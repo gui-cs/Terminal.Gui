@@ -289,10 +289,10 @@ public partial class View
         get
         {
 #if DEBUG
-            if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
+            if ((_width.ReferencesOtherViews () || _height.ReferencesOtherViews ()) && !IsInitialized)
             {
                 Debug.WriteLine (
-                                 $"WARNING: Viewport is being accessed before the View has been initialized. This is likely a bug in {this}"
+                                 $"WARNING: The dimensions of {this} are dependent on other views and Viewport is being accessed before the View has been initialized. This is likely a bug."
                                 );
             }
 #endif // DEBUG
@@ -304,6 +304,26 @@ public partial class View
             }
 
             Thickness thickness = GetAdornmentsThickness ();
+
+            if (Frame.Size == Size.Empty)
+            {
+                // The Frame has not been set yet (e.g. the view has not been added to a SuperView yet).
+                // 
+                if ((Width is Dim.DimAuto widthAuto && widthAuto._style != Dim.DimAutoStyle.Subviews)
+                    || (Height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews))
+                {
+                    if (TextFormatter.NeedsFormat)
+                    {
+                        // This updates TextFormatter.Size to the text size
+                        TextFormatter.AutoSize = true;
+
+                        // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
+                        ContentSize = TextFormatter.Size;
+
+                    }
+                }
+                //SetRelativeLayout (SuperView?.ContentSize ?? new Size (int.MaxValue, int.MaxValue));
+            }
 
             return new (
                         _viewportLocation,

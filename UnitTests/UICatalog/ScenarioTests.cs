@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace UICatalog.Tests;
 
-public class ScenarioTests
+public class ScenarioTests : TestsAllViews
 {
     private readonly ITestOutputHelper _output;
 
@@ -14,18 +14,25 @@ public class ScenarioTests
 #endif
         _output = output;
     }
+    
+    public static IEnumerable<object []> AllScenarioTypes =>
+        typeof (Scenario).Assembly
+                     .GetTypes ()
+                     .Where (type => type.IsClass && !type.IsAbstract && type.IsSubclassOf (typeof (Scenario)))
+                     .Select (type => new object [] { type });
 
-    public static TheoryData<Scenario, string> AllScenarios => TestHelpers.GetAllScenarioTheoryData ();
 
     /// <summary>
     ///     <para>This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run.</para>
     ///     <para>Should find any Scenarios which crash on load or do not respond to <see cref="Application.RequestStop()"/>.</para>
     /// </summary>
     [Theory]
-    [MemberData (nameof (AllScenarios))]
-    public void Run_All_Scenarios (Scenario scenario, string viewName)
+    [MemberData (nameof (AllScenarioTypes))]
+    public void Run_All_Scenarios (Type scenarioType)
     {
-        _output.WriteLine ($"Running Scenario '{scenario.GetName ()}'");
+        _output.WriteLine ($"Running Scenario '{scenarioType}'");
+
+        Scenario scenario = (Scenario)Activator.CreateInstance (scenarioType);
 
         Application.Init (new FakeDriver ());
 
@@ -116,16 +123,13 @@ public class ScenarioTests
         TextField _hText;
         var _hVal = 0;
         List<string> posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
-        List<string> dimNames = new () { "Factor", "Fill", "Absolute" };
+        List<string> dimNames = new () { "Auto", "Factor", "Fill", "Absolute" };
 
         Application.Init (new FakeDriver ());
 
         var top = new Toplevel ();
 
-        _viewClasses = GetAllViewClassesCollection ()
-                       .OrderBy (t => t.Name)
-                       .Select (t => new KeyValuePair<string, Type> (t.Name, t))
-                       .ToDictionary (t => t.Key, t => t.Value);
+        _viewClasses = TestHelpers.GetAllViewClasses ().ToDictionary(t => t.Name);
 
         _leftPane = new()
         {
@@ -200,7 +204,7 @@ public class ScenarioTests
             Title = "Size (Dim)"
         };
 
-        radioItems = new [] { "Percent(width)", "Fill(width)", "Sized(width)" };
+        radioItems = new [] { "Auto()", "Percent(width)", "Fill(width)", "Sized(width)" };
         label = new() { X = 0, Y = 0, Text = "width:" };
         _sizeFrame.Add (label);
         _wRadioGroup = new() { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
@@ -208,7 +212,7 @@ public class ScenarioTests
         _sizeFrame.Add (_wText);
         _sizeFrame.Add (_wRadioGroup);
 
-        radioItems = new [] { "Percent(height)", "Fill(height)", "Sized(height)" };
+        radioItems = new [] { "Auto()", "Percent(height)", "Fill(height)", "Sized(height)" };
         label = new() { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "height:" };
         _sizeFrame.Add (label);
         _hText = new() { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
@@ -451,22 +455,6 @@ public class ScenarioTests
         }
 
         void UpdateTitle (View view) { _hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}"; }
-
-        List<Type> GetAllViewClassesCollection ()
-        {
-            List<Type> types = new ();
-
-            foreach (Type type in typeof (View).Assembly.GetTypes ()
-                                               .Where (
-                                                       myType =>
-                                                           myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View))
-                                                      ))
-            {
-                types.Add (type);
-            }
-
-            return types;
-        }
 
         View CreateClass (Type type)
         {

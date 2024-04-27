@@ -45,11 +45,10 @@ public class Button : View
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
-        // Ensures a height of 1 if AutoSize is set to false
         Height = 1;
+        Width = Dim.Auto (Dim.DimAutoStyle.Text);
 
         CanFocus = true;
-        AutoSize = true;
         HighlightStyle |= HighlightStyle.Pressed;
 #if HOVER
         HighlightStyle |= HighlightStyle.Hover;

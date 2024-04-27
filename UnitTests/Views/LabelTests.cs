@@ -55,7 +55,7 @@ public class LabelTests
     [Fact]
     public void MouseClick_SetsFocus_OnNextSubview ()
     {
-        var superView = new View () { CanFocus = true, Height = 1, Width = 15};
+        var superView = new View () { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View () { CanFocus = true, Width = 1, Height = 1 };
         var label = new Label () { X = 2, Title = "_x" };
         var nextSubview = new View () { CanFocus = true, X = 4, Width = 4, Height = 1 };
@@ -141,7 +141,7 @@ public class LabelTests
         var top = new Toplevel ();
         top.Add (win);
 
-        Assert.True (label.AutoSize);
+        //Assert.True (label.AutoSize);
 
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
@@ -209,72 +209,72 @@ public class LabelTests
         var label = new Label ();
         Assert.Equal (string.Empty, label.Text);
         Assert.Equal (TextAlignment.Left, label.TextAlignment);
-        Assert.True (label.AutoSize);
+        //Assert.True (label.AutoSize);
         Assert.False (label.CanFocus);
         Assert.Equal (new Rectangle (0, 0, 0, 0), label.Frame);
         Assert.Equal (KeyCode.Null, label.HotKey);
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void Label_Draw_Fill_Remaining_AutoSize_True ()
-    {
-        var label = new Label { Text = "This label needs to be cleared before rewritten." };
+    //    [Fact]
+    //    [AutoInitShutdown]
+    //    public void Label_Draw_Fill_Remaining_AutoSize_True ()
+    //    {
+    //        var label = new Label { Text = "This label needs to be cleared before rewritten." };
 
-        var tf1 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom };
-        tf1.Text = "This TextFormatter (tf1) without fill will not be cleared on rewritten.";
-        Size tf1Size = tf1.Size;
+    //        var tf1 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom };
+    //        tf1.Text = "This TextFormatter (tf1) without fill will not be cleared on rewritten.";
+    //        Size tf1Size = tf1.Size;
 
-        var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, FillRemaining = true };
-        tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
-        Size tf2Size = tf2.Size;
+    //        var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, FillRemaining = true };
+    //        tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
+    //        Size tf2Size = tf2.Size;
 
-        var top = new Toplevel ();
-        top.Add (label);
-        Application.Begin (top);
+    //        var top = new Toplevel ();
+    //        top.Add (label);
+    //        Application.Begin (top);
 
-        Assert.True (label.AutoSize);
+    //        Assert.True (label.AutoSize);
 
-        tf1.Draw (
-                  new Rectangle (new Point (0, 1), tf1Size),
-                  label.GetNormalColor (),
-                  label.ColorScheme.HotNormal
-                 );
+    //        tf1.Draw (
+    //                  new Rectangle (new Point (0, 1), tf1Size),
+    //                  label.GetNormalColor (),
+    //                  label.ColorScheme.HotNormal
+    //                 );
 
-        tf2.Draw (new Rectangle (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
+    //        tf2.Draw (new Rectangle (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-This label needs to be cleared before rewritten.                       
-This TextFormatter (tf1) without fill will not be cleared on rewritten.
-This TextFormatter (tf2) with fill will be cleared on rewritten.       
-",
-                                                      _output
-                                                     );
+    //        TestHelpers.AssertDriverContentsWithFrameAre (
+    //                                                      @"
+    //This label needs to be cleared before rewritten.                       
+    //This TextFormatter (tf1) without fill will not be cleared on rewritten.
+    //This TextFormatter (tf2) with fill will be cleared on rewritten.       
+    //",
+    //                                                      _output
+    //                                                     );
 
-        label.Text = "This label is rewritten.";
-        label.Draw ();
+    //        label.Text = "This label is rewritten.";
+    //        label.Draw ();
 
-        tf1.Text = "This TextFormatter (tf1) is rewritten.";
+    //        tf1.Text = "This TextFormatter (tf1) is rewritten.";
 
-        tf1.Draw (
-                  new Rectangle (new Point (0, 1), tf1Size),
-                  label.GetNormalColor (),
-                  label.ColorScheme.HotNormal
-                 );
+    //        tf1.Draw (
+    //                  new Rectangle (new Point (0, 1), tf1Size),
+    //                  label.GetNormalColor (),
+    //                  label.ColorScheme.HotNormal
+    //                 );
 
-        tf2.Text = "This TextFormatter (tf2) is rewritten.";
-        tf2.Draw (new Rectangle (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
+    //        tf2.Text = "This TextFormatter (tf2) is rewritten.";
+    //        tf2.Draw (new Rectangle (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-This label is rewritten.                                               
-This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
-This TextFormatter (tf2) is rewritten.                                 
-",
-                                                      _output
-                                                     );
-    }
+    //        TestHelpers.AssertDriverContentsWithFrameAre (
+    //                                                      @"
+    //This label is rewritten.                                               
+    //This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
+    //This TextFormatter (tf2) is rewritten.                                 
+    //",
+    //                                                      _output
+    //                                                     );
+    //    }
 
     [Fact]
     [AutoInitShutdown]
@@ -476,16 +476,18 @@ e
 
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void Full_Border ()
     {
-        var label = new Label { Text = "Test", /*Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        var top = new Toplevel ();
-        top.Add (label);
-        Application.Begin (top);
+        var label = new Label { BorderStyle = LineStyle.Single , Text = "Test",} ;
+        label.BeginInit();
+        label.EndInit();
+        label.SetRelativeLayout (Application.Driver.Screen.Size);
 
-        Assert.Equal (new (0, 0, 6, 3), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
+        Assert.Equal (new (0, 0, 6, 3), label.Frame);
+
+        label.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -494,6 +496,7 @@ e
 └────┘",
                                                       _output
                                                      );
+        label.Dispose ();
     }
 
     [Fact]

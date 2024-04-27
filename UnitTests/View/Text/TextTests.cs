@@ -8,10 +8,9 @@ namespace Terminal.Gui.ViewTests;
 ///     Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties (independent of
 ///     AutoSize).
 /// </summary>
-public class TextTests
+public class TextTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public TextTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output = output;
 
     // Test that View.PreserveTrailingSpaces removes trailing spaces
     [Fact]
@@ -109,6 +108,47 @@ public class TextTests
     private class TestView : View
     {
         protected override void UpdateTextFormatterText () { TextFormatter.Text = $">{Text}<"; }
+    }
+
+    [Fact]
+    public void TextDirection_Horizontal_Dims_Correct ()
+    {
+        // Initializes a view with a vertical direction
+        var view = new View
+        {
+            Text = "01234",
+            TextDirection = TextDirection.LeftRight_TopBottom,
+            Width = Dim.Auto (Dim.DimAutoStyle.Text),
+            Height = Dim.Auto (Dim.DimAutoStyle.Text)
+        };
+        Assert.Equal (new Rectangle (0, 0, 5, 1), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 5, 1), view.Viewport);
+
+        view.BeginInit ();
+        view.EndInit ();
+        Assert.Equal (new Rectangle (0, 0, 5, 1), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 5, 1), view.Viewport);
+    }
+
+    [Fact]
+    public void TextDirection_Vertical_Dims_Correct ()
+    {
+        // Initializes a view with a vertical direction
+        var view = new View
+        {
+            TextDirection = TextDirection.TopBottom_LeftRight,
+            Text = "01234",
+            Width = Dim.Auto (Dim.DimAutoStyle.Text),
+            Height = Dim.Auto (Dim.DimAutoStyle.Text),
+        };
+        Assert.Equal (new Rectangle (0, 0, 1, 5), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 1, 5), view.Viewport);
+
+        view.BeginInit ();
+        Assert.Equal (new Rectangle (0, 0, 1, 5), view.Frame);
+        view.EndInit ();
+        Assert.Equal (new Rectangle (0, 0, 1, 5), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 1, 5), view.Viewport);
     }
 
     // Test behavior of AutoSize property. 

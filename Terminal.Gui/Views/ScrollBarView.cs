@@ -944,7 +944,7 @@ public class ScrollBarView : View
         // BUGBUG: v2 - If Host is also the ScrollBarView's superview, this is all bogus because it's not
         // supported that a view can reference it's superview's Dims. This code also assumes the host does 
         //  not have a margin/borderframe/padding.
-        if (!IsInitialized)
+        if (!IsInitialized || _otherScrollBarView is { IsInitialized: false })
         {
             return;
         }

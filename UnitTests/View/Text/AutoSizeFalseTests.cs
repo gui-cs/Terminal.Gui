@@ -1,4 +1,5 @@
 ﻿using Xunit.Abstractions;
+using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -192,10 +193,8 @@ public class AutoSizeFalseTests
         Assert.Equal ("Absolute(1)", view.Height.ToString ());
 
         view.AutoSize = true;
-
-        // There's no Text, so the view should be sized (0, 0)
-        Assert.Equal ("Absolute(0)", view.Width.ToString ());
-        Assert.Equal ("Absolute(0)", view.Height.ToString ());
+        Assert.Equal (Dim.Auto(Dim.DimAutoStyle.Text), view.Width);
+        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Text), view.Height);
 
         view.AutoSize = false;
         Assert.Equal ("Absolute(0)", view.Width.ToString ());
@@ -211,29 +210,6 @@ public class AutoSizeFalseTests
         Assert.Equal ("Absolute(1)", view.Height.ToString ());
     }
 
-    [Fact]
-    public void AutoSize_False_Text_Does_Not_Change_Size ()
-    {
-        var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
-
-        view.SetRelativeLayout (new (10, 4));
-        Assert.Equal (new (0, 0, 10, 4), view.Frame);
-        Assert.Equal (new (0, 0), view.TextFormatter.Size);
-        Assert.False (view.AutoSize);
-        Assert.True (view.TextFormatter.NeedsFormat);
-        Assert.Equal (string.Empty, view.TextFormatter.Format ()); // There's no size, so it returns an empty string
-        Assert.False (view.TextFormatter.NeedsFormat);
-        Assert.Single (view.TextFormatter.GetLines ());
-        Assert.True (string.IsNullOrEmpty (view.TextFormatter.GetLines () [0]));
-
-        view.Text = "Views";
-        Assert.True (view.TextFormatter.NeedsFormat);
-        Assert.Equal (new (0, 0), view.TextFormatter.Size);
-        Assert.Equal (string.Empty, view.TextFormatter.Format ()); // There's no size, so it returns an empty string
-        Assert.False (view.TextFormatter.NeedsFormat);
-        Assert.Single (view.TextFormatter.GetLines ());
-        Assert.True (string.IsNullOrEmpty (view.TextFormatter.GetLines () [0]));
-    }
 
     [Fact]
     [SetupFakeDriver]

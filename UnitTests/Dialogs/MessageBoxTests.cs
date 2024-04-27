@@ -831,45 +831,46 @@ ffffffffffffffffffff
                                  };
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void Size_Tiny_Fixed_Size ()
-    {
-        int iterations = -1;
+    // TODO: Reimplement once messagebox ues Dim.Auto
+//    [Fact]
+//    [AutoInitShutdown]
+//    public void Size_Tiny_Fixed_Size ()
+//    {
+//        int iterations = -1;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     iterations++;
+//        Application.Iteration += (s, a) =>
+//                                 {
+//                                     iterations++;
 
-                                     if (iterations == 0)
-                                     {
-                                         MessageBox.Query (7, 5, string.Empty, "Message", "_Ok");
+//                                     if (iterations == 0)
+//                                     {
+//                                         MessageBox.Query (7, 5, string.Empty, "Message", "_Ok");
 
-                                         Application.RequestStop ();
-                                     }
-                                     else if (iterations == 1)
-                                     {
-                                         Application.Refresh ();
+//                                         Application.RequestStop ();
+//                                     }
+//                                     else if (iterations == 1)
+//                                     {
+//                                         Application.Refresh ();
 
-                                         Assert.Equal (new (7, 5), Application.Current.Frame.Size);
+//                                         Assert.Equal (new (7, 5), Application.Current.Frame.Size);
 
-                                         TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                                       @$"
-                                    ┌─────┐
-                                    │Messa│
-                                    │ ge  │
-                                    │ Ok {
-                                        CM.Glyphs.RightDefaultIndicator
-                                    }│
-                                    └─────┘
-",
-                                                                                       _output
-                                                                                      );
+//                                         TestHelpers.AssertDriverContentsWithFrameAre (
+//                                                                                       @$"
+//                                    ┌─────┐
+//                                    │Messa│
+//                                    │ ge  │
+//                                    │ Ok {
+//                                        CM.Glyphs.RightDefaultIndicator
+//                                    }│
+//                                    └─────┘
+//",
+//                                                                                       _output
+//                                                                                      );
 
-                                         Application.RequestStop ();
-                                     }
-                                 };
+//                                         Application.RequestStop ();
+//                                     }
+//                                 };
 
-        Application.Run ().Dispose ();
-    }
+//        Application.Run ().Dispose ();
+//    }
 }

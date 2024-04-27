@@ -15,8 +15,9 @@ public class Label : View
     /// <inheritdoc/>
     public Label ()
     {
-        Height = 1;
-        AutoSize = true;
+        Height = Dim.Auto (Dim.DimAutoStyle.Text);
+        Width = Dim.Auto (Dim.DimAutoStyle.Text);
+        TextFormatter.AutoSize = true;
 
         // Things this view knows how to do
         AddCommand (Command.HotKey, FocusNext);

@@ -413,7 +413,7 @@ public partial class View
     {
         if (!IsInitialized)
         {
-            return false;
+           return false;
         }
 
         // Each of these renders lines to either this View's LineCanvas 

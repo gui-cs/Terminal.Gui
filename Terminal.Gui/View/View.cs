@@ -139,6 +139,8 @@ public partial class View : Responder, ISupportInitializeNotification
     /// </remarks>
     public View ()
     {
+        CreateAdornments ();
+
         HotKeySpecifier = (Rune)'_';
         TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
 
@@ -150,8 +152,6 @@ public partial class View : Responder, ISupportInitializeNotification
         TabStop = false;
 
         AddCommands ();
-
-        CreateAdornments ();
     }
 
     /// <summary>

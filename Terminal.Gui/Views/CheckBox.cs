@@ -20,11 +20,10 @@ public class CheckBox : View
         _charChecked = Glyphs.Checked;
         _charUnChecked = Glyphs.UnChecked;
 
-        // Ensures a height of 1 if AutoSize is set to false
+        Width = Dim.Auto (Dim.DimAutoStyle.Text);
         Height = 1;
 
         CanFocus = true;
-        AutoSize = true;
 
         // Things this view knows how to do
         AddCommand (Command.Accept, OnToggled);
