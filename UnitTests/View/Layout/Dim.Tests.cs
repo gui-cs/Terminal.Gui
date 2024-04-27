@@ -587,10 +587,7 @@ public class DimTests
 
                        v4.Text = "Button4";
                        v4.AutoSize = false;
-                       Assert.Equal ("Absolute(50)", v4.Width.ToString ());
-                       Assert.Equal ("Absolute(50)", v4.Height.ToString ());
-                       Assert.Equal (50, v4.Frame.Width);
-                       Assert.Equal (50, v4.Frame.Height);
+                       Assert.Equal (new (4, 1), v4.Frame.Size); 
                        v4.AutoSize = true;
                        Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Width);
                        Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Height);

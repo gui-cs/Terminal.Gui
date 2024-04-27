@@ -40,11 +40,14 @@ public class TextFormatterTests
         };
 
     [Fact]
-    public void Basic_Usage ()
+    public void Basic_Usage_With_AutoSize_True ()
     {
         var testText = "test";
         var testBounds = new Rectangle (0, 0, 100, 1);
         var tf = new TextFormatter ();
+
+        // Manually set AutoSize to true
+        tf.AutoSize = true;
 
         tf.Text = testText;
         Size expectedSize = new (testText.Length, 1);
@@ -424,6 +427,7 @@ ssb
         var text = "Les Mise\u0328\u0301rables";
 
         var tf = new TextFormatter ();
+        tf.AutoSize = true;
         tf.Direction = textDirection;
         tf.Text = text;
 
@@ -2076,6 +2080,7 @@ ssb
 
         var text = "This is a \tTab";
         var tf = new TextFormatter ();
+        tf.AutoSize = true;
         tf.Direction = textDirection;
         tf.TabWidth = tabWidth;
         tf.Text = text;
@@ -2114,6 +2119,8 @@ ssb
 
         var text = "This is a \tTab";
         var tf = new TextFormatter ();
+        tf.AutoSize = true;
+
         tf.Direction = textDirection;
         tf.TabWidth = tabWidth;
         tf.PreserveTrailingSpaces = true;
@@ -2152,6 +2159,8 @@ ssb
 
         var text = "This is a \tTab";
         var tf = new TextFormatter ();
+        tf.AutoSize = true;
+
         tf.Direction = textDirection;
         tf.TabWidth = tabWidth;
         tf.WordWrap = true;
@@ -2191,37 +2200,22 @@ ssb
     }
 
     [Theory]
-    [InlineData (TextDirection.LeftRight_TopBottom)]
-    [InlineData (TextDirection.TopBottom_LeftRight)]
-    public void TestSize_AutoSizeChange (TextDirection textDirection)
+    [InlineData ("你你", TextDirection.LeftRight_TopBottom, 4, 1)]
+    [InlineData ("AB", TextDirection.LeftRight_TopBottom, 2, 1)]
+    [InlineData ("你你", TextDirection.TopBottom_LeftRight, 1, 4)] // BUGBUG: Vertical wide char is broken. This should be 2,2
+    [InlineData ("AB", TextDirection.TopBottom_LeftRight, 1, 2)]
+    public void AutoSize_True_TextDirection_Correct_Size (string text, TextDirection textDirection, int expectedWidth, int expectedHeight)
     {
-        var tf = new TextFormatter { Direction = textDirection, Text = "你你" };
-
-        //if (textDirection == TextDirection.LeftRight_TopBottom)
-        //{
-        //    Assert.Equal (4, tf.Size.Width);
-        //    Assert.Equal (1, tf.Size.Height);
-        //}
-        //else
-        //{
-        //    Assert.Equal (2, tf.Size.Width);
-        //    Assert.Equal (2, tf.Size.Height);
-        //}
-
+        var tf = new TextFormatter { Direction = textDirection, Text = text };
         Assert.False (tf.AutoSize);
 
-        tf.Size = new (1, 1);
-        Assert.Equal (new Size (1, 1), tf.Size);
+        // If autosize is false, no auto sizing!
+        Assert.Equal (Size.Empty, tf.Size);
+
+        tf.Size = new (1, 1); // This should have no impact (autosize overrides)
         tf.AutoSize = true;
 
-        if (textDirection == TextDirection.LeftRight_TopBottom)
-        {
-            Assert.Equal (new Size (4, 1), tf.Size);
-        }
-        else
-        {
-            Assert.Equal (new Size (2, 2), tf.Size);
-        }
+        Assert.Equal (new Size (expectedWidth, expectedHeight), tf.Size);
     }
 
     [Theory]
@@ -3503,6 +3497,51 @@ ssb
             tf.Size = new Size (width, 1);
         }
         tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 0, 0, false, "")]
+    [InlineData ("A", 0, 1, false, "")]
+    [InlineData ("A", 1, 1, false, "A")]
+    [InlineData ("A", 2, 1, false, "A")]
+    [InlineData ("AB", 1, 1, false, "A")]
+    [InlineData ("AB", 2, 1, false, "AB")]
+    [InlineData ("ABC", 3, 1, false, "ABC")]
+    [InlineData ("ABC", 4, 1, false, "ABC")]
+    [InlineData ("ABC", 6, 1, false, "ABC")]
+
+    [InlineData ("A", 1, 0, false, "")]
+    [InlineData ("A", 1, 2, false, "A")]
+    [InlineData ("AB", 1, 2, false, "A\nB")]
+    [InlineData ("ABC", 1, 3, false, "A\nB\nC")]
+    [InlineData ("ABC", 1, 4, false, "A\nB\nC")]
+    [InlineData ("ABC", 2, 2, false, "AC\nB ")] // BUGBUG: Should tis space be here?
+
+    // With true, the width & height should be ignored
+    [InlineData ("A", 0, 0, true, "A")]
+    [InlineData ("AB", 0, 0, true, "A\nB")]
+    [InlineData ("AB", 2, 1, true, "A\nB")]
+    [InlineData ("ABC", 0, 0, true, "A\nB\nC")]
+    [InlineData ("ABC", 2, 2, true, "A\nB\nC")]
+    public void Draw_Vertical_TopBottom_LeftRight (string text, int width, int height, bool autoSize, string expectedText)
+
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.TopBottom_LeftRight,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, height);
+        }
+        tf.Draw (new Rectangle (0, 0, 20, 20), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
     }

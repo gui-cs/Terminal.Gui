@@ -245,7 +245,7 @@ public class TextFormatter
             _text = EnableNeedsFormat (value);
 
             // BUGBUG: If AutoSize is false, there should be no "automatic behavior" like setting the size
-            if (AutoSize || (textWasNull && Size.IsEmpty))
+            if (AutoSize /*|| (textWasNull && Size.IsEmpty)*/)
             {
                 Size = GetAutoSize ();
             }
