@@ -1040,9 +1040,7 @@ namespace Terminal.Gui {
 			if (refreshDriver) {
 				MdiTop?.OnChildLoaded (toplevel);
 				toplevel.OnLoaded ();
-				Redraw (toplevel);
-				toplevel.PositionCursor ();
-				Driver.Refresh ();
+				Refresh ();
 			}
 
 			NotifyNewRunState?.Invoke (rs);
