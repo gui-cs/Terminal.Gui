@@ -964,7 +964,7 @@ ssb
     [Theory]
     [InlineData (new [] { "Hello", "World" }, 2, 1, 1, 1)]
     [InlineData (new [] { "こんにちは", "世界" }, 4, 1, 1, 2)]
-    public void GetWidestLineLength_List_Simple_And_Wide_Runes (
+    public void GetColumnsRequiredForVerticalText_List_Simple_And_Wide_Runes (
         IEnumerable<string> text,
         int width,
         int index,
@@ -972,15 +972,15 @@ ssb
         int indexWidth
     )
     {
-        Assert.Equal (width, TextFormatter.GetWidestLineLength (text.ToList ()));
-        Assert.Equal (indexWidth, TextFormatter.GetWidestLineLength (text.ToList (), index, length));
+        Assert.Equal (width, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList ()));
+        Assert.Equal (indexWidth, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList (), index, length));
     }
 
     [Fact]
-    public void GetWidestLineLength_List_With_Combining_Runes ()
+    public void GetColumnsRequiredForVerticalText_List_With_Combining_Runes ()
     {
         List<string> text = new () { "Les Mis", "e\u0328\u0301", "rables" };
-        Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
+        Assert.Equal (1, TextFormatter.GetColumnsRequiredForVerticalText (text, 1, 1));
     }
 
     [Fact]
