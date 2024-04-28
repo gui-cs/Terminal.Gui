@@ -30,7 +30,7 @@ public class TextFormatter
 
     /// <summary>Gets or sets whether the <see cref="Size"/> should be automatically changed to fit the <see cref="Text"/>.</summary>
     /// <remarks>
-    ///     <para>Used by <see cref="View.AutoSize"/> to resize the view's <see cref="View.Viewport"/> to fit <see cref="Size"/>.</para>
+    ///     <para>Used when <see cref="View"/> is using <see cref="Dim.Auto"/> to resize the view's <see cref="View.Viewport"/> to fit <see cref="Size"/>.</para>
     ///     <para>
     ///         AutoSize is ignored if <see cref="TextAlignment.Justified"/> and
     ///         <see cref="VerticalTextAlignment.Justified"/> are used.
