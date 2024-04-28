@@ -381,6 +381,7 @@ public class Slider<T> : View
     ///     For testing, if there is no SuperView, the slider will be sized based on what <see cref="InnerSpacing"/> is
     ///     set to.
     /// </remarks>
+    [ObsoleteAttribute ("Use Dim.Auto instead.", false)]
     public override bool AutoSize
     {
         get => _config._autoSize;
