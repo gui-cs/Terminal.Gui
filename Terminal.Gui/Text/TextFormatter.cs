@@ -427,7 +427,7 @@ public class TextFormatter
                     }
 
                     if ((!isVertical && current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset)
-                        || (isVertical && idx > maxScreen.Top + maxScreen.Height - screen.Y))
+                        || (isVertical && current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y))
                     {
                         break;
                     }

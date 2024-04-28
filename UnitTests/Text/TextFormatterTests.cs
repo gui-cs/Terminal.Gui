@@ -3553,24 +3553,46 @@ ek")]
 
     [SetupFakeDriver]
     [Theory]
-    [InlineData ("A", 0, 1, false, "")]
-    [InlineData ("A", 1, 1, false, "A")]
-    [InlineData ("A", 2, 2, false, " A")]
-    [InlineData ("AB", 1, 1, false, "B")]
-    [InlineData ("AB", 2, 2, false, " A\n B")]
-    [InlineData ("ABC", 3, 2, false, "  B\n  C")]
-    [InlineData ("ABC", 4, 2, false, "   B\n   C")]
-    [InlineData ("ABC", 6, 2, false, "     B\n     C")]
+    [InlineData ("A", 0, 1, false, "", 0)]
+    [InlineData ("A", 1, 1, false, "A", 0)]
+    [InlineData ("A", 2, 2, false, " A", 1)]
+    [InlineData ("AB", 1, 1, false, "B", 0)]
+    [InlineData ("AB", 2, 2, false, " A\n B", 0)]
+    [InlineData ("ABC", 3, 2, false, "  B\n  C", 0)]
+    [InlineData ("ABC", 4, 2, false, "   B\n   C", 0)]
+    [InlineData ("ABC", 6, 2, false, "     B\n     C", 0)]
+    [InlineData ("こんにちは", 0, 1, false, "", 0)]
+    [InlineData ("こんにちは", 1, 0, false, "", 0)]
+    [InlineData ("こんにちは", 1, 1, false, "", 0)]
+    [InlineData ("こんにちは", 2, 1, false, "は", 0)]
+    [InlineData ("こんにちは", 2, 2, false, "ち\nは", 0)]
+    [InlineData ("こんにちは", 2, 3, false, "に\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 4, false, "ん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 5, false, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 6, false, "こ\nん\nに\nち\nは", 1)]
+    [InlineData ("ABCD\nこんにちは", 4, 7, false, "  こ\n Aん\n Bに\n Cち\n Dは", 2)]
+    [InlineData ("こんにちは\nABCD", 3, 7, false, "こ \nんA\nにB\nちC\nはD", 2)]
 
-    [InlineData ("A", 0, 1, true, "")]
-    [InlineData ("A", 1, 1, true, "A")]
-    [InlineData ("A", 2, 2, true, " A")]
-    [InlineData ("AB", 1, 1, true, "B")]
-    [InlineData ("AB", 2, 2, true, " A\n B")]
-    [InlineData ("ABC", 3, 2, true, "  B\n  C")]
-    [InlineData ("ABC", 4, 2, true, "   B\n   C")]
-    [InlineData ("ABC", 6, 2, true, "     B\n     C")]
-    public void Draw_Vertical_Bottom_Horizontal_Right (string text, int width, int height, bool autoSize, string expectedText)
+    [InlineData ("A", 0, 1, true, "", 0)]
+    [InlineData ("A", 1, 1, true, "A", 0)]
+    [InlineData ("A", 2, 2, true, " A", 1)]
+    [InlineData ("AB", 1, 1, true, "B", 0)]
+    [InlineData ("AB", 2, 2, true, " A\n B", 0)]
+    [InlineData ("ABC", 3, 2, true, "  B\n  C", 0)]
+    [InlineData ("ABC", 4, 2, true, "   B\n   C", 0)]
+    [InlineData ("ABC", 6, 2, true, "     B\n     C", 0)]
+    [InlineData ("こんにちは", 0, 1, true, "", 0)]
+    [InlineData ("こんにちは", 1, 0, true, "", 0)]
+    [InlineData ("こんにちは", 1, 1, true, "", 0)]
+    [InlineData ("こんにちは", 2, 1, true, "は", 0)]
+    [InlineData ("こんにちは", 2, 2, true, "ち\nは", 0)]
+    [InlineData ("こんにちは", 2, 3, true, "に\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 4, true, "ん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 5, true, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 6, true, "こ\nん\nに\nち\nは", 1)]
+    [InlineData ("ABCD\nこんにちは", 4, 7, true, "  こ\n Aん\n Bに\n Cち\n Dは", 2)]
+    [InlineData ("こんにちは\nABCD", 3, 7, true, "こ \nんA\nにB\nちC\nはD", 2)]
+    public void Draw_Vertical_Bottom_Horizontal_Right (string text, int width, int height, bool autoSize, string expectedText, int expectedY)
     {
         TextFormatter tf = new ()
         {
@@ -3587,7 +3609,8 @@ ek")]
         }
 
         tf.Draw (new Rectangle (Point.Empty, new (width, height)), Attribute.Default, Attribute.Default);
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        Rectangle rect = TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        Assert.Equal (expectedY, rect.Y);
     }
 
     [SetupFakeDriver]
@@ -3641,7 +3664,7 @@ B")]
 に
 ち
 は")]
-    public void Draw_Vertical_TopBottom_LeftRight (string text, int height, bool autoSize, string expectedText)
+    public void Draw_Vertical_TopBottom_LeftRight_Top (string text, int height, bool autoSize, string expectedText)
     {
         TextFormatter tf = new ()
         {
@@ -3701,7 +3724,7 @@ B")]
     [InlineData ("ABC", 9, true, "A\nB\nC", 3)]
     [InlineData ("ABCD", 2, true, "B\nC", 0)]
     [InlineData ("こんにちは", 0, true, "", 0)]
-    [InlineData ("こんにちは", 1, true, "", 0)]
+    [InlineData ("こんにちは", 1, true, "に", 0)]
     [InlineData ("こんにちは", 2, true, "ん\nに", 0)]
     [InlineData ("こんにちは", 3, true, "ん\nに\nち", 0)]
     [InlineData ("こんにちは", 4, true, "こ\nん\nに\nち", 0)]
@@ -3710,7 +3733,7 @@ B")]
     [InlineData ("こんにちは", 7, true, "こ\nん\nに\nち\nは", 1)]
     [InlineData ("ABCD\nこんにちは", 7, true, "Aこ\nBん\nCに\nDち\n は", 1)]
     [InlineData ("こんにちは\nABCD", 7, true, "こA\nんB\nにC\nちD\nは ", 1)]
-    public void Draw_Vertical_Centered (string text, int height, bool autoSize, string expectedText, int expectedY)
+    public void Draw_Vertical_TopBottom_LeftRight_Middle (string text, int height, bool autoSize, string expectedText, int expectedY)
     {
         TextFormatter tf = new ()
         {
