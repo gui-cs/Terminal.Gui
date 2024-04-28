@@ -1,0 +1,98 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <!-- 
+        Do not remove netstandard2.0 from the TargetFrameworks.
+        Visual Studio requires that Analyzers/Generators target netstandard2.0 to work properly.
+        Additional TFMs are for support of additional APIs and language features.
+        -->
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <LangVersion>12</LangVersion>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Terminal.Gui.Analyzers.Internal</RootNamespace>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <AnalysisLevel>latest-recommended</AnalysisLevel>
+        <WarningLevel>7</WarningLevel>
+        <CharacterSet>UTF-8</CharacterSet>
+        <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+        <Deterministic>true</Deterministic>
+        <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+        <UTF8OutPut>true</UTF8OutPut>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <IsRoslynComponent>true</IsRoslynComponent>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ApiCompatExcludeAttributesFile Include="ApiCompatExcludedAttributes.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="Compatibility/*.cs" />
+    </ItemGroup>
+
+    <Choose>
+        <When Condition="'$(TargetFramework)' == 'netstandard2.0'">
+            <PropertyGroup>
+                <!-- Disabling some useless warnings caused by the netstandard2.0 target -->
+                <NoWarn>$(NoWarn);nullable;CA1067</NoWarn>
+            </PropertyGroup>
+            <ItemGroup>                                                                         
+                <Compile Include="Compatibility/CompilerFeatureRequiredAttribute.cs" />         
+                <Compile Include="Compatibility/IsExternalInit.cs" />                           
+                <Compile Include="Compatibility/IEqualityOperators.cs" />
+                <Compile Include="Compatibility/NullableAttributes.cs" />                         
+                <Compile Include="Compatibility/RequiredMemberAttribute.cs" />                  
+                <Compile Include="Compatibility/SetsRequiredMembersAttribute.cs" />             
+            </ItemGroup>                                                                        
+            <ItemGroup>
+                <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" PrivateAssets="all" />
+                <PackageReference Include="System.Runtime.Extensions" Version="4.3.1" PrivateAssets="all" />
+                <PackageReference Include="System.Runtime.Numerics" Version="4.3.0" PrivateAssets="all" />
+            </ItemGroup>
+        </When>
+        <When Condition="'$(TargetFramework)' == 'net8.0'">
+        </When>
+    </Choose>
+    
+    <ItemGroup>
+        <Compile Include="Compatibility/NumericExtensions.cs" />
+        <Compile Include="Compatibility/SkipLocalsInitAttribute.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+        <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.2" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.9.2" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" PrivateAssets="all" />
+        <PackageReference Include="Roslynator.Analyzers" Version="4.12.1" PrivateAssets="all">
+            <!--<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
+        </PackageReference>
+        <PackageReference Include="Roslynator.CodeAnalysis.Analyzers" Version="4.12.1" PrivateAssets="all">
+            <!--<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
+        </PackageReference>
+        <PackageReference Include="Roslynator.CSharp" Version="4.12.1" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="System.Buffers" />
+        <Using Include="System.Collections.Specialized" />
+        <Using Include="System.Numerics" />
+        <Using Include="System.Runtime.CompilerServices" />
+    </ItemGroup>
+
+</Project>
