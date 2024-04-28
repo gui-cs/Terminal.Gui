@@ -34,9 +34,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal.Gui.Analyzers.Internal", "Analyzers\Terminal.Gui.Analyzers.Internal\Terminal.Gui.Analyzers.Internal.csproj", "{5DE91722-8765-4E2B-97E4-2A18010B5CED}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal.Gui.Analyzers.Internal.Tests", "Analyzers\Terminal.Gui.Analyzers.Internal.Tests\Terminal.Gui.Analyzers.Internal.Tests.csproj", "{715DB4BA-F989-4DF6-B46F-5ED26A32B2DD}"
+EndProject
 Global
 	GlobalSection(NestedProjects) = preSolution
 		{5DE91722-8765-4E2B-97E4-2A18010B5CED} = {CCADA0BC-61CF-4B4B-96BA-A3B0C0A7F54D}
+		{715DB4BA-F989-4DF6-B46F-5ED26A32B2DD} = {CCADA0BC-61CF-4B4B-96BA-A3B0C0A7F54D}
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +54,10 @@ Global
 		{5DE91722-8765-4E2B-97E4-2A18010B5CED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DE91722-8765-4E2B-97E4-2A18010B5CED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DE91722-8765-4E2B-97E4-2A18010B5CED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{715DB4BA-F989-4DF6-B46F-5ED26A32B2DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{715DB4BA-F989-4DF6-B46F-5ED26A32B2DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{715DB4BA-F989-4DF6-B46F-5ED26A32B2DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{715DB4BA-F989-4DF6-B46F-5ED26A32B2DD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{88979F89-9A42-448F-AE3E-3060145F6375}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88979F89-9A42-448F-AE3E-3060145F6375}.Release|Any CPU.ActiveCfg = Release|Any CPU
