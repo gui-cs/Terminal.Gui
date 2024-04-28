@@ -339,64 +339,6 @@ public partial class View
 
     #endregion Frame
 
-    #region AutoSize
-
-    /// <summary>
-    ///     Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/>
-    ///     within <see cref="Viewport"/>.
-    ///     <para>
-    ///         The default is <see langword="false"/>. Set to <see langword="true"/> to turn on AutoSize. If
-    ///         <see langword="true"/> then <see cref="Width"/> and <see cref="Height"/> will be used if <see cref="Text"/> can
-    ///         fit; if <see cref="Text"/> won't fit the view will be resized as needed.
-    ///     </para>
-    ///     <para>
-    ///         If <see cref="AutoSize"/> is set to <see langword="true"/> then <see cref="Width"/> and <see cref="Height"/>
-    ///         will be changed to <see cref="Dim.DimAbsolute"/> if they are not already.
-    ///     </para>
-    ///     <para>
-    ///         If <see cref="AutoSize"/> is set to <see langword="false"/> then <see cref="Width"/> and <see cref="Height"/>
-    ///         will left unchanged.
-    ///     </para>
-    /// </summary>
-    [ObsoleteAttribute ("Use Dim.Auto instead.", false)]
-    public virtual bool AutoSize
-    {
-        get => _height is Dim.DimAuto && _width is Dim.DimAuto;
-        set
-        {
-            TextFormatter.AutoSize = value;
-
-            // BUGBUG: This is all a hack until AutoSize is removed
-            if (value)
-            {
-                UpdateTextFormatterText ();
-
-                if (IsInitialized)
-                {
-                    Height = Dim.Auto (Dim.DimAutoStyle.Text);
-                    Width = Dim.Auto (Dim.DimAutoStyle.Text);
-                }
-                else
-                {
-                    _height = Dim.Auto (Dim.DimAutoStyle.Text);
-                    _width = Dim.Auto (Dim.DimAutoStyle.Text);
-                    OnResizeNeeded ();
-                }
-            }
-            else
-            {
-                _height = ContentSize.Height;
-                _width = ContentSize.Width;
-
-                // Force ContentSize to be reset to Viewport
-                _contentSize = Size.Empty;
-                OnResizeNeeded ();
-            }
-        }
-    }
-
-    #endregion AutoSize
-
     #region Layout Engine
 
     /// <summary>
