@@ -1,0 +1,17 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <WarningLevel>7</WarningLevel>
+    <CharacterSet>UTF-8</CharacterSet>
+    <Deterministic>true</Deterministic>
+    <UTF8OutPut>true</UTF8OutPut>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+      <Using Include="System.Buffers" />
+      <Using Include="System.Collections.Specialized" />
+      <Using Include="System.Numerics" />
+      <Using Include="System.Runtime.CompilerServices" />
+  </ItemGroup>
+</Project>
