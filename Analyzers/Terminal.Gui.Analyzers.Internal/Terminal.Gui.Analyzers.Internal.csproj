@@ -11,21 +11,14 @@
     <PropertyGroup>
         <OutputType>Library</OutputType>
         <LangVersion>12</LangVersion>
-        <Nullable>enable</Nullable>
         <RootNamespace>Terminal.Gui.Analyzers.Internal</RootNamespace>
         <ImplicitUsings>disable</ImplicitUsings>
         <InvariantGlobalization>true</InvariantGlobalization>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <AnalysisLevel>latest-recommended</AnalysisLevel>
-        <WarningLevel>7</WarningLevel>
-        <CharacterSet>UTF-8</CharacterSet>
         <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-        <Deterministic>true</Deterministic>
         <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-        <UTF8OutPut>true</UTF8OutPut>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
         <IsRoslynComponent>true</IsRoslynComponent>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
@@ -87,12 +80,4 @@
         </PackageReference>
         <PackageReference Include="Roslynator.CSharp" Version="4.12.1" PrivateAssets="all" />
     </ItemGroup>
-
-    <ItemGroup>
-        <Using Include="System.Buffers" />
-        <Using Include="System.Collections.Specialized" />
-        <Using Include="System.Numerics" />
-        <Using Include="System.Runtime.CompilerServices" />
-    </ItemGroup>
-
 </Project>
