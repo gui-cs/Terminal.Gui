@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <!-- =================================================================== -->
   <!-- Version numbers -->
   <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
@@ -45,7 +45,7 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <PackageReference Include="ColorHelper" Version="1.8.1" />
-    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" PrivateAssets="All" />
     <!-- Enable Nuget Source Link for github -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     <PackageReference Include="System.IO.Abstractions" Version="21.0.2" />
