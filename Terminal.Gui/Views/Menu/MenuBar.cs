@@ -738,7 +738,7 @@ public class MenuBar : View
             case false:
                 if (_openMenu is { })
                 {
-                    Application.Current.Remove (_openMenu);
+                    Application.Current?.Remove (_openMenu);
                 }
 
                 SetNeedsDisplay ();
@@ -822,7 +822,12 @@ public class MenuBar : View
 
         Rectangle superViewFrame = SuperView is null ? Driver.Screen : SuperView.Frame;
         View sv = SuperView is null ? Application.Current : SuperView;
-        Point viewportOffset = sv.GetViewportOffsetFromFrame ();
+        if (sv is null)
+        {
+            // Support Unit Tests
+            return Point.Empty;
+        }
+        Point viewportOffset = sv?.GetViewportOffsetFromFrame () ?? Point.Empty;
 
         return new (
                     superViewFrame.X - sv.Frame.X - viewportOffset.X,
@@ -964,7 +969,7 @@ public class MenuBar : View
 
                 if (_openMenu is { })
                 {
-                    Application.Current.Remove (_openMenu);
+                    Application.Current?.Remove (_openMenu);
                     _openMenu.Dispose ();
                     _openMenu = null;
                 }
@@ -1001,7 +1006,15 @@ public class MenuBar : View
                 openCurrentMenu = _openMenu;
                 openCurrentMenu._previousSubFocused = _openMenu;
 
-                Application.Current.Add (_openMenu);
+                if (Application.Current is { })
+                {
+                    Application.Current.Add (_openMenu);
+                }
+                else
+                {
+                    _openMenu.BeginInit();
+                    _openMenu.EndInit();
+                }
                 _openMenu.SetFocus ();
 
                 break;
@@ -1059,7 +1072,14 @@ public class MenuBar : View
 
                     openCurrentMenu._previousSubFocused = last._previousSubFocused;
                     _openSubMenu.Add (openCurrentMenu);
-                    Application.Current.Add (openCurrentMenu);
+                    Application.Current?.Add (openCurrentMenu);
+
+                    if (!openCurrentMenu.IsInitialized)
+                    {
+                        // Supports unit tests
+                        openCurrentMenu.BeginInit ();
+                        openCurrentMenu.EndInit ();
+                    }
                 }
 
                 _selectedSub = _openSubMenu.Count - 1;

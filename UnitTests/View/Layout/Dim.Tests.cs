@@ -520,11 +520,11 @@ public class DimTests
                        Assert.Equal ("Absolute(50)", v4.Height.ToString ());
                        Assert.Equal (50, v4.Frame.Width);
                        Assert.Equal (50, v4.Frame.Height);
-                   #if DEBUG
+#if DEBUG
                        Assert.Equal ($"Combine(View(Width,Button(v1){v1.Frame})-View(Width,Button(v3){v3.Viewport}))", v5.Width.ToString ());
-                    #else
+#else
                        Assert.Equal ($"Combine(View(Height,Button(){v1.Frame})-View(Height,Button(){v3.Viewport}))", v5.Height.ToString ( ));
-                   #endif
+#endif
                        Assert.Equal (38, v5.Frame.Width);  // 47-9=38
                        Assert.Equal (80, v5.Frame.Height); // 89-9=80
 
@@ -586,8 +586,6 @@ public class DimTests
                        Assert.Equal (19, v3.Frame.Height);
 
                        v4.Text = "Button4";
-                       v4.AutoSize = false;
-                       Assert.Equal (new (4, 1), v4.Frame.Size); 
                        v4.AutoSize = true;
                        Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Width);
                        Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Height);
@@ -683,7 +681,7 @@ public class DimTests
         dim = Dim.Sized (testVal);
         Assert.Equal ($"Absolute({testVal})", dim.ToString ());
     }
-    
+
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]

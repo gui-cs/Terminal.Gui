@@ -268,15 +268,14 @@ public class ButtonTests (ITestOutputHelper output)
     {
         var btn1 = new Button
         {
-            X = 0,
-            Y = 0,
+            Text = text,
             Width = width,
             Height = height,
-            Text = text
         };
 
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.ContentSize);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.Size);
 
         btn1.Dispose ();
@@ -293,8 +292,6 @@ public class ButtonTests (ITestOutputHelper output)
     {
         var btn1 = new Button
         {
-            X = 0,
-            Y = 0,
             Width = width,
             Height = height,
         };
@@ -396,6 +393,10 @@ public class ButtonTests (ITestOutputHelper output)
         btn.Dispose ();
 
         btn = new () { Text = "_Test", IsDefault = true };
+        Assert.Equal (new (10, 1), btn.TextFormatter.Size);
+
+
+
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
@@ -413,6 +414,10 @@ public class ButtonTests (ITestOutputHelper output)
         btn.SetRelativeLayout (new (100, 100));
         // 0123456789012345678901234567890123456789
         // [* Test *]
+        Assert.Equal ('_', btn.HotKeySpecifier.Value);
+        Assert.Equal (10, btn.TextFormatter.Format ().Length);
+        Assert.Equal (new (10, 1), btn.TextFormatter.Size);
+        Assert.Equal (new (10, 1), btn.ContentSize);
         Assert.Equal (new (0, 0, 10, 1), btn.Viewport);
         Assert.Equal (new (0, 0, 10, 1), btn.Frame);
         Assert.Equal (KeyCode.T, btn.HotKey);

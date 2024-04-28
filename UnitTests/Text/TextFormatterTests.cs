@@ -3638,4 +3638,30 @@ ek")]
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
+
+
+    [Theory]
+    [InlineData ("1234", 4)]
+    [InlineData ("_1234", 4)]
+    public void AutoSize_HotKey_Size_Correct (string text, int expected)
+    {
+        // Horizontal
+        TextFormatter tf = new ()
+        {
+            AutoSize = true,
+            HotKeySpecifier = (Rune)'_',
+            Text = text,
+        };
+        Assert.Equal (new (expected, 1), tf.Size);
+
+        // Vertical
+        tf = new ()
+        {
+            HotKeySpecifier = (Rune)'_',
+            Direction = TextDirection.TopBottom_LeftRight,
+            Text = text,
+            AutoSize = true,
+        };
+        Assert.Equal (new (1, expected), tf.Size);
+    }
 }

@@ -20,8 +20,8 @@ public class CheckBox : View
         _charChecked = Glyphs.Checked;
         _charUnChecked = Glyphs.UnChecked;
 
-        Width = Dim.Auto (Dim.DimAutoStyle.Text);
         Height = 1;
+        Width = Dim.Auto (Dim.DimAutoStyle.Text);
 
         CanFocus = true;
 
@@ -191,11 +191,11 @@ public class CheckBox : View
 
     private string GetFormatterText ()
     {
-        if (AutoSize || string.IsNullOrEmpty (Title) || Frame.Width <= 2)
+        if (Width is Dim.DimAuto || string.IsNullOrEmpty (Title) || ContentSize.Width <= 2)
         {
             return Text;
         }
 
-        return Text [..Math.Min (Frame.Width - 2, Text.GetRuneCount ())];
+        return Text [..Math.Min (ContentSize.Width - 2, Text.GetRuneCount ())];
     }
 }

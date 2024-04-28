@@ -577,7 +577,7 @@ public partial class View
     /// </remarks>
     public void SetNeedsDisplay ()
     {
-        if (IsInitialized)
+        //if (IsInitialized)
         {
             SetNeedsDisplay (Viewport);
         }
@@ -597,12 +597,12 @@ public partial class View
     /// <param name="region">The content-relative region that needs to be redrawn.</param>
     public void SetNeedsDisplay (Rectangle region)
     {
-        if (!IsInitialized)
-        {
-            _needsDisplayRect = region;
+        //if (!IsInitialized)
+        //{
+        //    _needsDisplayRect = region;
 
-            return;
-        }
+        //    return;
+        //}
 
         if (_needsDisplayRect.IsEmpty)
         {

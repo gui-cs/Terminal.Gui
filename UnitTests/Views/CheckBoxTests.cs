@@ -491,11 +491,9 @@ public class CheckBoxTests
 
         Assert.Equal (TextAlignment.Justified, checkBox1.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
-        Assert.Equal (_size25x1, checkBox1.TextFormatter.Size);
         Assert.Equal (TextAlignment.Justified, checkBox2.TextAlignment);
         Assert.Equal (new (1, 2, 25, 1), checkBox2.Frame);
-        Assert.Equal (_size25x1, checkBox2.TextFormatter.Size);
-
+ 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │

@@ -389,6 +389,12 @@ public partial class Toplevel : View
                                               out int ny,
                                               out StatusBar sb
                                              );
+
+        if (superView is null)
+        {
+            return;
+        }
+
         var layoutSubviews = false;
         var maxWidth = 0;
 

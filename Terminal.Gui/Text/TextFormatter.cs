@@ -45,9 +45,50 @@ public class TextFormatter
 
             if (_autoSize)
             {
-                Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
+                Size = GetAutoSize ();
             }
         }
+    }
+
+    private Size GetAutoSize ()
+    {
+        Size size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
+        return size with
+        {
+            Width = size.Width - GetHotKeySpecifierLength (),
+            Height = size.Height - GetHotKeySpecifierLength (false)
+        };
+
+    }
+    /// <summary>
+    ///     Gets the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> characters
+    ///     in the <see cref="Text"/> property.
+    /// </summary>
+    /// <remarks>
+    ///     Only the first HotKey specifier found in <see cref="Text"/> is supported.
+    /// </remarks>
+    /// <param name="isWidth">
+    ///     If <see langword="true"/> (the default) the width required for the HotKey specifier is returned. Otherwise the
+    ///     height
+    ///     is returned.
+    /// </param>
+    /// <returns>
+    ///     The number of characters required for the <see cref="TextFormatter.HotKeySpecifier"/>. If the text
+    ///     direction specified
+    ///     by <see cref="TextDirection"/> does not match the <paramref name="isWidth"/> parameter, <c>0</c> is returned.
+    /// </returns>
+    public int GetHotKeySpecifierLength (bool isWidth = true)
+    {
+        if (isWidth)
+        {
+            return TextFormatter.IsHorizontalDirection (Direction) && Text?.Contains ((char)HotKeySpecifier.Value) == true
+                       ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                       : 0;
+        }
+
+        return TextFormatter.IsVerticalDirection (Direction) && Text?.Contains ((char)HotKeySpecifier.Value) == true
+                   ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                   : 0;
     }
 
     /// <summary>
@@ -67,10 +108,11 @@ public class TextFormatter
 
             if (AutoSize)
             {
-                Size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
+                Size = GetAutoSize ();
             }
         }
     }
+
 
     /// <summary>
     ///     Determines if the viewport width will be used or only the text width will be used,
@@ -150,7 +192,7 @@ public class TextFormatter
         {
             if (AutoSize)
             {
-                _size = EnableNeedsFormat (CalcRect (0, 0, Text, Direction, TabWidth).Size);
+                _size = EnableNeedsFormat (GetAutoSize());
             }
             else
             {
@@ -176,7 +218,7 @@ public class TextFormatter
 
             if (AutoSize)
             {
-                Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
+                Size = GetAutoSize (); ;
             }
         }
     }

@@ -101,6 +101,11 @@ public partial class View
         _frame = frame;
 
         OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
+
+        if (!TextFormatter.AutoSize)
+        {
+            TextFormatter.Size = ContentSize;
+        }
     }
 
     /// <summary>Gets the <see cref="Frame"/> with a screen-relative location.</summary>
@@ -274,6 +279,12 @@ public partial class View
                 return;
             }
 
+            if (_height is Dim.DimAuto)
+            {
+                // Reset ContentSize to Viewport
+                _contentSize = Size.Empty;
+            }
+
             _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
 
             OnResizeNeeded ();
@@ -314,6 +325,12 @@ public partial class View
                 return;
             }
 
+            if (_width is Dim.DimAuto)
+            {
+                // Reset ContentSize to Viewport
+                _contentSize = Size.Empty;
+            }
+
             _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
 
             OnResizeNeeded ();
@@ -341,6 +358,7 @@ public partial class View
     ///         will left unchanged.
     ///     </para>
     /// </summary>
+    [ObsoleteAttribute ("Use Dim.Auto instead.", false)]
     public virtual bool AutoSize
     {
         get => _height is Dim.DimAuto && _width is Dim.DimAuto;
@@ -352,6 +370,7 @@ public partial class View
             if (value)
             {
                 UpdateTextFormatterText ();
+
                 if (IsInitialized)
                 {
                     Height = Dim.Auto (Dim.DimAutoStyle.Text);
@@ -368,11 +387,13 @@ public partial class View
             {
                 _height = ContentSize.Height;
                 _width = ContentSize.Width;
+
+                // Force ContentSize to be reset to Viewport
+                _contentSize = Size.Empty;
                 OnResizeNeeded ();
             }
         }
     }
-
 
     ///// <summary>Determines if the View's <see cref="Height"/> can be set to a new value.</summary>
     ///// <remarks>TrySetHeight can only be called when AutoSize is true (or being set to true).</remarks>
@@ -706,7 +727,7 @@ public partial class View
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
-            menuVisible = Application.Top.MenuBar?.Visible == true;
+            menuVisible = Application.Top?.MenuBar?.Visible == true;
         }
         else
         {
@@ -736,8 +757,8 @@ public partial class View
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
-            statusVisible = Application.Top.StatusBar?.Visible == true;
-            statusBar = Application.Top.StatusBar;
+            statusVisible = Application.Top?.StatusBar?.Visible == true;
+            statusBar = Application.Top?.StatusBar;
         }
         else
         {
@@ -764,14 +785,14 @@ public partial class View
             maxDimension = statusVisible ? viewToMove.SuperView.Viewport.Height - 1 : viewToMove.SuperView.Viewport.Height;
         }
 
-        if (superView.Margin is { } && superView == viewToMove.SuperView)
+        if (superView?.Margin is { } && superView == viewToMove?.SuperView)
         {
             maxDimension -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
         }
 
         ny = Math.Min (ny, maxDimension);
 
-        if (viewToMove.Frame.Height <= maxDimension)
+        if (viewToMove?.Frame.Height <= maxDimension)
         {
             ny = ny + viewToMove.Frame.Height > maxDimension
                      ? Math.Max (maxDimension - viewToMove.Frame.Height, menuVisible ? 1 : 0)
@@ -926,7 +947,9 @@ public partial class View
             if (bad != null)
             {
                 throw new InvalidOperationException (
-                                                     @$"{view.GetType ().Name}.{name} = {bad.GetType ().Name} which depends on the SuperView's dimensions and the SuperView uses Dim.Auto.");
+                                                     $"{view.GetType ().Name}.{name} = {bad.GetType ().Name} "
+                                                     + $"which depends on the SuperView's dimensions and the SuperView uses Dim.Auto."
+                                                     );
             }
         }
 
@@ -990,8 +1013,6 @@ public partial class View
                            Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.ContentSize :
                            Application.Driver?.Screen.Size ?? new (int.MaxValue, int.MaxValue);
 
-
-
         SetTextFormatterSize ();
 
         SetRelativeLayout (contentSize);
@@ -1003,7 +1024,6 @@ public partial class View
 
         SetNeedsDisplay ();
         SetNeedsLayout ();
-
     }
 
     internal bool LayoutNeeded { get; private set; } = true;
@@ -1264,12 +1284,14 @@ public partial class View
                 if (ReferenceEquals (from.SuperView, to))
                 {
                     throw new InvalidOperationException (
-                                                         $"ComputedLayout for \"{superView}\": \"{to}\" references a SubView (\"{from}\")."
+                                                         $"ComputedLayout for \"{superView}\": \"{to}\" "
+                                                         + $"references a SubView (\"{from}\")."
                                                         );
                 }
 
                 throw new InvalidOperationException (
-                                                     $"ComputedLayout for \"{superView}\": \"{from}\" linked with \"{to}\" was not found. Did you forget to add it to {superView}?"
+                                                     $"ComputedLayout for \"{superView}\": \"{from}\" "
+                                                     + $"linked with \"{to}\" was not found. Did you forget to add it to {superView}?"
                                                     );
             }
         }
@@ -1282,9 +1304,12 @@ public partial class View
     private Pos VerifyIsInitialized (Pos pos, string member)
     {
 #if DEBUG
-        if (pos is not Pos.PosAbsolute && LayoutStyle == LayoutStyle.Computed && !IsInitialized)
+        if ((pos.ReferencesOtherViews () || pos.ReferencesOtherViews ()) && !IsInitialized)
         {
-            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate ({pos}). This is potentially a bug.");
+            Debug.WriteLine (
+                             $"WARNING: The {pos} of {this} is dependent on other views and {member} "
+                             + $"is being accessed before the View has been initialized. This is likely a bug."
+                            );
         }
 #endif // DEBUG
         return pos;
@@ -1294,9 +1319,13 @@ public partial class View
     private Dim VerifyIsInitialized (Dim dim, string member)
     {
 #if DEBUG
-        if (dim is not Dim.DimAbsolute && LayoutStyle == LayoutStyle.Computed && !IsInitialized)
+        if ((dim.ReferencesOtherViews () || dim.ReferencesOtherViews ()) && !IsInitialized)
         {
-            Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate: ({dim}). This is potentially a bug.");
+            Debug.WriteLine (
+                             $"WARNING: The {member} of {this} is dependent on other views and is "
+                             + $"is being accessed before the View has been initialized. This is likely a bug. "
+                             + $"{member} is {dim}"
+                            );
         }
 #endif // DEBUG
         return dim;

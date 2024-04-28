@@ -3,10 +3,6 @@ using System.Text;
 using Xunit.Abstractions;
 using static Terminal.Gui.Dim;
 
-
-// Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
-
 namespace Terminal.Gui.PosDimTests;
 
 public class DimAutoTests (ITestOutputHelper output)
@@ -786,6 +782,105 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         view.Height = Dim.Auto ();
         Assert.True (view.TextFormatter.AutoSize);
+    }
+
+    [Theory]
+    [InlineData ("1234", 4)]
+    [InlineData ("_1234", 4)]
+    public void Width_Auto_HotKey_TextFormatter_Size_Correct (string text, int expected)
+    {
+        View view = new ()
+        {
+            Text = text,
+            Height = 1,
+            Width = Dim.Auto ()
+        };
+        Assert.Equal (new (expected, 1), view.TextFormatter.Size);
+    }
+
+    [Theory]
+    [InlineData ("1234", 4)]
+    [InlineData ("_1234", 4)]
+    public void Height_Auto_HotKey_TextFormatter_Size_Correct (string text, int expected)
+    {
+        View view = new ()
+        {
+            HotKeySpecifier = (Rune)'_',
+            Text = text,
+            Width = Auto (),
+            Height = 1,
+        };
+        Assert.Equal (new (expected, 1), view.TextFormatter.Size);
+
+        view = new ()
+        {
+            HotKeySpecifier = (Rune)'_',
+            TextDirection = TextDirection.TopBottom_LeftRight,
+            Text = text,
+            Width = 1,
+            Height = Auto (),
+        };
+        Assert.Equal (new (1, expected), view.TextFormatter.Size);
+    }
+
+
+    [SetupFakeDriver]
+    [Fact]
+    public void DimAuto_ChangeToANonDimAuto_Resets_ContentSize ()
+    {
+        View view = new ()
+        {
+            Width = Auto (),
+            Height = Auto (),
+            Text = "01234"
+        };
+
+        Assert.Equal (new Rectangle (0, 0, 5, 1), view.Frame);
+        Assert.Equal (new Size (5, 1), view.ContentSize);
+
+        // Change text to a longer string
+        view.Text = "0123456789";
+
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Frame);
+        Assert.Equal (new Size (10, 1), view.ContentSize);
+
+        // If ContentSize was reset, these should cause it to update
+        view.Width = 5;
+        view.Height = 1;
+
+        Assert.Equal (new Size (5, 1), view.ContentSize);
+    }
+    [SetupFakeDriver]
+    [Fact]
+    public void DimAuto_ChangeNonDimAuto_Via_AutoSize_False_Resets_ContentSize ()
+    {
+        View view = new ()
+        {
+            Width = Auto (),
+            Height = Auto(),
+            Text = "01234"
+        };
+
+        Assert.Equal (new Rectangle (0, 0, 5, 1), view.Frame);
+        Assert.Equal (new Size (5, 1), view.ContentSize);
+
+        // Change text to a longer string
+        view.Text = "0123456789";
+
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Frame);
+        Assert.Equal (new Size (10, 1), view.ContentSize);
+
+        // Cause Width/Height to be set to absolute. This should reset ContentSize
+        view.AutoSize = false;
+
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Frame);
+        Assert.Equal (new Size (10, 1), view.ContentSize);
+
+        // If ContentSize was reset, these should cause it to update
+        view.Width = 5;
+        view.Height = 1;
+
+        Assert.Equal(new Size (5,1), view.ContentSize);
     }
 
 

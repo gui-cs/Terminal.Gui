@@ -243,8 +243,9 @@ public partial class View
         //Dim.DimAuto heightAuto = Height as Dim.DimAuto;
 
         // TODO: This is a hack. Figure out how to move this into DimDimAuto
-        if ((Width is Dim.DimAuto widthAuto && widthAuto._style != Dim.DimAutoStyle.Subviews)
-            || (Height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews))
+        // Use _width & _height instead of Width & Height to avoid debug spew
+        if ((_width is Dim.DimAuto widthAuto && widthAuto._style != Dim.DimAutoStyle.Subviews)
+            || (_height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews))
         {
             // This updates TextFormatter.Size to the text size
             TextFormatter.AutoSize = true;
