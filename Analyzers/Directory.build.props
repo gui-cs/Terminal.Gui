@@ -7,6 +7,8 @@
     <Deterministic>true</Deterministic>
     <UTF8OutPut>true</UTF8OutPut>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
+    <NoLogo>True</NoLogo>
+    <DefineTrace>True</DefineTrace>
   </PropertyGroup>
   <ItemGroup>
       <Using Include="System.Buffers" />
