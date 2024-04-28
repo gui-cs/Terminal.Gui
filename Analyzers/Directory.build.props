@@ -11,8 +11,8 @@
     <DefineTrace>True</DefineTrace>
   </PropertyGroup>
   <ItemGroup>
-      <PackageReference Update="JetBrains.Annotations" Version="2023.3.0" />
-      <PackageReference Update="JetBrains.ExternalAnnotations" Version="10.2.147" />
+    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+    <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.147" />
   </ItemGroup>
   <ItemGroup>
       <Using Include="System.Buffers" />
