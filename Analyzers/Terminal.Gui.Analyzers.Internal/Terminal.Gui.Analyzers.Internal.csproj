@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <!-- 
-        Do not remove netstandard2.0 from the TargetFrameworks.
+        Do not remove netstandard2.0 from the TargetFramework.
         Visual Studio requires that Analyzers/Generators target netstandard2.0 to work properly.
-        Additional TFMs are for support of additional APIs and language features.
+        Also do not change this to TargetFrameworks without fully understanding the behavior change that implies.
         -->
         <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
@@ -32,36 +32,22 @@
         <Compile Remove="Compatibility/*.cs" />
     </ItemGroup>
 
-    <Choose>
-        <When Condition="'$(TargetFramework)' == 'netstandard2.0'">
-            <PropertyGroup>
-                <!-- Disabling some useless warnings caused by the netstandard2.0 target -->
-                <NoWarn>$(NoWarn);nullable;CA1067</NoWarn>
-            </PropertyGroup>
-            <ItemGroup>                                                                         
-                <Compile Include="Compatibility/CompilerFeatureRequiredAttribute.cs" />         
-                <Compile Include="Compatibility/IsExternalInit.cs" />                           
-                <Compile Include="Compatibility/IEqualityOperators.cs" />
-                <Compile Include="Compatibility/NullableAttributes.cs" />                         
-                <Compile Include="Compatibility/RequiredMemberAttribute.cs" />                  
-                <Compile Include="Compatibility/SetsRequiredMembersAttribute.cs" />             
-            </ItemGroup>                                                                        
-            <ItemGroup>
-                <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" PrivateAssets="all" />
-                <PackageReference Include="System.Runtime.Extensions" Version="4.3.1" PrivateAssets="all" />
-                <PackageReference Include="System.Runtime.Numerics" Version="4.3.0" PrivateAssets="all" />
-            </ItemGroup>
-        </When>
-        <When Condition="'$(TargetFramework)' == 'net8.0'">
-        </When>
-    </Choose>
-    
-    <ItemGroup>
+    <PropertyGroup>
+        <!-- Disabling some useless warnings caused by the netstandard2.0 target -->
+        <NoWarn>$(NoWarn);nullable;CA1067</NoWarn>
+    </PropertyGroup>
+    <ItemGroup>                                                                         
+        <Compile Include="Compatibility/CompilerFeatureRequiredAttribute.cs" />         
+        <Compile Include="Compatibility/IsExternalInit.cs" />                           
+        <Compile Include="Compatibility/IEqualityOperators.cs" />
+        <Compile Include="Compatibility/NullableAttributes.cs" />                         
+        <Compile Include="Compatibility/RequiredMemberAttribute.cs" />                  
+        <Compile Include="Compatibility/SetsRequiredMembersAttribute.cs" />             
         <Compile Include="Compatibility/NumericExtensions.cs" />
         <Compile Include="Compatibility/SkipLocalsInitAttribute.cs" />
-    </ItemGroup>
+    </ItemGroup>                                                                        
 
-    <ItemGroup>
+  <ItemGroup>
         <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
         <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
     </ItemGroup>
@@ -79,5 +65,8 @@
             <!--<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
         </PackageReference>
         <PackageReference Include="Roslynator.CSharp" Version="4.12.1" PrivateAssets="all" />
+        <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" PrivateAssets="all" />
+        <PackageReference Include="System.Runtime.Extensions" Version="4.3.1" PrivateAssets="all" />
+        <PackageReference Include="System.Runtime.Numerics" Version="4.3.0" PrivateAssets="all" />
     </ItemGroup>
 </Project>
