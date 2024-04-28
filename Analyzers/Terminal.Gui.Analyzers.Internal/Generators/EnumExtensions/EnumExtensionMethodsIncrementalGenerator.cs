@@ -260,8 +260,8 @@ public sealed class EnumExtensionMethodsIncrementalGenerator : IIncrementalGener
                                            ///     Used to enable source generation of a common set of extension methods for enum types.
                                            /// </summary>
                                            {{Strings.Templates.AttributesForGeneratedTypes}}
-                                           [System.AttributeUsageAttribute (System.AttributeTargets.Enum)]
-                                           public sealed class {{GeneratorAttributeName}} : Attribute
+                                           [{{Strings.DotnetNames.Types.AttributeUsageAttribute}} ({{Strings.DotnetNames.Types.AttributeTargets}}.Enum)]
+                                           public sealed class {{GeneratorAttributeName}} : {{Strings.DotnetNames.Types.Attribute}}
                                            {
                                                /// <summary>
                                                ///     The name of the generated static class.
