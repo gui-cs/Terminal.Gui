@@ -45,9 +45,9 @@
         <Compile Include="Compatibility/SetsRequiredMembersAttribute.cs" />             
         <Compile Include="Compatibility/NumericExtensions.cs" />
         <Compile Include="Compatibility/SkipLocalsInitAttribute.cs" />
-    </ItemGroup>                                                                        
+    </ItemGroup>
 
-  <ItemGroup>
+    <ItemGroup>
         <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
         <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
     </ItemGroup>
