@@ -18,7 +18,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineTrace>True</DefineTrace>
     <DebugType>portable</DebugType>
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
     <ImplicitUsings>enable</ImplicitUsings>
     <NoLogo>True</NoLogo>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
@@ -46,18 +46,26 @@
   <ItemGroup>
     <PackageReference Include="ColorHelper" Version="1.8.1" />
     <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.9.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
     <!-- Enable Nuget Source Link for github -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     <PackageReference Include="System.IO.Abstractions" Version="21.0.2" />
     <PackageReference Include="System.Text.Json" Version="8.0.3" />
     <PackageReference Include="Wcwidth" Version="2.0.0" />
+    <ProjectReference Include="..\Analyzers\Terminal.Gui.Analyzers.Internal\Terminal.Gui.Analyzers.Internal.csproj">
+      <PrivateAssets>all</PrivateAssets>
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Global Usings and Type Aliases -->
   <!-- =================================================================== -->
   <ItemGroup>
     <Using Include="JetBrains.Annotations" />
-    <Using Include="System.Diagnostics.Contracts.PureAttribute" Alias="PureAttribute" />
+    <Using Include="JetBrains.Annotations.PureAttribute" Alias="PureAttribute" />
     <Using Include="System.Drawing" />
     <Using Include="System.Text" />
   </ItemGroup>
