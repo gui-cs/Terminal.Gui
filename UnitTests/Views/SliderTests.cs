@@ -486,5 +486,43 @@ public class SliderTests
         Assert.Throws<ArgumentNullException> (() => slider.Options = null);
     }
 
+    [Fact]
+    private void AutoSize_Respects_SuperView_ContentSize ()
+    {
+        View view = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+        };
+
+        List<object> options = new () { "01234", "01234" };
+        Slider slider = new (options)
+        {
+            Orientation = Orientation.Vertical,
+            Type = SliderType.Multiple,
+            Width = Dim.Auto (Dim.DimAutoStyle.Subviews),
+            Height = Dim.Auto (Dim.DimAutoStyle.Subviews),
+            //IdealContentSize = new (6, 2)
+        };
+        view.Add (slider);
+        view.BeginInit ();
+        view.EndInit ();
+
+        view.LayoutSubviews ();
+        slider.SetRelativeLayout(view.Viewport.Size);
+
+        Size expectedSize = slider.Frame.Size;
+
+        Assert.Equal (new (6, 2), expectedSize);
+
+        view.ContentSize = new (1, 1);
+
+        view.LayoutSubviews ();
+        slider.SetRelativeLayout (view.Viewport.Size);
+
+        Assert.Equal(new (1, 1), slider.Frame.Size);
+
+    }
+
     // Add more tests for different scenarios and edge cases.
 }

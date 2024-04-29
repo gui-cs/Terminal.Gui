@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Terminal.Gui;
@@ -26,7 +27,7 @@ public class ContentScrolling : Scenario
             BorderStyle = LineStyle.Rounded;
             Arrangement = ViewArrangement.Fixed;
 
-            ContentSize = new (60, 40);
+            ContentSize = new (10, 40);
             ViewportSettings |= ViewportSettings.ClearContentOnly;
             ViewportSettings |= ViewportSettings.ClipContentOnly;
 
@@ -383,6 +384,20 @@ public class ContentScrolling : Scenario
         };
         longLabel.TextFormatter.WordWrap = true;
         view.Add (longLabel);
+
+        List<object> options = new () { "Option 1", "Option 2", "Option 3" };
+        Slider slider = new (options)
+        {
+            X = 0,
+            Y = Pos.Bottom (textField) + 1,
+            AutoSize = true,
+            Orientation = Orientation.Vertical,
+            Type = SliderType.Multiple,
+            AllowEmpty = false,
+            BorderStyle = LineStyle.Double,
+            Title = "_Slider"
+        };
+        view.Add(slider);
 
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 

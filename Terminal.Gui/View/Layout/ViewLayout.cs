@@ -91,10 +91,12 @@ public partial class View
     private void SetFrame (Rectangle frame)
     {
         var oldViewport = Rectangle.Empty;
+        var oldContentSize = Size.Empty;
 
         if (IsInitialized)
         {
             oldViewport = Viewport;
+            oldContentSize = ContentSize;
         }
 
         // This is the only place where _frame should be set directly. Use Frame = or SetFrame instead.
@@ -340,6 +342,18 @@ public partial class View
     #endregion Frame
 
     #region Layout Engine
+
+
+    // @tig Notes on layout flow. Ignore for now.
+    // BeginLayout
+    //   If !LayoutNeeded return
+    //   If !SizeNeeded return
+    //   Call OnLayoutStarted
+    //      Views and subviews can update things
+    //   
+
+
+    // EndLayout
 
     /// <summary>
     ///     Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is
