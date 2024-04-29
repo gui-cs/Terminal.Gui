@@ -265,6 +265,13 @@ public class Slider<T> : View
 
         Enter += (s, e) => { };
 
+        // BUGBUG: This should not be needed - Need to ensure SetRelativeLayout gets called during EndInit
+        Initialized += (s, e) =>
+                         {
+                             CalcSpacingConfig ();
+                             SetContentSizeBestFit ();
+                         };
+
         LayoutStarted += (s, e) =>
                           {
                               CalcSpacingConfig ();

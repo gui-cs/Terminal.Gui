@@ -794,6 +794,7 @@ public partial class View
 
     private void LayoutSubview (View v, Size contentSize)
     {
+        // BUGBUG: Calling SetRelativeLayout before LayoutSubviews is problematic. Need to resolve.
         v.SetRelativeLayout (contentSize);
         v.LayoutSubviews ();
         v.LayoutNeeded = false;

@@ -508,8 +508,9 @@ public class SliderTests
         view.BeginInit ();
         view.EndInit ();
 
+        // BUGBUG: This should not be needed. EndInit should have called LayoutSubviews
+        // BUGBUG: and LayoutSubviews should have 
         view.LayoutSubviews ();
-        slider.SetRelativeLayout(view.Viewport.Size);
 
         Size expectedSize = slider.Frame.Size;
 

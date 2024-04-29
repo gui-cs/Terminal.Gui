@@ -27,7 +27,7 @@ public class ContentScrolling : Scenario
             BorderStyle = LineStyle.Rounded;
             Arrangement = ViewArrangement.Fixed;
 
-            ContentSize = new (10, 40);
+            ContentSize = new (60, 40);
             ViewportSettings |= ViewportSettings.ClearContentOnly;
             ViewportSettings |= ViewportSettings.ClipContentOnly;
 
