@@ -165,6 +165,7 @@ public class TextAlignmentsAndDirections : Scenario
         {
             X = Pos.AnchorEnd (4),
             Y = 1,
+            Width = 2,
             Height = 9,
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
