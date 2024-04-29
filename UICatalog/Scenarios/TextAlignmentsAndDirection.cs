@@ -284,6 +284,7 @@ public class TextAlignmentsAndDirections : Scenario
             ColorScheme = color1,
             Text = txt
         };
+        txtLabelTL.TextFormatter.MultiLine = true;
 
         var txtLabelTC = new Label
         {
@@ -297,6 +298,7 @@ public class TextAlignmentsAndDirections : Scenario
             ColorScheme = color1,
             Text = txt
         };
+        txtLabelTC.TextFormatter.MultiLine = true;
 
         var txtLabelTR = new Label
         {
@@ -310,6 +312,7 @@ public class TextAlignmentsAndDirections : Scenario
             ColorScheme = color1,
             Text = txt
         };
+        txtLabelTR.TextFormatter.MultiLine = true;
 
         var txtLabelML = new Label
         {
@@ -323,6 +326,7 @@ public class TextAlignmentsAndDirections : Scenario
             ColorScheme = color1,
             Text = txt
         };
+        txtLabelML.TextFormatter.MultiLine = true;
 
         var txtLabelMC = new Label
         {
@@ -336,6 +340,7 @@ public class TextAlignmentsAndDirections : Scenario
             ColorScheme = color1,
             Text = txt
         };
+        txtLabelMC.TextFormatter.MultiLine = true;
 
         var txtLabelMR = new Label
         {
@@ -349,6 +354,7 @@ public class TextAlignmentsAndDirections : Scenario
             ColorScheme = color1,
             Text = txt
         };
+        txtLabelMR.TextFormatter.MultiLine = true;
 
         var txtLabelBL = new Label
         {
@@ -362,6 +368,7 @@ public class TextAlignmentsAndDirections : Scenario
             ColorScheme = color1,
             Text = txt
         };
+        txtLabelBL.TextFormatter.MultiLine = true;
 
         var txtLabelBC = new Label
         {
@@ -375,6 +382,7 @@ public class TextAlignmentsAndDirections : Scenario
             ColorScheme = color1,
             Text = txt
         };
+        txtLabelBC.TextFormatter.MultiLine = true;
 
         var txtLabelBR = new Label
         {
@@ -388,6 +396,7 @@ public class TextAlignmentsAndDirections : Scenario
             ColorScheme = color1,
             Text = txt
         };
+        txtLabelBR.TextFormatter.MultiLine = true;
 
         mtxts.Add (txtLabelTL);
         mtxts.Add (txtLabelTC);
