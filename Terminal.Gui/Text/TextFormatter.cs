@@ -345,7 +345,7 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int runesWidth = GetWidestLineLength (linesFormatted, 0, linesFormatted.Count - line, TabWidth);
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, line, linesFormatted.Count - line, TabWidth);
                     x = screen.Right - runesWidth;
                     CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
@@ -361,7 +361,7 @@ public class TextFormatter
                 if (isVertical)
                 {
                     int runesWidth = line > 0
-                                         ? GetWidestLineLength (linesFormatted, 0, line, TabWidth)
+                                         ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
                                          : 0;
                     x = screen.Left + runesWidth;
                 }
@@ -376,8 +376,9 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int runesWidth = GetWidestLineLength (linesFormatted, line, 1, TabWidth);
-                    x = screen.Left + line + (screen.Width - runesWidth) / 2;
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                    int linesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth);
+                    x = screen.Left + linesWidth + (screen.Width - runesWidth) / 2;
 
                     CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
@@ -467,7 +468,7 @@ public class TextFormatter
                     }
 
                     if ((!isVertical && current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset)
-                        || (isVertical && idx > maxScreen.Top + maxScreen.Height - screen.Y))
+                        || (isVertical && current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y))
                     {
                         break;
                     }
@@ -1703,43 +1704,6 @@ public class TextFormatter
         List<string> result = SplitNewLine (text);
 
         return result.Max (x => GetRuneWidth (x, tabWidth));
-    }
-
-    /// <summary>
-    ///     Returns the number of columns in the widest line in the list based on the <paramref name="startIndex"/> and
-    ///     the <paramref name="length"/>.
-    /// </summary>
-    /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
-    ///     glyphs (e.g. Arabic).
-    /// </remarks>
-    /// <param name="lines">The lines.</param>
-    /// <param name="startIndex">The start index.</param>
-    /// <param name="length">The length.</param>
-    /// <param name="tabWidth">The number of columns used for a tab.</param>
-    /// <returns>The maximum characters width.</returns>
-    public static int GetWidestLineLength (
-        List<string> lines,
-        int startIndex = -1,
-        int length = -1,
-        int tabWidth = 0
-    )
-    {
-        var max = 0;
-
-        for (int i = startIndex == -1 ? 0 : startIndex;
-             i < (length == -1 ? lines.Count : startIndex + length);
-             i++)
-        {
-            string runes = lines [i];
-
-            if (runes.Length > 0)
-            {
-                max += runes.EnumerateRunes ().Max (r => GetRuneWidth (r, tabWidth));
-            }
-        }
-
-        return max;
     }
 
     /// <summary>
