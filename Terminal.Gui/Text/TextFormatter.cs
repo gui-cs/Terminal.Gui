@@ -269,17 +269,6 @@ public class TextFormatter
 
         List<string> linesFormatted = GetLines ();
 
-        switch (Direction)
-        {
-            case TextDirection.TopBottom_RightLeft:
-            case TextDirection.LeftRight_BottomTop:
-            case TextDirection.RightLeft_BottomTop:
-            case TextDirection.BottomTop_RightLeft:
-                linesFormatted.Reverse ();
-
-                break;
-        }
-
         bool isVertical = IsVerticalDirection (Direction);
         Rectangle maxScreen = screen;
 
@@ -326,15 +315,6 @@ public class TextFormatter
             }
 
             Rune [] runes = linesFormatted [line].ToRunes ();
-
-            runes = Direction switch
-            {
-                TextDirection.RightLeft_BottomTop => runes.Reverse ().ToArray (),
-                TextDirection.RightLeft_TopBottom => runes.Reverse ().ToArray (),
-                TextDirection.BottomTop_LeftRight => runes.Reverse ().ToArray (),
-                TextDirection.BottomTop_RightLeft => runes.Reverse ().ToArray (),
-                _ => runes
-            };
 
             // When text is justified, we lost left or right, so we use the direction to align. 
 
@@ -467,8 +447,8 @@ public class TextFormatter
                         break;
                     }
 
-                    if ((!isVertical && current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset)
-                        || (isVertical && current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y))
+                    if ((!isVertical && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset || (idx < runes.Length && runes [idx].GetColumns () > screen.Width)))
+                        || (isVertical && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y) || (idx < runes.Length && runes [idx].GetColumns () > screen.Width))))
                     {
                         break;
                     }
@@ -1368,7 +1348,7 @@ public class TextFormatter
     {
         return StringExtensions.ToString (
                                           runes.GetRange (
-                                                          index,
+                                                          Math.Max (index, 0),
                                                           GetLengthThatFits (text, width, tabWidth, textDirection)
                                                          )
                                          );
@@ -1581,16 +1561,17 @@ public class TextFormatter
 
                 foreach (string line in lines)
                 {
-                    lineResult.Add (ClipAndJustify (line, width, justify, textDirection, tabWidth, textFormatter));
+
+                    lineResult.Add (ClipAndJustify (PerformCorrectFormatDirection (textDirection, line), width, justify, textDirection, tabWidth, textFormatter));
                 }
 
-                return lineResult;
+                return PerformCorrectFormatDirection (textDirection, lineResult);
             }
 
             text = ReplaceCRLFWithSpace (text);
-            lineResult.Add (ClipAndJustify (text, width, justify, textDirection, tabWidth, textFormatter));
+            lineResult.Add (ClipAndJustify (PerformCorrectFormatDirection (textDirection, text), width, justify, textDirection, tabWidth, textFormatter));
 
-            return lineResult;
+            return PerformCorrectFormatDirection (textDirection, lineResult);
         }
 
         List<Rune> runes = StripCRLF (text, true).ToRuneList ();
@@ -1605,7 +1586,7 @@ public class TextFormatter
             {
                 List<string> wrappedLines =
                     WordWrapText (
-                                  StringExtensions.ToString (runes.GetRange (lp, i - lp)),
+                                  StringExtensions.ToString (PerformCorrectFormatDirection (textDirection, runes.GetRange (lp, i - lp))),
                                   width,
                                   preserveTrailingSpaces,
                                   tabWidth,
@@ -1628,7 +1609,7 @@ public class TextFormatter
         }
 
         foreach (string line in WordWrapText (
-                                              StringExtensions.ToString (runes.GetRange (lp, runeCount - lp)),
+                                              StringExtensions.ToString (PerformCorrectFormatDirection (textDirection, runes.GetRange (lp, runeCount - lp))),
                                               width,
                                               preserveTrailingSpaces,
                                               tabWidth,
@@ -1639,7 +1620,36 @@ public class TextFormatter
             lineResult.Add (ClipAndJustify (line, width, justify, textDirection, tabWidth));
         }
 
-        return lineResult;
+        return PerformCorrectFormatDirection (textDirection, lineResult);
+    }
+
+    private static string PerformCorrectFormatDirection (TextDirection textDirection, string line)
+    {
+        return textDirection switch
+               {
+                   TextDirection.RightLeft_BottomTop
+                       or TextDirection.RightLeft_TopBottom
+                       or TextDirection.BottomTop_LeftRight
+                       or TextDirection.BottomTop_RightLeft => StringExtensions.ToString (line.EnumerateRunes ().Reverse ()),
+                   _ => line
+               };
+    }
+
+    private static List<Rune> PerformCorrectFormatDirection (TextDirection textDirection, List<Rune> runes)
+    {
+        return PerformCorrectFormatDirection (textDirection, StringExtensions.ToString (runes)).ToRuneList ();
+    }
+
+    private static List<string> PerformCorrectFormatDirection (TextDirection textDirection, List<string> lines)
+    {
+        return textDirection switch
+               {
+                   TextDirection.TopBottom_RightLeft
+                       or TextDirection.LeftRight_BottomTop
+                       or TextDirection.RightLeft_BottomTop
+                       or TextDirection.BottomTop_RightLeft => lines.ToArray ().Reverse ().ToList (),
+                   _ => lines
+               };
     }
 
     /// <summary>Returns the number of lines needed to render the specified text given the width.</summary>

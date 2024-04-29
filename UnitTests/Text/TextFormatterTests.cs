@@ -3872,4 +3872,176 @@ B")]
         };
         Assert.Equal (new (1, expected), tf.Size);
     }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 1, 0, false, "")]
+    [InlineData ("A", 0, 1, false, "")]
+    [InlineData ("AB1 2", 2, 1, false, "2")]
+    [InlineData ("AB12", 5, 1, false, "21BA")]
+    [InlineData ("AB\n12", 5, 2, false, "BA\n21")]
+    [InlineData ("ABC 123 456", 7, 2, false, "654 321\nCBA    ")]
+    [InlineData ("こんにちは", 1, 1, false, "")]
+    [InlineData ("こんにちは", 2, 1, false, "は")]
+    [InlineData ("こんにちは", 5, 1, false, "はち")]
+    [InlineData ("こんにちは", 10, 1, false, "はちにんこ")]
+    [InlineData ("こんにちは\nAB\n12", 10, 3, false, "はちにんこ\nBA        \n21        ")]
+
+    [InlineData ("A", 1, 0, true, "")]
+    [InlineData ("A", 0, 1, true, "")]
+    [InlineData ("AB1 2", 2, 1, true, "2")]
+    [InlineData ("AB12", 5, 1, true, "21BA")]
+    [InlineData ("AB\n12", 5, 2, true, "BA\n21")]
+    [InlineData ("ABC 123 456", 7, 2, true, "654 321")]
+    [InlineData ("こんにちは", 1, 1, true, "")]
+    [InlineData ("こんにちは", 2, 1, true, "は")]
+    [InlineData ("こんにちは", 5, 1, true, "はち")]
+    [InlineData ("こんにちは", 10, 1, true, "はちにんこ")]
+    [InlineData ("こんにちは\nAB\n12", 10, 3, true, "はちにんこ\nBA        \n21        ")]
+    public void Draw_Horizontal_RightLeft_TopBottom (string text, int width, int height, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.RightLeft_TopBottom,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, height);
+        }
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 1, 0, false, "")]
+    [InlineData ("A", 0, 1, false, "")]
+    [InlineData ("AB1 2", 2, 1, false, "2")]
+    [InlineData ("AB12", 5, 1, false, "21BA")]
+    [InlineData ("AB\n12", 5, 2, false, "21\nBA")]
+    [InlineData ("ABC 123 456", 7, 2, false, "CBA    \n654 321")]
+    [InlineData ("こんにちは", 1, 1, false, "")]
+    [InlineData ("こんにちは", 2, 1, false, "は")]
+    [InlineData ("こんにちは", 5, 1, false, "はち")]
+    [InlineData ("こんにちは", 10, 1, false, "はちにんこ")]
+    [InlineData ("こんにちは\nAB\n12", 10, 3, false, "21        \nBA        \nはちにんこ")]
+
+    [InlineData ("A", 1, 0, true, "")]
+    [InlineData ("A", 0, 1, true, "")]
+    [InlineData ("AB1 2", 2, 1, true, "2")]
+    [InlineData ("AB12", 5, 1, true, "21BA")]
+    [InlineData ("AB\n12", 5, 2, true, "21\nBA")]
+    [InlineData ("ABC 123 456", 7, 2, true, "654 321")]
+    [InlineData ("こんにちは", 1, 1, true, "")]
+    [InlineData ("こんにちは", 2, 1, true, "は")]
+    [InlineData ("こんにちは", 5, 1, true, "はち")]
+    [InlineData ("こんにちは", 10, 1, true, "はちにんこ")]
+    [InlineData ("こんにちは\nAB\n12", 10, 3, true, "21        \nBA        \nはちにんこ")]
+    public void Draw_Horizontal_RightLeft_BottomTop (string text, int width, int height, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.RightLeft_BottomTop,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, height);
+        }
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 1, 0, false, "")]
+    [InlineData ("A", 0, 1, false, "")]
+    [InlineData ("AB1 2", 1, 2, false, "2")]
+    [InlineData ("AB12", 1, 5, false, "2\n1\nB\nA")]
+    [InlineData ("AB\n12", 2, 5, false, "B2\nA1")]
+    [InlineData ("ABC 123 456", 2, 7, false, "6C\n5B\n4A\n  \n3 \n2 \n1 ")]
+    [InlineData ("こんにちは", 1, 1, false, "")]
+    [InlineData ("こんにちは", 2, 1, false, "は")]
+    [InlineData ("こんにちは", 2, 5, false, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは", 2, 10, false, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは\nAB\n12", 4, 10, false, "はB2\nちA1\nに  \nん  \nこ  ")]
+
+    [InlineData ("A", 1, 0, true, "")]
+    [InlineData ("A", 0, 1, true, "")]
+    [InlineData ("AB1 2", 1, 2, true, "2")]
+    [InlineData ("AB12", 1, 5, true, "2\n1\nB\nA")]
+    [InlineData ("AB\n12", 2, 5, true, "B2\nA1")]
+    [InlineData ("ABC 123 456", 2, 7, true, "6\n5\n4\n \n3\n2\n1")]
+    [InlineData ("こんにちは", 1, 1, true, "")]
+    [InlineData ("こんにちは", 2, 1, true, "は")]
+    [InlineData ("こんにちは", 2, 5, true, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは", 2, 10, true, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは\nAB\n12", 4, 10, true, "はB2\nちA1\nに  \nん  \nこ  ")]
+    public void Draw_Vertical_BottomTop_LeftRight (string text, int width, int height, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.BottomTop_LeftRight,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, height);
+        }
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 1, 0, false, "")]
+    [InlineData ("A", 0, 1, false, "")]
+    [InlineData ("AB1 2", 1, 2, false, "2")]
+    [InlineData ("AB12", 1, 5, false, "2\n1\nB\nA")]
+    [InlineData ("AB\n12", 2, 5, false, "2B\n1A")]
+    [InlineData ("ABC 123 456", 2, 7, false, "C6\nB5\nA4\n  \n 3\n 2\n 1")]
+    [InlineData ("こんにちは", 1, 1, false, "")]
+    [InlineData ("こんにちは", 2, 1, false, "は")]
+    [InlineData ("こんにちは", 2, 5, false, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは", 2, 10, false, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは\nAB\n12", 4, 10, false, "2Bは\n1Aち\n  に\n  ん\n  こ")]
+
+    [InlineData ("A", 1, 0, true, "")]
+    [InlineData ("A", 0, 1, true, "")]
+    [InlineData ("AB1 2", 1, 2, true, "2")]
+    [InlineData ("AB12", 1, 5, true, "2\n1\nB\nA")]
+    [InlineData ("AB\n12", 2, 5, true, "2B\n1A")]
+    [InlineData ("ABC 123 456", 2, 7, true, "6\n5\n4\n \n3\n2\n1")]
+    [InlineData ("こんにちは", 1, 1, true, "")]
+    [InlineData ("こんにちは", 2, 1, true, "は")]
+    [InlineData ("こんにちは", 2, 5, true, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは", 2, 10, true, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは\nAB\n12", 4, 10, true, "2Bは\n1Aち\n  に\n  ん\n  こ")]
+    public void Draw_Vertical_BottomTop_RightLeft (string text, int width, int height, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.BottomTop_RightLeft,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, height);
+        }
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
 }
