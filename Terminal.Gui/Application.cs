@@ -1304,14 +1304,14 @@ public static partial class Application
     {
         SizeChanging?.Invoke (null, args);
 
-        if (args.Cancel)
+        if (args.Cancel || args.Size is null)
         {
             return false;
         }
 
         foreach (Toplevel t in _topLevels)
         {
-            t.SetRelativeLayout (args.Size);
+            t.SetRelativeLayout (args.Size.Value);
             t.LayoutSubviews ();
             t.PositionToplevels ();
             t.OnSizeChanging (new (args.Size));

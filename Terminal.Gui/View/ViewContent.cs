@@ -120,27 +120,31 @@ public partial class View
 {
     #region Content Area
 
-    private Size _contentSize;
+    internal Size? _contentSize;
 
     /// <summary>
-    ///     Gets or sets the size of the View's content. If not set, the value will be the same as the size of <see cref="Viewport"/>,
+    ///     Gets or sets the size of the View's content. If <see langword="null"/>, the value will be the same as the size of <see cref="Viewport"/>,
     ///     and <c>Viewport.Location</c> will always be <c>0, 0</c>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If a positive size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
+    ///         If a size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
     ///         to the view. This enables virtual scrolling.
+    ///     </para>
+    ///     <para>
+    ///         If a size is provided, the behavior of <see cref="Dim.DimAutoStyle.Content"/> will be to use the ContentSize
+    ///         to determine the size of the view.
     ///     </para>
     ///     <para>
     ///         Negative sizes are not supported.
     ///     </para>
     /// </remarks>
-    public Size ContentSize
+    public Size? ContentSize
     {
-        get => _contentSize == Size.Empty ? Viewport.Size : _contentSize;
+        get => _contentSize ?? Viewport.Size;
         set
         {
-            if (value.Width < 0 || value.Height < 0)
+            if (value?.Width < 0 || value?.Height < 0)
             {
                 throw new ArgumentException (@"ContentSize cannot be negative.", nameof (value));
             }
@@ -154,8 +158,6 @@ public partial class View
             OnContentSizeChanged (new (_contentSize));
         }
     }
-
-    public Size? IdealContentSize { get; set; }
 
     /// <summary>
     ///     Called when <see cref="ContentSize"/> changes. Invokes the <see cref="ContentSizeChanged"/> event.
@@ -253,7 +255,8 @@ public partial class View
     /// <summary>
     ///     Gets or sets the rectangle describing the portion of the View's content that is visible to the user.
     ///     The viewport Location is relative to the top-left corner of the inner rectangle of <see cref="Padding"/>.
-    ///     If the viewport Size is the same as <see cref="ContentSize"/> the Location will be <c>0, 0</c>.
+    ///     If the viewport Size is the same as <see cref="ContentSize"/>, or <see cref="ContentSize"/> is
+    ///     <see langword="null"/> the Location will be <c>0, 0</c>.
     /// </summary>
     /// <value>
     ///     The rectangle describing the location and size of the viewport into the View's virtual content, described by
@@ -305,14 +308,13 @@ public partial class View
                 return new (_viewportLocation, Frame.Size);
             }
 
-            Thickness thickness = GetAdornmentsThickness ();
-
+            // BUGBUG: This is a hack. Viewport_get should not have side effects.
             if (Frame.Size == Size.Empty)
             {
                 // The Frame has not been set yet (e.g. the view has not been added to a SuperView yet).
                 // 
-                if ((Width is Dim.DimAuto widthAuto && widthAuto._style != Dim.DimAutoStyle.Subviews)
-                    || (Height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews))
+                if ((Width is Dim.DimAuto widthAuto && widthAuto._style.HasFlag(Dim.DimAutoStyle.Text))
+                    || (Height is Dim.DimAuto heightAuto && heightAuto._style.HasFlag (Dim.DimAutoStyle.Text)))
                 {
                     if (TextFormatter.NeedsFormat)
                     {
@@ -320,11 +322,12 @@ public partial class View
                         TextFormatter.AutoSize = true;
 
                         // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
-                        ContentSize = TextFormatter.Size;
+                        ContentSize = TextFormatter.Size == Size.Empty ? null : TextFormatter.Size;
                     }
                 }
             }
 
+            Thickness thickness = GetAdornmentsThickness ();
             return new (
                         _viewportLocation,
                         new (
@@ -372,9 +375,9 @@ public partial class View
         {
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth))
             {
-                if (newViewport.X >= ContentSize.Width)
+                if (newViewport.X >= ContentSize.GetValueOrDefault ().Width)
                 {
-                    newViewport.X = ContentSize.Width - 1;
+                    newViewport.X = ContentSize.GetValueOrDefault ().Width - 1;
                 }
             }
 
@@ -389,9 +392,9 @@ public partial class View
 
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight))
             {
-                if (newViewport.Y >= ContentSize.Height)
+                if (newViewport.Y >= ContentSize.GetValueOrDefault().Height)
                 {
-                    newViewport.Y = ContentSize.Height - 1;
+                    newViewport.Y = ContentSize.GetValueOrDefault ().Height - 1;
                 }
             }
 

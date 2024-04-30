@@ -581,7 +581,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
         superView.BeginInit ();
         superView.EndInit ();
-        superView.SetRelativeLayout (superView.ContentSize);
+        superView.SetRelativeLayout (superView.ContentSize.GetValueOrDefault ());
 
         superView.LayoutSubviews ();
         Assert.Equal (expectedSubWidth, subView.Frame.Width);
@@ -611,7 +611,7 @@ public class DimAutoTests (ITestOutputHelper output)
         {
             X = subX,
             Y = 0,
-            Width = Dim.Auto (Dim.DimAutoStyle.Subviews),
+            Width = Dim.Auto (Dim.DimAutoStyle.Content),
             Height = 1,
             ValidatePosDim = true
         };

@@ -485,8 +485,8 @@ public class ScrollViewTests
         top.Add (sv);
         Application.Begin (top);
 
-        Assert.Equal (50, sv.ContentSize.Width);
-        Assert.Equal (50, sv.ContentSize.Height);
+        Assert.Equal (50, sv.ContentSize.GetValueOrDefault ().Width);
+        Assert.Equal (50, sv.ContentSize.GetValueOrDefault ().Height);
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.ShowHorizontalScrollIndicator);
         Assert.True (sv.ShowVerticalScrollIndicator);

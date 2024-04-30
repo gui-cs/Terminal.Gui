@@ -1,8 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.InteropServices.JavaScript;
-using static System.Net.Mime.MediaTypeNames;
-using static Terminal.Gui.Dialog;
-using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui;
 
@@ -350,7 +346,7 @@ public class Pos
     ///     that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
     {
         return Anchor (superviewDimension);
     }
@@ -399,7 +395,7 @@ public class Pos
             return width - _offset;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
             int newLocation = Anchor (superviewDimension);
 
@@ -417,7 +413,7 @@ public class Pos
         public override string ToString () { return "Center"; }
         internal override int Anchor (int width) { return width / 2; }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
             int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension), 0);
 
@@ -445,7 +441,7 @@ public class Pos
             return la - ra;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
             int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
             int left = _left.Calculate (superviewDimension, dim, us, dimension);
@@ -654,28 +650,42 @@ public class Dim
     /// <summary>
     ///     Specifies how <see cref="DimAuto"/> will compute the dimension.
     /// </summary>
+    [Flags]
     public enum DimAutoStyle
     {
         /// <summary>
         ///     The dimension will be computed using both the view's <see cref="View.Text"/> and
         ///     <see cref="View.Subviews"/> (whichever is larger).
         /// </summary>
-        Auto,
+        Auto = Content | Text,
 
         /// <summary>
-        ///     The Subview in <see cref="View.Subviews"/> with the largest corresponding position plus dimension
+        ///     The dimensions will be computed based on the View's content.
+        /// <para>
+        ///     If <see cref="View.ContentSize"/> is explicitly set (is not <see langword="null"/>) then <see cref="View.ContentSize"/>
+        ///     will be used to determine the dimension.
+        /// </para>
+        /// <para>
+        ///     Otherwise, the Subview in <see cref="View.Subviews"/> with the largest corresponding position plus dimension
         ///     will determine the dimension.
+        /// </para>
+        /// <para>
         ///     The corresponding dimension of the view's <see cref="View.Text"/> will be ignored.
+        /// </para>
         /// </summary>
-        Subviews,
+        Content = 1,
 
         /// <summary>
+        /// <para>
         ///     The corresponding dimension of the view's <see cref="View.Text"/>, formatted using the
         ///     <see cref="View.TextFormatter"/> settings,
         ///     will be used to determine the dimension.
+        /// </para>
+        /// <para>
         ///     The corresponding dimensions of the <see cref="View.Subviews"/> will be ignored.
+        /// </para>
         /// </summary>
-        Text
+        Text = 2
     }
 
 
@@ -704,6 +714,12 @@ public class Dim
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all of the view's SubViews and/or Text.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Tthe behavior of <see cref="DimAutoStyle.Content"/> is overridden and the size of the
+    ///         view will be based on ContentSize.
+    ///     </para>
+    /// </remarks>
     /// <example>
     ///     This initializes a <see cref="View"/> with two SubViews. The view will be automatically sized to fit the two
     ///     SubViews.
@@ -932,16 +948,16 @@ public class Dim
                 return superviewContentSize;
             }
 
-            if (_style is Dim.DimAutoStyle.Text or Dim.DimAutoStyle.Auto)
+            if (_style.HasFlag (Dim.DimAutoStyle.Text))
             {
                 textSize = int.Max (autoMin, dimension == Dimension.Width ? us.TextFormatter.Size.Width : us.TextFormatter.Size.Height);
             }
 
-            if (_style is Dim.DimAutoStyle.Subviews or Dim.DimAutoStyle.Auto)
+            if (_style.HasFlag (DimAutoStyle.Content))
             {
-                if (us.IdealContentSize.HasValue)
+                if (us._contentSize is { })
                 {
-                    subviewsSize = dimension == Dimension.Width ? us.IdealContentSize.Value.Width : us.IdealContentSize.Value.Height;
+                    subviewsSize = dimension == Dimension.Width ? us.ContentSize.Value.Width : us.ContentSize.Value.Height;
                 }
                 else
                 {
@@ -976,7 +992,8 @@ public class Dim
         /// <returns></returns>
         internal override bool ReferencesOtherViews ()
         {
-            return _style is Dim.DimAutoStyle.Subviews or Dim.DimAutoStyle.Auto;
+            // BUGBUG: This is not correct. _contentSize may be null.
+            return _style.HasFlag (Dim.DimAutoStyle.Content);
         }
 
     }

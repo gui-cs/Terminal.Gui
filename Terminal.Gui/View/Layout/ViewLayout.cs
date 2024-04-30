@@ -91,7 +91,7 @@ public partial class View
     private void SetFrame (Rectangle frame)
     {
         var oldViewport = Rectangle.Empty;
-        var oldContentSize = Size.Empty;
+        Size? oldContentSize = null;
 
         if (IsInitialized)
         {
@@ -106,7 +106,7 @@ public partial class View
 
         if (!TextFormatter.AutoSize)
         {
-            TextFormatter.Size = ContentSize;
+            TextFormatter.Size = ContentSize.GetValueOrDefault ();
         }
     }
 
@@ -284,7 +284,7 @@ public partial class View
             if (_height is Dim.DimAuto)
             {
                 // Reset ContentSize to Viewport
-                _contentSize = Size.Empty;
+                _contentSize = null;
             }
 
             _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
@@ -330,7 +330,7 @@ public partial class View
             if (_width is Dim.DimAuto)
             {
                 // Reset ContentSize to Viewport
-                _contentSize = Size.Empty;
+                _contentSize = null;
             }
 
             _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
@@ -672,7 +672,7 @@ public partial class View
 
         LayoutAdornments ();
 
-        OnLayoutStarted (new (ContentSize));
+        OnLayoutStarted (new (ContentSize.GetValueOrDefault ()));
 
         SetTextFormatterSize ();
 
@@ -712,13 +712,13 @@ public partial class View
         {
             foreach ((View from, View to) in edges)
             {
-                LayoutSubview (to, from.ContentSize);
+                LayoutSubview (to, from.ContentSize.GetValueOrDefault ());
             }
         }
 
         LayoutNeeded = false;
 
-        OnLayoutComplete (new (ContentSize));
+        OnLayoutComplete (new (ContentSize.GetValueOrDefault ()));
     }
 
     // TODO: Move this logic into the Pos/Dim classes
@@ -835,13 +835,13 @@ public partial class View
 
         // First try SuperView.Viewport, then Application.Top, then Driver.Viewport.
         // Finally, if none of those are valid, use int.MaxValue (for Unit tests).
-        Size contentSize = SuperView is { IsInitialized: true } ? SuperView.ContentSize :
+        Size? contentSize = SuperView is { IsInitialized: true } ? SuperView.ContentSize :
                            Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.ContentSize :
                            Application.Driver?.Screen.Size ?? new (int.MaxValue, int.MaxValue);
 
         SetTextFormatterSize ();
 
-        SetRelativeLayout (contentSize);
+        SetRelativeLayout (contentSize.GetValueOrDefault ());
 
         if (IsInitialized)
         {
@@ -892,18 +892,23 @@ public partial class View
     /// <param name="superviewContentSize">
     ///     The size of the SuperView's content (nominally the same as <c>this.SuperView.ContentSize</c>).
     /// </param>
-    internal void SetRelativeLayout (Size superviewContentSize)
+    internal void SetRelativeLayout (Size? superviewContentSize)
     {
         Debug.Assert (_x is { });
         Debug.Assert (_y is { });
         Debug.Assert (_width is { });
         Debug.Assert (_height is { });
 
+        if (superviewContentSize is null)
+        {
+            return;
+        }
+
         CheckDimAuto ();
-        int newX = _x.Calculate (superviewContentSize.Width, _width, this, Dim.Dimension.Width);
-        int newW = _width.Calculate (newX, superviewContentSize.Width, this, Dim.Dimension.Width);
-        int newY = _y.Calculate (superviewContentSize.Height, _height, this, Dim.Dimension.Height);
-        int newH = _height.Calculate (newY, superviewContentSize.Height, this, Dim.Dimension.Height);
+        int newX = _x.Calculate (superviewContentSize.Value.Width, _width, this, Dim.Dimension.Width);
+        int newW = _width.Calculate (newX, superviewContentSize.Value.Width, this, Dim.Dimension.Width);
+        int newY = _y.Calculate (superviewContentSize.Value.Height, _height, this, Dim.Dimension.Height);
+        int newH = _height.Calculate (newY, superviewContentSize.Value.Height, this, Dim.Dimension.Height);
 
         Rectangle newFrame = new (newX, newY, newW, newH);
 
