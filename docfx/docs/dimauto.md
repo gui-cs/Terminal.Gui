@@ -12,7 +12,14 @@ The `DimAutoStyle` enum defines the different ways that `Dim.Auto` can be used t
 
 ## Using Dim.Auto
 
+`Dim.Auto` is defined as:
+
+```cs
+public static Dim Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim min = null, Dim max = null)
+```
+
 To use `Dim.Auto`, set the `Width` or `Height` property of a view to `Dim.Auto (DimAutoStyle.Text)` or `Dim.Auto (DimAutoStyle.Content)`.
+
 
 For example, to create a `View` that is sized based on the `Text` property, you can do this:
 
@@ -39,6 +46,23 @@ view.Add (new Label () { Text = "Hello, World!" });
 ```
 
 In this example, the `View` will be sized based on the size of the `Label` that is added to it.
+
+### Specifying a miniumum size
+
+You can specify a minimum size by passing a `Dim` object to the `min` parameter. For example, to create a `View` that is sized based on the `Text` property, but has a minimum width of 10 columns, you can do this:
+
+```cs
+View view = new ()
+{
+    Text = "Hello, World!",
+    Width = Dim.Auto (DimAutoStyle.Text, min: Dim.Absolute (10)),
+    Height = Dim.Auto (DimAutoStyle.Text),
+};
+```
+
+### Specifying a maximum size
+
+> NOT YET IMPLEMENTED
 
 ## Limitations
 
