@@ -4080,7 +4080,7 @@ B")]
         Application.Shutdown ();
     }
 
-    //TODO: Expand this test to cover Vertical Alignment as well
+    //FIXED: Expand this test to cover Vertical Alignment as well
     [SetupFakeDriver]
     [Theory]
     [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
