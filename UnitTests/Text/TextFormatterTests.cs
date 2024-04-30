@@ -4117,8 +4117,8 @@ B")]
 *******
 *******")]
 
-    [InlineData ("0 2 4", TextAlignment.Left, TextDirection.LeftRight_BottomTop, @"
-0 2 4**
+    [InlineData ("0 你 4", TextAlignment.Left, TextDirection.LeftRight_BottomTop, @"
+0 你 4*
 *******
 *******
 *******
