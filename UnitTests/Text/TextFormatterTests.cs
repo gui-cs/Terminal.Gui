@@ -4083,7 +4083,7 @@ B")]
     //TODO: Expand this test to cover Vertical Alignment as well
     [SetupFakeDriver]
     [Theory]
-    [InlineData ("0 2 4", TextAlignment.Left, TextDirection.LeftRight_BottomTop, @"
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
 0 2 4**
 *******
 *******
@@ -4091,7 +4091,7 @@ B")]
 *******
 *******
 *******")]
-    [InlineData ("0 2 4", TextAlignment.Right, TextDirection.LeftRight_BottomTop, @"
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
 **0 2 4
 *******
 *******
@@ -4099,7 +4099,7 @@ B")]
 *******
 *******
 *******")]
-    [InlineData ("0 2 4", TextAlignment.Centered, TextDirection.LeftRight_BottomTop, @"
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
 *0 2 4*
 *******
 *******
@@ -4107,8 +4107,7 @@ B")]
 *******
 *******
 *******")]
-
-    [InlineData ("0 2 4", TextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
 0  2  4
 *******
 *******
@@ -4117,7 +4116,7 @@ B")]
 *******
 *******")]
 
-    [InlineData ("0 你 4", TextAlignment.Left, TextDirection.LeftRight_BottomTop, @"
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
 0 你 4*
 *******
 *******
@@ -4125,7 +4124,7 @@ B")]
 *******
 *******
 *******")]
-    [InlineData ("0 你 4", TextAlignment.Right, TextDirection.LeftRight_BottomTop, @"
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
 *0 你 4
 *******
 *******
@@ -4133,7 +4132,7 @@ B")]
 *******
 *******
 *******")]
-    [InlineData ("0 你 4", TextAlignment.Centered, TextDirection.LeftRight_BottomTop, @"
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
 0 你 4*
 *******
 *******
@@ -4141,8 +4140,7 @@ B")]
 *******
 *******
 *******")]
-
-    [InlineData ("0 你 4", TextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
 0  你 4
 *******
 *******
@@ -4150,11 +4148,78 @@ B")]
 *******
 *******
 *******")]
-    public void Draw_Text_Alignment (string text, TextAlignment horizontalTextAlignment, TextDirection textDirection, string expectedText)
+
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+2******
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.TopBottom_RightLeft, @"
+*******
+*******
+0******
+ ******
+2******
+ ******
+4******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.TopBottom_RightLeft, @"
+*******
+0******
+ ******
+2******
+ ******
+4******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+ ******
+2******
+ ******
+ ******
+4******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+你*****
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.TopBottom_RightLeft, @"
+*******
+*******
+0******
+ ******
+你*****
+ ******
+4******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.TopBottom_RightLeft, @"
+*******
+0******
+ ******
+你*****
+ ******
+4******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+ ******
+你*****
+ ******
+ ******
+4******")]
+    public void Draw_Text_Alignment (string text, TextAlignment horizontalTextAlignment, VerticalTextAlignment verticalTextAlignment, TextDirection textDirection, string expectedText)
     {
         TextFormatter tf = new ()
         {
             Alignment = horizontalTextAlignment,
+            VerticalAlignment = verticalTextAlignment,
             Direction = textDirection,
             Size = new (7, 7),
             Text = text
