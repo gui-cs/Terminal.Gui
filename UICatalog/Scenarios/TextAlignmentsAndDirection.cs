@@ -474,13 +474,11 @@ public class TextAlignmentsAndDirections : Scenario
         {
             X = Pos.Right (container) + 1,
             Y = Pos.Y (justifyCheckbox) + 1,
-            AutoSize = false,
             Width = Dim.Fill (10),
             Height = 1,
             Text = "Word Wrap",
-            Checked = true
         };
-
+        wrapCheckbox.Checked = wrapCheckbox.TextFormatter.WordWrap;
         wrapCheckbox.Toggled += (s, e) =>
                                 {
                                     if (e.OldValue == true)
@@ -501,6 +499,37 @@ public class TextAlignmentsAndDirections : Scenario
 
         app.Add (wrapCheckbox);
 
+        // AUTOSIZE CHECKBOX
+
+        var autoSizeCheckbox = new CheckBox
+        {
+            X = Pos.Right (container) + 1,
+            Y = Pos.Y (wrapCheckbox) + 1,
+            Width = Dim.Fill (10),
+            Height = 1,
+            Text = "AutoSize",
+        };
+        autoSizeCheckbox.Checked = autoSizeCheckbox.TextFormatter.AutoSize;
+        autoSizeCheckbox.Toggled += (s, e) =>
+                                    {
+                                        if (e.OldValue == true)
+                                        {
+                                            foreach (Label t in mtxts)
+                                            {
+                                                t.TextFormatter.AutoSize = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foreach (Label t in mtxts)
+                                            {
+                                                t.TextFormatter.AutoSize = true;
+                                            }
+                                        }
+                                    };
+
+        app.Add (autoSizeCheckbox);
+
         // Direction Options
 
         List<TextDirection> directionsEnum = Enum.GetValues (typeof (TextDirection)).Cast<TextDirection> ().ToList ();
@@ -508,7 +537,7 @@ public class TextAlignmentsAndDirections : Scenario
         var directionOptions = new RadioGroup
         {
             X = Pos.Right (container) + 1,
-            Y = Pos.Bottom (wrapCheckbox) + 1,
+            Y = Pos.Bottom (autoSizeCheckbox) + 1,
             Width = Dim.Fill (10),
             Height = Dim.Fill (1),
             HotKeySpecifier = (Rune)'\xffff',
