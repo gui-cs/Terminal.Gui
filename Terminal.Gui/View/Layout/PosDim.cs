@@ -593,7 +593,7 @@ public class Pos
 ///                 </term>
 ///                 <description>
 ///                     Creates a <see cref="Dim"/> object that automatically sizes the view to fit
-///                     the view's SubViews.
+///                     the view's Text, SubViews, or ContentArea.
 ///                 </description>
 ///             </item>
 ///             <item>
@@ -660,7 +660,7 @@ public class Dim
         Auto = Content | Text,
 
         /// <summary>
-        ///     The dimensions will be computed based on the View's content.
+        ///     The dimensions will be computed based on the View's non-Text content.
         /// <para>
         ///     If <see cref="View.ContentSize"/> is explicitly set (is not <see langword="null"/>) then <see cref="View.ContentSize"/>
         ///     will be used to determine the dimension.
@@ -712,12 +712,11 @@ public class Dim
 
 
     /// <summary>
-    ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all of the view's SubViews and/or Text.
+    ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all the view's SubViews and/or Text.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Tthe behavior of <see cref="DimAutoStyle.Content"/> is overridden and the size of the
-    ///         view will be based on ContentSize.
+    ///         See <see cref="DimAutoStyle"/>.
     ///     </para>
     /// </remarks>
     /// <example>
