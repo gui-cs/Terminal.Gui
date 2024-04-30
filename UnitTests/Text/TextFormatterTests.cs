@@ -3664,4 +3664,124 @@ ek")]
         };
         Assert.Equal (new (1, expected), tf.Size);
     }
+
+    // Draw tests - Note that these depend on View
+
+    [Fact]
+    [TestRespondersDisposed]
+    public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+    {
+        Application.Init (new FakeDriver ());
+
+        Toplevel top = new ();
+
+        var view = new View { Y = -2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight, Text = "view" };
+        top.Add (view);
+
+        Application.Iteration += (s, a) =>
+        {
+            Assert.Equal (-2, view.Y);
+
+            Application.RequestStop ();
+        };
+
+        try
+        {
+            Application.Run (top);
+        }
+        catch (IndexOutOfRangeException ex)
+        {
+            // After the fix this exception will not be caught.
+            Assert.IsType<IndexOutOfRangeException> (ex);
+        }
+
+        top.Dispose ();
+        // Shutdown must be called to safely clean up Application if Init has been called
+        Application.Shutdown ();
+    }
+
+    //TODO: Expand this test to cover Vertical Alignment as well
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("0 2 4", TextAlignment.Left, TextDirection.LeftRight_BottomTop, @"
+0 2 4**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, TextDirection.LeftRight_BottomTop, @"
+**0 2 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, TextDirection.LeftRight_BottomTop, @"
+*0 2 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 2 4", TextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+0  2  4
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 2 4", TextAlignment.Left, TextDirection.LeftRight_BottomTop, @"
+0 2 4**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, TextDirection.LeftRight_BottomTop, @"
+*0 你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, TextDirection.LeftRight_BottomTop, @"
+0 你 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+0  你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    public void Draw_Text_Alignment (string text, TextAlignment horizontalTextAlignment, TextDirection textDirection, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Alignment = horizontalTextAlignment,
+            Direction = textDirection,
+            Size = new (7, 7),
+            Text = text
+        };
+
+        Application.Driver.FillRect (new Rectangle (0, 0, 7, 7), (Rune)'*');
+        tf.Draw (new Rectangle (0, 0, 7, 7), Attribute.Default, Attribute.Default);
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
 }
