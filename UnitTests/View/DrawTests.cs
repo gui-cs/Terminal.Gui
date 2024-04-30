@@ -1110,7 +1110,7 @@ public class DrawTests (ITestOutputHelper _output)
 *******
 *******
 *******")]
-    public void Daw_Text_Alignment (string text, TextAlignment textAlignment, string expectedText)
+    public void Draw_Text_Alignment (string text, TextAlignment textAlignment, string expectedText)
     {
         View view = new ()
         {

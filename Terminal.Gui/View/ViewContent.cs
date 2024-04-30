@@ -132,8 +132,8 @@ public partial class View
     ///         to the view. This enables virtual scrolling.
     ///     </para>
     ///     <para>
-    ///         If a size is provided, the behavior of <see cref="Dim.DimAutoStyle.Content"/> is overridden and the size of the
-    ///         view will be based on ContentSize.
+    ///         If a size is provided, the behavior of <see cref="Dim.DimAutoStyle.Content"/> will be to use the ContentSize
+    ///         to determine the size of the view.
     ///     </para>
     ///     <para>
     ///         Negative sizes are not supported.
