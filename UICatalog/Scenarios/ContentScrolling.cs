@@ -115,7 +115,7 @@ public class ContentScrolling : Scenario
         var view = new ScrollingDemoView
         {
             Title = "Demo View",
-            X = Pos.Right(editor),
+            X = Pos.Right (editor),
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
@@ -227,7 +227,7 @@ public class ContentScrolling : Scenario
 
         var contentSizeWidth = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.Width,
+            Value = view.ContentSize.GetValueOrDefault ().Width,
             X = Pos.Right (labelContentSize) + 1,
             Y = Pos.Top (labelContentSize)
         };
@@ -242,7 +242,7 @@ public class ContentScrolling : Scenario
                 return;
             }
 
-            view.ContentSize = view.ContentSize with { Width = e.NewValue };
+            view.ContentSize = view.ContentSize.GetValueOrDefault () with { Width = e.NewValue };
         }
 
         var labelComma = new Label
@@ -254,7 +254,7 @@ public class ContentScrolling : Scenario
 
         var contentSizeHeight = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.Height,
+            Value = view.ContentSize.GetValueOrDefault ().Height,
             X = Pos.Right (labelComma) + 1,
             Y = Pos.Top (labelContentSize),
             CanFocus = false
@@ -270,7 +270,7 @@ public class ContentScrolling : Scenario
                 return;
             }
 
-            view.ContentSize = view.ContentSize with { Height = e.NewValue };
+            view.ContentSize = view.ContentSize.GetValueOrDefault () with { Height = e.NewValue };
         }
 
         var cbClearOnlyVisible = new CheckBox
@@ -397,7 +397,7 @@ public class ContentScrolling : Scenario
             BorderStyle = LineStyle.Double,
             Title = "_Slider"
         };
-        view.Add(slider);
+        view.Add (slider);
 
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 

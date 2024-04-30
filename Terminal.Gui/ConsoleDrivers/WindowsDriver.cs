@@ -1517,23 +1517,28 @@ internal class WindowsDriver : ConsoleDriver
 #if HACK_CHECK_WINCHANGED
     private void ChangeWin (object s, SizeChangedEventArgs e)
     {
-        int w = e.Size.Width;
+        if (e.Size is null)
+        {
+            return;
+        }
 
-        if (w == Cols - 3 && e.Size.Height < Rows)
+        int w = e.Size.Value.Width;
+
+        if (w == Cols - 3 && e.Size.Value.Height < Rows)
         {
             w += 3;
         }
 
         Left = 0;
         Top = 0;
-        Cols = e.Size.Width;
-        Rows = e.Size.Height;
+        Cols = e.Size.Value.Width;
+        Rows = e.Size.Value.Height;
 
         if (!RunningUnitTests)
         {
             Size newSize = WinConsole.SetConsoleWindow (
                                                         (short)Math.Max (w, 16),
-                                                        (short)Math.Max (e.Size.Height, 0));
+                                                        (short)Math.Max (e.Size.Value.Height, 0));
 
             Cols = newSize.Width;
             Rows = newSize.Height;

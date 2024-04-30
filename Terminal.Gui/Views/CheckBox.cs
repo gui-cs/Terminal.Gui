@@ -191,11 +191,11 @@ public class CheckBox : View
 
     private string GetFormatterText ()
     {
-        if (Width is Dim.DimAuto || string.IsNullOrEmpty (Title) || ContentSize.Width <= 2)
+        if (Width is Dim.DimAuto || string.IsNullOrEmpty (Title) || ContentSize?.Width <= 2)
         {
             return Text;
         }
 
-        return Text [..Math.Min (ContentSize.Width - 2, Text.GetRuneCount ())];
+        return ContentSize is null ? Text : Text [..Math.Min (ContentSize.Value.Width - 2, Text.GetRuneCount ())];
     }
 }

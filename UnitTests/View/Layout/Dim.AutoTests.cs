@@ -581,7 +581,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
         superView.BeginInit ();
         superView.EndInit ();
-        superView.SetRelativeLayout (superView.ContentSize);
+        superView.SetRelativeLayout (superView.ContentSize.GetValueOrDefault ());
 
         superView.LayoutSubviews ();
         Assert.Equal (expectedSubWidth, subView.Frame.Width);

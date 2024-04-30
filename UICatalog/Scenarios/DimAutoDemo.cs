@@ -27,7 +27,11 @@ public class DimAutoDemo : Scenario
         };
         view.ValidatePosDim = true;
 
-        var textEdit = new TextView { Text = "", X = 1, Y = 0, Width = 20, Height = 4 };
+        var textEdit = new TextView
+        {
+            Text = "",
+            X = 1, Y = 0, Width = 20, Height = 4
+        };
         view.Add (textEdit);
 
         var hlabel = new Label

@@ -502,7 +502,6 @@ public class SliderTests
             Type = SliderType.Multiple,
             Width = Dim.Auto (Dim.DimAutoStyle.Subviews),
             Height = Dim.Auto (Dim.DimAutoStyle.Subviews),
-            //IdealContentSize = new (6, 2)
         };
         view.Add (slider);
         view.BeginInit ();

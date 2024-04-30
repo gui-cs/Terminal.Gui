@@ -211,8 +211,8 @@ public class ConsoleDriverTests
         driver.SizeChanged += (s, e) =>
                               {
                                   wasTerminalResized = true;
-                                  Assert.Equal (120, e.Size.Width);
-                                  Assert.Equal (40, e.Size.Height);
+                                  Assert.Equal (120, e.Size.GetValueOrDefault ().Width);
+                                  Assert.Equal (40, e.Size.GetValueOrDefault ().Height);
                               };
 
         Assert.Equal (80, driver.Cols);

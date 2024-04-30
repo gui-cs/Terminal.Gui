@@ -119,7 +119,7 @@ public partial class View
     /// <summary>
     ///     Gets or sets the <see cref="Gui.TextFormatter"/> used to format <see cref="Text"/>.
     /// </summary>
-    public TextFormatter TextFormatter { get; init; } = new () {};
+    public TextFormatter TextFormatter { get; init; } = new () { };
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned vertically when drawn. Changing this property will
@@ -179,19 +179,19 @@ public partial class View
 
         // TODO: This is a hack. Figure out how to move this into DimDimAuto
         // Use _width & _height instead of Width & Height to avoid debug spew
-        if ((_width is Dim.DimAuto widthAuto && widthAuto._style != Dim.DimAutoStyle.Subviews)
-            || (_height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews))
+        if ((_width is Dim.DimAuto widthAuto && widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
+            || (_height is Dim.DimAuto heightAuto && heightAuto._style.HasFlag (Dim.DimAutoStyle.Text)))
         {
             // This updates TextFormatter.Size to the text size
             TextFormatter.AutoSize = true;
 
             // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
-            ContentSize = TextFormatter.Size;
+            ContentSize = TextFormatter.Size == Size.Empty ? null : TextFormatter.Size;
             return;
         }
 
         TextFormatter.AutoSize = false;
-        TextFormatter.Size = new Size (ContentSize.Width, ContentSize.Height);
+        TextFormatter.Size = new Size (ContentSize.GetValueOrDefault ().Width, ContentSize.GetValueOrDefault ().Height);
     }
 
     private void UpdateTextDirection (TextDirection newDirection)
@@ -257,11 +257,11 @@ public partial class View
             }
             else
             {
-                _height = ContentSize.Height;
-                _width = ContentSize.Width;
+                _height = ContentSize.GetValueOrDefault ().Height;
+                _width = ContentSize.GetValueOrDefault ().Width;
 
                 // Force ContentSize to be reset to Viewport
-                _contentSize = Size.Empty;
+                _contentSize = null;
                 OnResizeNeeded ();
             }
         }

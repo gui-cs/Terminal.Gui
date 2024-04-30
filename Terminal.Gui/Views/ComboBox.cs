@@ -612,13 +612,14 @@ public class ComboBox : View
             Height = _minimumHeight;
         }
 
+        // BUGBUG: This uses Viewport. Should use ContentSize
         if ((!_autoHide && Viewport.Width > 0 && _search.Frame.Width != Viewport.Width)
             || (_autoHide && Viewport.Width > 0 && _search.Frame.Width != Viewport.Width - 1))
         {
             _search.Width = _listview.Width = _autoHide ? Viewport.Width - 1 : Viewport.Width;
             _listview.Height = CalculatetHeight ();
-            _search.SetRelativeLayout (ContentSize);
-            _listview.SetRelativeLayout (ContentSize);
+            _search.SetRelativeLayout (ContentSize.GetValueOrDefault());
+            _listview.SetRelativeLayout (ContentSize.GetValueOrDefault ());
         }
     }
 

@@ -400,8 +400,8 @@ public class Slider<T> : View
             }
             else
             {
-                Width = ContentSize.Width;
-                Height = ContentSize.Height;
+                Width = ContentSize.GetValueOrDefault ().Width;
+                Height = ContentSize.GetValueOrDefault ().Height;
             }
         }
     }
@@ -792,11 +792,11 @@ public class Slider<T> : View
                           Viewport.Location,
                           new (
                                int.Min (
-                                        SuperView.ContentSize.Width - adornmentsThickness.Horizontal,
+                                        SuperView.ContentSize.GetValueOrDefault ().Width - adornmentsThickness.Horizontal,
                                         CalcBestLength ()
                                        ),
                                int.Min (
-                                        SuperView.ContentSize.Height - adornmentsThickness.Vertical,
+                                        SuperView.ContentSize.GetValueOrDefault ().Height - adornmentsThickness.Vertical,
                                         CalcThickness ()
                                        )
                               )
@@ -804,14 +804,14 @@ public class Slider<T> : View
         }
         else
         {
-            IdealContentSize = new (
+            ContentSize = new (
                           new (
                                int.Min (
-                                        SuperView.ContentSize.Width - adornmentsThickness.Horizontal,
+                                        SuperView.ContentSize.GetValueOrDefault ().Width - adornmentsThickness.Horizontal,
                                         CalcThickness ()
                                        ),
                                int.Min (
-                                        SuperView.ContentSize.Height - adornmentsThickness.Vertical,
+                                        SuperView.ContentSize.GetValueOrDefault ().Height - adornmentsThickness.Vertical,
                                         CalcBestLength ()
                                        )
                               )
@@ -1532,7 +1532,7 @@ public class Slider<T> : View
     private Point? _moveRenderPosition;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent mouseEvent)
+    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
         // Note(jmperricone): Maybe we click to focus the cursor, and on next click we set the option.
         //                    That will makes OptionFocused Event more relevant.
