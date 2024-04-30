@@ -939,11 +939,18 @@ public class Dim
 
             if (_style is Dim.DimAutoStyle.Subviews or Dim.DimAutoStyle.Auto)
             {
-                subviewsSize = us.Subviews.Count == 0
-                                   ? 0
-                                   : us.Subviews
-                                         .Where (v => dimension == Dimension.Width ? v.X is not Pos.PosAnchorEnd : v.Y is not Pos.PosAnchorEnd)
-                                         .Max (v => dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height);
+                if (us.IdealContentSize.HasValue)
+                {
+                    subviewsSize = dimension == Dimension.Width ? us.IdealContentSize.Value.Width : us.IdealContentSize.Value.Height;
+                }
+                else
+                {
+                    subviewsSize = us.Subviews.Count == 0
+                                       ? 0
+                                       : us.Subviews
+                                           .Where (v => dimension == Dimension.Width ? v.X is not Pos.PosAnchorEnd : v.Y is not Pos.PosAnchorEnd)
+                                           .Max (v => dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height);
+                }
             }
 
             int max = int.Max (textSize, subviewsSize);

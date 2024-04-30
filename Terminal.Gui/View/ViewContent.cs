@@ -155,6 +155,8 @@ public partial class View
         }
     }
 
+    public Size? IdealContentSize { get; set; }
+
     /// <summary>
     ///     Called when <see cref="ContentSize"/> changes. Invokes the <see cref="ContentSizeChanged"/> event.
     /// </summary>
@@ -319,10 +321,8 @@ public partial class View
 
                         // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
                         ContentSize = TextFormatter.Size;
-
                     }
                 }
-                //SetRelativeLayout (SuperView?.ContentSize ?? new Size (int.MaxValue, int.MaxValue));
             }
 
             return new (
@@ -357,7 +357,6 @@ public partial class View
             }
 
             OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
-
             return;
         }
 
@@ -417,7 +416,10 @@ public partial class View
     ///     Called when the <see cref="Viewport"/> changes. Invokes the <see cref="ViewportChanged"/> event.
     /// </summary>
     /// <param name="e"></param>
-    protected virtual void OnViewportChanged (DrawEventArgs e) { ViewportChanged?.Invoke (this, e); }
+    protected virtual void OnViewportChanged (DrawEventArgs e)
+    {
+        ViewportChanged?.Invoke (this, e);
+    }
 
     /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location to a screen-relative location.

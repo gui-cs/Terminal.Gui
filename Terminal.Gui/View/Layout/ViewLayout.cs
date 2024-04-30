@@ -91,10 +91,12 @@ public partial class View
     private void SetFrame (Rectangle frame)
     {
         var oldViewport = Rectangle.Empty;
+        var oldContentSize = Size.Empty;
 
         if (IsInitialized)
         {
             oldViewport = Viewport;
+            oldContentSize = ContentSize;
         }
 
         // This is the only place where _frame should be set directly. Use Frame = or SetFrame instead.
@@ -340,6 +342,18 @@ public partial class View
     #endregion Frame
 
     #region Layout Engine
+
+
+    // @tig Notes on layout flow. Ignore for now.
+    // BeginLayout
+    //   If !LayoutNeeded return
+    //   If !SizeNeeded return
+    //   Call OnLayoutStarted
+    //      Views and subviews can update things
+    //   
+
+
+    // EndLayout
 
     /// <summary>
     ///     Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is
@@ -780,6 +794,7 @@ public partial class View
 
     private void LayoutSubview (View v, Size contentSize)
     {
+        // BUGBUG: Calling SetRelativeLayout before LayoutSubviews is problematic. Need to resolve.
         v.SetRelativeLayout (contentSize);
         v.LayoutSubviews ();
         v.LayoutNeeded = false;
@@ -793,6 +808,9 @@ public partial class View
     ///     have been laid out.
     /// </summary>
     internal virtual void OnLayoutComplete (LayoutEventArgs args) { LayoutComplete?.Invoke (this, args); }
+
+    // BUGBUG: We need an API/event that is called from SetRelativeLayout instead of/in addition to 
+    // BUGBUG: OnLayoutStarted which is called from LayoutSubviews.
 
     /// <summary>
     ///     Raises the <see cref="LayoutStarted"/> event. Called from  <see cref="LayoutSubviews"/> before any subviews

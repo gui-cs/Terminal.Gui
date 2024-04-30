@@ -265,11 +265,19 @@ public class Slider<T> : View
 
         Enter += (s, e) => { };
 
-        LayoutComplete += (s, e) =>
+        // BUGBUG: This should not be needed - Need to ensure SetRelativeLayout gets called during EndInit
+        Initialized += (s, e) =>
+                         {
+                             CalcSpacingConfig ();
+                             SetContentSizeBestFit ();
+                         };
+
+        LayoutStarted += (s, e) =>
                           {
                               CalcSpacingConfig ();
-                              SetBoundsBestFit ();
+                              SetContentSizeBestFit ();
                           };
+
     }
 
     #endregion
@@ -374,13 +382,9 @@ public class Slider<T> : View
     }
 
     /// <summary>
-    ///     If <see langword="true"/> the slider will be sized to fit the available space (the Viewport of the the
-    ///     SuperView).
+    ///     If <see langword="true"/>, <see cref="View.Width"/> and <see cref="View.Height"/> will be automatically set
+    /// such that the slider will be optimally sized to fit the options using the various slider settings.
     /// </summary>
-    /// <remarks>
-    ///     For testing, if there is no SuperView, the slider will be sized based on what <see cref="InnerSpacing"/> is
-    ///     set to.
-    /// </remarks>
     [ObsoleteAttribute ("Use Dim.Auto instead.", false)]
     public override bool AutoSize
     {
@@ -389,10 +393,15 @@ public class Slider<T> : View
         {
             _config._autoSize = value;
 
-            if (IsInitialized)
+            if (value)
             {
-                CalcSpacingConfig ();
-                SetBoundsBestFit ();
+                Width = Dim.Auto (Dim.DimAutoStyle.Subviews);
+                Height = Dim.Auto (Dim.DimAutoStyle.Subviews);
+            }
+            else
+            {
+                Width = ContentSize.Width;
+                Height = ContentSize.Height;
             }
         }
     }
@@ -408,7 +417,7 @@ public class Slider<T> : View
             if (IsInitialized)
             {
                 CalcSpacingConfig ();
-                SetBoundsBestFit ();
+                SetContentSizeBestFit ();
             }
         }
     }
@@ -456,7 +465,7 @@ public class Slider<T> : View
             if (IsInitialized)
             {
                 CalcSpacingConfig ();
-                SetBoundsBestFit ();
+                SetContentSizeBestFit ();
             }
         }
 
@@ -474,7 +483,7 @@ public class Slider<T> : View
             if (IsInitialized)
             {
                 CalcSpacingConfig ();
-                SetBoundsBestFit ();
+                SetContentSizeBestFit ();
             }
         }
     }
@@ -508,7 +517,7 @@ public class Slider<T> : View
             }
 
             CalcSpacingConfig ();
-            SetBoundsBestFit ();
+            SetContentSizeBestFit ();
         }
     }
 
@@ -537,7 +546,7 @@ public class Slider<T> : View
         set
         {
             _config._showLegends = value;
-            SetBoundsBestFit ();
+            SetContentSizeBestFit ();
         }
     }
 
@@ -767,9 +776,9 @@ public class Slider<T> : View
     }
 
     /// <summary>Adjust the dimensions of the Slider to the best value if <see cref="AutoSize"/> is true.</summary>
-    public void SetBoundsBestFit ()
+    public void SetContentSizeBestFit ()
     {
-        if (!IsInitialized || AutoSize == false)
+        if (!IsInitialized || !(Height is Dim.DimAuto && Width is Dim.DimAuto))
         {
             return;
         }
@@ -778,15 +787,16 @@ public class Slider<T> : View
 
         if (_config._sliderOrientation == Orientation.Horizontal)
         {
+            // BUGBUG: For this View, ContentSize == Viewport.Size, so this works. But for correctness we should be setting ContentSize here
             Viewport = new (
                           Viewport.Location,
                           new (
                                int.Min (
-                                        SuperView.Viewport.Width - adornmentsThickness.Horizontal,
+                                        SuperView.ContentSize.Width - adornmentsThickness.Horizontal,
                                         CalcBestLength ()
                                        ),
                                int.Min (
-                                        SuperView.Viewport.Height - adornmentsThickness.Vertical,
+                                        SuperView.ContentSize.Height - adornmentsThickness.Vertical,
                                         CalcThickness ()
                                        )
                               )
@@ -794,15 +804,14 @@ public class Slider<T> : View
         }
         else
         {
-            Viewport = new (
-                          Viewport.Location,
+            IdealContentSize = new (
                           new (
                                int.Min (
-                                        SuperView.Viewport.Width - adornmentsThickness.Horizontal,
+                                        SuperView.ContentSize.Width - adornmentsThickness.Horizontal,
                                         CalcThickness ()
                                        ),
                                int.Min (
-                                        SuperView.Viewport.Height - adornmentsThickness.Vertical,
+                                        SuperView.ContentSize.Height - adornmentsThickness.Vertical,
                                         CalcBestLength ()
                                        )
                               )
