@@ -22,8 +22,8 @@ public class DimAutoDemo : Scenario
             Title = "Type to make View grow",
             X = 1,
             Y = 1,
-            Width = Auto (DimAutoStyle.Subviews, 40),
-            Height = Auto (DimAutoStyle.Subviews, 10)
+            Width = Auto (DimAutoStyle.Content, 40),
+            Height = Auto (DimAutoStyle.Content, 10)
         };
         view.ValidatePosDim = true;
 

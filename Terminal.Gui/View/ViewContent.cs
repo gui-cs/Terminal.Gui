@@ -128,8 +128,12 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If a positive size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
+    ///         If a size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
     ///         to the view. This enables virtual scrolling.
+    ///     </para>
+    ///     <para>
+    ///         If a size is provided, the behavior of <see cref="Dim.DimAutoStyle.Content"/> is overridden and the size of the
+    ///         view will be based on ContentSize.
     ///     </para>
     ///     <para>
     ///         Negative sizes are not supported.

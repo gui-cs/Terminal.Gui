@@ -657,20 +657,33 @@ public class Dim
         ///     The dimension will be computed using both the view's <see cref="View.Text"/> and
         ///     <see cref="View.Subviews"/> (whichever is larger).
         /// </summary>
-        Auto = Subviews | Text,
+        Auto = Content | Text,
 
         /// <summary>
-        ///     The Subview in <see cref="View.Subviews"/> with the largest corresponding position plus dimension
+        ///     The dimensions will be computed based on the View's content.
+        /// <para>
+        ///     If <see cref="View.ContentSize"/> is explicitly set (is not <see langword="null"/>) then <see cref="View.ContentSize"/>
+        ///     will be used to determine the dimension.
+        /// </para>
+        /// <para>
+        ///     Otherwise, the Subview in <see cref="View.Subviews"/> with the largest corresponding position plus dimension
         ///     will determine the dimension.
+        /// </para>
+        /// <para>
         ///     The corresponding dimension of the view's <see cref="View.Text"/> will be ignored.
+        /// </para>
         /// </summary>
-        Subviews = 1,
+        Content = 1,
 
         /// <summary>
+        /// <para>
         ///     The corresponding dimension of the view's <see cref="View.Text"/>, formatted using the
         ///     <see cref="View.TextFormatter"/> settings,
         ///     will be used to determine the dimension.
+        /// </para>
+        /// <para>
         ///     The corresponding dimensions of the <see cref="View.Subviews"/> will be ignored.
+        /// </para>
         /// </summary>
         Text = 2
     }
@@ -701,6 +714,12 @@ public class Dim
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all of the view's SubViews and/or Text.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Tthe behavior of <see cref="DimAutoStyle.Content"/> is overridden and the size of the
+    ///         view will be based on ContentSize.
+    ///     </para>
+    /// </remarks>
     /// <example>
     ///     This initializes a <see cref="View"/> with two SubViews. The view will be automatically sized to fit the two
     ///     SubViews.
@@ -934,7 +953,7 @@ public class Dim
                 textSize = int.Max (autoMin, dimension == Dimension.Width ? us.TextFormatter.Size.Width : us.TextFormatter.Size.Height);
             }
 
-            if (_style.HasFlag (DimAutoStyle.Subviews))
+            if (_style.HasFlag (DimAutoStyle.Content))
             {
                 if (us._contentSize is { })
                 {
@@ -974,7 +993,7 @@ public class Dim
         internal override bool ReferencesOtherViews ()
         {
             // BUGBUG: This is not correct. _contentSize may be null.
-            return _style.HasFlag (Dim.DimAutoStyle.Subviews);
+            return _style.HasFlag (Dim.DimAutoStyle.Content);
         }
 
     }

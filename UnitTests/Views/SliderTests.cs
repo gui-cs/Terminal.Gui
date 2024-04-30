@@ -500,8 +500,8 @@ public class SliderTests
         {
             Orientation = Orientation.Vertical,
             Type = SliderType.Multiple,
-            Width = Dim.Auto (Dim.DimAutoStyle.Subviews),
-            Height = Dim.Auto (Dim.DimAutoStyle.Subviews),
+            Width = Dim.Auto (Dim.DimAutoStyle.Content),
+            Height = Dim.Auto (Dim.DimAutoStyle.Content),
         };
         view.Add (slider);
         view.BeginInit ();

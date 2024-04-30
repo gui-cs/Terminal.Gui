@@ -395,8 +395,8 @@ public class Slider<T> : View
 
             if (value)
             {
-                Width = Dim.Auto (Dim.DimAutoStyle.Subviews);
-                Height = Dim.Auto (Dim.DimAutoStyle.Subviews);
+                Width = Dim.Auto (Dim.DimAutoStyle.Content);
+                Height = Dim.Auto (Dim.DimAutoStyle.Content);
             }
             else
             {

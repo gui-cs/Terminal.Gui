@@ -611,7 +611,7 @@ public class DimAutoTests (ITestOutputHelper output)
         {
             X = subX,
             Y = 0,
-            Width = Dim.Auto (Dim.DimAutoStyle.Subviews),
+            Width = Dim.Auto (Dim.DimAutoStyle.Content),
             Height = 1,
             ValidatePosDim = true
         };
