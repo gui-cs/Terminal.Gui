@@ -138,7 +138,7 @@ public class ScrollView : View
 
     private void ScrollViewContentSizeChanged (object sender, SizeChangedEventArgs e)
     {
-        _contentView.Frame = new Rectangle (ContentOffset, e.Size with {Width = e.Size.Width-1, Height = e.Size.Height-1});
+        _contentView.Frame = new Rectangle (ContentOffset, e.Size with { Width = e.Size.Width - 1, Height = e.Size.Height - 1 });
         _vertical.Size = e.Size.Height;
         _horizontal.Size = e.Size.Width;
     }
@@ -410,7 +410,7 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (!Enabled)
         {
@@ -447,20 +447,18 @@ public class ScrollView : View
             Application.UngrabMouse ();
         }
 
-        return base.OnMouseEvent(me);
+        return base.OnMouseEvent (me);
     }
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (InternalSubviews.Count == 0)
         {
             Move (0, 0);
+            return Point.Empty;
         }
-        else
-        {
-            base.PositionCursor ();
-        }
+        return base.PositionCursor ();
     }
 
     /// <summary>Removes the view from the scrollview.</summary>

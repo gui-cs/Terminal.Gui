@@ -351,19 +351,27 @@ public class RadioGroup : View
     public event EventHandler<OrientationEventArgs> OrientationChanged;
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
+        int x = 0;
+        int y = 0;
         switch (Orientation)
         {
             case Orientation.Vertical:
-                Move (0, _cursor);
+                y = _cursor;
 
                 break;
             case Orientation.Horizontal:
-                Move (_horizontal [_cursor].pos, 0);
+                x = _horizontal [_cursor].pos;
 
                 break;
+
+            default:
+                return null;
         }
+
+        Move (x, y);
+        return new Point (x, y);
     }
 
     /// <summary>Allow to invoke the <see cref="SelectedItemChanged"/> after their creation.</summary>

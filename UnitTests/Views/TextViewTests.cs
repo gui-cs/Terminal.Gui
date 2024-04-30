@@ -1065,34 +1065,44 @@ This is the second line.
 
         var tv = new TextView { Width = 10, Height = 10 };
         tv.Text = text;
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.Equal (0, tv.LeftColumn);
-        tv.PositionCursor ();
+        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Application.PositionCursor (top);
         Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
 
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledRight });
-            tv.PositionCursor ();
             Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
-            Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+            Application.PositionCursor (top);
+            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
+            Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
         }
 
         for (var i = 11; i > 0; i--)
         {
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledLeft });
-            tv.PositionCursor ();
             Assert.Equal (i - 1, tv.LeftColumn);
+
+            Application.PositionCursor (top);
+            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
 
             if (i - 1 == 0)
             {
-                Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+                Assert.Equal (CursorVisibility.Default, cursorVisibility);
             }
             else
             {
-                Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+                Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
             }
         }
+
+        top.Dispose ();
+        Application.Shutdown ();
     }
 
     [Fact]
@@ -1108,34 +1118,44 @@ This is the second line.
 
         var tv = new TextView { Width = 10, Height = 10 };
         tv.Text = text;
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.Equal (0, tv.TopRow);
-        tv.PositionCursor ();
+        Application.PositionCursor (top);
         Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
 
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledDown });
-            tv.PositionCursor ();
+            Application.PositionCursor (top);
             Assert.Equal (i + 1, tv.TopRow);
-            Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
+            Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
         }
 
         for (var i = 12; i > 0; i--)
         {
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledUp });
-            tv.PositionCursor ();
+            Application.PositionCursor (top);
             Assert.Equal (i - 1, tv.TopRow);
+
+            Application.PositionCursor (top);
+            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
 
             if (i - 1 == 0)
             {
-                Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+                Assert.Equal (CursorVisibility.Default, cursorVisibility);
             }
             else
             {
-                Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+                Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
             }
         }
+
+        top.Dispose ();
+        Application.Shutdown ();
     }
 
     [Fact]

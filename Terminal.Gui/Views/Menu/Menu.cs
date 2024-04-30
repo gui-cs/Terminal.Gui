@@ -945,23 +945,22 @@ internal sealed class Menu : View
         }
     }
 
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (_host?.IsMenuOpen != false)
         {
             if (_barItems.IsTopLevel)
             {
-                _host?.PositionCursor ();
+                return _host?.PositionCursor ();
             }
             else
             {
                 Move (2, 1 + _currentChild);
+                return new (2, 1 + _currentChild);
             }
         }
-        else
-        {
-            _host?.PositionCursor ();
-        }
+
+        return _host?.PositionCursor ();
     }
 
     public void Run (Action action)

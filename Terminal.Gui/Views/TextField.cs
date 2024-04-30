@@ -9,10 +9,8 @@ namespace Terminal.Gui;
 public class TextField : View
 {
     private readonly HistoryText _historyText;
-    private readonly CursorVisibility _savedCursorVisibility;
     private CultureInfo _currentCulture;
     private int _cursorPosition;
-    private CursorVisibility _desiredCursorVisibility;
     private bool _isButtonPressed;
     private bool _isButtonReleased;
     private bool _isDrawing;
@@ -21,7 +19,6 @@ public class TextField : View
     private string _selectedText;
     private int _start;
     private List<Rune> _text;
-    private CursorVisibility _visibility;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/>
@@ -30,7 +27,6 @@ public class TextField : View
     public TextField ()
     {
         _historyText = new HistoryText ();
-        _desiredCursorVisibility = CursorVisibility.Default;
         _isButtonReleased = true;
         _selectedStart = -1;
         _text = new List<Rune> ();
@@ -42,7 +38,6 @@ public class TextField : View
         CanFocus = true;
         Used = true;
         WantMousePositionReports = true;
-        _savedCursorVisibility = _desiredCursorVisibility;
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
@@ -466,21 +461,6 @@ public class TextField : View
             }
 
             PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
-        }
-    }
-
-    /// <summary>Get / Set the wished cursor when the field is focused</summary>
-    public CursorVisibility DesiredCursorVisibility
-    {
-        get => _desiredCursorVisibility;
-        set
-        {
-            if ((_desiredCursorVisibility != value || _visibility != value) && HasFocus)
-            {
-                Application.Driver.SetCursorVisibility (value);
-            }
-
-            _desiredCursorVisibility = _visibility = value;
         }
     }
 
@@ -1060,7 +1040,7 @@ public class TextField : View
     {
         if (IsInitialized)
         {
-            Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
+            Application.Driver.SetCursorVisibility (CursorVisibility.Default);
         }
 
         return base.OnEnter (view);
@@ -1172,13 +1152,8 @@ public class TextField : View
     }
 
     /// <summary>Sets the cursor position.</summary>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
-        if (!IsInitialized)
-        {
-            return;
-        }
-
         ProcessAutocomplete ();
 
         var col = 0;
@@ -1195,31 +1170,8 @@ public class TextField : View
         }
 
         int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
-        int offB = OffSetBackground ();
-        Rectangle containerFrame = SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle);
-        Rectangle thisFrame = ViewportToScreen (Viewport);
-
-        if (pos > -1
-            && col >= pos
-            && pos < Frame.Width + offB
-            && containerFrame.IntersectsWith (thisFrame))
-        {
-            RestoreCursorVisibility ();
-            Move (col, 0);
-        }
-        else
-        {
-            HideCursorVisibility ();
-
-            if (pos < 0)
-            {
-                Move (pos, 0);
-            }
-            else
-            {
-                Move (pos - offB, 0);
-            }
-        }
+        Move (pos, 0);
+        return new Point (pos, 0);
     }
 
     /// <summary>Redoes the latest changes.</summary>
@@ -1231,21 +1183,6 @@ public class TextField : View
         }
 
         _historyText.Redo ();
-
-        //if (string.IsNullOrEmpty (Clipboard.Contents))
-        //	return true;
-        //var clip = TextModel.ToRunes (Clipboard.Contents);
-        //if (clip is null)
-        //	return true;
-
-        //if (point == text.Count) {
-        //	point = text.Count;
-        //	SetText(text.Concat(clip).ToList());
-        //} else {
-        //	point += clip.Count;
-        //	SetText(text.GetRange(0, oldCursorPos).Concat(clip).Concat(text.GetRange(oldCursorPos, text.Count - oldCursorPos)));
-        //}
-        //Adjust ();
     }
 
     /// <summary>Selects all text.</summary>
@@ -1463,14 +1400,6 @@ public class TextField : View
         }
 
         return new Attribute (cs.Disabled.Foreground, cs.Focus.Background);
-    }
-
-    private void HideCursorVisibility ()
-    {
-        if (_desiredCursorVisibility != CursorVisibility.Invisible)
-        {
-            DesiredCursorVisibility = CursorVisibility.Invisible;
-        }
     }
 
     private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
@@ -1884,16 +1813,6 @@ public class TextField : View
         }
 
         Driver.AddStr (render);
-    }
-
-    private void RestoreCursorVisibility ()
-    {
-        Application.Driver.GetCursorVisibility (out _visibility);
-
-        if (_desiredCursorVisibility != _savedCursorVisibility || _visibility != _savedCursorVisibility)
-        {
-            DesiredCursorVisibility = _savedCursorVisibility;
-        }
     }
 
     private void SetClipboard (IEnumerable<Rune> text)
