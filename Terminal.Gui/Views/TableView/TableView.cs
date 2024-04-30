@@ -1017,13 +1017,11 @@ public class TableView : View
     ///     Positions the cursor in the area of the screen in which the start of the active cell is rendered.  Calls base
     ///     implementation if active cell is not visible due to scrolling or table is loaded etc
     /// </summary>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (TableIsNullOrInvisible ())
         {
-            base.PositionCursor ();
-
-            return;
+            return base.PositionCursor ();
         }
 
         Point? screenPoint = CellToScreen (SelectedColumn, SelectedRow);
@@ -1031,7 +1029,10 @@ public class TableView : View
         if (screenPoint is { })
         {
             Move (screenPoint.Value.X, screenPoint.Value.Y);
+            return screenPoint;
         }
+
+        return null;
     }
 
     /// <summary>

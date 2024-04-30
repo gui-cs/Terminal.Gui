@@ -605,7 +605,7 @@ public class MenuBar : View
     }
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (_selected == -1 && HasFocus && Menus.Length > 0)
         {
@@ -621,7 +621,7 @@ public class MenuBar : View
                 pos++;
                 Move (pos + 1, 0);
 
-                return;
+                return new (pos +1, 0);
             }
 
             pos += _leftPadding
@@ -631,6 +631,7 @@ public class MenuBar : View
                           : 0)
                    + _rightPadding;
         }
+        return null;
     }
 
     // Activates the menu, handles either first focus, or activating an entry when it was already active

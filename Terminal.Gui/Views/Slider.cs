@@ -983,7 +983,7 @@ public class Slider<T> : View
     #region Cursor and Drawing
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         //base.PositionCursor ();
 
@@ -1001,8 +1001,11 @@ public class Slider<T> : View
             if (IsInitialized && Viewport.Contains (position.x, position.y))
             {
                 Move (position.x, position.y);
+
+                return new (position.x, position.x);
             }
         }
+        return null;
     }
 
     /// <inheritdoc/>

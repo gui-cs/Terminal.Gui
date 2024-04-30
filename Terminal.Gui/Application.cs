@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
+using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 
@@ -542,13 +545,110 @@ public static partial class Application
             toplevel.OnLoaded ();
             toplevel.SetNeedsDisplay ();
             toplevel.Draw ();
-            toplevel.PositionCursor ();
-            Driver.Refresh ();
+            Driver.UpdateScreen ();
+            if (PositionCursor (toplevel))
+            {
+                Driver.UpdateCursor ();
+            }
         }
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));
 
         return rs;
+    }
+
+    private static CursorVisibility _cachedCursorVisibility;
+
+    /// <summary>
+    /// Calls <see cref="View.PositionCursor"/> on the most focused view in the view starting with <paramref name="view"/>.
+    /// </summary>
+    /// <remarks>
+    /// Does nothing if <paramref name="view"/> is <see langword="null"/> or if the most focused view is not visible or enabled.
+    /// <para>
+    /// If the most focused view is not visible within it's superview, the cursor will be hidden.
+    /// </para>
+    /// </remarks>
+    /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
+    internal static bool PositionCursor (View view)
+    {
+        if (view is null)
+        {
+            return false;
+        }
+
+        // Find the most focused view and position the cursor there.
+        View mostFocused = view.MostFocused;
+
+        if (mostFocused is null)
+        {
+            return false;
+        }
+
+        CursorVisibility cachedCursorVisibility;
+
+        // If the view is not visible or enabled, don't position the cursor
+        if (!mostFocused.Visible || !mostFocused.Enabled)
+        {
+            Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+            if (cachedCursorVisibility != CursorVisibility.Invisible)
+            {
+                _cachedCursorVisibility = cachedCursorVisibility;
+                Driver.SetCursorVisibility (CursorVisibility.Invisible);
+            }
+
+            return false;
+        }
+
+        // If the view is not visible within it's superview, don't position the cursor
+        Rectangle mostFocusedViewport = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = Point.Empty });
+        Rectangle superViewViewport = mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver.Screen;
+        if (!superViewViewport.IntersectsWith (mostFocusedViewport))
+        {
+            return false;
+        }
+
+        Point? prevCursor = new (Driver.Row, Driver.Col);
+        Point? cursor = mostFocused.PositionCursor ();
+
+        // If the cursor is not in a visible location in the SuperView, hide it
+        if (cursor is { })
+        {
+            // Convert cursor to screen coords
+            cursor = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = cursor.Value }).Location;
+            if (!superViewViewport.Contains (cursor.Value))
+            {
+                Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+                if (cachedCursorVisibility != CursorVisibility.Invisible)
+                {
+                    _cachedCursorVisibility = cachedCursorVisibility;
+                }
+
+                Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+                return false;
+            }
+
+            Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+            if (cachedCursorVisibility == CursorVisibility.Invisible)
+            {
+                Driver.SetCursorVisibility (_cachedCursorVisibility);
+            }
+
+            return prevCursor != cursor;
+        }
+
+        Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+        if (cachedCursorVisibility != CursorVisibility.Invisible)
+        {
+            _cachedCursorVisibility = cachedCursorVisibility;
+            Driver.SetCursorVisibility (CursorVisibility.Invisible);
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -764,7 +864,6 @@ public static partial class Application
             last = v;
         }
 
-        last?.PositionCursor ();
         Driver.Refresh ();
     }
 
@@ -877,11 +976,21 @@ public static partial class Application
         if (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || OverlappedChildNeedsDisplay ())
         {
             state.Toplevel.Draw ();
-            state.Toplevel.PositionCursor ();
-            Driver.Refresh ();
+            Driver.UpdateScreen ();
+            //Driver.UpdateCursor ();
         }
-        else
+
+        if (PositionCursor (state.Toplevel))
         {
+            Driver.UpdateCursor();
+        }
+
+        //        else
+        {
+            //if (PositionCursor (state.Toplevel))
+            //{
+            //    Driver.Refresh ();
+            //}
             //Driver.UpdateCursor ();
         }
 
@@ -1315,6 +1424,11 @@ public static partial class Application
             t.LayoutSubviews ();
             t.PositionToplevels ();
             t.OnSizeChanging (new (args.Size));
+
+            if (PositionCursor (t))
+            {
+                Driver.UpdateCursor ();
+            }
         }
 
         Refresh ();

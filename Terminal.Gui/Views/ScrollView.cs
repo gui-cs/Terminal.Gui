@@ -455,16 +455,14 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (InternalSubviews.Count == 0)
         {
             Move (0, 0);
+            return Point.Empty;
         }
-        else
-        {
-            base.PositionCursor ();
-        }
+        return base.PositionCursor ();
     }
 
     /// <summary>Removes the view from the scrollview.</summary>
