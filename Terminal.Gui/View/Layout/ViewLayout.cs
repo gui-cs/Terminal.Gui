@@ -938,6 +938,11 @@ public partial class View
                 _height = Frame.Height;
             }
 
+            if (!string.IsNullOrEmpty (Title))
+            {
+                SetTitleTextFormatterSize ();
+            }
+
             SetNeedsLayout ();
             SetNeedsDisplay ();
         }
