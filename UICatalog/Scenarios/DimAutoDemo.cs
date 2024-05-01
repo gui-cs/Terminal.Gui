@@ -34,32 +34,30 @@ public class DimAutoDemo : Scenario
         };
         view.Add (textEdit);
 
-        var hlabel = new Label
-        {
-            Text = textEdit.Text,
-            X = Pos.Left (textEdit) + 1,
-            Y = Pos.Bottom (textEdit),
-            AutoSize = false,
-            Width = Auto (DimAutoStyle.Text, 20),
-            Height = 1,
-            ColorScheme = Colors.ColorSchemes ["Error"]
-        };
-        view.Add (hlabel);
-
         var vlabel = new Label
         {
             Text = textEdit.Text,
             X = Pos.Left (textEdit),
             Y = Pos.Bottom (textEdit) + 1,
-            AutoSize = false,
-            Width = 1,
+            Width = Auto (DimAutoStyle.Text, 1),
             Height = Auto (DimAutoStyle.Text, 8),
-            ColorScheme = Colors.ColorSchemes ["Error"]
-
-            //TextDirection = TextDirection.TopBottom_LeftRight
+            ColorScheme = Colors.ColorSchemes ["Error"],
+            TextDirection = TextDirection.TopBottom_LeftRight
         };
         vlabel.Id = "vlabel";
         view.Add (vlabel);
+
+        var hlabel = new Label
+        {
+            Text = textEdit.Text,
+            X = Pos.Right (vlabel) + 1,
+            Y = Pos.Bottom (textEdit),
+            Width = Auto (DimAutoStyle.Text, 20),
+            Height = Auto (DimAutoStyle.Text, 1),
+            ColorScheme = Colors.ColorSchemes ["Error"]
+        };
+        hlabel.Id = "hlabel";
+        view.Add (hlabel);
 
         var heightAuto = new View
         {
