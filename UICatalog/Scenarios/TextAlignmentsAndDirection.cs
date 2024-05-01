@@ -19,9 +19,7 @@ public class TextAlignmentsAndDirections : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
         };
 
-        // string txt = ".\n...\n.....\nHELLO\n.....\n...\n.";
-        // string txt = "┌──┴──┐\n┤HELLO├\n└──┬──┘";
-        var txt = "HELLO WORLD";
+        var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}世界 您好";
 
         var color1 = new ColorScheme { Normal = new (Color.Black, Color.Gray) };
         var color2 = new ColorScheme { Normal = new (Color.Black, Color.DarkGray) };
