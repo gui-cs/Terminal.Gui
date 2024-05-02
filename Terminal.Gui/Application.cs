@@ -1642,25 +1642,16 @@ public static partial class Application
             if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
-                // Give a chance for the current view process the event
-                if (ProcessMouseEvent (mouseEvent, view))
-                {
-                    return;
-                }
+                _mouseEnteredView?.NewMouseLeaveEvent (mouseEvent);
             }
 
-            //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) == true)
+            if ((MouseGrabView?.WantMousePositionReports == true || MouseGrabView?.WantContinuousButtonPressed == true)
+                && MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) == true)
             {
                 return;
             }
         }
 
-        ProcessMouseEvent (mouseEvent, view);
-    }
-
-    private static bool ProcessMouseEvent (MouseEvent mouseEvent, View? view)
-    {
         if (view is { WantContinuousButtonPressed: true })
         {
             WantContinuousButtonPressedView = view;
@@ -1669,7 +1660,6 @@ public static partial class Application
         {
             WantContinuousButtonPressedView = null;
         }
-
 
         if (view is not Adornment)
         {
@@ -1693,7 +1683,7 @@ public static partial class Application
 
         if (view is null)
         {
-            return false;
+            return;
         }
 
         MouseEvent? me = null;
@@ -1729,7 +1719,7 @@ public static partial class Application
 
         if (me is null)
         {
-            return false;
+            return;
         }
 
         if (_mouseEnteredView is null)
@@ -1746,7 +1736,7 @@ public static partial class Application
 
         if (!view.WantMousePositionReports && mouseEvent.Flags == MouseFlags.ReportMousePosition)
         {
-            return false;
+            return;
         }
 
         WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
@@ -1787,9 +1777,8 @@ public static partial class Application
         }
 
         BringOverlappedTopToFront ();
-
-        return true;
     }
+
 #nullable restore
 
     #endregion Mouse handling

@@ -823,7 +823,50 @@ public class ButtonTests (ITestOutputHelper output)
         button.NewMouseEvent (me);
         Assert.Equal (1, acceptCount);
 
+        me.Flags = clicked;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
         button.Dispose ();
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void WantMousePositionReports_False_And_WantContinuousButtonPressed_False_Focus_The_Another_Button_On_Mouse_Pressed_Released ()
+    {
+        var button1 = new Button { Text = "Button1" };
+        var acceptCount = 0;
+        button1.Accept += (s, e) => acceptCount++;
+        var button2 = new Button { Text = "Button2", X = Pos.Right (button1) + 1 };
+        button2.Accept += (s, e) => acceptCount++;
+        var top = new Toplevel ();
+        top.Add (button1, button2);
+        Application.Begin (top);
+
+        Assert.True (button1.HasFocus);
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
+        Assert.Equal (button1, Application.MouseGrabView);
+        Assert.Equal (0, acceptCount);
+        Assert.True (button1.HasFocus);
+
+        Application.OnMouseEvent (new () { X = 13, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition});
+        Assert.Equal (button2, Application.MouseGrabView);
+        Assert.Equal (0, acceptCount);
+        Assert.True (button2.HasFocus);
+
+        Application.OnMouseEvent (new () { X = 13, Y = 0, Flags = MouseFlags.Button1Released });
+        Assert.Equal (button2, Application.MouseGrabView);
+        Assert.Equal (0, acceptCount);
+        Assert.True (button2.HasFocus);
+
+        Application.OnMouseEvent (new () { X = 13, Y = 0, Flags = MouseFlags.Button1Clicked });
+        Assert.Equal (button2, Application.MouseGrabView);
+        Assert.Equal (0, acceptCount);
+        Assert.True (button2.HasFocus);
+
+        Application.OnMouseEvent (new () { X = 13, Y = 0, Flags = MouseFlags.Button1Clicked });
+        Assert.Null (Application.MouseGrabView);
+        Assert.Equal (1, acceptCount);
+        Assert.True (button2.HasFocus);
+    }
 }
