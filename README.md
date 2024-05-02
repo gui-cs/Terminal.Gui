@@ -1,6 +1,6 @@
-![Terminal.Gui](https://socialify.git.ci/gui-cs/Terminal.GuiV2Docs/image?description=1&font=Rokkitt&forks=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Fgui-cs%2FTerminal.Gui%2Fdevelop%2Fdocfx%2Fimages%2Flogo.png&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Auto)
-![.NET Core](https://github.com/gui-cs/Terminal.GuiV2Docs/workflows/.NET%20Core/badge.svg?branch=develop)
-![Code scanning - action](https://github.com/gui-cs/Terminal.GuiV2Docs/workflows/Code%20scanning%20-%20action/badge.svg)
+![Terminal.Gui](https://socialify.git.ci/gui-cs/Terminal.Gui/image?description=1&font=Rokkitt&forks=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Fgui-cs%2FTerminal.Gui%2Fdevelop%2Fdocfx%2Fimages%2Flogo.png&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Auto)
+![.NET Core](https://github.com/gui-cs/Terminal.Gui/workflows/.NET%20Core/badge.svg?branch=develop)
+![Code scanning - action](https://github.com/gui-cs/Terminal.Gui/workflows/Code%20scanning%20-%20action/badge.svg)
 [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
 ![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27/raw/code-coverage.json)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
@@ -31,8 +31,10 @@ dotnet run
 
 ## Documentation 
 
-* [Documentation Home](https://gui-cs.github.io/Terminal.GuiV2Docs)
+* [Getting Started](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/getting-started.html)
+* [What's new in v2](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/newinv2.html)
 * [API Documentation](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.html)
+* [Documentation Home](https://gui-cs.github.io/Terminal.GuiV2Docs)
 
 ## Showcase & Examples
 

@@ -60,7 +60,7 @@ public class MouseTests
 
     /// <summary>
     ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. No adornments;
-    ///     Frame == Bounds
+    ///     Frame == Viewport
     /// </summary>
     [Theory]
     [AutoInitShutdown]
@@ -134,7 +134,7 @@ public class MouseTests
 
     /// <summary>
     ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. With
-    ///     Frames; Frame != Bounds
+    ///     Frames; Frame != Viewport
     /// </summary>
     [AutoInitShutdown]
     [Theory]
@@ -207,7 +207,7 @@ public class MouseTests
 
         var view = new View { X = pos.X, Y = pos.Y, Width = size.Width, Height = size.Height };
 
-        // Give the view a border. With PR #2920, mouse clicks are only passed if they are inside the view's Bounds.
+        // Give the view a border. With PR #2920, mouse clicks are only passed if they are inside the view's Viewport.
         view.BorderStyle = LineStyle.Single;
         view.CanFocus = true;
 
@@ -371,6 +371,31 @@ public class MouseTests
         }
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void View_Is_Responsible_For_Calling_UnGrabMouse_Before_Being_Disposed ()
+    {
+        var count = 0;
+        var view = new View { Width = 1, Height = 1 };
+        view.MouseEvent += (s, e) => count++;
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
+
+        Assert.Null (Application.MouseGrabView);
+        Application.GrabMouse (view);
+        Assert.Equal (view, Application.MouseGrabView);
+        top.Remove (view);
+        Application.UngrabMouse ();
+        view.Dispose ();
+#if DEBUG_IDISPOSABLE
+        Assert.True (view.WasDisposed);
+#endif
+
+        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
+        Assert.Null (Application.MouseGrabView);
+        Assert.Equal (0, count);
+    }
     [Fact]
     [AutoInitShutdown]
     public void Clicked_Event_Only_Occurs_In_The_Same_View_That_Pressed_The_Mouse ()

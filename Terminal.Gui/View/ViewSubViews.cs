@@ -234,7 +234,15 @@ public partial class View
         }
     }
 
-    /// <summary>Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
+    /// <summary>
+    /// Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the Subview's
+    ///     lifecycle to be transferred to the caller; the caller must call <see cref="Dispose"/> on any Views that were added.
+    /// </para>
+    /// </remarks>
     public virtual void RemoveAll ()
     {
         if (_subviews is null)
@@ -503,7 +511,9 @@ public partial class View
             return true;
         }
 
-        Driver?.SetCursorVisibility (CursorVisibility.Invisible);
+        // BUGBUG: This is a hack to ensure that the cursor is hidden when the view loses focus.
+        // BUGBUG: This is not needed as the minloop will take care of this.
+        //Driver?.SetCursorVisibility (CursorVisibility.Invisible);
 
         return false;
     }
@@ -848,38 +858,30 @@ public partial class View
     /// a way of hiding the cursor, so it can be distracting to have the cursor left at
     /// the last focused view. Views should make sure that they place the cursor
     /// in a visually sensible place.
-    public virtual void PositionCursor ()
+    /// <returns>Viewport-relative cursor position.</returns>
+    public virtual Point? PositionCursor ()
     {
-        if (!CanBeVisible (this) || !Enabled)
+        if (!IsInitialized)
         {
-            return;
+            return null;
         }
 
-        // BUGBUG: v2 - This needs to support children of Frames too
+        // TODO: v2 - This needs to support Subviews of Adornments too
 
-        if (Focused is null && SuperView is { })
+        // By default we will position the cursor at the top left corner of the Viewport.
+        // Overrides should return the position where the cursor has been placed.
+        Point location = Viewport.Location;
+
+        if (CanFocus && HasFocus && ContentSize != Size.Empty)
         {
-            SuperView.EnsureFocus ();
+            location.X = TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition;
+            location.Y = 0;
+            Move (location.X, location.Y);
+            return location;
         }
-        else if (Focused?.Visible == true
-                 && Focused?.Enabled == true
-                 && Focused?.Frame.Width > 0
-                 && Focused.Frame.Height > 0)
-        {
-            Focused.PositionCursor ();
-        }
-        else if (Focused?.Visible == true && Focused?.Enabled == false)
-        {
-            Focused = null;
-        }
-        else if (CanFocus && HasFocus && Visible && Frame.Width > 0 && Frame.Height > 0)
-        {
-            Move (TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition, 0);
-        }
-        else
-        {
-            Move (_frame.X, _frame.Y);
-        }
+
+        return null;
+
     }
 
     #endregion Focus

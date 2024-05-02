@@ -11,7 +11,13 @@ public class BorderTests
     [SetupFakeDriver]
     public void Border_Parent_HasFocus_Title_Uses_FocusAttribute ()
     {
+        var superView = new View { Width = 10, Height = 10, CanFocus = true };
+        var otherView = new View { Width = 0, Height = 0, CanFocus = true };
+        superView.Add (otherView);
+
         var view = new View { Title = "A", Height = 2, Width = 5 };
+        superView.Add (view);
+
         view.Border.Thickness = new Thickness (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
@@ -25,9 +31,9 @@ public class BorderTests
         Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor ());
         Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
 
-        view.BeginInit ();
-        view.EndInit ();
-        view.Draw ();
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.Draw ();
 
         var expected = @"─┤A├─";
         TestHelpers.AssertDriverContentsAre (expected, _output);

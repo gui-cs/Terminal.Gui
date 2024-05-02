@@ -1,4 +1,5 @@
 using System.Collections;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -94,7 +95,10 @@ public class ListView : View
     private int _lastSelectedItem = -1;
     private int _selected = -1;
     private IListDataSource _source;
-    private int _top, _left;
+    // TODO: ListView has been upgraded to use Viewport and ContentSize instead of the
+    // TODO: bespoke _top and _left. It was a quick & dirty port. There is now duplicate logic
+    // TODO: that could be removed. 
+    //private int _top, _left;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display
@@ -107,8 +111,8 @@ public class ListView : View
         // Things this view knows how to do
         AddCommand (Command.LineUp, () => MoveUp ());
         AddCommand (Command.LineDown, () => MoveDown ());
-        AddCommand (Command.ScrollUp, () => ScrollUp (1));
-        AddCommand (Command.ScrollDown, () => ScrollDown (1));
+        AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
+        AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         AddCommand (Command.PageUp, () => MovePageUp ());
         AddCommand (Command.PageDown, () => MovePageDown ());
         AddCommand (Command.TopHome, () => MoveHome ());
@@ -116,6 +120,9 @@ public class ListView : View
         AddCommand (Command.Accept, () => OnOpenSelectedItem ());
         AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
         AddCommand (Command.Select, () => MarkUnmarkRow ());
+
+        AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
+        AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
 
         // Default keybindings for all ListViews
         KeyBindings.Add (Key.CursorUp, Command.LineUp);
@@ -199,7 +206,7 @@ public class ListView : View
     /// <value>The left position.</value>
     public int LeftItem
     {
-        get => _left;
+        get => Viewport.X;
         set
         {
             if (_source is null)
@@ -212,7 +219,7 @@ public class ListView : View
                 throw new ArgumentException ("value");
             }
 
-            _left = value;
+            Viewport = Viewport with { X = value };
             SetNeedsDisplay ();
         }
     }
@@ -250,20 +257,34 @@ public class ListView : View
         get => _source;
         set
         {
+            if (_source == value)
+
+            {
+                return;
+            }
             _source = value;
+
+            ContentSize = new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width);
+            if (IsInitialized)
+            {
+                Viewport = Viewport with { Y = 0 };
+            }
+
             KeystrokeNavigator.Collection = _source?.ToList ();
-            _top = 0;
             _selected = -1;
             _lastSelectedItem = -1;
             SetNeedsDisplay ();
         }
     }
 
-    /// <summary>Gets or sets the item that is displayed at the top of the <see cref="ListView"/>.</summary>
+    /// <summary>Gets or sets the index of the item that will appear at the top of the <see cref="View.Viewport"/>.</summary>
+    /// <remarks>
+    /// This a helper property for accessing <c>listView.Viewport.Y</c>.
+    /// </remarks>
     /// <value>The top item.</value>
     public int TopItem
     {
-        get => _top;
+        get => Viewport.Y;
         set
         {
             if (_source is null)
@@ -271,13 +292,7 @@ public class ListView : View
                 return;
             }
 
-            if (value < 0 || (_source.Count > 0 && value >= _source.Count))
-            {
-                throw new ArgumentException ("value");
-            }
-
-            _top = Math.Max (value, 0);
-            SetNeedsDisplay ();
+            Viewport = Viewport with { Y = value };
         }
     }
 
@@ -314,13 +329,14 @@ public class ListView : View
     {
         if (SuperView?.IsInitialized == true)
         {
-            if (_selected < _top)
+            if (_selected < Viewport.Y)
             {
-                _top = Math.Max (_selected, 0);
+                // TODO: The Max check here is not needed because, by default, Viewport enforces staying w/in ContentArea (View.ScrollSettings).
+                Viewport = Viewport with { Y = _selected };
             }
-            else if (Bounds.Height > 0 && _selected >= _top + Bounds.Height)
+            else if (Viewport.Height > 0 && _selected >= Viewport.Y + Viewport.Height)
             {
-                _top = Math.Max (_selected - Bounds.Height + 1, 0);
+                Viewport = Viewport with { Y = _selected - Viewport.Height + 1};
             }
 
             LayoutStarted -= ListView_LayoutStarted;
@@ -347,7 +363,7 @@ public class ListView : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
@@ -371,40 +387,40 @@ public class ListView : View
 
         if (me.Flags == MouseFlags.WheeledDown)
         {
-            ScrollDown (1);
+            ScrollVertical (1);
 
             return true;
         }
 
         if (me.Flags == MouseFlags.WheeledUp)
         {
-            ScrollUp (1);
+            ScrollVertical (-1);
 
             return true;
         }
 
         if (me.Flags == MouseFlags.WheeledRight)
         {
-            ScrollRight (1);
+            ScrollHorizontal (1);
 
             return true;
         }
 
         if (me.Flags == MouseFlags.WheeledLeft)
         {
-            ScrollLeft (1);
+            ScrollHorizontal(-1);
 
             return true;
         }
 
-        if (me.Y + _top >= _source.Count
-            || me.Y + _top < 0
-            || me.Y + _top > _top + Bounds.Height)
+        if (me.Y + Viewport.Y >= _source.Count
+            || me.Y + Viewport.Y < 0
+            || me.Y + Viewport.Y > Viewport.Y + Viewport.Height)
         {
             return true;
         }
 
-        _selected = _top + me.Y;
+        _selected = Viewport.Y + me.Y;
 
         if (AllowsAll ())
         {
@@ -449,13 +465,13 @@ public class ListView : View
             //can move by down by one.
             _selected++;
 
-            if (_selected >= _top + Bounds.Height)
+            if (_selected >= Viewport.Y + Viewport.Height)
             {
-                _top++;
+                Viewport = Viewport with { Y = Viewport.Y + 1 };
             }
-            else if (_selected < _top)
+            else if (_selected < Viewport.Y)
             {
-                _top = Math.Max (_selected, 0);
+                Viewport = Viewport with { Y = _selected };
             }
 
             OnSelectedChanged ();
@@ -466,9 +482,9 @@ public class ListView : View
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
-        else if (_selected >= _top + Bounds.Height)
+        else if (_selected >= Viewport.Y + Viewport.Height)
         {
-            _top = Math.Max (_source.Count - Bounds.Height, 0);
+            Viewport = Viewport with { Y = _source.Count - Viewport.Height };
             SetNeedsDisplay ();
         }
 
@@ -483,9 +499,9 @@ public class ListView : View
         {
             _selected = _source.Count - 1;
 
-            if (_top + _selected > Bounds.Height - 1)
+            if (Viewport.Y + _selected > Viewport.Height - 1)
             {
-                _top = Math.Max (_selected, 0);
+                Viewport = Viewport with { Y = _selected };
             }
 
             OnSelectedChanged ();
@@ -502,7 +518,7 @@ public class ListView : View
         if (_selected != 0)
         {
             _selected = 0;
-            _top = Math.Max (_selected, 0);
+            Viewport = Viewport with { Y = _selected };
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
@@ -522,7 +538,7 @@ public class ListView : View
             return true;
         }
 
-        int n = _selected + Bounds.Height;
+        int n = _selected + Viewport.Height;
 
         if (n >= _source.Count)
         {
@@ -533,13 +549,13 @@ public class ListView : View
         {
             _selected = n;
 
-            if (_source.Count >= Bounds.Height)
+            if (_source.Count >= Viewport.Height)
             {
-                _top = Math.Max (_selected, 0);
+                Viewport = Viewport with { Y = _selected };
             }
             else
             {
-                _top = 0;
+                Viewport = Viewport with { Y = 0 };
             }
 
             OnSelectedChanged ();
@@ -553,7 +569,7 @@ public class ListView : View
     /// <returns></returns>
     public virtual bool MovePageUp ()
     {
-        int n = _selected - Bounds.Height;
+        int n = _selected - Viewport.Height;
 
         if (n < 0)
         {
@@ -563,7 +579,7 @@ public class ListView : View
         if (n != _selected)
         {
             _selected = n;
-            _top = Math.Max (_selected, 0);
+            Viewport = Viewport with { Y = _selected };
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
@@ -599,21 +615,21 @@ public class ListView : View
                 _selected = Source.Count - 1;
             }
 
-            if (_selected < _top)
+            if (_selected < Viewport.Y)
             {
-                _top = Math.Max (_selected, 0);
+                Viewport = Viewport with { Y = _selected };
             }
-            else if (_selected > _top + Bounds.Height)
+            else if (_selected > Viewport.Y + Viewport.Height)
             {
-                _top = Math.Max (_selected - Bounds.Height + 1, 0);
+                Viewport = Viewport with { Y = _selected - Viewport.Height + 1 };
             }
 
             OnSelectedChanged ();
             SetNeedsDisplay ();
         }
-        else if (_selected < _top)
+        else if (_selected < Viewport.Y)
         {
-            _top = Math.Max (_selected, 0);
+            Viewport = Viewport with { Y = _selected };
             SetNeedsDisplay ();
         }
 
@@ -621,18 +637,18 @@ public class ListView : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         Attribute current = ColorScheme.Focus;
         Driver.SetAttribute (current);
         Move (0, 0);
-        Rectangle f = Bounds;
-        int item = _top;
+        Rectangle f = Viewport;
+        int item = Viewport.Y;
         bool focused = HasFocus;
         int col = _allowsMarking ? 2 : 0;
-        int start = _left;
+        int start = Viewport.X;
 
         for (var row = 0; row < f.Height; row++, item++)
         {
@@ -765,60 +781,21 @@ public class ListView : View
     public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
-        if (_allowsMarking)
+        int x = 0;
+        int y = _selected - Viewport.Y;
+        if (!_allowsMarking)
         {
-            Move (0, _selected - _top);
+            x = Viewport.Width - 1;
         }
-        else
-        {
-            Move (Bounds.Width - 1, _selected - _top);
-        }
+
+        Move (x, y);
+        return new Point (x, y);
     }
 
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
     public event EventHandler<ListViewRowEventArgs> RowRender;
-
-    /// <summary>Scrolls the view down by <paramref name="items"/> items.</summary>
-    /// <param name="items">Number of items to scroll down.</param>
-    public virtual bool ScrollDown (int items)
-    {
-        _top = Math.Max (Math.Min (_top + items, _source.Count - 1), 0);
-        SetNeedsDisplay ();
-
-        return true;
-    }
-
-    /// <summary>Scrolls the view left.</summary>
-    /// <param name="cols">Number of columns to scroll left.</param>
-    public virtual bool ScrollLeft (int cols)
-    {
-        _left = Math.Max (_left - cols, 0);
-        SetNeedsDisplay ();
-
-        return true;
-    }
-
-    /// <summary>Scrolls the view right.</summary>
-    /// <param name="cols">Number of columns to scroll right.</param>
-    public virtual bool ScrollRight (int cols)
-    {
-        _left = Math.Max (Math.Min (_left + cols, MaxLength - 1), 0);
-        SetNeedsDisplay ();
-
-        return true;
-    }
-
-    /// <summary>Scrolls the view up by <paramref name="items"/> items.</summary>
-    /// <param name="items">Number of items to scroll up.</param>
-    public virtual bool ScrollUp (int items)
-    {
-        _top = Math.Max (_top - items, 0);
-        SetNeedsDisplay ();
-
-        return true;
-    }
 
     /// <summary>This event is raised when the selected item in the <see cref="ListView"/> has changed.</summary>
     public event EventHandler<ListViewItemEventArgs> SelectedItemChanged;
@@ -912,7 +889,7 @@ public class ListWrapper : IListDataSource
         int start = 0
     )
     {
-        container.Move (col, line);
+        container.Move (Math.Max (col - start, 0), line);
         object t = _source? [item];
 
         if (t is null)
@@ -1028,7 +1005,8 @@ public class ListWrapper : IListDataSource
 
     private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
     {
-        string u = TextFormatter.ClipAndJustify (ustr, width, TextAlignment.Left);
+        string str = start > ustr.GetColumns () ? string.Empty : ustr.Substring (Math.Min (start, ustr.ToRunes ().Length - 1));
+        string u = TextFormatter.ClipAndJustify (str, width, TextAlignment.Left);
         driver.AddStr (u);
         width -= u.GetColumns ();
 

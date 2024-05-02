@@ -36,6 +36,7 @@ public class BackgroundWorkerCollection : Scenario
 
         public OverlappedMain ()
         {
+            Arrangement = ViewArrangement.Movable;
             Data = "OverlappedMain";
 
             IsOverlappedContainer = true;
@@ -258,6 +259,8 @@ public class BackgroundWorkerCollection : Scenario
 
         public StagingUIController ()
         {
+            Arrangement = ViewArrangement.Movable;
+
             X = Pos.Center ();
             Y = Pos.Center ();
             Width = Dim.Percent (85);
@@ -303,7 +306,7 @@ public class BackgroundWorkerCollection : Scenario
             LayoutStarted += (s, e) =>
                              {
                                  int btnsWidth = _start.Frame.Width + _close.Frame.Width + 2 - 1;
-                                 int shiftLeft = Math.Max ((Bounds.Width - btnsWidth) / 2 - 2, 0);
+                                 int shiftLeft = Math.Max ((Viewport.Width - btnsWidth) / 2 - 2, 0);
 
                                  shiftLeft += _close.Frame.Width + 1;
                                  _close.X = Pos.AnchorEnd (shiftLeft);
@@ -338,6 +341,8 @@ public class BackgroundWorkerCollection : Scenario
 
         public WorkerApp ()
         {
+            Arrangement = ViewArrangement.Movable;
+
             Data = "WorkerApp";
             Title = "Worker collection Log";
 

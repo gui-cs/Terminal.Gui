@@ -8,21 +8,14 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Proof of Concept")]
 public class LineCanvasExperiment : Scenario
 {
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
-        Top = new ();
-    }
 
-    /// <summary>Setup the scenario.</summary>
-    public override void Setup ()
-    {
-        //var menu = new MenuBar (new MenuBarItem [] {
-        //new MenuBarItem ("_File", new MenuItem [] {
-        //	new MenuItem ("_Quit", "", () => Application.RequestStop()),
-        //}) });
-
-        //Top.Add (menu);
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
 
         var frame1 = new FrameView
         {
@@ -37,7 +30,7 @@ public class LineCanvasExperiment : Scenario
 
         //View.Diagnostics ^= DiagnosticFlags.FrameRuler;
 
-        Top.Add (frame1);
+        app.Add (frame1);
 
         var win1 = new Window
         {
@@ -52,7 +45,7 @@ public class LineCanvasExperiment : Scenario
             BorderStyle = LineStyle.Heavy,
             SuperViewRendersLineCanvas = true
         };
-        win1.Padding.Thickness = new Thickness (1);
+        win1.Padding.Thickness = new (1);
 
         frame1.Add (win1);
 
@@ -140,9 +133,12 @@ public class LineCanvasExperiment : Scenario
             SuperViewRendersLineCanvas = true
         };
         marginWindow.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
-        marginWindow.Margin.Thickness = new Thickness (1);
-        marginWindow.Border.Thickness = new Thickness (1, 2, 1, 1);
+        marginWindow.Margin.Thickness = new (1);
+        marginWindow.Border.Thickness = new (1, 2, 1, 1);
 
         frame1.Add (marginWindow);
+
+        Application.Run (app);
+        app.Dispose ();
     }
 }

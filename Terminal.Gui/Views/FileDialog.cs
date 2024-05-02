@@ -410,23 +410,23 @@ public class FileDialog : Dialog
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         if (!string.IsNullOrWhiteSpace (_feedback))
         {
             int feedbackWidth = _feedback.EnumerateRunes ().Sum (c => c.GetColumns ());
-            int feedbackPadLeft = (Bounds.Width - feedbackWidth) / 2 - 1;
+            int feedbackPadLeft = (Viewport.Width - feedbackWidth) / 2 - 1;
 
-            feedbackPadLeft = Math.Min (Bounds.Width, feedbackPadLeft);
+            feedbackPadLeft = Math.Min (Viewport.Width, feedbackPadLeft);
             feedbackPadLeft = Math.Max (0, feedbackPadLeft);
 
-            int feedbackPadRight = Bounds.Width - (feedbackPadLeft + feedbackWidth + 2);
-            feedbackPadRight = Math.Min (Bounds.Width, feedbackPadRight);
+            int feedbackPadRight = Viewport.Width - (feedbackPadLeft + feedbackWidth + 2);
+            feedbackPadRight = Math.Min (Viewport.Width, feedbackPadRight);
             feedbackPadRight = Math.Max (0, feedbackPadRight);
 
-            Move (0, Bounds.Height / 2);
+            Move (0, Viewport.Height / 2);
 
             Driver.SetAttribute (new Attribute (Color.Red, ColorScheme.Normal.Background));
             Driver.AddStr (new string (' ', feedbackPadLeft));
@@ -519,7 +519,7 @@ public class FileDialog : Dialog
 
             _allowedTypeMenuBar.DrawContentComplete += (s, e) =>
                                                        {
-                                                           _allowedTypeMenuBar.Move (e.Rectangle.Width - 1, 0);
+                                                           _allowedTypeMenuBar.Move (e.NewViewport.Width - 1, 0);
                                                            Driver.AddRune (Glyphs.DownArrow);
                                                        };
 
@@ -776,12 +776,12 @@ public class FileDialog : Dialog
             return 0;
         }
 
-        return Bounds.Width
-               - _btnOk.Bounds.Width
-               - _btnCancel.Bounds.Width
+        return Viewport.Width
+               - _btnOk.Viewport.Width
+               - _btnCancel.Viewport.Width
                - 1
 
-               // TODO: Fiddle factor, seems the Bounds are wrong for someone
+               // TODO: Fiddle factor, seems the Viewport are wrong for someone
                - 2;
     }
 

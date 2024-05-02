@@ -84,9 +84,9 @@ public class ListViewWithSelection : Scenario
 
         _listView.DrawContent += (s, e) =>
                                  {
-                                     scrollBar.Size = _listView.Source.Count - 1;
+                                     scrollBar.Size = _listView.Source.Count;
                                      scrollBar.Position = _listView.TopItem;
-                                     scrollBar.OtherScrollBarView.Size = _listView.MaxLength - 1;
+                                     scrollBar.OtherScrollBarView.Size = _listView.MaxLength;
                                      scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
                                      scrollBar.Refresh ();
                                  };

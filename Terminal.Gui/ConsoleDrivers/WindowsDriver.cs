@@ -18,6 +18,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 
 namespace Terminal.Gui;
@@ -110,6 +111,7 @@ internal class WindowsConsole
             }
 
             _stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
+            _stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
 
             var s = _stringBuilder.ToString ();
 
@@ -127,6 +129,11 @@ internal class WindowsConsole
         }
 
         return result;
+    }
+
+    public bool WriteANSI (string ansi)
+    {
+        return WriteConsole (_screenBuffer, ansi, (uint)ansi.Length, out uint _, null);
     }
 
     public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
@@ -167,7 +174,10 @@ internal class WindowsConsole
         }
     }
 
-    public bool SetCursorPosition (Coord position) { return SetConsoleCursorPosition (_screenBuffer, position); }
+    public bool SetCursorPosition (Coord position)
+    {
+        return SetConsoleCursorPosition (_screenBuffer, position);
+    }
 
     public void SetInitialCursorVisibility ()
     {
@@ -577,14 +587,14 @@ internal class WindowsConsole
         public readonly override string ToString ()
         {
             return EventType switch
-                   {
-                       EventType.Focus => FocusEvent.ToString (),
-                       EventType.Key => KeyEvent.ToString (),
-                       EventType.Menu => MenuEvent.ToString (),
-                       EventType.Mouse => MouseEvent.ToString (),
-                       EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
-                       _ => "Unknown event type: " + EventType
-                   };
+            {
+                EventType.Focus => FocusEvent.ToString (),
+                EventType.Key => KeyEvent.ToString (),
+                EventType.Menu => MenuEvent.ToString (),
+                EventType.Mouse => MouseEvent.ToString (),
+                EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
+                _ => "Unknown event type: " + EventType
+            };
         }
     }
 
@@ -980,7 +990,6 @@ internal class WindowsDriver : ConsoleDriver
 {
     private readonly bool _isWindowsTerminal;
 
-    private CursorVisibility _cachedCursorVisibility;
     private WindowsConsole.SmallRect _damageRegion;
     private bool _isButtonDoubleClicked;
     private bool _isButtonPressed;
@@ -1022,9 +1031,6 @@ internal class WindowsDriver : ConsoleDriver
     public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
 
     public WindowsConsole WinConsole { get; private set; }
-
-    /// <inheritdoc/>
-    public override bool EnsureCursorVisibility () { return WinConsole is null || WinConsole.EnsureCursorVisibility (); }
 
     public WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)
     {
@@ -1072,25 +1078,12 @@ internal class WindowsDriver : ConsoleDriver
         };
     }
 
-    /// <inheritdoc/>
-    public override bool GetCursorVisibility (out CursorVisibility visibility)
-    {
-        if (WinConsole is { })
-        {
-            return WinConsole.GetCursorVisibility (out visibility);
-        }
-
-        visibility = _cachedCursorVisibility;
-
-        return true;
-    }
-
     public override bool IsRuneSupported (Rune rune) { return base.IsRuneSupported (rune) && rune.IsBmp; }
 
     public override void Refresh ()
     {
         UpdateScreen ();
-        WinConsole?.SetInitialCursorVisibility ();
+        //WinConsole?.SetInitialCursorVisibility ();
         UpdateCursor ();
     }
 
@@ -1164,13 +1157,6 @@ internal class WindowsDriver : ConsoleDriver
         }
     }
 
-    /// <inheritdoc/>
-    public override bool SetCursorVisibility (CursorVisibility visibility)
-    {
-        _cachedCursorVisibility = visibility;
-
-        return WinConsole is null || WinConsole.SetCursorVisibility (visibility);
-    }
 
     #region Not Implemented
 
@@ -1194,9 +1180,13 @@ internal class WindowsDriver : ConsoleDriver
         return new WindowsConsole.ConsoleKeyInfoEx (cki, capslock, numlock, scrolllock);
     }
 
+    #region Cursor Handling
+
+    private CursorVisibility? _cachedCursorVisibility;
+
     public override void UpdateCursor ()
     {
-        if (Col < 0 || Row < 0 || Col > Cols || Row > Rows)
+        if (Col < 0 || Row < 0 || Col >= Cols || Row >= Rows)
         {
             GetCursorVisibility (out CursorVisibility cursorVisibility);
             _cachedCursorVisibility = cursorVisibility;
@@ -1205,15 +1195,89 @@ internal class WindowsDriver : ConsoleDriver
             return;
         }
 
-        SetCursorVisibility (_cachedCursorVisibility);
-
         var position = new WindowsConsole.Coord
         {
             X = (short)Col,
             Y = (short)Row
         };
-        WinConsole?.SetCursorPosition (position);
+
+        if (Force16Colors)
+        {
+            WinConsole?.SetCursorPosition (position);
+        }
+        else
+        {
+            var sb = new StringBuilder ();
+            sb.Append (EscSeqUtils.CSI_SetCursorPosition (position.Y + 1, position.X + 1));
+            WinConsole?.WriteANSI (sb.ToString ());
+        }
+
+        if (_cachedCursorVisibility is { })
+        {
+            SetCursorVisibility (_cachedCursorVisibility.Value);
+        }
+        //EnsureCursorVisibility ();
     }
+
+    /// <inheritdoc/>
+    public override bool GetCursorVisibility (out CursorVisibility visibility)
+    {
+        if (WinConsole is { })
+        {
+            return WinConsole.GetCursorVisibility (out visibility);
+        }
+
+        visibility = _cachedCursorVisibility ?? CursorVisibility.Default;
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public override bool SetCursorVisibility (CursorVisibility visibility)
+    {
+        _cachedCursorVisibility = visibility;
+
+        if (Force16Colors)
+        {
+            return WinConsole is null || WinConsole.SetCursorVisibility (visibility);
+        }
+        else
+        {
+            var sb = new StringBuilder ();
+            sb.Append (visibility != CursorVisibility.Invisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+            return WinConsole?.WriteANSI (sb.ToString ()) ?? false;
+        }
+    }
+
+    /// <inheritdoc/>
+    public override bool EnsureCursorVisibility ()
+    {
+        if (Force16Colors)
+        {
+            return WinConsole is null || WinConsole.EnsureCursorVisibility ();
+        }
+        else
+        {
+            var sb = new StringBuilder ();
+            sb.Append (_cachedCursorVisibility != CursorVisibility.Invisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+            return WinConsole?.WriteANSI (sb.ToString ()) ?? false;
+        }
+
+        if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))
+        {
+            GetCursorVisibility (out CursorVisibility cursorVisibility);
+            _cachedCursorVisibility = cursorVisibility;
+            SetCursorVisibility (CursorVisibility.Invisible);
+
+            return false;
+        }
+
+        SetCursorVisibility (_cachedCursorVisibility ?? CursorVisibility.Default);
+
+        return _cachedCursorVisibility == CursorVisibility.Default;
+    }
+
+    #endregion Cursor Handling
 
     public override void UpdateScreen ()
     {
@@ -1226,8 +1290,8 @@ internal class WindowsDriver : ConsoleDriver
 
         var bufferCoords = new WindowsConsole.Coord
         {
-            X = (short)Clip.Width,
-            Y = (short)Clip.Height
+            X = (short)Cols, //Clip.Width,
+            Y = (short)Rows, //Clip.Height
         };
 
         for (var row = 0; row < Rows; row++)
@@ -1574,13 +1638,13 @@ internal class WindowsDriver : ConsoleDriver
                         // returned (e.g. on ENG OemPlus un-shifted is =, not +). This is important
                         // for key persistence ("Ctrl++" vs. "Ctrl+=").
                         mappedChar = keyInfo.Key switch
-                                     {
-                                         ConsoleKey.OemPeriod => '.',
-                                         ConsoleKey.OemComma => ',',
-                                         ConsoleKey.OemPlus => '+',
-                                         ConsoleKey.OemMinus => '-',
-                                         _ => mappedChar
-                                     };
+                        {
+                            ConsoleKey.OemPeriod => '.',
+                            ConsoleKey.OemComma => ',',
+                            ConsoleKey.OemPlus => '+',
+                            ConsoleKey.OemMinus => '-',
+                            _ => mappedChar
+                        };
                     }
 
                     // Return the mappedChar with they modifiers. Because mappedChar is un-shifted, if Shift was down
@@ -1745,7 +1809,10 @@ internal class WindowsDriver : ConsoleDriver
                 Flags = mouseFlag
             };
 
-            if (Application.WantContinuousButtonPressedView is null)
+            // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
+            View view = Application.WantContinuousButtonPressedView;
+
+            if (view is null)
             {
                 break;
             }
@@ -1759,6 +1826,7 @@ internal class WindowsDriver : ConsoleDriver
             //Debug.WriteLine($"ProcessContinuousButtonPressedAsync: {view}");
             if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
+                // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
                 Application.Invoke (() => OnMouseEvent (me));
             }
         }
@@ -1813,6 +1881,7 @@ internal class WindowsDriver : ConsoleDriver
 
         if (_isButtonDoubleClicked || _isOneFingerDoubleClicked)
         {
+            // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
             Application.MainLoop.AddIdle (
                                           () =>
                                           {
@@ -1884,6 +1953,7 @@ internal class WindowsDriver : ConsoleDriver
 
             if ((mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
+                // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
                 Application.MainLoop.AddIdle (
                                               () =>
                                               {

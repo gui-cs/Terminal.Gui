@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Text;
 using Xunit.Abstractions;
+using static Terminal.Gui.Dim;
+
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -22,6 +24,57 @@ public class DimTests
         Thread.CurrentThread.CurrentUICulture = culture;
     }
 
+    [Fact]
+    public void DimAbsolute_GetDimension_ReturnsCorrectValue ()
+    {
+        var dim = new DimAbsolute (10);
+        var result = dim.Calculate (0, 100, 50, false);
+        Assert.Equal (10, result);
+    }
+
+    [Fact]
+    public void DimCombine_GetDimension_ReturnsCorrectValue ()
+    {
+        var dim1 = new DimAbsolute (10);
+        var dim2 = new DimAbsolute (20);
+        var dim = dim1 + dim2;
+        var result = dim.Calculate (0, 100, 50, false);
+        Assert.Equal (30, result);
+    }
+
+    [Fact]
+    public void DimFactor_GetDimension_ReturnsCorrectValue ()
+    {
+        var dim = new DimFactor (0.5f);
+        var result = dim.Calculate (0, 100, 50, false);
+        Assert.Equal (50, result);
+    }
+
+    [Fact]
+    public void DimFill_GetDimension_ReturnsCorrectValue ()
+    {
+        var dim = Dim.Fill ();
+        var result = dim.Calculate (0, 100, 50, false);
+        Assert.Equal (100, result);
+    }
+
+    [Fact]
+    public void DimFunc_GetDimension_ReturnsCorrectValue ()
+    {
+        var dim = new DimFunc (() => 10);
+        var result = dim.Calculate (0, 100, 50, false);
+        Assert.Equal (10, result);
+    }
+
+    [Fact]
+    public void DimView_GetDimension_ReturnsCorrectValue ()
+    {
+        var view = new View { Width = 10 };
+        var dim = new DimView (view, Dimension.Width);
+        var result = dim.Calculate (0, 100, 50, false);
+        Assert.Equal (10, result);
+    }
+
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // A new test that does not depend on Application is needed.
     [Fact]
@@ -39,7 +92,7 @@ public class DimTests
                              if (k.KeyCode == KeyCode.Enter)
                              {
                                  field.Text = $"Label {count}";
-                                 var label = new Label { X = 0, Y = view.Bounds.Height, /*Width = 20,*/ Text = field.Text };
+                                 var label = new Label { X = 0, Y = view.Viewport.Height, /*Width = 20,*/ Text = field.Text };
                                  view.Add (label);
                                  Assert.Equal ($"Label {count}", label.Text);
                                  Assert.Equal ($"Absolute({count})", label.Y.ToString ());
@@ -68,6 +121,7 @@ public class DimTests
         top.Add (win);
 
         Application.Run (top);
+        top.Dispose ();
 
         Assert.Equal (20, count);
     }
@@ -112,7 +166,7 @@ public class DimTests
         for (var i = 0; i < count; i++)
         {
             field.Text = $"Label {i}";
-            var label = new Label { X = 0, Y = view.Bounds.Height, /*Width = 20,*/ Text = field.Text };
+            var label = new Label { X = 0, Y = view.Viewport.Height, /*Width = 20,*/ Text = field.Text };
             view.Add (label);
             Assert.Equal ($"Label {i}", label.Text);
             Assert.Equal ($"Absolute({i})", label.Y.ToString ());
@@ -507,9 +561,9 @@ public class DimTests
         Assert.Equal (20, dimCombine.Anchor (100));
 
         var view = new View { Frame = new Rectangle (20, 10, 20, 1) };
-        var dimViewHeight = new Dim.DimView (view, 0);
+        var dimViewHeight = new Dim.DimView (view, Dimension.Height);
         Assert.Equal (1, dimViewHeight.Anchor (0));
-        var dimViewWidth = new Dim.DimView (view, 1);
+        var dimViewWidth = new Dim.DimView (view, Dimension.Width);
         Assert.Equal (20, dimViewWidth.Anchor (0));
 
         view.Dispose ();
@@ -668,9 +722,9 @@ public class DimTests
                        Assert.Equal (50, v4.Frame.Width);
                        Assert.Equal (50, v4.Frame.Height);
                    #if DEBUG
-                       Assert.Equal ($"Combine(View(Width,Button(v1){v1.Frame})-View(Width,Button(v3){v3.Bounds}))", v5.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Width,Button(v1){v1.Frame})-View(Width,Button(v3){v3.Viewport}))", v5.Width.ToString ());
                     #else
-                       Assert.Equal ($"Combine(View(Height,Button(){v1.Frame})-View(Height,Button(){v3.Bounds}))", v5.Height.ToString ( ));
+                       Assert.Equal ($"Combine(View(Height,Button(){v1.Frame})-View(Height,Button(){v3.Viewport}))", v5.Height.ToString ( ));
                    #endif
                        Assert.Equal (38, v5.Frame.Width);  // 47-9=38
                        Assert.Equal (80, v5.Frame.Height); // 89-9=80

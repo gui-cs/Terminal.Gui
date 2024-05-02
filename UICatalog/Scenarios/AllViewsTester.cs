@@ -147,7 +147,7 @@ public class AllViewsTester : Scenario
                                      };
         _settingsPane.Add (_computedCheckBox);
 
-        string [] radioItems = { "_Percent(x)", "_AnchorEnd(x)", "_Center", "A_t(x)" };
+        string [] radioItems = { "_Percent(x)", "_AnchorEnd", "_Center", "A_t(x)" };
 
         _locationFrame = new FrameView
         {
@@ -179,7 +179,7 @@ public class AllViewsTester : Scenario
 
         _locationFrame.Add (_xRadioGroup);
 
-        radioItems = new [] { "P_ercent(y)", "A_nchorEnd(y)", "C_enter", "At(_y)" };
+        radioItems = new [] { "P_ercent(y)", "A_nchorEnd", "C_enter", "At(_y)" };
         label = new Label { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "Y:" };
         _locationFrame.Add (label);
         _yText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
@@ -388,7 +388,7 @@ public class AllViewsTester : Scenario
             view.X = _xRadioGroup.SelectedItem switch
                      {
                          0 => Pos.Percent (_xVal),
-                         1 => Pos.AnchorEnd (_xVal),
+                         1 => Pos.AnchorEnd (),
                          2 => Pos.Center (),
                          3 => Pos.At (_xVal),
                          _ => view.X
@@ -397,7 +397,7 @@ public class AllViewsTester : Scenario
             view.Y = _yRadioGroup.SelectedItem switch
                      {
                          0 => Pos.Percent (_yVal),
-                         1 => Pos.AnchorEnd (_yVal),
+                         1 => Pos.AnchorEnd (),
                          2 => Pos.Center (),
                          3 => Pos.At (_yVal),
                          _ => view.Y

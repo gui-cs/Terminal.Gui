@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
+using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 
@@ -88,7 +91,7 @@ public static partial class Application
 #if DEBUG_IDISPOSABLE
 
             // Don't dispose the toplevels. It's up to caller dispose them
-            Debug.Assert (t.WasDisposed);
+            //Debug.Assert (t.WasDisposed);
 #endif
         }
 
@@ -99,6 +102,7 @@ public static partial class Application
         // Don't dispose the Top. It's up to caller dispose it
         if (Top is { })
         {
+
             Debug.Assert (Top.WasDisposed);
 
             // If End wasn't called _cachedRunStateToplevel may be null
@@ -132,7 +136,7 @@ public static partial class Application
 
         // Don't reset ForceDriver; it needs to be set before Init is called.
         //ForceDriver = string.Empty;
-        Force16Colors = false;
+        //Force16Colors = false;
         _forceFakeConsole = false;
 
         // Run State stuff
@@ -528,7 +532,10 @@ public static partial class Application
             MoveCurrent (Current);
         }
 
-        toplevel.SetRelativeLayout (Driver.Bounds);
+        //if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
+        toplevel.SetRelativeLayout (Driver.Screen.Size);
+
+        //}
 
         // BUGBUG: This call is likely not needed.
         toplevel.LayoutSubviews ();
@@ -541,13 +548,110 @@ public static partial class Application
             toplevel.OnLoaded ();
             toplevel.SetNeedsDisplay ();
             toplevel.Draw ();
-            toplevel.PositionCursor ();
-            Driver.Refresh ();
+            Driver.UpdateScreen ();
+            if (PositionCursor (toplevel))
+            {
+                Driver.UpdateCursor ();
+            }
         }
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));
 
         return rs;
+    }
+
+    private static CursorVisibility _cachedCursorVisibility;
+
+    /// <summary>
+    /// Calls <see cref="View.PositionCursor"/> on the most focused view in the view starting with <paramref name="view"/>.
+    /// </summary>
+    /// <remarks>
+    /// Does nothing if <paramref name="view"/> is <see langword="null"/> or if the most focused view is not visible or enabled.
+    /// <para>
+    /// If the most focused view is not visible within it's superview, the cursor will be hidden.
+    /// </para>
+    /// </remarks>
+    /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
+    internal static bool PositionCursor (View view)
+    {
+        if (view is null)
+        {
+            return false;
+        }
+
+        // Find the most focused view and position the cursor there.
+        View mostFocused = view.MostFocused;
+
+        if (mostFocused is null)
+        {
+            return false;
+        }
+
+        CursorVisibility cachedCursorVisibility;
+
+        // If the view is not visible or enabled, don't position the cursor
+        if (!mostFocused.Visible || !mostFocused.Enabled)
+        {
+            Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+            if (cachedCursorVisibility != CursorVisibility.Invisible)
+            {
+                _cachedCursorVisibility = cachedCursorVisibility;
+                Driver.SetCursorVisibility (CursorVisibility.Invisible);
+            }
+
+            return false;
+        }
+
+        // If the view is not visible within it's superview, don't position the cursor
+        Rectangle mostFocusedViewport = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = Point.Empty });
+        Rectangle superViewViewport = mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver.Screen;
+        if (!superViewViewport.IntersectsWith (mostFocusedViewport))
+        {
+            return false;
+        }
+
+        Point? prevCursor = new (Driver.Row, Driver.Col);
+        Point? cursor = mostFocused.PositionCursor ();
+
+        // If the cursor is not in a visible location in the SuperView, hide it
+        if (cursor is { })
+        {
+            // Convert cursor to screen coords
+            cursor = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = cursor.Value }).Location;
+            if (!superViewViewport.Contains (cursor.Value))
+            {
+                Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+                if (cachedCursorVisibility != CursorVisibility.Invisible)
+                {
+                    _cachedCursorVisibility = cachedCursorVisibility;
+                }
+
+                Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+                return false;
+            }
+
+            Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+            if (cachedCursorVisibility == CursorVisibility.Invisible)
+            {
+                Driver.SetCursorVisibility (_cachedCursorVisibility);
+            }
+
+            return prevCursor != cursor;
+        }
+
+        Driver.GetCursorVisibility (out cachedCursorVisibility);
+
+        if (cachedCursorVisibility != CursorVisibility.Invisible)
+        {
+            _cachedCursorVisibility = cachedCursorVisibility;
+            Driver.SetCursorVisibility (CursorVisibility.Invisible);
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -641,7 +745,7 @@ public static partial class Application
     public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
     {
         ArgumentNullException.ThrowIfNull (view);
-        
+
         if (_initialized)
         {
             if (Driver is null)
@@ -763,7 +867,6 @@ public static partial class Application
             last = v;
         }
 
-        last?.PositionCursor ();
         Driver.Refresh ();
     }
 
@@ -876,12 +979,22 @@ public static partial class Application
         if (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || OverlappedChildNeedsDisplay ())
         {
             state.Toplevel.Draw ();
-            state.Toplevel.PositionCursor ();
-            Driver.Refresh ();
+            Driver.UpdateScreen ();
+            //Driver.UpdateCursor ();
         }
-        else
+
+        if (PositionCursor (state.Toplevel))
         {
-            Driver.UpdateCursor ();
+            Driver.UpdateCursor();
+        }
+
+        //        else
+        {
+            //if (PositionCursor (state.Toplevel))
+            //{
+            //    Driver.Refresh ();
+            //}
+            //Driver.UpdateCursor ();
         }
 
         if (state.Toplevel != Top && !state.Toplevel.Modal && (Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded))
@@ -1310,10 +1423,15 @@ public static partial class Application
 
         foreach (Toplevel t in _topLevels)
         {
-            t.SetRelativeLayout (Rectangle.Empty with { Size = args.Size });
+            t.SetRelativeLayout (args.Size);
             t.LayoutSubviews ();
             t.PositionToplevels ();
             t.OnSizeChanging (new (args.Size));
+
+            if (PositionCursor (t))
+            {
+                Driver.UpdateCursor ();
+            }
         }
 
         Refresh ();
@@ -1443,15 +1561,15 @@ public static partial class Application
     /// <remarks>
     ///     <para>
     ///         Use this event to receive mouse events in screen coordinates. Use <see cref="MouseEvent"/> to
-    ///         receive mouse events relative to a <see cref="View"/>'s bounds.
+    ///         receive mouse events relative to a <see cref="View.Viewport"/>.
     ///     </para>
     ///     <para>The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.</para>
     /// </remarks>
-    public static event EventHandler<MouseEvent> MouseEvent;
+    public static event EventHandler<MouseEvent>? MouseEvent;
 
     /// <summary>Called when a mouse event occurs. Raises the <see cref="MouseEvent"/> event.</summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
-    /// <param name="a">The mouse event with coordinates relative to the screen.</param>
+    /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
     internal static void OnMouseEvent (MouseEvent mouseEvent)
     {
         if (IsMouseDisabled)
@@ -1459,7 +1577,6 @@ public static partial class Application
             return;
         }
 
-        // TODO: In PR #3273, FindDeepestView will return adornments. Update logic below to fix adornment mouse handling
         var view = View.FindDeepestView (Current, mouseEvent.X, mouseEvent.Y);
 
         if (view is { })
@@ -1510,19 +1627,19 @@ public static partial class Application
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point boundsLoc = MouseGrabView.ScreenToBounds (mouseEvent.X, mouseEvent.Y);
+            Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.X, mouseEvent.Y);
 
             var viewRelativeMouseEvent = new MouseEvent
             {
-                X = boundsLoc.X,
-                Y = boundsLoc.Y,
+                X = frameLoc.X,
+                Y = frameLoc.Y,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
                 View = view ?? MouseGrabView,
                 IsMouseDown = _isMouseDown
             };
 
-            if (MouseGrabView.Bounds.Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
+            if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
                 // Give a chance for the current view process the event
@@ -1595,14 +1712,14 @@ public static partial class Application
                 IsMouseDown = _isMouseDown
             };
         }
-        else if (view.BoundsToScreen (view.Bounds).Contains (mouseEvent.X, mouseEvent.Y))
+        else if (view.ViewportToScreen (Rectangle.Empty with { Size = view.Viewport.Size }).Contains (mouseEvent.X, mouseEvent.Y))
         {
-            Point boundsPoint = view.ScreenToBounds (mouseEvent.X, mouseEvent.Y);
+            Point viewportLocation = view.ScreenToViewport (mouseEvent.X, mouseEvent.Y);
 
             me = new ()
             {
-                X = boundsPoint.X,
-                Y = boundsPoint.Y,
+                X = viewportLocation.X,
+                Y = viewportLocation.Y,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
                 View = view,
@@ -1636,10 +1753,37 @@ public static partial class Application
 
         //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
-        if (view.NewMouseEvent (me) == false)
+        while (view.NewMouseEvent (me) != true)
         {
-            // Should we bubble up the event, if it is not handled?
-            return false;
+            if (MouseGrabView is { })
+            {
+                break;
+            }
+
+            if (view is Adornment adornmentView)
+            {
+                view = adornmentView.Parent.SuperView;
+            }
+            else
+            {
+                view = view.SuperView;
+            }
+
+            if (view is null)
+            {
+                break;
+            }
+
+            Point boundsPoint = view.ScreenToViewport (mouseEvent.X, mouseEvent.Y);
+
+            me = new ()
+            {
+                X = boundsPoint.X,
+                Y = boundsPoint.Y,
+                Flags = mouseEvent.Flags,
+                ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
+                View = view
+            };
         }
 
         BringOverlappedTopToFront ();

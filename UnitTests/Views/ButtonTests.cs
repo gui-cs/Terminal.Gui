@@ -164,8 +164,8 @@ public class ButtonTests (ITestOutputHelper output)
         var btn = new Button { Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
         var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
-        btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
-        btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
+        btn.X = Pos.AnchorEnd (0) - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
+        btn.X = Pos.AnchorEnd (0) - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
@@ -391,14 +391,14 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new (0, 0, 4, 1), btn.Bounds);
+        Assert.Equal (new (0, 0, 4, 1), btn.Viewport);
         Assert.Equal (new (0, 0, 4, 1), btn.Frame);
         Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.False (btn.IsDefault);
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new (0, 0, 4, 1), btn.Bounds);
+        Assert.Equal (new (0, 0, 4, 1), btn.Viewport);
         Assert.Equal (new (0, 0, 4, 1), btn.Frame);
 
         Assert.Equal (string.Empty, btn.Title);
@@ -426,7 +426,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (btn.IsDefault);
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new (0, 0, 10, 1), btn.Bounds);
+        Assert.Equal (new (0, 0, 10, 1), btn.Viewport);
         Assert.Equal (new (0, 0, 10, 1), btn.Frame);
         Assert.Equal (KeyCode.T, btn.HotKey);
 
@@ -455,7 +455,7 @@ public class ButtonTests (ITestOutputHelper output)
 ";
         TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-        Assert.Equal (new (0, 0, 9, 1), btn.Bounds);
+        Assert.Equal (new (0, 0, 9, 1), btn.Viewport);
         Assert.Equal (new (1, 2, 9, 1), btn.Frame);
         btn.Dispose ();
     }
@@ -708,7 +708,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
         Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal (new (0, 0, 16, 1), btn.Bounds);
+        Assert.Equal (new (0, 0, 16, 1), btn.Viewport);
         var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
         var expected = @$"
@@ -742,7 +742,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
         Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal (new (0, 0, 16, 1), btn.Bounds);
+        Assert.Equal (new (0, 0, 16, 1), btn.Viewport);
         var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
         var expected = @$"
@@ -757,4 +757,73 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }
+    
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_ButtonClick_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    {
+        var me = new MouseEvent ();
+
+        var button = new Button ()
+        {
+            AutoSize = false,
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true
+        };
+
+        var acceptCount = 0;
+
+        button.Accept += (s, e) => acceptCount++;
+
+        me.Flags = pressed;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        me.Flags = released;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        me.Flags = clicked;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        button.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_ButtonPressRelease_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    {
+        var me = new MouseEvent ();
+
+        var button = new Button ()
+        {
+            AutoSize = false,
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true
+        };
+
+        var acceptCount = 0;
+
+        button.Accept += (s, e) => acceptCount++;
+
+        me.Flags = pressed;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        me.Flags = released;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        button.Dispose ();
+    }
+
 }

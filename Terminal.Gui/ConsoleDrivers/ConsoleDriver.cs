@@ -18,15 +18,31 @@ public abstract class ConsoleDriver
     // This is in addition to the dirty flag on each cell.
     internal bool [] _dirtyLines;
 
-    /// <summary>Gets the dimensions of the terminal.</summary>
-    public Rectangle Bounds => new (0, 0, Cols, Rows);
+    // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
+    /// <summary>Gets the location and size of the terminal screen.</summary>
+    public Rectangle Screen => new (0, 0, Cols, Rows);
+
+    private Rectangle _clip;
 
     /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
     ///     to.
     /// </summary>
-    /// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
-    public Rectangle Clip { get; set; }
+    /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
+    public Rectangle Clip
+    {
+        get => _clip;
+        set
+        {
+            if (_clip == value)
+            {
+                return;
+            }
+
+            // Don't ever let Clip be bigger than Screen
+            _clip = Rectangle.Intersect (Screen, value);
+        }
+    }
 
     /// <summary>Get the operating system clipboard.</summary>
     public IClipboard Clipboard { get; internal set; }
@@ -278,16 +294,6 @@ public abstract class ConsoleDriver
 
         for (var i = 0; i < runes.Count; i++)
         {
-            //if (runes [i].IsCombiningMark()) {
-
-            //	// Attempt to normalize
-            //	string combined = runes [i-1] + runes [i].ToString();
-
-            //	// Normalize to Form C (Canonical Composition)
-            //	string normalized = combined.Normalize (NormalizationForm.FormC);
-
-            //	runes [i-]
-            //}
             AddRune (runes [i]);
         }
     }
@@ -295,31 +301,27 @@ public abstract class ConsoleDriver
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
     public void ClearContents ()
     {
-        // TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
         Contents = new Cell [Rows, Cols];
         //CONCURRENCY: Unsynchronized access to Clip isn't safe.
-        Clip = new (0, 0, Cols, Rows);
+        // TODO: ClearContents should not clear the clip; it should only clear the contents. Move clearing it elsewhere.
+        Clip = Screen;
         _dirtyLines = new bool [Rows];
 
         lock (Contents)
         {
-            // Can raise an exception while is still resizing.
-            try
+            for (var row = 0; row < Rows; row++)
             {
-                for (var row = 0; row < Rows; row++)
+                for (var c = 0; c < Cols; c++)
                 {
-                    for (var c = 0; c < Cols; c++)
+                    Contents [row, c] = new Cell
                     {
-                        Contents [row, c] = new Cell
-                        {
-                            Rune = (Rune)' ', Attribute = new Attribute (Color.White, Color.Black), IsDirty = true
-                        };
-                        _dirtyLines [row] = true;
-                    }
+                        Rune = (Rune)' ', 
+                        Attribute = new Attribute (Color.White, Color.Black), 
+                        IsDirty = true
+                    };
+                    _dirtyLines [row] = true;
                 }
             }
-            catch (IndexOutOfRangeException)
-            { }
         }
     }
 
@@ -327,18 +329,28 @@ public abstract class ConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     public abstract bool EnsureCursorVisibility ();
 
-    // TODO: Move FillRect to ./Drawing	
-    /// <summary>Fills the specified rectangle with the specified rune.</summary>
-    /// <param name="rect"></param>
-    /// <param name="rune"></param>
+    /// <summary>Fills the specified rectangle with the specified rune, using <see cref="CurrentAttribute"/></summary>
+    /// <remarks>
+    /// The value of <see cref="Clip"/> is honored. Any parts of the rectangle not in the clip will not be drawn.
+    /// </remarks>
+    /// <param name="rect">The Screen-relative rectangle.</param>
+    /// <param name="rune">The Rune used to fill the rectangle</param>
     public void FillRect (Rectangle rect, Rune rune = default)
     {
-        for (int r = rect.Y; r < rect.Y + rect.Height; r++)
+        rect = Rectangle.Intersect (rect, Clip);
+        lock (Contents)
         {
-            for (int c = rect.X; c < rect.X + rect.Width; c++)
+            for (int r = rect.Y; r < rect.Y + rect.Height; r++)
             {
-                Application.Driver.Move (c, r);
-                Application.Driver.AddRune (rune == default (Rune) ? new Rune (' ') : rune);
+                for (int c = rect.X; c < rect.X + rect.Width; c++)
+                {
+                    Contents [r, c] = new Cell
+                    {
+                        Rune = (rune != default ? rune : (Rune)' '),
+                        Attribute = CurrentAttribute, IsDirty = true
+                    };
+                    _dirtyLines [r] = true;
+                }
             }
         }
     }
@@ -372,10 +384,13 @@ public abstract class ConsoleDriver
     /// <param name="col">The column.</param>
     /// <param name="row">The row.</param>
     /// <returns>
-    ///     <see langword="false"/> if the coordinate is outside of the screen bounds or outside of <see cref="Clip"/>.
+    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of <see cref="Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
-    public bool IsValidLocation (int col, int row) { return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip.Contains (col, row); }
+    public bool IsValidLocation (int col, int row)
+    {
+        return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip.Contains (col, row);
+    }
 
     /// <summary>
     ///     Updates <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>.
@@ -437,6 +452,7 @@ public abstract class ConsoleDriver
     /// <summary>Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.</summary>
     public virtual bool SupportsTrueColor => true;
 
+    // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
     /// <summary>
     ///     Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors.
     ///     See <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.
@@ -466,6 +482,7 @@ public abstract class ConsoleDriver
         get => _currentAttribute;
         set
         {
+            // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
             if (Application.Driver is { })
             {
                 _currentAttribute = new Attribute (value.Foreground, value.Background);

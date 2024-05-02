@@ -78,7 +78,7 @@ public class ListViewTests
                                                       _output
                                                      );
 
-        Assert.True (lv.ScrollDown (10));
+        Assert.True (lv.ScrollVertical(10));
         lv.Draw ();
         Assert.Equal (-1, lv.SelectedItem);
 
@@ -141,7 +141,7 @@ public class ListViewTests
                                                       _output
                                                      );
 
-        Assert.True (lv.ScrollUp (20));
+        Assert.True (lv.ScrollVertical (-20));
         lv.Draw ();
         Assert.Equal (19, lv.SelectedItem);
 
@@ -183,7 +183,7 @@ public class ListViewTests
                                                       _output
                                                      );
 
-        Assert.True (lv.ScrollUp (20));
+        Assert.True (lv.ScrollVertical (-20));
         lv.Draw ();
         Assert.Equal (19, lv.SelectedItem);
 
@@ -246,7 +246,7 @@ public class ListViewTests
                                                       _output
                                                      );
 
-        Assert.True (lv.ScrollDown (20));
+        Assert.True (lv.ScrollVertical (20));
         lv.Draw ();
         Assert.Equal (0, lv.SelectedItem);
 
@@ -670,8 +670,8 @@ Item 6",
 
     private class NewListDataSource : IListDataSource
     {
-        public int Count => throw new NotImplementedException ();
-        public int Length => throw new NotImplementedException ();
+        public int Count => 0;
+        public int Length => 0;
         public bool IsMarked (int item) { throw new NotImplementedException (); }
 
         public void Render (
@@ -758,5 +758,40 @@ Item 6",
         });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void LeftItem_TopItem_Tests ()
+    {
+        var source = new List<string> ();
+        for (int i = 0; i < 5; i++) {
+            source.Add ($"Item {i}");
+        }
+        var lv = new ListView () {
+            X = 1,
+            Width = 10,
+            Height = 5,
+            Source = new ListWrapper (source)
+        };
+        var top = new Toplevel ();
+        top.Add (lv);
+        Application.Begin (top);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
+ Item 0
+ Item 1
+ Item 2
+ Item 3
+ Item 4", _output);
+
+        lv.LeftItem = 1;
+        lv.TopItem = 1;
+        Application.Refresh ();
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
+ tem 1
+ tem 2
+ tem 3
+ tem 4", _output);
     }
 }

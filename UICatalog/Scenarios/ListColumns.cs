@@ -12,6 +12,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Scrolling")]
+
 public class ListColumns : Scenario
 {
     private ColorScheme _alternatingColorScheme;

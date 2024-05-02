@@ -26,10 +26,10 @@ public class ToplevelTests
     }
 
     [Fact]
-    public void Arrangement_Is_Movable ()
+    public void Arrangement_Default_Is_Fixed ()
     {
         var top = new Toplevel ();
-        Assert.Equal (ViewArrangement.Movable, top.Arrangement);
+        Assert.Equal (ViewArrangement.Fixed, top.Arrangement);
     }
 
 #if BROKE_IN_2927
@@ -869,7 +869,8 @@ public class ToplevelTests
                                              X = 2,
                                              Y = 2,
                                              Width = 10,
-                                             Height = 3
+                                             Height = 3,
+                                             Arrangement = ViewArrangement.Movable
                                          };
                                          Application.Run (testWindow);
                                      }
@@ -964,7 +965,7 @@ public class ToplevelTests
     [AutoInitShutdown]
     public void Mouse_Drag_On_Top_With_Superview_Not_Null ()
     {
-        var win = new Window { X = 3, Y = 2, Width = 10, Height = 5 };
+        var win = new Window { X = 3, Y = 2, Width = 10, Height = 5, Arrangement = ViewArrangement.Movable };
         Toplevel top = new ();
         top.Add (win);
 
@@ -1260,12 +1261,13 @@ public class ToplevelTests
         Application.Begin (top);
 
         Assert.True (tf.HasFocus);
+        Application.PositionCursor (top);
         Application.Driver.GetCursorVisibility (out CursorVisibility cursor);
         Assert.Equal (CursorVisibility.Default, cursor);
 
         view.Enabled = false;
         Assert.False (tf.HasFocus);
-        Application.Refresh ();
+        Application.PositionCursor (top);
         Application.Driver.GetCursorVisibility (out cursor);
         Assert.Equal (CursorVisibility.Invisible, cursor);
     }
@@ -1313,7 +1315,7 @@ public class ToplevelTests
         Assert.Equal (new (1, 3, 10, 5), view.Frame);
         Assert.Equal (new (0, 0, 10, 5), view._needsDisplayRect);
 
-        view.OnDrawContent (view.Bounds);
+        view.OnDrawContent (view.Viewport);
         view.Frame = new (1, 3, 10, 5);
         Assert.Equal (new (1, 3, 10, 5), view.Frame);
         Assert.Equal (new (0, 0, 10, 5), view._needsDisplayRect);
@@ -1331,7 +1333,7 @@ public class ToplevelTests
             Height = 16,
             ContentSize = new (200, 100)
         };
-        var win = new Window { X = 3, Y = 3, Width = Dim.Fill (3), Height = Dim.Fill (3) };
+        var win = new Window { X = 3, Y = 3, Width = Dim.Fill (3), Height = Dim.Fill (3), Arrangement = ViewArrangement.Movable };
         scrollView.Add (win);
         Toplevel top = new ();
         top.Add (scrollView);
@@ -1377,10 +1379,10 @@ public class ToplevelTests
 
     [Fact]
     [AutoInitShutdown]
-    public void Window_Bounds_Bigger_Than_Driver_Cols_And_Rows_Allow_Drag_Beyond_Left_Right_And_Bottom ()
+    public void Window_Viewport_Bigger_Than_Driver_Cols_And_Rows_Allow_Drag_Beyond_Left_Right_And_Bottom ()
     {
         Toplevel top = new ();
-        var window = new Window { Width = 20, Height = 3 };
+        var window = new Window { Width = 20, Height = 3, Arrangement = ViewArrangement.Movable};
         RunState rsTop = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (40, 10);
         RunState rsWindow = Application.Begin (window);
@@ -1471,7 +1473,7 @@ public class ToplevelTests
     public void Modal_As_Top_Will_Drag_Cleanly ()
     {
         // Don't use Dialog as a Top, use a Window instead - dialog has complex layout behavior that is not needed here.
-        var window = new Window { Width = 10, Height = 3 };
+        var window = new Window { Width = 10, Height = 3, Arrangement = ViewArrangement.Movable };
 
         window.Add (
                     new Label
@@ -1553,7 +1555,7 @@ public class ToplevelTests
 
         btnPopup.Accept += (s, e) =>
                             {
-                                Rectangle viewToScreen = btnPopup.BoundsToScreen (top.Frame);
+                                Rectangle viewToScreen = btnPopup.ViewportToScreen (top.Frame);
 
                                 var viewAddedToTop = new View
                                 {

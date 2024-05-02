@@ -264,7 +264,7 @@ public class HexView : View
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent  (MouseEvent me)
     {
-        // BUGBUG: Test this with a border! Assumes Frame == Bounds!
+        // BUGBUG: Test this with a border! Assumes Frame == Viewport!
 
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
@@ -351,14 +351,14 @@ public class HexView : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         Attribute currentAttribute;
         Attribute current = ColorScheme.Focus;
         Driver.SetAttribute (current);
         Move (0, 0);
 
-        // BUGBUG: Bounds!!!!
+        // BUGBUG: Viewport!!!!
         Rectangle frame = Frame;
 
         int nblocks = bytesPerLine / bsize;
@@ -373,7 +373,7 @@ public class HexView : View
         {
             Rectangle lineRect = new (0, line, frame.Width, 1);
 
-            if (!Bounds.Contains (lineRect))
+            if (!Viewport.Contains (lineRect))
             {
                 continue;
             }
@@ -547,7 +547,7 @@ public class HexView : View
     public event EventHandler<HexViewEventArgs> PositionChanged;
 
     ///<inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         var delta = (int)(position - displayStart);
         int line = delta / bytesPerLine;
@@ -555,14 +555,15 @@ public class HexView : View
         int block = item / bsize;
         int column = item % bsize * 3;
 
-        if (leftSide)
+        int x = displayWidth + block * 14 + column + (firstNibble ? 0 : 1);
+        int y = line;
+        if (!leftSide)
         {
-            Move (displayWidth + block * 14 + column + (firstNibble ? 0 : 1), line);
+            x = displayWidth + bytesPerLine / bsize * 14 + item - 1;
         }
-        else
-        {
-            Move (displayWidth + bytesPerLine / bsize * 14 + item - 1, line);
-        }
+
+        Move (x, y);
+        return new (x, y);
     }
 
     internal void SetDisplayStart (long value)
@@ -611,15 +612,15 @@ public class HexView : View
         // Small buffers will just show the position, with the bsize field value (4 bytes)
         bytesPerLine = bsize;
 
-        if (Bounds.Width - displayWidth > 17)
+        if (Viewport.Width - displayWidth > 17)
         {
-            bytesPerLine = bsize * ((Bounds.Width - displayWidth) / 18);
+            bytesPerLine = bsize * ((Viewport.Width - displayWidth) / 18);
         }
     }
 
     private bool MoveDown (int bytes)
     {
-        // BUGBUG: Bounds!
+        // BUGBUG: Viewport!
         RedisplayLine (position);
 
         if (position + bytes < source.Length)
@@ -657,7 +658,7 @@ public class HexView : View
     {
         position = source.Length;
 
-        // BUGBUG: Bounds!
+        // BUGBUG: Viewport!
         if (position >= DisplayStart + bytesPerLine * Frame.Height)
         {
             SetDisplayStart (position);
@@ -744,7 +745,7 @@ public class HexView : View
             position++;
         }
 
-        // BUGBUG: Bounds!
+        // BUGBUG: Viewport!
         if (position >= DisplayStart + bytesPerLine * Frame.Height)
         {
             SetDisplayStart (DisplayStart + bytesPerLine);
@@ -793,7 +794,7 @@ public class HexView : View
         var delta = (int)(pos - DisplayStart);
         int line = delta / bytesPerLine;
 
-        // BUGBUG: Bounds!
+        // BUGBUG: Viewport!
         SetNeedsDisplay (new (0, line, Frame.Width, 1));
     }
 

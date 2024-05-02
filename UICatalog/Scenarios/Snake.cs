@@ -309,12 +309,12 @@ public class Snake : Scenario
 
         public SnakeState State { get; }
 
-        public override void OnDrawContent (Rectangle contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
 
             Driver.SetAttribute (white);
-            Clear (contentArea);
+            Clear ();
 
             var canvas = new LineCanvas ();
 
@@ -341,7 +341,7 @@ public class Snake : Scenario
                                );
             }
 
-            foreach (KeyValuePair<Point, Rune> p in canvas.GetMap (Bounds))
+            foreach (KeyValuePair<Point, Rune> p in canvas.GetMap (Viewport))
             {
                 AddRune (p.Key.X, p.Key.Y, p.Value);
             }

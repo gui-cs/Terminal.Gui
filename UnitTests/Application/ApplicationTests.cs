@@ -172,7 +172,8 @@ public class ApplicationTests
 
             // Don't check Application.ForceDriver
             // Assert.Empty (Application.ForceDriver);
-            Assert.False (Application.Force16Colors);
+            // Don't check Application.Force16Colors
+            //Assert.False (Application.Force16Colors);
             Assert.Null (Application.Driver);
             Assert.Null (Application.MainLoop);
             Assert.False (Application.EndAfterFirstIteration);
@@ -808,7 +809,11 @@ public class ApplicationTests
         Init ();
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
-        var w = new Window { Width = 5, Height = 5 };
+        var w = new Window
+        {
+            Width = 5, Height = 5,
+            Arrangement = ViewArrangement.Movable
+        };
         ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
         RunState rs = Application.Begin (w);
 

@@ -39,7 +39,7 @@ public partial class View
 
     /// <summary>
     ///     The <see cref="Adornment"/> that enables separation of a View from other SubViews of the same
-    ///     SuperView. The margin offsets the <see cref="Bounds"/> from the <see cref="Frame"/>.
+    ///     SuperView. The margin offsets the <see cref="Viewport"/> from the <see cref="Frame"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -55,7 +55,7 @@ public partial class View
     public Margin Margin { get; private set; }
 
     /// <summary>
-    ///     The <see cref="Adornment"/> that offsets the <see cref="Bounds"/> from the <see cref="Margin"/>.
+    ///     The <see cref="Adornment"/> that offsets the <see cref="Viewport"/> from the <see cref="Margin"/>.
     ///     The Border provides the space for a visual border (drawn using
     ///     line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2` the
     ///     border and title will take up the first row and the second row will be filled with spaces.
@@ -116,7 +116,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="Bounds"/>
+    ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="Viewport"/>
     ///     from the <see cref="Border"/>.
     /// </summary>
     /// <remarks>
@@ -151,7 +151,7 @@ public partial class View
 
         if (Margin.Frame.Size != Frame.Size)
         {
-            Margin._frame = Rectangle.Empty with { Size = Frame.Size };
+            Margin.SetFrame (Rectangle.Empty with { Size = Frame.Size });
             Margin.X = 0;
             Margin.Y = 0;
             Margin.Width = Frame.Size.Width;
@@ -170,7 +170,7 @@ public partial class View
 
         if (border != Border.Frame)
         {
-            Border._frame = border;
+            Border.SetFrame (border);
             Border.X = border.Location.X;
             Border.Y = border.Location.Y;
             Border.Width = border.Size.Width;
@@ -189,7 +189,7 @@ public partial class View
 
         if (padding != Padding.Frame)
         {
-            Padding._frame = padding;
+            Padding.SetFrame (padding);
             Padding.X = padding.Location.X;
             Padding.Y = padding.Location.Y;
             Padding.Width = padding.Size.Width;

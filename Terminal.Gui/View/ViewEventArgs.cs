@@ -3,8 +3,8 @@
 /// <summary>Args for events that relate to specific <see cref="View"/></summary>
 public class ViewEventArgs : EventArgs
 {
-    /// <summary>Creates a new instance of the <see cref="Terminal.Gui.View"/> class.</summary>
-    /// <param name="view"></param>
+    /// <summary>Creates a new instance of the <see cref="Terminal.Gui.ViewEventArgs"/> class.</summary>
+    /// <param name="view">The view that the event is about.</param>
     public ViewEventArgs (View view) { View = view; }
 
     /// <summary>The view that the event is about.</summary>
@@ -18,25 +18,40 @@ public class ViewEventArgs : EventArgs
 /// <summary>Event arguments for the <see cref="View.LayoutComplete"/> event.</summary>
 public class LayoutEventArgs : EventArgs
 {
-    /// <summary>The view-relative bounds of the <see cref="View"/> before it was laid out.</summary>
-    public Rectangle OldBounds { get; set; }
+    /// <summary>Creates a new instance of the <see cref="Terminal.Gui.LayoutEventArgs"/> class.</summary>
+    /// <param name="oldContentSize">The view that the event is about.</param>
+    public LayoutEventArgs (Size oldContentSize) { OldContentSize = oldContentSize; }
+
+    /// <summary>The viewport of the <see cref="View"/> before it was laid out.</summary>
+    public Size OldContentSize { get; set; }
 }
 
 /// <summary>Event args for draw events</summary>
 public class DrawEventArgs : EventArgs
 {
     /// <summary>Creates a new instance of the <see cref="DrawEventArgs"/> class.</summary>
-    /// <param name="rect">
-    ///     Gets the view-relative rectangle describing the currently visible viewport into the
+    /// <param name="newViewport">
+    ///     The Content-relative rectangle describing the new visible viewport into the
     ///     <see cref="View"/>.
     /// </param>
-    public DrawEventArgs (Rectangle rect) { Rectangle = rect; }
+    /// <param name="oldViewport">
+    ///     The Content-relative rectangle describing the old visible viewport into the
+    ///     <see cref="View"/>.
+    /// </param>
+    public DrawEventArgs (Rectangle newViewport, Rectangle oldViewport)
+    {
+        NewViewport = newViewport;
+        OldViewport = oldViewport;
+    }
 
     /// <summary>If set to true, the draw operation will be canceled, if applicable.</summary>
     public bool Cancel { get; set; }
 
-    /// <summary>Gets the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.</summary>
-    public Rectangle Rectangle { get; }
+    /// <summary>Gets the Content-relative rectangle describing the old visible viewport into the <see cref="View"/>.</summary>
+    public Rectangle OldViewport { get; }
+
+    /// <summary>Gets the Content-relative rectangle describing the currently visible viewport into the <see cref="View"/>.</summary>
+    public Rectangle NewViewport { get; }
 }
 
 /// <summary>Defines the event arguments for <see cref="View.SetFocus()"/></summary>
