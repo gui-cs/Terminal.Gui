@@ -24,12 +24,10 @@ namespace Terminal.Gui.Analyzers.Internal.Generators.EnumExtensions;
 internal sealed record EnumExtensionMethodsGenerationInfo : IGeneratedTypeMetadata<EnumExtensionMethodsGenerationInfo>,
                                                             IEqualityOperators<EnumExtensionMethodsGenerationInfo, EnumExtensionMethodsGenerationInfo, bool>
 {
-    private const int ExplicitFastHasFlagsMask = 0b1000;
-    private const int ExplicitFastIsDefinedMask = 0b1_0000;
-    private const int ExplicitIncludeInterfaceMask = 0b10_0000;
-    private const int ExplicitNameMask = 0b10;
-    private const int ExplicitNamespaceMask = 0b1;
-    private const int ExplicitPartialMask = 0b100;
+    private const int ExplicitFastHasFlagsMask  = 0b_0100;
+    private const int ExplicitFastIsDefinedMask = 0b_1000;
+    private const int ExplicitNameMask          = 0b_0010;
+    private const int ExplicitNamespaceMask     = 0b_0001;
     private const string GeneratorAttributeFullyQualifiedName = $"{GeneratorAttributeNamespace}.{GeneratorAttributeName}";
     private const string GeneratorAttributeName = nameof (GenerateEnumExtensionMethodsAttribute);
     private const string GeneratorAttributeNamespace = Constants.Strings.AnalyzersAttributesNamespace;
@@ -159,7 +157,7 @@ internal sealed record EnumExtensionMethodsGenerationInfo : IGeneratedTypeMetada
     public bool IsStatic => true;
 
     /// <inheritdoc/>
-    public bool IncludeInterface { get; private set; }
+    public bool IncludeInterface => false;
 
     public string GeneratedTypeFullName => $"{GeneratedTypeNamespace}.{GeneratedTypeName}";
 
@@ -326,18 +324,6 @@ internal sealed record EnumExtensionMethodsGenerationInfo : IGeneratedTypeMetada
     {
         [UsedImplicitly]get => _discoveredProperties [ExplicitFastIsDefinedMask];
         set => _discoveredProperties [ExplicitFastIsDefinedMask] = value;
-    }
-
-    private bool HasExplicitIncludeInterface
-    {
-        [UsedImplicitly]get => _discoveredProperties [ExplicitIncludeInterfaceMask];
-        set => _discoveredProperties [ExplicitIncludeInterfaceMask] = value;
-    }
-
-    private bool HasExplicitPartial
-    {
-        [UsedImplicitly]get => _discoveredProperties [ExplicitPartialMask];
-        set => _discoveredProperties [ExplicitPartialMask] = value;
     }
 
     private bool HasExplicitTypeName
