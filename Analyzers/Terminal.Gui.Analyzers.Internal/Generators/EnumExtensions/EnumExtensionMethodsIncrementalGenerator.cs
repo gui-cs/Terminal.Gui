@@ -22,7 +22,7 @@ public sealed class EnumExtensionMethodsIncrementalGenerator : IIncrementalGener
     private const string GeneratorAttributeName = nameof (GenerateEnumExtensionMethodsAttribute);
 
     /// <summary>Fully-qualified symbol name format without the "global::" prefix.</summary>
-    private static readonly SymbolDisplayFormat FullyQualifiedSymbolDisplayFormatWithoutGlobal =
+    private static readonly SymbolDisplayFormat _fullyQualifiedSymbolDisplayFormatWithoutGlobal =
         SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle (SymbolDisplayGlobalNamespaceStyle.Omitted);
 
     /// <inheritdoc/>
@@ -160,7 +160,7 @@ public sealed class EnumExtensionMethodsIncrementalGenerator : IIncrementalGener
 
         string enumName = namedSymbol.Name;
 
-        string enumNamespace = enumNamespaceSymbol.ToDisplayString (FullyQualifiedSymbolDisplayFormatWithoutGlobal);
+        string enumNamespace = enumNamespaceSymbol.ToDisplayString (_fullyQualifiedSymbolDisplayFormatWithoutGlobal);
 
         TypeCode enumTypeCode = namedSymbol.EnumUnderlyingType.Name switch
                                 {
