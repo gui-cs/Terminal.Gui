@@ -580,7 +580,8 @@ public class DimTests
                        Assert.Equal (19, v3.Frame.Height);
 
                        v4.Text = "Button4";
-                       v4.AutoSize = true;
+                       v4.Width = Auto(DimAutoStyle.Text);
+                       v4.Height = Auto (DimAutoStyle.Text);
                        Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Width);
                        Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Height);
                        Assert.Equal (11, v4.Frame.Width); // 11 is the text length and because is Dim.DimAbsolute

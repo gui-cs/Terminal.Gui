@@ -881,7 +881,13 @@ public class PosTests (ITestOutputHelper output)
         var clicked = false;
         Toplevel top = new Toplevel () { Width = 80, Height = 25 };
         var win1 = new Window { Id = "win1", Width = 20, Height = 10 };
-        var view1 = new View { Text = "view1", AutoSize = true }; // BUGBUG: AutoSize or Width must be set
+        var view1 = new View
+        {
+            Text = "view1",
+            Width = Auto (DimAutoStyle.Text),
+            Height = Auto (DimAutoStyle.Text)
+
+        }; 
         var win2 = new Window { Id = "win2", Y = Pos.Bottom (view1) + 1, Width = 10, Height = 3 };
         var view2 = new View { Id = "view2", Width = Dim.Fill (), Height = 1, CanFocus = true };
         view2.MouseClick += (sender, e) => clicked = true;

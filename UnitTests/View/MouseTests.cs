@@ -136,7 +136,6 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             CanFocus = true,
         };
 
-        view.AutoSize = false;
         view.X = Pos.Right (otherView);
         view.Y = 0;
         view.Width = 10;
@@ -231,7 +230,6 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         };
 
         view.Visible = false;
-        view.AutoSize = false;
         view.X = Pos.Right (otherView);
         view.Y = 0;
         view.Width = 10;
