@@ -260,7 +260,6 @@ public class Buttons : Scenario
         {
             X = 2,
             Y = Pos.Bottom (radioGroup) + 1,
-            AutoSize = false,
             Height = 1,
             Width = Dim.Width (computedFrame) - 2,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
@@ -275,7 +274,6 @@ public class Buttons : Scenario
         {
             X = Pos.Left (absoluteFrame) + 1,
             Y = Pos.Bottom (radioGroup) + 1,
-            AutoSize = false,
             Height = 1,
             Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
@@ -426,7 +424,6 @@ public class Buttons : Scenario
 
             _down = new ()
             {
-                AutoSize = false,
                 Height = 1,
                 Width = 1,
                 NoPadding = true,
@@ -439,7 +436,6 @@ public class Buttons : Scenario
             _number = new ()
             {
                 Text = Value.ToString (),
-                AutoSize = false,
                 X = Pos.Right (_down),
                 Y = Pos.Top (_down),
                 Width = Dim.Function (() => Digits),
@@ -450,7 +446,6 @@ public class Buttons : Scenario
 
             _up = new ()
             {
-                AutoSize = false,
                 X = Pos.AnchorEnd (),
                 Y = Pos.Top (_number),
                 Height = 1,

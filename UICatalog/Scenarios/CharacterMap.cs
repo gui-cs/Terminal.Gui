@@ -472,7 +472,6 @@ internal class CharMap : View
 
         var up = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (1),
             Y = 0,
             Height = 1,
@@ -487,7 +486,6 @@ internal class CharMap : View
 
         var down = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (1),
             Y = Pos.AnchorEnd (2),
             Height = 1,
@@ -502,7 +500,6 @@ internal class CharMap : View
 
         var left = new Button
         {
-            AutoSize = false,
             X = 0,
             Y = Pos.AnchorEnd (1),
             Height = 1,
@@ -517,7 +514,6 @@ internal class CharMap : View
 
         var right = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (2),
             Y = Pos.AnchorEnd (1),
             Height = 1,

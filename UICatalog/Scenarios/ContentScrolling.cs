@@ -46,7 +46,7 @@ public class ContentScrolling : Scenario
 
             // Add a status label to the border that shows Viewport and ContentSize values. Bit of a hack.
             // TODO: Move to Padding with controls
-            Border.Add (new Label { AutoSize = false, X = 20 });
+            Border.Add (new Label { X = 20 });
             LayoutComplete += VirtualDemoView_LayoutComplete;
 
             MouseEvent += VirtualDemoView_MouseEvent;
