@@ -34,7 +34,6 @@ public class LineCanvasExperiment : Scenario
 
         var win1 = new Window
         {
-            AutoSize = false,
             Title = "win1",
             Text = "Win1 30%/50% Heavy",
             X = 20,

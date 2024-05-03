@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Terminal.Gui;
 
@@ -21,7 +20,7 @@ public class Adornments : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
         };
 
         var editor = new AdornmentsEditor ();
@@ -31,9 +30,9 @@ public class Adornments : Scenario
         {
             Title = "The _Window",
             Arrangement = ViewArrangement.Movable,
-            X = Pos.Right(editor),
+            X = Pos.Right (editor),
             Width = Dim.Percent (60),
-            Height = Dim.Percent (80),
+            Height = Dim.Percent (80)
         };
         app.Add (window);
 
@@ -74,7 +73,7 @@ public class Adornments : Scenario
         {
             Y = Pos.AnchorEnd (),
             Width = 40,
-            Height = Dim.Percent(20),
+            Height = Dim.Percent (20),
             Text = "Label\nY=AnchorEnd(),Height=Dim.Percent(10)",
             ColorScheme = Colors.ColorSchemes ["Error"]
         };
@@ -88,10 +87,9 @@ public class Adornments : Scenario
         window.Padding.Data = "Padding";
         window.Padding.Thickness = new (3);
 
-        var longLabel = new Label ()
+        var longLabel = new Label
         {
-            X = 40, Y = 5, Title = "This is long text (in a label) that should clip.",
-
+            X = 40, Y = 5, Title = "This is long text (in a label) that should clip."
         };
         longLabel.TextFormatter.WordWrap = true;
         window.Add (tf1, color, button, label, btnButtonInWindow, labelAnchorEnd, longLabel);
@@ -99,19 +97,20 @@ public class Adornments : Scenario
         editor.Initialized += (s, e) => { editor.ViewToEdit = window; };
 
         window.Initialized += (s, e) =>
-                            {
-                                var labelInPadding = new Label () { X = 1, Y = 0, Title = "_Text:" };
-                                window.Padding.Add (labelInPadding);
+                              {
+                                  var labelInPadding = new Label { X = 1, Y = 0, Title = "_Text:" };
+                                  window.Padding.Add (labelInPadding);
 
-                                var textFieldInPadding = new TextField () { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
-                                textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
-                                window.Padding.Add (textFieldInPadding);
+                                  var textFieldInPadding = new TextField
+                                      { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
+                                  textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
+                                  window.Padding.Add (textFieldInPadding);
 
-                                var btnButtonInPadding = new Button { X = Pos.Center (), Y = 0, Text = "_Button in Padding" };
-                                btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
-                                btnButtonInPadding.BorderStyle = LineStyle.Dashed;
-                                btnButtonInPadding.Border.Thickness = new (1, 1, 1, 1);
-                                window.Padding.Add (btnButtonInPadding);
+                                  var btnButtonInPadding = new Button { X = Pos.Center (), Y = 0, Text = "_Button in Padding" };
+                                  btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
+                                  btnButtonInPadding.BorderStyle = LineStyle.Dashed;
+                                  btnButtonInPadding.Border.Thickness = new (1, 1, 1, 1);
+                                  window.Padding.Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER
                                 btnButtonInPadding.Border.CloseButton.Visible = true;
@@ -125,7 +124,7 @@ public class Adornments : Scenario
 
                                 view.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
 #endif
-                            };
+                              };
 
         app.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
 
@@ -136,7 +135,7 @@ public class Adornments : Scenario
     }
 
     /// <summary>
-    /// Provides a composable UI for editing the settings of an Adornment.
+    ///     Provides a composable UI for editing the settings of an Adornment.
     /// </summary>
     public class AdornmentEditor : View
     {
@@ -171,6 +170,7 @@ public class Adornments : Scenario
             BorderStyle = LineStyle.Double;
             Initialized += AdornmentEditor_Initialized;
         }
+
         public Attribute Color
         {
             get => new (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor);
@@ -337,7 +337,7 @@ public class Adornments : Scenario
     }
 
     /// <summary>
-    /// Provides an editor UI for the Margin, Border, and Padding of a View.
+    ///     Provides an editor UI for the Margin, Border, and Padding of a View.
     /// </summary>
     public class AdornmentsEditor : View
     {
@@ -470,19 +470,19 @@ public class Adornments : Scenario
                 _paddingEditor.AttributeChanged += Editor_AttributeChanged;
                 Add (_paddingEditor);
 
-                _diagCheckBox = new CheckBox { Text = "_Diagnostics", Y = Pos.Bottom (_paddingEditor) };
-                _diagCheckBox.Checked = View.Diagnostics != ViewDiagnosticFlags.Off;
+                _diagCheckBox = new() { Text = "_Diagnostics", Y = Pos.Bottom (_paddingEditor) };
+                _diagCheckBox.Checked = Diagnostics != ViewDiagnosticFlags.Off;
 
                 _diagCheckBox.Toggled += (s, e) =>
                                          {
                                              if (e.NewValue == true)
                                              {
-                                                 View.Diagnostics =
+                                                 Diagnostics =
                                                      ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler;
                                              }
                                              else
                                              {
-                                                 View.Diagnostics = ViewDiagnosticFlags.Off;
+                                                 Diagnostics = ViewDiagnosticFlags.Off;
                                              }
                                          };
 

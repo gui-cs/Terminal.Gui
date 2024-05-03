@@ -11,6 +11,7 @@ public class DimAutoDemo : Scenario
     public override void Main ()
     {
         Application.Init ();
+
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
         {
@@ -111,7 +112,7 @@ public class DimAutoDemo : Scenario
         {
             Text = "_Move down",
             X = Pos.Right (vlabel),
-            Y = Pos.Bottom (vlabel),
+            Y = Pos.Bottom (vlabel)
         };
         movingButton.Accept += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
         view.Add (movingButton);
@@ -142,7 +143,6 @@ public class DimAutoDemo : Scenario
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
-
     }
 
     private void DlgButton_Clicked (object sender, EventArgs e)
@@ -150,7 +150,8 @@ public class DimAutoDemo : Scenario
         var dlg = new Dialog
         {
             Title = "Test Dialog",
-            Width = Dim.Auto (min: Dim.Percent (10)),
+            Width = Auto (min: Percent (10))
+
             //Height = Dim.Auto (min: Dim.Percent (50))
         };
 
@@ -166,7 +167,7 @@ public class DimAutoDemo : Scenario
         //{
         //    ValidatePosDim = true,
         //    Text = "This is a label (AutoSize = false; Dim.Auto(3/20). Press Esc to close. Even more text.",
-        //    AutoSize = false,
+        //    
         //    X = Pos.Center (),
         //    Y = 0,
         //    Height = Auto (min: 3),
@@ -178,7 +179,7 @@ public class DimAutoDemo : Scenario
         {
             ValidatePosDim = true,
             Text = "TextField: X=1; Y=Pos.Bottom (label)+1, Width=Dim.Fill (0); Height=1",
-            TextFormatter = new TextFormatter { WordWrap = true },
+            TextFormatter = new() { WordWrap = true },
             X = 0,
             Y = 0, //Pos.Bottom (label) + 1,
             Width = Fill (10),
@@ -194,6 +195,7 @@ public class DimAutoDemo : Scenario
         //btn.X = Pos.AnchorEnd () - (Pos.Right (btn) - Pos.Left (btn));
         //dlg.Add (label);
         dlg.Add (text);
+
         //dlg.Add (btn);
         Application.Run (dlg);
         dlg.Dispose ();

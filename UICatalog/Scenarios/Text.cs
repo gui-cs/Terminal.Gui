@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,6 +22,7 @@ public class Text : Scenario
         // TextField is a simple, single-line text input control
         var label = new Label { Text = "_TextField:" };
         Win.Add (label);
+
         var textField = new TextField
         {
             X = Pos.Right (label) + 1,
@@ -37,6 +37,7 @@ public class Text : Scenario
         var singleWordGenerator = new SingleWordSuggestionGenerator ();
         textField.Autocomplete.SuggestionGenerator = singleWordGenerator;
         textField.TextChanging += TextField_TextChanging;
+
         void TextField_TextChanging (object sender, StateEventArgs<string> e)
         {
             singleWordGenerator.AllSuggestions = Regex.Matches (e.NewValue, "\\w+")
@@ -44,13 +45,14 @@ public class Text : Scenario
                                                       .Distinct ()
                                                       .ToList ();
         }
+
         Win.Add (textField);
 
         var labelMirroringTextField = new Label
         {
             X = Pos.Right (textField) + 1,
             Y = Pos.Top (textField),
-            AutoSize = false,
+
             Width = Dim.Fill (1) - 1,
             Height = 1,
             Text = textField.Text
@@ -59,8 +61,9 @@ public class Text : Scenario
         textField.TextChanged += (s, prev) => { labelMirroringTextField.Text = textField.Text; };
 
         // TextView is a rich (as in functionality, not formatting) text editing control
-        label = new Label { Text = "T_extView:", Y = Pos.Bottom (label) + 1 };
+        label = new() { Text = "T_extView:", Y = Pos.Bottom (label) + 1 };
         Win.Add (label);
+
         var textView = new TextView
         {
             X = Pos.Right (label) + 1, Y = Pos.Bottom (textField) + 1, Width = Dim.Percent (50) - 1, Height = Dim.Percent (30)
@@ -83,7 +86,7 @@ public class Text : Scenario
         {
             X = Pos.Right (textView) + 1,
             Y = Pos.Top (textView),
-            AutoSize = false,
+
             Width = Dim.Fill (1) - 1,
             Height = Dim.Height (textView) - 1
         };
@@ -163,7 +166,7 @@ public class Text : Scenario
         Win.Add (chxCaptureTabs);
 
         // Hex editor
-        label = new Label { Text = "_HexView:", Y = Pos.Bottom (chxMultiline) + 1 };
+        label = new() { Text = "_HexView:", Y = Pos.Bottom (chxMultiline) + 1 };
         Win.Add (label);
 
         var hexEditor =
@@ -179,7 +182,7 @@ public class Text : Scenario
         {
             X = Pos.Right (hexEditor) + 1,
             Y = Pos.Top (hexEditor),
-            AutoSize = false,
+
             Width = Dim.Fill (1) - 1,
             Height = Dim.Height (hexEditor) - 1
         };
@@ -195,7 +198,7 @@ public class Text : Scenario
         Win.Add (labelMirroringHexEditor);
 
         // DateField
-        label = new Label { Text = "_DateField:", Y = Pos.Bottom (hexEditor) + 1 };
+        label = new() { Text = "_DateField:", Y = Pos.Bottom (hexEditor) + 1 };
         Win.Add (label);
 
         var dateField = new DateField (DateTime.Now) { X = Pos.Right (label) + 1, Y = Pos.Bottom (hexEditor) + 1, Width = 20 };
@@ -205,7 +208,7 @@ public class Text : Scenario
         {
             X = Pos.Right (dateField) + 1,
             Y = Pos.Top (dateField),
-            AutoSize = false,
+
             Width = Dim.Width (dateField),
             Height = Dim.Height (dateField),
             Text = dateField.Text
@@ -215,10 +218,10 @@ public class Text : Scenario
         dateField.TextChanged += (s, prev) => { labelMirroringDateField.Text = dateField.Text; };
 
         // TimeField
-        label = new Label { Text = "T_imeField:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
+        label = new() { Text = "T_imeField:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
         Win.Add (label);
 
-        _timeField = new TimeField
+        _timeField = new()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (dateField),
@@ -228,11 +231,11 @@ public class Text : Scenario
         };
         Win.Add (_timeField);
 
-        _labelMirroringTimeField = new Label
+        _labelMirroringTimeField = new()
         {
             X = Pos.Right (_timeField) + 1,
             Y = Pos.Top (_timeField),
-            AutoSize = false,
+
             Width = Dim.Width (_timeField),
             Height = Dim.Height (_timeField),
             Text = _timeField.Text
@@ -262,7 +265,7 @@ public class Text : Scenario
         {
             X = Pos.Right (netProviderField) + 1,
             Y = Pos.Top (netProviderField),
-            AutoSize = false,
+
             Width = Dim.Width (netProviderField),
             Height = Dim.Height (netProviderField),
             Text = netProviderField.Text
@@ -296,7 +299,7 @@ public class Text : Scenario
         {
             X = Pos.Right (regexProviderField) + 1,
             Y = Pos.Top (regexProviderField),
-            AutoSize = false,
+
             Width = Dim.Width (regexProviderField),
             Height = Dim.Height (regexProviderField),
             Text = regexProviderField.Text
@@ -318,7 +321,7 @@ public class Text : Scenario
 
         appendAutocompleteTextField.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator
         {
-            AllSuggestions = new List<string>
+            AllSuggestions = new()
             {
                 "fish",
                 "flipper",

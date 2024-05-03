@@ -26,22 +26,22 @@ public class TextAlignments : Scenario
 
         foreach (TextAlignment alignment in alignments)
         {
-            singleLines [(int)alignment] = new Label
+            singleLines [(int)alignment] = new()
             {
                 TextAlignment = alignment,
                 X = 1,
-                AutoSize = false,
+
                 Width = Dim.Fill (1),
                 Height = 1,
                 ColorScheme = Colors.ColorSchemes ["Dialog"],
                 Text = txt
             };
 
-            multipleLines [(int)alignment] = new Label
+            multipleLines [(int)alignment] = new()
             {
                 TextAlignment = alignment,
                 X = 1,
-                AutoSize = false,
+
                 Width = Dim.Fill (1),
                 Height = multiLineHeight,
                 ColorScheme = Colors.ColorSchemes ["Dialog"],
@@ -80,13 +80,13 @@ public class TextAlignments : Scenario
         var update = new Button { X = Pos.Right (edit) + 1, Y = Pos.Bottom (edit) - 1, Text = "_Update" };
 
         update.Accept += (s, e) =>
-                          {
-                              foreach (TextAlignment alignment in alignments)
-                              {
-                                  singleLines [(int)alignment].Text = edit.Text;
-                                  multipleLines [(int)alignment].Text = edit.Text;
-                              }
-                          };
+                         {
+                             foreach (TextAlignment alignment in alignments)
+                             {
+                                 singleLines [(int)alignment].Text = edit.Text;
+                                 multipleLines [(int)alignment].Text = edit.Text;
+                             }
+                         };
         Win.Add (update);
 
         var enableHotKeyCheckBox = new CheckBox
@@ -104,7 +104,7 @@ public class TextAlignments : Scenario
 
         foreach (TextAlignment alignment in alignments)
         {
-            label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };
+            label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             Win.Add (label);
             singleLines [(int)alignment].Y = Pos.Bottom (label);
             Win.Add (singleLines [(int)alignment]);
@@ -112,12 +112,12 @@ public class TextAlignments : Scenario
         }
 
         txt += "\nSecond line\n\nFourth Line.";
-        label = new Label { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
+        label = new() { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
         Win.Add (label);
 
         foreach (TextAlignment alignment in alignments)
         {
-            label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };
+            label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             Win.Add (label);
             multipleLines [(int)alignment].Y = Pos.Bottom (label);
             Win.Add (multipleLines [(int)alignment]);

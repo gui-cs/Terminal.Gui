@@ -209,46 +209,4 @@ public partial class View
         SetTextFormatterSize ();
         SetNeedsDisplay ();
     }
-
-
-    #region AutoSize
-
-    [ObsoleteAttribute ("Use Dim.Auto instead.", false)]
-    public virtual bool AutoSize
-    {
-        get => _height is Dim.DimAuto && _width is Dim.DimAuto;
-        set
-        {
-            TextFormatter.AutoSize = value;
-
-            // BUGBUG: This is all a hack until AutoSize is removed
-            if (value)
-            {
-                UpdateTextFormatterText ();
-
-                if (IsInitialized)
-                {
-                    Height = Dim.Auto (Dim.DimAutoStyle.Text);
-                    Width = Dim.Auto (Dim.DimAutoStyle.Text);
-                }
-                else
-                {
-                    _height = Dim.Auto (Dim.DimAutoStyle.Text);
-                    _width = Dim.Auto (Dim.DimAutoStyle.Text);
-                    OnResizeNeeded ();
-                }
-            }
-            else
-            {
-                _height = ContentSize.GetValueOrDefault ().Height;
-                _width = ContentSize.GetValueOrDefault ().Width;
-
-                // Force ContentSize to be reset to Viewport
-                _contentSize = null;
-                OnResizeNeeded ();
-            }
-        }
-    }
-
-    #endregion AutoSize
 }
