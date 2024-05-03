@@ -1,8 +1,11 @@
 ﻿
+using Terminal.Gui.Analyzers.Internal.Attributes;
+
 namespace Terminal.Gui;
 
 /// <summary>Enables diagnostic functions for <see cref="View"/>.</summary>
 [Flags]
+[GenerateEnumExtensionMethods(FastHasFlags = true)]
 public enum ViewDiagnosticFlags : uint
 {
     /// <summary>All diagnostics off</summary>

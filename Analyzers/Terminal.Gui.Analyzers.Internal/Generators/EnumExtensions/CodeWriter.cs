@@ -147,14 +147,14 @@ internal sealed class CodeWriter (in EnumExtensionMethodsGenerationInfo metadata
         switch (Metadata.EnumBackingTypeCode)
         {
             case TypeCode.Int32:
-                foreach (int definedValue in Metadata.IntMembers)
+                foreach (int definedValue in Metadata._intMembers)
                 {
                     w.WriteLine ($"{definedValue:D} => true,");
                 }
 
                 break;
             case TypeCode.UInt32:
-                foreach (uint definedValue in Metadata.UIntMembers)
+                foreach (uint definedValue in Metadata._uIntMembers)
                 {
                     w.WriteLine ($"{definedValue:D} => true,");
                 }
