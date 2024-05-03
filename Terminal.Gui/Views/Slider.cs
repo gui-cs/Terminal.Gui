@@ -615,7 +615,7 @@ public class Slider<T> : View
         // Last = '┤',
     }
 
-    /// <summary>Adjust the dimensions of the Slider to the best value if <see cref="AutoSize"/> is true.</summary>
+    /// <summary>Adjust the dimensions of the Slider to the best value.</summary>
     public void SetContentSizeBestFit ()
     {
         if (!IsInitialized || /*!(Height is Dim.DimAuto && Width is Dim.DimAuto) || */_options.Count == 0)

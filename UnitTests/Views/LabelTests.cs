@@ -141,8 +141,6 @@ public class LabelTests
         var top = new Toplevel ();
         top.Add (win);
 
-        //Assert.True (label.AutoSize);
-
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
@@ -209,7 +207,6 @@ public class LabelTests
         var label = new Label ();
         Assert.Equal (string.Empty, label.Text);
         Assert.Equal (TextAlignment.Left, label.TextAlignment);
-        //Assert.True (label.AutoSize);
         Assert.False (label.CanFocus);
         Assert.Equal (new Rectangle (0, 0, 0, 0), label.Frame);
         Assert.Equal (KeyCode.Null, label.HotKey);

@@ -154,27 +154,6 @@ public class DimAutoDemo : Scenario
 
             //Height = Dim.Auto (min: Dim.Percent (50))
         };
-
-        //var ok = new Button ("Bye") { IsDefault = true };
-        //ok.Clicked += (s, _) => Application.RequestStop (dlg);
-        //dlg.AddButton (ok);
-
-        //var cancel = new Button ("Abort") { };
-        //cancel.Clicked += (s, _) => Application.RequestStop (dlg);
-        //dlg.AddButton (cancel);
-
-        //var label = new Label
-        //{
-        //    ValidatePosDim = true,
-        //    Text = "This is a label (AutoSize = false; Dim.Auto(3/20). Press Esc to close. Even more text.",
-        //    
-        //    X = Pos.Center (),
-        //    Y = 0,
-        //    Height = Auto (min: 3),
-        //    Width = Auto (min: 20),
-        //    ColorScheme = Colors.ColorSchemes ["Menu"]
-        //};
-
         var text = new TextField
         {
             ValidatePosDim = true,

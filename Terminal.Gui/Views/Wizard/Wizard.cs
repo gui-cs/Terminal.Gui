@@ -32,7 +32,7 @@ namespace Terminal.Gui;
 /// var secondStep = new WizardStep ("Second Step");
 /// wizard.AddStep(secondStep);
 /// secondStep.HelpText = "This is the help text for the Second Step.";
-/// var lbl = new Label () { Text = "Name:",  AutoSize = true };
+/// var lbl = new Label () { Text = "Name:" };
 /// secondStep.Add(lbl);
 /// 
 /// var name = new TextField { X = Pos.Right (lbl) + 1, Width = Dim.Fill () - 1 };

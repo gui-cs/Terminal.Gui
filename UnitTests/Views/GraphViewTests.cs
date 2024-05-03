@@ -1521,7 +1521,6 @@ public class PathAnnotationTests
             mount.Add (view);
 
             //putting mount into Toplevel since changing size
-            //also change AutoSize to false
             top.Add (mount);
             Application.Begin (top);
 

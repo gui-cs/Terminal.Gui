@@ -146,7 +146,6 @@ public class Dialog : Window
             return;
         }
 
-        //button.AutoSize = false; // BUGBUG: v2 - Hack to get around autosize not accounting for Margin?
         _buttons.Add (button);
         Add (button);
 

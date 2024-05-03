@@ -1080,7 +1080,6 @@ public class ScrollViewTests
             Width = width;
             Height = height;
 
-            //labelFill = new Label { AutoSize = false, X = Pos.Center (), Y = Pos.Center (), Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
             labelFill = new Label { Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
 
             labelFill.LayoutComplete += (s, e) =>
