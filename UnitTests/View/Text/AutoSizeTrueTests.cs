@@ -1650,8 +1650,6 @@ Y
 
         verticalView.Text = "最初の行二行目";
         Application.Top.Draw ();
-        Assert.True (horizontalView.AutoSize);
-        Assert.True (verticalView.AutoSize);
 
         // height was initialized with 8 and can only grow or keep initial value
         Assert.Equal (new Rectangle (0, 3, 2, 7), verticalView.Frame);
@@ -1694,7 +1692,6 @@ Y
         top.Add (lbl);
         RunState rs = Application.Begin (top);
 
-        Assert.True (lbl.AutoSize);
         Assert.Equal ("123 ", GetContents ());
 
         lbl.Text = "12";
@@ -1728,7 +1725,10 @@ Y
         var text = "Say Hello 你";
 
         // Frame: 0, 0, 12, 1
-        var horizontalView = new View { AutoSize = true };
+        var horizontalView = new View
+        {
+            Width = Dim.Auto (), Height = Dim.Auto ()
+        };
         horizontalView.TextFormatter.HotKeySpecifier = (Rune)'_';
         horizontalView.Text = text;
 
@@ -1745,12 +1745,10 @@ Y
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (50, 50);
 
-        Assert.True (horizontalView.AutoSize);
         Assert.Equal (new (0, 0, 12, 1), horizontalView.Frame);
         Assert.Equal (new (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
         Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
 
-        Assert.True (verticalView.AutoSize);
         Assert.Equal (new (0, 0, 2, 11), verticalView.Frame);
         Assert.Equal (new (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
         Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
@@ -1759,12 +1757,10 @@ Y
         horizontalView.Text = text;
         verticalView.Text = text;
 
-        Assert.True (horizontalView.AutoSize);
         Assert.Equal (new (0, 0, 11, 1), horizontalView.Frame);
         Assert.Equal (new (11, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
         Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
 
-        Assert.True (verticalView.AutoSize);
         Assert.Equal (new (0, 0, 2, 10), verticalView.Frame);
         Assert.Equal (new (2, 10), verticalView.GetSizeNeededForTextWithoutHotKey ());
         Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
@@ -1773,10 +1769,13 @@ Y
     [Fact]
     public void SetRelativeLayout_Respects_AutoSize ()
     {
-        var view = new View { Frame = new (0, 0, 10, 0), AutoSize = true };
+        var view = new View
+        {
+            Frame = new (0, 0, 10, 0),
+            Width = Dim.Auto (), Height = Dim.Auto ()
+        };
         view.Text = "01234567890123456789";
 
-        Assert.True (view.AutoSize);
         Assert.Equal (new (0, 0, 20, 1), view.Frame);
 
         view.SetRelativeLayout (new (25, 5));
@@ -1793,7 +1792,18 @@ Y
     {
         var text = "Hello World";
         var width = 20;
-        var lblLeft = new View { Text = text, Width = width, Height = 1, AutoSize = autoSize };
+        var lblLeft = new View
+        {
+            Text = text,
+            Width = width,
+            Height = 1,
+        };
+
+        if (autoSize)
+        {
+            lblLeft.Width = Dim.Auto ();
+            lblLeft.Height = Dim.Auto ();
+        }
 
         var lblCenter = new View
         {
@@ -1802,8 +1812,13 @@ Y
             Width = width,
             Height = 1,
             TextAlignment = TextAlignment.Centered,
-            AutoSize = autoSize
         };
+
+        if (autoSize)
+        {
+            lblCenter.Width = Dim.Auto ();
+            lblCenter.Height = Dim.Auto ();
+        }
 
         var lblRight = new View
         {
@@ -1812,8 +1827,12 @@ Y
             Width = width,
             Height = 1,
             TextAlignment = TextAlignment.Right,
-            AutoSize = autoSize
         };
+        if (autoSize)
+        {
+            lblRight.Width = Dim.Auto ();
+            lblRight.Height = Dim.Auto ();
+        }
 
         var lblJust = new View
         {
@@ -1822,8 +1841,13 @@ Y
             Width = width,
             Height = 1,
             TextAlignment = TextAlignment.Justified,
-            AutoSize = autoSize
         };
+        if (autoSize)
+        {
+            lblJust.Width = Dim.Auto ();
+            lblJust.Height = Dim.Auto ();
+        }
+
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
         frame.Add (lblLeft, lblCenter, lblRight, lblJust);
         var top = new Toplevel ();
@@ -1831,10 +1855,6 @@ Y
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
 
-        Assert.True (lblLeft.AutoSize == autoSize);
-        Assert.True (lblCenter.AutoSize == autoSize);
-        Assert.True (lblRight.AutoSize == autoSize);
-        Assert.True (lblJust.AutoSize == autoSize);
         Assert.True (lblLeft.TextFormatter.AutoSize == autoSize);
         Assert.True (lblCenter.TextFormatter.AutoSize == autoSize);
         Assert.True (lblRight.TextFormatter.AutoSize == autoSize);
@@ -1903,8 +1923,12 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            AutoSize = autoSize
         };
+        if (autoSize)
+        {
+            lblLeft.Width = Dim.Auto ();
+            lblLeft.Height = Dim.Auto ();
+        }
 
         var lblCenter = new View
         {
@@ -1913,9 +1937,13 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            AutoSize = autoSize,
             VerticalTextAlignment = VerticalTextAlignment.Middle
         };
+        if (autoSize)
+        {
+            lblCenter.Width = Dim.Auto ();
+            lblCenter.Height = Dim.Auto ();
+        }
 
         var lblRight = new View
         {
@@ -1924,9 +1952,13 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            AutoSize = autoSize,
             VerticalTextAlignment = VerticalTextAlignment.Bottom
         };
+        if (autoSize)
+        {
+            lblRight.Width = Dim.Auto ();
+            lblRight.Height = Dim.Auto ();
+        }
 
         var lblJust = new View
         {
@@ -1935,9 +1967,14 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            AutoSize = autoSize,
             VerticalTextAlignment = VerticalTextAlignment.Justified
         };
+        if (autoSize)
+        {
+            lblJust.Width = Dim.Auto ();
+            lblJust.Height = Dim.Auto ();
+        }
+
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
         frame.Add (lblLeft, lblCenter, lblRight, lblJust);
