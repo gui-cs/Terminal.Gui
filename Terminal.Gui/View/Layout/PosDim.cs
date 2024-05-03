@@ -960,8 +960,8 @@ public class Dim
                 }
                 else
                 {
-                    // BUGBUG: AnchorEnd needs work
-                    // If _min > 0 we can SetRelativeLayout for the subviews?
+                    // TODO: AnchorEnd needs work
+                    // TODO: If _min > 0 we can SetRelativeLayout for the subviews?
                     subviewsSize = 0;
                     if (us.Subviews.Count > 0)
                     {
@@ -970,12 +970,12 @@ public class Dim
                             var v = us.Subviews [i];
                             bool isNotPosAnchorEnd = dimension == Dim.Dimension.Width ? !(v.X is Pos.PosAnchorEnd) : !(v.Y is Pos.PosAnchorEnd);
 
-                            if (!isNotPosAnchorEnd)
-                            {
-                                v.SetRelativeLayout(dimension == Dim.Dimension.Width ? (new Size (autoMin, 0)) : new Size (0, autoMin));
-                            }
+                            //if (!isNotPosAnchorEnd)
+                            //{
+                            //    v.SetRelativeLayout(dimension == Dim.Dimension.Width ? (new Size (autoMin, 0)) : new Size (0, autoMin));
+                            //}
 
-                            //if (isNotPosAnchorEnd)
+                            if (isNotPosAnchorEnd)
                             {
                                 int size = dimension == Dim.Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
                                 if (size > subviewsSize)

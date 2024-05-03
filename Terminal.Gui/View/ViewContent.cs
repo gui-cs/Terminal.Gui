@@ -170,8 +170,9 @@ public partial class View
 
         if (e.Cancel != true)
         {
-            SetNeedsLayout ();
-            SetNeedsDisplay ();
+            OnResizeNeeded ();
+            //SetNeedsLayout ();
+            //SetNeedsDisplay ();
         }
 
         return e.Cancel;

@@ -390,7 +390,6 @@ public class ContentScrolling : Scenario
         {
             X = 0,
             Y = Pos.Bottom (textField) + 1,
-            AutoSize = true,
             Orientation = Orientation.Vertical,
             Type = SliderType.Multiple,
             AllowEmpty = false,
