@@ -208,7 +208,7 @@ public class AllViewsTester : Scenario
             Title = "Size (Dim)"
         };
 
-        radioItems = new [] { "Auto", "_Percent(width)", "_Fill(width)", "_Sized(width)" };
+        radioItems = new [] { "Auto (min)", "_Percent(width)", "_Fill(width)", "_Sized(width)" };
         label = new Label { X = 0, Y = 0, Text = "Width:" };
         _sizeFrame.Add (label);
         _wRadioGroup = new RadioGroup { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
@@ -221,12 +221,13 @@ public class AllViewsTester : Scenario
                                   {
                                       switch (_wRadioGroup.SelectedItem)
                                       {
-                                          case 0:
+                                          case 1:
                                               _wVal = Math.Min (int.Parse (_wText.Text), 100);
 
                                               break;
-                                          case 1:
+                                          case 0:
                                           case 2:
+                                          case 3:
                                               _wVal = int.Parse (_wText.Text);
 
                                               break;
@@ -240,7 +241,7 @@ public class AllViewsTester : Scenario
         _sizeFrame.Add (_wText);
         _sizeFrame.Add (_wRadioGroup);
 
-        radioItems = new [] { "_Auto", "P_ercent(height)", "F_ill(height)", "Si_zed(height)" };
+        radioItems = new [] { "_Auto (min)", "P_ercent(height)", "F_ill(height)", "Si_zed(height)" };
         label = new Label { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "Height:" };
         _sizeFrame.Add (label);
         _hText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
@@ -251,12 +252,13 @@ public class AllViewsTester : Scenario
                                   {
                                       switch (_hRadioGroup.SelectedItem)
                                       {
-                                          case 0:
+                                          case 1:
                                               _hVal = Math.Min (int.Parse (_hText.Text), 100);
 
                                               break;
-                                          case 1:
+                                          case 0:
                                           case 2:
+                                          case 3:
                                               _hVal = int.Parse (_hText.Text);
 
                                               break;
@@ -386,38 +388,40 @@ public class AllViewsTester : Scenario
             //view.LayoutStyle = LayoutStyle.Absolute;
 
             view.X = _xRadioGroup.SelectedItem switch
-                     {
-                         0 => Pos.Percent (_xVal),
-                         1 => Pos.AnchorEnd (),
-                         2 => Pos.Center (),
-                         3 => Pos.At (_xVal),
-                         _ => view.X
-                     };
+            {
+                0 => Pos.Percent (_xVal),
+                1 => Pos.AnchorEnd (),
+                2 => Pos.Center (),
+                3 => Pos.At (_xVal),
+                _ => view.X
+            };
 
             view.Y = _yRadioGroup.SelectedItem switch
-                     {
-                         0 => Pos.Percent (_yVal),
-                         1 => Pos.AnchorEnd (),
-                         2 => Pos.Center (),
-                         3 => Pos.At (_yVal),
-                         _ => view.Y
-                     };
+            {
+                0 => Pos.Percent (_yVal),
+                1 => Pos.AnchorEnd (),
+                2 => Pos.Center (),
+                3 => Pos.At (_yVal),
+                _ => view.Y
+            };
 
             view.Width = _wRadioGroup.SelectedItem switch
-                         {
-                             0 => Dim.Percent (_wVal),
-                             1 => Dim.Fill (_wVal),
-                             2 => Dim.Sized (_wVal),
-                             _ => view.Width
-                         };
+            {
+                0 => Dim.Auto (min: _wVal),
+                1 => Dim.Percent (_wVal),
+                2 => Dim.Fill (_wVal),
+                3 => Dim.Sized (_wVal),
+                _ => view.Width
+            };
 
             view.Height = _hRadioGroup.SelectedItem switch
-                          {
-                              0 => Dim.Percent (_hVal),
-                              1 => Dim.Fill (_hVal),
-                              2 => Dim.Sized (_hVal),
-                              _ => view.Height
-                          };
+            {
+                0 => Dim.Auto (min: _hVal),
+                1 => Dim.Percent (_hVal),
+                2 => Dim.Fill (_hVal),
+                3 => Dim.Sized (_hVal),
+                _ => view.Height
+            };
         }
         catch (Exception e)
         {
@@ -476,14 +480,17 @@ public class AllViewsTester : Scenario
     {
         var view = sender as View;
 
-        //view.X = Pos.Center ();
-        //view.Y = Pos.Center ();
-        if (view.Width == null || view.Frame.Width == 0)
+        if (view is null)
+        {
+            return;
+        }
+
+        if (view.Width is not Dim.DimAuto && (view.Width is null || view.Frame.Width == 0))
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Height == null || view.Frame.Height == 0)
+        if (view.Width is not Dim.DimAuto && (view.Height is null || view.Frame.Height == 0))
         {
             view.Height = Dim.Fill ();
         }

@@ -44,7 +44,6 @@ public class Dialogs : Scenario
 
         label = new Label
         {
-            AutoSize = false,
             X = 0,
             Y = Pos.Bottom (label),
             Width = Dim.Width (numButtonsLabel),

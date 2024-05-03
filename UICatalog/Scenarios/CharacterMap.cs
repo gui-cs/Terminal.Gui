@@ -972,7 +972,6 @@ internal class CharMap : View
         var errorLabel = new Label
         {
             Text = UcdApiClient.BaseUrl,
-            AutoSize = false,
             X = 0,
             Y = 1,
             Width = Dim.Fill (),

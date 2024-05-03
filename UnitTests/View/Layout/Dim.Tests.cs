@@ -406,7 +406,6 @@ public class DimTests
 
         var v1 = new Button
         {
-            AutoSize = false,
             X = Pos.X (f1) + 2,
             Y = Pos.Bottom (f1) + 2,
             Width = Dim.Width (f1) - 2,
@@ -417,7 +416,6 @@ public class DimTests
 
         var v2 = new Button
         {
-            AutoSize = false,
             X = Pos.X (f2) + 2,
             Y = Pos.Bottom (f2) + 2,
             Width = Dim.Width (f2) - 2,
@@ -428,7 +426,6 @@ public class DimTests
 
         var v3 = new Button
         {
-            AutoSize = false,
             Width = Dim.Percent (10),
             Height = Dim.Percent (10),
             ValidatePosDim = true,
@@ -437,7 +434,6 @@ public class DimTests
 
         var v4 = new Button
         {
-            AutoSize = false,
             Width = Dim.Sized (50),
             Height = Dim.Sized (50),
             ValidatePosDim = true,
@@ -446,7 +442,6 @@ public class DimTests
 
         var v5 = new Button
         {
-            AutoSize = false,
             Width = Dim.Width (v1) - Dim.Width (v3),
             Height = Dim.Height (v1) - Dim.Height (v3),
             ValidatePosDim = true,
@@ -455,7 +450,6 @@ public class DimTests
 
         var v6 = new Button
         {
-            AutoSize = false,
             X = Pos.X (f2),
             Y = Pos.Bottom (f2) + 2,
             Width = Dim.Percent (20, true),

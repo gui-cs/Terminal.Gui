@@ -850,38 +850,6 @@ public class DimAutoTests (ITestOutputHelper output)
 
         Assert.Equal (new Size (5, 1), view.ContentSize);
     }
-    [SetupFakeDriver]
-    [Fact]
-    public void DimAuto_ChangeNonDimAuto_Via_AutoSize_False_Resets_ContentSize ()
-    {
-        View view = new ()
-        {
-            Width = Auto (),
-            Height = Auto (),
-            Text = "01234"
-        };
-
-        Assert.Equal (new Rectangle (0, 0, 5, 1), view.Frame);
-        Assert.Equal (new Size (5, 1), view.ContentSize);
-
-        // Change text to a longer string
-        view.Text = "0123456789";
-
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Frame);
-        Assert.Equal (new Size (10, 1), view.ContentSize);
-
-        // Cause Width/Height to be set to absolute. This should reset ContentSize
-        view.AutoSize = false;
-
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Frame);
-        Assert.Equal (new Size (10, 1), view.ContentSize);
-
-        // If ContentSize was reset, these should cause it to update
-        view.Width = 5;
-        view.Height = 1;
-
-        Assert.Equal (new Size (5, 1), view.ContentSize);
-    }
 
     // DimAutoStyle.Content tests
     [Fact]

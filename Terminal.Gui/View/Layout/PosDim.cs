@@ -917,7 +917,7 @@ public class Dim
         }
     }
 
-    internal class DimAuto (DimAutoStyle style, Dim min, Dim max) : Dim
+    public class DimAuto (DimAutoStyle style, Dim min, Dim max) : Dim
     {
         internal readonly Dim _max = max;
         internal readonly Dim _min = min;
