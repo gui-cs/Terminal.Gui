@@ -4080,7 +4080,6 @@ B")]
         Application.Shutdown ();
     }
 
-    //FIXED: Expand this test to cover Vertical Alignment as well
     [SetupFakeDriver]
     [Theory]
     [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
@@ -4214,6 +4213,17 @@ B")]
  ******
  ******
 4******")]
+
+    // Right
+    // TODO: Add more tests for Right alignment
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.TopBottom_RightLeft, @"
+*******
+*****0*
+***** *
+*****你
+***** *
+*****4*
+*******")]
     public void Draw_Text_Alignment (string text, TextAlignment horizontalTextAlignment, VerticalTextAlignment verticalTextAlignment, TextDirection textDirection, string expectedText)
     {
         TextFormatter tf = new ()

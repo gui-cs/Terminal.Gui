@@ -960,11 +960,32 @@ public class Dim
                 }
                 else
                 {
-                    subviewsSize = us.Subviews.Count == 0
-                                       ? 0
-                                       : us.Subviews
-                                           .Where (v => dimension == Dimension.Width ? v.X is not Pos.PosAnchorEnd : v.Y is not Pos.PosAnchorEnd)
-                                           .Max (v => dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height);
+                    // BUGBUG: AnchorEnd needs work
+                    // If _min > 0 we can SetRelativeLayout for the subviews?
+                    subviewsSize = 0;
+                    if (us.Subviews.Count > 0)
+                    {
+                        for (int i = 0; i < us.Subviews.Count; i++)
+                        {
+                            var v = us.Subviews [i];
+                            bool isNotPosAnchorEnd = dimension == Dim.Dimension.Width ? !(v.X is Pos.PosAnchorEnd) : !(v.Y is Pos.PosAnchorEnd);
+
+                            if (!isNotPosAnchorEnd)
+                            {
+                                v.SetRelativeLayout(dimension == Dim.Dimension.Width ? (new Size (autoMin, 0)) : new Size (0, autoMin));
+                            }
+
+                            //if (isNotPosAnchorEnd)
+                            {
+                                int size = dimension == Dim.Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
+                                if (size > subviewsSize)
+                                {
+                                    subviewsSize = size;
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
 

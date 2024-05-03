@@ -118,8 +118,8 @@ public class DimAutoDemo : Scenario
 
         var resetButton = new Button
         {
-            Text = "_Reset Button",
-            X = Pos.Right (movingButton),
+            Text = "_Reset Button (AnchorEnd)",
+            X = Pos.AnchorEnd (),
             Y = Pos.Top (movingButton)
         };
 
