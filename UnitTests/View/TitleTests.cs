@@ -102,5 +102,7 @@ public class TitleTests
 ┌┤Hello World├──────────┐
 │This text will incremen│
 └───────────────────────┘", _output);
+
+        top.Dispose ();
     }
 }

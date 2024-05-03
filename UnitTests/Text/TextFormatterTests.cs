@@ -4083,6 +4083,75 @@ B")]
     //FIXED: Expand this test to cover Vertical Alignment as well
     [SetupFakeDriver]
     [Theory]
+
+    // LeftRight_TopBottom
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+0 2 4**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+**0 2 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+*0 2 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+0  2  4
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+0 你 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+*0 你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+0 你 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+0  你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    // LeftRight_BottomTop
     [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
 0 2 4**
 *******
@@ -4149,6 +4218,208 @@ B")]
 *******
 *******")]
 
+    // RightLeft_TopBottom
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+4 2 0**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+**4 2 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+*4 2 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+4  2  0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+*4 你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+4  你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    // RightLeft_BottomTop
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+4 2 0**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+**4 2 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+*4 2 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+4  2  0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+*4 你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+4  你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    // TopBottom_LeftRight
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+2******
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.TopBottom_LeftRight, @"
+*******
+*******
+0******
+ ******
+2******
+ ******
+4******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.TopBottom_LeftRight, @"
+*******
+0******
+ ******
+2******
+ ******
+4******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+ ******
+2******
+ ******
+ ******
+4******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+你*****
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.TopBottom_LeftRight, @"
+*******
+*******
+0******
+ ******
+你*****
+ ******
+4******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.TopBottom_LeftRight, @"
+*******
+0******
+ ******
+你*****
+ ******
+4******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+ ******
+你*****
+ ******
+ ******
+4******")]
+
+    // TopBottom_RightLeft
     [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.TopBottom_RightLeft, @"
 0******
  ******
@@ -4214,6 +4485,140 @@ B")]
  ******
  ******
 4******")]
+
+    // BottomTop_LeftRight
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+2******
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.BottomTop_LeftRight, @"
+*******
+*******
+4******
+ ******
+2******
+ ******
+0******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.BottomTop_LeftRight, @"
+*******
+4******
+ ******
+2******
+ ******
+0******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+ ******
+2******
+ ******
+ ******
+0******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+你*****
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.BottomTop_LeftRight, @"
+*******
+*******
+4******
+ ******
+你*****
+ ******
+0******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.BottomTop_LeftRight, @"
+*******
+4******
+ ******
+你*****
+ ******
+0******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+ ******
+你*****
+ ******
+ ******
+0******")]
+
+    // BottomTop_RightLeft
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+2******
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.BottomTop_RightLeft, @"
+*******
+*******
+4******
+ ******
+2******
+ ******
+0******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.BottomTop_RightLeft, @"
+*******
+4******
+ ******
+2******
+ ******
+0******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+ ******
+2******
+ ******
+ ******
+0******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+你*****
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.BottomTop_RightLeft, @"
+*******
+*******
+4******
+ ******
+你*****
+ ******
+0******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.BottomTop_RightLeft, @"
+*******
+4******
+ ******
+你*****
+ ******
+0******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+ ******
+你*****
+ ******
+ ******
+0******")]
     public void Draw_Text_Alignment (string text, TextAlignment horizontalTextAlignment, VerticalTextAlignment verticalTextAlignment, TextDirection textDirection, string expectedText)
     {
         TextFormatter tf = new ()
