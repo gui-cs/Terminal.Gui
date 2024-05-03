@@ -745,19 +745,17 @@ public class AutoSizeTrueTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void AutoSize_False_Label_Height_Zero_Stays_Zero ()
     {
+        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
         var text = "Label";
         var label = new Label
         {
             Text = text,
-            Width = Dim.Auto (Dim.DimAutoStyle.Text),
-            Height = Dim.Auto (Dim.DimAutoStyle.Text)
         };
         label.Width = Dim.Fill () - text.Length;
         label.Height = 0;
 
         var win = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
         win.BeginInit ();
         win.EndInit ();
         win.LayoutSubviews ();
@@ -1029,7 +1027,7 @@ Y
     [AutoInitShutdown]
     public void AutoSize_True_Setting_With_Height_Vertical ()
     {
-        // BUGBUG: Label is AutoSize = true, so Width & Height are ignored
+        // BUGBUG: Label is Width = Dim.Auto (), Height = Dim.Auto (), so Width & Height are ignored
         var label = new Label
         { /*Width = 2, Height = 10, */
             TextDirection = TextDirection.TopBottom_LeftRight, ValidatePosDim = true
@@ -1598,7 +1596,8 @@ Y
 
         var horizontalView = new View
         {
-            Id = "horizontalView", AutoSize = true, Text = text
+            Id = "horizontalView",
+            Width = Dim.Auto (), Height = Dim.Auto (), Text = text
         };
 
         var verticalView = new View
@@ -1736,7 +1735,7 @@ Y
         // Frame: 0, 0, 1, 12
         var verticalView = new View
         {
-            AutoSize = true, TextDirection = TextDirection.TopBottom_LeftRight
+            Width = Dim.Auto (), Height = Dim.Auto (), TextDirection = TextDirection.TopBottom_LeftRight
         };
         verticalView.Text = text;
         verticalView.TextFormatter.HotKeySpecifier = (Rune)'_';

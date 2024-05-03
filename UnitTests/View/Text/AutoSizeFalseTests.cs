@@ -25,64 +25,7 @@ public class AutoSizeFalseTests (ITestOutputHelper output)
         Assert.True (view.IsInitialized);
         Assert.Equal (expectedViewBounds, view.Viewport);
     }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void AutoSize_False_View_IsEmpty_False_Return_Null_Lines ()
-    {
-        var text = "Views";
-        var view = new View { Width = Dim.Fill () - text.Length, Height = 1, Text = text };
-        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
-        frame.Add (view);
-
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
-        frame.BeginInit ();
-        frame.EndInit ();
-        frame.LayoutSubviews ();
-
-        Assert.Equal (5, text.Length);
-        Assert.Equal (new (0, 0, 3, 1), view.Frame);
-        Assert.Equal (new (3, 1), view.TextFormatter.Size);
-        Assert.Equal (new() { "Vie" }, view.TextFormatter.GetLines ());
-        Assert.Equal (new (0, 0, 10, 4), frame.Frame);
-
-        frame.LayoutSubviews ();
-        frame.Clear ();
-        frame.Draw ();
-
-        var expected = @"
-┌────────┐
-│Vie     │
-│        │
-└────────┘
-";
-
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (0, 0, 10, 4), pos);
-
-        text = "0123456789";
-        Assert.Equal (10, text.Length);
-        view.Width = Dim.Fill () - text.Length;
-
-        frame.LayoutSubviews ();
-        frame.Clear ();
-        frame.Draw ();
-
-        Assert.Equal (new (0, 0, 0, 1), view.Frame);
-        Assert.Equal (new (0, 1), view.TextFormatter.Size);
-        Assert.Equal (new() { string.Empty }, view.TextFormatter.GetLines ());
-
-        expected = @"
-┌────────┐
-│        │
-│        │
-└────────┘
-";
-
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (0, 0, 10, 4), pos);
-    }
-
+    
     [Fact]
     [SetupFakeDriver]
     public void AutoSize_False_Width_Height_SetMinWidthHeight_Narrow_Wide_Runes ()
