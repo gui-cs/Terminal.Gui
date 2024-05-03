@@ -93,10 +93,10 @@ public class Wizard : Dialog
         Add (separator);
 
         // BUGBUG: Space is to work around https://github.com/gui-cs/Terminal.Gui/issues/1812
-        BackButton = new Button { AutoSize = true, Text = Strings.wzBack };
+        BackButton = new () { Text = Strings.wzBack };
         AddButton (BackButton);
 
-        NextFinishButton = new Button { AutoSize = true, Text = Strings.wzFinish };
+        NextFinishButton = new () { Text = Strings.wzFinish };
         NextFinishButton.IsDefault = true;
         AddButton (NextFinishButton);
 
@@ -417,10 +417,10 @@ public class Wizard : Dialog
         {
             if (key == Key.Esc)
             {
-                    var args = new WizardButtonEventArgs ();
-                    Cancelled?.Invoke (this, args);
+                var args = new WizardButtonEventArgs ();
+                Cancelled?.Invoke (this, args);
 
-                    return false;
+                return false;
             }
         }
 
