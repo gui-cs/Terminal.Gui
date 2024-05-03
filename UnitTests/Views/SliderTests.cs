@@ -180,8 +180,7 @@ public class SliderTests
     public void MovePlus_Should_MoveFocusRight_When_OptionIsAvailable ()
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3, 4 });
-        slider.AutoSize = true;
+        Slider<int> slider = new (new () { 1, 2, 3, 4 });
 
         // Act
         bool result = slider.MovePlus ();
@@ -195,8 +194,8 @@ public class SliderTests
     public void MovePlus_Should_NotMoveFocusRight_When_AtEnd ()
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3, 4 });
-        slider.AutoSize = true;
+        Slider<int> slider = new (new () { 1, 2, 3, 4 });
+
         slider.FocusedOption = 3;
 
         // Act
@@ -211,7 +210,7 @@ public class SliderTests
     public void OnOptionFocused_Event_Cancelled ()
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3 });
+        Slider<int> slider = new (new () { 1, 2, 3 });
         var eventRaised = false;
         var cancel = false;
         slider.OptionFocused += (sender, args) => eventRaised = true;
@@ -251,7 +250,7 @@ public class SliderTests
     public void OnOptionFocused_Event_Raised ()
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3 });
+        Slider<int> slider = new (new () { 1, 2, 3 });
         var eventRaised = false;
         slider.OptionFocused += (sender, args) => eventRaised = true;
         var newFocusedOption = 1;
@@ -283,8 +282,7 @@ public class SliderTests
     public void Set_Should_Not_UnSetFocusedOption_When_EmptyNotAllowed ()
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3, 4 }) { AllowEmpty = false };
-        slider.AutoSize = true;
+        Slider<int> slider = new (new () { 1, 2, 3, 4 }) { AllowEmpty = false };
 
         Assert.NotEmpty (slider.GetSetOptions ());
 
@@ -302,8 +300,7 @@ public class SliderTests
     public void Set_Should_SetFocusedOption ()
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3, 4 });
-        slider.AutoSize = true;
+        Slider<int> slider = new (new () { 1, 2, 3, 4 });
 
         // Act
         slider.FocusedOption = 2;
@@ -319,7 +316,7 @@ public class SliderTests
     public void TryGetOptionByPosition_InvalidPosition_Failure ()
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3 });
+        Slider<int> slider = new (new () { 1, 2, 3 });
         var x = 10;
         var y = 10;
         var threshold = 2;
@@ -343,8 +340,9 @@ public class SliderTests
     public void TryGetOptionByPosition_ValidPositionHorizontal_Success (int x, int y, int threshold, int expectedData)
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3, 4 });
-        slider.AutoSize = true; // Set auto size to true to enable testing
+        Slider<int> slider = new (new () { 1, 2, 3, 4 });
+
+        // Set auto size to true to enable testing
         slider.InnerSpacing = 2;
 
         // 0123456789
@@ -370,9 +368,10 @@ public class SliderTests
     public void TryGetOptionByPosition_ValidPositionVertical_Success (int x, int y, int threshold, int expectedData)
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3, 4 });
+        Slider<int> slider = new (new () { 1, 2, 3, 4 });
         slider.Orientation = Orientation.Vertical;
-        slider.AutoSize = true; // Set auto size to true to enable testing
+
+        // Set auto size to true to enable testing
         slider.InnerSpacing = 2;
 
         // 0 1
@@ -398,7 +397,7 @@ public class SliderTests
     public void TryGetPositionByOption_InvalidOption_Failure ()
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3 });
+        Slider<int> slider = new (new () { 1, 2, 3 });
         int option = -1;
         (int, int) expectedPosition = (-1, -1);
 
@@ -417,8 +416,9 @@ public class SliderTests
     public void TryGetPositionByOption_ValidOptionHorizontal_Success (int option, int expectedX, int expectedY)
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3, 4 });
-        slider.AutoSize = true; // Set auto size to true to enable testing
+        Slider<int> slider = new (new () { 1, 2, 3, 4 });
+
+        // Set auto size to true to enable testing
         slider.InnerSpacing = 2;
 
         // 0123456789
@@ -440,9 +440,10 @@ public class SliderTests
     public void TryGetPositionByOption_ValidOptionVertical_Success (int option, int expectedX, int expectedY)
     {
         // Arrange
-        Slider<int> slider = new (new() { 1, 2, 3, 4 });
+        Slider<int> slider = new (new () { 1, 2, 3, 4 });
         slider.Orientation = Orientation.Vertical;
-        slider.AutoSize = true; // Set auto size to true to enable testing
+
+        // Set auto size to true to enable testing
         slider.InnerSpacing = 2;
 
         // Act
@@ -464,7 +465,7 @@ public class SliderTests
         slider.EndInit ();
 
         // Act/Assert
-        slider.Options = new() { new () };
+        slider.Options = new () { new () };
     }
 
     [Fact]

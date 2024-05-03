@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-/// <summary>Tests of the  <see cref="View.Text"/> property with <see cref="View.AutoSize"/> set to false.</summary>
+/// <summary>Tests of the  <see cref="View.Text"/> property with AutoSize set to false.</summary>
 public class AutoSizeFalseTests (ITestOutputHelper output)
 {
     [Fact]

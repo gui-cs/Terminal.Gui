@@ -761,7 +761,6 @@ public class ButtonTests (ITestOutputHelper output)
 
         var button = new Button ()
         {
-            AutoSize = false,
             Width = 1,
             Height = 1,
             WantContinuousButtonPressed = true
@@ -797,7 +796,6 @@ public class ButtonTests (ITestOutputHelper output)
 
         var button = new Button ()
         {
-            AutoSize = false,
             Width = 1,
             Height = 1,
             WantContinuousButtonPressed = true

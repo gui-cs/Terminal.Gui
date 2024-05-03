@@ -1480,7 +1480,6 @@ public class ToplevelTests
                     {
                         X = Pos.Center (),
                         Y = Pos.Center (),
-                        AutoSize = false,
                         Width = Dim.Fill (),
                         Height = Dim.Fill (),
                         TextAlignment = TextAlignment.Centered,

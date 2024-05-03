@@ -213,23 +213,6 @@ public partial class View
 
     #region AutoSize
 
-    /// <summary>
-    ///     Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/>
-    ///     within <see cref="Viewport"/>.
-    ///     <para>
-    ///         The default is <see langword="false"/>. Set to <see langword="true"/> to turn on AutoSize. If
-    ///         <see langword="true"/> then <see cref="Width"/> and <see cref="Height"/> will be used if <see cref="Text"/> can
-    ///         fit; if <see cref="Text"/> won't fit the view will be resized as needed.
-    ///     </para>
-    ///     <para>
-    ///         If <see cref="AutoSize"/> is set to <see langword="true"/> then <see cref="Width"/> and <see cref="Height"/>
-    ///         will be changed to <see cref="Dim.DimAbsolute"/> if they are not already.
-    ///     </para>
-    ///     <para>
-    ///         If <see cref="AutoSize"/> is set to <see langword="false"/> then <see cref="Width"/> and <see cref="Height"/>
-    ///         will left unchanged.
-    ///     </para>
-    /// </summary>
     [ObsoleteAttribute ("Use Dim.Auto instead.", false)]
     public virtual bool AutoSize
     {

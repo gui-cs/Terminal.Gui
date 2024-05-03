@@ -381,7 +381,6 @@ public class TabViewTests
         var btn = new Button
         {
             Y = Pos.Bottom (tv) + 1,
-            AutoSize = false,
             Height = 1,
             Width = 7,
             Text = "Ok"

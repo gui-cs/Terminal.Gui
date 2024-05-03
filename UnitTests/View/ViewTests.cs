@@ -158,13 +158,11 @@ public class ViewTests
 
         if (label)
         {
-            Assert.True (v.AutoSize);
             Assert.False (v.CanFocus);
             Assert.Equal (new Rectangle (0, 0, 20, 1), v.Frame);
         }
         else
         {
-            Assert.False (v.AutoSize);
             Assert.True (v.CanFocus);
             Assert.Equal (new Rectangle (0, 0, 20, 1), v.Frame);
         }
@@ -488,7 +486,6 @@ At 0,0
 
         button.LayoutComplete += (s, e) => { Assert.Equal (new Rectangle (0, 0, 13, 1), button._needsDisplayRect); };
 
-        Assert.True (label.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
         Assert.Equal (new Rectangle (20, 8, 40, 8), frame.Frame);
 
@@ -1013,7 +1010,8 @@ At 0,0
         top.Add (win);
         RunState rs = Application.Begin (top);
 
-        view.AutoSize = true;
+        view.Width = Dim.Auto ();
+        view.Height = Dim.Auto ();
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);

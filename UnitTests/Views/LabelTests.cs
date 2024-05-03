@@ -91,7 +91,7 @@ public class LabelTests
     [AutoInitShutdown]
     public void AutoSize_Stays_True_AnchorEnd ()
     {
-        var label = new Label { Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
+        var label = new Label { Y = Pos.Center (), Text = "Say Hello 你" };
         label.X = Pos.AnchorEnd (0) - Pos.Function (() => label.TextFormatter.Text.GetColumns ());
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -99,7 +99,7 @@ public class LabelTests
         var top = new Toplevel ();
         top.Add (win);
 
-        Assert.True (label.AutoSize);
+       
 
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
@@ -114,9 +114,9 @@ public class LabelTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-        Assert.True (label.AutoSize);
+       
         label.Text = "Say Hello 你 changed";
-        Assert.True (label.AutoSize);
+       
         Application.Refresh ();
 
         expected = @"
@@ -156,9 +156,9 @@ public class LabelTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-        Assert.True (label.AutoSize);
+       
         label.Text = "Say Hello 你 changed";
-        Assert.True (label.AutoSize);
+       
         Application.Refresh ();
 
         expected = @"
@@ -176,18 +176,18 @@ public class LabelTests
     [AutoInitShutdown]
     public void AutoSize_Stays_True_With_EmptyText ()
     {
-        var label = new Label { X = Pos.Center (), Y = Pos.Center (), AutoSize = true };
+        var label = new Label { X = Pos.Center (), Y = Pos.Center () };
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
         var top = new Toplevel ();
         top.Add (win);
 
-        Assert.True (label.AutoSize);
+       
 
         label.Text = "Say Hello 你";
 
-        Assert.True (label.AutoSize);
+       
 
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
@@ -285,7 +285,7 @@ This TextFormatter (tf2) is rewritten.                                 ",
         top.Add (label);
         Application.Begin (top);
 
-        Assert.True (label.AutoSize);
+       
         Assert.Equal (new Rectangle (0, 0, 16, 1), label.Frame);
 
         var expected = @"
@@ -446,7 +446,7 @@ e
     [AutoInitShutdown]
     public void Update_Parameterless_Only_On_Or_After_Initialize ()
     {
-        var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
+        var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
         var top = new Toplevel ();

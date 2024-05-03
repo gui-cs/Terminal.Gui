@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-/// <summary>Tests of the  <see cref="View.AutoSize"/> property which auto sizes Views based on <see cref="Text"/>.</summary>
+/// <summary>Tests of the View.AutoSize property which auto sizes Views based on <see cref="Text"/>.</summary>
 public class AutoSizeTrueTests (ITestOutputHelper output)
 {
     private readonly string [] expecteds = new string [21]
@@ -746,10 +746,11 @@ public class AutoSizeTrueTests (ITestOutputHelper output)
     public void AutoSize_False_Label_Height_Zero_Stays_Zero ()
     {
         var text = "Label";
-        var label = new Label { 
-            Text = text, 
-            Width = Dim.Auto(Dim.DimAutoStyle.Text), 
-            Height = Dim.Auto(Dim.DimAutoStyle.Text)
+        var label = new Label
+        {
+            Text = text,
+            Width = Dim.Auto (Dim.DimAutoStyle.Text),
+            Height = Dim.Auto (Dim.DimAutoStyle.Text)
         };
         label.Width = Dim.Fill () - text.Length;
         label.Height = 0;
@@ -786,7 +787,7 @@ public class AutoSizeTrueTests (ITestOutputHelper output)
         win.Draw ();
 
         Assert.Equal (Rectangle.Empty, label.Frame);
-//        Assert.Equal (new (5, 1), label.TextFormatter.Size);
+        //        Assert.Equal (new (5, 1), label.TextFormatter.Size);
 
         //Exception exception = Record.Exception (
         //                                        () => Assert.Equal (
@@ -946,7 +947,7 @@ public class AutoSizeTrueTests (ITestOutputHelper output)
         //label.Width = Dim.Fill () - text.Length;
         Application.Refresh ();
 
-        Assert.True (label.AutoSize);
+
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.Size);
         Assert.Single (label.TextFormatter.GetLines ());
@@ -1007,10 +1008,9 @@ Y
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-        label.AutoSize = false;
         label.Width = 10;
         label.Height = 2;
-        Assert.False (label.AutoSize);
+
         Assert.Equal (new (0, 0, 10, 2), label.Frame);
 
         top.LayoutSubviews ();
@@ -1041,7 +1041,7 @@ Y
         top.Add (label, viewX, viewY);
         RunState rs = Application.Begin (top);
 
-        Assert.True (label.AutoSize);
+
         label.Text = "Hello";
         Application.Refresh ();
 
@@ -1058,12 +1058,11 @@ Y
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-        label.AutoSize = false;
         label.Width = 2;
         label.Height = 10;
         Application.Refresh ();
 
-        Assert.False (label.AutoSize);
+
         Assert.Equal (new (0, 0, 2, 10), label.Frame);
 
         expected = @"
@@ -1103,7 +1102,7 @@ Y
         Assert.Equal (new Rectangle (0, 0, 15, 15), win.Margin.Frame);
         Assert.Equal (new Rectangle (0, 0, 15, 15), win.Border.Frame);
         Assert.Equal (new Rectangle (1, 1, 13, 13), win.Padding.Frame);
-        Assert.False (view.AutoSize);
+
         Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
         Assert.Equal (Rectangle.Empty, view.Frame);
         Assert.Equal ("Absolute(0)", view.X.ToString ());
@@ -1163,7 +1162,9 @@ Y
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-        view.AutoSize = true;
+        view.Width = Dim.Auto ();
+        view.Height = Dim.Auto ();
+
         view.Text = "Hello Worlds";
         Application.Refresh ();
         int len = "Hello Worlds".Length;
@@ -1217,7 +1218,8 @@ Y
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
         // Setting to false causes Width and Height to be set to the current ContentSize
-        view.AutoSize = false;
+        view.Width = 1;
+        view.Height = 12;
 
         Assert.Equal (new Rectangle (0, 0, 1, 12), view.Frame);
 
@@ -1312,7 +1314,9 @@ Y
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-        view.AutoSize = true;
+        view.Width = Dim.Auto ();
+        view.Height = Dim.Auto ();
+
         Application.Refresh ();
 
         Assert.Equal (new Rectangle (0, 0, 1, 12), view.Frame);
@@ -1350,8 +1354,10 @@ Y
             TextDirection = TextDirection.TopBottom_LeftRight,
             Height = Dim.Fill () - text.Length,
             Text = text,
-            AutoSize = true
         };
+        view.Width = Dim.Auto ();
+        view.Height = Dim.Auto ();
+
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (view);
         var top = new Toplevel ();
@@ -1360,7 +1366,7 @@ Y
         ((FakeDriver)Application.Driver).SetBufferSize (4, 10);
 
         Assert.Equal (5, text.Length);
-        Assert.True (view.AutoSize);
+
         Assert.Equal (new (0, 0, 1, 5), view.Frame);
         Assert.Equal (new (1, 5), view.TextFormatter.Size);
         Assert.Equal (new List<string> { "Views" }, view.TextFormatter.GetLines ());
@@ -1420,9 +1426,9 @@ Y
         var view = new View
         {
             TextDirection = TextDirection.TopBottom_LeftRight,
-            Height = Dim.Fill () - text.Length,
             Text = text,
-            AutoSize = true
+            Width = Dim.Auto (),
+            Height = Dim.Auto ()
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (view);
@@ -1432,7 +1438,6 @@ Y
         ((FakeDriver)Application.Driver).SetBufferSize (4, 10);
 
         Assert.Equal (5, text.Length);
-        Assert.True (view.AutoSize);
         Assert.Equal (new (0, 0, 2, 5), view.Frame);
         Assert.Equal (new (2, 5), view.TextFormatter.Size);
         Assert.Equal (new List<string> { "界View" }, view.TextFormatter.GetLines ());
@@ -1497,16 +1502,15 @@ Y
 
         var horizontalView = new View
         {
-            AutoSize = true,
-
-            //Width = 11,  
-            //Height = 2, 
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
             Text = text
         };
 
         var verticalView = new View
         {
-            AutoSize = true,
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
             Y = 3,
 
             //Height = 11,
@@ -1517,8 +1521,6 @@ Y
 
         var win = new Window
         {
-            AutoSize = true,
-
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             Text = "Window"
@@ -1529,8 +1531,6 @@ Y
         RunState rs = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
 
-        Assert.True (horizontalView.AutoSize);
-        Assert.True (verticalView.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 11, 2), horizontalView.Frame);
         Assert.Equal (new Rectangle (0, 3, 2, 11), verticalView.Frame);
 
@@ -1605,7 +1605,8 @@ Y
         {
             Id = "verticalView",
             Y = 3,
-            AutoSize = true,
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
             Text = text,
             TextDirection = TextDirection.TopBottom_LeftRight
         };
@@ -1616,8 +1617,6 @@ Y
         RunState rs = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (22, 22);
 
-        Assert.True (horizontalView.AutoSize);
-        Assert.True (verticalView.AutoSize);
         Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.Size);
         Assert.Equal (new (2, 8), verticalView.TextFormatter.Size);
         //Assert.Equal (new (0, 0, 10, 1), horizontalView.Frame);
@@ -1722,7 +1721,7 @@ Y
 
         Application.End (rs);
     }
-    
+
     [Fact]
     [AutoInitShutdown]
     public void GetTextFormatterBoundsSize_GetSizeNeededForText_HotKeySpecifier ()
@@ -1786,7 +1785,7 @@ Y
         Assert.Equal (new (0, 0, 20, 1), view.Frame);
     }
 
-    
+
     [Theory]
     [AutoInitShutdown]
     [InlineData (true)]
@@ -1948,10 +1947,6 @@ Y
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (9, height + 2);
 
-        Assert.True (lblLeft.AutoSize == autoSize);
-        Assert.True (lblCenter.AutoSize == autoSize);
-        Assert.True (lblRight.AutoSize == autoSize);
-        Assert.True (lblJust.AutoSize == autoSize);
         Assert.True (lblLeft.TextFormatter.AutoSize == autoSize);
         Assert.True (lblCenter.TextFormatter.AutoSize == autoSize);
         Assert.True (lblRight.TextFormatter.AutoSize == autoSize);

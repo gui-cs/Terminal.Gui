@@ -418,7 +418,6 @@ public class CheckBoxTests
             Y = Pos.Center (),
             Text = "Check this out 你",
             TextAlignment = TextAlignment.Centered,
-            AutoSize = false,
             Width = 25
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
@@ -432,7 +431,6 @@ public class CheckBoxTests
         Assert.Equal (TextAlignment.Centered, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
         Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
-        Assert.False (checkBox.AutoSize);
 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
@@ -536,7 +534,6 @@ public class CheckBoxTests
             X = 1,
             Y = Pos.Center (),
             Text = "Check this out 你",
-            AutoSize = false,
             Width = 25
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
@@ -587,7 +584,6 @@ public class CheckBoxTests
             Y = Pos.Center (),
             Text = "Check this out 你",
             TextAlignment = TextAlignment.Right,
-            AutoSize = false,
             Width = 25
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
@@ -601,7 +597,6 @@ public class CheckBoxTests
         Assert.Equal (TextAlignment.Right, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
         Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
-        Assert.False (checkBox.AutoSize);
 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐

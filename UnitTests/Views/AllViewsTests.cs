@@ -27,9 +27,6 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         view.X = Pos.Center ();
         view.Y = Pos.Center ();
 
-        // Turn off AutoSize
-        view.AutoSize = false;
-
         // Ensure the view has positive dimensions
         view.Width = 10;
         view.Height = 10;
@@ -75,7 +72,6 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
         Toplevel top = new ();
 
-        vType.AutoSize = false;
         vType.X = 0;
         vType.Y = 0;
         vType.Width = 10;
