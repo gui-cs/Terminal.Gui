@@ -478,9 +478,7 @@ public class AllViewsTester : Scenario
 
     private void View_Initialized (object sender, EventArgs e)
     {
-        var view = sender as View;
-
-        if (view is null)
+        if (sender is not View view)
         {
             return;
         }
