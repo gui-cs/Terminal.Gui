@@ -456,12 +456,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 _title = value;
                 TitleTextFormatter.Text = _title;
 
-                TitleTextFormatter.Size = new (
-                                               TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
-                                               - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                                                      ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                                                      : 0),
-                                               1);
+                SetTitleTextFormatterSize ();
                 SetHotKeyFromTitle ();
                 SetNeedsDisplay ();
 #if DEBUG
@@ -473,6 +468,16 @@ public partial class View : Responder, ISupportInitializeNotification
                 OnTitleChanged (old, _title);
             }
         }
+    }
+
+    private void SetTitleTextFormatterSize ()
+    {
+        TitleTextFormatter.Size = new (
+                                       TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
+                                       - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
+                                              ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                                              : 0),
+                                       1);
     }
 
     /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>

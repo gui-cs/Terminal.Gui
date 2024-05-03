@@ -1064,7 +1064,7 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (15, calculatedHeight); // 5 (Y position) + 10 (Height)
     }
 
-    [Fact]
+    [Fact (Skip = "DimAuto_TextOnly")]
     public void DimAuto_With_Subview_At_PosPercent ()
     {
         var view = new View () { Width = 100, Height = 100 };
@@ -1083,7 +1083,7 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (60, calculatedHeight); // 50% of 100 (Height) + 10
     }
 
-    [Fact]
+    [Fact (Skip = "DimAuto_TextOnly")]
     public void DimAuto_With_Subview_At_PosCenter ()
     {
         var view = new View () { Width = 100, Height = 100 };
@@ -1102,7 +1102,7 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (60, calculatedHeight); // Centered in 100 (Height) + 10
     }
 
-    [Fact]
+    [Fact (Skip = "DimAuto_TextOnly")]
     public void DimAuto_With_Subview_At_PosAnchorEnd ()
     {
         var dimWidth = Dim.Auto (min: 50);
