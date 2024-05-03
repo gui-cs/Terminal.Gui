@@ -11,13 +11,11 @@ public class AutoSizeFalseTests (ITestOutputHelper output)
         var super = new View { Frame = new (0, 0, 30, 80) };
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
         super.Add (view);
-        Assert.False (view.AutoSize);
 
         view.Text = "New text\nNew line";
         super.LayoutSubviews ();
         Rectangle expectedViewBounds = new (0, 0, 30, 80);
 
-        Assert.False (view.AutoSize);
         Assert.Equal (expectedViewBounds, view.Viewport);
         Assert.False (view.IsInitialized);
 
@@ -25,7 +23,6 @@ public class AutoSizeFalseTests (ITestOutputHelper output)
         super.EndInit ();
 
         Assert.True (view.IsInitialized);
-        Assert.False (view.AutoSize);
         Assert.Equal (expectedViewBounds, view.Viewport);
     }
 
@@ -44,7 +41,6 @@ public class AutoSizeFalseTests (ITestOutputHelper output)
         frame.LayoutSubviews ();
 
         Assert.Equal (5, text.Length);
-        Assert.False (view.AutoSize);
         Assert.Equal (new (0, 0, 3, 1), view.Frame);
         Assert.Equal (new (3, 1), view.TextFormatter.Size);
         Assert.Equal (new() { "Vie" }, view.TextFormatter.GetLines ());
@@ -118,8 +114,6 @@ public class AutoSizeFalseTests (ITestOutputHelper output)
         top.BeginInit ();
         top.EndInit ();
 
-        Assert.False (horizontalView.AutoSize);
-        Assert.False (verticalView.AutoSize);
         Assert.Equal (new (0, 0, 20, 1), horizontalView.Frame);
         Assert.Equal (new (0, 3, 1, 20), verticalView.Frame);
 

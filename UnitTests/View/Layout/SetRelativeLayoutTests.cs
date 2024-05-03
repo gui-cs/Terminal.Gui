@@ -1,4 +1,5 @@
 ﻿using Xunit.Abstractions;
+using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui.LayoutTests;
 
@@ -249,7 +250,7 @@ public class SetRelativeLayoutTests
         Assert.Equal (4, testView.Frame.X);
         Assert.Equal (4, testView.Frame.Y);
 
-        testView = new()
+        testView = new ()
         {
             X = Pos.Center () + 1, // ((10 / 2) - (1 / 2)) + 1 = 5 - 1 + 1 = 5
             Y = Pos.Center () + 1,
@@ -261,7 +262,7 @@ public class SetRelativeLayoutTests
         Assert.Equal (5, testView.Frame.X);
         Assert.Equal (5, testView.Frame.Y);
 
-        testView = new()
+        testView = new ()
         {
             X = 1 + Pos.Center (),
             Y = 1 + Pos.Center (),
@@ -273,7 +274,7 @@ public class SetRelativeLayoutTests
         Assert.Equal (5, testView.Frame.X);
         Assert.Equal (5, testView.Frame.Y);
 
-        testView = new()
+        testView = new ()
         {
             X = 1 + Pos.Percent (50),
             Y = Pos.Percent (50) + 1,
@@ -285,7 +286,7 @@ public class SetRelativeLayoutTests
         Assert.Equal (6, testView.Frame.X);
         Assert.Equal (6, testView.Frame.Y);
 
-        testView = new()
+        testView = new ()
         {
             X = Pos.Percent (10) + Pos.Percent (40),
             Y = Pos.Percent (10) + Pos.Percent (40),
@@ -297,7 +298,7 @@ public class SetRelativeLayoutTests
         Assert.Equal (5, testView.Frame.X);
         Assert.Equal (5, testView.Frame.Y);
 
-        testView = new()
+        testView = new ()
         {
             X = 1 + Pos.Percent (10) + Pos.Percent (40) - 1,
             Y = 5 + Pos.Percent (10) + Pos.Percent (40) - 5,
@@ -309,7 +310,7 @@ public class SetRelativeLayoutTests
         Assert.Equal (5, testView.Frame.X);
         Assert.Equal (5, testView.Frame.Y);
 
-        testView = new()
+        testView = new ()
         {
             X = Pos.Left (testView),
             Y = Pos.Left (testView),
@@ -321,7 +322,7 @@ public class SetRelativeLayoutTests
         Assert.Equal (5, testView.Frame.X);
         Assert.Equal (5, testView.Frame.Y);
 
-        testView = new()
+        testView = new ()
         {
             X = 1 + Pos.Left (testView),
             Y = Pos.Top (testView) + 1,
@@ -396,7 +397,12 @@ public class SetRelativeLayoutTests
     public void PosDimFunction ()
     {
         var screen = new Size (30, 1);
-        var view = new View { Text = "abc", AutoSize = true }; // BUGBUG: AutoSize or Width must be set
+        var view = new View
+        {
+            Text = "abc",
+            Width = Auto (DimAutoStyle.Text),
+            Height = Auto (DimAutoStyle.Text)
+        };
         view.X = Pos.AnchorEnd (0) - Pos.Function (GetViewWidth);
 
         int GetViewWidth () { return view.Frame.Width; }
