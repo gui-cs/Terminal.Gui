@@ -72,7 +72,6 @@ public class Adornments : Scenario
 
         var labelAnchorEnd = new Label
         {
-            AutoSize = false,
             Y = Pos.AnchorEnd (),
             Width = 40,
             Height = Dim.Percent(20),

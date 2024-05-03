@@ -82,8 +82,6 @@ public class ASCIICustomButtonTest : Scenario
         {
             _border = new FrameView { Width = Width, Height = Height };
 
-            AutoSize = false;
-
             var fillText = new StringBuilder ();
 
             for (var i = 0; i < Viewport.Height; i++)
@@ -198,7 +196,6 @@ public class ASCIICustomButtonTest : Scenario
 
                 var button = new ASCIICustomButton
                 {
-                    AutoSize = false,
                     Id = j.ToString (),
                     Text = $"section {j}",
                     Y = yPos,
@@ -217,7 +214,6 @@ public class ASCIICustomButtonTest : Scenario
 
             var closeButton = new ASCIICustomButton
             {
-                AutoSize = false,
                 Id = "close",
                 Text = "Close",
                 Y = Pos.Bottom (prevButton),

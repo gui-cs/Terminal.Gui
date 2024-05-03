@@ -375,7 +375,7 @@ public static class MessageBox
             Y = 0
         };
 
-        if (!wrapMessage)
+        if (wrapMessage)
         {
             messageLabel.Width = Dim.Fill ();
             messageLabel.Height = Dim.Fill (1);
