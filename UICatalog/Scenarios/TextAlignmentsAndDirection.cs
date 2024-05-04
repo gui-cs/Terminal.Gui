@@ -462,16 +462,34 @@ public class TextAlignmentsAndDirections : Scenario
             Text = "Justify"
         };
 
+        app.Add (justifyCheckbox);
+
+        // JUSTIFY OPTIONS
+
+        var justifyOptions = new RadioGroup
+        {
+            X = Pos.Left (justifyCheckbox) + 1,
+            Y = Pos.Y (justifyCheckbox) + 1,
+            Width = Dim.Fill (11),
+            RadioLabels = ["Current direction", "Opposite direction", "Justify Both"],
+            Enabled = false
+        };
+
         justifyCheckbox.Toggled += (s, e) => ToggleJustify (e.OldValue is { } && (bool)e.OldValue);
 
-        app.Add (justifyCheckbox);
+        justifyOptions.SelectedItemChanged += (s, e) =>
+                                              {
+                                                  ToggleJustify (false, true);
+                                              };
+
+        app.Add (justifyOptions);
 
         // WRAP CHECKBOX
 
         var wrapCheckbox = new CheckBox
         {
             X = Pos.Right (container) + 1,
-            Y = Pos.Y (justifyCheckbox) + 1,
+            Y = Pos.Bottom (justifyOptions),
             Width = Dim.Fill (10),
             Height = 1,
             Text = "Word Wrap",
@@ -564,10 +582,15 @@ public class TextAlignmentsAndDirections : Scenario
         Application.Run (app);
         app.Dispose ();
 
-        void ToggleJustify (bool oldValue)
+        void ToggleJustify (bool oldValue, bool wasJustOptions = false)
         {
             if (oldValue == true)
             {
+                if (!wasJustOptions)
+                {
+                    justifyOptions.Enabled = false;
+                }
+
                 foreach (Label t in mtxts)
                 {
                     t.TextAlignment = (TextAlignment)((dynamic)t.Data).h;
@@ -578,15 +601,46 @@ public class TextAlignmentsAndDirections : Scenario
             {
                 foreach (Label t in mtxts)
                 {
+                    if (!wasJustOptions)
+                    {
+                        justifyOptions.Enabled = true;
+                    }
+
                     if (TextFormatter.IsVerticalDirection (t.TextDirection))
                     {
-                        t.VerticalTextAlignment = VerticalTextAlignment.Justified;
-                        t.TextAlignment = ((dynamic)t.Data).h;
+                        switch (justifyOptions.SelectedItem)
+                        {
+                            case 0:
+                                t.VerticalTextAlignment = VerticalTextAlignment.Justified;
+                                t.TextAlignment = ((dynamic)t.Data).h;
+                                break;
+                            case 1:
+                                t.VerticalTextAlignment = (VerticalTextAlignment)((dynamic)t.Data).v;
+                                t.TextAlignment = TextAlignment.Justified;
+                                break;
+                            case 2:
+                                t.VerticalTextAlignment = VerticalTextAlignment.Justified;
+                                t.TextAlignment = TextAlignment.Justified;
+                                break;
+                        }
                     }
                     else
                     {
-                        t.TextAlignment = TextAlignment.Justified;
-                        t.VerticalTextAlignment = ((dynamic)t.Data).v;
+                        switch (justifyOptions.SelectedItem)
+                        {
+                            case 0:
+                                t.TextAlignment = TextAlignment.Justified;
+                                t.VerticalTextAlignment = ((dynamic)t.Data).v;
+                                break;
+                            case 1:
+                                t.TextAlignment = (TextAlignment)((dynamic)t.Data).h;
+                                t.VerticalTextAlignment = VerticalTextAlignment.Justified;
+                                break;
+                            case 2:
+                                t.TextAlignment = TextAlignment.Justified;
+                                t.VerticalTextAlignment = VerticalTextAlignment.Justified;
+                                break;
+                        }
                     }
                 }
             }
