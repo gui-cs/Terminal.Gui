@@ -321,7 +321,7 @@ public class TextFormatter
             int x, y;
 
             // Horizontal Alignment
-            if (Alignment == TextAlignment.Right || (Alignment == TextAlignment.Justified && !IsLeftToRight (Direction)))
+            if (Alignment is TextAlignment.Right)
             {
                 if (isVertical)
                 {
@@ -336,7 +336,7 @@ public class TextFormatter
                     CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
             }
-            else if (Alignment is TextAlignment.Left or TextAlignment.Justified)
+            else if (Alignment is TextAlignment.Left)
             {
                 if (isVertical)
                 {
@@ -352,7 +352,30 @@ public class TextFormatter
 
                 CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
             }
-            else if (Alignment == TextAlignment.Centered)
+            else if (Alignment is TextAlignment.Justified)
+            {
+                if (isVertical)
+                {
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                    int prevLineWidth = line > 0 ? GetColumnsRequiredForVerticalText (linesFormatted, line - 1, 1, TabWidth) : 0;
+                    int firstLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, 1, TabWidth);
+                    int lastLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, linesFormatted.Count - 1, 1, TabWidth);
+                    var interval = (int)Math.Round ((double)(screen.Width + firstLineWidth + lastLineWidth) / linesFormatted.Count);
+
+                    x = line == 0
+                            ? screen.Left
+                            : line < linesFormatted.Count - 1
+                                ? screen.Width - runesWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
+                                : screen.Right - lastLineWidth;
+                }
+                else
+                {
+                    x = screen.Left;
+                }
+
+                CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
+            }
+            else if (Alignment is TextAlignment.Centered)
             {
                 if (isVertical)
                 {
@@ -376,7 +399,7 @@ public class TextFormatter
             }
 
             // Vertical Alignment
-            if (VerticalAlignment == VerticalTextAlignment.Bottom || (VerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (Direction)))
+            if (VerticalAlignment is VerticalTextAlignment.Bottom)
             {
                 if (isVertical)
                 {
@@ -387,7 +410,7 @@ public class TextFormatter
                     y = screen.Bottom - linesFormatted.Count + line;
                 }
             }
-            else if (VerticalAlignment is VerticalTextAlignment.Top or VerticalTextAlignment.Justified)
+            else if (VerticalAlignment is VerticalTextAlignment.Top)
             {
                 if (isVertical)
                 {
@@ -398,7 +421,21 @@ public class TextFormatter
                     y = screen.Top + line;
                 }
             }
-            else if (VerticalAlignment == VerticalTextAlignment.Middle)
+            else if (VerticalAlignment is VerticalTextAlignment.Justified)
+            {
+                if (isVertical)
+                {
+                    y = screen.Top;
+                }
+                else
+                {
+                    var interval = (int)Math.Round ((double)(screen.Height + 2) / linesFormatted.Count);
+
+                    y = line == 0 ? screen.Top :
+                        line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
+                }
+            }
+            else if (VerticalAlignment is VerticalTextAlignment.Middle)
             {
                 if (isVertical)
                 {
