@@ -4,15 +4,12 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>12</LangVersion>
-    <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineTrace>True</DefineTrace>
     <DebugType>portable</DebugType>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
     <ImplicitUsings>enable</ImplicitUsings>
-    <NoLogo>True</NoLogo>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
 

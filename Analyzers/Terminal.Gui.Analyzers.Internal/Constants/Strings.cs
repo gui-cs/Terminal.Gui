@@ -46,7 +46,7 @@ internal static class Strings
             /// <inheritdoc cref="ExcludeFromCodeCoverageAttribute"/>
             internal const string ExcludeFromCodeCoverage = $"{Namespaces.System_Diagnostics_CodeAnalysis}.{nameof (ExcludeFromCodeCoverageAttribute)}";
 
-            internal const string Flags = $"{Namespaces.SystemNS}.{nameof (FlagsAttribute)}";
+            internal const string Flags = $"{Namespaces.SystemNs}.{nameof (FlagsAttribute)}";
 
             internal const string GeneratedCode = $"{Namespaces.System_CodeDom_Compiler}.{nameof (GeneratedCodeAttribute)}";
 
@@ -83,22 +83,24 @@ internal static class Strings
         /// <summary>Names of dotnet namespaces.</summary>
         internal static class Namespaces
         {
-            internal const string SystemNS = nameof (System);
-            internal const string System_CodeDom = $"{SystemNS}.{nameof (System.CodeDom)}";
+            internal const string SystemNs = nameof (System);
+            // ReSharper disable InconsistentNaming
+            internal const string System_CodeDom = $"{SystemNs}.{nameof (System.CodeDom)}";
             internal const string System_CodeDom_Compiler = $"{System_CodeDom}.{nameof (System.CodeDom.Compiler)}";
-            internal const string System_ComponentModel = $"{SystemNS}.{nameof (System.ComponentModel)}";
-            internal const string System_Diagnostics = $"{SystemNS}.{nameof (System.Diagnostics)}";
+            internal const string System_ComponentModel = $"{SystemNs}.{nameof (System.ComponentModel)}";
+            internal const string System_Diagnostics = $"{SystemNs}.{nameof (System.Diagnostics)}";
             internal const string System_Diagnostics_CodeAnalysis = $"{System_Diagnostics}.{nameof (System.Diagnostics.CodeAnalysis)}";
-            internal const string System_Numerics = $"{SystemNS}.{nameof (System.Numerics)}";
-            internal const string System_Runtime = $"{SystemNS}.{nameof (System.Runtime)}";
+            internal const string System_Numerics = $"{SystemNs}.{nameof (System.Numerics)}";
+            internal const string System_Runtime = $"{SystemNs}.{nameof (System.Runtime)}";
             internal const string System_Runtime_CompilerServices = $"{System_Runtime}.{nameof (System.Runtime.CompilerServices)}";
+            // ReSharper restore InconsistentNaming
         }
 
         internal static class Types
         {
-            internal const string Attribute = $"{Namespaces.SystemNS}.{nameof (System.Attribute)}";
-            internal const string AttributeTargets = $"{Namespaces.SystemNS}.{nameof (System.AttributeTargets)}";
-            internal const string AttributeUsageAttribute = $"{Namespaces.SystemNS}.{nameof (System.AttributeUsageAttribute)}";
+            internal const string Attribute = $"{Namespaces.SystemNs}.{nameof (System.Attribute)}";
+            internal const string AttributeTargets = $"{Namespaces.SystemNs}.{nameof (System.AttributeTargets)}";
+            internal const string AttributeUsageAttribute = $"{Namespaces.SystemNs}.{nameof (System.AttributeUsageAttribute)}";
 
             internal const string MethodImplOptions =
                 $"{Namespaces.System_Runtime_CompilerServices}.{nameof (System.Runtime.CompilerServices.MethodImplOptions)}";
@@ -131,7 +133,7 @@ internal static class Strings
 
         /// <summary>Using directives for common namespaces in generated code.</summary>
         internal const string DotnetNamespaceUsingDirectives = $"""
-                                                                using {DotnetNames.Namespaces.SystemNS};
+                                                                using {DotnetNames.Namespaces.SystemNs};
                                                                 using {DotnetNames.Namespaces.System_CodeDom};
                                                                 using {DotnetNames.Namespaces.System_CodeDom_Compiler};
                                                                 using {DotnetNames.Namespaces.System_ComponentModel};

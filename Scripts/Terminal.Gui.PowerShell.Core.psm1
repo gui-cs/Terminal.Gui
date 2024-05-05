@@ -14,17 +14,18 @@ Function Open-Solution {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory=$false, HelpMessage="The path to the solution file to open.")]
-    [Uri]$SolutionFilePath = (Resolve-Path "../Terminal.sln")
+    [ValidatePattern(".*Terminal\.sln" )]
+    [string]$Path = $SolutionFilePath
   )
   
   if(!$IsWindows) {
     [string]$warningMessage = "The Open-Solution cmdlet is only supported on Windows.`n`
-    Attempt to open file $SolutionFilePath with the system default handler?"
+    Attempt to open file $Path with the system default handler?"
     
     Write-Warning $warningMessage -WarningAction Inquire
   }
   
-  Invoke-Item $SolutionFilePath
+  Invoke-Item $Path
   return
 }
 
@@ -61,6 +62,16 @@ Function Close-Solution {
 Function Set-PowerShellEnvironment {
   [CmdletBinding()]
   param()
+
+  # Set up some common globals
+  New-Variable -Name ScriptsDirectory -Value $PSScriptRoot -Option ReadOnly -Scope Global -Visibility Public
+  New-Variable -Name RepositoryRootDirectory -Value (Join-Path -Resolve $ScriptsDirectory "..") -Option ReadOnly -Scope Global -Visibility Public
+  New-Variable -Name SolutionFilePath -Value (Join-Path -Resolve $RepositoryRootDirectory "Terminal.sln") -Option ReadOnly -Scope Global -Visibility Public
+  New-Variable -Name TerminalGuiProjectDirectory -Value (Join-Path -Resolve $RepositoryRootDirectory "Terminal.Gui") -Option ReadOnly -Scope Global -Visibility Public
+  New-Variable -Name TerminalGuiProjectFilePath -Value (Join-Path -Resolve $TerminalGuiProjectDirectory "Terminal.Gui.csproj") -Option ReadOnly -Scope Global -Visibility Public
+  New-Variable -Name AnalyzersDirectory -Value (Join-Path -Resolve $RepositoryRootDirectory "Analyzers") -Option ReadOnly -Scope Global -Visibility Public
+  New-Variable -Name InternalAnalyzersProjectDirectory -Value (Join-Path -Resolve $AnalyzersDirectory "Terminal.Gui.Analyzers.Internal") -Option ReadOnly -Scope Global -Visibility Public
+  New-Variable -Name InternalAnalyzersProjectFilePath -Value (Join-Path -Resolve $InternalAnalyzersProjectDirectory "Terminal.Gui.Analyzers.Internal.csproj") -Option ReadOnly -Scope Global -Visibility Public
 
   # Set a custom prompt to indicate we're in our modified environment.
   # Save the normal one first, though.
@@ -132,6 +143,14 @@ Function Reset-PowerShellEnvironment {
   }
 
   Remove-Variable -Name PathVarSeparator -Scope Global -Force -ErrorAction SilentlyContinue
+  Remove-Variable -Name RepositoryRootDirectory -Scope Global -Force -ErrorAction SilentlyContinue
+  Remove-Variable -Name SolutionFilePath -Scope Global -Force -ErrorAction SilentlyContinue
+  Remove-Variable -Name TerminalGuiProjectDirectory -Scope Global -Force -ErrorAction SilentlyContinue
+  Remove-Variable -Name TerminalGuiProjectFilePath -Scope Global -Force -ErrorAction SilentlyContinue
+  Remove-Variable -Name ScriptsDirectory -Scope Global -Force -ErrorAction SilentlyContinue
+  Remove-Variable -Name AnalyzersDirectory -Scope Global -Force -ErrorAction SilentlyContinue
+  Remove-Variable -Name InternalAnalyzersProjectDirectory -Scope Global -Force -ErrorAction SilentlyContinue
+  Remove-Variable -Name InternalAnalyzersProjectFilePath -Scope Global -Force -ErrorAction SilentlyContinue
 }
 
 # This ensures the environment is reset when unloading the module.

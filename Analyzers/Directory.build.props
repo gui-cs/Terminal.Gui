@@ -1,0 +1,23 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <WarningLevel>7</WarningLevel>
+    <CharacterSet>UTF-8</CharacterSet>
+    <Deterministic>true</Deterministic>
+    <UTF8OutPut>true</UTF8OutPut>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
+    <NoLogo>True</NoLogo>
+    <DefineTrace>True</DefineTrace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+    <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.147" />
+  </ItemGroup>
+  <ItemGroup>
+      <Using Include="System.Buffers" />
+      <Using Include="System.Collections.Specialized" />
+      <Using Include="System.Numerics" />
+      <Using Include="System.Runtime.CompilerServices" />
+  </ItemGroup>
+</Project>

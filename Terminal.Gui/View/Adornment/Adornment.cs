@@ -244,7 +244,7 @@ public class Adornment : View
     protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
     {
         // Invert Normal
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
+        if (Diagnostics.FastHasFlags (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
         {
             var cs = new ColorScheme (ColorScheme)
             {
