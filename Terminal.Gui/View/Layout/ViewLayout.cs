@@ -684,30 +684,11 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            // TODO: Move this logic into the Pos/Dim classes
-
-            if (v.Width is Dim.DimAuto || v.Height is Dim.DimAuto)
-            {
-                // If the view is auto-sized...
-                Rectangle f = v.Frame;
-                v._frame = new (v.Frame.X, v.Frame.Y, 0, 0);
-                LayoutSubview (v, Viewport.Size);
-
-                if (v.Frame != f)
-                {
-                    // The subviews changed; do it again
-                    v.LayoutNeeded = true;
-                    LayoutSubview (v, Viewport.Size);
-                }
-            }
-            else
-            {
-                LayoutSubview (v, Viewport.Size);
-            }
+            LayoutSubview (v, Viewport.Size);
         }
 
-        // If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
-        // Use LayoutSubview with the Frame of the 'from' 
+        // If the 'to' is rooted to 'from' it's a special-case.
+        // Use LayoutSubview with the Frame of the 'from'.
         if (SuperView is { } && GetTopSuperView () is { } && LayoutNeeded && edges.Count > 0)
         {
             foreach ((View from, View to) in edges)
@@ -719,77 +700,6 @@ public partial class View
         LayoutNeeded = false;
 
         OnLayoutComplete (new (ContentSize.GetValueOrDefault ()));
-    }
-
-    // TODO: Move this logic into the Pos/Dim classes
-    /// <summary>
-    ///     Throws an <see cref="InvalidOperationException"/> if any SubViews are using Dim objects that depend on this
-    ///     Views dimensions.
-    /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
-    private void CheckDimAuto ()
-    {
-        if (!ValidatePosDim || !IsInitialized || (Width is not Dim.DimAuto && Height is not Dim.DimAuto))
-        {
-            return;
-        }
-
-        void ThrowInvalid (View view, object checkPosDim, string name)
-        {
-            // TODO: Figure out how to make CheckDimAuto deal with PosCombine
-            object bad = null;
-
-            switch (checkPosDim)
-            {
-                case Pos pos and not Pos.PosAbsolute and not Pos.PosView and not Pos.PosCombine:
-                    bad = pos;
-
-                    break;
-
-                case Pos pos and Pos.PosCombine:
-                    // Recursively check for not Absolute or not View
-                    ThrowInvalid (view, (pos as Pos.PosCombine)._left, name);
-                    ThrowInvalid (view, (pos as Pos.PosCombine)._right, name);
-
-                    break;
-
-                case Dim dim and not Dim.DimAbsolute and not Dim.DimView and not Dim.DimCombine:
-                    bad = dim;
-
-                    break;
-
-                case Dim dim and Dim.DimCombine:
-                    // Recursively check for not Absolute or not View
-                    ThrowInvalid (view, (dim as Dim.DimCombine)._left, name);
-                    ThrowInvalid (view, (dim as Dim.DimCombine)._right, name);
-
-                    break;
-            }
-
-            if (bad != null)
-            {
-                throw new InvalidOperationException (
-                                                     $"{view.GetType ().Name}.{name} = {bad.GetType ().Name} "
-                                                     + $"which depends on the SuperView's dimensions and the SuperView uses Dim.Auto."
-                                                     );
-            }
-        }
-
-        // Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
-        foreach (View view in Subviews)
-        {
-            if (Width is Dim.DimAuto { _min: null })
-            {
-                ThrowInvalid (view, view.Width, nameof (view.Width));
-                ThrowInvalid (view, view.X, nameof (view.X));
-            }
-
-            if (Height is Dim.DimAuto { _min: null })
-            {
-                ThrowInvalid (view, view.Height, nameof (view.Height));
-                ThrowInvalid (view, view.Y, nameof (view.Y));
-            }
-        }
     }
 
     private void LayoutSubview (View v, Size contentSize)
@@ -1148,4 +1058,77 @@ public partial class View
     ///     thus should only be used for debugging.
     /// </remarks>
     public bool ValidatePosDim { get; set; }
+
+
+    // TODO: Move this logic into the Pos/Dim classes
+    /// <summary>
+    ///     Throws an <see cref="InvalidOperationException"/> if any SubViews are using Dim objects that depend on this
+    ///     Views dimensions.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    private void CheckDimAuto ()
+    {
+        if (!ValidatePosDim || !IsInitialized || (Width is not Dim.DimAuto && Height is not Dim.DimAuto))
+        {
+            return;
+        }
+
+        // Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
+        foreach (View view in Subviews)
+        {
+            if (Width is Dim.DimAuto { _min: null })
+            {
+                ThrowInvalid (view, view.Width, nameof (view.Width));
+                ThrowInvalid (view, view.X, nameof (view.X));
+            }
+
+            if (Height is Dim.DimAuto { _min: null })
+            {
+                ThrowInvalid (view, view.Height, nameof (view.Height));
+                ThrowInvalid (view, view.Y, nameof (view.Y));
+            }
+        }
+
+        return;
+
+        void ThrowInvalid (View view, object checkPosDim, string name)
+        {
+            object bad = null;
+
+            switch (checkPosDim)
+            {
+                case Pos pos and not Pos.PosAbsolute and not Pos.PosView and not Pos.PosCombine:
+                    bad = pos;
+
+                    break;
+
+                case Pos pos and Pos.PosCombine:
+                    // Recursively check for not Absolute or not View
+                    ThrowInvalid (view, (pos as Pos.PosCombine)._left, name);
+                    ThrowInvalid (view, (pos as Pos.PosCombine)._right, name);
+
+                    break;
+
+                case Dim dim and not Dim.DimAbsolute and not Dim.DimView and not Dim.DimCombine:
+                    bad = dim;
+
+                    break;
+
+                case Dim dim and Dim.DimCombine:
+                    // Recursively check for not Absolute or not View
+                    ThrowInvalid (view, (dim as Dim.DimCombine)._left, name);
+                    ThrowInvalid (view, (dim as Dim.DimCombine)._right, name);
+
+                    break;
+            }
+
+            if (bad != null)
+            {
+                throw new InvalidOperationException (
+                                                     $"{view.GetType ().Name}.{name} = {bad.GetType ().Name} "
+                                                     + $"which depends on the SuperView's dimensions and the SuperView uses Dim.Auto."
+                                                     );
+            }
+        }
+    }
 }
