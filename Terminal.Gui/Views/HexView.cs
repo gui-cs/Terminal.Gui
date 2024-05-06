@@ -547,7 +547,7 @@ public class HexView : View
     public event EventHandler<HexViewEventArgs> PositionChanged;
 
     ///<inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         var delta = (int)(position - displayStart);
         int line = delta / bytesPerLine;
@@ -555,14 +555,15 @@ public class HexView : View
         int block = item / bsize;
         int column = item % bsize * 3;
 
-        if (leftSide)
+        int x = displayWidth + block * 14 + column + (firstNibble ? 0 : 1);
+        int y = line;
+        if (!leftSide)
         {
-            Move (displayWidth + block * 14 + column + (firstNibble ? 0 : 1), line);
+            x = displayWidth + bytesPerLine / bsize * 14 + item - 1;
         }
-        else
-        {
-            Move (displayWidth + bytesPerLine / bsize * 14 + item - 1, line);
-        }
+
+        Move (x, y);
+        return new (x, y);
     }
 
     internal void SetDisplayStart (long value)

@@ -1261,12 +1261,13 @@ public class ToplevelTests
         Application.Begin (top);
 
         Assert.True (tf.HasFocus);
+        Application.PositionCursor (top);
         Application.Driver.GetCursorVisibility (out CursorVisibility cursor);
         Assert.Equal (CursorVisibility.Default, cursor);
 
         view.Enabled = false;
         Assert.False (tf.HasFocus);
-        Application.Refresh ();
+        Application.PositionCursor (top);
         Application.Driver.GetCursorVisibility (out cursor);
         Assert.Equal (CursorVisibility.Invisible, cursor);
     }

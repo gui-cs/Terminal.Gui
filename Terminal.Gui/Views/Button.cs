@@ -147,7 +147,7 @@ public class Button : View
     }
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (HotKey.IsValid && Text != "")
         {
@@ -157,12 +157,12 @@ public class Button : View
                 {
                     Move (i, 0);
 
-                    return;
+                    return new (i,0);
                 }
             }
         }
 
-        base.PositionCursor ();
+        return base.PositionCursor ();
     }
 
     /// <inheritdoc/>
