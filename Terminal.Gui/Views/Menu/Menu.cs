@@ -935,7 +935,7 @@ internal sealed class Menu : View
 
         Driver.Clip = savedClip;
 
-        PositionCursor ();
+       // PositionCursor ();
     }
 
     private void Current_DrawContentComplete (object sender, DrawEventArgs e)
@@ -957,7 +957,8 @@ internal sealed class Menu : View
             else
             {
                 Move (2, 1 + _currentChild);
-                return new (2, 1 + _currentChild);
+
+                return null;//new (2, 1 + _currentChild);
             }
         }
 

@@ -316,7 +316,7 @@ public class Slider<T> : View
         {
             _lastFocusedOption = FocusedOption;
             FocusedOption = newFocusedOption;
-            PositionCursor ();
+            //PositionCursor ();
         }
 
         return args.Cancel;

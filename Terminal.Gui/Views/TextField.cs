@@ -1026,7 +1026,7 @@ public class TextField : View
             Driver.AddRune ((Rune)' ');
         }
 
-        PositionCursor ();
+        //PositionCursor ();
 
         RenderCaption ();
 
@@ -1269,7 +1269,7 @@ public class TextField : View
         }
         else
         {
-            PositionCursor ();
+            //PositionCursor ();
         }
     }
 

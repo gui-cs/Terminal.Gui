@@ -1250,7 +1250,8 @@ public class TreeView<T> : View, ITreeView where T : class
             if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
             {
                 Move (0, idx - ScrollOffsetVertical);
-                return new Point (0, idx - ScrollOffsetVertical);
+
+                return null;//new Point (0, idx - ScrollOffsetVertical);
             }
         }
         return base.PositionCursor ();

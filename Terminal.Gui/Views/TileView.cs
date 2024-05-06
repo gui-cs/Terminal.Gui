@@ -993,7 +993,8 @@ public class TileView : View
 
             Point location = moveRuneRenderLocation ?? new Point (Viewport.Width / 2, Viewport.Height / 2);
             Move (location.X, location.Y);
-            return location;
+
+            return null; //location;
         }
 
         /// <summary>

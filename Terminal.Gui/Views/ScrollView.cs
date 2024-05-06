@@ -460,7 +460,8 @@ public class ScrollView : View
         if (InternalSubviews.Count == 0)
         {
             Move (0, 0);
-            return Point.Empty;
+
+            return null;//Point.Empty;
         }
         return base.PositionCursor ();
     }

@@ -700,10 +700,10 @@ public class ListView : View
     /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-        }
+        //if (IsInitialized)
+        //{
+        //    Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+        //}
 
         if (_lastSelectedItem != _selected)
         {
@@ -791,7 +791,8 @@ public class ListView : View
         }
 
         Move (x, y);
-        return new Point (x, y);
+
+        return null;//new Point (x, y);
     }
 
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>

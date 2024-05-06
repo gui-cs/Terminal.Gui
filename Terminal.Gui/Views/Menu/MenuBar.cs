@@ -509,7 +509,7 @@ public class MenuBar : View
                    + _rightPadding;
         }
 
-        PositionCursor ();
+        //PositionCursor ();
     }
 
     /// <summary>Virtual method that will invoke the <see cref="MenuAllClosed"/>.</summary>
@@ -788,7 +788,7 @@ public class MenuBar : View
                 else
                 {
                     SetFocus ();
-                    PositionCursor ();
+                    //PositionCursor ();
                 }
 
                 IsMenuOpen = false;

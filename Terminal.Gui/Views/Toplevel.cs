@@ -372,7 +372,8 @@ public partial class Toplevel : View
         {
             Driver.SetCursorVisibility (CursorVisibility.Invisible);
         }
-        return cursor2;
+
+        return null;//cursor2;
     }
 
     /// <summary>

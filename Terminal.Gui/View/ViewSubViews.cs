@@ -851,35 +851,37 @@ public partial class View
         return view.Focused is { } ? GetMostFocused (view.Focused) : view;
     }
 
-    /// <summary>Positions the cursor in the right position based on the currently focused view in the chain.</summary>
-    /// Views that are focusable should override
-    /// <see cref="PositionCursor"/>
-    /// to ensure
-    /// the cursor is placed in a location that makes sense. Unix terminals do not have
+    /// <summary>
+    ///     Positions the cursor in the right position based on the currently focused view in the chain.
+    /// </summary>
+    /// <remarks>
+    /// Views that are focusable and want the cursor visible should override <see cref="PositionCursor"/> 
+    /// place the cursor in a location that makes sense. Unix terminals do not have
     /// a way of hiding the cursor, so it can be distracting to have the cursor left at
     /// the last focused view. Views should make sure that they place the cursor
     /// in a visually sensible place.
+    /// </remarks>
     /// <returns>Viewport-relative cursor position.</returns>
     public virtual Point? PositionCursor ()
     {
-        if (!IsInitialized)
-        {
-            return null;
-        }
+        //if (!IsInitialized)
+        //{
+        //    return null;
+        //}
 
-        // TODO: v2 - This needs to support Subviews of Adornments too
+        //// TODO: v2 - This needs to support Subviews of Adornments too
 
-        // By default we will position the cursor at the top left corner of the Viewport.
-        // Overrides should return the position where the cursor has been placed.
-        Point location = Viewport.Location;
+        //// By default we will position the cursor at the top left corner of the Viewport.
+        //// Overrides should return the position where the cursor has been placed.
+        //Point location = Viewport.Location;
 
-        if (CanFocus && HasFocus && ContentSize != Size.Empty)
-        {
-            location.X = TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition;
-            location.Y = 0;
-            Move (location.X, location.Y);
-            return location;
-        }
+        //if (CanFocus && HasFocus && ContentSize != Size.Empty)
+        //{
+        //    location.X = TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition;
+        //    location.Y = 0;
+        //    Move (location.X, location.Y);
+        //    return location;
+        //}
 
         return null;
 

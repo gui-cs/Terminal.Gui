@@ -315,7 +315,6 @@ public class CharacterMap : Scenario
 
 internal class CharMap : View
 {
-    private const CursorVisibility _cursor = CursorVisibility.Default;
     private const int COLUMN_WIDTH = 3;
 
     private ContextMenu _contextMenu = new ();
@@ -803,23 +802,6 @@ internal class CharMap : View
         }
     }
 
-    public override bool OnEnter (View view)
-    {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (_cursor);
-        }
-
-        return base.OnEnter (view);
-    }
-
-    public override bool OnLeave (View view)
-    {
-        Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnLeave (view);
-    }
-
     public override Point? PositionCursor ()
     {
         if (HasFocus
@@ -828,12 +810,14 @@ internal class CharMap : View
             && Cursor.Y > 0
             && Cursor.Y < Viewport.Height)
         {
-            Driver.SetCursorVisibility (_cursor);
+            Driver.SetCursorVisibility (CursorVisibility.Default);
             Move (Cursor.X, Cursor.Y);
         }
         else
         {
             Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+            return null;
         }
 
         return Cursor;

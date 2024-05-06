@@ -978,7 +978,7 @@ public class TableView : View
     {
         if (TableIsNullOrInvisible ())
         {
-            PositionCursor ();
+            //PositionCursor ();
 
             return false;
         }
@@ -1029,7 +1029,8 @@ public class TableView : View
         if (screenPoint is { })
         {
             Move (screenPoint.Value.X, screenPoint.Value.Y);
-            return screenPoint;
+
+            return null;//screenPoint;
         }
 
         return null;
@@ -1529,7 +1530,7 @@ public class TableView : View
             SelectedRow = match;
             EnsureValidSelection ();
             EnsureSelectedCellIsVisible ();
-            PositionCursor ();
+            //PositionCursor ();
             SetNeedsDisplay ();
 
             return true;
