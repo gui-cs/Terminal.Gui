@@ -870,7 +870,7 @@ public partial class View
     /// <returns>Viewport-relative cursor position. Return <see langword="null"/> to ensure the cursor is not visible.</returns>
     public virtual Point? PositionCursor ()
     {
-        if (CanFocus && HasFocus && ContentSize.HasValue)
+        if (IsInitialized && CanFocus && HasFocus && ContentSize.HasValue)
         {
             // Base class will position the cursor at the end of the text.
             Point location = Viewport.Location;
