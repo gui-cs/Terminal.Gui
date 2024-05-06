@@ -571,13 +571,8 @@ public static partial class Application
     /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
     internal static bool PositionCursor (View view)
     {
-        if (view is null)
-        {
-            return false;
-        }
-
         // Find the most focused view and position the cursor there.
-        View mostFocused = view.MostFocused;
+        View mostFocused = view?.MostFocused;
 
         if (mostFocused is null)
         {
