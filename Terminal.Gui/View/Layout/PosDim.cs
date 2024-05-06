@@ -917,15 +917,31 @@ public class Dim
         }
     }
 
+    /// <summary>
+    ///     A <see cref="Dim"/> object that automatically sizes the view to fit all the view's SubViews and/or Text.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         See <see cref="Dim.DimAutoStyle"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="style">
+    ///     Specifies how <see cref="Dim.DimAuto"/> will compute the dimension. The default is <see cref="Dim.DimAutoStyle.Auto"/>.
+    /// </param>
+    /// <param name="min">Specifies the minimum dimension that view will be automatically sized to.</param>
+    /// <param name="max">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
     public class DimAuto (DimAutoStyle style, Dim min, Dim max) : Dim
     {
         internal readonly Dim _max = max;
         internal readonly Dim _min = min;
         internal readonly DimAutoStyle _style = style;
-        internal int Size;
+        internal int _size;
 
+        /// <inheritdoc />
         public override bool Equals (object other) { return other is DimAuto auto && auto._min == _min && auto._max == _max && auto._style == _style; }
+        /// <inheritdoc />
         public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), _min, _max, _style); }
+        /// <inheritdoc />
         public override string ToString () { return $"Auto({_style},{_min},{_max})"; }
 
         internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
@@ -956,7 +972,7 @@ public class Dim
             {
                 if (us._contentSize is { })
                 {
-                    subviewsSize = dimension == Dimension.Width ? us.ContentSize.Value.Width : us.ContentSize.Value.Height;
+                    subviewsSize = dimension == Dimension.Width ? us.ContentSize!.Value.Width : us.ContentSize!.Value.Height;
                 }
                 else
                 {
@@ -968,7 +984,7 @@ public class Dim
                         for (int i = 0; i < us.Subviews.Count; i++)
                         {
                             var v = us.Subviews [i];
-                            bool isNotPosAnchorEnd = dimension == Dim.Dimension.Width ? !(v.X is Pos.PosAnchorEnd) : !(v.Y is Pos.PosAnchorEnd);
+                            bool isNotPosAnchorEnd = dimension == Dim.Dimension.Width ? v.X is not Pos.PosAnchorEnd : v.Y is not Pos.PosAnchorEnd;
 
                             //if (!isNotPosAnchorEnd)
                             //{
