@@ -979,13 +979,13 @@ public class TileView : View
             DrawSplitterSymbol ();
         }
 
-        public override bool OnEnter (View view)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Default);
-            PositionCursor ();
+        //public override bool OnEnter (View view)
+        //{
+        //    Driver.SetCursorVisibility (CursorVisibility.Default);
+        //    PositionCursor ();
 
-            return base.OnEnter (view);
-        }
+        //    return base.OnEnter (view);
+        //}
 
         public override Point? PositionCursor ()
         {

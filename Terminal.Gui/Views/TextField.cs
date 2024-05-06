@@ -756,11 +756,11 @@ public class TextField : View
     {
         foreach (char ch in toAdd)
         {
-            KeyCode key;
+            Key key;
 
             try
             {
-                key = (KeyCode)ch;
+                key = ch;
             }
             catch (Exception)
             {
@@ -769,7 +769,7 @@ public class TextField : View
                                             );
             }
 
-            InsertText (new Key { KeyCode = key }, useOldCursorPos);
+            InsertText (key, useOldCursorPos);
         }
     }
 
@@ -819,7 +819,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent ev)
+    protected internal override bool OnMouseEvent (MouseEvent ev)
     {
         if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed)
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
@@ -1026,7 +1026,7 @@ public class TextField : View
             Driver.AddRune ((Rune)' ');
         }
 
-        //PositionCursor ();
+        PositionCursor ();
 
         RenderCaption ();
 
@@ -1035,16 +1035,16 @@ public class TextField : View
         _isDrawing = false;
     }
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-        }
+    ///// <inheritdoc/>
+    //public override bool OnEnter (View view)
+    //{
+    //    if (IsInitialized)
+    //    {
+    //        Application.Driver.SetCursorVisibility (CursorVisibility.Default);
+    //    }
 
-        return base.OnEnter (view);
-    }
+    //    return base.OnEnter (view);
+    //}
 
     /// <inheritdoc/>
     public override bool? OnInvokingKeyBindings (Key a)
@@ -1269,7 +1269,7 @@ public class TextField : View
         }
         else
         {
-            //PositionCursor ();
+            PositionCursor ();
         }
     }
 

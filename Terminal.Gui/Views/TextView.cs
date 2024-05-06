@@ -3228,7 +3228,7 @@ public class TextView : View
             }
             else
             {
-                //PositionCursor ();
+                PositionCursor ();
             }
         }
     }
@@ -3353,7 +3353,7 @@ public class TextView : View
 
             if (Used)
             {
-                //PositionCursor ();
+                PositionCursor ();
             }
             else
             {
@@ -3390,7 +3390,7 @@ public class TextView : View
         else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
         {
             ProcessMouseClick (ev, out List<RuneCell> line);
-            //PositionCursor ();
+            PositionCursor ();
 
             if (_model.Count > 0 && _shiftSelecting && Selecting)
             {
@@ -3441,7 +3441,7 @@ public class TextView : View
             }
 
             ProcessMouseClick (ev, out _);
-            //PositionCursor ();
+            PositionCursor ();
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
@@ -3454,7 +3454,7 @@ public class TextView : View
             }
 
             ProcessMouseClick (ev, out _);
-           // PositionCursor ();
+            PositionCursor ();
 
             if (!Selecting)
             {
@@ -3514,7 +3514,7 @@ public class TextView : View
                 CurrentColumn = CurrentRow == newPos.Value.row ? newPos.Value.col : line.Count;
             }
 
-           // PositionCursor ();
+            PositionCursor ();
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
@@ -3534,7 +3534,7 @@ public class TextView : View
             }
 
             CurrentColumn = line.Count;
-            //PositionCursor ();
+            PositionCursor ();
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
@@ -3554,7 +3554,7 @@ public class TextView : View
         List<RuneCell> line = GetCurrentLine ();
         CurrentColumn = line.Count;
         TrackColumn ();
-        //PositionCursor ();
+        PositionCursor ();
     }
 
     /// <summary>Will scroll the <see cref="TextView"/> to the first line and position the cursor there.</summary>
@@ -3565,7 +3565,7 @@ public class TextView : View
         CurrentColumn = 0;
         _leftColumn = 0;
         TrackColumn ();
-        //PositionCursor ();
+        PositionCursor ();
         SetNeedsDisplay ();
     }
 
@@ -3671,7 +3671,7 @@ public class TextView : View
             ClearRegion (viewport.Left, row, right, bottom);
         }
 
-        //PositionCursor ();
+        PositionCursor ();
 
         _isDrawing = false;
     }
@@ -4174,7 +4174,7 @@ public class TextView : View
         }
         else
         {
-            //PositionCursor ();
+            PositionCursor ();
         }
 
         OnUnwrappedCursorPosition ();
@@ -4525,7 +4525,7 @@ public class TextView : View
         }
         else
         {
-            //PositionCursor ();
+            PositionCursor ();
         }
     }
 
@@ -5357,7 +5357,7 @@ public class TextView : View
             }
 
             TrackColumn ();
-            //PositionCursor ();
+            PositionCursor ();
         }
         else if (CurrentRow > Frame.Height)
         {
@@ -5436,7 +5436,7 @@ public class TextView : View
             }
 
             TrackColumn ();
-            //PositionCursor ();
+            PositionCursor ();
         }
 
         DoNeededAction ();
@@ -5462,7 +5462,7 @@ public class TextView : View
             }
 
             TrackColumn ();
-           // PositionCursor ();
+            PositionCursor ();
         }
 
         DoNeededAction ();
@@ -5555,7 +5555,7 @@ public class TextView : View
             }
 
             TrackColumn ();
-            //PositionCursor ();
+            PositionCursor ();
         }
 
         DoNeededAction ();

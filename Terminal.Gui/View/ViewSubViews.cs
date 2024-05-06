@@ -31,14 +31,14 @@ public partial class View
 
     /// <summary>Adds a subview (child) to this view.</summary>
     /// <remarks>
-    /// <para>
-    ///     The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
-    ///     <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
-    /// </para>
-    /// <para>
-    ///     Subviews will be disposed when this View is disposed. In other-words, calling this method causes
-    ///     the lifecycle of the subviews to be transferred to this View.
-    /// </para>
+    ///     <para>
+    ///         The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
+    ///         <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
+    ///     </para>
+    ///     <para>
+    ///         Subviews will be disposed when this View is disposed. In other-words, calling this method causes
+    ///         the lifecycle of the subviews to be transferred to this View.
+    ///     </para>
     /// </remarks>
     public virtual void Add (View view)
     {
@@ -49,12 +49,12 @@ public partial class View
 
         if (_subviews is null)
         {
-            _subviews = new List<View> ();
+            _subviews = new ();
         }
 
         if (_tabIndexes is null)
         {
-            _tabIndexes = new List<View> ();
+            _tabIndexes = new ();
         }
 
         _subviews.Add (view);
@@ -83,7 +83,7 @@ public partial class View
             view.Enabled = false;
         }
 
-        OnAdded (new SuperViewChangedEventArgs (this, view));
+        OnAdded (new (this, view));
 
         if (IsInitialized && !view.IsInitialized)
         {
@@ -99,14 +99,14 @@ public partial class View
     /// <summary>Adds the specified views (children) to the view.</summary>
     /// <param name="views">Array of one or more views (can be optional parameter).</param>
     /// <remarks>
-    /// <para>
-    ///     The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
-    ///     <seealso cref="Remove(View)"/> and <seealso cref="RemoveAll"/>.
-    /// </para>
-    /// <para>
-    ///     Subviews will be disposed when this View is disposed. In other-words, calling this method causes
-    ///     the lifecycle of the subviews to be transferred to this View.
-    /// </para>
+    ///     <para>
+    ///         The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
+    ///         <seealso cref="Remove(View)"/> and <seealso cref="RemoveAll"/>.
+    ///     </para>
+    ///     <para>
+    ///         Subviews will be disposed when this View is disposed. In other-words, calling this method causes
+    ///         the lifecycle of the subviews to be transferred to this View.
+    ///     </para>
     /// </remarks>
     public void Add (params View [] views)
     {
@@ -199,10 +199,11 @@ public partial class View
 
     /// <summary>Removes a subview added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
     /// <remarks>
-    /// <para>
-    ///     Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the Subview's
-    ///     lifecycle to be transferred to the caller; the caller muse call <see cref="Dispose"/>.
-    /// </para>
+    ///     <para>
+    ///         Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the
+    ///         Subview's
+    ///         lifecycle to be transferred to the caller; the caller muse call <see cref="Dispose"/>.
+    ///     </para>
     /// </remarks>
     public virtual void Remove (View view)
     {
@@ -227,7 +228,7 @@ public partial class View
             }
         }
 
-        OnRemoved (new SuperViewChangedEventArgs (this, view));
+        OnRemoved (new (this, view));
 
         if (Focused == view)
         {
@@ -236,13 +237,15 @@ public partial class View
     }
 
     /// <summary>
-    /// Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
+    ///     Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the Subview's
-    ///     lifecycle to be transferred to the caller; the caller must call <see cref="Dispose"/> on any Views that were added.
-    /// </para>
+    ///     <para>
+    ///         Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the
+    ///         Subview's
+    ///         lifecycle to be transferred to the caller; the caller must call <see cref="Dispose"/> on any Views that were
+    ///         added.
+    ///     </para>
     /// </remarks>
     public virtual void RemoveAll ()
     {
@@ -379,7 +382,6 @@ public partial class View
         }
     }
 
-
     /// <summary>Event fired when the <see cref="CanFocus"/> value is being changed.</summary>
     public event EventHandler CanFocusChanged;
 
@@ -497,7 +499,6 @@ public partial class View
 
         return false;
     }
-
 
     /// <summary>Method invoked when a view loses focus.</summary>
     /// <param name="view">The view that is getting focus.</param>
@@ -855,36 +856,31 @@ public partial class View
     ///     Positions the cursor in the right position based on the currently focused view in the chain.
     /// </summary>
     /// <remarks>
-    /// Views that are focusable and want the cursor visible should override <see cref="PositionCursor"/> 
-    /// place the cursor in a location that makes sense. Unix terminals do not have
-    /// a way of hiding the cursor, so it can be distracting to have the cursor left at
-    /// the last focused view. Views should make sure that they place the cursor
-    /// in a visually sensible place.
+    ///     <para>
+    ///         Views that are focusable and want the cursor visible should override <see cref="PositionCursor"/>,
+    ///         use <see cref="Move"/> to place the cursor in a location that makes sense, use
+    ///         <see cref="ConsoleDriver.SetCursorVisibility"/>
+    ///         to make the cursor visible, and return the position where the cursor was placed.
+    ///     </para>
+    ///     <para>
+    ///         Unix terminals do not have  a way of hiding the cursor, so it can be distracting to have the cursor left at
+    ///         the last focused view. Views should make sure that they place the cursor in a visually sensible place.
+    ///     </para>
     /// </remarks>
-    /// <returns>Viewport-relative cursor position.</returns>
+    /// <returns>Viewport-relative cursor position. Return <see langword="null"/> to ensure the cursor is not visible.</returns>
     public virtual Point? PositionCursor ()
     {
-        //if (!IsInitialized)
-        //{
-        //    return null;
-        //}
+        if (CanFocus && HasFocus && ContentSize.HasValue)
+        {
+            // Base class will position the cursor at the end of the text.
+            Point location = Viewport.Location;
+            location.X = TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition;
+            location.Y = 0;
+            Move (location.X, location.Y);
+        }
 
-        //// TODO: v2 - This needs to support Subviews of Adornments too
-
-        //// By default we will position the cursor at the top left corner of the Viewport.
-        //// Overrides should return the position where the cursor has been placed.
-        //Point location = Viewport.Location;
-
-        //if (CanFocus && HasFocus && ContentSize != Size.Empty)
-        //{
-        //    location.X = TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition;
-        //    location.Y = 0;
-        //    Move (location.X, location.Y);
-        //    return location;
-        //}
-
+        // Returning null will hide the cursor.
         return null;
-
     }
 
     #endregion Focus

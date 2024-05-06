@@ -468,7 +468,7 @@ public class TreeView<T> : View, ITreeView where T : class
             // TODO: Should this be cancelable?
             ObjectActivatedEventArgs<T> e = new (this, o);
             OnObjectActivated (e);
-            PositionCursor ();
+            //PositionCursor ();
             return true;
         }
         return false;
@@ -676,7 +676,7 @@ public class TreeView<T> : View, ITreeView where T : class
         var characterAsStr = character.ToString ();
         AdjustSelectionToNext (b => AspectGetter (b.Model).StartsWith (characterAsStr, caseSensitivity));
 
-        PositionCursor ();
+        //PositionCursor ();
     }
 
     /// <summary>
@@ -1231,7 +1231,7 @@ public class TreeView<T> : View, ITreeView where T : class
         {
             if (IsInitialized)
             {
-                PositionCursor ();
+                //PositionCursor ();
             }
         }
 
@@ -1250,6 +1250,7 @@ public class TreeView<T> : View, ITreeView where T : class
             if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
             {
                 Move (0, idx - ScrollOffsetVertical);
+                Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
 
                 return null;//new Point (0, idx - ScrollOffsetVertical);
             }
