@@ -1109,7 +1109,6 @@ public class Dim
             return _remaining ? Math.Max (Anchor (superviewContentSize - location), 0) : Anchor (superviewContentSize);
         }
     }
-
     internal class DimFill (int margin) : Dim
     {
         private readonly int _margin = margin;
