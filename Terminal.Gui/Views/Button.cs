@@ -137,14 +137,6 @@ public class Button : View
     /// <summary></summary>
     public bool NoPadding { get; set; }
 
-    ///// <inheritdoc/>
-    //public override bool OnEnter (View view)
-    //{
-    //    Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-    //    return base.OnEnter (view);
-    //}
-
     /// <inheritdoc/>
     public override Point? PositionCursor ()
     {
@@ -155,8 +147,7 @@ public class Button : View
                 if (TextFormatter.Text [i] == Text [0])
                 {
                     Move (i, 0);
-
-                    return null;//new (i,0);
+                    return null; // Don't show the cursor
                 }
             }
         }

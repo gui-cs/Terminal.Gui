@@ -385,17 +385,6 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        if (Subviews.Count == 0 || !Subviews.Any (subview => subview.CanFocus))
-        {
-            Application.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
     public override bool OnKeyDown (Key a)
     {
         if (base.OnKeyDown (a))
@@ -461,7 +450,7 @@ public class ScrollView : View
         {
             Move (0, 0);
 
-            return null;//Point.Empty;
+            return null; // Don't show the cursor
         }
         return base.PositionCursor ();
     }

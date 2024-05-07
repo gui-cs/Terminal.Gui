@@ -267,7 +267,6 @@ public class Editor : Scenario
         _textView.UnwrappedCursorPosition += (s, e) =>
                                              {
                                                  siCursorPosition.Title = $"Ln {e.Point.Y + 1}, Col {e.Point.X + 1}";
-                                                 statusBar.SetNeedsDisplay ();
                                              };
 
         Top.Add (statusBar);
@@ -587,7 +586,7 @@ public class Editor : Scenario
                        new ("_Invisible", "", () => SetCursor (CursorVisibility.Invisible))
                        {
                            CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility
+                           Checked = _textView.CursorVisibility
                                      == CursorVisibility.Invisible
                        }
                       );
@@ -596,7 +595,7 @@ public class Editor : Scenario
                        new ("_Box", "", () => SetCursor (CursorVisibility.Box))
                        {
                            CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility == CursorVisibility.Box
+                           Checked = _textView.CursorVisibility == CursorVisibility.Box
                        }
                       );
 
@@ -604,7 +603,7 @@ public class Editor : Scenario
                        new ("_Underline", "", () => SetCursor (CursorVisibility.Underline))
                        {
                            CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility
+                           Checked = _textView.CursorVisibility
                                      == CursorVisibility.Underline
                        }
                       );
@@ -616,7 +615,7 @@ public class Editor : Scenario
                        new ("  _Default", "", () => SetCursor (CursorVisibility.Default))
                        {
                            CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility
+                           Checked = _textView.CursorVisibility
                                      == CursorVisibility.Default
                        }
                       );
@@ -625,7 +624,7 @@ public class Editor : Scenario
                        new ("  _Vertical", "", () => SetCursor (CursorVisibility.Vertical))
                        {
                            CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility
+                           Checked = _textView.CursorVisibility
                                      == CursorVisibility.Vertical
                        }
                       );
@@ -634,7 +633,7 @@ public class Editor : Scenario
                        new ("  V_ertical Fix", "", () => SetCursor (CursorVisibility.VerticalFix))
                        {
                            CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility == CursorVisibility.VerticalFix
+                           Checked = _textView.CursorVisibility == CursorVisibility.VerticalFix
                        }
                       );
 
@@ -642,7 +641,7 @@ public class Editor : Scenario
                        new ("  B_ox Fix", "", () => SetCursor (CursorVisibility.BoxFix))
                        {
                            CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility
+                           Checked = _textView.CursorVisibility
                                      == CursorVisibility.BoxFix
                        }
                       );
@@ -651,13 +650,13 @@ public class Editor : Scenario
                        new ("  U_nderline Fix", "", () => SetCursor (CursorVisibility.UnderlineFix))
                        {
                            CheckType = MenuItemCheckStyle.Radio,
-                           Checked = _textView.DesiredCursorVisibility == CursorVisibility.UnderlineFix
+                           Checked = _textView.CursorVisibility == CursorVisibility.UnderlineFix
                        }
                       );
 
         void SetCursor (CursorVisibility visibility)
         {
-            _textView.DesiredCursorVisibility = visibility;
+            _textView.CursorVisibility = visibility;
             var title = "";
 
             switch (visibility)
@@ -698,7 +697,7 @@ public class Editor : Scenario
 
             foreach (MenuItem menuItem in menuItems)
             {
-                menuItem.Checked = menuItem.Title.Equals (title) && visibility == _textView.DesiredCursorVisibility;
+                menuItem.Checked = menuItem.Title.Equals (title) && visibility == _textView.CursorVisibility;
             }
         }
 

@@ -32,10 +32,11 @@ namespace Terminal.Gui;
 ///         <see cref="Enabled"/>, <see cref="Visible"/>, and <see cref="CanFocus"/> will receive focus.
 ///     </para>
 ///     <para>
-///         Views that are focusable should implement the <see cref="PositionCursor"/> to make sure that the cursor is
-///         placed in a location that makes sense. Unix terminals do not have a way of hiding the cursor, so it can be
+///         Views that are focusable should override <see cref="PositionCursor"/> to make sure that the cursor is
+///         placed in a location that makes sense. Some terminals do not have a way of hiding the cursor, so it can be
 ///         distracting to have the cursor left at the last focused view. So views should make sure that they place the
-///         cursor in a visually sensible place.
+///         cursor in a visually sensible place. The default implementation of <see cref="PositionCursor"/> will place the
+///         cursor at either the hotkey (if defined) or <c>0,0</c>.
 ///     </para>
 ///     <para>
 ///         The View defines the base functionality for user interface elements in Terminal.Gui. Views can contain one or

@@ -621,7 +621,7 @@ public class MenuBar : View
                 pos++;
                 Move (pos + 1, 0);
 
-                return new (pos +1, 0);
+                return null; // Don't show the cursor
             }
 
             pos += _leftPadding
@@ -631,7 +631,7 @@ public class MenuBar : View
                           : 0)
                    + _rightPadding;
         }
-        return null;
+        return null; // Don't show the cursor
     }
 
     // Activates the menu, handles either first focus, or activating an entry when it was already active
@@ -1651,13 +1651,6 @@ public class MenuBar : View
 
     #region Mouse Handling
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
 
     /// <inheritdoc/>
     public override bool OnLeave (View view)

@@ -340,11 +340,6 @@ public partial class Toplevel : View
             if (Focused is null)
             {
                 EnsureFocus ();
-
-                if (Focused is null)
-                {
-                    Driver.SetCursorVisibility (CursorVisibility.Invisible);
-                }
             }
 
             return null;
@@ -368,12 +363,7 @@ public partial class Toplevel : View
 
         var cursor2 = base.PositionCursor ();
 
-        if (Focused is null)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-
-        return null;//cursor2;
+        return null; 
     }
 
     /// <summary>

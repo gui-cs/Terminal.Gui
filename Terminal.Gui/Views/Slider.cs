@@ -245,6 +245,7 @@ public class Slider<T> : View
         Width = Dim.Auto (Dim.DimAutoStyle.Content);
         Height = Dim.Auto (Dim.DimAutoStyle.Content);
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
 
         _options = options ?? new List<SliderOption<T>> ();
 
@@ -254,15 +255,6 @@ public class Slider<T> : View
 
         SetDefaultStyle ();
         SetCommands ();
-
-        // When we lose focus of the View(Slider), if we are range selecting we stop it.
-        Leave += (s, e) =>
-                 {
-                     //if (_settingRange == true) {
-                     //	_settingRange = false;
-                     //}
-                     Driver.SetCursorVisibility (CursorVisibility.Invisible);
-                 };
 
         Enter += (s, e) => { };
 
@@ -888,17 +880,6 @@ public class Slider<T> : View
     /// <inheritdoc/>
     public override Point? PositionCursor ()
     {
-        //base.PositionCursor ();
-
-        if (HasFocus)
-        {
-            Driver?.SetCursorVisibility (CursorVisibility.Default);
-        }
-        else
-        {
-            Driver?.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-
         if (TryGetPositionByOption (FocusedOption, out (int x, int y) position))
         {
             if (IsInitialized && Viewport.Contains (position.x, position.y))
@@ -908,7 +889,7 @@ public class Slider<T> : View
                 return new (position.x, position.x);
             }
         }
-        return null;
+        return base.PositionCursor ();
     }
 
     /// <inheritdoc/>

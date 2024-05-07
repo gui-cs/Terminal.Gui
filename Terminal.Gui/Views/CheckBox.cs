@@ -94,14 +94,6 @@ public class CheckBox : View
         }
     }
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
     /// <summary>Called when the <see cref="Checked"/> property changes. Invokes the <see cref="Toggled"/> event.</summary>
     /// <remarks>
     /// </remarks>
@@ -149,9 +141,6 @@ public class CheckBox : View
 
         return true;
     }
-
-    /// <inheritdoc/>
-    public override Point? PositionCursor () { Move (0, 0); return Point.Empty; }
 
     /// <summary>Toggled event, raised when the <see cref="CheckBox"/> is toggled.</summary>
     /// <remarks>

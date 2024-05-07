@@ -484,7 +484,9 @@ public partial class View
         }
     }
 
-    /// <summary>Method invoked when a view gets focus.</summary>
+    /// <summary>
+    /// Called when a view gets focus.
+    /// </summary>
     /// <param name="view">The view that is losing focus.</param>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
     public virtual bool OnEnter (View view)
@@ -513,18 +515,16 @@ public partial class View
             return true;
         }
 
-        // BUGBUG: This is a hack to ensure that the cursor is hidden when the view loses focus.
-        // BUGBUG: This is not needed as the minloop will take care of this.
-        //Driver?.SetCursorVisibility (CursorVisibility.Invisible);
-
         return false;
     }
 
-    /// <summary>Returns the currently focused view inside this view, or null if nothing is focused.</summary>
+    // BUGBUG: This API is poorly defined and implemented. It does not specify what it means if THIS view is focused and has no subviews.
+    /// <summary>Returns the currently focused Subview inside this view, or null if nothing is focused.</summary>
     /// <value>The focused.</value>
     public View Focused { get; private set; }
 
-    /// <summary>Returns the most focused view in the chain of subviews (the leaf view that has the focus).</summary>
+    // BUGBUG: This API is poorly defined and implemented. It does not specify what it means if THIS view is focused and has no subviews.
+    /// <summary>Returns the most focused Subview in the chain of subviews (the leaf view that has the focus).</summary>
     /// <value>The most focused View.</value>
     public View MostFocused
     {
@@ -853,18 +853,20 @@ public partial class View
     }
 
     /// <summary>
+    /// Gets or sets the cursor style to be used when the view is focused. The default is <see cref="CursorVisibility.Invisible"/>.
+    /// </summary>
+    public CursorVisibility CursorVisibility { get; set; } = CursorVisibility.Invisible;
+
+    /// <summary>
     ///     Positions the cursor in the right position based on the currently focused view in the chain.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Views that are focusable and want the cursor visible should override <see cref="PositionCursor"/>,
-    ///         use <see cref="Move"/> to place the cursor in a location that makes sense, use
-    ///         <see cref="ConsoleDriver.SetCursorVisibility"/>
-    ///         to make the cursor visible, and return the position where the cursor was placed.
-    ///     </para>
-    ///     <para>
-    ///         Unix terminals do not have  a way of hiding the cursor, so it can be distracting to have the cursor left at
-    ///         the last focused view. Views should make sure that they place the cursor in a visually sensible place.
+    ///         Views that are focusable should override <see cref="PositionCursor"/> to make sure that the cursor is
+    ///         placed in a location that makes sense. Some terminals do not have a way of hiding the cursor, so it can be
+    ///         distracting to have the cursor left at the last focused view. So views should make sure that they place the
+    ///         cursor in a visually sensible place. The default implementation of <see cref="PositionCursor"/> will place the
+    ///         cursor at either the hotkey (if defined) or <c>0,0</c>.
     ///     </para>
     /// </remarks>
     /// <returns>Viewport-relative cursor position. Return <see langword="null"/> to ensure the cursor is not visible.</returns>
@@ -872,7 +874,7 @@ public partial class View
     {
         if (IsInitialized && CanFocus && HasFocus && ContentSize.HasValue)
         {
-            // Base class will position the cursor at the end of the text.
+            // By default, position the cursor at the hotkey (if any) or 0, 0.
             Point location = Viewport.Location;
             location.X = TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition;
             location.Y = 0;

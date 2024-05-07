@@ -277,14 +277,6 @@ public class RadioGroup : View
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
     public override bool? OnInvokingKeyBindings (Key keyEvent)
     {
         // This is a bit of a hack. We want to handle the key bindings for the radio group but
@@ -371,7 +363,7 @@ public class RadioGroup : View
         }
 
         Move (x, y);
-        return new Point (x, y);
+        return null; // Don't show the cursor
     }
 
     /// <summary>Allow to invoke the <see cref="SelectedItemChanged"/> after their creation.</summary>

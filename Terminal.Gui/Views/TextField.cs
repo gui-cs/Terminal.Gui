@@ -36,6 +36,7 @@ public class TextField : View
         Height = 1;
 
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
         Used = true;
         WantMousePositionReports = true;
 
@@ -931,7 +932,7 @@ public class TextField : View
             ShowContextMenu ();
         }
 
-        SetNeedsDisplay ();
+        //SetNeedsDisplay ();
 
         return true;
 
@@ -1034,17 +1035,6 @@ public class TextField : View
 
         _isDrawing = false;
     }
-
-    ///// <inheritdoc/>
-    //public override bool OnEnter (View view)
-    //{
-    //    if (IsInitialized)
-    //    {
-    //        Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-    //    }
-
-    //    return base.OnEnter (view);
-    //}
 
     /// <inheritdoc/>
     public override bool? OnInvokingKeyBindings (Key a)

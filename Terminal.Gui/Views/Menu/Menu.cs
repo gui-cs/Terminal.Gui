@@ -958,7 +958,8 @@ internal sealed class Menu : View
             {
                 Move (2, 1 + _currentChild);
 
-                return null;//new (2, 1 + _currentChild);
+                return null; // Don't show the cursor
+
             }
         }
 
@@ -1332,14 +1333,6 @@ internal sealed class Menu : View
         }
 
         return pos;
-    }
-
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
     }
 
     protected override void Dispose (bool disposing)

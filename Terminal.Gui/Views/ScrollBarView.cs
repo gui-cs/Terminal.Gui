@@ -667,13 +667,6 @@ public class ScrollBarView : View
         }
     }
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
 
     /// <summary>Only used for a hosted view that will update and redraw the scrollbars.</summary>
     public virtual void Refresh () { ShowHideScrollBars (); }

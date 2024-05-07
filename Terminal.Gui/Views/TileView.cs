@@ -979,14 +979,6 @@ public class TileView : View
             DrawSplitterSymbol ();
         }
 
-        //public override bool OnEnter (View view)
-        //{
-        //    Driver.SetCursorVisibility (CursorVisibility.Default);
-        //    PositionCursor ();
-
-        //    return base.OnEnter (view);
-        //}
-
         public override Point? PositionCursor ()
         {
             base.PositionCursor ();
@@ -994,7 +986,7 @@ public class TileView : View
             Point location = moveRuneRenderLocation ?? new Point (Viewport.Width / 2, Viewport.Height / 2);
             Move (location.X, location.Y);
 
-            return null; //location;
+            return null; // Hide cursor
         }
 
         /// <summary>

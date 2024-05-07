@@ -326,6 +326,7 @@ internal class CharMap : View
     {
         ColorScheme = Colors.ColorSchemes ["Dialog"];
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
 
         ContentSize = new (RowWidth, (MaxCodePoint / 16 + 2) * _rowHeight);
 
@@ -810,13 +811,10 @@ internal class CharMap : View
             && Cursor.Y > 0
             && Cursor.Y < Viewport.Height)
         {
-            Driver.SetCursorVisibility (CursorVisibility.Default);
             Move (Cursor.X, Cursor.Y);
         }
         else
         {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
             return null;
         }
 

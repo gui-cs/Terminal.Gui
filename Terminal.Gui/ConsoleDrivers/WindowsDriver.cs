@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -156,10 +157,7 @@ internal class WindowsConsole
             }
         }
 
-        if (!_initialCursorVisibility.HasValue && GetCursorVisibility (out CursorVisibility visibility))
-        {
-            _initialCursorVisibility = visibility;
-        }
+        SetInitialCursorVisibility();
 
         if (!SetConsoleActiveScreenBuffer (_screenBuffer))
         {
@@ -216,11 +214,11 @@ internal class WindowsConsole
         }
         else if (info.dwSize > 50)
         {
-            visibility = CursorVisibility.Box;
+            visibility = CursorVisibility.Default;
         }
         else
         {
-            visibility = CursorVisibility.Underline;
+            visibility = CursorVisibility.Default;
         }
 
         return true;
@@ -815,6 +813,11 @@ internal class WindowsConsole
     [StructLayout (LayoutKind.Sequential)]
     public struct ConsoleCursorInfo
     {
+        /// <summary>
+        /// The percentage of the character cell that is filled by the cursor.This value is between 1 and 100.
+        /// The cursor appearance varies, ranging from completely filling the cell to showing up as a horizontal
+        /// line at the bottom of the cell.
+        /// </summary>
         public uint dwSize;
         public bool bVisible;
     }
@@ -1436,6 +1439,8 @@ internal class WindowsDriver : ConsoleDriver
 #if HACK_CHECK_WINCHANGED
         _mainLoopDriver.WinChanged = ChangeWin;
 #endif
+
+        WinConsole?.SetInitialCursorVisibility ();
         return new MainLoop (_mainLoopDriver);
     }
 

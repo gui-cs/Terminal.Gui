@@ -978,8 +978,6 @@ public class TableView : View
     {
         if (TableIsNullOrInvisible ())
         {
-            //PositionCursor ();
-
             return false;
         }
 
@@ -1530,7 +1528,6 @@ public class TableView : View
             SelectedRow = match;
             EnsureValidSelection ();
             EnsureSelectedCellIsVisible ();
-            //PositionCursor ();
             SetNeedsDisplay ();
 
             return true;
