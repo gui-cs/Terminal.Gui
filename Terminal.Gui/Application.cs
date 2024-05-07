@@ -557,8 +557,6 @@ public static partial class Application
         return rs;
     }
 
-    //private static CursorVisibility _cachedCursorVisibility;
-
     /// <summary>
     /// Calls <see cref="View.PositionCursor"/> on the most focused view in the view starting with <paramref name="view"/>.
     /// </summary>
@@ -586,7 +584,6 @@ public static partial class Application
             Driver.GetCursorVisibility (out CursorVisibility current);
             if (current != CursorVisibility.Invisible)
             {
-                //_cachedCursorVisibility = current;
                 Driver.SetCursorVisibility (CursorVisibility.Invisible);
             }
 
@@ -616,7 +613,6 @@ public static partial class Application
             {
                 if (currentCursorVisibility != CursorVisibility.Invisible)
                 {
-                    //_cachedCursorVisibility = currentCursorVisibility;
                     Driver.SetCursorVisibility (CursorVisibility.Invisible);
                 }
 
@@ -624,7 +620,7 @@ public static partial class Application
             }
 
             // Show it
-            if (currentCursorVisibility == CursorVisibility.Invisible/* && currentCursorVisibility != _cachedCursorVisibility*/)
+            if (currentCursorVisibility == CursorVisibility.Invisible)
             {
                 Driver.SetCursorVisibility (mostFocused.CursorVisibility);
             }
@@ -634,7 +630,6 @@ public static partial class Application
 
         if (currentCursorVisibility != CursorVisibility.Invisible)
         {
-            //_cachedCursorVisibility = currentCursorVisibility;
             Driver.SetCursorVisibility (CursorVisibility.Invisible);
         }
 
