@@ -4,6 +4,8 @@
   href: getting-started.md
 - name: What's new in v2
   href: newinv2.md
+- name: v1 To v2 Migration Guide
+  href: migratingfromv1.md  
 - name: List of Views
   href: views.md
 - name: Configuration
