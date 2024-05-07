@@ -610,6 +610,12 @@ internal class CursesDriver : ConsoleDriver
                 k = KeyCode.Enter;
             }
 
+            // Strip the KeyCode.Space flag off if it's set
+            if (k != KeyCode.Space && k.HasFlag (KeyCode.Space))
+            {
+                k &= ~KeyCode.Space;
+            }
+
             OnKeyDown (new Key (k));
             OnKeyUp (new Key (k));
         }
