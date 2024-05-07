@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace UICatalog.Tests;
 
-public class ScenarioTests
+public class ScenarioTests : TestsAllViews
 {
     private readonly ITestOutputHelper _output;
 
@@ -15,17 +15,24 @@ public class ScenarioTests
         _output = output;
     }
 
-    public static TheoryData<Scenario, string> AllScenarios => TestHelpers.GetAllScenarioTheoryData ();
+    public static IEnumerable<object []> AllScenarioTypes =>
+        typeof (Scenario).Assembly
+                     .GetTypes ()
+                     .Where (type => type.IsClass && !type.IsAbstract && type.IsSubclassOf (typeof (Scenario)))
+                     .Select (type => new object [] { type });
+
 
     /// <summary>
     ///     <para>This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run.</para>
     ///     <para>Should find any Scenarios which crash on load or do not respond to <see cref="Application.RequestStop()"/>.</para>
     /// </summary>
     [Theory]
-    [MemberData (nameof (AllScenarios))]
-    public void Run_All_Scenarios (Scenario scenario, string viewName)
+    [MemberData (nameof (AllScenarioTypes))]
+    public void Run_All_Scenarios (Type scenarioType)
     {
-        _output.WriteLine ($"Running Scenario '{scenario.GetName ()}'");
+        _output.WriteLine ($"Running Scenario '{scenarioType}'");
+
+        Scenario scenario = (Scenario)Activator.CreateInstance (scenarioType);
 
         Application.Init (new FakeDriver ());
 
@@ -116,18 +123,15 @@ public class ScenarioTests
         TextField _hText;
         var _hVal = 0;
         List<string> posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
-        List<string> dimNames = new () { "Factor", "Fill", "Absolute" };
+        List<string> dimNames = new () { "Auto", "Factor", "Fill", "Absolute" };
 
         Application.Init (new FakeDriver ());
 
         var top = new Toplevel ();
 
-        _viewClasses = GetAllViewClassesCollection ()
-                       .OrderBy (t => t.Name)
-                       .Select (t => new KeyValuePair<string, Type> (t.Name, t))
-                       .ToDictionary (t => t.Key, t => t.Value);
+        _viewClasses = TestHelpers.GetAllViewClasses ().ToDictionary (t => t.Name);
 
-        _leftPane = new()
+        _leftPane = new ()
         {
             Title = "Classes",
             X = 0,
@@ -138,7 +142,7 @@ public class ScenarioTests
             ColorScheme = Colors.ColorSchemes ["TopLevel"]
         };
 
-        _classListView = new()
+        _classListView = new ()
         {
             X = 0,
             Y = 0,
@@ -150,7 +154,7 @@ public class ScenarioTests
         };
         _leftPane.Add (_classListView);
 
-        _settingsPane = new()
+        _settingsPane = new ()
         {
             X = Pos.Right (_leftPane),
             Y = 0, // for menu
@@ -160,12 +164,12 @@ public class ScenarioTests
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Title = "Settings"
         };
-        _computedCheckBox = new() { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
+        _computedCheckBox = new () { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
         _settingsPane.Add (_computedCheckBox);
 
         var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
 
-        _locationFrame = new()
+        _locationFrame = new ()
         {
             X = Pos.Left (_computedCheckBox),
             Y = Pos.Bottom (_computedCheckBox),
@@ -177,21 +181,21 @@ public class ScenarioTests
 
         var label = new Label { X = 0, Y = 0, Text = "x:" };
         _locationFrame.Add (label);
-        _xRadioGroup = new() { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _xText = new() { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
+        _xRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _xText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
         _locationFrame.Add (_xText);
 
         _locationFrame.Add (_xRadioGroup);
 
         radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
-        label = new() { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "y:" };
+        label = new () { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "y:" };
         _locationFrame.Add (label);
-        _yText = new() { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
+        _yText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
         _locationFrame.Add (_yText);
-        _yRadioGroup = new() { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _yRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
         _locationFrame.Add (_yRadioGroup);
 
-        _sizeFrame = new()
+        _sizeFrame = new ()
         {
             X = Pos.Right (_locationFrame),
             Y = Pos.Y (_locationFrame),
@@ -200,26 +204,26 @@ public class ScenarioTests
             Title = "Size (Dim)"
         };
 
-        radioItems = new [] { "Percent(width)", "Fill(width)", "Sized(width)" };
-        label = new() { X = 0, Y = 0, Text = "width:" };
+        radioItems = new [] { "Auto()", "Percent(width)", "Fill(width)", "Sized(width)" };
+        label = new () { X = 0, Y = 0, Text = "width:" };
         _sizeFrame.Add (label);
-        _wRadioGroup = new() { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _wText = new() { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
+        _wRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
         _sizeFrame.Add (_wText);
         _sizeFrame.Add (_wRadioGroup);
 
-        radioItems = new [] { "Percent(height)", "Fill(height)", "Sized(height)" };
-        label = new() { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "height:" };
+        radioItems = new [] { "Auto()", "Percent(height)", "Fill(height)", "Sized(height)" };
+        label = new () { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "height:" };
         _sizeFrame.Add (label);
-        _hText = new() { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
+        _hText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
         _sizeFrame.Add (_hText);
 
-        _hRadioGroup = new() { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _hRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
         _sizeFrame.Add (_hRadioGroup);
 
         _settingsPane.Add (_sizeFrame);
 
-        _hostPane = new()
+        _hostPane = new ()
         {
             X = Pos.Right (_leftPane),
             Y = Pos.Bottom (_settingsPane),
@@ -452,22 +456,6 @@ public class ScenarioTests
 
         void UpdateTitle (View view) { _hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}"; }
 
-        List<Type> GetAllViewClassesCollection ()
-        {
-            List<Type> types = new ();
-
-            foreach (Type type in typeof (View).Assembly.GetTypes ()
-                                               .Where (
-                                                       myType =>
-                                                           myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View))
-                                                      ))
-            {
-                types.Add (type);
-            }
-
-            return types;
-        }
-
         View CreateClass (Type type)
         {
             // If we are to create a generic Type
@@ -489,19 +477,23 @@ public class ScenarioTests
             // Instantiate view
             var view = (View)Activator.CreateInstance (type);
 
-            //_curView.X = Pos.Center ();
-            //_curView.Y = Pos.Center ();
-            if (!view.AutoSize)
+            if (view is null)
+            {
+                return null;
+            }
+
+            if (view.Width is not Dim.DimAuto)
             {
                 view.Width = Dim.Percent (75);
+            }
+
+            if (view.Height is not Dim.DimAuto)
+            {
                 view.Height = Dim.Percent (75);
             }
 
             // Set the colorscheme to make it stand out if is null by default
-            if (view.ColorScheme == null)
-            {
-                view.ColorScheme = Colors.ColorSchemes ["Base"];
-            }
+            view.ColorScheme ??= Colors.ColorSchemes ["Base"];
 
             // If the view supports a Text property, set it so we have something to look at
             if (view.GetType ().GetProperty ("Text") != null)

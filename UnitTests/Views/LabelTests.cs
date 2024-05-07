@@ -55,7 +55,7 @@ public class LabelTests
     [Fact]
     public void MouseClick_SetsFocus_OnNextSubview ()
     {
-        var superView = new View () { CanFocus = true, Height = 1, Width = 15};
+        var superView = new View () { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View () { CanFocus = true, Width = 1, Height = 1 };
         var label = new Label () { X = 2, Title = "_x" };
         var nextSubview = new View () { CanFocus = true, X = 4, Width = 4, Height = 1 };
@@ -91,7 +91,7 @@ public class LabelTests
     [AutoInitShutdown]
     public void AutoSize_Stays_True_AnchorEnd ()
     {
-        var label = new Label { Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
+        var label = new Label { Y = Pos.Center (), Text = "Say Hello 你" };
         label.X = Pos.AnchorEnd (0) - Pos.Function (() => label.TextFormatter.Text.GetColumns ());
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -99,7 +99,7 @@ public class LabelTests
         var top = new Toplevel ();
         top.Add (win);
 
-        Assert.True (label.AutoSize);
+       
 
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
@@ -114,9 +114,9 @@ public class LabelTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-        Assert.True (label.AutoSize);
+       
         label.Text = "Say Hello 你 changed";
-        Assert.True (label.AutoSize);
+       
         Application.Refresh ();
 
         expected = @"
@@ -141,8 +141,6 @@ public class LabelTests
         var top = new Toplevel ();
         top.Add (win);
 
-        Assert.True (label.AutoSize);
-
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
@@ -156,9 +154,9 @@ public class LabelTests
 
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-        Assert.True (label.AutoSize);
+       
         label.Text = "Say Hello 你 changed";
-        Assert.True (label.AutoSize);
+       
         Application.Refresh ();
 
         expected = @"
@@ -176,18 +174,18 @@ public class LabelTests
     [AutoInitShutdown]
     public void AutoSize_Stays_True_With_EmptyText ()
     {
-        var label = new Label { X = Pos.Center (), Y = Pos.Center (), AutoSize = true };
+        var label = new Label { X = Pos.Center (), Y = Pos.Center () };
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
         var top = new Toplevel ();
         top.Add (win);
 
-        Assert.True (label.AutoSize);
+       
 
         label.Text = "Say Hello 你";
 
-        Assert.True (label.AutoSize);
+       
 
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
@@ -209,7 +207,6 @@ public class LabelTests
         var label = new Label ();
         Assert.Equal (string.Empty, label.Text);
         Assert.Equal (TextAlignment.Left, label.TextAlignment);
-        Assert.True (label.AutoSize);
         Assert.False (label.CanFocus);
         Assert.Equal (new Rectangle (0, 0, 0, 0), label.Frame);
         Assert.Equal (KeyCode.Null, label.HotKey);
@@ -217,61 +214,61 @@ public class LabelTests
 
     [Fact]
     [AutoInitShutdown]
-    public void Label_Draw_Fill_Remaining_AutoSize_True ()
+    public void Label_Draw_Fill_Remaining_AutoSize_False ()
     {
-        var label = new Label { Text = "This label needs to be cleared before rewritten." };
+        Size tfSize = new Size (80, 1);
 
-        var tf1 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom };
+        var label = new Label { Text = "This label needs to be cleared before rewritten.", Width = tfSize.Width, Height = tfSize.Height };
+
+        var tf1 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, Size = tfSize };
         tf1.Text = "This TextFormatter (tf1) without fill will not be cleared on rewritten.";
-        Size tf1Size = tf1.Size;
 
-        var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, FillRemaining = true };
+        var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, Size = tfSize, FillRemaining = true };
         tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
-        Size tf2Size = tf2.Size;
 
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
 
-        Assert.True (label.AutoSize);
+        Assert.False (label.TextFormatter.AutoSize);
+        Assert.False (tf1.AutoSize);
+        Assert.False (tf2.AutoSize);
+        Assert.False (label.TextFormatter.FillRemaining);
+        Assert.False (tf1.FillRemaining);
+        Assert.True (tf2.FillRemaining);
 
-        tf1.Draw (
-                  new Rectangle (new Point (0, 1), tf1Size),
-                  label.GetNormalColor (),
-                  label.ColorScheme.HotNormal
-                 );
+        tf1.Draw (new Rectangle (new Point (0, 1), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
-        tf2.Draw (new Rectangle (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf2.Draw (new Rectangle (new Point (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 This label needs to be cleared before rewritten.                       
 This TextFormatter (tf1) without fill will not be cleared on rewritten.
-This TextFormatter (tf2) with fill will be cleared on rewritten.       
-",
+This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
                                                       _output
                                                      );
 
+        Assert.False (label.NeedsDisplay);
+        Assert.False (label.LayoutNeeded);
+        Assert.False (label.SubViewNeedsDisplay);
         label.Text = "This label is rewritten.";
+        Assert.True (label.NeedsDisplay);
+        Assert.True (label.LayoutNeeded);
+        Assert.False (label.SubViewNeedsDisplay);
         label.Draw ();
 
         tf1.Text = "This TextFormatter (tf1) is rewritten.";
-
-        tf1.Draw (
-                  new Rectangle (new Point (0, 1), tf1Size),
-                  label.GetNormalColor (),
-                  label.ColorScheme.HotNormal
-                 );
+        tf1.Draw (new Rectangle (new Point (0, 1), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         tf2.Text = "This TextFormatter (tf2) is rewritten.";
-        tf2.Draw (new Rectangle (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf2.Draw (new Rectangle (new Point (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 This label is rewritten.                                               
 This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
-This TextFormatter (tf2) is rewritten.                                 
-",
+This TextFormatter (tf2) is rewritten.                                 ",
                                                       _output
                                                      );
     }
@@ -285,7 +282,7 @@ This TextFormatter (tf2) is rewritten.
         top.Add (label);
         Application.Begin (top);
 
-        Assert.True (label.AutoSize);
+       
         Assert.Equal (new Rectangle (0, 0, 16, 1), label.Frame);
 
         var expected = @"
@@ -446,7 +443,7 @@ e
     [AutoInitShutdown]
     public void Update_Parameterless_Only_On_Or_After_Initialize ()
     {
-        var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
+        var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
         var top = new Toplevel ();
@@ -476,16 +473,18 @@ e
 
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void Full_Border ()
     {
-        var label = new Label { Text = "Test", /*Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        var top = new Toplevel ();
-        top.Add (label);
-        Application.Begin (top);
+        var label = new Label { BorderStyle = LineStyle.Single , Text = "Test",} ;
+        label.BeginInit();
+        label.EndInit();
+        label.SetRelativeLayout (Application.Driver.Screen.Size);
 
-        Assert.Equal (new (0, 0, 6, 3), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
+        Assert.Equal (new (0, 0, 6, 3), label.Frame);
+
+        label.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -494,6 +493,7 @@ e
 └────┘",
                                                       _output
                                                      );
+        label.Dispose ();
     }
 
     [Fact]

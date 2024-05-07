@@ -31,7 +31,6 @@ public class HexView : View
     private const int displayWidth = 9;
 
     private int bpl;
-    private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
     private long displayStart, pos;
     private SortedDictionary<long, byte> edits = [];
     private bool firstNibble, leftSide;
@@ -50,6 +49,7 @@ public class HexView : View
         // BUG: This will always call the most-derived definition of CanFocus.
         // Either seal it or don't set it here.
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
         leftSide = true;
         firstNibble = true;
 
@@ -126,21 +126,6 @@ public class HexView : View
             int item = delta % bytesPerLine + 1;
 
             return new Point (item, line);
-        }
-    }
-
-    /// <summary>Get / Set the wished cursor when the field is focused</summary>
-    public CursorVisibility DesiredCursorVisibility
-    {
-        get => desiredCursorVisibility;
-        set
-        {
-            if (desiredCursorVisibility != value && HasFocus)
-            {
-                Application.Driver.SetCursorVisibility (value);
-            }
-
-            desiredCursorVisibility = value;
         }
     }
 
@@ -461,14 +446,6 @@ public class HexView : View
     /// <summary>Method used to invoke the <see cref="Edited"/> event passing the <see cref="KeyValuePair{TKey, TValue}"/>.</summary>
     /// <param name="e">The key value pair.</param>
     public virtual void OnEdited (HexViewEditEventArgs e) { Edited?.Invoke (this, e); }
-
-    ///<inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
-
-        return base.OnEnter (view);
-    }
 
     /// <summary>
     ///     Method used to invoke the <see cref="PositionChanged"/> event passing the <see cref="HexViewEventArgs"/>

@@ -106,11 +106,11 @@ public partial class View
 
         if (ViewportSettings.HasFlag (ViewportSettings.ClearContentOnly))
         {
-            Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize));
+            Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize.GetValueOrDefault ()));
             toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
-        Attribute prev = Driver.SetAttribute (GetNormalColor());
+        Attribute prev = Driver.SetAttribute (GetNormalColor ());
         Driver.FillRect (toClear);
         Driver.SetAttribute (prev);
 
@@ -134,7 +134,7 @@ public partial class View
 
         Driver.Clip = Rectangle.Intersect (prevClip, ViewportToScreen (Viewport with { Location = new (0, 0) }));
 
-        Attribute prev = Driver.SetAttribute (new (color ?? GetNormalColor().Background));
+        Attribute prev = Driver.SetAttribute (new (color ?? GetNormalColor ().Background));
         Driver.FillRect (toClear);
         Driver.SetAttribute (prev);
 
@@ -172,7 +172,7 @@ public partial class View
         if (ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly))
         {
             // Clamp the Clip to the just content area that is within the viewport
-            Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize));
+            Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize.GetValueOrDefault ()));
             clip = Rectangle.Intersect (clip, visibleContent);
         }
 
@@ -475,7 +475,7 @@ public partial class View
 
             // This should NOT clear 
             // TODO: If the output is not in the Viewport, do nothing
-            var drawRect = new Rectangle (ContentToScreen (Point.Empty), ContentSize);
+            var drawRect = new Rectangle (ContentToScreen (Point.Empty), ContentSize.GetValueOrDefault ());
 
             TextFormatter?.Draw (
                                  drawRect,
@@ -577,10 +577,7 @@ public partial class View
     /// </remarks>
     public void SetNeedsDisplay ()
     {
-        if (IsInitialized)
-        {
-            SetNeedsDisplay (Viewport);
-        }
+        SetNeedsDisplay (Viewport);
     }
 
     /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="region"/>.</summary>
@@ -597,13 +594,6 @@ public partial class View
     /// <param name="region">The content-relative region that needs to be redrawn.</param>
     public void SetNeedsDisplay (Rectangle region)
     {
-        if (!IsInitialized)
-        {
-            _needsDisplayRect = region;
-
-            return;
-        }
-
         if (_needsDisplayRect.IsEmpty)
         {
             _needsDisplayRect = region;

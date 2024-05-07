@@ -215,14 +215,6 @@ public class StatusBar : View
         }
     }
 
-    ///<inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
     /// <inheritdoc/>
     public override bool? OnInvokingKeyBindings (Key keyEvent)
     {

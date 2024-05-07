@@ -39,15 +39,4 @@ public class FrameView : View
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
-
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        if (Subviews.Count == 0 || !Subviews.Any (subview => subview.CanFocus))
-        {
-            Application.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-
-        return base.OnEnter (view);
-    }
 }

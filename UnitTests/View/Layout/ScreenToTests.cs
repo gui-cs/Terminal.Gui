@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace Terminal.Gui.LayoutTests;
 
 /// <summary>Tests for view coordinate mapping (e.g. <see cref="View.ScreenToFrame"/> etc...).</summary>
 public class ScreenToTests

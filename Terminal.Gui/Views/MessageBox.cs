@@ -369,14 +369,13 @@ public static class MessageBox
 
         var messageLabel = new Label
         {
-            AutoSize = !wrapMessage,
             Text = message,
             TextAlignment = TextAlignment.Centered,
             X = Pos.Center (),
             Y = 0
         };
 
-        if (!messageLabel.AutoSize)
+        if (wrapMessage)
         {
             messageLabel.Width = Dim.Fill ();
             messageLabel.Height = Dim.Fill (1);
@@ -467,7 +466,7 @@ public static class MessageBox
                                      + adornmentsThickness.Vertical);
             }
 
-            d.SetRelativeLayout (d.SuperView?.ContentSize ?? Application.Top.ContentSize);
+            d.SetRelativeLayout (d.SuperView?.ContentSize.GetValueOrDefault () ?? Application.Top.ContentSize.GetValueOrDefault ());
             d.LayoutSubviews ();
         }
     }

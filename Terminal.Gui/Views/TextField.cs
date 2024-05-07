@@ -36,6 +36,7 @@ public class TextField : View
         Height = 1;
 
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
         Used = true;
         WantMousePositionReports = true;
 
@@ -756,11 +757,11 @@ public class TextField : View
     {
         foreach (char ch in toAdd)
         {
-            KeyCode key;
+            Key key;
 
             try
             {
-                key = (KeyCode)ch;
+                key = ch;
             }
             catch (Exception)
             {
@@ -769,7 +770,7 @@ public class TextField : View
                                             );
             }
 
-            InsertText (new Key { KeyCode = key }, useOldCursorPos);
+            InsertText (key, useOldCursorPos);
         }
     }
 
@@ -819,7 +820,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent ev)
+    protected internal override bool OnMouseEvent (MouseEvent ev)
     {
         if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed)
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
@@ -931,7 +932,7 @@ public class TextField : View
             ShowContextMenu ();
         }
 
-        SetNeedsDisplay ();
+        //SetNeedsDisplay ();
 
         return true;
 
@@ -1033,17 +1034,6 @@ public class TextField : View
         ProcessAutocomplete ();
 
         _isDrawing = false;
-    }
-
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-        }
-
-        return base.OnEnter (view);
     }
 
     /// <inheritdoc/>

@@ -28,14 +28,14 @@ public class VkeyPacketSimulator : Scenario
 
         var inputHorizontalRuler = new Label
         {
-            Y = Pos.Bottom (btnInput), AutoSize = false, Width = Dim.Fill (), ColorScheme = Colors.ColorSchemes ["Error"]
+            Y = Pos.Bottom (btnInput), Width = Dim.Fill (), ColorScheme = Colors.ColorSchemes ["Error"]
         };
         Win.Add (inputHorizontalRuler);
 
         var inputVerticalRuler = new Label
         {
             Y = Pos.Bottom (btnInput),
-            AutoSize = false,
+
             Width = 1,
             ColorScheme = Colors.ColorSchemes ["Error"],
             TextDirection = TextDirection.TopBottom_LeftRight
@@ -52,7 +52,7 @@ public class VkeyPacketSimulator : Scenario
         };
         Win.Add (tvInput);
 
-        label = new Label { X = Pos.Center (), Y = Pos.Bottom (tvInput), Text = "Output" };
+        label = new() { X = Pos.Center (), Y = Pos.Bottom (tvInput), Text = "Output" };
         Win.Add (label);
 
         var btnOutput = new Button { X = Pos.AnchorEnd (17), Y = Pos.Top (label), Text = "Select Output" };
@@ -61,7 +61,7 @@ public class VkeyPacketSimulator : Scenario
         var outputHorizontalRuler = new Label
         {
             Y = Pos.Bottom (btnOutput),
-            AutoSize = false,
+
             Width = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Error"]
         };
@@ -70,7 +70,7 @@ public class VkeyPacketSimulator : Scenario
         var outputVerticalRuler = new Label
         {
             Y = Pos.Bottom (btnOutput),
-            AutoSize = false,
+
             Width = 1,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Error"],
@@ -113,12 +113,10 @@ public class VkeyPacketSimulator : Scenario
                                             Application.Invoke (
                                                                 () => MessageBox.Query (
                                                                                         "Keys",
-                                                                                        $"'{
-                                                                                            Key.ToString (
+                                                                                        $"'{Key.ToString (
                                                                                                           e.KeyCode,
                                                                                                           MenuBar.ShortcutDelimiter
-                                                                                                         )
-                                                                                        }' pressed!",
+                                                                                                         )}' pressed!",
                                                                                         "Ok"
                                                                                        )
                                                                );
@@ -243,20 +241,20 @@ public class VkeyPacketSimulator : Scenario
                          };
 
         btnInput.Accept += (s, e) =>
-                            {
-                                if (!tvInput.HasFocus && _keyboardStrokes.Count == 0)
-                                {
-                                    tvInput.SetFocus ();
-                                }
-                            };
+                           {
+                               if (!tvInput.HasFocus && _keyboardStrokes.Count == 0)
+                               {
+                                   tvInput.SetFocus ();
+                               }
+                           };
 
         btnOutput.Accept += (s, e) =>
-                             {
-                                 if (!tvOutput.HasFocus && _keyboardStrokes.Count == 0)
-                                 {
-                                     tvOutput.SetFocus ();
-                                 }
-                             };
+                            {
+                                if (!tvOutput.HasFocus && _keyboardStrokes.Count == 0)
+                                {
+                                    tvOutput.SetFocus ();
+                                }
+                            };
 
         tvInput.SetFocus ();
 

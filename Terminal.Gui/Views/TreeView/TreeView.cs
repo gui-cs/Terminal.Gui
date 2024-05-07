@@ -64,8 +64,6 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
     private IReadOnlyCollection<Branch<T>> cachedLineMap;
 
-    private CursorVisibility desiredCursorVisibility = CursorVisibility.Invisible;
-
     private KeyCode objectActivationKey = KeyCode.Enter;
     private int scrollOffsetHorizontal;
     private int scrollOffsetVertical;
@@ -326,27 +324,6 @@ public class TreeView<T> : View, ITreeView where T : class
     public int ContentHeight => BuildLineMap ().Count ();
 
     /// <summary>
-    ///     Get / Set the wished cursor when the tree is focused. Only applies when <see cref="MultiSelect"/> is true.
-    ///     Defaults to <see cref="CursorVisibility.Invisible"/>.
-    /// </summary>
-    public CursorVisibility DesiredCursorVisibility
-    {
-        get => MultiSelect ? desiredCursorVisibility : CursorVisibility.Invisible;
-        set
-        {
-            if (desiredCursorVisibility != value)
-            {
-                desiredCursorVisibility = value;
-
-                if (HasFocus)
-                {
-                    Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
-                }
-            }
-        }
-    }
-
-    /// <summary>
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user
     ///     types.
     /// </summary>
@@ -468,7 +445,6 @@ public class TreeView<T> : View, ITreeView where T : class
             // TODO: Should this be cancelable?
             ObjectActivatedEventArgs<T> e = new (this, o);
             OnObjectActivated (e);
-            PositionCursor ();
             return true;
         }
         return false;
@@ -675,8 +651,6 @@ public class TreeView<T> : View, ITreeView where T : class
         // search for next branch that begins with that letter
         var characterAsStr = character.ToString ();
         AdjustSelectionToNext (b => AspectGetter (b.Model).StartsWith (characterAsStr, caseSensitivity));
-
-        PositionCursor ();
     }
 
     /// <summary>
@@ -1183,8 +1157,6 @@ public class TreeView<T> : View, ITreeView where T : class
     ///<inheritdoc/>
     public override bool OnEnter (View view)
     {
-        Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
-
         if (SelectedObject is null && Objects.Any ())
         {
             SelectedObject = Objects.First ();
@@ -1201,37 +1173,27 @@ public class TreeView<T> : View, ITreeView where T : class
             return false;
         }
 
-        try
+        // BUGBUG: this should move to OnInvokingKeyBindings
+        // If not a keybinding, is the key a searchable key press?
+        if (CollectionNavigatorBase.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation)
         {
-            // BUGBUG: this should move to OnInvokingKeyBindings
-            // If not a keybinding, is the key a searchable key press?
-            if (CollectionNavigatorBase.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation)
+            IReadOnlyCollection<Branch<T>> map;
+
+            // If there has been a call to InvalidateMap since the last time
+            // we need a new one to reflect the new exposed tree state
+            map = BuildLineMap ();
+
+            // Find the current selected object within the tree
+            int current = map.IndexOf (b => b.Model == SelectedObject);
+            int? newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)keyEvent);
+
+            if (newIndex is int && newIndex != -1)
             {
-                IReadOnlyCollection<Branch<T>> map;
+                SelectedObject = map.ElementAt ((int)newIndex).Model;
+                EnsureVisible (selectedObject);
+                SetNeedsDisplay ();
 
-                // If there has been a call to InvalidateMap since the last time
-                // we need a new one to reflect the new exposed tree state
-                map = BuildLineMap ();
-
-                // Find the current selected object within the tree
-                int current = map.IndexOf (b => b.Model == SelectedObject);
-                int? newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)keyEvent);
-
-                if (newIndex is int && newIndex != -1)
-                {
-                    SelectedObject = map.ElementAt ((int)newIndex).Model;
-                    EnsureVisible (selectedObject);
-                    SetNeedsDisplay ();
-
-                    return true;
-                }
-            }
-        }
-        finally
-        {
-            if (IsInitialized)
-            {
-                PositionCursor ();
+                return true;
             }
         }
 
@@ -1250,7 +1212,8 @@ public class TreeView<T> : View, ITreeView where T : class
             if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
             {
                 Move (0, idx - ScrollOffsetVertical);
-                return new Point (0, idx - ScrollOffsetVertical);
+
+                return MultiSelect ? new (0, idx - ScrollOffsetVertical) : null ;
             }
         }
         return base.PositionCursor ();

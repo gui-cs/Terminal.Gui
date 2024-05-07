@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Terminal.Gui;
@@ -45,7 +46,7 @@ public class ContentScrolling : Scenario
 
             // Add a status label to the border that shows Viewport and ContentSize values. Bit of a hack.
             // TODO: Move to Padding with controls
-            Border.Add (new Label { AutoSize = false, X = 20 });
+            Border.Add (new Label { X = 20 });
             LayoutComplete += VirtualDemoView_LayoutComplete;
 
             MouseEvent += VirtualDemoView_MouseEvent;
@@ -114,7 +115,7 @@ public class ContentScrolling : Scenario
         var view = new ScrollingDemoView
         {
             Title = "Demo View",
-            X = Pos.Right(editor),
+            X = Pos.Right (editor),
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
@@ -226,7 +227,7 @@ public class ContentScrolling : Scenario
 
         var contentSizeWidth = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.Width,
+            Value = view.ContentSize.GetValueOrDefault ().Width,
             X = Pos.Right (labelContentSize) + 1,
             Y = Pos.Top (labelContentSize)
         };
@@ -241,7 +242,7 @@ public class ContentScrolling : Scenario
                 return;
             }
 
-            view.ContentSize = view.ContentSize with { Width = e.NewValue };
+            view.ContentSize = view.ContentSize.GetValueOrDefault () with { Width = e.NewValue };
         }
 
         var labelComma = new Label
@@ -253,7 +254,7 @@ public class ContentScrolling : Scenario
 
         var contentSizeHeight = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.Height,
+            Value = view.ContentSize.GetValueOrDefault ().Height,
             X = Pos.Right (labelComma) + 1,
             Y = Pos.Top (labelContentSize),
             CanFocus = false
@@ -269,7 +270,7 @@ public class ContentScrolling : Scenario
                 return;
             }
 
-            view.ContentSize = view.ContentSize with { Height = e.NewValue };
+            view.ContentSize = view.ContentSize.GetValueOrDefault () with { Height = e.NewValue };
         }
 
         var cbClearOnlyVisible = new CheckBox
@@ -383,6 +384,19 @@ public class ContentScrolling : Scenario
         };
         longLabel.TextFormatter.WordWrap = true;
         view.Add (longLabel);
+
+        List<object> options = new () { "Option 1", "Option 2", "Option 3" };
+        Slider slider = new (options)
+        {
+            X = 0,
+            Y = Pos.Bottom (textField) + 1,
+            Orientation = Orientation.Vertical,
+            Type = SliderType.Multiple,
+            AllowEmpty = false,
+            BorderStyle = LineStyle.Double,
+            Title = "_Slider"
+        };
+        view.Add (slider);
 
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 

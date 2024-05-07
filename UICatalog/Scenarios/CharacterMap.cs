@@ -315,7 +315,6 @@ public class CharacterMap : Scenario
 
 internal class CharMap : View
 {
-    private const CursorVisibility _cursor = CursorVisibility.Default;
     private const int COLUMN_WIDTH = 3;
 
     private ContextMenu _contextMenu = new ();
@@ -327,6 +326,7 @@ internal class CharMap : View
     {
         ColorScheme = Colors.ColorSchemes ["Dialog"];
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
 
         ContentSize = new (RowWidth, (MaxCodePoint / 16 + 2) * _rowHeight);
 
@@ -472,7 +472,6 @@ internal class CharMap : View
 
         var up = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (1),
             Y = 0,
             Height = 1,
@@ -487,7 +486,6 @@ internal class CharMap : View
 
         var down = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (1),
             Y = Pos.AnchorEnd (2),
             Height = 1,
@@ -502,7 +500,6 @@ internal class CharMap : View
 
         var left = new Button
         {
-            AutoSize = false,
             X = 0,
             Y = Pos.AnchorEnd (1),
             Height = 1,
@@ -517,7 +514,6 @@ internal class CharMap : View
 
         var right = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (2),
             Y = Pos.AnchorEnd (1),
             Height = 1,
@@ -807,23 +803,6 @@ internal class CharMap : View
         }
     }
 
-    public override bool OnEnter (View view)
-    {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (_cursor);
-        }
-
-        return base.OnEnter (view);
-    }
-
-    public override bool OnLeave (View view)
-    {
-        Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnLeave (view);
-    }
-
     public override Point? PositionCursor ()
     {
         if (HasFocus
@@ -832,12 +811,11 @@ internal class CharMap : View
             && Cursor.Y > 0
             && Cursor.Y < Viewport.Height)
         {
-            Driver.SetCursorVisibility (_cursor);
             Move (Cursor.X, Cursor.Y);
         }
         else
         {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
+            return null;
         }
 
         return Cursor;
@@ -976,7 +954,6 @@ internal class CharMap : View
         var errorLabel = new Label
         {
             Text = UcdApiClient.BaseUrl,
-            AutoSize = false,
             X = 0,
             Y = 1,
             Width = Dim.Fill (),
