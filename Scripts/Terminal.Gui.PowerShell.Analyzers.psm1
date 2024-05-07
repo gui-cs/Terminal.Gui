@@ -55,43 +55,34 @@ Function Build-Analyzers {
     return
   }
   
-  New-Variable -Name solutionRoot -Visibility Public -Value (Resolve-Path ..)
-  Push-Location $solutionRoot
-  New-Variable -Name solutionFile -Visibility Public -Value (Resolve-Path ./Terminal.sln)
-  $mainProjectRoot = Resolve-Path ./Terminal.Gui
-  $mainProjectFile = Join-Path $mainProjectRoot Terminal.Gui.csproj
-  $analyzersRoot = Resolve-Path ./Analyzers
-  $internalAnalyzersProjectRoot = Join-Path $analyzersRoot Terminal.Gui.Analyzers.Internal
-  $internalAnalyzersProjectFile = Join-Path $internalAnalyzersProjectRoot Terminal.Gui.Analyzers.Internal.csproj
+  Push-Location $InternalAnalyzersProjectDirectory
   
   if(!$NoClean) {
     if(!$Quiet) {
       Write-Host Deleting bin and obj folders for Terminal.Gui
     }
-    if(Test-Path $mainProjectRoot/bin) {
-      Remove-Item -Recurse -Force $mainProjectRoot/bin
-      Remove-Item -Recurse -Force $mainProjectRoot/obj
-    }
+    Remove-Item -Recurse -Force $TerminalGuiProjectDirectory/bin -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force $TerminalGuiProjectDirectory/obj -ErrorAction SilentlyContinue
 
     if(!$Quiet) {
       Write-Host Deleting bin and obj folders for Terminal.Gui.InternalAnalyzers
     }
-    if(Test-Path $internalAnalyzersProjectRoot/bin) {
-      Remove-Item -Recurse -Force $internalAnalyzersProjectRoot/bin
-      Remove-Item -Recurse -Force $internalAnalyzersProjectRoot/obj
-    }
+    Remove-Item -Recurse -Force $InternalAnalyzersProjectDirectory/bin -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force $InternalAnalyzersProjectDirectory/obj -ErrorAction SilentlyContinue
   }
   
   if(!$Quiet) {
     Write-Host Building analyzers in Debug configuration
   }
-  dotnet build $internalAnalyzersProjectFile --no-incremental --nologo --force --configuration Debug
+  dotnet build $InternalAnalyzersProjectFilePath --no-incremental --nologo --force --configuration Debug
 
   if(!$Quiet) {
     Write-Host Building analyzers in Release configuration
   }
-  dotnet build $internalAnalyzersProjectFile --no-incremental --nologo --force --configuration Release
+  dotnet build $InternalAnalyzersProjectFilePath --no-incremental --nologo --force --configuration Release
 
+  Pop-Location
+  
   if(!$AutoLaunch) {
     Write-Host -ForegroundColor Green Finished. Restart Visual Studio for changes to take effect.
   } else {
