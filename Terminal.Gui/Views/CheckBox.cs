@@ -20,11 +20,10 @@ public class CheckBox : View
         _charChecked = Glyphs.Checked;
         _charUnChecked = Glyphs.UnChecked;
 
-        // Ensures a height of 1 if AutoSize is set to false
         Height = 1;
+        Width = Dim.Auto (Dim.DimAutoStyle.Text);
 
         CanFocus = true;
-        AutoSize = true;
 
         // Things this view knows how to do
         AddCommand (Command.Accept, OnToggled);
@@ -95,14 +94,6 @@ public class CheckBox : View
         }
     }
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
     /// <summary>Called when the <see cref="Checked"/> property changes. Invokes the <see cref="Toggled"/> event.</summary>
     /// <remarks>
     /// </remarks>
@@ -151,9 +142,6 @@ public class CheckBox : View
         return true;
     }
 
-    /// <inheritdoc/>
-    public override Point? PositionCursor () { Move (0, 0); return Point.Empty; }
-
     /// <summary>Toggled event, raised when the <see cref="CheckBox"/> is toggled.</summary>
     /// <remarks>
     /// <para>
@@ -192,11 +180,11 @@ public class CheckBox : View
 
     private string GetFormatterText ()
     {
-        if (AutoSize || string.IsNullOrEmpty (Title) || Frame.Width <= 2)
+        if (Width is Dim.DimAuto || string.IsNullOrEmpty (Title) || ContentSize?.Width <= 2)
         {
             return Text;
         }
 
-        return Text [..Math.Min (Frame.Width - 2, Text.GetRuneCount ())];
+        return ContentSize is null ? Text : Text [..Math.Min (ContentSize.Value.Width - 2, Text.GetRuneCount ())];
     }
 }

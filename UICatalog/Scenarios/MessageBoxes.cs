@@ -27,11 +27,11 @@ public class MessageBoxes : Scenario
         };
         frame.Add (widthEdit);
 
-        label = new Label
+        label = new()
         {
             X = 0,
             Y = Pos.Bottom (label),
-            AutoSize = false,
+
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = TextAlignment.Right,
@@ -62,11 +62,11 @@ public class MessageBoxes : Scenario
                    }
                   );
 
-        label = new Label
+        label = new()
         {
             X = 0,
             Y = Pos.Bottom (label),
-            AutoSize = false,
+
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = TextAlignment.Right,
@@ -84,11 +84,11 @@ public class MessageBoxes : Scenario
         };
         frame.Add (titleEdit);
 
-        label = new Label
+        label = new()
         {
             X = 0,
             Y = Pos.Bottom (label),
-            AutoSize = false,
+
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = TextAlignment.Right,
@@ -106,11 +106,11 @@ public class MessageBoxes : Scenario
         };
         frame.Add (messageEdit);
 
-        label = new Label
+        label = new()
         {
             X = 0,
             Y = Pos.Bottom (messageEdit),
-            AutoSize = false,
+
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = TextAlignment.Right,
@@ -128,11 +128,11 @@ public class MessageBoxes : Scenario
         };
         frame.Add (numButtonsEdit);
 
-        label = new Label
+        label = new()
         {
             X = 0,
             Y = Pos.Bottom (label),
-            AutoSize = false,
+
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = TextAlignment.Right,
@@ -150,11 +150,11 @@ public class MessageBoxes : Scenario
         };
         frame.Add (defaultButtonEdit);
 
-        label = new Label
+        label = new()
         {
             X = 0,
             Y = Pos.Bottom (label),
-            AutoSize = false,
+
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = TextAlignment.Right,
@@ -193,7 +193,7 @@ public class MessageBoxes : Scenario
 
         Top.LayoutComplete += Top_LayoutComplete;
 
-        label = new Label
+        label = new()
         {
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, TextAlignment = TextAlignment.Right, Text = "Button Pressed:"
         };
@@ -216,58 +216,58 @@ public class MessageBoxes : Scenario
         };
 
         showMessageBoxButton.Accept += (s, e) =>
-                                        {
-                                            try
-                                            {
-                                                int width = int.Parse (widthEdit.Text);
-                                                int height = int.Parse (heightEdit.Text);
-                                                int numButtons = int.Parse (numButtonsEdit.Text);
-                                                int defaultButton = int.Parse (defaultButtonEdit.Text);
+                                       {
+                                           try
+                                           {
+                                               int width = int.Parse (widthEdit.Text);
+                                               int height = int.Parse (heightEdit.Text);
+                                               int numButtons = int.Parse (numButtonsEdit.Text);
+                                               int defaultButton = int.Parse (defaultButtonEdit.Text);
 
-                                                List<string> btns = new ();
+                                               List<string> btns = new ();
 
-                                                for (var i = 0; i < numButtons; i++)
-                                                {
-                                                    //btns.Add(btnText[i % 10]);
-                                                    btns.Add (NumberToWords.Convert (i));
-                                                }
+                                               for (var i = 0; i < numButtons; i++)
+                                               {
+                                                   //btns.Add(btnText[i % 10]);
+                                                   btns.Add (NumberToWords.Convert (i));
+                                               }
 
-                                                if (styleRadioGroup.SelectedItem == 0)
-                                                {
-                                                    buttonPressedLabel.Text =
-                                                        $"{
-                                                            MessageBox.Query (
-                                                                              width,
-                                                                              height,
-                                                                              titleEdit.Text,
-                                                                              messageEdit.Text,
-                                                                              defaultButton,
-                                                                              (bool)ckbWrapMessage.Checked,
-                                                                              btns.ToArray ()
-                                                                             )
-                                                        }";
-                                                }
-                                                else
-                                                {
-                                                    buttonPressedLabel.Text =
-                                                        $"{
-                                                            MessageBox.ErrorQuery (
-                                                                                   width,
-                                                                                   height,
-                                                                                   titleEdit.Text,
-                                                                                   messageEdit.Text,
-                                                                                   defaultButton,
-                                                                                   (bool)ckbWrapMessage.Checked,
-                                                                                   btns.ToArray ()
-                                                                                  )
-                                                        }";
-                                                }
-                                            }
-                                            catch (FormatException)
-                                            {
-                                                buttonPressedLabel.Text = "Invalid Options";
-                                            }
-                                        };
+                                               if (styleRadioGroup.SelectedItem == 0)
+                                               {
+                                                   buttonPressedLabel.Text =
+                                                       $"{
+                                                           MessageBox.Query (
+                                                                             width,
+                                                                             height,
+                                                                             titleEdit.Text,
+                                                                             messageEdit.Text,
+                                                                             defaultButton,
+                                                                             (bool)ckbWrapMessage.Checked,
+                                                                             btns.ToArray ()
+                                                                            )
+                                                       }";
+                                               }
+                                               else
+                                               {
+                                                   buttonPressedLabel.Text =
+                                                       $"{
+                                                           MessageBox.ErrorQuery (
+                                                                                  width,
+                                                                                  height,
+                                                                                  titleEdit.Text,
+                                                                                  messageEdit.Text,
+                                                                                  defaultButton,
+                                                                                  (bool)ckbWrapMessage.Checked,
+                                                                                  btns.ToArray ()
+                                                                                 )
+                                                       }";
+                                               }
+                                           }
+                                           catch (FormatException)
+                                           {
+                                               buttonPressedLabel.Text = "Invalid Options";
+                                           }
+                                       };
         Win.Add (showMessageBoxButton);
 
         Win.Add (buttonPressedLabel);

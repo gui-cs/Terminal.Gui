@@ -340,11 +340,6 @@ public partial class Toplevel : View
             if (Focused is null)
             {
                 EnsureFocus ();
-
-                if (Focused is null)
-                {
-                    Driver.SetCursorVisibility (CursorVisibility.Invisible);
-                }
             }
 
             return null;
@@ -368,11 +363,7 @@ public partial class Toplevel : View
 
         var cursor2 = base.PositionCursor ();
 
-        if (Focused is null)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-        return cursor2;
+        return null; 
     }
 
     /// <summary>
@@ -391,6 +382,12 @@ public partial class Toplevel : View
                                               out int ny,
                                               out StatusBar sb
                                              );
+
+        if (superView is null)
+        {
+            return;
+        }
+
         var layoutSubviews = false;
         var maxWidth = 0;
 

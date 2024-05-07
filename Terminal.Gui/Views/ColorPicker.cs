@@ -188,13 +188,6 @@ public class ColorPicker : View
         }
     }
 
-    ///<inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
 
     /// <summary>Add the commands.</summary>
     private void AddCommands ()

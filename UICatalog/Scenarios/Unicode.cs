@@ -32,32 +32,32 @@ public class UnicodeInMenu : Scenario
         {
             Menus =
             [
-                new MenuBarItem (
-                                 "_Файл",
-                                 new MenuItem []
-                                 {
-                                     new (
-                                          "_Создать",
-                                          "Creates new file",
-                                          null
-                                         ),
-                                     new ("_Открыть", "", null),
-                                     new ("Со_хранить", "", null),
-                                     new (
-                                          "_Выход",
-                                          "",
-                                          () => Application.RequestStop ()
-                                         )
-                                 }
-                                ),
-                new MenuBarItem (
-                                 "_Edit",
-                                 new MenuItem []
-                                 {
-                                     new ("_Copy", "", null), new ("C_ut", "", null),
-                                     new ("_糊", "hú (Paste)", null)
-                                 }
-                                )
+                new (
+                     "_Файл",
+                     new MenuItem []
+                     {
+                         new (
+                              "_Создать",
+                              "Creates new file",
+                              null
+                             ),
+                         new ("_Открыть", "", null),
+                         new ("Со_хранить", "", null),
+                         new (
+                              "_Выход",
+                              "",
+                              () => Application.RequestStop ()
+                             )
+                     }
+                    ),
+                new (
+                     "_Edit",
+                     new MenuItem []
+                     {
+                         new ("_Copy", "", null), new ("C_ut", "", null),
+                         new ("_糊", "hú (Paste)", null)
+                     }
+                    )
             ]
         };
         Top.Add (menu);
@@ -83,43 +83,43 @@ public class UnicodeInMenu : Scenario
         {
             X = 20,
             Y = Pos.Y (label),
-            AutoSize = false,
+
             Width = Dim.Percent (50),
             Text = gitString
         };
         Win.Add (testlabel);
 
-        label = new Label { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Label (CanFocus):" };
+        label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Label (CanFocus):" };
         Win.Add (label);
         var sb = new StringBuilder ();
         sb.Append ('e');
         sb.Append ('\u0301');
         sb.Append ('\u0301');
 
-        testlabel = new Label
+        testlabel = new()
         {
             X = 20,
             Y = Pos.Y (label),
-            AutoSize = false,
+
             Width = Dim.Percent (50),
             CanFocus = true,
-            HotKeySpecifier = new Rune ('&'),
+            HotKeySpecifier = new ('&'),
             Text = $"Should be [e with two accents, but isn't due to #2616]: [{sb}]"
         };
         Win.Add (testlabel);
-        label = new Label { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Button:" };
+        label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Button:" };
         Win.Add (label);
         var button = new Button { X = 20, Y = Pos.Y (label), Text = "A123456789♥♦♣♠JQK" };
         Win.Add (button);
 
-        label = new Label { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "CheckBox:" };
+        label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "CheckBox:" };
         Win.Add (label);
 
         var checkBox = new CheckBox
         {
             X = 20,
             Y = Pos.Y (label),
-            AutoSize = false,
+
             Width = Dim.Percent (50),
             Height = 1,
             Text = gitString
@@ -129,7 +129,7 @@ public class UnicodeInMenu : Scenario
         {
             X = 20,
             Y = Pos.Bottom (checkBox),
-            AutoSize = false,
+
             Width = Dim.Percent (50),
             Height = 1,
             TextAlignment = TextAlignment.Right,
@@ -137,7 +137,7 @@ public class UnicodeInMenu : Scenario
         };
         Win.Add (checkBox, checkBoxRight);
 
-        label = new Label { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1, Text = "ComboBox:" };
+        label = new() { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1, Text = "ComboBox:" };
         Win.Add (label);
         var comboBox = new ComboBox { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
         comboBox.SetSource (new List<string> { gitString, "Со_хранить" });
@@ -145,7 +145,7 @@ public class UnicodeInMenu : Scenario
         Win.Add (comboBox);
         comboBox.Text = gitString;
 
-        label = new Label { X = Pos.X (label), Y = Pos.Bottom (label) + 2, Text = "HexView:" };
+        label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 2, Text = "HexView:" };
         Win.Add (label);
 
         var hexView = new HexView (new MemoryStream (Encoding.ASCII.GetBytes (gitString + " Со_хранить")))
@@ -154,7 +154,7 @@ public class UnicodeInMenu : Scenario
         };
         Win.Add (hexView);
 
-        label = new Label { X = Pos.X (label), Y = Pos.Bottom (hexView) + 1, Text = "ListView:" };
+        label = new() { X = Pos.X (label), Y = Pos.Bottom (hexView) + 1, Text = "ListView:" };
         Win.Add (label);
 
         var listView = new ListView
@@ -169,7 +169,7 @@ public class UnicodeInMenu : Scenario
         };
         Win.Add (listView);
 
-        label = new Label { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "RadioGroup:" };
+        label = new() { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "RadioGroup:" };
         Win.Add (label);
 
         var radioGroup = new RadioGroup
@@ -181,7 +181,7 @@ public class UnicodeInMenu : Scenario
         };
         Win.Add (radioGroup);
 
-        label = new Label { X = Pos.X (label), Y = Pos.Bottom (radioGroup) + 1, Text = "TextField:" };
+        label = new() { X = Pos.X (label), Y = Pos.Bottom (radioGroup) + 1, Text = "TextField:" };
         Win.Add (label);
 
         var textField = new TextField
@@ -190,7 +190,7 @@ public class UnicodeInMenu : Scenario
         };
         Win.Add (textField);
 
-        label = new Label { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "TextView:" };
+        label = new() { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "TextView:" };
         Win.Add (label);
 
         var textView = new TextView

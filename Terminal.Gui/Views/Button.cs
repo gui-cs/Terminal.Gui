@@ -45,11 +45,10 @@ public class Button : View
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
-        // Ensures a height of 1 if AutoSize is set to false
         Height = 1;
+        Width = Dim.Auto (Dim.DimAutoStyle.Text);
 
         CanFocus = true;
-        AutoSize = true;
         HighlightStyle |= HighlightStyle.Pressed;
 #if HOVER
         HighlightStyle |= HighlightStyle.Hover;
@@ -139,14 +138,6 @@ public class Button : View
     public bool NoPadding { get; set; }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
     public override Point? PositionCursor ()
     {
         if (HotKey.IsValid && Text != "")
@@ -156,8 +147,7 @@ public class Button : View
                 if (TextFormatter.Text [i] == Text [0])
                 {
                     Move (i, 0);
-
-                    return new (i,0);
+                    return null; // Don't show the cursor
                 }
             }
         }

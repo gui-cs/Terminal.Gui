@@ -3068,15 +3068,15 @@ Edit
         };
 
         menu.UseKeysUpDownAsKeysLeftRight = true;
-        var top = new Toplevel ();
-        top.Add (menu);
-        Application.Begin (top);
+        menu.BeginInit();
+        menu.EndInit();
 
-        Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
-        Assert.False (menu.UseSubMenusSingleFrame);
+        menu.OpenMenu();
+        menu.ColorScheme = menu._openMenu.ColorScheme = new ColorScheme (Attribute.Default);
+        Assert.True (menu.IsMenuOpen);
 
-        Assert.True (menu.NewKeyDownEvent (menu.Key));
-        top.Draw ();
+        menu.Draw ();
+        menu._openMenu.Draw ();
 
         var expected = @"
  Numbers
@@ -3086,8 +3086,10 @@ Edit
 
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-        Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (Key.CursorDown));
-        top.Draw ();
+        Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorDown));
+        menu.Draw ();
+        menu._openMenu.Draw ();
+        menu.openCurrentMenu.Draw ();
 
         expected = @"
  Numbers           
@@ -3354,17 +3356,17 @@ Edit
                                 )
             ]
         };
-        var top = new Toplevel ();
-        top.Add (menu);
-        Application.Begin (top);
 
-        Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
-        Assert.False (menu.UseSubMenusSingleFrame);
         menu.UseSubMenusSingleFrame = true;
-        Assert.True (menu.UseSubMenusSingleFrame);
+        menu.BeginInit ();
+        menu.EndInit ();
 
-        Assert.True (menu.NewKeyDownEvent (menu.Key));
-        top.Draw ();
+        menu.OpenMenu ();
+        Assert.True (menu.IsMenuOpen);
+
+        menu.Draw ();
+        menu.ColorScheme = menu._openMenu.ColorScheme = new ColorScheme (Attribute.Default);
+        menu._openMenu.Draw ();
 
         var expected = @"
  Numbers
@@ -3374,9 +3376,11 @@ Edit
 
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-        Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (Key.CursorDown));
-        Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (Key.Enter));
-        top.Draw ();
+        Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorDown));
+        Assert.True (menu._openMenu.NewKeyDownEvent (Key.Enter));
+        menu.Draw ();
+        menu._openMenu.Draw ();
+        menu.openCurrentMenu.Draw ();
 
         expected = @"
  Numbers     

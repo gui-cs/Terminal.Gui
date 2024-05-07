@@ -599,22 +599,6 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override bool OnEnter (View view)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-
-            return base.OnEnter (view);
-        }
-
-        /// <inheritdoc/>
-        public override bool OnLeave (View view)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-            return base.OnLeave (view);
-        }
-
-        /// <inheritdoc/>
         public override bool OnProcessKeyDown (Key a)
         {
             if (_provider is null)
@@ -659,14 +643,6 @@ namespace Terminal.Gui
             }
             Move (curPos, 0);
 
-            if (curPos < 0 || curPos >= Viewport.Width)
-            {
-                Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-            }
-            else
-            {
-                Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-            }
             return new (curPos, 0);
         }
 

@@ -101,7 +101,7 @@ public class TreeViewTests
 
     [Fact]
     [AutoInitShutdown]
-    public void DesiredCursorVisibility_MultiSelect ()
+    public void CursorVisibility_MultiSelect ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
 
@@ -116,13 +116,13 @@ public class TreeViewTests
 
         Assert.True (tv.MultiSelect);
         Assert.True (tv.HasFocus);
-        Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+        Assert.Equal (CursorVisibility.Invisible, tv.CursorVisibility);
 
         tv.SelectAll ();
-        tv.DesiredCursorVisibility = CursorVisibility.Default;
-        Application.Refresh ();
+        tv.CursorVisibility = CursorVisibility.Default;
+        Application.PositionCursor (top);
         Application.Driver.GetCursorVisibility (out CursorVisibility visibility);
-        Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
         Assert.Equal (CursorVisibility.Default, visibility);
     }
 

@@ -136,7 +136,14 @@ public partial class View
     ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
     /// </summary>
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
-    public Thickness GetAdornmentsThickness () { return Margin.Thickness + Border.Thickness + Padding.Thickness; }
+    public Thickness GetAdornmentsThickness ()
+    {
+        if (Margin is null)
+        {
+            return Thickness.Empty;
+        }
+        return Margin.Thickness + Border.Thickness + Padding.Thickness;
+    }
 
     /// <summary>Lays out the Adornments of the View.</summary>
     /// <remarks>

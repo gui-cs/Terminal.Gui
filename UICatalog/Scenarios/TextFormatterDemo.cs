@@ -14,9 +14,9 @@ public class TextFormatterDemo : Scenario
     {
         Application.Init ();
 
-        var app = new Window ()
+        var app = new Window
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
         };
 
         // Make Win smaller so sizing the window horizontally will make the
@@ -34,9 +34,9 @@ public class TextFormatterDemo : Scenario
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             X = 0,
             Y = 0,
-            AutoSize = false,
+
             Height = 10,
-            Width = Dim.Fill (),
+            Width = Dim.Fill ()
         };
 
         var block = new StringBuilder ();
@@ -71,22 +71,22 @@ public class TextFormatterDemo : Scenario
 
         foreach (TextAlignment alignment in alignments)
         {
-            singleLines [(int)alignment] = new Label
+            singleLines [(int)alignment] = new()
             {
                 TextAlignment = alignment,
                 X = 0,
-                AutoSize = false,
+
                 Width = Dim.Fill (),
                 Height = 1,
                 ColorScheme = Colors.ColorSchemes ["Dialog"],
                 Text = text
             };
 
-            multipleLines [(int)alignment] = new Label
+            multipleLines [(int)alignment] = new()
             {
                 TextAlignment = alignment,
                 X = 0,
-                AutoSize = false,
+
                 Width = Dim.Fill (),
                 Height = multiLineHeight,
                 ColorScheme = Colors.ColorSchemes ["Dialog"],
@@ -102,19 +102,19 @@ public class TextFormatterDemo : Scenario
 
         foreach (TextAlignment alignment in alignments)
         {
-            label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };
+            label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             app.Add (label);
             singleLines [(int)alignment].Y = Pos.Bottom (label);
             app.Add (singleLines [(int)alignment]);
             label = singleLines [(int)alignment];
         }
 
-        label = new Label { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
+        label = new() { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
         app.Add (label);
 
         foreach (TextAlignment alignment in alignments)
         {
-            label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };
+            label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             app.Add (label);
             multipleLines [(int)alignment].Y = Pos.Bottom (label);
             app.Add (multipleLines [(int)alignment]);

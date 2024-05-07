@@ -59,10 +59,10 @@ public class SendKeys : Scenario
                                  }
                              };
 
-        var lblShippedKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 3, AutoSize = true };
+        var lblShippedKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 3 };
         Win.Add (lblShippedKeys);
 
-        var lblShippedControlKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 5, AutoSize = true };
+        var lblShippedControlKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 5 };
         Win.Add (lblShippedControlKeys);
 
         var button = new Button { X = Pos.Center (), Y = Pos.Center () + 7, IsDefault = true, Text = "Process keys" };

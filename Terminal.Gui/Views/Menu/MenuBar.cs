@@ -509,7 +509,7 @@ public class MenuBar : View
                    + _rightPadding;
         }
 
-        PositionCursor ();
+        //PositionCursor ();
     }
 
     /// <summary>Virtual method that will invoke the <see cref="MenuAllClosed"/>.</summary>
@@ -621,7 +621,7 @@ public class MenuBar : View
                 pos++;
                 Move (pos + 1, 0);
 
-                return new (pos +1, 0);
+                return null; // Don't show the cursor
             }
 
             pos += _leftPadding
@@ -631,7 +631,7 @@ public class MenuBar : View
                           : 0)
                    + _rightPadding;
         }
-        return null;
+        return null; // Don't show the cursor
     }
 
     // Activates the menu, handles either first focus, or activating an entry when it was already active
@@ -739,7 +739,7 @@ public class MenuBar : View
             case false:
                 if (_openMenu is { })
                 {
-                    Application.Current.Remove (_openMenu);
+                    Application.Current?.Remove (_openMenu);
                 }
 
                 SetNeedsDisplay ();
@@ -788,7 +788,7 @@ public class MenuBar : View
                 else
                 {
                     SetFocus ();
-                    PositionCursor ();
+                    //PositionCursor ();
                 }
 
                 IsMenuOpen = false;
@@ -823,7 +823,12 @@ public class MenuBar : View
 
         Rectangle superViewFrame = SuperView is null ? Driver.Screen : SuperView.Frame;
         View sv = SuperView is null ? Application.Current : SuperView;
-        Point viewportOffset = sv.GetViewportOffsetFromFrame ();
+        if (sv is null)
+        {
+            // Support Unit Tests
+            return Point.Empty;
+        }
+        Point viewportOffset = sv?.GetViewportOffsetFromFrame () ?? Point.Empty;
 
         return new (
                     superViewFrame.X - sv.Frame.X - viewportOffset.X,
@@ -965,7 +970,7 @@ public class MenuBar : View
 
                 if (_openMenu is { })
                 {
-                    Application.Current.Remove (_openMenu);
+                    Application.Current?.Remove (_openMenu);
                     _openMenu.Dispose ();
                     _openMenu = null;
                 }
@@ -1002,7 +1007,15 @@ public class MenuBar : View
                 openCurrentMenu = _openMenu;
                 openCurrentMenu._previousSubFocused = _openMenu;
 
-                Application.Current.Add (_openMenu);
+                if (Application.Current is { })
+                {
+                    Application.Current.Add (_openMenu);
+                }
+                else
+                {
+                    _openMenu.BeginInit();
+                    _openMenu.EndInit();
+                }
                 _openMenu.SetFocus ();
 
                 break;
@@ -1060,7 +1073,14 @@ public class MenuBar : View
 
                     openCurrentMenu._previousSubFocused = last._previousSubFocused;
                     _openSubMenu.Add (openCurrentMenu);
-                    Application.Current.Add (openCurrentMenu);
+                    Application.Current?.Add (openCurrentMenu);
+
+                    if (!openCurrentMenu.IsInitialized)
+                    {
+                        // Supports unit tests
+                        openCurrentMenu.BeginInit ();
+                        openCurrentMenu.EndInit ();
+                    }
                 }
 
                 _selectedSub = _openSubMenu.Count - 1;
@@ -1631,13 +1651,6 @@ public class MenuBar : View
 
     #region Mouse Handling
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
 
     /// <inheritdoc/>
     public override bool OnLeave (View view)

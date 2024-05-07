@@ -869,7 +869,7 @@ public class NavigationTests
         Assert.Equal (0, screen.Y);
         var found = View.FindDeepestView (top, 0, 0);
         Assert.Equal (top.Border, found);
- 
+
         Assert.Equal (0, found.Frame.X);
         Assert.Equal (0, found.Frame.Y);
         Assert.Equal (new Point (3, 2), top.ScreenToFrame (3, 2));
@@ -934,14 +934,14 @@ public class NavigationTests
         Assert.Equal (3, screen.Y);
         found = View.FindDeepestView (top, 4, 3);
         Assert.Equal (view, found);
-        
+
         Assert.Equal (new Point (9, -1), view.ScreenToFrame (13, 2));
         screen = view.ViewportToScreen (new (10, 0, 0, 0));
         Assert.Equal (14, screen.X);
         Assert.Equal (3, screen.Y);
         found = View.FindDeepestView (top, 14, 3);
         Assert.Equal (top, found);
-        
+
         Assert.Equal (new Point (10, 0), view.ScreenToFrame (14, 3));
         screen = view.ViewportToScreen (new (11, 1, 0, 0));
         Assert.Equal (15, screen.X);
@@ -1042,7 +1042,7 @@ public class NavigationTests
         Assert.Equal (15, screen.X);
         Assert.Equal (4, screen.Y);
         Assert.Equal (top, View.FindDeepestView (top, 14, 3));
-        
+
         // view
         Assert.Equal (new Point (-7, -5), view.ScreenToFrame (0, 0));
         screen = view.Margin.ViewportToScreen (new (-6, -4, 0, 0));
@@ -1549,5 +1549,33 @@ public class NavigationTests
 
         // Assert does Not throw NullReferenceException
         top.SetFocus ();
+    }
+
+    // View.Focused & View.MostFocused tests
+
+    // View.Focused - No subviews
+    [Fact, Trait("BUGBUG", "Fix in Issue #3444")]
+    public void Focused_NoSubviews ()
+    {
+        var view = new View ();
+        Assert.Null (view.Focused);
+
+        view.CanFocus = true;
+        view.SetFocus ();
+        Assert.True (view.HasFocus);
+        Assert.Null (view.Focused); // BUGBUG: Should be view
+    }
+
+    // View.MostFocused - No subviews
+    [Fact, Trait ("BUGBUG", "Fix in Issue #3444")]
+    public void Most_Focused_NoSubviews ()
+    {
+        var view = new View ();
+        Assert.Null (view.Focused);
+
+        view.CanFocus = true;
+        view.SetFocus ();
+        Assert.True (view.HasFocus);
+        Assert.Null (view.MostFocused); // BUGBUG: Should be view
     }
 }

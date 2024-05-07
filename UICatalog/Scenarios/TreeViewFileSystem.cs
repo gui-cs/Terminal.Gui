@@ -223,7 +223,7 @@ public class TreeViewFileSystem : Scenario
     {
         _miCursor.Checked = !_miCursor.Checked;
 
-        _treeViewFiles.DesiredCursorVisibility =
+        _treeViewFiles.CursorVisibility =
             _miCursor.Checked == true ? CursorVisibility.Default : CursorVisibility.Invisible;
     }
 

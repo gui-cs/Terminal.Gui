@@ -751,7 +751,7 @@ internal sealed class Menu : View
 
         if (index == _currentChild)
         {
-            return ColorScheme.Focus;
+            return GetFocusColor ();
         }
 
         return !item.IsEnabled () ? ColorScheme.Disabled : GetNormalColor ();
@@ -787,7 +787,7 @@ internal sealed class Menu : View
 
             Driver.SetAttribute (
                                  item is null ? GetNormalColor () :
-                                 i == _currentChild ? ColorScheme.Focus : GetNormalColor ()
+                                 i == _currentChild ? GetFocusColor() : GetNormalColor ()
                                 );
 
             if (item is null && BorderStyle != LineStyle.None)
@@ -890,13 +890,14 @@ internal sealed class Menu : View
                 {
                     var tf = new TextFormatter
                     {
+                        AutoSize = true,
                         Alignment = TextAlignment.Centered, HotKeySpecifier = MenuBar.HotKeySpecifier, Text = textToDraw
                     };
 
                     // The -3 is left/right border + one space (not sure what for)
                     tf.Draw (
                              ViewportToScreen (new (1, i, Frame.Width - 3, 1)),
-                             i == _currentChild ? ColorScheme.Focus : GetNormalColor (),
+                             i == _currentChild ? GetFocusColor () : GetNormalColor (),
                              i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
                              SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
                             );
@@ -906,7 +907,7 @@ internal sealed class Menu : View
                     DrawHotString (
                                    textToDraw,
                                    i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
-                                   i == _currentChild ? ColorScheme.Focus : GetNormalColor ()
+                                   i == _currentChild ? GetFocusColor () : GetNormalColor ()
                                   );
                 }
 
@@ -934,7 +935,7 @@ internal sealed class Menu : View
 
         Driver.Clip = savedClip;
 
-        PositionCursor ();
+       // PositionCursor ();
     }
 
     private void Current_DrawContentComplete (object sender, DrawEventArgs e)
@@ -956,7 +957,9 @@ internal sealed class Menu : View
             else
             {
                 Move (2, 1 + _currentChild);
-                return new (2, 1 + _currentChild);
+
+                return null; // Don't show the cursor
+
             }
         }
 
@@ -1330,14 +1333,6 @@ internal sealed class Menu : View
         }
 
         return pos;
-    }
-
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
     }
 
     protected override void Dispose (bool disposing)

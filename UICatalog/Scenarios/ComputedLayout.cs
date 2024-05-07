@@ -27,7 +27,6 @@ public class ComputedLayout : Scenario
 
         var horizontalRuler = new Label
         {
-            AutoSize = false,
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
@@ -43,7 +42,6 @@ public class ComputedLayout : Scenario
 
         var verticalRuler = new Label
         {
-            AutoSize = false,
             X = 0,
             Y = 0,
             Width = 1,
@@ -93,7 +91,6 @@ public class ComputedLayout : Scenario
                        new Label
                        {
                            TextAlignment = TextAlignment.Left,
-                           AutoSize = false,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -106,7 +103,6 @@ public class ComputedLayout : Scenario
                        new Label
                        {
                            TextAlignment = TextAlignment.Right,
-                           AutoSize = false,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -119,7 +115,6 @@ public class ComputedLayout : Scenario
                        new Label
                        {
                            TextAlignment = TextAlignment.Centered,
-                           AutoSize = false,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -132,7 +127,6 @@ public class ComputedLayout : Scenario
                        new Label
                        {
                            TextAlignment = TextAlignment.Justified,
-                           AutoSize = false,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -159,7 +153,6 @@ public class ComputedLayout : Scenario
                        new Label
                        {
                            TextAlignment = TextAlignment.Left,
-                           AutoSize = false,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -172,7 +165,6 @@ public class ComputedLayout : Scenario
                        new Label
                        {
                            TextAlignment = TextAlignment.Right,
-                           AutoSize = false,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -185,7 +177,6 @@ public class ComputedLayout : Scenario
                        new Label
                        {
                            TextAlignment = TextAlignment.Centered,
-                           AutoSize = false,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -198,7 +189,6 @@ public class ComputedLayout : Scenario
                        new Label
                        {
                            TextAlignment = TextAlignment.Justified,
-                           AutoSize = false,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -335,7 +325,6 @@ public class ComputedLayout : Scenario
             Text = "This Label should be the 2nd to last line (AnchorEnd (2)).",
             TextAlignment = TextAlignment.Centered,
             ColorScheme = Colors.ColorSchemes ["Menu"],
-            AutoSize = false,
             Width = Dim.Fill (5),
             X = 5,
             Y = Pos.AnchorEnd (2)
@@ -350,7 +339,6 @@ public class ComputedLayout : Scenario
                 "This TextField should be the 3rd to last line (AnchorEnd (2) - 1).",
             TextAlignment = TextAlignment.Left,
             ColorScheme = Colors.ColorSchemes ["Menu"],
-            AutoSize = false,
             Width = Dim.Fill (5),
             X = 5,
             Y = Pos.AnchorEnd (2) - 1 // Pos.Combine

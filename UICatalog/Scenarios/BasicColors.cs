@@ -28,7 +28,6 @@ public class BasicColors : Scenario
 
             var vl = new Label
             {
-                AutoSize = false,
                 X = vx,
                 Y = 0,
                 Width = 1,
@@ -42,7 +41,6 @@ public class BasicColors : Scenario
 
             var hl = new Label
             {
-                AutoSize = false,
                 X = 15,
                 Y = y,
                 Width = 13,

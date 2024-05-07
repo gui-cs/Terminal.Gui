@@ -61,9 +61,8 @@ public class Dialog : Window
         Y = Pos.Center ();
         ValidatePosDim = true;
 
-        Width = Dim.Percent (85); // Dim.Auto (min: Dim.Percent (10));
-        Height = Dim.Percent (85); //Dim.Auto (min: Dim.Percent (50));
-
+        Width = Dim.Percent (85); 
+        Height = Dim.Percent (85);
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;
@@ -147,7 +146,6 @@ public class Dialog : Window
             return;
         }
 
-        //button.AutoSize = false; // BUGBUG: v2 - Hack to get around autosize not accounting for Margin?
         _buttons.Add (button);
         Add (button);
 

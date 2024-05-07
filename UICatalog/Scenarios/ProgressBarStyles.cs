@@ -65,7 +65,7 @@ public class ProgressBarStyles : Scenario
         {
             var colorPicker = new ColorPicker { Title = text, SelectedColor = colorName };
 
-            var dialog = new Dialog { AutoSize = false, Title = text };
+            var dialog = new Dialog { Title = text };
 
             dialog.Initialized += (sender, args) =>
                                      {

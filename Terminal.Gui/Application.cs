@@ -557,8 +557,6 @@ public static partial class Application
         return rs;
     }
 
-    private static CursorVisibility _cachedCursorVisibility;
-
     /// <summary>
     /// Calls <see cref="View.PositionCursor"/> on the most focused view in the view starting with <paramref name="view"/>.
     /// </summary>
@@ -571,29 +569,21 @@ public static partial class Application
     /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
     internal static bool PositionCursor (View view)
     {
-        if (view is null)
-        {
-            return false;
-        }
-
         // Find the most focused view and position the cursor there.
-        View mostFocused = view.MostFocused;
+        View mostFocused = view?.MostFocused;
 
         if (mostFocused is null)
         {
             return false;
         }
 
-        CursorVisibility cachedCursorVisibility;
 
         // If the view is not visible or enabled, don't position the cursor
         if (!mostFocused.Visible || !mostFocused.Enabled)
         {
-            Driver.GetCursorVisibility (out cachedCursorVisibility);
-
-            if (cachedCursorVisibility != CursorVisibility.Invisible)
+            Driver.GetCursorVisibility (out CursorVisibility current);
+            if (current != CursorVisibility.Invisible)
             {
-                _cachedCursorVisibility = cachedCursorVisibility;
                 Driver.SetCursorVisibility (CursorVisibility.Invisible);
             }
 
@@ -611,40 +601,35 @@ public static partial class Application
         Point? prevCursor = new (Driver.Row, Driver.Col);
         Point? cursor = mostFocused.PositionCursor ();
 
-        // If the cursor is not in a visible location in the SuperView, hide it
+        Driver.GetCursorVisibility (out CursorVisibility currentCursorVisibility);
+
         if (cursor is { })
         {
             // Convert cursor to screen coords
             cursor = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = cursor.Value }).Location;
+
+            // If the cursor is not in a visible location in the SuperView, hide it
             if (!superViewViewport.Contains (cursor.Value))
             {
-                Driver.GetCursorVisibility (out cachedCursorVisibility);
-
-                if (cachedCursorVisibility != CursorVisibility.Invisible)
+                if (currentCursorVisibility != CursorVisibility.Invisible)
                 {
-                    _cachedCursorVisibility = cachedCursorVisibility;
+                    Driver.SetCursorVisibility (CursorVisibility.Invisible);
                 }
-
-                Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
                 return false;
             }
 
-            Driver.GetCursorVisibility (out cachedCursorVisibility);
-
-            if (cachedCursorVisibility == CursorVisibility.Invisible)
+            // Show it
+            if (currentCursorVisibility == CursorVisibility.Invisible)
             {
-                Driver.SetCursorVisibility (_cachedCursorVisibility);
+                Driver.SetCursorVisibility (mostFocused.CursorVisibility);
             }
 
-            return prevCursor != cursor;
+            return true;
         }
 
-        Driver.GetCursorVisibility (out cachedCursorVisibility);
-
-        if (cachedCursorVisibility != CursorVisibility.Invisible)
+        if (currentCursorVisibility != CursorVisibility.Invisible)
         {
-            _cachedCursorVisibility = cachedCursorVisibility;
             Driver.SetCursorVisibility (CursorVisibility.Invisible);
         }
 
@@ -1413,14 +1398,14 @@ public static partial class Application
     {
         SizeChanging?.Invoke (null, args);
 
-        if (args.Cancel)
+        if (args.Cancel || args.Size is null)
         {
             return false;
         }
 
         foreach (Toplevel t in _topLevels)
         {
-            t.SetRelativeLayout (args.Size);
+            t.SetRelativeLayout (args.Size.Value);
             t.LayoutSubviews ();
             t.PositionToplevels ();
             t.OnSizeChanging (new (args.Size));

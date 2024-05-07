@@ -198,14 +198,6 @@ public class ProgressBar : View
         }
     }
 
-    ///<inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
     /// <summary>Notifies the <see cref="ProgressBar"/> that some progress has taken place.</summary>
     /// <remarks>
     ///     If the <see cref="ProgressBar"/> is percentage mode, it switches to activity mode. If is in activity mode, the

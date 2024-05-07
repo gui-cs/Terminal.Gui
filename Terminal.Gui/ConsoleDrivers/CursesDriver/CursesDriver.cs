@@ -214,8 +214,12 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests && Col >= 0 && Col < Cols && Row >= 0 && Row < Rows)
         {
             Curses.move (Row, Col);
+            Curses.raw ();
+            Curses.noecho ();
+            Curses.refresh ();
         }
     }
+
 
     public override void UpdateScreen ()
     {
@@ -604,6 +608,12 @@ internal class CursesDriver : ConsoleDriver
             if (wch == '\n' || wch == '\r')
             {
                 k = KeyCode.Enter;
+            }
+
+            // Strip the KeyCode.Space flag off if it's set
+            if (k != KeyCode.Space && k.HasFlag (KeyCode.Space))
+            {
+                k &= ~KeyCode.Space;
             }
 
             OnKeyDown (new Key (k));

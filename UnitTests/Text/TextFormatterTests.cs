@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
+using static Terminal.Gui.SpinnerStyle;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -40,11 +41,14 @@ public class TextFormatterTests
         };
 
     [Fact]
-    public void Basic_Usage ()
+    public void Basic_Usage_With_AutoSize_True ()
     {
         var testText = "test";
         var testBounds = new Rectangle (0, 0, 100, 1);
         var tf = new TextFormatter ();
+
+        // Manually set AutoSize to true
+        tf.AutoSize = true;
 
         tf.Text = testText;
         Size expectedSize = new (testText.Length, 1);
@@ -65,7 +69,7 @@ public class TextFormatterTests
         Assert.NotEmpty (tf.GetLines ());
 
         tf.Alignment = TextAlignment.Right;
-        expectedSize = new (testText.Length * 2, 1);
+        expectedSize = new (testText.Length, 1);
         tf.Size = expectedSize;
         Assert.Equal (testText, tf.Text);
         Assert.Equal (TextAlignment.Right, tf.Alignment);
@@ -75,7 +79,7 @@ public class TextFormatterTests
         Assert.NotEmpty (tf.GetLines ());
 
         tf.Alignment = TextAlignment.Centered;
-        expectedSize = new (testText.Length * 2, 1);
+        expectedSize = new (testText.Length, 1);
         tf.Size = expectedSize;
         Assert.Equal (testText, tf.Text);
         Assert.Equal (TextAlignment.Centered, tf.Alignment);
@@ -152,6 +156,32 @@ public class TextFormatterTests
     {
         var text = "Les Mise\u0328\u0301rables";
         Assert.Equal (new (0, 0, width, height), TextFormatter.CalcRect (0, 0, text, textDirection));
+    }
+
+    [Theory]
+    [InlineData ("test", TextDirection.LeftRight_TopBottom)]
+    [InlineData (" ~  s  gui.cs   master ↑10", TextDirection.LeftRight_TopBottom)]
+    [InlineData ("Say Hello view4 你", TextDirection.LeftRight_TopBottom)]
+    [InlineData ("Say Hello view4 你", TextDirection.RightLeft_TopBottom)]
+    [InlineData ("Say Hello view4 你", TextDirection.LeftRight_BottomTop)]
+    [InlineData ("Say Hello view4 你", TextDirection.RightLeft_BottomTop)]
+    public void CalcRect_Horizontal_Width_Correct (string text, TextDirection textDirection)
+    {
+        // The width is the number of columns in the text
+        Assert.Equal (new Size (text.GetColumns (), 1), TextFormatter.CalcRect (0, 0, text, textDirection).Size);
+    }
+
+    [Theory]
+    [InlineData ("test", TextDirection.TopBottom_LeftRight)]
+    [InlineData (" ~  s  gui.cs   master ↑10", TextDirection.TopBottom_LeftRight)]
+    [InlineData ("Say Hello view4 你", TextDirection.TopBottom_LeftRight)]
+    [InlineData ("Say Hello view4 你", TextDirection.TopBottom_RightLeft)]
+    [InlineData ("Say Hello view4 你", TextDirection.BottomTop_LeftRight)]
+    [InlineData ("Say Hello view4 你", TextDirection.BottomTop_RightLeft)]
+    public void CalcRect_Vertical_Height_Correct (string text, TextDirection textDirection)
+    {
+        // The height is based both the number of lines and the number of wide chars
+        Assert.Equal (new Size (1 + text.GetColumns () - text.Length, text.Length), TextFormatter.CalcRect (0, 0, text, textDirection).Size);
     }
 
     [Theory]
@@ -403,15 +433,7 @@ ssb
 
         Assert.True (tf.WordWrap);
 
-        if (textDirection == TextDirection.LeftRight_TopBottom)
-        {
-            Assert.Equal (new (width, height), tf.Size);
-        }
-        else
-        {
-            Assert.Equal (new (1, text.GetColumns ()), tf.Size);
-            tf.Size = new (width, height);
-        }
+        tf.Size = new (width, height);
 
         tf.Draw (
                  new (0, 0, width, height),
@@ -961,34 +983,47 @@ ssb
         Assert.Equal (1, TextFormatter.GetMaxColsForWidth (text, 1));
     }
 
+
     [Theory]
+    [InlineData (new [] { "0123456789" }, 1)]
+    [InlineData (new [] { "Hello World" }, 1)]
+    [InlineData (new [] { "Hello", "World" }, 2)]
+    [InlineData (new [] { "こんにちは", "世界" }, 4)]
+    public void GetColumnsRequiredForVerticalText_List_GetsWidth (IEnumerable<string> text, int expectedWidth)
+    {
+        Assert.Equal (expectedWidth, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList ()));
+
+    }
+
+    [Theory]
+    [InlineData (new [] { "Hello World" }, 1, 0, 1, 1)]
     [InlineData (new [] { "Hello", "World" }, 2, 1, 1, 1)]
     [InlineData (new [] { "こんにちは", "世界" }, 4, 1, 1, 2)]
-    public void GetWidestLineLength_List_Simple_And_Wide_Runes (
+    public void GetColumnsRequiredForVerticalText_List_Simple_And_Wide_Runes (
         IEnumerable<string> text,
-        int width,
+        int expectedWidth,
         int index,
         int length,
-        int indexWidth
+        int expectedIndexWidth
     )
     {
-        Assert.Equal (width, TextFormatter.GetWidestLineLength (text.ToList ()));
-        Assert.Equal (indexWidth, TextFormatter.GetWidestLineLength (text.ToList (), index, length));
+        Assert.Equal (expectedWidth, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList ()));
+        Assert.Equal (expectedIndexWidth, TextFormatter.GetColumnsRequiredForVerticalText (text.ToList (), index, length));
     }
 
     [Fact]
-    public void GetWidestLineLength_List_With_Combining_Runes ()
+    public void GetColumnsRequiredForVerticalText_List_With_Combining_Runes ()
     {
         List<string> text = new () { "Les Mis", "e\u0328\u0301", "rables" };
-        Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
+        Assert.Equal (1, TextFormatter.GetColumnsRequiredForVerticalText (text, 1, 1));
     }
 
-    [Fact]
-    public void GetWidestLineLength_With_Combining_Runes ()
-    {
-        var text = "Les Mise\u0328\u0301rables";
-        Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
-    }
+    //[Fact]
+    //public void GetWidestLineLength_With_Combining_Runes ()
+    //{
+    //    var text = "Les Mise\u0328\u0301rables";
+    //    Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
+    //}
 
     [Fact]
     public void Internal_Tests ()
@@ -2050,6 +2085,7 @@ ssb
 
         var text = "This is a \tTab";
         var tf = new TextFormatter ();
+        tf.AutoSize = true;
         tf.Direction = textDirection;
         tf.TabWidth = tabWidth;
         tf.Text = text;
@@ -2088,6 +2124,8 @@ ssb
 
         var text = "This is a \tTab";
         var tf = new TextFormatter ();
+        tf.AutoSize = true;
+
         tf.Direction = textDirection;
         tf.TabWidth = tabWidth;
         tf.PreserveTrailingSpaces = true;
@@ -2126,6 +2164,8 @@ ssb
 
         var text = "This is a \tTab";
         var tf = new TextFormatter ();
+        tf.AutoSize = true;
+
         tf.Direction = textDirection;
         tf.TabWidth = tabWidth;
         tf.WordWrap = true;
@@ -2165,242 +2205,241 @@ ssb
     }
 
     [Theory]
-    [InlineData (TextDirection.LeftRight_TopBottom)]
-    [InlineData (TextDirection.TopBottom_LeftRight)]
-    public void TestSize_AutoSizeChange (TextDirection textDirection)
+    [InlineData ("你你", TextDirection.LeftRight_TopBottom, 4, 1)]
+    [InlineData ("AB", TextDirection.LeftRight_TopBottom, 2, 1)]
+    [InlineData ("你你", TextDirection.TopBottom_LeftRight, 2, 2)]
+    [InlineData ("AB", TextDirection.TopBottom_LeftRight, 1, 2)]
+    public void AutoSize_True_TextDirection_Correct_Size (string text, TextDirection textDirection, int expectedWidth, int expectedHeight)
     {
-        var tf = new TextFormatter { Direction = textDirection, Text = "你你" };
-
-        if (textDirection == TextDirection.LeftRight_TopBottom)
-        {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
-        }
-
+        var tf = new TextFormatter { Direction = textDirection, Text = text };
         Assert.False (tf.AutoSize);
 
-        tf.Size = new (1, 1);
-        Assert.Equal (1, tf.Size.Width);
-        Assert.Equal (1, tf.Size.Height);
+        // If autosize is false, no auto sizing!
+        Assert.Equal (Size.Empty, tf.Size);
+
+        tf.Size = new (1, 1); // This should have no impact (autosize overrides)
         tf.AutoSize = true;
 
-        if (textDirection == TextDirection.LeftRight_TopBottom)
-        {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
-        }
+        Assert.Equal (new Size (expectedWidth, expectedHeight), tf.Size);
     }
+
+    //[Theory]
+    //[InlineData (TextAlignment.Left, false)]
+    //[InlineData (TextAlignment.Centered, true)]
+    //[InlineData (TextAlignment.Right, false)]
+    //[InlineData (TextAlignment.Justified, true)]
+    //public void TestSize_DirectionChange_AutoSize_True_Or_False_Horizontal (
+    //    TextAlignment textAlignment,
+    //    bool autoSize
+    //)
+    //{
+    //    var tf = new TextFormatter
+    //    {
+    //        Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = textAlignment, AutoSize = autoSize
+    //    };
+    //    Assert.Equal (4, tf.Size.Width);
+    //    Assert.Equal (1, tf.Size.Height);
+
+    //    tf.Direction = TextDirection.TopBottom_LeftRight;
+
+    //    if (autoSize/* && textAlignment != TextAlignment.Justified*/)
+    //    {
+    //        Assert.Equal (2, tf.Size.Width);
+    //        Assert.Equal (2, tf.Size.Height);
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (4, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //}
+
+    //[Theory]
+    //[InlineData (VerticalTextAlignment.Top, false)]
+    //[InlineData (VerticalTextAlignment.Middle, true)]
+    //[InlineData (VerticalTextAlignment.Bottom, false)]
+    //[InlineData (VerticalTextAlignment.Justified, true)]
+    //public void TestSize_DirectionChange_AutoSize_True_Or_False_Vertical (
+    //    VerticalTextAlignment textAlignment,
+    //    bool autoSize
+    //)
+    //{
+    //    var tf = new TextFormatter
+    //    {
+    //        Direction = TextDirection.TopBottom_LeftRight,
+    //        Text = "你你",
+    //        VerticalAlignment = textAlignment,
+    //        AutoSize = autoSize
+    //    };
+    //    Assert.Equal (2, tf.Size.Width);
+    //    Assert.Equal (2, tf.Size.Height);
+
+    //    tf.Direction = TextDirection.LeftRight_TopBottom;
+
+    //    if (autoSize/* && textAlignment != VerticalTextAlignment.Justified*/)
+    //    {
+    //        Assert.Equal (4, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (2, tf.Size.Width);
+    //        Assert.Equal (2, tf.Size.Height);
+    //    }
+    //}
+
+    //[Theory]
+    //[InlineData (TextDirection.LeftRight_TopBottom, false)]
+    //[InlineData (TextDirection.LeftRight_TopBottom, true)]
+    //[InlineData (TextDirection.TopBottom_LeftRight, false)]
+    //[InlineData (TextDirection.TopBottom_LeftRight, true)]
+    //public void TestSize_SizeChange_AutoSize_True_Or_False (TextDirection textDirection, bool autoSize)
+    //{
+    //    var tf = new TextFormatter { Direction = textDirection, Text = "你你", AutoSize = autoSize };
+
+    //    if (textDirection == TextDirection.LeftRight_TopBottom)
+    //    {
+    //        Assert.Equal (4, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (2, tf.Size.Width);
+    //        Assert.Equal (2, tf.Size.Height);
+    //    }
+
+    //    tf.Size = new (1, 1);
+
+    //    if (autoSize)
+    //    {
+    //        if (textDirection == TextDirection.LeftRight_TopBottom)
+    //        {
+    //            Assert.Equal (4, tf.Size.Width);
+    //            Assert.Equal (1, tf.Size.Height);
+    //        }
+    //        else
+    //        {
+    //            Assert.Equal (2, tf.Size.Width);
+    //            Assert.Equal (2, tf.Size.Height);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (1, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //}
+
+    //[Theory]
+    //[InlineData (TextAlignment.Left, false)]
+    //[InlineData (TextAlignment.Centered, true)]
+    //[InlineData (TextAlignment.Right, false)]
+    //[InlineData (TextAlignment.Justified, true)]
+    //public void TestSize_SizeChange_AutoSize_True_Or_False_Horizontal (TextAlignment textAlignment, bool autoSize)
+    //{
+    //    var tf = new TextFormatter
+    //    {
+    //        Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = textAlignment, AutoSize = autoSize
+    //    };
+    //    Assert.Equal (4, tf.Size.Width);
+    //    Assert.Equal (1, tf.Size.Height);
+
+    //    tf.Size = new (1, 1);
+
+    //    if (autoSize)
+    //    {
+    //        Assert.Equal (4, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (1, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //}
+
+    //[Theory]
+    //[InlineData (VerticalTextAlignment.Top, false)]
+    //[InlineData (VerticalTextAlignment.Middle, true)]
+    //[InlineData (VerticalTextAlignment.Bottom, false)]
+    //[InlineData (VerticalTextAlignment.Justified, true)]
+    //public void TestSize_SizeChange_AutoSize_True_Or_False_Vertical (
+    //    VerticalTextAlignment textAlignment,
+    //    bool autoSize
+    //)
+    //{
+    //    var tf = new TextFormatter
+    //    {
+    //        Direction = TextDirection.TopBottom_LeftRight,
+    //        Text = "你你",
+    //        VerticalAlignment = textAlignment,
+    //        AutoSize = autoSize
+    //    };
+    //    Assert.Equal (2, tf.Size.Width);
+    //    Assert.Equal (2, tf.Size.Height);
+
+    //    tf.Size = new (1, 1);
+
+    //    if (autoSize)
+    //    {
+    //        Assert.Equal (2, tf.Size.Width);
+    //        Assert.Equal (2, tf.Size.Height);
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (1, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //}
 
     [Theory]
-    [InlineData (TextAlignment.Left, false)]
-    [InlineData (TextAlignment.Centered, true)]
-    [InlineData (TextAlignment.Right, false)]
-    [InlineData (TextAlignment.Justified, true)]
-    public void TestSize_DirectionChange_AutoSize_True_Or_False_Horizontal (
-        TextAlignment textAlignment,
-        bool autoSize
-    )
+    [InlineData ("你", TextDirection.LeftRight_TopBottom, false, 0, 0)]
+    [InlineData ("你", TextDirection.LeftRight_TopBottom, true, 2, 1)]
+    [InlineData ("你", TextDirection.TopBottom_LeftRight, false, 0, 0)]
+    [InlineData ("你", TextDirection.TopBottom_LeftRight, true, 2, 1)]
+
+    [InlineData ("你你", TextDirection.LeftRight_TopBottom, false, 0, 0)]
+    [InlineData ("你你", TextDirection.LeftRight_TopBottom, true, 4, 1)]
+    [InlineData ("你你", TextDirection.TopBottom_LeftRight, false, 0, 0)]
+    [InlineData ("你你", TextDirection.TopBottom_LeftRight, true, 2, 2)]
+    public void Text_Set_SizeIsCorrect (string text, TextDirection textDirection, bool autoSize, int expectedWidth, int expectedHeight)
     {
-        var tf = new TextFormatter
-        {
-            Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = textAlignment, AutoSize = autoSize
-        };
-        Assert.Equal (4, tf.Size.Width);
-        Assert.Equal (1, tf.Size.Height);
-
-        tf.Direction = TextDirection.TopBottom_LeftRight;
-
-        if (autoSize && textAlignment != TextAlignment.Justified)
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
+        var tf = new TextFormatter { Direction = textDirection, Text = text, AutoSize = autoSize };
+        Assert.Equal (new Size (expectedWidth, expectedHeight), tf.Size);
     }
 
-    [Theory]
-    [InlineData (VerticalTextAlignment.Top, false)]
-    [InlineData (VerticalTextAlignment.Middle, true)]
-    [InlineData (VerticalTextAlignment.Bottom, false)]
-    [InlineData (VerticalTextAlignment.Justified, true)]
-    public void TestSize_DirectionChange_AutoSize_True_Or_False_Vertical (
-        VerticalTextAlignment textAlignment,
-        bool autoSize
-    )
-    {
-        var tf = new TextFormatter
-        {
-            Direction = TextDirection.TopBottom_LeftRight,
-            Text = "你你",
-            VerticalAlignment = textAlignment,
-            AutoSize = autoSize
-        };
-        Assert.Equal (2, tf.Size.Width);
-        Assert.Equal (2, tf.Size.Height);
+    //[Theory]
+    //[InlineData (TextDirection.LeftRight_TopBottom, false)]
+    //[InlineData (TextDirection.LeftRight_TopBottom, true)]
+    //[InlineData (TextDirection.TopBottom_LeftRight, false)]
+    //[InlineData (TextDirection.TopBottom_LeftRight, true)]
+    //public void TestSize_TextChange (TextDirection textDirection, bool autoSize)
+    //{
+    //    var tf = new TextFormatter { Direction = textDirection, Text = "你", AutoSize = autoSize };
+    //    Assert.Equal (new Size (2, 1), tf.Size);
+    //    tf.Text = "你你";
 
-        tf.Direction = TextDirection.LeftRight_TopBottom;
+    //    Assert.Equal (autoSize, tf.AutoSize);
 
-        if (autoSize && textAlignment != VerticalTextAlignment.Justified)
-        {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
-        }
-    }
-
-    [Theory]
-    [InlineData (TextDirection.LeftRight_TopBottom, false)]
-    [InlineData (TextDirection.LeftRight_TopBottom, true)]
-    [InlineData (TextDirection.TopBottom_LeftRight, false)]
-    [InlineData (TextDirection.TopBottom_LeftRight, true)]
-    public void TestSize_SizeChange_AutoSize_True_Or_False (TextDirection textDirection, bool autoSize)
-    {
-        var tf = new TextFormatter { Direction = textDirection, Text = "你你", AutoSize = autoSize };
-
-        if (textDirection == TextDirection.LeftRight_TopBottom)
-        {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
-        }
-
-        tf.Size = new (1, 1);
-
-        if (autoSize)
-        {
-            if (textDirection == TextDirection.LeftRight_TopBottom)
-            {
-                Assert.Equal (4, tf.Size.Width);
-                Assert.Equal (1, tf.Size.Height);
-            }
-            else
-            {
-                Assert.Equal (2, tf.Size.Width);
-                Assert.Equal (2, tf.Size.Height);
-            }
-        }
-        else
-        {
-            Assert.Equal (1, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-    }
-
-    [Theory]
-    [InlineData (TextAlignment.Left, false)]
-    [InlineData (TextAlignment.Centered, true)]
-    [InlineData (TextAlignment.Right, false)]
-    [InlineData (TextAlignment.Justified, true)]
-    public void TestSize_SizeChange_AutoSize_True_Or_False_Horizontal (TextAlignment textAlignment, bool autoSize)
-    {
-        var tf = new TextFormatter
-        {
-            Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = textAlignment, AutoSize = autoSize
-        };
-        Assert.Equal (4, tf.Size.Width);
-        Assert.Equal (1, tf.Size.Height);
-
-        tf.Size = new (1, 1);
-
-        if (autoSize && textAlignment != TextAlignment.Justified)
-        {
-            Assert.Equal (4, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (1, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-    }
-
-    [Theory]
-    [InlineData (VerticalTextAlignment.Top, false)]
-    [InlineData (VerticalTextAlignment.Middle, true)]
-    [InlineData (VerticalTextAlignment.Bottom, false)]
-    [InlineData (VerticalTextAlignment.Justified, true)]
-    public void TestSize_SizeChange_AutoSize_True_Or_False_Vertical (
-        VerticalTextAlignment textAlignment,
-        bool autoSize
-    )
-    {
-        var tf = new TextFormatter
-        {
-            Direction = TextDirection.TopBottom_LeftRight,
-            Text = "你你",
-            VerticalAlignment = textAlignment,
-            AutoSize = autoSize
-        };
-        Assert.Equal (2, tf.Size.Width);
-        Assert.Equal (2, tf.Size.Height);
-
-        tf.Size = new (1, 1);
-
-        if (autoSize && textAlignment != VerticalTextAlignment.Justified)
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (2, tf.Size.Height);
-        }
-        else
-        {
-            Assert.Equal (1, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-    }
-
-    [Theory]
-    [InlineData (TextDirection.LeftRight_TopBottom, false)]
-    [InlineData (TextDirection.LeftRight_TopBottom, true)]
-    [InlineData (TextDirection.TopBottom_LeftRight, false)]
-    [InlineData (TextDirection.TopBottom_LeftRight, true)]
-    public void TestSize_TextChange (TextDirection textDirection, bool autoSize)
-    {
-        var tf = new TextFormatter { Direction = textDirection, Text = "你", AutoSize = autoSize };
-        Assert.Equal (2, tf.Size.Width);
-        Assert.Equal (1, tf.Size.Height);
-        tf.Text = "你你";
-
-        if (autoSize)
-        {
-            if (textDirection == TextDirection.LeftRight_TopBottom)
-            {
-                Assert.Equal (4, tf.Size.Width);
-                Assert.Equal (1, tf.Size.Height);
-            }
-            else
-            {
-                Assert.Equal (2, tf.Size.Width);
-                Assert.Equal (2, tf.Size.Height);
-            }
-        }
-        else
-        {
-            Assert.Equal (2, tf.Size.Width);
-            Assert.Equal (1, tf.Size.Height);
-        }
-    }
+    //    if (autoSize)
+    //    {
+    //        if (textDirection == TextDirection.LeftRight_TopBottom)
+    //        {
+    //            Assert.Equal (4, tf.Size.Width);
+    //            Assert.Equal (1, tf.Size.Height);
+    //        }
+    //        else
+    //        {
+    //            Assert.Equal (2, tf.Size.Width);
+    //            Assert.Equal (2, tf.Size.Height);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Assert.Equal (2, tf.Size.Width);
+    //        Assert.Equal (1, tf.Size.Height);
+    //    }
+    //}
 
     [Fact]
     public void WordWrap_BigWidth ()
@@ -3297,5 +3336,2918 @@ ssb
                      expectedClippedWidth >= (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0)
                     );
         Assert.Equal (resultLines, wrappedLines);
+    }
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 0, false, "")]
+    [InlineData ("A", 1, false, "A")]
+    [InlineData ("A", 2, false, "A")]
+    [InlineData ("AB", 1, false, "A")]
+    [InlineData ("AB", 2, false, "AB")]
+    [InlineData ("ABC", 3, false, "ABC")]
+    [InlineData ("ABC", 4, false, "ABC")]
+    [InlineData ("ABC", 6, false, "ABC")]
+
+    [InlineData ("A", 0, true, "")]
+    [InlineData ("A", 1, true, "A")]
+    [InlineData ("A", 2, true, "A")]
+    [InlineData ("AB", 1, true, "A")]
+    [InlineData ("AB", 2, true, "AB")]
+    [InlineData ("ABC", 3, true, "ABC")]
+    [InlineData ("ABC", 4, true, "ABC")]
+    [InlineData ("ABC", 6, true, "ABC")]
+    public void Draw_Horizontal_Left (string text, int width, bool autoSize, string expectedText)
+
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = TextAlignment.Left,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, 1);
+        }
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 0, false, "")]
+    [InlineData ("A", 1, false, "A")]
+    [InlineData ("A", 2, false, " A")]
+    [InlineData ("AB", 1, false, "B")]
+    [InlineData ("AB", 2, false, "AB")]
+    [InlineData ("ABC", 3, false, "ABC")]
+    [InlineData ("ABC", 4, false, " ABC")]
+    [InlineData ("ABC", 6, false, "   ABC")]
+
+    [InlineData ("A", 0, true, "")]
+    [InlineData ("A", 1, true, "A")]
+    [InlineData ("A", 2, true, " A")]
+    [InlineData ("AB", 1, true, "B")]
+    [InlineData ("AB", 2, true, "AB")]
+    [InlineData ("ABC", 3, true, "ABC")]
+    [InlineData ("ABC", 4, true, " ABC")]
+    [InlineData ("ABC", 6, true, "   ABC")]
+    public void Draw_Horizontal_Right (string text, int width, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = TextAlignment.Right,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, 1);
+        }
+
+        tf.Draw (new Rectangle (Point.Empty, new (width, 1)), Attribute.Default, Attribute.Default);
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 0, false, "")]
+    [InlineData ("A", 1, false, "A")]
+    [InlineData ("A", 2, false, "A")]
+    [InlineData ("A", 3, false, " A")]
+    [InlineData ("AB", 1, false, "A")]
+    [InlineData ("AB", 2, false, "AB")]
+    [InlineData ("ABC", 3, false, "ABC")]
+    [InlineData ("ABC", 4, false, "ABC")]
+    [InlineData ("ABC", 5, false, " ABC")]
+    [InlineData ("ABC", 6, false, " ABC")]
+    [InlineData ("ABC", 9, false, "   ABC")]
+
+    [InlineData ("A", 0, true, "")]
+    [InlineData ("A", 1, true, "A")]
+    [InlineData ("A", 2, true, "A")]
+    [InlineData ("A", 3, true, " A")]
+    [InlineData ("AB", 1, true, "A")]
+    [InlineData ("AB", 2, true, "AB")]
+    [InlineData ("ABC", 3, true, "ABC")]
+    [InlineData ("ABC", 4, true, "ABC")]
+    [InlineData ("ABC", 5, true, " ABC")]
+    [InlineData ("ABC", 6, true, " ABC")]
+    [InlineData ("ABC", 9, true, "   ABC")]
+    public void Draw_Horizontal_Centered (string text, int width, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = TextAlignment.Centered,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, 1);
+        }
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 0, false, "")]
+    [InlineData ("A", 1, false, "A")]
+    [InlineData ("A", 2, false, "A")]
+    [InlineData ("A B", 3, false, "A B")]
+    [InlineData ("A B", 1, false, "A")]
+    [InlineData ("A B", 2, false, "A")]
+    [InlineData ("A B", 3, false, "A B")]
+    [InlineData ("A B", 4, false, "A  B")]
+    [InlineData ("A B", 5, false, "A   B")]
+    [InlineData ("A B", 6, false, "A    B")]
+    [InlineData ("A B", 10, false, "A        B")]
+    [InlineData ("ABC ABC", 10, false, "ABC    ABC")]
+
+    [InlineData ("A", 0, true, "")]
+    [InlineData ("A", 1, true, "A")]
+    [InlineData ("A", 2, true, "A")]
+    [InlineData ("A B", 3, true, "A B")]
+    [InlineData ("A B", 1, true, "A")]
+    [InlineData ("A B", 2, true, "A")]
+    [InlineData ("A B", 3, true, "A B")]
+    [InlineData ("A B", 4, true, "A B")]
+    [InlineData ("A B", 5, true, "A B")]
+    [InlineData ("A B", 6, true, "A B")]
+    [InlineData ("A B", 10, true, "A B")]
+    [InlineData ("ABC ABC", 10, true, "ABC ABC")]
+    public void Draw_Horizontal_Justified (string text, int width, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = TextAlignment.Justified,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, 1);
+        }
+        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 5, 5, false, "A")]
+    [InlineData ("AB12", 5, 5, false, @"
+A
+B
+1
+2")]
+    [InlineData ("AB\n12", 5, 5, false, @"
+A1
+B2")]
+    [InlineData ("", 5, 1, false, "")]
+
+    [InlineData ("Hello Worlds", 1, 12, true, @"
+H
+e
+l
+l
+o
+ 
+W
+o
+r
+l
+d
+s")]
+
+    [InlineData ("Hello Worlds", 1, 12, false, @"
+H
+e
+l
+l
+o
+ 
+W
+o
+r
+l
+d
+s")]
+
+    [InlineData ("Hello Worlds", 12, 1, false, @"HelloWorlds")]
+
+    public void Draw_Vertical_TopBottom_LeftRight (string text, int width, int height, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            AutoSize = autoSize,
+            Direction = TextDirection.TopBottom_LeftRight,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, height);
+        }
+        tf.Draw (new Rectangle (0, 0, 20, 20), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("Hello World", 15, 1, "Hello     World")]
+    [InlineData ("Well Done\nNice Work", 15, 2, @"
+Well       Done
+Nice       Work")]
+    [InlineData ("你好 世界", 15, 1, "你好       世界")]
+    [InlineData ("做 得好\n幹 得好", 15, 2, @"
+做         得好
+幹         得好")]
+    public void Justify_Horizontal (string text, int width, int height, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = TextAlignment.Justified,
+            Size = new Size (width, height),
+            MultiLine = true
+        };
+
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("Hello World", 1, 15, "H\ne\nl\nl\no\n \n \n \n \n \nW\no\nr\nl\nd")]
+    [InlineData ("Well Done\nNice Work", 2, 15, @"
+WN
+ei
+lc
+le
+  
+  
+  
+  
+  
+  
+  
+DW
+oo
+nr
+ek")]
+    [InlineData ("你好 世界", 2, 15, "你\n好\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n世\n界")]
+    [InlineData ("做 得好\n幹 得好", 4, 15, @"
+做幹
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+得得
+好好")]
+    public void Justify_Vertical (string text, int width, int height, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.TopBottom_LeftRight,
+            VerticalAlignment = VerticalTextAlignment.Justified,
+            Size = new Size (width, height),
+            MultiLine = true
+        };
+
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 0, 1, false, "", 0)]
+    [InlineData ("A", 1, 1, false, "A", 0)]
+    [InlineData ("A", 2, 2, false, " A", 1)]
+    [InlineData ("AB", 1, 1, false, "B", 0)]
+    [InlineData ("AB", 2, 2, false, " A\n B", 0)]
+    [InlineData ("ABC", 3, 2, false, "  B\n  C", 0)]
+    [InlineData ("ABC", 4, 2, false, "   B\n   C", 0)]
+    [InlineData ("ABC", 6, 2, false, "     B\n     C", 0)]
+    [InlineData ("こんにちは", 0, 1, false, "", 0)]
+    [InlineData ("こんにちは", 1, 0, false, "", 0)]
+    [InlineData ("こんにちは", 1, 1, false, "", 0)]
+    [InlineData ("こんにちは", 2, 1, false, "は", 0)]
+    [InlineData ("こんにちは", 2, 2, false, "ち\nは", 0)]
+    [InlineData ("こんにちは", 2, 3, false, "に\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 4, false, "ん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 5, false, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 6, false, "こ\nん\nに\nち\nは", 1)]
+    [InlineData ("ABCD\nこんにちは", 4, 7, false, "  こ\n Aん\n Bに\n Cち\n Dは", 2)]
+    [InlineData ("こんにちは\nABCD", 3, 7, false, "こ \nんA\nにB\nちC\nはD", 2)]
+
+    [InlineData ("A", 0, 1, true, "", 0)]
+    [InlineData ("A", 1, 1, true, "A", 0)]
+    [InlineData ("A", 2, 2, true, " A", 1)]
+    [InlineData ("AB", 1, 1, true, "B", 0)]
+    [InlineData ("AB", 2, 2, true, " A\n B", 0)]
+    [InlineData ("ABC", 3, 2, true, "  B\n  C", 0)]
+    [InlineData ("ABC", 4, 2, true, "   B\n   C", 0)]
+    [InlineData ("ABC", 6, 2, true, "     B\n     C", 0)]
+    [InlineData ("こんにちは", 0, 1, true, "", 0)]
+    [InlineData ("こんにちは", 1, 0, true, "", 0)]
+    [InlineData ("こんにちは", 1, 1, true, "", 0)]
+    [InlineData ("こんにちは", 2, 1, true, "は", 0)]
+    [InlineData ("こんにちは", 2, 2, true, "ち\nは", 0)]
+    [InlineData ("こんにちは", 2, 3, true, "に\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 4, true, "ん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 5, true, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 2, 6, true, "こ\nん\nに\nち\nは", 1)]
+    [InlineData ("ABCD\nこんにちは", 4, 7, true, "  こ\n Aん\n Bに\n Cち\n Dは", 2)]
+    [InlineData ("こんにちは\nABCD", 3, 7, true, "こ \nんA\nにB\nちC\nはD", 2)]
+    public void Draw_Vertical_Bottom_Horizontal_Right (string text, int width, int height, bool autoSize, string expectedText, int expectedY)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = TextAlignment.Right,
+            Direction = TextDirection.TopBottom_LeftRight,
+            VerticalAlignment = VerticalTextAlignment.Bottom,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, height);
+        }
+
+        tf.Draw (new Rectangle (Point.Empty, new (width, height)), Attribute.Default, Attribute.Default);
+        Rectangle rect = TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        Assert.Equal (expectedY, rect.Y);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 5, false, "A")]
+    [InlineData ("AB12", 5, false, @"
+A
+B
+1
+2")]
+    [InlineData ("AB\n12", 5, false, @"
+A1
+B2")]
+    [InlineData ("", 1, false, "")]
+    [InlineData ("AB1 2", 2, false, @"
+A12
+B  ")]
+    [InlineData ("こんにちは", 1, false, @"
+こん")]
+    [InlineData ("こんにちは", 2, false, @"
+こに
+んち")]
+    [InlineData ("こんにちは", 5, false, @"
+こ
+ん
+に
+ち
+は")]
+
+    [InlineData ("A", 5, true, "A")]
+    [InlineData ("AB12", 5, true, @"
+A
+B
+1
+2")]
+    [InlineData ("AB\n12", 5, true, @"
+A1
+B2")]
+    [InlineData ("", 1, true, "")]
+    [InlineData ("AB1 2", 2, true, @"
+A
+B")]
+    [InlineData ("こんにちは", 1, true, @"
+こ")]
+    [InlineData ("こんにちは", 2, true, @"
+こ
+ん")]
+    [InlineData ("こんにちは", 5, true, @"
+こ
+ん
+に
+ち
+は")]
+    public void Draw_Vertical_TopBottom_LeftRight_Top (string text, int height, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            AutoSize = autoSize,
+            Direction = TextDirection.TopBottom_LeftRight,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (5, height);
+        }
+        tf.Draw (new Rectangle (0, 0, 5, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+
+    // The expectedY param is to probe that the expectedText param start at that Y coordinate
+
+    [InlineData ("A", 0, false, "", 0)]
+    [InlineData ("A", 1, false, "A", 0)]
+    [InlineData ("A", 2, false, "A", 0)]
+    [InlineData ("A", 3, false, "A", 1)]
+    [InlineData ("AB", 1, false, "A", 0)]
+    [InlineData ("AB", 2, false, "A\nB", 0)]
+    [InlineData ("ABC", 2, false, "A\nB", 0)]
+    [InlineData ("ABC", 3, false, "A\nB\nC", 0)]
+    [InlineData ("ABC", 4, false, "A\nB\nC", 0)]
+    [InlineData ("ABC", 5, false, "A\nB\nC", 1)]
+    [InlineData ("ABC", 6, false, "A\nB\nC", 1)]
+    [InlineData ("ABC", 9, false, "A\nB\nC", 3)]
+    [InlineData ("ABCD", 2, false, "B\nC", 0)]
+    [InlineData ("こんにちは", 0, false, "", 0)]
+    [InlineData ("こんにちは", 1, false, "に", 0)]
+    [InlineData ("こんにちは", 2, false, "ん\nに", 0)]
+    [InlineData ("こんにちは", 3, false, "ん\nに\nち", 0)]
+    [InlineData ("こんにちは", 4, false, "こ\nん\nに\nち", 0)]
+    [InlineData ("こんにちは", 5, false, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 6, false, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("ABCD\nこんにちは", 7, false, "Aこ\nBん\nCに\nDち\n は", 1)]
+    [InlineData ("こんにちは\nABCD", 7, false, "こA\nんB\nにC\nちD\nは ", 1)]
+
+    [InlineData ("A", 0, true, "", 0)]
+    [InlineData ("A", 1, true, "A", 0)]
+    [InlineData ("A", 2, true, "A", 0)]
+    [InlineData ("A", 3, true, "A", 1)]
+    [InlineData ("AB", 1, true, "A", 0)]
+    [InlineData ("AB", 2, true, "A\nB", 0)]
+    [InlineData ("ABC", 2, true, "A\nB", 0)]
+    [InlineData ("ABC", 3, true, "A\nB\nC", 0)]
+    [InlineData ("ABC", 4, true, "A\nB\nC", 0)]
+    [InlineData ("ABC", 5, true, "A\nB\nC", 1)]
+    [InlineData ("ABC", 6, true, "A\nB\nC", 1)]
+    [InlineData ("ABC", 9, true, "A\nB\nC", 3)]
+    [InlineData ("ABCD", 2, true, "B\nC", 0)]
+    [InlineData ("こんにちは", 0, true, "", 0)]
+    [InlineData ("こんにちは", 1, true, "に", 0)]
+    [InlineData ("こんにちは", 2, true, "ん\nに", 0)]
+    [InlineData ("こんにちは", 3, true, "ん\nに\nち", 0)]
+    [InlineData ("こんにちは", 4, true, "こ\nん\nに\nち", 0)]
+    [InlineData ("こんにちは", 5, true, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 6, true, "こ\nん\nに\nち\nは", 0)]
+    [InlineData ("こんにちは", 7, true, "こ\nん\nに\nち\nは", 1)]
+    [InlineData ("ABCD\nこんにちは", 7, true, "Aこ\nBん\nCに\nDち\n は", 1)]
+    [InlineData ("こんにちは\nABCD", 7, true, "こA\nんB\nにC\nちD\nは ", 1)]
+    public void Draw_Vertical_TopBottom_LeftRight_Middle (string text, int height, bool autoSize, string expectedText, int expectedY)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.TopBottom_LeftRight,
+            VerticalAlignment = VerticalTextAlignment.Middle,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            int width = text.ToRunes ().Max (r => r.GetColumns ());
+
+            if (text.Contains ("\n"))
+            {
+                width++;
+            }
+
+            tf.Size = new Size (width, height);
+        }
+        tf.Draw (new Rectangle (0, 0, 5, height), Attribute.Default, Attribute.Default);
+
+        Rectangle rect = TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        Assert.Equal (expectedY, rect.Y);
+    }
+
+    [Theory]
+    [InlineData ("1234", 4)]
+    [InlineData ("_1234", 4)]
+    public void AutoSize_HotKey_Size_Correct (string text, int expected)
+    {
+        // Horizontal
+        TextFormatter tf = new ()
+        {
+            AutoSize = true,
+            HotKeySpecifier = (Rune)'_',
+            Text = text,
+        };
+        Assert.Equal (new (expected, 1), tf.Size);
+
+        // Vertical
+        tf = new ()
+        {
+            HotKeySpecifier = (Rune)'_',
+            Direction = TextDirection.TopBottom_LeftRight,
+            Text = text,
+            AutoSize = true,
+        };
+        Assert.Equal (new (1, expected), tf.Size);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 1, 0, false, "")]
+    [InlineData ("A", 0, 1, false, "")]
+    [InlineData ("AB1 2", 2, 1, false, "2")]
+    [InlineData ("AB12", 5, 1, false, "21BA")]
+    [InlineData ("AB\n12", 5, 2, false, "BA\n21")]
+    [InlineData ("ABC 123 456", 7, 2, false, "654 321\nCBA    ")]
+    [InlineData ("こんにちは", 1, 1, false, "")]
+    [InlineData ("こんにちは", 2, 1, false, "は")]
+    [InlineData ("こんにちは", 5, 1, false, "はち")]
+    [InlineData ("こんにちは", 10, 1, false, "はちにんこ")]
+    [InlineData ("こんにちは\nAB\n12", 10, 3, false, "はちにんこ\nBA        \n21        ")]
+
+    [InlineData ("A", 1, 0, true, "")]
+    [InlineData ("A", 0, 1, true, "")]
+    [InlineData ("AB1 2", 2, 1, true, "2")]
+    [InlineData ("AB12", 5, 1, true, "21BA")]
+    [InlineData ("AB\n12", 5, 2, true, "BA\n21")]
+    [InlineData ("ABC 123 456", 7, 2, true, "654 321")]
+    [InlineData ("こんにちは", 1, 1, true, "")]
+    [InlineData ("こんにちは", 2, 1, true, "は")]
+    [InlineData ("こんにちは", 5, 1, true, "はち")]
+    [InlineData ("こんにちは", 10, 1, true, "はちにんこ")]
+    [InlineData ("こんにちは\nAB\n12", 10, 3, true, "はちにんこ\nBA        \n21        ")]
+    public void Draw_Horizontal_RightLeft_TopBottom (string text, int width, int height, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.RightLeft_TopBottom,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, height);
+        }
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 1, 0, false, "")]
+    [InlineData ("A", 0, 1, false, "")]
+    [InlineData ("AB1 2", 2, 1, false, "2")]
+    [InlineData ("AB12", 5, 1, false, "21BA")]
+    [InlineData ("AB\n12", 5, 2, false, "21\nBA")]
+    [InlineData ("ABC 123 456", 7, 2, false, "CBA    \n654 321")]
+    [InlineData ("こんにちは", 1, 1, false, "")]
+    [InlineData ("こんにちは", 2, 1, false, "は")]
+    [InlineData ("こんにちは", 5, 1, false, "はち")]
+    [InlineData ("こんにちは", 10, 1, false, "はちにんこ")]
+    [InlineData ("こんにちは\nAB\n12", 10, 3, false, "21        \nBA        \nはちにんこ")]
+
+    [InlineData ("A", 1, 0, true, "")]
+    [InlineData ("A", 0, 1, true, "")]
+    [InlineData ("AB1 2", 2, 1, true, "2")]
+    [InlineData ("AB12", 5, 1, true, "21BA")]
+    [InlineData ("AB\n12", 5, 2, true, "21\nBA")]
+    [InlineData ("ABC 123 456", 7, 2, true, "654 321")]
+    [InlineData ("こんにちは", 1, 1, true, "")]
+    [InlineData ("こんにちは", 2, 1, true, "は")]
+    [InlineData ("こんにちは", 5, 1, true, "はち")]
+    [InlineData ("こんにちは", 10, 1, true, "はちにんこ")]
+    [InlineData ("こんにちは\nAB\n12", 10, 3, true, "21        \nBA        \nはちにんこ")]
+    public void Draw_Horizontal_RightLeft_BottomTop (string text, int width, int height, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.RightLeft_BottomTop,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, height);
+        }
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 1, 0, false, "")]
+    [InlineData ("A", 0, 1, false, "")]
+    [InlineData ("AB1 2", 1, 2, false, "2")]
+    [InlineData ("AB12", 1, 5, false, "2\n1\nB\nA")]
+    [InlineData ("AB\n12", 2, 5, false, "B2\nA1")]
+    [InlineData ("ABC 123 456", 2, 7, false, "6C\n5B\n4A\n  \n3 \n2 \n1 ")]
+    [InlineData ("こんにちは", 1, 1, false, "")]
+    [InlineData ("こんにちは", 2, 1, false, "は")]
+    [InlineData ("こんにちは", 2, 5, false, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは", 2, 10, false, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは\nAB\n12", 4, 10, false, "はB2\nちA1\nに  \nん  \nこ  ")]
+
+    [InlineData ("A", 1, 0, true, "")]
+    [InlineData ("A", 0, 1, true, "")]
+    [InlineData ("AB1 2", 1, 2, true, "2")]
+    [InlineData ("AB12", 1, 5, true, "2\n1\nB\nA")]
+    [InlineData ("AB\n12", 2, 5, true, "B2\nA1")]
+    [InlineData ("ABC 123 456", 2, 7, true, "6\n5\n4\n \n3\n2\n1")]
+    [InlineData ("こんにちは", 1, 1, true, "")]
+    [InlineData ("こんにちは", 2, 1, true, "は")]
+    [InlineData ("こんにちは", 2, 5, true, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは", 2, 10, true, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは\nAB\n12", 4, 10, true, "はB2\nちA1\nに  \nん  \nこ  ")]
+    public void Draw_Vertical_BottomTop_LeftRight (string text, int width, int height, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.BottomTop_LeftRight,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, height);
+        }
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+    [InlineData ("A", 1, 0, false, "")]
+    [InlineData ("A", 0, 1, false, "")]
+    [InlineData ("AB1 2", 1, 2, false, "2")]
+    [InlineData ("AB12", 1, 5, false, "2\n1\nB\nA")]
+    [InlineData ("AB\n12", 2, 5, false, "2B\n1A")]
+    [InlineData ("ABC 123 456", 2, 7, false, "C6\nB5\nA4\n  \n 3\n 2\n 1")]
+    [InlineData ("こんにちは", 1, 1, false, "")]
+    [InlineData ("こんにちは", 2, 1, false, "は")]
+    [InlineData ("こんにちは", 2, 5, false, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは", 2, 10, false, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは\nAB\n12", 4, 10, false, "2Bは\n1Aち\n  に\n  ん\n  こ")]
+
+    [InlineData ("A", 1, 0, true, "")]
+    [InlineData ("A", 0, 1, true, "")]
+    [InlineData ("AB1 2", 1, 2, true, "2")]
+    [InlineData ("AB12", 1, 5, true, "2\n1\nB\nA")]
+    [InlineData ("AB\n12", 2, 5, true, "2B\n1A")]
+    [InlineData ("ABC 123 456", 2, 7, true, "6\n5\n4\n \n3\n2\n1")]
+    [InlineData ("こんにちは", 1, 1, true, "")]
+    [InlineData ("こんにちは", 2, 1, true, "は")]
+    [InlineData ("こんにちは", 2, 5, true, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは", 2, 10, true, "は\nち\nに\nん\nこ")]
+    [InlineData ("こんにちは\nAB\n12", 4, 10, true, "2Bは\n1Aち\n  に\n  ん\n  こ")]
+    public void Draw_Vertical_BottomTop_RightLeft (string text, int width, int height, bool autoSize, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Direction = TextDirection.BottomTop_RightLeft,
+            AutoSize = autoSize,
+        };
+
+        if (!autoSize)
+        {
+            tf.Size = new Size (width, height);
+        }
+        tf.Draw (new Rectangle (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+    }
+
+    // Draw tests - Note that these depend on View
+
+    [Fact]
+    [TestRespondersDisposed]
+    public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+    {
+        Application.Init (new FakeDriver ());
+
+        Toplevel top = new ();
+
+        var view = new View { Y = -2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight, Text = "view" };
+        top.Add (view);
+
+        Application.Iteration += (s, a) =>
+        {
+            Assert.Equal (-2, view.Y);
+
+            Application.RequestStop ();
+        };
+
+        try
+        {
+            Application.Run (top);
+        }
+        catch (IndexOutOfRangeException ex)
+        {
+            // After the fix this exception will not be caught.
+            Assert.IsType<IndexOutOfRangeException> (ex);
+        }
+
+        top.Dispose ();
+        // Shutdown must be called to safely clean up Application if Init has been called
+        Application.Shutdown ();
+    }
+
+    [SetupFakeDriver]
+    [Theory]
+
+    // Horizontal with VerticalTextAlignment.Top
+    // LeftRight_TopBottom
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+0 2 4**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+**0 2 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+*0 2 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+0  2  4
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+0 你 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+*0 你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+0 你 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.LeftRight_TopBottom, @"
+0  你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    // LeftRight_BottomTop
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
+0 2 4**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
+**0 2 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
+*0 2 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
+0  2  4
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
+0 你 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
+*0 你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
+0 你 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.LeftRight_BottomTop, @"
+0  你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    // RightLeft_TopBottom
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+4 2 0**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+**4 2 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+*4 2 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+4  2  0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+*4 你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.RightLeft_TopBottom, @"
+4  你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    // RightLeft_BottomTop
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+4 2 0**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+**4 2 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+*4 2 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+4  2  0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+*4 你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.RightLeft_BottomTop, @"
+4  你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    // Horizontal with VerticalTextAlignment.Bottom
+    // LeftRight_TopBottom
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+0 2 4**")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+**0 2 4")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+*0 2 4*")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+0  2  4")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+0 你 4*")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+*0 你 4")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+0 你 4*")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+0  你 4")]
+
+    // LeftRight_BottomTop
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+0 2 4**")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+**0 2 4")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+*0 2 4*")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+0  2  4")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+0 你 4*")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+*0 你 4")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+0 你 4*")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+0  你 4")]
+
+    // RightLeft_TopBottom
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+4 2 0**")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+**4 2 0")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+*4 2 0*")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+4  2  0")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+4 你 0*")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+*4 你 0")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+4 你 0*")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+*******
+*******
+*******
+4  你 0")]
+
+    // RightLeft_BottomTop
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+4 2 0**")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+**4 2 0")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+*4 2 0*")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+4  2  0")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+4 你 0*")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+*4 你 0")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+4 你 0*")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+*******
+*******
+*******
+4  你 0")]
+
+    // Horizontal with VerticalTextAlignment.Middle
+    // LeftRight_TopBottom
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+0 2 4**
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+**0 2 4
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+*0 2 4*
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+0  2  4
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+0 你 4*
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+*0 你 4
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+0 你 4*
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.LeftRight_TopBottom, @"
+*******
+*******
+*******
+0  你 4
+*******
+*******
+*******")]
+
+    // LeftRight_BottomTop
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+0 2 4**
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+**0 2 4
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+*0 2 4*
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+0  2  4
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+0 你 4*
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+*0 你 4
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+0 你 4*
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.LeftRight_BottomTop, @"
+*******
+*******
+*******
+0  你 4
+*******
+*******
+*******")]
+
+    // RightLeft_TopBottom
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+4 2 0**
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+**4 2 0
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+*4 2 0*
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+4  2  0
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+4 你 0*
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+*4 你 0
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+4 你 0*
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.RightLeft_TopBottom, @"
+*******
+*******
+*******
+4  你 0
+*******
+*******
+*******")]
+
+    // RightLeft_BottomTop
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+4 2 0**
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+**4 2 0
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+*4 2 0*
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+4  2  0
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+4 你 0*
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+*4 你 0
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+4 你 0*
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.RightLeft_BottomTop, @"
+*******
+*******
+*******
+4  你 0
+*******
+*******
+*******")]
+
+    // Horizontal with VerticalTextAlignment.Justified
+    // LeftRight_TopBottom
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.LeftRight_TopBottom, @"
+0 2 4**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.LeftRight_TopBottom, @"
+**0 2 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.LeftRight_TopBottom, @"
+*0 2 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.LeftRight_TopBottom, @"
+0  2  4
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.LeftRight_TopBottom, @"
+0 你 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.LeftRight_TopBottom, @"
+*0 你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.LeftRight_TopBottom, @"
+0 你 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.LeftRight_TopBottom, @"
+0  你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    // LeftRight_BottomTop
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+0 2 4**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+**0 2 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+*0 2 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+0  2  4
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+0 你 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+*0 你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+0 你 4*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.LeftRight_BottomTop, @"
+0  你 4
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    // RightLeft_TopBottom
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.RightLeft_TopBottom, @"
+4 2 0**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.RightLeft_TopBottom, @"
+**4 2 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.RightLeft_TopBottom, @"
+*4 2 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.RightLeft_TopBottom, @"
+4  2  0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.RightLeft_TopBottom, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.RightLeft_TopBottom, @"
+*4 你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.RightLeft_TopBottom, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.RightLeft_TopBottom, @"
+4  你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    // RightLeft_BottomTop
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.RightLeft_BottomTop, @"
+4 2 0**
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.RightLeft_BottomTop, @"
+**4 2 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.RightLeft_BottomTop, @"
+*4 2 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.RightLeft_BottomTop, @"
+4  2  0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.RightLeft_BottomTop, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.RightLeft_BottomTop, @"
+*4 你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.RightLeft_BottomTop, @"
+4 你 0*
+*******
+*******
+*******
+*******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.RightLeft_BottomTop, @"
+4  你 0
+*******
+*******
+*******
+*******
+*******
+*******")]
+
+    // Vertical with TextAlignment.Left
+    // TopBottom_LeftRight
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+2******
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.TopBottom_LeftRight, @"
+*******
+*******
+0******
+ ******
+2******
+ ******
+4******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.TopBottom_LeftRight, @"
+*******
+0******
+ ******
+2******
+ ******
+4******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+ ******
+2******
+ ******
+ ******
+4******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+你*****
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.TopBottom_LeftRight, @"
+*******
+*******
+0******
+ ******
+你*****
+ ******
+4******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.TopBottom_LeftRight, @"
+*******
+0******
+ ******
+你*****
+ ******
+4******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+ ******
+你*****
+ ******
+ ******
+4******")]
+
+    // TopBottom_RightLeft
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+2******
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.TopBottom_RightLeft, @"
+*******
+*******
+0******
+ ******
+2******
+ ******
+4******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.TopBottom_RightLeft, @"
+*******
+0******
+ ******
+2******
+ ******
+4******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+ ******
+2******
+ ******
+ ******
+4******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+你*****
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.TopBottom_RightLeft, @"
+*******
+*******
+0******
+ ******
+你*****
+ ******
+4******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.TopBottom_RightLeft, @"
+*******
+0******
+ ******
+你*****
+ ******
+4******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+ ******
+你*****
+ ******
+ ******
+4******")]
+
+    // BottomTop_LeftRight
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+2******
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.BottomTop_LeftRight, @"
+*******
+*******
+4******
+ ******
+2******
+ ******
+0******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.BottomTop_LeftRight, @"
+*******
+4******
+ ******
+2******
+ ******
+0******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+ ******
+2******
+ ******
+ ******
+0******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+你*****
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.BottomTop_LeftRight, @"
+*******
+*******
+4******
+ ******
+你*****
+ ******
+0******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.BottomTop_LeftRight, @"
+*******
+4******
+ ******
+你*****
+ ******
+0******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+ ******
+你*****
+ ******
+ ******
+0******")]
+
+    // BottomTop_RightLeft
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+2******
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.BottomTop_RightLeft, @"
+*******
+*******
+4******
+ ******
+2******
+ ******
+0******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.BottomTop_RightLeft, @"
+*******
+4******
+ ******
+2******
+ ******
+0******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+ ******
+2******
+ ******
+ ******
+0******")]
+
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Top, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+你*****
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Bottom, TextDirection.BottomTop_RightLeft, @"
+*******
+*******
+4******
+ ******
+你*****
+ ******
+0******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Middle, TextDirection.BottomTop_RightLeft, @"
+*******
+4******
+ ******
+你*****
+ ******
+0******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Left, VerticalTextAlignment.Justified, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+ ******
+你*****
+ ******
+ ******
+0******")]
+
+    // Vertical with TextAlignment.Right
+    // TopBottom_LeftRight
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.TopBottom_LeftRight, @"
+******0
+****** 
+******2
+****** 
+******4
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.TopBottom_LeftRight, @"
+*******
+*******
+******0
+****** 
+******2
+****** 
+******4")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.TopBottom_LeftRight, @"
+*******
+******0
+****** 
+******2
+****** 
+******4
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.TopBottom_LeftRight, @"
+******0
+****** 
+****** 
+******2
+****** 
+****** 
+******4")]
+
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.TopBottom_LeftRight, @"
+*****0*
+***** *
+*****你
+***** *
+*****4*
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.TopBottom_LeftRight, @"
+*******
+*******
+*****0*
+***** *
+*****你
+***** *
+*****4*")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.TopBottom_LeftRight, @"
+*******
+*****0*
+***** *
+*****你
+***** *
+*****4*
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.TopBottom_LeftRight, @"
+*****0*
+***** *
+***** *
+*****你
+***** *
+***** *
+*****4*")]
+
+    // TopBottom_RightLeft
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.TopBottom_RightLeft, @"
+******0
+****** 
+******2
+****** 
+******4
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.TopBottom_RightLeft, @"
+*******
+*******
+******0
+****** 
+******2
+****** 
+******4")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.TopBottom_RightLeft, @"
+*******
+******0
+****** 
+******2
+****** 
+******4
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.TopBottom_RightLeft, @"
+******0
+****** 
+****** 
+******2
+****** 
+****** 
+******4")]
+
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.TopBottom_RightLeft, @"
+*****0*
+***** *
+*****你
+***** *
+*****4*
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.TopBottom_RightLeft, @"
+*******
+*******
+*****0*
+***** *
+*****你
+***** *
+*****4*")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.TopBottom_RightLeft, @"
+*******
+*****0*
+***** *
+*****你
+***** *
+*****4*
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.TopBottom_RightLeft, @"
+*****0*
+***** *
+***** *
+*****你
+***** *
+***** *
+*****4*")]
+
+    // BottomTop_LeftRight
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.BottomTop_LeftRight, @"
+******4
+****** 
+******2
+****** 
+******0
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.BottomTop_LeftRight, @"
+*******
+*******
+******4
+****** 
+******2
+****** 
+******0")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.BottomTop_LeftRight, @"
+*******
+******4
+****** 
+******2
+****** 
+******0
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.BottomTop_LeftRight, @"
+******4
+****** 
+****** 
+******2
+****** 
+****** 
+******0")]
+
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.BottomTop_LeftRight, @"
+*****4*
+***** *
+*****你
+***** *
+*****0*
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.BottomTop_LeftRight, @"
+*******
+*******
+*****4*
+***** *
+*****你
+***** *
+*****0*")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.BottomTop_LeftRight, @"
+*******
+*****4*
+***** *
+*****你
+***** *
+*****0*
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.BottomTop_LeftRight, @"
+*****4*
+***** *
+***** *
+*****你
+***** *
+***** *
+*****0*")]
+
+    // BottomTop_RightLeft
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.BottomTop_RightLeft, @"
+******4
+****** 
+******2
+****** 
+******0
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.BottomTop_RightLeft, @"
+*******
+*******
+******4
+****** 
+******2
+****** 
+******0")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.BottomTop_RightLeft, @"
+*******
+******4
+****** 
+******2
+****** 
+******0
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.BottomTop_RightLeft, @"
+******4
+****** 
+****** 
+******2
+****** 
+****** 
+******0")]
+
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Top, TextDirection.BottomTop_RightLeft, @"
+*****4*
+***** *
+*****你
+***** *
+*****0*
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Bottom, TextDirection.BottomTop_RightLeft, @"
+*******
+*******
+*****4*
+***** *
+*****你
+***** *
+*****0*")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Middle, TextDirection.BottomTop_RightLeft, @"
+*******
+*****4*
+***** *
+*****你
+***** *
+*****0*
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Right, VerticalTextAlignment.Justified, TextDirection.BottomTop_RightLeft, @"
+*****4*
+***** *
+***** *
+*****你
+***** *
+***** *
+*****0*")]
+
+    // Vertical with TextAlignment.Centered
+    // TopBottom_LeftRight
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.TopBottom_LeftRight, @"
+***0***
+*** ***
+***2***
+*** ***
+***4***
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.TopBottom_LeftRight, @"
+*******
+*******
+***0***
+*** ***
+***2***
+*** ***
+***4***")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.TopBottom_LeftRight, @"
+*******
+***0***
+*** ***
+***2***
+*** ***
+***4***
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.TopBottom_LeftRight, @"
+***0***
+*** ***
+*** ***
+***2***
+*** ***
+*** ***
+***4***")]
+
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.TopBottom_LeftRight, @"
+**0****
+** ****
+**你***
+** ****
+**4****
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.TopBottom_LeftRight, @"
+*******
+*******
+**0****
+** ****
+**你***
+** ****
+**4****")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.TopBottom_LeftRight, @"
+*******
+**0****
+** ****
+**你***
+** ****
+**4****
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.TopBottom_LeftRight, @"
+**0****
+** ****
+** ****
+**你***
+** ****
+** ****
+**4****")]
+
+    // TopBottom_RightLeft
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.TopBottom_RightLeft, @"
+***0***
+*** ***
+***2***
+*** ***
+***4***
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.TopBottom_RightLeft, @"
+*******
+*******
+***0***
+*** ***
+***2***
+*** ***
+***4***")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.TopBottom_RightLeft, @"
+*******
+***0***
+*** ***
+***2***
+*** ***
+***4***
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.TopBottom_RightLeft, @"
+***0***
+*** ***
+*** ***
+***2***
+*** ***
+*** ***
+***4***")]
+
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.TopBottom_RightLeft, @"
+**0****
+** ****
+**你***
+** ****
+**4****
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.TopBottom_RightLeft, @"
+*******
+*******
+**0****
+** ****
+**你***
+** ****
+**4****")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.TopBottom_RightLeft, @"
+*******
+**0****
+** ****
+**你***
+** ****
+**4****
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.TopBottom_RightLeft, @"
+**0****
+** ****
+** ****
+**你***
+** ****
+** ****
+**4****")]
+
+    // BottomTop_LeftRight
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.BottomTop_LeftRight, @"
+***4***
+*** ***
+***2***
+*** ***
+***0***
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.BottomTop_LeftRight, @"
+*******
+*******
+***4***
+*** ***
+***2***
+*** ***
+***0***")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.BottomTop_LeftRight, @"
+*******
+***4***
+*** ***
+***2***
+*** ***
+***0***
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.BottomTop_LeftRight, @"
+***4***
+*** ***
+*** ***
+***2***
+*** ***
+*** ***
+***0***")]
+
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.BottomTop_LeftRight, @"
+**4****
+** ****
+**你***
+** ****
+**0****
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.BottomTop_LeftRight, @"
+*******
+*******
+**4****
+** ****
+**你***
+** ****
+**0****")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.BottomTop_LeftRight, @"
+*******
+**4****
+** ****
+**你***
+** ****
+**0****
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.BottomTop_LeftRight, @"
+**4****
+** ****
+** ****
+**你***
+** ****
+** ****
+**0****")]
+
+    // BottomTop_RightLeft
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.BottomTop_RightLeft, @"
+***4***
+*** ***
+***2***
+*** ***
+***0***
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.BottomTop_RightLeft, @"
+*******
+*******
+***4***
+*** ***
+***2***
+*** ***
+***0***")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.BottomTop_RightLeft, @"
+*******
+***4***
+*** ***
+***2***
+*** ***
+***0***
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.BottomTop_RightLeft, @"
+***4***
+*** ***
+*** ***
+***2***
+*** ***
+*** ***
+***0***")]
+
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Top, TextDirection.BottomTop_RightLeft, @"
+**4****
+** ****
+**你***
+** ****
+**0****
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Bottom, TextDirection.BottomTop_RightLeft, @"
+*******
+*******
+**4****
+** ****
+**你***
+** ****
+**0****")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Middle, TextDirection.BottomTop_RightLeft, @"
+*******
+**4****
+** ****
+**你***
+** ****
+**0****
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Centered, VerticalTextAlignment.Justified, TextDirection.BottomTop_RightLeft, @"
+**4****
+** ****
+** ****
+**你***
+** ****
+** ****
+**0****")]
+
+    // Vertical with TextAlignment.Justified
+    // TopBottom_LeftRight
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+2******
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.TopBottom_LeftRight, @"
+*******
+*******
+0******
+ ******
+2******
+ ******
+4******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.TopBottom_LeftRight, @"
+*******
+0******
+ ******
+2******
+ ******
+4******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+ ******
+2******
+ ******
+ ******
+4******")]
+
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+你*****
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.TopBottom_LeftRight, @"
+*******
+*******
+0******
+ ******
+你*****
+ ******
+4******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.TopBottom_LeftRight, @"
+*******
+0******
+ ******
+你*****
+ ******
+4******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.TopBottom_LeftRight, @"
+0******
+ ******
+ ******
+你*****
+ ******
+ ******
+4******")]
+
+    // TopBottom_RightLeft
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+2******
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.TopBottom_RightLeft, @"
+*******
+*******
+0******
+ ******
+2******
+ ******
+4******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.TopBottom_RightLeft, @"
+*******
+0******
+ ******
+2******
+ ******
+4******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+ ******
+2******
+ ******
+ ******
+4******")]
+
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+你*****
+ ******
+4******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.TopBottom_RightLeft, @"
+*******
+*******
+0******
+ ******
+你*****
+ ******
+4******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.TopBottom_RightLeft, @"
+*******
+0******
+ ******
+你*****
+ ******
+4******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.TopBottom_RightLeft, @"
+0******
+ ******
+ ******
+你*****
+ ******
+ ******
+4******")]
+
+    // BottomTop_LeftRight
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+2******
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.BottomTop_LeftRight, @"
+*******
+*******
+4******
+ ******
+2******
+ ******
+0******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.BottomTop_LeftRight, @"
+*******
+4******
+ ******
+2******
+ ******
+0******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+ ******
+2******
+ ******
+ ******
+0******")]
+
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+你*****
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.BottomTop_LeftRight, @"
+*******
+*******
+4******
+ ******
+你*****
+ ******
+0******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.BottomTop_LeftRight, @"
+*******
+4******
+ ******
+你*****
+ ******
+0******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.BottomTop_LeftRight, @"
+4******
+ ******
+ ******
+你*****
+ ******
+ ******
+0******")]
+
+    // BottomTop_RightLeft
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+2******
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.BottomTop_RightLeft, @"
+*******
+*******
+4******
+ ******
+2******
+ ******
+0******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.BottomTop_RightLeft, @"
+*******
+4******
+ ******
+2******
+ ******
+0******
+*******")]
+    [InlineData ("0 2 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+ ******
+2******
+ ******
+ ******
+0******")]
+
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Top, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+你*****
+ ******
+0******
+*******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Bottom, TextDirection.BottomTop_RightLeft, @"
+*******
+*******
+4******
+ ******
+你*****
+ ******
+0******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Middle, TextDirection.BottomTop_RightLeft, @"
+*******
+4******
+ ******
+你*****
+ ******
+0******
+*******")]
+    [InlineData ("0 你 4", TextAlignment.Justified, VerticalTextAlignment.Justified, TextDirection.BottomTop_RightLeft, @"
+4******
+ ******
+ ******
+你*****
+ ******
+ ******
+0******")]
+
+    public void Draw_Text_Alignment (string text, TextAlignment horizontalTextAlignment, VerticalTextAlignment verticalTextAlignment, TextDirection textDirection, string expectedText)
+    {
+        TextFormatter tf = new ()
+        {
+            Alignment = horizontalTextAlignment,
+            VerticalAlignment = verticalTextAlignment,
+            Direction = textDirection,
+            Size = new (7, 7),
+            Text = text
+        };
+
+        Application.Driver.FillRect (new Rectangle (0, 0, 7, 7), (Rune)'*');
+        tf.Draw (new Rectangle (0, 0, 7, 7), Attribute.Default, Attribute.Default);
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
 }

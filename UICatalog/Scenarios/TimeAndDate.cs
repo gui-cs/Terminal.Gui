@@ -53,67 +53,67 @@ public class TimeAndDate : Scenario
         longDate.DateChanged += DateChanged;
         Win.Add (longDate);
 
-        _lblOldTime = new Label
+        _lblOldTime = new()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (longDate) + 1,
             TextAlignment = TextAlignment.Centered,
-            AutoSize = false,
+
             Width = Dim.Fill (),
             Text = "Old Time: "
         };
         Win.Add (_lblOldTime);
 
-        _lblNewTime = new Label
+        _lblNewTime = new()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblOldTime) + 1,
             TextAlignment = TextAlignment.Centered,
-            AutoSize = false,
+
             Width = Dim.Fill (),
             Text = "New Time: "
         };
         Win.Add (_lblNewTime);
 
-        _lblTimeFmt = new Label
+        _lblTimeFmt = new()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblNewTime) + 1,
             TextAlignment = TextAlignment.Centered,
-            AutoSize = false,
+
             Width = Dim.Fill (),
             Text = "Time Format: "
         };
         Win.Add (_lblTimeFmt);
 
-        _lblOldDate = new Label
+        _lblOldDate = new()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblTimeFmt) + 2,
             TextAlignment = TextAlignment.Centered,
-            AutoSize = false,
+
             Width = Dim.Fill (),
             Text = "Old Date: "
         };
         Win.Add (_lblOldDate);
 
-        _lblNewDate = new Label
+        _lblNewDate = new()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblOldDate) + 1,
             TextAlignment = TextAlignment.Centered,
-            AutoSize = false,
+
             Width = Dim.Fill (),
             Text = "New Date: "
         };
         Win.Add (_lblNewDate);
 
-        _lblDateFmt = new Label
+        _lblDateFmt = new()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblNewDate) + 1,
             TextAlignment = TextAlignment.Centered,
-            AutoSize = false,
+
             Width = Dim.Fill (),
             Text = "Date Format: "
         };
@@ -125,16 +125,16 @@ public class TimeAndDate : Scenario
         };
 
         swapButton.Accept += (s, e) =>
-                              {
-                                  longTime.ReadOnly = !longTime.ReadOnly;
-                                  shortTime.ReadOnly = !shortTime.ReadOnly;
+                             {
+                                 longTime.ReadOnly = !longTime.ReadOnly;
+                                 shortTime.ReadOnly = !shortTime.ReadOnly;
 
-                                  longTime.IsShortFormat = !longTime.IsShortFormat;
-                                  shortTime.IsShortFormat = !shortTime.IsShortFormat;
+                                 longTime.IsShortFormat = !longTime.IsShortFormat;
+                                 shortTime.IsShortFormat = !shortTime.IsShortFormat;
 
-                                  longDate.ReadOnly = !longDate.ReadOnly;
-                                  shortDate.ReadOnly = !shortDate.ReadOnly;
-                              };
+                                 longDate.ReadOnly = !longDate.ReadOnly;
+                                 shortDate.ReadOnly = !shortDate.ReadOnly;
+                             };
         Win.Add (swapButton);
     }
 

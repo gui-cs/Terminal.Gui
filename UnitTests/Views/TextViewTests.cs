@@ -1072,7 +1072,7 @@ This is the second line.
         Assert.Equal (0, tv.LeftColumn);
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Application.PositionCursor (top);
-        Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
 
         for (var i = 0; i < 12; i++)
         {
@@ -1124,7 +1124,7 @@ This is the second line.
 
         Assert.Equal (0, tv.TopRow);
         Application.PositionCursor (top);
-        Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
 
         for (var i = 0; i < 12; i++)
         {

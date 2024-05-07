@@ -158,13 +158,11 @@ public class ViewTests
 
         if (label)
         {
-            Assert.True (v.AutoSize);
             Assert.False (v.CanFocus);
-            Assert.Equal (new Rectangle (0, 0, 100, 1), v.Frame);
+            Assert.Equal (new Rectangle (0, 0, 20, 1), v.Frame);
         }
         else
         {
-            Assert.False (v.AutoSize);
             Assert.True (v.CanFocus);
             Assert.Equal (new Rectangle (0, 0, 20, 1), v.Frame);
         }
@@ -442,7 +440,7 @@ At 0,0
         tv.DrawContentComplete += (s, e) => tvCalled = true;
 
         var top = new Toplevel ();
-       top.Add (view, tv);
+        top.Add (view, tv);
         Application.Begin (top);
 
         Assert.True (viewCalled);
@@ -488,7 +486,6 @@ At 0,0
 
         button.LayoutComplete += (s, e) => { Assert.Equal (new Rectangle (0, 0, 13, 1), button._needsDisplayRect); };
 
-        Assert.True (label.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
         Assert.Equal (new Rectangle (20, 8, 40, 8), frame.Frame);
 
@@ -741,7 +738,7 @@ At 0,0
         view.EndInit ();
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre ( text, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (text, _output);
     }
 
     [Fact]
@@ -829,10 +826,13 @@ At 0,0
         // Initializes a view with a vertical direction
         r = new View
         {
-            Text = "Vertical View", TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = true
+            Text = "Vertical View",
+            TextDirection = TextDirection.TopBottom_LeftRight,
+            Width = Dim.Auto (),
+            Height = Dim.Auto ()
         }; // BUGBUG: AutoSize or Height need be set
         Assert.NotNull (r);
-        Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
+        Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
 
         // BUGBUG: IsInitialized must be true to process calculation
         r.BeginInit ();
@@ -1010,7 +1010,8 @@ At 0,0
         top.Add (win);
         RunState rs = Application.Begin (top);
 
-        view.AutoSize = true;
+        view.Width = Dim.Auto ();
+        view.Height = Dim.Auto ();
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
@@ -1209,7 +1210,8 @@ At 0,0
         Assert.True (acceptInvoked);
 
         return;
-        void ViewOnAccept (object sender, CancelEventArgs e) { 
+        void ViewOnAccept (object sender, CancelEventArgs e)
+        {
             acceptInvoked = true;
             e.Cancel = true;
         }
