@@ -1,12 +1,55 @@
-# Terminal.Gui v2
+# Migrating from v1 to v2
 
-Check out this Discussion: https://github.com/gui-cs/Terminal.Gui/discussions/2448
+This document provides an overview of the changes between Terminal.Gui v1 and v2. It is intended to help developers migrate their applications from v1 to v2.
+
+For detailed breaking change documentation check out this Discussion: https://github.com/gui-cs/Terminal.Gui/discussions/2448
+
+## TrueColor Support - 24-bit Color is the default
+
+Terminal.Gui v2 now supports 24-bit color by default. This means that the colors you use in your application will be more accurate and vibrant. If you are using custom colors in your application, you may need to update them to use the new 24-bit color format.
+
+### How to Fix
+
+* ...
+
+## Low-Level Type Changes
+
+* `Rect` -> `Rectangle`
+* `Point` -> `Point`
+* `Size` -> `Size`
+
+### How to Fix
+
+* Replace `Rect` with `Rectangle`
+
+## Layout Improvements
+
+In v2, the layout system has been improved to make it easier to create complex user interfaces. If you are using custom layouts in your application, you may need to update them to use the new layout system.
+
+* `View.Frame` now represents the position and size of the view in the superview's coordinate system. The `Frame` property is of type `Rectangle`.
+* `View.Bounds` has been replaced by `View.Viewport`. The `Viewport` property represents the visible area of the view in its own coordinate system. The `Viewport` property is of type `Rectangle`.
+* `View.ContentSize` represents the size of the view's content. The `ContentSize` property is of type `Size`.
+
+### How to Fix
+
+### `Bounds` -> `Viewport`
+
+* Rename `Bounds` to `Viewport`. The `Location` property of `Bounds` can now have non-zero values.
+* Update any code that assumed `Bounds.Location` was always `Point.Empty`.
+* Update any code that used `Bounds` to refer to the size of the view's content. Use `ContentSize` instead.
+* Update any code that assumed `Bounds.Size` was the same as `Frame.Size`. `Frame.Size` defines the size of the view in the superview's coordinate system, while `Viewport.Size` defines the visible area of the view in its own coordinate system.
+* Use `GetAdornmentsThickness` to get the thickness of the view's border, margin, and padding.
+
+## Adornments
+
+In v2, the `Border`, `Margin`, and `Padding` properties have been added to all views. This simplifies view development and enables a sophisticated look and feel. If you are using custom borders, margins, or padding in your application, you may need to update them to use the new properties.
+
+* `View.Border` is now of type `Adornment`. `View.BorderStyle` is provided as a convenience property to set the border style (`myView.BorderStyle = LineStyle.Double`).
+
+## How to Fix
 
 ## Modern Look & Feel 
 
-Apps built with Terminal.Gui now feel modern thanks to these improvements:
-
-* *TrueColor support* - 24-bit color support for Windows, Mac, and Linux. Legacy 16-color systems are still supported, automatically. See [TrueColor](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#truecolor) for details.
 * *Enhanced Borders and Padding* - Terminal.Gui now supports a `Border`, `Margin`, and `Padding` property on all views. This simplifies View development and enables a sophisticated look and feel. See [Adornments](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#adornments) for details.
 * *User Configurable Color Themes* - See [Color Themes](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#color-themes) for details.
 * *Enhanced Unicode/Wide Character support *- Terminal.Gui now supports the full range of Unicode/wide characters. See [Unicode](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#unicode) for details.
