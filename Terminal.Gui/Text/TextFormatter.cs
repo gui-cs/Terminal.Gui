@@ -662,7 +662,7 @@ public class TextFormatter
     /// <remarks>
     ///     <para>
     ///         If the text needs to be formatted (if <see cref="NeedsFormat"/> is <see langword="true"/>)
-    ///         <see cref="Format(string, int, bool, bool, bool, int, TextDirection, bool)"/> will be called and upon return
+    ///         <see cref="Format()"/> will be called and upon return
     ///         <see cref="NeedsFormat"/> will be <see langword="false"/>.
     ///     </para>
     ///     <para>

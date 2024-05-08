@@ -115,66 +115,65 @@ public class LayoutTests (ITestOutputHelper output)
         sub2.Dispose ();
     }
 
-    //[Fact]
-    //[AutoInitShutdown]
-    //public void TrySetHeight_ForceValidatePosDim ()
-    //{
-    //    var top = new View { X = 0, Y = 0, Height = 20 };
+    [Fact]
+    public void LayoutSubviews_Uses_ContentSize ()
+    {
+        var superView = new View ()
+        {
+            Width = 5,
+            Height = 5,
+            ContentSize = new (10, 10)
+        };
+        var view = new View ()
+        {
+            X = Pos.Center ()
+        };
+        superView.Add (view);
 
-    //    var v = new View { Height = Dim.Fill (), ValidatePosDim = true };
-    //    top.Add (v);
+        superView.LayoutSubviews ();
 
-    //    Assert.False (v.TrySetHeight (10, out int rHeight));
-    //    Assert.Equal (10, rHeight);
+        Assert.Equal (5, view.Frame.X);
+        superView.Dispose ();
+    }
 
-    //    v.Height = Dim.Fill (1);
-    //    Assert.False (v.TrySetHeight (10, out rHeight));
-    //    Assert.Equal (9, rHeight);
+    // Test OnLayoutStarted/OnLayoutComplete - ensure that they are called at right times
+    [Fact]
+    public void LayoutSubviews_LayoutStarted_Complete ()
+    {
+        var superView = new View ();
+        var view = new View ();
+        superView.Add (view);
+        superView.BeginInit ();
+        superView.EndInit ();
 
-    //    v.Height = 0;
-    //    Assert.True (v.TrySetHeight (10, out rHeight));
-    //    Assert.Equal (10, rHeight);
-    //    Assert.False (v.IsInitialized);
+        var layoutStarted = false;
+        var layoutComplete = false;
 
-    //    var toplevel = new Toplevel ();
-    //    toplevel.Add (top);
-    //    Application.Begin (toplevel);
+        var borderLayoutStarted = false;
+        var borderLayoutComplete = false;
 
-    //    Assert.True (v.IsInitialized);
+        view.LayoutStarted += (sender, e) => layoutStarted = true;
+        view.LayoutComplete += (sender, e) => layoutComplete = true;
 
-    //    v.Height = 15;
-    //    Assert.True (v.TrySetHeight (5, out rHeight));
-    //    Assert.Equal (5, rHeight);
-    //}
+        view.Border.LayoutStarted += (sender, e) =>
+                                     {
+                                         Assert.True (layoutStarted);
+                                         borderLayoutStarted = true;
+                                     };
+        view.Border.LayoutComplete += (sender, e) =>
+                                      {
+                                          Assert.True (layoutStarted);
+                                          Assert.False (layoutComplete);
+                                          borderLayoutComplete = true;
+                                      };
 
-    //[Fact]
-    //[AutoInitShutdown]
-    //public void TrySetWidth_ForceValidatePosDim ()
-    //{
-    //    var top = new View { X = 0, Y = 0, Width = 80 };
+        superView.LayoutSubviews ();
 
-    //    var v = new View { Width = Dim.Fill (), ValidatePosDim = true };
-    //    top.Add (v);
+        Assert.True (borderLayoutStarted);
+        Assert.True (borderLayoutComplete);
 
-    //    Assert.False (v.TrySetWidth (70, out int rWidth));
-    //    Assert.Equal (70, rWidth);
-
-    //    v.Width = Dim.Fill (1);
-    //    Assert.False (v.TrySetWidth (70, out rWidth));
-    //    Assert.Equal (69, rWidth);
-
-    //    v.Width = 0;
-    //    Assert.True (v.TrySetWidth (70, out rWidth));
-    //    Assert.Equal (70, rWidth);
-    //    Assert.False (v.IsInitialized);
-
-    //    var toplevel = new Toplevel ();
-    //    toplevel.Add (top);
-    //    Application.Begin (toplevel);
-
-    //    Assert.True (v.IsInitialized);
-    //    v.Width = 75;
-    //    Assert.True (v.TrySetWidth (60, out rWidth));
-    //    Assert.Equal (60, rWidth);
-    //}
+        Assert.True (layoutStarted);
+        Assert.True (layoutComplete);
+        superView.Dispose ();
+    }
 }
