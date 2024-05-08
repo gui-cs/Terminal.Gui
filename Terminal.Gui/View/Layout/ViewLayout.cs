@@ -179,7 +179,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout"/> has been
     ///         called.
     ///     </para>
     ///     <para>
@@ -218,7 +218,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout"/> has been
     ///         called.
     ///     </para>
     ///     <para>
@@ -257,7 +257,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout"/> has been
     ///         called.
     ///     </para>
     ///     <para>
@@ -303,7 +303,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout"/> has been
     ///         called.
     ///     </para>
     ///     <para>
@@ -735,7 +735,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         Determines the relative bounds of the <see cref="View"/> and its <see cref="Frame"/>s, and then calls
-    ///         <see cref="SetRelativeLayout(Size)"/> to update the view.
+    ///         <see cref="SetRelativeLayout"/> to update the view.
     ///     </para>
     /// </remarks>
     internal void OnResizeNeeded ()
