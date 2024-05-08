@@ -88,15 +88,13 @@ public partial class View
         }
     }
 
-    private void SetFrame (Rectangle frame)
+    private void SetFrame (in Rectangle frame)
     {
         var oldViewport = Rectangle.Empty;
-        Size? oldContentSize = null;
 
         if (IsInitialized)
         {
             oldViewport = Viewport;
-            oldContentSize = ContentSize;
         }
 
         // This is the only place where _frame should be set directly. Use Frame = or SetFrame instead.
@@ -148,7 +146,7 @@ public partial class View
     /// </summary>
     /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Viewport"/>.</returns>
     /// <param name="location">Screen-relative coordinate.</param>
-    public virtual Point ScreenToFrame (Point location)
+    public virtual Point ScreenToFrame (in Point location)
     {
         if (SuperView is null)
         {
@@ -156,15 +154,13 @@ public partial class View
         }
 
         Point superViewViewportOffset = SuperView.GetViewportOffsetFromFrame ();
-        superViewViewportOffset.X -= SuperView.Viewport.X;
-        superViewViewportOffset.Y -= SuperView.Viewport.Y;
+        superViewViewportOffset.Offset(-SuperView.Viewport.X, -SuperView.Viewport.Y);
 
-        location.X -= superViewViewportOffset.X;
-        location.Y -= superViewViewportOffset.Y;
+        Point frame = location;
+        frame.Offset(-superViewViewportOffset.X, -superViewViewportOffset.Y);
 
-        Point frame = SuperView.ScreenToFrame (location);
-        frame.X -= Frame.X;
-        frame.Y -= Frame.Y;
+        frame = SuperView.ScreenToFrame (frame);
+        frame.Offset (-Frame.X, -Frame.Y);
 
         return frame;
     }
