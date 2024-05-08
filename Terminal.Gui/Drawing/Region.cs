@@ -77,7 +77,7 @@ public sealed class Region : IDisposable
     /// </summary>
     /// <param name="regions"></param>
     /// <returns></returns>
-    public static dynamic? Union (params Region [] regions)
+    public static dynamic? Union (Region [] regions)
     {
         ArgumentNullException.ThrowIfNull (regions);
 
@@ -148,7 +148,7 @@ public sealed class Region : IDisposable
     /// </summary>
     /// <param name="views"></param>
     /// <returns></returns>
-    public static Rectangle GetViewsBounds (params View [] views)
+    public static Rectangle GetViewsBounds (View [] views)
     {
         return Union (views.Select (c => new Region (c.Viewport)).ToArray ());
     }
