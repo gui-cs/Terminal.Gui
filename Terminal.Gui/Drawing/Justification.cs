@@ -96,7 +96,7 @@ public class Justifier
     public int ContainerSize { get; set; }
 
     /// <summary>
-    ///     Gets or sets whether <see cref="Justify"/> puts a space is placed between items. Default is <see langword="false"/>. If <see langword="true"/>, a space will be
+    ///     Gets or sets whether <see cref="Justify(int[])"/> puts a space is placed between items. Default is <see langword="false"/>. If <see langword="true"/>, a space will be
     ///     placed between each item, which is useful for justifying text.
     /// </summary>
     public bool PutSpaceBetweenItems { get; set; }
@@ -118,6 +118,7 @@ public class Justifier
     /// </summary>
     /// <param name="sizes">The sizes of the items to justify.</param>
     /// <param name="justification">The justification style.</param>
+    /// <param name="putSpaceBetweenItems"></param>
     /// <param name="containerSize">The size of the container.</param>
     /// <returns>The locations of the items, from left to right.</returns>
     public static int [] Justify (Justification justification, bool putSpaceBetweenItems, int containerSize, int [] sizes)

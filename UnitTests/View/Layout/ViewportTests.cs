@@ -248,7 +248,7 @@ public class ViewportTests (ITestOutputHelper output)
         view.Viewport = newViewport;
 
         // Assert
-        Assert.Equal (new Rectangle(expectedX, expectedY, viewWidth, viewHeight), view.Viewport);
+        Assert.Equal (new Rectangle (expectedX, expectedY, viewWidth, viewHeight), view.Viewport);
     }
 
     [Theory]
@@ -321,18 +321,9 @@ public class ViewportTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (0, 0, 0)]
-    [InlineData (1, 0, 0)]
-    [InlineData (-1, 0, 0)]
-    [InlineData (10, 0, 0)]
-    [InlineData (11, 0, 0)]
-
-    [InlineData (0, 1, 1)]
-    [InlineData (1, 1, 1)]
-    [InlineData (-1, 1, 1)]
-    [InlineData (10, 1, 1)]
-    [InlineData (11, 1, 1)]
-    public void GetViewportOffset_Returns_Offset_From_Frame (int frameX, int adornmentThickness, int expectedOffset)
+    [InlineData (0, 0)]
+    [InlineData (1, 1)]
+    public void GetViewportOffset_Returns_Offset_From_Frame (int adornmentThickness, int expectedOffset)
     {
         View view = new ()
         {

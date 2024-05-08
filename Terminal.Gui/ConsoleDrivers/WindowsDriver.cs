@@ -2344,11 +2344,9 @@ internal class WindowsMainLoop : IMainLoopDriver
 
 internal class WindowsClipboard : ClipboardBase
 {
-    private const uint _cfUnicodeText = 13;
+    private const uint CF_UNICODE_TEXT = 13;
 
-    public WindowsClipboard () { IsSupported = IsClipboardFormatAvailable (_cfUnicodeText); }
-
-    public override bool IsSupported { get; }
+    public override bool IsSupported { get; } = IsClipboardFormatAvailable (CF_UNICODE_TEXT);
 
     protected override string GetClipboardDataImpl ()
     {
@@ -2359,7 +2357,7 @@ internal class WindowsClipboard : ClipboardBase
                 return string.Empty;
             }
 
-            nint handle = GetClipboardData (_cfUnicodeText);
+            nint handle = GetClipboardData (CF_UNICODE_TEXT);
 
             if (handle == nint.Zero)
             {
@@ -2431,7 +2429,7 @@ internal class WindowsClipboard : ClipboardBase
                 GlobalUnlock (target);
             }
 
-            if (SetClipboardData (_cfUnicodeText, hGlobal) == default (nint))
+            if (SetClipboardData (CF_UNICODE_TEXT, hGlobal) == default (nint))
             {
                 ThrowWin32 ();
             }
