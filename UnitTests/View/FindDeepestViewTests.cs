@@ -8,7 +8,7 @@ namespace Terminal.Gui.ViewTests;
 /// Tests View.FindDeepestView
 /// </summary>
 /// <param name="output"></param>
-public class FindDeepestViewTests (ITestOutputHelper output)
+public class FindDeepestViewTests ()
 {
     [Theory]
     [InlineData (0, 0, 0, 0, 0, -1, -1, null)]
@@ -249,7 +249,6 @@ public class FindDeepestViewTests (ITestOutputHelper output)
 
     [InlineData (2, 3, true)]
     [InlineData (5, 6, true)]
-    [InlineData (2, 3, true)]
     [InlineData (6, 7, true)]
     public void Returns_Correct_If_Start_Has_Adornments (int testX, int testY, bool expectedSubViewFound)
     {
@@ -303,15 +302,14 @@ public class FindDeepestViewTests (ITestOutputHelper output)
     }
 
     [Theory]
+    [InlineData (9, 9, true)]
     [InlineData (0, 0, false)]
     [InlineData (1, 1, false)]
-    [InlineData (9, 9, true)]
     [InlineData (10, 10, false)]
     [InlineData (7, 8, false)]
     [InlineData (1, 2, false)]
     [InlineData (2, 3, false)]
     [InlineData (5, 6, false)]
-    [InlineData (2, 3, false)]
     [InlineData (6, 7, false)]
     public void Returns_Correct_If_Start_Has_Adornment_WithSubview (int testX, int testY, bool expectedSubViewFound)
     {
@@ -365,7 +363,7 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         start.Add (subview);
 
         var found = View.FindDeepestView (start, testX, testY);
-        Assert.Equal (expectedAdornmentType, found.GetType ());
+        Assert.Equal (expectedAdornmentType, found!.GetType ());
     }
 
     // Test that FindDeepestView works if the subview has positive Adornments
@@ -379,7 +377,6 @@ public class FindDeepestViewTests (ITestOutputHelper output)
     [InlineData (1, 2, false)]
     [InlineData (5, 6, false)]
 
-    [InlineData (2, 3, true)]
     [InlineData (2, 3, true)]
     public void Returns_Correct_If_SubView_Has_Adornments (int testX, int testY, bool expectedSubViewFound)
     {
@@ -533,6 +530,6 @@ public class FindDeepestViewTests (ITestOutputHelper output)
         start.Add (subviews [0]);
 
         var found = View.FindDeepestView (start, testX, testY);
-        Assert.Equal (expectedSubViewFound, subviews.IndexOf (found));
+        Assert.Equal (expectedSubViewFound, subviews.IndexOf (found!));
     }
 }
