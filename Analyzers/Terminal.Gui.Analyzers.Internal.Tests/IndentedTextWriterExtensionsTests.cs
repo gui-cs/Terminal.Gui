@@ -45,20 +45,19 @@ public class IndentedTextWriterExtensionsTests
         }
 
         writer.Flush ();
-        var result = sb.ToString ();
+        var result = sb.ToString ().Replace ("\r\n", "\n");
 
         Assert.That (
                      result,
                      Is.EqualTo (
-                                 $"""
-                                  
-                                          {scopeClosing}
-                                        {scopeClosing}
-                                      {scopeClosing}
-                                    {scopeClosing}
-                                  {scopeClosing}
-
-                                  """));
+                                 @$"
+        {scopeClosing}
+      {scopeClosing}
+    {scopeClosing}
+  {scopeClosing}
+{scopeClosing}
+".Replace ("\r\n", "\n")
+                                ));
     }
 
     [Test]
@@ -89,23 +88,23 @@ public class IndentedTextWriterExtensionsTests
         }
 
         writer.Flush ();
-        var result = sb.ToString ();
+        var result = sb.ToString ().Replace ("\r\n", "\n").Trim ();
 
         Assert.That (
                      result,
                      Is.EqualTo (
-                                 $"""
-                                  Opening UninterestingEnum
-                                  {scopeOpening}
-                                    Opening UninterestingEnum
-                                    {scopeOpening}
-                                      Opening UninterestingEnum
-                                      {scopeOpening}
-                                        Opening UninterestingEnum
-                                        {scopeOpening}
-                                          Opening UninterestingEnum
-                                          {scopeOpening}
-
-                                  """));
+                                 @$"
+Opening UninterestingEnum
+{scopeOpening}
+  Opening UninterestingEnum
+  {scopeOpening}
+    Opening UninterestingEnum
+    {scopeOpening}
+      Opening UninterestingEnum
+      {scopeOpening}
+        Opening UninterestingEnum
+        {scopeOpening}".Replace ("\r\n", "\n")
+                       .Trim ()
+                                ));
     }
 }
