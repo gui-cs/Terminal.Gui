@@ -833,7 +833,7 @@ internal class CursesDriver : ConsoleDriver
     /// <returns></returns>
     private static Attribute MakeColor (short foreground, short background)
     {
-        var v = (short)(foreground | (background << 4));
+        var v = (short)((ushort)foreground | (background << 4));
 
         // TODO: for TrueColor - Use InitExtendedPair
         Curses.InitColorPair (v, foreground, background);

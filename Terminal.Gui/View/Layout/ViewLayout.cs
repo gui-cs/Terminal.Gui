@@ -670,9 +670,10 @@ public partial class View
 
         CheckDimAuto ();
 
-        LayoutAdornments ();
+        var contentSize = ContentSize.GetValueOrDefault ();
+        OnLayoutStarted (new (contentSize));
 
-        OnLayoutStarted (new (ContentSize.GetValueOrDefault ()));
+        LayoutAdornments ();
 
         SetTextFormatterSize ();
 
@@ -684,7 +685,7 @@ public partial class View
 
         foreach (View v in ordered)
         {
-            LayoutSubview (v, Viewport.Size);
+            LayoutSubview (v, contentSize);
         }
 
         // If the 'to' is rooted to 'from' it's a special-case.
@@ -699,7 +700,7 @@ public partial class View
 
         LayoutNeeded = false;
 
-        OnLayoutComplete (new (ContentSize.GetValueOrDefault ()));
+        OnLayoutComplete (new (contentSize));
     }
 
     private void LayoutSubview (View v, Size contentSize)
