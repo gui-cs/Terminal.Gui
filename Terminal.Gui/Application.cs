@@ -1637,7 +1637,7 @@ public static partial class Application
 
         if (view is Adornment adornment)
         {
-            Point frameLoc = adornment.ScreenToFrame (mouseEvent.X, mouseEvent.Y);
+            Point frameLoc = adornment.ScreenToFrame (new (mouseEvent.X, mouseEvent.Y));
 
             me = new ()
             {

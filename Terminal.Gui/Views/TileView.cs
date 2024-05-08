@@ -219,7 +219,7 @@ public class TileView : View
                 bool isRoot = _splitterLines.Contains (line);
 
                 Rectangle screen = line.ViewportToScreen (Rectangle.Empty);
-                Point origin = ScreenToFrame (screen.X, screen.Y);
+                Point origin = ScreenToFrame (screen.Location);
                 int length = line.Orientation == Orientation.Horizontal ? line.Frame.Width : line.Frame.Height;
 
                 if (!isRoot)
@@ -841,7 +841,7 @@ public class TileView : View
         public Point GetLocalCoordinateForTitle (TileView intoCoordinateSpace)
         {
             Rectangle screen = Tile.ContentView.ViewportToScreen (Rectangle.Empty);
-            return intoCoordinateSpace.ScreenToFrame (screen.X, screen.Y - 1);
+            return intoCoordinateSpace.ScreenToFrame (new (screen.X, screen.Y - 1));
         }
 
         internal string GetTrimmedTitle ()

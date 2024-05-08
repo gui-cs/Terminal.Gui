@@ -211,7 +211,7 @@ public partial class View
     public Point ScreenToContent (in Point location)
     {
         Point viewportOffset = GetViewportOffsetFromFrame ();
-        Point screen = ScreenToFrame (location.X, location.Y);
+        Point screen = ScreenToFrame (location);
         screen.Offset (Viewport.X - viewportOffset.X, Viewport.Y - viewportOffset.Y);
 
         return screen;
@@ -451,7 +451,7 @@ public partial class View
     public Point ScreenToViewport (int x, int y)
     {
         Point viewportOffset = GetViewportOffsetFromFrame ();
-        Point screen = ScreenToFrame (x, y);
+        Point screen = ScreenToFrame (new (x, y));
         screen.Offset (-viewportOffset.X, -viewportOffset.Y);
 
         return screen;

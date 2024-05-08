@@ -147,23 +147,22 @@ public partial class View
     ///     View's <see cref="SuperView"/>'s <see cref="Viewport"/>.
     /// </summary>
     /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Viewport"/>.</returns>
-    /// <param name="x">Screen-relative column.</param>
-    /// <param name="y">Screen-relative row.</param>
-    public virtual Point ScreenToFrame (int x, int y)
+    /// <param name="screen">Screen-relative coordinate.</param>
+    public virtual Point ScreenToFrame (Point screen)
     {
         if (SuperView is null)
         {
-            return new (x - Frame.X, y - Frame.Y);
+            return new (screen.X - Frame.X, screen.Y - Frame.Y);
         }
 
         Point superViewViewportOffset = SuperView.GetViewportOffsetFromFrame ();
         superViewViewportOffset.X -= SuperView.Viewport.X;
         superViewViewportOffset.Y -= SuperView.Viewport.Y;
 
-        x -= superViewViewportOffset.X;
-        y -= superViewViewportOffset.Y;
+        screen.X -= superViewViewportOffset.X;
+        screen.Y -= superViewViewportOffset.Y;
 
-        Point frame = SuperView.ScreenToFrame (x, y);
+        Point frame = SuperView.ScreenToFrame (screen);
         frame.X -= Frame.X;
         frame.Y -= Frame.Y;
 

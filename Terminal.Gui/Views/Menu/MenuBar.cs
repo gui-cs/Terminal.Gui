@@ -1805,7 +1805,7 @@ public class MenuBar : View
 
                     if (me.Y > -1)
                     {
-                        Point frameLoc = v.ScreenToFrame (me.X, me.Y);
+                        Point frameLoc = v.ScreenToFrame (new (me.X, me.Y));
 
                         nme = new ()
                         {
