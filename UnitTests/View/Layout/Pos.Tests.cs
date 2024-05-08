@@ -906,7 +906,7 @@ public class PosTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 2, 10, 3), win2.Frame);
         Assert.Equal (new Rectangle (0, 0, 8, 1), view2.Frame);
         Assert.Equal (new Rectangle (0, 0, 7, 1), view3.Frame);
-        var foundView = View.FindDeepestView (top, 9, 4);
+        var foundView = View.FindDeepestView (top, new (9, 4));
         Assert.Equal (foundView, view2);
     }
 

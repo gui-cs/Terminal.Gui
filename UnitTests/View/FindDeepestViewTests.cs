@@ -80,22 +80,22 @@ public class FindDeepestViewTests ()
         view.Padding.Thickness = new Thickness (paddingThickness);
 
         Type? containedType = null;
-        if (view.Contains (testX, testY))
+        if (view.Contains (new (testX, testY)))
         {
             containedType = view.GetType ();
         }
 
-        if (view.Margin.Contains (testX, testY))
+        if (view.Margin.Contains (new (testX, testY)))
         {
             containedType = view.Margin.GetType ();
         }
 
-        if (view.Border.Contains (testX, testY))
+        if (view.Border.Contains (new (testX, testY)))
         {
             containedType = view.Border.GetType ();
         }
 
-        if (view.Padding.Contains (testX, testY))
+        if (view.Padding.Contains (new (testX, testY)))
         {
             containedType = view.Padding.GetType ();
         }
@@ -115,7 +115,7 @@ public class FindDeepestViewTests ()
             Width = 10, Height = 10,
         };
 
-        Assert.Same (start, View.FindDeepestView (start, testX, testY));
+        Assert.Same (start, View.FindDeepestView (start, new (testX, testY)));
     }
 
     // Test that FindDeepestView returns null if the start view has no subviews and coords are outside the view
@@ -131,7 +131,7 @@ public class FindDeepestViewTests ()
             Width = 10, Height = 10,
         };
 
-        Assert.Null (View.FindDeepestView (start, testX, testY));
+        Assert.Null (View.FindDeepestView (start, new (testX, testY)));
     }
 
     [Theory]
@@ -147,7 +147,7 @@ public class FindDeepestViewTests ()
             Visible = false,
         };
 
-        Assert.Null (View.FindDeepestView (start, testX, testY));
+        Assert.Null (View.FindDeepestView (start, new (testX, testY)));
     }
 
     // Test that FindDeepestView returns the correct view if the start view has subviews
@@ -174,7 +174,7 @@ public class FindDeepestViewTests ()
         };
         start.Add (subview);
 
-        var found = View.FindDeepestView (start, testX, testY);
+        var found = View.FindDeepestView (start, new (testX, testY));
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
@@ -202,7 +202,7 @@ public class FindDeepestViewTests ()
         };
         start.Add (subview);
 
-        var found = View.FindDeepestView (start, testX, testY);
+        var found = View.FindDeepestView (start, new (testX, testY));
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
@@ -233,7 +233,7 @@ public class FindDeepestViewTests ()
         subview.Visible = true;
         Assert.True (subview.Visible);
         Assert.False (start.Visible);
-        var found = View.FindDeepestView (start, testX, testY);
+        var found = View.FindDeepestView (start, new (testX, testY));
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
@@ -265,7 +265,7 @@ public class FindDeepestViewTests ()
         };
         start.Add (subview);
 
-        var found = View.FindDeepestView (start, testX, testY);
+        var found = View.FindDeepestView (start, new (testX, testY));
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
@@ -296,7 +296,7 @@ public class FindDeepestViewTests ()
         };
         start.Add (subview);
 
-        var found = View.FindDeepestView (start, testX, testY);
+        var found = View.FindDeepestView (start, new (testX, testY));
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
@@ -328,7 +328,7 @@ public class FindDeepestViewTests ()
         start.BeginInit();
         start.EndInit();
 
-        var found = View.FindDeepestView (start, testX, testY);
+        var found = View.FindDeepestView (start, new (testX, testY));
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
@@ -362,7 +362,7 @@ public class FindDeepestViewTests ()
         };
         start.Add (subview);
 
-        var found = View.FindDeepestView (start, testX, testY);
+        var found = View.FindDeepestView (start, new (testX, testY));
         Assert.Equal (expectedAdornmentType, found!.GetType ());
     }
 
@@ -393,7 +393,7 @@ public class FindDeepestViewTests ()
         subview.Margin.Thickness = new Thickness (1);
         start.Add (subview);
 
-        var found = View.FindDeepestView (start, testX, testY);
+        var found = View.FindDeepestView (start, new (testX, testY));
 
         Assert.Equal (expectedSubViewFound, found == subview);
     }
@@ -438,7 +438,7 @@ public class FindDeepestViewTests ()
         start.BeginInit();
         start.EndInit();
 
-        var found = View.FindDeepestView (start, testX, testY);
+        var found = View.FindDeepestView (start, new (testX, testY));
 
         Assert.Equal (expectedSubViewFound, found == paddingSubview);
     }
@@ -487,7 +487,7 @@ public class FindDeepestViewTests ()
         start.BeginInit ();
         start.EndInit ();
 
-        var found = View.FindDeepestView (start, testX, testY);
+        var found = View.FindDeepestView (start, new (testX, testY));
 
         Assert.Equal (expectedSubViewFound, found == paddingSubview);
     }
@@ -529,7 +529,7 @@ public class FindDeepestViewTests ()
 
         start.Add (subviews [0]);
 
-        var found = View.FindDeepestView (start, testX, testY);
+        var found = View.FindDeepestView (start, new (testX, testY));
         Assert.Equal (expectedSubViewFound, subviews.IndexOf (found!));
     }
 }

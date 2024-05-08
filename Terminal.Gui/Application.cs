@@ -1556,7 +1556,7 @@ public static partial class Application
             return;
         }
 
-        var view = View.FindDeepestView (Current, mouseEvent.X, mouseEvent.Y);
+        var view = View.FindDeepestView (Current, new (mouseEvent.X, mouseEvent.Y));
 
         if (view is { })
         {
@@ -1619,7 +1619,7 @@ public static partial class Application
                 // This occurs when there are multiple overlapped "tops"
                 // E.g. "Mdi" - in the Background Worker Scenario
                 View? top = FindDeepestTop (Top, mouseEvent.X, mouseEvent.Y);
-                view = View.FindDeepestView (top, mouseEvent.X, mouseEvent.Y);
+                view = View.FindDeepestView (top, new (mouseEvent.X, mouseEvent.Y));
 
                 if (view is { } && view != OverlappedTop && top != Current)
                 {

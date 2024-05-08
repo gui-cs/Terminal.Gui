@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.CodeAnalysis;
 
 namespace Terminal.Gui;
 
@@ -392,10 +393,9 @@ public partial class View
     /// <summary>
     ///     Indicates whether the specified SuperView-relative coordinates are within the View's <see cref="Frame"/>.
     /// </summary>
-    /// <param name="x">SuperView-relative X coordinate.</param>
-    /// <param name="y">SuperView-relative Y coordinate.</param>
+    /// <param name="location">SuperView-relative coordinate</param>
     /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
-    public virtual bool Contains (int x, int y) { return Frame.Contains (x, y); }
+    public virtual bool Contains (in Point location) { return Frame.Contains (location); }
 
 #nullable enable
     /// <summary>Finds the first Subview of <paramref name="start"/> that is visible at the provided location.</summary>
@@ -405,29 +405,29 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="start">The view to scope the search by.</param>
-    /// <param name="x"><paramref name="start"/>.SuperView-relative X coordinate.</param>
-    /// <param name="y"><paramref name="start"/>.SuperView-relative Y coordinate.</param>
+    /// <param name="location"><paramref name="start"/>.SuperView-relative coordinate.</param>
     /// <returns>
-    ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
+    ///     The view that was found at the <paramref name="location"/> coordinate.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
 
     // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    internal static View? FindDeepestView (View? start, int x, int y)
+    internal static View? FindDeepestView (View? start, in Point location)
     {
-        while (start is { Visible: true } && start.Contains (x, y))
+        Point currentLocation = location;
+        while (start is { Visible: true } && start.Contains (currentLocation))
         {
             Adornment? found = null;
 
-            if (start.Margin.Contains (x, y))
+            if (start.Margin.Contains (currentLocation))
             {
                 found = start.Margin;
             }
-            else if (start.Border.Contains (x, y))
+            else if (start.Border.Contains (currentLocation))
             {
                 found = start.Border;
             }
-            else if (start.Padding.Contains (x, y))
+            else if (start.Padding.Contains (currentLocation))
             {
                 found = start.Padding;
             }
@@ -440,19 +440,19 @@ public partial class View
                 viewportOffset = found.Parent.Frame.Location;
             }
 
-            int startOffsetX = x - (start.Frame.X + viewportOffset.X);
-            int startOffsetY = y - (start.Frame.Y + viewportOffset.Y);
+            int startOffsetX = currentLocation.X - (start.Frame.X + viewportOffset.X);
+            int startOffsetY = currentLocation.Y - (start.Frame.Y + viewportOffset.Y);
 
             View? subview = null;
 
             for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
                 if (start.InternalSubviews [i].Visible
-                    && start.InternalSubviews [i].Contains (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
+                    && start.InternalSubviews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y)))
                 {
                     subview = start.InternalSubviews [i];
-                    x = startOffsetX + start.Viewport.X;
-                    y = startOffsetY + start.Viewport.Y;
+                    currentLocation.X = startOffsetX + start.Viewport.X;
+                    currentLocation.Y = startOffsetY + start.Viewport.Y;
 
                     // start is the deepest subview under the mouse; stop searching the subviews
                     break;

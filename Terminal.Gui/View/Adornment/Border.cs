@@ -273,7 +273,7 @@ public class Border : Adornment
 
             // Only start grabbing if the user clicks in the Thickness area
             // Adornment.Contains takes Parent SuperView=relative coords.
-            if (Contains (mouseEvent.X + Parent.Frame.X + Frame.X, mouseEvent.Y + Parent.Frame.Y + Frame.Y))
+            if (Contains (new (mouseEvent.X + Parent.Frame.X + Frame.X, mouseEvent.Y + Parent.Frame.Y + Frame.Y)))
             {
                 // Set the start grab point to the Frame coords
                 _startGrabPoint = new (mouseEvent.X + Frame.X, mouseEvent.Y + Frame.Y);

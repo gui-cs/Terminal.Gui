@@ -90,14 +90,13 @@ public class Thickness : IEquatable<Thickness>
     ///     the rectangle described by <see cref="GetInside(Rectangle)"/>.
     /// </summary>
     /// <param name="outside">Describes the location and size of the rectangle that contains the thickness.</param>
-    /// <param name="x">The x coord to check.</param>
-    /// <param name="y">The y coord to check.</param>
+    /// <param name="location">The coordinate to check.</param>
     /// <returns><see langword="true"/> if the specified coordinate is within the thickness; <see langword="false"/> otherwise.</returns>
-    public bool Contains (Rectangle outside, int x, int y)
+    public bool Contains (in Rectangle outside, in Point location)
     {
         Rectangle inside = GetInside (outside);
 
-        return outside.Contains (x, y) && !inside.Contains (x, y);
+        return outside.Contains (location) && !inside.Contains (location);
     }
 
     /// <summary>
