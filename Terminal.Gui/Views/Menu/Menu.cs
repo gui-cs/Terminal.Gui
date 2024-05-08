@@ -726,7 +726,7 @@ internal sealed class Menu : View
 
         View view = a.View ?? this;
 
-        Point boundsPoint = view.ScreenToViewport (a.X, a.Y);
+        Point boundsPoint = view.ScreenToViewport (new (a.X, a.Y));
         var me = new MouseEvent
         {
             X = boundsPoint.X,

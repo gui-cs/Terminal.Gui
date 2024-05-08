@@ -1574,7 +1574,7 @@ public static partial class Application
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.X, mouseEvent.Y);
+            Point frameLoc = MouseGrabView.ScreenToViewport (new (mouseEvent.X, mouseEvent.Y));
 
             var viewRelativeMouseEvent = new MouseEvent
             {
@@ -1650,7 +1650,7 @@ public static partial class Application
         }
         else if (view.ViewportToScreen (Rectangle.Empty with { Size = view.Viewport.Size }).Contains (mouseEvent.X, mouseEvent.Y))
         {
-            Point viewportLocation = view.ScreenToViewport (mouseEvent.X, mouseEvent.Y);
+            Point viewportLocation = view.ScreenToViewport (new (mouseEvent.X, mouseEvent.Y));
 
             me = new ()
             {
@@ -1709,7 +1709,7 @@ public static partial class Application
                 break;
             }
 
-            Point boundsPoint = view.ScreenToViewport (mouseEvent.X, mouseEvent.Y);
+            Point boundsPoint = view.ScreenToViewport (new (mouseEvent.X, mouseEvent.Y));
 
             me = new ()
             {

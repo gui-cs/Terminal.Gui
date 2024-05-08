@@ -135,9 +135,9 @@ public class Adornment : View
     }
 
     /// <inheritdoc/>
-    public override Point ScreenToFrame (Point screen)
+    public override Point ScreenToFrame (Point location)
     {
-        return Parent.ScreenToFrame (new (screen.X - Frame.X, screen.Y - Frame.Y));
+        return Parent.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
     }
 
     /// <summary>Does nothing for Adornment</summary>

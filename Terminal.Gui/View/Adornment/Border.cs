@@ -301,7 +301,7 @@ public class Border : Adornment
 
                 _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 
-                Point parentLoc = Parent.SuperView?.ScreenToViewport (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
+                Point parentLoc = Parent.SuperView?.ScreenToViewport (new (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y)) ?? mouseEvent.ScreenPosition;
 
                 GetLocationEnsuringFullVisibility (
                                      Parent,

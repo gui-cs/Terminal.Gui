@@ -446,15 +446,14 @@ public partial class View
     /// <remarks>
     ///     Viewport-relative means relative to the top-left corner of the inner rectangle of the <see cref="Padding"/>.
     /// </remarks>
-    /// <param name="x">Column relative to the left side of the Viewport.</param>
-    /// <param name="y">Row relative to the top of the Viewport</param>
-    public Point ScreenToViewport (int x, int y)
+    /// <param name="location">Screen-Relative Coordinate.</param>
+    public Point ScreenToViewport (in Point location)
     {
         Point viewportOffset = GetViewportOffsetFromFrame ();
-        Point screen = ScreenToFrame (new (x, y));
-        screen.Offset (-viewportOffset.X, -viewportOffset.Y);
+        Point frame = ScreenToFrame (location);
+        frame.Offset (-viewportOffset.X, -viewportOffset.Y);
 
-        return screen;
+        return frame;
     }
 
     /// <summary>
