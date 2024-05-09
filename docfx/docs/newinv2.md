@@ -1,6 +1,8 @@
 # Terminal.Gui v2
 
-Check out this Discussion: https://github.com/gui-cs/Terminal.Gui/discussions/2448
+This document provides an overview of the new features and improvements in Terminal.Gui v2.
+
+For information on how to port code from v1 to v2, see the [v1 To v2 Migration Guide](migratingfromv1.md).
 
 ## Modern Look & Feel 
 
