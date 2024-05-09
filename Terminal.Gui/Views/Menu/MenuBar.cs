@@ -1496,7 +1496,7 @@ public class MenuBar : View
     // Set in OnInvokingKeyBindings. null means no sub-menu is selected for activation.
     private MenuItem _menuItemToSelect;
     private bool _openedByAltKey;
-    //private bool _openedByHotKey;
+    private bool _openedByHotKey;
 
     /// <summary>
     ///     Called when a key bound to Command.Select is pressed. Either activates the menu item or runs it, depending on
