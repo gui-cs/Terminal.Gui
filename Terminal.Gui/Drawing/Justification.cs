@@ -132,7 +132,7 @@ public class Justifier
     /// </summary>
     public bool PutSpaceBetweenItems { get; set; }
 
-    // TODO: Add property change events
+    // TODO: Add property change events so PosJustify can know when to update the locations.
 
     /// <summary>
     ///     Takes a list of items and returns their positions when justified within a container <see name="ContainerSize"/>
