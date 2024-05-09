@@ -655,7 +655,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var screen = view.ViewportToScreen (new (viewportX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -687,7 +687,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var screen = view.ViewportToScreen (new (viewportX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -729,7 +729,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.ViewportToScreen (new (viewportX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -772,7 +772,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.ViewportToScreen (new (viewportX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -824,7 +824,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.ViewportToScreen (new (viewportX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -878,7 +878,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.ViewportToScreen (new (viewportX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -935,7 +935,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.ViewportToScreen (new (testX, 0, 0, 0));
+        var screen = view.ViewportToScreen (new Point (testX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);

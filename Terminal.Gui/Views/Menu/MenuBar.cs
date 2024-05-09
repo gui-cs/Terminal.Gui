@@ -1336,7 +1336,7 @@ public class MenuBar : View
 
         if (mi.IsTopLevel)
         {
-            Rectangle screen = ViewportToScreen (new (new (0, i), Size.Empty));
+            var screen = ViewportToScreen (new Point (0 , i));
             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = mi };
             menu.Run (mi.Action);
             menu.Dispose ();
@@ -1699,7 +1699,7 @@ public class MenuBar : View
                     {
                         if (Menus [i].IsTopLevel)
                         {
-                            Rectangle screen = ViewportToScreen (new (new (0, i), Size.Empty));
+                            var screen = ViewportToScreen (new Point(0 , i));
                             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = Menus [i] };
                             menu.Run (Menus [i].Action);
                             menu.Dispose ();

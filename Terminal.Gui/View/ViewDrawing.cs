@@ -106,7 +106,7 @@ public partial class View
 
         if (ViewportSettings.HasFlag (ViewportSettings.ClearContentOnly))
         {
-            Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize.GetValueOrDefault ()));
+            Rectangle visibleContent = ViewportToScreen (new Rectangle (new (-Viewport.X, -Viewport.Y), ContentSize.GetValueOrDefault ()));
             toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
@@ -172,7 +172,7 @@ public partial class View
         if (ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly))
         {
             // Clamp the Clip to the just content area that is within the viewport
-            Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize.GetValueOrDefault ()));
+            Rectangle visibleContent = ViewportToScreen (new Rectangle (new (-Viewport.X, -Viewport.Y), ContentSize.GetValueOrDefault ()));
             clip = Rectangle.Intersect (clip, visibleContent);
         }
 
@@ -396,7 +396,7 @@ public partial class View
             return false;
         }
 
-        Rectangle screen = ViewportToScreen (new (col, row, 0, 0));
+        var screen = ViewportToScreen (new Point (col, row));
         Driver?.Move (screen.X, screen.Y);
 
         return true;

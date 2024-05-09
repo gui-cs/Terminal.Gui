@@ -196,9 +196,7 @@ public partial class View
         contentRelativeToViewport.Offset (-Viewport.X, -Viewport.Y);
 
         // Translate to Screen-Relative (our SuperView's Viewport-relative coordinates)
-        Rectangle screen = ViewportToScreen (new (contentRelativeToViewport, Size.Empty));
-
-        return screen.Location;
+        return ViewportToScreen (contentRelativeToViewport);
     }
 
     /// <summary>Converts a Screen-relative coordinate to a Content-relative coordinate.</summary>
@@ -426,21 +424,34 @@ public partial class View
     }
 
     /// <summary>
+    ///     Converts a <see cref="Viewport"/>-relative location and size to a screen-relative location and size.
+    /// </summary>
+    /// <remarks>
+    ///     Viewport-relative means relative to the top-left corner of the inner rectangle of the <see cref="Padding"/>.
+    /// </remarks>
+    /// <param name="viewport">Viewport-relative location and size.</param>
+    /// <returns>Screen-relative location and size.</returns>
+    public Rectangle ViewportToScreen (in Rectangle viewport)
+    {
+        return viewport with { Location = ViewportToScreen (viewport.Location) };
+    }
+
+    /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location to a screen-relative location.
     /// </summary>
     /// <remarks>
     ///     Viewport-relative means relative to the top-left corner of the inner rectangle of the <see cref="Padding"/>.
     /// </remarks>
-    /// <param name="location">Viewport-relative location.</param>
+    /// <param name="viewportLocation">Viewport-relative location.</param>
     /// <returns>Screen-relative location.</returns>
-    public Rectangle ViewportToScreen (in Rectangle location)
+    public Point ViewportToScreen (in Point viewportLocation)
     {
         // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
         Rectangle screen = FrameToScreen ();
         Point viewportOffset = GetViewportOffsetFromFrame ();
-        screen.Offset (viewportOffset.X + location.X, viewportOffset.Y + location.Y);
+        screen.Offset (viewportOffset.X + viewportLocation.X, viewportOffset.Y + viewportLocation.Y);
 
-        return new (screen.Location, location.Size);
+        return screen.Location;
     }
 
     /// <summary>Converts a screen-relative coordinate to a Viewport-relative coordinate.</summary>
