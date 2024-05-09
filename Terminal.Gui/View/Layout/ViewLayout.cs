@@ -523,7 +523,7 @@ public partial class View
             maxDimension -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
 
-        if (viewToMove.Frame.Width <= maxDimension)
+        if (viewToMove!.Frame.Width <= maxDimension)
         {
             nx = Math.Max (targetX, 0);
             nx = nx + viewToMove.Frame.Width > maxDimension ? Math.Max (maxDimension - viewToMove.Frame.Width, 0) : nx;
@@ -555,9 +555,9 @@ public partial class View
                 t = t.SuperView;
             }
 
-            if (t is Toplevel toplevel)
+            if (t is Toplevel topLevel)
             {
-                menuVisible = toplevel.MenuBar?.Visible == true;
+                menuVisible = topLevel.MenuBar?.Visible == true;
             }
         }
 

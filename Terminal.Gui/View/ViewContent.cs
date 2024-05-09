@@ -431,6 +431,8 @@ public partial class View
     /// <remarks>
     ///     Viewport-relative means relative to the top-left corner of the inner rectangle of the <see cref="Padding"/>.
     /// </remarks>
+    /// <param name="location">Viewport-relative location.</param>
+    /// <returns>Screen-relative location.</returns>
     public Rectangle ViewportToScreen (in Rectangle location)
     {
         // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
@@ -447,6 +449,7 @@ public partial class View
     ///     Viewport-relative means relative to the top-left corner of the inner rectangle of the <see cref="Padding"/>.
     /// </remarks>
     /// <param name="location">Screen-Relative Coordinate.</param>
+    /// <returns>Viewport-relative location.</returns>
     public Point ScreenToViewport (in Point location)
     {
         Point viewportOffset = GetViewportOffsetFromFrame ();

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
+using Microsoft.CodeAnalysis;
 using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
@@ -967,7 +968,7 @@ public static partial class Application
 
         if (PositionCursor (state.Toplevel))
         {
-            Driver.UpdateCursor();
+            Driver.UpdateCursor ();
         }
 
         //        else
@@ -1226,10 +1227,10 @@ public static partial class Application
     /// <value>The current.</value>
     public static Toplevel Current { get; private set; }
 
-    private static void EnsureModalOrVisibleAlwaysOnTop (Toplevel Toplevel)
+    private static void EnsureModalOrVisibleAlwaysOnTop (Toplevel topLevel)
     {
-        if (!Toplevel.Running
-            || (Toplevel == Current && Toplevel.Visible)
+        if (!topLevel.Running
+            || (topLevel == Current && topLevel.Visible)
             || OverlappedTop == null
             || _topLevels.Peek ().Modal)
         {
@@ -1246,24 +1247,24 @@ public static partial class Application
             }
         }
 
-        if (!Toplevel.Visible && Toplevel == Current)
+        if (!topLevel.Visible && topLevel == Current)
         {
             OverlappedMoveNext ();
         }
     }
 
 #nullable enable
-    private static Toplevel? FindDeepestTop (Toplevel start, int x, int y)
+    private static Toplevel? FindDeepestTop (Toplevel start, in Point location)
     {
-        if (!start.Frame.Contains (x, y))
+        if (!start.Frame.Contains (location))
         {
             return null;
         }
 
         if (_topLevels is { Count: > 0 })
         {
-            int rx = x - start.Frame.X;
-            int ry = y - start.Frame.Y;
+            int rx = location.X - start.Frame.X;
+            int ry = location.Y - start.Frame.Y;
 
             foreach (Toplevel t in _topLevels)
             {
@@ -1617,10 +1618,10 @@ public static partial class Application
             {
                 // This occurs when there are multiple overlapped "tops"
                 // E.g. "Mdi" - in the Background Worker Scenario
-                View? top = FindDeepestTop (Top, mouseEvent.Position.X, mouseEvent.Position.Y);
+                View? top = FindDeepestTop (Top, mouseEvent.Position);
                 view = View.FindDeepestView (top, mouseEvent.Position);
 
-                if (view is { } && view != OverlappedTop && top != Current)
+                if (view is { } && view != OverlappedTop && top != Current && top is { })
                 {
                     MoveCurrent ((Toplevel)top);
                 }
