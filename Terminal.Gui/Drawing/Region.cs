@@ -33,12 +33,18 @@ public sealed class Region : IDisposable
         _rect = rect;
     }
 
+    /// <summary>
+    /// <summary>
+    /// Destructor for disposing this.
+    /// </summary>
+    ~Region () { Dispose (); }
+
     #endregion
 
     /// <inheritdoc />
     public void Dispose ()
     {
-        throw new NotImplementedException ();
+        GC.SuppressFinalize (this);
     }
 
     /// <inheritdoc />
