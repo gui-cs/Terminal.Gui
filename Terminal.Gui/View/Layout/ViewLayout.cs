@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui;
 
@@ -35,6 +36,7 @@ public enum LayoutStyle
     /// </summary>
     Computed
 }
+
 
 public partial class View
 {
@@ -198,7 +200,7 @@ public partial class View
         get => VerifyIsInitialized (_x, nameof (X));
         set
         {
-            if (Equals (_x, value))
+            if (_x.Equals (value))
             {
                 return;
             }
@@ -237,7 +239,7 @@ public partial class View
         get => VerifyIsInitialized (_y, nameof (Y));
         set
         {
-            if (Equals (_y, value))
+            if (_y.Equals (value))
             {
                 return;
             }
@@ -676,6 +678,9 @@ public partial class View
         LayoutAdornments ();
 
         SetTextFormatterSize ();
+
+        PosJustify.JustifyGroup (0, Subviews, Dim.Dimension.Width, Viewport.Width);
+        PosJustify.JustifyGroup (0, Subviews, Dim.Dimension.Height, Viewport.Height);
 
         // Sort out the dependencies of the X, Y, Width, Height properties
         HashSet<View> nodes = new ();

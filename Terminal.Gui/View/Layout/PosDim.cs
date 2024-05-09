@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui;
 
@@ -202,6 +203,14 @@ public class Pos
     /// <param name="function">The function to be executed.</param>
     /// <returns>The <see cref="Pos"/> returned from the function.</returns>
     public static Pos Function (Func<int> function) { return new PosFunc (function); }
+
+    /// <summary>
+    ///      Creates a <see cref="Pos"/> object that justifies a set of views according to the specified justification.
+    /// </summary>
+    /// <param name="views"></param>
+    /// <param name="justification"></param>
+    /// <returns></returns>
+    public static Pos Justify (Justification justification) { return new PosJustify (justification); }
 
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
@@ -484,6 +493,119 @@ public class Pos
         internal override int Anchor (int width) { return (int)(width * _factor); }
     }
 
+
+    /// <summary>
+    /// Enables justification of a set of views. 
+    /// </summary>
+    public class PosJustify : Pos
+    {
+        public Justifier Justifier { get; } = new ();
+        public int? _location;
+
+        public int GroupId { get; set; }
+
+        public static void JustifyGroup (int groupId, IList<View> views, Dim.Dimension dimension, int size)
+        {
+            if (views is null)
+            {
+                return;
+            }
+            Justifier firstInGroup = null;
+            List<int> dimensionsList = new ();
+            List<View> viewsInGroup = views.Where (
+                                                   v =>
+                                                   {
+                                                       if (dimension == Dimension.Width && v.X is PosJustify justifyX)
+                                                       {
+                                                           return justifyX.GroupId == groupId;
+                                                       }
+
+                                                       if (dimension == Dimension.Height && v.Y is PosJustify justifyY)
+                                                       {
+                                                           return justifyY.GroupId == groupId;
+                                                       }
+
+                                                       return false;
+                                                   }).ToList ();
+            if (viewsInGroup.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var view in viewsInGroup)
+            {
+                var posJustify = dimension == Dimension.Width ? view.X as PosJustify : view.Y as PosJustify;
+
+                if (posJustify is { })
+                {
+                    if (firstInGroup is null)
+                    {
+                        firstInGroup = posJustify.Justifier;
+                    }
+
+                    dimensionsList.Add (dimension == Dimension.Width ? view.Frame.Width : view.Frame.Height);
+                }
+            }
+
+            if (firstInGroup is null)
+            {
+                return;
+            }
+
+            firstInGroup.ContainerSize = size;
+            var locations = firstInGroup.Justify (dimensionsList.ToArray ());
+
+            for (var index = 0; index < viewsInGroup.Count; index++)
+            {
+                View view = viewsInGroup [index];
+                PosJustify justify = dimension == Dimension.Width ? view.X as PosJustify : view.Y as PosJustify;
+
+                if (justify is { })
+                {
+                    justify._location = locations [index];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Enables justification of a set of views.
+        /// </summary>
+        /// <param name="views">The set of views to justify according to <paramref name="justification"/>.</param>
+        /// <param name="justification"></param>
+        public PosJustify (Justification justification)
+        {
+            Justifier.Justification = justification;
+        }
+
+        public override bool Equals (object other)
+        {
+            return other is PosJustify justify && justify.Justifier.Equals (Justifier);
+        }
+
+        public override int GetHashCode () { return Justifier.GetHashCode (); }
+
+
+        public override string ToString ()
+        {
+            return $"Justify(justification={Justifier.Justification})";
+        }
+
+        internal override int Anchor (int width)
+        {
+            return _location ?? 0 - width;
+        }
+
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
+        {
+            if (_location.HasValue)
+            {
+                return _location.Value;
+            }
+
+            return 0;
+        }
+
+    }
     // Helper class to provide dynamic value by the execution of a function that returns an integer.
     internal class PosFunc (Func<int> n) : Pos
     {

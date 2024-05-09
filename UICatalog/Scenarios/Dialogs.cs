@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -131,11 +132,24 @@ public class Dialogs : Scenario
         };
         frame.Add (label);
 
+        static IEnumerable<string> GetUniqueEnumNames<T> () where T : Enum
+        {
+            var values = new HashSet<int> ();
+            foreach (var name in Enum.GetNames (typeof (T)))
+            {
+                var value = (int)Enum.Parse (typeof (T), name);
+                if (values.Add (value))
+                {
+                    yield return name;
+                }
+            }
+        }
+
         var styleRadioGroup = new RadioGroup
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            RadioLabels = new [] { "_Center", "_Justify", "_Left", "_Right" }
+            RadioLabels = GetUniqueEnumNames<Justification> ().ToArray (),
         };
         frame.Add (styleRadioGroup);
 
@@ -239,7 +253,10 @@ public class Dialogs : Scenario
                 }
                 else
                 {
-                    button = new() { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                    button = new Button
+                    {
+                        Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0
+                    };
                 }
 
                 button.Accept += (s, e) =>
@@ -263,7 +280,7 @@ public class Dialogs : Scenario
             dialog = new()
             {
                 Title = titleEdit.Text,
-                ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem,
+                ButtonAlignment = (Justification)styleRadioGroup.SelectedItem,
                 Buttons = buttons.ToArray ()
             };
 
