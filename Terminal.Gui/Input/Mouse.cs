@@ -120,17 +120,11 @@ public class MouseEvent
     public Point Position { get; set; }
 
     /// <summary>
-    ///     Indicates if the current mouse event has been processed. Set this value to <see langword="true"/> to indicate the mouse
-    ///     event was handled.
-    /// </summary>
-    public bool Handled { get; set; }
-
-    /// <summary>
     ///     The screen-relative mouse position.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         The <see cref="X"/> and <see cref="Y"/> properties are always <see cref="Gui.View.Viewport"/>-relative. When the mouse is grabbed by a view,
+    ///         <see cref="Position"/> is <see cref="Gui.View.Viewport"/>-relative. When the mouse is grabbed by a view,
     ///         <see cref="ScreenPosition"/> provides the mouse position screen-relative coordinates, enabling the grabbed view to know how much the
     ///         mouse has moved.
     ///     </para>
@@ -139,6 +133,12 @@ public class MouseEvent
     ///     </para>
     /// </remarks>
     public Point ScreenPosition { get; set; }
+
+    /// <summary>
+    ///     Indicates if the current mouse event has been processed. Set this value to <see langword="true"/> to indicate the mouse
+    ///     event was handled.
+    /// </summary>
+    public bool Handled { get; set; }
 
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>

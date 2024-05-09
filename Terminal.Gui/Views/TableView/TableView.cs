@@ -1050,7 +1050,7 @@ public class TableView : View
     ///     bounds.
     /// </summary>
     /// <param name="client">offset from the top left of the control.</param>
-    /// <retur
+    /// <returns>The position.</returns>
     public Point? ScreenToCell (Point client) { return ScreenToCell (client, out _, out _); }
 
     /// <summary>
