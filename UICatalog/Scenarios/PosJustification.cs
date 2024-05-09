@@ -85,6 +85,7 @@ public sealed class PosJustification : Scenario
                                      if (view.X is Pos.PosJustify j)
                                      {
                                          j.Justifier.PutSpaceBetweenItems = _horizJustifier.PutSpaceBetweenItems;
+                                         view.X = j;
                                      }
                                  }
                              };

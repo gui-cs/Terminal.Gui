@@ -132,6 +132,8 @@ public class Justifier
     /// </summary>
     public bool PutSpaceBetweenItems { get; set; }
 
+    // TODO: Add property change events
+
     /// <summary>
     ///     Takes a list of items and returns their positions when justified within a container <see name="ContainerSize"/>
     ///     wide based on the specified

@@ -679,9 +679,6 @@ public partial class View
 
         SetTextFormatterSize ();
 
-        PosJustify.JustifyGroup (0, Subviews, Dim.Dimension.Width, Viewport.Width);
-        PosJustify.JustifyGroup (0, Subviews, Dim.Dimension.Height, Viewport.Height);
-
         // Sort out the dependencies of the X, Y, Width, Height properties
         HashSet<View> nodes = new ();
         HashSet<(View, View)> edges = new ();
