@@ -55,19 +55,8 @@ public sealed class Region : IDisposable
             return false;
         }
 
-        dynamic thisRect;
-        dynamic otherRect;
-
-        if (_rect.GetType ().Name == "Rectangle")
-        {
-            thisRect = (Rectangle)_rect;
-            otherRect = (Rectangle)((Region)obj)._rect;
-        }
-        else
-        {
-            thisRect = (RectangleF)_rect;
-            otherRect = (RectangleF)((Region)obj)._rect;
-        }
+        dynamic thisRect = (RectangleF)_rect;
+        dynamic otherRect = (RectangleF)((Region)obj)._rect;
 
         return thisRect == otherRect;
     }
@@ -132,7 +121,7 @@ public sealed class Region : IDisposable
     /// <returns></returns>
     public dynamic Union (dynamic rect)
     {
-        _rect = rect.GetType ().Name == "Rectangle" ? Rectangle.Union ((Rectangle)_rect, rect) : RectangleF.Union ((RectangleF)_rect, rect);
+        _rect = _rect.GetType ().Name == "Rectangle" ? Rectangle.Union (_rect, Rectangle.Round (rect)) : RectangleF.Union (_rect, (RectangleF)rect);
 
         return _rect;
     }
@@ -220,7 +209,7 @@ public sealed class Region : IDisposable
     /// <returns></returns>
     public dynamic Intersect (dynamic rect)
     {
-        _rect = _rect.GetType ().Name == "Rectangle" ? Rectangle.Intersect ((Rectangle)_rect, rect) : RectangleF.Intersect ((RectangleF)_rect, rect);
+        _rect = _rect.GetType ().Name == "Rectangle" ? Rectangle.Intersect (_rect, Rectangle.Round (rect)) : RectangleF.Intersect (_rect, (RectangleF)rect);
 
         return _rect;
     }

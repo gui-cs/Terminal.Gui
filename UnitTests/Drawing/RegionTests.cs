@@ -31,7 +31,7 @@ public class RegionTests (ITestOutputHelper output)
     [Fact]
     public void Union_Array_Throws_If_Null ()
     {
-        Region [] regions = null;
+        Region [] regions = null!;
         Assert.Throws<ArgumentNullException> (() => Region.Union (regions));
     }
 
@@ -45,7 +45,7 @@ public class RegionTests (ITestOutputHelper output)
     [Fact]
     public void Union_HashSet_Throws_If_Null ()
     {
-        HashSet<Region> regions = null;
+        HashSet<Region> regions = null!;
         Assert.Throws<ArgumentNullException> (() => Region.Union (regions));
     }
 
@@ -60,7 +60,7 @@ public class RegionTests (ITestOutputHelper output)
     public void Union_Throws_If_Null ()
     {
         Region region = new ();
-        Assert.Throws<ArgumentNullException> (() => region.Union (null));
+        Assert.Throws<ArgumentNullException> (() => region.Union (null!));
     }
 
     [Theory]
@@ -127,18 +127,18 @@ public class RegionTests (ITestOutputHelper output)
     public void Location_HashSet ()
     {
         HashSet<Region> regions = [new (new Rectangle (10, 10, 30, 30))];
-        Assert.Equal (new Point (10, 10), Region.Union (regions).Location);
+        Assert.Equal (new Point (10, 10), Region.Union (regions)!.Location);
         regions = [new (new RectangleF (10, 10, 30, 30))];
-        Assert.Equal (new Point (10, 10), Region.Union (regions).Location);
+        Assert.Equal (new Point (10, 10), Region.Union (regions)!.Location);
     }
 
     [Fact]
     public void Size_HashSet ()
     {
         HashSet<Region> regions = [new (new Rectangle (10, 10, 30, 30))];
-        Assert.Equal (new Size (30, 30), Region.Union (regions).Size);
+        Assert.Equal (new Size (30, 30), Region.Union (regions)!.Size);
         regions = [new (new RectangleF (10, 10, 30, 30))];
-        Assert.Equal (new Size (30, 30), Region.Union (regions).Size);
+        Assert.Equal (new Size (30, 30), Region.Union (regions)!.Size);
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public class RegionTests (ITestOutputHelper output)
     [Fact]
     public void Intersect_Array_Throws_If_Null ()
     {
-        Region [] regions = null;
+        Region [] regions = null!;
         Assert.Throws<ArgumentNullException> (() => Region.Intersect (regions, Rectangle.Empty));
     }
 
@@ -176,7 +176,7 @@ public class RegionTests (ITestOutputHelper output)
     [Fact]
     public void Intersect_HashSet_Throws_If_Null ()
     {
-        HashSet<Region> regions = null;
+        HashSet<Region> regions = null!;
         Assert.Throws<ArgumentNullException> (() => Region.Intersect (regions, Rectangle.Empty));
     }
 
@@ -191,7 +191,7 @@ public class RegionTests (ITestOutputHelper output)
     public void Intersect_Throws_If_Null ()
     {
         Region region = new ();
-        Assert.Throws<ArgumentNullException> (() => region.Intersect (null));
+        Assert.Throws<ArgumentNullException> (() => region.Intersect (null!));
     }
 
     [Theory]
