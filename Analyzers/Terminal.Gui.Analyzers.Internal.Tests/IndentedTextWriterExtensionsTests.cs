@@ -45,19 +45,20 @@ public class IndentedTextWriterExtensionsTests
         }
 
         writer.Flush ();
-        var result = sb.ToString ().Replace ("\r\n", "\n");
+        var result = sb.ToString ();
 
         Assert.That (
                      result,
                      Is.EqualTo (
-                                 @$"
-        {scopeClosing}
-      {scopeClosing}
-    {scopeClosing}
-  {scopeClosing}
-{scopeClosing}
-".Replace ("\r\n", "\n")
-                                ));
+                                 $"""
+                                  
+                                          {scopeClosing}
+                                        {scopeClosing}
+                                      {scopeClosing}
+                                    {scopeClosing}
+                                  {scopeClosing}
+
+                                  """));
     }
 
     [Test]
@@ -88,23 +89,23 @@ public class IndentedTextWriterExtensionsTests
         }
 
         writer.Flush ();
-        var result = sb.ToString ().Replace ("\r\n", "\n").Trim ();
+        var result = sb.ToString ();
 
         Assert.That (
                      result,
                      Is.EqualTo (
-                                 @$"
-Opening UninterestingEnum
-{scopeOpening}
-  Opening UninterestingEnum
-  {scopeOpening}
-    Opening UninterestingEnum
-    {scopeOpening}
-      Opening UninterestingEnum
-      {scopeOpening}
-        Opening UninterestingEnum
-        {scopeOpening}".Replace ("\r\n", "\n")
-                       .Trim ()
-                                ));
+                                 $"""
+                                  Opening UninterestingEnum
+                                  {scopeOpening}
+                                    Opening UninterestingEnum
+                                    {scopeOpening}
+                                      Opening UninterestingEnum
+                                      {scopeOpening}
+                                        Opening UninterestingEnum
+                                        {scopeOpening}
+                                          Opening UninterestingEnum
+                                          {scopeOpening}
+
+                                  """));
     }
 }
