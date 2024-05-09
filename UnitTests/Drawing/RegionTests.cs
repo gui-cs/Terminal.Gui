@@ -310,6 +310,16 @@ public class RegionTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (1, 1, 9, 9), region.Intersect (new Rectangle (1, 1, 20, 20)));
 
         Assert.Equal (new Rectangle (1, 1, 9, 9), region.Intersect (region2));
+
+        var region3 = new Region (new RegionData ([]));
+        Assert.Equal (Rectangle.Empty, region3.Union (Rectangle.Empty));
+    }
+
+    [Fact]
+    public void Constructor_Throws_If_Null ()
+    {
+        RegionData rgnData = null!;
+        Assert.Throws<ArgumentNullException> (() => new Region (rgnData));
     }
 
     [Fact]
@@ -336,5 +346,96 @@ public class RegionTests (ITestOutputHelper output)
         var region = new Region (new Rectangle (1, 2, 3, 4));
         var regionCloned = region.Clone ();
         Assert.Equal (regionCloned, region);
+    }
+
+    [Theory]
+    [MemberData (nameof (RegionDataData))]
+    public void CreateRegionFromRegionData_Tests (string text, Region expectedRegion)
+    {
+        RegionData rgnData = new RegionData (text.ToRunes ());
+        Region region = new Region (rgnData);
+
+        Assert.Equal (expectedRegion, region);
+    }
+
+    public static TheoryData<string, Region> RegionDataData =>
+        new ()
+        {
+            {
+                "This a RegionData test.", new Region (new Rectangle (0, 0, 23, 1))
+            },
+            {
+                "Ends with a new line.\n", new Region (new Rectangle (0, 0, 21, 2))
+            },
+            {
+                "Ends with a new line.\r\n", new Region (new Rectangle (0, 0, 21, 2))
+            },
+            {
+                "Ends with a new line." + Environment.NewLine, new Region (new Rectangle (0, 0, 21, 2))
+            },
+            {
+                "First line.\nSecond line.\nThird line.", new Region (new Rectangle (0, 0, 12, 3))
+            },
+            {
+                "文に は言葉 があり ます。", new Region (new Rectangle (0, 0, 25, 1))
+            },
+            {
+                "文に は言葉 があり ます。\nこんにちは世界。", new Region (new Rectangle (0, 0, 25, 2))
+            },
+
+        };
+
+    [Fact]
+    public void GetRegionData_Return_Null_If_Size_Is_Zero ()
+    {
+        Region region = new Region (new Rectangle (10, 10, 0, 0));
+
+        Assert.Null (region.GetRegionData ());
+    }
+
+    [SetupFakeDriver]
+    [Fact]
+    public void GetRegionData_Return_Driver_Content_Within_Region ()
+    {
+        Toplevel top = new Toplevel { X = 10, Y = 10, Text = "This a test for Region\n and for RegionData \ud835\udd39" }; // 𝔹
+        Application.Begin (top);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+          This a test for
+          Region         
+           and for       
+          RegionData 𝔹   ",
+                                                      output);
+
+        Region region = new Region (new Rectangle (10, 10, 30, 20));
+        RegionData rgnData = region.GetRegionData ()!;
+
+        Assert.Equal (
+                      "This a test forRegion          and for       RegionData \ud835\udd39",
+                      StringExtensions.ToString (rgnData.Data).Replace ("\0", "").Trim ());
+
+        Application.Driver.Move (0, 16);
+        Application.Driver.AddStr (StringExtensions.ToString (rgnData.Data [..15]));
+        Application.Driver.Move (0, 17);
+        Application.Driver.AddStr (StringExtensions.ToString (rgnData.Data [15..30]));
+        Application.Driver.Move (0, 18);
+        Application.Driver.AddStr (StringExtensions.ToString (rgnData.Data [30..45]));
+        Application.Driver.Move (0, 19);
+        Application.Driver.AddStr (StringExtensions.ToString (rgnData.Data [45..60]));
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+          This a test for
+          Region         
+           and for       
+          RegionData 𝔹   
+                         
+                         
+This a test for          
+Region                   
+ and for                 
+RegionData 𝔹             ",
+                                                      output);
     }
 }

@@ -34,6 +34,17 @@ public sealed class Region : IDisposable
     }
 
     /// <summary>
+    /// Initializes a new <see cref="Region"/> from the specified data.
+    /// </summary>
+    /// <param name="regionData"></param>
+    public Region (RegionData regionData)
+    {
+        ArgumentNullException.ThrowIfNull (regionData);
+
+        var region = CreateRegionFromRegionData (regionData.Data);
+        _rect = region._rect;
+    }
+
     /// <summary>
     /// Destructor for disposing this.
     /// </summary>
@@ -257,4 +268,49 @@ public sealed class Region : IDisposable
     {
         return new Region (_rect);
     }
+
+    #region RegionData
+
+    /// <summary>
+    /// Creates a region that is defined by data obtained from another region.
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public static Region CreateRegionFromRegionData (Rune [] data)
+    {
+        RectangleF rect = TextFormatter.CalcRect (0, 0, StringExtensions.ToString (data));
+
+        return new (rect);
+    }
+
+    /// <summary>
+    /// Returns a <see cref="RegionData"/> that represents the information that describes this <see cref="Region"/>.
+    /// </summary>
+    /// <returns></returns>
+    public RegionData? GetRegionData ()
+    {
+        int regionSize = (int)(((RectangleF)_rect).Width * ((RectangleF)_rect).Height);
+
+        if (regionSize == 0)
+        {
+            return null;
+        }
+
+        int index = 0;
+        Rune [] data = new Rune [regionSize];
+
+        for (int y = (int)((RectangleF)_rect).Y; y < Math.Min ((int)((RectangleF)_rect).Height, Application.Driver.Rows); y++)
+        {
+            for (int x = (int)((RectangleF)_rect).X; x < Math.Min ((int)((RectangleF)_rect).Width, Application.Driver.Cols); x++)
+            {
+                data [index] = Application.Driver.Contents [y, x].Rune;
+                index++;
+            }
+        }
+
+        return new RegionData (data);
+    }
+
+    #endregion
+
 }
