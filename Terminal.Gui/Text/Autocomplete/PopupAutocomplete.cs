@@ -143,7 +143,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
         if (me.Flags == MouseFlags.Button1Clicked)
         {
-            SelectedIdx = me.Y - ScrollOffset;
+            SelectedIdx = me.Position.Y - ScrollOffset;
 
             return Select ();
         }
@@ -465,9 +465,9 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     /// <param name="me"></param>
     protected void RenderSelectedIdxByMouse (MouseEvent me)
     {
-        if (SelectedIdx != me.Y - ScrollOffset)
+        if (SelectedIdx != me.Position.Y - ScrollOffset)
         {
-            SelectedIdx = me.Y - ScrollOffset;
+            SelectedIdx = me.Position.Y - ScrollOffset;
 
             if (LastPopupPos is { })
             {

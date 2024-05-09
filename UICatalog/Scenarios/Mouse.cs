@@ -130,8 +130,8 @@ public class Mouse : Scenario
 
                                       if (filterSlider.GetSetOptions ().Contains (i))
                                       {
-                                          ml.Text = $"MouseEvent: ({a.X},{a.Y}) - {a.Flags} {count}";
-                                          appLogList.Add ($"({a.X},{a.Y}) - {a.Flags} {count++}");
+                                          ml.Text = $"MouseEvent: ({a.Position}) - {a.Flags} {count}";
+                                          appLogList.Add ($"({a.Position}) - {a.Flags} {count++}");
                                           appLog.MoveDown ();
                                       }
                                   };
@@ -169,14 +169,14 @@ public class Mouse : Scenario
 
                               if (filterSlider.GetSetOptions ().Contains (i))
                               {
-                                  winLogList.Add ($"MouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
+                                  winLogList.Add ($"MouseEvent: ({a.MouseEvent.Position}) - {a.MouseEvent.Flags} {count++}");
                                   winLog.MoveDown ();
                               }
                           };
 
         win.MouseClick += (sender, a) =>
                           {
-                              winLogList.Add ($"MouseClick: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
+                              winLogList.Add ($"MouseClick: ({a.MouseEvent.Position}) - {a.MouseEvent.Flags} {count++}");
                               winLog.MoveDown ();
                           };
 

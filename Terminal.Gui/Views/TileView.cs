@@ -912,7 +912,7 @@ public class TileView : View
 
                 if (mouseEvent.Flags == MouseFlags.Button1Pressed)
                 {
-                    dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+                    dragPosition = mouseEvent.Position;
                     dragOrignalPos = Orientation == Orientation.Horizontal ? Y : X;
                     Application.GrabMouse (this);
 
@@ -922,7 +922,7 @@ public class TileView : View
                     {
                         moveRuneRenderLocation = new Point (
                                                             0,
-                                                            Math.Max (1, Math.Min (Viewport.Height - 2, mouseEvent.Y))
+                                                            Math.Max (1, Math.Min (Viewport.Height - 2, mouseEvent.Position.Y))
                                                            );
                     }
                 }
@@ -938,15 +938,15 @@ public class TileView : View
                 // how far has user dragged from original location?						
                 if (Orientation == Orientation.Horizontal)
                 {
-                    int dy = mouseEvent.Y - dragPosition.Value.Y;
+                    int dy = mouseEvent.Position.Y - dragPosition.Value.Y;
                     Parent.SetSplitterPos (Idx, Offset (Y, dy));
-                    moveRuneRenderLocation = new Point (mouseEvent.X, 0);
+                    moveRuneRenderLocation = new Point (mouseEvent.Position.X, 0);
                 }
                 else
                 {
-                    int dx = mouseEvent.X - dragPosition.Value.X;
+                    int dx = mouseEvent.Position.X - dragPosition.Value.X;
                     Parent.SetSplitterPos (Idx, Offset (X, dx));
-                    moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Viewport.Height - 2, mouseEvent.Y)));
+                    moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Viewport.Height - 2, mouseEvent.Position.Y)));
                 }
 
                 Parent.SetNeedsDisplay ();

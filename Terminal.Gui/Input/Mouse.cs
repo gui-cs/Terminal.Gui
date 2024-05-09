@@ -116,11 +116,8 @@ public class MouseEvent
     /// <summary>The View at the location for the mouse event.</summary>
     public View View { get; set; }
 
-    /// <summary>The X position of the mouse in <see cref="Gui.View.Viewport"/>-relative coordinates.</summary>
-    public int X { get; set; }
-
-    /// <summary>The Y position of the mouse in <see cref="Gui.View.Viewport"/>-relative coordinates.</summary>
-    public int Y { get; set; }
+    /// <summary>The position of the mouse in <see cref="Gui.View.Viewport"/>-relative coordinates.</summary>
+    public Point Position { get; set; }
 
     /// <summary>
     ///     Indicates if the current mouse event has been processed. Set this value to <see langword="true"/> to indicate the mouse
@@ -145,5 +142,5 @@ public class MouseEvent
 
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>
-    public override string ToString () { return $"({X},{Y}):{Flags}"; }
+    public override string ToString () { return $"({Position}):{Flags}"; }
 }

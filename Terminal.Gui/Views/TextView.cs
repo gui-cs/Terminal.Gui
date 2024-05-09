@@ -3400,11 +3400,11 @@ public class TextView : View
                 {
                     ScrollTo (_topRow - Frame.Height);
                 }
-                else if (ev.Y >= Frame.Height)
+                else if (ev.Position.Y >= Frame.Height)
                 {
                     ScrollTo (_model.Count + BottomOffset);
                 }
-                else if (ev.Y < 0 && _topRow > 0)
+                else if (ev.Position.Y < 0 && _topRow > 0)
                 {
                     ScrollTo (0);
                 }
@@ -3417,11 +3417,11 @@ public class TextView : View
                 {
                     ScrollTo (_leftColumn - Frame.Width, false);
                 }
-                else if (ev.X >= Frame.Width)
+                else if (ev.Position.X >= Frame.Width)
                 {
                     ScrollTo (line.Count + RightOffset, false);
                 }
-                else if (ev.X < 0 && _leftColumn > 0)
+                else if (ev.Position.X < 0 && _leftColumn > 0)
                 {
                     ScrollTo (0, false);
                 }
@@ -3538,7 +3538,7 @@ public class TextView : View
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
-            ContextMenu.Position = new (ev.X + 2, ev.Y + 2);
+            ContextMenu.Position = new (ev.Position.X + 2, ev.Position.Y + 2);
             ShowContextMenu ();
         }
 
@@ -5825,17 +5825,17 @@ public class TextView : View
         {
             int maxCursorPositionableLine = Math.Max (_model.Count - 1 - _topRow, 0);
 
-            if (Math.Max (ev.Y, 0) > maxCursorPositionableLine)
+            if (Math.Max (ev.Position.Y, 0) > maxCursorPositionableLine)
             {
                 CurrentRow = maxCursorPositionableLine + _topRow;
             }
             else
             {
-                CurrentRow = Math.Max (ev.Y + _topRow, 0);
+                CurrentRow = Math.Max (ev.Position.Y + _topRow, 0);
             }
 
             r = GetCurrentLine ();
-            int idx = TextModel.GetColFromX (r, _leftColumn, Math.Max (ev.X, 0), TabWidth);
+            int idx = TextModel.GetColFromX (r, _leftColumn, Math.Max (ev.Position.X, 0), TabWidth);
 
             if (idx - _leftColumn >= r.Count + RightOffset)
             {

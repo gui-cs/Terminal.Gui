@@ -146,21 +146,21 @@ public class TabViewTests
         // Waving mouse around does not trigger click
         for (var i = 0; i < 100; i++)
         {
-            args = new MouseEvent { X = i, Y = 1, Flags = MouseFlags.ReportMousePosition };
+            args = new MouseEvent { Position = new (i, 1), Flags = MouseFlags.ReportMousePosition };
             Application.OnMouseEvent (args);
             Application.Refresh ();
             Assert.Null (clicked);
             Assert.Equal (tab1, tv.SelectedTab);
         }
 
-        args = new MouseEvent { X = 3, Y = 1, Flags = MouseFlags.Button1Clicked };
+        args = new MouseEvent { Position = new (3, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Equal (tab1, clicked);
         Assert.Equal (tab1, tv.SelectedTab);
 
         // Click to tab2
-        args = new MouseEvent { X = 6, Y = 1, Flags = MouseFlags.Button1Clicked };
+        args = new MouseEvent { Position = new (6, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Equal (tab2, clicked);
@@ -173,7 +173,7 @@ public class TabViewTests
                              e.MouseEvent.Handled = true;
                          };
 
-        args = new MouseEvent { X = 3, Y = 1, Flags = MouseFlags.Button1Clicked };
+        args = new MouseEvent { Position = new (3, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
 
@@ -181,7 +181,7 @@ public class TabViewTests
         Assert.Equal (tab1, clicked);
         Assert.Equal (tab2, tv.SelectedTab);
 
-        args = new MouseEvent { X = 12, Y = 1, Flags = MouseFlags.Button1Clicked };
+        args = new MouseEvent { Position = new (12, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
 
@@ -235,7 +235,7 @@ public class TabViewTests
         Application.Begin (top);
 
         // Click the right arrow
-        var args = new MouseEvent { X = 6, Y = 2, Flags = MouseFlags.Button1Clicked };
+        var args = new MouseEvent { Position = new (6, 2), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -255,7 +255,7 @@ public class TabViewTests
                                             );
 
         // Click the left arrow
-        args = new MouseEvent { X = 0, Y = 2, Flags = MouseFlags.Button1Clicked };
+        args = new MouseEvent { Position = new (0, 2), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -325,7 +325,7 @@ public class TabViewTests
         Application.Begin (top);
 
         // Click the right arrow
-        var args = new MouseEvent { X = 7, Y = 3, Flags = MouseFlags.Button1Clicked };
+        var args = new MouseEvent { Position = new (7, 3), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -347,7 +347,7 @@ public class TabViewTests
                                             );
 
         // Click the left arrow
-        args = new MouseEvent { X = 1, Y = 3, Flags = MouseFlags.Button1Clicked };
+        args = new MouseEvent { Position = new (1, 3), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);

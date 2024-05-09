@@ -1689,7 +1689,7 @@ public class MenuBar : View
                 locationOffset.Y += SuperView.Border.Thickness.Top;
             }
 
-            int cx = me.X - locationOffset.X;
+            int cx = me.Position.X - locationOffset.X;
 
             for (var i = 0; i < Menus.Length; i++)
             {
@@ -1803,21 +1803,24 @@ public class MenuBar : View
                     Application.GrabMouse (v);
                     MouseEvent nme;
 
-                    if (me.Y > -1)
+                    if (me.Position.Y > -1)
                     {
-                        Point frameLoc = v.ScreenToFrame (new (me.X, me.Y));
+                        Point frameLoc = v.ScreenToFrame (me.Position);
 
                         nme = new ()
                         {
-                            X = frameLoc.X,
-                            Y = frameLoc.Y,
+                            Position = frameLoc,
                             Flags = me.Flags,
                             View = v
                         };
                     }
                     else
                     {
-                        nme = new () { X = me.X + current.Frame.X, Y = 0, Flags = me.Flags, View = v };
+                        nme = new ()
+                        {
+                            Position = new (me.Position.X + current.Frame.X, me.Position.Y + current.Frame.Y),
+                            Flags = me.Flags, View = v
+                        };
                     }
 
                     v.NewMouseEvent (nme);

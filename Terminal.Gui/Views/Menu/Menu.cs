@@ -726,13 +726,12 @@ internal sealed class Menu : View
 
         View view = a.View ?? this;
 
-        Point boundsPoint = view.ScreenToViewport (new (a.X, a.Y));
+        Point boundsPoint = view.ScreenToViewport (new (a.Position.X, a.Position.Y));
         var me = new MouseEvent
         {
-            X = boundsPoint.X,
-            Y = boundsPoint.Y,
+            Position = boundsPoint,
             Flags = a.Flags,
-            ScreenPosition = new (a.X, a.Y),
+            ScreenPosition = a.Position,
             View = view
         };
 
@@ -1191,17 +1190,17 @@ internal sealed class Menu : View
         {
             disabled = false;
 
-            if (me.Y < 0)
+            if (me.Position.Y < 0)
             {
                 return me.Handled = true;
             }
 
-            if (me.Y >= _barItems.Children.Length)
+            if (me.Position.Y >= _barItems.Children.Length)
             {
                 return me.Handled = true;
             }
 
-            MenuItem item = _barItems.Children [me.Y];
+            MenuItem item = _barItems.Children [me.Position.Y];
 
             if (item is null || !item.IsEnabled ())
             {
@@ -1213,7 +1212,7 @@ internal sealed class Menu : View
                 return me.Handled = true;
             }
 
-            _currentChild = me.Y;
+            _currentChild = me.Position.Y;
             RunSelected ();
 
             return me.Handled = true;
@@ -1231,12 +1230,12 @@ internal sealed class Menu : View
         {
             disabled = false;
 
-            if (me.Y < 0 || me.Y >= _barItems.Children.Length)
+            if (me.Position.Y < 0 || me.Position.Y >= _barItems.Children.Length)
             {
                 return me.Handled = true;
             }
 
-            MenuItem item = _barItems.Children [me.Y];
+            MenuItem item = _barItems.Children [me.Position.Y];
 
             if (item is null)
             {
@@ -1250,7 +1249,7 @@ internal sealed class Menu : View
 
             if (!disabled)
             {
-                _currentChild = me.Y;
+                _currentChild = me.Position.Y;
             }
 
             if (_host.UseSubMenusSingleFrame || !CheckSubMenu ())

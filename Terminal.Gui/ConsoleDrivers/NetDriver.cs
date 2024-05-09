@@ -1523,7 +1523,7 @@ internal class NetDriver : ConsoleDriver
             mouseFlag |= MouseFlags.ButtonAlt;
         }
 
-        return new MouseEvent { X = me.Position.X, Y = me.Position.Y, Flags = mouseFlag };
+        return new MouseEvent { Position = me.Position, Flags = mouseFlag };
     }
 
     #endregion Mouse Handling

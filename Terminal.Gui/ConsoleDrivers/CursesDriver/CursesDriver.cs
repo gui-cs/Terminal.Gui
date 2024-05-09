@@ -819,8 +819,8 @@ internal class CursesDriver : ConsoleDriver
 
         _lastMouseFlags = mouseFlag;
 
-        var me = new MouseEvent { Flags = mouseFlag, X = pos.X, Y = pos.Y };
-        Debug.WriteLine ($"CursesDriver: ({me.X},{me.Y}) - {me.Flags}");
+        var me = new MouseEvent { Flags = mouseFlag, Position = pos };
+        //Debug.WriteLine ($"CursesDriver: ({me.Position}) - {me.Flags}");
 
         OnMouseEvent (me);
     }

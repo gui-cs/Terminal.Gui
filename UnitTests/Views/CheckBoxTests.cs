@@ -108,7 +108,7 @@ public class CheckBoxTests
         Assert.False (checkBox.Checked);
         Assert.True (checkBox.NewKeyDownEvent (Key.Space));
         Assert.True (checkBox.Checked);
-        Assert.True (checkBox.NewMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (checkBox.NewMouseEvent (new MouseEvent { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
         Assert.False (checkBox.Checked);
 
         checkBox.AllowNullChecked = true;
@@ -121,11 +121,11 @@ public class CheckBoxTests
 {CM.Glyphs.NullChecked} Check this out 你",
                                                       _output
                                                      );
-        Assert.True (checkBox.NewMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (checkBox.NewMouseEvent (new MouseEvent { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
         Assert.True (checkBox.Checked);
         Assert.True (checkBox.NewKeyDownEvent (Key.Space));
         Assert.False (checkBox.Checked);
-        Assert.True (checkBox.NewMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (checkBox.NewMouseEvent (new MouseEvent { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
         Assert.Null (checkBox.Checked);
 
         checkBox.AllowNullChecked = false;

@@ -333,7 +333,7 @@ public partial class View
                 mouseEvent.Handled = true;
             }
 
-            if (Viewport.Contains (mouseEvent.X, mouseEvent.Y))
+            if (Viewport.Contains (mouseEvent.Position))
             {
                 if (SetHighlight (HighlightStyle.HasFlag (HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None) == true)
                 {
@@ -414,7 +414,7 @@ public partial class View
             }
 
             // If mouse is still in bounds, click
-            if (!WantContinuousButtonPressed && Viewport.Contains (mouseEvent.X, mouseEvent.Y))
+            if (!WantContinuousButtonPressed && Viewport.Contains (mouseEvent.Position))
             {
                 return OnMouseClick (new (mouseEvent));
             }

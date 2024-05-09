@@ -1556,7 +1556,7 @@ public static partial class Application
             return;
         }
 
-        var view = View.FindDeepestView (Current, new (mouseEvent.X, mouseEvent.Y));
+        var view = View.FindDeepestView (Current, mouseEvent.Position);
 
         if (view is { })
         {
@@ -1574,18 +1574,17 @@ public static partial class Application
         {
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = MouseGrabView.ScreenToViewport (new (mouseEvent.X, mouseEvent.Y));
+            Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.Position);
 
             var viewRelativeMouseEvent = new MouseEvent
             {
-                X = frameLoc.X,
-                Y = frameLoc.Y,
+                Position = frameLoc,
                 Flags = mouseEvent.Flags,
-                ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
+                ScreenPosition = mouseEvent.Position,
                 View = MouseGrabView
             };
 
-            if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.X, viewRelativeMouseEvent.Y) is false)
+            if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
                 _mouseEnteredView?.NewMouseLeaveEvent (mouseEvent);
@@ -1618,8 +1617,8 @@ public static partial class Application
             {
                 // This occurs when there are multiple overlapped "tops"
                 // E.g. "Mdi" - in the Background Worker Scenario
-                View? top = FindDeepestTop (Top, mouseEvent.X, mouseEvent.Y);
-                view = View.FindDeepestView (top, new (mouseEvent.X, mouseEvent.Y));
+                View? top = FindDeepestTop (Top, mouseEvent.Position.X, mouseEvent.Position.Y);
+                view = View.FindDeepestView (top, mouseEvent.Position);
 
                 if (view is { } && view != OverlappedTop && top != Current)
                 {
@@ -1637,27 +1636,25 @@ public static partial class Application
 
         if (view is Adornment adornment)
         {
-            Point frameLoc = adornment.ScreenToFrame (new (mouseEvent.X, mouseEvent.Y));
+            Point frameLoc = adornment.ScreenToFrame (mouseEvent.Position);
 
             me = new ()
             {
-                X = frameLoc.X,
-                Y = frameLoc.Y,
+                Position = frameLoc,
                 Flags = mouseEvent.Flags,
-                ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
+                ScreenPosition = mouseEvent.Position,
                 View = view
             };
         }
-        else if (view.ViewportToScreen (Rectangle.Empty with { Size = view.Viewport.Size }).Contains (mouseEvent.X, mouseEvent.Y))
+        else if (view.ViewportToScreen (Rectangle.Empty with { Size = view.Viewport.Size }).Contains (mouseEvent.Position))
         {
-            Point viewportLocation = view.ScreenToViewport (new (mouseEvent.X, mouseEvent.Y));
+            Point viewportLocation = view.ScreenToViewport (mouseEvent.Position);
 
             me = new ()
             {
-                X = viewportLocation.X,
-                Y = viewportLocation.Y,
+                Position = viewportLocation,
                 Flags = mouseEvent.Flags,
-                ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
+                ScreenPosition = mouseEvent.Position,
                 View = view
             };
         }
@@ -1709,14 +1706,13 @@ public static partial class Application
                 break;
             }
 
-            Point boundsPoint = view.ScreenToViewport (new (mouseEvent.X, mouseEvent.Y));
+            Point boundsPoint = view.ScreenToViewport (mouseEvent.Position);
 
             me = new ()
             {
-                X = boundsPoint.X,
-                Y = boundsPoint.Y,
+                Position = boundsPoint,
                 Flags = mouseEvent.Flags,
-                ScreenPosition = new (mouseEvent.X, mouseEvent.Y),
+                ScreenPosition = mouseEvent.Position,
                 View = view
             };
         }

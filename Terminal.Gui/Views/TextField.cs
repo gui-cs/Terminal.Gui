@@ -1680,7 +1680,7 @@ public class TextField : View
 
     private int PositionCursor (MouseEvent ev)
     {
-        return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.X), false);
+        return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.Position.X), false);
     }
 
     private int PositionCursor (int x, bool getX = true)

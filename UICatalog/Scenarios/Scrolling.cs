@@ -221,7 +221,7 @@ public class Scrolling : Scenario
             Text = "Mouse: "
         };
         app.Add (mousePos);
-        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.X},{a.Y}) - {a.Flags} {count++}"; };
+        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.Position}) - {a.Flags} {count++}"; };
 
         // Add a progress bar to cause constant redraws
         var progress = new ProgressBar { X = Pos.Right (scrollView) + 1, Y = Pos.AnchorEnd (2), Width = 50 };

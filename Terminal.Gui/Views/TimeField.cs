@@ -169,7 +169,7 @@ public class TimeField : TextField
 
         if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            int point = ev.X;
+            int point = ev.Position.X;
             AdjCursorPosition (point);
         }
 
