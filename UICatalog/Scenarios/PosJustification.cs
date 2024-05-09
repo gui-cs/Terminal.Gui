@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using System;
-using Terminal.Gui;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -10,11 +9,10 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Layout")]
 public sealed class PosJustification : Scenario
 {
-
-    private Justifier _horizJustifier = new Justifier ();
-    private int _leftMargin = 0;
-    private Justifier _vertJustifier = new Justifier ();
-    private int _topMargin = 0;
+    private readonly Justifier _horizJustifier = new ();
+    private int _leftMargin;
+    private readonly Justifier _vertJustifier = new ();
+    private int _topMargin;
 
     public override void Main ()
     {
@@ -31,6 +29,8 @@ public sealed class PosJustification : Scenario
 
         SetupVerticalControls (appWindow);
 
+        Setup3by3Grid (appWindow);
+
         // Run - Start the application.
         Application.Run (appWindow);
         appWindow.Dispose ();
@@ -42,6 +42,7 @@ public sealed class PosJustification : Scenario
     private void SetupHorizontalControls (Window appWindow)
     {
         ColorScheme colorScheme = Colors.ColorSchemes ["Toplevel"];
+
         RadioGroup justification = new ()
         {
             X = Pos.Justify (_horizJustifier.Justification),
@@ -51,23 +52,25 @@ public sealed class PosJustification : Scenario
         };
 
         justification.SelectedItemChanged += (s, e) =>
-        {
-            _horizJustifier.Justification = (Justification)Enum.Parse (typeof (Justification), justification.SelectedItem.ToString ());
-            foreach (var view in appWindow.Subviews.Where (v => v.X is Pos.PosJustify))
-            {
-                if (view.X is Pos.PosJustify j)
-                {
-                    var newJust = new Pos.PosJustify (_horizJustifier.Justification)
-                    {
-                        Justifier =
-                        {
-                            PutSpaceBetweenItems = _horizJustifier.PutSpaceBetweenItems
-                        }
-                    };
-                    view.X = newJust;
-                }
-            }
-        };
+                                             {
+                                                 _horizJustifier.Justification =
+                                                     (Justification)Enum.Parse (typeof (Justification), justification.SelectedItem.ToString ());
+
+                                                 foreach (View view in appWindow.Subviews.Where (v => v.X is Pos.PosJustify))
+                                                 {
+                                                     if (view.X is Pos.PosJustify j)
+                                                     {
+                                                         var newJust = new Pos.PosJustify (_horizJustifier.Justification)
+                                                         {
+                                                             Justifier =
+                                                             {
+                                                                 PutSpaceBetweenItems = _horizJustifier.PutSpaceBetweenItems
+                                                             }
+                                                         };
+                                                         view.X = newJust;
+                                                     }
+                                                 }
+                                             };
         appWindow.Add (justification);
 
         CheckBox putSpaces = new ()
@@ -75,12 +78,14 @@ public sealed class PosJustification : Scenario
             X = Pos.Justify (_horizJustifier.Justification),
             Y = Pos.Top (justification),
             ColorScheme = colorScheme,
-            Text = "Spaces",
+            Text = "Spaces"
         };
+
         putSpaces.Toggled += (s, e) =>
                              {
                                  _horizJustifier.PutSpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
-                                 foreach (var view in appWindow.Subviews.Where (v => v.X is Pos.PosJustify))
+
+                                 foreach (View view in appWindow.Subviews.Where (v => v.X is Pos.PosJustify))
                                  {
                                      if (view.X is Pos.PosJustify j)
                                      {
@@ -95,33 +100,37 @@ public sealed class PosJustification : Scenario
             X = Pos.Left (putSpaces),
             Y = Pos.Bottom (putSpaces),
             ColorScheme = colorScheme,
-            Text = "Margin",
+            Text = "Margin"
         };
-        margin.Toggled += (s, e) =>
-        {
-            _leftMargin = e.NewValue is { } && e.NewValue.Value ? 1 : 0;
-            foreach (var view in appWindow.Subviews.Where (v => v.X is Pos.PosJustify))
-            {
-                // Skip the justification radio group
-                if (view != justification)
-                {
-                    view.Margin.Thickness = new Thickness (_leftMargin, 0, 0, 0);
-                }
-            }
-            appWindow.LayoutSubviews ();
 
-        };
+        margin.Toggled += (s, e) =>
+                          {
+                              _leftMargin = e.NewValue is { } && e.NewValue.Value ? 1 : 0;
+
+                              foreach (View view in appWindow.Subviews.Where (v => v.X is Pos.PosJustify))
+                              {
+                                  // Skip the justification radio group
+                                  if (view != justification)
+                                  {
+                                      view.Margin.Thickness = new (_leftMargin, 0, 0, 0);
+                                  }
+                              }
+
+                              appWindow.LayoutSubviews ();
+                          };
         appWindow.Add (margin);
 
-        var addedViews = new List<Button> ();
-        addedViews.Add (new Button
-        {
-            X = Pos.Justify (_horizJustifier.Justification),
-            Y = Pos.Center (),
-            Text = NumberToWords.Convert (0)
-        });
+        List<Button> addedViews = new List<Button> ();
 
-        var addedViewsUpDown = new Buttons.NumericUpDown<int> ()
+        addedViews.Add (
+                        new()
+                        {
+                            X = Pos.Justify (_horizJustifier.Justification),
+                            Y = Pos.Center (),
+                            Text = NumberToWords.Convert (0)
+                        });
+
+        Buttons.NumericUpDown<int> addedViewsUpDown = new Buttons.NumericUpDown<int>
         {
             X = Pos.Justify (_horizJustifier.Justification),
             Y = Pos.Top (justification),
@@ -131,54 +140,55 @@ public sealed class PosJustification : Scenario
             BorderStyle = LineStyle.None,
             Value = addedViews.Count
         };
-        addedViewsUpDown.Border.Thickness = new Thickness (0, 1, 0, 0);
+        addedViewsUpDown.Border.Thickness = new (0, 1, 0, 0);
+
         addedViewsUpDown.ValueChanging += (s, e) =>
-                                            {
-                                                if (e.NewValue < 0)
-                                                {
-                                                    e.Cancel = true;
+                                          {
+                                              if (e.NewValue < 0)
+                                              {
+                                                  e.Cancel = true;
 
-                                                    return;
-                                                }
+                                                  return;
+                                              }
 
-                                                // Add or remove buttons
-                                                if (e.NewValue < e.OldValue)
-                                                {
-                                                    // Remove buttons
-                                                    for (int i = e.OldValue - 1; i >= e.NewValue; i--)
-                                                    {
-                                                        var button = addedViews [i];
-                                                        appWindow.Remove (button);
-                                                        addedViews.RemoveAt (i);
-                                                        button.Dispose ();
-                                                    }
-                                                }
+                                              // Add or remove buttons
+                                              if (e.NewValue < e.OldValue)
+                                              {
+                                                  // Remove buttons
+                                                  for (int i = e.OldValue - 1; i >= e.NewValue; i--)
+                                                  {
+                                                      Button button = addedViews [i];
+                                                      appWindow.Remove (button);
+                                                      addedViews.RemoveAt (i);
+                                                      button.Dispose ();
+                                                  }
+                                              }
 
-                                                if (e.NewValue > e.OldValue)
-                                                {
-                                                    // Add buttons
-                                                    for (int i = e.OldValue; i < e.NewValue; i++)
-                                                    {
-                                                        var button = new Button
-                                                        {
-                                                            X = Pos.Justify (_horizJustifier.Justification),
-                                                            Y = Pos.Center (),
-                                                            Text = NumberToWords.Convert (i + 1)
-                                                        };
-                                                        appWindow.Add (button);
-                                                        addedViews.Add (button);
-                                                    }
-                                                }
-                                            };
+                                              if (e.NewValue > e.OldValue)
+                                              {
+                                                  // Add buttons
+                                                  for (int i = e.OldValue; i < e.NewValue; i++)
+                                                  {
+                                                      var button = new Button
+                                                      {
+                                                          X = Pos.Justify (_horizJustifier.Justification),
+                                                          Y = Pos.Center (),
+                                                          Text = NumberToWords.Convert (i + 1)
+                                                      };
+                                                      appWindow.Add (button);
+                                                      addedViews.Add (button);
+                                                  }
+                                              }
+                                          };
         appWindow.Add (addedViewsUpDown);
 
         appWindow.Add (addedViews [0]);
-
     }
 
     private void SetupVerticalControls (Window appWindow)
     {
         ColorScheme colorScheme = Colors.ColorSchemes ["Error"];
+
         RadioGroup justification = new ()
         {
             X = 0,
@@ -188,23 +198,25 @@ public sealed class PosJustification : Scenario
         };
 
         justification.SelectedItemChanged += (s, e) =>
-        {
-            _vertJustifier.Justification = (Justification)Enum.Parse (typeof (Justification), justification.SelectedItem.ToString ());
-            foreach (var view in appWindow.Subviews.Where (v => v.Y is Pos.PosJustify))
-            {
-                if (view.Y is Pos.PosJustify j)
-                {
-                    var newJust = new Pos.PosJustify (_vertJustifier.Justification)
-                    {
-                        Justifier =
-                        {
-                            PutSpaceBetweenItems = _vertJustifier.PutSpaceBetweenItems
-                        }
-                    };
-                    view.Y = newJust;
-                }
-            }
-        };
+                                             {
+                                                 _vertJustifier.Justification =
+                                                     (Justification)Enum.Parse (typeof (Justification), justification.SelectedItem.ToString ());
+
+                                                 foreach (View view in appWindow.Subviews.Where (v => v.Y is Pos.PosJustify))
+                                                 {
+                                                     if (view.Y is Pos.PosJustify j)
+                                                     {
+                                                         var newJust = new Pos.PosJustify (_vertJustifier.Justification)
+                                                         {
+                                                             Justifier =
+                                                             {
+                                                                 PutSpaceBetweenItems = _vertJustifier.PutSpaceBetweenItems
+                                                             }
+                                                         };
+                                                         view.Y = newJust;
+                                                     }
+                                                 }
+                                             };
         appWindow.Add (justification);
 
         CheckBox putSpaces = new ()
@@ -212,20 +224,21 @@ public sealed class PosJustification : Scenario
             X = 0,
             Y = Pos.Justify (_vertJustifier.Justification),
             ColorScheme = colorScheme,
-            Text = "Spaces",
+            Text = "Spaces"
         };
-        putSpaces.Toggled += (s, e) =>
-        {
-            _vertJustifier.PutSpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
-            foreach (var view in appWindow.Subviews.Where (v => v.Y is Pos.PosJustify))
-            {
-                if (view.Y is Pos.PosJustify j)
-                {
-                    j.Justifier.PutSpaceBetweenItems = _vertJustifier.PutSpaceBetweenItems;
-                }
-            }
 
-        };
+        putSpaces.Toggled += (s, e) =>
+                             {
+                                 _vertJustifier.PutSpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
+
+                                 foreach (View view in appWindow.Subviews.Where (v => v.Y is Pos.PosJustify))
+                                 {
+                                     if (view.Y is Pos.PosJustify j)
+                                     {
+                                         j.Justifier.PutSpaceBetweenItems = _vertJustifier.PutSpaceBetweenItems;
+                                     }
+                                 }
+                             };
         appWindow.Add (putSpaces);
 
         CheckBox margin = new ()
@@ -233,32 +246,37 @@ public sealed class PosJustification : Scenario
             X = Pos.Right (putSpaces) + 1,
             Y = Pos.Top (putSpaces),
             ColorScheme = colorScheme,
-            Text = "Margin",
+            Text = "Margin"
         };
+
         margin.Toggled += (s, e) =>
-        {
-            _topMargin = e.NewValue is { } && e.NewValue.Value ? 1 : 0;
-            foreach (var view in appWindow.Subviews.Where (v => v.Y is Pos.PosJustify))
-            {
-                // Skip the justification radio group
-                if (view != justification)
-                {
-                    view.Margin.Thickness = new Thickness (0, _topMargin, 0, 0);
-                }
-            }
-            appWindow.LayoutSubviews ();
-        };
+                          {
+                              _topMargin = e.NewValue is { } && e.NewValue.Value ? 1 : 0;
+
+                              foreach (View view in appWindow.Subviews.Where (v => v.Y is Pos.PosJustify))
+                              {
+                                  // Skip the justification radio group
+                                  if (view != justification)
+                                  {
+                                      view.Margin.Thickness = new (0, _topMargin, 0, 0);
+                                  }
+                              }
+
+                              appWindow.LayoutSubviews ();
+                          };
         appWindow.Add (margin);
 
-        var addedViews = new List<CheckBox> ();
-        addedViews.Add (new CheckBox
-        {
-            X = 0,
-            Y = Pos.Justify (_vertJustifier.Justification),
-            Text = NumberToWords.Convert (0)
-        });
+        List<CheckBox> addedViews = new List<CheckBox> ();
 
-        var addedViewsUpDown = new Buttons.NumericUpDown<int> ()
+        addedViews.Add (
+                        new()
+                        {
+                            X = 0,
+                            Y = Pos.Justify (_vertJustifier.Justification),
+                            Text = NumberToWords.Convert (0)
+                        });
+
+        Buttons.NumericUpDown<int> addedViewsUpDown = new Buttons.NumericUpDown<int>
         {
             X = 0,
             Y = Pos.Justify (_vertJustifier.Justification),
@@ -268,67 +286,101 @@ public sealed class PosJustification : Scenario
             BorderStyle = LineStyle.None,
             Value = addedViews.Count
         };
-        addedViewsUpDown.Border.Thickness = new Thickness (0, 1, 0, 0);
+        addedViewsUpDown.Border.Thickness = new (0, 1, 0, 0);
+
         addedViewsUpDown.ValueChanging += (s, e) =>
-        {
-            if (e.NewValue < 0)
-            {
-                e.Cancel = true;
+                                          {
+                                              if (e.NewValue < 0)
+                                              {
+                                                  e.Cancel = true;
 
-                return;
-            }
+                                                  return;
+                                              }
 
-            // Add or remove buttons
-            if (e.NewValue < e.OldValue)
-            {
-                // Remove buttons
-                for (int i = e.OldValue - 1; i >= e.NewValue; i--)
-                {
-                    var button = addedViews [i];
-                    appWindow.Remove (button);
-                    addedViews.RemoveAt (i);
-                    button.Dispose ();
-                }
-            }
+                                              // Add or remove buttons
+                                              if (e.NewValue < e.OldValue)
+                                              {
+                                                  // Remove buttons
+                                                  for (int i = e.OldValue - 1; i >= e.NewValue; i--)
+                                                  {
+                                                      CheckBox button = addedViews [i];
+                                                      appWindow.Remove (button);
+                                                      addedViews.RemoveAt (i);
+                                                      button.Dispose ();
+                                                  }
+                                              }
 
-            if (e.NewValue > e.OldValue)
-            {
-                // Add buttons
-                for (int i = e.OldValue; i < e.NewValue; i++)
-                {
-                    var button = new CheckBox ()
-                    {
-                        X = 0,
-                        Y = Pos.Justify (_vertJustifier.Justification),
-                        Text = NumberToWords.Convert (i + 1)
-                    };
-                    appWindow.Add (button);
-                    addedViews.Add (button);
-                }
-            }
-        };
+                                              if (e.NewValue > e.OldValue)
+                                              {
+                                                  // Add buttons
+                                                  for (int i = e.OldValue; i < e.NewValue; i++)
+                                                  {
+                                                      var button = new CheckBox
+                                                      {
+                                                          X = 0,
+                                                          Y = Pos.Justify (_vertJustifier.Justification),
+                                                          Text = NumberToWords.Convert (i + 1)
+                                                      };
+                                                      appWindow.Add (button);
+                                                      addedViews.Add (button);
+                                                  }
+                                              }
+                                          };
         appWindow.Add (addedViewsUpDown);
 
         appWindow.Add (addedViews [0]);
-
     }
 
-    static IEnumerable<string> GetUniqueEnumNames<T> (bool reverse) where T : Enum
+    private static IEnumerable<string> GetUniqueEnumNames<T> (bool reverse) where T : Enum
     {
-        var values = new HashSet<int> ();
-        var names = Enum.GetNames (typeof (T));
+        HashSet<int> values = new HashSet<int> ();
+        string [] names = Enum.GetNames (typeof (T));
 
         if (reverse)
         {
             names = Enum.GetNames (typeof (T)).Reverse ().ToArray ();
         }
-        foreach (var name in names)
+
+        foreach (string name in names)
         {
             var value = (int)Enum.Parse (typeof (T), name);
+
             if (values.Add (value))
             {
                 yield return name;
             }
         }
+    }
+
+    private void Setup3by3Grid (Window appWindow)
+    {
+        var container = new View
+        {
+            Title = "3 by 3",
+            BorderStyle = LineStyle.Single,
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Percent (30),
+            Height = Dim.Percent (30)
+        };
+
+        for (var i = 0; i < 9; i++)
+
+        {
+            var v = new View
+            {
+                Title = $"{i}",
+                BorderStyle = LineStyle.Dashed,
+                Height = 3,
+                Width = 5
+            };
+
+            v.X = Pos.Justify (Justification.Right, i / 3);
+            v.Y = Pos.Justify (Justification.Justified, i % 3 + 10);
+
+            container.Add (v);
+        }
+
+        appWindow.Add (container);
     }
 }
