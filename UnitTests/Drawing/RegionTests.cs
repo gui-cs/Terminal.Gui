@@ -437,5 +437,8 @@ Region
  and for                 
 RegionData 𝔹             ",
                                                       output);
+
+        top.Dispose ();
+        Application.Shutdown ();
     }
 }
