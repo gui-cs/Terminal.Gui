@@ -85,7 +85,7 @@ public class Wizard : Dialog
     {
         // Using Justify causes the Back and Next buttons to be hard justified against
         // the left and right edge
-        ButtonAlignment = ButtonAlignments.Justify;
+        ButtonAlignment = Justification.Justified;
         BorderStyle = LineStyle.Double;
 
         //// Add a horiz separator

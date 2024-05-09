@@ -4163,7 +4163,10 @@ public class TextView : View
         }
         else
         {
-            PositionCursor ();
+            if (IsInitialized)
+            {
+                PositionCursor ();
+            }
         }
 
         OnUnwrappedCursorPosition ();

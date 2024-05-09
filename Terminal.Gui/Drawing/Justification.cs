@@ -1,7 +1,10 @@
+using System.ComponentModel;
+using static Terminal.Gui.Pos;
+
 namespace Terminal.Gui;
 
 /// <summary>
-///     Controls how the <see cref="Justifier"/> justifies items within a container. 
+///     Controls how the <see cref="Justifier"/> justifies items within a container.
 /// </summary>
 public enum Justification
 {
@@ -18,6 +21,13 @@ public enum Justification
     Left,
 
     /// <summary>
+    ///     The items will be aligned to the top.
+    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     each item.
+    /// </summary>
+    Top = Left,
+
+    /// <summary>
     ///     The items will be aligned to the right.
     ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
@@ -28,6 +38,13 @@ public enum Justification
     ///     </c>
     /// </example>
     Right,
+
+    /// <summary>
+    ///     The items will be aligned to the bottom.
+    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     each item.
+    /// </summary>
+    Bottom = Right,
 
     /// <summary>
     ///     The group will be centered in the container.
@@ -68,6 +85,13 @@ public enum Justification
     FirstLeftRestRight,
 
     /// <summary>
+    ///     The first item will be aligned to the top and the remaining will aligned to the bottom.
+    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     each item.
+    /// </summary>
+    FirstTopRestBottom = FirstLeftRestRight,
+
+    /// <summary>
     ///     The last item will be aligned to the right and the remaining will aligned to the left.
     ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
@@ -77,48 +101,88 @@ public enum Justification
     ///         111 2222        33333
     ///     </c>
     /// </example>
-    LastRightRestLeft
+    LastRightRestLeft,
+
+    /// <summary>
+    ///     The last item will be aligned to the bottom and the remaining will aligned to the left.
+    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     each item.
+    /// </summary>
+    LastBottomRestTop = LastRightRestLeft,
 }
 
 /// <summary>
 ///     Justifies items within a container based on the specified <see cref="Justification"/>.
 /// </summary>
-public class Justifier
+public class Justifier : INotifyPropertyChanged
 {
-    /// <summary>
-    /// Gets or sets how the <see cref="Justifier"/> justifies items within a container.
-    /// </summary>
-    public Justification Justification { get; set; }
+    private Justification _justification;
 
     /// <summary>
-    /// The size of the container.
+    ///     Gets or sets how the <see cref="Justifier"/> justifies items within a container.
     /// </summary>
-    public int ContainerSize { get; set; }
+    public Justification Justification
+    {
+        get => _justification;
+        set
+        {
+            _justification = value;
+            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (Justification)));
+        }
+    }
+
+    private int _containerSize;
 
     /// <summary>
-    ///     Gets or sets whether <see cref="Justify(int[])"/> puts a space is placed between items. Default is <see langword="false"/>. If <see langword="true"/>, a space will be
+    ///     The size of the container.
+    /// </summary>
+    public int ContainerSize
+    {
+        get => _containerSize;
+        set
+        {
+            _containerSize = value;
+            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (ContainerSize)));
+        }
+    }
+
+    private bool _putSpaceBetweenItems;
+
+    /// <summary>
+    ///     Gets or sets whether <see cref="Justifier"/> puts a space is placed between items. Default is
+    ///     <see langword="false"/>. If <see langword="true"/>, a space will be
     ///     placed between each item, which is useful for justifying text.
     /// </summary>
-    public bool PutSpaceBetweenItems { get; set; }
+    public bool PutSpaceBetweenItems
+    {
+        get => _putSpaceBetweenItems;
+        set
+        {
+            _putSpaceBetweenItems = value;
+            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (PutSpaceBetweenItems)));
+        }
+    }
+
+    /// <inheritdoc />
+    public event PropertyChangedEventHandler PropertyChanged;
 
     /// <summary>
-    ///     Takes a list of items and returns their positions when justified within a container <see name="ContainerSize"/> wide based on the specified
+    ///     Takes a list of items and returns their positions when justified within a container <see name="ContainerSize"/>
+    ///     wide based on the specified
     ///     <see cref="Justification"/>.
     /// </summary>
     /// <param name="sizes">The sizes of the items to justify.</param>
     /// <returns>The locations of the items, from left to right.</returns>
-    public int [] Justify (int [] sizes)
-    {
-        return Justify (Justification, PutSpaceBetweenItems, ContainerSize, sizes);
-    }
+    public int [] Justify (int [] sizes) { return Justify (Justification, PutSpaceBetweenItems, ContainerSize, sizes); }
 
     /// <summary>
-    ///     Takes a list of items and returns their positions when justified within a container <paramref name="containerSize"/> wide based on the specified
+    ///     Takes a list of items and returns their positions when justified within a container
+    ///     <paramref name="containerSize"/> wide based on the specified
     ///     <see cref="Justification"/>.
     /// </summary>
     /// <param name="sizes">The sizes of the items to justify.</param>
     /// <param name="justification">The justification style.</param>
-    /// <param name="putSpaceBetweenItems"></param>
+    /// <param name="putSpaceBetweenItems">Puts a space is placed between items.</param>
     /// <param name="containerSize">The size of the container.</param>
     /// <returns>The locations of the items, from left to right.</returns>
     public static int [] Justify (Justification justification, bool putSpaceBetweenItems, int containerSize, int [] sizes)
@@ -136,6 +200,7 @@ public class Justifier
         int totalItemsAndSpaces = totalItemsSize + totalGaps * maxSpaceBetweenItems; // total size of items and spaces if we had enough room
 
         int spaces = totalGaps * maxSpaceBetweenItems; // We'll decrement this below to place one space between each item until we run out
+
         if (totalItemsSize >= containerSize)
         {
             spaces = 0;
@@ -152,10 +217,7 @@ public class Justifier
 
                 for (var i = 0; i < sizes.Length; i++)
                 {
-                    if (sizes [i] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
+                    CheckSizeCannotBeNegative (i, sizes);
 
                     if (i == 0)
                     {
@@ -176,11 +238,7 @@ public class Justifier
 
                 for (var i = 0; i < sizes.Length; i++)
                 {
-                    if (sizes [i] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
-
+                    CheckSizeCannotBeNegative (i, sizes);
                     int spaceBefore = spaces-- > 0 ? maxSpaceBetweenItems : 0;
 
                     positions [i] = currentPosition;
@@ -197,10 +255,7 @@ public class Justifier
 
                     for (var i = 0; i < sizes.Length; i++)
                     {
-                        if (sizes [i] < 0)
-                        {
-                            throw new ArgumentException ("The size of an item cannot be negative.");
-                        }
+                        CheckSizeCannotBeNegative (i, sizes);
 
                         if (i == 0)
                         {
@@ -217,11 +272,7 @@ public class Justifier
                 }
                 else if (sizes.Length == 1)
                 {
-                    if (sizes [0] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
-
+                    CheckSizeCannotBeNegative (0, sizes);
                     positions [0] = (containerSize - sizes [0]) / 2; // single item is centered
                 }
 
@@ -234,11 +285,7 @@ public class Justifier
 
                 for (var i = 0; i < sizes.Length; i++)
                 {
-                    if (sizes [i] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
-
+                    CheckSizeCannotBeNegative (i, sizes);
                     positions [i] = currentPosition;
                     int extraSpace = i < remainder ? 1 : 0;
                     currentPosition += sizes [i] + spaceBetween + extraSpace;
@@ -254,10 +301,7 @@ public class Justifier
 
                     for (var i = 0; i < sizes.Length; i++)
                     {
-                        if (sizes [i] < 0)
-                        {
-                            throw new ArgumentException ("The size of an item cannot be negative.");
-                        }
+                        CheckSizeCannotBeNegative (i, sizes);
 
                         if (i < sizes.Length - 1)
                         {
@@ -268,14 +312,11 @@ public class Justifier
                         }
                     }
 
-                    positions [sizes.Length - 1] = containerSize - sizes [sizes.Length - 1];
+                    positions [sizes.Length - 1] = containerSize - sizes [^1];
                 }
                 else if (sizes.Length == 1)
                 {
-                    if (sizes [0] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
+                    CheckSizeCannotBeNegative (0, sizes);
 
                     positions [0] = containerSize - sizes [0]; // single item is flush right
                 }
@@ -291,10 +332,7 @@ public class Justifier
 
                     for (int i = sizes.Length - 1; i >= 0; i--)
                     {
-                        if (sizes [i] < 0)
-                        {
-                            throw new ArgumentException ("The size of an item cannot be negative.");
-                        }
+                        CheckSizeCannotBeNegative (i, sizes);
 
                         if (i == sizes.Length - 1)
                         {
@@ -314,11 +352,7 @@ public class Justifier
                 }
                 else if (sizes.Length == 1)
                 {
-                    if (sizes [0] < 0)
-                    {
-                        throw new ArgumentException ("The size of an item cannot be negative.");
-                    }
-
+                    CheckSizeCannotBeNegative (0, sizes);
                     positions [0] = 0; // single item is flush left
                 }
 
@@ -329,5 +363,13 @@ public class Justifier
         }
 
         return positions;
+    }
+
+    private static void CheckSizeCannotBeNegative (int i, int [] sizes)
+    {
+        if (sizes [i] < 0)
+        {
+            throw new ArgumentException ("The size of an item cannot be negative.");
+        }
     }
 }

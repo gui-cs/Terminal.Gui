@@ -418,9 +418,8 @@ public class Buttons : Scenario
                 throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
             }
 
-            // TODO: Use Dim.Auto for the Width and Height
-            Height = 1;
-            Width = Dim.Function (() => Digits + 2); // button + 3 for number + button
+            Width = Dim.Auto (Dim.DimAutoStyle.Content); //Dim.Function (() => Digits + 2); // button + 3 for number + button
+            Height = Dim.Auto (Dim.DimAutoStyle.Content);
 
             _down = new ()
             {

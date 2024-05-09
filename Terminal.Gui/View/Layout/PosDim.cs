@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui;
 
@@ -202,6 +203,14 @@ public class Pos
     /// <param name="function">The function to be executed.</param>
     /// <returns>The <see cref="Pos"/> returned from the function.</returns>
     public static Pos Function (Func<int> function) { return new PosFunc (function); }
+
+    /// <summary>
+    ///      Creates a <see cref="Pos"/> object that justifies a set of views according to the specified justification.
+    /// </summary>
+    /// <param name="justification"></param>
+    /// <param name="groupId">The optional, unique identifier for the set of views to justify according to <paramref name="justification"/>.</param>
+    /// <returns></returns>
+    public static Pos Justify (Justification justification, int groupId = 0) { return new PosJustify (justification, groupId); }
 
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
@@ -484,6 +493,173 @@ public class Pos
         internal override int Anchor (int width) { return (int)(width * _factor); }
     }
 
+    /// <summary>
+    /// Enables justification of a set of views.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     The Group ID is used to identify a set of views that should be justified together. When only a single
+    ///     set of views is justified, setting the Group ID is not needed because it defaults to 0.
+    /// </para>
+    /// <para>
+    ///     The first view added to the Superview with a given Group ID is used to determine the justification of the group.
+    ///     The justification is applied to all views with the same Group ID.
+    /// </para>
+    /// </remarks>
+    public class PosJustify : Pos
+    {
+        // TODO: Figure out how to invalidate _location if Justifier changes.
+
+        /// <summary>
+        /// The cached location. Used to store the calculated location to avoid recalculating it.
+        /// </summary>
+        private int? _location;
+
+        /// <summary>
+        /// Gets the identifier of a set of views that should be justified together. When only a single
+        /// set of views is justified, setting the <see cref="_groupId"/> is not needed because it defaults to 0.
+        /// </summary>
+        private readonly int _groupId;
+
+        /// <summary>
+        /// Gets the justification settings.
+        /// </summary>
+        public Justifier Justifier { get; } = new ();
+
+
+        /// <summary>
+        /// Justifies the views in <paramref name="views"/> that have the same group ID as <paramref name="groupId"/>.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="views"></param>
+        /// <param name="dimension"></param>
+        /// <param name="size"></param>
+        private static void JustifyGroup (int groupId, IList<View> views, Dim.Dimension dimension, int size)
+        {
+            if (views is null)
+            {
+                return;
+            }
+            Justifier firstInGroup = null;
+            List<int> dimensionsList = new ();
+            List<View> viewsInGroup = views.Where (
+                                                   v =>
+                                                   {
+                                                       if (dimension == Dimension.Width && v.X is PosJustify justifyX)
+                                                       {
+                                                           return justifyX._groupId == groupId;
+                                                       }
+
+                                                       if (dimension == Dimension.Height && v.Y is PosJustify justifyY)
+                                                       {
+                                                           return justifyY._groupId == groupId;
+                                                       }
+
+                                                       return false;
+                                                   }).ToList ();
+            if (viewsInGroup.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var view in viewsInGroup)
+            {
+                var posJustify = dimension == Dimension.Width ? view.X as PosJustify : view.Y as PosJustify;
+
+                if (posJustify is { })
+                {
+                    if (firstInGroup is null)
+                    {
+                        firstInGroup = posJustify.Justifier;
+                    }
+
+                    dimensionsList.Add (dimension == Dimension.Width ? view.Frame.Width : view.Frame.Height);
+                }
+            }
+
+            if (firstInGroup is null)
+            {
+                return;
+            }
+
+            firstInGroup.ContainerSize = size;
+            var locations = firstInGroup.Justify (dimensionsList.ToArray ());
+
+            for (var index = 0; index < viewsInGroup.Count; index++)
+            {
+                View view = viewsInGroup [index];
+                PosJustify justify = dimension == Dimension.Width ? view.X as PosJustify : view.Y as PosJustify;
+
+                if (justify is { })
+                {
+                    justify._location = locations [index];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Enables justification of a set of views.
+        /// </summary>
+        /// <param name="justification"></param>
+        /// <param name="groupId">The unique identifier for the set of views to justify according to <paramref name="justification"/>.</param>
+        public PosJustify (Justification justification, int groupId = 0)
+        {
+            Justifier.Justification = justification;
+            _groupId = groupId;
+            Justifier.PropertyChanged += Justifier_PropertyChanged;
+        }
+
+        private void Justifier_PropertyChanged (object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            _location = null;
+        }
+
+        /// <inheritdoc />
+        public override bool Equals (object other)
+        {
+            return other is PosJustify justify && _groupId == justify._groupId && _location == justify._location && justify.Justifier.Equals (Justifier);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode ()
+        {
+            return Justifier.GetHashCode () ^ _groupId.GetHashCode ();
+        }
+
+        /// <inheritdoc />
+        public override string ToString ()
+        {
+            return $"Justify(groupId={_groupId}, justification={Justifier.Justification})";
+        }
+
+        internal override int Anchor (int width)
+        {
+            return _location ?? 0 - width;
+        }
+
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
+        {
+            if (_location.HasValue && Justifier.ContainerSize == superviewDimension)
+            {
+                return _location.Value;
+            }
+
+            if (us.SuperView is null)
+            {
+                return 0;
+            }
+
+            JustifyGroup (_groupId, us.SuperView.Subviews, dimension, superviewDimension);
+
+            if (_location.HasValue)
+            {
+                return _location.Value;
+            }
+
+            return 0;
+        }
+
+    }
     // Helper class to provide dynamic value by the execution of a function that returns an integer.
     internal class PosFunc (Func<int> n) : Pos
     {

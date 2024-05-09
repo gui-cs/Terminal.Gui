@@ -199,6 +199,8 @@ public class JustifierTests (ITestOutputHelper output)
     [InlineData (Justification.FirstLeftRestRight, new [] { 10, 20, 30 }, 101, new [] { 0, 50, 71 })]
     [InlineData (Justification.FirstLeftRestRight, new [] { 10, 20, 30, 40 }, 101, new [] { 0, 10, 30, 61 })]
     [InlineData (Justification.FirstLeftRestRight, new [] { 10, 20, 30, 40, 50 }, 151, new [] { 0, 10, 30, 60, 101 })]
+    [InlineData (Justification.FirstLeftRestRight, new [] { 3, 3, 3 }, 21, new [] { 0, 14, 18 })]
+    [InlineData (Justification.FirstLeftRestRight, new [] { 3, 4, 5 }, 21, new [] { 0, 11, 16 })]
     public void TestJustifications_PutSpaceBetweenItems (Justification justification, int [] sizes, int containerSize, int [] expected)
     {
         int [] positions = new Justifier
