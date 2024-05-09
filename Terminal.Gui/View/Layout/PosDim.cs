@@ -606,6 +606,12 @@ public class Pos
         {
             Justifier.Justification = justification;
             _groupId = groupId;
+            Justifier.PropertyChanged += Justifier_PropertyChanged;
+        }
+
+        private void Justifier_PropertyChanged (object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            _location = null;
         }
 
         /// <inheritdoc />
@@ -633,7 +639,7 @@ public class Pos
 
         internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
-            if (_location.HasValue)
+            if (_location.HasValue && Justifier.ContainerSize == superviewDimension)
             {
                 return _location.Value;
             }

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui;
@@ -113,26 +114,57 @@ public enum Justification
 /// <summary>
 ///     Justifies items within a container based on the specified <see cref="Justification"/>.
 /// </summary>
-public class Justifier
+public class Justifier : INotifyPropertyChanged
 {
+    private Justification _justification;
+
     /// <summary>
     ///     Gets or sets how the <see cref="Justifier"/> justifies items within a container.
     /// </summary>
-    public Justification Justification { get; set; }
+    public Justification Justification
+    {
+        get => _justification;
+        set
+        {
+            _justification = value;
+            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (Justification)));
+        }
+    }
+
+    private int _containerSize;
 
     /// <summary>
     ///     The size of the container.
     /// </summary>
-    public int ContainerSize { get; set; }
+    public int ContainerSize
+    {
+        get => _containerSize;
+        set
+        {
+            _containerSize = value;
+            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (ContainerSize)));
+        }
+    }
+
+    private bool _putSpaceBetweenItems;
 
     /// <summary>
     ///     Gets or sets whether <see cref="Justifier"/> puts a space is placed between items. Default is
     ///     <see langword="false"/>. If <see langword="true"/>, a space will be
     ///     placed between each item, which is useful for justifying text.
     /// </summary>
-    public bool PutSpaceBetweenItems { get; set; }
+    public bool PutSpaceBetweenItems
+    {
+        get => _putSpaceBetweenItems;
+        set
+        {
+            _putSpaceBetweenItems = value;
+            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (PutSpaceBetweenItems)));
+        }
+    }
 
-    // TODO: Add property change events so PosJustify can know when to update the locations.
+    /// <inheritdoc />
+    public event PropertyChangedEventHandler PropertyChanged;
 
     /// <summary>
     ///     Takes a list of items and returns their positions when justified within a container <see name="ContainerSize"/>
@@ -339,16 +371,5 @@ public class Justifier
         {
             throw new ArgumentException ("The size of an item cannot be negative.");
         }
-    }
-    public override bool Equals (object other)
-    {
-        if (other is Justifier justifier)
-        {
-            return Justification == justifier.Justification &&
-                   ContainerSize == justifier.ContainerSize &&
-                   PutSpaceBetweenItems == justifier.PutSpaceBetweenItems;
-        }
-
-        return false;
     }
 }
