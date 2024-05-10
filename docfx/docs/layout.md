@@ -66,7 +66,7 @@ The [Pos](~/api/Terminal.Gui.Pos.yml) is the type of `View.X` and `View.Y` and s
 * Anchored from the end of the dimension - `Pos.AnchorEnd()`.
 * Centered, using `Pos.Center()`.
 * The `Pos.Left(otherView)`, `Pos.Top(otherView)`, `Pos.Bottom(otherView)`, `Pos.Right(otherView)` positions of another view.
-* Justified (left, right, center, etc...) with other views - `Pos.Justify(Justification)`.
+* Aligned (left, right, center, etc...) with other views - `Pos.Justify(Justification)`.
 
 All `Pos` coordinates are relative to the Superview's content area.
 

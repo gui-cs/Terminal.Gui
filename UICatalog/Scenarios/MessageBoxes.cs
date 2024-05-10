@@ -14,7 +14,7 @@ public class MessageBoxes : Scenario
         var frame = new FrameView { X = Pos.Center (), Y = 1, Width = Dim.Percent (75), Title = "MessageBox Options" };
         Win.Add (frame);
 
-        var label = new Label { X = 0, Y = 0, TextJustification = Alignment.Right, Text = "Width:" };
+        var label = new Label { X = 0, Y = 0, TextAlignment = Alignment.Right, Text = "Width:" };
         frame.Add (label);
 
         var widthEdit = new TextField
@@ -34,7 +34,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             Text = "Height:"
         };
         frame.Add (label);
@@ -69,7 +69,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             Text = "Title:"
         };
         frame.Add (label);
@@ -91,7 +91,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             Text = "Message:"
         };
         frame.Add (label);
@@ -113,7 +113,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             Text = "Num Buttons:"
         };
         frame.Add (label);
@@ -135,7 +135,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             Text = "Default Button:"
         };
         frame.Add (label);
@@ -157,7 +157,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             Text = "Style:"
         };
         frame.Add (label);
@@ -195,7 +195,7 @@ public class MessageBoxes : Scenario
 
         label = new()
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, TextJustification = Alignment.Right, Text = "Button Pressed:"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, TextAlignment = Alignment.Right, Text = "Button Pressed:"
         };
         Win.Add (label);
 
@@ -204,7 +204,7 @@ public class MessageBoxes : Scenario
             X = Pos.Center (),
             Y = Pos.Bottom (label) + 1,
             ColorScheme = Colors.ColorSchemes ["Error"],
-            TextJustification = Alignment.Centered,
+            TextAlignment = Alignment.Centered,
             Text = " "
         };
 

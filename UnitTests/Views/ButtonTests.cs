@@ -155,14 +155,14 @@ public class ButtonTests (ITestOutputHelper output)
 
         Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.False (btn.IsDefault);
-        Assert.Equal (Alignment.Centered, btn.TextJustification);
+        Assert.Equal (Alignment.Centered, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
         Assert.Equal (new (0, 0, 4, 1), btn.Viewport);
         Assert.Equal (new (0, 0, 4, 1), btn.Frame);
         Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.False (btn.IsDefault);
-        Assert.Equal (Alignment.Centered, btn.TextJustification);
+        Assert.Equal (Alignment.Centered, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
         Assert.Equal (new (0, 0, 4, 1), btn.Viewport);
@@ -195,7 +195,7 @@ public class ButtonTests (ITestOutputHelper output)
                       btn.TextFormatter.Format ()
                      );
         Assert.True (btn.IsDefault);
-        Assert.Equal (Alignment.Centered, btn.TextJustification);
+        Assert.Equal (Alignment.Centered, btn.TextAlignment);
         Assert.True (btn.CanFocus);
 
         btn.SetRelativeLayout (new (100, 100));
@@ -222,7 +222,7 @@ public class ButtonTests (ITestOutputHelper output)
                       btn.TextFormatter.Format ()
                      );
         Assert.True (btn.IsDefault);
-        Assert.Equal (Alignment.Centered, btn.TextJustification);
+        Assert.Equal (Alignment.Centered, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
 

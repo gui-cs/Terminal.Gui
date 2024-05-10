@@ -6,9 +6,9 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Text Justification and Direction", "Demos horizontal and vertical text justification and direction.")]
+[ScenarioMetadata ("Text Alignment and Direction", "Demos horizontal and vertical text alignment and direction.")]
 [ScenarioCategory ("Text and Formatting")]
-public class TextJustificationAndDirections : Scenario
+public class TextAlignmentAndDirection : Scenario
 {
     public override void Main ()
     {
@@ -35,7 +35,7 @@ public class TextJustificationAndDirections : Scenario
             Y = 1,
             Width = 9,
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             ColorScheme = Colors.ColorSchemes ["Dialog"],
             Text = "Left"
         };
@@ -46,7 +46,7 @@ public class TextJustificationAndDirections : Scenario
             Y = 2,
             Width = 9,
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             ColorScheme = Colors.ColorSchemes ["Dialog"],
             Text = "Centered"
         };
@@ -57,7 +57,7 @@ public class TextJustificationAndDirections : Scenario
             Y = 3,
             Width = 9,
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             ColorScheme = Colors.ColorSchemes ["Dialog"],
             Text = "Right"
         };
@@ -68,7 +68,7 @@ public class TextJustificationAndDirections : Scenario
             Y = 4,
             Width = 9,
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             ColorScheme = Colors.ColorSchemes ["Dialog"],
             Text = "Justified"
         };
@@ -80,7 +80,7 @@ public class TextJustificationAndDirections : Scenario
             Width = Dim.Fill (1) - 9,
             Height = 1,
             ColorScheme = color1,
-            TextJustification = Alignment.Left,
+            TextAlignment = Alignment.Left,
             Text = txt
         };
 
@@ -91,7 +91,7 @@ public class TextJustificationAndDirections : Scenario
             Width = Dim.Fill (1) - 9,
             Height = 1,
             ColorScheme = color2,
-            TextJustification = Alignment.Centered,
+            TextAlignment = Alignment.Centered,
             Text = txt
         };
 
@@ -102,7 +102,7 @@ public class TextJustificationAndDirections : Scenario
             Width = Dim.Fill (1) - 9,
             Height = 1,
             ColorScheme = color1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             Text = txt
         };
 
@@ -113,7 +113,7 @@ public class TextJustificationAndDirections : Scenario
             Width = Dim.Fill (1) - 9,
             Height = 1,
             ColorScheme = color2,
-            TextJustification = Alignment.Justified,
+            TextAlignment = Alignment.Justified,
             Text = txt
         };
 
@@ -141,7 +141,7 @@ public class TextJustificationAndDirections : Scenario
             Height = 9,
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextJustification = Alignment.Bottom,
+            VerticalTextAlignment = Alignment.Bottom,
             Text = "Top"
         };
         labelVT.TextFormatter.WordWrap = false;
@@ -154,7 +154,7 @@ public class TextJustificationAndDirections : Scenario
             Height = 9,
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextJustification = Alignment.Bottom,
+            VerticalTextAlignment = Alignment.Bottom,
             Text = "Centered"
         };
         labelVM.TextFormatter.WordWrap = false;
@@ -167,7 +167,7 @@ public class TextJustificationAndDirections : Scenario
             Height = 9,
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextJustification = Alignment.Bottom,
+            VerticalTextAlignment = Alignment.Bottom,
             Text = "Bottom"
         };
         labelVB.TextFormatter.WordWrap = false;
@@ -180,7 +180,7 @@ public class TextJustificationAndDirections : Scenario
             Height = 9,
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextJustification = Alignment.Bottom,
+            VerticalTextAlignment = Alignment.Bottom,
             Text = "Justified"
         };
         labelVJ.TextFormatter.WordWrap = false;
@@ -193,7 +193,7 @@ public class TextJustificationAndDirections : Scenario
             Height = Dim.Fill (1),
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextJustification = Alignment.Top,
+            VerticalTextAlignment = Alignment.Top,
             Text = txt
         };
         txtLabelVT.TextFormatter.WordWrap = false;
@@ -206,7 +206,7 @@ public class TextJustificationAndDirections : Scenario
             Height = Dim.Fill (1),
             ColorScheme = color2,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextJustification = Alignment.Centered,
+            VerticalTextAlignment = Alignment.Centered,
             Text = txt
         };
         txtLabelVM.TextFormatter.WordWrap = false;
@@ -219,7 +219,7 @@ public class TextJustificationAndDirections : Scenario
             Height = Dim.Fill (1),
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextJustification = Alignment.Bottom,
+            VerticalTextAlignment = Alignment.Bottom,
             Text = txt
         };
         txtLabelVB.TextFormatter.WordWrap = false;
@@ -232,7 +232,7 @@ public class TextJustificationAndDirections : Scenario
             Height = Dim.Fill (1),
             ColorScheme = color2,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextJustification = Alignment.Justified,
+            VerticalTextAlignment = Alignment.Justified,
             Text = txt
         };
         txtLabelVJ.TextFormatter.WordWrap = false;
@@ -268,8 +268,8 @@ public class TextJustificationAndDirections : Scenario
             Y = 1,
             Width = Dim.Percent (100f / 3f),
             Height = Dim.Percent (100f / 3f),
-            TextJustification = Alignment.Left,
-            VerticalTextJustification = Alignment.Top,
+            TextAlignment = Alignment.Left,
+            VerticalTextAlignment = Alignment.Top,
             ColorScheme = color1,
             Text = txt
         };
@@ -281,8 +281,8 @@ public class TextJustificationAndDirections : Scenario
             Y = 1,
             Width = Dim.Percent (100f / 3f),
             Height = Dim.Percent (100f / 3f),
-            TextJustification = Alignment.Centered,
-            VerticalTextJustification = Alignment.Top,
+            TextAlignment = Alignment.Centered,
+            VerticalTextAlignment = Alignment.Top,
             ColorScheme = color1,
             Text = txt
         };
@@ -294,8 +294,8 @@ public class TextJustificationAndDirections : Scenario
             Y = 1,
             Width = Dim.Percent (100f, true),
             Height = Dim.Percent (100f / 3f),
-            TextJustification = Alignment.Right,
-            VerticalTextJustification = Alignment.Top,
+            TextAlignment = Alignment.Right,
+            VerticalTextAlignment = Alignment.Top,
             ColorScheme = color1,
             Text = txt
         };
@@ -307,8 +307,8 @@ public class TextJustificationAndDirections : Scenario
             Y = Pos.Bottom (txtLabelTL) + 1,
             Width = Dim.Width (txtLabelTL),
             Height = Dim.Percent (100f / 3f),
-            TextJustification = Alignment.Left,
-            VerticalTextJustification = Alignment.Centered,
+            TextAlignment = Alignment.Left,
+            VerticalTextAlignment = Alignment.Centered,
             ColorScheme = color1,
             Text = txt
         };
@@ -320,8 +320,8 @@ public class TextJustificationAndDirections : Scenario
             Y = Pos.Bottom (txtLabelTC) + 1,
             Width = Dim.Width (txtLabelTC),
             Height = Dim.Percent (100f / 3f),
-            TextJustification = Alignment.Centered,
-            VerticalTextJustification = Alignment.Centered,
+            TextAlignment = Alignment.Centered,
+            VerticalTextAlignment = Alignment.Centered,
             ColorScheme = color1,
             Text = txt
         };
@@ -333,8 +333,8 @@ public class TextJustificationAndDirections : Scenario
             Y = Pos.Bottom (txtLabelTR) + 1,
             Width = Dim.Percent (100f, true),
             Height = Dim.Percent (100f / 3f),
-            TextJustification = Alignment.Right,
-            VerticalTextJustification = Alignment.Centered,
+            TextAlignment = Alignment.Right,
+            VerticalTextAlignment = Alignment.Centered,
             ColorScheme = color1,
             Text = txt
         };
@@ -346,8 +346,8 @@ public class TextJustificationAndDirections : Scenario
             Y = Pos.Bottom (txtLabelML) + 1,
             Width = Dim.Width (txtLabelML),
             Height = Dim.Percent (100f, true),
-            TextJustification = Alignment.Left,
-            VerticalTextJustification = Alignment.Bottom,
+            TextAlignment = Alignment.Left,
+            VerticalTextAlignment = Alignment.Bottom,
             ColorScheme = color1,
             Text = txt
         };
@@ -359,8 +359,8 @@ public class TextJustificationAndDirections : Scenario
             Y = Pos.Bottom (txtLabelMC) + 1,
             Width = Dim.Width (txtLabelMC),
             Height = Dim.Percent (100f, true),
-            TextJustification = Alignment.Centered,
-            VerticalTextJustification = Alignment.Bottom,
+            TextAlignment = Alignment.Centered,
+            VerticalTextAlignment = Alignment.Bottom,
             ColorScheme = color1,
             Text = txt
         };
@@ -372,8 +372,8 @@ public class TextJustificationAndDirections : Scenario
             Y = Pos.Bottom (txtLabelMR) + 1,
             Width = Dim.Percent (100f, true),
             Height = Dim.Percent (100f, true),
-            TextJustification = Alignment.Right,
-            VerticalTextJustification = Alignment.Bottom,
+            TextAlignment = Alignment.Right,
+            VerticalTextAlignment = Alignment.Bottom,
             ColorScheme = color1,
             Text = txt
         };
@@ -389,10 +389,10 @@ public class TextJustificationAndDirections : Scenario
         mtxts.Add (txtLabelBC);
         mtxts.Add (txtLabelBR);
 
-        // Save Justification in Data
+        // Save Alignment in Data
         foreach (Label t in mtxts)
         {
-            t.Data = new { h = t.TextJustification, v = t.VerticalTextJustification };
+            t.Data = new { h = t.TextAlignment, v = t.VerticalTextAlignment };
         }
 
         container.Add (txtLabelTL);
@@ -593,8 +593,8 @@ public class TextJustificationAndDirections : Scenario
 
                 foreach (Label t in mtxts)
                 {
-                    t.TextJustification = (Alignment)((dynamic)t.Data).h;
-                    t.VerticalTextJustification = (Alignment)((dynamic)t.Data).v;
+                    t.TextAlignment = (Alignment)((dynamic)t.Data).h;
+                    t.VerticalTextAlignment = (Alignment)((dynamic)t.Data).v;
                 }
             }
             else
@@ -611,16 +611,16 @@ public class TextJustificationAndDirections : Scenario
                         switch (justifyOptions.SelectedItem)
                         {
                             case 0:
-                                t.VerticalTextJustification = Alignment.Justified;
-                                t.TextJustification = ((dynamic)t.Data).h;
+                                t.VerticalTextAlignment = Alignment.Justified;
+                                t.TextAlignment = ((dynamic)t.Data).h;
                                 break;
                             case 1:
-                                t.VerticalTextJustification = (Alignment)((dynamic)t.Data).v;
-                                t.TextJustification = Alignment.Justified;
+                                t.VerticalTextAlignment = (Alignment)((dynamic)t.Data).v;
+                                t.TextAlignment = Alignment.Justified;
                                 break;
                             case 2:
-                                t.VerticalTextJustification = Alignment.Justified;
-                                t.TextJustification = Alignment.Justified;
+                                t.VerticalTextAlignment = Alignment.Justified;
+                                t.TextAlignment = Alignment.Justified;
                                 break;
                         }
                     }
@@ -629,16 +629,16 @@ public class TextJustificationAndDirections : Scenario
                         switch (justifyOptions.SelectedItem)
                         {
                             case 0:
-                                t.TextJustification = Alignment.Justified;
-                                t.VerticalTextJustification = ((dynamic)t.Data).v;
+                                t.TextAlignment = Alignment.Justified;
+                                t.VerticalTextAlignment = ((dynamic)t.Data).v;
                                 break;
                             case 1:
-                                t.TextJustification = (Alignment)((dynamic)t.Data).h;
-                                t.VerticalTextJustification = Alignment.Justified;
+                                t.TextAlignment = (Alignment)((dynamic)t.Data).h;
+                                t.VerticalTextAlignment = Alignment.Justified;
                                 break;
                             case 2:
-                                t.TextJustification = Alignment.Justified;
-                                t.VerticalTextJustification = Alignment.Justified;
+                                t.TextAlignment = Alignment.Justified;
+                                t.VerticalTextAlignment = Alignment.Justified;
                                 break;
                         }
                     }

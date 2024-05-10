@@ -75,17 +75,17 @@ public class TextFormatterDemo : Scenario
             }
         }
 
-        List<Alignment> justifications = GetUniqueEnumValues<Alignment>().ToList ();
-        Label [] singleLines = new Label [justifications.Count];
-        Label [] multipleLines = new Label [justifications.Count];
+        List<Alignment> alignments = GetUniqueEnumValues<Alignment>().ToList ();
+        Label [] singleLines = new Label [alignments.Count];
+        Label [] multipleLines = new Label [alignments.Count];
 
         var multiLineHeight = 5;
 
-        foreach (Alignment justification in justifications)
+        foreach (Alignment alignment in alignments)
         {
-            singleLines [(int)justification] = new()
+            singleLines [(int)alignment] = new()
             {
-                TextJustification = justification,
+                TextAlignment = alignment,
                 X = 0,
 
                 Width = Dim.Fill (),
@@ -94,9 +94,9 @@ public class TextFormatterDemo : Scenario
                 Text = text
             };
 
-            multipleLines [(int)justification] = new()
+            multipleLines [(int)alignment] = new()
             {
-                TextJustification = justification,
+                TextAlignment = alignment,
                 X = 0,
 
                 Width = Dim.Fill (),
@@ -112,33 +112,33 @@ public class TextFormatterDemo : Scenario
         };
         app.Add (label);
 
-        foreach (Alignment justification in justifications)
+        foreach (Alignment alignment in alignments)
         {
-            label = new() { Y = Pos.Bottom (label), Text = $"{justification}:" };
+            label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             app.Add (label);
-            singleLines [(int)justification].Y = Pos.Bottom (label);
-            app.Add (singleLines [(int)justification]);
-            label = singleLines [(int)justification];
+            singleLines [(int)alignment].Y = Pos.Bottom (label);
+            app.Add (singleLines [(int)alignment]);
+            label = singleLines [(int)alignment];
         }
 
         label = new() { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
         app.Add (label);
 
-        foreach (Alignment justification in justifications)
+        foreach (Alignment alignment in alignments)
         {
-            label = new() { Y = Pos.Bottom (label), Text = $"{justification}:" };
+            label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             app.Add (label);
-            multipleLines [(int)justification].Y = Pos.Bottom (label);
-            app.Add (multipleLines [(int)justification]);
-            label = multipleLines [(int)justification];
+            multipleLines [(int)alignment].Y = Pos.Bottom (label);
+            app.Add (multipleLines [(int)alignment]);
+            label = multipleLines [(int)alignment];
         }
 
         unicodeCheckBox.Toggled += (s, e) =>
                                    {
-                                       foreach (Alignment justification in justifications)
+                                       foreach (Alignment alignment in alignments)
                                        {
-                                           singleLines [(int)justification].Text = e.OldValue == true ? text : unicode;
-                                           multipleLines [(int)justification].Text = e.OldValue == true ? text : unicode;
+                                           singleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;
+                                           multipleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;
                                        }
                                    };
 

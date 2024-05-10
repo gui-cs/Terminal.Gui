@@ -1788,7 +1788,7 @@ Y
     [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
-    public void View_Draw_Horizontal_Simple_TextJustifications (bool autoSize)
+    public void View_Draw_Horizontal_Simple_TextAlignments (bool autoSize)
     {
         var text = "Hello World";
         var width = 20;
@@ -1811,7 +1811,7 @@ Y
             Y = 1,
             Width = width,
             Height = 1,
-            TextJustification = Alignment.Centered,
+            TextAlignment = Alignment.Centered,
         };
 
         if (autoSize)
@@ -1826,7 +1826,7 @@ Y
             Y = 2,
             Width = width,
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
         };
         if (autoSize)
         {
@@ -1840,7 +1840,7 @@ Y
             Y = 3,
             Width = width,
             Height = 1,
-            TextJustification = Alignment.Justified,
+            TextAlignment = Alignment.Justified,
         };
         if (autoSize)
         {
@@ -1912,7 +1912,7 @@ Y
     [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
-    public void View_Draw_Vertical_Simple_TextJustifications (bool autoSize)
+    public void View_Draw_Vertical_Simple_TextAlignments (bool autoSize)
     {
         var text = "Hello World";
         var height = 20;
@@ -1937,7 +1937,7 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextJustification = Alignment.Centered
+            VerticalTextAlignment = Alignment.Centered
         };
         if (autoSize)
         {
@@ -1952,7 +1952,7 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextJustification = Alignment.Bottom
+            VerticalTextAlignment = Alignment.Bottom
         };
         if (autoSize)
         {
@@ -1967,7 +1967,7 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextJustification = Alignment.Justified
+            VerticalTextAlignment = Alignment.Justified
         };
         if (autoSize)
         {

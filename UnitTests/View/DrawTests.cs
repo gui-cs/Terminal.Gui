@@ -332,14 +332,14 @@ public class DrawTests (ITestOutputHelper _output)
     [Fact]
     [AutoInitShutdown]
     [Trait ("Category", "Output")]
-    public void Colors_On_TextJustification_Right_And_Bottom ()
+    public void Colors_On_TextAlignment_Right_And_Bottom ()
     {
         var viewRight = new View
         {
             Text = "Test",
             Width = 6,
             Height = 1,
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             ColorScheme = Colors.ColorSchemes ["Base"]
         };
 
@@ -350,7 +350,7 @@ public class DrawTests (ITestOutputHelper _output)
             Y = 1,
             Width = 1,
             Height = 6,
-            VerticalTextJustification = Alignment.Bottom,
+            VerticalTextAlignment = Alignment.Bottom,
             ColorScheme = Colors.ColorSchemes ["Base"]
         };
         Toplevel top = new ();

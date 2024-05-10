@@ -86,12 +86,12 @@ public class ComputedLayout : Scenario
         var i = 1;
         var txt = "Resize the terminal to see computed layout in action.";
         List<Label> labelList = new ();
-        labelList.Add (new Label { Text = "The lines below show different justification" });
+        labelList.Add (new Label { Text = "The lines below show different alignment" });
 
         labelList.Add (
                        new Label
                        {
-                           TextJustification = Alignment.Left,
+                           TextAlignment = Alignment.Left,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -103,7 +103,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextJustification = Alignment.Right,
+                           TextAlignment = Alignment.Right,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -115,7 +115,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextJustification = Alignment.Centered,
+                           TextAlignment = Alignment.Centered,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -127,7 +127,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextJustification = Alignment.Justified,
+                           TextAlignment = Alignment.Justified,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -148,12 +148,12 @@ public class ComputedLayout : Scenario
                                  };
         i = 1;
         labelList = new List<Label> ();
-        labelList.Add (new Label { Text = "The lines below show different justifications" });
+        labelList.Add (new Label { Text = "The lines below show different alignment" });
 
         labelList.Add (
                        new Label
                        {
-                           TextJustification = Alignment.Left,
+                           TextAlignment = Alignment.Left,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -165,7 +165,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextJustification = Alignment.Right,
+                           TextAlignment = Alignment.Right,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -177,7 +177,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextJustification = Alignment.Centered,
+                           TextAlignment = Alignment.Centered,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -189,7 +189,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextJustification = Alignment.Justified,
+                           TextAlignment = Alignment.Justified,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -324,7 +324,7 @@ public class ComputedLayout : Scenario
         var anchorEndLabel1 = new Label
         {
             Text = "This Label should be the 3rd to last line (AnchorEnd (3)).",
-            TextJustification = Alignment.Centered,
+            TextAlignment = Alignment.Centered,
             ColorScheme = Colors.ColorSchemes ["Menu"],
             Width = Dim.Fill (5),
             X = 5,
@@ -338,7 +338,7 @@ public class ComputedLayout : Scenario
         {
             Text =
                 "This TextField should be the 4th to last line (AnchorEnd (3) - 1).",
-            TextJustification = Alignment.Left,
+            TextAlignment = Alignment.Left,
             ColorScheme = Colors.ColorSchemes ["Menu"],
             Width = Dim.Fill (5),
             X = 5,
@@ -397,9 +397,9 @@ public class ComputedLayout : Scenario
 
 
         // Center three buttons with 
-        leftButton.X = Pos.Justify (Alignment.Centered);
-        centerButton.X = Pos.Justify (Alignment.Centered);
-        rightButton.X = Pos.Justify (Alignment.Centered);
+        leftButton.X = Pos.Align (Alignment.Centered);
+        centerButton.X = Pos.Align (Alignment.Centered);
+        rightButton.X = Pos.Align (Alignment.Centered);
 
         Application.Run (app);
         app.Dispose ();

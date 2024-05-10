@@ -53,36 +53,36 @@ public class TextFormatterTests
         tf.Text = testText;
         Size expectedSize = new (testText.Length, 1);
         Assert.Equal (testText, tf.Text);
-        Assert.Equal (Alignment.Left, tf.Justification);
+        Assert.Equal (Alignment.Left, tf.Alignment);
         Assert.Equal (expectedSize, tf.Size);
         tf.Draw (testBounds, new Attribute (), new Attribute ());
         Assert.Equal (expectedSize, tf.Size);
         Assert.NotEmpty (tf.GetLines ());
 
-        tf.Justification = Alignment.Right;
+        tf.Alignment = Alignment.Right;
         expectedSize = new (testText.Length, 1);
         Assert.Equal (testText, tf.Text);
-        Assert.Equal (Alignment.Right, tf.Justification);
+        Assert.Equal (Alignment.Right, tf.Alignment);
         Assert.Equal (expectedSize, tf.Size);
         tf.Draw (testBounds, new Attribute (), new Attribute ());
         Assert.Equal (expectedSize, tf.Size);
         Assert.NotEmpty (tf.GetLines ());
 
-        tf.Justification = Alignment.Right;
-        expectedSize = new (testText.Length, 1);
-        tf.Size = expectedSize;
-        Assert.Equal (testText, tf.Text);
-        Assert.Equal (Alignment.Right, tf.Justification);
-        Assert.Equal (expectedSize, tf.Size);
-        tf.Draw (testBounds, new Attribute (), new Attribute ());
-        Assert.Equal (expectedSize, tf.Size);
-        Assert.NotEmpty (tf.GetLines ());
-
-        tf.Justification = Alignment.Centered;
+        tf.Alignment = Alignment.Right;
         expectedSize = new (testText.Length, 1);
         tf.Size = expectedSize;
         Assert.Equal (testText, tf.Text);
-        Assert.Equal (Alignment.Centered, tf.Justification);
+        Assert.Equal (Alignment.Right, tf.Alignment);
+        Assert.Equal (expectedSize, tf.Size);
+        tf.Draw (testBounds, new Attribute (), new Attribute ());
+        Assert.Equal (expectedSize, tf.Size);
+        Assert.NotEmpty (tf.GetLines ());
+
+        tf.Alignment = Alignment.Centered;
+        expectedSize = new (testText.Length, 1);
+        tf.Size = expectedSize;
+        Assert.Equal (testText, tf.Text);
+        Assert.Equal (Alignment.Centered, tf.Alignment);
         Assert.Equal (expectedSize, tf.Size);
         tf.Draw (testBounds, new Attribute (), new Attribute ());
         Assert.Equal (expectedSize, tf.Size);
@@ -219,19 +219,19 @@ public class TextFormatterTests
     [InlineData ("Ð ÑÐ", "Ð Ñ", 3)] // Should not fit
     public void ClipAndJustify_Valid_Centered (string text, string justifiedText, int maxWidth)
     {
-        var justify = Alignment.Centered;
+        var alignment = Alignment.Centered;
         var textDirection = TextDirection.LeftRight_TopBottom;
         var tabWidth = 1;
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, alignment, textDirection, tabWidth)
                      );
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, alignment, textDirection, tabWidth)
                      );
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
@@ -277,19 +277,19 @@ public class TextFormatterTests
     [InlineData ("Ð ÑÐ", "Ð Ñ", 3)] // Should not fit
     public void ClipAndJustify_Valid_Justified (string text, string justifiedText, int maxWidth)
     {
-        var justify = Alignment.Justified;
+        var alignment = Alignment.Justified;
         var textDirection = TextDirection.LeftRight_TopBottom;
         var tabWidth = 1;
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, alignment, textDirection, tabWidth)
                      );
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, alignment, textDirection, tabWidth)
                      );
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
@@ -328,19 +328,19 @@ public class TextFormatterTests
     [InlineData ("Ð ÑÐ", "Ð Ñ", 3)] // Should not fit
     public void ClipAndJustify_Valid_Left (string text, string justifiedText, int maxWidth)
     {
-        var justify = Alignment.Left;
+        var alignment = Alignment.Left;
         var textDirection = TextDirection.LeftRight_BottomTop;
         var tabWidth = 1;
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, alignment, textDirection, tabWidth)
                      );
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, alignment, textDirection, tabWidth)
                      );
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
@@ -377,19 +377,19 @@ public class TextFormatterTests
     [InlineData ("Ð ÑÐ", "Ð Ñ", 3)] // Should not fit
     public void ClipAndJustify_Valid_Right (string text, string justifiedText, int maxWidth)
     {
-        var justify = Alignment.Right;
+        var alignment = Alignment.Right;
         var textDirection = TextDirection.LeftRight_BottomTop;
         var tabWidth = 1;
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, alignment, textDirection, tabWidth)
                      );
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, alignment, textDirection, tabWidth)
                      );
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
@@ -900,7 +900,7 @@ ssb
         string text,
         int maxWidth,
         int widthOffset,
-        Alignment Justification,
+        Alignment alignment,
         bool wrap,
         bool preserveTrailingSpaces,
         IEnumerable<string> resultLines,
@@ -908,7 +908,7 @@ ssb
     )
     {
         Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
-        List<string> list = TextFormatter.Format (text, maxWidth, Justification, wrap, preserveTrailingSpaces);
+        List<string> list = TextFormatter.Format (text, maxWidth, alignment, wrap, preserveTrailingSpaces);
         Assert.Equal (list.Count, resultLines.Count ());
         Assert.Equal (resultLines, list);
         var wrappedText = string.Empty;
@@ -1336,7 +1336,7 @@ ssb
         Assert.NotEmpty (tf.GetLines ());
         Assert.False (tf.NeedsFormat); // get_Lines causes a Format
 
-        tf.Justification = Alignment.Centered;
+        tf.Alignment = Alignment.Centered;
         Assert.True (tf.NeedsFormat);
         Assert.NotEmpty (tf.GetLines ());
         Assert.False (tf.NeedsFormat); // get_Lines causes a Format
@@ -1348,18 +1348,18 @@ ssb
     [InlineData (null, 0, Alignment.Left, true, 1)]
     [InlineData ("", 0, Alignment.Left, false, 1)]
     [InlineData ("", 0, Alignment.Left, true, 1)]
-    public void Reformat_Invalid (string text, int maxWidth, Alignment Justification, bool wrap, int linesCount)
+    public void Reformat_Invalid (string text, int maxWidth, Alignment alignment, bool wrap, int linesCount)
     {
         if (maxWidth < 0)
         {
             Assert.Throws<ArgumentOutOfRangeException> (
                                                         () =>
-                                                            TextFormatter.Format (text, maxWidth, Justification, wrap)
+                                                            TextFormatter.Format (text, maxWidth, alignment, wrap)
                                                        );
         }
         else
         {
-            List<string> list = TextFormatter.Format (text, maxWidth, Justification, wrap);
+            List<string> list = TextFormatter.Format (text, maxWidth, alignment, wrap);
             Assert.NotEmpty (list);
             Assert.True (list.Count == linesCount);
             Assert.Equal (string.Empty, list [0]);
@@ -1385,7 +1385,7 @@ ssb
         string text,
         int maxWidth,
         int widthOffset,
-        Alignment Justification,
+        Alignment alignment,
         bool wrap,
         int linesCount,
         bool stringEmpty,
@@ -1394,7 +1394,7 @@ ssb
     {
         Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth) + clipWidthOffset;
-        List<string> list = TextFormatter.Format (text, maxWidth, Justification, wrap);
+        List<string> list = TextFormatter.Format (text, maxWidth, alignment, wrap);
         Assert.NotEmpty (list);
         Assert.True (list.Count == linesCount);
 
@@ -1537,7 +1537,7 @@ ssb
         string text,
         int maxWidth,
         int widthOffset,
-        Alignment Justification,
+        Alignment alignment,
         bool wrap,
         int linesCount,
         bool stringEmpty,
@@ -1549,7 +1549,7 @@ ssb
         List<string> list = TextFormatter.Format (
                                                   text,
                                                   maxWidth,
-                                                  Justification,
+                                                  alignment,
                                                   wrap,
                                                   false,
                                                   0,
@@ -1679,7 +1679,7 @@ ssb
         string text,
         int maxWidth,
         int widthOffset,
-        Alignment Justification,
+        Alignment alignment,
         bool wrap,
         int linesCount,
         bool stringEmpty,
@@ -1691,7 +1691,7 @@ ssb
         List<string> list = TextFormatter.Format (
                                                   text,
                                                   maxWidth,
-                                                  Justification,
+                                                  alignment,
                                                   wrap,
                                                   false,
                                                   0,
@@ -1728,7 +1728,7 @@ ssb
         string text,
         int maxWidth,
         int widthOffset,
-        Alignment Justification,
+        Alignment alignment,
         bool wrap,
         int linesCount,
         bool stringEmpty
@@ -1736,7 +1736,7 @@ ssb
     {
         Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
-        List<string> list = TextFormatter.Format (text, maxWidth, Justification, wrap);
+        List<string> list = TextFormatter.Format (text, maxWidth, alignment, wrap);
         Assert.NotEmpty (list);
         Assert.True (list.Count == linesCount);
 
@@ -1788,14 +1788,14 @@ ssb
         string text,
         int maxWidth,
         int widthOffset,
-        Alignment Justification,
+        Alignment alignment,
         bool wrap,
         bool preserveTrailingSpaces,
         IEnumerable<string> resultLines
     )
     {
         Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
-        List<string> list = TextFormatter.Format (text, maxWidth, Justification, wrap, preserveTrailingSpaces);
+        List<string> list = TextFormatter.Format (text, maxWidth, alignment, wrap, preserveTrailingSpaces);
         Assert.Equal (list.Count, resultLines.Count ());
         Assert.Equal (resultLines, list);
     }
@@ -1823,14 +1823,14 @@ ssb
         string text,
         int maxWidth,
         int widthOffset,
-        Alignment Justification,
+        Alignment alignment,
         bool wrap,
         bool preserveTrailingSpaces,
         IEnumerable<string> resultLines
     )
     {
         Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
-        List<string> list = TextFormatter.Format (text, maxWidth, Justification, wrap, preserveTrailingSpaces);
+        List<string> list = TextFormatter.Format (text, maxWidth, alignment, wrap, preserveTrailingSpaces);
         Assert.Equal (list.Count, resultLines.Count ());
         Assert.Equal (resultLines, list);
     }
@@ -1869,7 +1869,7 @@ ssb
         string text,
         int maxWidth,
         int widthOffset,
-        Alignment Justification,
+        Alignment alignment,
         bool wrap,
         bool preserveTrailingSpaces,
         bool stringEmpty,
@@ -1879,7 +1879,7 @@ ssb
     {
         Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
-        List<string> list = TextFormatter.Format (text, maxWidth, Justification, wrap, preserveTrailingSpaces);
+        List<string> list = TextFormatter.Format (text, maxWidth, alignment, wrap, preserveTrailingSpaces);
         Assert.NotEmpty (list);
         Assert.True (list.Count == resultLines.Count ());
 
@@ -3159,7 +3159,7 @@ ssb
         TextFormatter tf = new ()
         {
             Text = text,
-            Justification = Alignment.Left,
+            Alignment = Alignment.Left,
             AutoSize = autoSize,
         };
 
@@ -3196,7 +3196,7 @@ ssb
         TextFormatter tf = new ()
         {
             Text = text,
-            Justification = Alignment.Right,
+            Alignment = Alignment.Right,
             AutoSize = autoSize,
         };
 
@@ -3239,7 +3239,7 @@ ssb
         TextFormatter tf = new ()
         {
             Text = text,
-            Justification = Alignment.Centered,
+            Alignment = Alignment.Centered,
             AutoSize = autoSize,
         };
 
@@ -3284,7 +3284,7 @@ ssb
         TextFormatter tf = new ()
         {
             Text = text,
-            Justification = Alignment.Justified,
+            Alignment = Alignment.Justified,
             AutoSize = autoSize,
         };
 
@@ -3374,7 +3374,7 @@ Nice       Work")]
         TextFormatter tf = new ()
         {
             Text = text,
-            Justification = Alignment.Justified,
+            Alignment = Alignment.Justified,
             Size = new Size (width, height),
             MultiLine = true
         };
@@ -3426,7 +3426,7 @@ ek")]
         {
             Text = text,
             Direction = TextDirection.TopBottom_LeftRight,
-            VerticalJustification = Alignment.Justified,
+            VerticalAlignment = Alignment.Justified,
             Size = new Size (width, height),
             MultiLine = true
         };
@@ -3482,9 +3482,9 @@ ek")]
         TextFormatter tf = new ()
         {
             Text = text,
-            Justification = Alignment.Right,
+            Alignment = Alignment.Right,
             Direction = TextDirection.TopBottom_LeftRight,
-            VerticalJustification = Alignment.Bottom,
+            VerticalAlignment = Alignment.Bottom,
             AutoSize = autoSize,
         };
 
@@ -3624,7 +3624,7 @@ B")]
         {
             Text = text,
             Direction = TextDirection.TopBottom_LeftRight,
-            VerticalJustification = Alignment.Centered,
+            VerticalAlignment = Alignment.Centered,
             AutoSize = autoSize,
         };
 
@@ -3880,7 +3880,7 @@ B")]
     [SetupFakeDriver]
     [Theory]
 
-    // Horizontal with Justification.Top
+    // Horizontal with alignment.Top
     // LeftRight_TopBottom
     [InlineData ("0 2 4", Alignment.Left, Alignment.Top, TextDirection.LeftRight_TopBottom, @"
 0 2 4**
@@ -4149,7 +4149,7 @@ B")]
 *******
 *******")]
 
-    // Horizontal with Justification.Bottom
+    // Horizontal with alignment.Bottom
     // LeftRight_TopBottom
     [InlineData ("0 2 4", Alignment.Left, Alignment.Bottom, TextDirection.LeftRight_TopBottom, @"
 *******
@@ -4418,7 +4418,7 @@ B")]
 *******
 4  你 0")]
 
-    // Horizontal with Justification.Centered
+    // Horizontal with alignment.Centered
     // LeftRight_TopBottom
     [InlineData ("0 2 4", Alignment.Left, Alignment.Centered, TextDirection.LeftRight_TopBottom, @"
 *******
@@ -4687,7 +4687,7 @@ B")]
 *******
 *******")]
 
-    // Horizontal with Justification.Justified
+    // Horizontal with alignment.Justified
     // LeftRight_TopBottom
     [InlineData ("0 2 4", Alignment.Left, Alignment.Justified, TextDirection.LeftRight_TopBottom, @"
 0 2 4**
@@ -4956,7 +4956,7 @@ B")]
 *******
 *******")]
 
-    // Vertical with Justification.Left
+    // Vertical with alignment.Left
     // TopBottom_LeftRight
     [InlineData ("0 2 4", Alignment.Left, Alignment.Top, TextDirection.TopBottom_LeftRight, @"
 0******
@@ -5225,7 +5225,7 @@ B")]
  ******
 0******")]
 
-    // Vertical with Justification.Right
+    // Vertical with alignment.Right
     // TopBottom_LeftRight
     [InlineData ("0 2 4", Alignment.Right, Alignment.Top, TextDirection.TopBottom_LeftRight, @"
 ******0
@@ -5494,7 +5494,7 @@ B")]
 ***** *
 *****0*")]
 
-    // Vertical with Justification.Centered
+    // Vertical with alignment.Centered
     // TopBottom_LeftRight
     [InlineData ("0 2 4", Alignment.Centered, Alignment.Top, TextDirection.TopBottom_LeftRight, @"
 ***0***
@@ -5763,7 +5763,7 @@ B")]
 ** ****
 **0****")]
 
-    // Vertical with Justification.Justified
+    // Vertical with alignment.Justified
     // TopBottom_LeftRight
     [InlineData ("0 2 4", Alignment.Justified, Alignment.Top, TextDirection.TopBottom_LeftRight, @"
 0******
@@ -6032,12 +6032,12 @@ B")]
  ******
 0******")]
 
-    public void Draw_Text_Justification (string text, Alignment horizontalTextJustification, Alignment justification, TextDirection textDirection, string expectedText)
+    public void Draw_Text_Justification (string text, Alignment horizontalTextAlignment, Alignment alignment, TextDirection textDirection, string expectedText)
     {
         TextFormatter tf = new ()
         {
-            Justification = horizontalTextJustification,
-            VerticalJustification = justification,
+            Alignment = horizontalTextAlignment,
+            VerticalAlignment = alignment,
             Direction = textDirection,
             Size = new (7, 7),
             Text = text

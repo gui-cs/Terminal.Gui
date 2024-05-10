@@ -153,7 +153,7 @@ public class CheckBox : View
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
-        switch (TextJustification)
+        switch (TextAlignment)
         {
             case Alignment.Left:
             case Alignment.Centered:

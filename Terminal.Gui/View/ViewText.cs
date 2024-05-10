@@ -34,7 +34,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         The text will be drawn starting at the view origin (0, 0) and will be formatted according
-    ///         to <see cref="TextJustification"/> and <see cref="TextDirection"/>.
+    ///         to <see cref="TextAlignment"/> and <see cref="TextDirection"/>.
     ///     </para>
     ///     <para>
     ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="ContentSize"/>'s height
@@ -80,19 +80,19 @@ public partial class View
     public event EventHandler<StateEventArgs<string>> TextChanged;
 
     /// <summary>
-    ///     Gets or sets how the View's <see cref="Text"/> is justified horizontally when drawn. Changing this property will
+    ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will
     ///     redisplay the <see cref="View"/>.
     /// </summary>
     /// <remarks>
     ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="Dim.DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
-    /// <value>The text justification.</value>
-    public virtual Alignment TextJustification
+    /// <value>The text alignment.</value>
+    public virtual Alignment TextAlignment
     {
-        get => TextFormatter.Justification;
+        get => TextFormatter.Alignment;
         set
         {
-            TextFormatter.Justification = value;
+            TextFormatter.Alignment = value;
             UpdateTextFormatterText ();
             OnResizeNeeded ();
         }
@@ -122,20 +122,20 @@ public partial class View
     public TextFormatter TextFormatter { get; init; } = new () { };
 
     /// <summary>
-    ///     Gets or sets how the View's <see cref="Text"/> is justified vertically when drawn. Changing this property will
+    ///     Gets or sets how the View's <see cref="Text"/> is aligned vertically when drawn. Changing this property will
     ///     redisplay
     ///     the <see cref="View"/>.
     /// </summary>
     /// <remarks>
     ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="Dim.DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
-    /// <value>The vertical text justification.</value>
-    public virtual Alignment VerticalTextJustification
+    /// <value>The vertical text alignment.</value>
+    public virtual Alignment VerticalTextAlignment
     {
-        get => TextFormatter.VerticalJustification;
+        get => TextFormatter.VerticalAlignment;
         set
         {
-            TextFormatter.VerticalJustification = value;
+            TextFormatter.VerticalAlignment = value;
             SetNeedsDisplay ();
         }
     }

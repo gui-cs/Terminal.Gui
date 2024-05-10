@@ -51,7 +51,7 @@ public class Dialog : Window
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;
-        ButtonJustification = DefaultButtonJustification;
+        ButtonAlignment = DefaultButtonAlignment;
 
         AddCommand (
                     Command.QuitToplevel,
@@ -96,9 +96,9 @@ public class Dialog : Window
         }
     }
 
-    // TODO: Update button.X = Pos.Justify when justification changes
-    /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are justified along the bottom of the dialog.</summary>
-    public Alignment ButtonJustification { get; set; }
+    // TODO: Update button.X = Pos.Justify when alignment changes
+    /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
+    public Alignment ButtonAlignment { get; set; }
 
     /// <summary>Optional buttons to lay out at the bottom of the dialog.</summary>
     public Button [] Buttons
@@ -122,7 +122,7 @@ public class Dialog : Window
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static Alignment DefaultButtonJustification { get; set; } = Alignment.Right;
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Right;
 
     /// <summary>
     ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
@@ -136,7 +136,7 @@ public class Dialog : Window
             return;
         }
 
-        button.X = Pos.Justify (ButtonJustification);
+        button.X = Pos.Align (ButtonAlignment);
         button.Y = Pos.AnchorEnd () - 1;
 
         _buttons.Add (button);

@@ -1,17 +1,17 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Justification"/> and
+///     Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> and
 ///     textual representation of cells (e.g. date formats)
 ///     <a href="../docs/tableview.md">See TableView Deep Dive for more information</a>.
 /// </summary>
 public class ColumnStyle
 {
     /// <summary>
-    ///     Defines a delegate for returning custom justification per cell based on cell values. When specified this will
-    ///     override <see cref="Justification"/>
+    ///     Defines a delegate for returning custom alignment per cell based on cell values. When specified this will
+    ///     override <see cref="Alignment"/>
     /// </summary>
-    public Func<object, Alignment> JustificationGetter;
+    public Func<object, Alignment> AlignmentGetter;
 
     /// <summary>
     ///     Defines a delegate for returning a custom color scheme per cell based on cell values. Return null for the
@@ -29,10 +29,10 @@ public class ColumnStyle
     private bool _visible = true;
 
     /// <summary>
-    ///     Defines the default justification for all values rendered in this column. For custom justification based on cell
-    ///     contents use <see cref="JustificationGetter"/>.
+    ///     Defines the default alignment for all values rendered in this column. For custom alignment based on cell
+    ///     contents use <see cref="AlignmentGetter"/>.
     /// </summary>
-    public Alignment Justification { get; set; }
+    public Alignment Alignment { get; set; }
 
     /// <summary>Defines the format for values e.g. "yyyy-MM-dd" for dates</summary>
     public string Format { get; set; }
@@ -69,19 +69,19 @@ public class ColumnStyle
     }
 
     /// <summary>
-    ///     Returns the justification for the cell based on <paramref name="cellValue"/> and <see cref="JustificationGetter"/>/
-    ///     <see cref="Justification"/>
+    ///     Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/
+    ///     <see cref="Alignment"/>
     /// </summary>
     /// <param name="cellValue"></param>
     /// <returns></returns>
-    public Alignment GetJustification (object cellValue)
+    public Alignment GetAlignment (object cellValue)
     {
-        if (JustificationGetter is { })
+        if (AlignmentGetter is { })
         {
-            return JustificationGetter (cellValue);
+            return AlignmentGetter (cellValue);
         }
 
-        return Justification;
+        return Alignment;
     }
 
     /// <summary>

@@ -46,6 +46,14 @@ namespace Terminal.Gui;
 ///             </item>
 ///             <item>
 ///                 <term>
+///                     <see cref="Pos.Align()"/>
+///                 </term>
+///                 <description>
+///                     Creates a <see cref="Pos"/> object that aligns a set of views.
+///                 </description>
+///             </item>
+///             <item>
+///                 <term>
 ///                     <see cref="Pos.AnchorEnd()"/>
 ///                 </term>
 ///                 <description>
@@ -206,12 +214,12 @@ public class Pos
 
 
     /// <summary>
-    ///      Creates a <see cref="Pos"/> object that justifies a set of views according to the specified justification.
+    ///      Creates a <see cref="Pos"/> object that aligns a set of views according to the specified alignment setting.
     /// </summary>
-    /// <param name="justification"></param>
-    /// <param name="groupId">The optional, unique identifier for the set of views to justify according to <paramref name="justification"/>.</param>
+    /// <param name="alignment"></param>
+    /// <param name="groupId">The optional, unique identifier for the set of views to align according to <paramref name="alignment"/>.</param>
     /// <returns></returns>
-    public static Pos Justify (Alignment justification, int groupId = 0) { return new PosJustify (justification, groupId); }
+    public static Pos Align (Alignment alignment, int groupId = 0) { return new PosAlign (alignment, groupId); }
 
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
@@ -496,47 +504,45 @@ public class Pos
 
 
     /// <summary>
-    /// Enables justification of a set of views.
+    /// Enables alignment of a set of views.
     /// </summary>
     /// <remarks>
     /// <para>
-    ///     The Group ID is used to identify a set of views that should be justified together. When only a single
-    ///     set of views is justified, setting the Group ID is not needed because it defaults to 0.
+    ///     The Group ID is used to identify a set of views that should be alignment together. When only a single
+    ///     set of views is aligned, setting the Group ID is not needed because it defaults to 0.
     /// </para>
     /// <para>
-    ///     The first view added to the Superview with a given Group ID is used to determine the justification of the group.
-    ///     The justification is applied to all views with the same Group ID.
+    ///     The first view added to the Superview with a given Group ID is used to determine the alignment of the group.
+    ///     The alignment is applied to all views with the same Group ID.
     /// </para>
     /// </remarks>
-    public class PosJustify : Pos
+    public class PosAlign : Pos
     {
-        // TODO: Figure out how to invalidate _location if Justifier changes.
-
         /// <summary>
         /// The cached location. Used to store the calculated location to avoid recalculating it.
         /// </summary>
         private int? _location;
 
         /// <summary>
-        /// Gets the identifier of a set of views that should be justified together. When only a single
-        /// set of views is justified, setting the <see cref="_groupId"/> is not needed because it defaults to 0.
+        /// Gets the identifier of a set of views that should be aligned together. When only a single
+        /// set of views is aligned, setting the <see cref="_groupId"/> is not needed because it defaults to 0.
         /// </summary>
         private readonly int _groupId;
 
         /// <summary>
-        /// Gets the justification settings.
+        /// Gets the alignment settings.
         /// </summary>
-        public Aligner Justifier { get; } = new ();
+        public Aligner Aligner { get; } = new ();
 
 
         /// <summary>
-        /// Justifies the views in <paramref name="views"/> that have the same group ID as <paramref name="groupId"/>.
+        /// Aligns the views in <paramref name="views"/> that have the same group ID as <paramref name="groupId"/>.
         /// </summary>
         /// <param name="groupId"></param>
         /// <param name="views"></param>
         /// <param name="dimension"></param>
         /// <param name="size"></param>
-        private static void JustifyGroup (int groupId, IList<View> views, Dim.Dimension dimension, int size)
+        private static void AlignGroup (int groupId, IList<View> views, Dim.Dimension dimension, int size)
         {
             if (views is null)
             {
@@ -547,14 +553,14 @@ public class Pos
             List<View> viewsInGroup = views.Where (
                                                    v =>
                                                    {
-                                                       if (dimension == Dimension.Width && v.X is PosJustify justifyX)
+                                                       if (dimension == Dimension.Width && v.X is PosAlign alignX)
                                                        {
-                                                           return justifyX._groupId == groupId;
+                                                           return alignX._groupId == groupId;
                                                        }
 
-                                                       if (dimension == Dimension.Height && v.Y is PosJustify justifyY)
+                                                       if (dimension == Dimension.Height && v.Y is PosAlign alignY)
                                                        {
-                                                           return justifyY._groupId == groupId;
+                                                           return alignY._groupId == groupId;
                                                        }
 
                                                        return false;
@@ -566,13 +572,13 @@ public class Pos
 
             foreach (var view in viewsInGroup)
             {
-                var posJustify = dimension == Dimension.Width ? view.X as PosJustify : view.Y as PosJustify;
+                var posAlign = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
 
-                if (posJustify is { })
+                if (posAlign is { })
                 {
                     if (firstInGroup is null)
                     {
-                        firstInGroup = posJustify.Justifier;
+                        firstInGroup = posAlign.Aligner;
                     }
 
                     dimensionsList.Add (dimension == Dimension.Width ? view.Frame.Width : view.Frame.Height);
@@ -590,29 +596,29 @@ public class Pos
             for (var index = 0; index < viewsInGroup.Count; index++)
             {
                 View view = viewsInGroup [index];
-                PosJustify justify = dimension == Dimension.Width ? view.X as PosJustify : view.Y as PosJustify;
+                PosAlign align = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
 
-                if (justify is { })
+                if (align is { })
                 {
-                    justify._location = locations [index];
+                    align._location = locations [index];
                 }
             }
         }
 
         /// <summary>
-        /// Enables justification of a set of views.
+        /// Enables alignment of a set of views.
         /// </summary>
-        /// <param name="justification"></param>
-        /// <param name="groupId">The unique identifier for the set of views to justify according to <paramref name="justification"/>.</param>
-        public PosJustify (Alignment justification, int groupId = 0)
+        /// <param name="alignment"></param>
+        /// <param name="groupId">The unique identifier for the set of views to align according to <paramref name="alignment"/>.</param>
+        public PosAlign (Alignment alignment, int groupId = 0)
         {
-            Justifier.PutSpaceBetweenItems = true;
-            Justifier.Alignment = justification;
+            Aligner.PutSpaceBetweenItems = true;
+            Aligner.Alignment = alignment;
             _groupId = groupId;
-            Justifier.PropertyChanged += Justifier_PropertyChanged;
+            Aligner.PropertyChanged += Aligner_PropertyChanged;
         }
 
-        private void Justifier_PropertyChanged (object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Aligner_PropertyChanged (object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             _location = null;
         }
@@ -620,19 +626,19 @@ public class Pos
         /// <inheritdoc />
         public override bool Equals (object other)
         {
-            return other is PosJustify justify && _groupId == justify._groupId && _location == justify._location && justify.Justifier.Equals (Justifier);
+            return other is PosAlign align && _groupId == align._groupId && _location == align._location && align.Aligner.Equals (Aligner);
         }
 
         /// <inheritdoc />
         public override int GetHashCode ()
         {
-            return Justifier.GetHashCode () ^ _groupId.GetHashCode ();
+            return Aligner.GetHashCode () ^ _groupId.GetHashCode ();
         }
 
         /// <inheritdoc />
         public override string ToString ()
         {
-            return $"Justify(groupId={_groupId}, justification={Justifier.Alignment})";
+            return $"Align(groupId={_groupId}, alignment={Aligner.Alignment})";
         }
 
         internal override int Anchor (int width)
@@ -642,7 +648,7 @@ public class Pos
 
         internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
         {
-            if (_location.HasValue && Justifier.ContainerSize == superviewDimension)
+            if (_location.HasValue && Aligner.ContainerSize == superviewDimension)
             {
                 return _location.Value;
             }
@@ -652,7 +658,7 @@ public class Pos
                 return 0;
             }
 
-            JustifyGroup (_groupId, us.SuperView.Subviews, dimension, superviewDimension);
+            AlignGroup (_groupId, us.SuperView.Subviews, dimension, superviewDimension);
 
             if (_location.HasValue)
             {

@@ -32,7 +32,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonJustification = Alignment.Centered,
+            ButtonAlignment = Alignment.Centered,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -57,7 +57,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonJustification = Alignment.Justified,
+            ButtonAlignment = Alignment.Justified,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -82,7 +82,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonJustification = Alignment.Right,
+            ButtonAlignment = Alignment.Right,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -107,7 +107,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonJustification = Alignment.Left,
+            ButtonAlignment = Alignment.Left,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -129,7 +129,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonJustification_Four ()
+    public void ButtonAlignment_Four ()
     {
         RunState runstate = null;
 
@@ -219,7 +219,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonJustification_Four_On_Too_Small_Width ()
+    public void ButtonAlignment_Four_On_Too_Small_Width ()
     {
         RunState runstate = null;
 
@@ -312,7 +312,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonJustification_Four_WideOdd ()
+    public void ButtonAlignment_Four_WideOdd ()
     {
         RunState runstate = null;
 
@@ -404,7 +404,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonJustification_Four_Wider ()
+    public void ButtonAlignment_Four_Wider ()
     {
         RunState runstate = null;
 
@@ -498,7 +498,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonJustification_One ()
+    public void ButtonAlignment_One ()
     {
         var d = (FakeDriver)Driver;
         RunState runstate = null;
@@ -636,7 +636,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonJustification_Three ()
+    public void ButtonAlignment_Three ()
     {
         RunState runstate = null;
 
@@ -720,7 +720,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonJustification_Two ()
+    public void ButtonAlignment_Two ()
     {
         RunState runstate = null;
 
@@ -798,7 +798,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonJustification_Two_Hidden ()
+    public void ButtonAlignment_Two_Hidden ()
     {
         RunState runstate = null;
         var firstIteration = false;
@@ -889,7 +889,7 @@ public class DialogTests
 
         win.Loaded += (s, a) =>
                       {
-                          Dialog.DefaultButtonJustification = Alignment.Centered;
+                          Dialog.DefaultButtonAlignment = Alignment.Centered;
                           var dlg = new Dialog { Width = 18, Height = 3, Buttons = [new () { Text = "Ok" }] };
 
                           dlg.Loaded += (s, a) =>
@@ -973,7 +973,7 @@ public class DialogTests
         var win = new Window ();
 
         int iterations = -1;
-        Dialog.DefaultButtonJustification = Alignment.Centered;
+        Dialog.DefaultButtonAlignment = Alignment.Centered;
 
         Iteration += (s, a) =>
                      {
@@ -1008,7 +1008,7 @@ public class DialogTests
     public void Dialog_Opened_From_Another_Dialog ()
     {
         ((FakeDriver)Driver).SetBufferSize (30, 10);
-        Dialog.DefaultButtonJustification = Alignment.Centered;
+        Dialog.DefaultButtonAlignment = Alignment.Centered;
 
         var btn1 = new Button { Text = "press me 1" };
         Button btn2 = null;
@@ -1359,7 +1359,7 @@ public class DialogTests
             Y = 0,
             Width = width,
             Height = 1,
-            ButtonJustification = align,
+            ButtonAlignment = align,
             Buttons = btns
         };
 

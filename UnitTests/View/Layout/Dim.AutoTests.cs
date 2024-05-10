@@ -681,11 +681,11 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.Justification = Alignment.Justified;
+        view.TextFormatter.Alignment = Alignment.Justified;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.VerticalJustification = Alignment.Centered;
+        view.TextFormatter.VerticalAlignment = Alignment.Centered;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
@@ -709,11 +709,11 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextJustification = Alignment.Justified;
+        view.TextAlignment = Alignment.Justified;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.VerticalTextJustification = Alignment.Centered;
+        view.VerticalTextAlignment = Alignment.Centered;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
@@ -738,7 +738,7 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.True (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
-        view.TextJustification = Alignment.Justified;
+        view.TextAlignment = Alignment.Justified;
         Assert.True (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
@@ -747,7 +747,7 @@ public class DimAutoTests (ITestOutputHelper output)
             Text = "_1234",
             Width = Dim.Auto ()
         };
-        view.VerticalTextJustification = Alignment.Centered;
+        view.VerticalTextAlignment = Alignment.Centered;
         Assert.True (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 

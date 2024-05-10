@@ -247,7 +247,7 @@ public class ListColumns : Scenario
             Text = "0,0",
 
             Width = Dim.Fill (),
-            TextJustification = Alignment.Right
+            TextAlignment = Alignment.Right
         };
 
         Win.Add (selectedCellLabel);

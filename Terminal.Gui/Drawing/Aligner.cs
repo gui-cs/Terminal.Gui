@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui;
 
@@ -15,7 +14,8 @@ public enum Alignment
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If the container is smaller than the total size of the items, the right items will be clipped (their locations will be greater than the container size).
+    ///         If the container is smaller than the total size of the items, the right items will be clipped (their locations
+    ///         will be greater than the container size).
     ///     </para>
     /// </remarks>
     /// <example>
@@ -39,7 +39,8 @@ public enum Alignment
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If the container is smaller than the total size of the items, the left items will be clipped (their locations will be negative).
+    ///         If the container is smaller than the total size of the items, the left items will be clipped (their locations
+    ///         will be negative).
     ///     </para>
     /// </remarks>
     /// <example>
@@ -99,7 +100,8 @@ public enum Alignment
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If the container is smaller than the total size of the items, the right items will be clipped (their locations will be greater than the container size).
+    ///         If the container is smaller than the total size of the items, the right items will be clipped (their locations
+    ///         will be greater than the container size).
     ///     </para>
     /// </remarks>
     /// <example>
@@ -123,7 +125,8 @@ public enum Alignment
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If the container is smaller than the total size of the items, the left items will be clipped (their locations will be negative).
+    ///         If the container is smaller than the total size of the items, the left items will be clipped (their locations
+    ///         will be negative).
     ///     </para>
     /// </remarks>
     /// <example>
@@ -138,7 +141,7 @@ public enum Alignment
     ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
-    LastBottomRestTop = LastRightRestLeft,
+    LastBottomRestTop = LastRightRestLeft
 }
 
 /// <summary>
@@ -157,7 +160,7 @@ public class Aligner : INotifyPropertyChanged
         set
         {
             _alignment = value;
-            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (Alignment)));
+            PropertyChanged?.Invoke (this, new (nameof (Alignment)));
         }
     }
 
@@ -172,7 +175,7 @@ public class Aligner : INotifyPropertyChanged
         set
         {
             _containerSize = value;
-            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (ContainerSize)));
+            PropertyChanged?.Invoke (this, new (nameof (ContainerSize)));
         }
     }
 
@@ -185,8 +188,9 @@ public class Aligner : INotifyPropertyChanged
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///        If the total size of the items is greater than the container size, the space between items will be ignored starting
-    ///        from the right.
+    ///         If the total size of the items is greater than the container size, the space between items will be ignored
+    ///         starting
+    ///         from the right.
     ///     </para>
     /// </remarks>
     public bool PutSpaceBetweenItems
@@ -195,11 +199,11 @@ public class Aligner : INotifyPropertyChanged
         set
         {
             _putSpaceBetweenItems = value;
-            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (PutSpaceBetweenItems)));
+            PropertyChanged?.Invoke (this, new (nameof (PutSpaceBetweenItems)));
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event PropertyChangedEventHandler PropertyChanged;
 
     /// <summary>

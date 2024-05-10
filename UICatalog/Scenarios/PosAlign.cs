@@ -5,13 +5,13 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("PosJustification", "Shows off Pos.Justify")]
+[ScenarioMetadata ("Pos.Align", "Shows off Pos.Align")]
 [ScenarioCategory ("Layout")]
-public sealed class PosJustification : Scenario
+public sealed class PosAlign : Scenario
 {
-    private readonly Aligner _horizJustifier = new ();
+    private readonly Aligner _horizAligner = new ();
     private int _leftMargin;
-    private readonly Aligner _vertJustifier = new ();
+    private readonly Aligner _vertAligner = new ();
     private int _topMargin;
 
     public override void Main ()
@@ -43,53 +43,53 @@ public sealed class PosJustification : Scenario
     {
         ColorScheme colorScheme = Colors.ColorSchemes ["Toplevel"];
 
-        RadioGroup justification = new ()
+        RadioGroup alignRadioGroup = new ()
         {
-            X = Pos.Justify (_horizJustifier.Alignment),
+            X = Pos.Align (_horizAligner.Alignment),
             Y = Pos.Center (),
             RadioLabels = GetUniqueEnumNames<Alignment> (false).ToArray (),
             ColorScheme = colorScheme
         };
 
-        justification.SelectedItemChanged += (s, e) =>
+        alignRadioGroup.SelectedItemChanged += (s, e) =>
                                              {
-                                                 _horizJustifier.Alignment =
-                                                     (Alignment)Enum.Parse (typeof (Alignment), justification.SelectedItem.ToString ());
+                                                 _horizAligner.Alignment =
+                                                     (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.SelectedItem.ToString ());
 
-                                                 foreach (View view in appWindow.Subviews.Where (v => v.X is Pos.PosJustify))
+                                                 foreach (View view in appWindow.Subviews.Where (v => v.X is Pos.PosAlign))
                                                  {
-                                                     if (view.X is Pos.PosJustify j)
+                                                     if (view.X is Pos.PosAlign j)
                                                      {
-                                                         var newJust = new Pos.PosJustify (_horizJustifier.Alignment)
+                                                         var newJust = new Pos.PosAlign (_horizAligner.Alignment)
                                                          {
-                                                             Justifier =
+                                                             Aligner =
                                                              {
-                                                                 PutSpaceBetweenItems = _horizJustifier.PutSpaceBetweenItems
+                                                                 PutSpaceBetweenItems = _horizAligner.PutSpaceBetweenItems
                                                              }
                                                          };
                                                          view.X = newJust;
                                                      }
                                                  }
                                              };
-        appWindow.Add (justification);
+        appWindow.Add (alignRadioGroup);
 
         CheckBox putSpaces = new ()
         {
-            X = Pos.Justify (_horizJustifier.Alignment),
-            Y = Pos.Top (justification),
+            X = Pos.Align (_horizAligner.Alignment),
+            Y = Pos.Top (alignRadioGroup),
             ColorScheme = colorScheme,
             Text = "Spaces"
         };
 
         putSpaces.Toggled += (s, e) =>
                              {
-                                 _horizJustifier.PutSpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
+                                 _horizAligner.PutSpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
 
-                                 foreach (View view in appWindow.Subviews.Where (v => v.X is Pos.PosJustify))
+                                 foreach (View view in appWindow.Subviews.Where (v => v.X is Pos.PosAlign))
                                  {
-                                     if (view.X is Pos.PosJustify j)
+                                     if (view.X is Pos.PosAlign j)
                                      {
-                                         j.Justifier.PutSpaceBetweenItems = _horizJustifier.PutSpaceBetweenItems;
+                                         j.Aligner.PutSpaceBetweenItems = _horizAligner.PutSpaceBetweenItems;
                                      }
                                  }
                              };
@@ -107,10 +107,10 @@ public sealed class PosJustification : Scenario
                           {
                               _leftMargin = e.NewValue is { } && e.NewValue.Value ? 1 : 0;
 
-                              foreach (View view in appWindow.Subviews.Where (v => v.X is Pos.PosJustify))
+                              foreach (View view in appWindow.Subviews.Where (v => v.X is Pos.PosAlign))
                               {
                                   // Skip the justification radio group
-                                  if (view != justification)
+                                  if (view != alignRadioGroup)
                                   {
                                       view.Margin.Thickness = new (_leftMargin, 0, 0, 0);
                                   }
@@ -125,15 +125,15 @@ public sealed class PosJustification : Scenario
         addedViews.Add (
                         new()
                         {
-                            X = Pos.Justify (_horizJustifier.Alignment),
+                            X = Pos.Align (_horizAligner.Alignment),
                             Y = Pos.Center (),
                             Text = NumberToWords.Convert (0)
                         });
 
         Buttons.NumericUpDown<int> addedViewsUpDown = new Buttons.NumericUpDown<int>
         {
-            X = Pos.Justify (_horizJustifier.Alignment),
-            Y = Pos.Top (justification),
+            X = Pos.Align (_horizAligner.Alignment),
+            Y = Pos.Top (alignRadioGroup),
             Width = 9,
             Title = "Added",
             ColorScheme = colorScheme,
@@ -171,7 +171,7 @@ public sealed class PosJustification : Scenario
                                                   {
                                                       var button = new Button
                                                       {
-                                                          X = Pos.Justify (_horizJustifier.Alignment),
+                                                          X = Pos.Align (_horizAligner.Alignment),
                                                           Y = Pos.Center (),
                                                           Text = NumberToWords.Convert (i + 1)
                                                       };
@@ -189,53 +189,53 @@ public sealed class PosJustification : Scenario
     {
         ColorScheme colorScheme = Colors.ColorSchemes ["Error"];
 
-        RadioGroup justification = new ()
+        RadioGroup alignRadioGroup = new ()
         {
             X = 0,
-            Y = Pos.Justify (_vertJustifier.Alignment),
+            Y = Pos.Align (_vertAligner.Alignment),
             RadioLabels = GetUniqueEnumNames<Alignment> (true).Reverse ().ToArray (),
             ColorScheme = colorScheme
         };
 
-        justification.SelectedItemChanged += (s, e) =>
+        alignRadioGroup.SelectedItemChanged += (s, e) =>
                                              {
-                                                 _vertJustifier.Alignment =
-                                                     (Alignment)Enum.Parse (typeof (Alignment), justification.SelectedItem.ToString ());
+                                                 _vertAligner.Alignment =
+                                                     (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.SelectedItem.ToString ());
 
-                                                 foreach (View view in appWindow.Subviews.Where (v => v.Y is Pos.PosJustify))
+                                                 foreach (View view in appWindow.Subviews.Where (v => v.Y is Pos.PosAlign))
                                                  {
-                                                     if (view.Y is Pos.PosJustify j)
+                                                     if (view.Y is Pos.PosAlign j)
                                                      {
-                                                         var newJust = new Pos.PosJustify (_vertJustifier.Alignment)
+                                                         var newJust = new Pos.PosAlign (_vertAligner.Alignment)
                                                          {
-                                                             Justifier =
+                                                             Aligner =
                                                              {
-                                                                 PutSpaceBetweenItems = _vertJustifier.PutSpaceBetweenItems
+                                                                 PutSpaceBetweenItems = _vertAligner.PutSpaceBetweenItems
                                                              }
                                                          };
                                                          view.Y = newJust;
                                                      }
                                                  }
                                              };
-        appWindow.Add (justification);
+        appWindow.Add (alignRadioGroup);
 
         CheckBox putSpaces = new ()
         {
             X = 0,
-            Y = Pos.Justify (_vertJustifier.Alignment),
+            Y = Pos.Align (_vertAligner.Alignment),
             ColorScheme = colorScheme,
             Text = "Spaces"
         };
 
         putSpaces.Toggled += (s, e) =>
                              {
-                                 _vertJustifier.PutSpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
+                                 _vertAligner.PutSpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
 
-                                 foreach (View view in appWindow.Subviews.Where (v => v.Y is Pos.PosJustify))
+                                 foreach (View view in appWindow.Subviews.Where (v => v.Y is Pos.PosAlign))
                                  {
-                                     if (view.Y is Pos.PosJustify j)
+                                     if (view.Y is Pos.PosAlign j)
                                      {
-                                         j.Justifier.PutSpaceBetweenItems = _vertJustifier.PutSpaceBetweenItems;
+                                         j.Aligner.PutSpaceBetweenItems = _vertAligner.PutSpaceBetweenItems;
                                      }
                                  }
                              };
@@ -253,10 +253,10 @@ public sealed class PosJustification : Scenario
                           {
                               _topMargin = e.NewValue is { } && e.NewValue.Value ? 1 : 0;
 
-                              foreach (View view in appWindow.Subviews.Where (v => v.Y is Pos.PosJustify))
+                              foreach (View view in appWindow.Subviews.Where (v => v.Y is Pos.PosAlign))
                               {
                                   // Skip the justification radio group
-                                  if (view != justification)
+                                  if (view != alignRadioGroup)
                                   {
                                       view.Margin.Thickness = new (0, _topMargin, 0, 0);
                                   }
@@ -272,14 +272,14 @@ public sealed class PosJustification : Scenario
                         new()
                         {
                             X = 0,
-                            Y = Pos.Justify (_vertJustifier.Alignment),
+                            Y = Pos.Align (_vertAligner.Alignment),
                             Text = NumberToWords.Convert (0)
                         });
 
         Buttons.NumericUpDown<int> addedViewsUpDown = new Buttons.NumericUpDown<int>
         {
             X = 0,
-            Y = Pos.Justify (_vertJustifier.Alignment),
+            Y = Pos.Align (_vertAligner.Alignment),
             Width = 9,
             Title = "Added",
             ColorScheme = colorScheme,
@@ -318,7 +318,7 @@ public sealed class PosJustification : Scenario
                                                       var button = new CheckBox
                                                       {
                                                           X = 0,
-                                                          Y = Pos.Justify (_vertJustifier.Alignment),
+                                                          Y = Pos.Align (_vertAligner.Alignment),
                                                           Text = NumberToWords.Convert (i + 1)
                                                       };
                                                       appWindow.Add (button);
@@ -375,8 +375,8 @@ public sealed class PosJustification : Scenario
                 Width = 5
             };
 
-            v.X = Pos.Justify (Alignment.Right, i / 3);
-            v.Y = Pos.Justify (Alignment.Justified, i % 3 + 10);
+            v.X = Pos.Align (Alignment.Right, i / 3);
+            v.Y = Pos.Align (Alignment.Justified, i % 3 + 10);
 
             container.Add (v);
         }

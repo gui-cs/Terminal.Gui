@@ -244,14 +244,14 @@ public class CheckBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void TextJustification_Centered ()
+    public void TextAlignment_Centered ()
     {
         var checkBox = new CheckBox
         {
             X = 1,
             Y = Pos.Center (),
             Text = "Check this out 你",
-            TextJustification = Alignment.Centered,
+            TextAlignment = Alignment.Centered,
             Width = 25
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
@@ -262,7 +262,7 @@ public class CheckBoxTests
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
-        Assert.Equal (Alignment.Centered, checkBox.TextJustification);
+        Assert.Equal (Alignment.Centered, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
         Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
 
@@ -294,14 +294,14 @@ public class CheckBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void TextJustification_Justified ()
+    public void TextAlignment_Justified ()
     {
         var checkBox1 = new CheckBox
         {
             X = 1,
             Y = Pos.Center (),
             Text = "Check first out 你",
-            TextJustification = Alignment.Justified,
+            TextAlignment = Alignment.Justified,
             Width = 25
         };
 
@@ -310,7 +310,7 @@ public class CheckBoxTests
             X = 1,
             Y = Pos.Bottom (checkBox1),
             Text = "Check second out 你",
-            TextJustification = Alignment.Justified,
+            TextAlignment = Alignment.Justified,
             Width = 25
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
@@ -321,9 +321,9 @@ public class CheckBoxTests
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 6);
 
-        Assert.Equal (Alignment.Justified, checkBox1.TextJustification);
+        Assert.Equal (Alignment.Justified, checkBox1.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
-        Assert.Equal (Alignment.Justified, checkBox2.TextJustification);
+        Assert.Equal (Alignment.Justified, checkBox2.TextAlignment);
         Assert.Equal (new (1, 2, 25, 1), checkBox2.Frame);
  
         var expected = @$"
@@ -361,7 +361,7 @@ public class CheckBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void TextJustification_Left ()
+    public void TextAlignment_Left ()
     {
         var checkBox = new CheckBox
         {
@@ -378,7 +378,7 @@ public class CheckBoxTests
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
-        Assert.Equal (Alignment.Left, checkBox.TextJustification);
+        Assert.Equal (Alignment.Left, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
         Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
 
@@ -410,14 +410,14 @@ public class CheckBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void TextJustification_Right ()
+    public void TextAlignment_Right ()
     {
         var checkBox = new CheckBox
         {
             X = 1,
             Y = Pos.Center (),
             Text = "Check this out 你",
-            TextJustification = Alignment.Right,
+            TextAlignment = Alignment.Right,
             Width = 25
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
@@ -428,7 +428,7 @@ public class CheckBoxTests
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
-        Assert.Equal (Alignment.Right, checkBox.TextJustification);
+        Assert.Equal (Alignment.Right, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
         Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
 

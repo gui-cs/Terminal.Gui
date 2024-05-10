@@ -539,7 +539,7 @@ namespace Terminal.Gui
             {
                 int c = _provider.Cursor (mouseEvent.X - GetMargins (Viewport.Width).left);
 
-                if (_provider.Fixed == false && TextJustification == Alignment.Right && Text.Length > 0)
+                if (_provider.Fixed == false && TextAlignment == Alignment.Right && Text.Length > 0)
                 {
                     c++;
                 }
@@ -633,7 +633,7 @@ namespace Terminal.Gui
             // When it's right-aligned and it's a normal input, the cursor behaves differently.
             int curPos;
 
-            if (_provider?.Fixed == false && TextJustification == Alignment.Right)
+            if (_provider?.Fixed == false && TextAlignment == Alignment.Right)
             {
                 curPos = _cursorPosition + left - 1;
             }
@@ -650,7 +650,7 @@ namespace Terminal.Gui
         /// <returns></returns>
         private bool BackspaceKeyHandler ()
         {
-            if (_provider.Fixed == false && TextJustification == Alignment.Right && _cursorPosition <= 1)
+            if (_provider.Fixed == false && TextAlignment == Alignment.Right && _cursorPosition <= 1)
             {
                 return false;
             }
@@ -688,7 +688,7 @@ namespace Terminal.Gui
         /// <returns></returns>
         private bool DeleteKeyHandler ()
         {
-            if (_provider.Fixed == false && TextJustification == Alignment.Right)
+            if (_provider.Fixed == false && TextAlignment == Alignment.Right)
             {
                 _cursorPosition = _provider.CursorLeft (_cursorPosition);
             }
@@ -709,7 +709,7 @@ namespace Terminal.Gui
             return true;
         }
 
-        /// <summary>Margins for text justification.</summary>
+        /// <summary>Margins for text alignment.</summary>
         /// <param name="width">Total width</param>
         /// <returns>Left and right margins</returns>
         private (int left, int right) GetMargins (int width)
@@ -717,7 +717,7 @@ namespace Terminal.Gui
             int count = Text.Length;
             int total = width - count;
 
-            switch (TextJustification)
+            switch (TextAlignment)
             {
                 case Alignment.Left:
                     return (0, total);

@@ -340,8 +340,8 @@ public static class MessageBox
             }
         }
 
-        Alignment buttonJust = Dialog.DefaultButtonJustification;
-        Dialog.DefaultButtonJustification = Alignment.Centered;
+        Alignment buttonJust = Dialog.DefaultButtonAlignment;
+        Dialog.DefaultButtonAlignment = Alignment.Centered;
         var d = new Dialog
         {
             Buttons = buttonList.ToArray (),
@@ -350,7 +350,7 @@ public static class MessageBox
             Width = Dim.Percent (60),
             Height = 5 // Border + one line of text + vspace + buttons
         };
-        Dialog.DefaultButtonJustification = buttonJust;
+        Dialog.DefaultButtonAlignment = buttonJust;
 
         if (width != 0)
         {
@@ -374,7 +374,7 @@ public static class MessageBox
         var messageLabel = new Label
         {
             Text = message,
-            TextJustification = Alignment.Centered,
+            TextAlignment = Alignment.Centered,
             X = Pos.Center (),
             Y = 0
         };
