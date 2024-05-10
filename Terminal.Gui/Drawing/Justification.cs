@@ -13,6 +13,11 @@ public enum Justification
     ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the container is smaller than the total size of the items, the right items will be clipped (their locations will be greater than the container size).
+    ///     </para>
+    /// </remarks>
     /// <example>
     ///     <c>
     ///         111 2222 33333
@@ -32,6 +37,11 @@ public enum Justification
     ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the container is smaller than the total size of the items, the left items will be clipped (their locations will be negative).
+    ///     </para>
+    /// </remarks>
     /// <example>
     ///     <c>
     ///         111 2222 33333
@@ -52,6 +62,11 @@ public enum Justification
     ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Extra space will be distributed between the items, biased towards the left.
+    ///     </para>
+    /// </remarks>
     /// <example>
     ///     <c>
     ///         111 2222 33333
@@ -65,6 +80,11 @@ public enum Justification
     ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Extra space will be distributed between the items, biased towards the left.
+    ///     </para>
+    /// </remarks>
     /// <example>
     ///     <c>
     ///         111    2222     33333
@@ -77,6 +97,11 @@ public enum Justification
     ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the container is smaller than the total size of the items, the right items will be clipped (their locations will be greater than the container size).
+    ///     </para>
+    /// </remarks>
     /// <example>
     ///     <c>
     ///         111        2222 33333
@@ -96,6 +121,11 @@ public enum Justification
     ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the container is smaller than the total size of the items, the left items will be clipped (their locations will be negative).
+    ///     </para>
+    /// </remarks>
     /// <example>
     ///     <c>
     ///         111 2222        33333
@@ -153,6 +183,12 @@ public class Justifier : INotifyPropertyChanged
     ///     <see langword="false"/>. If <see langword="true"/>, a space will be
     ///     placed between each item, which is useful for justifying text.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///        If the total size of the items is greater than the container size, the space between items will be ignored starting
+    ///        from the right.
+    ///     </para>
+    /// </remarks>
     public bool PutSpaceBetweenItems
     {
         get => _putSpaceBetweenItems;
@@ -234,7 +270,7 @@ public class Justifier : INotifyPropertyChanged
 
                 break;
             case Justification.Right:
-                currentPosition = Math.Max (0, containerSize - totalItemsSize - spaces);
+                currentPosition = containerSize - totalItemsSize - spaces;
 
                 for (var i = 0; i < sizes.Length; i++)
                 {
@@ -297,7 +333,14 @@ public class Justifier : INotifyPropertyChanged
             case Justification.LastRightRestLeft:
                 if (sizes.Length > 1)
                 {
-                    currentPosition = 0;
+                    if (totalItemsSize > containerSize)
+                    {
+                        currentPosition = containerSize - totalItemsSize - spaces;
+                    }
+                    else
+                    {
+                        currentPosition = 0;
+                    }
 
                     for (var i = 0; i < sizes.Length; i++)
                     {
@@ -337,7 +380,7 @@ public class Justifier : INotifyPropertyChanged
                         if (i == sizes.Length - 1)
                         {
                             // start at right
-                            currentPosition = containerSize - sizes [i];
+                            currentPosition = Math.Max (totalItemsSize, containerSize) - sizes [i];
                             positions [i] = currentPosition;
                         }
 

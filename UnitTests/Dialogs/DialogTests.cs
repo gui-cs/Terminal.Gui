@@ -39,7 +39,7 @@ public class DialogTests
         // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
         dlg.Border.Thickness = new (1, 0, 1, 0);
         runstate = Begin (dlg);
-        var buttonRow = $"{CM.Glyphs.VLine}     {btn1}    {CM.Glyphs.VLine}";
+        var buttonRow = $"{CM.Glyphs.VLine}    {btn1}     {CM.Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         // Now add a second button
@@ -64,7 +64,7 @@ public class DialogTests
         // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
         dlg.Border.Thickness = new (1, 0, 1, 0);
         runstate = Begin (dlg);
-        buttonRow = $"{CM.Glyphs.VLine}         {btn1}{CM.Glyphs.VLine}";
+        buttonRow = $"{CM.Glyphs.VLine}{btn1}         {CM.Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         // Now add a second button
@@ -166,7 +166,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Justify
-        buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2}  {btn3}  {btn4}{CM.Glyphs.VLine}";
+        buttonRow = $"{CM.Glyphs.VLine}{btn1}  {btn2}  {btn3} {btn4}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = RunButtonTestDialog (
@@ -243,7 +243,7 @@ public class DialogTests
 
         // Default - Center
         buttonRow =
-            $"{CM.Glyphs.VLine}es {CM.Glyphs.RightBracket} {btn2} {btn3} {CM.Glyphs.LeftBracket} neve{CM.Glyphs.VLine}";
+            $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} yes {CM.Glyphs.RightBracket}{btn2}{btn3}{CM.Glyphs.LeftBracket} neve{CM.Glyphs.VLine}";
 
         (runstate, Dialog dlg) = RunButtonTestDialog (
                                                       title,
@@ -277,7 +277,8 @@ public class DialogTests
         dlg.Dispose ();
 
         // Right
-        buttonRow = $"{CM.Glyphs.VLine}{CM.Glyphs.RightBracket} {btn2} {btn3} {btn4}{CM.Glyphs.VLine}";
+        buttonRow = $"{CM.Glyphs.VLine}es {CM.Glyphs.RightBracket}{btn2}{btn3}{btn4}{CM.Glyphs.VLine}";
+        Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
@@ -293,7 +294,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Left
-        buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2} {btn3} {CM.Glyphs.LeftBracket} n{CM.Glyphs.VLine}";
+        buttonRow = $"{CM.Glyphs.VLine}{btn1}{btn2}{btn3}{CM.Glyphs.LeftBracket} neve{CM.Glyphs.VLine}";
 
         (runstate, dlg) = RunButtonTestDialog (
                                                     title,
@@ -527,7 +528,7 @@ public class DialogTests
 
         // Justify 
         buttonRow =
-            $"{CM.Glyphs.VLine}    {CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}{CM.Glyphs.VLine}";
+            $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}    {CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = RunButtonTestDialog (
@@ -589,7 +590,7 @@ public class DialogTests
 
         // Justify
         buttonRow =
-            $"{CM.Glyphs.VLine}      {CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}{CM.Glyphs.VLine}";
+            $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}      {CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = RunButtonTestDialog (
@@ -915,7 +916,7 @@ public class DialogTests
                     @"
 ┌┌───────────────┐─┐
 ││               │ │
-││     ⟦ Ok ⟧    │ │
+││    ⟦ Ok ⟧     │ │
 │└───────────────┘ │
 └──────────────────┘"
                 )]
@@ -925,7 +926,7 @@ public class DialogTests
 ┌┌───────────────┐─┐
 ││               │ │
 ││               │ │
-││     ⟦ Ok ⟧    │ │
+││    ⟦ Ok ⟧     │ │
 │└───────────────┘ │
 └──────────────────┘"
                 )]
@@ -936,7 +937,7 @@ public class DialogTests
 │┌───────────────┐ │
 ││               │ │
 ││               │ │
-││     ⟦ Ok ⟧    │ │
+││    ⟦ Ok ⟧     │ │
 │└───────────────┘ │
 └──────────────────┘"
                 )]
@@ -948,7 +949,7 @@ public class DialogTests
 ││               │ │
 ││               │ │
 ││               │ │
-││     ⟦ Ok ⟧    │ │
+││    ⟦ Ok ⟧     │ │
 │└───────────────┘ │
 └──────────────────┘"
                 )]
@@ -961,7 +962,7 @@ public class DialogTests
 ││               │ │
 ││               │ │
 ││               │ │
-││     ⟦ Ok ⟧    │ │
+││    ⟦ Ok ⟧     │ │
 │└───────────────┘ │
 └──────────────────┘"
                 )]

@@ -204,6 +204,7 @@ public class Pos
     /// <returns>The <see cref="Pos"/> returned from the function.</returns>
     public static Pos Function (Func<int> function) { return new PosFunc (function); }
 
+
     /// <summary>
     ///      Creates a <see cref="Pos"/> object that justifies a set of views according to the specified justification.
     /// </summary>
@@ -493,6 +494,7 @@ public class Pos
         internal override int Anchor (int width) { return (int)(width * _factor); }
     }
 
+
     /// <summary>
     /// Enables justification of a set of views.
     /// </summary>
@@ -604,6 +606,7 @@ public class Pos
         /// <param name="groupId">The unique identifier for the set of views to justify according to <paramref name="justification"/>.</param>
         public PosJustify (Justification justification, int groupId = 0)
         {
+            Justifier.PutSpaceBetweenItems = true;
             Justifier.Justification = justification;
             _groupId = groupId;
             Justifier.PropertyChanged += Justifier_PropertyChanged;

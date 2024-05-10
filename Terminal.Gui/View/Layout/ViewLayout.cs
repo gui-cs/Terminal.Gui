@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui;
 
@@ -36,7 +35,6 @@ public enum LayoutStyle
     /// </summary>
     Computed
 }
-
 
 public partial class View
 {
@@ -200,7 +198,7 @@ public partial class View
         get => VerifyIsInitialized (_x, nameof (X));
         set
         {
-            if (_x.Equals (value))
+            if (Equals (_x, value))
             {
                 return;
             }
@@ -239,7 +237,7 @@ public partial class View
         get => VerifyIsInitialized (_y, nameof (Y));
         set
         {
-            if (_y.Equals (value))
+            if (Equals (_y, value))
             {
                 return;
             }

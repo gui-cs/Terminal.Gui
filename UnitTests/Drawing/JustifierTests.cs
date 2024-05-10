@@ -62,6 +62,7 @@ public class JustifierTests (ITestOutputHelper output)
     [InlineData (Justification.Left, new [] { 1, 2, 3 }, 11, new [] { 0, 2, 5 })]
     [InlineData (Justification.Left, new [] { 1, 2, 3 }, 12, new [] { 0, 2, 5 })]
     [InlineData (Justification.Left, new [] { 1, 2, 3 }, 13, new [] { 0, 2, 5 })]
+    [InlineData (Justification.Left, new [] { 1, 2, 3 }, 5, new [] { 0, 1, 3 })] // 5 is too small to fit the items. The first item is at 0, the items to the right are clipped.
     [InlineData (Justification.Left, new [] { 1, 2, 3, 4 }, 10, new [] { 0, 1, 3, 6 })]
     [InlineData (Justification.Left, new [] { 1, 2, 3, 4 }, 11, new [] { 0, 2, 4, 7 })]
     [InlineData (Justification.Left, new [] { 33, 33, 33 }, 100, new [] { 0, 34, 67 })]
@@ -80,6 +81,9 @@ public class JustifierTests (ITestOutputHelper output)
     [InlineData (Justification.Right, new [] { 1, 2, 3 }, 11, new [] { 3, 5, 8 })]
     [InlineData (Justification.Right, new [] { 1, 2, 3 }, 12, new [] { 4, 6, 9 })]
     [InlineData (Justification.Right, new [] { 1, 2, 3 }, 13, new [] { 5, 7, 10 })]
+
+    [InlineData (Justification.Right, new [] { 1, 2, 3 }, 5, new [] { -1, 0, 2 })] // 5 is too small to fit the items. The first item is at -1.
+
     [InlineData (Justification.Right, new [] { 1, 2, 3, 4 }, 10, new [] { 0, 1, 3, 6 })]
     [InlineData (Justification.Right, new [] { 1, 2, 3, 4 }, 11, new [] { 0, 2, 4, 7 })]
     [InlineData (Justification.Right, new [] { 10, 20, 30 }, 100, new [] { 38, 49, 70 })]
@@ -103,6 +107,7 @@ public class JustifierTests (ITestOutputHelper output)
     [InlineData (Justification.Centered, new [] { 1, 2, 3 }, 7, new [] { 0, 2, 4 })]
     [InlineData (Justification.Centered, new [] { 1, 2, 3 }, 10, new [] { 1, 3, 6 })]
     [InlineData (Justification.Centered, new [] { 1, 2, 3 }, 11, new [] { 1, 3, 6 })]
+    [InlineData (Justification.Centered, new [] { 1, 2, 3 }, 5, new [] { 0, 1, 3 })] // 5 is too small to fit the items. The first item is at 0, the items to the right are clipped.
     [InlineData (Justification.Centered, new [] { 1, 2, 3, 4 }, 10, new [] { 0, 1, 3, 6 })]
     [InlineData (Justification.Centered, new [] { 1, 2, 3, 4 }, 11, new [] { 0, 2, 4, 7 })]
     [InlineData (Justification.Centered, new [] { 3, 3, 3 }, 9, new [] { 0, 3, 6 })]
@@ -160,6 +165,7 @@ public class JustifierTests (ITestOutputHelper output)
     [InlineData (Justification.LastRightRestLeft, new [] { 1, 2, 3 }, 9, new [] { 0, 2, 6 })]
     [InlineData (Justification.LastRightRestLeft, new [] { 1, 2, 3 }, 10, new [] { 0, 2, 7 })]
     [InlineData (Justification.LastRightRestLeft, new [] { 1, 2, 3 }, 11, new [] { 0, 2, 8 })]
+    [InlineData (Justification.LastRightRestLeft, new [] { 1, 2, 3 }, 5, new [] { -1, 0, 2 })] // 5 is too small to fit the items. The first item is at -1.})]
     [InlineData (Justification.LastRightRestLeft, new [] { 1, 2, 3, 4 }, 10, new [] { 0, 1, 3, 6 })]
     [InlineData (Justification.LastRightRestLeft, new [] { 1, 2, 3, 4 }, 11, new [] { 0, 2, 4, 7 })]
     [InlineData (Justification.LastRightRestLeft, new [] { 3, 3, 3 }, 21, new [] { 0, 4, 18 })]
@@ -187,6 +193,7 @@ public class JustifierTests (ITestOutputHelper output)
     [InlineData (Justification.FirstLeftRestRight, new [] { 1, 2, 3 }, 9, new [] { 0, 3, 6 })]
     [InlineData (Justification.FirstLeftRestRight, new [] { 1, 2, 3 }, 10, new [] { 0, 4, 7 })]
     [InlineData (Justification.FirstLeftRestRight, new [] { 1, 2, 3 }, 11, new [] { 0, 5, 8 })]
+    [InlineData (Justification.FirstLeftRestRight, new [] { 1, 2, 3 }, 5, new [] { 0, 1, 3 })]
     [InlineData (Justification.FirstLeftRestRight, new [] { 1, 2, 3, 4 }, 10, new [] { 0, 1, 3, 6 })]
     [InlineData (Justification.FirstLeftRestRight, new [] { 1, 2, 3, 4 }, 11, new [] { 0, 1, 3, 7 })]
     [InlineData (Justification.FirstLeftRestRight, new [] { 1, 2, 3, 4 }, 12, new [] { 0, 1, 4, 8 })]
@@ -224,6 +231,8 @@ public class JustifierTests (ITestOutputHelper output)
     [InlineData (Justification.Left, new [] { 1, 2, 3 }, 13, new [] { 0, 1, 3 })]
     [InlineData (Justification.Left, new [] { 1, 2, 3, 4 }, 10, new [] { 0, 1, 3, 6 })]
     [InlineData (Justification.Left, new [] { 1, 2, 3, 4 }, 11, new [] { 0, 1, 3, 6 })]
+    [InlineData (Justification.Left, new [] { 1, 2, 3 }, 5, new [] { 0, 1, 3 })] // 5 is too small to fit the items. The first item is at 0, the items to the right are clipped.
+
     [InlineData (Justification.Left, new [] { 10, 20, 30 }, 100, new [] { 0, 10, 30 })]
     [InlineData (Justification.Left, new [] { 33, 33, 33 }, 100, new [] { 0, 33, 66 })]
     [InlineData (Justification.Left, new [] { 10 }, 101, new [] { 0 })]
@@ -240,6 +249,9 @@ public class JustifierTests (ITestOutputHelper output)
     [InlineData (Justification.Right, new [] { 1, 2, 3 }, 11, new [] { 5, 6, 8 })]
     [InlineData (Justification.Right, new [] { 1, 2, 3 }, 12, new [] { 6, 7, 9 })]
     [InlineData (Justification.Right, new [] { 1, 2, 3 }, 13, new [] { 7, 8, 10 })]
+
+    [InlineData (Justification.Right, new [] { 1, 2, 3 }, 5, new [] { -1, 0, 2 })] // 5 is too small to fit the items. The first item is at -1.
+
     [InlineData (Justification.Right, new [] { 1, 2, 3, 4 }, 10, new [] { 0, 1, 3, 6 })]
     [InlineData (Justification.Right, new [] { 1, 2, 3, 4 }, 11, new [] { 1, 2, 4, 7 })]
     [InlineData (Justification.Right, new [] { 10, 20, 30 }, 100, new [] { 40, 50, 70 })]
@@ -267,6 +279,8 @@ public class JustifierTests (ITestOutputHelper output)
     [InlineData (Justification.Centered, new [] { 3, 3, 3 }, 11, new [] { 1, 4, 7 })]
     [InlineData (Justification.Centered, new [] { 3, 3, 3 }, 12, new [] { 1, 4, 7 })]
     [InlineData (Justification.Centered, new [] { 3, 3, 3 }, 13, new [] { 2, 5, 8 })]
+    [InlineData (Justification.Centered, new [] { 1, 2, 3 }, 5, new [] { 0, 1, 3 })] // 5 is too small to fit the items. The first item is at 0, the items to the right are clipped.
+
     [InlineData (Justification.Centered, new [] { 33, 33, 33 }, 100, new [] { 0, 33, 66 })]
     [InlineData (Justification.Centered, new [] { 33, 33, 33 }, 101, new [] { 1, 34, 67 })]
     [InlineData (Justification.Centered, new [] { 33, 33, 33 }, 102, new [] { 1, 34, 67 })]
@@ -408,7 +422,10 @@ public class JustifierTests (ITestOutputHelper output)
             {
                 for (var j = 0; j < sizes [position] && positions [position] + j < totalSize; j++)
                 {
-                    items [positions [position] + j] = (position + 1).ToString () [0];
+                    if (positions [position] + j >= 0)
+                    {
+                        items [positions [position] + j] = (position + 1).ToString () [0];
+                    }
                 }
             }
 

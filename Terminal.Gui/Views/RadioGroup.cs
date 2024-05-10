@@ -80,11 +80,6 @@ public class RadioGroup : View
         HighlightStyle = Gui.HighlightStyle.PressedOutside | Gui.HighlightStyle.Pressed;
 
         MouseClick += RadioGroup_MouseClick;
-
-        // TOOD: Hack - using Text when we should use SubViews
-        Add (_dummyView);
-        Width = Dim.Auto (Dim.DimAutoStyle.Content);
-        Height = Dim.Auto (Dim.DimAutoStyle.Content);
     }
 
     // TODO: Fix InvertColorsOnPress - only highlight the selected item
@@ -177,7 +172,7 @@ public class RadioGroup : View
                 }
             }
 
-            if (prevCount != _radioLabels.Count)
+            if (IsInitialized && prevCount != _radioLabels.Count)
             {
                 SetWidthHeight (_radioLabels);
             }
@@ -444,25 +439,21 @@ public class RadioGroup : View
         }
     }
 
-    private void RadioGroup_LayoutStarted (object sender, EventArgs e) { /*SetWidthHeight (_radioLabels);*/ }
+    private void RadioGroup_LayoutStarted (object sender, EventArgs e) { SetWidthHeight (_radioLabels); }
     private void SelectItem () { SelectedItem = _cursor; }
 
-    private View _dummyView = new View () {};
     private void SetWidthHeight (List<string> radioLabels)
     {
         switch (_orientation)
         {
             case Orientation.Vertical:
                 Rectangle r = MakeRect (0, 0, radioLabels);
-                // TODO: Hack
-                _dummyView.X = r.Width + +GetAdornmentsThickness ().Horizontal;
-                _dummyView.Y = radioLabels.Count + GetAdornmentsThickness ().Vertical;
 
-                //if (IsInitialized)
-                //{
-                //    Width = r.Width + GetAdornmentsThickness ().Horizontal;
-                //    Height = radioLabels.Count + GetAdornmentsThickness ().Vertical;
-                //}
+                if (IsInitialized)
+                {
+                    Width = r.Width + GetAdornmentsThickness ().Horizontal;
+                    Height = radioLabels.Count + GetAdornmentsThickness ().Vertical;
+                }
 
                 break;
 
@@ -475,15 +466,11 @@ public class RadioGroup : View
                     length += item.length;
                 }
 
-                // TODO: Hack
-                _dummyView.X = length + GetAdornmentsThickness ().Horizontal;
-                _dummyView.Y = 1 + GetAdornmentsThickness ().Vertical;
-
-                //if (IsInitialized)
-                //{
-                //    Width = length + GetAdornmentsThickness ().Vertical;
-                //    Height = 1 + GetAdornmentsThickness ().Horizontal;
-                //}
+                if (IsInitialized)
+                {
+                    Width = length + GetAdornmentsThickness ().Vertical;
+                    Height = 1 + GetAdornmentsThickness ().Horizontal;
+                }
 
                 break;
         }
