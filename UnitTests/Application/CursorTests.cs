@@ -111,7 +111,7 @@ public class CursorTests
         Assert.False (Application.PositionCursor (view));
     }
 
-    [Fact, Trait("BUGBUG", "Views without subviews don't support Focused or MostFocused")]
+    [Fact]
     [SetupFakeDriver]
     public void PositionCursor_Focused_With_Position_Returns_True ()
     {
@@ -124,7 +124,7 @@ public class CursorTests
         view.CanFocus = true;
         view.SetFocus ();
         view.TestLocation = new Point (0, 0);
-        Assert.False (Application.PositionCursor (view));  // BUGBUG: This should be true
+        Assert.True (Application.PositionCursor (view));
     }
 
     [Fact]
@@ -144,5 +144,4 @@ public class CursorTests
         Application.Driver.GetCursorVisibility (out CursorVisibility cursor);
         Assert.Equal (CursorVisibility.Invisible, cursor);
     }
-
 }
