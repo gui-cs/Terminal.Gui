@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using Microsoft.CodeAnalysis;
+using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui;
 

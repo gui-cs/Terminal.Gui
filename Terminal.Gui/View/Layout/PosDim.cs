@@ -626,7 +626,7 @@ public class Pos
         /// <inheritdoc />
         public override bool Equals (object other)
         {
-            return other is PosAlign align && _groupId == align._groupId && _location == align._location && align.Aligner.Equals (Aligner);
+            return other is PosAlign align && _groupId == align._groupId && _location == align._location && align.Aligner.Alignment == Aligner.Alignment;
         }
 
         /// <inheritdoc />
@@ -653,7 +653,7 @@ public class Pos
                 return _location.Value;
             }
 
-            if (us.SuperView is null)
+            if (us?.SuperView is null)
             {
                 return 0;
             }
