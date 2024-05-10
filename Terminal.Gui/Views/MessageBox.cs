@@ -374,7 +374,7 @@ public static class MessageBox
         var messageLabel = new Label
         {
             Text = message,
-            TextAlignment = TextAlignment.Centered,
+            Justification = Justification.Centered,
             X = Pos.Center (),
             Y = 0
         };

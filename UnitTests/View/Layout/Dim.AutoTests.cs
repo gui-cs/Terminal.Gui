@@ -681,11 +681,11 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.Alignment = TextAlignment.Justified;
+        view.TextFormatter.Alignment = Justification.Justified;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.VerticalAlignment = VerticalTextAlignment.Middle;
+        view.TextFormatter.VerticalAlignment = Justification.Centered;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
@@ -709,11 +709,11 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextAlignment = TextAlignment.Justified;
+        view.Justification = Justification.Justified;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.VerticalTextAlignment = VerticalTextAlignment.Middle;
+        view.VerticalJustification = Justification.Centered;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
@@ -738,7 +738,7 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.True (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
-        view.TextAlignment = TextAlignment.Justified;
+        view.Justification = Justification.Justified;
         Assert.True (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
@@ -747,7 +747,7 @@ public class DimAutoTests (ITestOutputHelper output)
             Text = "_1234",
             Width = Dim.Auto ()
         };
-        view.VerticalTextAlignment = VerticalTextAlignment.Middle;
+        view.VerticalJustification = Justification.Centered;
         Assert.True (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 

@@ -287,39 +287,39 @@ public class Buttons : Scenario
                                               switch (args.SelectedItem)
                                               {
                                                   case 0:
-                                                      moveBtn.TextAlignment = TextAlignment.Left;
-                                                      sizeBtn.TextAlignment = TextAlignment.Left;
-                                                      moveBtnA.TextAlignment = TextAlignment.Left;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Left;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Left;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Left;
+                                                      moveBtn.Justification = Justification.Left;
+                                                      sizeBtn.Justification = Justification.Left;
+                                                      moveBtnA.Justification = Justification.Left;
+                                                      sizeBtnA.Justification = Justification.Left;
+                                                      moveHotKeyBtn.Justification = Justification.Left;
+                                                      moveUnicodeHotKeyBtn.Justification = Justification.Left;
 
                                                       break;
                                                   case 1:
-                                                      moveBtn.TextAlignment = TextAlignment.Right;
-                                                      sizeBtn.TextAlignment = TextAlignment.Right;
-                                                      moveBtnA.TextAlignment = TextAlignment.Right;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Right;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Right;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Right;
+                                                      moveBtn.Justification = Justification.Right;
+                                                      sizeBtn.Justification = Justification.Right;
+                                                      moveBtnA.Justification = Justification.Right;
+                                                      sizeBtnA.Justification = Justification.Right;
+                                                      moveHotKeyBtn.Justification = Justification.Right;
+                                                      moveUnicodeHotKeyBtn.Justification = Justification.Right;
 
                                                       break;
                                                   case 2:
-                                                      moveBtn.TextAlignment = TextAlignment.Centered;
-                                                      sizeBtn.TextAlignment = TextAlignment.Centered;
-                                                      moveBtnA.TextAlignment = TextAlignment.Centered;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Centered;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Centered;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Centered;
+                                                      moveBtn.Justification = Justification.Centered;
+                                                      sizeBtn.Justification = Justification.Centered;
+                                                      moveBtnA.Justification = Justification.Centered;
+                                                      sizeBtnA.Justification = Justification.Centered;
+                                                      moveHotKeyBtn.Justification = Justification.Centered;
+                                                      moveUnicodeHotKeyBtn.Justification = Justification.Centered;
 
                                                       break;
                                                   case 3:
-                                                      moveBtn.TextAlignment = TextAlignment.Justified;
-                                                      sizeBtn.TextAlignment = TextAlignment.Justified;
-                                                      moveBtnA.TextAlignment = TextAlignment.Justified;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Justified;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Justified;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Justified;
+                                                      moveBtn.Justification = Justification.Justified;
+                                                      sizeBtn.Justification = Justification.Justified;
+                                                      moveBtnA.Justification = Justification.Justified;
+                                                      sizeBtnA.Justification = Justification.Justified;
+                                                      moveHotKeyBtn.Justification = Justification.Justified;
+                                                      moveUnicodeHotKeyBtn.Justification = Justification.Justified;
 
                                                       break;
                                               }
@@ -439,7 +439,7 @@ public class Buttons : Scenario
                 Y = Pos.Top (_down),
                 Width = Dim.Function (() => Digits),
                 Height = 1,
-                TextAlignment = TextAlignment.Centered,
+                Justification = Justification.Centered,
                 CanFocus = true
             };
 

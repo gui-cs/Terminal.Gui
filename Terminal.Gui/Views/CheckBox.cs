@@ -153,15 +153,15 @@ public class CheckBox : View
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
-        switch (TextAlignment)
+        switch (Justification)
         {
-            case TextAlignment.Left:
-            case TextAlignment.Centered:
-            case TextAlignment.Justified:
+            case Justification.Left:
+            case Justification.Centered:
+            case Justification.Justified:
                 TextFormatter.Text = $"{GetCheckedState ()} {GetFormatterText ()}";
 
                 break;
-            case TextAlignment.Right:
+            case Justification.Right:
                 TextFormatter.Text = $"{GetFormatterText ()} {GetCheckedState ()}";
 
                 break;

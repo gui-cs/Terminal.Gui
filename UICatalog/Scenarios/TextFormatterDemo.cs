@@ -63,17 +63,17 @@ public class TextFormatterDemo : Scenario
 
         app.Add (unicodeCheckBox);
 
-        List<TextAlignment> alignments = Enum.GetValues (typeof (TextAlignment)).Cast<TextAlignment> ().ToList ();
+        List<Justification> alignments = Enum.GetValues (typeof (Justification)).Cast<Justification> ().ToList ();
         Label [] singleLines = new Label [alignments.Count];
         Label [] multipleLines = new Label [alignments.Count];
 
         var multiLineHeight = 5;
 
-        foreach (TextAlignment alignment in alignments)
+        foreach (Justification alignment in alignments)
         {
             singleLines [(int)alignment] = new()
             {
-                TextAlignment = alignment,
+                Justification = alignment,
                 X = 0,
 
                 Width = Dim.Fill (),
@@ -84,7 +84,7 @@ public class TextFormatterDemo : Scenario
 
             multipleLines [(int)alignment] = new()
             {
-                TextAlignment = alignment,
+                Justification = alignment,
                 X = 0,
 
                 Width = Dim.Fill (),
@@ -100,7 +100,7 @@ public class TextFormatterDemo : Scenario
         };
         app.Add (label);
 
-        foreach (TextAlignment alignment in alignments)
+        foreach (Justification alignment in alignments)
         {
             label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             app.Add (label);
@@ -112,7 +112,7 @@ public class TextFormatterDemo : Scenario
         label = new() { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
         app.Add (label);
 
-        foreach (TextAlignment alignment in alignments)
+        foreach (Justification alignment in alignments)
         {
             label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             app.Add (label);
@@ -123,7 +123,7 @@ public class TextFormatterDemo : Scenario
 
         unicodeCheckBox.Toggled += (s, e) =>
                                    {
-                                       foreach (TextAlignment alignment in alignments)
+                                       foreach (Justification alignment in alignments)
                                        {
                                            singleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;
                                            multipleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;

@@ -91,7 +91,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Left,
+                           Justification = Justification.Left,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -103,7 +103,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Right,
+                           Justification = Justification.Right,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -115,7 +115,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Centered,
+                           Justification = Justification.Centered,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -127,7 +127,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Justified,
+                           Justification = Justification.Justified,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -153,7 +153,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Left,
+                           Justification = Justification.Left,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -165,7 +165,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Right,
+                           Justification = Justification.Right,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -177,7 +177,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Centered,
+                           Justification = Justification.Centered,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -189,7 +189,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Justified,
+                           Justification = Justification.Justified,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -324,7 +324,7 @@ public class ComputedLayout : Scenario
         var anchorEndLabel1 = new Label
         {
             Text = "This Label should be the 3rd to last line (AnchorEnd (3)).",
-            TextAlignment = TextAlignment.Centered,
+            Justification = Justification.Centered,
             ColorScheme = Colors.ColorSchemes ["Menu"],
             Width = Dim.Fill (5),
             X = 5,
@@ -338,7 +338,7 @@ public class ComputedLayout : Scenario
         {
             Text =
                 "This TextField should be the 4th to last line (AnchorEnd (3) - 1).",
-            TextAlignment = TextAlignment.Left,
+            Justification = Justification.Left,
             ColorScheme = Colors.ColorSchemes ["Menu"],
             Width = Dim.Fill (5),
             X = 5,

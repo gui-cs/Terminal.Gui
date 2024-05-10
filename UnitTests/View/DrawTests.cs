@@ -339,7 +339,7 @@ public class DrawTests (ITestOutputHelper _output)
             Text = "Test",
             Width = 6,
             Height = 1,
-            TextAlignment = TextAlignment.Right,
+            Justification = Justification.Right,
             ColorScheme = Colors.ColorSchemes ["Base"]
         };
 
@@ -350,7 +350,7 @@ public class DrawTests (ITestOutputHelper _output)
             Y = 1,
             Width = 1,
             Height = 6,
-            VerticalTextAlignment = VerticalTextAlignment.Bottom,
+            VerticalJustification = Justification.Bottom,
             ColorScheme = Colors.ColorSchemes ["Base"]
         };
         Toplevel top = new ();

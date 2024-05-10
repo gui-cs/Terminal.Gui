@@ -11,7 +11,7 @@ public class ColumnStyle
     ///     Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will
     ///     override <see cref="Alignment"/>
     /// </summary>
-    public Func<object, TextAlignment> AlignmentGetter;
+    public Func<object, Justification> AlignmentGetter;
 
     /// <summary>
     ///     Defines a delegate for returning a custom color scheme per cell based on cell values. Return null for the
@@ -32,7 +32,7 @@ public class ColumnStyle
     ///     Defines the default alignment for all values rendered in this column.  For custom alignment based on cell
     ///     contents use <see cref="AlignmentGetter"/>.
     /// </summary>
-    public TextAlignment Alignment { get; set; }
+    public Justification Alignment { get; set; }
 
     /// <summary>Defines the format for values e.g. "yyyy-MM-dd" for dates</summary>
     public string Format { get; set; }
@@ -74,7 +74,7 @@ public class ColumnStyle
     /// </summary>
     /// <param name="cellValue"></param>
     /// <returns></returns>
-    public TextAlignment GetAlignment (object cellValue)
+    public Justification GetAlignment (object cellValue)
     {
         if (AlignmentGetter is { })
         {

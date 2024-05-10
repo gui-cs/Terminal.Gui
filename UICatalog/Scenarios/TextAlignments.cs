@@ -18,17 +18,17 @@ public class TextAlignments : Scenario
         var txt = "Hello world, how are you today? Pretty neat!";
         var unicodeSampleText = "A Unicode sentence (Ð¿ÑÐ Ð²ÐµÑ) has words.";
 
-        List<TextAlignment> alignments = Enum.GetValues (typeof (TextAlignment)).Cast<TextAlignment> ().ToList ();
+        List<Justification> alignments = Enum.GetValues (typeof (Justification)).Cast<Justification> ().ToList ();
         Label [] singleLines = new Label [alignments.Count];
         Label [] multipleLines = new Label [alignments.Count];
 
         var multiLineHeight = 5;
 
-        foreach (TextAlignment alignment in alignments)
+        foreach (Justification alignment in alignments)
         {
             singleLines [(int)alignment] = new()
             {
-                TextAlignment = alignment,
+                Justification = alignment,
                 X = 1,
 
                 Width = Dim.Fill (1),
@@ -39,7 +39,7 @@ public class TextAlignments : Scenario
 
             multipleLines [(int)alignment] = new()
             {
-                TextAlignment = alignment,
+                Justification = alignment,
                 X = 1,
 
                 Width = Dim.Fill (1),
@@ -65,7 +65,7 @@ public class TextAlignments : Scenario
 
         edit.TextChanged += (s, e) =>
                             {
-                                foreach (TextAlignment alignment in alignments)
+                                foreach (Justification alignment in alignments)
                                 {
                                     singleLines [(int)alignment].Text = edit.Text;
                                     multipleLines [(int)alignment].Text = edit.Text;
@@ -81,7 +81,7 @@ public class TextAlignments : Scenario
 
         update.Accept += (s, e) =>
                          {
-                             foreach (TextAlignment alignment in alignments)
+                             foreach (Justification alignment in alignments)
                              {
                                  singleLines [(int)alignment].Text = edit.Text;
                                  multipleLines [(int)alignment].Text = edit.Text;
@@ -102,7 +102,7 @@ public class TextAlignments : Scenario
         };
         Win.Add (label);
 
-        foreach (TextAlignment alignment in alignments)
+        foreach (Justification alignment in alignments)
         {
             label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             Win.Add (label);
@@ -115,7 +115,7 @@ public class TextAlignments : Scenario
         label = new() { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
         Win.Add (label);
 
-        foreach (TextAlignment alignment in alignments)
+        foreach (Justification alignment in alignments)
         {
             label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             Win.Add (label);
@@ -126,7 +126,7 @@ public class TextAlignments : Scenario
 
         enableHotKeyCheckBox.Toggled += (s, e) =>
                                         {
-                                            foreach (TextAlignment alignment in alignments)
+                                            foreach (Justification alignment in alignments)
                                             {
                                                 singleLines [(int)alignment].HotKeySpecifier =
                                                     e.OldValue == true ? (Rune)0xffff : (Rune)'_';

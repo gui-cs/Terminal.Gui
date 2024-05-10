@@ -1002,7 +1002,7 @@ public class ListWrapper : IListDataSource
     private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
     {
         string str = start > ustr.GetColumns () ? string.Empty : ustr.Substring (Math.Min (start, ustr.ToRunes ().Length - 1));
-        string u = TextFormatter.ClipAndJustify (str, width, TextAlignment.Left);
+        string u = TextFormatter.ClipAndJustify (str, width, Justification.Left);
         driver.AddStr (u);
         width -= u.GetColumns ();
 

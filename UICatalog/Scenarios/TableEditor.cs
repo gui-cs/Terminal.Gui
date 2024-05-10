@@ -707,7 +707,7 @@ public class TableEditor : Scenario
             Text = "0,0",
 
             Width = Dim.Fill (),
-            TextAlignment = TextAlignment.Right
+            Justification = Justification.Right
         };
 
         Win.Add (selectedCellLabel);
@@ -1107,12 +1107,12 @@ public class TableEditor : Scenario
     {
         _tableView.Style.ColumnStyles.Clear ();
 
-        var alignMid = new ColumnStyle { Alignment = TextAlignment.Centered };
-        var alignRight = new ColumnStyle { Alignment = TextAlignment.Right };
+        var alignMid = new ColumnStyle { Alignment = Justification.Centered };
+        var alignRight = new ColumnStyle { Alignment = Justification.Right };
 
         var dateFormatStyle = new ColumnStyle
         {
-            Alignment = TextAlignment.Right,
+            Alignment = Justification.Right,
             RepresentationGetter = v =>
                                        v is DateTime d ? d.ToString ("yyyy-MM-dd") : v.ToString ()
         };
@@ -1126,15 +1126,15 @@ public class TableEditor : Scenario
 
                                        // align negative values right
                                        d < 0
-                                           ? TextAlignment.Right
+                                           ? Justification.Right
                                            :
 
                                            // align positive values left
-                                           TextAlignment.Left
+                                           Justification.Left
                                        :
 
                                        // not a double
-                                       TextAlignment.Left,
+                                       Justification.Left,
             ColorGetter = a => a.CellValue is double d
                                    ?
 
