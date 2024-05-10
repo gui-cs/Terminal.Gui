@@ -783,8 +783,7 @@ public class ConfigurationManagerTests
               }
             }
           }
-        ],
-        ""Dialog.DefaultButtonAlignment"": ""Center""
+        ]
       }
     }
   ]
