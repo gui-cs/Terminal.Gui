@@ -34,7 +34,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         The text will be drawn starting at the view origin (0, 0) and will be formatted according
-    ///         to <see cref="Justification"/> and <see cref="TextDirection"/>.
+    ///         to <see cref="TextJustification"/> and <see cref="TextDirection"/>.
     ///     </para>
     ///     <para>
     ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="ContentSize"/>'s height
@@ -87,7 +87,7 @@ public partial class View
     ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="Dim.DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text justification.</value>
-    public virtual Justification Justification
+    public virtual Justification TextJustification
     {
         get => TextFormatter.Justification;
         set
@@ -130,7 +130,7 @@ public partial class View
     ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="Dim.DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The vertical text justification.</value>
-    public virtual Justification VerticalJustification
+    public virtual Justification VerticalTextJustification
     {
         get => TextFormatter.VerticalJustification;
         set

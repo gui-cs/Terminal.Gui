@@ -232,3 +232,15 @@ Replace references to to nested types with the new standalone version
 - var myTab = new TabView.Tab();
 + var myTab = new Tab();
 ```
+
+## View and Text Alignment is now Justification
+
+In v1, both `TextAlignment` and `VerticalTextAlignment` enums were used to align text in views. In v2, these enums have been replaced with the `Justification` enum. The `View.TextJustification` property controls horizontal text alignment, and the `View.VerticalTextAlignment` property controls vertical text alignment.
+
+v2 now supports `Pos.Justify` which enables views to be justified within their superview. 
+
+### How to Fix
+
+* Replace `TextAlignment` with `Justification` 
+* Replace `VerticalTextAlignment` with `Justification`. `Middle` is now `Center`. 
+* Update any code that used `View.TextAlignment` or `View.VerticalTextAlignment` to justify text in views.
