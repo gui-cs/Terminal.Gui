@@ -219,19 +219,19 @@ public class TextFormatterTests
     [InlineData ("Ð ÑÐ", "Ð Ñ", 3)] // Should not fit
     public void ClipAndJustify_Valid_Centered (string text, string justifiedText, int maxWidth)
     {
-        var align = Justification.Centered;
+        var justify = Justification.Centered;
         var textDirection = TextDirection.LeftRight_TopBottom;
         var tabWidth = 1;
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
                      );
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
                      );
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
@@ -277,19 +277,19 @@ public class TextFormatterTests
     [InlineData ("Ð ÑÐ", "Ð Ñ", 3)] // Should not fit
     public void ClipAndJustify_Valid_Justified (string text, string justifiedText, int maxWidth)
     {
-        var align = Justification.Justified;
+        var justify = Justification.Justified;
         var textDirection = TextDirection.LeftRight_TopBottom;
         var tabWidth = 1;
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
                      );
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
                      );
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
@@ -328,19 +328,19 @@ public class TextFormatterTests
     [InlineData ("Ð ÑÐ", "Ð Ñ", 3)] // Should not fit
     public void ClipAndJustify_Valid_Left (string text, string justifiedText, int maxWidth)
     {
-        var align = Justification.Left;
+        var justify = Justification.Left;
         var textDirection = TextDirection.LeftRight_BottomTop;
         var tabWidth = 1;
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
                      );
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
                      );
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
@@ -377,19 +377,19 @@ public class TextFormatterTests
     [InlineData ("Ð ÑÐ", "Ð Ñ", 3)] // Should not fit
     public void ClipAndJustify_Valid_Right (string text, string justifiedText, int maxWidth)
     {
-        var align = Justification.Right;
+        var justify = Justification.Right;
         var textDirection = TextDirection.LeftRight_BottomTop;
         var tabWidth = 1;
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
                      );
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
 
         Assert.Equal (
                       justifiedText,
-                      TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth)
+                      TextFormatter.ClipAndJustify (text, maxWidth, justify, textDirection, tabWidth)
                      );
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
@@ -2222,176 +2222,6 @@ ssb
 
         Assert.Equal (new Size (expectedWidth, expectedHeight), tf.Size);
     }
-
-    //[Theory]
-    //[InlineData (Justification.Left, false)]
-    //[InlineData (Justification.Centered, true)]
-    //[InlineData (Justification.Right, false)]
-    //[InlineData (Justification.Justified, true)]
-    //public void TestSize_DirectionChange_AutoSize_True_Or_False_Horizontal (
-    //    Justification Justification,
-    //    bool autoSize
-    //)
-    //{
-    //    var tf = new TextFormatter
-    //    {
-    //        Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = Justification, AutoSize = autoSize
-    //    };
-    //    Assert.Equal (4, tf.Size.Width);
-    //    Assert.Equal (1, tf.Size.Height);
-
-    //    tf.Direction = TextDirection.TopBottom_LeftRight;
-
-    //    if (autoSize/* && Justification != Justification.Justified*/)
-    //    {
-    //        Assert.Equal (2, tf.Size.Width);
-    //        Assert.Equal (2, tf.Size.Height);
-    //    }
-    //    else
-    //    {
-    //        Assert.Equal (4, tf.Size.Width);
-    //        Assert.Equal (1, tf.Size.Height);
-    //    }
-    //}
-
-    //[Theory]
-    //[InlineData (Justification.Top, false)]
-    //[InlineData (Justification.Centered, true)]
-    //[InlineData (Justification.Bottom, false)]
-    //[InlineData (Justification.Justified, true)]
-    //public void TestSize_DirectionChange_AutoSize_True_Or_False_Vertical (
-    //    Justification Justification,
-    //    bool autoSize
-    //)
-    //{
-    //    var tf = new TextFormatter
-    //    {
-    //        Direction = TextDirection.TopBottom_LeftRight,
-    //        Text = "你你",
-    //        VerticalAlignment = Justification,
-    //        AutoSize = autoSize
-    //    };
-    //    Assert.Equal (2, tf.Size.Width);
-    //    Assert.Equal (2, tf.Size.Height);
-
-    //    tf.Direction = TextDirection.LeftRight_TopBottom;
-
-    //    if (autoSize/* && Justification != Justification.Justified*/)
-    //    {
-    //        Assert.Equal (4, tf.Size.Width);
-    //        Assert.Equal (1, tf.Size.Height);
-    //    }
-    //    else
-    //    {
-    //        Assert.Equal (2, tf.Size.Width);
-    //        Assert.Equal (2, tf.Size.Height);
-    //    }
-    //}
-
-    //[Theory]
-    //[InlineData (TextDirection.LeftRight_TopBottom, false)]
-    //[InlineData (TextDirection.LeftRight_TopBottom, true)]
-    //[InlineData (TextDirection.TopBottom_LeftRight, false)]
-    //[InlineData (TextDirection.TopBottom_LeftRight, true)]
-    //public void TestSize_SizeChange_AutoSize_True_Or_False (TextDirection textDirection, bool autoSize)
-    //{
-    //    var tf = new TextFormatter { Direction = textDirection, Text = "你你", AutoSize = autoSize };
-
-    //    if (textDirection == TextDirection.LeftRight_TopBottom)
-    //    {
-    //        Assert.Equal (4, tf.Size.Width);
-    //        Assert.Equal (1, tf.Size.Height);
-    //    }
-    //    else
-    //    {
-    //        Assert.Equal (2, tf.Size.Width);
-    //        Assert.Equal (2, tf.Size.Height);
-    //    }
-
-    //    tf.Size = new (1, 1);
-
-    //    if (autoSize)
-    //    {
-    //        if (textDirection == TextDirection.LeftRight_TopBottom)
-    //        {
-    //            Assert.Equal (4, tf.Size.Width);
-    //            Assert.Equal (1, tf.Size.Height);
-    //        }
-    //        else
-    //        {
-    //            Assert.Equal (2, tf.Size.Width);
-    //            Assert.Equal (2, tf.Size.Height);
-    //        }
-    //    }
-    //    else
-    //    {
-    //        Assert.Equal (1, tf.Size.Width);
-    //        Assert.Equal (1, tf.Size.Height);
-    //    }
-    //}
-
-    //[Theory]
-    //[InlineData (Justification.Left, false)]
-    //[InlineData (Justification.Centered, true)]
-    //[InlineData (Justification.Right, false)]
-    //[InlineData (Justification.Justified, true)]
-    //public void TestSize_SizeChange_AutoSize_True_Or_False_Horizontal (Justification Justification, bool autoSize)
-    //{
-    //    var tf = new TextFormatter
-    //    {
-    //        Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = Justification, AutoSize = autoSize
-    //    };
-    //    Assert.Equal (4, tf.Size.Width);
-    //    Assert.Equal (1, tf.Size.Height);
-
-    //    tf.Size = new (1, 1);
-
-    //    if (autoSize)
-    //    {
-    //        Assert.Equal (4, tf.Size.Width);
-    //        Assert.Equal (1, tf.Size.Height);
-    //    }
-    //    else
-    //    {
-    //        Assert.Equal (1, tf.Size.Width);
-    //        Assert.Equal (1, tf.Size.Height);
-    //    }
-    //}
-
-    //[Theory]
-    //[InlineData (Justification.Top, false)]
-    //[InlineData (Justification.Centered, true)]
-    //[InlineData (Justification.Bottom, false)]
-    //[InlineData (Justification.Justified, true)]
-    //public void TestSize_SizeChange_AutoSize_True_Or_False_Vertical (
-    //    Justification Justification,
-    //    bool autoSize
-    //)
-    //{
-    //    var tf = new TextFormatter
-    //    {
-    //        Direction = TextDirection.TopBottom_LeftRight,
-    //        Text = "你你",
-    //        VerticalAlignment = Justification,
-    //        AutoSize = autoSize
-    //    };
-    //    Assert.Equal (2, tf.Size.Width);
-    //    Assert.Equal (2, tf.Size.Height);
-
-    //    tf.Size = new (1, 1);
-
-    //    if (autoSize)
-    //    {
-    //        Assert.Equal (2, tf.Size.Width);
-    //        Assert.Equal (2, tf.Size.Height);
-    //    }
-    //    else
-    //    {
-    //        Assert.Equal (1, tf.Size.Width);
-    //        Assert.Equal (1, tf.Size.Height);
-    //    }
-    //}
-
     [Theory]
     [InlineData ("你", TextDirection.LeftRight_TopBottom, false, 0, 0)]
     [InlineData ("你", TextDirection.LeftRight_TopBottom, true, 2, 1)]
@@ -2407,39 +2237,6 @@ ssb
         var tf = new TextFormatter { Direction = textDirection, Text = text, AutoSize = autoSize };
         Assert.Equal (new Size (expectedWidth, expectedHeight), tf.Size);
     }
-
-    //[Theory]
-    //[InlineData (TextDirection.LeftRight_TopBottom, false)]
-    //[InlineData (TextDirection.LeftRight_TopBottom, true)]
-    //[InlineData (TextDirection.TopBottom_LeftRight, false)]
-    //[InlineData (TextDirection.TopBottom_LeftRight, true)]
-    //public void TestSize_TextChange (TextDirection textDirection, bool autoSize)
-    //{
-    //    var tf = new TextFormatter { Direction = textDirection, Text = "你", AutoSize = autoSize };
-    //    Assert.Equal (new Size (2, 1), tf.Size);
-    //    tf.Text = "你你";
-
-    //    Assert.Equal (autoSize, tf.AutoSize);
-
-    //    if (autoSize)
-    //    {
-    //        if (textDirection == TextDirection.LeftRight_TopBottom)
-    //        {
-    //            Assert.Equal (4, tf.Size.Width);
-    //            Assert.Equal (1, tf.Size.Height);
-    //        }
-    //        else
-    //        {
-    //            Assert.Equal (2, tf.Size.Width);
-    //            Assert.Equal (2, tf.Size.Height);
-    //        }
-    //    }
-    //    else
-    //    {
-    //        Assert.Equal (2, tf.Size.Width);
-    //        Assert.Equal (1, tf.Size.Height);
-    //    }
-    //}
 
     [Fact]
     public void WordWrap_BigWidth ()
@@ -6235,12 +6032,12 @@ B")]
  ******
 0******")]
 
-    public void Draw_Text_Alignment (string text, Justification horizontalTextAlignment, Justification Justification, TextDirection textDirection, string expectedText)
+    public void Draw_Text_Justification (string text, Justification horizontalTextJustification, Justification justification, TextDirection textDirection, string expectedText)
     {
         TextFormatter tf = new ()
         {
-            Justification = horizontalTextAlignment,
-            VerticalJustification = Justification,
+            Justification = horizontalTextJustification,
+            VerticalJustification = justification,
             Direction = textDirection,
             Size = new (7, 7),
             Text = text

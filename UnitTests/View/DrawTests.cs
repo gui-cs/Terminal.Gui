@@ -332,7 +332,7 @@ public class DrawTests (ITestOutputHelper _output)
     [Fact]
     [AutoInitShutdown]
     [Trait ("Category", "Output")]
-    public void Colors_On_TextAlignment_Right_And_Bottom ()
+    public void Colors_On_TextJustification_Right_And_Bottom ()
     {
         var viewRight = new View
         {

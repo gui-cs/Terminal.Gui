@@ -244,7 +244,7 @@ public class CheckBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void TextAlignment_Centered ()
+    public void TextJustification_Centered ()
     {
         var checkBox = new CheckBox
         {
@@ -294,7 +294,7 @@ public class CheckBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void TextAlignment_Justified ()
+    public void TextJustification_Justified ()
     {
         var checkBox1 = new CheckBox
         {
@@ -361,7 +361,7 @@ public class CheckBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void TextAlignment_Left ()
+    public void TextJustification_Left ()
     {
         var checkBox = new CheckBox
         {
@@ -410,7 +410,7 @@ public class CheckBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void TextAlignment_Right ()
+    public void TextJustification_Right ()
     {
         var checkBox = new CheckBox
         {

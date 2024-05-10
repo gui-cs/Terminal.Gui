@@ -930,7 +930,7 @@ public class Slider<T> : View
         }
     }
 
-    private string AlignText (string text, int width, Justification Justification)
+    private string JustifyText (string text, int width, Justification justification)
     {
         if (text is null)
         {
@@ -947,7 +947,7 @@ public class Slider<T> : View
         string s2 = new (' ', w % 2);
 
         // Note: The formatter doesn't handle all of this ???
-        switch (Justification)
+        switch (justification)
         {
             case Justification.Justified:
                 return TextFormatter.Justify (text, width);
@@ -1293,7 +1293,7 @@ public class Slider<T> : View
                     switch (_config._legendsOrientation)
                     {
                         case Orientation.Horizontal:
-                            text = AlignText (text, _config._innerSpacing + 1, Justification.Centered);
+                            text = JustifyText (text, _config._innerSpacing + 1, Justification.Centered);
 
                             break;
                         case Orientation.Vertical:
@@ -1311,7 +1311,7 @@ public class Slider<T> : View
 
                             break;
                         case Orientation.Vertical:
-                            text = AlignText (text, _config._innerSpacing + 1, Justification.Centered);
+                            text = JustifyText (text, _config._innerSpacing + 1, Justification.Centered);
 
                             break;
                     }

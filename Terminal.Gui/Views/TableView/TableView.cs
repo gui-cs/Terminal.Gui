@@ -2057,13 +2057,13 @@ public class TableView : View
 
     /// <summary>
     ///     Truncates or pads <paramref name="representation"/> so that it occupies a exactly
-    ///     <paramref name="availableHorizontalSpace"/> using the alignment specified in <paramref name="colStyle"/> (or left
+    ///     <paramref name="availableHorizontalSpace"/> using the justification specified in <paramref name="colStyle"/> (or left
     ///     if no style is defined)
     /// </summary>
     /// <param name="originalCellValue">The object in this cell of the <see cref="Table"/></param>
     /// <param name="representation">The string representation of <paramref name="originalCellValue"/></param>
     /// <param name="availableHorizontalSpace"></param>
-    /// <param name="colStyle">Optional style indicating custom alignment for the cell</param>
+    /// <param name="colStyle">Optional style indicating custom justification for the cell</param>
     /// <returns></returns>
     private string TruncateOrPad (
         object originalCellValue,

@@ -129,7 +129,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonAlignment_Four ()
+    public void ButtonJustification_Four ()
     {
         RunState runstate = null;
 
@@ -219,7 +219,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonAlignment_Four_On_Too_Small_Width ()
+    public void ButtonJustification_Four_On_Too_Small_Width ()
     {
         RunState runstate = null;
 
@@ -312,7 +312,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonAlignment_Four_WideOdd ()
+    public void ButtonJustification_Four_WideOdd ()
     {
         RunState runstate = null;
 
@@ -404,7 +404,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonAlignment_Four_Wider ()
+    public void ButtonJustification_Four_Wider ()
     {
         RunState runstate = null;
 
@@ -498,7 +498,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonAlignment_One ()
+    public void ButtonJustification_One ()
     {
         var d = (FakeDriver)Driver;
         RunState runstate = null;
@@ -636,7 +636,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonAlignment_Three ()
+    public void ButtonJustification_Three ()
     {
         RunState runstate = null;
 
@@ -720,7 +720,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonAlignment_Two ()
+    public void ButtonJustification_Two ()
     {
         RunState runstate = null;
 
@@ -798,7 +798,7 @@ public class DialogTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ButtonAlignment_Two_Hidden ()
+    public void ButtonJustification_Two_Hidden ()
     {
         RunState runstate = null;
         var firstIteration = false;

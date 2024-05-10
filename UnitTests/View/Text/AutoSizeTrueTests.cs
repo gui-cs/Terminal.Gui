@@ -1788,7 +1788,7 @@ Y
     [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
-    public void View_Draw_Horizontal_Simple_TextAlignments (bool autoSize)
+    public void View_Draw_Horizontal_Simple_TextJustifications (bool autoSize)
     {
         var text = "Hello World";
         var width = 20;
@@ -1912,7 +1912,7 @@ Y
     [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
-    public void View_Draw_Vertical_Simple_TextAlignments (bool autoSize)
+    public void View_Draw_Vertical_Simple_TextJustifications (bool autoSize)
     {
         var text = "Hello World";
         var height = 20;

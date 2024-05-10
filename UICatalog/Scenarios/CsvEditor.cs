@@ -76,19 +76,19 @@ public class CsvEditor : Scenario
                                  new []
                                  {
                                      _miLeft = new MenuItem (
-                                                             "_Align Left",
+                                                             "_Justify Left",
                                                              "",
-                                                             () => Align (Justification.Left)
+                                                             () => Justify (Justification.Left)
                                                             ),
                                      _miRight = new MenuItem (
-                                                              "_Align Right",
+                                                              "_Justify Right",
                                                               "",
-                                                              () => Align (Justification.Right)
+                                                              () => Justify (Justification.Right)
                                                              ),
                                      _miCentered = new MenuItem (
-                                                                 "_Align Centered",
+                                                                 "_Justify Centered",
                                                                  "",
-                                                                 () => Align (Justification.Centered)
+                                                                 () => Justify (Justification.Centered)
                                                                 ),
 
                                      // Format requires hard typed data table, when we read a CSV everything is untyped (string) so this only works for new columns in this demo
@@ -218,7 +218,7 @@ public class CsvEditor : Scenario
         _tableView.Update ();
     }
 
-    private void Align (Justification newJustification)
+    private void Justify (Justification newJustification)
     {
         if (NoTableLoaded ())
         {
