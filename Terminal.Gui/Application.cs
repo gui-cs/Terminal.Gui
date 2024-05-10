@@ -574,9 +574,15 @@ public static partial class Application
 
         if (mostFocused is null)
         {
-            return false;
+            if (view is { HasFocus: true })
+            {
+                mostFocused = view;
+            }
+            else
+            {
+                return false;
+            }
         }
-
 
         // If the view is not visible or enabled, don't position the cursor
         if (!mostFocused.Visible || !mostFocused.Enabled)
@@ -598,7 +604,6 @@ public static partial class Application
             return false;
         }
 
-        Point? prevCursor = new (Driver.Row, Driver.Col);
         Point? cursor = mostFocused.PositionCursor ();
 
         Driver.GetCursorVisibility (out CursorVisibility currentCursorVisibility);
