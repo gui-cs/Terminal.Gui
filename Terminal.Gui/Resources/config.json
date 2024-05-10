@@ -24,7 +24,7 @@
   "Themes": [
     {
       "Default": {
-        "Dialog.DefaultButtonAlignment": "Centered",
+        "Dialog.DefaultButtonJustification": "Right",
         "FrameView.DefaultBorderStyle": "Single",
         "Window.DefaultBorderStyle": "Single",
         "ColorSchemes": [

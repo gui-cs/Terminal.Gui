@@ -327,9 +327,7 @@ public static class MessageBox
             {
                 var b = new Button
                 {
-                    Text = s, 
-                    Y = Pos.AnchorEnd (), 
-                    X = Pos.Justify (Justification.Centered)
+                    Text = s,
                 };
 
                 if (count == defaultButton)
@@ -342,9 +340,9 @@ public static class MessageBox
             }
         }
 
-        Dialog d;
-
-        d = new Dialog
+        Justification buttonJust = Dialog.DefaultButtonJustification;
+        Dialog.DefaultButtonJustification = Justification.Centered;
+        var d = new Dialog
         {
             Buttons = buttonList.ToArray (),
             Title = title,
@@ -352,6 +350,7 @@ public static class MessageBox
             Width = Dim.Percent (60),
             Height = 5 // Border + one line of text + vspace + buttons
         };
+        Dialog.DefaultButtonJustification = buttonJust;
 
         if (width != 0)
         {

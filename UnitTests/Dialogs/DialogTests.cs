@@ -889,6 +889,7 @@ public class DialogTests
 
         win.Loaded += (s, a) =>
                       {
+                          Dialog.DefaultButtonJustification = Justification.Centered;
                           var dlg = new Dialog { Width = 18, Height = 3, Buttons = [new () { Text = "Ok" }] };
 
                           dlg.Loaded += (s, a) =>
@@ -972,6 +973,7 @@ public class DialogTests
         var win = new Window ();
 
         int iterations = -1;
+        Dialog.DefaultButtonJustification = Justification.Centered;
 
         Iteration += (s, a) =>
                      {
@@ -1006,6 +1008,7 @@ public class DialogTests
     public void Dialog_Opened_From_Another_Dialog ()
     {
         ((FakeDriver)Driver).SetBufferSize (30, 10);
+        Dialog.DefaultButtonJustification = Justification.Centered;
 
         var btn1 = new Button { Text = "press me 1" };
         Button btn2 = null;

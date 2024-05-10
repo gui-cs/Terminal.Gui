@@ -51,7 +51,7 @@ public class Dialog : Window
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;
-        ButtonAlignment = DefaultButtonAlignment;
+        ButtonAlignment = DefaultButtonJustification;
 
         AddCommand (
                     Command.QuitToplevel,
@@ -122,7 +122,7 @@ public class Dialog : Window
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static Justification DefaultButtonAlignment { get; set; } = Justification.Centered;
+    public static Justification DefaultButtonJustification { get; set; } = Justification.Right;
 
     /// <summary>
     ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the

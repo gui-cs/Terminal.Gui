@@ -29,12 +29,12 @@ public class ThemeScopeTests
     {
         Reset ();
         Assert.NotEmpty (Themes);
-        Assert.Equal (Justification.Centered, Dialog.DefaultButtonAlignment);
+        Assert.Equal (Justification.Right, Dialog.DefaultButtonJustification);
 
-        Themes ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = Justification.Right;
+        Themes ["Default"] ["Dialog.DefaultButtonJustification"].PropertyValue = Justification.Centered;
 
         ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
-        Assert.Equal (Justification.Right, Dialog.DefaultButtonAlignment);
+        Assert.Equal (Justification.Centered, Dialog.DefaultButtonJustification);
         Reset ();
     }
 

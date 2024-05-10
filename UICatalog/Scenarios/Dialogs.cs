@@ -145,13 +145,15 @@ public class Dialogs : Scenario
             }
         }
 
+        var labels = GetUniqueEnumNames<Justification> ();
         var styleRadioGroup = new RadioGroup
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            RadioLabels = GetUniqueEnumNames<Justification> ().ToArray (),
+            RadioLabels = labels.ToArray (),
         };
         frame.Add (styleRadioGroup);
+        styleRadioGroup.SelectedItem = labels.ToList().IndexOf (Dialog.DefaultButtonJustification.ToString());
 
         frame.ValidatePosDim = true;
 
