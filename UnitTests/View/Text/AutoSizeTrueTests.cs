@@ -1811,7 +1811,7 @@ Y
             Y = 1,
             Width = width,
             Height = 1,
-            Justification = Justification.Centered,
+            TextJustification = Alignment.Centered,
         };
 
         if (autoSize)
@@ -1826,7 +1826,7 @@ Y
             Y = 2,
             Width = width,
             Height = 1,
-            Justification = Justification.Right,
+            TextJustification = Alignment.Right,
         };
         if (autoSize)
         {
@@ -1840,7 +1840,7 @@ Y
             Y = 3,
             Width = width,
             Height = 1,
-            Justification = Justification.Justified,
+            TextJustification = Alignment.Justified,
         };
         if (autoSize)
         {
@@ -1937,7 +1937,7 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalJustification = Justification.Centered
+            VerticalTextJustification = Alignment.Centered
         };
         if (autoSize)
         {
@@ -1952,7 +1952,7 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalJustification = Justification.Bottom
+            VerticalTextJustification = Alignment.Bottom
         };
         if (autoSize)
         {
@@ -1967,7 +1967,7 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalJustification = Justification.Justified
+            VerticalTextJustification = Alignment.Justified
         };
         if (autoSize)
         {

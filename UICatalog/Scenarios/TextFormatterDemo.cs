@@ -75,17 +75,17 @@ public class TextFormatterDemo : Scenario
             }
         }
 
-        List<Justification> justifications = GetUniqueEnumValues<Justification>().ToList ();
+        List<Alignment> justifications = GetUniqueEnumValues<Alignment>().ToList ();
         Label [] singleLines = new Label [justifications.Count];
         Label [] multipleLines = new Label [justifications.Count];
 
         var multiLineHeight = 5;
 
-        foreach (Justification justification in justifications)
+        foreach (Alignment justification in justifications)
         {
             singleLines [(int)justification] = new()
             {
-                Justification = justification,
+                TextJustification = justification,
                 X = 0,
 
                 Width = Dim.Fill (),
@@ -96,7 +96,7 @@ public class TextFormatterDemo : Scenario
 
             multipleLines [(int)justification] = new()
             {
-                Justification = justification,
+                TextJustification = justification,
                 X = 0,
 
                 Width = Dim.Fill (),
@@ -112,7 +112,7 @@ public class TextFormatterDemo : Scenario
         };
         app.Add (label);
 
-        foreach (Justification justification in justifications)
+        foreach (Alignment justification in justifications)
         {
             label = new() { Y = Pos.Bottom (label), Text = $"{justification}:" };
             app.Add (label);
@@ -124,7 +124,7 @@ public class TextFormatterDemo : Scenario
         label = new() { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
         app.Add (label);
 
-        foreach (Justification justification in justifications)
+        foreach (Alignment justification in justifications)
         {
             label = new() { Y = Pos.Bottom (label), Text = $"{justification}:" };
             app.Add (label);
@@ -135,7 +135,7 @@ public class TextFormatterDemo : Scenario
 
         unicodeCheckBox.Toggled += (s, e) =>
                                    {
-                                       foreach (Justification justification in justifications)
+                                       foreach (Alignment justification in justifications)
                                        {
                                            singleLines [(int)justification].Text = e.OldValue == true ? text : unicode;
                                            multipleLines [(int)justification].Text = e.OldValue == true ? text : unicode;

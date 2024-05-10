@@ -1482,8 +1482,8 @@ public class ToplevelTests
                         Y = Pos.Center (),
                         Width = Dim.Fill (),
                         Height = Dim.Fill (),
-                        Justification = Justification.Centered,
-                        VerticalJustification = Justification.Centered,
+                        TextJustification = Alignment.Centered,
+                        VerticalTextJustification = Alignment.Centered,
                         Text = "Test"
                     }
                    );

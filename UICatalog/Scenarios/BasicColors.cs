@@ -32,7 +32,7 @@ public class BasicColors : Scenario
                 Y = 0,
                 Width = 1,
                 Height = 13,
-                VerticalJustification = Justification.Bottom,
+                VerticalTextJustification = Alignment.Bottom,
                 ColorScheme = new ColorScheme { Normal = attr },
                 Text = bg.ToString (),
                 TextDirection = TextDirection.TopBottom_LeftRight
@@ -45,7 +45,7 @@ public class BasicColors : Scenario
                 Y = y,
                 Width = 13,
                 Height = 1,
-                Justification = Justification.Right,
+                TextJustification = Alignment.Right,
                 ColorScheme = new ColorScheme { Normal = attr },
                 Text = bg.ToString ()
             };

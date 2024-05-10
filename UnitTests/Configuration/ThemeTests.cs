@@ -77,15 +77,15 @@ public class ThemeTests
     public void TestSerialize_RoundTrip ()
     {
         var theme = new ThemeScope ();
-        theme ["Dialog.DefaultButtonJustification"].PropertyValue = Justification.Right;
+        theme ["Dialog.DefaultButtonJustification"].PropertyValue = Alignment.Right;
 
         string json = JsonSerializer.Serialize (theme, _jsonOptions);
 
         var deserialized = JsonSerializer.Deserialize<ThemeScope> (json, _jsonOptions);
 
         Assert.Equal (
-                      Justification.Right,
-                      (Justification)deserialized ["Dialog.DefaultButtonJustification"].PropertyValue
+                      Alignment.Right,
+                      (Alignment)deserialized ["Dialog.DefaultButtonJustification"].PropertyValue
                      );
         Reset ();
     }

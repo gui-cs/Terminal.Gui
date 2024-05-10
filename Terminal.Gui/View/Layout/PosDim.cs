@@ -211,7 +211,7 @@ public class Pos
     /// <param name="justification"></param>
     /// <param name="groupId">The optional, unique identifier for the set of views to justify according to <paramref name="justification"/>.</param>
     /// <returns></returns>
-    public static Pos Justify (Justification justification, int groupId = 0) { return new PosJustify (justification, groupId); }
+    public static Pos Justify (Alignment justification, int groupId = 0) { return new PosJustify (justification, groupId); }
 
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
@@ -526,7 +526,7 @@ public class Pos
         /// <summary>
         /// Gets the justification settings.
         /// </summary>
-        public Justifier Justifier { get; } = new ();
+        public Aligner Justifier { get; } = new ();
 
 
         /// <summary>
@@ -542,7 +542,7 @@ public class Pos
             {
                 return;
             }
-            Justifier firstInGroup = null;
+            Aligner firstInGroup = null;
             List<int> dimensionsList = new ();
             List<View> viewsInGroup = views.Where (
                                                    v =>
@@ -585,7 +585,7 @@ public class Pos
             }
 
             firstInGroup.ContainerSize = size;
-            var locations = firstInGroup.Justify (dimensionsList.ToArray ());
+            var locations = firstInGroup.Align (dimensionsList.ToArray ());
 
             for (var index = 0; index < viewsInGroup.Count; index++)
             {
@@ -604,10 +604,10 @@ public class Pos
         /// </summary>
         /// <param name="justification"></param>
         /// <param name="groupId">The unique identifier for the set of views to justify according to <paramref name="justification"/>.</param>
-        public PosJustify (Justification justification, int groupId = 0)
+        public PosJustify (Alignment justification, int groupId = 0)
         {
             Justifier.PutSpaceBetweenItems = true;
-            Justifier.Justification = justification;
+            Justifier.Alignment = justification;
             _groupId = groupId;
             Justifier.PropertyChanged += Justifier_PropertyChanged;
         }
@@ -632,7 +632,7 @@ public class Pos
         /// <inheritdoc />
         public override string ToString ()
         {
-            return $"Justify(groupId={_groupId}, justification={Justifier.Justification})";
+            return $"Justify(groupId={_groupId}, justification={Justifier.Alignment})";
         }
 
         internal override int Anchor (int width)

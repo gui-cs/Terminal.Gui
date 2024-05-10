@@ -78,17 +78,17 @@ public class CsvEditor : Scenario
                                      _miLeft = new MenuItem (
                                                              "_Justify Left",
                                                              "",
-                                                             () => Justify (Justification.Left)
+                                                             () => Justify (Alignment.Left)
                                                             ),
                                      _miRight = new MenuItem (
                                                               "_Justify Right",
                                                               "",
-                                                              () => Justify (Justification.Right)
+                                                              () => Justify (Alignment.Right)
                                                              ),
                                      _miCentered = new MenuItem (
                                                                  "_Justify Centered",
                                                                  "",
-                                                                 () => Justify (Justification.Centered)
+                                                                 () => Justify (Alignment.Centered)
                                                                 ),
 
                                      // Format requires hard typed data table, when we read a CSV everything is untyped (string) so this only works for new columns in this demo
@@ -133,7 +133,7 @@ public class CsvEditor : Scenario
             Y = Pos.Bottom (_tableView),
             Text = "0,0",
             Width = Dim.Fill (),
-            Justification = Justification.Right
+            TextJustification = Alignment.Right
         };
         _selectedCellLabel.TextChanged += SelectedCellLabel_TextChanged;
 
@@ -218,7 +218,7 @@ public class CsvEditor : Scenario
         _tableView.Update ();
     }
 
-    private void Justify (Justification newJustification)
+    private void Justify (Alignment newJustification)
     {
         if (NoTableLoaded ())
         {
@@ -228,9 +228,9 @@ public class CsvEditor : Scenario
         ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (_tableView.SelectedColumn);
         style.Justification = newJustification;
 
-        _miLeft.Checked = style.Justification == Justification.Left;
-        _miRight.Checked = style.Justification == Justification.Right;
-        _miCentered.Checked = style.Justification == Justification.Centered;
+        _miLeft.Checked = style.Justification == Alignment.Left;
+        _miRight.Checked = style.Justification == Alignment.Right;
+        _miCentered.Checked = style.Justification == Alignment.Centered;
 
         _tableView.Update ();
     }
@@ -437,9 +437,9 @@ public class CsvEditor : Scenario
 
         ColumnStyle style = _tableView.Style.GetColumnStyleIfAny (_tableView.SelectedColumn);
 
-        _miLeft.Checked = style?.Justification == Justification.Left;
-        _miRight.Checked = style?.Justification == Justification.Right;
-        _miCentered.Checked = style?.Justification == Justification.Centered;
+        _miLeft.Checked = style?.Justification == Alignment.Left;
+        _miRight.Checked = style?.Justification == Alignment.Right;
+        _miCentered.Checked = style?.Justification == Alignment.Centered;
     }
 
     private void Open ()

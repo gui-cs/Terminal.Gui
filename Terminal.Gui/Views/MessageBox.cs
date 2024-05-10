@@ -340,8 +340,8 @@ public static class MessageBox
             }
         }
 
-        Justification buttonJust = Dialog.DefaultButtonJustification;
-        Dialog.DefaultButtonJustification = Justification.Centered;
+        Alignment buttonJust = Dialog.DefaultButtonJustification;
+        Dialog.DefaultButtonJustification = Alignment.Centered;
         var d = new Dialog
         {
             Buttons = buttonList.ToArray (),
@@ -374,7 +374,7 @@ public static class MessageBox
         var messageLabel = new Label
         {
             Text = message,
-            Justification = Justification.Centered,
+            TextJustification = Alignment.Centered,
             X = Pos.Center (),
             Y = 0
         };

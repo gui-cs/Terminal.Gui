@@ -623,7 +623,7 @@ public class DynamicMenuBar : Scenario
             var _lblMenuBar = new Label
             {
                 ColorScheme = Colors.ColorSchemes ["Dialog"],
-                Justification = Justification.Centered,
+                TextJustification = Alignment.Centered,
                 X = Pos.Right (_btnPrevious) + 1,
                 Y = Pos.Top (_btnPrevious),
 
@@ -636,7 +636,7 @@ public class DynamicMenuBar : Scenario
 
             var _lblParent = new Label
             {
-                Justification = Justification.Centered,
+                TextJustification = Alignment.Centered,
                 X = Pos.Right (_btnPrevious) + 1,
                 Y = Pos.Top (_btnPrevious) + 1,
 

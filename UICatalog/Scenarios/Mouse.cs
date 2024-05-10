@@ -98,8 +98,8 @@ public class Mouse : Scenario
             Width = 20,
             Height = 3,
             Text = "Enter/Leave Demo",
-            Justification = Justification.Centered,
-            VerticalJustification = Justification.Centered,
+            TextJustification = Alignment.Centered,
+            VerticalTextJustification = Alignment.Centered,
             ColorScheme = Colors.ColorSchemes ["Dialog"]
         };
         win.Add (demo);

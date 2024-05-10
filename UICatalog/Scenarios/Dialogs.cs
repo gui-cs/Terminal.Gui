@@ -18,7 +18,7 @@ public class Dialogs : Scenario
         var numButtonsLabel = new Label
         {
             X = 0,
-            Justification = Justification.Right,
+            TextJustification = Alignment.Right,
             Text = "_Number of Buttons:"
         };
 
@@ -28,7 +28,7 @@ public class Dialogs : Scenario
             Y = 0,
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
-            Justification = Justification.Right,
+            TextJustification = Alignment.Right,
             Text = "_Width:"
         };
         frame.Add (label);
@@ -49,7 +49,7 @@ public class Dialogs : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
-            Justification = Justification.Right,
+            TextJustification = Alignment.Right,
             Text = "_Height:"
         };
         frame.Add (label);
@@ -83,7 +83,7 @@ public class Dialogs : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
-            Justification = Justification.Right,
+            TextJustification = Alignment.Right,
             Text = "_Title:"
         };
         frame.Add (label);
@@ -115,7 +115,7 @@ public class Dialogs : Scenario
         {
             X = Pos.Right (numButtonsLabel) + 1,
             Y = Pos.Bottom (numButtonsLabel),
-            Justification = Justification.Right,
+            TextJustification = Alignment.Right,
             Text = $"_Add {char.ConvertFromUtf32 (CODE_POINT)} to button text to stress wide char support",
             Checked = false
         };
@@ -127,7 +127,7 @@ public class Dialogs : Scenario
             Y = Pos.Bottom (glyphsNotWords),
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
-            Justification = Justification.Right,
+            TextJustification = Alignment.Right,
             Text = "Button St_yle:"
         };
         frame.Add (label);
@@ -145,7 +145,7 @@ public class Dialogs : Scenario
             }
         }
 
-        var labels = GetUniqueEnumNames<Justification> ();
+        var labels = GetUniqueEnumNames<Alignment> ();
         var styleRadioGroup = new RadioGroup
         {
             X = Pos.Right (label) + 1,
@@ -175,7 +175,7 @@ public class Dialogs : Scenario
 
         label = new()
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 4, Justification = Justification.Right, Text = "Button Pressed:"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 4, TextJustification = Alignment.Right, Text = "Button Pressed:"
         };
         Win.Add (label);
 
@@ -282,7 +282,7 @@ public class Dialogs : Scenario
             dialog = new()
             {
                 Title = titleEdit.Text,
-                ButtonJustification = (Justification)styleRadioGroup.SelectedItem,
+                ButtonJustification = (Alignment)styleRadioGroup.SelectedItem,
                 Buttons = buttons.ToArray ()
             };
 

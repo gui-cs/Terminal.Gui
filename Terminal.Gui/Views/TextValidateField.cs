@@ -539,7 +539,7 @@ namespace Terminal.Gui
             {
                 int c = _provider.Cursor (mouseEvent.X - GetMargins (Viewport.Width).left);
 
-                if (_provider.Fixed == false && Justification == Justification.Right && Text.Length > 0)
+                if (_provider.Fixed == false && TextJustification == Alignment.Right && Text.Length > 0)
                 {
                     c++;
                 }
@@ -633,7 +633,7 @@ namespace Terminal.Gui
             // When it's right-aligned and it's a normal input, the cursor behaves differently.
             int curPos;
 
-            if (_provider?.Fixed == false && Justification == Justification.Right)
+            if (_provider?.Fixed == false && TextJustification == Alignment.Right)
             {
                 curPos = _cursorPosition + left - 1;
             }
@@ -650,7 +650,7 @@ namespace Terminal.Gui
         /// <returns></returns>
         private bool BackspaceKeyHandler ()
         {
-            if (_provider.Fixed == false && Justification == Justification.Right && _cursorPosition <= 1)
+            if (_provider.Fixed == false && TextJustification == Alignment.Right && _cursorPosition <= 1)
             {
                 return false;
             }
@@ -688,7 +688,7 @@ namespace Terminal.Gui
         /// <returns></returns>
         private bool DeleteKeyHandler ()
         {
-            if (_provider.Fixed == false && Justification == Justification.Right)
+            if (_provider.Fixed == false && TextJustification == Alignment.Right)
             {
                 _cursorPosition = _provider.CursorLeft (_cursorPosition);
             }
@@ -717,13 +717,13 @@ namespace Terminal.Gui
             int count = Text.Length;
             int total = width - count;
 
-            switch (Justification)
+            switch (TextJustification)
             {
-                case Justification.Left:
+                case Alignment.Left:
                     return (0, total);
-                case Justification.Centered:
+                case Alignment.Centered:
                     return (total / 2, total / 2 + total % 2);
-                case Justification.Right:
+                case Alignment.Right:
                     return (total, 0);
                 default:
                     return (0, total);

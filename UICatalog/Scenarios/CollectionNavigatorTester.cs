@@ -142,7 +142,7 @@ public class CollectionNavigatorTester : Scenario
         var label = new Label
         {
             Text = "ListView",
-            Justification = Justification.Centered,
+            TextJustification = Alignment.Centered,
             X = 0,
             Y = 1, // for menu
             Width = Dim.Percent (50),
@@ -171,7 +171,7 @@ public class CollectionNavigatorTester : Scenario
         var label = new Label
         {
             Text = "TreeView",
-            Justification = Justification.Centered,
+            TextJustification = Alignment.Centered,
             X = Pos.Right (_listView) + 2,
             Y = 1, // for menu
             Width = Dim.Percent (50),

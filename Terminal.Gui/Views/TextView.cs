@@ -1776,7 +1776,7 @@ internal class WordWrapManager
                                                             TextFormatter.Format (
                                                                                   TextModel.ToString (line),
                                                                                   width,
-                                                                                  Justification.Left,
+                                                                                  Alignment.Left,
                                                                                   true,
                                                                                   preserveTrailingSpaces,
                                                                                   tabWidth

@@ -232,8 +232,8 @@ public class Thickness : IEquatable<Thickness>
             var tf = new TextFormatter
             {
                 Text = label is null ? string.Empty : $"{label} {this}",
-                Justification = Justification.Centered,
-                VerticalJustification = Justification.Bottom,
+                Justification = Alignment.Centered,
+                VerticalJustification = Alignment.Bottom,
                 AutoSize = true
             };
             tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect);

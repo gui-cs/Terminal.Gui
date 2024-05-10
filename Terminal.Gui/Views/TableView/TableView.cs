@@ -2085,16 +2085,16 @@ public class TableView : View
                         - (representation.EnumerateRunes ().Sum (c => c.GetColumns ())
                            + 1 /*leave 1 space for cell boundary*/);
 
-            switch (colStyle?.GetJustification (originalCellValue) ?? Justification.Left)
+            switch (colStyle?.GetJustification (originalCellValue) ?? Alignment.Left)
             {
-                case Justification.Left:
+                case Alignment.Left:
                     return representation + new string (' ', toPad);
-                case Justification.Right:
+                case Alignment.Right:
                     return new string (' ', toPad) + representation;
 
                 // TODO: With single line cells, centered and justified are the same right?
-                case Justification.Centered:
-                case Justification.Justified:
+                case Alignment.Centered:
+                case Alignment.Justified:
                     return
                         new string (' ', (int)Math.Floor (toPad / 2.0))
                         + // round down

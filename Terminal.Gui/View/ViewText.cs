@@ -87,7 +87,7 @@ public partial class View
     ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="Dim.DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text justification.</value>
-    public virtual Justification TextJustification
+    public virtual Alignment TextJustification
     {
         get => TextFormatter.Justification;
         set
@@ -130,7 +130,7 @@ public partial class View
     ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="Dim.DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The vertical text justification.</value>
-    public virtual Justification VerticalTextJustification
+    public virtual Alignment VerticalTextJustification
     {
         get => TextFormatter.VerticalJustification;
         set

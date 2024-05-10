@@ -206,7 +206,7 @@ public class LabelTests
     {
         var label = new Label ();
         Assert.Equal (string.Empty, label.Text);
-        Assert.Equal (Justification.Left, label.Justification);
+        Assert.Equal (Alignment.Left, label.TextJustification);
         Assert.False (label.CanFocus);
         Assert.Equal (new Rectangle (0, 0, 0, 0), label.Frame);
         Assert.Equal (KeyCode.Null, label.HotKey);

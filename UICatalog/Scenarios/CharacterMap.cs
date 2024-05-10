@@ -958,7 +958,7 @@ internal class CharMap : View
             Y = 1,
             Width = Dim.Fill (),
             Height = Dim.Fill (1),
-            Justification = Justification.Centered
+            TextJustification = Alignment.Centered
         };
         var spinner = new SpinnerView { X = Pos.Center (), Y = Pos.Center (), Style = new Aesthetic () };
         spinner.AutoSpin = true;

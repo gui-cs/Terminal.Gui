@@ -4,13 +4,13 @@ using static Terminal.Gui.Pos;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Controls how the <see cref="Justifier"/> justifies items within a container.
+///     Controls how the <see cref="Aligner"/> aligns items within a container.
 /// </summary>
-public enum Justification
+public enum Alignment
 {
     /// <summary>
     ///     The items will be aligned to the left.
-    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
     /// <remarks>
@@ -27,14 +27,14 @@ public enum Justification
 
     /// <summary>
     ///     The items will be aligned to the top.
-    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
     Top = Left,
 
     /// <summary>
     ///     The items will be aligned to the right.
-    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
     /// <remarks>
@@ -51,15 +51,15 @@ public enum Justification
 
     /// <summary>
     ///     The items will be aligned to the bottom.
-    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
     Bottom = Right,
 
     /// <summary>
     ///     The group will be centered in the container.
-    ///     If centering is not possible, the group will be left-justified.
-    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+    ///     If centering is not possible, the group will be left-aligned.
+    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
     /// <remarks>
@@ -77,7 +77,7 @@ public enum Justification
     /// <summary>
     ///     The items will be justified. Space will be added between the items such that the first item
     ///     is at the start and the right side of the last item against the end.
-    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
     /// <remarks>
@@ -94,7 +94,7 @@ public enum Justification
 
     /// <summary>
     ///     The first item will be aligned to the left and the remaining will aligned to the right.
-    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
     /// <remarks>
@@ -111,14 +111,14 @@ public enum Justification
 
     /// <summary>
     ///     The first item will be aligned to the top and the remaining will aligned to the bottom.
-    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
     FirstTopRestBottom = FirstLeftRestRight,
 
     /// <summary>
     ///     The last item will be aligned to the right and the remaining will aligned to the left.
-    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
     /// <remarks>
@@ -135,29 +135,29 @@ public enum Justification
 
     /// <summary>
     ///     The last item will be aligned to the bottom and the remaining will aligned to the left.
-    ///     Set <see cref="Justifier.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
     LastBottomRestTop = LastRightRestLeft,
 }
 
 /// <summary>
-///     Justifies items within a container based on the specified <see cref="Justification"/>.
+///     Aligns items within a container based on the specified <see cref="Gui.Alignment"/>.
 /// </summary>
-public class Justifier : INotifyPropertyChanged
+public class Aligner : INotifyPropertyChanged
 {
-    private Justification _justification;
+    private Alignment _alignment;
 
     /// <summary>
-    ///     Gets or sets how the <see cref="Justifier"/> justifies items within a container.
+    ///     Gets or sets how the <see cref="Aligner"/> aligns items within a container.
     /// </summary>
-    public Justification Justification
+    public Alignment Alignment
     {
-        get => _justification;
+        get => _alignment;
         set
         {
-            _justification = value;
-            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (Justification)));
+            _alignment = value;
+            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (Alignment)));
         }
     }
 
@@ -179,7 +179,7 @@ public class Justifier : INotifyPropertyChanged
     private bool _putSpaceBetweenItems;
 
     /// <summary>
-    ///     Gets or sets whether <see cref="Justifier"/> puts a space is placed between items. Default is
+    ///     Gets or sets whether <see cref="Aligner"/> puts a space is placed between items. Default is
     ///     <see langword="false"/>. If <see langword="true"/>, a space will be
     ///     placed between each item, which is useful for justifying text.
     /// </summary>
@@ -203,25 +203,25 @@ public class Justifier : INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
 
     /// <summary>
-    ///     Takes a list of items and returns their positions when justified within a container <see name="ContainerSize"/>
+    ///     Takes a list of items and returns their positions when aligned within a container <see name="ContainerSize"/>
     ///     wide based on the specified
-    ///     <see cref="Justification"/>.
+    ///     <see cref="Alignment"/>.
     /// </summary>
-    /// <param name="sizes">The sizes of the items to justify.</param>
+    /// <param name="sizes">The sizes of the items to align.</param>
     /// <returns>The locations of the items, from left to right.</returns>
-    public int [] Justify (int [] sizes) { return Justify (Justification, PutSpaceBetweenItems, ContainerSize, sizes); }
+    public int [] Align (int [] sizes) { return Align (Alignment, PutSpaceBetweenItems, ContainerSize, sizes); }
 
     /// <summary>
-    ///     Takes a list of items and returns their positions when justified within a container
+    ///     Takes a list of items and returns their positions when aligned within a container
     ///     <paramref name="containerSize"/> wide based on the specified
-    ///     <see cref="Justification"/>.
+    ///     <see cref="Alignment"/>.
     /// </summary>
-    /// <param name="sizes">The sizes of the items to justify.</param>
-    /// <param name="justification">The justification style.</param>
+    /// <param name="sizes">The sizes of the items to align.</param>
+    /// <param name="alignment">Specifies how the items will be aligned.</param>
     /// <param name="putSpaceBetweenItems">Puts a space is placed between items.</param>
     /// <param name="containerSize">The size of the container.</param>
     /// <returns>The locations of the items, from left to right.</returns>
-    public static int [] Justify (Justification justification, bool putSpaceBetweenItems, int containerSize, int [] sizes)
+    public static int [] Align (Alignment alignment, bool putSpaceBetweenItems, int containerSize, int [] sizes)
     {
         if (sizes.Length == 0)
         {
@@ -246,9 +246,9 @@ public class Justifier : INotifyPropertyChanged
             spaces = containerSize - totalItemsSize;
         }
 
-        switch (justification)
+        switch (alignment)
         {
-            case Justification.Left:
+            case Alignment.Left:
                 var currentPosition = 0;
 
                 for (var i = 0; i < sizes.Length; i++)
@@ -269,7 +269,7 @@ public class Justifier : INotifyPropertyChanged
                 }
 
                 break;
-            case Justification.Right:
+            case Alignment.Right:
                 currentPosition = containerSize - totalItemsSize - spaces;
 
                 for (var i = 0; i < sizes.Length; i++)
@@ -283,7 +283,7 @@ public class Justifier : INotifyPropertyChanged
 
                 break;
 
-            case Justification.Centered:
+            case Alignment.Centered:
                 if (sizes.Length > 1)
                 {
                     // remaining space to be distributed before first and after the items
@@ -314,7 +314,7 @@ public class Justifier : INotifyPropertyChanged
 
                 break;
 
-            case Justification.Justified:
+            case Alignment.Justified:
                 int spaceBetween = sizes.Length > 1 ? (containerSize - totalItemsSize) / (sizes.Length - 1) : 0;
                 int remainder = sizes.Length > 1 ? (containerSize - totalItemsSize) % (sizes.Length - 1) : 0;
                 currentPosition = 0;
@@ -330,7 +330,7 @@ public class Justifier : INotifyPropertyChanged
                 break;
 
             // 111 2222        33333
-            case Justification.LastRightRestLeft:
+            case Alignment.LastRightRestLeft:
                 if (sizes.Length > 1)
                 {
                     if (totalItemsSize > containerSize)
@@ -367,7 +367,7 @@ public class Justifier : INotifyPropertyChanged
                 break;
 
             // 111        2222 33333
-            case Justification.FirstLeftRestRight:
+            case Alignment.FirstLeftRestRight:
                 if (sizes.Length > 1)
                 {
                     currentPosition = 0;
@@ -402,7 +402,7 @@ public class Justifier : INotifyPropertyChanged
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException (nameof (justification), justification, null);
+                throw new ArgumentOutOfRangeException (nameof (alignment), alignment, null);
         }
 
         return positions;
