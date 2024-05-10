@@ -128,7 +128,7 @@ public class Dialogs : Scenario
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
             TextAlignment = Alignment.Right,
-            Text = "Button St_yle:"
+            Text = "Button A_lignment:"
         };
         frame.Add (label);
 
@@ -146,14 +146,14 @@ public class Dialogs : Scenario
         }
 
         var labels = GetUniqueEnumNames<Alignment> ();
-        var styleRadioGroup = new RadioGroup
+        var alignmentGroup = new RadioGroup
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             RadioLabels = labels.ToArray (),
         };
-        frame.Add (styleRadioGroup);
-        styleRadioGroup.SelectedItem = labels.ToList().IndexOf (Dialog.DefaultButtonAlignment.ToString());
+        frame.Add (alignmentGroup);
+        alignmentGroup.SelectedItem = labels.ToList().IndexOf (Dialog.DefaultButtonAlignment.ToString());
 
         frame.ValidatePosDim = true;
 
@@ -165,7 +165,7 @@ public class Dialogs : Scenario
                 + titleEdit.Frame.Height
                 + numButtonsEdit.Frame.Height
                 + glyphsNotWords.Frame.Height
-                + styleRadioGroup.Frame.Height
+                + alignmentGroup.Frame.Height
                 + frame.GetAdornmentsThickness ().Vertical;
         }
 
@@ -202,7 +202,7 @@ public class Dialogs : Scenario
                                                                       titleEdit,
                                                                       numButtonsEdit,
                                                                       glyphsNotWords,
-                                                                      styleRadioGroup,
+                                                                      alignmentGroup,
                                                                       buttonPressedLabel
                                                                      );
                                        Application.Run (dlg);
