@@ -218,7 +218,7 @@ public class CsvEditor : Scenario
         _tableView.Update ();
     }
 
-    private void Align (Justification newAlignment)
+    private void Align (Justification newJustification)
     {
         if (NoTableLoaded ())
         {
@@ -226,11 +226,11 @@ public class CsvEditor : Scenario
         }
 
         ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (_tableView.SelectedColumn);
-        style.Alignment = newAlignment;
+        style.Justification = newJustification;
 
-        _miLeft.Checked = style.Alignment == Justification.Left;
-        _miRight.Checked = style.Alignment == Justification.Right;
-        _miCentered.Checked = style.Alignment == Justification.Centered;
+        _miLeft.Checked = style.Justification == Justification.Left;
+        _miRight.Checked = style.Justification == Justification.Right;
+        _miCentered.Checked = style.Justification == Justification.Centered;
 
         _tableView.Update ();
     }
@@ -437,9 +437,9 @@ public class CsvEditor : Scenario
 
         ColumnStyle style = _tableView.Style.GetColumnStyleIfAny (_tableView.SelectedColumn);
 
-        _miLeft.Checked = style?.Alignment == Justification.Left;
-        _miRight.Checked = style?.Alignment == Justification.Right;
-        _miCentered.Checked = style?.Alignment == Justification.Centered;
+        _miLeft.Checked = style?.Justification == Justification.Left;
+        _miRight.Checked = style?.Justification == Justification.Right;
+        _miCentered.Checked = style?.Justification == Justification.Centered;
     }
 
     private void Open ()

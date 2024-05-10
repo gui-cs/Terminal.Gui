@@ -1937,7 +1937,7 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            Justification = Justification.Centered
+            VerticalJustification = Justification.Centered
         };
         if (autoSize)
         {

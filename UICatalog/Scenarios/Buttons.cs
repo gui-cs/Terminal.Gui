@@ -209,7 +209,7 @@ public class Buttons : Scenario
 
         var label = new Label
         {
-            X = 2, Y = Pos.Bottom (computedFrame) + 1, Text = "Text Alignment (changes the four buttons above): "
+            X = 2, Y = Pos.Bottom (computedFrame) + 1, Text = "Text Justification (changes the four buttons above): "
         };
         main.Add (label);
 

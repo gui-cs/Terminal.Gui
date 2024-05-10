@@ -709,7 +709,7 @@ namespace Terminal.Gui
             return true;
         }
 
-        /// <summary>Margins for text alignment.</summary>
+        /// <summary>Margins for text justification.</summary>
         /// <param name="width">Total width</param>
         /// <returns>Left and right margins</returns>
         private (int left, int right) GetMargins (int width)

@@ -1,17 +1,17 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> and
+///     Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Justification"/> and
 ///     textual representation of cells (e.g. date formats)
 ///     <a href="../docs/tableview.md">See TableView Deep Dive for more information</a>.
 /// </summary>
 public class ColumnStyle
 {
     /// <summary>
-    ///     Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will
-    ///     override <see cref="Alignment"/>
+    ///     Defines a delegate for returning custom justification per cell based on cell values. When specified this will
+    ///     override <see cref="Justification"/>
     /// </summary>
-    public Func<object, Justification> AlignmentGetter;
+    public Func<object, Justification> JustificationGetter;
 
     /// <summary>
     ///     Defines a delegate for returning a custom color scheme per cell based on cell values. Return null for the
@@ -20,26 +20,26 @@ public class ColumnStyle
     public CellColorGetterDelegate ColorGetter;
 
     /// <summary>
-    ///     Defines a delegate for returning custom representations of cell values.  If not set then
-    ///     <see cref="object.ToString()"/> is used.  Return values from your delegate may be truncated e.g. based on
+    ///     Defines a delegate for returning custom representations of cell values. If not set then
+    ///     <see cref="object.ToString()"/> is used. Return values from your delegate may be truncated e.g. based on
     ///     <see cref="MaxWidth"/>
     /// </summary>
     public Func<object, string> RepresentationGetter;
 
-    private bool visible = true;
+    private bool _visible = true;
 
     /// <summary>
-    ///     Defines the default alignment for all values rendered in this column.  For custom alignment based on cell
-    ///     contents use <see cref="AlignmentGetter"/>.
+    ///     Defines the default justification for all values rendered in this column. For custom justification based on cell
+    ///     contents use <see cref="JustificationGetter"/>.
     /// </summary>
-    public Justification Alignment { get; set; }
+    public Justification Justification { get; set; }
 
     /// <summary>Defines the format for values e.g. "yyyy-MM-dd" for dates</summary>
     public string Format { get; set; }
 
     /// <summary>
-    ///     Set the maximum width of the column in characters.  This value will be ignored if more than the tables
-    ///     <see cref="TableView.MaxCellWidth"/>.  Defaults to <see cref="TableView.DefaultMaxCellWidth"/>
+    ///     Set the maximum width of the column in characters. This value will be ignored if more than the tables
+    ///     <see cref="TableView.MaxCellWidth"/>. Defaults to <see cref="TableView.DefaultMaxCellWidth"/>
     /// </summary>
     public int MaxWidth { get; set; } = TableView.DefaultMaxCellWidth;
 
@@ -47,7 +47,7 @@ public class ColumnStyle
     public int MinAcceptableWidth { get; set; } = TableView.DefaultMinAcceptableWidth;
 
     /// <summary>
-    ///     Set the minimum width of the column in characters.  Setting this will ensure that even when a column has short
+    ///     Set the minimum width of the column in characters. Setting this will ensure that even when a column has short
     ///     content/header it still fills a given width of the control.
     ///     <para>
     ///         This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> or the
@@ -64,24 +64,24 @@ public class ColumnStyle
     /// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
     public bool Visible
     {
-        get => MaxWidth >= 0 && visible;
-        set => visible = value;
+        get => MaxWidth >= 0 && _visible;
+        set => _visible = value;
     }
 
     /// <summary>
-    ///     Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/
-    ///     <see cref="Alignment"/>
+    ///     Returns the justification for the cell based on <paramref name="cellValue"/> and <see cref="JustificationGetter"/>/
+    ///     <see cref="Justification"/>
     /// </summary>
     /// <param name="cellValue"></param>
     /// <returns></returns>
-    public Justification GetAlignment (object cellValue)
+    public Justification GetJustification (object cellValue)
     {
-        if (AlignmentGetter is { })
+        if (JustificationGetter is { })
         {
-            return AlignmentGetter (cellValue);
+            return JustificationGetter (cellValue);
         }
 
-        return Alignment;
+        return Justification;
     }
 
     /// <summary>

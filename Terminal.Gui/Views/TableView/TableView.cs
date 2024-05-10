@@ -2085,7 +2085,7 @@ public class TableView : View
                         - (representation.EnumerateRunes ().Sum (c => c.GetColumns ())
                            + 1 /*leave 1 space for cell boundary*/);
 
-            switch (colStyle?.GetAlignment (originalCellValue) ?? Justification.Left)
+            switch (colStyle?.GetJustification (originalCellValue) ?? Justification.Left)
             {
                 case Justification.Left:
                     return representation + new string (' ', toPad);

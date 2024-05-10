@@ -1107,12 +1107,12 @@ public class TableEditor : Scenario
     {
         _tableView.Style.ColumnStyles.Clear ();
 
-        var alignMid = new ColumnStyle { Alignment = Justification.Centered };
-        var alignRight = new ColumnStyle { Alignment = Justification.Right };
+        var alignMid = new ColumnStyle { Justification = Justification.Centered };
+        var alignRight = new ColumnStyle { Justification = Justification.Right };
 
         var dateFormatStyle = new ColumnStyle
         {
-            Alignment = Justification.Right,
+            Justification = Justification.Right,
             RepresentationGetter = v =>
                                        v is DateTime d ? d.ToString ("yyyy-MM-dd") : v.ToString ()
         };
@@ -1121,7 +1121,7 @@ public class TableEditor : Scenario
         {
             Format = "0.##",
             MinWidth = 10,
-            AlignmentGetter = v => v is double d
+            JustificationGetter = v => v is double d
                                        ?
 
                                        // align negative values right

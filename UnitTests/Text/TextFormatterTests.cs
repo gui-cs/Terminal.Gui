@@ -53,36 +53,36 @@ public class TextFormatterTests
         tf.Text = testText;
         Size expectedSize = new (testText.Length, 1);
         Assert.Equal (testText, tf.Text);
-        Assert.Equal (Justification.Left, tf.Alignment);
+        Assert.Equal (Justification.Left, tf.Justification);
         Assert.Equal (expectedSize, tf.Size);
         tf.Draw (testBounds, new Attribute (), new Attribute ());
         Assert.Equal (expectedSize, tf.Size);
         Assert.NotEmpty (tf.GetLines ());
 
-        tf.Alignment = Justification.Right;
+        tf.Justification = Justification.Right;
         expectedSize = new (testText.Length, 1);
         Assert.Equal (testText, tf.Text);
-        Assert.Equal (Justification.Right, tf.Alignment);
+        Assert.Equal (Justification.Right, tf.Justification);
         Assert.Equal (expectedSize, tf.Size);
         tf.Draw (testBounds, new Attribute (), new Attribute ());
         Assert.Equal (expectedSize, tf.Size);
         Assert.NotEmpty (tf.GetLines ());
 
-        tf.Alignment = Justification.Right;
-        expectedSize = new (testText.Length, 1);
-        tf.Size = expectedSize;
-        Assert.Equal (testText, tf.Text);
-        Assert.Equal (Justification.Right, tf.Alignment);
-        Assert.Equal (expectedSize, tf.Size);
-        tf.Draw (testBounds, new Attribute (), new Attribute ());
-        Assert.Equal (expectedSize, tf.Size);
-        Assert.NotEmpty (tf.GetLines ());
-
-        tf.Alignment = Justification.Centered;
+        tf.Justification = Justification.Right;
         expectedSize = new (testText.Length, 1);
         tf.Size = expectedSize;
         Assert.Equal (testText, tf.Text);
-        Assert.Equal (Justification.Centered, tf.Alignment);
+        Assert.Equal (Justification.Right, tf.Justification);
+        Assert.Equal (expectedSize, tf.Size);
+        tf.Draw (testBounds, new Attribute (), new Attribute ());
+        Assert.Equal (expectedSize, tf.Size);
+        Assert.NotEmpty (tf.GetLines ());
+
+        tf.Justification = Justification.Centered;
+        expectedSize = new (testText.Length, 1);
+        tf.Size = expectedSize;
+        Assert.Equal (testText, tf.Text);
+        Assert.Equal (Justification.Centered, tf.Justification);
         Assert.Equal (expectedSize, tf.Size);
         tf.Draw (testBounds, new Attribute (), new Attribute ());
         Assert.Equal (expectedSize, tf.Size);
@@ -1336,7 +1336,7 @@ ssb
         Assert.NotEmpty (tf.GetLines ());
         Assert.False (tf.NeedsFormat); // get_Lines causes a Format
 
-        tf.Alignment = Justification.Centered;
+        tf.Justification = Justification.Centered;
         Assert.True (tf.NeedsFormat);
         Assert.NotEmpty (tf.GetLines ());
         Assert.False (tf.NeedsFormat); // get_Lines causes a Format
@@ -3362,7 +3362,7 @@ ssb
         TextFormatter tf = new ()
         {
             Text = text,
-            Alignment = Justification.Left,
+            Justification = Justification.Left,
             AutoSize = autoSize,
         };
 
@@ -3399,7 +3399,7 @@ ssb
         TextFormatter tf = new ()
         {
             Text = text,
-            Alignment = Justification.Right,
+            Justification = Justification.Right,
             AutoSize = autoSize,
         };
 
@@ -3442,7 +3442,7 @@ ssb
         TextFormatter tf = new ()
         {
             Text = text,
-            Alignment = Justification.Centered,
+            Justification = Justification.Centered,
             AutoSize = autoSize,
         };
 
@@ -3487,7 +3487,7 @@ ssb
         TextFormatter tf = new ()
         {
             Text = text,
-            Alignment = Justification.Justified,
+            Justification = Justification.Justified,
             AutoSize = autoSize,
         };
 
@@ -3577,7 +3577,7 @@ Nice       Work")]
         TextFormatter tf = new ()
         {
             Text = text,
-            Alignment = Justification.Justified,
+            Justification = Justification.Justified,
             Size = new Size (width, height),
             MultiLine = true
         };
@@ -3629,7 +3629,7 @@ ek")]
         {
             Text = text,
             Direction = TextDirection.TopBottom_LeftRight,
-            VerticalAlignment = Justification.Justified,
+            VerticalJustification = Justification.Justified,
             Size = new Size (width, height),
             MultiLine = true
         };
@@ -3685,9 +3685,9 @@ ek")]
         TextFormatter tf = new ()
         {
             Text = text,
-            Alignment = Justification.Right,
+            Justification = Justification.Right,
             Direction = TextDirection.TopBottom_LeftRight,
-            VerticalAlignment = Justification.Bottom,
+            VerticalJustification = Justification.Bottom,
             AutoSize = autoSize,
         };
 
@@ -3827,7 +3827,7 @@ B")]
         {
             Text = text,
             Direction = TextDirection.TopBottom_LeftRight,
-            VerticalAlignment = Justification.Centered,
+            VerticalJustification = Justification.Centered,
             AutoSize = autoSize,
         };
 
@@ -6239,8 +6239,8 @@ B")]
     {
         TextFormatter tf = new ()
         {
-            Alignment = horizontalTextAlignment,
-            VerticalAlignment = Justification,
+            Justification = horizontalTextAlignment,
+            VerticalJustification = Justification,
             Direction = textDirection,
             Size = new (7, 7),
             Text = text

@@ -32,7 +32,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonAlignment = Justification.Centered,
+            ButtonJustification = Justification.Centered,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -57,7 +57,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonAlignment = Justification.Justified,
+            ButtonJustification = Justification.Justified,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -82,7 +82,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonAlignment = Justification.Right,
+            ButtonJustification = Justification.Right,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -107,7 +107,7 @@ public class DialogTests
             Title = title,
             Width = width,
             Height = 1,
-            ButtonAlignment = Justification.Left,
+            ButtonJustification = Justification.Left,
             Buttons = [new Button { Text = btn1Text }]
         };
 
@@ -1359,7 +1359,7 @@ public class DialogTests
             Y = 0,
             Width = width,
             Height = 1,
-            ButtonAlignment = align,
+            ButtonJustification = align,
             Buttons = btns
         };
 

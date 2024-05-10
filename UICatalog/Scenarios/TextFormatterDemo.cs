@@ -63,7 +63,19 @@ public class TextFormatterDemo : Scenario
 
         app.Add (unicodeCheckBox);
 
-        List<Justification> alignments = Enum.GetValues (typeof (Justification)).Cast<Justification> ().ToList ();
+        static IEnumerable<T> GetUniqueEnumValues<T> () where T : Enum
+        {
+            var values = new HashSet<T> ();
+            foreach (T v in Enum.GetValues (typeof(T)))
+            {
+                if (values.Add (v))
+                {
+                    yield return v;
+                }
+            }
+        }
+
+        List<Justification> alignments = GetUniqueEnumValues<Justification>().ToList ();
         Label [] singleLines = new Label [alignments.Count];
         Label [] multipleLines = new Label [alignments.Count];
 

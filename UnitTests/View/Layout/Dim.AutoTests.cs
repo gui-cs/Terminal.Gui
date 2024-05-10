@@ -681,11 +681,11 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.Alignment = Justification.Justified;
+        view.TextFormatter.Justification = Justification.Justified;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.VerticalAlignment = Justification.Centered;
+        view.TextFormatter.VerticalJustification = Justification.Centered;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 

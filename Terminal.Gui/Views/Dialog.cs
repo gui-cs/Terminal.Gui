@@ -51,7 +51,7 @@ public class Dialog : Window
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;
-        ButtonAlignment = DefaultButtonJustification;
+        ButtonJustification = DefaultButtonJustification;
 
         AddCommand (
                     Command.QuitToplevel,
@@ -96,9 +96,9 @@ public class Dialog : Window
         }
     }
 
-    // TODO: Update button.X = Pos.Justify when alignment changes
-    /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
-    public Justification ButtonAlignment { get; set; }
+    // TODO: Update button.X = Pos.Justify when justification changes
+    /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are justified along the bottom of the dialog.</summary>
+    public Justification ButtonJustification { get; set; }
 
     /// <summary>Optional buttons to lay out at the bottom of the dialog.</summary>
     public Button [] Buttons
@@ -136,7 +136,7 @@ public class Dialog : Window
             return;
         }
 
-        button.X = Pos.Justify (ButtonAlignment);
+        button.X = Pos.Justify (ButtonJustification);
         button.Y = Pos.AnchorEnd () - 1;
 
         _buttons.Add (button);

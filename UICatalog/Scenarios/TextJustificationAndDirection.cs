@@ -6,9 +6,9 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Text Alignment and Direction", "Demos horizontal and vertical text alignment and text direction.")]
+[ScenarioMetadata ("Text Justification and Direction", "Demos horizontal and vertical text justification and direction.")]
 [ScenarioCategory ("Text and Formatting")]
-public class TextAlignmentsAndDirections : Scenario
+public class TextJustificationAndDirections : Scenario
 {
     public override void Main ()
     {
@@ -389,7 +389,7 @@ public class TextAlignmentsAndDirections : Scenario
         mtxts.Add (txtLabelBC);
         mtxts.Add (txtLabelBR);
 
-        // Save Alignments in Data
+        // Save Justification in Data
         foreach (Label t in mtxts)
         {
             t.Data = new { h = t.Justification, v = t.VerticalJustification };

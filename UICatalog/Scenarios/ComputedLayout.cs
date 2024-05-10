@@ -86,7 +86,7 @@ public class ComputedLayout : Scenario
         var i = 1;
         var txt = "Resize the terminal to see computed layout in action.";
         List<Label> labelList = new ();
-        labelList.Add (new Label { Text = "The lines below show different TextAlignments" });
+        labelList.Add (new Label { Text = "The lines below show different justification" });
 
         labelList.Add (
                        new Label
@@ -148,7 +148,7 @@ public class ComputedLayout : Scenario
                                  };
         i = 1;
         labelList = new List<Label> ();
-        labelList.Add (new Label { Text = "The lines below show different TextAlignments" });
+        labelList.Add (new Label { Text = "The lines below show different justifications" });
 
         labelList.Add (
                        new Label

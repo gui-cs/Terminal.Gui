@@ -891,7 +891,7 @@ internal sealed class Menu : View
                     var tf = new TextFormatter
                     {
                         AutoSize = true,
-                        Alignment = Justification.Centered, HotKeySpecifier = MenuBar.HotKeySpecifier, Text = textToDraw
+                        Justification = Justification.Centered, HotKeySpecifier = MenuBar.HotKeySpecifier, Text = textToDraw
                     };
 
                     // The -3 is left/right border + one space (not sure what for)
