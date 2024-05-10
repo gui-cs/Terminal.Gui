@@ -216,14 +216,14 @@ public abstract class ConsoleDriver
                 {
                     Contents [Row, Col].Rune = rune;
 
-                    if (Col < Region.Union (Clip).Right - 1)
+                    if (Col + 1 < Region.Union (Clip)?.Right - 1)
                     {
                         Contents [Row, Col + 1].IsDirty = true;
                     }
                 }
                 else if (runeWidth == 2)
                 {
-                    if (Col == Region.Union (Clip).Right - 1)
+                    if (Col == Region.Union (Clip)?.Right - 1)
                     {
                         // We're at the right edge of the clip, so we can't display a wide character.
                         // TODO: Figure out if it is better to show a replacement character or ' '
@@ -233,7 +233,7 @@ public abstract class ConsoleDriver
                     {
                         Contents [Row, Col].Rune = rune;
 
-                        if (Col < Region.Union(Clip).Right - 1)
+                        if (Col < Region.Union(Clip)?.Right - 1)
                         {
                             // Invalidate cell to right so that it doesn't get drawn
                             // TODO: Figure out if it is better to show a replacement character or ' '
@@ -262,7 +262,7 @@ public abstract class ConsoleDriver
         {
             Debug.Assert (runeWidth <= 2);
 
-            if (validLocation && Col < Region.Union(Clip).Right)
+            if (validLocation && Col < Region.Union(Clip)?.Right)
             {
                 // This is a double-width character, and we are not at the end of the line.
                 // Col now points to the second column of the character. Ensure it doesn't
@@ -369,6 +369,38 @@ public abstract class ConsoleDriver
     /// <param name="rect"></param>
     /// <param name="c"></param>
     public void FillRect (Rectangle rect, char c) { FillRect (rect, new Rune (c)); }
+
+    /// <summary>
+    /// Fills the specified rectangle with the specified rune, using <see cref="CurrentAttribute"/>.
+    /// <remarks>
+    /// The value of <see cref="Clip"/> representing a <see cref="HashSet{T}"/> of <see cref="Region"/> is honored.
+    /// Any parts of the rectangle not in the clip will not be drawn.
+    /// </remarks>
+    /// </summary>
+    /// <param name="rect">The Screen-relative rectangle.</param>
+    /// <param name="rune">The Rune used to fill the rectangle.</param>
+    public void FillRegions (Rectangle rect, Rune rune = default)
+    {
+        lock (Contents)
+        {
+            for (int r = rect.Y; r < rect.Y + rect.Height; r++)
+            {
+                for (int c = rect.X; c < rect.X + rect.Width; c++)
+                {
+                    Move (c, r);
+                    AddRune (rune != default ? rune : (Rune)' ');
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Fills the specified rectangle with the specified <see langword="char"/>. This method is a convenience method
+    ///     that calls <see cref="FillRegions(Rectangle, Rune)"/>.
+    /// </summary>
+    /// <param name="rect">The Screen-relative rectangle.</param>
+    /// <param name="c">The char used to fill the rectangle.</param>
+    public void FillRegions (Rectangle rect, char c) { FillRegions (rect, new Rune (c)); }
 
     /// <summary>Gets the terminal cursor visibility.</summary>
     /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
