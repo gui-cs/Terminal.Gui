@@ -285,7 +285,7 @@ public class ConsoleDriverTests
 
     [SetupFakeDriver]
     [Fact]
-    public void FillRegions_Clipping_With_Region_HashSet ()
+    public void FillRegions_Clipping_With_Region_HashSet_Using_Driver_Screen ()
     {
         HashSet<Region> regions =
         [
@@ -307,6 +307,45 @@ public class ConsoleDriverTests
 
         Application.Driver.Clip = regions;
         Application.Driver.FillRegions (Application.Driver.Screen, 'x');
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+xxxxxxxxx     xxxxxxxx   
+xxxxxxxxx   xxx      xxx 
+   xxx     xxx          x
+   xxx     xxx    xxxxx  
+   xxx     xxx    xx  xxx
+   xxx      xxx      xxx 
+   xxx       xxxx xxxx   ",
+                                                      _output);
+
+        Application.Shutdown ();
+    }
+
+    [SetupFakeDriver]
+    [Fact]
+    public void FillRegions_Clipping_With_Region_HashSet_Using_Union ()
+    {
+        HashSet<Region> regions =
+        [
+            new (new Rectangle (0, 0, 9, 2)),
+            new (new Rectangle (3, 2, 3, 5)),
+            new (new Rectangle (14, 0, 8, 1)),
+            new (new Rectangle (12, 1, 3, 1)),
+            new (new Rectangle (11, 2, 3, 3)),
+            new (new Rectangle (12, 5, 3, 1)),
+            new (new Rectangle (13, 6, 4, 1)),
+            new (new Rectangle (21, 1, 3, 1)),
+            new (new Rectangle (24, 2, 1, 1)),
+            new (new Rectangle (18, 3, 5, 1)),
+            new (new Rectangle (18, 4, 2, 1)),
+            new (new Rectangle (22, 4, 3, 1)),
+            new (new Rectangle (21, 5, 3, 1)),
+            new (new Rectangle (18, 6, 4, 1))
+        ];
+
+        Application.Driver.Clip = regions;
+        Application.Driver.FillRegions (Region.Union (regions), 'x');
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
