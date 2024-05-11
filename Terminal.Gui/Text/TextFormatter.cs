@@ -17,9 +17,9 @@ public class TextFormatter
     private Size _size;
     private int _tabWidth = 4;
     private string _text;
-    private Alignment _textAlignment;
+    private Alignment _textAlignment = Alignment.Left;
     private TextDirection _textDirection;
-    private Alignment _textVerticalAlignment;
+    private Alignment _textVerticalAlignment = Alignment.Top;
     private bool _wordWrap = true;
 
     /// <summary>Get or sets the horizontal text alignment.</summary>

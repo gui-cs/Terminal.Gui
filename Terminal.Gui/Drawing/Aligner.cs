@@ -32,7 +32,7 @@ public enum Alignment
     ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
-    Top = Left,
+    Top,
 
     /// <summary>
     ///     The items will be aligned to the right.
@@ -57,7 +57,7 @@ public enum Alignment
     ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
-    Bottom = Right,
+    Bottom,
 
     /// <summary>
     ///     The group will be centered in the container.
@@ -77,23 +77,23 @@ public enum Alignment
     /// </example>
     Centered,
 
-    /// <summary>
-    ///     The items will be justified. Space will be added between the items such that the first item
-    ///     is at the start and the right side of the last item against the end.
-    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
-    ///     each item.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Extra space will be distributed between the items, biased towards the left.
-    ///     </para>
-    /// </remarks>
-    /// <example>
-    ///     <c>
-    ///         111    2222     33333
-    ///     </c>
-    /// </example>
-    Justified,
+        /// <summary>
+        ///     The items will be justified. Space will be added between the items such that the first item
+        ///     is at the start and the right side of the last item against the end.
+        ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+        ///     each item.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         Extra space will be distributed between the items, biased towards the left.
+        ///     </para>
+        /// </remarks>
+        /// <example>
+        ///     <c>
+        ///         111    2222     33333
+        ///     </c>
+        /// </example>
+        Justified,
 
     /// <summary>
     ///     The first item will be aligned to the left and the remaining will aligned to the right.
@@ -118,7 +118,7 @@ public enum Alignment
     ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
-    FirstTopRestBottom = FirstLeftRestRight,
+    FirstTopRestBottom,
 
     /// <summary>
     ///     The last item will be aligned to the right and the remaining will aligned to the left.
@@ -143,7 +143,7 @@ public enum Alignment
     ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
-    LastBottomRestTop = LastRightRestLeft
+    LastBottomRestTop
 }
 
 /// <summary>
@@ -255,6 +255,7 @@ public class Aligner : INotifyPropertyChanged
         switch (alignment)
         {
             case Alignment.Left:
+            case Alignment.Top:
                 var currentPosition = 0;
 
                 for (var i = 0; i < sizes.Length; i++)
@@ -275,7 +276,10 @@ public class Aligner : INotifyPropertyChanged
                 }
 
                 break;
+
             case Alignment.Right:
+            case Alignment.Bottom:
+
                 currentPosition = containerSize - totalItemsSize - spaces;
 
                 for (var i = 0; i < sizes.Length; i++)
@@ -337,6 +341,7 @@ public class Aligner : INotifyPropertyChanged
 
             // 111 2222        33333
             case Alignment.LastRightRestLeft:
+            case Alignment.LastBottomRestTop:
                 if (sizes.Length > 1)
                 {
                     if (totalItemsSize > containerSize)
@@ -374,6 +379,7 @@ public class Aligner : INotifyPropertyChanged
 
             // 111        2222 33333
             case Alignment.FirstLeftRestRight:
+            case Alignment.FirstTopRestBottom:
                 if (sizes.Length > 1)
                 {
                     currentPosition = 0;

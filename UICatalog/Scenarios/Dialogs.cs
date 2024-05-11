@@ -43,7 +43,7 @@ public class Dialogs : Scenario
         };
         frame.Add (widthEdit);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -77,7 +77,7 @@ public class Dialogs : Scenario
                    }
                   );
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -121,7 +121,7 @@ public class Dialogs : Scenario
         };
         frame.Add (glyphsNotWords);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (glyphsNotWords),
@@ -145,7 +145,7 @@ public class Dialogs : Scenario
             }
         }
 
-        var labels = GetUniqueEnumNames<Alignment> ();
+        var labels = new [] { "Left", "Centered", "Right", "Justified", "FirstLeftRestRight", "LastRightRestLeft" };
         var alignmentGroup = new RadioGroup
         {
             X = Pos.Right (label) + 1,
@@ -153,7 +153,7 @@ public class Dialogs : Scenario
             RadioLabels = labels.ToArray (),
         };
         frame.Add (alignmentGroup);
-        alignmentGroup.SelectedItem = labels.ToList().IndexOf (Dialog.DefaultButtonAlignment.ToString());
+        alignmentGroup.SelectedItem = labels.ToList ().IndexOf (Dialog.DefaultButtonAlignment.ToString ());
 
         frame.ValidatePosDim = true;
 
@@ -173,7 +173,7 @@ public class Dialogs : Scenario
 
         Win.Add (frame);
 
-        label = new()
+        label = new ()
         {
             X = Pos.Center (), Y = Pos.Bottom (frame) + 4, TextAlignment = Alignment.Right, Text = "Button Pressed:"
         };
@@ -220,7 +220,7 @@ public class Dialogs : Scenario
         TextField titleEdit,
         TextField numButtonsEdit,
         CheckBox glyphsNotWords,
-        RadioGroup styleRadioGroup,
+        RadioGroup alignmentRadioGroup,
         Label buttonPressedLabel
     )
     {
@@ -247,7 +247,7 @@ public class Dialogs : Scenario
                 {
                     buttonId = i;
 
-                    button = new()
+                    button = new ()
                     {
                         Text = NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
                         IsDefault = buttonId == 0
@@ -279,10 +279,11 @@ public class Dialogs : Scenario
 
             // This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
             // the buttons are laid out correctly
-            dialog = new()
+            dialog = new ()
             {
                 Title = titleEdit.Text,
-                ButtonAlignment = (Alignment)styleRadioGroup.SelectedItem,
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem]),
+
                 Buttons = buttons.ToArray ()
             };
 
@@ -301,7 +302,7 @@ public class Dialogs : Scenario
 
                               if (glyphsNotWords.Checked == true)
                               {
-                                  button = new()
+                                  button = new ()
                                   {
                                       Text = NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
                                       IsDefault = buttonId == 0
@@ -309,7 +310,7 @@ public class Dialogs : Scenario
                               }
                               else
                               {
-                                  button = new() { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                                  button = new () { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
                               }
 
                               button.Accept += (s, e) =>

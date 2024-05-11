@@ -47,14 +47,14 @@ public sealed class PosAlign : Scenario
         {
             X = Pos.Align (_horizAligner.Alignment),
             Y = Pos.Center (),
-            RadioLabels = GetUniqueEnumNames<Alignment> (false).ToArray (),
+            RadioLabels = new [] { "Left", "Right", "Centered", "Justified", "FirstLeftRestRight", "LastRightRestLeft" },
             ColorScheme = colorScheme
         };
 
         alignRadioGroup.SelectedItemChanged += (s, e) =>
                                              {
                                                  _horizAligner.Alignment =
-                                                     (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.SelectedItem.ToString ());
+                                                     (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
 
                                                  foreach (View view in appWindow.Subviews.Where (v => v.X is Pos.PosAlign))
                                                  {
@@ -193,14 +193,14 @@ public sealed class PosAlign : Scenario
         {
             X = 0,
             Y = Pos.Align (_vertAligner.Alignment),
-            RadioLabels = GetUniqueEnumNames<Alignment> (true).Reverse ().ToArray (),
+            RadioLabels = new [] { "Top", "Bottom", "Centered", "Justified", "FirstTopRestBottom", "LastBottomRestTop" },
             ColorScheme = colorScheme
         };
 
         alignRadioGroup.SelectedItemChanged += (s, e) =>
                                              {
                                                  _vertAligner.Alignment =
-                                                     (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.SelectedItem.ToString ());
+                                                     (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
 
                                                  foreach (View view in appWindow.Subviews.Where (v => v.Y is Pos.PosAlign))
                                                  {
@@ -329,27 +329,6 @@ public sealed class PosAlign : Scenario
         appWindow.Add (addedViewsUpDown);
 
         appWindow.Add (addedViews [0]);
-    }
-
-    private static IEnumerable<string> GetUniqueEnumNames<T> (bool reverse) where T : Enum
-    {
-        HashSet<int> values = new HashSet<int> ();
-        string [] names = Enum.GetNames (typeof (T));
-
-        if (reverse)
-        {
-            names = Enum.GetNames (typeof (T)).Reverse ().ToArray ();
-        }
-
-        foreach (string name in names)
-        {
-            var value = (int)Enum.Parse (typeof (T), name);
-
-            if (values.Add (value))
-            {
-                yield return name;
-            }
-        }
     }
 
     private void Setup3by3Grid (Window appWindow)
