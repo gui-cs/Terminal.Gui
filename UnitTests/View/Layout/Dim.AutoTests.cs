@@ -893,7 +893,6 @@ public class DimAutoTests (ITestOutputHelper output)
     [Theory]
     [InlineData (0, 15, 15)]
     [InlineData (1, 15, 16)]
-    [InlineData (0, 15, 15)]
     [InlineData (-1, 15, 14)]
     public void DimAuto_With_Subview_Using_DimAbsolute (int subViewOffset, int dimAbsoluteSize, int expectedSize)
     {

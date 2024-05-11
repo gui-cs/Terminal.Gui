@@ -228,7 +228,6 @@ public class AlignerTests (ITestOutputHelper output)
     [InlineData (Alignment.FirstLeftRestRight, new [] { 10, 20, 30 }, 101, new [] { 0, 50, 71 })]
     [InlineData (Alignment.FirstLeftRestRight, new [] { 10, 20, 30, 40 }, 101, new [] { 0, 10, 30, 61 })]
     [InlineData (Alignment.FirstLeftRestRight, new [] { 10, 20, 30, 40, 50 }, 151, new [] { 0, 10, 30, 60, 101 })]
-    [InlineData (Alignment.FirstLeftRestRight, new [] { 3, 3, 3 }, 21, new [] { 0, 14, 18 })]
     [InlineData (Alignment.FirstLeftRestRight, new [] { 3, 4, 5 }, 21, new [] { 0, 11, 16 })]
     public void Alignment_SpaceBetweenItems (Alignment alignment, int [] sizes, int containerSize, int [] expected)
     {

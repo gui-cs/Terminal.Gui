@@ -4,13 +4,13 @@ using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui.PosDimTests;
 
-public class PosAlignTests (ITestOutputHelper output)
+public class PosAlignTests ()
 {
     [Fact]
     public void PosAlign_Constructor ()
     {
-        var PosAlign = new PosAlign (Alignment.Justified);
-        Assert.NotNull (PosAlign);
+        var posAlign = new PosAlign (Alignment.Justified);
+        Assert.NotNull (posAlign);
     }
 
     [Theory]
@@ -30,20 +30,20 @@ public class PosAlignTests (ITestOutputHelper output)
     [Fact]
     public void PosAlign_ToString ()
     {
-        var PosAlign = new PosAlign (Alignment.Justified);
+        var posAlign = new PosAlign (Alignment.Justified);
         var expectedString = "Align(groupId=0, alignment=Justified)";
 
-        Assert.Equal (expectedString, PosAlign.ToString ());
+        Assert.Equal (expectedString, posAlign.ToString ());
     }
 
     [Fact]
     public void PosAlign_Anchor ()
     {
-        var PosAlign = new PosAlign (Alignment.Left);
+        var posAlign = new PosAlign (Alignment.Left);
         var width = 50;
         var expectedAnchor = -width;
 
-        Assert.Equal (expectedAnchor, PosAlign.Anchor (width));
+        Assert.Equal (expectedAnchor, posAlign.Anchor (width));
     }
 
     [Fact]

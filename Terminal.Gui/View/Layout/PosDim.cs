@@ -454,15 +454,15 @@ public class Pos
     internal class PosCombine (bool add, Pos left, Pos right) : Pos
     {
         internal bool Add { get; set; } = add;
-        internal Pos Left { get; set; } = left;
-        internal Pos Right { get; set; } = right;
+        internal Pos LeftPos { get; set; } = left;
+        internal Pos RightPos { get; set; } = right;
 
-        public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
+        public override string ToString () { return $"Combine({LeftPos}{(Add ? '+' : '-')}{RightPos})"; }
 
         internal override int Anchor (int width)
         {
-            int la = Left.Anchor (width);
-            int ra = Right.Anchor (width);
+            int la = LeftPos.Anchor (width);
+            int ra = RightPos.Anchor (width);
 
             if (Add)
             {
@@ -475,8 +475,8 @@ public class Pos
         internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
         {
             int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
-            int left = Left.Calculate (superviewDimension, dim, us, dimension);
-            int right = Right.Calculate (superviewDimension, dim, us, dimension);
+            int left = LeftPos.Calculate (superviewDimension, dim, us, dimension);
+            int right = RightPos.Calculate (superviewDimension, dim, us, dimension);
 
             if (Add)
             {
@@ -492,12 +492,12 @@ public class Pos
         /// <returns></returns>
         internal override bool ReferencesOtherViews ()
         {
-            if (Left.ReferencesOtherViews ())
+            if (LeftPos.ReferencesOtherViews ())
             {
                 return true;
             }
 
-            if (Right.ReferencesOtherViews ())
+            if (RightPos.ReferencesOtherViews ())
             {
                 return true;
             }
@@ -1243,17 +1243,18 @@ public class Dim
 
     internal class DimCombine (bool add, Dim left, Dim right) : Dim
     {
-        internal bool _add = add;
-        internal Dim _left = left, _right = right;
+        internal bool Add { get; set; } = add;
+        internal Dim Left { get; set; } = left;
+        internal Dim Right { get; set; } = right;
 
-        public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
+        public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
 
         internal override int Anchor (int width)
         {
-            int la = _left.Anchor (width);
-            int ra = _right.Anchor (width);
+            int la = Left.Anchor (width);
+            int ra = Right.Anchor (width);
 
-            if (_add)
+            if (Add)
             {
                 return la + ra;
             }
@@ -1263,12 +1264,12 @@ public class Dim
 
         internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
         {
-            int leftNewDim = _left.Calculate (location, superviewContentSize, us, dimension);
-            int rightNewDim = _right.Calculate (location, superviewContentSize, us, dimension);
+            int leftNewDim = Left.Calculate (location, superviewContentSize, us, dimension);
+            int rightNewDim = Right.Calculate (location, superviewContentSize, us, dimension);
 
             int newDimension;
 
-            if (_add)
+            if (Add)
             {
                 newDimension = leftNewDim + rightNewDim;
             }
@@ -1286,12 +1287,12 @@ public class Dim
         /// <returns></returns>
         internal override bool ReferencesOtherViews ()
         {
-            if (_left.ReferencesOtherViews ())
+            if (Left.ReferencesOtherViews ())
             {
                 return true;
             }
 
-            if (_right.ReferencesOtherViews ())
+            if (Right.ReferencesOtherViews ())
             {
                 return true;
             }
