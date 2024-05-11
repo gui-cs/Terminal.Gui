@@ -1,9 +1,9 @@
 ﻿#nullable enable
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace Terminal.Gui.DrawingTests;
 
-[Trait ("Category", "Output")]
+[Trait ("Category", "Drawing")]
 public class RegionTests (ITestOutputHelper output)
 {
     [Fact]
