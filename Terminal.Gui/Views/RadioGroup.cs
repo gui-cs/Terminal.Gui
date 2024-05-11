@@ -88,8 +88,8 @@ public class RadioGroup : View
     {
         SetFocus ();
 
-        int boundsX = e.MouseEvent.X;
-        int boundsY = e.MouseEvent.Y;
+        int boundsX = e.MouseEvent.Position.X;
+        int boundsY = e.MouseEvent.Position.Y;
 
         int pos = _orientation == Orientation.Horizontal ? boundsX : boundsY;
 

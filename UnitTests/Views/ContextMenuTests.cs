@@ -107,11 +107,11 @@ public class ContextMenuTests
         Assert.True (ContextMenu.IsShow);
         Assert.Equal (cm.MenuBar, Application.MouseGrabView);
         Assert.False (menu.IsMenuOpen);
-        Assert.False (menu.NewMouseEvent(new MouseEvent { X = 1, Flags = MouseFlags.ReportMousePosition, View = menu }));
+        Assert.False (menu.NewMouseEvent(new MouseEvent { Position = new (1, 0), Flags = MouseFlags.ReportMousePosition, View = menu }));
         Assert.True (ContextMenu.IsShow);
         Assert.Equal (cm.MenuBar, Application.MouseGrabView);
         Assert.False (menu.IsMenuOpen);
-        Assert.True (menu.NewMouseEvent(new MouseEvent { X = 1, Flags = MouseFlags.Button1Clicked, View = menu }));
+        Assert.True (menu.NewMouseEvent(new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1Clicked, View = menu }));
         Assert.False (ContextMenu.IsShow);
         Assert.Equal (menu, Application.MouseGrabView);
         Assert.True (menu.IsMenuOpen);
@@ -269,7 +269,7 @@ public class ContextMenuTests
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { X = 8, Y = 2, Flags = MouseFlags.Button3Clicked });
+        Application.OnMouseEvent (new MouseEvent { Position = new (8, 2), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -351,7 +351,7 @@ public class ContextMenuTests
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { X = 9, Y = 3, Flags = MouseFlags.Button3Clicked });
+        Application.OnMouseEvent (new MouseEvent { Position = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rsDialog, ref firstIteration);
@@ -406,7 +406,7 @@ public class ContextMenuTests
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { X = 9, Y = 3, Flags = MouseFlags.Button3Clicked });
+        Application.OnMouseEvent (new MouseEvent { Position = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -642,7 +642,7 @@ public class ContextMenuTests
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                     new MouseEvent { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -690,7 +690,7 @@ public class ContextMenuTests
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { X = 30, Y = 3, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -737,7 +737,7 @@ public class ContextMenuTests
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { X = 30, Y = 3, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -781,7 +781,7 @@ public class ContextMenuTests
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { X = 30, Y = 3, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -825,7 +825,7 @@ public class ContextMenuTests
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { X = 30, Y = 3, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -1314,7 +1314,7 @@ public class ContextMenuTests
                                                      );
 
         // X=5 is the border and so need to use at least one more
-        Application.OnMouseEvent (new MouseEvent { X = 6, Y = 13, Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new MouseEvent { Position = new (6, 13), Flags = MouseFlags.Button1Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1332,7 +1332,7 @@ public class ContextMenuTests
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { X = 6, Y = 12, Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new MouseEvent { Position = new (6, 12), Flags = MouseFlags.Button1Clicked });
 
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1403,7 +1403,7 @@ public class ContextMenuTests
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { X = 6, Y = 13, Flags = MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new MouseEvent { Position = new (6, 13), Flags = MouseFlags.ReportMousePosition });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1420,7 +1420,7 @@ public class ContextMenuTests
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { X = 6, Y = 14, Flags = MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new MouseEvent { Position = new (6, 14), Flags = MouseFlags.ReportMousePosition });
 
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1438,7 +1438,7 @@ public class ContextMenuTests
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { X = 6, Y = 13, Flags = MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new MouseEvent { Position = new (6, 13), Flags = MouseFlags.ReportMousePosition });
 
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);

@@ -875,10 +875,7 @@ public partial class View
         if (IsInitialized && CanFocus && HasFocus && ContentSize.HasValue)
         {
             // By default, position the cursor at the hotkey (if any) or 0, 0.
-            Point location = Viewport.Location;
-            location.X = TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition;
-            location.Y = 0;
-            Move (location.X, location.Y);
+            Move (TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition, 0);
         }
 
         // Returning null will hide the cursor.

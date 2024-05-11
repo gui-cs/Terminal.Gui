@@ -153,7 +153,7 @@ public class StatusBar : View
 
         for (var i = 0; i < Items.Length; i++)
         {
-            if (me.X >= pos && me.X < pos + GetItemTitleLength (Items [i].Title))
+            if (me.Position.X >= pos && me.Position.X < pos + GetItemTitleLength (Items [i].Title))
             {
                 StatusItem item = Items [i];
 

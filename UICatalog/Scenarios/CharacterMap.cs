@@ -109,7 +109,7 @@ public class CharacterMap : Scenario
         // if user clicks the mouse in TableView
         _categoryList.MouseClick += (s, e) =>
                                     {
-                                        _categoryList.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
+                                        _categoryList.ScreenToCell (e.MouseEvent.Position, out int? clickedCol);
 
                                         if (clickedCol != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
                                         {
@@ -850,18 +850,18 @@ internal class CharMap : View
             return;
         }
 
-        if (me.Y == 0)
+        if (me.Position.Y == 0)
         {
-            me.Y = Cursor.Y;
+            me.Position = me.Position with { Y = Cursor.Y };
         }
 
-        if (me.X < RowLabelWidth || me.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)
+        if (me.Position.X < RowLabelWidth || me.Position.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)
         {
-            me.X = Cursor.X;
+            me.Position = me.Position with { X = Cursor.X };
         }
 
-        int row = (me.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
-        int col = (me.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
+        int row = (me.Position.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
+        int col = (me.Position.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
 
         if (col > 15)
         {
@@ -907,7 +907,7 @@ internal class CharMap : View
 
             _contextMenu = new ()
             {
-                Position = new (me.X + 1, me.Y + 1),
+                Position = new (me.Position.X + 1, me.Position.Y + 1),
                 MenuItems = new (
                                  new MenuItem []
                                  {

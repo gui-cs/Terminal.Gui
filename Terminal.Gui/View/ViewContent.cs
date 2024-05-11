@@ -196,9 +196,7 @@ public partial class View
         contentRelativeToViewport.Offset (-Viewport.X, -Viewport.Y);
 
         // Translate to Screen-Relative (our SuperView's Viewport-relative coordinates)
-        Rectangle screen = ViewportToScreen (new (contentRelativeToViewport, Size.Empty));
-
-        return screen.Location;
+        return ViewportToScreen (contentRelativeToViewport);
     }
 
     /// <summary>Converts a Screen-relative coordinate to a Content-relative coordinate.</summary>
@@ -211,7 +209,7 @@ public partial class View
     public Point ScreenToContent (in Point location)
     {
         Point viewportOffset = GetViewportOffsetFromFrame ();
-        Point screen = ScreenToFrame (location.X, location.Y);
+        Point screen = ScreenToFrame (location);
         screen.Offset (Viewport.X - viewportOffset.X, Viewport.Y - viewportOffset.Y);
 
         return screen;
@@ -426,19 +424,34 @@ public partial class View
     }
 
     /// <summary>
+    ///     Converts a <see cref="Viewport"/>-relative location and size to a screen-relative location and size.
+    /// </summary>
+    /// <remarks>
+    ///     Viewport-relative means relative to the top-left corner of the inner rectangle of the <see cref="Padding"/>.
+    /// </remarks>
+    /// <param name="viewport">Viewport-relative location and size.</param>
+    /// <returns>Screen-relative location and size.</returns>
+    public Rectangle ViewportToScreen (in Rectangle viewport)
+    {
+        return viewport with { Location = ViewportToScreen (viewport.Location) };
+    }
+
+    /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location to a screen-relative location.
     /// </summary>
     /// <remarks>
     ///     Viewport-relative means relative to the top-left corner of the inner rectangle of the <see cref="Padding"/>.
     /// </remarks>
-    public Rectangle ViewportToScreen (in Rectangle location)
+    /// <param name="viewportLocation">Viewport-relative location.</param>
+    /// <returns>Screen-relative location.</returns>
+    public Point ViewportToScreen (in Point viewportLocation)
     {
         // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
         Rectangle screen = FrameToScreen ();
         Point viewportOffset = GetViewportOffsetFromFrame ();
-        screen.Offset (viewportOffset.X + location.X, viewportOffset.Y + location.Y);
+        screen.Offset (viewportOffset.X + viewportLocation.X, viewportOffset.Y + viewportLocation.Y);
 
-        return new (screen.Location, location.Size);
+        return screen.Location;
     }
 
     /// <summary>Converts a screen-relative coordinate to a Viewport-relative coordinate.</summary>
@@ -446,15 +459,15 @@ public partial class View
     /// <remarks>
     ///     Viewport-relative means relative to the top-left corner of the inner rectangle of the <see cref="Padding"/>.
     /// </remarks>
-    /// <param name="x">Column relative to the left side of the Viewport.</param>
-    /// <param name="y">Row relative to the top of the Viewport</param>
-    public Point ScreenToViewport (int x, int y)
+    /// <param name="location">Screen-Relative Coordinate.</param>
+    /// <returns>Viewport-relative location.</returns>
+    public Point ScreenToViewport (in Point location)
     {
         Point viewportOffset = GetViewportOffsetFromFrame ();
-        Point screen = ScreenToFrame (x, y);
-        screen.Offset (-viewportOffset.X, -viewportOffset.Y);
+        Point frame = ScreenToFrame (location);
+        frame.Offset (-viewportOffset.X, -viewportOffset.Y);
 
-        return screen;
+        return frame;
     }
 
     /// <summary>

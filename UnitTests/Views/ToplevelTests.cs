@@ -382,12 +382,12 @@ public class ToplevelTests
         Assert.Equal (new Rectangle (0, 1, 60, 15), win.Frame);
 
         //Assert.Null (Toplevel._dragPosition);
-        win.NewMouseEvent (new MouseEvent { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
+        win.NewMouseEvent (new MouseEvent { Position = new (6, 0), Flags = MouseFlags.Button1Pressed });
         // Assert.Equal (new Point (6, 0), Toplevel._dragPosition);
-        win.NewMouseEvent (new MouseEvent { X = 6, Y = 0, Flags = MouseFlags.Button1Released });
+        win.NewMouseEvent (new MouseEvent { Position = new (6, 0), Flags = MouseFlags.Button1Released });
         //Assert.Null (Toplevel._dragPosition);
         win.CanFocus = false;
-        win.NewMouseEvent (new MouseEvent { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
+        win.NewMouseEvent (new MouseEvent { Position = new (6, 0), Flags = MouseFlags.Button1Pressed });
         //Assert.Null (Toplevel._dragPosition);
     }
 
@@ -883,7 +883,7 @@ public class ToplevelTests
                                          Assert.Null (Application.MouseGrabView);
 
                                          // Grab the mouse
-                                         Application.OnMouseEvent (new () { X = 3, Y = 2, Flags = MouseFlags.Button1Pressed });
+                                         Application.OnMouseEvent (new () { Position = new (3, 2), Flags = MouseFlags.Button1Pressed });
 
                                          Assert.Equal (Application.Current.Border, Application.MouseGrabView);
                                          Assert.Equal (new Rectangle (2, 2, 10, 3), Application.Current.Frame);
@@ -895,10 +895,8 @@ public class ToplevelTests
                                          // Drag to left
                                          Application.OnMouseEvent (new ()
                                          {
-                                             X = 2,
-                                             Y = 2,
-                                             Flags = MouseFlags.Button1Pressed
-                                                     | MouseFlags.ReportMousePosition
+                                             Position = new (2, 2), Flags = MouseFlags.Button1Pressed
+                                                                   | MouseFlags.ReportMousePosition
                                          });
                                          Application.Refresh ();
 
@@ -919,10 +917,7 @@ public class ToplevelTests
                                          // Drag up
                                          Application.OnMouseEvent (new ()
                                          {
-                                             X = 2,
-                                             Y = 1,
-                                             Flags = MouseFlags.Button1Pressed
-                                                     | MouseFlags.ReportMousePosition
+                                             Position = new (2, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                          });
                                          Application.Refresh ();
 
@@ -943,7 +938,7 @@ public class ToplevelTests
                                          Assert.Equal (Application.Current.Border, Application.MouseGrabView);
 
                                          // Ungrab the mouse
-                                         Application.OnMouseEvent (new () { X = 2, Y = 1, Flags = MouseFlags.Button1Released });
+                                         Application.OnMouseEvent (new () { Position = new (2, 1), Flags = MouseFlags.Button1Released });
                                          Application.Refresh ();
 
                                          Assert.Null (Application.MouseGrabView);
@@ -993,8 +988,7 @@ public class ToplevelTests
                                          // Grab the mouse
                                          Application.OnMouseEvent (new MouseEvent
                                          {
-                                             X = win.Frame.X, Y = win.Frame.Y,
-                                             Flags = MouseFlags.Button1Pressed
+                                             Position = new (win.Frame.X, win.Frame.Y), Flags = MouseFlags.Button1Pressed
                                          });
 
                                          Assert.Equal (win.Border, Application.MouseGrabView);
@@ -1009,10 +1003,8 @@ public class ToplevelTests
 
                                          Application.OnMouseEvent (new MouseEvent
                                          {
-                                             X = win.Frame.X + movex,
-                                             Y = win.Frame.Y + movey,
-                                             Flags = MouseFlags.Button1Pressed
-                                                     | MouseFlags.ReportMousePosition
+                                             Position = new (win.Frame.X + movex, win.Frame.Y + movey), Flags = MouseFlags.Button1Pressed
+                                                                                                       | MouseFlags.ReportMousePosition
                                          });
 
                                          Assert.Equal (win.Border, Application.MouseGrabView);
@@ -1034,10 +1026,8 @@ public class ToplevelTests
 
                                          Application.OnMouseEvent (new MouseEvent
                                          {
-                                             X = win.Frame.X + movex,
-                                             Y = win.Frame.Y + movey,
-                                             Flags = MouseFlags.Button1Pressed
-                                                     | MouseFlags.ReportMousePosition
+                                             Position = new (win.Frame.X + movex, win.Frame.Y + movey), Flags = MouseFlags.Button1Pressed
+                                                                                                       | MouseFlags.ReportMousePosition
                                          });
 
                                          Assert.Equal (win.Border, Application.MouseGrabView);
@@ -1059,8 +1049,7 @@ public class ToplevelTests
 
                                          Application.OnMouseEvent (new MouseEvent
                                          {
-                                             X = win.Frame.X + movex, Y = win.Frame.Y + movey,
-                                             Flags = MouseFlags.Button1Released
+                                             Position = new (win.Frame.X + movex, win.Frame.Y + movey), Flags = MouseFlags.Button1Released
                                          });
 
                                          Assert.Null (Application.MouseGrabView);
@@ -1345,11 +1334,11 @@ public class ToplevelTests
         Assert.Equal (new (3, 3, 194, 94), win.Frame);
 
 
-        Application.OnMouseEvent (new MouseEvent { X = 6, Y = 6, Flags = MouseFlags.Button1Pressed });
+        Application.OnMouseEvent (new MouseEvent { Position = new (6, 6), Flags = MouseFlags.Button1Pressed });
         Assert.Equal (win.Border, Application.MouseGrabView);
         Assert.Equal (new (3, 3, 194, 94), win.Frame);
 
-        Application.OnMouseEvent (new MouseEvent { X = 9, Y = 9, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new MouseEvent { Position = new (9, 9), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         Assert.Equal (win.Border, Application.MouseGrabView);
         top.SetNeedsLayout ();
         top.LayoutSubviews ();
@@ -1358,10 +1347,7 @@ public class ToplevelTests
 
         Application.OnMouseEvent (new MouseEvent
         {
-            X = 5,
-            Y = 5,
-            Flags = MouseFlags.Button1Pressed
-                    | MouseFlags.ReportMousePosition
+            Position = new (5, 5), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
         });
         Assert.Equal (win.Border, Application.MouseGrabView);
         top.SetNeedsLayout ();
@@ -1369,11 +1355,11 @@ public class ToplevelTests
         Assert.Equal (new Rectangle (2, 2, 195, 95), win.Frame);
         Application.Refresh ();
 
-        Application.OnMouseEvent (new MouseEvent { X = 5, Y = 5, Flags = MouseFlags.Button1Released });
+        Application.OnMouseEvent (new MouseEvent { Position = new (5, 5), Flags = MouseFlags.Button1Released });
         // ScrollView always grab the mouse when the container's subview OnMouseEnter don't want grab the mouse
         Assert.Equal (scrollView, Application.MouseGrabView);
 
-        Application.OnMouseEvent (new MouseEvent { X = 4, Y = 4, Flags = MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new MouseEvent { Position = new (4, 4), Flags = MouseFlags.ReportMousePosition });
         Assert.Equal (scrollView, Application.MouseGrabView);
     }
 
@@ -1392,16 +1378,13 @@ public class ToplevelTests
 
         Assert.Null (Application.MouseGrabView);
 
-        Application.OnMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
+        Application.OnMouseEvent (new MouseEvent { Position = new (0, 0), Flags = MouseFlags.Button1Pressed });
 
         Assert.Equal (window.Border, Application.MouseGrabView);
 
         Application.OnMouseEvent (new MouseEvent
         {
-            X = -11,
-            Y = -4,
-            Flags = MouseFlags.Button1Pressed
-                    | MouseFlags.ReportMousePosition
+            Position = new (-11, -4), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
         });
 
         Application.Refresh ();
@@ -1413,10 +1396,7 @@ public class ToplevelTests
 
         Application.OnMouseEvent (new MouseEvent
         {
-            X = -1,
-            Y = -1,
-            Flags = MouseFlags.Button1Pressed
-                    | MouseFlags.ReportMousePosition
+            Position = new (-1, -1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
         });
 
         Application.Refresh ();
@@ -1428,10 +1408,7 @@ public class ToplevelTests
 
         Application.OnMouseEvent (new MouseEvent
         {
-            X = -1,
-            Y = -1,
-            Flags = MouseFlags.Button1Pressed
-                    | MouseFlags.ReportMousePosition
+            Position = new (-1, -1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
         });
 
         Application.Refresh ();
@@ -1440,10 +1417,7 @@ public class ToplevelTests
 
         Application.OnMouseEvent (new MouseEvent
         {
-            X = 18,
-            Y = 1,
-            Flags = MouseFlags.Button1Pressed
-                    | MouseFlags.ReportMousePosition
+            Position = new (18, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
         });
 
         Application.Refresh ();
@@ -1453,10 +1427,7 @@ public class ToplevelTests
         // On a real app we can't go beyond the SuperView bounds
         Application.OnMouseEvent (new MouseEvent
         {
-            X = 19,
-            Y = 2,
-            Flags = MouseFlags.Button1Pressed
-                    | MouseFlags.ReportMousePosition
+            Position = new (19, 2), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
         });
 
         Application.Refresh ();
@@ -1493,7 +1464,7 @@ public class ToplevelTests
         Assert.Null (Application.MouseGrabView);
         Assert.Equal (new Rectangle (0, 0, 10, 3), window.Frame);
 
-        Application.OnMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
+        Application.OnMouseEvent (new MouseEvent { Position = new (0, 0), Flags = MouseFlags.Button1Pressed });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1503,10 +1474,7 @@ public class ToplevelTests
 
         Application.OnMouseEvent (new MouseEvent
         {
-            X = 1,
-            Y = 1,
-            Flags = MouseFlags.Button1Pressed
-                    | MouseFlags.ReportMousePosition
+            Position = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
         });
 
         firstIteration = false;
@@ -1591,7 +1559,7 @@ public class ToplevelTests
 
         Assert.Equal (new Rectangle (2, 1, 15, 10), testWindow.Frame);
 
-        Application.OnMouseEvent (new () { X = 5, Y = 2, Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { Position = new (5, 2), Flags = MouseFlags.Button1Clicked });
         Application.Top.Draw ();
 
         var firstIteration = false;

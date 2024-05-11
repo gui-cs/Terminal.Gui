@@ -273,11 +273,11 @@ public class Border : Adornment
 
             // Only start grabbing if the user clicks in the Thickness area
             // Adornment.Contains takes Parent SuperView=relative coords.
-            if (Contains (mouseEvent.X + Parent.Frame.X + Frame.X, mouseEvent.Y + Parent.Frame.Y + Frame.Y))
+            if (Contains (new (mouseEvent.Position.X + Parent.Frame.X + Frame.X, mouseEvent.Position.Y + Parent.Frame.Y + Frame.Y)))
             {
                 // Set the start grab point to the Frame coords
-                _startGrabPoint = new (mouseEvent.X + Frame.X, mouseEvent.Y + Frame.Y);
-                _dragPosition = new (mouseEvent.X, mouseEvent.Y);
+                _startGrabPoint = new (mouseEvent.Position.X + Frame.X, mouseEvent.Position.Y + Frame.Y);
+                _dragPosition = mouseEvent.Position;
                 Application.GrabMouse (this);
                 SetHighlight (HighlightStyle);
             }
@@ -299,9 +299,9 @@ public class Border : Adornment
                     Parent.SuperView.SetNeedsDisplay ();
                 }
 
-                _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+                _dragPosition = mouseEvent.Position;
 
-                Point parentLoc = Parent.SuperView?.ScreenToViewport (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y) ?? mouseEvent.ScreenPosition;
+                Point parentLoc = Parent.SuperView?.ScreenToViewport (new (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y)) ?? mouseEvent.ScreenPosition;
 
                 GetLocationEnsuringFullVisibility (
                                      Parent,

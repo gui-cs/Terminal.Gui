@@ -53,7 +53,7 @@ public class ColorPicker : View
     {
         if (CanFocus)
         {
-            Cursor = new Point (me.MouseEvent.X / _boxWidth, me.MouseEvent.Y / _boxHeight);
+            Cursor = new Point (me.MouseEvent.Position.X / _boxWidth, me.MouseEvent.Position.Y / _boxHeight);
             SetFocus ();
             me.Handled = true;
         }
