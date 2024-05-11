@@ -1042,4 +1042,32 @@ public class RuneTests
 
         return true;
     }
+
+    [Theory]
+    [InlineData (new [] { '\u4f60', '\ud835', '\udd39' }, "你𝔹")]
+    [InlineData (new [] { 'T', 'e', 's', 't', ' ', '\u4f60', '\ud835', '\udd39' }, "Test 你𝔹")]
+    public void StringExtensions_ToString_IEnumerable_Rune (char [] codes, string expectedString)
+    {
+        List<Rune> runes = [];
+        char highSurrogateChar = '\0';
+
+        foreach (char c in codes)
+        {
+            if (char.IsHighSurrogate (c))
+            {
+                highSurrogateChar = c;
+            }
+            else if (char.IsHighSurrogate (highSurrogateChar))
+            {
+                runes.Add (new (highSurrogateChar, c));
+                highSurrogateChar = '\0';
+            }
+            else
+            {
+                runes.Add (new (c));
+            }
+        }
+
+        Assert.Equal (expectedString, StringExtensions.ToString (runes.ToArray ()));
+    }
 }

@@ -397,7 +397,7 @@ public class RegionTests (ITestOutputHelper output)
     [Fact]
     public void GetRegionData_Return_Driver_Content_Within_Region ()
     {
-        Toplevel top = new Toplevel { X = 10, Y = 10, Text = "This a test for Region\n and for RegionData \ud835\udd39" }; // 𝔹
+        Toplevel top = new Toplevel { X = 10, Y = 10, Text = "This a test for Region\n and for RegionData 你\ud835\udd39" }; // 𝔹
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -405,14 +405,14 @@ public class RegionTests (ITestOutputHelper output)
           This a test for
           Region         
            and for       
-          RegionData 𝔹   ",
+          RegionData 你𝔹 ",
                                                       output);
 
         Region region = new Region (new Rectangle (10, 10, 30, 20));
         RegionData rgnData = region.GetRegionData ()!;
 
         Assert.Equal (
-                      "This a test forRegion          and for       RegionData \ud835\udd39",
+                      "This a test forRegion          and for       RegionData 你\ud835\udd39",
                       StringExtensions.ToString (rgnData.Data).Replace ("\0", "").Trim ());
 
         Application.Driver.Move (0, 16);
@@ -429,13 +429,13 @@ public class RegionTests (ITestOutputHelper output)
           This a test for
           Region         
            and for       
-          RegionData 𝔹   
+          RegionData 你𝔹 
                          
                          
 This a test for          
 Region                   
  and for                 
-RegionData 𝔹             ",
+RegionData 你𝔹           ",
                                                       output);
 
         top.Dispose ();

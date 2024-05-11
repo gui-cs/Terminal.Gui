@@ -77,6 +77,7 @@ public sealed class Region : IDisposable
 
     #region Rectangle, RectangleF
 
+    #region Union
     /// <summary>
     /// Calculates from the <see cref="Region"/> array to the union and the specified
     /// <see cref="Rectangle"/> or <see cref="RectangleF"/> structure of each other.
@@ -159,6 +160,8 @@ public sealed class Region : IDisposable
         return Union (views.Select (c => new Region (c.Viewport)).ToArray ());
     }
 
+    #endregion
+    #region Intersect
     /// <summary>
     /// Calculates from the <see cref="Region"/> array to the intersection and the specified
     /// <see cref="Rectangle"/> or <see cref="RectangleF"/> structure of each other.
@@ -237,6 +240,7 @@ public sealed class Region : IDisposable
         return Intersect (region._rect);
     }
 
+    #endregion
     /// <summary>
     /// Verify if any of the <see cref="Region"/> <see cref="HashSet{T}"/> is contained on
     /// the <param name="x"></param> and <param name="y"></param> coordinates.
@@ -303,8 +307,14 @@ public sealed class Region : IDisposable
         {
             for (int x = (int)((RectangleF)_rect).X; x < Math.Min ((int)((RectangleF)_rect).Width, Application.Driver.Cols); x++)
             {
-                data [index] = Application.Driver.Contents [y, x].Rune;
+                Rune rune = Application.Driver.Contents [y, x].Rune;
+                data [index] = rune;
                 index++;
+
+                if (rune.GetColumns () > 1)
+                {
+                    x++;
+                }
             }
         }
 
