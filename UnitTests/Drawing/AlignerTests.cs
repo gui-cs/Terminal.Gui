@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests;
@@ -13,6 +14,16 @@ public class AlignerTests (ITestOutputHelper output)
         {
             yield return new [] { number };
         }
+    }
+
+    [Theory]
+    [MemberData (nameof (AlignmentEnumValues))]
+    public void Alignment_Round_Trips (Alignment alignment)
+    {
+        string serialized = JsonSerializer.Serialize<Alignment> (alignment);
+        var deserialized = JsonSerializer.Deserialize<Alignment> (serialized);
+
+        Assert.Equal (alignment, deserialized);
     }
 
     [Theory]
