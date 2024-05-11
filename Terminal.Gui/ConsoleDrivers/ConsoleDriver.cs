@@ -233,7 +233,7 @@ public abstract class ConsoleDriver
                     {
                         Contents [Row, Col].Rune = rune;
 
-                        if (Col < Region.Union(Clip)?.Right - 1)
+                        if (Col < Region.Union (Clip)?.Right - 1)
                         {
                             // Invalidate cell to right so that it doesn't get drawn
                             // TODO: Figure out if it is better to show a replacement character or ' '
@@ -262,7 +262,7 @@ public abstract class ConsoleDriver
         {
             Debug.Assert (runeWidth <= 2);
 
-            if (validLocation && Col < Region.Union(Clip)?.Right)
+            if (validLocation && Col < Region.Union (Clip)?.Right)
             {
                 // This is a double-width character, and we are not at the end of the line.
                 // Col now points to the second column of the character. Ensure it doesn't
