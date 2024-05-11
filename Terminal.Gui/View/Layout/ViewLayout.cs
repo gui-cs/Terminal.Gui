@@ -917,8 +917,8 @@ public partial class View
 
                 return;
             case Pos.PosCombine pc:
-                CollectPos (pc._left, from, ref nNodes, ref nEdges);
-                CollectPos (pc._right, from, ref nNodes, ref nEdges);
+                CollectPos (pc.Left, from, ref nNodes, ref nEdges);
+                CollectPos (pc.Right, from, ref nNodes, ref nEdges);
 
                 break;
         }
@@ -1105,8 +1105,8 @@ public partial class View
 
                 case Pos pos and Pos.PosCombine:
                     // Recursively check for not Absolute or not View
-                    ThrowInvalid (view, (pos as Pos.PosCombine)._left, name);
-                    ThrowInvalid (view, (pos as Pos.PosCombine)._right, name);
+                    ThrowInvalid (view, (pos as Pos.PosCombine).Left, name);
+                    ThrowInvalid (view, (pos as Pos.PosCombine).Right, name);
 
                     break;
 

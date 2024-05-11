@@ -132,19 +132,6 @@ public class Dialogs : Scenario
         };
         frame.Add (label);
 
-        static IEnumerable<string> GetUniqueEnumNames<T> () where T : Enum
-        {
-            var values = new HashSet<int> ();
-            foreach (var name in Enum.GetNames (typeof (T)))
-            {
-                var value = (int)Enum.Parse (typeof (T), name);
-                if (values.Add (value))
-                {
-                    yield return name;
-                }
-            }
-        }
-
         var labels = new [] { "Left", "Centered", "Right", "Justified", "FirstLeftRestRight", "LastRightRestLeft" };
         var alignmentGroup = new RadioGroup
         {

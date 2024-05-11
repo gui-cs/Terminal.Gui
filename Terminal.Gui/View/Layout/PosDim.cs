@@ -453,17 +453,18 @@ public class Pos
 
     internal class PosCombine (bool add, Pos left, Pos right) : Pos
     {
-        internal bool _add = add;
-        internal Pos _left = left, _right = right;
+        internal bool Add { get; set; } = add;
+        internal Pos Left { get; set; } = left;
+        internal Pos Right { get; set; } = right;
 
-        public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
+        public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
 
         internal override int Anchor (int width)
         {
-            int la = _left.Anchor (width);
-            int ra = _right.Anchor (width);
+            int la = Left.Anchor (width);
+            int ra = Right.Anchor (width);
 
-            if (_add)
+            if (Add)
             {
                 return la + ra;
             }
@@ -474,10 +475,10 @@ public class Pos
         internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
         {
             int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
-            int left = _left.Calculate (superviewDimension, dim, us, dimension);
-            int right = _right.Calculate (superviewDimension, dim, us, dimension);
+            int left = Left.Calculate (superviewDimension, dim, us, dimension);
+            int right = Right.Calculate (superviewDimension, dim, us, dimension);
 
-            if (_add)
+            if (Add)
             {
                 return left + right;
             }
@@ -491,12 +492,12 @@ public class Pos
         /// <returns></returns>
         internal override bool ReferencesOtherViews ()
         {
-            if (_left.ReferencesOtherViews ())
+            if (Left.ReferencesOtherViews ())
             {
                 return true;
             }
 
-            if (_right.ReferencesOtherViews ())
+            if (Right.ReferencesOtherViews ())
             {
                 return true;
             }
@@ -758,7 +759,7 @@ public class Pos
 
 /// <summary>
 ///     <para>
-///         A Dim object describes the dimensions of a <see cref="View"/>. Dim is the type of the
+///         Describes the horizontal or vertical dimensions of a <see cref="View"/>. Dim is the type of the
 ///         <see cref="View.Width"/> and <see cref="View.Height"/> properties of <see cref="View"/>. Dim objects enable
 ///         Computed Layout (see <see cref="LayoutStyle.Computed"/>) to automatically manage the dimensions of a view.
 ///     </para>
