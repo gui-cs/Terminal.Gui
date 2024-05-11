@@ -11,13 +11,16 @@ public enum Alignment
 {
     /// <summary>
     ///     The items will be aligned to the left.
-    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+    ///     Set <see cref="Aligner.SpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         If the container is smaller than the total size of the items, the right items will be clipped (their locations
     ///         will be greater than the container size).
+    ///     </para>
+    ///     <para>
+    ///         <see cref="Left"/> and <see cref="Top"/> have equivalent behavior.
     ///     </para>
     /// </remarks>
     /// <example>
@@ -29,20 +32,32 @@ public enum Alignment
 
     /// <summary>
     ///     The items will be aligned to the top.
-    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     Set <see cref="Aligner.SpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the container is smaller than the total size of the items, the bottom items will be clipped (their locations
+    ///         will be greater than the container size).
+    ///     </para>
+    ///     <para>
+    ///         <see cref="Left"/> and <see cref="Top"/> have equivalent behavior.
+    ///     </para>
+    /// </remarks>
     Top,
 
     /// <summary>
     ///     The items will be aligned to the right.
-    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+    ///     Set <see cref="Aligner.SpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         If the container is smaller than the total size of the items, the left items will be clipped (their locations
     ///         will be negative).
+    ///     </para>
+    ///     <para>
+    ///         <see cref="Right"/> and <see cref="Bottom"/> have equivalent behavior.
     ///     </para>
     /// </remarks>
     /// <example>
@@ -54,15 +69,24 @@ public enum Alignment
 
     /// <summary>
     ///     The items will be aligned to the bottom.
-    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     Set <see cref="Aligner.SpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the container is smaller than the total size of the items, the top items will be clipped (their locations
+    ///         will be negative).
+    ///     </para>
+    ///     <para>
+    ///         <see cref="Right"/> and <see cref="Bottom"/> have equivalent behavior.
+    ///     </para>
+    /// </remarks>
     Bottom,
 
     /// <summary>
     ///     The group will be centered in the container.
     ///     If centering is not possible, the group will be left-aligned.
-    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+    ///     Set <see cref="Aligner.SpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
     /// <remarks>
@@ -80,7 +104,7 @@ public enum Alignment
         /// <summary>
         ///     The items will be justified. Space will be added between the items such that the first item
         ///     is at the start and the right side of the last item against the end.
-        ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+        ///     Set <see cref="Aligner.SpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
         ///     each item.
         /// </summary>
         /// <remarks>
@@ -97,13 +121,16 @@ public enum Alignment
 
     /// <summary>
     ///     The first item will be aligned to the left and the remaining will aligned to the right.
-    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+    ///     Set <see cref="Aligner.SpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         If the container is smaller than the total size of the items, the right items will be clipped (their locations
     ///         will be greater than the container size).
+    ///     </para>
+    ///     <para>
+    ///         <see cref="FirstLeftRestRight"/> and <see cref="FirstTopRestBottom"/> have equivalent behavior.
     ///     </para>
     /// </remarks>
     /// <example>
@@ -115,20 +142,32 @@ public enum Alignment
 
     /// <summary>
     ///     The first item will be aligned to the top and the remaining will aligned to the bottom.
-    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     Set <see cref="Aligner.SpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the container is smaller than the total size of the items, the bottom items will be clipped (their locations
+    ///         will be greater than the container size).
+    ///     </para>
+    ///     <para>
+    ///         <see cref="FirstLeftRestRight"/> and <see cref="FirstTopRestBottom"/> have equivalent behavior.
+    ///     </para>
+    /// </remarks>
     FirstTopRestBottom,
 
     /// <summary>
     ///     The last item will be aligned to the right and the remaining will aligned to the left.
-    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
+    ///     Set <see cref="Aligner.SpaceBetweenItems"/> to <see langword="true"/> to ensure at least one space between
     ///     each item.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         If the container is smaller than the total size of the items, the left items will be clipped (their locations
     ///         will be negative).
+    ///     </para>
+    ///     <para>
+    ///         <see cref="LastRightRestLeft"/> and <see cref="LastBottomRestTop"/> have equivalent behavior.
     ///     </para>
     /// </remarks>
     /// <example>
@@ -140,14 +179,23 @@ public enum Alignment
 
     /// <summary>
     ///     The last item will be aligned to the bottom and the remaining will aligned to the left.
-    ///     Set <see cref="Aligner.PutSpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
+    ///     Set <see cref="Aligner.SpaceBetweenItems"/> to <see langword="true"/> to ensure at least one line between
     ///     each item.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the container is smaller than the total size of the items, the top items will be clipped (their locations
+    ///         will be negative).
+    ///     </para>
+    ///     <para>
+    ///         <see cref="LastRightRestLeft"/> and <see cref="LastBottomRestTop"/> have equivalent behavior.
+    ///     </para>
+    /// </remarks>
     LastBottomRestTop
 }
 
 /// <summary>
-///     Aligns items within a container based on the specified <see cref="Gui.Alignment"/>.
+///     Aligns items within a container based on the specified <see cref="Gui.Alignment"/>. Both horizontal and vertical alignments are supported.
 /// </summary>
 public class Aligner : INotifyPropertyChanged
 {
@@ -181,27 +229,25 @@ public class Aligner : INotifyPropertyChanged
         }
     }
 
-    private bool _putSpaceBetweenItems;
+    private bool _spaceBetweenItems;
 
     /// <summary>
-    ///     Gets or sets whether <see cref="Aligner"/> puts a space is placed between items. Default is
-    ///     <see langword="false"/>. If <see langword="true"/>, a space will be
-    ///     placed between each item, which is useful for justifying text.
+    ///     Gets or sets whether <see cref="Aligner"/> adds at least one space between items. Default is
+    ///     <see langword="false"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         If the total size of the items is greater than the container size, the space between items will be ignored
-    ///         starting
-    ///         from the right.
+    ///         starting from the right or bottom.
     ///     </para>
     /// </remarks>
-    public bool PutSpaceBetweenItems
+    public bool SpaceBetweenItems
     {
-        get => _putSpaceBetweenItems;
+        get => _spaceBetweenItems;
         set
         {
-            _putSpaceBetweenItems = value;
-            PropertyChanged?.Invoke (this, new (nameof (PutSpaceBetweenItems)));
+            _spaceBetweenItems = value;
+            PropertyChanged?.Invoke (this, new (nameof (SpaceBetweenItems)));
         }
     }
 
@@ -209,32 +255,38 @@ public class Aligner : INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
 
     /// <summary>
-    ///     Takes a list of items and returns their positions when aligned within a container <see name="ContainerSize"/>
-    ///     wide based on the specified
-    ///     <see cref="Alignment"/>.
+    ///     Takes a list of item sizes and returns a list of the positions of those items when aligned within <see name="ContainerSize"/>
+    ///     using the <see cref="Alignment"/> and <see cref="SpaceBetweenItems"/> settings.
     /// </summary>
     /// <param name="sizes">The sizes of the items to align.</param>
-    /// <returns>The locations of the items, from left to right.</returns>
-    public int [] Align (int [] sizes) { return Align (Alignment, PutSpaceBetweenItems, ContainerSize, sizes); }
+    /// <returns>The locations of the items, from left/top to right/bottom.</returns>
+    public int [] Align (int [] sizes) { return Align (Alignment, SpaceBetweenItems, ContainerSize, sizes); }
 
     /// <summary>
-    ///     Takes a list of items and returns their positions when aligned within a container
-    ///     <paramref name="containerSize"/> wide based on the specified
-    ///     <see cref="Alignment"/>.
+    ///     Takes a list of item sizes and returns a list of the  positions of those items when aligned within <paramref name="containerSize"/>
+    ///     using specified parameters.
     /// </summary>
     /// <param name="sizes">The sizes of the items to align.</param>
     /// <param name="alignment">Specifies how the items will be aligned.</param>
-    /// <param name="putSpaceBetweenItems">Puts a space is placed between items.</param>
+    /// <param name="spaceBetweenItems">
+    ///     <para>
+    ///         Indicates whether at least one space should be added between items.
+    ///     </para>
+    ///     <para>
+    ///         If the total size of the items is greater than the container size, the space between items will be ignored
+    ///         starting from the right or bottom.
+    ///     </para>
+    /// </param>
     /// <param name="containerSize">The size of the container.</param>
-    /// <returns>The locations of the items, from left to right.</returns>
-    public static int [] Align (Alignment alignment, bool putSpaceBetweenItems, int containerSize, int [] sizes)
+    /// <returns>The positions of the items, from left/top to right/bottom.</returns>
+    public static int [] Align (Alignment alignment, bool spaceBetweenItems, int containerSize, int [] sizes)
     {
         if (sizes.Length == 0)
         {
             return new int [] { };
         }
 
-        int maxSpaceBetweenItems = putSpaceBetweenItems ? 1 : 0;
+        int maxSpaceBetweenItems = spaceBetweenItems ? 1 : 0;
 
         var positions = new int [sizes.Length]; // positions of the items. the return value.
         int totalItemsSize = sizes.Sum ();
