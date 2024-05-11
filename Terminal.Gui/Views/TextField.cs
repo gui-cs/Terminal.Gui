@@ -33,6 +33,7 @@ public class TextField : View
         CaptionColor = new Color (Color.DarkGray);
         ReadOnly = false;
         Autocomplete = new TextFieldAutocomplete ();
+
         Height = 1;
 
         CanFocus = true;

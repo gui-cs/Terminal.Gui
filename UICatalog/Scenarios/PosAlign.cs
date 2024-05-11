@@ -78,7 +78,8 @@ public sealed class PosAlign : Scenario
             X = Pos.Align (_horizAligner.Alignment),
             Y = Pos.Top (alignRadioGroup),
             ColorScheme = colorScheme,
-            Text = "Spaces"
+            Text = "Spaces",
+            Checked = true
         };
 
         putSpaces.Toggled += (s, e) =>
@@ -115,20 +116,18 @@ public sealed class PosAlign : Scenario
                                       view.Margin.Thickness = new (_leftMargin, 0, 0, 0);
                                   }
                               }
-
-                              appWindow.LayoutSubviews ();
                           };
         appWindow.Add (margin);
 
-        List<Button> addedViews = new List<Button> ();
-
-        addedViews.Add (
-                        new()
-                        {
-                            X = Pos.Align (_horizAligner.Alignment),
-                            Y = Pos.Center (),
-                            Text = NumberToWords.Convert (0)
-                        });
+        List<Button> addedViews =
+        [
+            new ()
+            {
+                X = Pos.Align (_horizAligner.Alignment),
+                Y = Pos.Center (),
+                Text = NumberToWords.Convert (0)
+            }
+        ];
 
         Buttons.NumericUpDown<int> addedViewsUpDown = new Buttons.NumericUpDown<int>
         {
@@ -224,7 +223,8 @@ public sealed class PosAlign : Scenario
             X = 0,
             Y = Pos.Align (_vertAligner.Alignment),
             ColorScheme = colorScheme,
-            Text = "Spaces"
+            Text = "Spaces",
+            Checked = true
         };
 
         putSpaces.Toggled += (s, e) =>
@@ -258,23 +258,27 @@ public sealed class PosAlign : Scenario
                                   // Skip the justification radio group
                                   if (view != alignRadioGroup)
                                   {
+                                      // BUGBUG: This is a hack to work around #3469
+                                      if (view is CheckBox)
+                                      {
+                                          view.Height = 1 + _topMargin;
+                                      }
+
                                       view.Margin.Thickness = new (0, _topMargin, 0, 0);
                                   }
                               }
-
-                              appWindow.LayoutSubviews ();
                           };
         appWindow.Add (margin);
 
-        List<CheckBox> addedViews = new List<CheckBox> ();
-
-        addedViews.Add (
-                        new()
-                        {
-                            X = 0,
-                            Y = Pos.Align (_vertAligner.Alignment),
-                            Text = NumberToWords.Convert (0)
-                        });
+        List<CheckBox> addedViews =
+        [
+            new ()
+            {
+                X = 0,
+                Y = Pos.Align (_vertAligner.Alignment),
+                Text = NumberToWords.Convert (0)
+            }
+        ];
 
         Buttons.NumericUpDown<int> addedViewsUpDown = new Buttons.NumericUpDown<int>
         {

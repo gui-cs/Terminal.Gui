@@ -20,7 +20,7 @@ public class CheckBox : View
         _charChecked = Glyphs.Checked;
         _charUnChecked = Glyphs.UnChecked;
 
-        Height = 1;
+        Height = 1;//Dim.Auto (Dim.DimAutoStyle.Text);
         Width = Dim.Auto (Dim.DimAutoStyle.Text);
 
         CanFocus = true;

@@ -665,7 +665,6 @@ public class DimAutoTests (ITestOutputHelper output)
         super.Dispose ();
     }
 
-
     // Test that changing TextFormatter does not impact View dimensions if Dim.Auto is not in play
     [Fact]
     public void DimAuto_Not_Used_TextFormatter_Does_Not_Change_View_Size ()
