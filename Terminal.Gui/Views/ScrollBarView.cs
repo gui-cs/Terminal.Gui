@@ -299,7 +299,7 @@ public class ScrollBarView : View
             Host.SetFocus ();
         }
 
-        int location = _vertical ? mouseEvent.Y : mouseEvent.X;
+        int location = _vertical ? mouseEvent.Position.Y : mouseEvent.Position.X;
         int barsize = _vertical ? Viewport.Height : Viewport.Width;
         int posTopLeftTee = _vertical ? _posTopTee + 1 : _posLeftTee + 1;
         int posBottomRightTee = _vertical ? _posBottomTee + 1 : _posRightTee + 1;

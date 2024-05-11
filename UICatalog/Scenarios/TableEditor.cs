@@ -750,7 +750,7 @@ public class TableEditor : Scenario
                                          return;
                                      }
 
-                                     _tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
+                                     _tableView.ScreenToCell (e.MouseEvent.Position, out int? clickedCol);
 
                                      if (clickedCol != null)
                                      {
@@ -1254,7 +1254,7 @@ public class TableEditor : Scenario
 
         var contextMenu = new ContextMenu
         {
-            Position = new (e.MouseEvent.X + 1, e.MouseEvent.Y + 1),
+            Position = new (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
             MenuItems = new (
                              [
                                  new (

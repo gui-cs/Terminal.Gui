@@ -123,7 +123,7 @@ public class TextFieldTests
         Assert.False (fv.HasFocus);
 
         tf.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
+                       new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
                       );
 
         Assert.Null (tf.SelectedText);
@@ -137,7 +137,7 @@ public class TextFieldTests
         tf.CanFocus = true;
 
         tf.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
+                       new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
                       );
 
         Assert.Equal ("some ", tf.SelectedText);
@@ -149,7 +149,7 @@ public class TextFieldTests
         fv.CanFocus = false;
 
         tf.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
+                       new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
                       );
 
         Assert.Equal ("some ", tf.SelectedText); // Setting CanFocus to false don't change the SelectedText
@@ -485,7 +485,7 @@ public class TextFieldTests
 
         Assert.True (
                      tf.NewMouseEvent (
-                                    new MouseEvent { X = 7, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                    new MouseEvent { Position = new (7, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
                                    )
                     );
         Assert.Equal ("Misérables ", tf.SelectedText);
@@ -1150,12 +1150,12 @@ public class TextFieldTests
     {
         var tf = new TextField { Width = 10, Text = " " };
 
-        var ev = new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
+        var ev = new MouseEvent { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
 
         tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
 
-        ev = new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
+        ev = new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked };
 
         tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
@@ -1538,14 +1538,14 @@ public class TextFieldTests
 
         Assert.True (
                      tf.NewMouseEvent (
-                                    new MouseEvent { X = idx, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                    new MouseEvent { Position = new (idx, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
                                    )
                     );
         Assert.Equal ("movie.", tf.SelectedText);
 
         Assert.True (
                      tf.NewMouseEvent (
-                                    new MouseEvent { X = idx + 1, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                    new MouseEvent { Position = new (idx + 1, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
                                    )
                     );
         Assert.Equal ("movie.", tf.SelectedText);

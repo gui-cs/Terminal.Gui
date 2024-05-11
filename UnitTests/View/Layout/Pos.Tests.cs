@@ -254,8 +254,70 @@ public class PosTests (ITestOutputHelper output)
     [TestRespondersDisposed]
     public void LeftTopBottomRight_Win_ShouldNotThrow ()
     {
+        // Test cases:
+        (Toplevel top, Window win, Button button) app = Setup ();
+        app.button.Y = Pos.Left (app.win);
+        RunState rs = Application.Begin (app.top);
+
+        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
+        Application.RunLoop (rs);
+        Cleanup (rs);
+
+        app = Setup ();
+        app.button.Y = Pos.X (app.win);
+        rs = Application.Begin (app.top);
+
+        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
+        Application.RunLoop (rs);
+        Cleanup (rs);
+
+        app = Setup ();
+        app.button.Y = Pos.Top (app.win);
+        rs = Application.Begin (app.top);
+
+        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
+        Application.RunLoop (rs);
+        Cleanup (rs);
+
+        app = Setup ();
+        app.button.Y = Pos.Y (app.win);
+        rs = Application.Begin (app.top);
+
+        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
+        Application.RunLoop (rs);
+        Cleanup (rs);
+
+        app = Setup ();
+        app.button.Y = Pos.Bottom (app.win);
+        rs = Application.Begin (app.top);
+
+        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
+        Application.RunLoop (rs);
+        Cleanup (rs);
+
+        app = Setup ();
+        app.button.Y = Pos.Right (app.win);
+        rs = Application.Begin (app.top);
+
+        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
+        Application.RunLoop (rs);
+        Cleanup (rs);
+
+        return;
+
+        void Cleanup (RunState rs)
+        {
+            // Cleanup
+            Application.End (rs);
+
+            Application.Top.Dispose ();
+
+            // Shutdown must be called to safely clean up Application if Init has been called
+            Application.Shutdown ();
+        }
+
         // Setup Fake driver
-        (Toplevel top, Window win, Button button) setup ()
+        (Toplevel top, Window win, Button button) Setup ()
         {
             Application.Init (new FakeDriver ());
             Application.Iteration += (s, a) => { Application.RequestStop (); };
@@ -268,68 +330,6 @@ public class PosTests (ITestOutputHelper output)
 
             return (top, win, button);
         }
-
-        RunState rs;
-
-        void cleanup (RunState rs)
-        {
-            // Cleanup
-            Application.End (rs);
-
-            Application.Top.Dispose ();
-
-            // Shutdown must be called to safely clean up Application if Init has been called
-            Application.Shutdown ();
-        }
-
-        // Test cases:
-        (Toplevel top, Window win, Button button) app = setup ();
-        app.button.Y = Pos.Left (app.win);
-        rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        cleanup (rs);
-
-        app = setup ();
-        app.button.Y = Pos.X (app.win);
-        rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        cleanup (rs);
-
-        app = setup ();
-        app.button.Y = Pos.Top (app.win);
-        rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        cleanup (rs);
-
-        app = setup ();
-        app.button.Y = Pos.Y (app.win);
-        rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        cleanup (rs);
-
-        app = setup ();
-        app.button.Y = Pos.Bottom (app.win);
-        rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        cleanup (rs);
-
-        app = setup ();
-        app.button.Y = Pos.Right (app.win);
-        rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        cleanup (rs);
     }
 
     [Fact]
@@ -906,7 +906,7 @@ public class PosTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 2, 10, 3), win2.Frame);
         Assert.Equal (new Rectangle (0, 0, 8, 1), view2.Frame);
         Assert.Equal (new Rectangle (0, 0, 7, 1), view3.Frame);
-        var foundView = View.FindDeepestView (top, 9, 4);
+        var foundView = View.FindDeepestView (top, new (9, 4));
         Assert.Equal (foundView, view2);
     }
 

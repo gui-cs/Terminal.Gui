@@ -116,24 +116,15 @@ public class MouseEvent
     /// <summary>The View at the location for the mouse event.</summary>
     public View View { get; set; }
 
-    /// <summary>The X position of the mouse in <see cref="Gui.View.Viewport"/>-relative coordinates.</summary>
-    public int X { get; set; }
-
-    /// <summary>The Y position of the mouse in <see cref="Gui.View.Viewport"/>-relative coordinates.</summary>
-    public int Y { get; set; }
-
-    /// <summary>
-    ///     Indicates if the current mouse event has been processed. Set this value to <see langword="true"/> to indicate the mouse
-    ///     event was handled.
-    /// </summary>
-    public bool Handled { get; set; }
+    /// <summary>The position of the mouse in <see cref="Gui.View.Viewport"/>-relative coordinates.</summary>
+    public Point Position { get; set; }
 
     /// <summary>
     ///     The screen-relative mouse position.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         The <see cref="X"/> and <see cref="Y"/> properties are always <see cref="Gui.View.Viewport"/>-relative. When the mouse is grabbed by a view,
+    ///         <see cref="Position"/> is <see cref="Gui.View.Viewport"/>-relative. When the mouse is grabbed by a view,
     ///         <see cref="ScreenPosition"/> provides the mouse position screen-relative coordinates, enabling the grabbed view to know how much the
     ///         mouse has moved.
     ///     </para>
@@ -143,7 +134,13 @@ public class MouseEvent
     /// </remarks>
     public Point ScreenPosition { get; set; }
 
+    /// <summary>
+    ///     Indicates if the current mouse event has been processed. Set this value to <see langword="true"/> to indicate the mouse
+    ///     event was handled.
+    /// </summary>
+    public bool Handled { get; set; }
+
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>
-    public override string ToString () { return $"({X},{Y}):{Flags}"; }
+    public override string ToString () { return $"({Position}):{Flags}"; }
 }

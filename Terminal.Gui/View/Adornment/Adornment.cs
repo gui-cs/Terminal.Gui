@@ -135,7 +135,10 @@ public class Adornment : View
     }
 
     /// <inheritdoc/>
-    public override Point ScreenToFrame (int x, int y) { return Parent.ScreenToFrame (x - Frame.X, y - Frame.Y); }
+    public override Point ScreenToFrame (in Point location)
+    {
+        return Parent.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
+    }
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
@@ -206,12 +209,11 @@ public class Adornment : View
     /// Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness.
     /// </summary>
     /// <remarks>
-    ///     The <paramref name="x"/> and <paramref name="x"/> are relative to the PARENT's SuperView.
+    ///     The <paramref name="location"/> is relative to the PARENT's SuperView.
     /// </remarks>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
+    /// <param name="location"></param>
     /// <returns><see langword="true"/> if the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness. </returns>
-    public override bool Contains (int x, int y)
+    public override bool Contains (in Point location)
     {
         if (Parent is null)
         {
@@ -221,7 +223,7 @@ public class Adornment : View
         Rectangle frame = Frame;
         frame.Offset (Parent.Frame.Location);
 
-        return Thickness.Contains (frame, x, y);
+        return Thickness.Contains (frame, location);
     }
 
     /// <inheritdoc/>

@@ -413,14 +413,14 @@ public class ListView : View
             return true;
         }
 
-        if (me.Y + Viewport.Y >= _source.Count
-            || me.Y + Viewport.Y < 0
-            || me.Y + Viewport.Y > Viewport.Y + Viewport.Height)
+        if (me.Position.Y + Viewport.Y >= _source.Count
+            || me.Position.Y + Viewport.Y < 0
+            || me.Position.Y + Viewport.Y > Viewport.Y + Viewport.Height)
         {
             return true;
         }
 
-        _selected = Viewport.Y + me.Y;
+        _selected = Viewport.Y + me.Position.Y;
 
         if (AllowsAll ())
         {

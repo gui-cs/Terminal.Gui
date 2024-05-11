@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.CodeAnalysis;
 
 namespace Terminal.Gui;
 
@@ -88,15 +89,13 @@ public partial class View
         }
     }
 
-    private void SetFrame (Rectangle frame)
+    private void SetFrame (in Rectangle frame)
     {
         var oldViewport = Rectangle.Empty;
-        Size? oldContentSize = null;
 
         if (IsInitialized)
         {
             oldViewport = Viewport;
-            oldContentSize = ContentSize;
         }
 
         // This is the only place where _frame should be set directly. Use Frame = or SetFrame instead.
@@ -147,25 +146,22 @@ public partial class View
     ///     View's <see cref="SuperView"/>'s <see cref="Viewport"/>.
     /// </summary>
     /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Viewport"/>.</returns>
-    /// <param name="x">Screen-relative column.</param>
-    /// <param name="y">Screen-relative row.</param>
-    public virtual Point ScreenToFrame (int x, int y)
+    /// <param name="location">Screen-relative coordinate.</param>
+    public virtual Point ScreenToFrame (in Point location)
     {
         if (SuperView is null)
         {
-            return new (x - Frame.X, y - Frame.Y);
+            return new (location.X - Frame.X, location.Y - Frame.Y);
         }
 
         Point superViewViewportOffset = SuperView.GetViewportOffsetFromFrame ();
-        superViewViewportOffset.X -= SuperView.Viewport.X;
-        superViewViewportOffset.Y -= SuperView.Viewport.Y;
+        superViewViewportOffset.Offset(-SuperView.Viewport.X, -SuperView.Viewport.Y);
 
-        x -= superViewViewportOffset.X;
-        y -= superViewViewportOffset.Y;
+        Point frame = location;
+        frame.Offset(-superViewViewportOffset.X, -superViewViewportOffset.Y);
 
-        Point frame = SuperView.ScreenToFrame (x, y);
-        frame.X -= Frame.X;
-        frame.Y -= Frame.Y;
+        frame = SuperView.ScreenToFrame (frame);
+        frame.Offset (-Frame.X, -Frame.Y);
 
         return frame;
     }
@@ -180,7 +176,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout"/> has been
     ///         called.
     ///     </para>
     ///     <para>
@@ -219,7 +215,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
-    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
+    ///         initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout"/> has been
     ///         called.
     ///     </para>
     ///     <para>
@@ -258,7 +254,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout"/> has been
     ///         called.
     ///     </para>
     ///     <para>
@@ -304,7 +300,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
-    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Size)"/> has been
+    ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout"/> has been
     ///         called.
     ///     </para>
     ///     <para>
@@ -397,10 +393,9 @@ public partial class View
     /// <summary>
     ///     Indicates whether the specified SuperView-relative coordinates are within the View's <see cref="Frame"/>.
     /// </summary>
-    /// <param name="x">SuperView-relative X coordinate.</param>
-    /// <param name="y">SuperView-relative Y coordinate.</param>
+    /// <param name="location">SuperView-relative coordinate</param>
     /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
-    public virtual bool Contains (int x, int y) { return Frame.Contains (x, y); }
+    public virtual bool Contains (in Point location) { return Frame.Contains (location); }
 
 #nullable enable
     /// <summary>Finds the first Subview of <paramref name="start"/> that is visible at the provided location.</summary>
@@ -410,29 +405,29 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="start">The view to scope the search by.</param>
-    /// <param name="x"><paramref name="start"/>.SuperView-relative X coordinate.</param>
-    /// <param name="y"><paramref name="start"/>.SuperView-relative Y coordinate.</param>
+    /// <param name="location"><paramref name="start"/>.SuperView-relative coordinate.</param>
     /// <returns>
-    ///     The view that was found at the <paramref name="x"/> and <paramref name="y"/> coordinates.
+    ///     The view that was found at the <paramref name="location"/> coordinate.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
 
     // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    internal static View? FindDeepestView (View? start, int x, int y)
+    internal static View? FindDeepestView (View? start, in Point location)
     {
-        while (start is { Visible: true } && start.Contains (x, y))
+        Point currentLocation = location;
+        while (start is { Visible: true } && start.Contains (currentLocation))
         {
             Adornment? found = null;
 
-            if (start.Margin.Contains (x, y))
+            if (start.Margin.Contains (currentLocation))
             {
                 found = start.Margin;
             }
-            else if (start.Border.Contains (x, y))
+            else if (start.Border.Contains (currentLocation))
             {
                 found = start.Border;
             }
-            else if (start.Padding.Contains (x, y))
+            else if (start.Padding.Contains (currentLocation))
             {
                 found = start.Padding;
             }
@@ -445,19 +440,19 @@ public partial class View
                 viewportOffset = found.Parent.Frame.Location;
             }
 
-            int startOffsetX = x - (start.Frame.X + viewportOffset.X);
-            int startOffsetY = y - (start.Frame.Y + viewportOffset.Y);
+            int startOffsetX = currentLocation.X - (start.Frame.X + viewportOffset.X);
+            int startOffsetY = currentLocation.Y - (start.Frame.Y + viewportOffset.Y);
 
             View? subview = null;
 
             for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
                 if (start.InternalSubviews [i].Visible
-                    && start.InternalSubviews [i].Contains (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
+                    && start.InternalSubviews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y)))
                 {
                     subview = start.InternalSubviews [i];
-                    x = startOffsetX + start.Viewport.X;
-                    y = startOffsetY + start.Viewport.Y;
+                    currentLocation.X = startOffsetX + start.Viewport.X;
+                    currentLocation.Y = startOffsetY + start.Viewport.Y;
 
                     // start is the deepest subview under the mouse; stop searching the subviews
                     break;
@@ -528,7 +523,7 @@ public partial class View
             maxDimension -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
 
-        if (viewToMove.Frame.Width <= maxDimension)
+        if (viewToMove!.Frame.Width <= maxDimension)
         {
             nx = Math.Max (targetX, 0);
             nx = nx + viewToMove.Frame.Width > maxDimension ? Math.Max (maxDimension - viewToMove.Frame.Width, 0) : nx;
@@ -560,9 +555,9 @@ public partial class View
                 t = t.SuperView;
             }
 
-            if (t is Toplevel toplevel)
+            if (t is Toplevel topLevel)
             {
-                menuVisible = toplevel.MenuBar?.Visible == true;
+                menuVisible = topLevel.MenuBar?.Visible == true;
             }
         }
 
@@ -736,7 +731,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         Determines the relative bounds of the <see cref="View"/> and its <see cref="Frame"/>s, and then calls
-    ///         <see cref="SetRelativeLayout(Size)"/> to update the view.
+    ///         <see cref="SetRelativeLayout"/> to update the view.
     ///     </para>
     /// </remarks>
     internal void OnResizeNeeded ()

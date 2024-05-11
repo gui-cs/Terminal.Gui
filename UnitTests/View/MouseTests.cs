@@ -27,7 +27,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             testView.SetFocus ();
         }
 
-        testView.NewMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked });
+        testView.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (superView.HasFocus);
         Assert.Equal (expectedHasFocus, testView.HasFocus);
     }
@@ -73,9 +73,9 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         Application.Begin (top);
 
         Assert.Equal (new Point (4, 4), testView.Frame.Location);
-        Application.OnMouseEvent (new () { X = xy, Y = xy, Flags = MouseFlags.Button1Pressed });
+        Application.OnMouseEvent (new () { Position = new (xy, xy), Flags = MouseFlags.Button1Pressed });
 
-        Application.OnMouseEvent (new () { X = xy + 1, Y = xy + 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new () { Position = new (xy + 1, xy + 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
 
         Assert.Equal (expectedMoved, new Point (5, 5) == testView.Frame.Location);
     }
@@ -504,21 +504,21 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         // Start in Viewport
         me.Flags = MouseFlags.Button1Pressed;
-        me.X = 0;
+        me.Position = me.Position with { X = 0 };
         view.NewMouseEvent (me);
         Assert.Equal (1, clickedCount);
         me.Handled = false;
 
         // Move out of Viewport
         me.Flags = MouseFlags.Button1Pressed;
-        me.X = 1;
+        me.Position = me.Position with { X = 1 };
         view.NewMouseEvent (me);
         Assert.Equal (2, clickedCount);
         me.Handled = false;
 
         // Move into Viewport
         me.Flags = MouseFlags.Button1Pressed;
-        me.X = 0;
+        me.Position = me.Position with { X = 0 };
         view.NewMouseEvent (me);
         Assert.Equal (3, clickedCount);
         me.Handled = false;
@@ -597,12 +597,12 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         bool inViewport = view.Viewport.Contains (x, 0);
 
         // Start at 0,0 ; in viewport
-        view.NewMouseEvent (new () { X = 0, Flags = MouseFlags.Button1Pressed });
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
         Assert.Equal (1, enablingHighlight);
         Assert.Equal (0, disablingHighlight);
 
         // Move to x,0 
-        view.NewMouseEvent (new () { X = x, Flags = MouseFlags.Button1Pressed });
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
 
         if (inViewport)
         {
@@ -616,7 +616,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         }
 
         // Move backto 0,0 ; in viewport
-        view.NewMouseEvent (new () { X = 0, Flags = MouseFlags.Button1Pressed });
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
         if (inViewport)
         {
             Assert.Equal (3, enablingHighlight);

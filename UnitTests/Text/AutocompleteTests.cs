@@ -51,7 +51,7 @@ This a long line and against TextView.
 
         Assert.True (
                      tv.NewMouseEvent (
-                                    new MouseEvent { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (6, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Application.Refresh ();

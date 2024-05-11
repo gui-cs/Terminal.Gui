@@ -482,7 +482,7 @@ public class TreeViewFileSystem : Scenario
         // if user right clicks
         if (obj.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
         {
-            IFileSystemInfo rightClicked = _treeViewFiles.GetObjectOnRow (obj.MouseEvent.Y);
+            IFileSystemInfo rightClicked = _treeViewFiles.GetObjectOnRow (obj.MouseEvent.Position.Y);
 
             // nothing was clicked
             if (rightClicked == null)
@@ -492,8 +492,8 @@ public class TreeViewFileSystem : Scenario
 
             ShowContextMenu (
                              new Point (
-                                        obj.MouseEvent.X + _treeViewFiles.Frame.X,
-                                        obj.MouseEvent.Y + _treeViewFiles.Frame.Y + 2
+                                        obj.MouseEvent.Position.X + _treeViewFiles.Frame.X,
+                                        obj.MouseEvent.Position.Y + _treeViewFiles.Frame.Y + 2
                                        ),
                              rightClicked
                             );

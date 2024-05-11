@@ -278,7 +278,7 @@ public class HexView : View
             return true;
         }
 
-        if (me.X < displayWidth)
+        if (me.Position.X < displayWidth)
         {
             return true;
         }
@@ -287,14 +287,14 @@ public class HexView : View
         int blocksSize = nblocks * 14;
         int blocksRightOffset = displayWidth + blocksSize - 1;
 
-        if (me.X > blocksRightOffset + bytesPerLine - 1)
+        if (me.Position.X > blocksRightOffset + bytesPerLine - 1)
         {
             return true;
         }
 
-        leftSide = me.X >= blocksRightOffset;
-        long lineStart = me.Y * bytesPerLine + displayStart;
-        int x = me.X - displayWidth + 1;
+        leftSide = me.Position.X >= blocksRightOffset;
+        long lineStart = me.Position.Y * bytesPerLine + displayStart;
+        int x = me.Position.X - displayWidth + 1;
         int block = x / 14;
         x -= block * 2;
         int empty = x % 3;
@@ -309,7 +309,7 @@ public class HexView : View
 
         if (leftSide)
         {
-            position = Math.Min (lineStart + me.X - blocksRightOffset, source.Length);
+            position = Math.Min (lineStart + me.Position.X - blocksRightOffset, source.Length);
         }
         else
         {

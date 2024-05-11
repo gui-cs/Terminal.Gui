@@ -719,42 +719,34 @@ Item 6",
 │Three│
 └─────┘", _output);
 
-        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.Equal ("", selected);
         Assert.Equal (-1, lv.SelectedItem);
 
         Application.OnMouseEvent (new ()
         {
-            X = 1,
-            Y = 1,
-            Flags = MouseFlags.Button1Clicked
+            Position = new (1, 1), Flags = MouseFlags.Button1Clicked
         });
         Assert.Equal ("One", selected);
         Assert.Equal (0, lv.SelectedItem);
 
         Application.OnMouseEvent (new ()
         {
-            X = 1,
-            Y = 2,
-            Flags = MouseFlags.Button1Clicked
+            Position = new (1, 2), Flags = MouseFlags.Button1Clicked
         });
         Assert.Equal ("Two", selected);
         Assert.Equal (1, lv.SelectedItem);
 
         Application.OnMouseEvent (new ()
         {
-            X = 1,
-            Y = 3,
-            Flags = MouseFlags.Button1Clicked
+            Position = new (1, 3), Flags = MouseFlags.Button1Clicked
         });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
 
         Application.OnMouseEvent (new ()
         {
-            X = 1,
-            Y = 4,
-            Flags = MouseFlags.Button1Clicked
+            Position = new (1, 4), Flags = MouseFlags.Button1Clicked
         });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);

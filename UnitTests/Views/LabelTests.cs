@@ -67,7 +67,7 @@ public class LabelTests
         Assert.False (label.HasFocus);
         Assert.False (nextSubview.HasFocus);
 
-        label.NewMouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked });
+        label.NewMouseEvent (new MouseEvent () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
         Assert.True (nextSubview.HasFocus);
     }

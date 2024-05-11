@@ -67,14 +67,14 @@ public class ContextMenus : Scenario
                           {
                               if (e.MouseEvent.Flags == _contextMenu.MouseFlags)
                               {
-                                  ShowContextMenu (e.MouseEvent.X, e.MouseEvent.Y);
+                                  ShowContextMenu (e.MouseEvent.Position.X, e.MouseEvent.Position.Y);
                                   e.Handled = true;
                               }
                           };
 
         Application.MouseEvent += ApplicationMouseEvent;
 
-        void ApplicationMouseEvent (object sender, MouseEvent a) { mousePos = new Point (a.X, a.Y); }
+        void ApplicationMouseEvent (object sender, MouseEvent a) { mousePos = a.Position; }
 
         Win.WantMousePositionReports = true;
 

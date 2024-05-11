@@ -1028,14 +1028,14 @@ public class TreeView<T> : View, ITreeView where T : class
         if (me.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
             // The line they clicked on a branch
-            Branch<T> clickedBranch = HitTest (me.Y);
+            Branch<T> clickedBranch = HitTest (me.Position.Y);
 
             if (clickedBranch is null)
             {
                 return false;
             }
 
-            bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (Driver, me.X);
+            bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (Driver, me.Position.X);
 
             // If we are already selected (double click)
             if (Equals (SelectedObject, clickedBranch.Model))
@@ -1078,7 +1078,7 @@ public class TreeView<T> : View, ITreeView where T : class
         if (ObjectActivationButton.HasValue && me.Flags.HasFlag (ObjectActivationButton.Value))
         {
             // The line they clicked on a branch
-            Branch<T> clickedBranch = HitTest (me.Y);
+            Branch<T> clickedBranch = HitTest (me.Position.Y);
 
             if (clickedBranch is null)
             {

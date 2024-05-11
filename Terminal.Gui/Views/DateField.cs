@@ -120,8 +120,7 @@ public class DateField : TextField
 
         if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            int point = ev.X;
-            AdjCursorPosition (point);
+            AdjCursorPosition (ev.Position.X);
         }
 
         return result;

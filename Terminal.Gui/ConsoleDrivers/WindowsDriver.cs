@@ -157,7 +157,7 @@ internal class WindowsConsole
             }
         }
 
-        SetInitialCursorVisibility();
+        SetInitialCursorVisibility ();
 
         if (!SetConsoleActiveScreenBuffer (_screenBuffer))
         {
@@ -1483,7 +1483,7 @@ internal class WindowsDriver : ConsoleDriver
             case WindowsConsole.EventType.Mouse:
                 MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
 
-               if (me is null || me.Flags == MouseFlags.None)
+                if (me is null || me.Flags == MouseFlags.None)
                 {
                     break;
                 }
@@ -1494,8 +1494,7 @@ internal class WindowsDriver : ConsoleDriver
                 {
                     OnMouseEvent (new ()
                     {
-                        X = me.X,
-                        Y = me.Y,
+                        Position = me.Position,
                         Flags = ProcessButtonClick (inputEvent.MouseEvent)
                     });
                 }
@@ -1814,8 +1813,7 @@ internal class WindowsDriver : ConsoleDriver
         {
             var me = new MouseEvent
             {
-                X = _pointMove.X,
-                Y = _pointMove.Y,
+                Position = _pointMove,
                 Flags = mouseFlag
             };
 
@@ -2129,8 +2127,7 @@ internal class WindowsDriver : ConsoleDriver
 
         return new MouseEvent
         {
-            X = mouseEvent.MousePosition.X,
-            Y = mouseEvent.MousePosition.Y,
+            Position = new (mouseEvent.MousePosition.X, mouseEvent.MousePosition.Y),
             Flags = mouseFlag
         };
     }

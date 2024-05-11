@@ -537,7 +537,7 @@ namespace Terminal.Gui
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {
-                int c = _provider.Cursor (mouseEvent.X - GetMargins (Viewport.Width).left);
+                int c = _provider.Cursor (mouseEvent.Position.X - GetMargins (Viewport.Width).left);
 
                 if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && Text.Length > 0)
                 {

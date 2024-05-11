@@ -1465,7 +1465,7 @@ public class Slider<T> : View
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition))
             {
-                _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+                _dragPosition = mouseEvent.Position;
                 _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
                 Application.GrabMouse (this);
             }
@@ -1480,7 +1480,7 @@ public class Slider<T> : View
             && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             // Continue Drag
-            _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+            _dragPosition = mouseEvent.Position;
             _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
 
             var success = false;
@@ -1489,11 +1489,11 @@ public class Slider<T> : View
             // how far has user dragged from original location?						
             if (Orientation == Orientation.Horizontal)
             {
-                success = TryGetOptionByPosition (mouseEvent.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
             }
             else
             {
-                success = TryGetOptionByPosition (0, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._innerSpacing / 2), out option);
             }
 
             if (!_config._allowEmpty && success)
@@ -1523,11 +1523,11 @@ public class Slider<T> : View
 
             if (Orientation == Orientation.Horizontal)
             {
-                success = TryGetOptionByPosition (mouseEvent.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
             }
             else
             {
-                success = TryGetOptionByPosition (0, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._innerSpacing / 2), out option);
             }
 
             if (success)

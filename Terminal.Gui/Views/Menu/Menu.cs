@@ -726,13 +726,12 @@ internal sealed class Menu : View
 
         View view = a.View ?? this;
 
-        Point boundsPoint = view.ScreenToViewport (a.X, a.Y);
+        Point boundsPoint = view.ScreenToViewport (new (a.Position.X, a.Position.Y));
         var me = new MouseEvent
         {
-            X = boundsPoint.X,
-            Y = boundsPoint.Y,
+            Position = boundsPoint,
             Flags = a.Flags,
-            ScreenPosition = new (a.X, a.Y),
+            ScreenPosition = a.Position,
             View = view
         };
 
@@ -792,7 +791,7 @@ internal sealed class Menu : View
 
             if (item is null && BorderStyle != LineStyle.None)
             {
-                var s = ViewportToScreen (new (-1, i, 0, 0));
+                var s = ViewportToScreen (new Point (-1, i));
                 Driver.Move (s.X, s.Y);
                 Driver.AddRune (Glyphs.LeftTee);
             }
@@ -840,7 +839,7 @@ internal sealed class Menu : View
             {
                 if (BorderStyle != LineStyle.None && SuperView?.Frame.Right - Frame.X > Frame.Width)
                 {
-                    var s = ViewportToScreen (new (Frame.Width - 2, i, 0, 0));
+                    var s = ViewportToScreen (new Point (Frame.Width - 2, i));
                     Driver.Move (s.X, s.Y);
                     Driver.AddRune (Glyphs.RightTee);
                 }
@@ -877,7 +876,7 @@ internal sealed class Menu : View
                 textToDraw = item.Title;
             }
 
-            Rectangle screen = ViewportToScreen (new (new (0 , i), Size.Empty));
+            var screen = ViewportToScreen (new Point(0  , i));
             if (screen.X < Driver.Cols)
             {
                 Driver.Move (screen.X + 1, screen.Y);
@@ -896,7 +895,7 @@ internal sealed class Menu : View
 
                     // The -3 is left/right border + one space (not sure what for)
                     tf.Draw (
-                             ViewportToScreen (new (1, i, Frame.Width - 3, 1)),
+                             ViewportToScreen (new Rectangle(1, i, Frame.Width - 3, 1)),
                              i == _currentChild ? GetFocusColor () : GetNormalColor (),
                              i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
                              SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
@@ -916,7 +915,7 @@ internal sealed class Menu : View
                             ? item.Help.GetColumns ()
                             : item.Help.GetColumns () + item.ShortcutTag.GetColumns () + 2;
                 int col = Frame.Width - l - 3;
-                screen = ViewportToScreen (new (new (col, i), Size.Empty));
+                screen = ViewportToScreen (new Point (col, i));
 
                 if (screen.X < Driver.Cols)
                 {
@@ -1191,17 +1190,17 @@ internal sealed class Menu : View
         {
             disabled = false;
 
-            if (me.Y < 0)
+            if (me.Position.Y < 0)
             {
                 return me.Handled = true;
             }
 
-            if (me.Y >= _barItems.Children.Length)
+            if (me.Position.Y >= _barItems.Children.Length)
             {
                 return me.Handled = true;
             }
 
-            MenuItem item = _barItems.Children [me.Y];
+            MenuItem item = _barItems.Children [me.Position.Y];
 
             if (item is null || !item.IsEnabled ())
             {
@@ -1213,7 +1212,7 @@ internal sealed class Menu : View
                 return me.Handled = true;
             }
 
-            _currentChild = me.Y;
+            _currentChild = me.Position.Y;
             RunSelected ();
 
             return me.Handled = true;
@@ -1231,12 +1230,12 @@ internal sealed class Menu : View
         {
             disabled = false;
 
-            if (me.Y < 0 || me.Y >= _barItems.Children.Length)
+            if (me.Position.Y < 0 || me.Position.Y >= _barItems.Children.Length)
             {
                 return me.Handled = true;
             }
 
-            MenuItem item = _barItems.Children [me.Y];
+            MenuItem item = _barItems.Children [me.Position.Y];
 
             if (item is null)
             {
@@ -1250,7 +1249,7 @@ internal sealed class Menu : View
 
             if (!disabled)
             {
-                _currentChild = me.Y;
+                _currentChild = me.Position.Y;
             }
 
             if (_host.UseSubMenusSingleFrame || !CheckSubMenu ())

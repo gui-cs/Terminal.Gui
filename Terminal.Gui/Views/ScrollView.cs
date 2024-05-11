@@ -427,11 +427,11 @@ public class ScrollView : View
         {
             ScrollLeft (1);
         }
-        else if (me.X == _vertical.Frame.X && ShowVerticalScrollIndicator)
+        else if (me.Position.X == _vertical.Frame.X && ShowVerticalScrollIndicator)
         {
             _vertical.NewMouseEvent (me);
         }
-        else if (me.Y == _horizontal.Frame.Y && ShowHorizontalScrollIndicator)
+        else if (me.Position.Y == _horizontal.Frame.Y && ShowHorizontalScrollIndicator)
         {
             _horizontal.NewMouseEvent (me);
         }

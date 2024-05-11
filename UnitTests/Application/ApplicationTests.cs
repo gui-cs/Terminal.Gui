@@ -781,7 +781,7 @@ public class ApplicationTests
                                      }
                                      else if (iteration < 3)
                                      {
-                                         Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition });
+                                         Application.OnMouseEvent (new () { Flags = MouseFlags.ReportMousePosition });
                                          Assert.False (top.NeedsDisplay);
                                          Assert.False (top.SubViewNeedsDisplay);
                                          Assert.False (top.LayoutNeeded);
@@ -820,12 +820,12 @@ public class ApplicationTests
         // Don't use visuals to test as style of border can change over time.
         Assert.Equal (new Point (0, 0), w.Frame.Location);
 
-        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
+        Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
         Assert.Equal (w.Border, Application.MouseGrabView);
         Assert.Equal (new Point (0,0), w.Frame.Location);
 
         // Move down and to the right.
-        Application.OnMouseEvent (new () { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new () { Position = new (1,1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         Assert.Equal (new Point (1, 1), w.Frame.Location);
 
         Application.End (rs);

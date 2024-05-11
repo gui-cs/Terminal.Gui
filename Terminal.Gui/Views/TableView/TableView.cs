@@ -841,8 +841,8 @@ public class TableView : View
                 return true;
         }
 
-        int boundsX = me.X;
-        int boundsY = me.Y;
+        int boundsX = me.Position.X;
+        int boundsY = me.Position.Y;
 
         if (me.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
@@ -1035,7 +1035,7 @@ public class TableView : View
     }
 
     /// <summary>
-    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
     ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
     ///     bounds.
     /// </summary>
@@ -1043,6 +1043,15 @@ public class TableView : View
     /// <param name="clientY">Y offset from the top left of the control.</param>
     /// <returns>Cell clicked or null.</returns>
     public Point? ScreenToCell (int clientX, int clientY) { return ScreenToCell (clientX, clientY, out _, out _); }
+
+    /// <summary>
+    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
+    ///     bounds.
+    /// </summary>
+    /// <param name="client">offset from the top left of the control.</param>
+    /// <returns>The position.</returns>
+    public Point? ScreenToCell (Point client) { return ScreenToCell (client, out _, out _); }
 
     /// <summary>
     ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
@@ -1055,7 +1064,16 @@ public class TableView : View
     public Point? ScreenToCell (int clientX, int clientY, out int? headerIfAny) { return ScreenToCell (clientX, clientY, out headerIfAny, out _); }
 
     /// <summary>
-    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
+    ///     bounds.
+    /// </summary>
+    /// <param name="client">offset from the top left of the control.</param>
+    /// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
+    public Point? ScreenToCell (Point client, out int? headerIfAny) { return ScreenToCell (client, out headerIfAny, out _); }
+
+    /// <summary>
+    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
     ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
     ///     bounds.
     /// </summary>
@@ -1105,6 +1123,19 @@ public class TableView : View
         }
 
         return null;
+    }
+
+    /// <summary>
+    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
+    ///     bounds.
+    /// </summary>
+    /// <param name="client">offset from the top left of the control.</param>
+    /// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
+    /// <param name="offsetX">The horizontal offset of the click within the returned cell.</param>
+    public Point? ScreenToCell (Point client, out int? headerIfAny, out int? offsetX)
+    {
+        return ScreenToCell (client.X, client.Y, out headerIfAny, out offsetX);
     }
 
     /// <summary>

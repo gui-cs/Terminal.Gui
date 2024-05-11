@@ -663,7 +663,7 @@ public class ThicknessTests
     {
         var rect = new Rectangle (x, y, width, height);
         var thickness = new Thickness (1, 1, 1, 1); // Uniform thickness for simplicity
-        bool result = thickness.Contains (rect, pointX, pointY);
+        bool result = thickness.Contains (rect, new (pointX, pointY));
         Assert.Equal (expected, result);
     }
 
@@ -702,7 +702,7 @@ public class ThicknessTests
     {
         var rect = new Rectangle (x, y, width, height);
         var thickness = new Thickness (2, 2, 2, 2); // Uniform thickness for simplicity
-        bool result = thickness.Contains (rect, pointX, pointY);
+        bool result = thickness.Contains (rect, new (pointX, pointY));
         Assert.Equal (expected, result);
     }
 
@@ -737,7 +737,7 @@ public class ThicknessTests
     {
         var rect = new Rectangle (x, y, width, height);
         var thickness = new Thickness (0, 0, 0, 0); // Uniform thickness for simplicity
-        bool result = thickness.Contains (rect, pointX, pointY);
+        bool result = thickness.Contains (rect, new (pointX, pointY));
         Assert.Equal (expected, result);
     }
 
