@@ -180,6 +180,7 @@ public class CheckBox : View
 
     private string GetFormatterText ()
     {
+        // BUGBUG: DimAuto is internal - do something else here.
         if (Width is Dim.DimAuto || string.IsNullOrEmpty (Title) || ContentSize?.Width <= 2)
         {
             return Text;

@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Describes the horizontal or vertical position of a <see cref="View"/>. The position can be an absolute value,
 ///     a percentage, centered, a function, relative to the ending dimension, relative to another View, or aligned with a
-///     set of views.
+///     set of views. Pos objects enable Computed Layout (see <see cref="LayoutStyle.Computed"/>) to automatically manage the positions views.
 ///     Integer values are implicitly convertible to an absolute <see cref="Pos"/>. <see cref="Pos"/>
 ///     objects are created using the static methods provided (e.g. <see cref="Percent"/> and <see cref="Center"/>).
 ///     The <see cref="Pos"/> objects can be combined with the addition and subtraction operators.
@@ -834,12 +834,15 @@ public class Pos
 /// </remarks>
 public class Dim
 {
+    #region Static Methods - Create Dim objects
+
     /// <summary>
     ///     Specifies how <see cref="DimAuto"/> will compute the dimension.
     /// </summary>
     [Flags]
     public enum DimAutoStyle
     {
+        // BUGBUG: This should not be a nested enum. Extract it.
         /// <summary>
         ///     The dimension will be computed using both the view's <see cref="View.Text"/> and
         ///     <see cref="View.Subviews"/> (whichever is larger).
@@ -877,26 +880,6 @@ public class Dim
     }
 
     /// <summary>
-    /// </summary>
-    public enum Dimension
-    {
-        /// <summary>
-        ///     No dimension specified.
-        /// </summary>
-        None = 0,
-
-        /// <summary>
-        ///     The height dimension.
-        /// </summary>
-        Height = 1,
-
-        /// <summary>
-        ///     The width dimension.
-        /// </summary>
-        Width = 2
-    }
-
-    /// <summary>
     ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all the view's SubViews and/or Text.
     /// </summary>
     /// <remarks>
@@ -930,14 +913,6 @@ public class Dim
         return new DimAuto (style, min, max);
     }
 
-    /// <summary>Determines whether the specified object is equal to the current object.</summary>
-    /// <param name="other">The object to compare with the current object. </param>
-    /// <returns>
-    ///     <see langword="true"/> if the specified object  is equal to the current object; otherwise,
-    ///     <see langword="false"/>.
-    /// </returns>
-    public override bool Equals (object other) { return other is Dim abs && abs == this; }
-
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified number of columns for a
     ///     margin.
@@ -962,48 +937,6 @@ public class Dim
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
     public static Dim Height (View view) { return new DimView (view, Dimension.Height); }
-
-    /// <summary>Adds a <see cref="Dim"/> to a <see cref="Dim"/>, yielding a new <see cref="Dim"/>.</summary>
-    /// <param name="left">The first <see cref="Dim"/> to add.</param>
-    /// <param name="right">The second <see cref="Dim"/> to add.</param>
-    /// <returns>The <see cref="Dim"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
-    public static Dim operator + (Dim left, Dim right)
-    {
-        if (left is DimAbsolute && right is DimAbsolute)
-        {
-            return new DimAbsolute (left.Anchor (0) + right.Anchor (0));
-        }
-
-        var newDim = new DimCombine (true, left, right);
-        (left as DimView)?.Target.SetNeedsLayout ();
-
-        return newDim;
-    }
-
-    /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
-    /// <returns>The Absolute <see cref="Dim"/>.</returns>
-    /// <param name="n">The value to convert to the pos.</param>
-    public static implicit operator Dim (int n) { return new DimAbsolute (n); }
-
-    /// <summary>
-    ///     Subtracts a <see cref="Dim"/> from a <see cref="Dim"/>, yielding a new
-    ///     <see cref="Dim"/>.
-    /// </summary>
-    /// <param name="left">The <see cref="Dim"/> to subtract from (the minuend).</param>
-    /// <param name="right">The <see cref="Dim"/> to subtract (the subtrahend).</param>
-    /// <returns>The <see cref="Dim"/> that is the <c>left</c> minus <c>right</c>.</returns>
-    public static Dim operator - (Dim left, Dim right)
-    {
-        if (left is DimAbsolute && right is DimAbsolute)
-        {
-            return new DimAbsolute (left.Anchor (0) - right.Anchor (0));
-        }
-
-        var newDim = new DimCombine (false, left, right);
-        (left as DimView)?.Target.SetNeedsLayout ();
-
-        return newDim;
-    }
 
     /// <summary>Creates a percentage <see cref="Dim"/> object that is a percentage of the width or height of the SuperView.</summary>
     /// <returns>The percent <see cref="Dim"/> object.</returns>
@@ -1046,6 +979,32 @@ public class Dim
     /// <param name="view">The view that will be tracked.</param>
     public static Dim Width (View view) { return new DimView (view, Dimension.Width); }
 
+    #endregion Static Methods - Create Dim objects
+
+    #region Methods
+
+    /// <summary>
+    /// </summary>
+    internal enum Dimension
+    {
+        // BUGBUG: This should not be a nested enum. Extract it.
+
+        /// <summary>
+        ///     No dimension specified.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        ///     The height dimension.
+        /// </summary>
+        Height = 1,
+
+        /// <summary>
+        ///     The width dimension.
+        /// </summary>
+        Width = 2
+    }
+
     /// <summary>
     ///     Gets a dimension that is anchored to a certain point in the layout.
     ///     This method is typically used internally by the layout system to determine the size of a View.
@@ -1085,6 +1044,66 @@ public class Dim
     /// <returns></returns>
     internal virtual bool ReferencesOtherViews () { return false; }
 
+    #endregion
+
+    #region Operators
+
+    /// <summary>Adds a <see cref="Dim"/> to a <see cref="Dim"/>, yielding a new <see cref="Dim"/>.</summary>
+    /// <param name="left">The first <see cref="Dim"/> to add.</param>
+    /// <param name="right">The second <see cref="Dim"/> to add.</param>
+    /// <returns>The <see cref="Dim"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
+    public static Dim operator + (Dim left, Dim right)
+    {
+        if (left is DimAbsolute && right is DimAbsolute)
+        {
+            return new DimAbsolute (left.Anchor (0) + right.Anchor (0));
+        }
+
+        var newDim = new DimCombine (true, left, right);
+        (left as DimView)?.Target.SetNeedsLayout ();
+
+        return newDim;
+    }
+
+
+    /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
+    /// <returns>The Absolute <see cref="Dim"/>.</returns>
+    /// <param name="n">The value to convert to the pos.</param>
+    public static implicit operator Dim (int n) { return new DimAbsolute (n); }
+
+    /// <summary>
+    ///     Subtracts a <see cref="Dim"/> from a <see cref="Dim"/>, yielding a new
+    ///     <see cref="Dim"/>.
+    /// </summary>
+    /// <param name="left">The <see cref="Dim"/> to subtract from (the minuend).</param>
+    /// <param name="right">The <see cref="Dim"/> to subtract (the subtrahend).</param>
+    /// <returns>The <see cref="Dim"/> that is the <c>left</c> minus <c>right</c>.</returns>
+    public static Dim operator - (Dim left, Dim right)
+    {
+        if (left is DimAbsolute && right is DimAbsolute)
+        {
+            return new DimAbsolute (left.Anchor (0) - right.Anchor (0));
+        }
+
+        var newDim = new DimCombine (false, left, right);
+        (left as DimView)?.Target.SetNeedsLayout ();
+
+        return newDim;
+    }
+    #endregion
+
+    #region Overrides
+    /// <summary>Determines whether the specified object is equal to the current object.</summary>
+    /// <param name="other">The object to compare with the current object. </param>
+    /// <returns>
+    ///     <see langword="true"/> if the specified object  is equal to the current object; otherwise,
+    ///     <see langword="false"/>.
+    /// </returns>
+    public override bool Equals (object other) { return other is Dim abs && abs == this; }
+
+    #endregion Overrides
+
+    #region Dim Types
     internal class DimAbsolute (int n) : Dim
     {
         private readonly int _n = n;
@@ -1114,7 +1133,7 @@ public class Dim
     /// </param>
     /// <param name="min">Specifies the minimum dimension that view will be automatically sized to.</param>
     /// <param name="max">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
-    public class DimAuto (DimAutoStyle style, Dim min, Dim max) : Dim
+    internal class DimAuto (DimAutoStyle style, Dim min, Dim max) : Dim
     {
         internal readonly Dim _max = max;
         internal readonly Dim _min = min;
@@ -1359,4 +1378,5 @@ public class Dim
 
         internal override bool ReferencesOtherViews () { return true; }
     }
+    #endregion Dim Types
 }

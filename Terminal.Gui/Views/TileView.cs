@@ -851,6 +851,7 @@ public class TileView : View
         {
             Dim spaceDim = Tile.ContentView.Width;
 
+            // BUGBUG: Dim.Anchor is internal. This should do something else to get the width.
             int spaceAbs = spaceDim.Anchor (Parent.Viewport.Width);
 
             var title = $" {Tile.Title} ";
