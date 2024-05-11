@@ -355,8 +355,8 @@ public class DimTests
         Assert.Equal (99, dimFill.Anchor (100));
 
         var dimCombine = new Dim.DimCombine (true, dimFactor, dimAbsolute);
-        Assert.Equal (dimCombine._left, dimFactor);
-        Assert.Equal (dimCombine._right, dimAbsolute);
+        Assert.Equal (dimCombine.Left, dimFactor);
+        Assert.Equal (dimCombine.Right, dimAbsolute);
         Assert.Equal (20, dimCombine.Anchor (100));
 
         var view = new View { Frame = new Rectangle (20, 10, 20, 1) };

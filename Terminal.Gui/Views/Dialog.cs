@@ -15,21 +15,6 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Dialog : Window
 {
-    /// <summary>Determines the horizontal alignment of the Dialog buttons.</summary>
-    public enum ButtonAlignments
-    {
-        /// <summary>Center-aligns the buttons (the default).</summary>
-        Center = 0,
-
-        /// <summary>Justifies the buttons</summary>
-        Justify,
-
-        /// <summary>Left-aligns the buttons</summary>
-        Left,
-
-        /// <summary>Right-aligns the buttons</summary>
-        Right
-    }
 
     // TODO: Reenable once border/borderframe design is settled
     /// <summary>
@@ -61,19 +46,22 @@ public class Dialog : Window
         Y = Pos.Center ();
         ValidatePosDim = true;
 
-        Width = Dim.Percent (85); 
+        Width = Dim.Percent (85);
         Height = Dim.Percent (85);
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
 
-        AddCommand (Command.QuitToplevel, () =>
-                                          {
-                                              Canceled = true;
-                                              RequestStop ();
-                                              return true;
-                                          });
+        AddCommand (
+                    Command.QuitToplevel,
+                    () =>
+                    {
+                        Canceled = true;
+                        RequestStop ();
+
+                        return true;
+                    });
         KeyBindings.Add (Key.Esc, Command.QuitToplevel);
     }
 
@@ -103,12 +91,14 @@ public class Dialog : Window
             }
 #endif
             _canceled = value;
+
             return;
         }
     }
 
+    // TODO: Update button.X = Pos.Justify when alignment changes
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
-    public ButtonAlignments ButtonAlignment { get; set; }
+    public Alignment ButtonAlignment { get; set; }
 
     /// <summary>Optional buttons to lay out at the bottom of the dialog.</summary>
     public Button [] Buttons
@@ -128,11 +118,11 @@ public class Dialog : Window
         }
     }
 
-    /// <summary>The default <see cref="ButtonAlignments"/> for <see cref="Dialog"/>.</summary>
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static ButtonAlignments DefaultButtonAlignment { get; set; } = ButtonAlignments.Center;
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Right;
 
     /// <summary>
     ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
@@ -146,6 +136,9 @@ public class Dialog : Window
             return;
         }
 
+        button.X = Pos.Align (ButtonAlignment);
+        button.Y = Pos.AnchorEnd () - 1;
+
         _buttons.Add (button);
         Add (button);
 
@@ -155,20 +148,6 @@ public class Dialog : Window
         {
             LayoutSubviews ();
         }
-    }
-
-    /// <inheritdoc/>
-    public override void LayoutSubviews ()
-    {
-        if (_inLayout)
-        {
-            return;
-        }
-
-        _inLayout = true;
-        LayoutButtons ();
-        base.LayoutSubviews ();
-        _inLayout = false;
     }
 
     // Get the width of all buttons, not including any Margin.
@@ -183,110 +162,5 @@ public class Dialog : Window
         IEnumerable<int> widths = _buttons.Select (b => b.Frame.Width);
 
         return widths.Sum ();
-    }
-
-    private void LayoutButtons ()
-    {
-        if (_buttons.Count == 0 || !IsInitialized)
-        {
-            return;
-        }
-
-        var shiftLeft = 0;
-
-        int buttonsWidth = GetButtonsWidth ();
-
-        switch (ButtonAlignment)
-        {
-            case ButtonAlignments.Center:
-                // Center Buttons
-                shiftLeft = (Viewport.Width - buttonsWidth - _buttons.Count - 1) / 2 + 1;
-
-                for (int i = _buttons.Count - 1; i >= 0; i--)
-                {
-                    Button button = _buttons [i];
-                    shiftLeft += button.Frame.Width + (i == _buttons.Count - 1 ? 0 : 1);
-
-                    if (shiftLeft > -1)
-                    {
-                        button.X = Pos.AnchorEnd (shiftLeft);
-                    }
-                    else
-                    {
-                        button.X = Viewport.Width - shiftLeft;
-                    }
-
-                    button.Y = Pos.AnchorEnd (1);
-                }
-
-                break;
-
-            case ButtonAlignments.Justify:
-                // Justify Buttons
-                // leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
-
-                var spacing = (int)Math.Ceiling ((double)(Viewport.Width - buttonsWidth) / (_buttons.Count - 1));
-
-                for (int i = _buttons.Count - 1; i >= 0; i--)
-                {
-                    Button button = _buttons [i];
-
-                    if (i == _buttons.Count - 1)
-                    {
-                        shiftLeft += button.Frame.Width;
-                        button.X = Pos.AnchorEnd (shiftLeft);
-                    }
-                    else
-                    {
-                        if (i == 0)
-                        {
-                            // first (leftmost) button 
-                            int left = Viewport.Width;
-                            button.X = Pos.AnchorEnd (left);
-                        }
-                        else
-                        {
-                            shiftLeft += button.Frame.Width + spacing;
-                            button.X = Pos.AnchorEnd (shiftLeft);
-                        }
-                    }
-
-                    button.Y = Pos.AnchorEnd (1);
-                }
-
-                break;
-
-            case ButtonAlignments.Left:
-                // Left Align Buttons
-                Button prevButton = _buttons [0];
-                prevButton.X = 0;
-                prevButton.Y = Pos.AnchorEnd (1);
-
-                for (var i = 1; i < _buttons.Count; i++)
-                {
-                    Button button = _buttons [i];
-                    button.X = Pos.Right (prevButton) + 1;
-                    button.Y = Pos.AnchorEnd (1);
-                    prevButton = button;
-                }
-
-                break;
-
-            case ButtonAlignments.Right:
-                // Right align buttons
-                shiftLeft = _buttons [_buttons.Count - 1].Frame.Width;
-                _buttons [_buttons.Count - 1].X = Pos.AnchorEnd (shiftLeft);
-                _buttons [_buttons.Count - 1].Y = Pos.AnchorEnd (1);
-
-                for (int i = _buttons.Count - 2; i >= 0; i--)
-                {
-                    Button button = _buttons [i];
-                    shiftLeft += button.Frame.Width + 1;
-                    button.X = Pos.AnchorEnd (shiftLeft);
-                    button.Y = Pos.AnchorEnd (1);
-                }
-
-                break;
-        }
     }
 }

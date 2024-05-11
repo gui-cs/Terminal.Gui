@@ -483,12 +483,12 @@ public class AllViewsTester : Scenario
             return;
         }
 
-        if (view.Width is not Dim.DimAuto && (view.Width is null || view.Frame.Width == 0))
+        if (view.Width is null || view.Frame.Width == 0)
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Width is not Dim.DimAuto && (view.Height is null || view.Frame.Height == 0))
+        if (view.Height is null || view.Frame.Height == 0)
         {
             view.Height = Dim.Fill ();
         }

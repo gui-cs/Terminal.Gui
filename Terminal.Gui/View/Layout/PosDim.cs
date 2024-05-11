@@ -1,30 +1,62 @@
+using System.ComponentModel;
 using System.Diagnostics;
+using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui;
 
 /// <summary>
-///     Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or
-///     relative to the ending dimension. Integer values are implicitly convertible to an absolute <see cref="Pos"/>. These
-///     objects are created using the static methods Percent, AnchorEnd, and Center. The <see cref="Pos"/> objects can be
-///     combined with the addition and subtraction operators.
+///     Describes the horizontal or vertical position of a <see cref="View"/>. The position can be an absolute value,
+///     a percentage, centered, a function, relative to the ending dimension, relative to another View, or aligned with a
+///     set of views. Pos objects enable Computed Layout (see <see cref="LayoutStyle.Computed"/>) to automatically manage the positions views.
+///     Integer values are implicitly convertible to an absolute <see cref="Pos"/>. <see cref="Pos"/>
+///     objects are created using the static methods provided (e.g. <see cref="Percent"/> and <see cref="Center"/>).
+///     The <see cref="Pos"/> objects can be combined with the addition and subtraction operators.
 /// </summary>
 /// <remarks>
-///     <para>Use the <see cref="Pos"/> objects on the X or Y properties of a view to control the position.</para>
+///     <para>Use the <see cref="Pos"/> objects on the X or Y properties of a <see cref="View"/> to control the position.</para>
 ///     <para>
 ///         These can be used to set the absolute position, when merely assigning an integer value (via the implicit
 ///         integer to <see cref="Pos"/> conversion), and they can be combined to produce more useful layouts, like:
-///         Pos.Center - 3, which would shift the position of the <see cref="View"/> 3 characters to the left after
+///         <c>Pos.Center - 3</c>, which would shift the position of the <see cref="View"/> 3 characters to the left after
 ///         centering for example.
-///     </para>
-///     <para>
-///         Reference coordinates of another view by using the methods Left(View), Right(View), Bottom(View), Top(View).
-///         The X(View) and Y(View) are aliases to Left(View) and Top(View) respectively.
 ///     </para>
 ///     <para>
 ///         <list type="table">
 ///             <listheader>
 ///                 <term>Pos Object</term> <description>Description</description>
 ///             </listheader>
+///             <item>
+///                 <term>
+///                     <see cref="Pos.Align"/>
+///                 </term>
+///                 <description>
+///                     Creates a <see cref="Pos"/> object that aligns a set of views.
+///                 </description>
+///             </item>
+///             <item>
+///                 <term>
+///                     <see cref="Pos.AnchorEnd()"/>
+///                 </term>
+///                 <description>
+///                     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of
+///                     the dimension, useful to flush the layout from the right or bottom.
+///                 </description>
+///             </item>
+///             <item>
+///                 <term>
+///                     <see cref="Pos.At(int)"/>
+///                 </term>
+///                 <description>
+///                     Creates a <see cref="Pos"/> object that is an absolute position based on the specified
+///                     integer.
+///                 </description>
+///             </item>
+///             <item>
+///                 <term>
+///                     <see cref="Pos.Center"/>
+///                 </term>
+///                 <description>Creates a <see cref="Pos"/> object that can be used to center the <see cref="View"/>.</description>
+///             </item>
 ///             <item>
 ///                 <term>
 ///                     <see cref="Pos.Function(Func{int})"/>
@@ -45,31 +77,7 @@ namespace Terminal.Gui;
 ///             </item>
 ///             <item>
 ///                 <term>
-///                     <see cref="Pos.AnchorEnd()"/>
-///                 </term>
-///                 <description>
-///                     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of
-///                     the dimension, useful to flush the layout from the right or bottom.
-///                 </description>
-///             </item>
-///             <item>
-///                 <term>
-///                     <see cref="Pos.Center"/>
-///                 </term>
-///                 <description>Creates a <see cref="Pos"/> object that can be used to center the <see cref="View"/>.</description>
-///             </item>
-///             <item>
-///                 <term>
-///                     <see cref="Pos.At(int)"/>
-///                 </term>
-///                 <description>
-///                     Creates a <see cref="Pos"/> object that is an absolute position based on the specified
-///                     integer value.
-///                 </description>
-///             </item>
-///             <item>
-///                 <term>
-///                     <see cref="Pos.Left"/>
+///                     <see cref="Pos.Left(View)"/>
 ///                 </term>
 ///                 <description>
 ///                     Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified
@@ -126,6 +134,8 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Pos
 {
+    #region Static Methods - Create Pos objects
+
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or
     ///     bottom) of the SuperView, minus the respective dimension of the View. This is equivalent to using
@@ -187,14 +197,6 @@ public class Pos
     /// </example>
     public static Pos Center () { return new PosCenter (); }
 
-    /// <summary>Determines whether the specified object is equal to the current object.</summary>
-    /// <param name="other">The object to compare with the current object. </param>
-    /// <returns>
-    ///     <see langword="true"/> if the specified object  is equal to the current object; otherwise,
-    ///     <see langword="false"/>.
-    /// </returns>
-    public override bool Equals (object other) { return other is Pos abs && abs == this; }
-
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that computes the position by executing the provided function. The function
     ///     will be called every time the position is needed.
@@ -203,59 +205,16 @@ public class Pos
     /// <returns>The <see cref="Pos"/> returned from the function.</returns>
     public static Pos Function (Func<int> function) { return new PosFunc (function); }
 
-    /// <summary>Serves as the default hash function. </summary>
-    /// <returns>A hash code for the current object.</returns>
-    public override int GetHashCode () { return Anchor (0).GetHashCode (); }
-
-    /// <summary>Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.</summary>
-    /// <param name="left">The first <see cref="Terminal.Gui.Pos"/> to add.</param>
-    /// <param name="right">The second <see cref="Terminal.Gui.Pos"/> to add.</param>
-    /// <returns>The <see cref="Pos"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
-    public static Pos operator + (Pos left, Pos right)
-    {
-        if (left is PosAbsolute && right is PosAbsolute)
-        {
-            return new PosAbsolute (left.Anchor (0) + right.Anchor (0));
-        }
-
-        var newPos = new PosCombine (true, left, right);
-
-        if (left is PosView view)
-        {
-            view.Target.SetNeedsLayout ();
-        }
-
-        return newPos;
-    }
-
-    /// <summary>Creates an Absolute <see cref="Pos"/> from the specified integer value.</summary>
-    /// <returns>The Absolute <see cref="Pos"/>.</returns>
-    /// <param name="n">The value to convert to the <see cref="Pos"/> .</param>
-    public static implicit operator Pos (int n) { return new PosAbsolute (n); }
-
     /// <summary>
-    ///     Subtracts a <see cref="Terminal.Gui.Pos"/> from a <see cref="Terminal.Gui.Pos"/>, yielding a new
-    ///     <see cref="Pos"/>.
+    ///     Creates a <see cref="Pos"/> object that aligns a set of views according to the specified alignment setting.
     /// </summary>
-    /// <param name="left">The <see cref="Terminal.Gui.Pos"/> to subtract from (the minuend).</param>
-    /// <param name="right">The <see cref="Terminal.Gui.Pos"/> to subtract (the subtrahend).</param>
-    /// <returns>The <see cref="Pos"/> that is the <c>left</c> minus <c>right</c>.</returns>
-    public static Pos operator - (Pos left, Pos right)
-    {
-        if (left is PosAbsolute && right is PosAbsolute)
-        {
-            return new PosAbsolute (left.Anchor (0) - right.Anchor (0));
-        }
-
-        var newPos = new PosCombine (false, left, right);
-
-        if (left is PosView view)
-        {
-            view.Target.SetNeedsLayout ();
-        }
-
-        return newPos;
-    }
+    /// <param name="alignment"></param>
+    /// <param name="groupId">
+    ///     The optional, unique identifier for the set of views to align according to
+    ///     <paramref name="alignment"/>.
+    /// </param>
+    /// <returns></returns>
+    public static Pos Align (Alignment alignment, int groupId = 0) { return new PosAlign (alignment, groupId); }
 
     /// <summary>Creates a percentage <see cref="Pos"/> object</summary>
     /// <returns>The percent <see cref="Pos"/> object.</returns>
@@ -318,8 +277,12 @@ public class Pos
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
     public static Pos Right (View view) { return new PosView (view, Side.Right); }
 
+    #endregion Static Methods - Create Pos objects
+
+    #region Methods
+
     /// <summary>
-    ///     Gets a position that is anchored to a certain point in the layout. This method is typically used
+    ///     Gets a position that is anchored to a certain point in the layout. This method is used
     ///     internally by the layout system to determine where a View should be positioned.
     /// </summary>
     /// <param name="width">The width of the area where the View is being positioned (Superview.ContentSize).</param>
@@ -346,21 +309,88 @@ public class Pos
     ///     that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
-    {
-        return Anchor (superviewDimension);
-    }
-
+    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension) { return Anchor (superviewDimension); }
 
     /// <summary>
-    /// Diagnostics API to determine if this Pos object references other views.
+    ///     Diagnostics API to determine if this Pos object references other views.
     /// </summary>
     /// <returns></returns>
-    internal virtual bool ReferencesOtherViews ()
+    internal virtual bool ReferencesOtherViews () { return false; }
+
+    #endregion Methods
+
+    #region Operators
+
+    /// <summary>Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.</summary>
+    /// <param name="left">The first <see cref="Terminal.Gui.Pos"/> to add.</param>
+    /// <param name="right">The second <see cref="Terminal.Gui.Pos"/> to add.</param>
+    /// <returns>The <see cref="Pos"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
+    public static Pos operator + (Pos left, Pos right)
     {
-        return false;
+        if (left is PosAbsolute && right is PosAbsolute)
+        {
+            return new PosAbsolute (left.Anchor (0) + right.Anchor (0));
+        }
+
+        var newPos = new PosCombine (true, left, right);
+
+        if (left is PosView view)
+        {
+            view.Target.SetNeedsLayout ();
+        }
+
+        return newPos;
     }
 
+    /// <summary>Creates an Absolute <see cref="Pos"/> from the specified integer value.</summary>
+    /// <returns>The Absolute <see cref="Pos"/>.</returns>
+    /// <param name="n">The value to convert to the <see cref="Pos"/> .</param>
+    public static implicit operator Pos (int n) { return new PosAbsolute (n); }
+
+    /// <summary>
+    ///     Subtracts a <see cref="Terminal.Gui.Pos"/> from a <see cref="Terminal.Gui.Pos"/>, yielding a new
+    ///     <see cref="Pos"/>.
+    /// </summary>
+    /// <param name="left">The <see cref="Terminal.Gui.Pos"/> to subtract from (the minuend).</param>
+    /// <param name="right">The <see cref="Terminal.Gui.Pos"/> to subtract (the subtrahend).</param>
+    /// <returns>The <see cref="Pos"/> that is the <c>left</c> minus <c>right</c>.</returns>
+    public static Pos operator - (Pos left, Pos right)
+    {
+        if (left is PosAbsolute && right is PosAbsolute)
+        {
+            return new PosAbsolute (left.Anchor (0) - right.Anchor (0));
+        }
+
+        var newPos = new PosCombine (false, left, right);
+
+        if (left is PosView view)
+        {
+            view.Target.SetNeedsLayout ();
+        }
+
+        return newPos;
+    }
+
+    #endregion
+
+    #region Overrides
+
+    /// <summary>Determines whether the specified object is equal to the current object.</summary>
+    /// <param name="other">The object to compare with the current object. </param>
+    /// <returns>
+    ///     <see langword="true"/> if the specified object  is equal to the current object; otherwise,
+    ///     <see langword="false"/>.
+    /// </returns>
+    public override bool Equals (object other) { return other is Pos abs && abs == this; }
+
+    /// <summary>Serves as the default hash function. </summary>
+    /// <returns>A hash code for the current object.</returns>
+    public override int GetHashCode () { return Anchor (0).GetHashCode (); }
+
+    #endregion Overrides
+
+    #region Pos Types
+    // TODO: These should not be nested classes - extract them.
     internal class PosAbsolute (int n) : Pos
     {
         private readonly int _n = n;
@@ -395,7 +425,7 @@ public class Pos
             return width - _offset;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
         {
             int newLocation = Anchor (superviewDimension);
 
@@ -413,7 +443,7 @@ public class Pos
         public override string ToString () { return "Center"; }
         internal override int Anchor (int width) { return width / 2; }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
         {
             int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension), 0);
 
@@ -423,17 +453,18 @@ public class Pos
 
     internal class PosCombine (bool add, Pos left, Pos right) : Pos
     {
-        internal bool _add = add;
-        internal Pos _left = left, _right = right;
+        internal bool Add { get; set; } = add;
+        internal Pos LeftPos { get; set; } = left;
+        internal Pos RightPos { get; set; } = right;
 
-        public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
+        public override string ToString () { return $"Combine({LeftPos}{(Add ? '+' : '-')}{RightPos})"; }
 
         internal override int Anchor (int width)
         {
-            int la = _left.Anchor (width);
-            int ra = _right.Anchor (width);
+            int la = LeftPos.Anchor (width);
+            int ra = RightPos.Anchor (width);
 
-            if (_add)
+            if (Add)
             {
                 return la + ra;
             }
@@ -441,13 +472,13 @@ public class Pos
             return la - ra;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
         {
             int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
-            int left = _left.Calculate (superviewDimension, dim, us, dimension);
-            int right = _right.Calculate (superviewDimension, dim, us, dimension);
+            int left = LeftPos.Calculate (superviewDimension, dim, us, dimension);
+            int right = RightPos.Calculate (superviewDimension, dim, us, dimension);
 
-            if (_add)
+            if (Add)
             {
                 return left + right;
             }
@@ -456,17 +487,17 @@ public class Pos
         }
 
         /// <summary>
-        /// Diagnostics API to determine if this Pos object references other views.
+        ///     Diagnostics API to determine if this Pos object references other views.
         /// </summary>
         /// <returns></returns>
         internal override bool ReferencesOtherViews ()
         {
-            if (_left.ReferencesOtherViews ())
+            if (LeftPos.ReferencesOtherViews ())
             {
                 return true;
             }
 
-            if (_right.ReferencesOtherViews ())
+            if (RightPos.ReferencesOtherViews ())
             {
                 return true;
             }
@@ -484,6 +515,164 @@ public class Pos
         internal override int Anchor (int width) { return (int)(width * _factor); }
     }
 
+    /// <summary>
+    ///     Enables alignment of a set of views.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The Group ID is used to identify a set of views that should be alignment together. When only a single
+    ///         set of views is aligned, setting the Group ID is not needed because it defaults to 0.
+    ///     </para>
+    ///     <para>
+    ///         The first view added to the Superview with a given Group ID is used to determine the alignment of the group.
+    ///         The alignment is applied to all views with the same Group ID.
+    ///     </para>
+    /// </remarks>
+    public class PosAlign : Pos
+    {
+        // BUGBUG: PosAlign should be internal like all other Pos classes. It is public because the PosAlign Scenario uses it. Refactor that Scenario.
+        /// <summary>
+        ///     The cached location. Used to store the calculated location to avoid recalculating it.
+        /// </summary>
+        private int? _location;
+
+        /// <summary>
+        ///     Gets the identifier of a set of views that should be aligned together. When only a single
+        ///     set of views is aligned, setting the <see cref="_groupId"/> is not needed because it defaults to 0.
+        /// </summary>
+        private readonly int _groupId;
+
+        /// <summary>
+        ///     Gets the alignment settings.
+        /// </summary>
+        public Aligner Aligner { get; } = new ();
+
+        /// <summary>
+        ///     Aligns the views in <paramref name="views"/> that have the same group ID as <paramref name="groupId"/>.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="views"></param>
+        /// <param name="dimension"></param>
+        /// <param name="size"></param>
+        private static void AlignGroup (int groupId, IList<View> views, Dimension dimension, int size)
+        {
+            if (views is null)
+            {
+                return;
+            }
+
+            Aligner firstInGroup = null;
+            List<int> dimensionsList = new ();
+
+            List<View> viewsInGroup = views.Where (
+                                                   v =>
+                                                   {
+                                                       if (dimension == Dimension.Width && v.X is PosAlign alignX)
+                                                       {
+                                                           return alignX._groupId == groupId;
+                                                       }
+
+                                                       if (dimension == Dimension.Height && v.Y is PosAlign alignY)
+                                                       {
+                                                           return alignY._groupId == groupId;
+                                                       }
+
+                                                       return false;
+                                                   })
+                                           .ToList ();
+
+            if (viewsInGroup.Count == 0)
+            {
+                return;
+            }
+
+            foreach (View view in viewsInGroup)
+            {
+                PosAlign posAlign = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
+
+                if (posAlign is { })
+                {
+                    if (firstInGroup is null)
+                    {
+                        firstInGroup = posAlign.Aligner;
+                    }
+
+                    dimensionsList.Add (dimension == Dimension.Width ? view.Frame.Width : view.Frame.Height);
+                }
+            }
+
+            if (firstInGroup is null)
+            {
+                return;
+            }
+
+            firstInGroup.ContainerSize = size;
+            int [] locations = firstInGroup.Align (dimensionsList.ToArray ());
+
+            for (var index = 0; index < viewsInGroup.Count; index++)
+            {
+                View view = viewsInGroup [index];
+                PosAlign align = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
+
+                if (align is { })
+                {
+                    align._location = locations [index];
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Enables alignment of a set of views.
+        /// </summary>
+        /// <param name="alignment"></param>
+        /// <param name="groupId">The unique identifier for the set of views to align according to <paramref name="alignment"/>.</param>
+        public PosAlign (Alignment alignment, int groupId = 0)
+        {
+            Aligner.SpaceBetweenItems = true;
+            Aligner.Alignment = alignment;
+            _groupId = groupId;
+            Aligner.PropertyChanged += Aligner_PropertyChanged;
+        }
+
+        private void Aligner_PropertyChanged (object sender, PropertyChangedEventArgs e) { _location = null; }
+
+        /// <inheritdoc/>
+        public override bool Equals (object other)
+        {
+            return other is PosAlign align && _groupId == align._groupId && _location == align._location && align.Aligner.Alignment == Aligner.Alignment;
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode () { return Aligner.GetHashCode () ^ _groupId.GetHashCode (); }
+
+        /// <inheritdoc/>
+        public override string ToString () { return $"Align(groupId={_groupId}, alignment={Aligner.Alignment})"; }
+
+        internal override int Anchor (int width) { return _location ?? 0 - width; }
+
+        internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+        {
+            if (_location.HasValue && Aligner.ContainerSize == superviewDimension)
+            {
+                return _location.Value;
+            }
+
+            if (us?.SuperView is null)
+            {
+                return 0;
+            }
+
+            AlignGroup (_groupId, us.SuperView.Subviews, dimension, superviewDimension);
+
+            if (_location.HasValue)
+            {
+                return _location.Value;
+            }
+
+            return 0;
+        }
+    }
+
     // Helper class to provide dynamic value by the execution of a function that returns an integer.
     internal class PosFunc (Func<int> n) : Pos
     {
@@ -494,28 +683,29 @@ public class Pos
         internal override int Anchor (int width) { return _function (); }
     }
 
+    // TODO: This should not be a nested enum. Extract it.
     /// <summary>
-    /// Describes which side of the view to use for the position.
+    ///     Describes which side of the view to use for the position.
     /// </summary>
     public enum Side
     {
         /// <summary>
-        /// The left (X) side of the view.
+        ///     The left (X) side of the view.
         /// </summary>
         Left = 0,
 
         /// <summary>
-        /// The top (Y) side of the view.
+        ///     The top (Y) side of the view.
         /// </summary>
         Top = 1,
 
         /// <summary>
-        /// The right (X + Width) side of the view.
+        ///     The right (X + Width) side of the view.
         /// </summary>
         Right = 2,
 
         /// <summary>
-        /// The bottom (Y + Height) side of the view.
+        ///     The bottom (Y + Height) side of the view.
         /// </summary>
         Bottom = 3
     }
@@ -559,19 +749,17 @@ public class Pos
         }
 
         /// <summary>
-        /// Diagnostics API to determine if this Pos object references other views.
+        ///     Diagnostics API to determine if this Pos object references other views.
         /// </summary>
         /// <returns></returns>
-        internal override bool ReferencesOtherViews ()
-        {
-            return true;
-        }
+        internal override bool ReferencesOtherViews () { return true; }
     }
+    #endregion Pos Types
 }
 
 /// <summary>
 ///     <para>
-///         A Dim object describes the dimensions of a <see cref="View"/>. Dim is the type of the
+///         Describes the horizontal or vertical dimensions of a <see cref="View"/>. Dim is the type of the
 ///         <see cref="View.Width"/> and <see cref="View.Height"/> properties of <see cref="View"/>. Dim objects enable
 ///         Computed Layout (see <see cref="LayoutStyle.Computed"/>) to automatically manage the dimensions of a view.
 ///     </para>
@@ -647,12 +835,15 @@ public class Pos
 /// </remarks>
 public class Dim
 {
+    #region Static Methods - Create Dim objects
+
     /// <summary>
     ///     Specifies how <see cref="DimAuto"/> will compute the dimension.
     /// </summary>
     [Flags]
     public enum DimAutoStyle
     {
+        // BUGBUG: This should not be a nested enum. Extract it.
         /// <summary>
         ///     The dimension will be computed using both the view's <see cref="View.Text"/> and
         ///     <see cref="View.Subviews"/> (whichever is larger).
@@ -661,55 +852,33 @@ public class Dim
 
         /// <summary>
         ///     The dimensions will be computed based on the View's non-Text content.
-        /// <para>
-        ///     If <see cref="View.ContentSize"/> is explicitly set (is not <see langword="null"/>) then <see cref="View.ContentSize"/>
-        ///     will be used to determine the dimension.
-        /// </para>
-        /// <para>
-        ///     Otherwise, the Subview in <see cref="View.Subviews"/> with the largest corresponding position plus dimension
-        ///     will determine the dimension.
-        /// </para>
-        /// <para>
-        ///     The corresponding dimension of the view's <see cref="View.Text"/> will be ignored.
-        /// </para>
+        ///     <para>
+        ///         If <see cref="View.ContentSize"/> is explicitly set (is not <see langword="null"/>) then
+        ///         <see cref="View.ContentSize"/>
+        ///         will be used to determine the dimension.
+        ///     </para>
+        ///     <para>
+        ///         Otherwise, the Subview in <see cref="View.Subviews"/> with the largest corresponding position plus dimension
+        ///         will determine the dimension.
+        ///     </para>
+        ///     <para>
+        ///         The corresponding dimension of the view's <see cref="View.Text"/> will be ignored.
+        ///     </para>
         /// </summary>
         Content = 1,
 
         /// <summary>
-        /// <para>
-        ///     The corresponding dimension of the view's <see cref="View.Text"/>, formatted using the
-        ///     <see cref="View.TextFormatter"/> settings,
-        ///     will be used to determine the dimension.
-        /// </para>
-        /// <para>
-        ///     The corresponding dimensions of the <see cref="View.Subviews"/> will be ignored.
-        /// </para>
+        ///     <para>
+        ///         The corresponding dimension of the view's <see cref="View.Text"/>, formatted using the
+        ///         <see cref="View.TextFormatter"/> settings,
+        ///         will be used to determine the dimension.
+        ///     </para>
+        ///     <para>
+        ///         The corresponding dimensions of the <see cref="View.Subviews"/> will be ignored.
+        ///     </para>
         /// </summary>
         Text = 2
     }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public enum Dimension
-    {
-        /// <summary>
-        /// No dimension specified.
-        /// </summary>
-        None = 0,
-
-        /// <summary>
-        /// The height dimension.
-        /// </summary>
-        Height = 1,
-
-        /// <summary>
-        /// The width dimension.
-        /// </summary>
-        Width = 2
-    }
-
 
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all the view's SubViews and/or Text.
@@ -722,7 +891,7 @@ public class Dim
     /// <example>
     ///     This initializes a <see cref="View"/> with two SubViews. The view will be automatically sized to fit the two
     ///     SubViews.
-    /// <code>
+    ///     <code>
     /// var button = new Button () { Text = "Click Me!", X = 1, Y = 1, Width = 10, Height = 1 };
     /// var textField = new TextField { Text = "Type here", X = 1, Y = 2, Width = 20, Height = 1 };
     /// var view = new Window () { Title = "MyWindow", X = 0, Y = 0, Width = Dim.Auto (), Height = Dim.Auto () };
@@ -744,14 +913,6 @@ public class Dim
 
         return new DimAuto (style, min, max);
     }
-
-    /// <summary>Determines whether the specified object is equal to the current object.</summary>
-    /// <param name="other">The object to compare with the current object. </param>
-    /// <returns>
-    ///     <see langword="true"/> if the specified object  is equal to the current object; otherwise,
-    ///     <see langword="false"/>.
-    /// </returns>
-    public override bool Equals (object other) { return other is Dim abs && abs == this; }
 
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified number of columns for a
@@ -777,48 +938,6 @@ public class Dim
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
     public static Dim Height (View view) { return new DimView (view, Dimension.Height); }
-
-    /// <summary>Adds a <see cref="Dim"/> to a <see cref="Dim"/>, yielding a new <see cref="Dim"/>.</summary>
-    /// <param name="left">The first <see cref="Dim"/> to add.</param>
-    /// <param name="right">The second <see cref="Dim"/> to add.</param>
-    /// <returns>The <see cref="Dim"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
-    public static Dim operator + (Dim left, Dim right)
-    {
-        if (left is DimAbsolute && right is DimAbsolute)
-        {
-            return new DimAbsolute (left.Anchor (0) + right.Anchor (0));
-        }
-
-        var newDim = new DimCombine (true, left, right);
-        (left as DimView)?.Target.SetNeedsLayout ();
-
-        return newDim;
-    }
-
-    /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
-    /// <returns>The Absolute <see cref="Dim"/>.</returns>
-    /// <param name="n">The value to convert to the pos.</param>
-    public static implicit operator Dim (int n) { return new DimAbsolute (n); }
-
-    /// <summary>
-    ///     Subtracts a <see cref="Dim"/> from a <see cref="Dim"/>, yielding a new
-    ///     <see cref="Dim"/>.
-    /// </summary>
-    /// <param name="left">The <see cref="Dim"/> to subtract from (the minuend).</param>
-    /// <param name="right">The <see cref="Dim"/> to subtract (the subtrahend).</param>
-    /// <returns>The <see cref="Dim"/> that is the <c>left</c> minus <c>right</c>.</returns>
-    public static Dim operator - (Dim left, Dim right)
-    {
-        if (left is DimAbsolute && right is DimAbsolute)
-        {
-            return new DimAbsolute (left.Anchor (0) - right.Anchor (0));
-        }
-
-        var newDim = new DimCombine (false, left, right);
-        (left as DimView)?.Target.SetNeedsLayout ();
-
-        return newDim;
-    }
 
     /// <summary>Creates a percentage <see cref="Dim"/> object that is a percentage of the width or height of the SuperView.</summary>
     /// <returns>The percent <see cref="Dim"/> object.</returns>
@@ -861,6 +980,32 @@ public class Dim
     /// <param name="view">The view that will be tracked.</param>
     public static Dim Width (View view) { return new DimView (view, Dimension.Width); }
 
+    #endregion Static Methods - Create Dim objects
+
+    #region Methods
+
+    /// <summary>
+    /// </summary>
+    internal enum Dimension
+    {
+        // BUGBUG: This should not be a nested enum. Extract it.
+
+        /// <summary>
+        ///     No dimension specified.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        ///     The height dimension.
+        /// </summary>
+        Height = 1,
+
+        /// <summary>
+        ///     The width dimension.
+        /// </summary>
+        Width = 2
+    }
+
     /// <summary>
     ///     Gets a dimension that is anchored to a certain point in the layout.
     ///     This method is typically used internally by the layout system to determine the size of a View.
@@ -875,7 +1020,8 @@ public class Dim
 
     /// <summary>
     ///     Calculates and returns the dimension of a <see cref="View"/> object. It takes into account the location of the
-    ///     <see cref="View"/>, it's SuperView's ContentSize, and whether it should automatically adjust its size based on its content.
+    ///     <see cref="View"/>, it's SuperView's ContentSize, and whether it should automatically adjust its size based on its
+    ///     content.
     /// </summary>
     /// <param name="location">
     ///     The starting point from where the size calculation begins. It could be the left edge for width calculation or the
@@ -894,14 +1040,71 @@ public class Dim
     }
 
     /// <summary>
-    /// Diagnostics API to determine if this Dim object references other views.
+    ///     Diagnostics API to determine if this Dim object references other views.
     /// </summary>
     /// <returns></returns>
-    internal virtual bool ReferencesOtherViews ()
+    internal virtual bool ReferencesOtherViews () { return false; }
+
+    #endregion
+
+    #region Operators
+
+    /// <summary>Adds a <see cref="Dim"/> to a <see cref="Dim"/>, yielding a new <see cref="Dim"/>.</summary>
+    /// <param name="left">The first <see cref="Dim"/> to add.</param>
+    /// <param name="right">The second <see cref="Dim"/> to add.</param>
+    /// <returns>The <see cref="Dim"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
+    public static Dim operator + (Dim left, Dim right)
     {
-        return false;
+        if (left is DimAbsolute && right is DimAbsolute)
+        {
+            return new DimAbsolute (left.Anchor (0) + right.Anchor (0));
+        }
+
+        var newDim = new DimCombine (true, left, right);
+        (left as DimView)?.Target.SetNeedsLayout ();
+
+        return newDim;
     }
 
+
+    /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
+    /// <returns>The Absolute <see cref="Dim"/>.</returns>
+    /// <param name="n">The value to convert to the pos.</param>
+    public static implicit operator Dim (int n) { return new DimAbsolute (n); }
+
+    /// <summary>
+    ///     Subtracts a <see cref="Dim"/> from a <see cref="Dim"/>, yielding a new
+    ///     <see cref="Dim"/>.
+    /// </summary>
+    /// <param name="left">The <see cref="Dim"/> to subtract from (the minuend).</param>
+    /// <param name="right">The <see cref="Dim"/> to subtract (the subtrahend).</param>
+    /// <returns>The <see cref="Dim"/> that is the <c>left</c> minus <c>right</c>.</returns>
+    public static Dim operator - (Dim left, Dim right)
+    {
+        if (left is DimAbsolute && right is DimAbsolute)
+        {
+            return new DimAbsolute (left.Anchor (0) - right.Anchor (0));
+        }
+
+        var newDim = new DimCombine (false, left, right);
+        (left as DimView)?.Target.SetNeedsLayout ();
+
+        return newDim;
+    }
+    #endregion
+
+    #region Overrides
+    /// <summary>Determines whether the specified object is equal to the current object.</summary>
+    /// <param name="other">The object to compare with the current object. </param>
+    /// <returns>
+    ///     <see langword="true"/> if the specified object  is equal to the current object; otherwise,
+    ///     <see langword="false"/>.
+    /// </returns>
+    public override bool Equals (object other) { return other is Dim abs && abs == this; }
+
+    #endregion Overrides
+
+    #region Dim Types
     internal class DimAbsolute (int n) : Dim
     {
         private readonly int _n = n;
@@ -926,22 +1129,25 @@ public class Dim
     ///     </para>
     /// </remarks>
     /// <param name="style">
-    ///     Specifies how <see cref="Dim.DimAuto"/> will compute the dimension. The default is <see cref="Dim.DimAutoStyle.Auto"/>.
+    ///     Specifies how <see cref="Dim.DimAuto"/> will compute the dimension. The default is
+    ///     <see cref="Dim.DimAutoStyle.Auto"/>.
     /// </param>
     /// <param name="min">Specifies the minimum dimension that view will be automatically sized to.</param>
     /// <param name="max">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
-    public class DimAuto (DimAutoStyle style, Dim min, Dim max) : Dim
+    internal class DimAuto (DimAutoStyle style, Dim min, Dim max) : Dim
     {
         internal readonly Dim _max = max;
         internal readonly Dim _min = min;
         internal readonly DimAutoStyle _style = style;
         internal int _size;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override bool Equals (object other) { return other is DimAuto auto && auto._min == _min && auto._max == _max && auto._style == _style; }
-        /// <inheritdoc />
+
+        /// <inheritdoc/>
         public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), _min, _max, _style); }
-        /// <inheritdoc />
+
+        /// <inheritdoc/>
         public override string ToString () { return $"Auto({_style},{_min},{_max})"; }
 
         internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
@@ -963,7 +1169,7 @@ public class Dim
                 return superviewContentSize;
             }
 
-            if (_style.HasFlag (Dim.DimAutoStyle.Text))
+            if (_style.HasFlag (DimAutoStyle.Text))
             {
                 textSize = int.Max (autoMin, dimension == Dimension.Width ? us.TextFormatter.Size.Width : us.TextFormatter.Size.Height);
             }
@@ -979,12 +1185,13 @@ public class Dim
                     // TODO: AnchorEnd needs work
                     // TODO: If _min > 0 we can SetRelativeLayout for the subviews?
                     subviewsSize = 0;
+
                     if (us.Subviews.Count > 0)
                     {
-                        for (int i = 0; i < us.Subviews.Count; i++)
+                        for (var i = 0; i < us.Subviews.Count; i++)
                         {
-                            var v = us.Subviews [i];
-                            bool isNotPosAnchorEnd = dimension == Dim.Dimension.Width ? v.X is not Pos.PosAnchorEnd : v.Y is not Pos.PosAnchorEnd;
+                            View v = us.Subviews [i];
+                            bool isNotPosAnchorEnd = dimension == Dimension.Width ? v.X is not Pos.PosAnchorEnd : v.Y is not Pos.PosAnchorEnd;
 
                             //if (!isNotPosAnchorEnd)
                             //{
@@ -993,7 +1200,8 @@ public class Dim
 
                             if (isNotPosAnchorEnd)
                             {
-                                int size = dimension == Dim.Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
+                                int size = dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
+
                                 if (size > subviewsSize)
                                 {
                                     subviewsSize = size;
@@ -1001,7 +1209,6 @@ public class Dim
                             }
                         }
                     }
-
                 }
             }
 
@@ -1019,33 +1226,35 @@ public class Dim
             }
 
             max = int.Max (max, autoMin);
+
             return int.Min (max, _max?.Anchor (superviewContentSize) ?? superviewContentSize);
         }
 
         /// <summary>
-        /// Diagnostics API to determine if this Dim object references other views.
+        ///     Diagnostics API to determine if this Dim object references other views.
         /// </summary>
         /// <returns></returns>
         internal override bool ReferencesOtherViews ()
         {
             // BUGBUG: This is not correct. _contentSize may be null.
-            return _style.HasFlag (Dim.DimAutoStyle.Content);
+            return _style.HasFlag (DimAutoStyle.Content);
         }
-
     }
+
     internal class DimCombine (bool add, Dim left, Dim right) : Dim
     {
-        internal bool _add = add;
-        internal Dim _left = left, _right = right;
+        internal bool Add { get; set; } = add;
+        internal Dim Left { get; set; } = left;
+        internal Dim Right { get; set; } = right;
 
-        public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
+        public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
 
         internal override int Anchor (int width)
         {
-            int la = _left.Anchor (width);
-            int ra = _right.Anchor (width);
+            int la = Left.Anchor (width);
+            int ra = Right.Anchor (width);
 
-            if (_add)
+            if (Add)
             {
                 return la + ra;
             }
@@ -1055,12 +1264,12 @@ public class Dim
 
         internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
         {
-            int leftNewDim = _left.Calculate (location, superviewContentSize, us, dimension);
-            int rightNewDim = _right.Calculate (location, superviewContentSize, us, dimension);
+            int leftNewDim = Left.Calculate (location, superviewContentSize, us, dimension);
+            int rightNewDim = Right.Calculate (location, superviewContentSize, us, dimension);
 
             int newDimension;
 
-            if (_add)
+            if (Add)
             {
                 newDimension = leftNewDim + rightNewDim;
             }
@@ -1072,19 +1281,18 @@ public class Dim
             return newDimension;
         }
 
-
         /// <summary>
-        /// Diagnostics API to determine if this Dim object references other views.
+        ///     Diagnostics API to determine if this Dim object references other views.
         /// </summary>
         /// <returns></returns>
         internal override bool ReferencesOtherViews ()
         {
-            if (_left.ReferencesOtherViews ())
+            if (Left.ReferencesOtherViews ())
             {
                 return true;
             }
 
-            if (_right.ReferencesOtherViews ())
+            if (Right.ReferencesOtherViews ())
             {
                 return true;
             }
@@ -1170,9 +1378,7 @@ public class Dim
             };
         }
 
-        internal override bool ReferencesOtherViews ()
-        {
-            return true;
-        }
+        internal override bool ReferencesOtherViews () { return true; }
     }
+    #endregion Dim Types
 }
