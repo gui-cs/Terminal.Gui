@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 /// <summary>
 /// Encapsulates the data that makes up a <see cref="Region"/> object. This class cannot be inherited.
 /// </summary>
-public sealed  class RegionData
+public sealed class RegionData
 {
     internal RegionData (Rune [] data) { Data = data; }
 
