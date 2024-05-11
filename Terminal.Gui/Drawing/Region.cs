@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 /// </summary>
 public sealed class Region : IDisposable
 {
-    private dynamic _rect;
+    private Rectangle _rect;
 
     /// <inheritdoc/>
     public void Dispose () { GC.SuppressFinalize (this); }
@@ -48,10 +48,10 @@ public sealed class Region : IDisposable
     public Region (Rectangle rect) { _rect = rect; }
 
     /// <summary>
-    ///     Initializes a new <see cref="Region"/> from the specified <see cref="RectangleF"/> structure.
+    ///     Initializes a new <see cref="Region"/> from the specified <see cref="RectangleF"/> reference.
     /// </summary>
     /// <param name="rect"></param>
-    public Region (RectangleF rect) { _rect = rect; }
+    public Region (ref readonly RectangleF rect) { _rect = Rectangle.Round (rect); }
 
     /// <summary>
     ///     Initializes a new <see cref="Region"/> from the specified data.
