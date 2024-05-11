@@ -64,7 +64,7 @@ public sealed class PosAlign : Scenario
                                                          {
                                                              Aligner =
                                                              {
-                                                                 PutSpaceBetweenItems = _horizAligner.PutSpaceBetweenItems
+                                                                 SpaceBetweenItems = _horizAligner.SpaceBetweenItems
                                                              }
                                                          };
                                                          view.X = newJust;
@@ -83,13 +83,13 @@ public sealed class PosAlign : Scenario
 
         putSpaces.Toggled += (s, e) =>
                              {
-                                 _horizAligner.PutSpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
+                                 _horizAligner.SpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
 
                                  foreach (View view in appWindow.Subviews.Where (v => v.X is Pos.PosAlign))
                                  {
                                      if (view.X is Pos.PosAlign j)
                                      {
-                                         j.Aligner.PutSpaceBetweenItems = _horizAligner.PutSpaceBetweenItems;
+                                         j.Aligner.SpaceBetweenItems = _horizAligner.SpaceBetweenItems;
                                      }
                                  }
                              };
@@ -210,7 +210,7 @@ public sealed class PosAlign : Scenario
                                                          {
                                                              Aligner =
                                                              {
-                                                                 PutSpaceBetweenItems = _vertAligner.PutSpaceBetweenItems
+                                                                 SpaceBetweenItems = _vertAligner.SpaceBetweenItems
                                                              }
                                                          };
                                                          view.Y = newJust;
@@ -229,13 +229,13 @@ public sealed class PosAlign : Scenario
 
         putSpaces.Toggled += (s, e) =>
                              {
-                                 _vertAligner.PutSpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
+                                 _vertAligner.SpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
 
                                  foreach (View view in appWindow.Subviews.Where (v => v.Y is Pos.PosAlign))
                                  {
                                      if (view.Y is Pos.PosAlign j)
                                      {
-                                         j.Aligner.PutSpaceBetweenItems = _vertAligner.PutSpaceBetweenItems;
+                                         j.Aligner.SpaceBetweenItems = _vertAligner.SpaceBetweenItems;
                                      }
                                  }
                              };

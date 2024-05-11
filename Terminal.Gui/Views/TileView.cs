@@ -417,6 +417,7 @@ public class TileView : View
     /// </summary>
     public bool SetSplitterPos (int idx, Pos value)
     {
+        // BUGBUG: PosAbsolute & PosFactor are internal API. TileView should not be using it and should do something different to get the value.
         if (!(value is Pos.PosAbsolute) && !(value is Pos.PosFactor))
         {
             throw new ArgumentException (
@@ -601,10 +602,12 @@ public class TileView : View
 
         TileViewLineView nextSplitter = visibleSplitterLines [i];
         Pos nextSplitterPos = Orientation == Orientation.Vertical ? nextSplitter.X : nextSplitter.Y;
+        // BUGBUG: Pos.Anchor is an internal API. TileView should not be using it and should do something different to get the value.
         int nextSplitterDistance = nextSplitterPos.Anchor (space);
 
         TileViewLineView lastSplitter = i >= 1 ? visibleSplitterLines [i - 1] : null;
         Pos lastSplitterPos = Orientation == Orientation.Vertical ? lastSplitter?.X : lastSplitter?.Y;
+        // BUGBUG: Pos.Anchor is an internal API. TileView should not be using it and should do something different to get the value.
         int lastSplitterDistance = lastSplitterPos?.Anchor (space) ?? 0;
 
         int distance = nextSplitterDistance - lastSplitterDistance;

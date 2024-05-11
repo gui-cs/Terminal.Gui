@@ -230,11 +230,11 @@ public class AlignerTests (ITestOutputHelper output)
     [InlineData (Alignment.FirstLeftRestRight, new [] { 10, 20, 30, 40, 50 }, 151, new [] { 0, 10, 30, 60, 101 })]
     [InlineData (Alignment.FirstLeftRestRight, new [] { 3, 3, 3 }, 21, new [] { 0, 14, 18 })]
     [InlineData (Alignment.FirstLeftRestRight, new [] { 3, 4, 5 }, 21, new [] { 0, 11, 16 })]
-    public void Alignment_PutSpaceBetweenItems (Alignment alignment, int [] sizes, int containerSize, int [] expected)
+    public void Alignment_SpaceBetweenItems (Alignment alignment, int [] sizes, int containerSize, int [] expected)
     {
         int [] positions = new Aligner
         {
-            PutSpaceBetweenItems = true,
+            SpaceBetweenItems = true,
             Alignment = alignment,
             ContainerSize = containerSize
         }.Align (sizes);
@@ -394,7 +394,7 @@ public class AlignerTests (ITestOutputHelper output)
     {
         int [] positions = new Aligner
         {
-            PutSpaceBetweenItems = false,
+            SpaceBetweenItems = false,
             Alignment = alignment,
             ContainerSize = containerSize
         }.Align (sizes);
