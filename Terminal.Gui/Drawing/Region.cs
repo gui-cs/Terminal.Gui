@@ -15,7 +15,7 @@ public sealed class Region : IDisposable
     ///     Creates an exact copy of this <see cref="Region"/>.
     /// </summary>
     /// <returns></returns>
-    public Region Clone () { return new Region (_rect); }
+    public Region Clone () { return new (_rect); }
 
     /// <inheritdoc/>
     public override bool Equals (object? obj)
@@ -25,8 +25,8 @@ public sealed class Region : IDisposable
             return false;
         }
 
-        dynamic thisRect = (RectangleF)_rect;
-        dynamic otherRect = (RectangleF)((Region)obj)._rect;
+        Rectangle thisRect = _rect;
+        Rectangle otherRect = ((Region)obj)._rect;
 
         return thisRect == otherRect;
     }
@@ -51,7 +51,7 @@ public sealed class Region : IDisposable
     ///     Initializes a new <see cref="Region"/> from the specified <see cref="RectangleF"/> reference.
     /// </summary>
     /// <param name="rect"></param>
-    public Region (ref readonly RectangleF rect) { _rect = Rectangle.Round (rect); }
+    public Region (RectangleF rect) { _rect = Rectangle.Round (rect); }
 
     /// <summary>
     ///     Initializes a new <see cref="Region"/> from the specified data.
@@ -82,34 +82,18 @@ public sealed class Region : IDisposable
     /// </summary>
     /// <param name="regions"></param>
     /// <returns></returns>
-    public static dynamic? Union (Region [] regions)
+    public static Rectangle Union (Region [] regions)
     {
         ArgumentNullException.ThrowIfNull (regions);
 
-        dynamic? rBase = null;
+        var aggregatedArea = Rectangle.Empty;
 
         foreach (Region r in regions)
         {
-            if (rBase is null)
-            {
-                rBase = r._rect;
-
-                continue;
-            }
-
-            if (rBase.GetType ().Name == "Rectangle")
-            {
-                Rectangle rRect = r._rect.GetType ().Name == "RectangleF" ? Rectangle.Round (r._rect) : r._rect;
-                rBase = Rectangle.Union (rBase, rRect);
-            }
-            else
-            {
-                RectangleF rRect = r._rect;
-                rBase = RectangleF.Union (rBase, rRect);
-            }
+            aggregatedArea = aggregatedArea == Rectangle.Empty ? r._rect : Rectangle.Union (aggregatedArea, r._rect);
         }
 
-        return rBase;
+        return aggregatedArea;
     }
 
     /// <summary>
@@ -118,7 +102,7 @@ public sealed class Region : IDisposable
     /// </summary>
     /// <param name="regions"></param>
     /// <returns></returns>
-    public static dynamic? Union (HashSet<Region> regions)
+    public static Rectangle Union (HashSet<Region> regions)
     {
         ArgumentNullException.ThrowIfNull (regions);
 
@@ -131,9 +115,9 @@ public sealed class Region : IDisposable
     /// </summary>
     /// <param name="rect"></param>
     /// <returns></returns>
-    public dynamic Union (dynamic rect)
+    public Rectangle Union (Rectangle rect)
     {
-        _rect = _rect.GetType ().Name == "Rectangle" ? Rectangle.Union (_rect, Rectangle.Round (rect)) : RectangleF.Union (_rect, (RectangleF)rect);
+        _rect = Rectangle.Union (_rect, Rectangle.Round (rect));
 
         return _rect;
     }
@@ -143,7 +127,7 @@ public sealed class Region : IDisposable
     /// </summary>
     /// <param name="region"></param>
     /// <returns></returns>
-    public dynamic Union (Region region)
+    public Rectangle Union (Region region)
     {
         ArgumentNullException.ThrowIfNull (region);
 
@@ -169,35 +153,23 @@ public sealed class Region : IDisposable
     /// <param name="regions"></param>
     /// <param name="rect"></param>
     /// <returns></returns>
-    public static dynamic? Intersect (Region [] regions, dynamic rect)
+    public static Rectangle Intersect (Region [] regions, Rectangle rect)
     {
         ArgumentNullException.ThrowIfNull (regions);
 
-        dynamic? rBase = null;
+        var aggregatedArea = Rectangle.Empty;
 
         foreach (Region r in regions)
         {
-            if (r._rect.GetType ().Name == "Rectangle")
-            {
-                rBase = Rectangle.Intersect (rect, r._rect);
+            aggregatedArea = Rectangle.Intersect (rect, r._rect);
 
-                if ((Rectangle)rBase != Rectangle.Empty)
-                {
-                    break;
-                }
-            }
-            else
+            if (aggregatedArea != Rectangle.Empty)
             {
-                rBase = RectangleF.Intersect (rect, r._rect);
-
-                if ((RectangleF)rBase != RectangleF.Empty)
-                {
-                    break;
-                }
+                break;
             }
         }
 
-        return rBase;
+        return aggregatedArea;
     }
 
     /// <summary>
@@ -207,7 +179,7 @@ public sealed class Region : IDisposable
     /// <param name="regions"></param>
     /// <param name="rect"></param>
     /// <returns></returns>
-    public static dynamic Intersect (HashSet<Region> regions, dynamic rect)
+    public static Rectangle Intersect (HashSet<Region> regions, Rectangle rect)
     {
         ArgumentNullException.ThrowIfNull (regions);
 
@@ -220,9 +192,9 @@ public sealed class Region : IDisposable
     /// </summary>
     /// <param name="rect"></param>
     /// <returns></returns>
-    public dynamic Intersect (dynamic rect)
+    public Rectangle Intersect (Rectangle rect)
     {
-        _rect = _rect.GetType ().Name == "Rectangle" ? Rectangle.Intersect (_rect, Rectangle.Round (rect)) : RectangleF.Intersect (_rect, (RectangleF)rect);
+        _rect = Rectangle.Intersect (_rect, Rectangle.Round (rect));
 
         return _rect;
     }
@@ -232,7 +204,7 @@ public sealed class Region : IDisposable
     /// </summary>
     /// <param name="region"></param>
     /// <returns></returns>
-    public dynamic Intersect (Region region)
+    public Rectangle Intersect (Region region)
     {
         ArgumentNullException.ThrowIfNull (region);
 
@@ -255,7 +227,7 @@ public sealed class Region : IDisposable
     {
         foreach (Region region in regions)
         {
-            dynamic rect = region._rect;
+            Rectangle rect = region._rect;
 
             if (rect.Contains (x, y))
             {

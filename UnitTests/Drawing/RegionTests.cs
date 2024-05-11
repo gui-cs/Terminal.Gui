@@ -36,10 +36,10 @@ public class RegionTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Union_Array_Return_Null_If_Empty ()
+    public void Union_Empty_Array_Return_Rectangle_Empty ()
     {
         Region [] regions = [];
-        Assert.Null (Region.Union (regions));
+        Assert.Equal (Rectangle.Empty, Region.Union (regions));
     }
 
     [Fact]
@@ -50,10 +50,10 @@ public class RegionTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Union_HashSet_Return_Null_If_Empty ()
+    public void Union_Empty_HashSet_Return_Rectangle_Empty ()
     {
         HashSet<Region> regions = new ();
-        Assert.Null (Region.Union (regions));
+        Assert.Equal (Rectangle.Empty, Region.Union (regions));
     }
 
     [Fact]
@@ -167,10 +167,10 @@ public class RegionTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Intersect_Array_Return_Null_If_Empty ()
+    public void Intersect_Empty_Array_Return_Rectangle_Empty ()
     {
         Region [] regions = [];
-        Assert.Null (Region.Intersect (regions, Rectangle.Empty));
+        Assert.Equal (Rectangle.Empty, Region.Intersect (regions, Rectangle.Empty));
     }
 
     [Fact]
@@ -181,10 +181,10 @@ public class RegionTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Intersect_HashSet_Return_Null_If_Empty ()
+    public void Intersect_Empty_HashSet_Return_Rectangle_Empty ()
     {
         HashSet<Region> regions = new ();
-        Assert.Null (Region.Intersect (regions, Rectangle.Empty));
+        Assert.Equal (Rectangle.Empty, Region.Intersect (regions, Rectangle.Empty));
     }
 
     [Fact]
