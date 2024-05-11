@@ -11,9 +11,25 @@ public class Dialogs : Scenario
 {
     private static readonly int CODE_POINT = '你'; // We know this is a wide char
 
-    public override void Setup ()
+    public override void Main ()
     {
-        var frame = new FrameView { X = Pos.Center (), Y = 1, Width = Dim.Percent (75), Title = "Dialog Options" };
+        // Init
+        Application.Init ();
+
+        // Setup - Create a top-level application window and configure it.
+        Window appWindow = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()} - {GetDescription ()}"
+        };
+
+        var frame = new FrameView
+        {
+            X = Pos.Center (),
+            Y = 1,
+            Width = Dim.Percent (75),
+            //Height = Dim.Auto (),
+            Title = "Dialog Options"
+        };
 
         var numButtonsLabel = new Label
         {
@@ -146,6 +162,7 @@ public class Dialogs : Scenario
 
         void Top_LayoutComplete (object sender, EventArgs args)
         {
+            // TODO: Replace with Dim.Auto when DimAutoStyle.Content is working
             frame.Height =
                 widthEdit.Frame.Height
                 + heightEdit.Frame.Height
@@ -156,15 +173,15 @@ public class Dialogs : Scenario
                 + frame.GetAdornmentsThickness ().Vertical;
         }
 
-        Top.LayoutComplete += Top_LayoutComplete;
+        appWindow.LayoutComplete += Top_LayoutComplete;
 
-        Win.Add (frame);
+        appWindow.Add (frame);
 
         label = new ()
         {
             X = Pos.Center (), Y = Pos.Bottom (frame) + 4, TextAlignment = Alignment.Right, Text = "Button Pressed:"
         };
-        Win.Add (label);
+        appWindow.Add (label);
 
         var buttonPressedLabel = new Label
         {
@@ -196,9 +213,17 @@ public class Dialogs : Scenario
                                        dlg.Dispose ();
                                    };
 
-        Win.Add (showDialogButton);
+        appWindow.Add (showDialogButton);
 
-        Win.Add (buttonPressedLabel);
+        appWindow.Add (buttonPressedLabel);
+
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
+
     }
 
     private Dialog CreateDemoDialog (
