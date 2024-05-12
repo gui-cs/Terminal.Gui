@@ -4,12 +4,9 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Describes the interior of a screen shape composed of rectangles and paths. This class cannot be inherited.
 /// </summary>
-public sealed class Region : IDisposable
+public sealed class Region
 {
     private Rectangle _rect;
-
-    /// <inheritdoc/>
-    public void Dispose () { GC.SuppressFinalize (this); }
 
     /// <summary>
     ///     Creates an exact copy of this <see cref="Region"/>.
@@ -64,11 +61,6 @@ public sealed class Region : IDisposable
         Region region = CreateRegionFromRegionData (regionData.Data);
         _rect = region._rect;
     }
-
-    /// <summary>
-    ///     Destructor for disposing this.
-    /// </summary>
-    ~Region () { Dispose (); }
 
     #endregion
 
