@@ -64,8 +64,6 @@ public sealed class Region
 
     #endregion
 
-    #region Rectangle, RectangleF
-
     #region Union
 
     /// <summary>
@@ -229,8 +227,6 @@ public sealed class Region
 
         return false;
     }
-
-    #endregion
 
     #region RegionData
 
