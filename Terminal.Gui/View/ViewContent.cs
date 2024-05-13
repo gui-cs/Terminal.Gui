@@ -123,16 +123,64 @@ public partial class View
     internal Size? _contentSize;
 
     /// <summary>
-    ///     Gets or sets the size of the View's content. If <see langword="null"/>, the value will be the same as the size of <see cref="Viewport"/>,
-    ///     and <c>Viewport.Location</c> will always be <c>0, 0</c>.
+    ///     Sets the size of the View's content.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If a size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
+    ///         By default, the content size is set to <see langword="null"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="contentSize">
+    ///     <para>
+    ///         If <see langword="null"/>, and the View has no visible subviews, <see cref="ContentSize"/> will track the size of <see cref="Viewport"/>.
+    ///     </para>
+    ///     <para>
+    ///         If <see langword="null"/>, and the View has visible subviews, <see cref="ContentSize"/> will track the maximum position plus size of any
+    ///         visible Subviews
+    ///         and <c>Viewport.Location</c>  will track the minimum position and size of any visible Subviews.
+    ///     </para>
+    ///     <para>
+    ///         If not <see langword="null"/>, <see cref="ContentSize"/> is set to the passed value and <see cref="Viewport"/> describes the portion of the content currently visible
+    ///         to the user. This enables virtual scrolling.
+    ///     </para>
+    ///     <para>
+    ///         If not <see langword="null"/>, <see cref="ContentSize"/> is set to the passed value and the behavior of <see cref="Dim.DimAutoStyle.Content"/> will be to use the ContentSize
+    ///         to determine the size of the view.
+    ///     </para>
+    ///     <para>
+    ///         Negative sizes are not supported.
+    ///     </para>
+    /// </param>
+    public void SetContentSize (Size? contentSize)
+    {
+        if (contentSize?.Width < 0 || contentSize?.Height < 0)
+        {
+            throw new ArgumentException (@"ContentSize cannot be negative.", nameof (contentSize));
+        }
+
+        if (contentSize == _contentSize)
+        {
+            return;
+        }
+
+        _contentSize = contentSize;
+        OnContentSizeChanged (new (_contentSize));
+    }
+
+    /// <summary>
+    ///     Gets or sets the size of the View's content.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If set to <see langword="null"/>, the value will be the same as the size of <see cref="Viewport"/>,
+    ///         and <c>Viewport.Location</c> will always be <c>0, 0</c>.
+    ///     </para>
+    ///     <para>
+    ///         If explicitly set, <see cref="Viewport"/> describes the portion of the content currently visible
     ///         to the view. This enables virtual scrolling.
     ///     </para>
     ///     <para>
-    ///         If a size is provided, the behavior of <see cref="Dim.DimAutoStyle.Content"/> will be to use the ContentSize
+    ///         If explicitly set, the behavior of <see cref="Dim.DimAutoStyle.Content"/> will be to use the ContentSize
     ///         to determine the size of the view.
     ///     </para>
     ///     <para>
@@ -142,21 +190,21 @@ public partial class View
     public Size? ContentSize
     {
         get => _contentSize ?? Viewport.Size;
-        set
-        {
-            if (value?.Width < 0 || value?.Height < 0)
-            {
-                throw new ArgumentException (@"ContentSize cannot be negative.", nameof (value));
-            }
+        //set
+        //{
+        //    if (value?.Width < 0 || value?.Height < 0)
+        //    {
+        //        throw new ArgumentException (@"ContentSize cannot be negative.", nameof (value));
+        //    }
 
-            if (value == _contentSize)
-            {
-                return;
-            }
+        //    if (value == _contentSize)
+        //    {
+        //        return;
+        //    }
 
-            _contentSize = value;
-            OnContentSizeChanged (new (_contentSize));
-        }
+        //    _contentSize = value;
+        //    OnContentSizeChanged (new (_contentSize));
+        //}
     }
 
     /// <summary>

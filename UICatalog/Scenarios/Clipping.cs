@@ -29,7 +29,7 @@ public class Clipping : Scenario
 
         var scrollView = new ScrollView { X = 3, Y = 3, Width = 50, Height = 20 };
         scrollView.ColorScheme = Colors.ColorSchemes ["Menu"];
-        scrollView.ContentSize = new (200, 100);
+        scrollView.SetContentSize (new (200, 100));
 
         //ContentOffset = Point.Empty,
         scrollView.AutoHideScrollBars = true;

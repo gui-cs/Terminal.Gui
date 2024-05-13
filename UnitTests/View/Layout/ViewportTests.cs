@@ -279,7 +279,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange
         var view = new View ();
-        view.ContentSize = new Size (100, 100);
+        view.SetContentSize (new (100, 100));
         var newViewport = new Rectangle (0, 0, 200, 200);
         view.ViewportSettings = ViewportSettings.AllowLocationGreaterThanContentSize;
 

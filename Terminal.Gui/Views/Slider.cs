@@ -624,11 +624,11 @@ public class Slider<T> : View
 
         if (_config._sliderOrientation == Orientation.Horizontal)
         {
-            ContentSize = new (int.Min (svWidth, CalcBestLength ()), int.Min (svHeight, CalcThickness ()));
+            SetContentSize (new (int.Min (svWidth, CalcBestLength ()), int.Min (svHeight, CalcThickness ())));
         }
         else
         {
-            ContentSize = new (int.Min (svWidth, CalcThickness ()), int.Min (svHeight, CalcBestLength ()));
+            SetContentSize (new (int.Min (svWidth, CalcThickness ()), int.Min (svHeight, CalcBestLength ())));
         }
 
         return;

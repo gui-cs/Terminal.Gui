@@ -470,7 +470,7 @@ public class FindDeepestViewTests ()
         subview.Padding.Thickness = new (1);
 
         // Scroll the subview
-        subview.ContentSize = new Size (10, 10);
+        subview.SetContentSize (new (10, 10));
         subview.Viewport = subview.Viewport with { Location = new (1, 1) };
 
         // This subview will be at the bottom-right-corner of subview

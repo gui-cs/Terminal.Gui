@@ -122,8 +122,8 @@ public class LayoutTests (ITestOutputHelper output)
         {
             Width = 5,
             Height = 5,
-            ContentSize = new (10, 10)
         };
+        superView.SetContentSize (new (10, 10));
         var view = new View ()
         {
             X = Pos.Center ()

@@ -39,12 +39,12 @@ public class Scrolling : Scenario
             Width = 60,
             Height = 20,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            ContentSize = new (120, 40),
 
             //ContentOffset = Point.Empty,
             ShowVerticalScrollIndicator = true,
             ShowHorizontalScrollIndicator = true
         };
+        scrollView.SetContentSize (new (120, 40));
         scrollView.Padding.Thickness = new (1);
 
         label.Text = $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";

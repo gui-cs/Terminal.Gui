@@ -61,7 +61,7 @@ public class ProgressBar : View
         set
         {
             _bidirectionalMarquee = value;
-            ContentSize = Viewport.Size with { Height = 1 };
+            SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -74,12 +74,22 @@ public class ProgressBar : View
         {
             _fraction = Math.Min (value, 1);
             _isActivity = false;
-            ContentSize = Viewport.Size with { Height = 1 };
+            SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
+    private ProgressBarFormat _progressBarFormat;
+
     /// <summary>Specifies the format that a <see cref="ProgressBar"/> uses to indicate the visual presentation.</summary>
-    public ProgressBarFormat ProgressBarFormat { get; set; }
+    public ProgressBarFormat ProgressBarFormat
+    {
+        get => _progressBarFormat;
+        set
+        {
+            _progressBarFormat = value;
+            SetContentSize (Viewport.Size with { Height = 1 });
+        }
+    }
 
     /// <summary>Gets/Sets the progress bar style based on the <see cref="Terminal.Gui.ProgressBarStyle"/></summary>
     public ProgressBarStyle ProgressBarStyle
@@ -109,7 +119,7 @@ public class ProgressBar : View
                     break;
             }
 
-            ContentSize = Viewport.Size with { Height = 1 };
+            SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -120,7 +130,7 @@ public class ProgressBar : View
         set
         {
             _segmentCharacter = value;
-            ContentSize = Viewport.Size with { Height = 1 };
+            SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -181,7 +191,7 @@ public class ProgressBar : View
 
         if (ProgressBarFormat != ProgressBarFormat.Simple && !_isActivity)
         {
-            var tf = new TextFormatter { Alignment = TextAlignment.Centered, Text = Text, AutoSize = true};
+            var tf = new TextFormatter { Alignment = TextAlignment.Centered, Text = Text, AutoSize = true };
             var attr = new Attribute (ColorScheme.HotNormal.Foreground, ColorScheme.HotNormal.Background);
 
             if (_fraction > .5)
@@ -269,7 +279,7 @@ public class ProgressBar : View
 
     private void ProgressBar_Initialized (object sender, EventArgs e)
     {
-        ContentSize = new (0, 1);
+        SetContentSize (Viewport.Size with { Height = 1 });
 
         ColorScheme = new ColorScheme (ColorScheme ?? SuperView?.ColorScheme ?? Colors.ColorSchemes ["Base"])
         {

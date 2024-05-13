@@ -882,7 +882,9 @@ public class DimAutoTests (ITestOutputHelper output)
     [Fact]
     public void DimAutoStyle_Content_UsesContentSize_WhenSet ()
     {
-        var view = new View () { ContentSize = new Size (10, 5) };
+        var view = new View ();
+        view.SetContentSize (new (10, 5));
+
         var dim = Dim.Auto (Dim.DimAutoStyle.Content);
 
         int calculatedWidth = dim.Calculate (0, 100, view, Dim.Dimension.Width);
@@ -1220,7 +1222,7 @@ public class DimAutoTests (ITestOutputHelper output)
     public void DimAutoStyle_Content_UsesContentSize_If_No_Subviews ()
     {
         DimAutoTestView view = new (Auto (DimAutoStyle.Content), Auto (DimAutoStyle.Content));
-        view.ContentSize = new (5, 5);
+        view.SetContentSize (new (5, 5));
         view.SetRelativeLayout (new (10, 10));
 
         Assert.Equal (new (5, 5), view.Frame.Size);
