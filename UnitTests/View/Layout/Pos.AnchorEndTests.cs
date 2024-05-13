@@ -303,4 +303,12 @@ public class PosAnchorEndTests (ITestOutputHelper output)
         Assert.Equal (5, result);
     }
 
+    [Fact]
+    public void PosAnchorEnd_MinusOne_Combine_Works ()
+    {
+        var pos = AnchorEnd () - 1;
+        var result = pos.Calculate (10, new DimAbsolute (2), null, Dimension.None);
+        Assert.Equal (7, result);
+
+    }
 }

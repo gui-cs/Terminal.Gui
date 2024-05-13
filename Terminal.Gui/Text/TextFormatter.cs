@@ -198,6 +198,8 @@ public class TextFormatter
             {
                 _size = EnableNeedsFormat (value);
             }
+            Debug.Assert (Size.Width >= 0);
+            Debug.Assert (Size.Height >= 0);
         }
     }
 
