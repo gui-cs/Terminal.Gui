@@ -1234,7 +1234,7 @@ Y
 
     [Fact]
     [SetupFakeDriver]
-    public void Width_Height_SetMinWidthHeight_Narrow_Wide_Runes ()
+    public void Narrow_Wide_Runes ()
     {
         ((FakeDriver)Application.Driver).SetBufferSize (32, 32);
         var top = new View { Width = 32, Height = 32 };
