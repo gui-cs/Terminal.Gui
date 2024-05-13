@@ -299,7 +299,7 @@ public class ScrollBarView : View
             Host.SetFocus ();
         }
 
-        int location = _vertical ? mouseEvent.Y : mouseEvent.X;
+        int location = _vertical ? mouseEvent.Position.Y : mouseEvent.Position.X;
         int barsize = _vertical ? Viewport.Height : Viewport.Width;
         int posTopLeftTee = _vertical ? _posTopTee + 1 : _posLeftTee + 1;
         int posBottomRightTee = _vertical ? _posBottomTee + 1 : _posRightTee + 1;
@@ -667,13 +667,6 @@ public class ScrollBarView : View
         }
     }
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
 
     /// <summary>Only used for a hosted view that will update and redraw the scrollbars.</summary>
     public virtual void Refresh () { ShowHideScrollBars (); }
@@ -944,7 +937,7 @@ public class ScrollBarView : View
         // BUGBUG: v2 - If Host is also the ScrollBarView's superview, this is all bogus because it's not
         // supported that a view can reference it's superview's Dims. This code also assumes the host does 
         //  not have a margin/borderframe/padding.
-        if (!IsInitialized)
+        if (!IsInitialized || _otherScrollBarView is { IsInitialized: false })
         {
             return;
         }

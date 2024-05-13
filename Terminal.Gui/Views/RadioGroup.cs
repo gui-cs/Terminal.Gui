@@ -88,8 +88,8 @@ public class RadioGroup : View
     {
         SetFocus ();
 
-        int boundsX = e.MouseEvent.X;
-        int boundsY = e.MouseEvent.Y;
+        int boundsX = e.MouseEvent.Position.X;
+        int boundsY = e.MouseEvent.Position.Y;
 
         int pos = _orientation == Orientation.Horizontal ? boundsX : boundsY;
 
@@ -277,14 +277,6 @@ public class RadioGroup : View
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
     public override bool? OnInvokingKeyBindings (Key keyEvent)
     {
         // This is a bit of a hack. We want to handle the key bindings for the radio group but
@@ -351,19 +343,27 @@ public class RadioGroup : View
     public event EventHandler<OrientationEventArgs> OrientationChanged;
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
+        int x = 0;
+        int y = 0;
         switch (Orientation)
         {
             case Orientation.Vertical:
-                Move (0, _cursor);
+                y = _cursor;
 
                 break;
             case Orientation.Horizontal:
-                Move (_horizontal [_cursor].pos, 0);
+                x = _horizontal [_cursor].pos;
 
                 break;
+
+            default:
+                return null;
         }
+
+        Move (x, y);
+        return null; // Don't show the cursor
     }
 
     /// <summary>Allow to invoke the <see cref="SelectedItemChanged"/> after their creation.</summary>

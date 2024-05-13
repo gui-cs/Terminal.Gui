@@ -24,15 +24,13 @@ namespace Terminal.Gui.Analyzers.Internal.Generators.EnumExtensions;
 internal sealed record EnumExtensionMethodsGenerationInfo : IGeneratedTypeMetadata<EnumExtensionMethodsGenerationInfo>,
                                                             IEqualityOperators<EnumExtensionMethodsGenerationInfo, EnumExtensionMethodsGenerationInfo, bool>
 {
-    private const int ExplicitFastHasFlagsMask = 0b1000;
-    private const int ExplicitFastIsDefinedMask = 0b1_0000;
-    private const int ExplicitIncludeInterfaceMask = 0b10_0000;
-    private const int ExplicitNameMask = 0b10;
-    private const int ExplicitNamespaceMask = 0b1;
-    private const int ExplicitPartialMask = 0b100;
+    private const int ExplicitFastHasFlagsMask  = 0b_0100;
+    private const int ExplicitFastIsDefinedMask = 0b_1000;
+    private const int ExplicitNameMask          = 0b_0010;
+    private const int ExplicitNamespaceMask     = 0b_0001;
     private const string GeneratorAttributeFullyQualifiedName = $"{GeneratorAttributeNamespace}.{GeneratorAttributeName}";
     private const string GeneratorAttributeName = nameof (GenerateEnumExtensionMethodsAttribute);
-    private const string GeneratorAttributeNamespace = Constants.Strings.AnalyzersAttributesNamespace;
+    private const string GeneratorAttributeNamespace = Strings.AnalyzersAttributesNamespace;
 
     /// <summary>
     ///     Type containing the information necessary to generate code according to the declared attribute values,
@@ -90,7 +88,7 @@ internal sealed record EnumExtensionMethodsGenerationInfo : IGeneratedTypeMetada
     }
 
     [AccessedThroughProperty (nameof (EnumBackingTypeCode))]
-    private TypeCode _enumBackingTypeCode;
+    private readonly TypeCode _enumBackingTypeCode;
 
     [AccessedThroughProperty (nameof (GeneratedTypeName))]
     private string? _generatedTypeName;
@@ -159,7 +157,7 @@ internal sealed record EnumExtensionMethodsGenerationInfo : IGeneratedTypeMetada
     public bool IsStatic => true;
 
     /// <inheritdoc/>
-    public bool IncludeInterface { get; private set; }
+    public bool IncludeInterface => false;
 
     public string GeneratedTypeFullName => $"{GeneratedTypeNamespace}.{GeneratedTypeName}";
 
@@ -189,7 +187,7 @@ internal sealed record EnumExtensionMethodsGenerationInfo : IGeneratedTypeMetada
     public TypeCode EnumBackingTypeCode
     {
         get => _enumBackingTypeCode;
-        set
+        init
         {
             if (value is not TypeCode.Int32 and not TypeCode.UInt32)
             {
@@ -208,8 +206,8 @@ internal sealed record EnumExtensionMethodsGenerationInfo : IGeneratedTypeMetada
     /// <summary>Whether a switch-based IsDefined replacement will be generated (Default: true)</summary>
     public bool GenerateFastIsDefined { [UsedImplicitly]get; set; } = true;
 
-    internal ImmutableHashSet<int>? IntMembers;
-    internal ImmutableHashSet<uint>? UIntMembers;
+    internal ImmutableHashSet<int>? _intMembers;
+    internal ImmutableHashSet<uint>? _uIntMembers;
 
     /// <summary>
     ///     Fully-qualified name of the extension class
@@ -309,11 +307,11 @@ internal sealed record EnumExtensionMethodsGenerationInfo : IGeneratedTypeMetada
     {
         ImmutableArray<ISymbol> enumMembers = enumSymbol.GetMembers ();
         IEnumerable<IFieldSymbol> fieldSymbols = enumMembers.OfType<IFieldSymbol> ();
-        IntMembers = fieldSymbols.Select (static m => m.HasConstantValue ? (int)m.ConstantValue : 0).ToImmutableHashSet ();
+        _intMembers = fieldSymbols.Select (static m => m.HasConstantValue ? (int)m.ConstantValue : 0).ToImmutableHashSet ();
     }
     private void PopulateUIntMembersHashSet (INamedTypeSymbol enumSymbol)
     {
-        UIntMembers = enumSymbol.GetMembers ().OfType<IFieldSymbol> ().Select (static m => (uint)m.ConstantValue).ToImmutableHashSet ();
+        _uIntMembers = enumSymbol.GetMembers ().OfType<IFieldSymbol> ().Select (static m => (uint)m.ConstantValue).ToImmutableHashSet ();
     }
 
     private bool HasExplicitFastHasFlags
@@ -326,18 +324,6 @@ internal sealed record EnumExtensionMethodsGenerationInfo : IGeneratedTypeMetada
     {
         [UsedImplicitly]get => _discoveredProperties [ExplicitFastIsDefinedMask];
         set => _discoveredProperties [ExplicitFastIsDefinedMask] = value;
-    }
-
-    private bool HasExplicitIncludeInterface
-    {
-        [UsedImplicitly]get => _discoveredProperties [ExplicitIncludeInterfaceMask];
-        set => _discoveredProperties [ExplicitIncludeInterfaceMask] = value;
-    }
-
-    private bool HasExplicitPartial
-    {
-        [UsedImplicitly]get => _discoveredProperties [ExplicitPartialMask];
-        set => _discoveredProperties [ExplicitPartialMask] = value;
     }
 
     private bool HasExplicitTypeName

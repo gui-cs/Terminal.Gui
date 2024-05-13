@@ -333,44 +333,37 @@ public partial class Toplevel : View
     }
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (!IsOverlappedContainer)
         {
-            base.PositionCursor ();
-
             if (Focused is null)
             {
                 EnsureFocus ();
-
-                if (Focused is null)
-                {
-                    Driver.SetCursorVisibility (CursorVisibility.Invisible);
-                }
             }
 
-            return;
+            return null;
         }
+
+        // This code path only happens when the Toplevel is an Overlapped container
 
         if (Focused is null)
         {
+            // TODO: this is an Overlapped hack
             foreach (Toplevel top in Application.OverlappedChildren)
             {
                 if (top != this && top.Visible)
                 {
                     top.SetFocus ();
 
-                    return;
+                    return null;
                 }
             }
         }
 
-        base.PositionCursor ();
+        var cursor2 = base.PositionCursor ();
 
-        if (Focused is null)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
-        }
+        return null; 
     }
 
     /// <summary>
@@ -389,6 +382,12 @@ public partial class Toplevel : View
                                               out int ny,
                                               out StatusBar sb
                                              );
+
+        if (superView is null)
+        {
+            return;
+        }
+
         var layoutSubviews = false;
         var maxWidth = 0;
 

@@ -101,7 +101,7 @@ public class TreeViewTests
 
     [Fact]
     [AutoInitShutdown]
-    public void DesiredCursorVisibility_MultiSelect ()
+    public void CursorVisibility_MultiSelect ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
 
@@ -116,13 +116,13 @@ public class TreeViewTests
 
         Assert.True (tv.MultiSelect);
         Assert.True (tv.HasFocus);
-        Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+        Assert.Equal (CursorVisibility.Invisible, tv.CursorVisibility);
 
         tv.SelectAll ();
-        tv.DesiredCursorVisibility = CursorVisibility.Default;
-        Application.Refresh ();
+        tv.CursorVisibility = CursorVisibility.Default;
+        Application.PositionCursor (top);
         Application.Driver.GetCursorVisibility (out CursorVisibility visibility);
-        Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
         Assert.Equal (CursorVisibility.Default, visibility);
     }
 
@@ -453,7 +453,7 @@ public class TreeViewTests
         Assert.False (called);
 
         // double click triggers activation
-        tree.NewMouseEvent (new MouseEvent { Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.True (called);
         Assert.Same (f, activated);
@@ -485,12 +485,12 @@ public class TreeViewTests
         Assert.False (called);
 
         // double click does nothing because we changed button binding to right click
-        tree.NewMouseEvent (new MouseEvent { Y = 1, Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new MouseEvent { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Null (activated);
         Assert.False (called);
 
-        tree.NewMouseEvent (new MouseEvent { Y = 1, Flags = MouseFlags.Button2Clicked });
+        tree.NewMouseEvent (new MouseEvent { Position = new (0, 1), Flags = MouseFlags.Button2Clicked });
 
         Assert.True (called);
         Assert.Same (car1, activated);
@@ -522,7 +522,7 @@ public class TreeViewTests
         Assert.False (called);
 
         // double click does nothing because we changed button to null
-        tree.NewMouseEvent (new MouseEvent { Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.False (called);
         Assert.Null (activated);

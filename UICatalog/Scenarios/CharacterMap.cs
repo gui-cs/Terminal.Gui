@@ -109,7 +109,7 @@ public class CharacterMap : Scenario
         // if user clicks the mouse in TableView
         _categoryList.MouseClick += (s, e) =>
                                     {
-                                        _categoryList.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
+                                        _categoryList.ScreenToCell (e.MouseEvent.Position, out int? clickedCol);
 
                                         if (clickedCol != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
                                         {
@@ -315,7 +315,6 @@ public class CharacterMap : Scenario
 
 internal class CharMap : View
 {
-    private const CursorVisibility _cursor = CursorVisibility.Default;
     private const int COLUMN_WIDTH = 3;
 
     private ContextMenu _contextMenu = new ();
@@ -327,6 +326,7 @@ internal class CharMap : View
     {
         ColorScheme = Colors.ColorSchemes ["Dialog"];
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
 
         ContentSize = new (RowWidth, (MaxCodePoint / 16 + 2) * _rowHeight);
 
@@ -472,7 +472,6 @@ internal class CharMap : View
 
         var up = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (1),
             Y = 0,
             Height = 1,
@@ -487,7 +486,6 @@ internal class CharMap : View
 
         var down = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (1),
             Y = Pos.AnchorEnd (2),
             Height = 1,
@@ -502,7 +500,6 @@ internal class CharMap : View
 
         var left = new Button
         {
-            AutoSize = false,
             X = 0,
             Y = Pos.AnchorEnd (1),
             Height = 1,
@@ -517,7 +514,6 @@ internal class CharMap : View
 
         var right = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (2),
             Y = Pos.AnchorEnd (1),
             Height = 1,
@@ -807,24 +803,7 @@ internal class CharMap : View
         }
     }
 
-    public override bool OnEnter (View view)
-    {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (_cursor);
-        }
-
-        return base.OnEnter (view);
-    }
-
-    public override bool OnLeave (View view)
-    {
-        Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnLeave (view);
-    }
-
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (HasFocus
             && Cursor.X >= RowLabelWidth
@@ -832,13 +811,14 @@ internal class CharMap : View
             && Cursor.Y > 0
             && Cursor.Y < Viewport.Height)
         {
-            Driver.SetCursorVisibility (_cursor);
             Move (Cursor.X, Cursor.Y);
         }
         else
         {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
+            return null;
         }
+
+        return Cursor;
     }
 
     public event EventHandler<ListViewItemEventArgs> SelectedCodePointChanged;
@@ -870,23 +850,18 @@ internal class CharMap : View
             return;
         }
 
-        args.Handled = true;
-
-        if (me.Y == 0)
+        if (me.Position.Y == 0)
         {
-            me.Y = Cursor.Y;
+            me.Position = me.Position with { Y = Cursor.Y };
         }
 
-        if (me.Y > 0)
-        { }
-
-        if (me.X < RowLabelWidth || me.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)
+        if (me.Position.X < RowLabelWidth || me.Position.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)
         {
-            me.X = Cursor.X;
+            me.Position = me.Position with { X = Cursor.X };
         }
 
-        int row = (me.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
-        int col = (me.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
+        int row = (me.Position.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
+        int col = (me.Position.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
 
         if (col > 15)
         {
@@ -905,10 +880,16 @@ internal class CharMap : View
             Hover?.Invoke (this, new (val, null));
         }
 
+        if (!HasFocus && CanFocus)
+        {
+            SetFocus ();
+        }
+
+        args.Handled = true;
+
         if (me.Flags == MouseFlags.Button1Clicked)
         {
             SelectedCodePoint = val;
-
             return;
         }
 
@@ -926,7 +907,7 @@ internal class CharMap : View
 
             _contextMenu = new ()
             {
-                Position = new (me.X + 1, me.Y + 1),
+                Position = new (me.Position.X + 1, me.Position.Y + 1),
                 MenuItems = new (
                                  new MenuItem []
                                  {
@@ -973,7 +954,6 @@ internal class CharMap : View
         var errorLabel = new Label
         {
             Text = UcdApiClient.BaseUrl,
-            AutoSize = false,
             X = 0,
             Y = 1,
             Width = Dim.Fill (),

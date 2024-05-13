@@ -851,102 +851,102 @@ public class NavigationTests
                                                          );
 
         // top
-        Assert.Equal (Point.Empty, top.ScreenToFrame (0, 0));
-        Rectangle screen = top.Margin.ViewportToScreen (new (0, 0, 0, 0));
+        Assert.Equal (Point.Empty, top.ScreenToFrame (new (0, 0)));
+        var screen = top.Margin.ViewportToScreen (new Point (0, 0));
         Assert.Equal (0, screen.X);
         Assert.Equal (0, screen.Y);
-        screen = top.Border.ViewportToScreen (new (0, 0, 0, 0));
+        screen = top.Border.ViewportToScreen (new Point (0, 0));
         Assert.Equal (0, screen.X);
         Assert.Equal (0, screen.Y);
-        screen = top.Padding.ViewportToScreen (new (0, 0, 0, 0));
+        screen = top.Padding.ViewportToScreen (new Point (0, 0));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        screen = top.ViewportToScreen (new (0, 0, 0, 0));
+        screen = top.ViewportToScreen (new Point (0, 0));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        screen = top.ViewportToScreen (new (-1, -1, 0, 0));
+        screen = top.ViewportToScreen (new Point (-1, -1));
         Assert.Equal (0, screen.X);
         Assert.Equal (0, screen.Y);
-        var found = View.FindDeepestView (top, 0, 0);
+        var found = View.FindDeepestView (top, new (0, 0));
         Assert.Equal (top.Border, found);
- 
+
         Assert.Equal (0, found.Frame.X);
         Assert.Equal (0, found.Frame.Y);
-        Assert.Equal (new Point (3, 2), top.ScreenToFrame (3, 2));
-        screen = top.ViewportToScreen (new (3, 2, 0, 0));
+        Assert.Equal (new Point (3, 2), top.ScreenToFrame (new (3, 2)));
+        screen = top.ViewportToScreen (new Point (3, 2));
         Assert.Equal (4, screen.X);
         Assert.Equal (3, screen.Y);
-        found = View.FindDeepestView (top, screen.X, screen.Y);
+        found = View.FindDeepestView (top, new (screen.X, screen.Y));
         Assert.Equal (view, found);
         //Assert.Equal (0, found.FrameToScreen ().X);
         //Assert.Equal (0, found.FrameToScreen ().Y);
-        found = View.FindDeepestView (top, 3, 2);
+        found = View.FindDeepestView (top, new (3, 2));
         Assert.Equal (top, found);
         //Assert.Equal (3, found.FrameToScreen ().X);
         //Assert.Equal (2, found.FrameToScreen ().Y);
-        Assert.Equal (new Point (13, 2), top.ScreenToFrame (13, 2));
-        screen = top.ViewportToScreen (new (12, 2, 0, 0));
+        Assert.Equal (new Point (13, 2), top.ScreenToFrame (new (13, 2)));
+        screen = top.ViewportToScreen (new Point (12, 2));
         Assert.Equal (13, screen.X);
         Assert.Equal (3, screen.Y);
-        found = View.FindDeepestView (top, screen.X, screen.Y);
+        found = View.FindDeepestView (top, new (screen.X, screen.Y));
         Assert.Equal (view, found);
         //Assert.Equal (9, found.FrameToScreen ().X);
         //Assert.Equal (0, found.FrameToScreen ().Y);
-        screen = top.ViewportToScreen (new (13, 2, 0, 0));
+        screen = top.ViewportToScreen (new Point (13, 2));
         Assert.Equal (14, screen.X);
         Assert.Equal (3, screen.Y);
-        found = View.FindDeepestView (top, 13, 2);
+        found = View.FindDeepestView (top, new (13, 2));
         Assert.Equal (top, found);
         //Assert.Equal (13, found.FrameToScreen ().X);
         //Assert.Equal (2, found.FrameToScreen ().Y);
-        Assert.Equal (new Point (14, 3), top.ScreenToFrame (14, 3));
-        screen = top.ViewportToScreen (new (14, 3, 0, 0));
+        Assert.Equal (new Point (14, 3), top.ScreenToFrame (new (14, 3)));
+        screen = top.ViewportToScreen (new Point (14, 3));
         Assert.Equal (15, screen.X);
         Assert.Equal (4, screen.Y);
-        found = View.FindDeepestView (top, 14, 3);
+        found = View.FindDeepestView (top, new (14, 3));
         Assert.Equal (top, found);
         //Assert.Equal (14, found.FrameToScreen ().X);
         //Assert.Equal (3, found.FrameToScreen ().Y);
 
         // view
-        Assert.Equal (new Point (-4, -3), view.ScreenToFrame (0, 0));
-        screen = view.Margin.ViewportToScreen (new (-3, -2, 0, 0));
+        Assert.Equal (new Point (-4, -3), view.ScreenToFrame (new (0, 0)));
+        screen = view.Margin.ViewportToScreen (new Point (-3, -2));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        screen = view.Border.ViewportToScreen (new (-3, -2, 0, 0));
+        screen = view.Border.ViewportToScreen (new Point (-3, -2));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        screen = view.Padding.ViewportToScreen (new (-3, -2, 0, 0));
+        screen = view.Padding.ViewportToScreen (new Point (-3, -2));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        screen = view.ViewportToScreen (new (-3, -2, 0, 0));
+        screen = view.ViewportToScreen (new Point (-3, -2));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        screen = view.ViewportToScreen (new (-4, -3, 0, 0));
+        screen = view.ViewportToScreen (new Point (-4, -3));
         Assert.Equal (0, screen.X);
         Assert.Equal (0, screen.Y);
-        found = View.FindDeepestView (top, 0, 0);
+        found = View.FindDeepestView (top, new (0, 0));
         Assert.Equal (top.Border, found);
 
-        Assert.Equal (new Point (-1, -1), view.ScreenToFrame (3, 2));
-        screen = view.ViewportToScreen (new (0, 0, 0, 0));
+        Assert.Equal (new Point (-1, -1), view.ScreenToFrame (new (3, 2)));
+        screen = view.ViewportToScreen (new Point (0, 0));
         Assert.Equal (4, screen.X);
         Assert.Equal (3, screen.Y);
-        found = View.FindDeepestView (top, 4, 3);
+        found = View.FindDeepestView (top, new (4, 3));
         Assert.Equal (view, found);
-        
-        Assert.Equal (new Point (9, -1), view.ScreenToFrame (13, 2));
-        screen = view.ViewportToScreen (new (10, 0, 0, 0));
+
+        Assert.Equal (new Point (9, -1), view.ScreenToFrame (new (13, 2)));
+        screen = view.ViewportToScreen (new Point (10, 0));
         Assert.Equal (14, screen.X);
         Assert.Equal (3, screen.Y);
-        found = View.FindDeepestView (top, 14, 3);
+        found = View.FindDeepestView (top, new (14, 3));
         Assert.Equal (top, found);
-        
-        Assert.Equal (new Point (10, 0), view.ScreenToFrame (14, 3));
-        screen = view.ViewportToScreen (new (11, 1, 0, 0));
+
+        Assert.Equal (new Point (10, 0), view.ScreenToFrame (new (14, 3)));
+        screen = view.ViewportToScreen (new Point (11, 1));
         Assert.Equal (15, screen.X);
         Assert.Equal (4, screen.Y);
-        found = View.FindDeepestView (top, 15, 4);
+        found = View.FindDeepestView (top, new (15, 4));
         Assert.Equal (top, found);
     }
 
@@ -1005,84 +1005,84 @@ public class NavigationTests
         Assert.Equal (new Rectangle (3, 2, 23, 10), frame);
 
         // top
-        Assert.Equal (new Point (-3, -2), top.ScreenToFrame (0, 0));
-        Rectangle screen = top.Margin.ViewportToScreen (new (-3, -2, 0, 0));
+        Assert.Equal (new Point (-3, -2), top.ScreenToFrame (new (0, 0)));
+        var  screen = top.Margin.ViewportToScreen (new Point (-3, -2));
         Assert.Equal (0, screen.X);
         Assert.Equal (0, screen.Y);
-        screen = top.Border.ViewportToScreen (new (-3, -2, 0, 0));
+        screen = top.Border.ViewportToScreen (new Point (-3, -2));
         Assert.Equal (0, screen.X);
         Assert.Equal (0, screen.Y);
-        screen = top.Padding.ViewportToScreen (new (-3, -2, 0, 0));
+        screen = top.Padding.ViewportToScreen (new Point (-3, -2));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        screen = top.ViewportToScreen (new (-3, -2, 0, 0));
+        screen = top.ViewportToScreen (new Point (-3, -2));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        screen = top.ViewportToScreen (new (-4, -3, 0, 0));
+        screen = top.ViewportToScreen (new Point (-4, -3));
         Assert.Equal (0, screen.X);
         Assert.Equal (0, screen.Y);
-        var found = View.FindDeepestView (top, -4, -3);
+        var found = View.FindDeepestView (top, new (-4, -3));
         Assert.Null (found);
-        Assert.Equal (Point.Empty, top.ScreenToFrame (3, 2));
-        screen = top.ViewportToScreen (new (0, 0, 0, 0));
+        Assert.Equal (Point.Empty, top.ScreenToFrame (new (3, 2)));
+        screen = top.ViewportToScreen (new Point (0, 0));
         Assert.Equal (4, screen.X);
         Assert.Equal (3, screen.Y);
-        Assert.Equal (top.Border, View.FindDeepestView (top, 3, 2));
+        Assert.Equal (top.Border, View.FindDeepestView (top, new (3, 2)));
         //Assert.Equal (0, found.FrameToScreen ().X);
         //Assert.Equal (0, found.FrameToScreen ().Y);
-        Assert.Equal (new Point (10, 0), top.ScreenToFrame (13, 2));
-        screen = top.ViewportToScreen (new (10, 0, 0, 0));
+        Assert.Equal (new Point (10, 0), top.ScreenToFrame (new (13, 2)));
+        screen = top.ViewportToScreen (new Point (10, 0));
         Assert.Equal (14, screen.X);
         Assert.Equal (3, screen.Y);
-        Assert.Equal (top.Border, View.FindDeepestView (top, 13, 2));
+        Assert.Equal (top.Border, View.FindDeepestView (top, new (13, 2)));
         //Assert.Equal (10, found.FrameToScreen ().X);
         //Assert.Equal (0, found.FrameToScreen ().Y);
-        Assert.Equal (new Point (11, 1), top.ScreenToFrame (14, 3));
-        screen = top.ViewportToScreen (new (11, 1, 0, 0));
+        Assert.Equal (new Point (11, 1), top.ScreenToFrame (new (14, 3)));
+        screen = top.ViewportToScreen (new Point (11, 1));
         Assert.Equal (15, screen.X);
         Assert.Equal (4, screen.Y);
-        Assert.Equal (top, View.FindDeepestView (top, 14, 3));
-        
+        Assert.Equal (top, View.FindDeepestView (top, new (14, 3)));
+
         // view
-        Assert.Equal (new Point (-7, -5), view.ScreenToFrame (0, 0));
-        screen = view.Margin.ViewportToScreen (new (-6, -4, 0, 0));
+        Assert.Equal (new Point (-7, -5), view.ScreenToFrame (new (0, 0)));
+        screen = view.Margin.ViewportToScreen (new Point (-6, -4));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        screen = view.Border.ViewportToScreen (new (-6, -4, 0, 0));
+        screen = view.Border.ViewportToScreen (new Point (-6, -4));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        screen = view.Padding.ViewportToScreen (new (-6, -4, 0, 0));
+        screen = view.Padding.ViewportToScreen (new Point (-6, -4));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        screen = view.ViewportToScreen (new (-6, -4, 0, 0));
+        screen = view.ViewportToScreen (new Point (-6, -4));
         Assert.Equal (1, screen.X);
         Assert.Equal (1, screen.Y);
-        Assert.Null (View.FindDeepestView (top, 1, 1));
-        Assert.Equal (new Point (-4, -3), view.ScreenToFrame (3, 2));
-        screen = view.ViewportToScreen (new (-3, -2, 0, 0));
+        Assert.Null (View.FindDeepestView (top, new (1, 1)));
+        Assert.Equal (new Point (-4, -3), view.ScreenToFrame (new (3, 2)));
+        screen = view.ViewportToScreen (new Point (-3, -2));
         Assert.Equal (4, screen.X);
         Assert.Equal (3, screen.Y);
-        Assert.Equal (top, View.FindDeepestView (top, 4, 3));
-        Assert.Equal (new Point (-1, -1), view.ScreenToFrame (6, 4));
-        screen = view.ViewportToScreen (new (0, 0, 0, 0));
+        Assert.Equal (top, View.FindDeepestView (top, new (4, 3)));
+        Assert.Equal (new Point (-1, -1), view.ScreenToFrame (new (6, 4)));
+        screen = view.ViewportToScreen (new Point (0, 0));
         Assert.Equal (7, screen.X);
         Assert.Equal (5, screen.Y);
-        Assert.Equal (view, View.FindDeepestView (top, 7, 5));
-        Assert.Equal (new Point (6, -1), view.ScreenToFrame (13, 4));
-        screen = view.ViewportToScreen (new (7, 0, 0, 0));
+        Assert.Equal (view, View.FindDeepestView (top, new (7, 5)));
+        Assert.Equal (new Point (6, -1), view.ScreenToFrame (new (13, 4)));
+        screen = view.ViewportToScreen (new Point (7, 0));
         Assert.Equal (14, screen.X);
         Assert.Equal (5, screen.Y);
-        Assert.Equal (view, View.FindDeepestView (top, 14, 5));
-        Assert.Equal (new Point (7, -2), view.ScreenToFrame (14, 3));
-        screen = view.ViewportToScreen (new (8, -1, 0, 0));
+        Assert.Equal (view, View.FindDeepestView (top, new (14, 5)));
+        Assert.Equal (new Point (7, -2), view.ScreenToFrame (new (14, 3)));
+        screen = view.ViewportToScreen (new Point (8, -1));
         Assert.Equal (15, screen.X);
         Assert.Equal (4, screen.Y);
-        Assert.Equal (top, View.FindDeepestView (top, 15, 4));
-        Assert.Equal (new Point (16, -2), view.ScreenToFrame (23, 3));
-        screen = view.ViewportToScreen (new (17, -1, 0, 0));
+        Assert.Equal (top, View.FindDeepestView (top, new (15, 4)));
+        Assert.Equal (new Point (16, -2), view.ScreenToFrame (new (23, 3)));
+        screen = view.ViewportToScreen (new Point (17, -1));
         Assert.Equal (24, screen.X);
         Assert.Equal (4, screen.Y);
-        Assert.Null (View.FindDeepestView (top, 24, 4));
+        Assert.Null (View.FindDeepestView (top, new (24, 4)));
     }
 
     [Fact]
@@ -1549,5 +1549,33 @@ public class NavigationTests
 
         // Assert does Not throw NullReferenceException
         top.SetFocus ();
+    }
+
+    // View.Focused & View.MostFocused tests
+
+    // View.Focused - No subviews
+    [Fact, Trait("BUGBUG", "Fix in Issue #3444")]
+    public void Focused_NoSubviews ()
+    {
+        var view = new View ();
+        Assert.Null (view.Focused);
+
+        view.CanFocus = true;
+        view.SetFocus ();
+        Assert.True (view.HasFocus);
+        Assert.Null (view.Focused); // BUGBUG: Should be view
+    }
+
+    // View.MostFocused - No subviews
+    [Fact, Trait ("BUGBUG", "Fix in Issue #3444")]
+    public void Most_Focused_NoSubviews ()
+    {
+        var view = new View ();
+        Assert.Null (view.Focused);
+
+        view.CanFocus = true;
+        view.SetFocus ();
+        Assert.True (view.HasFocus);
+        Assert.Null (view.MostFocused); // BUGBUG: Should be view
     }
 }

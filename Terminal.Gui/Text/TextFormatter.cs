@@ -30,7 +30,7 @@ public class TextFormatter
 
     /// <summary>Gets or sets whether the <see cref="Size"/> should be automatically changed to fit the <see cref="Text"/>.</summary>
     /// <remarks>
-    ///     <para>Used by <see cref="View.AutoSize"/> to resize the view's <see cref="View.Viewport"/> to fit <see cref="Size"/>.</para>
+    ///     <para>Used when <see cref="View"/> is using <see cref="Dim.Auto"/> to resize the view's <see cref="View.Viewport"/> to fit <see cref="Size"/>.</para>
     ///     <para>
     ///         AutoSize is ignored if <see cref="TextAlignment.Justified"/> and
     ///         <see cref="VerticalTextAlignment.Justified"/> are used.
@@ -43,11 +43,52 @@ public class TextFormatter
         {
             _autoSize = EnableNeedsFormat (value);
 
-            if (_autoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
+            if (_autoSize)
             {
-                Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
+                Size = GetAutoSize ();
             }
         }
+    }
+
+    private Size GetAutoSize ()
+    {
+        Size size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
+        return size with
+        {
+            Width = size.Width - GetHotKeySpecifierLength (),
+            Height = size.Height - GetHotKeySpecifierLength (false)
+        };
+
+    }
+    /// <summary>
+    ///     Gets the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> characters
+    ///     in the <see cref="Text"/> property.
+    /// </summary>
+    /// <remarks>
+    ///     Only the first HotKey specifier found in <see cref="Text"/> is supported.
+    /// </remarks>
+    /// <param name="isWidth">
+    ///     If <see langword="true"/> (the default) the width required for the HotKey specifier is returned. Otherwise the
+    ///     height
+    ///     is returned.
+    /// </param>
+    /// <returns>
+    ///     The number of characters required for the <see cref="TextFormatter.HotKeySpecifier"/>. If the text
+    ///     direction specified
+    ///     by <see cref="TextDirection"/> does not match the <paramref name="isWidth"/> parameter, <c>0</c> is returned.
+    /// </returns>
+    public int GetHotKeySpecifierLength (bool isWidth = true)
+    {
+        if (isWidth)
+        {
+            return TextFormatter.IsHorizontalDirection (Direction) && Text?.Contains ((char)HotKeySpecifier.Value) == true
+                       ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                       : 0;
+        }
+
+        return TextFormatter.IsVerticalDirection (Direction) && Text?.Contains ((char)HotKeySpecifier.Value) == true
+                   ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                   : 0;
     }
 
     /// <summary>
@@ -65,12 +106,13 @@ public class TextFormatter
         {
             _textDirection = EnableNeedsFormat (value);
 
-            if (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
+            if (AutoSize)
             {
-                Size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
+                Size = GetAutoSize ();
             }
         }
     }
+
 
     /// <summary>
     ///     Determines if the viewport width will be used or only the text width will be used,
@@ -148,9 +190,9 @@ public class TextFormatter
         get => _size;
         set
         {
-            if (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)
+            if (AutoSize)
             {
-                _size = EnableNeedsFormat (CalcRect (0, 0, Text, Direction, TabWidth).Size);
+                _size = EnableNeedsFormat (GetAutoSize());
             }
             else
             {
@@ -172,12 +214,11 @@ public class TextFormatter
         get => _text;
         set
         {
-            bool textWasNull = _text is null && value != null;
             _text = EnableNeedsFormat (value);
 
-            if ((AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) || (textWasNull && Size.IsEmpty))
+            if (AutoSize)
             {
-                Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
+                Size = GetAutoSize (); ;
             }
         }
     }
@@ -228,17 +269,6 @@ public class TextFormatter
 
         List<string> linesFormatted = GetLines ();
 
-        switch (Direction)
-        {
-            case TextDirection.TopBottom_RightLeft:
-            case TextDirection.LeftRight_BottomTop:
-            case TextDirection.RightLeft_BottomTop:
-            case TextDirection.BottomTop_RightLeft:
-                linesFormatted.Reverse ();
-
-                break;
-        }
-
         bool isVertical = IsVerticalDirection (Direction);
         Rectangle maxScreen = screen;
 
@@ -286,25 +316,16 @@ public class TextFormatter
 
             Rune [] runes = linesFormatted [line].ToRunes ();
 
-            runes = Direction switch
-            {
-                TextDirection.RightLeft_BottomTop => runes.Reverse ().ToArray (),
-                TextDirection.RightLeft_TopBottom => runes.Reverse ().ToArray (),
-                TextDirection.BottomTop_LeftRight => runes.Reverse ().ToArray (),
-                TextDirection.BottomTop_RightLeft => runes.Reverse ().ToArray (),
-                _ => runes
-            };
-
             // When text is justified, we lost left or right, so we use the direction to align. 
 
             int x, y;
 
             // Horizontal Alignment
-            if (Alignment == TextAlignment.Right || (Alignment == TextAlignment.Justified && !IsLeftToRight (Direction)))
+            if (Alignment is TextAlignment.Right)
             {
                 if (isVertical)
                 {
-                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, tabWidth: TabWidth);
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, line, linesFormatted.Count - line, TabWidth);
                     x = screen.Right - runesWidth;
                     CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
@@ -315,12 +336,12 @@ public class TextFormatter
                     CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
             }
-            else if (Alignment is TextAlignment.Left or TextAlignment.Justified)
+            else if (Alignment is TextAlignment.Left)
             {
                 if (isVertical)
                 {
                     int runesWidth = line > 0
-                                         ? GetColumnsRequiredForVerticalText (linesFormatted, tabWidth: TabWidth)
+                                         ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
                                          : 0;
                     x = screen.Left + runesWidth;
                 }
@@ -331,12 +352,36 @@ public class TextFormatter
 
                 CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
             }
-            else if (Alignment == TextAlignment.Centered)
+            else if (Alignment is TextAlignment.Justified)
             {
                 if (isVertical)
                 {
-                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, tabWidth: TabWidth);
-                    x = screen.Left + line + (screen.Width - runesWidth) / 2;
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                    int prevLineWidth = line > 0 ? GetColumnsRequiredForVerticalText (linesFormatted, line - 1, 1, TabWidth) : 0;
+                    int firstLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, 1, TabWidth);
+                    int lastLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, linesFormatted.Count - 1, 1, TabWidth);
+                    var interval = (int)Math.Round ((double)(screen.Width + firstLineWidth + lastLineWidth) / linesFormatted.Count);
+
+                    x = line == 0
+                            ? screen.Left
+                            : line < linesFormatted.Count - 1
+                                ? screen.Width - runesWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
+                                : screen.Right - lastLineWidth;
+                }
+                else
+                {
+                    x = screen.Left;
+                }
+
+                CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
+            }
+            else if (Alignment is TextAlignment.Centered)
+            {
+                if (isVertical)
+                {
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                    int linesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth);
+                    x = screen.Left + linesWidth + (screen.Width - runesWidth) / 2;
 
                     CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
@@ -354,7 +399,7 @@ public class TextFormatter
             }
 
             // Vertical Alignment
-            if (VerticalAlignment == VerticalTextAlignment.Bottom || (VerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (Direction)))
+            if (VerticalAlignment is VerticalTextAlignment.Bottom)
             {
                 if (isVertical)
                 {
@@ -365,7 +410,7 @@ public class TextFormatter
                     y = screen.Bottom - linesFormatted.Count + line;
                 }
             }
-            else if (VerticalAlignment is VerticalTextAlignment.Top or VerticalTextAlignment.Justified)
+            else if (VerticalAlignment is VerticalTextAlignment.Top)
             {
                 if (isVertical)
                 {
@@ -376,7 +421,21 @@ public class TextFormatter
                     y = screen.Top + line;
                 }
             }
-            else if (VerticalAlignment == VerticalTextAlignment.Middle)
+            else if (VerticalAlignment is VerticalTextAlignment.Justified)
+            {
+                if (isVertical)
+                {
+                    y = screen.Top;
+                }
+                else
+                {
+                    var interval = (int)Math.Round ((double)(screen.Height + 2) / linesFormatted.Count);
+
+                    y = line == 0 ? screen.Top :
+                        line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
+                }
+            }
+            else if (VerticalAlignment is VerticalTextAlignment.Middle)
             {
                 if (isVertical)
                 {
@@ -410,7 +469,10 @@ public class TextFormatter
 
                 if (lastZeroWidthPos is null)
                 {
-                    if (idx < 0 || x + current + colOffset < 0)
+                    if (idx < 0
+                        || (isVertical
+                                ? VerticalAlignment != VerticalTextAlignment.Bottom && current < 0
+                                : Alignment != TextAlignment.Right && x + current + colOffset < 0))
                     {
                         current++;
 
@@ -422,8 +484,8 @@ public class TextFormatter
                         break;
                     }
 
-                    if ((!isVertical && current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset)
-                        || (isVertical && idx > maxScreen.Top + maxScreen.Height - screen.Y))
+                    if ((!isVertical && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset || (idx < runes.Length && runes [idx].GetColumns () > screen.Width)))
+                        || (isVertical && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y) || (idx < runes.Length && runes [idx].GetColumns () > screen.Width))))
                     {
                         break;
                     }
@@ -600,7 +662,7 @@ public class TextFormatter
     /// <remarks>
     ///     <para>
     ///         If the text needs to be formatted (if <see cref="NeedsFormat"/> is <see langword="true"/>)
-    ///         <see cref="Format(string, int, bool, bool, bool, int, TextDirection, bool)"/> will be called and upon return
+    ///         <see cref="Format()"/> will be called and upon return
     ///         <see cref="NeedsFormat"/> will be <see langword="false"/>.
     ///     </para>
     ///     <para>
@@ -642,7 +704,8 @@ public class TextFormatter
                                  PreserveTrailingSpaces,
                                  TabWidth,
                                  Direction,
-                                 MultiLine
+                                 MultiLine,
+                                 this
                                 );
 
                 if (!AutoSize)
@@ -665,7 +728,8 @@ public class TextFormatter
                                  PreserveTrailingSpaces,
                                  TabWidth,
                                  Direction,
-                                 MultiLine
+                                 MultiLine,
+                                 this
                                 );
 
                 if (!AutoSize && _lines.Count > Size.Height)
@@ -932,6 +996,7 @@ public class TextFormatter
     /// </param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <param name="textDirection">The text direction.</param>
+    /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
     /// <returns>A list of word wrapped lines.</returns>
     /// <remarks>
     ///     <para>This method does not do any justification.</para>
@@ -947,7 +1012,8 @@ public class TextFormatter
         int width,
         bool preserveTrailingSpaces = false,
         int tabWidth = 0,
-        TextDirection textDirection = TextDirection.LeftRight_TopBottom
+        TextDirection textDirection = TextDirection.LeftRight_TopBottom,
+        TextFormatter textFormatter = null
     )
     {
         if (width < 0)
@@ -955,7 +1021,6 @@ public class TextFormatter
             throw new ArgumentOutOfRangeException ($"{nameof (width)} cannot be negative.");
         }
 
-        int start = 0, end;
         List<string> lines = new ();
 
         if (string.IsNullOrEmpty (text))
@@ -964,6 +1029,13 @@ public class TextFormatter
         }
 
         List<Rune> runes = StripCRLF (text).ToRuneList ();
+
+        int start = Math.Max (
+                              !runes.Contains ((Rune)' ') && textFormatter is { VerticalAlignment: VerticalTextAlignment.Bottom } && IsVerticalDirection (textDirection)
+                                  ? runes.Count - width
+                                  : 0,
+                              0);
+        int end;
 
         if (preserveTrailingSpaces)
         {
@@ -997,7 +1069,8 @@ public class TextFormatter
                               + GetLengthThatFits (
                                                    runes.GetRange (start, runes.Count - start),
                                                    width,
-                                                   tabWidth
+                                                   tabWidth,
+                                                   textDirection
                                                   ))
                        < runes.Count)
                 {
@@ -1012,13 +1085,15 @@ public class TextFormatter
                               + GetLengthThatFits (
                                                    runes.GetRange (end, runes.Count - end),
                                                    width,
-                                                   tabWidth
+                                                   tabWidth,
+                                                   textDirection
                                                   );
                     }
 
                     var str = StringExtensions.ToString (runes.GetRange (start, end - start));
+                    int zeroLength = text.EnumerateRunes ().Sum (r => r.GetColumns () == 0 ? 1 : 0);
 
-                    if (end > start && GetRuneWidth (str, tabWidth) <= width)
+                    if (end > start && GetRuneWidth (str, tabWidth, textDirection) <= width + zeroLength)
                     {
                         lines.Add (str);
                         start = end;
@@ -1177,16 +1252,18 @@ public class TextFormatter
     /// <param name="talign">Alignment.</param>
     /// <param name="textDirection">The text direction.</param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
+    /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
     /// <returns>Justified and clipped text.</returns>
     public static string ClipAndJustify (
         string text,
         int width,
         TextAlignment talign,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
-        int tabWidth = 0
+        int tabWidth = 0,
+        TextFormatter textFormatter = null
     )
     {
-        return ClipAndJustify (text, width, talign == TextAlignment.Justified, textDirection, tabWidth);
+        return ClipAndJustify (text, width, talign == TextAlignment.Justified, textDirection, tabWidth, textFormatter);
     }
 
     /// <summary>Justifies text within a specified width.</summary>
@@ -1198,13 +1275,15 @@ public class TextFormatter
     /// <param name="justify">Justify.</param>
     /// <param name="textDirection">The text direction.</param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
+    /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
     /// <returns>Justified and clipped text.</returns>
     public static string ClipAndJustify (
         string text,
         int width,
         bool justify,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
-        int tabWidth = 0
+        int tabWidth = 0,
+        TextFormatter textFormatter = null
     )
     {
         if (width < 0)
@@ -1219,20 +1298,39 @@ public class TextFormatter
 
         text = ReplaceTABWithSpaces (text, tabWidth);
         List<Rune> runes = text.ToRuneList ();
+        int zeroLength = runes.Sum (r => r.GetColumns () == 0 ? 1 : 0);
 
-        if (runes.Count > width)
+        if (runes.Count - zeroLength > width)
         {
             if (IsHorizontalDirection (textDirection))
             {
-                return StringExtensions.ToString (
-                                                  runes.GetRange (
-                                                                  0,
-                                                                  GetLengthThatFits (text, width, tabWidth)
-                                                                 )
-                                                 );
+                if (textFormatter is { Alignment: TextAlignment.Right })
+                {
+                    return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
+                }
+
+                if (textFormatter is { Alignment: TextAlignment.Centered })
+                {
+                    return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
+                }
+
+                return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
             }
 
-            int zeroLength = runes.Sum (r => r.GetColumns () == 0 ? 1 : 0);
+            if (IsVerticalDirection (textDirection))
+            {
+                if (textFormatter is { VerticalAlignment: VerticalTextAlignment.Bottom })
+                {
+                    return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
+                }
+
+                if (textFormatter is { VerticalAlignment: VerticalTextAlignment.Middle })
+                {
+                    return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
+                }
+
+                return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
+            }
 
             return StringExtensions.ToString (runes.GetRange (0, width + zeroLength));
         }
@@ -1242,17 +1340,55 @@ public class TextFormatter
             return Justify (text, width, ' ', textDirection, tabWidth);
         }
 
-        if (IsHorizontalDirection (textDirection) && GetRuneWidth (text, tabWidth) > width)
+        if (IsHorizontalDirection (textDirection))
         {
-            return StringExtensions.ToString (
-                                              runes.GetRange (
-                                                              0,
-                                                              GetLengthThatFits (text, width, tabWidth)
-                                                             )
-                                             );
+            if (textFormatter is { Alignment: TextAlignment.Right })
+            {
+                if (GetRuneWidth (text, tabWidth, textDirection) > width)
+                {
+                    return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
+                }
+            }
+            else if (textFormatter is { Alignment: TextAlignment.Centered })
+            {
+                return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
+            }
+            else if (GetRuneWidth (text, tabWidth, textDirection) > width)
+            {
+                return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
+            }
+        }
+
+        if (IsVerticalDirection (textDirection))
+        {
+            if (textFormatter is { VerticalAlignment: VerticalTextAlignment.Bottom })
+            {
+                if (runes.Count - zeroLength > width)
+                {
+                    return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
+                }
+            }
+            else if (textFormatter is { VerticalAlignment: VerticalTextAlignment.Middle })
+            {
+                return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
+            }
+            else if (runes.Count - zeroLength > width)
+            {
+                return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
+            }
         }
 
         return text;
+    }
+
+    private static string GetRangeThatFits (List<Rune> runes, int index, string text, int width, int tabWidth, TextDirection textDirection)
+    {
+        return StringExtensions.ToString (
+                                          runes.GetRange (
+                                                          Math.Max (index, 0),
+                                                          GetLengthThatFits (text, width, tabWidth, textDirection)
+                                                         )
+                                         );
     }
 
     /// <summary>
@@ -1289,7 +1425,7 @@ public class TextFormatter
 
         if (IsHorizontalDirection (textDirection))
         {
-            textCount = words.Sum (arg => GetRuneWidth (arg, tabWidth));
+            textCount = words.Sum (arg => GetRuneWidth (arg, tabWidth, textDirection));
         }
         else
         {
@@ -1352,6 +1488,7 @@ public class TextFormatter
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <param name="textDirection">The text direction.</param>
     /// <param name="multiLine">If <see langword="true"/> new lines are allowed.</param>
+    /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
     /// <returns>A list of word wrapped lines.</returns>
     /// <remarks>
     ///     <para>An empty <paramref name="text"/> string will result in one empty line.</para>
@@ -1366,7 +1503,8 @@ public class TextFormatter
         bool preserveTrailingSpaces = false,
         int tabWidth = 0,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
-        bool multiLine = false
+        bool multiLine = false,
+        TextFormatter textFormatter = null
     )
     {
         return Format (
@@ -1377,7 +1515,8 @@ public class TextFormatter
                        preserveTrailingSpaces,
                        tabWidth,
                        textDirection,
-                       multiLine
+                       multiLine,
+                       textFormatter
                       );
     }
 
@@ -1397,6 +1536,7 @@ public class TextFormatter
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <param name="textDirection">The text direction.</param>
     /// <param name="multiLine">If <see langword="true"/> new lines are allowed.</param>
+    /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
     /// <returns>A list of word wrapped lines.</returns>
     /// <remarks>
     ///     <para>An empty <paramref name="text"/> string will result in one empty line.</para>
@@ -1411,7 +1551,8 @@ public class TextFormatter
         bool preserveTrailingSpaces = false,
         int tabWidth = 0,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
-        bool multiLine = false
+        bool multiLine = false,
+        TextFormatter textFormatter = null
     )
     {
         if (width < 0)
@@ -1457,16 +1598,17 @@ public class TextFormatter
 
                 foreach (string line in lines)
                 {
-                    lineResult.Add (ClipAndJustify (line, width, justify, textDirection, tabWidth));
+
+                    lineResult.Add (ClipAndJustify (PerformCorrectFormatDirection (textDirection, line), width, justify, textDirection, tabWidth, textFormatter));
                 }
 
-                return lineResult;
+                return PerformCorrectFormatDirection (textDirection, lineResult);
             }
 
             text = ReplaceCRLFWithSpace (text);
-            lineResult.Add (ClipAndJustify (text, width, justify, textDirection, tabWidth));
+            lineResult.Add (ClipAndJustify (PerformCorrectFormatDirection (textDirection, text), width, justify, textDirection, tabWidth, textFormatter));
 
-            return lineResult;
+            return PerformCorrectFormatDirection (textDirection, lineResult);
         }
 
         List<Rune> runes = StripCRLF (text, true).ToRuneList ();
@@ -1481,11 +1623,12 @@ public class TextFormatter
             {
                 List<string> wrappedLines =
                     WordWrapText (
-                                  StringExtensions.ToString (runes.GetRange (lp, i - lp)),
+                                  StringExtensions.ToString (PerformCorrectFormatDirection (textDirection, runes.GetRange (lp, i - lp))),
                                   width,
                                   preserveTrailingSpaces,
                                   tabWidth,
-                                  textDirection
+                                  textDirection,
+                                  textFormatter
                                  );
 
                 foreach (string line in wrappedLines)
@@ -1503,17 +1646,47 @@ public class TextFormatter
         }
 
         foreach (string line in WordWrapText (
-                                              StringExtensions.ToString (runes.GetRange (lp, runeCount - lp)),
+                                              StringExtensions.ToString (PerformCorrectFormatDirection (textDirection, runes.GetRange (lp, runeCount - lp))),
                                               width,
                                               preserveTrailingSpaces,
                                               tabWidth,
-                                              textDirection
+                                              textDirection,
+                                              textFormatter
                                              ))
         {
             lineResult.Add (ClipAndJustify (line, width, justify, textDirection, tabWidth));
         }
 
-        return lineResult;
+        return PerformCorrectFormatDirection (textDirection, lineResult);
+    }
+
+    private static string PerformCorrectFormatDirection (TextDirection textDirection, string line)
+    {
+        return textDirection switch
+               {
+                   TextDirection.RightLeft_BottomTop
+                       or TextDirection.RightLeft_TopBottom
+                       or TextDirection.BottomTop_LeftRight
+                       or TextDirection.BottomTop_RightLeft => StringExtensions.ToString (line.EnumerateRunes ().Reverse ()),
+                   _ => line
+               };
+    }
+
+    private static List<Rune> PerformCorrectFormatDirection (TextDirection textDirection, List<Rune> runes)
+    {
+        return PerformCorrectFormatDirection (textDirection, StringExtensions.ToString (runes)).ToRuneList ();
+    }
+
+    private static List<string> PerformCorrectFormatDirection (TextDirection textDirection, List<string> lines)
+    {
+        return textDirection switch
+               {
+                   TextDirection.TopBottom_RightLeft
+                       or TextDirection.LeftRight_BottomTop
+                       or TextDirection.RightLeft_BottomTop
+                       or TextDirection.BottomTop_RightLeft => lines.ToArray ().Reverse ().ToList (),
+                   _ => lines
+               };
     }
 
     /// <summary>Returns the number of lines needed to render the specified text given the width.</summary>
@@ -1529,61 +1702,10 @@ public class TextFormatter
     }
 
     /// <summary>
-    ///     Returns the maximum number of columns needed to render the text (single line or multiple lines, word wrapped)
-    ///     given a number of columns to constrain the text to.
-    /// </summary>
-    /// <remarks>
-    ///     Calls <see cref="Format()"/>. This API will return incorrect results if the text includes glyphs who's width
-    ///     is dependent on surrounding glyphs (e.g. Arabic).
-    /// </remarks>
-    /// <returns>Width of the longest line after formatting the text constrained by <paramref name="maxColumns"/>.</returns>
-    /// <param name="text">Text, may contain newlines.</param>
-    /// <param name="maxColumns">The number of columns to constrain the text to for formatting.</param>
-    /// <param name="tabWidth">The number of columns used for a tab.</param>
-    public static int GetWidestLineLength (string text, int maxColumns, int tabWidth = 0)
-    {
-        List<string> result = Format (text, maxColumns, false, true);
-        var max = 0;
-
-        result.ForEach (
-                        s =>
-                        {
-                            var m = 0;
-                            s.ToRuneList ().ForEach (r => m += GetRuneWidth (r, tabWidth));
-
-                            if (m > max)
-                            {
-                                max = m;
-                            }
-                        }
-                       );
-
-        return max;
-    }
-
-    /// <summary>
-    ///     Returns the number of columns in the widest line in the text, without word wrap, accounting for wide-glyphs
-    ///     (uses <see cref="StringExtensions.GetColumns"/>). <paramref name="text"/> if it contains newlines.
-    /// </summary>
-    /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
-    ///     glyphs (e.g. Arabic).
-    /// </remarks>
-    /// <param name="text">Text, may contain newlines.</param>
-    /// <param name="tabWidth">The number of columns used for a tab.</param>
-    /// <returns>The length of the longest line.</returns>
-    public static int GetWidestLineLength (string text, int tabWidth = 0)
-    {
-        List<string> result = SplitNewLine (text);
-
-        return result.Max (x => GetRuneWidth (x, tabWidth));
-    }
-
-    /// <summary>
     ///     Returns the number of columns required to render <paramref name="lines"/> oriented vertically.
     /// </summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="lines">The lines.</param>
@@ -1605,14 +1727,30 @@ public class TextFormatter
              i++)
         {
             string runes = lines [i];
-
             if (runes.Length > 0)
             {
                 max += runes.EnumerateRunes ().Max (r => GetRuneWidth (r, tabWidth));
             }
         }
-
         return max;
+    }
+
+    /// <summary>
+    ///     Returns the number of columns in the widest line in the text, without word wrap, accounting for wide-glyphs
+    ///     (uses <see cref="StringExtensions.GetColumns"/>). <paramref name="text"/> if it contains newlines.
+    /// </summary>
+    /// <remarks>
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     glyphs (e.g. Arabic).
+    /// </remarks>
+    /// <param name="text">Text, may contain newlines.</param>
+    /// <param name="tabWidth">The number of columns used for a tab.</param>
+    /// <returns>The length of the longest line.</returns>
+    public static int GetWidestLineLength (string text, int tabWidth = 0)
+    {
+        List<string> result = SplitNewLine (text);
+
+        return result.Max (x => GetRuneWidth (x, tabWidth));
     }
 
     /// <summary>
@@ -1643,27 +1781,32 @@ public class TextFormatter
         return max;
     }
 
-    /// <summary>Gets the number of the Runes in the text that will fit in <paramref name="columns"/>.</summary>
+    /// <summary>Gets the number of the Runes in the text that will fit in <paramref name="width"/>.</summary>
     /// <remarks>
     ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="text">The text.</param>
-    /// <param name="columns">The width.</param>
-    /// <param name="tabWidth">The number of columns used for a tab.</param>
+    /// <param name="width">The width.</param>
+    /// <param name="tabWidth">The width used for a tab.</param>
+    /// <param name="textDirection">The text direction.</param>
     /// <returns>The index of the text that fit the width.</returns>
-    public static int GetLengthThatFits (string text, int columns, int tabWidth = 0) { return GetLengthThatFits (text?.ToRuneList (), columns, tabWidth); }
+    public static int GetLengthThatFits (string text, int width, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
+    {
+        return GetLengthThatFits (text?.ToRuneList (), width, tabWidth, textDirection);
+    }
 
-    /// <summary>Gets the number of the Runes in a list of Runes that will fit in <paramref name="columns"/>.</summary>
+    /// <summary>Gets the number of the Runes in a list of Runes that will fit in <paramref name="width"/>.</summary>
     /// <remarks>
     ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="runes">The list of runes.</param>
-    /// <param name="columns">The width.</param>
-    /// <param name="tabWidth">The number of columns used for a tab.</param>
-    /// <returns>The index of the last Rune in <paramref name="runes"/> that fit in <paramref name="columns"/>.</returns>
-    public static int GetLengthThatFits (List<Rune> runes, int columns, int tabWidth = 0)
+    /// <param name="width">The width.</param>
+    /// <param name="tabWidth">The width used for a tab.</param>
+    /// <param name="textDirection">The text direction.</param>
+    /// <returns>The index of the last Rune in <paramref name="runes"/> that fit in <paramref name="width"/>.</returns>
+    public static int GetLengthThatFits (List<Rune> runes, int width, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
     {
         if (runes is null || runes.Count == 0)
         {
@@ -1675,9 +1818,9 @@ public class TextFormatter
 
         for (; runeIdx < runes.Count; runeIdx++)
         {
-            int runeWidth = GetRuneWidth (runes [runeIdx], tabWidth);
+            int runeWidth = GetRuneWidth (runes [runeIdx], tabWidth, textDirection);
 
-            if (runesLength + runeWidth > columns)
+            if (runesLength + runeWidth > width)
             {
                 break;
             }
@@ -1688,12 +1831,12 @@ public class TextFormatter
         return runeIdx;
     }
 
-    private static int GetRuneWidth (string str, int tabWidth) { return GetRuneWidth (str.EnumerateRunes ().ToList (), tabWidth); }
-    private static int GetRuneWidth (List<Rune> runes, int tabWidth) { return runes.Sum (r => GetRuneWidth (r, tabWidth)); }
+    private static int GetRuneWidth (string str, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom) { return GetRuneWidth (str.EnumerateRunes ().ToList (), tabWidth, textDirection); }
+    private static int GetRuneWidth (List<Rune> runes, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom) { return runes.Sum (r => GetRuneWidth (r, tabWidth, textDirection)); }
 
-    private static int GetRuneWidth (Rune rune, int tabWidth)
+    private static int GetRuneWidth (Rune rune, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
     {
-        int runeWidth = rune.GetColumns ();
+        int runeWidth = IsHorizontalDirection (textDirection) ? rune.GetColumns () : 1;
 
         if (rune.Value == '\t')
         {

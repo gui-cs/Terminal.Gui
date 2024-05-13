@@ -214,8 +214,12 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests && Col >= 0 && Col < Cols && Row >= 0 && Row < Rows)
         {
             Curses.move (Row, Col);
+            Curses.raw ();
+            Curses.noecho ();
+            Curses.refresh ();
         }
     }
+
 
     public override void UpdateScreen ()
     {
@@ -606,6 +610,12 @@ internal class CursesDriver : ConsoleDriver
                 k = KeyCode.Enter;
             }
 
+            // Strip the KeyCode.Space flag off if it's set
+            if (k != KeyCode.Space && k.HasFlag (KeyCode.Space))
+            {
+                k &= ~KeyCode.Space;
+            }
+
             OnKeyDown (new Key (k));
             OnKeyUp (new Key (k));
         }
@@ -809,8 +819,8 @@ internal class CursesDriver : ConsoleDriver
 
         _lastMouseFlags = mouseFlag;
 
-        var me = new MouseEvent { Flags = mouseFlag, X = pos.X, Y = pos.Y };
-        Debug.WriteLine ($"CursesDriver: ({me.X},{me.Y}) - {me.Flags}");
+        var me = new MouseEvent { Flags = mouseFlag, Position = pos };
+        //Debug.WriteLine ($"CursesDriver: ({me.Position}) - {me.Flags}");
 
         OnMouseEvent (me);
     }
@@ -823,7 +833,7 @@ internal class CursesDriver : ConsoleDriver
     /// <returns></returns>
     private static Attribute MakeColor (short foreground, short background)
     {
-        var v = (short)(foreground | (background << 4));
+        var v = (short)((ushort)foreground | (background << 4));
 
         // TODO: for TrueColor - Use InitExtendedPair
         Curses.InitColorPair (v, foreground, background);

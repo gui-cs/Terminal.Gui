@@ -1071,7 +1071,7 @@ public class FileDialog : Dialog
 
     private void OnTableViewMouseClick (object sender, MouseEventEventArgs e)
     {
-        Point? clickedCell = _tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
+        Point? clickedCell = _tableView.ScreenToCell (e.MouseEvent.Position.X, e.MouseEvent.Position.Y, out int? clickedCol);
 
         if (clickedCol is { })
         {
@@ -1269,7 +1269,7 @@ public class FileDialog : Dialog
 
         var contextMenu = new ContextMenu
         {
-            Position = new Point (e.MouseEvent.X + 1, e.MouseEvent.Y + 1),
+            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
             MenuItems = new MenuBarItem (
                                          [
                                              new MenuItem (Strings.fdCtxNew, string.Empty, New),
@@ -1290,7 +1290,7 @@ public class FileDialog : Dialog
 
         var contextMenu = new ContextMenu
         {
-            Position = new Point (e.MouseEvent.X + 1, e.MouseEvent.Y + 1),
+            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
             MenuItems = new MenuBarItem (
                                          [
                                              new MenuItem (

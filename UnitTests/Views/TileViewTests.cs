@@ -2282,27 +2282,27 @@ public class TileViewTests
 
         tv.Tiles.ElementAt (0)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
                            );
 
         tv.Tiles.ElementAt (1)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
                            );
 
         tv.Tiles.ElementAt (2)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('3', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('3', 100) }
                            );
 
         tv.Tiles.ElementAt (3)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('4', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('4', 100) }
                            );
 
         tv.Tiles.ElementAt (4)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('5', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('5', 100) }
                            );
 
         var top = new Toplevel ();
@@ -2397,14 +2397,13 @@ public class TileViewTests
 
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
-                                   new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
+                                   new Label { Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
                                   );
 
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
                                    new Label
                                    {
-                                       AutoSize = false,
                                        Width = Dim.Fill (),
                                        Height = 1,
                                        Y = 1,
@@ -2414,14 +2413,13 @@ public class TileViewTests
 
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
-                                   new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
+                                   new Label { Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
                                   );
 
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
                                    new Label
                                    {
-                                       AutoSize = false,
                                        Width = Dim.Fill (),
                                        Height = 1,
                                        Y = 1,

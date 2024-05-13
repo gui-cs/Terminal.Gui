@@ -32,10 +32,11 @@ namespace Terminal.Gui;
 ///         <see cref="Enabled"/>, <see cref="Visible"/>, and <see cref="CanFocus"/> will receive focus.
 ///     </para>
 ///     <para>
-///         Views that are focusable should implement the <see cref="PositionCursor"/> to make sure that the cursor is
-///         placed in a location that makes sense. Unix terminals do not have a way of hiding the cursor, so it can be
+///         Views that are focusable should override <see cref="PositionCursor"/> to make sure that the cursor is
+///         placed in a location that makes sense. Some terminals do not have a way of hiding the cursor, so it can be
 ///         distracting to have the cursor left at the last focused view. So views should make sure that they place the
-///         cursor in a visually sensible place.
+///         cursor in a visually sensible place. The default implementation of <see cref="PositionCursor"/> will place the
+///         cursor at either the hotkey (if defined) or <c>0,0</c>.
 ///     </para>
 ///     <para>
 ///         The View defines the base functionality for user interface elements in Terminal.Gui. Views can contain one or
@@ -139,6 +140,8 @@ public partial class View : Responder, ISupportInitializeNotification
     /// </remarks>
     public View ()
     {
+        CreateAdornments ();
+
         HotKeySpecifier = (Rune)'_';
         TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
 
@@ -150,8 +153,6 @@ public partial class View : Responder, ISupportInitializeNotification
         TabStop = false;
 
         AddCommands ();
-
-        CreateAdornments ();
     }
 
     /// <summary>
@@ -456,12 +457,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 _title = value;
                 TitleTextFormatter.Text = _title;
 
-                TitleTextFormatter.Size = new (
-                                               TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
-                                               - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                                                      ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                                                      : 0),
-                                               1);
+                SetTitleTextFormatterSize ();
                 SetHotKeyFromTitle ();
                 SetNeedsDisplay ();
 #if DEBUG
@@ -473,6 +469,16 @@ public partial class View : Responder, ISupportInitializeNotification
                 OnTitleChanged (old, _title);
             }
         }
+    }
+
+    private void SetTitleTextFormatterSize ()
+    {
+        TitleTextFormatter.Size = new (
+                                       TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
+                                       - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
+                                              ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                                              : 0),
+                                       1);
     }
 
     /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>

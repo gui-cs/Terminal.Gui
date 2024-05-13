@@ -2197,7 +2197,7 @@ public class TableViewTests
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 4, Flags = MouseFlags.Button1Clicked }
+                       new MouseEvent { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
                       );
 
         // should select that row
@@ -2205,7 +2205,7 @@ public class TableViewTests
 
         // shift clicking top row
         tv.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl }
+                       new MouseEvent { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl }
                       );
 
         // should extend the selection
@@ -2269,7 +2269,7 @@ public class TableViewTests
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 4, Flags = MouseFlags.Button1Clicked }
+                       new MouseEvent { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
                       );
 
         // should select that row
@@ -2324,7 +2324,7 @@ public class TableViewTests
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 4, Flags = MouseFlags.Button1Clicked }
+                       new MouseEvent { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
                       );
 
         // should select that row
@@ -2377,7 +2377,7 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 4, Flags = MouseFlags.Button1Clicked }
+                       new MouseEvent { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
                       );
 
         // should select that row
@@ -2558,7 +2558,7 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 3, Flags = MouseFlags.Button1Clicked }
+                       new MouseEvent { Position = new (1, 3), Flags = MouseFlags.Button1Clicked }
                       );
 
         // should select that row
@@ -2566,7 +2566,7 @@ A B C
 
         // shift clicking top row
         tv.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift }
+                       new MouseEvent { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift }
                       );
 
         // should extend the selection

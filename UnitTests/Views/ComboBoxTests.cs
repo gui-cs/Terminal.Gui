@@ -20,7 +20,6 @@ public class ComboBoxTests
         cb.LayoutSubviews ();
         Assert.Equal ("Two", cb.Text);
         Assert.NotNull (cb.Source);
-        Assert.False (cb.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 0, 2), cb.Frame);
         Assert.Equal (1, cb.SelectedItem);
     }
@@ -35,7 +34,6 @@ public class ComboBoxTests
         cb.LayoutSubviews ();
         Assert.Equal (string.Empty, cb.Text);
         Assert.Null (cb.Source);
-        Assert.False (cb.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 0, 2), cb.Frame);
         Assert.Equal (-1, cb.SelectedItem);
 
@@ -45,7 +43,6 @@ public class ComboBoxTests
         cb.LayoutSubviews ();
         Assert.Equal ("Test", cb.Text);
         Assert.Null (cb.Source);
-        Assert.False (cb.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 0, 2), cb.Frame);
         Assert.Equal (-1, cb.SelectedItem);
 
@@ -62,7 +59,6 @@ public class ComboBoxTests
         cb.LayoutSubviews ();
         Assert.Equal (string.Empty, cb.Text);
         Assert.NotNull (cb.Source);
-        Assert.False (cb.AutoSize);
         Assert.Equal (new Rectangle (1, 2, 10, 20), cb.Frame);
         Assert.Equal (-1, cb.SelectedItem);
 
@@ -72,7 +68,6 @@ public class ComboBoxTests
         cb.LayoutSubviews ();
         Assert.Equal (string.Empty, cb.Text);
         Assert.NotNull (cb.Source);
-        Assert.False (cb.AutoSize);
         Assert.Equal (new Rectangle (0, 0, 0, 2), cb.Frame);
         Assert.Equal (-1, cb.SelectedItem);
     }
@@ -145,7 +140,7 @@ public class ComboBoxTests
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.NewMouseEvent (new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }));
+        Assert.True (cb.NewMouseEvent (new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }));
         Assert.Equal ("", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
@@ -200,7 +195,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -237,7 +232,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -294,7 +289,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -305,7 +300,7 @@ public class ComboBoxTests
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = 0, Y = 1, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -316,7 +311,7 @@ public class ComboBoxTests
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = 0, Y = 1, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -329,7 +324,7 @@ public class ComboBoxTests
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = 0, Y = 2, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (0, 2), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("Three", selected);
@@ -339,14 +334,14 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
 
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = 0, Y = 2, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (0, 2), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("Three", selected);
@@ -356,7 +351,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Assert.Equal ("Three", selected);
@@ -367,7 +362,7 @@ public class ComboBoxTests
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("One", selected);
@@ -395,14 +390,14 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
 
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -413,7 +408,7 @@ public class ComboBoxTests
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = -1, Y = 0, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (-1, 0), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -426,7 +421,7 @@ public class ComboBoxTests
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -437,7 +432,7 @@ public class ComboBoxTests
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = 0, Y = -1, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (0, -1), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -450,7 +445,7 @@ public class ComboBoxTests
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -461,7 +456,7 @@ public class ComboBoxTests
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = cb.Frame.Width, Y = 0, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (cb.Frame.Width, 0), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -474,7 +469,7 @@ public class ComboBoxTests
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -485,7 +480,7 @@ public class ComboBoxTests
         Assert.True (
                      cb.Subviews [1]
                        .NewMouseEvent (
-                                    new MouseEvent { X = 0, Y = cb.Frame.Height, Flags = MouseFlags.Button1Clicked }
+                                    new MouseEvent { Position = new (0, cb.Frame.Height), Flags = MouseFlags.Button1Clicked }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -513,7 +508,7 @@ public class ComboBoxTests
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -670,7 +665,7 @@ Three ",
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -682,7 +677,7 @@ Three ",
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -692,7 +687,7 @@ Three ",
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -704,7 +699,7 @@ Three ",
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -732,7 +727,7 @@ Three ",
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Assert.Equal ("", selected);
@@ -789,7 +784,7 @@ Three ",
 
         Assert.True (
                      cb.NewMouseEvent (
-                                    new MouseEvent { X = cb.Viewport.Right - 1, Y = 0, Flags = MouseFlags.Button1Pressed }
+                                    new MouseEvent { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                    )
                     );
         Assert.Equal ("", selected);

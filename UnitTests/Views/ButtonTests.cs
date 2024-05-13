@@ -32,296 +32,62 @@ public class ButtonTests (ITestOutputHelper output)
         view.Dispose ();
     }
 
-    // BUGBUG: This test is NOT a unit test and needs to be broken apart into 
-    //         more specific tests (e.g. it tests Checkbox as well as Button)
-    [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_False_With_Fixed_Width ()
+    [Theory]
+    [InlineData ("01234", 0, 0, 0, 0)]
+    [InlineData ("01234", 1, 0, 1, 0)]
+    [InlineData ("01234", 0, 1, 0, 1)]
+    [InlineData ("01234", 1, 1, 1, 1)]
+    [InlineData ("01234", 10, 1, 10, 1)]
+    [InlineData ("01234", 10, 3, 10, 3)]
+    [InlineData ("0_1234", 0, 0, 0, 0)]
+    [InlineData ("0_1234", 1, 0, 1, 0)]
+    [InlineData ("0_1234", 0, 1, 0, 1)]
+    [InlineData ("0_1234", 1, 1, 1, 1)]
+    [InlineData ("0_1234", 10, 1, 10, 1)]
+    [InlineData ("0_12你", 10, 3, 10, 3)]
+    [InlineData ("0_12你", 0, 0, 0, 0)]
+    [InlineData ("0_12你", 1, 0, 1, 0)]
+    [InlineData ("0_12你", 0, 1, 0, 1)]
+    [InlineData ("0_12你", 1, 1, 1, 1)]
+    [InlineData ("0_12你", 10, 1, 10, 1)]
+    [InlineData ("0_12你", 10, 3, 10, 3)]
+    public void Button_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
-        var tab = new View ();
-
-        var lblWidth = 8;
-
-        var view = new View
-        {
-            Y = 1,
-            Width = lblWidth,
-            Height = 1,
-            TextAlignment = TextAlignment.Right,
-            Text = "Find:"
-        };
-        tab.Add (view);
-
-        var txtToFind = new TextField
-        {
-            X = Pos.Right (view) + 1, Y = Pos.Top (view), Width = 20, Text = "Testing buttons."
-        };
-        tab.Add (txtToFind);
-
-        var btnFindNext = new Button
-        {
-            AutoSize = false,
-            X = Pos.Right (txtToFind) + 1,
-            Y = Pos.Top (view),
-            Width = 20,
-            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            TextAlignment = TextAlignment.Centered,
-            IsDefault = true,
-            Text = "Find _Next"
-        };
-        tab.Add (btnFindNext);
-
-        var btnFindPrevious = new Button
-        {
-            AutoSize = false,
-            X = Pos.Right (txtToFind) + 1,
-            Y = Pos.Top (btnFindNext) + 1,
-            Width = 20,
-            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            TextAlignment = TextAlignment.Centered,
-            Text = "Find _Previous"
-        };
-        tab.Add (btnFindPrevious);
-
-        var btnCancel = new Button
-        {
-            AutoSize = false,
-            X = Pos.Right (txtToFind) + 1,
-            Y = Pos.Top (btnFindPrevious) + 2,
-            Width = 20,
-            TextAlignment = TextAlignment.Centered,
-            Text = "Cancel"
-        };
-        tab.Add (btnCancel);
-
-        var ckbMatchCase = new CheckBox { X = 0, Y = Pos.Top (txtToFind) + 2, Checked = true, Text = "Match c_ase" };
-        tab.Add (ckbMatchCase);
-
-        var ckbMatchWholeWord = new CheckBox
-        {
-            X = 0, Y = Pos.Top (ckbMatchCase) + 1, Checked = false, Text = "Match _whole word"
-        };
-        tab.Add (ckbMatchWholeWord);
-
-        var tabView = new TabView { Width = Dim.Fill (), Height = Dim.Fill () };
-        tabView.AddTab (new () { DisplayText = "Find", View = tab }, true);
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-
-        tab.Width = view.Width + txtToFind.Width + btnFindNext.Width + 2;
-        tab.Height = btnFindNext.Height + btnFindPrevious.Height + btnCancel.Height + 4;
-
-        win.Add (tabView);
-        var top = new Toplevel ();
-        top.Add (win);
-
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (54, 11);
-
-        Assert.Equal (new (0, 0, 54, 11), win.Frame);
-        Assert.Equal (new (0, 0, 52, 9), tabView.Frame);
-        Assert.Equal (new (0, 0, 50, 7), tab.Frame);
-        Assert.Equal (new (0, 1, 8, 1), view.Frame);
-        Assert.Equal (new (9, 1, 20, 1), txtToFind.Frame);
-
-        Assert.Equal (0, txtToFind.ScrollOffset);
-        Assert.Equal (16, txtToFind.CursorPosition);
-
-        Assert.Equal (new (30, 1, 20, 1), btnFindNext.Frame);
-        Assert.Equal (new (30, 2, 20, 1), btnFindPrevious.Frame);
-        Assert.Equal (new (30, 4, 20, 1), btnCancel.Frame);
-
-        //        Assert.Equal (new (0, 3, 12, 1), ckbMatchCase.Frame);
-        //        Assert.Equal (new (0, 4, 18, 1), ckbMatchWholeWord.Frame);
-
-        var btn1 =
-            $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Find Next {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
-        var btn2 = $"{CM.Glyphs.LeftBracket} Find Previous {CM.Glyphs.RightBracket}";
-        var btn3 = $"{CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}";
-
-        var expected = @$"
-┌────────────────────────────────────────────────────┐
-│╭────╮                                              │
-││Find│                                              │
-││    ╰─────────────────────────────────────────────╮│
-││                                                  ││
-││   Find: Testing buttons.       {btn1}   ││
-││                               {btn2}  ││
-││{CM.Glyphs.Checked} Match case                                      ││
-││{CM.Glyphs.UnChecked} Match whole word                 {btn3}     ││
-│└──────────────────────────────────────────────────┘│
-└────────────────────────────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        view.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_Stays_True_AnchorEnd ()
-    {
-        var btn = new Button { Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
-        var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
-
-        btn.X = Pos.AnchorEnd (0) - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
-        btn.X = Pos.AnchorEnd (0) - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (btn);
-        var top = new Toplevel ();
-        top.Add (win);
-
-        Assert.True (btn.AutoSize);
-
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│            {btnTxt}│
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-
-        Assert.True (btn.AutoSize);
-        btn.Text = "Say Hello 你 changed";
-        btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
-        Assert.True (btn.AutoSize);
-        Application.Refresh ();
-
-        expected = @$"
-┌────────────────────────────┐
-│                            │
-│    {btnTxt}│
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_Stays_True_Center ()
-    {
-        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (btn);
-        var top = new Toplevel ();
-        top.Add (win);
-
-        Assert.True (btn.AutoSize);
-
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│      {CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}      │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-
-        Assert.True (btn.AutoSize);
-        btn.Text = "Say Hello 你 changed";
-        Assert.True (btn.AutoSize);
-        Application.Refresh ();
-
-        expected = @$"
-┌────────────────────────────┐
-│                            │
-│  {CM.Glyphs.LeftBracket} Say Hello 你 changed {CM.Glyphs.RightBracket}  │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_Stays_True_With_EmptyText ()
-    {
-        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), AutoSize = true };
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (btn);
-        var top = new Toplevel ();
-        top.Add (win);
-
-        Assert.True (btn.AutoSize);
-
-        btn.Text = "Say Hello 你";
-
-        Assert.True (btn.AutoSize);
-
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│      {CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}      │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void Button_AutoSize_False_With_Fixed_Width ()
-    {
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 5);
-
-        var top = new View { Width = 20, Height = 5 };
-
         var btn1 = new Button
         {
-            AutoSize = false,
-            X = Pos.Center (),
-            Y = Pos.Center (),
-            Width = 16,
-            Height = 1,
-            Text = "Open me!"
+            Text = text,
+            Width = width,
+            Height = height,
         };
 
-        var btn2 = new Button
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.ContentSize);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.Size);
+
+        btn1.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0, 0)]
+    [InlineData (1, 0, 1, 0)]
+    [InlineData (0, 1, 0, 1)]
+    [InlineData (1, 1, 1, 1)]
+    [InlineData (10, 1, 10, 1)]
+    [InlineData (10, 3, 10, 3)]
+    public void Button_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
+    {
+        var btn1 = new Button
         {
-            AutoSize = false,
-            X = Pos.Center (),
-            Y = Pos.Center () + 1,
-            Width = 16,
-            Height = 1,
-            Text = "Close me!"
+            Width = width,
+            Height = height,
         };
-        top.Add (btn1, btn2);
-        top.BeginInit ();
-        top.EndInit ();
-        top.Draw ();
 
-        Assert.Equal ("{Width=16, Height=1}", btn1.TextFormatter.Size.ToString ());
-        Assert.Equal ("{Width=16, Height=1}", btn2.TextFormatter.Size.ToString ());
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.Size);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @$"
-    {CM.Glyphs.LeftBracket} {btn1.Text} {CM.Glyphs.RightBracket}
-   {CM.Glyphs.LeftBracket} {btn2.Text} {CM.Glyphs.RightBracket}",
-                                                      output
-                                                     );
-        top.Dispose ();
+        btn1.Dispose ();
     }
 
     [Fact]
@@ -385,6 +151,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal (string.Empty, btn.Text);
         btn.BeginInit ();
         btn.EndInit ();
+        btn.SetRelativeLayout (new (100, 100));
 
         Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.False (btn.IsDefault);
@@ -413,6 +180,10 @@ public class ButtonTests (ITestOutputHelper output)
         btn.Dispose ();
 
         btn = new () { Text = "_Test", IsDefault = true };
+        Assert.Equal (new (10, 1), btn.TextFormatter.Size);
+
+
+
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
@@ -426,6 +197,14 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (btn.IsDefault);
         Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
         Assert.True (btn.CanFocus);
+
+        btn.SetRelativeLayout (new (100, 100));
+        // 0123456789012345678901234567890123456789
+        // [* Test *]
+        Assert.Equal ('_', btn.HotKeySpecifier.Value);
+        Assert.Equal (10, btn.TextFormatter.Format ().Length);
+        Assert.Equal (new (10, 1), btn.TextFormatter.Size);
+        Assert.Equal (new (10, 1), btn.ContentSize);
         Assert.Equal (new (0, 0, 10, 1), btn.Viewport);
         Assert.Equal (new (0, 0, 10, 1), btn.Frame);
         Assert.Equal (KeyCode.T, btn.HotKey);
@@ -757,7 +536,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }
-    
+
     [Theory]
     [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
     [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
@@ -769,7 +548,6 @@ public class ButtonTests (ITestOutputHelper output)
 
         var button = new Button ()
         {
-            AutoSize = false,
             Width = 1,
             Height = 1,
             WantContinuousButtonPressed = true
@@ -805,7 +583,6 @@ public class ButtonTests (ITestOutputHelper output)
 
         var button = new Button ()
         {
-            AutoSize = false,
             Width = 1,
             Height = 1,
             WantContinuousButtonPressed = true

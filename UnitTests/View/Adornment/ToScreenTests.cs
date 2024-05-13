@@ -251,9 +251,9 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var marginScreen = view.Margin.ViewportToScreen (new (testX, 0, 0, 0));
-        var borderScreen = view.Border.ViewportToScreen (new (testX, 0, 0, 0));
-        var paddingScreen = view.Padding.ViewportToScreen (new (testX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new Point (testX, 0));
+        var borderScreen = view.Border.ViewportToScreen (new Point (testX, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new Point (testX, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);
@@ -292,9 +292,9 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         Assert.Equal(4, view.Viewport.Width);
 
         // Act
-        var marginScreen = view.Margin.ViewportToScreen (new (testX, 0, 0, 0));
-        var borderScreen = view.Border.ViewportToScreen (new (testX, 0, 0, 0));
-        var paddingScreen = view.Padding.ViewportToScreen (new (testX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new Point (testX, 0));
+        var borderScreen = view.Border.ViewportToScreen (new Point (testX, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new Point (testX, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);
@@ -338,9 +338,9 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var marginScreen = view.Margin.ViewportToScreen (new (testX, 0, 0, 0));
-        var borderScreen = view.Border.ViewportToScreen (new (testX, 0, 0, 0));
-        var paddingScreen = view.Padding.ViewportToScreen (new (testX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new Point (testX, 0));
+        var borderScreen = view.Border.ViewportToScreen (new Point (testX, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new Point (testX, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);
@@ -385,9 +385,9 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var marginScreen = view.Margin.ViewportToScreen (new (testX, 0, 0, 0));
-        var borderScreen = view.Border.ViewportToScreen (new (testX, 0, 0, 0));
-        var paddingScreen = view.Padding.ViewportToScreen (new (testX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new Point (testX, 0));
+        var borderScreen = view.Border.ViewportToScreen (new Point (testX, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new Point (testX, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);
@@ -441,9 +441,9 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var marginScreen = view.Margin.ViewportToScreen (new (testX, 0, 0, 0));
-        var borderScreen = view.Border.ViewportToScreen (new (testX, 0, 0, 0));
-        var paddingScreen = view.Padding.ViewportToScreen (new (testX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new Point (testX, 0));
+        var borderScreen = view.Border.ViewportToScreen (new Point (testX, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new Point (testX, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);
@@ -502,9 +502,9 @@ public class AdornmentToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var marginScreen = view.Margin.ViewportToScreen (new (testX, 0, 0, 0));
-        var borderScreen = view.Border.ViewportToScreen (new (testX, 0, 0, 0));
-        var paddingScreen = view.Padding.ViewportToScreen (new (testX, 0, 0, 0));
+        var marginScreen = view.Margin.ViewportToScreen (new Point (testX, 0));
+        var borderScreen = view.Border.ViewportToScreen (new Point (testX, 0));
+        var paddingScreen = view.Padding.ViewportToScreen (new Point (testX, 0));
 
         // Assert
         Assert.Equal (expectedX, marginScreen.X);

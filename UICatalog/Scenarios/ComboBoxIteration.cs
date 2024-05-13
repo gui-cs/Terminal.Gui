@@ -12,7 +12,7 @@ public class ComboBoxIteration : Scenario
     {
         List<string> items = new () { "one", "two", "three" };
 
-        var lbListView = new Label { AutoSize = false, Width = 10, Height = 1 };
+        var lbListView = new Label { Width = 10, Height = 1 };
         Win.Add (lbListView);
 
         var listview = new ListView
@@ -25,7 +25,6 @@ public class ComboBoxIteration : Scenario
         {
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             X = Pos.Right (lbListView) + 1,
-            AutoSize = false,
             Width = Dim.Percent (40)
         };
 

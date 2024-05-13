@@ -2,19 +2,28 @@
 
 Terminal.Gui provides a rich system for how `View` objects are laid out relative to each other. The layout system also defines how coordinates are specified.
 
-## Dealing with coordinates
+## Coordinates
 
-The coordinate systems in Terminal.Gui are:
 
-* `Screen` - Describes the dimensions and characteristics of the underlying terminal. Currently Terminal.Gui only supports applications that run "full-screen", meaning they fill the entire terminal when running. As the user resizes their terminal, the `Screen` changes size and the applicaiton will be resized to fit. *Screen-Relative* means an origin (`0, 0`) at the top-left corner of the terminal. `ConsoleDriver`s operate exclusively on *Screen-Relative* coordinates.
-* `Application` - The dimensions and characteristics of the application. Because only full-screen apps are currently supported, `Application` is effectively the same as `Screen` from a layout perspective. *Application-Relative* currently means an origin (`0, 0`) at the top-left corner of the terminal. `Applicaiton.Top` is a `View` with a top-left corner fixed at the *Application.Relative* coordinate of (`0, 0`) and is the size of `Screen`.
-* `View Frame` - A rectangle at a particular point, and of a particular size, within another `View`, referred to as the `Superview`. *Frame-Relative* means a coordinate is relative to the top-left corner of the View in question. `View.FrameToScreen ()` and `View.ScreenToFrame ()` are helper methods for translating a *Frame-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa.
-* `View Content/Content Area` - A rectangle, with an origin of (`0, 0`) and size (defined by `View.ContentSize`) where the View's content exists. *Content-Relative* means a coordinate is relative to the top-left corner of the content, which is always (`0,0`). `View.ContentToScreen ()` and `View.ScreenToContent ()` are helper methods for translating a *Content-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa.
-* `Viewport` - A *Content-Relative* rectangle representing the subset of the View's content that is visible to the user. If `View.ContentSize` is larger than the Viewport, scrolling is enabled. *Viewport-Relative* means a coordinate that is bound by (`0,0`) and the size of the inner-rectangle of the View's `Padding`. The View drawing primitives (e.g. `View.Move`) take *Viewport-Relative* coordinates; `Move (0, 0)` means the `Cell` in the top-left corner of the inner rectangle of `Padding`. `View.ViewportToScreen ()` and `View.ScreenToViewport ()` are helper methods for translating a *Viewport-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa. To convert a *Viewport-Relative* coordinate to a *Content-Relative* coordinate, simply subtract `Viewport.X` and/or `Viewport.Y` from the *Content-Relative* coordinate. To convert a *Viewport-Relative* coordinate to a *Frame-Relative* coordinate, subtract the point returned by `View.GetViewportOffsetFromFrame`.
+* **Screen-Relative** - Describes the dimensions and characteristics of the underlying terminal. Currently Terminal.Gui only supports applications that run "full-screen", meaning they fill the entire terminal when running. As the user resizes their terminal, the `Screen` changes size and the applicaiton will be resized to fit. *Screen-Relative* means an origin (`0, 0`) at the top-left corner of the terminal. `ConsoleDriver`s operate exclusively on *Screen-Relative* coordinates.
+* **Application.Relative** - The dimensions and characteristics of the application. Because only full-screen apps are currently supported, `Application` is effectively the same as `Screen` from a layout perspective. *Application-Relative* currently means an origin (`0, 0`) at the top-left corner of the terminal. `Applicaiton.Top` is a `View` with a top-left corner fixed at the *Application.Relative* coordinate of (`0, 0`) and is the size of `Screen`.
+* **Frame-Relative**  - The `Frame` property of a `View` is a rectangle that describes the current location and size of the view relative to the `Superview`'s content area. *Frame-Relative* means a coordinate is relative to the top-left corner of the View in question. `View.FrameToScreen ()` and `View.ScreenToFrame ()` are helper methods for translating a *Frame-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa.
+* **Content-Relative** - A rectangle, with an origin of (`0, 0`) and size (defined by `View.ContentSize`) where the View's content exists. *Content-Relative* means a coordinate is relative to the top-left corner of the content, which is always (`0,0`). `View.ContentToScreen ()` and `View.ScreenToContent ()` are helper methods for translating a *Content-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa.
+* **Viewport-Relative** - A *Content-Relative* rectangle representing the subset of the View's content that is visible to the user. If `View.ContentSize` is larger than the Viewport, scrolling is enabled. *Viewport-Relative* means a coordinate that is bound by (`0,0`) and the size of the inner-rectangle of the View's `Padding`. The View drawing primitives (e.g. `View.Move`) take *Viewport-Relative* coordinates; `Move (0, 0)` means the `Cell` in the top-left corner of the inner rectangle of `Padding`. `View.ViewportToScreen ()` and `View.ScreenToViewport ()` are helper methods for translating a *Viewport-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa. To convert a *Viewport-Relative* coordinate to a *Content-Relative* coordinate, simply subtract `Viewport.X` and/or `Viewport.Y` from the *Content-Relative* coordinate. To convert a *Viewport-Relative* coordinate to a *Frame-Relative* coordinate, subtract the point returned by `View.GetViewportOffsetFromFrame`.
+
+## The Frame
+
+The `Frame` property of a `View` is a rectangle that describes the current location and size of the view relative to the `Superview`'s content area. The `Frame`  has a `Location` and `Size`. The `Location` describes the top-left corner of the view relative to the `Superview`'s content area. The `Size` describes the width and height of the view. The `Frame` is used to determine where the view is drawn on the screen and is used to calculate the `Viewport` and `ContentSize`.
+
+## The Content Area
+
+ The content area is the area where the view's content is drawn. Content can be any combination of the `View.Text` property, `Subviews`, and other content drawn by the View. The `View.ContentSize` property defines the size of the content area of the view. *Content Area* refers to the rectangle with a location of `0,0` with a size of `ContentSize`.
+
+ `ContentSize` is `null` by default. If `ContentSize` is `null`, the content area is the size of the `Viewport`. If `ContentSize` is set, the content area is the size of `ContentSize`. If `ContentSize` is larger than the `Viewport`, scrolling is enabled. 
 
 ## The Viewport
 
-The Viewport (`View.Viewport`) is a rectangle describing a sub-set of the View's content. It is a "portal" into the content. The `Viewport.Location` is relative to the top-left corner of the inner rectangle of `View.Padding`. If `Viewport.Size` is the same as `View.ContentSize`, `Viewport.Location` will be `0,0`. 
+The Viewport (`View.Viewport`) is a rectangle describing the portion of the *Content Area* that is currently visible to the user. It is a "portal" into the content. The `Viewport.Location` is relative to the top-left corner of the inner rectangle of `View.Padding`. If `Viewport.Size` is the same as `View.ContentSize`, `Viewport.Location` will be `0,0`. 
 
 To enable scrolling set `View.ContentSize` and then set `Viewport.Location` to positive values. Making `Viewport.Location` positive moves the Viewport down and to the right in the content. 
 
@@ -42,7 +51,6 @@ var label2 = new Label () {
     Width = Dim.Fill (),
     Height = Dim.Percent (50)
 };
-
 ```
 
 The `Frame` property is a rectangle that provides the current location and size of the view relative to the View's `Superview`'s Content area. 
@@ -84,7 +92,7 @@ The [Dim](~/api/Terminal.Gui.Dim.yml) is the type of `View.Width` and `View.Heig
 * Fill to the end of the Superview's Content Area - `Dim.Fill ()`.
 * Reference the Width or Height of another view - `Dim.Width (otherView)`, `Dim.Height (otherView)`.
 * An arbitrary function - `Dim.Function(fn)`
-* Automatic size based on the View's content (either Subviews or Text) - `Dim.Auto()`
+* Automatic size based on the View's content (either Subviews or Text) - `Dim.Auto()` - See the [DimAuto Deep Dive](dimauto.md) for more information.
 
 All `Dim` dimensions are relative to the Superview's content area.
 

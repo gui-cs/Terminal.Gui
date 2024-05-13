@@ -101,7 +101,10 @@ public class Sliders : Scenario
 
         v.Add (single);
 
-        single.OptionsChanged += (s, e) => { single.Title = $"Continuous {e.Options.FirstOrDefault ().Key}"; };
+        single.OptionsChanged += (s, e) =>
+                                 {
+                                     single.Title = $"Continuous {e.Options.FirstOrDefault ().Key}";
+                                 };
 
         List<object> oneOption = new () { "The Only Option" };
 
@@ -150,41 +153,43 @@ public class Sliders : Scenario
 
         #region Config Slider
 
-        Slider<string> slider = new ()
+        Slider<string> optionsSlider = new ()
         {
             Title = "Options",
             X = 0,
             Y = 0,
             Type = SliderType.Multiple,
-            Width = Dim.Fill (),
-            Height = 4,
             AllowEmpty = true,
             BorderStyle = LineStyle.Single
         };
 
-        slider.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
-        slider.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Black);
+        optionsSlider.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
+        optionsSlider.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Black);
 
-        slider.Options = new List<SliderOption<string>>
+        optionsSlider.Options = new List<SliderOption<string>>
         {
             new () { Legend = "Legends" },
             new () { Legend = "RangeAllowSingle" },
             new () { Legend = "EndSpacing" },
-            new () { Legend = "AutoSize" }
+            new () { Legend = "DimAuto" }
         };
 
-        configView.Add (slider);
+        configView.Add (optionsSlider);
 
-        slider.OptionsChanged += (sender, e) =>
+        optionsSlider.OptionsChanged += (sender, e) =>
                                  {
                                      foreach (Slider s in Win.Subviews.OfType<Slider> ())
                                      {
                                          s.ShowLegends = e.Options.ContainsKey (0);
                                          s.RangeAllowSingle = e.Options.ContainsKey (1);
                                          s.ShowEndSpacing = e.Options.ContainsKey (2);
-                                         s.AutoSize = e.Options.ContainsKey (3);
 
-                                         if (!s.AutoSize)
+                                         if (e.Options.ContainsKey (3))
+                                         {
+                                             s.Width = Dim.Auto (Dim.DimAutoStyle.Content);
+                                             s.Height = Dim.Auto (Dim.DimAutoStyle.Content);
+                                         }
+                                         else
                                          {
                                              if (s.Orientation == Orientation.Horizontal)
                                              {
@@ -209,28 +214,25 @@ public class Sliders : Scenario
                                          Win.LayoutSubviews ();
                                      }
                                  };
-        slider.SetOption (0); // Legends
-        slider.SetOption (1); // RangeAllowSingle
-
-        //slider.SetOption (3); // AutoSize
+        optionsSlider.SetOption (0); // Legends
+        optionsSlider.SetOption (1); // RangeAllowSingle
+        optionsSlider.SetOption (3); // DimAuto
 
         #region Slider Orientation Slider
 
-        Slider<string> slider_orientation_slider = new (new List<string> { "Horizontal", "Vertical" })
+        Slider<string> orientationSlider = new (new List<string> { "Horizontal", "Vertical" })
         {
             Title = "Slider Orientation",
             X = 0,
-            Y = Pos.Bottom (slider) + 1,
-            Width = Dim.Fill (),
-            Height = 4,
+            Y = Pos.Bottom (optionsSlider) + 1,
             BorderStyle = LineStyle.Single
         };
 
-        slider_orientation_slider.SetOption (0);
+        orientationSlider.SetOption (0);
 
-        configView.Add (slider_orientation_slider);
+        configView.Add (orientationSlider);
 
-        slider_orientation_slider.OptionsChanged += (sender, e) =>
+        orientationSlider.OptionsChanged += (sender, e) =>
                                                     {
                                                         View prev = null;
 
@@ -273,20 +275,28 @@ public class Sliders : Scenario
                                                                 prev = s;
                                                             }
 
-                                                            if (s.Orientation == Orientation.Horizontal)
+                                                            if (optionsSlider.GetSetOptions ().Contains (3))
                                                             {
-                                                                s.Width = Dim.Percent (50);
-
-                                                                int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
-                                                                            ? s.Options.Max (o => o.Legend.Length) + 3
-                                                                            : 4;
-                                                                s.Height = h;
+                                                                s.Width = Dim.Auto (Dim.DimAutoStyle.Content);
+                                                                s.Height = Dim.Auto (Dim.DimAutoStyle.Content);
                                                             }
                                                             else
                                                             {
-                                                                int w = s.ShowLegends ? s.Options.Max (o => o.Legend.Length) + 3 : 3;
-                                                                s.Width = w;
-                                                                s.Height = Dim.Fill ();
+                                                                if (s.Orientation == Orientation.Horizontal)
+                                                                {
+                                                                    s.Width = Dim.Percent (50);
+
+                                                                    int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
+                                                                                ? s.Options.Max (o => o.Legend.Length) + 3
+                                                                                : 4;
+                                                                    s.Height = h;
+                                                                }
+                                                                else
+                                                                {
+                                                                    int w = s.ShowLegends ? s.Options.Max (o => o.Legend.Length) + 3 : 3;
+                                                                    s.Width = w;
+                                                                    s.Height = Dim.Fill ();
+                                                                }
                                                             }
                                                         }
 
@@ -297,21 +307,19 @@ public class Sliders : Scenario
 
         #region Legends Orientation Slider
 
-        Slider<string> legends_orientation_slider = new (new List<string> { "Horizontal", "Vertical" })
+        Slider<string> legendsOrientationSlider = new (new List<string> { "Horizontal", "Vertical" })
         {
             Title = "Legends Orientation",
-            X = Pos.Center (),
-            Y = Pos.Bottom (slider_orientation_slider) + 1,
-            Width = Dim.Fill (),
-            Height = 4,
+            X = 0,
+            Y = Pos.Bottom (orientationSlider) + 1,
             BorderStyle = LineStyle.Single
         };
 
-        legends_orientation_slider.SetOption (0);
+        legendsOrientationSlider.SetOption (0);
 
-        configView.Add (legends_orientation_slider);
+        configView.Add (legendsOrientationSlider);
 
-        legends_orientation_slider.OptionsChanged += (sender, e) =>
+        legendsOrientationSlider.OptionsChanged += (sender, e) =>
                                                      {
                                                          foreach (Slider s in Win.Subviews.OfType<Slider> ())
                                                          {
@@ -324,20 +332,28 @@ public class Sliders : Scenario
                                                                  s.LegendsOrientation = Orientation.Vertical;
                                                              }
 
-                                                             if (s.Orientation == Orientation.Horizontal)
+                                                             if (optionsSlider.GetSetOptions ().Contains (3))
                                                              {
-                                                                 s.Width = Dim.Percent (50);
-
-                                                                 int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
-                                                                             ? s.Options.Max (o => o.Legend.Length) + 3
-                                                                             : 4;
-                                                                 s.Height = h;
+                                                                 s.Width = Dim.Auto (Dim.DimAutoStyle.Content);
+                                                                 s.Height = Dim.Auto (Dim.DimAutoStyle.Content);
                                                              }
                                                              else
                                                              {
-                                                                 int w = s.ShowLegends ? s.Options.Max (o => o.Legend.Length) + 3 : 3;
-                                                                 s.Width = w;
-                                                                 s.Height = Dim.Fill ();
+                                                                 if (s.Orientation == Orientation.Horizontal)
+                                                                 {
+                                                                     s.Width = Dim.Percent (50);
+
+                                                                     int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
+                                                                                 ? s.Options.Max (o => o.Legend.Length) + 3
+                                                                                 : 4;
+                                                                     s.Height = h;
+                                                                 }
+                                                                 else
+                                                                 {
+                                                                     int w = s.ShowLegends ? s.Options.Max (o => o.Legend.Length) + 3 : 3;
+                                                                     s.Width = w;
+                                                                     s.Height = Dim.Fill ();
+                                                                 }
                                                              }
                                                          }
 
@@ -361,16 +377,14 @@ public class Sliders : Scenario
             Title = "FG Color",
             X = 0,
             Y = Pos.Bottom (
-                            legends_orientation_slider
+                            legendsOrientationSlider
                            )
                 + 1,
             Type = SliderType.Single,
             BorderStyle = LineStyle.Single,
             AllowEmpty = false,
             Orientation = Orientation.Vertical,
-            LegendsOrientation =
-                Orientation.Horizontal,
-            AutoSize = true
+            LegendsOrientation = Orientation.Horizontal,
         };
 
         sliderFGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
@@ -441,9 +455,7 @@ public class Sliders : Scenario
             BorderStyle = LineStyle.Single,
             AllowEmpty = false,
             Orientation = Orientation.Vertical,
-            LegendsOrientation =
-                Orientation.Horizontal,
-            AutoSize = true
+            LegendsOrientation = Orientation.Horizontal,
         };
 
         sliderBGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);

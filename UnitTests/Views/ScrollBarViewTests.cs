@@ -1126,7 +1126,7 @@ This is a test
     {
         var clicked = false;
         var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
-        var label = new Label { AutoSize = false, Width = 14, Height = 5, Text = text };
+        var label = new Label { Width = 14, Height = 5, Text = text };
         var btn = new Button { X = 14, Text = "Click Me!" };
         btn.Accept += (s, e) => clicked = true;
         var top = new Toplevel ();
@@ -1154,7 +1154,7 @@ This is a test             ",
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { X = 15, Y = 0, Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new MouseEvent { Position = new (15, 0), Flags = MouseFlags.Button1Clicked });
 
         Assert.Null (Application.MouseGrabView);
         Assert.True (clicked);
@@ -1182,7 +1182,7 @@ This is a test             ",
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { X = 15, Y = 0, Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new MouseEvent { Position = new (15, 0), Flags = MouseFlags.Button1Clicked });
 
         Assert.Null (Application.MouseGrabView);
         Assert.True (clicked);

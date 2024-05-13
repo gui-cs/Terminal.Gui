@@ -248,7 +248,7 @@ public class ViewportTests (ITestOutputHelper output)
         view.Viewport = newViewport;
 
         // Assert
-        Assert.Equal (new Rectangle(expectedX, expectedY, viewWidth, viewHeight), view.Viewport);
+        Assert.Equal (new Rectangle (expectedX, expectedY, viewWidth, viewHeight), view.Viewport);
     }
 
     [Theory]
@@ -321,18 +321,9 @@ public class ViewportTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (0, 0, 0)]
-    [InlineData (1, 0, 0)]
-    [InlineData (-1, 0, 0)]
-    [InlineData (10, 0, 0)]
-    [InlineData (11, 0, 0)]
-
-    [InlineData (0, 1, 1)]
-    [InlineData (1, 1, 1)]
-    [InlineData (-1, 1, 1)]
-    [InlineData (10, 1, 1)]
-    [InlineData (11, 1, 1)]
-    public void GetViewportOffset_Returns_Offset_From_Frame (int frameX, int adornmentThickness, int expectedOffset)
+    [InlineData (0, 0)]
+    [InlineData (1, 1)]
+    public void GetViewportOffset_Returns_Offset_From_Frame (int adornmentThickness, int expectedOffset)
     {
         View view = new ()
         {
@@ -359,4 +350,97 @@ public class ViewportTests (ITestOutputHelper output)
         Assert.Equal (view.Viewport.Size, view.ContentSize);
     }
 
+    //[Theory]
+    //[InlineData (0, 0, true)]
+    //[InlineData (-1, 0, true)]
+    //[InlineData (0, -1, true)]
+    //[InlineData (-1, -1, true)]
+    //[InlineData (-2, -2, true)]
+    //[InlineData (-3, -3, true)]
+    //[InlineData (-4, -4, true)]
+    //[InlineData (-5, -4, false)]
+    //[InlineData (-4, -5, false)]
+    //[InlineData (-5, -5, false)]
+
+    //[InlineData (1, 1, true)]
+    //[InlineData (2, 2, true)]
+    //[InlineData (3, 3, true)]
+    //[InlineData (4, 4, true)]
+    //[InlineData (5, 4, false)]
+    //[InlineData (4, 5, false)]
+    //[InlineData (5, 5, false)]
+    //public void IsVisibleInSuperView_No_Driver_No_SuperView (int x, int y, bool expected)
+    //{
+    //    var view = new View { X = 1, Y = 1, Width = 5, Height = 5 };
+    //    Assert.True (view.IsVisibleInSuperView (x, y) == expected);
+    //}
+
+    //[Theory]
+    //[InlineData (0, 0, true)]
+    //[InlineData (-1, 0, true)]
+    //[InlineData (0, -1, true)]
+    //[InlineData (-1, -1, true)]
+    //[InlineData (-2, -2, true)]
+    //[InlineData (-3, -3, true)]
+    //[InlineData (-4, -4, true)]
+    //[InlineData (-5, -4, true)]
+    //[InlineData (-4, -5, true)]
+    //[InlineData (-5, -5, true)]
+    //[InlineData (-6, -5, false)]
+    //[InlineData (-5, -6, false)]
+    //[InlineData (-6, -6, false)]
+
+    //[InlineData (1, 1, true)]
+    //[InlineData (2, 2, true)]
+    //[InlineData (3, 3, true)]
+    //[InlineData (4, 4, true)]
+    //[InlineData (5, 4, true)]
+    //[InlineData (4, 5, true)]
+    //[InlineData (5, 5, true)]
+    //[InlineData (6, 5, true)]
+    //[InlineData (6, 6, true)]
+    //[InlineData (7, 7, true)]
+    //[InlineData (8, 8, true)]
+    //[InlineData (9, 8, false)]
+    //[InlineData (8, 9, false)]
+    //[InlineData (9, 9, false)]
+    //public void IsVisibleInSuperView_No_Driver_With_SuperView (int x, int y, bool expected)
+    //{
+    //    var view = new View { X = 1, Y = 1, Width = 5, Height = 5 };
+    //    var top = new Toplevel { Width = 10, Height = 10 };
+    //    top.Add (view);
+
+    //    Assert.True (view.IsVisibleInSuperView (x, y) == expected);
+    //}
+
+    //[SetupFakeDriver]
+    //[Theory]
+    //[InlineData (0, 0, true)]
+    //[InlineData (-1, 0, false)]
+    //[InlineData (0, -1, false)]
+    //[InlineData (-1, -1, false)]
+
+    //[InlineData (1, 0, true)]
+    //[InlineData (0, 1, true)]
+    //[InlineData (1, 1, true)]
+    //[InlineData (2, 2, true)]
+    //[InlineData (3, 3, true)]
+    //[InlineData (4, 4, true)]
+    //[InlineData (5, 4, false)]
+    //[InlineData (4, 5, false)]
+    //[InlineData (5, 5, false)]
+    //public void IsVisibleInSuperView_With_Driver (int x, int y, bool expected)
+    //{
+    //    ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+
+    //    var view = new View { X = 1, Y = 1, Width = 5, Height = 5 };
+    //    var top = new Toplevel ();
+    //    top.Add (view);
+    //    Application.Begin (top);
+
+    //    Assert.True (view.IsVisibleInSuperView (x, y) == expected);
+
+    //    top.Dispose ();
+    //    Application.Shutdown ();
+    //}
 }

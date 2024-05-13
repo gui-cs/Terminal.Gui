@@ -392,10 +392,9 @@ public class ScrollViewTests
 
         var view = new View
         {
-            Width = size.Width,
-            Height = size.Height,
             ColorScheme = new ColorScheme { Normal = new Attribute (Color.Blue, Color.Yellow) },
-            AutoSize = true,
+            Width = Dim.Auto (Dim.DimAutoStyle.Text),
+            Height = Dim.Auto (Dim.DimAutoStyle.Text),
             Text = text
         };
         sv.Add (view);
@@ -485,8 +484,8 @@ public class ScrollViewTests
         top.Add (sv);
         Application.Begin (top);
 
-        Assert.Equal (50, sv.ContentSize.Width);
-        Assert.Equal (50, sv.ContentSize.Height);
+        Assert.Equal (50, sv.ContentSize.GetValueOrDefault ().Width);
+        Assert.Equal (50, sv.ContentSize.GetValueOrDefault ().Height);
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.ShowHorizontalScrollIndicator);
         Assert.True (sv.ShowVerticalScrollIndicator);
@@ -519,14 +518,13 @@ public class ScrollViewTests
         view.Add (
                   new Label
                   {
-                      AutoSize = false, Width = Dim.Fill (), Height = 1, Text = rule.Repeat (size.Width / rule.Length)
+                      Width = Dim.Fill (), Height = 1, Text = rule.Repeat (size.Width / rule.Length)
                   }
                  );
 
         view.Add (
                   new Label
                   {
-                      AutoSize = false,
                       Height = Dim.Fill (),
                       Width = 1,
                       Text = rule.Repeat (size.Height / rule.Length),
@@ -1082,8 +1080,7 @@ public class ScrollViewTests
             Width = width;
             Height = height;
 
-            //labelFill = new Label { AutoSize = false, X = Pos.Center (), Y = Pos.Center (), Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
-            labelFill = new Label { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
+            labelFill = new Label { Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
 
             labelFill.LayoutComplete += (s, e) =>
                                         {

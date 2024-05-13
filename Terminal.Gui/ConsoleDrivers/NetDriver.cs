@@ -1137,7 +1137,7 @@ internal class NetDriver : ConsoleDriver
                 break;
             case EventType.Mouse:
                 MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
-                Debug.WriteLine ($"NetDriver: ({me.X},{me.Y}) - {me.Flags}");
+                //Debug.WriteLine ($"NetDriver: ({me.X},{me.Y}) - {me.Flags}");
                 OnMouseEvent (me);
 
                 break;
@@ -1523,7 +1523,7 @@ internal class NetDriver : ConsoleDriver
             mouseFlag |= MouseFlags.ButtonAlt;
         }
 
-        return new MouseEvent { X = me.Position.X, Y = me.Position.Y, Flags = mouseFlag };
+        return new MouseEvent { Position = me.Position, Flags = mouseFlag };
     }
 
     #endregion Mouse Handling
@@ -1591,10 +1591,7 @@ internal class NetDriver : ConsoleDriver
                 return KeyCode.Tab;
             }
 
-            if (keyInfo.Key == ConsoleKey.Tab)
-            {
-                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
-            }
+            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
         }
 
         // Handle control keys (e.g. CursorUp)
@@ -1648,7 +1645,7 @@ internal class NetDriver : ConsoleDriver
         }
 
 
-        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
+        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
     }
 
     #endregion Keyboard Handling

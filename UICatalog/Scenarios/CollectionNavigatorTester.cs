@@ -145,7 +145,6 @@ public class CollectionNavigatorTester : Scenario
             TextAlignment = TextAlignment.Centered,
             X = 0,
             Y = 1, // for menu
-            AutoSize = false,
             Width = Dim.Percent (50),
             Height = 1
         };
@@ -175,7 +174,6 @@ public class CollectionNavigatorTester : Scenario
             TextAlignment = TextAlignment.Centered,
             X = Pos.Right (_listView) + 2,
             Y = 1, // for menu
-            AutoSize = false,
             Width = Dim.Percent (50),
             Height = 1
         };

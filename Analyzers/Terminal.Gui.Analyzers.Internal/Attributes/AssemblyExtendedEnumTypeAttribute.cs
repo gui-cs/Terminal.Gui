@@ -1,4 +1,5 @@
 ﻿// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable once RedundantNullableDirective
 #nullable enable
 
 namespace Terminal.Gui.Analyzers.Internal.Attributes;

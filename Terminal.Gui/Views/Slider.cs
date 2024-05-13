@@ -150,7 +150,6 @@ public class SliderStyle
 internal class SliderConfiguration
 {
     internal bool _allowEmpty;
-    internal bool _autoSize;
     internal int _endSpacing;
     internal int _innerSpacing;
     internal Orientation _legendsOrientation = Orientation.Horizontal;
@@ -243,7 +242,10 @@ public class Slider<T> : View
         Orientation orientation = Orientation.Horizontal
     )
     {
+        Width = Dim.Auto (Dim.DimAutoStyle.Content);
+        Height = Dim.Auto (Dim.DimAutoStyle.Content);
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
 
         _options = options ?? new List<SliderOption<T>> ();
 
@@ -254,22 +256,19 @@ public class Slider<T> : View
         SetDefaultStyle ();
         SetCommands ();
 
-        // When we lose focus of the View(Slider), if we are range selecting we stop it.
-        Leave += (s, e) =>
-                 {
-                     //if (_settingRange == true) {
-                     //	_settingRange = false;
-                     //}
-                     Driver.SetCursorVisibility (CursorVisibility.Invisible);
-                 };
-
         Enter += (s, e) => { };
 
-        LayoutComplete += (s, e) =>
+        // BUGBUG: This should not be needed - Need to ensure SetRelativeLayout gets called during EndInit
+        Initialized += (s, e) =>
+                         {
+                             SetContentSizeBestFit ();
+                         };
+
+        LayoutStarted += (s, e) =>
                           {
-                              CalcSpacingConfig ();
-                              SetBoundsBestFit ();
+                              SetContentSizeBestFit ();
                           };
+
     }
 
     #endregion
@@ -309,7 +308,7 @@ public class Slider<T> : View
         {
             _lastFocusedOption = FocusedOption;
             FocusedOption = newFocusedOption;
-            PositionCursor ();
+            //PositionCursor ();
         }
 
         return args.Cancel;
@@ -373,29 +372,6 @@ public class Slider<T> : View
         }
     }
 
-    /// <summary>
-    ///     If <see langword="true"/> the slider will be sized to fit the available space (the Viewport of the the
-    ///     SuperView).
-    /// </summary>
-    /// <remarks>
-    ///     For testing, if there is no SuperView, the slider will be sized based on what <see cref="InnerSpacing"/> is
-    ///     set to.
-    /// </remarks>
-    public override bool AutoSize
-    {
-        get => _config._autoSize;
-        set
-        {
-            _config._autoSize = value;
-
-            if (IsInitialized)
-            {
-                CalcSpacingConfig ();
-                SetBoundsBestFit ();
-            }
-        }
-    }
-
     /// <summary>Gets or sets the number of rows/columns between <see cref="Options"/></summary>
     public int InnerSpacing
     {
@@ -404,11 +380,7 @@ public class Slider<T> : View
         {
             _config._innerSpacing = value;
 
-            if (IsInitialized)
-            {
-                CalcSpacingConfig ();
-                SetBoundsBestFit ();
-            }
+            SetContentSizeBestFit ();
         }
     }
 
@@ -452,11 +424,7 @@ public class Slider<T> : View
             _config._sliderOrientation = newOrientation;
             SetKeyBindings ();
 
-            if (IsInitialized)
-            {
-                CalcSpacingConfig ();
-                SetBoundsBestFit ();
-            }
+            SetContentSizeBestFit ();
         }
 
         return args.Cancel;
@@ -470,11 +438,7 @@ public class Slider<T> : View
         {
             _config._legendsOrientation = value;
 
-            if (IsInitialized)
-            {
-                CalcSpacingConfig ();
-                SetBoundsBestFit ();
-            }
+            SetContentSizeBestFit ();
         }
     }
 
@@ -506,8 +470,7 @@ public class Slider<T> : View
                 return;
             }
 
-            CalcSpacingConfig ();
-            SetBoundsBestFit ();
+            SetContentSizeBestFit ();
         }
     }
 
@@ -536,7 +499,7 @@ public class Slider<T> : View
         set
         {
             _config._showLegends = value;
-            SetBoundsBestFit ();
+            SetContentSizeBestFit ();
         }
     }
 
@@ -644,168 +607,110 @@ public class Slider<T> : View
         // Last = '┤',
     }
 
-    /// <summary>
-    ///     Calculates the spacing configuration (start, inner, end) as well as turning on/off legend abbreviation if
-    ///     needed. Behaves differently based on <see cref="AutoSize"/> and <see cref="View.IsInitialized"/> .
-    /// </summary>
-    internal void CalcSpacingConfig ()
+    /// <summary>Adjust the dimensions of the Slider to the best value.</summary>
+    public void SetContentSizeBestFit ()
     {
-        var size = 0;
-
-        if (_options.Count == 0 || !IsInitialized)
+        if (!IsInitialized || /*!(Height is Dim.DimAuto && Width is Dim.DimAuto) || */_options.Count == 0)
         {
             return;
         }
 
-        _config._innerSpacing = 0;
-        _config._startSpacing = 0;
-        _config._endSpacing = 0;
-
-        if (AutoSize)
-        {
-            // Max size is SuperView's Viewport. Min Size is size that will fit.
-            if (SuperView is { })
-            {
-                // Calculate the size of the slider based on the size of the SuperView's Viewport.
-                if (_config._sliderOrientation == Orientation.Horizontal)
-                {
-                    size = int.Min (SuperView.Viewport.Width, CalcBestLength ());
-                }
-                else
-                {
-                    size = int.Min (SuperView.Viewport.Height, CalcBestLength ());
-                }
-            }
-            else
-            {
-                // Use the config values
-                size = CalcMinLength ();
-
-                return;
-            }
-        }
-        else
-        {
-            // Fit Slider to the Viewport
-            if (_config._sliderOrientation == Orientation.Horizontal)
-            {
-                size = Viewport.Width;
-            }
-            else
-            {
-                size = Viewport.Height;
-            }
-        }
-
-        int max_legend; // Because the legends are centered, the longest one determines inner spacing
-
-        if (_config._sliderOrientation == _config._legendsOrientation)
-        {
-            max_legend = int.Max (_options.Max (s => s.Legend?.Length ?? 1), 1);
-        }
-        else
-        {
-            max_legend = 1;
-        }
-
-        int min_size_that_fits_legends = _options.Count == 1 ? max_legend : max_legend / (_options.Count - 1);
-
-        string first;
-        string last;
-
-        if (max_legend >= size)
-        {
-            if (_config._sliderOrientation == _config._legendsOrientation)
-            {
-                _config._showLegendsAbbr = true;
-
-                foreach (SliderOption<T> o in _options.Where (op => op.LegendAbbr == default (Rune)))
-                {
-                    o.LegendAbbr = (Rune)(o.Legend?.Length > 0 ? o.Legend [0] : ' ');
-                }
-            }
-
-            first = "x";
-            last = "x";
-        }
-        else
-        {
-            _config._showLegendsAbbr = false;
-            first = _options.First ().Legend;
-            last = _options.Last ().Legend;
-        }
-
-        // --o--
-        // Hello
-        // Left = He
-        // Right = lo
-        int first_left = (first.Length - 1) / 2; // Chars count of the first option to the left.
-        int last_right = last.Length / 2; // Chars count of the last option to the right.
-
-        if (_config._sliderOrientation != _config._legendsOrientation)
-        {
-            first_left = 0;
-            last_right = 0;
-        }
-
-        // -1 because it's better to have an extra space at right than to clip
-        int width = size - first_left - last_right - 1;
-
-        _config._startSpacing = first_left;
-
-        if (_options.Count == 1)
-        {
-            _config._innerSpacing = max_legend;
-        }
-        else
-        {
-            _config._innerSpacing = Math.Max (0, (int)Math.Floor ((double)width / (_options.Count - 1)) - 1);
-        }
-
-        _config._endSpacing = last_right;
-    }
-
-    /// <summary>Adjust the dimensions of the Slider to the best value if <see cref="AutoSize"/> is true.</summary>
-    public void SetBoundsBestFit ()
-    {
-        if (!IsInitialized || AutoSize == false)
-        {
-            return;
-        }
+        CalcSpacingConfig ();
 
         Thickness adornmentsThickness = GetAdornmentsThickness ();
 
+        var svWidth = SuperView?.ContentSize?.Width ?? 0;
+        var svHeight = SuperView?.ContentSize?.Height ?? 0;
+
         if (_config._sliderOrientation == Orientation.Horizontal)
         {
-            Viewport = new (
-                          Viewport.Location,
-                          new (
-                               int.Min (
-                                        SuperView.Viewport.Width - adornmentsThickness.Horizontal,
-                                        CalcBestLength ()
-                                       ),
-                               int.Min (
-                                        SuperView.Viewport.Height - adornmentsThickness.Vertical,
-                                        CalcThickness ()
-                                       )
-                              )
-                         );
+            ContentSize = new (int.Min (svWidth, CalcBestLength ()), int.Min (svHeight, CalcThickness ()));
         }
         else
         {
-            Viewport = new (
-                          Viewport.Location,
-                          new (
-                               int.Min (
-                                        SuperView.Viewport.Width - adornmentsThickness.Horizontal,
-                                        CalcThickness ()
-                                       ),
-                               int.Min (
-                                        SuperView.Viewport.Height - adornmentsThickness.Vertical,
-                                        CalcBestLength ()
-                                       )
-                              )
-                         );
+            ContentSize = new (int.Min (svWidth, CalcThickness ()), int.Min (svHeight, CalcBestLength ()));
+        }
+
+        return;
+
+        void CalcSpacingConfig ()
+        {
+            _config._innerSpacing = 0;
+            _config._startSpacing = 0;
+            _config._endSpacing = 0;
+
+            int size = 0;
+            if (ContentSize is { })
+            {
+                size = _config._sliderOrientation == Orientation.Horizontal ? ContentSize.Value.Width : ContentSize.Value.Height;
+            }
+
+            int max_legend; // Because the legends are centered, the longest one determines inner spacing
+
+            if (_config._sliderOrientation == _config._legendsOrientation)
+            {
+                max_legend = int.Max (_options.Max (s => s.Legend?.Length ?? 1), 1);
+            }
+            else
+            {
+                max_legend = 1;
+            }
+
+            int min_size_that_fits_legends = _options.Count == 1 ? max_legend : max_legend / (_options.Count - 1);
+
+            string first;
+            string last;
+
+            if (max_legend >= size)
+            {
+                if (_config._sliderOrientation == _config._legendsOrientation)
+                {
+                    _config._showLegendsAbbr = true;
+
+                    foreach (SliderOption<T> o in _options.Where (op => op.LegendAbbr == default (Rune)))
+                    {
+                        o.LegendAbbr = (Rune)(o.Legend?.Length > 0 ? o.Legend [0] : ' ');
+                    }
+                }
+
+                first = "x";
+                last = "x";
+            }
+            else
+            {
+                _config._showLegendsAbbr = false;
+                first = _options.First ().Legend;
+                last = _options.Last ().Legend;
+            }
+
+            // --o--
+            // Hello
+            // Left = He
+            // Right = lo
+            int first_left = (first.Length - 1) / 2; // Chars count of the first option to the left.
+            int last_right = last.Length / 2; // Chars count of the last option to the right.
+
+            if (_config._sliderOrientation != _config._legendsOrientation)
+            {
+                first_left = 0;
+                last_right = 0;
+            }
+
+            // -1 because it's better to have an extra space at right than to clip
+            int width = size - first_left - last_right - 1;
+
+            _config._startSpacing = first_left;
+
+            if (_options.Count == 1)
+            {
+                _config._innerSpacing = max_legend;
+            }
+            else
+            {
+                _config._innerSpacing = Math.Max (0, (int)Math.Floor ((double)width / (_options.Count - 1)) - 1);
+            }
+
+            _config._endSpacing = last_right;
         }
     }
 
@@ -973,26 +878,18 @@ public class Slider<T> : View
     #region Cursor and Drawing
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
-        //base.PositionCursor ();
-
-        if (HasFocus)
-        {
-            Driver?.SetCursorVisibility (CursorVisibility.Default);
-        }
-        else
-        {
-            Driver?.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-
         if (TryGetPositionByOption (FocusedOption, out (int x, int y) position))
         {
             if (IsInitialized && Viewport.Contains (position.x, position.y))
             {
                 Move (position.x, position.y);
+
+                return new (position.x, position.x);
             }
         }
+        return base.PositionCursor ();
     }
 
     /// <inheritdoc/>
@@ -1522,7 +1419,7 @@ public class Slider<T> : View
     private Point? _moveRenderPosition;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent mouseEvent)
+    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
         // Note(jmperricone): Maybe we click to focus the cursor, and on next click we set the option.
         //                    That will makes OptionFocused Event more relevant.
@@ -1568,7 +1465,7 @@ public class Slider<T> : View
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition))
             {
-                _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+                _dragPosition = mouseEvent.Position;
                 _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
                 Application.GrabMouse (this);
             }
@@ -1583,7 +1480,7 @@ public class Slider<T> : View
             && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             // Continue Drag
-            _dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+            _dragPosition = mouseEvent.Position;
             _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
 
             var success = false;
@@ -1592,11 +1489,11 @@ public class Slider<T> : View
             // how far has user dragged from original location?						
             if (Orientation == Orientation.Horizontal)
             {
-                success = TryGetOptionByPosition (mouseEvent.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
             }
             else
             {
-                success = TryGetOptionByPosition (0, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._innerSpacing / 2), out option);
             }
 
             if (!_config._allowEmpty && success)
@@ -1626,11 +1523,11 @@ public class Slider<T> : View
 
             if (Orientation == Orientation.Horizontal)
             {
-                success = TryGetOptionByPosition (mouseEvent.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
             }
             else
             {
-                success = TryGetOptionByPosition (0, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._innerSpacing / 2), out option);
             }
 
             if (success)

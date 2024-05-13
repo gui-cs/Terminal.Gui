@@ -1204,13 +1204,6 @@ public class TabView : View
             }
         }
 
-        public override bool OnEnter (View view)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-            return base.OnEnter (view);
-        }
-
         private int GetUnderlineYPosition ()
         {
             if (_host.Style.TabsOnBottom)

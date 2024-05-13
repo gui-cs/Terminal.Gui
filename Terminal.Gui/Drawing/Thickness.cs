@@ -9,7 +9,8 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Use the helper API (<see cref="GetInside(Rectangle)"/> to get the rectangle describing the insides of the frame,
+///         Use the helper API (<see cref="GetInside(Rectangle)"/> to get the rectangle describing the insides of the
+///         frame,
 ///         with the thickness widths subtracted.
 ///     </para>
 ///     <para>Use the helper API (<see cref="Draw(Rectangle, string)"/> to draw the frame with the specified thickness.</para>
@@ -86,32 +87,29 @@ public class Thickness : IEquatable<Thickness>
     public bool Equals (Thickness other) { return other is { } && Left == other.Left && Right == other.Right && Top == other.Top && Bottom == other.Bottom; }
 
     /// <summary>
-    ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside of
+    ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside
     ///     the rectangle described by <see cref="GetInside(Rectangle)"/>.
     /// </summary>
     /// <param name="outside">Describes the location and size of the rectangle that contains the thickness.</param>
-    /// <param name="x">The x coord to check.</param>
-    /// <param name="y">The y coord to check.</param>
+    /// <param name="location">The coordinate to check.</param>
     /// <returns><see langword="true"/> if the specified coordinate is within the thickness; <see langword="false"/> otherwise.</returns>
-    public bool Contains (Rectangle outside, int x, int y)
+    public bool Contains (in Rectangle outside, in Point location)
     {
         Rectangle inside = GetInside (outside);
 
-        return outside.Contains (x, y) && !inside.Contains (x, y);
+        return outside.Contains (location) && !inside.Contains (location);
     }
 
     /// <summary>
-    /// Adds the thickness widths of another <see cref="Thickness"/> to the current <see cref="Thickness"/>, returning a new <see cref="Thickness"/>.
+    ///     Adds the thickness widths of another <see cref="Thickness"/> to the current <see cref="Thickness"/>, returning a
+    ///     new <see cref="Thickness"/>.
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public Thickness Add (Thickness other)
-    {
-        return new Thickness (Left + other.Left, Top + other.Top, Right + other.Right, Bottom + other.Bottom);
-    }
+    public Thickness Add (Thickness other) { return new (Left + other.Left, Top + other.Top, Right + other.Right, Bottom + other.Bottom); }
 
     /// <summary>
-    /// Adds the thickness widths of another <see cref="Thickness"/> to another <see cref="Thickness"/>.
+    ///     Adds the thickness widths of another <see cref="Thickness"/> to another <see cref="Thickness"/>.
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
@@ -194,7 +192,7 @@ public class Thickness : IEquatable<Thickness>
                                         );
         }
 
-        if (View.Diagnostics.HasFlag(ViewDiagnosticFlags.Ruler))
+        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))
         {
             // PERF: This can almost certainly be simplified down to a single point offset and fewer calls to Draw
             // Top
@@ -233,7 +231,8 @@ public class Thickness : IEquatable<Thickness>
             {
                 Text = label is null ? string.Empty : $"{label} {this}",
                 Alignment = TextAlignment.Centered,
-                VerticalAlignment = VerticalTextAlignment.Bottom
+                VerticalAlignment = VerticalTextAlignment.Bottom,
+                AutoSize = true
             };
             tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect);
         }

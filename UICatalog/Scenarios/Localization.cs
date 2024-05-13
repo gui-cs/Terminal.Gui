@@ -79,18 +79,18 @@ public class Localization : Scenario
         {
             Menus =
             [
-                new MenuBarItem (
-                                 "_File",
-                                 new MenuItem []
-                                 {
-                                     new MenuBarItem (
-                                                      "_Language",
-                                                      languageMenus
-                                                     ),
-                                     null,
-                                     new ("_Quit", "", Quit)
-                                 }
-                                )
+                new (
+                     "_File",
+                     new MenuItem []
+                     {
+                         new MenuBarItem (
+                                          "_Language",
+                                          languageMenus
+                                         ),
+                         null,
+                         new ("_Quit", "", Quit)
+                     }
+                    )
             ]
         };
         Top.Add (menu);
@@ -99,13 +99,13 @@ public class Localization : Scenario
         {
             X = 2,
             Y = 1,
-            AutoSize = false,
+
             Width = Dim.Fill (2),
             Text = "Please select a language."
         };
         Win.Add (selectLanguageLabel);
 
-        _languageComboBox = new ComboBox
+        _languageComboBox = new()
         {
             X = 2,
             Y = Pos.Bottom (selectLanguageLabel) + 1,
@@ -123,7 +123,7 @@ public class Localization : Scenario
         {
             X = 2,
             Y = Pos.Top (_languageComboBox) + 3,
-            AutoSize = false,
+
             Width = Dim.Fill (2),
             Height = 1,
             Text =
@@ -137,7 +137,7 @@ public class Localization : Scenario
         };
         Win.Add (textField);
 
-        _allowAnyCheckBox = new CheckBox
+        _allowAnyCheckBox = new()
         {
             X = Pos.Right (textField) + 1,
             Y = Pos.Bottom (textAndFileDialogLabel) + 1,
@@ -164,7 +164,7 @@ public class Localization : Scenario
         {
             X = 2,
             Y = Pos.Bottom (textField) + 1,
-            AutoSize = false,
+
             Width = Dim.Fill (2),
             Text = "Click the button to open a wizard."
         };
@@ -206,9 +206,9 @@ public class Localization : Scenario
     public void ShowWizard ()
     {
         var wizard = new Wizard { Height = 8, Width = 36, Title = "The wizard" };
-        wizard.AddStep (new WizardStep { HelpText = "Wizard first step" });
-        wizard.AddStep (new WizardStep { HelpText = "Wizard step 2", NextButtonText = ">>> (_N)" });
-        wizard.AddStep (new WizardStep { HelpText = "Wizard last step" });
+        wizard.AddStep (new() { HelpText = "Wizard first step" });
+        wizard.AddStep (new() { HelpText = "Wizard step 2", NextButtonText = ">>> (_N)" });
+        wizard.AddStep (new() { HelpText = "Wizard last step" });
         Application.Run (wizard);
         wizard.Dispose ();
     }

@@ -53,7 +53,7 @@ public class ColorPicker : View
     {
         if (CanFocus)
         {
-            Cursor = new Point (me.MouseEvent.X / _boxWidth, me.MouseEvent.Y / _boxHeight);
+            Cursor = new Point (me.MouseEvent.Position.X / _boxWidth, me.MouseEvent.Position.Y / _boxHeight);
             SetFocus ();
             me.Handled = true;
         }
@@ -188,13 +188,6 @@ public class ColorPicker : View
         }
     }
 
-    ///<inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
 
     /// <summary>Add the commands.</summary>
     private void AddCommands ()

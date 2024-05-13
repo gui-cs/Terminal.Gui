@@ -120,27 +120,31 @@ public partial class View
 {
     #region Content Area
 
-    private Size _contentSize;
+    internal Size? _contentSize;
 
     /// <summary>
-    ///     Gets or sets the size of the View's content. If not set, the value will be the same as the size of <see cref="Viewport"/>,
+    ///     Gets or sets the size of the View's content. If <see langword="null"/>, the value will be the same as the size of <see cref="Viewport"/>,
     ///     and <c>Viewport.Location</c> will always be <c>0, 0</c>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If a positive size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
+    ///         If a size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
     ///         to the view. This enables virtual scrolling.
+    ///     </para>
+    ///     <para>
+    ///         If a size is provided, the behavior of <see cref="Dim.DimAutoStyle.Content"/> will be to use the ContentSize
+    ///         to determine the size of the view.
     ///     </para>
     ///     <para>
     ///         Negative sizes are not supported.
     ///     </para>
     /// </remarks>
-    public Size ContentSize
+    public Size? ContentSize
     {
-        get => _contentSize == Size.Empty ? Viewport.Size : _contentSize;
+        get => _contentSize ?? Viewport.Size;
         set
         {
-            if (value.Width < 0 || value.Height < 0)
+            if (value?.Width < 0 || value?.Height < 0)
             {
                 throw new ArgumentException (@"ContentSize cannot be negative.", nameof (value));
             }
@@ -166,8 +170,9 @@ public partial class View
 
         if (e.Cancel != true)
         {
-            SetNeedsLayout ();
-            SetNeedsDisplay ();
+            OnResizeNeeded ();
+            //SetNeedsLayout ();
+            //SetNeedsDisplay ();
         }
 
         return e.Cancel;
@@ -191,9 +196,7 @@ public partial class View
         contentRelativeToViewport.Offset (-Viewport.X, -Viewport.Y);
 
         // Translate to Screen-Relative (our SuperView's Viewport-relative coordinates)
-        Rectangle screen = ViewportToScreen (new (contentRelativeToViewport, Size.Empty));
-
-        return screen.Location;
+        return ViewportToScreen (contentRelativeToViewport);
     }
 
     /// <summary>Converts a Screen-relative coordinate to a Content-relative coordinate.</summary>
@@ -206,7 +209,7 @@ public partial class View
     public Point ScreenToContent (in Point location)
     {
         Point viewportOffset = GetViewportOffsetFromFrame ();
-        Point screen = ScreenToFrame (location.X, location.Y);
+        Point screen = ScreenToFrame (location);
         screen.Offset (Viewport.X - viewportOffset.X, Viewport.Y - viewportOffset.Y);
 
         return screen;
@@ -251,7 +254,8 @@ public partial class View
     /// <summary>
     ///     Gets or sets the rectangle describing the portion of the View's content that is visible to the user.
     ///     The viewport Location is relative to the top-left corner of the inner rectangle of <see cref="Padding"/>.
-    ///     If the viewport Size is the same as <see cref="ContentSize"/> the Location will be <c>0, 0</c>.
+    ///     If the viewport Size is the same as <see cref="ContentSize"/>, or <see cref="ContentSize"/> is
+    ///     <see langword="null"/> the Location will be <c>0, 0</c>.
     /// </summary>
     /// <value>
     ///     The rectangle describing the location and size of the viewport into the View's virtual content, described by
@@ -289,10 +293,10 @@ public partial class View
         get
         {
 #if DEBUG
-            if (LayoutStyle == LayoutStyle.Computed && !IsInitialized)
+            if ((_width.ReferencesOtherViews () || _height.ReferencesOtherViews ()) && !IsInitialized)
             {
                 Debug.WriteLine (
-                                 $"WARNING: Viewport is being accessed before the View has been initialized. This is likely a bug in {this}"
+                                 $"WARNING: The dimensions of {this} are dependent on other views and Viewport is being accessed before the View has been initialized. This is likely a bug."
                                 );
             }
 #endif // DEBUG
@@ -303,8 +307,26 @@ public partial class View
                 return new (_viewportLocation, Frame.Size);
             }
 
-            Thickness thickness = GetAdornmentsThickness ();
+            // BUGBUG: This is a hack. Viewport_get should not have side effects.
+            if (Frame.Size == Size.Empty)
+            {
+                // The Frame has not been set yet (e.g. the view has not been added to a SuperView yet).
+                // 
+                if ((Width is Dim.DimAuto widthAuto && widthAuto._style.HasFlag(Dim.DimAutoStyle.Text))
+                    || (Height is Dim.DimAuto heightAuto && heightAuto._style.HasFlag (Dim.DimAutoStyle.Text)))
+                {
+                    if (TextFormatter.NeedsFormat)
+                    {
+                        // This updates TextFormatter.Size to the text size
+                        TextFormatter.AutoSize = true;
 
+                        // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
+                        ContentSize = TextFormatter.Size == Size.Empty ? null : TextFormatter.Size;
+                    }
+                }
+            }
+
+            Thickness thickness = GetAdornmentsThickness ();
             return new (
                         _viewportLocation,
                         new (
@@ -337,7 +359,6 @@ public partial class View
             }
 
             OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
-
             return;
         }
 
@@ -353,9 +374,9 @@ public partial class View
         {
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth))
             {
-                if (newViewport.X >= ContentSize.Width)
+                if (newViewport.X >= ContentSize.GetValueOrDefault ().Width)
                 {
-                    newViewport.X = ContentSize.Width - 1;
+                    newViewport.X = ContentSize.GetValueOrDefault ().Width - 1;
                 }
             }
 
@@ -370,9 +391,9 @@ public partial class View
 
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight))
             {
-                if (newViewport.Y >= ContentSize.Height)
+                if (newViewport.Y >= ContentSize.GetValueOrDefault().Height)
                 {
-                    newViewport.Y = ContentSize.Height - 1;
+                    newViewport.Y = ContentSize.GetValueOrDefault ().Height - 1;
                 }
             }
 
@@ -397,7 +418,23 @@ public partial class View
     ///     Called when the <see cref="Viewport"/> changes. Invokes the <see cref="ViewportChanged"/> event.
     /// </summary>
     /// <param name="e"></param>
-    protected virtual void OnViewportChanged (DrawEventArgs e) { ViewportChanged?.Invoke (this, e); }
+    protected virtual void OnViewportChanged (DrawEventArgs e)
+    {
+        ViewportChanged?.Invoke (this, e);
+    }
+
+    /// <summary>
+    ///     Converts a <see cref="Viewport"/>-relative location and size to a screen-relative location and size.
+    /// </summary>
+    /// <remarks>
+    ///     Viewport-relative means relative to the top-left corner of the inner rectangle of the <see cref="Padding"/>.
+    /// </remarks>
+    /// <param name="viewport">Viewport-relative location and size.</param>
+    /// <returns>Screen-relative location and size.</returns>
+    public Rectangle ViewportToScreen (in Rectangle viewport)
+    {
+        return viewport with { Location = ViewportToScreen (viewport.Location) };
+    }
 
     /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location to a screen-relative location.
@@ -405,14 +442,16 @@ public partial class View
     /// <remarks>
     ///     Viewport-relative means relative to the top-left corner of the inner rectangle of the <see cref="Padding"/>.
     /// </remarks>
-    public Rectangle ViewportToScreen (in Rectangle location)
+    /// <param name="viewportLocation">Viewport-relative location.</param>
+    /// <returns>Screen-relative location.</returns>
+    public Point ViewportToScreen (in Point viewportLocation)
     {
         // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
         Rectangle screen = FrameToScreen ();
         Point viewportOffset = GetViewportOffsetFromFrame ();
-        screen.Offset (viewportOffset.X + location.X, viewportOffset.Y + location.Y);
+        screen.Offset (viewportOffset.X + viewportLocation.X, viewportOffset.Y + viewportLocation.Y);
 
-        return new (screen.Location, location.Size);
+        return screen.Location;
     }
 
     /// <summary>Converts a screen-relative coordinate to a Viewport-relative coordinate.</summary>
@@ -420,15 +459,15 @@ public partial class View
     /// <remarks>
     ///     Viewport-relative means relative to the top-left corner of the inner rectangle of the <see cref="Padding"/>.
     /// </remarks>
-    /// <param name="x">Column relative to the left side of the Viewport.</param>
-    /// <param name="y">Row relative to the top of the Viewport</param>
-    public Point ScreenToViewport (int x, int y)
+    /// <param name="location">Screen-Relative Coordinate.</param>
+    /// <returns>Viewport-relative location.</returns>
+    public Point ScreenToViewport (in Point location)
     {
         Point viewportOffset = GetViewportOffsetFromFrame ();
-        Point screen = ScreenToFrame (x, y);
-        screen.Offset (-viewportOffset.X, -viewportOffset.Y);
+        Point frame = ScreenToFrame (location);
+        frame.Offset (-viewportOffset.X, -viewportOffset.Y);
 
-        return screen;
+        return frame;
     }
 
     /// <summary>

@@ -92,7 +92,7 @@ public class LineDrawing : Scenario
                 {
                     // Mouse pressed down
                     _currentLine = new StraightLine (
-                                                     new Point (mouseEvent.X, mouseEvent.Y),
+                                                     mouseEvent.Position,
                                                      0,
                                                      Orientation.Vertical,
                                                      LineStyle,
@@ -105,7 +105,7 @@ public class LineDrawing : Scenario
                 {
                     // Mouse dragged
                     Point start = _currentLine.Start;
-                    var end = new Point (mouseEvent.X, mouseEvent.Y);
+                    var end = mouseEvent.Position;
                     var orientation = Orientation.Vertical;
                     int length = end.Y - start.Y;
 

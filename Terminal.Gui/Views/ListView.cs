@@ -413,14 +413,14 @@ public class ListView : View
             return true;
         }
 
-        if (me.Y + Viewport.Y >= _source.Count
-            || me.Y + Viewport.Y < 0
-            || me.Y + Viewport.Y > Viewport.Y + Viewport.Height)
+        if (me.Position.Y + Viewport.Y >= _source.Count
+            || me.Position.Y + Viewport.Y < 0
+            || me.Position.Y + Viewport.Y > Viewport.Y + Viewport.Height)
         {
             return true;
         }
 
-        _selected = Viewport.Y + me.Y;
+        _selected = Viewport.Y + me.Position.Y;
 
         if (AllowsAll ())
         {
@@ -700,11 +700,6 @@ public class ListView : View
     /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-
         if (_lastSelectedItem != _selected)
         {
             EnsureSelectedItemVisible ();
@@ -781,16 +776,18 @@ public class ListView : View
     public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
-        if (_allowsMarking)
+        int x = 0;
+        int y = _selected - Viewport.Y;
+        if (!_allowsMarking)
         {
-            Move (0, _selected - Viewport.Y);
+            x = Viewport.Width - 1;
         }
-        else
-        {
-            Move (Viewport.Width - 1, _selected - Viewport.Y);
-        }
+
+        Move (x, y);
+
+        return null; // Don't show the cursor
     }
 
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>

@@ -537,7 +537,7 @@ namespace Terminal.Gui
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {
-                int c = _provider.Cursor (mouseEvent.X - GetMargins (Viewport.Width).left);
+                int c = _provider.Cursor (mouseEvent.Position.X - GetMargins (Viewport.Width).left);
 
                 if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && Text.Length > 0)
                 {
@@ -599,22 +599,6 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override bool OnEnter (View view)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-
-            return base.OnEnter (view);
-        }
-
-        /// <inheritdoc/>
-        public override bool OnLeave (View view)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-            return base.OnLeave (view);
-        }
-
-        /// <inheritdoc/>
         public override bool OnProcessKeyDown (Key a)
         {
             if (_provider is null)
@@ -640,7 +624,7 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override void PositionCursor ()
+        public override Point? PositionCursor ()
         {
             (int left, _) = GetMargins (Viewport.Width);
 
@@ -652,22 +636,14 @@ namespace Terminal.Gui
             if (_provider?.Fixed == false && TextAlignment == TextAlignment.Right)
             {
                 curPos = _cursorPosition + left - 1;
-                Move (curPos, 0);
             }
             else
             {
                 curPos = _cursorPosition + left;
-                Move (curPos, 0);
             }
+            Move (curPos, 0);
 
-            if (curPos < 0 || curPos >= Viewport.Width)
-            {
-                Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-            }
-            else
-            {
-                Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-            }
+            return new (curPos, 0);
         }
 
         /// <summary>Delete char at cursor position - 1, moving the cursor.</summary>

@@ -205,7 +205,7 @@ public partial class View
         }
         set
         {
-            TitleTextFormatter.HotKeySpecifier = value;
+            TitleTextFormatter.HotKeySpecifier = TextFormatter.HotKeySpecifier = value;
             SetHotKeyFromTitle ();
         }
     }
