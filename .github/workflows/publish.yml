@@ -43,10 +43,9 @@ jobs:
     - name: Build Release
       run: |
         dotnet-gitversion /updateprojectfiles
-        Import-Module ./Scripts/Terminal.Gui.PowerShell.psd1
-        Build-Analyzers
-        dotnet build -c Release
-        Remove-Module Terminal.Gui.PowerShell 
+        dotnet build .\Analyzers\Terminal.Gui.Analyzers.Internal\ --no-incremental --nologo --force --configuration Release
+        dotnet build --no-incremental --nologo --force --configuration Release
+
     - name: Pack
       run: dotnet pack -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
 
