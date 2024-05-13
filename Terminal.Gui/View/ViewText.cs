@@ -175,7 +175,12 @@ public partial class View
     /// <returns></returns>
     internal void SetTextFormatterSize ()
     {
+        // View subclasses can override UpdateTextFormatterText to modify the Text it holds (e.g. Checkbox and Button).
+        // We need to ensure TextFormatter is accurate by calling it here.
         UpdateTextFormatterText ();
+
+        // Default is to use ContentSize.
+        var size = ContentSize;
 
         // TODO: This is a hack. Figure out how to move this into DimDimAuto
         // Use _width & _height instead of Width & Height to avoid debug spew
@@ -184,30 +189,20 @@ public partial class View
         if ((widthAuto is {} && widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
             || (heightAuto is {} && heightAuto._style.HasFlag (Dim.DimAutoStyle.Text)))
         {
-            // We always use TF in autosize = false mode
-            TextFormatter.AutoSize = false;
-
-            var size = TextFormatter.GetAutoSize ();
+            size = TextFormatter.GetAutoSize ();
 
             if (widthAuto is null || !widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
             {
-                size.Width = ContentSize.Value.Width;
+                size.Width = ContentSize.Width;
             }
 
             if (heightAuto is null || !heightAuto._style.HasFlag (Dim.DimAutoStyle.Text))
             {
-                size.Height = ContentSize.Value.Height;
+                size.Height = ContentSize.Height;
             }
-
-            // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
-            //ContentSize = size;//TextFormatter.Size == Size.Empty ? null : TextFormatter.Size;
-            TextFormatter.Size = size;
-            return;
         }
 
-        // We always use TF in autosize = false mode
-        TextFormatter.AutoSize = false;
-        TextFormatter.Size = new Size (ContentSize.GetValueOrDefault ().Width, ContentSize.GetValueOrDefault ().Height);
+        TextFormatter.Size = size;
     }
 
     private void UpdateTextDirection (TextDirection newDirection)

@@ -17,7 +17,6 @@ public class Label : View
     {
         Height = Dim.Auto (Dim.DimAutoStyle.Text);
         Width = Dim.Auto (Dim.DimAutoStyle.Text);
-        TextFormatter.AutoSize = true;
 
         // Things this view knows how to do
         AddCommand (Command.HotKey, FocusNext);

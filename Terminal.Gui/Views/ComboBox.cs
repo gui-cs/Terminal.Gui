@@ -618,8 +618,8 @@ public class ComboBox : View
         {
             _search.Width = _listview.Width = _autoHide ? Viewport.Width - 1 : Viewport.Width;
             _listview.Height = CalculatetHeight ();
-            _search.SetRelativeLayout (ContentSize.GetValueOrDefault());
-            _listview.SetRelativeLayout (ContentSize.GetValueOrDefault ());
+            _search.SetRelativeLayout (ContentSize);
+            _listview.SetRelativeLayout (ContentSize);
         }
     }
 

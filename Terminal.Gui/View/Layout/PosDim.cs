@@ -972,7 +972,7 @@ public class Dim
             {
                 if (us._contentSize is { })
                 {
-                    subviewsSize = dimension == Dimension.Width ? us.ContentSize!.Value.Width : us.ContentSize!.Value.Height;
+                    subviewsSize = dimension == Dimension.Width ? us.ContentSize.Width : us.ContentSize.Height;
                 }
                 else
                 {

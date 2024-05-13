@@ -872,7 +872,7 @@ public partial class View
     /// <returns>Viewport-relative cursor position. Return <see langword="null"/> to ensure the cursor is not visible.</returns>
     public virtual Point? PositionCursor ()
     {
-        if (IsInitialized && CanFocus && HasFocus && ContentSize.HasValue)
+        if (IsInitialized && CanFocus && HasFocus)
         {
             // By default, position the cursor at the hotkey (if any) or 0, 0.
             Move (TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition, 0);

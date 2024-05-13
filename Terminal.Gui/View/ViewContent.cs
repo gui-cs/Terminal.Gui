@@ -153,7 +153,7 @@ public partial class View
     /// </param>
     public void SetContentSize (Size? contentSize)
     {
-        if (contentSize?.Width < 0 || contentSize?.Height < 0)
+        if (ContentSize.Width < 0 || ContentSize.Height < 0)
         {
             throw new ArgumentException (@"ContentSize cannot be negative.", nameof (contentSize));
         }
@@ -168,47 +168,21 @@ public partial class View
     }
 
     /// <summary>
-    ///     Gets or sets the size of the View's content.
+    ///     Gets the size of the View's content.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If set to <see langword="null"/>, the value will be the same as the size of <see cref="Viewport"/>,
-    ///         and <c>Viewport.Location</c> will always be <c>0, 0</c>.
+    ///         Use <see cref="SetContentSize"/> to change to change the content size.
     ///     </para>
     ///     <para>
-    ///         If explicitly set, <see cref="Viewport"/> describes the portion of the content currently visible
-    ///         to the view. This enables virtual scrolling.
-    ///     </para>
-    ///     <para>
-    ///         If explicitly set, the behavior of <see cref="Dim.DimAutoStyle.Content"/> will be to use the ContentSize
-    ///         to determine the size of the view.
-    ///     </para>
-    ///     <para>
-    ///         Negative sizes are not supported.
+    ///         If the content size has not been explicitly set with <see cref="SetContentSize"/>, the value tracks
+    ///         <see cref="Viewport"/>.
     ///     </para>
     /// </remarks>
-    public Size? ContentSize
-    {
-        get => _contentSize ?? Viewport.Size;
-        //set
-        //{
-        //    if (value?.Width < 0 || value?.Height < 0)
-        //    {
-        //        throw new ArgumentException (@"ContentSize cannot be negative.", nameof (value));
-        //    }
-
-        //    if (value == _contentSize)
-        //    {
-        //        return;
-        //    }
-
-        //    _contentSize = value;
-        //    OnContentSizeChanged (new (_contentSize));
-        //}
-    }
+    public Size ContentSize => _contentSize ?? Viewport.Size;
 
     /// <summary>
-    ///     Called when <see cref="ContentSize"/> changes. Invokes the <see cref="ContentSizeChanged"/> event.
+    /// Called when <see cref="ContentSize"/> has changed.
     /// </summary>
     /// <param name="e"></param>
     /// <returns></returns>
@@ -441,9 +415,9 @@ public partial class View
         {
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth))
             {
-                if (newViewport.X >= ContentSize.GetValueOrDefault ().Width)
+                if (newViewport.X >= ContentSize.Width)
                 {
-                    newViewport.X = ContentSize.GetValueOrDefault ().Width - 1;
+                    newViewport.X = ContentSize.Width - 1;
                 }
             }
 
@@ -458,9 +432,9 @@ public partial class View
 
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight))
             {
-                if (newViewport.Y >= ContentSize.GetValueOrDefault().Height)
+                if (newViewport.Y >= ContentSize.Height)
                 {
-                    newViewport.Y = ContentSize.GetValueOrDefault ().Height - 1;
+                    newViewport.Y = ContentSize.Height - 1;
                 }
             }
 

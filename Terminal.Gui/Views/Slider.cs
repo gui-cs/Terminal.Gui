@@ -619,8 +619,8 @@ public class Slider<T> : View
 
         Thickness adornmentsThickness = GetAdornmentsThickness ();
 
-        var svWidth = SuperView?.ContentSize?.Width ?? 0;
-        var svHeight = SuperView?.ContentSize?.Height ?? 0;
+        var svWidth = SuperView?.ContentSize.Width ?? 0;
+        var svHeight = SuperView?.ContentSize.Height ?? 0;
 
         if (_config._sliderOrientation == Orientation.Horizontal)
         {
@@ -642,7 +642,7 @@ public class Slider<T> : View
             int size = 0;
             if (ContentSize is { })
             {
-                size = _config._sliderOrientation == Orientation.Horizontal ? ContentSize.Value.Width : ContentSize.Value.Height;
+                size = _config._sliderOrientation == Orientation.Horizontal ? ContentSize.Width : ContentSize.Height;
             }
 
             int max_legend; // Because the legends are centered, the longest one determines inner spacing

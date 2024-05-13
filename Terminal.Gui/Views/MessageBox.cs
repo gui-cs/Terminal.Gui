@@ -466,7 +466,7 @@ public static class MessageBox
                                      + adornmentsThickness.Vertical);
             }
 
-            d.SetRelativeLayout (d.SuperView?.ContentSize.GetValueOrDefault () ?? Application.Top.ContentSize.GetValueOrDefault ());
+            d.SetRelativeLayout (d.SuperView?.ContentSize ?? Application.Top.ContentSize);
             d.LayoutSubviews ();
         }
     }
