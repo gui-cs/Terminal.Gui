@@ -381,15 +381,12 @@ public abstract class ConsoleDriver
     /// <param name="rune">The Rune used to fill the rectangle.</param>
     public void FillRegions (Rectangle rect, Rune rune = default)
     {
-        lock (Contents)
+        for (int r = rect.Y; r < rect.Y + rect.Height; r++)
         {
-            for (int r = rect.Y; r < rect.Y + rect.Height; r++)
+            for (int c = rect.X; c < rect.X + rect.Width; c++)
             {
-                for (int c = rect.X; c < rect.X + rect.Width; c++)
-                {
-                    Move (c, r);
-                    AddRune (rune != default ? rune : (Rune)' ');
-                }
+                Move (c, r);
+                AddRune (rune != default ? rune : (Rune)' ');
             }
         }
     }
