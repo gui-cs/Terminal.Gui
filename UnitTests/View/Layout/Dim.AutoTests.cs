@@ -1191,7 +1191,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
 
     [Theory]
-    [InlineData("01234", 5, 5)]
+    [InlineData ("01234", 5, 5)]
     [InlineData ("01234", 6, 6)]
     [InlineData ("01234", 4, 5)]
     [InlineData ("01234", 0, 5)]
@@ -1213,6 +1213,18 @@ public class DimAutoTests (ITestOutputHelper output)
 
         view.SetRelativeLayout (new (10, 10));
         Assert.Equal (expected, view.Frame.Width);
+
+    }
+
+    [Fact]
+    public void DimAutoStyle_Content_UsesContentSize_If_No_Subviews ()
+    {
+        DimAutoTestView view = new (Auto (DimAutoStyle.Content), Auto (DimAutoStyle.Content));
+        view.ContentSize = new (5, 5);
+        view.SetRelativeLayout (new (10, 10));
+
+        Assert.Equal (new (5, 5), view.Frame.Size);
+
 
     }
 

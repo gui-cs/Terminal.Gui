@@ -61,7 +61,7 @@ public class ProgressBar : View
         set
         {
             _bidirectionalMarquee = value;
-            SetNeedsDisplay ();
+            ContentSize = Viewport.Size with { Height = 1 };
         }
     }
 
@@ -74,7 +74,7 @@ public class ProgressBar : View
         {
             _fraction = Math.Min (value, 1);
             _isActivity = false;
-            SetNeedsDisplay ();
+            ContentSize = Viewport.Size with { Height = 1 };
         }
     }
 
@@ -109,7 +109,7 @@ public class ProgressBar : View
                     break;
             }
 
-            SetNeedsDisplay ();
+            ContentSize = Viewport.Size with { Height = 1 };
         }
     }
 
@@ -120,7 +120,7 @@ public class ProgressBar : View
         set
         {
             _segmentCharacter = value;
-            SetNeedsDisplay ();
+            ContentSize = Viewport.Size with { Height = 1 };
         }
     }
 
@@ -181,7 +181,7 @@ public class ProgressBar : View
 
         if (ProgressBarFormat != ProgressBarFormat.Simple && !_isActivity)
         {
-            var tf = new TextFormatter { Alignment = TextAlignment.Centered, Text = Text };
+            var tf = new TextFormatter { Alignment = TextAlignment.Centered, Text = Text, AutoSize = true};
             var attr = new Attribute (ColorScheme.HotNormal.Foreground, ColorScheme.HotNormal.Background);
 
             if (_fraction > .5)
@@ -269,24 +269,19 @@ public class ProgressBar : View
 
     private void ProgressBar_Initialized (object sender, EventArgs e)
     {
+        ContentSize = new (0, 1);
+
         ColorScheme = new ColorScheme (ColorScheme ?? SuperView?.ColorScheme ?? Colors.ColorSchemes ["Base"])
         {
             HotNormal = new Attribute (Color.BrightGreen, Color.Gray)
         };
     }
 
-    private void ProgressBar_LayoutStarted (object sender, EventArgs e)
-    {
-        // TODO: use Dim.Auto
-        Height = 1 + GetAdornmentsThickness ().Vertical;
-    }
-
     private void SetInitialProperties ()
     {
-        Height = 1; // This will be updated when Viewport is updated in ProgressBar_LayoutStarted
+        Height = Dim.Auto (Dim.DimAutoStyle.Content);
         CanFocus = false;
         _fraction = 0;
-        LayoutStarted += ProgressBar_LayoutStarted;
         Initialized += ProgressBar_Initialized;
     }
 }
