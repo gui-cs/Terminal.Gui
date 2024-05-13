@@ -14,14 +14,14 @@ public class LineView : View
         switch (orientation)
         {
             case Orientation.Horizontal:
-                Height = 1;
+                Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
                 Width = Dim.Fill ();
                 LineRune = Glyphs.HLine;
 
                 break;
             case Orientation.Vertical:
                 Height = Dim.Fill ();
-                Width = 1;
+                Width = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
                 LineRune = Glyphs.VLine;
 
                 break;

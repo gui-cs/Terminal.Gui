@@ -2703,7 +2703,7 @@ public class TextView : View
                 //if (LayoutStyle == LayoutStyle.Computed) {
                 //	LayoutStyle = LayoutStyle.Absolute;
                 //}
-                Height = 1;
+                Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
 
                 //LayoutStyle = prevLayoutStyle;
                 if (!IsInitialized)

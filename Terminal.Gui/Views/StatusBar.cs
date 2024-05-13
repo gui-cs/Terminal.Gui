@@ -93,7 +93,7 @@ public class StatusBar : View
         X = 0;
         Y = Pos.AnchorEnd (1);
         Width = Dim.Fill ();
-        Height = 1;
+        Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
         AddCommand (Command.Accept, InvokeItem);
     }
 

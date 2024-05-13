@@ -1864,7 +1864,7 @@ public class TextField : View
         // Don't let height > 1
         if (Frame.Height > 1)
         {
-            Height = 1;
+            Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
         }
     }
 }

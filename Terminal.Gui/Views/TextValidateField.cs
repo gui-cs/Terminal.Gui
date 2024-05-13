@@ -397,7 +397,7 @@ namespace Terminal.Gui
         /// </summary>
         public TextValidateField ()
         {
-            Height = 1;
+            Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
             CanFocus = true;
 
             // Things this view knows how to do
