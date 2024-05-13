@@ -137,7 +137,7 @@ public class CheckBoxTests
     {
         var ckb = new CheckBox ();
         Assert.True (ckb.Width is Dim.DimAuto);
-        Assert.Equal (Dim.Sized (1), ckb.Height);
+        Assert.True (ckb.Height is Dim.DimAuto);
         Assert.False (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
         Assert.Equal (string.Empty, ckb.Text);
@@ -147,7 +147,7 @@ public class CheckBoxTests
 
         ckb = new CheckBox { Text = "Test", Checked = true };
         Assert.True (ckb.Width is Dim.DimAuto);
-        Assert.Equal (Dim.Sized (1), ckb.Height);
+        Assert.True (ckb.Height is Dim.DimAuto);
         Assert.True (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
         Assert.Equal ("Test", ckb.Text);
@@ -157,7 +157,7 @@ public class CheckBoxTests
 
         ckb = new CheckBox { Text = "Test", X = 1, Y = 2 };
         Assert.True (ckb.Width is Dim.DimAuto);
-        Assert.Equal (Dim.Sized (1), ckb.Height);
+        Assert.True (ckb.Height is Dim.DimAuto);
         Assert.False (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
         Assert.Equal ("Test", ckb.Text);
@@ -167,7 +167,7 @@ public class CheckBoxTests
 
         ckb = new CheckBox { Text = "Test", X = 3, Y = 4, Checked = true };
         Assert.True (ckb.Width is Dim.DimAuto);
-        Assert.Equal (Dim.Sized (1), ckb.Height);
+        Assert.True (ckb.Height is Dim.DimAuto);
         Assert.True (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
         Assert.Equal ("Test", ckb.Text);

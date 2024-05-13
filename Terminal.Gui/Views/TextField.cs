@@ -33,7 +33,7 @@ public class TextField : View
         CaptionColor = new Color (Color.DarkGray);
         ReadOnly = false;
         Autocomplete = new TextFieldAutocomplete ();
-        Height = 1;
+        Height = 1; // BUGBUG: This should either be Dim.Auto or we should enforce ContentSize.Height = 1
 
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
