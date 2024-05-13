@@ -12,7 +12,6 @@ public class TextTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
-
     [Fact]
     [SetupFakeDriver]
     public void Setting_With_Height_Horizontal ()
@@ -72,7 +71,6 @@ Y
         top.Add (label, viewX, viewY);
         RunState rs = Application.Begin (top);
 
-
         label.Text = "Hello";
         Application.Refresh ();
 
@@ -92,7 +90,6 @@ Y
         label.Width = 2;
         label.Height = 10;
         Application.Refresh ();
-
 
         Assert.Equal (new (0, 0, 2, 10), label.Frame);
 
@@ -129,10 +126,10 @@ Y
         RunState rs = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (15, 15);
 
-        Assert.Equal (new Rectangle (0, 0, 15, 15), win.Frame);
-        Assert.Equal (new Rectangle (0, 0, 15, 15), win.Margin.Frame);
-        Assert.Equal (new Rectangle (0, 0, 15, 15), win.Border.Frame);
-        Assert.Equal (new Rectangle (1, 1, 13, 13), win.Padding.Frame);
+        Assert.Equal (new (0, 0, 15, 15), win.Frame);
+        Assert.Equal (new (0, 0, 15, 15), win.Margin.Frame);
+        Assert.Equal (new (0, 0, 15, 15), win.Border.Frame);
+        Assert.Equal (new (1, 1, 13, 13), win.Padding.Frame);
 
         Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
         Assert.Equal (Rectangle.Empty, view.Frame);
@@ -167,7 +164,7 @@ Y
         win.LayoutSubviews ();
         Application.Refresh ();
 
-        Assert.Equal (new Rectangle (0, 0, 11, 1), view.Frame);
+        Assert.Equal (new (0, 0, 11, 1), view.Frame);
         Assert.Equal ("Absolute(0)", view.X.ToString ());
         Assert.Equal ("Absolute(0)", view.Y.ToString ());
         Assert.Equal ("Absolute(11)", view.Width.ToString ());
@@ -200,7 +197,7 @@ Y
         Application.Refresh ();
         int len = "Hello Worlds".Length;
         Assert.Equal (12, len);
-        Assert.Equal (new Rectangle (0, 0, len, 1), view.Frame);
+        Assert.Equal (new (0, 0, len, 1), view.Frame);
 
         expected = @"
 ┌─────────────┐
@@ -225,8 +222,8 @@ Y
         view.TextDirection = TextDirection.TopBottom_LeftRight;
         Application.Refresh ();
 
-        Assert.Equal (new Rectangle (0, 0, 1, 12), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 1, 12), view.Frame);
+        Assert.Equal (new (0, 0, 1, 12), view.Frame);
+        Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
         expected = @"
 ┌─────────────┐
@@ -252,14 +249,14 @@ Y
         view.Width = 1;
         view.Height = 12;
 
-        Assert.Equal (new Rectangle (0, 0, 1, 12), view.Frame);
+        Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
         view.Width = 12;
         view.Height = 1;
         view.TextFormatter.Size = new (12, 1);
         win.LayoutSubviews ();
-        Assert.Equal (new Size (12, 1), view.TextFormatter.Size);
-        Assert.Equal (new Rectangle (0, 0, 12, 1), view.Frame);
+        Assert.Equal (new (12, 1), view.TextFormatter.Size);
+        Assert.Equal (new (0, 0, 12, 1), view.Frame);
         top.Clear ();
         view.Draw ();
         expected = @" HelloWorlds";
@@ -294,7 +291,7 @@ Y
         view.PreserveTrailingSpaces = true;
         Application.Refresh ();
 
-        Assert.Equal (new Rectangle (0, 0, 12, 1), view.Frame);
+        Assert.Equal (new (0, 0, 12, 1), view.Frame);
 
         expected = @"
 ┌─────────────┐
@@ -323,7 +320,7 @@ Y
         view.TextDirection = TextDirection.TopBottom_LeftRight;
         Application.Refresh ();
 
-        Assert.Equal (new Rectangle (0, 0, 1, 12), view.Frame);
+        Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
         expected = @"
 ┌─────────────┐
@@ -350,7 +347,7 @@ Y
 
         Application.Refresh ();
 
-        Assert.Equal (new Rectangle (0, 0, 1, 12), view.Frame);
+        Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
         expected = @"
 ┌─────────────┐
@@ -384,7 +381,7 @@ Y
         {
             TextDirection = TextDirection.TopBottom_LeftRight,
             Height = Dim.Fill () - text.Length,
-            Text = text,
+            Text = text
         };
         view.Width = Dim.Auto ();
         view.Height = Dim.Auto ();
@@ -400,7 +397,7 @@ Y
 
         Assert.Equal (new (0, 0, 1, 5), view.Frame);
         Assert.Equal (new (1, 5), view.TextFormatter.Size);
-        Assert.Equal (new List<string> { "Views" }, view.TextFormatter.GetLines ());
+        Assert.Equal (new() { "Views" }, view.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 4, 10), win.Frame);
         Assert.Equal (new (0, 0, 4, 10), Application.Top.Frame);
 
@@ -445,7 +442,7 @@ Y
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new Rectangle (0, 0, 4, 10), pos);
+        Assert.Equal (new (0, 0, 4, 10), pos);
     }
 
     [Fact]
@@ -471,7 +468,7 @@ Y
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 2, 5), view.Frame);
         Assert.Equal (new (2, 5), view.TextFormatter.Size);
-        Assert.Equal (new List<string> { "界View" }, view.TextFormatter.GetLines ());
+        Assert.Equal (new() { "界View" }, view.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 4, 10), win.Frame);
         Assert.Equal (new (0, 0, 4, 10), Application.Top.Frame);
 
@@ -502,7 +499,7 @@ Y
 
         Exception exception = Record.Exception (
                                                 () => Assert.Equal (
-                                                                    new List<string> { "界View" },
+                                                                    new() { "界View" },
                                                                     view.TextFormatter.GetLines ()
                                                                    )
                                                );
@@ -522,7 +519,7 @@ Y
 ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new Rectangle (0, 0, 4, 10), pos);
+        Assert.Equal (new (0, 0, 4, 10), pos);
     }
 
     [Fact]
@@ -562,8 +559,8 @@ Y
         RunState rs = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
 
-        Assert.Equal (new Rectangle (0, 0, 11, 2), horizontalView.Frame);
-        Assert.Equal (new Rectangle (0, 3, 2, 11), verticalView.Frame);
+        Assert.Equal (new (0, 0, 11, 2), horizontalView.Frame);
+        Assert.Equal (new (0, 3, 2, 11), verticalView.Frame);
 
         var expected = @"
 ┌──────────────────┐
@@ -592,7 +589,7 @@ Y
 
         verticalView.Text = $"最初の行{Environment.NewLine}二行目";
         Application.Top.Draw ();
-        Assert.Equal (new Rectangle (0, 3, 4, 4), verticalView.Frame);
+        Assert.Equal (new (0, 3, 4, 4), verticalView.Frame);
 
         expected = @"
 ┌──────────────────┐
@@ -651,6 +648,7 @@ Y
 
         Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.Size);
         Assert.Equal (new (2, 8), verticalView.TextFormatter.Size);
+
         //Assert.Equal (new (0, 0, 10, 1), horizontalView.Frame);
         //Assert.Equal (new (0, 3, 10, 9), verticalView.Frame);
 
@@ -685,7 +683,7 @@ Y
         Application.Top.Draw ();
 
         // height was initialized with 8 and can only grow or keep initial value
-        Assert.Equal (new Rectangle (0, 3, 2, 7), verticalView.Frame);
+        Assert.Equal (new (0, 3, 2, 7), verticalView.Frame);
 
         expected = @"
 ┌────────────────────┐
@@ -729,9 +727,9 @@ Y
 
         lbl.Text = "12";
 
-        Assert.Equal (new Rectangle (0, 0, 2, 1), lbl.Frame);
-        Assert.Equal (new Rectangle (0, 0, 3, 1), lbl._needsDisplayRect);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), lbl.SuperView._needsDisplayRect);
+        Assert.Equal (new (0, 0, 2, 1), lbl.Frame);
+        Assert.Equal (new (0, 0, 3, 1), lbl._needsDisplayRect);
+        Assert.Equal (new (0, 0, 0, 0), lbl.SuperView._needsDisplayRect);
         Assert.True (lbl.SuperView.LayoutNeeded);
         lbl.SuperView.Draw ();
         Assert.Equal ("12  ", GetContents ());
@@ -807,11 +805,12 @@ Y
     {
         var text = "Hello World";
         var width = 20;
+
         var lblLeft = new View
         {
             Text = text,
             Width = width,
-            Height = 1,
+            Height = 1
         };
 
         if (autoSize)
@@ -826,7 +825,7 @@ Y
             Y = 1,
             Width = width,
             Height = 1,
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = TextAlignment.Centered
         };
 
         if (autoSize)
@@ -841,8 +840,9 @@ Y
             Y = 2,
             Width = width,
             Height = 1,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = TextAlignment.Right
         };
+
         if (autoSize)
         {
             lblRight.Width = Dim.Auto ();
@@ -855,8 +855,9 @@ Y
             Y = 3,
             Width = width,
             Height = 1,
-            TextAlignment = TextAlignment.Justified,
+            TextAlignment = TextAlignment.Justified
         };
+
         if (autoSize)
         {
             lblJust.Width = Dim.Auto ();
@@ -932,8 +933,9 @@ Y
             Text = text,
             Width = 1,
             Height = height,
-            TextDirection = TextDirection.TopBottom_LeftRight,
+            TextDirection = TextDirection.TopBottom_LeftRight
         };
+
         if (autoSize)
         {
             lblLeft.Width = Dim.Auto ();
@@ -949,6 +951,7 @@ Y
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = VerticalTextAlignment.Middle
         };
+
         if (autoSize)
         {
             lblCenter.Width = Dim.Auto ();
@@ -964,6 +967,7 @@ Y
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = VerticalTextAlignment.Bottom
         };
+
         if (autoSize)
         {
             lblRight.Width = Dim.Auto ();
@@ -979,6 +983,7 @@ Y
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = VerticalTextAlignment.Justified
         };
+
         if (autoSize)
         {
             lblJust.Width = Dim.Auto ();
@@ -1038,7 +1043,6 @@ Y
 │       │
 └───────┘
 ";
-
         }
         else
         {
@@ -1181,13 +1185,13 @@ Y
             Width = Dim.Auto (Dim.DimAutoStyle.Text),
             Height = Dim.Auto (Dim.DimAutoStyle.Text)
         };
-        Assert.Equal (new Rectangle (0, 0, 5, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 5, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 5, 1), view.Frame);
+        Assert.Equal (new (0, 0, 5, 1), view.Viewport);
 
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (new Rectangle (0, 0, 5, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 5, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 5, 1), view.Frame);
+        Assert.Equal (new (0, 0, 5, 1), view.Viewport);
     }
 
     // BUGBUG: this is a temporary test that helped identify #3469 - It needs to be expanded upon (and renamed)
@@ -1204,10 +1208,10 @@ Y
         };
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
 
-        Assert.Equal (new (10, 1), view.TextFormatter.Size);  
+        Assert.Equal (new (10, 1), view.TextFormatter.Size);
     }
 
     [Fact]
@@ -1219,18 +1223,17 @@ Y
             TextDirection = TextDirection.TopBottom_LeftRight,
             Text = "01234",
             Width = Dim.Auto (Dim.DimAutoStyle.Text),
-            Height = Dim.Auto (Dim.DimAutoStyle.Text),
+            Height = Dim.Auto (Dim.DimAutoStyle.Text)
         };
-        Assert.Equal (new Rectangle (0, 0, 1, 5), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 1, 5), view.Viewport);
+        Assert.Equal (new (0, 0, 1, 5), view.Frame);
+        Assert.Equal (new (0, 0, 1, 5), view.Viewport);
 
         view.BeginInit ();
-        Assert.Equal (new Rectangle (0, 0, 1, 5), view.Frame);
+        Assert.Equal (new (0, 0, 1, 5), view.Frame);
         view.EndInit ();
-        Assert.Equal (new Rectangle (0, 0, 1, 5), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 1, 5), view.Viewport);
+        Assert.Equal (new (0, 0, 1, 5), view.Frame);
+        Assert.Equal (new (0, 0, 1, 5), view.Viewport);
     }
-
 
     [Fact]
     [SetupFakeDriver]
