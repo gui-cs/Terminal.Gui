@@ -147,7 +147,7 @@ public class TextTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, 10, 1), view.Frame);
         Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
 
-        Assert.Equal (new (5, 1), view.TextFormatter.Size);  // BUGBUG: should be 10, 1
+        Assert.Equal (new (10, 1), view.TextFormatter.Size);  
     }
 
     [Fact]

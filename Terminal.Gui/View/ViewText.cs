@@ -179,17 +179,33 @@ public partial class View
 
         // TODO: This is a hack. Figure out how to move this into DimDimAuto
         // Use _width & _height instead of Width & Height to avoid debug spew
-        if ((_width is Dim.DimAuto widthAuto && widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
-            || (_height is Dim.DimAuto heightAuto && heightAuto._style.HasFlag (Dim.DimAutoStyle.Text)))
+        Dim.DimAuto widthAuto = _width as Dim.DimAuto;
+        Dim.DimAuto heightAuto = _height as Dim.DimAuto;
+        if ((widthAuto is {} && widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
+            || (heightAuto is {} && heightAuto._style.HasFlag (Dim.DimAutoStyle.Text)))
         {
-            // This updates TextFormatter.Size to the text size
-            TextFormatter.AutoSize = true;
+            // We always use TF in autosize = false mode
+            TextFormatter.AutoSize = false;
+
+            var size = TextFormatter.GetAutoSize ();
+
+            if (widthAuto is null || !widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
+            {
+                size.Width = _width.Anchor (0);
+            }
+
+            if (heightAuto is null || !heightAuto._style.HasFlag (Dim.DimAutoStyle.Text))
+            {
+                size.Height = _height.Anchor (0);
+            }
 
             // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
-            ContentSize = TextFormatter.Size == Size.Empty ? null : TextFormatter.Size;
+            //ContentSize = size;//TextFormatter.Size == Size.Empty ? null : TextFormatter.Size;
+            TextFormatter.Size = size;
             return;
         }
 
+        // We always use TF in autosize = false mode
         TextFormatter.AutoSize = false;
         TextFormatter.Size = new Size (ContentSize.GetValueOrDefault ().Width, ContentSize.GetValueOrDefault ().Height);
     }
