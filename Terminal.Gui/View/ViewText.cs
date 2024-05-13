@@ -191,12 +191,12 @@ public partial class View
 
             if (widthAuto is null || !widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
             {
-                size.Width = _width.Anchor (0);
+                size.Width = ContentSize.Value.Width;
             }
 
             if (heightAuto is null || !heightAuto._style.HasFlag (Dim.DimAutoStyle.Text))
             {
-                size.Height = _height.Anchor (0);
+                size.Height = ContentSize.Value.Height;
             }
 
             // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
