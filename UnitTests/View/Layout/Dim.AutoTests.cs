@@ -9,9 +9,34 @@ public class DimAutoTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
+    private class DimAutoTestView : View
+    {
+        public DimAutoTestView ()
+        {
+            ValidatePosDim = true;
+            Width = Dim.Auto ();
+            Height = Dim.Auto ();
+        }
+
+        public DimAutoTestView (Dim width, Dim height)
+        {
+            ValidatePosDim = true;
+            Width = width;
+            Height = height;
+        }
+
+        public DimAutoTestView (string text, Dim width, Dim height)
+        {
+            ValidatePosDim = true;
+            Text = text;
+            Width = width;
+            Height = height;
+        }
+    }
+
     // Test min - ensure that if min is specified in the DimAuto constructor it is honored
     [Fact]
-    public void DimAuto_Min ()
+    public void Min_Is_Honored ()
     {
         var superView = new View
         {
@@ -43,7 +68,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
     // what happens if DimAuto (min: 10) and the subview moves to a negative coord?
     [Fact]
-    public void DimAuto_Min_Resets_If_Subview_Moves_Negative ()
+    public void Min_Resets_If_Subview_Moves_Negative ()
     {
         var superView = new View
         {
@@ -85,7 +110,7 @@ public class DimAutoTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void DimAuto_Min_Resets_If_Subview_Shrinks ()
+    public void Min_Resets_If_Subview_Shrinks ()
     {
         var superView = new View
         {
@@ -139,7 +164,7 @@ public class DimAutoTests (ITestOutputHelper output)
     [InlineData (-1, 0, 0, 5, 5)]
     [InlineData (-1, 0, 5, 5, 5)]
     [InlineData (-1, -1, 5, 5, 4)]
-    public void Height_Auto_Width_NotChanged (int subX, int subY, int subWidth, int subHeight, int expectedHeight)
+    public void Height_Auto_Width_Absolute_NotChanged (int subX, int subY, int subWidth, int subHeight, int expectedHeight)
     {
         var superView = new View
         {
@@ -450,7 +475,7 @@ public class DimAutoTests (ITestOutputHelper output)
     [InlineData (-1, 0, 0, 5, 0)]
     [InlineData (-1, 0, 5, 5, 4)]
     [InlineData (-1, -1, 5, 5, 4)]
-    public void Width_Auto_Height_NotChanged (int subX, int subY, int subWidth, int subHeight, int expectedWidth)
+    public void Width_Auto_Height_Absolute_NotChanged (int subX, int subY, int subWidth, int subHeight, int expectedWidth)
     {
         var superView = new View
         {
@@ -478,14 +503,15 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, expectedWidth, 10), superView.Frame);
     }
 
-    // Test that when a view has Width set to DimAuto (min: x) the width is never < x even if SetRelativeLayout is called with smaller bounds
+    // Test that when a view has Width set to DimAuto (min: x)
+    // the width is never < x even if SetRelativeLayout is called with smaller bounds
     [Theory]
     [InlineData (0, 0)]
     [InlineData (1, 1)]
     [InlineData (3, 3)]
     [InlineData (4, 4)]
     [InlineData (5, 4)] // This is clearly invalid, but we choose to not throw but log a debug message
-    public void Width_Auto_Min (int min, int expectedWidth)
+    public void Width_Auto_Min_Honored (int min, int expectedWidth)
     {
         var superView = new View
         {
@@ -637,7 +663,7 @@ public class DimAutoTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void DimAuto_Text_Viewport_Stays_Set ()
+    public void DimAutoStyle_Text_Viewport_Stays_Set ()
     {
         var super = new View ()
         {
@@ -668,7 +694,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
     // Test that changing TextFormatter does not impact View dimensions if Dim.Auto is not in play
     [Fact]
-    public void DimAuto_Not_Used_TextFormatter_Does_Not_Change_View_Size ()
+    public void Not_Used_TextFormatter_Does_Not_Change_View_Size ()
     {
         View view = new ()
         {
@@ -700,7 +726,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
 
     [Fact]
-    public void DimAuto_Not_Used_TextSettings_Do_Not_Change_View_Size ()
+    public void Not_Used_TextSettings_Do_Not_Change_View_Size ()
     {
         View view = new ()
         {
@@ -728,7 +754,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
 
     [Fact]
-    public void DimAuto_TextSettings_Change_View_Size ()
+    public void TextFormatter_Settings_Change_View_Size ()
     {
         View view = new ()
         {
@@ -739,7 +765,7 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
         view.TextAlignment = TextAlignment.Justified;
-        Assert.True (view.TextFormatter.AutoSize);
+        Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
         view = new ()
@@ -748,7 +774,7 @@ public class DimAutoTests (ITestOutputHelper output)
             Width = Dim.Auto ()
         };
         view.VerticalTextAlignment = VerticalTextAlignment.Middle;
-        Assert.True (view.TextFormatter.AutoSize);
+        Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
         view = new ()
@@ -770,19 +796,20 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.NotEqual (Size.Empty, view.Frame.Size);
     }
 
-    //[Fact]
-    //public void DimAuto_TextFormatter_Is_Auto ()
-    //{
-    //    View view = new ();
-    //    Assert.False (view.TextFormatter.AutoSize);
-    //    view.Width = Dim.Auto ();
-    //    Assert.True (view.TextFormatter.AutoSize);
+    // Ensure TextFormatter.AutoSize is never used for View.Text
+    [Fact]
+    public void TextFormatter_Is_Not_Auto ()
+    {
+        View view = new ();
+        Assert.False (view.TextFormatter.AutoSize);
+        view.Width = Dim.Auto ();
+        Assert.False (view.TextFormatter.AutoSize);
 
-    //    view = new ();
-    //    Assert.False (view.TextFormatter.AutoSize);
-    //    view.Height = Dim.Auto ();
-    //    Assert.True (view.TextFormatter.AutoSize);
-    //}
+        view = new ();
+        Assert.False (view.TextFormatter.AutoSize);
+        view.Height = Dim.Auto ();
+        Assert.False (view.TextFormatter.AutoSize);
+    }
 
     [Theory]
     [InlineData ("1234", 4)]
@@ -826,7 +853,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
     [SetupFakeDriver]
     [Fact]
-    public void DimAuto_ChangeToANonDimAuto_Resets_ContentSize ()
+    public void Change_To_Non_Auto_Resets_ContentSize ()
     {
         View view = new ()
         {
@@ -895,7 +922,7 @@ public class DimAutoTests (ITestOutputHelper output)
     [InlineData (1, 15, 16)]
     [InlineData (0, 15, 15)]
     [InlineData (-1, 15, 14)]
-    public void DimAuto_With_Subview_Using_DimAbsolute (int subViewOffset, int dimAbsoluteSize, int expectedSize)
+    public void With_Subview_Using_DimAbsolute (int subViewOffset, int dimAbsoluteSize, int expectedSize)
     {
         var view = new View ();
         var subview = new View ()
@@ -921,7 +948,7 @@ public class DimAutoTests (ITestOutputHelper output)
     [InlineData (1, 50, 51)]
     [InlineData (0, 25, 25)]
     [InlineData (-1, 50, 49)]
-    public void DimAuto_With_Subview_Using_DimFactor (int subViewOffset, int dimFactor, int expectedSize)
+    public void With_Subview_Using_DimFactor (int subViewOffset, int dimFactor, int expectedSize)
     {
         var view = new View () { Width = 100, Height = 100 };
         var subview = new View ()
@@ -949,7 +976,7 @@ public class DimAutoTests (ITestOutputHelper output)
     [InlineData (1, 0, 100)]
     [InlineData (0, 1, 99)]
     [InlineData (1, 1, 99)]
-    public void DimAuto_With_Subview_Using_DimFill (int subViewOffset, int dimFillMargin, int expectedSize)
+    public void With_Subview_Using_DimFill (int subViewOffset, int dimFillMargin, int expectedSize)
     {
         var view = new View ();
         var subview = new View ()
@@ -974,7 +1001,7 @@ public class DimAutoTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void DimAuto_With_Subview_Using_DimFunc ()
+    public void With_Subview_Using_DimFunc ()
     {
         var view = new View ();
         var subview = new View () { Width = Dim.Function (() => 20), Height = Dim.Function (() => 25) };
@@ -992,7 +1019,7 @@ public class DimAutoTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void DimAuto_With_Subview_Using_DimView ()
+    public void With_Subview_Using_DimView ()
     {
         var view = new View ();
         var subview = new View () { Width = 30, Height = 40 };
@@ -1015,7 +1042,7 @@ public class DimAutoTests (ITestOutputHelper output)
     // Testing all Pos combinations
 
     [Fact]
-    public void DimAuto_With_Subview_At_PosAt ()
+    public void With_Subview_At_PosAt ()
     {
         var view = new View ();
         var subview = new View () { X = Pos.At (10), Y = Pos.At (5), Width = 20, Height = 10 };
@@ -1032,8 +1059,8 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (15, calculatedHeight); // 5 (Y position) + 10 (Height)
     }
 
-    [Fact (Skip = "DimAuto_TextOnly")]
-    public void DimAuto_With_Subview_At_PosPercent ()
+    [Fact (Skip = "TextOnly")]
+    public void With_Subview_At_PosPercent ()
     {
         var view = new View () { Width = 100, Height = 100 };
         var subview = new View () { X = Pos.Percent (50), Y = Pos.Percent (50), Width = 20, Height = 10 };
@@ -1051,8 +1078,8 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (60, calculatedHeight); // 50% of 100 (Height) + 10
     }
 
-    [Fact (Skip = "DimAuto_TextOnly")]
-    public void DimAuto_With_Subview_At_PosCenter ()
+    [Fact (Skip = "TextOnly")]
+    public void With_Subview_At_PosCenter ()
     {
         var view = new View () { Width = 100, Height = 100 };
         var subview = new View () { X = Pos.Center (), Y = Pos.Center (), Width = 20, Height = 10 };
@@ -1070,8 +1097,8 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (60, calculatedHeight); // Centered in 100 (Height) + 10
     }
 
-    [Fact (Skip = "DimAuto_TextOnly")]
-    public void DimAuto_With_Subview_At_PosAnchorEnd ()
+    [Fact (Skip = "TextOnly")]
+    public void With_Subview_At_PosAnchorEnd ()
     {
         var dimWidth = Dim.Auto (min: 50);
         var dimHeight = Dim.Auto (min: 50);
@@ -1100,6 +1127,94 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (100, calculatedHeight);
     }
 
+    [Fact]
+    public void DimAutoStyle_Text_Pos_AnchorEnd_Locates_Correctly ()
+    {
+        DimAutoTestView view = new ("01234", Auto (DimAutoStyle.Text), Auto (DimAutoStyle.Text));
+
+        view.SetRelativeLayout (new (10, 10));
+        Assert.Equal (new (5, 1), view.Frame.Size);
+        Assert.Equal (new (0, 0), view.Frame.Location);
+
+        view.X = 0;
+
+        view.Y = Pos.AnchorEnd (1);
+        view.SetRelativeLayout (new (10, 10));
+        Assert.Equal (new (5, 1), view.Frame.Size);
+        Assert.Equal (new (0, 9), view.Frame.Location);
+
+        view.Y = Pos.AnchorEnd ();
+        view.SetRelativeLayout (new (10, 10));
+        Assert.Equal (new (5, 1), view.Frame.Size);
+        Assert.Equal (new (0, 9), view.Frame.Location);
+
+        view.Y = Pos.AnchorEnd () - 1;
+        view.SetRelativeLayout (new (10, 10));
+        Assert.Equal (new (5, 1), view.Frame.Size);
+        Assert.Equal (new (0, 8), view.Frame.Location);
+    }
+
+
+    [Fact]
+    public void DimAutoStyle_Content_Pos_AnchorEnd_Locates_Correctly ()
+    {
+        DimAutoTestView view = new (Auto (DimAutoStyle.Content), Auto (DimAutoStyle.Content));
+
+        View subView = new ()
+        {
+            Width = 5,
+            Height = 1
+        };
+        view.Add (subView);
+
+        view.SetRelativeLayout (new (10, 10));
+        Assert.Equal (new (5, 1), view.Frame.Size);
+        Assert.Equal (new (0, 0), view.Frame.Location);
+
+        view.X = 0;
+
+        view.Y = Pos.AnchorEnd (1);
+        view.SetRelativeLayout (new (10, 10));
+        Assert.Equal (new (5, 1), view.Frame.Size);
+        Assert.Equal (new (0, 9), view.Frame.Location);
+
+        view.Y = Pos.AnchorEnd ();
+        view.SetRelativeLayout (new (10, 10));
+        Assert.Equal (new (5, 1), view.Frame.Size);
+        Assert.Equal (new (0, 9), view.Frame.Location);
+
+        view.Y = Pos.AnchorEnd () - 1;
+        view.SetRelativeLayout (new (10, 10));
+        Assert.Equal (new (5, 1), view.Frame.Size);
+        Assert.Equal (new (0, 8), view.Frame.Location);
+    }
+
+
+    [Theory]
+    [InlineData("01234", 5, 5)]
+    [InlineData ("01234", 6, 6)]
+    [InlineData ("01234", 4, 5)]
+    [InlineData ("01234", 0, 5)]
+    [InlineData ("", 5, 5)]
+    [InlineData ("", 0, 0)]
+    public void DimAutoStyle_Auto_Larger_Wins (string text, int dimension, int expected)
+    {
+        View view = new ()
+        {
+            Width = Auto (),
+            Text = text
+        };
+
+        View subView = new ()
+        {
+            Width = dimension,
+        };
+        view.Add (subView);
+
+        view.SetRelativeLayout (new (10, 10));
+        Assert.Equal (expected, view.Frame.Width);
+
+    }
 
     // Test variations of Frame
 }

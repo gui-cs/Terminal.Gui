@@ -138,7 +138,7 @@ public class TextTests (ITestOutputHelper output)
         {
             Text = "01234",
             TextDirection = TextDirection.LeftRight_TopBottom,
-            TextAlignment = Alignment.Centered,
+            TextAlignment = TextAlignment.Centered,
             Width = 10,
             Height = Dim.Auto (Dim.DimAutoStyle.Text)
         };

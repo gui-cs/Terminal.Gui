@@ -811,10 +811,29 @@ public partial class View
         }
 
         CheckDimAuto ();
-        int newX = _x.Calculate (superviewContentSize.Value.Width, _width, this, Dim.Dimension.Width);
-        int newW = _width.Calculate (newX, superviewContentSize.Value.Width, this, Dim.Dimension.Width);
-        int newY = _y.Calculate (superviewContentSize.Value.Height, _height, this, Dim.Dimension.Height);
-        int newH = _height.Calculate (newY, superviewContentSize.Value.Height, this, Dim.Dimension.Height);
+        int newX, newW, newY, newH;
+
+        if (_width is Dim.DimAuto)
+        {
+            newW = _width.Calculate (0, superviewContentSize.Value.Width, this, Dim.Dimension.Width);
+            newX = _x.Calculate (superviewContentSize.Value.Width, newW, this, Dim.Dimension.Width);
+        }
+        else
+        {
+            newX = _x.Calculate (superviewContentSize.Value.Width, _width, this, Dim.Dimension.Width);
+            newW = _width.Calculate (newX, superviewContentSize.Value.Width, this, Dim.Dimension.Width);
+        }
+
+        if (_height is Dim.DimAuto)
+        {
+            newH = _height.Calculate (0, superviewContentSize.Value.Height, this, Dim.Dimension.Height);
+            newY = _y.Calculate (superviewContentSize.Value.Height, newH, this, Dim.Dimension.Height);
+        }
+        else
+        {
+            newY = _y.Calculate (superviewContentSize.Value.Height, _height, this, Dim.Dimension.Height);
+            newH = _height.Calculate (newY, superviewContentSize.Value.Height, this, Dim.Dimension.Height);
+        }
 
         Rectangle newFrame = new (newX, newY, newW, newH);
 
