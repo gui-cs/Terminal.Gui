@@ -130,6 +130,26 @@ public class TextTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, 5, 1), view.Viewport);
     }
 
+    // BUGBUG: this is a temporary test that helped identify #3469 - It needs to be expanded upon (and renamed)
+    [Fact]
+    public void TextDirection_Horizontal_Dims_Correct_WidthAbsolute ()
+    {
+        var view = new View
+        {
+            Text = "01234",
+            TextDirection = TextDirection.LeftRight_TopBottom,
+            TextAlignment = Alignment.Centered,
+            Width = 10,
+            Height = Dim.Auto (Dim.DimAutoStyle.Text)
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
+
+        Assert.Equal (new (10, 1), view.TextFormatter.Size);  
+    }
+
     [Fact]
     public void TextDirection_Vertical_Dims_Correct ()
     {

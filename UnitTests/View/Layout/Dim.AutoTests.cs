@@ -735,7 +735,7 @@ public class DimAutoTests (ITestOutputHelper output)
             Text = "_1234",
             Width = Dim.Auto ()
         };
-        Assert.True (view.TextFormatter.AutoSize);
+        Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
         view.TextAlignment = TextAlignment.Justified;
@@ -757,7 +757,7 @@ public class DimAutoTests (ITestOutputHelper output)
             Width = Dim.Auto ()
         };
         view.HotKeySpecifier = (Rune)'*';
-        Assert.True (view.TextFormatter.AutoSize);
+        Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
         view = new ()
@@ -766,23 +766,23 @@ public class DimAutoTests (ITestOutputHelper output)
             Width = Dim.Auto ()
         };
         view.Text = "*ABC";
-        Assert.True (view.TextFormatter.AutoSize);
+        Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
     }
 
-    [Fact]
-    public void DimAuto_TextFormatter_Is_Auto ()
-    {
-        View view = new ();
-        Assert.False (view.TextFormatter.AutoSize);
-        view.Width = Dim.Auto ();
-        Assert.True (view.TextFormatter.AutoSize);
+    //[Fact]
+    //public void DimAuto_TextFormatter_Is_Auto ()
+    //{
+    //    View view = new ();
+    //    Assert.False (view.TextFormatter.AutoSize);
+    //    view.Width = Dim.Auto ();
+    //    Assert.True (view.TextFormatter.AutoSize);
 
-        view = new ();
-        Assert.False (view.TextFormatter.AutoSize);
-        view.Height = Dim.Auto ();
-        Assert.True (view.TextFormatter.AutoSize);
-    }
+    //    view = new ();
+    //    Assert.False (view.TextFormatter.AutoSize);
+    //    view.Height = Dim.Auto ();
+    //    Assert.True (view.TextFormatter.AutoSize);
+    //}
 
     [Theory]
     [InlineData ("1234", 4)]

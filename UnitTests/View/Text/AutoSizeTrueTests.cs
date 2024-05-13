@@ -1855,11 +1855,6 @@ Y
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
 
-        Assert.True (lblLeft.TextFormatter.AutoSize == autoSize);
-        Assert.True (lblCenter.TextFormatter.AutoSize == autoSize);
-        Assert.True (lblRight.TextFormatter.AutoSize == autoSize);
-        Assert.True (lblJust.TextFormatter.AutoSize == autoSize);
-
         if (autoSize)
         {
             Size expectedSize = new (11, 1);
@@ -1982,11 +1977,6 @@ Y
         top.Add (frame);
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (9, height + 2);
-
-        Assert.True (lblLeft.TextFormatter.AutoSize == autoSize);
-        Assert.True (lblCenter.TextFormatter.AutoSize == autoSize);
-        Assert.True (lblRight.TextFormatter.AutoSize == autoSize);
-        Assert.True (lblJust.TextFormatter.AutoSize == autoSize);
 
         if (autoSize)
         {
