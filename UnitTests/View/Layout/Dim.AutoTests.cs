@@ -42,8 +42,8 @@ public class DimAutoTests (ITestOutputHelper output)
         {
             X = 0,
             Y = 0,
-            Width = Dim.Auto (min: 10),
-            Height = Dim.Auto (min: 10),
+            Width = Dim.Auto (minimumContentDim: 10),
+            Height = Dim.Auto (minimumContentDim: 10),
             ValidatePosDim = true
         };
 
@@ -66,6 +66,68 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (10, superView.Frame.Height);
     }
 
+    [Theory]
+    [InlineData (0, 2, 4)]
+    [InlineData (1, 2, 4)]
+    [InlineData (2, 2, 4)]
+    [InlineData (3, 2, 5)]
+    [InlineData (1, 0, 3)]
+    public void Min_Absolute_Is_Content_Relative (int contentSize, int minAbsolute, int expected)
+    {
+        var view = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Auto (minimumContentDim: minAbsolute),
+            BorderStyle = LineStyle.Single, // a 1 thick adornment
+            ValidatePosDim = true
+        };
+
+        view.SetContentSize (new (contentSize, 0));
+
+        Assert.Equal (expected, view.Frame.Width);
+    }
+
+
+    [Theory]
+    [InlineData (1, 100, 100)]
+    [InlineData (1, 50, 50)]
+    public void Min_Percent (int contentSize, int minPercent, int expected)
+    {
+        var view = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (minPercent)),
+            ValidatePosDim = true
+        };
+
+        view.SetContentSize (new (contentSize, 0));
+        view.SetRelativeLayout (new (100, 100));
+
+        Assert.Equal (expected, view.Frame.Width);
+    }
+
+    [Theory]
+    [InlineData (1, 100, 100)]
+    [InlineData (1, 50, 50)]
+    public void Min_Percent_Is_Content_Relative (int contentSize, int minPercent, int expected)
+    {
+        var view = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (minPercent)),
+            BorderStyle = LineStyle.Single, // a 1 thick adornment
+            ValidatePosDim = true
+        };
+
+        view.SetContentSize (new (contentSize, 0));
+        view.SetRelativeLayout (new (100, 100));
+
+        Assert.Equal (expected, view.Frame.Width);
+    }
+
     // what happens if DimAuto (min: 10) and the subview moves to a negative coord?
     [Fact]
     public void Min_Resets_If_Subview_Moves_Negative ()
@@ -74,8 +136,8 @@ public class DimAutoTests (ITestOutputHelper output)
         {
             X = 0,
             Y = 0,
-            Width = Dim.Auto (min: 10),
-            Height = Dim.Auto (min: 10),
+            Width = Dim.Auto (minimumContentDim: 10),
+            Height = Dim.Auto (minimumContentDim: 10),
             ValidatePosDim = true
         };
 
@@ -116,8 +178,8 @@ public class DimAutoTests (ITestOutputHelper output)
         {
             X = 0,
             Y = 0,
-            Width = Dim.Auto (min: 10),
-            Height = Dim.Auto (min: 10),
+            Width = Dim.Auto (minimumContentDim: 10),
+            Height = Dim.Auto (minimumContentDim: 10),
             ValidatePosDim = true
         };
 
@@ -517,7 +579,7 @@ public class DimAutoTests (ITestOutputHelper output)
         {
             X = 0,
             Y = 0,
-            Width = Dim.Auto (min: min),
+            Width = Dim.Auto (minimumContentDim: min),
             Height = 1,
             ValidatePosDim = true
         };
@@ -548,7 +610,7 @@ public class DimAutoTests (ITestOutputHelper output)
         {
             X = 0,
             Y = 0,
-            Width = Dim.Auto (min: superMinWidth),
+            Width = Dim.Auto (minimumContentDim: superMinWidth),
             Height = 1,
             ValidatePosDim = true
         };
@@ -689,6 +751,22 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (expectedViewport, view.Viewport);
 
         super.Dispose ();
+    }
+
+
+    // TextFormatter.Size normally tracks ContentSize, but with DimAuto, tracks the text size
+    [Theory]
+    [InlineData ("", 0, 0)]
+    [InlineData (" ", 1, 1)]
+    [InlineData ("01234", 5, 1)]
+    public void DimAutoStyle_Text_TextFormatter_Size_Ignores_ContentSize (string text, int expectedW, int expectedH)
+    {
+        var view = new View ();
+        view.Width = Auto (DimAutoStyle.Text);
+        view.Height = Auto (DimAutoStyle.Text);
+        view.SetContentSize (new (1, 1));
+        view.Text = text;
+        Assert.Equal (new (expectedW, expectedH), view.TextFormatter.Size);
     }
 
 
@@ -1102,8 +1180,8 @@ public class DimAutoTests (ITestOutputHelper output)
     [Fact (Skip = "TextOnly")]
     public void With_Subview_At_PosAnchorEnd ()
     {
-        var dimWidth = Dim.Auto (min: 50);
-        var dimHeight = Dim.Auto (min: 50);
+        var dimWidth = Dim.Auto (minimumContentDim: 50);
+        var dimHeight = Dim.Auto (minimumContentDim: 50);
 
         var view = new View ()
         {

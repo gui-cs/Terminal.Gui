@@ -186,8 +186,8 @@ public partial class View
         // Use _width & _height instead of Width & Height to avoid debug spew
         Dim.DimAuto widthAuto = _width as Dim.DimAuto;
         Dim.DimAuto heightAuto = _height as Dim.DimAuto;
-        if ((widthAuto is {} && widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
-            || (heightAuto is {} && heightAuto._style.HasFlag (Dim.DimAutoStyle.Text)))
+        if ((widthAuto is { } && widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
+            || (heightAuto is { } && heightAuto._style.HasFlag (Dim.DimAutoStyle.Text)))
         {
             size = TextFormatter.GetAutoSize ();
 

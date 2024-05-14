@@ -648,7 +648,7 @@ public class Pos
 public class Dim
 {
     /// <summary>
-    ///     Specifies how <see cref="DimAuto"/> will compute the dimension.
+    ///     Specifies how <see cref="Dim.Auto"/> will compute the dimension.
     /// </summary>
     [Flags]
     public enum DimAutoStyle
@@ -731,18 +731,18 @@ public class Dim
     /// </example>
     /// <returns>The <see cref="Dim"/> object.</returns>
     /// <param name="style">
-    ///     Specifies how <see cref="DimAuto"/> will compute the dimension. The default is <see cref="DimAutoStyle.Auto"/>.
+    ///     Specifies how <see cref="Dim.Auto"/> will compute the dimension. The default is <see cref="DimAutoStyle.Auto"/>.
     /// </param>
-    /// <param name="min">Specifies the minimum dimension that view will be automatically sized to.</param>
-    /// <param name="max">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
-    public static Dim Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim min = null, Dim max = null)
+    /// <param name="minimumContentDim">The minimum dimension the View's ContentSize will be constrained to.</param>
+    /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.</param>
+    public static Dim Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim minimumContentDim = null, Dim maximumContentDim = null)
     {
-        if (max != null)
+        if (maximumContentDim != null)
         {
-            throw new NotImplementedException (@"max is not implemented");
+            throw new NotImplementedException (@"maximumContentDim is not implemented");
         }
 
-        return new DimAuto (style, min, max);
+        return new DimAuto (style, minimumContentDim, maximumContentDim);
     }
 
     /// <summary>Determines whether the specified object is equal to the current object.</summary>
@@ -928,33 +928,33 @@ public class Dim
     /// <param name="style">
     ///     Specifies how <see cref="Dim.DimAuto"/> will compute the dimension. The default is <see cref="Dim.DimAutoStyle.Auto"/>.
     /// </param>
-    /// <param name="min">Specifies the minimum dimension that view will be automatically sized to.</param>
-    /// <param name="max">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
-    public class DimAuto (DimAutoStyle style, Dim min, Dim max) : Dim
+    /// <param name="minimumContentDim">The minimum dimension the View's ContentSize will be constrained to.</param>
+    /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.</param>
+    public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumContentDim) : Dim
     {
-        internal readonly Dim _max = max;
-        internal readonly Dim _min = min;
+        internal readonly Dim _minContentDim = minimumContentDim;
+        internal readonly Dim _maxContentDim = maximumContentDim;
         internal readonly DimAutoStyle _style = style;
         internal int _size;
 
         /// <inheritdoc />
-        public override bool Equals (object other) { return other is DimAuto auto && auto._min == _min && auto._max == _max && auto._style == _style; }
+        public override bool Equals (object other) { return other is DimAuto auto && auto._minContentDim == _minContentDim && auto._maxContentDim == _maxContentDim && auto._style == _style; }
         /// <inheritdoc />
-        public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), _min, _max, _style); }
+        public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), _minContentDim, _maxContentDim, _style); }
         /// <inheritdoc />
-        public override string ToString () { return $"Auto({_style},{_min},{_max})"; }
+        public override string ToString () { return $"Auto({_style},{_minContentDim},{_maxContentDim})"; }
 
         internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
         {
             if (us == null)
             {
-                return _max?.Anchor (0) ?? 0;
+                return _maxContentDim?.Anchor (0) ?? 0;
             }
 
             var textSize = 0;
             var subviewsSize = 0;
 
-            int autoMin = _min?.Anchor (superviewContentSize) ?? 0;
+            int autoMin = _minContentDim?.Anchor (superviewContentSize) ?? 0;
 
             if (superviewContentSize < autoMin)
             {
@@ -1005,10 +1005,15 @@ public class Dim
                 }
             }
 
+            // All sizes here are content-relative; ignoring adornments.
+            // We take the larger of text and content.
             int max = int.Max (textSize, subviewsSize);
 
-            Thickness thickness = us.GetAdornmentsThickness ();
+            // And, if min: is set, it wins if larger
+            max = int.Max (max, autoMin);
 
+            // Factor in adornments
+            Thickness thickness = us.GetAdornmentsThickness ();
             if (dimension == Dimension.Width)
             {
                 max += thickness.Horizontal;
@@ -1018,8 +1023,8 @@ public class Dim
                 max += thickness.Vertical;
             }
 
-            max = int.Max (max, autoMin);
-            return int.Min (max, _max?.Anchor (superviewContentSize) ?? superviewContentSize);
+            // If max: is set, clamp the return - BUGBUG: Not tested
+            return int.Min (max, _maxContentDim?.Anchor (superviewContentSize) ?? superviewContentSize);
         }
 
         /// <summary>
@@ -1029,7 +1034,7 @@ public class Dim
         internal override bool ReferencesOtherViews ()
         {
             // BUGBUG: This is not correct. _contentSize may be null.
-            return _style.HasFlag (Dim.DimAutoStyle.Content);
+            return false;//_style.HasFlag (Dim.DimAutoStyle.Content);
         }
 
     }

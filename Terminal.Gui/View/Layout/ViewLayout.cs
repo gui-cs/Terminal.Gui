@@ -101,12 +101,9 @@ public partial class View
         // This is the only place where _frame should be set directly. Use Frame = or SetFrame instead.
         _frame = frame;
 
-        OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
+        SetTextFormatterSize ();
 
-        if (!TextFormatter.AutoSize)
-        {
-            TextFormatter.Size = ContentSize;
-        }
+        OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
     }
 
     /// <summary>Gets the <see cref="Frame"/> with a screen-relative location.</summary>
@@ -155,10 +152,10 @@ public partial class View
         }
 
         Point superViewViewportOffset = SuperView.GetViewportOffsetFromFrame ();
-        superViewViewportOffset.Offset(-SuperView.Viewport.X, -SuperView.Viewport.Y);
+        superViewViewportOffset.Offset (-SuperView.Viewport.X, -SuperView.Viewport.Y);
 
         Point frame = location;
-        frame.Offset(-superViewViewportOffset.X, -superViewViewportOffset.Y);
+        frame.Offset (-superViewViewportOffset.X, -superViewViewportOffset.Y);
 
         frame = SuperView.ScreenToFrame (frame);
         frame.Offset (-Frame.X, -Frame.Y);
@@ -1033,31 +1030,30 @@ public partial class View
     // Diagnostics to highlight when X or Y is read before the view has been initialized
     private Pos VerifyIsInitialized (Pos pos, string member)
     {
-#if DEBUG
-        if ((pos.ReferencesOtherViews () || pos.ReferencesOtherViews ()) && !IsInitialized)
-        {
-            Debug.WriteLine (
-                             $"WARNING: The {pos} of {this} is dependent on other views and {member} "
-                             + $"is being accessed before the View has been initialized. This is likely a bug."
-                            );
-        }
-#endif // DEBUG
+//#if DEBUG
+//        if (pos.ReferencesOtherViews () && !IsInitialized)
+//        {
+//            Debug.WriteLine (
+//                             $"WARNING: {member} = {pos} of {this} is dependent on other views and {member} "
+//                             + $"is being accessed before the View has been initialized. This is likely a bug."
+//                            );
+//        }
+//#endif // DEBUG
         return pos;
     }
 
     // Diagnostics to highlight when Width or Height is read before the view has been initialized
     private Dim VerifyIsInitialized (Dim dim, string member)
     {
-#if DEBUG
-        if ((dim.ReferencesOtherViews () || dim.ReferencesOtherViews ()) && !IsInitialized)
-        {
-            Debug.WriteLine (
-                             $"WARNING: The {member} of {this} is dependent on other views and is "
-                             + $"is being accessed before the View has been initialized. This is likely a bug. "
-                             + $"{member} is {dim}"
-                            );
-        }
-#endif // DEBUG
+//#if DEBUG
+//        if (dim.ReferencesOtherViews () && !IsInitialized)
+//        {
+//            Debug.WriteLine (
+//                             $"WARNING: {member} = {dim} of {this} is dependent on other views and {member} "
+//                             + $"is being accessed before the View has been initialized. This is likely a bug."
+//                            );
+//        }
+//#endif // DEBUG
         return dim;
     }
 
@@ -1087,13 +1083,13 @@ public partial class View
         // Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
         foreach (View view in Subviews)
         {
-            if (Width is Dim.DimAuto { _min: null })
+            if (Width is Dim.DimAuto { _minContentDim: null })
             {
                 ThrowInvalid (view, view.Width, nameof (view.Width));
                 ThrowInvalid (view, view.X, nameof (view.X));
             }
 
-            if (Height is Dim.DimAuto { _min: null })
+            if (Height is Dim.DimAuto { _minContentDim: null })
             {
                 ThrowInvalid (view, view.Height, nameof (view.Height));
                 ThrowInvalid (view, view.Y, nameof (view.Y));

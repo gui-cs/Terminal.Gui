@@ -407,7 +407,7 @@ public class AllViewsTester : Scenario
 
             view.Width = _wRadioGroup.SelectedItem switch
             {
-                0 => Dim.Auto (min: _wVal),
+                0 => Dim.Auto (minimumContentDim: _wVal),
                 1 => Dim.Percent (_wVal),
                 2 => Dim.Fill (_wVal),
                 3 => Dim.Sized (_wVal),
@@ -416,7 +416,7 @@ public class AllViewsTester : Scenario
 
             view.Height = _hRadioGroup.SelectedItem switch
             {
-                0 => Dim.Auto (min: _hVal),
+                0 => Dim.Auto (minimumContentDim: _hVal),
                 1 => Dim.Percent (_hVal),
                 2 => Dim.Fill (_hVal),
                 3 => Dim.Sized (_hVal),

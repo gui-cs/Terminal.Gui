@@ -15,17 +15,19 @@ public class DimAutoDemo : Scenario
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
         };
+        appWindow.Padding.Thickness = new Thickness (1);
 
         var view = new FrameView
         {
             Title = "Type to make View grow",
-            X = 1,
-            Y = 1,
-            Width = Auto (DimAutoStyle.Content, 40),
-            Height = Auto (DimAutoStyle.Content, 10)
+            X = 0,
+            Y = 0,
+            Width = Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (25)),
+            Height = Auto (DimAutoStyle.Content, minimumContentDim: 10)
         };
+        view.Margin.Thickness = new Thickness (1);
         view.ValidatePosDim = true;
 
         var textEdit = new TextView
@@ -110,7 +112,7 @@ public class DimAutoDemo : Scenario
 
         var movingButton = new Button
         {
-            Text = "_Move down",
+            Text = "_Click\nTo Move\nDown",
             X = Pos.Right (vlabel),
             Y = Pos.Bottom (vlabel)
         };
@@ -121,7 +123,7 @@ public class DimAutoDemo : Scenario
         {
             Text = "_Reset Button (AnchorEnd)",
             X = Pos.AnchorEnd (),
-            Y = Pos.Top (movingButton)
+            Y = Pos.AnchorEnd ()
         };
 
         resetButton.Accept += (s, e) => { movingButton.Y = Pos.Bottom (hlabel); };
@@ -150,7 +152,7 @@ public class DimAutoDemo : Scenario
         var dlg = new Dialog
         {
             Title = "Test Dialog",
-            Width = Auto (min: Percent (10))
+            Width = Auto (minimumContentDim: Percent (10))
 
             //Height = Dim.Auto (min: Dim.Percent (50))
         };
@@ -158,7 +160,7 @@ public class DimAutoDemo : Scenario
         {
             ValidatePosDim = true,
             Text = "TextField: X=1; Y=Pos.Bottom (label)+1, Width=Dim.Fill (0); Height=1",
-            TextFormatter = new() { WordWrap = true },
+            TextFormatter = new () { WordWrap = true },
             X = 0,
             Y = 0, //Pos.Bottom (label) + 1,
             Width = Fill (10),

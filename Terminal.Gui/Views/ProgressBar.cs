@@ -61,7 +61,7 @@ public class ProgressBar : View
         set
         {
             _bidirectionalMarquee = value;
-            SetContentSize (Viewport.Size with { Height = 1 });
+            // SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -74,7 +74,7 @@ public class ProgressBar : View
         {
             _fraction = Math.Min (value, 1);
             _isActivity = false;
-            SetContentSize (Viewport.Size with { Height = 1 });
+            // SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -87,7 +87,7 @@ public class ProgressBar : View
         set
         {
             _progressBarFormat = value;
-            SetContentSize (Viewport.Size with { Height = 1 });
+            // SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -119,7 +119,7 @@ public class ProgressBar : View
                     break;
             }
 
-            SetContentSize (Viewport.Size with { Height = 1 });
+            // SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -130,7 +130,7 @@ public class ProgressBar : View
         set
         {
             _segmentCharacter = value;
-            SetContentSize (Viewport.Size with { Height = 1 });
+            // SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -279,7 +279,7 @@ public class ProgressBar : View
 
     private void ProgressBar_Initialized (object sender, EventArgs e)
     {
-        SetContentSize (Viewport.Size with { Height = 1 });
+        // SetContentSize (Viewport.Size with { Height = 1 });
 
         ColorScheme = new ColorScheme (ColorScheme ?? SuperView?.ColorScheme ?? Colors.ColorSchemes ["Base"])
         {
@@ -289,7 +289,7 @@ public class ProgressBar : View
 
     private void SetInitialProperties ()
     {
-        Height = Dim.Auto (Dim.DimAutoStyle.Content);
+        Height = Dim.Auto (Dim.DimAutoStyle.Content, minimumContentDim: 1);
         CanFocus = false;
         _fraction = 0;
         Initialized += ProgressBar_Initialized;

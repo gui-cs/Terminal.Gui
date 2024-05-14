@@ -12,6 +12,31 @@ public class TextTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
+    // TextFormatter.Size should be empty unless DimAuto is set or ContentSize is set
+    [Theory]
+    [InlineData ("", 0, 0)]
+    [InlineData (" ", 0, 0)]
+    [InlineData ("01234", 0, 0)]
+    public void TextFormatter_Size_Default (string text, int expectedW, int expectedH)
+    {
+        var view = new View ();
+        view.Text = text;
+        Assert.Equal (new (expectedW, expectedH), view.TextFormatter.Size);
+    }
+
+    // TextFormatter.Size should track ContentSize (without DimAuto)
+    [Theory]
+    [InlineData ("", 1, 1)]
+    [InlineData (" ", 1, 1)]
+    [InlineData ("01234", 1, 1)]
+    public void TextFormatter_Size_Tracks_ContentSize (string text, int expectedW, int expectedH)
+    {
+        var view = new View ();
+        view.SetContentSize(new (1,1));
+        view.Text = text;
+        Assert.Equal (new (expectedW, expectedH), view.TextFormatter.Size);
+    }
+
     [Fact]
     [SetupFakeDriver]
     public void Setting_With_Height_Horizontal ()
