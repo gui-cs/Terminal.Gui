@@ -42,7 +42,8 @@ public class ProgressBar : View
     private int _delta;
     private float _fraction;
     private bool _isActivity;
-    private ProgressBarStyle _progressBarStyle;
+    private ProgressBarStyle _progressBarStyle = ProgressBarStyle.MarqueeBlocks;
+    private ProgressBarFormat _progressBarFormat = ProgressBarFormat.SimplePlusPercentage;
     private Rune _segmentCharacter = Glyphs.BlocksMeterSegment;
 
     /// <summary>
@@ -61,7 +62,6 @@ public class ProgressBar : View
         set
         {
             _bidirectionalMarquee = value;
-            // SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -74,11 +74,8 @@ public class ProgressBar : View
         {
             _fraction = Math.Min (value, 1);
             _isActivity = false;
-            // SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
-
-    private ProgressBarFormat _progressBarFormat;
 
     /// <summary>Specifies the format that a <see cref="ProgressBar"/> uses to indicate the visual presentation.</summary>
     public ProgressBarFormat ProgressBarFormat
@@ -87,7 +84,6 @@ public class ProgressBar : View
         set
         {
             _progressBarFormat = value;
-            // SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -118,8 +114,6 @@ public class ProgressBar : View
 
                     break;
             }
-
-            // SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -130,7 +124,6 @@ public class ProgressBar : View
         set
         {
             _segmentCharacter = value;
-            // SetContentSize (Viewport.Size with { Height = 1 });
         }
     }
 
@@ -289,6 +282,7 @@ public class ProgressBar : View
 
     private void SetInitialProperties ()
     {
+        Width = Dim.Auto (Dim.DimAutoStyle.Content);
         Height = Dim.Auto (Dim.DimAutoStyle.Content, minimumContentDim: 1);
         CanFocus = false;
         _fraction = 0;

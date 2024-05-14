@@ -110,7 +110,9 @@ public class DimAutoTests (ITestOutputHelper output)
 
     [Theory]
     [InlineData (1, 100, 100)]
-    [InlineData (1, 50, 50)]
+    [InlineData (1, 50, 52)] // 50% of 100 is 50, but the border adds 2
+    [InlineData (1, 30, 32)] // 30% of 100 is 30, but the border adds 2
+    [InlineData (2, 30, 32)] // 30% of 100 is 30, but the border adds 2
     public void Min_Percent_Is_Content_Relative (int contentSize, int minPercent, int expected)
     {
         var view = new View

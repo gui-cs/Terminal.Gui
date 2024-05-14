@@ -168,11 +168,13 @@ public class ProgressBarStyles : Scenario
             Title = "Blocks",
             X = Pos.Center (),
             Y = Pos.Bottom (button) + 1,
-            Width = Dim.Percent(50),
+            Width = Dim.Percent (50),
             BorderStyle = LineStyle.Single,
             CanFocus = true
         };
         container.Add (blocksPB);
+
+        rbPBFormat.SelectedItem = (int)blocksPB.ProgressBarFormat;
 
         var continuousPB = new ProgressBar
         {

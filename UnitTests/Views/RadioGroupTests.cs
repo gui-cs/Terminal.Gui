@@ -206,8 +206,8 @@ public class RadioGroupTests
         Assert.Equal (2, rg.HorizontalSpace);
         Assert.Equal (0, rg.X);
         Assert.Equal (0, rg.Y);
-        Assert.Equal (21, rg.Width);
-        Assert.Equal (1, rg.Height);
+        Assert.Equal (21, rg.Frame.Width);
+        Assert.Equal (1, rg.Frame.Height);
 
         expected = @$"
 ┌────────────────────────────┐
@@ -231,8 +231,8 @@ public class RadioGroupTests
         Assert.Equal (4, rg.HorizontalSpace);
         Assert.Equal (0, rg.X);
         Assert.Equal (0, rg.Y);
-        Assert.Equal (23, rg.Width);
-        Assert.Equal (1, rg.Height);
+        Assert.Equal (23, rg.Frame.Width);
+        Assert.Equal (1, rg.Frame.Height);
 
         expected = @$"
 ┌────────────────────────────┐

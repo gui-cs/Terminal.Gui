@@ -33,7 +33,7 @@ public class DimAutoDemo : Scenario
         var textEdit = new TextView
         {
             Text = "",
-            X = 1, Y = 0, Width = 20, Height = 4
+            X = 0, Y = 0, Width = 20, Height = 4
         };
         view.Add (textEdit);
 

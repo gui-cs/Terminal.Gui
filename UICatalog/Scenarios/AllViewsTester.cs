@@ -17,7 +17,6 @@ public class AllViewsTester : Scenario
     // TODO: This is missing some
     private readonly List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
     private ListView _classListView;
-    private CheckBox _computedCheckBox;
     private View _curView;
     private FrameView _hostPane;
     private RadioGroup _hRadioGroup;
@@ -39,6 +38,9 @@ public class AllViewsTester : Scenario
     private RadioGroup _yRadioGroup;
     private TextField _yText;
     private int _yVal;
+    private RadioGroup _orientation;
+    private string _demoText = "This, that, and the other thing.";
+    private TextView _demoTextView;
 
     public override void Init ()
     {
@@ -90,7 +92,7 @@ public class AllViewsTester : Scenario
         {
             X = 0,
             Y = 0,
-            Width = 15,
+            Width = Dim.Auto (Dim.DimAutoStyle.Content),
             Height = Dim.Fill (1), // for status bar
             CanFocus = false,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
@@ -101,7 +103,7 @@ public class AllViewsTester : Scenario
         {
             X = 0,
             Y = 0,
-            Width = Dim.Fill (),
+            Width = Dim.Auto (),
             Height = Dim.Fill (),
             AllowsMarking = false,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
@@ -131,30 +133,20 @@ public class AllViewsTester : Scenario
             X = Pos.Right (_leftPane),
             Y = 0, // for menu
             Width = Dim.Fill (),
-            Height = 10,
+            Height = Dim.Auto (),
             CanFocus = false,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Title = "Settings"
         };
-        _computedCheckBox = new CheckBox { X = 0, Y = 0, Text = "_Computed Layout", Checked = true };
-
-        _computedCheckBox.Toggled += (s, e) =>
-                                     {
-                                         if (_curView != null)
-                                         {
-                                             _hostPane.LayoutSubviews ();
-                                         }
-                                     };
-        _settingsPane.Add (_computedCheckBox);
 
         string [] radioItems = { "_Percent(x)", "_AnchorEnd", "_Center", "A_t(x)" };
 
         _locationFrame = new FrameView
         {
-            X = Pos.Left (_computedCheckBox),
-            Y = Pos.Bottom (_computedCheckBox),
-            Height = 3 + radioItems.Length,
-            Width = 36,
+            X = 0,
+            Y = 0,
+            Height = Dim.Auto (), //3 + radioItems.Length,
+            Width = Dim.Auto (),
             Title = "Location (Pos)"
         };
         _settingsPane.Add (_locationFrame);
@@ -165,16 +157,16 @@ public class AllViewsTester : Scenario
         _xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
         _xText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
 
-        _xText.TextChanged += (s, args) =>
-                              {
-                                  try
-                                  {
-                                      _xVal = int.Parse (_xText.Text);
-                                      DimPosChanged (_curView);
-                                  }
-                                  catch
-                                  { }
-                              };
+        _xText.Accept += (s, args) =>
+                         {
+                             try
+                             {
+                                 _xVal = int.Parse (_xText.Text);
+                                 DimPosChanged (_curView);
+                             }
+                             catch
+                             { }
+                         };
         _locationFrame.Add (_xText);
 
         _locationFrame.Add (_xRadioGroup);
@@ -184,16 +176,16 @@ public class AllViewsTester : Scenario
         _locationFrame.Add (label);
         _yText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
 
-        _yText.TextChanged += (s, args) =>
-                              {
-                                  try
-                                  {
-                                      _yVal = int.Parse (_yText.Text);
-                                      DimPosChanged (_curView);
-                                  }
-                                  catch
-                                  { }
-                              };
+        _yText.Accept += (s, args) =>
+                         {
+                             try
+                             {
+                                 _yVal = int.Parse (_yText.Text);
+                                 DimPosChanged (_curView);
+                             }
+                             catch
+                             { }
+                         };
         _locationFrame.Add (_yText);
         _yRadioGroup = new RadioGroup { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
         _yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
@@ -208,14 +200,14 @@ public class AllViewsTester : Scenario
             Title = "Size (Dim)"
         };
 
-        radioItems = new [] { "Auto (min)", "_Percent(width)", "_Fill(width)", "_Sized(width)" };
+        radioItems = new [] { "Auto", "_Percent(width)", "_Fill(width)", "_Sized(width)" };
         label = new Label { X = 0, Y = 0, Text = "Width:" };
         _sizeFrame.Add (label);
         _wRadioGroup = new RadioGroup { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
         _wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
         _wText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
 
-        _wText.TextChanged += (s, args) =>
+        _wText.Accept += (s, args) =>
                               {
                                   try
                                   {
@@ -241,34 +233,34 @@ public class AllViewsTester : Scenario
         _sizeFrame.Add (_wText);
         _sizeFrame.Add (_wRadioGroup);
 
-        radioItems = new [] { "_Auto (min)", "P_ercent(height)", "F_ill(height)", "Si_zed(height)" };
+        radioItems = new [] { "_Auto", "P_ercent(height)", "F_ill(height)", "Si_zed(height)" };
         label = new Label { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "Height:" };
         _sizeFrame.Add (label);
         _hText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
 
-        _hText.TextChanged += (s, args) =>
-                              {
-                                  try
-                                  {
-                                      switch (_hRadioGroup.SelectedItem)
-                                      {
-                                          case 1:
-                                              _hVal = Math.Min (int.Parse (_hText.Text), 100);
+        _hText.Accept += (s, args) =>
+                         {
+                             try
+                             {
+                                 switch (_hRadioGroup.SelectedItem)
+                                 {
+                                     case 1:
+                                         _hVal = Math.Min (int.Parse (_hText.Text), 100);
 
-                                              break;
-                                          case 0:
-                                          case 2:
-                                          case 3:
-                                              _hVal = int.Parse (_hText.Text);
+                                         break;
+                                     case 0:
+                                     case 2:
+                                     case 3:
+                                         _hVal = int.Parse (_hText.Text);
 
-                                              break;
-                                      }
+                                         break;
+                                 }
 
-                                      DimPosChanged (_curView);
-                                  }
-                                  catch
-                                  { }
-                              };
+                                 DimPosChanged (_curView);
+                             }
+                             catch
+                             { }
+                         };
         _sizeFrame.Add (_hText);
 
         _hRadioGroup = new RadioGroup { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
@@ -276,6 +268,40 @@ public class AllViewsTester : Scenario
         _sizeFrame.Add (_hRadioGroup);
 
         _settingsPane.Add (_sizeFrame);
+
+        label = new Label { X = 0, Y = Pos.Bottom (_sizeFrame), Text = "_Orientation:" };
+        _orientation = new RadioGroup
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            RadioLabels = new [] { "Horizontal", "Vertical" },
+            Orientation = Orientation.Horizontal
+        };
+        _orientation.SelectedItemChanged += (s, selected) =>
+                                            {
+                                                if (_curView?.GetType ().GetProperty ("Orientation") is {} prop)
+                                                {
+                                                    prop.GetSetMethod ()?.Invoke (_curView, new object [] { _orientation.SelectedItem });
+                                                }
+                                            };
+        _settingsPane.Add (label, _orientation);
+
+        label = new Label { X = 0, Y = Pos.Bottom (_orientation), Text = "_Text:" };
+        _demoTextView = new ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Width = Dim.Fill (),
+            Height = Dim.Auto (minimumContentDim: 2),
+            Text = _demoText
+        };
+        _demoTextView.ContentsChanged += (s, e) =>
+                                     {
+                                         _demoText = _demoTextView.Text;
+                                         _curView.Text = _demoText;
+                                     };
+
+        _settingsPane.Add (label, _demoTextView);
 
         _hostPane = new FrameView
         {
@@ -327,7 +353,7 @@ public class AllViewsTester : Scenario
                 view.GetType ()
                     .GetProperty ("Text")
                     ?.GetSetMethod ()
-                    ?.Invoke (view, new [] { "Test Text" });
+                    ?.Invoke (view, new [] { _demoText });
             }
             catch (TargetInvocationException e)
             {
@@ -339,7 +365,7 @@ public class AllViewsTester : Scenario
         // If the view supports a Title property, set it so we have something to look at
         if (view != null && view.GetType ().GetProperty ("Title") != null)
         {
-            if (view.GetType ().GetProperty ("Title").PropertyType == typeof (string))
+            if (view.GetType ().GetProperty ("Title")!.PropertyType == typeof (string))
             {
                 view?.GetType ()
                     .GetProperty ("Title")
@@ -362,8 +388,16 @@ public class AllViewsTester : Scenario
             view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
         }
 
-        // Set Settings
-        _computedCheckBox.Checked = view.LayoutStyle == LayoutStyle.Computed;
+        // If the view supports a Title property, set it so we have something to look at
+        if (view?.GetType ().GetProperty ("Orientation") is {} prop)
+        {
+            _orientation.SelectedItem = (int)prop.GetGetMethod()!.Invoke (view, null)!;
+            _orientation.Enabled = true;
+        }
+        else
+        {
+            _orientation.Enabled = false;
+        }
 
         view.Initialized += View_Initialized;
 
@@ -407,7 +441,7 @@ public class AllViewsTester : Scenario
 
             view.Width = _wRadioGroup.SelectedItem switch
             {
-                0 => Dim.Auto (minimumContentDim: _wVal),
+                0 => Dim.Auto (),
                 1 => Dim.Percent (_wVal),
                 2 => Dim.Fill (_wVal),
                 3 => Dim.Sized (_wVal),
@@ -416,7 +450,7 @@ public class AllViewsTester : Scenario
 
             view.Height = _hRadioGroup.SelectedItem switch
             {
-                0 => Dim.Auto (minimumContentDim: _hVal),
+                0 => Dim.Auto (),
                 1 => Dim.Percent (_hVal),
                 2 => Dim.Fill (_hVal),
                 3 => Dim.Sized (_hVal),
@@ -427,6 +461,30 @@ public class AllViewsTester : Scenario
         {
             MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
         }
+
+        if (view.Width is Dim.DimAuto)
+        {
+            _wText.Text = $"Auto";
+            _wText.Enabled = false;
+        }
+        else
+        {
+            _wText.Text = $"{_wVal}";
+            _wText.Enabled = true;
+        }
+
+        if (view.Height is Dim.DimAuto)
+        {
+            _hText.Text = $"Auto";
+            _hText.Enabled = false;
+        }
+        else
+        {
+            _hText.Text = $"{_hVal}";
+            _hText.Enabled = true;
+        }
+
+
 
         UpdateTitle (view);
     }
@@ -470,8 +528,28 @@ public class AllViewsTester : Scenario
         var h = view.Height.ToString ();
         _wRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.Where (s => w.Contains (s)).First ());
         _hRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.Where (s => h.Contains (s)).First ());
-        _wText.Text = $"{view.Frame.Width}";
-        _hText.Text = $"{view.Frame.Height}";
+        if (view.Width is Dim.DimAuto)
+        {
+            _wText.Text = $"Auto";
+            _wText.Enabled = false;
+        }
+        else
+        {
+            _wText.Text = $"100";
+            _wText.Enabled = true;
+        }
+
+        if (view.Height is Dim.DimAuto)
+        {
+            _hText.Text = $"Auto";
+            _hText.Enabled = false;
+        }
+        else
+        {
+            _hText.Text = $"100";
+            _hText.Enabled = true;
+        }
+
     }
 
     private void UpdateTitle (View view) { _hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}"; }
@@ -488,7 +566,7 @@ public class AllViewsTester : Scenario
             view.Width = Dim.Fill ();
         }
 
-        if (view.Width is not Dim.DimAuto && (view.Height is null || view.Frame.Height == 0))
+        if (view.Height is not Dim.DimAuto && (view.Height is null || view.Frame.Height == 0))
         {
             view.Height = Dim.Fill ();
         }
