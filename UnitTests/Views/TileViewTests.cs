@@ -1959,7 +1959,7 @@ public class TileViewTests
     {
         TileView tileView = Get11By3TileView (out LineView line);
         tileView.SetSplitterPos (0, Pos.Percent (50));
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosFactor> (tileView.SplitterDistances.ElementAt (0));
         tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
 
         tileView.Draw ();
@@ -1983,7 +1983,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Even when moving the splitter location it should stay a Percentage based one
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosFactor> (tileView.SplitterDistances.ElementAt (0));
 
         // and 2 to the left
         line.NewKeyDownEvent (Key.CursorLeft);
@@ -1998,7 +1998,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Even when moving the splitter location it should stay a Percentage based one
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosFactor> (tileView.SplitterDistances.ElementAt (0));
     }
 
     [Fact]

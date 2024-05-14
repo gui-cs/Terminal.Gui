@@ -182,7 +182,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
-    ///         <see cref="Pos.PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///         <see cref="PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
     ///     </para>
     ///     <para>The default value is <c>Pos.At (0)</c>.</para>
     /// </remarks>
@@ -221,7 +221,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
-    ///         <see cref="Pos.PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///         <see cref="PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
     ///     </para>
     ///     <para>The default value is <c>Pos.At (0)</c>.</para>
     /// </remarks>
@@ -363,7 +363,7 @@ public partial class View
     ///     <para>
     ///         Setting this property to <see cref="LayoutStyle.Computed"/> will cause the view to use the
     ///         <see cref="LayoutSubviews"/> method to size and position of the view. If either of the <see cref="X"/> and
-    ///         <see cref="Y"/> properties are `null` they will be set to <see cref="Pos.PosAbsolute"/> using the current value
+    ///         <see cref="Y"/> properties are `null` they will be set to <see cref="PosAbsolute"/> using the current value
     ///         of <see cref="Frame"/>. If either of the <see cref="Width"/> and <see cref="Height"/> properties are `null`
     ///         they will be set to <see cref="Dim.DimAbsolute"/> using <see cref="Frame"/>.
     ///     </para>
@@ -373,8 +373,8 @@ public partial class View
     {
         get
         {
-            if (_x is Pos.PosAbsolute
-                && _y is Pos.PosAbsolute
+            if (_x is PosAbsolute
+                && _y is PosAbsolute
                 && _width is Dim.DimAbsolute
                 && _height is Dim.DimAbsolute)
             {
@@ -836,12 +836,12 @@ public partial class View
             // the view LayoutStyle.Absolute.
             SetFrame (newFrame);
 
-            if (_x is Pos.PosAbsolute)
+            if (_x is PosAbsolute)
             {
                 _x = Frame.X;
             }
 
-            if (_y is Pos.PosAbsolute)
+            if (_y is PosAbsolute)
             {
                 _y = Frame.Y;
             }
@@ -912,7 +912,7 @@ public partial class View
     {
         switch (pos)
         {
-            case Pos.PosView pv:
+            case PosView pv:
                 // See #2461
                 //if (!from.InternalSubviews.Contains (pv.Target)) {
                 //	throw new InvalidOperationException ($"View {pv.Target} is not a subview of {from}");
@@ -923,7 +923,7 @@ public partial class View
                 }
 
                 return;
-            case Pos.PosCombine pc:
+            case PosCombine pc:
                 CollectPos (pc._left, from, ref nNodes, ref nEdges);
                 CollectPos (pc._right, from, ref nNodes, ref nEdges);
 
@@ -1104,15 +1104,15 @@ public partial class View
 
             switch (checkPosDim)
             {
-                case Pos pos and not Pos.PosAbsolute and not Pos.PosView and not Pos.PosCombine:
+                case Pos pos and not PosAbsolute and not PosView and not PosCombine:
                     bad = pos;
 
                     break;
 
-                case Pos pos and Pos.PosCombine:
+                case Pos pos and PosCombine:
                     // Recursively check for not Absolute or not View
-                    ThrowInvalid (view, (pos as Pos.PosCombine)._left, name);
-                    ThrowInvalid (view, (pos as Pos.PosCombine)._right, name);
+                    ThrowInvalid (view, (pos as PosCombine)._left, name);
+                    ThrowInvalid (view, (pos as PosCombine)._right, name);
 
                     break;
 

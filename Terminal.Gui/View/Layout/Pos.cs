@@ -346,225 +346,219 @@ public class Pos
     ///     that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
-    {
-        return Anchor (superviewDimension);
-    }
+    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension) { return Anchor (superviewDimension); }
 
 
     /// <summary>
     /// Diagnostics API to determine if this Pos object references other views.
     /// </summary>
     /// <returns></returns>
-    internal virtual bool ReferencesOtherViews ()
+    internal virtual bool ReferencesOtherViews () { return false; }
+}
+
+internal class PosAbsolute (int n) : Pos
+{
+    private readonly int _n = n;
+    public override bool Equals (object other) { return other is PosAbsolute abs && abs._n == _n; }
+    public override int GetHashCode () { return _n.GetHashCode (); }
+    public override string ToString () { return $"Absolute({_n})"; }
+    internal override int Anchor (int width) { return _n; }
+}
+
+internal class PosAnchorEnd : Pos
+{
+    private readonly int _offset;
+    public PosAnchorEnd () { UseDimForOffset = true; }
+    public PosAnchorEnd (int offset) { _offset = offset; }
+    public override bool Equals (object other) { return other is PosAnchorEnd anchorEnd && anchorEnd._offset == _offset; }
+    public override int GetHashCode () { return _offset.GetHashCode (); }
+
+    /// <summary>
+    ///     If true, the offset is the width of the view, if false, the offset is the offset value.
+    /// </summary>
+    internal bool UseDimForOffset { get; set; }
+
+    public override string ToString () { return UseDimForOffset ? "AnchorEnd()" : $"AnchorEnd({_offset})"; }
+
+    internal override int Anchor (int width)
     {
-        return false;
-    }
-
-    internal class PosAbsolute (int n) : Pos
-    {
-        private readonly int _n = n;
-        public override bool Equals (object other) { return other is PosAbsolute abs && abs._n == _n; }
-        public override int GetHashCode () { return _n.GetHashCode (); }
-        public override string ToString () { return $"Absolute({_n})"; }
-        internal override int Anchor (int width) { return _n; }
-    }
-
-    internal class PosAnchorEnd : Pos
-    {
-        private readonly int _offset;
-        public PosAnchorEnd () { UseDimForOffset = true; }
-        public PosAnchorEnd (int offset) { _offset = offset; }
-        public override bool Equals (object other) { return other is PosAnchorEnd anchorEnd && anchorEnd._offset == _offset; }
-        public override int GetHashCode () { return _offset.GetHashCode (); }
-
-        /// <summary>
-        ///     If true, the offset is the width of the view, if false, the offset is the offset value.
-        /// </summary>
-        internal bool UseDimForOffset { get; set; }
-
-        public override string ToString () { return UseDimForOffset ? "AnchorEnd()" : $"AnchorEnd({_offset})"; }
-
-        internal override int Anchor (int width)
+        if (UseDimForOffset)
         {
-            if (UseDimForOffset)
-            {
-                return width;
-            }
-
-            return width - _offset;
+            return width;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
-        {
-            int newLocation = Anchor (superviewDimension);
-
-            if (UseDimForOffset)
-            {
-                newLocation -= dim.Anchor (superviewDimension);
-            }
-
-            return newLocation;
-        }
+        return width - _offset;
     }
 
-    internal class PosCenter : Pos
+    internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
     {
-        public override string ToString () { return "Center"; }
-        internal override int Anchor (int width) { return width / 2; }
+        int newLocation = Anchor (superviewDimension);
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
+        if (UseDimForOffset)
         {
-            int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension), 0);
-
-            return Anchor (superviewDimension - newDimension);
+            newLocation -= dim.Anchor (superviewDimension);
         }
+
+        return newLocation;
+    }
+}
+
+internal class PosCenter : Pos
+{
+    public override string ToString () { return "Center"; }
+    internal override int Anchor (int width) { return width / 2; }
+
+    internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
+    {
+        int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension), 0);
+
+        return Anchor (superviewDimension - newDimension);
+    }
+}
+
+internal class PosCombine (bool add, Pos left, Pos right) : Pos
+{
+    internal bool _add = add;
+    internal Pos _left = left, _right = right;
+
+    public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
+
+    internal override int Anchor (int width)
+    {
+        int la = _left.Anchor (width);
+        int ra = _right.Anchor (width);
+
+        if (_add)
+        {
+            return la + ra;
+        }
+
+        return la - ra;
     }
 
-    internal class PosCombine (bool add, Pos left, Pos right) : Pos
+    internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
     {
-        internal bool _add = add;
-        internal Pos _left = left, _right = right;
+        int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
+        int left = _left.Calculate (superviewDimension, dim, us, dimension);
+        int right = _right.Calculate (superviewDimension, dim, us, dimension);
 
-        public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
-
-        internal override int Anchor (int width)
+        if (_add)
         {
-            int la = _left.Anchor (width);
-            int ra = _right.Anchor (width);
-
-            if (_add)
-            {
-                return la + ra;
-            }
-
-            return la - ra;
+            return left + right;
         }
 
-        internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
-        {
-            int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
-            int left = _left.Calculate (superviewDimension, dim, us, dimension);
-            int right = _right.Calculate (superviewDimension, dim, us, dimension);
-
-            if (_add)
-            {
-                return left + right;
-            }
-
-            return left - right;
-        }
-
-        /// <summary>
-        /// Diagnostics API to determine if this Pos object references other views.
-        /// </summary>
-        /// <returns></returns>
-        internal override bool ReferencesOtherViews ()
-        {
-            if (_left.ReferencesOtherViews ())
-            {
-                return true;
-            }
-
-            if (_right.ReferencesOtherViews ())
-            {
-                return true;
-            }
-
-            return false;
-        }
-    }
-
-    internal class PosFactor (float factor) : Pos
-    {
-        private readonly float _factor = factor;
-        public override bool Equals (object other) { return other is PosFactor f && f._factor == _factor; }
-        public override int GetHashCode () { return _factor.GetHashCode (); }
-        public override string ToString () { return $"Factor({_factor})"; }
-        internal override int Anchor (int width) { return (int)(width * _factor); }
-    }
-
-    // Helper class to provide dynamic value by the execution of a function that returns an integer.
-    internal class PosFunc (Func<int> n) : Pos
-    {
-        private readonly Func<int> _function = n;
-        public override bool Equals (object other) { return other is PosFunc f && f._function () == _function (); }
-        public override int GetHashCode () { return _function.GetHashCode (); }
-        public override string ToString () { return $"PosFunc({_function ()})"; }
-        internal override int Anchor (int width) { return _function (); }
+        return left - right;
     }
 
     /// <summary>
-    /// Describes which side of the view to use for the position.
+    /// Diagnostics API to determine if this Pos object references other views.
     /// </summary>
-    public enum Side
+    /// <returns></returns>
+    internal override bool ReferencesOtherViews ()
     {
-        /// <summary>
-        /// The left (X) side of the view.
-        /// </summary>
-        Left = 0,
-
-        /// <summary>
-        /// The top (Y) side of the view.
-        /// </summary>
-        Top = 1,
-
-        /// <summary>
-        /// The right (X + Width) side of the view.
-        /// </summary>
-        Right = 2,
-
-        /// <summary>
-        /// The bottom (Y + Height) side of the view.
-        /// </summary>
-        Bottom = 3
-    }
-
-    internal class PosView (View view, Side side) : Pos
-    {
-        public readonly View Target = view;
-
-        public override bool Equals (object other) { return other is PosView abs && abs.Target == Target; }
-        public override int GetHashCode () { return Target.GetHashCode (); }
-
-        public override string ToString ()
-        {
-            string sideString = side switch
-            {
-                Side.Left => "left",
-                Side.Top => "top",
-                Side.Right => "right",
-                Side.Bottom => "bottom",
-                _ => "unknown"
-            };
-
-            if (Target == null)
-            {
-                throw new NullReferenceException (nameof (Target));
-            }
-
-            return $"View(side={sideString},target={Target})";
-        }
-
-        internal override int Anchor (int width)
-        {
-            return side switch
-            {
-                Side.Left => Target.Frame.X,
-                Side.Top => Target.Frame.Y,
-                Side.Right => Target.Frame.Right,
-                Side.Bottom => Target.Frame.Bottom,
-                _ => 0
-            };
-        }
-
-        /// <summary>
-        /// Diagnostics API to determine if this Pos object references other views.
-        /// </summary>
-        /// <returns></returns>
-        internal override bool ReferencesOtherViews ()
+        if (_left.ReferencesOtherViews ())
         {
             return true;
         }
+
+        if (_right.ReferencesOtherViews ())
+        {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+internal class PosFactor (float factor) : Pos
+{
+    private readonly float _factor = factor;
+    public override bool Equals (object other) { return other is PosFactor f && f._factor == _factor; }
+    public override int GetHashCode () { return _factor.GetHashCode (); }
+    public override string ToString () { return $"Factor({_factor})"; }
+    internal override int Anchor (int width) { return (int)(width * _factor); }
+}
+
+// Helper class to provide dynamic value by the execution of a function that returns an integer.
+internal class PosFunc (Func<int> n) : Pos
+{
+    private readonly Func<int> _function = n;
+    public override bool Equals (object other) { return other is PosFunc f && f._function () == _function (); }
+    public override int GetHashCode () { return _function.GetHashCode (); }
+    public override string ToString () { return $"PosFunc({_function ()})"; }
+    internal override int Anchor (int width) { return _function (); }
+}
+
+/// <summary>
+/// Describes which side of the view to use for the position.
+/// </summary>
+public enum Side
+{
+    /// <summary>
+    /// The left (X) side of the view.
+    /// </summary>
+    Left = 0,
+
+    /// <summary>
+    /// The top (Y) side of the view.
+    /// </summary>
+    Top = 1,
+
+    /// <summary>
+    /// The right (X + Width) side of the view.
+    /// </summary>
+    Right = 2,
+
+    /// <summary>
+    /// The bottom (Y + Height) side of the view.
+    /// </summary>
+    Bottom = 3
+}
+
+internal class PosView (View view, Side side) : Pos
+{
+    public readonly View Target = view;
+
+    public override bool Equals (object other) { return other is PosView abs && abs.Target == Target; }
+    public override int GetHashCode () { return Target.GetHashCode (); }
+
+    public override string ToString ()
+    {
+        string sideString = side switch
+        {
+            Side.Left => "left",
+            Side.Top => "top",
+            Side.Right => "right",
+            Side.Bottom => "bottom",
+            _ => "unknown"
+        };
+
+        if (Target == null)
+        {
+            throw new NullReferenceException (nameof (Target));
+        }
+
+        return $"View(side={sideString},target={Target})";
+    }
+
+    internal override int Anchor (int width)
+    {
+        return side switch
+        {
+            Side.Left => Target.Frame.X,
+            Side.Top => Target.Frame.Y,
+            Side.Right => Target.Frame.Right,
+            Side.Bottom => Target.Frame.Bottom,
+            _ => 0
+        };
+    }
+
+    /// <summary>
+    /// Diagnostics API to determine if this Pos object references other views.
+    /// </summary>
+    /// <returns></returns>
+    internal override bool ReferencesOtherViews ()
+    {
+        return true;
     }
 }

@@ -417,7 +417,7 @@ public class Dim
                         for (int i = 0; i < us.Subviews.Count; i++)
                         {
                             var v = us.Subviews [i];
-                            bool isNotPosAnchorEnd = dimension == Dim.Dimension.Width ? v.X is not Pos.PosAnchorEnd : v.Y is not Pos.PosAnchorEnd;
+                            bool isNotPosAnchorEnd = dimension == Dim.Dimension.Width ? v.X is not PosAnchorEnd : v.Y is not PosAnchorEnd;
 
                             //if (!isNotPosAnchorEnd)
                             //{
