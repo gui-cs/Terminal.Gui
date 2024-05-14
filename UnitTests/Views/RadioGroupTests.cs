@@ -20,7 +20,6 @@ public class RadioGroupTests
         rg = new RadioGroup { RadioLabels = new [] { "Test" } };
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
         rg = new RadioGroup

@@ -42,8 +42,8 @@ public class ProgressBar : View
     private int _delta;
     private float _fraction;
     private bool _isActivity;
-    private ProgressBarStyle _progressBarStyle = ProgressBarStyle.MarqueeBlocks;
-    private ProgressBarFormat _progressBarFormat = ProgressBarFormat.SimplePlusPercentage;
+    private ProgressBarStyle _progressBarStyle = ProgressBarStyle.Blocks;
+    private ProgressBarFormat _progressBarFormat = ProgressBarFormat.Simple;
     private Rune _segmentCharacter = Glyphs.BlocksMeterSegment;
 
     /// <summary>

@@ -145,7 +145,7 @@ public class AllViewsTester : Scenario
         {
             X = 0,
             Y = 0,
-            Height = Dim.Auto (), //3 + radioItems.Length,
+            Height = Dim.Auto (), 
             Width = Dim.Auto (),
             Title = "Location (Pos)"
         };
@@ -195,8 +195,8 @@ public class AllViewsTester : Scenario
         {
             X = Pos.Right (_locationFrame),
             Y = Pos.Y (_locationFrame),
-            Height = 3 + radioItems.Length,
-            Width = 40,
+            Height = Dim.Auto (),
+            Width = Dim.Auto (),
             Title = "Size (Dim)"
         };
 
