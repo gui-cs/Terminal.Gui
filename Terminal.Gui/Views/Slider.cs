@@ -242,8 +242,8 @@ public class Slider<T> : View
         Orientation orientation = Orientation.Horizontal
     )
     {
-        Width = Dim.Auto (Dim.DimAutoStyle.Content);
-        Height = Dim.Auto (Dim.DimAutoStyle.Content);
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content);
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
 
@@ -610,7 +610,7 @@ public class Slider<T> : View
     /// <summary>Adjust the dimensions of the Slider to the best value.</summary>
     public void SetContentSizeBestFit ()
     {
-        if (!IsInitialized || /*!(Height is Dim.DimAuto && Width is Dim.DimAuto) || */_options.Count == 0)
+        if (!IsInitialized || /*!(Height is DimAuto && Width is DimAuto) || */_options.Count == 0)
         {
             return;
         }

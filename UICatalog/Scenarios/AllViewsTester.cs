@@ -92,7 +92,7 @@ public class AllViewsTester : Scenario
         {
             X = 0,
             Y = 0,
-            Width = Dim.Auto (Dim.DimAutoStyle.Content),
+            Width = Dim.Auto (DimAutoStyle.Content),
             Height = Dim.Fill (1), // for status bar
             CanFocus = false,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
@@ -462,7 +462,7 @@ public class AllViewsTester : Scenario
             MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
         }
 
-        if (view.Width is Dim.DimAuto)
+        if (view.Width is DimAuto)
         {
             _wText.Text = $"Auto";
             _wText.Enabled = false;
@@ -473,7 +473,7 @@ public class AllViewsTester : Scenario
             _wText.Enabled = true;
         }
 
-        if (view.Height is Dim.DimAuto)
+        if (view.Height is DimAuto)
         {
             _hText.Text = $"Auto";
             _hText.Enabled = false;
@@ -528,7 +528,7 @@ public class AllViewsTester : Scenario
         var h = view.Height.ToString ();
         _wRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.Where (s => w.Contains (s)).First ());
         _hRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.Where (s => h.Contains (s)).First ());
-        if (view.Width is Dim.DimAuto)
+        if (view.Width is DimAuto)
         {
             _wText.Text = $"Auto";
             _wText.Enabled = false;
@@ -539,7 +539,7 @@ public class AllViewsTester : Scenario
             _wText.Enabled = true;
         }
 
-        if (view.Height is Dim.DimAuto)
+        if (view.Height is DimAuto)
         {
             _hText.Text = $"Auto";
             _hText.Enabled = false;
@@ -561,12 +561,12 @@ public class AllViewsTester : Scenario
             return;
         }
 
-        if (view.Width is not Dim.DimAuto && (view.Width is null || view.Frame.Width == 0))
+        if (view.Width is not DimAuto && (view.Width is null || view.Frame.Width == 0))
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Height is not Dim.DimAuto && (view.Height is null || view.Frame.Height == 0))
+        if (view.Height is not DimAuto && (view.Height is null || view.Frame.Height == 0))
         {
             view.Height = Dim.Fill ();
         }

@@ -186,8 +186,8 @@ public class Sliders : Scenario
 
                                          if (e.Options.ContainsKey (3))
                                          {
-                                             s.Width = Dim.Auto (Dim.DimAutoStyle.Content);
-                                             s.Height = Dim.Auto (Dim.DimAutoStyle.Content);
+                                             s.Width = Dim.Auto (DimAutoStyle.Content);
+                                             s.Height = Dim.Auto (DimAutoStyle.Content);
                                          }
                                          else
                                          {
@@ -277,8 +277,8 @@ public class Sliders : Scenario
 
                                                             if (optionsSlider.GetSetOptions ().Contains (3))
                                                             {
-                                                                s.Width = Dim.Auto (Dim.DimAutoStyle.Content);
-                                                                s.Height = Dim.Auto (Dim.DimAutoStyle.Content);
+                                                                s.Width = Dim.Auto (DimAutoStyle.Content);
+                                                                s.Height = Dim.Auto (DimAutoStyle.Content);
                                                             }
                                                             else
                                                             {
@@ -334,8 +334,8 @@ public class Sliders : Scenario
 
                                                              if (optionsSlider.GetSetOptions ().Contains (3))
                                                              {
-                                                                 s.Width = Dim.Auto (Dim.DimAutoStyle.Content);
-                                                                 s.Height = Dim.Auto (Dim.DimAutoStyle.Content);
+                                                                 s.Width = Dim.Auto (DimAutoStyle.Content);
+                                                                 s.Height = Dim.Auto (DimAutoStyle.Content);
                                                              }
                                                              else
                                                              {

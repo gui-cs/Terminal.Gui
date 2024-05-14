@@ -156,8 +156,8 @@ public class SliderTests
         Assert.False (slider.ShowEndSpacing);
         Assert.Equal (SliderType.Single, slider.Type);
         Assert.Equal (0, slider.InnerSpacing);
-        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Content), slider.Width);
-        Assert.Equal (Dim.Auto (Dim.DimAutoStyle.Content), slider.Height);
+        Assert.Equal (Dim.Auto (DimAutoStyle.Content), slider.Width);
+        Assert.Equal (Dim.Auto (DimAutoStyle.Content), slider.Height);
         Assert.Equal (0, slider.FocusedOption);
     }
 
@@ -503,8 +503,8 @@ public class SliderTests
         {
             Orientation = Orientation.Vertical,
             Type = SliderType.Multiple,
-            Width = Dim.Auto (Dim.DimAutoStyle.Content),
-            Height = Dim.Auto (Dim.DimAutoStyle.Content)
+            Width = Dim.Auto (DimAutoStyle.Content),
+            Height = Dim.Auto (DimAutoStyle.Content)
         };
         view.Add (slider);
         view.BeginInit ();
@@ -537,7 +537,7 @@ public class SliderTests
         {
             Orientation = Orientation.Vertical,
             Type = SliderType.Multiple,
-            Width = Dim.Auto (Dim.DimAutoStyle.Content),
+            Width = Dim.Auto (DimAutoStyle.Content),
             Height = 10
         };
         view.Add (slider);
@@ -572,7 +572,7 @@ public class SliderTests
             Orientation = Orientation.Vertical,
             Type = SliderType.Multiple,
             Width = 10,
-            Height = Dim.Auto (Dim.DimAutoStyle.Content)
+            Height = Dim.Auto (DimAutoStyle.Content)
         };
         view.Add (slider);
         view.BeginInit ();

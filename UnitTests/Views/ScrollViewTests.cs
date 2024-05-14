@@ -394,8 +394,8 @@ public class ScrollViewTests
         var view = new View
         {
             ColorScheme = new ColorScheme { Normal = new Attribute (Color.Blue, Color.Yellow) },
-            Width = Dim.Auto (Dim.DimAutoStyle.Text),
-            Height = Dim.Auto (Dim.DimAutoStyle.Text),
+            Width = Dim.Auto (DimAutoStyle.Text),
+            Height = Dim.Auto (DimAutoStyle.Text),
             Text = text
         };
         sv.Add (view);

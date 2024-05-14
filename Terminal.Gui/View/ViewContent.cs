@@ -144,7 +144,7 @@ public partial class View
     ///         to the user. This enables virtual scrolling.
     ///     </para>
     ///     <para>
-    ///         If not <see langword="null"/>, <see cref="ContentSize"/> is set to the passed value and the behavior of <see cref="Dim.DimAutoStyle.Content"/> will be to use the ContentSize
+    ///         If not <see langword="null"/>, <see cref="ContentSize"/> is set to the passed value and the behavior of <see cref="DimAutoStyle.Content"/> will be to use the ContentSize
     ///         to determine the size of the view.
     ///     </para>
     ///     <para>
@@ -335,11 +335,11 @@ public partial class View
             //    // The Frame has not been set yet (e.g. the view has not been added to a SuperView yet).
             //    // 
             //    // Use _width & _height instead of Width & Height to avoid debug spew
-            //    Dim.DimAuto widthAuto = _width as Dim.DimAuto;
-            //    Dim.DimAuto heightAuto = _height as Dim.DimAuto;
+            //    DimAuto widthAuto = _width as DimAuto;
+            //    DimAuto heightAuto = _height as DimAuto;
 
-            //    if ((widthAuto is { } && widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
-            //        || (heightAuto is { } && heightAuto._style.HasFlag (Dim.DimAutoStyle.Text)))
+            //    if ((widthAuto is { } && widthAuto._style.HasFlag (DimAutoStyle.Text))
+            //        || (heightAuto is { } && heightAuto._style.HasFlag (DimAutoStyle.Text)))
             //    {
             //        //if (TextFormatter.NeedsFormat)
             //        {
@@ -347,12 +347,12 @@ public partial class View
             //            TextFormatter.AutoSize = false;
 
             //            var size = TextFormatter.GetAutoSize ();
-            //            if (widthAuto is null || !widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
+            //            if (widthAuto is null || !widthAuto._style.HasFlag (DimAutoStyle.Text))
             //            {
             //                size.Width = _width.Anchor (0);
             //            }
 
-            //            if (heightAuto is null || !heightAuto._style.HasFlag (Dim.DimAutoStyle.Text))
+            //            if (heightAuto is null || !heightAuto._style.HasFlag (DimAutoStyle.Text))
             //            {
             //                size.Height = _height.Anchor (0);
             //            }

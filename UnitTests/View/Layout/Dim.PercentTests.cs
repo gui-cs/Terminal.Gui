@@ -13,7 +13,7 @@ public class DimPercentTests
     public void DimFactor_Calculate_ReturnsCorrectValue ()
     {
         var dim = new DimFactor (0.5f);
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
+        var result = dim.Calculate (0, 100, null, Dimension.None);
         Assert.Equal (50, result);
     }
 

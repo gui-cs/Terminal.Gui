@@ -282,8 +282,8 @@ public class ProgressBar : View
 
     private void SetInitialProperties ()
     {
-        Width = Dim.Auto (Dim.DimAutoStyle.Content);
-        Height = Dim.Auto (Dim.DimAutoStyle.Content, minimumContentDim: 1);
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1);
         CanFocus = false;
         _fraction = 0;
         Initialized += ProgressBar_Initialized;

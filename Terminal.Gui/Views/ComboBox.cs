@@ -607,7 +607,7 @@ public class ComboBox : View
 
     private void ProcessLayout ()
     {
-        if (Viewport.Height < _minimumHeight && (Height is null || Height is Dim.DimAbsolute))
+        if (Viewport.Height < _minimumHeight && (Height is null || Height is DimAbsolute))
         {
             Height = _minimumHeight;
         }

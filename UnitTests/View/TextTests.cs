@@ -1207,8 +1207,8 @@ Y
         {
             Text = "01234",
             TextDirection = TextDirection.LeftRight_TopBottom,
-            Width = Dim.Auto (Dim.DimAutoStyle.Text),
-            Height = Dim.Auto (Dim.DimAutoStyle.Text)
+            Width = Dim.Auto (DimAutoStyle.Text),
+            Height = Dim.Auto (DimAutoStyle.Text)
         };
         Assert.Equal (new (0, 0, 5, 1), view.Frame);
         Assert.Equal (new (0, 0, 5, 1), view.Viewport);
@@ -1229,7 +1229,7 @@ Y
             TextDirection = TextDirection.LeftRight_TopBottom,
             TextAlignment = TextAlignment.Centered,
             Width = 10,
-            Height = Dim.Auto (Dim.DimAutoStyle.Text)
+            Height = Dim.Auto (DimAutoStyle.Text)
         };
         view.BeginInit ();
         view.EndInit ();
@@ -1247,8 +1247,8 @@ Y
         {
             TextDirection = TextDirection.TopBottom_LeftRight,
             Text = "01234",
-            Width = Dim.Auto (Dim.DimAutoStyle.Text),
-            Height = Dim.Auto (Dim.DimAutoStyle.Text)
+            Width = Dim.Auto (DimAutoStyle.Text),
+            Height = Dim.Auto (DimAutoStyle.Text)
         };
         Assert.Equal (new (0, 0, 1, 5), view.Frame);
         Assert.Equal (new (0, 0, 1, 5), view.Viewport);

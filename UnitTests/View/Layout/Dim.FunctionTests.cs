@@ -42,7 +42,7 @@ public class DimFunctionTests (ITestOutputHelper output)
     public void DimFunction_Calculate_ReturnsCorrectValue ()
     {
         var dim = new DimFunc (() => 10);
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
+        var result = dim.Calculate (0, 100, null, Dimension.None);
         Assert.Equal (10, result);
     }
 }

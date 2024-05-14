@@ -1,6 +1,30 @@
-using System.Diagnostics;
-
 namespace Terminal.Gui;
+
+/// <summary>
+///     Indicates the side for <see cref="Pos"/> operations.
+/// </summary>
+public enum Side
+{
+    /// <summary>
+    ///     The left (X) side of the view.
+    /// </summary>
+    Left = 0,
+
+    /// <summary>
+    ///     The top (Y) side of the view.
+    /// </summary>
+    Top = 1,
+
+    /// <summary>
+    ///     The right (X + Width) side of the view.
+    /// </summary>
+    Right = 2,
+
+    /// <summary>
+    ///     The bottom (Y + Height) side of the view.
+    /// </summary>
+    Bottom = 3
+}
 
 /// <summary>
 ///     Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or
@@ -346,11 +370,10 @@ public class Pos
     ///     that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension) { return Anchor (superviewDimension); }
-
+    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension) { return Anchor (superviewDimension); }
 
     /// <summary>
-    /// Diagnostics API to determine if this Pos object references other views.
+    ///     Diagnostics API to determine if this Pos object references other views.
     /// </summary>
     /// <returns></returns>
     internal virtual bool ReferencesOtherViews () { return false; }
@@ -390,7 +413,7 @@ internal class PosAnchorEnd : Pos
         return width - _offset;
     }
 
-    internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
+    internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
         int newLocation = Anchor (superviewDimension);
 
@@ -408,7 +431,7 @@ internal class PosCenter : Pos
     public override string ToString () { return "Center"; }
     internal override int Anchor (int width) { return width / 2; }
 
-    internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
+    internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
         int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension), 0);
 
@@ -436,7 +459,7 @@ internal class PosCombine (bool add, Pos left, Pos right) : Pos
         return la - ra;
     }
 
-    internal override int Calculate (int superviewDimension, Dim dim, View us, Dim.Dimension dimension)
+    internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
         int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
         int left = _left.Calculate (superviewDimension, dim, us, dimension);
@@ -451,7 +474,7 @@ internal class PosCombine (bool add, Pos left, Pos right) : Pos
     }
 
     /// <summary>
-    /// Diagnostics API to determine if this Pos object references other views.
+    ///     Diagnostics API to determine if this Pos object references other views.
     /// </summary>
     /// <returns></returns>
     internal override bool ReferencesOtherViews ()
@@ -489,32 +512,6 @@ internal class PosFunc (Func<int> n) : Pos
     internal override int Anchor (int width) { return _function (); }
 }
 
-/// <summary>
-/// Describes which side of the view to use for the position.
-/// </summary>
-public enum Side
-{
-    /// <summary>
-    /// The left (X) side of the view.
-    /// </summary>
-    Left = 0,
-
-    /// <summary>
-    /// The top (Y) side of the view.
-    /// </summary>
-    Top = 1,
-
-    /// <summary>
-    /// The right (X + Width) side of the view.
-    /// </summary>
-    Right = 2,
-
-    /// <summary>
-    /// The bottom (Y + Height) side of the view.
-    /// </summary>
-    Bottom = 3
-}
-
 internal class PosView (View view, Side side) : Pos
 {
     public readonly View Target = view;
@@ -525,13 +522,13 @@ internal class PosView (View view, Side side) : Pos
     public override string ToString ()
     {
         string sideString = side switch
-        {
-            Side.Left => "left",
-            Side.Top => "top",
-            Side.Right => "right",
-            Side.Bottom => "bottom",
-            _ => "unknown"
-        };
+                            {
+                                Side.Left => "left",
+                                Side.Top => "top",
+                                Side.Right => "right",
+                                Side.Bottom => "bottom",
+                                _ => "unknown"
+                            };
 
         if (Target == null)
         {
@@ -544,21 +541,18 @@ internal class PosView (View view, Side side) : Pos
     internal override int Anchor (int width)
     {
         return side switch
-        {
-            Side.Left => Target.Frame.X,
-            Side.Top => Target.Frame.Y,
-            Side.Right => Target.Frame.Right,
-            Side.Bottom => Target.Frame.Bottom,
-            _ => 0
-        };
+               {
+                   Side.Left => Target.Frame.X,
+                   Side.Top => Target.Frame.Y,
+                   Side.Right => Target.Frame.Right,
+                   Side.Bottom => Target.Frame.Bottom,
+                   _ => 0
+               };
     }
 
     /// <summary>
-    /// Diagnostics API to determine if this Pos object references other views.
+    ///     Diagnostics API to determine if this Pos object references other views.
     /// </summary>
     /// <returns></returns>
-    internal override bool ReferencesOtherViews ()
-    {
-        return true;
-    }
+    internal override bool ReferencesOtherViews () { return true; }
 }

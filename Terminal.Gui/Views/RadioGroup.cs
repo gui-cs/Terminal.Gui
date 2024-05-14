@@ -18,8 +18,8 @@ public class RadioGroup : View
     {
         CanFocus = true;
 
-        Width = Dim.Auto (Dim.DimAutoStyle.Content);
-        Height = Dim.Auto (Dim.DimAutoStyle.Content);
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content);
 
         // Things this view knows how to do
         AddCommand (

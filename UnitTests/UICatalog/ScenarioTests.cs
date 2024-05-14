@@ -482,12 +482,12 @@ public class ScenarioTests : TestsAllViews
                 return null;
             }
 
-            if (view.Width is not Dim.DimAuto)
+            if (view.Width is not DimAuto)
             {
                 view.Width = Dim.Percent (75);
             }
 
-            if (view.Height is not Dim.DimAuto)
+            if (view.Height is not DimAuto)
             {
                 view.Height = Dim.Percent (75);
             }

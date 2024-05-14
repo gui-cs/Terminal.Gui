@@ -28,7 +28,7 @@ public class DimTests
     public void DimAbsolute_Calculate_ReturnsCorrectValue ()
     {
         var dim = new DimAbsolute (10);
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
+        var result = dim.Calculate (0, 100, null, Dimension.None);
         Assert.Equal (10, result);
     }
 
@@ -38,7 +38,7 @@ public class DimTests
     {
         var view = new View { Width = 10 };
         var dim = new DimView (view, Dimension.Width);
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
+        var result = dim.Calculate (0, 100, null, Dimension.None);
         Assert.Equal (10, result);
     }
 
@@ -345,24 +345,24 @@ public class DimTests
     [TestRespondersDisposed]
     public void Internal_Tests ()
     {
-        var dimFactor = new Dim.DimFactor (0.10F);
+        var dimFactor = new DimFactor (0.10F);
         Assert.Equal (10, dimFactor.Anchor (100));
 
-        var dimAbsolute = new Dim.DimAbsolute (10);
+        var dimAbsolute = new DimAbsolute (10);
         Assert.Equal (10, dimAbsolute.Anchor (0));
 
-        var dimFill = new Dim.DimFill (1);
+        var dimFill = new DimFill (1);
         Assert.Equal (99, dimFill.Anchor (100));
 
-        var dimCombine = new Dim.DimCombine (true, dimFactor, dimAbsolute);
+        var dimCombine = new DimCombine (true, dimFactor, dimAbsolute);
         Assert.Equal (dimCombine._left, dimFactor);
         Assert.Equal (dimCombine._right, dimAbsolute);
         Assert.Equal (20, dimCombine.Anchor (100));
 
         var view = new View { Frame = new Rectangle (20, 10, 20, 1) };
-        var dimViewHeight = new Dim.DimView (view, Dimension.Height);
+        var dimViewHeight = new DimView (view, Dimension.Height);
         Assert.Equal (1, dimViewHeight.Anchor (0));
-        var dimViewWidth = new Dim.DimView (view, Dimension.Width);
+        var dimViewWidth = new DimView (view, Dimension.Width);
         Assert.Equal (20, dimViewWidth.Anchor (0));
 
         view.Dispose ();
@@ -584,8 +584,8 @@ public class DimTests
                        v4.Height = Auto (DimAutoStyle.Text);
                        Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Width);
                        Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Height);
-                       Assert.Equal (11, v4.Frame.Width); // 11 is the text length and because is Dim.DimAbsolute
-                       Assert.Equal (1, v4.Frame.Height); // 1 because is Dim.DimAbsolute
+                       Assert.Equal (11, v4.Frame.Width); // 11 is the text length and because is DimAbsolute
+                       Assert.Equal (1, v4.Frame.Height); // 1 because is DimAbsolute
 
                        v5.Text = "Button5";
 

@@ -418,7 +418,7 @@ public partial class Toplevel : View
         if (sb != null
             && !top.Subviews.Contains (sb)
             && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-            && top.Height is Dim.DimFill
+            && top.Height is DimFill
             && -top.Height.Anchor (0) < 1)
         {
             top.Height = Dim.Fill (sb.Visible ? 1 : 0);

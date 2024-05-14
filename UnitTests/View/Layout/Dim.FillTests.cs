@@ -141,7 +141,7 @@ public class DimFillTests (ITestOutputHelper output)
     public void DimFill_Calculate_ReturnsCorrectValue ()
     {
         var dim = Dim.Fill ();
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
+        var result = dim.Calculate (0, 100, null, Dimension.None);
         Assert.Equal (100, result);
     }
 

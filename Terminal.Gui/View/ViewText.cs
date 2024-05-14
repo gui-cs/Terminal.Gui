@@ -40,7 +40,7 @@ public partial class View
     ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="ContentSize"/>'s height
     ///         is 1, the text will be clipped.
     ///     </para>
-    ///     <para>If <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="Dim.DimAutoStyle.Text"/>,
+    ///     <para>If <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>,
     ///     the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     ///     <para>When the text changes, the <see cref="TextChanged"/> is fired.</para>
     /// </remarks>
@@ -84,7 +84,7 @@ public partial class View
     ///     redisplay the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="Dim.DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
+    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual TextAlignment TextAlignment
@@ -103,7 +103,7 @@ public partial class View
     ///     <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="Dim.DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
+    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual TextDirection TextDirection
@@ -127,7 +127,7 @@ public partial class View
     ///     the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="Dim.DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
+    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual VerticalTextAlignment VerticalTextAlignment
@@ -184,19 +184,19 @@ public partial class View
 
         // TODO: This is a hack. Figure out how to move this into DimDimAuto
         // Use _width & _height instead of Width & Height to avoid debug spew
-        Dim.DimAuto widthAuto = _width as Dim.DimAuto;
-        Dim.DimAuto heightAuto = _height as Dim.DimAuto;
-        if ((widthAuto is { } && widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
-            || (heightAuto is { } && heightAuto._style.HasFlag (Dim.DimAutoStyle.Text)))
+        DimAuto widthAuto = _width as DimAuto;
+        DimAuto heightAuto = _height as DimAuto;
+        if ((widthAuto is { } && widthAuto._style.HasFlag (DimAutoStyle.Text))
+            || (heightAuto is { } && heightAuto._style.HasFlag (DimAutoStyle.Text)))
         {
             size = TextFormatter.GetAutoSize ();
 
-            if (widthAuto is null || !widthAuto._style.HasFlag (Dim.DimAutoStyle.Text))
+            if (widthAuto is null || !widthAuto._style.HasFlag (DimAutoStyle.Text))
             {
                 size.Width = ContentSize.Width;
             }
 
-            if (heightAuto is null || !heightAuto._style.HasFlag (Dim.DimAutoStyle.Text))
+            if (heightAuto is null || !heightAuto._style.HasFlag (DimAutoStyle.Text))
             {
                 size.Height = ContentSize.Height;
             }
