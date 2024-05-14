@@ -180,8 +180,7 @@ public class CheckBox : View
 
     private string GetFormatterText ()
     {
-        // BUGBUG: Dim.DimAuto is an internal API
-        if (Width is Dim.DimAuto || string.IsNullOrEmpty (Title) || ContentSize.Width <= 2)
+        if (string.IsNullOrEmpty (Title) || ContentSize.Width <= 2)
         {
             return Text;
         }
