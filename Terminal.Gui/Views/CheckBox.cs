@@ -158,11 +158,11 @@ public class CheckBox : View
             case TextAlignment.Left:
             case TextAlignment.Centered:
             case TextAlignment.Justified:
-                TextFormatter.Text = $"{GetCheckedState ()} {GetFormatterText ()}";
+                TextFormatter.Text = $"{GetCheckedState ()} {Text}";
 
                 break;
             case TextAlignment.Right:
-                TextFormatter.Text = $"{GetFormatterText ()} {GetCheckedState ()}";
+                TextFormatter.Text = $"{Text} {GetCheckedState ()}";
 
                 break;
         }
@@ -176,15 +176,5 @@ public class CheckBox : View
             false => _charUnChecked,
             var _ => _charNullChecked
         };
-    }
-
-    private string GetFormatterText ()
-    {
-        if (string.IsNullOrEmpty (Title) || ContentSize.Width <= 2)
-        {
-            return Text;
-        }
-
-        return Text [..Math.Min (ContentSize.Width - 2, Text.GetRuneCount ())];
     }
 }
