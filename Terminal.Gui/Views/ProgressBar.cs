@@ -59,10 +59,7 @@ public class ProgressBar : View
     public bool BidirectionalMarquee
     {
         get => _bidirectionalMarquee;
-        set
-        {
-            _bidirectionalMarquee = value;
-        }
+        set => _bidirectionalMarquee = value;
     }
 
     /// <summary>Gets or sets the <see cref="ProgressBar"/> fraction to display, must be a value between 0 and 1.</summary>
@@ -81,10 +78,7 @@ public class ProgressBar : View
     public ProgressBarFormat ProgressBarFormat
     {
         get => _progressBarFormat;
-        set
-        {
-            _progressBarFormat = value;
-        }
+        set => _progressBarFormat = value;
     }
 
     /// <summary>Gets/Sets the progress bar style based on the <see cref="Terminal.Gui.ProgressBarStyle"/></summary>
@@ -121,10 +115,7 @@ public class ProgressBar : View
     public Rune SegmentCharacter
     {
         get => _segmentCharacter;
-        set
-        {
-            _segmentCharacter = value;
-        }
+        set => _segmentCharacter = value;
     }
 
     /// <summary>
@@ -272,8 +263,6 @@ public class ProgressBar : View
 
     private void ProgressBar_Initialized (object sender, EventArgs e)
     {
-        // SetContentSize (Viewport.Size with { Height = 1 });
-
         ColorScheme = new ColorScheme (ColorScheme ?? SuperView?.ColorScheme ?? Colors.ColorSchemes ["Base"])
         {
             HotNormal = new Attribute (Color.BrightGreen, Color.Gray)
