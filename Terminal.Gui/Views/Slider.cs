@@ -930,7 +930,7 @@ public class Slider<T> : View
         }
     }
 
-    private string AlignText (string text, int width, TextAlignment textAlignment)
+    private string AlignText (string text, int width, Alignment alignment)
     {
         if (text is null)
         {
@@ -947,20 +947,20 @@ public class Slider<T> : View
         string s2 = new (' ', w % 2);
 
         // Note: The formatter doesn't handle all of this ???
-        switch (textAlignment)
+        switch (alignment)
         {
-            case TextAlignment.Justified:
+            case Alignment.Justified:
                 return TextFormatter.Justify (text, width);
-            case TextAlignment.Left:
+            case Alignment.Left:
                 return text + s1 + s1 + s2;
-            case TextAlignment.Centered:
+            case Alignment.Centered:
                 if (text.Length % 2 != 0)
                 {
                     return s1 + text + s1 + s2;
                 }
 
                 return s1 + s2 + text + s1;
-            case TextAlignment.Right:
+            case Alignment.Right:
                 return s1 + s1 + s2 + text;
             default:
                 return text;
@@ -1293,7 +1293,7 @@ public class Slider<T> : View
                     switch (_config._legendsOrientation)
                     {
                         case Orientation.Horizontal:
-                            text = AlignText (text, _config._innerSpacing + 1, TextAlignment.Centered);
+                            text = AlignText (text, _config._innerSpacing + 1, Alignment.Centered);
 
                             break;
                         case Orientation.Vertical:
@@ -1311,7 +1311,7 @@ public class Slider<T> : View
 
                             break;
                         case Orientation.Vertical:
-                            text = AlignText (text, _config._innerSpacing + 1, TextAlignment.Centered);
+                            text = AlignText (text, _config._innerSpacing + 1, Alignment.Centered);
 
                             break;
                     }

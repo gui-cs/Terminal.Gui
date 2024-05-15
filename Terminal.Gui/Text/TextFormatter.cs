@@ -17,14 +17,14 @@ public class TextFormatter
     private Size _size;
     private int _tabWidth = 4;
     private string _text;
-    private TextAlignment _textAlignment;
+    private Alignment _textAlignment = Alignment.Left;
     private TextDirection _textDirection;
-    private VerticalTextAlignment _textVerticalAlignment;
+    private Alignment _textVerticalAlignment = Alignment.Top;
     private bool _wordWrap = true;
 
-    /// <summary>Controls the horizontal text-alignment property.</summary>
+    /// <summary>Get or sets the horizontal text alignment.</summary>
     /// <value>The text alignment.</value>
-    public TextAlignment Alignment
+    public Alignment Alignment
     {
         get => _textAlignment;
         set => _textAlignment = EnableNeedsFormat (value);
@@ -34,8 +34,7 @@ public class TextFormatter
     /// <remarks>
     ///     <para>Used when <see cref="View"/> is using <see cref="Dim.Auto"/> to resize the view's <see cref="View.Viewport"/> to fit <see cref="Size"/>.</para>
     ///     <para>
-    ///         AutoSize is ignored if <see cref="TextAlignment.Justified"/> and
-    ///         <see cref="VerticalTextAlignment.Justified"/> are used.
+    ///         AutoSize is ignored if <see cref="Alignment.Justified"/> is used.
     ///     </para>
     /// </remarks>
     public bool AutoSize
@@ -70,9 +69,8 @@ public class TextFormatter
     ///     Only the first HotKey specifier found in <see cref="Text"/> is supported.
     /// </remarks>
     /// <param name="isWidth">
-    ///     If <see langword="true"/> (the default) the width required for the HotKey specifier is returned. Otherwise the
-    ///     height
-    ///     is returned.
+    ///     If <see langword="true"/> (the default) the width required for the HotKey specifier is returned. Otherwise, the
+    ///     height is returned.
     /// </param>
     /// <returns>
     ///     The number of characters required for the <see cref="TextFormatter.HotKeySpecifier"/>. If the text
@@ -99,8 +97,8 @@ public class TextFormatter
     /// </summary>
     public int CursorPosition { get; internal set; }
 
-    /// <summary>Controls the text-direction property.</summary>
-    /// <value>The text vertical alignment.</value>
+    /// <summary>Gets or sets the text-direction.</summary>
+    /// <value>The text direction.</value>
     public TextDirection Direction
     {
         get => _textDirection;
@@ -114,8 +112,7 @@ public class TextFormatter
             }
         }
     }
-
-
+    
     /// <summary>
     ///     Determines if the viewport width will be used or only the text width will be used,
     ///     If <see langword="true"/> all the viewport area will be filled with whitespaces and the same background color
@@ -227,9 +224,9 @@ public class TextFormatter
         }
     }
 
-    /// <summary>Controls the vertical text-alignment property.</summary>
+    /// <summary>Gets or sets the vertical text-alignment.</summary>
     /// <value>The text vertical alignment.</value>
-    public VerticalTextAlignment VerticalAlignment
+    public Alignment VerticalAlignment
     {
         get => _textVerticalAlignment;
         set => _textVerticalAlignment = EnableNeedsFormat (value);
@@ -322,10 +319,10 @@ public class TextFormatter
 
             // When text is justified, we lost left or right, so we use the direction to align. 
 
-            int x, y;
+            int x = 0, y = 0;
 
             // Horizontal Alignment
-            if (Alignment is TextAlignment.Right)
+            if (Alignment is Alignment.Right)
             {
                 if (isVertical)
                 {
@@ -340,7 +337,7 @@ public class TextFormatter
                     CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
             }
-            else if (Alignment is TextAlignment.Left)
+            else if (Alignment is Alignment.Left)
             {
                 if (isVertical)
                 {
@@ -356,7 +353,7 @@ public class TextFormatter
 
                 CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
             }
-            else if (Alignment is TextAlignment.Justified)
+            else if (Alignment is Alignment.Justified)
             {
                 if (isVertical)
                 {
@@ -379,7 +376,7 @@ public class TextFormatter
 
                 CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
             }
-            else if (Alignment is TextAlignment.Centered)
+            else if (Alignment is Alignment.Centered)
             {
                 if (isVertical)
                 {
@@ -399,11 +396,13 @@ public class TextFormatter
             }
             else
             {
-                throw new ArgumentOutOfRangeException ($"{nameof (Alignment)}");
+                Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+
+                return;
             }
 
             // Vertical Alignment
-            if (VerticalAlignment is VerticalTextAlignment.Bottom)
+            if (VerticalAlignment is Alignment.Bottom)
             {
                 if (isVertical)
                 {
@@ -414,7 +413,7 @@ public class TextFormatter
                     y = screen.Bottom - linesFormatted.Count + line;
                 }
             }
-            else if (VerticalAlignment is VerticalTextAlignment.Top)
+            else if (VerticalAlignment is Alignment.Top)
             {
                 if (isVertical)
                 {
@@ -425,7 +424,7 @@ public class TextFormatter
                     y = screen.Top + line;
                 }
             }
-            else if (VerticalAlignment is VerticalTextAlignment.Justified)
+            else if (VerticalAlignment is Alignment.Justified)
             {
                 if (isVertical)
                 {
@@ -439,7 +438,7 @@ public class TextFormatter
                         line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
                 }
             }
-            else if (VerticalAlignment is VerticalTextAlignment.Middle)
+            else if (VerticalAlignment is Alignment.Centered)
             {
                 if (isVertical)
                 {
@@ -454,7 +453,9 @@ public class TextFormatter
             }
             else
             {
-                throw new ArgumentOutOfRangeException ($"{nameof (VerticalAlignment)}");
+               Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+
+               return;
             }
 
             int colOffset = screen.X < 0 ? Math.Abs (screen.X) : 0;
@@ -475,8 +476,8 @@ public class TextFormatter
                 {
                     if (idx < 0
                         || (isVertical
-                                ? VerticalAlignment != VerticalTextAlignment.Bottom && current < 0
-                                : Alignment != TextAlignment.Right && x + current + colOffset < 0))
+                                ? VerticalAlignment != Alignment.Bottom && current < 0
+                                : Alignment != Alignment.Right && x + current + colOffset < 0))
                     {
                         current++;
 
@@ -565,7 +566,7 @@ public class TextFormatter
 
                 if (HotKeyPos > -1 && idx == HotKeyPos)
                 {
-                    if ((isVertical && VerticalAlignment == VerticalTextAlignment.Justified) || (!isVertical && Alignment == TextAlignment.Justified))
+                    if ((isVertical && VerticalAlignment == Alignment.Justified) || (!isVertical && Alignment == Alignment.Justified))
                     {
                         CursorPosition = idx - start;
                     }
@@ -703,7 +704,7 @@ public class TextFormatter
                 _lines = Format (
                                  text,
                                  Size.Height,
-                                 VerticalAlignment == VerticalTextAlignment.Justified,
+                                 VerticalAlignment == Alignment.Justified,
                                  Size.Width > colsWidth && WordWrap,
                                  PreserveTrailingSpaces,
                                  TabWidth,
@@ -727,7 +728,7 @@ public class TextFormatter
                 _lines = Format (
                                  text,
                                  Size.Width,
-                                 Alignment == TextAlignment.Justified,
+                                 Alignment == Alignment.Justified,
                                  Size.Height > 1 && WordWrap,
                                  PreserveTrailingSpaces,
                                  TabWidth,
@@ -981,7 +982,7 @@ public class TextFormatter
         // if value is not wide enough
         if (text.EnumerateRunes ().Sum (c => c.GetColumns ()) < width)
         {
-            // pad it out with spaces to the given alignment
+            // pad it out with spaces to the given Alignment
             int toPad = width - text.EnumerateRunes ().Sum (c => c.GetColumns ());
 
             return text + new string (' ', toPad);
@@ -1003,7 +1004,7 @@ public class TextFormatter
     /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
     /// <returns>A list of word wrapped lines.</returns>
     /// <remarks>
-    ///     <para>This method does not do any justification.</para>
+    ///     <para>This method does not do any alignment.</para>
     ///     <para>This method strips Newline ('\n' and '\r\n') sequences before processing.</para>
     ///     <para>
     ///         If <paramref name="preserveTrailingSpaces"/> is <see langword="false"/> at most one space will be preserved
@@ -1035,7 +1036,7 @@ public class TextFormatter
         List<Rune> runes = StripCRLF (text).ToRuneList ();
 
         int start = Math.Max (
-                              !runes.Contains ((Rune)' ') && textFormatter is { VerticalAlignment: VerticalTextAlignment.Bottom } && IsVerticalDirection (textDirection)
+                              !runes.Contains ((Rune)' ') && textFormatter is { VerticalAlignment: Alignment.Bottom } && IsVerticalDirection (textDirection)
                                   ? runes.Count - width
                                   : 0,
                               0);
@@ -1253,7 +1254,7 @@ public class TextFormatter
     ///     The number of columns to clip the text to. Text longer than <paramref name="width"/> will be
     ///     clipped.
     /// </param>
-    /// <param name="talign">Alignment.</param>
+    /// <param name="textAlignment">Alignment.</param>
     /// <param name="textDirection">The text direction.</param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
@@ -1261,13 +1262,13 @@ public class TextFormatter
     public static string ClipAndJustify (
         string text,
         int width,
-        TextAlignment talign,
+        Alignment textAlignment,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         int tabWidth = 0,
         TextFormatter textFormatter = null
     )
     {
-        return ClipAndJustify (text, width, talign == TextAlignment.Justified, textDirection, tabWidth, textFormatter);
+        return ClipAndJustify (text, width, textAlignment == Alignment.Justified, textDirection, tabWidth, textFormatter);
     }
 
     /// <summary>Justifies text within a specified width.</summary>
@@ -1308,12 +1309,12 @@ public class TextFormatter
         {
             if (IsHorizontalDirection (textDirection))
             {
-                if (textFormatter is { Alignment: TextAlignment.Right })
+                if (textFormatter is { Alignment: Alignment.Right })
                 {
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
                 }
 
-                if (textFormatter is { Alignment: TextAlignment.Centered })
+                if (textFormatter is { Alignment: Alignment.Centered })
                 {
                     return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
                 }
@@ -1323,12 +1324,12 @@ public class TextFormatter
 
             if (IsVerticalDirection (textDirection))
             {
-                if (textFormatter is { VerticalAlignment: VerticalTextAlignment.Bottom })
+                if (textFormatter is { VerticalAlignment: Alignment.Bottom })
                 {
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
                 }
 
-                if (textFormatter is { VerticalAlignment: VerticalTextAlignment.Middle })
+                if (textFormatter is { VerticalAlignment: Alignment.Centered })
                 {
                     return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
                 }
@@ -1346,14 +1347,14 @@ public class TextFormatter
 
         if (IsHorizontalDirection (textDirection))
         {
-            if (textFormatter is { Alignment: TextAlignment.Right })
+            if (textFormatter is { Alignment: Alignment.Right })
             {
                 if (GetRuneWidth (text, tabWidth, textDirection) > width)
                 {
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
                 }
             }
-            else if (textFormatter is { Alignment: TextAlignment.Centered })
+            else if (textFormatter is { Alignment: Alignment.Centered })
             {
                 return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
             }
@@ -1365,14 +1366,14 @@ public class TextFormatter
 
         if (IsVerticalDirection (textDirection))
         {
-            if (textFormatter is { VerticalAlignment: VerticalTextAlignment.Bottom })
+            if (textFormatter is { VerticalAlignment: Alignment.Bottom })
             {
                 if (runes.Count - zeroLength > width)
                 {
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
                 }
             }
-            else if (textFormatter is { VerticalAlignment: VerticalTextAlignment.Middle })
+            else if (textFormatter is { VerticalAlignment: Alignment.Centered })
             {
                 return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
             }
@@ -1479,7 +1480,7 @@ public class TextFormatter
     /// <summary>Formats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.</summary>
     /// <param name="text"></param>
     /// <param name="width">The number of columns to constrain the text to for word wrapping and clipping.</param>
-    /// <param name="talign">Specifies how the text will be aligned horizontally.</param>
+    /// <param name="textAlignment">Specifies how the text will be aligned horizontally.</param>
     /// <param name="wordWrap">
     ///     If <see langword="true"/>, the text will be wrapped to new lines no longer than
     ///     <paramref name="width"/>. If <see langword="false"/>, forces text to fit a single line. Line breaks are converted
@@ -1502,7 +1503,7 @@ public class TextFormatter
     public static List<string> Format (
         string text,
         int width,
-        TextAlignment talign,
+        Alignment textAlignment,
         bool wordWrap,
         bool preserveTrailingSpaces = false,
         int tabWidth = 0,
@@ -1514,7 +1515,7 @@ public class TextFormatter
         return Format (
                        text,
                        width,
-                       talign == TextAlignment.Justified,
+                       textAlignment == Alignment.Justified,
                        wordWrap,
                        preserveTrailingSpaces,
                        tabWidth,
@@ -1888,7 +1889,7 @@ public class TextFormatter
         return lineIdx;
     }
 
-    /// <summary>Calculates the rectangle required to hold text, assuming no word wrapping or justification.</summary>
+    /// <summary>Calculates the rectangle required to hold text, assuming no word wrapping or alignment.</summary>
     /// <remarks>
     ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
     ///     glyphs (e.g. Arabic).

@@ -216,7 +216,6 @@ public class DatePicker : View
         {
             X = Pos.Center () - 2,
             Y = Pos.Bottom (_calendar) - 1,
-            Height = 1,
             Width = 2,
             Text = GetBackButtonText (),
             WantContinuousButtonPressed = true,
@@ -235,7 +234,6 @@ public class DatePicker : View
         {
             X = Pos.Right (_previousMonthButton) + 2,
             Y = Pos.Bottom (_calendar) - 1,
-            Height = 1,
             Width = 2,
             Text = GetForwardButtonText(),
             WantContinuousButtonPressed = true,

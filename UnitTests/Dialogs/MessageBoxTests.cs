@@ -278,7 +278,7 @@ public class MessageBoxTests
 │ffffffffffffffffff│
 │  ffffffffffffff  │
 │                  │
-│     {btn}    │
+│    {btn}     │
 └──────────────────┘",
                                                                                        _output
                                                                                       );
@@ -302,7 +302,7 @@ public class MessageBoxTests
 │ffffffffffffffffff│
 │ffffffffffffffffff│
 │ffffffffffffffffff│
-│     {btn}    │",
+│    {btn}     │",
                                                                                        _output
                                                                                       );
                                          Application.RequestStop ();
@@ -377,7 +377,7 @@ ff ff ff ff ff ff ff
 ────────────────────
 ffffffffffffffffffff
                     
-      ⟦► btn ◄⟧     
+     ⟦► btn ◄⟧      
 ────────────────────
 ",
                                                                                        _output
@@ -459,7 +459,7 @@ ffffffffffffffffffff
 │ffffffffffffffffff│
 │ffffffffffffffffff│
 │ffffffffffffffffff│
-│     {btn}    │",
+│    {btn}     │",
                                                                                        _output
                                                                                       );
                                          Application.RequestStop ();
@@ -509,7 +509,7 @@ ffffffffffffffffffff
 ────────────────────
 ffffffffffffffffffff
                     
-      ⟦► btn ◄⟧     
+     ⟦► btn ◄⟧      
 ────────────────────
 ",
                                                                                        _output
@@ -529,7 +529,7 @@ ffffffffffffffffffff
 ────────────────────
 ffffffffffffffffffff
                     
-      ⟦► btn ◄⟧     
+     ⟦► btn ◄⟧      
 ────────────────────
 ",
                                                                                        _output

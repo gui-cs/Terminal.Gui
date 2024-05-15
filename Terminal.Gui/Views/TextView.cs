@@ -1776,7 +1776,7 @@ internal class WordWrapManager
                                                             TextFormatter.Format (
                                                                                   TextModel.ToString (line),
                                                                                   width,
-                                                                                  TextAlignment.Left,
+                                                                                  Alignment.Left,
                                                                                   true,
                                                                                   preserveTrailingSpaces,
                                                                                   tabWidth
@@ -4163,7 +4163,10 @@ public class TextView : View
         }
         else
         {
-            PositionCursor ();
+            if (IsInitialized)
+            {
+                PositionCursor ();
+            }
         }
 
         OnUnwrappedCursorPosition ();

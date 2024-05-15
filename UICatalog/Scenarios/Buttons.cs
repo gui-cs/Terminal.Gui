@@ -287,39 +287,39 @@ public class Buttons : Scenario
                                               switch (args.SelectedItem)
                                               {
                                                   case 0:
-                                                      moveBtn.TextAlignment = TextAlignment.Left;
-                                                      sizeBtn.TextAlignment = TextAlignment.Left;
-                                                      moveBtnA.TextAlignment = TextAlignment.Left;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Left;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Left;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Left;
+                                                      moveBtn.TextAlignment = Alignment.Left;
+                                                      sizeBtn.TextAlignment = Alignment.Left;
+                                                      moveBtnA.TextAlignment = Alignment.Left;
+                                                      sizeBtnA.TextAlignment = Alignment.Left;
+                                                      moveHotKeyBtn.TextAlignment = Alignment.Left;
+                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.Left;
 
                                                       break;
                                                   case 1:
-                                                      moveBtn.TextAlignment = TextAlignment.Right;
-                                                      sizeBtn.TextAlignment = TextAlignment.Right;
-                                                      moveBtnA.TextAlignment = TextAlignment.Right;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Right;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Right;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Right;
+                                                      moveBtn.TextAlignment = Alignment.Right;
+                                                      sizeBtn.TextAlignment = Alignment.Right;
+                                                      moveBtnA.TextAlignment = Alignment.Right;
+                                                      sizeBtnA.TextAlignment = Alignment.Right;
+                                                      moveHotKeyBtn.TextAlignment = Alignment.Right;
+                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.Right;
 
                                                       break;
                                                   case 2:
-                                                      moveBtn.TextAlignment = TextAlignment.Centered;
-                                                      sizeBtn.TextAlignment = TextAlignment.Centered;
-                                                      moveBtnA.TextAlignment = TextAlignment.Centered;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Centered;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Centered;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Centered;
+                                                      moveBtn.TextAlignment = Alignment.Centered;
+                                                      sizeBtn.TextAlignment = Alignment.Centered;
+                                                      moveBtnA.TextAlignment = Alignment.Centered;
+                                                      sizeBtnA.TextAlignment = Alignment.Centered;
+                                                      moveHotKeyBtn.TextAlignment = Alignment.Centered;
+                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.Centered;
 
                                                       break;
                                                   case 3:
-                                                      moveBtn.TextAlignment = TextAlignment.Justified;
-                                                      sizeBtn.TextAlignment = TextAlignment.Justified;
-                                                      moveBtnA.TextAlignment = TextAlignment.Justified;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Justified;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Justified;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Justified;
+                                                      moveBtn.TextAlignment = Alignment.Justified;
+                                                      sizeBtn.TextAlignment = Alignment.Justified;
+                                                      moveBtnA.TextAlignment = Alignment.Justified;
+                                                      sizeBtnA.TextAlignment = Alignment.Justified;
+                                                      moveHotKeyBtn.TextAlignment = Alignment.Justified;
+                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.Justified;
 
                                                       break;
                                               }
@@ -418,9 +418,8 @@ public class Buttons : Scenario
                 throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
             }
 
-            // TODO: Use Dim.Auto for the Width and Height
-            Height = 1;
-            Width = Dim.Function (() => Digits + 2); // button + 3 for number + button
+            Width = Dim.Auto (DimAutoStyle.Content); //Dim.Function (() => Digits + 2); // button + 3 for number + button
+            Height = Dim.Auto (DimAutoStyle.Content);
 
             _down = new ()
             {
@@ -440,7 +439,7 @@ public class Buttons : Scenario
                 Y = Pos.Top (_down),
                 Width = Dim.Function (() => Digits),
                 Height = 1,
-                TextAlignment = TextAlignment.Centered,
+                TextAlignment = Alignment.Centered,
                 CanFocus = true
             };
 

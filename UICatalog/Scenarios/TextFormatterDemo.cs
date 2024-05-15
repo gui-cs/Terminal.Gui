@@ -63,17 +63,29 @@ public class TextFormatterDemo : Scenario
 
         app.Add (unicodeCheckBox);
 
-        List<TextAlignment> alignments = Enum.GetValues (typeof (TextAlignment)).Cast<TextAlignment> ().ToList ();
+        static IEnumerable<T> GetUniqueEnumValues<T> () where T : Enum
+        {
+            var values = new HashSet<T> ();
+            foreach (T v in Enum.GetValues (typeof (T)))
+            {
+                if (values.Add (v))
+                {
+                    yield return v;
+                }
+            }
+        }
+
+        List<Alignment> alignments = new () { Alignment.Left, Alignment.Right, Alignment.Centered, Alignment.Justified };
         Label [] singleLines = new Label [alignments.Count];
         Label [] multipleLines = new Label [alignments.Count];
 
         var multiLineHeight = 5;
 
-        foreach (TextAlignment alignment in alignments)
+        for (int i = 0; i < alignments.Count; i++)
         {
-            singleLines [(int)alignment] = new()
+            singleLines [i] = new ()
             {
-                TextAlignment = alignment,
+                TextAlignment = alignments [i],
                 X = 0,
 
                 Width = Dim.Fill (),
@@ -82,9 +94,9 @@ public class TextFormatterDemo : Scenario
                 Text = text
             };
 
-            multipleLines [(int)alignment] = new()
+            multipleLines [i] = new ()
             {
-                TextAlignment = alignment,
+                TextAlignment = alignments [i],
                 X = 0,
 
                 Width = Dim.Fill (),
@@ -100,33 +112,33 @@ public class TextFormatterDemo : Scenario
         };
         app.Add (label);
 
-        foreach (TextAlignment alignment in alignments)
+        for (int i = 0; i < alignments.Count; i++)
         {
-            label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
+            label = new () { Y = Pos.Bottom (label), Text = $"{alignments [i]}:" };
             app.Add (label);
-            singleLines [(int)alignment].Y = Pos.Bottom (label);
-            app.Add (singleLines [(int)alignment]);
-            label = singleLines [(int)alignment];
+            singleLines [i].Y = Pos.Bottom (label);
+            app.Add (singleLines [i]);
+            label = singleLines [i];
         }
 
-        label = new() { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
+        label = new () { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
         app.Add (label);
 
-        foreach (TextAlignment alignment in alignments)
+        for (int i = 0; i < alignments.Count; i++)
         {
-            label = new() { Y = Pos.Bottom (label), Text = $"{alignment}:" };
+            label = new () { Y = Pos.Bottom (label), Text = $"{alignments [i]}:" };
             app.Add (label);
-            multipleLines [(int)alignment].Y = Pos.Bottom (label);
-            app.Add (multipleLines [(int)alignment]);
-            label = multipleLines [(int)alignment];
+            multipleLines [i].Y = Pos.Bottom (label);
+            app.Add (multipleLines [i]);
+            label = multipleLines [i];
         }
 
         unicodeCheckBox.Toggled += (s, e) =>
                                    {
-                                       foreach (TextAlignment alignment in alignments)
+                                       for (int i = 0; i < alignments.Count; i++)
                                        {
-                                           singleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;
-                                           multipleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;
+                                           singleLines [i].Text = e.OldValue == true ? text : unicode;
+                                           multipleLines [i].Text = e.OldValue == true ? text : unicode;
                                        }
                                    };
 
