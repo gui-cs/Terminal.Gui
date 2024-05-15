@@ -171,7 +171,7 @@ public class AllViewsTester : Scenario
 
         _locationFrame.Add (_xRadioGroup);
 
-        radioItems = new [] { "P_ercent(y)", "A_nchorEnd", "C_enter", "Absoulte(_y)" };
+        radioItems = new [] { "P_ercent(y)", "A_nchorEnd", "C_enter", "Absolute(_y)" };
         label = new Label { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "Y:" };
         _locationFrame.Add (label);
         _yText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
