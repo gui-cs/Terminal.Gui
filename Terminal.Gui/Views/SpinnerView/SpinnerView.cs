@@ -28,8 +28,8 @@ public class SpinnerView : View
     /// <summary>Creates a new instance of the <see cref="SpinnerView"/> class.</summary>
     public SpinnerView ()
     {
-        Width = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
-        Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
+        Width = Dim.Auto (minimumContentDim: 1);
+        Height = Dim.Auto (minimumContentDim: 1);
         _delay = DEFAULT_DELAY;
         _bounce = false;
         SpinReverse = false;
