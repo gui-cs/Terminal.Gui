@@ -122,8 +122,8 @@ public class ScenarioTests : TestsAllViews
         RadioGroup _hRadioGroup;
         TextField _hText;
         var _hVal = 0;
-        List<string> posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
-        List<string> dimNames = new () { "Auto", "Factor", "Fill", "Absolute" };
+        List<string> posNames = new () { "Percent", "AnchorEnd", "Center", "Absolute" };
+        List<string> dimNames = new () { "Auto", "Percent", "Fill", "Absolute" };
 
         Application.Init (new FakeDriver ());
 
@@ -167,7 +167,7 @@ public class ScenarioTests : TestsAllViews
         _computedCheckBox = new () { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
         _settingsPane.Add (_computedCheckBox);
 
-        var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
+        var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "Absolute(x)" };
 
         _locationFrame = new ()
         {
@@ -187,7 +187,7 @@ public class ScenarioTests : TestsAllViews
 
         _locationFrame.Add (_xRadioGroup);
 
-        radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
+        radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "Absolute(y)" };
         label = new () { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "y:" };
         _locationFrame.Add (label);
         _yText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };

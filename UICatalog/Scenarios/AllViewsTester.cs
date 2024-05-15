@@ -139,7 +139,7 @@ public class AllViewsTester : Scenario
             Title = "Settings"
         };
 
-        string [] radioItems = { "_Percent(x)", "_AnchorEnd", "_Center", "A_t(x)" };
+        string [] radioItems = { "_Percent(x)", "_AnchorEnd", "_Center", "A_bsolute(x)" };
 
         _locationFrame = new FrameView
         {
@@ -171,7 +171,7 @@ public class AllViewsTester : Scenario
 
         _locationFrame.Add (_xRadioGroup);
 
-        radioItems = new [] { "P_ercent(y)", "A_nchorEnd", "C_enter", "At(_y)" };
+        radioItems = new [] { "P_ercent(y)", "A_nchorEnd", "C_enter", "Absoulte(_y)" };
         label = new Label { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "Y:" };
         _locationFrame.Add (label);
         _yText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
