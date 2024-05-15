@@ -486,7 +486,7 @@ internal class UICatalogApp
             {
                 X = 0,
                 Y = 1,
-                Width = Dim.Percent (30),
+                Width = Dim.Auto (),
                 Height = Dim.Fill (1),
                 AllowsMarking = false,
                 CanFocus = true,
