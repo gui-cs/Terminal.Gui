@@ -1107,6 +1107,9 @@ public partial class View
 
             switch (checkPosDim)
             {
+                case Pos pos and PosAnchorEnd:
+                    break;
+
                 case Pos pos and not PosAbsolute and not PosView and not PosCombine:
                     bad = pos;
 
@@ -1120,6 +1123,9 @@ public partial class View
                     break;
 
                 case Dim dim and DimAuto:
+                    break;
+
+                case Dim dim and DimFill:
                     break;
 
                 case Dim dim and not DimAbsolute and not DimView and not DimCombine:
