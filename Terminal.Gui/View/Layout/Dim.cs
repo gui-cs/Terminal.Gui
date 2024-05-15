@@ -360,7 +360,7 @@ public class DimAbsolute (int size) : Dim
 }
 
 /// <summary>
-///     A <see cref="Dim"/> object that automatically sizes the view to fit all the view's SubViews and/or Text.
+///     Represents a dimension that automatically sizes the view to fit all the view's Content, SubViews, and/or Text.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -374,34 +374,32 @@ public class DimAbsolute (int size) : Dim
 /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.</param>
 public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumContentDim) : Dim
 {
-    internal readonly Dim _minContentDim = minimumContentDim;
-    internal readonly Dim _maxContentDim = maximumContentDim;
-    internal readonly DimAutoStyle _style = style;
-    internal int _size;
+    /// <summary>
+    /// Gets the minimum dimension the View's ContentSize will be constrained to.
+    /// </summary>
+    public Dim MinimumContentDim { get; } = minimumContentDim;
 
-    /// <inheritdoc/>
-    public override bool Equals (object other)
-    {
-        return other is DimAuto auto && auto._minContentDim == _minContentDim && auto._maxContentDim == _maxContentDim && auto._style == _style;
-    }
+    /// <summary>
+    /// Gets the maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.
+    /// </summary>
+    public Dim MaximumContentDim { get; } = maximumContentDim;
 
-    /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), _minContentDim, _maxContentDim, _style); }
-
-    /// <inheritdoc/>
-    public override string ToString () { return $"Auto({_style},{_minContentDim},{_maxContentDim})"; }
+    /// <summary>
+    /// Gets the style of the DimAuto.
+    /// </summary>
+    public DimAutoStyle Style { get; } = style;
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
         if (us == null)
         {
-            return _maxContentDim?.Anchor (0) ?? 0;
+            return MaximumContentDim?.Anchor (0) ?? 0;
         }
 
         var textSize = 0;
         var subviewsSize = 0;
 
-        int autoMin = _minContentDim?.Anchor (superviewContentSize) ?? 0;
+        int autoMin = MinimumContentDim?.Anchor (superviewContentSize) ?? 0;
 
         if (superviewContentSize < autoMin)
         {
@@ -410,12 +408,12 @@ public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumCont
             return superviewContentSize;
         }
 
-        if (_style.HasFlag (DimAutoStyle.Text))
+        if (Style.HasFlag (DimAutoStyle.Text))
         {
             textSize = int.Max (autoMin, dimension == Dimension.Width ? us.TextFormatter.Size.Width : us.TextFormatter.Size.Height);
         }
 
-        if (_style.HasFlag (DimAutoStyle.Content))
+        if (Style.HasFlag (DimAutoStyle.Content))
         {
             if (us._contentSize is { })
             {
@@ -473,18 +471,26 @@ public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumCont
         }
 
         // If max: is set, clamp the return - BUGBUG: Not tested
-        return int.Min (max, _maxContentDim?.Anchor (superviewContentSize) ?? superviewContentSize);
+        return int.Min (max, MaximumContentDim?.Anchor (superviewContentSize) ?? superviewContentSize);
     }
 
-    /// <summary>
-    ///     Diagnostics API to determine if this Dim object references other views.
-    /// </summary>
-    /// <returns></returns>
     internal override bool ReferencesOtherViews ()
     {
         // BUGBUG: This is not correct. _contentSize may be null.
         return false; //_style.HasFlag (DimAutoStyle.Content);
     }
+
+    /// <inheritdoc/>
+    public override bool Equals (object other)
+    {
+        return other is DimAuto auto && auto.MinimumContentDim == MinimumContentDim && auto.MaximumContentDim == MaximumContentDim && auto.Style == Style;
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), MinimumContentDim, MaximumContentDim, Style); }
+
+    /// <inheritdoc/>
+    public override string ToString () { return $"Auto({Style},{MinimumContentDim},{MaximumContentDim})"; }
 }
 
 internal class DimCombine (bool add, Dim left, Dim right) : Dim
