@@ -402,20 +402,42 @@ public class PosAbsolute (int position) : Pos
     internal override int Anchor (int width) { return Position; }
 }
 
-internal class PosAnchorEnd : Pos
+/// <summary>
+///     Represents a position anchored to the end (right side or bottom).
+/// </summary>
+public class PosAnchorEnd : Pos
 {
-    private readonly int _offset;
+    /// <summary>
+    /// Gets the offset of the position from the right/bottom.
+    /// </summary>
+    public int Offset { get; }
+
+    /// <summary>
+    ///     Constructs a new position anchored to the end (right side or bottom) of the SuperView,
+    ///     minus the respective dimension of the View. This is equivalent to using <see cref="PosAnchorEnd(int)"/>,
+    ///     with an offset equivalent to the View's respective dimension.
+    /// </summary>
     public PosAnchorEnd () { UseDimForOffset = true; }
-    public PosAnchorEnd (int offset) { _offset = offset; }
-    public override bool Equals (object other) { return other is PosAnchorEnd anchorEnd && anchorEnd._offset == _offset; }
-    public override int GetHashCode () { return _offset.GetHashCode (); }
+
+    /// <summary>
+    ///     Constructs a new position anchored to the end (right side or bottom) of the SuperView,
+    /// </summary>
+    /// <param name="offset"></param>
+    public PosAnchorEnd (int offset) { Offset = offset; }
+
+    /// <inheritdoc />
+    public override bool Equals (object other) { return other is PosAnchorEnd anchorEnd && anchorEnd.Offset == Offset; }
+
+    /// <inheritdoc />
+    public override int GetHashCode () { return Offset.GetHashCode (); }
 
     /// <summary>
     ///     If true, the offset is the width of the view, if false, the offset is the offset value.
     /// </summary>
-    internal bool UseDimForOffset { get; set; }
+    public bool UseDimForOffset { get; }
 
-    public override string ToString () { return UseDimForOffset ? "AnchorEnd()" : $"AnchorEnd({_offset})"; }
+    /// <inheritdoc />
+    public override string ToString () { return UseDimForOffset ? "AnchorEnd()" : $"AnchorEnd({Offset})"; }
 
     internal override int Anchor (int width)
     {
@@ -424,7 +446,7 @@ internal class PosAnchorEnd : Pos
             return width;
         }
 
-        return width - _offset;
+        return width - Offset;
     }
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
