@@ -612,13 +612,27 @@ public class DimPercent (float percent, bool usePosition = false) : Dim
     }
 }
 
-internal class DimFill (int margin) : Dim
+/// <summary>
+/// Represents a dimension that fills the dimension, leaving the specified margin.
+/// </summary>
+/// <param name="margin">The margin to not fill.</param>
+public class DimFill (int margin) : Dim
 {
-    private readonly int _margin = margin;
-    public override bool Equals (object other) { return other is DimFill fill && fill._margin == _margin; }
-    public override int GetHashCode () { return _margin.GetHashCode (); }
-    public override string ToString () { return $"Fill({_margin})"; }
-    internal override int Anchor (int width) { return width - _margin; }
+    /// <summary>
+    /// Gets the margin to not fill.
+    /// </summary>
+    public int Margin { get; } = margin;
+
+    /// <inheritdoc />
+    public override bool Equals (object other) { return other is DimFill fill && fill.Margin == Margin; }
+
+    /// <inheritdoc />
+    public override int GetHashCode () { return Margin.GetHashCode (); }
+
+    /// <inheritdoc />
+    public override string ToString () { return $"Fill({Margin})"; }
+
+    internal override int Anchor (int width) { return width - Margin; }
 }
 
 // Helper class to provide dynamic value by the execution of a function that returns an integer.
