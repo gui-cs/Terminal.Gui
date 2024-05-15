@@ -483,9 +483,9 @@ public class PosCenter : Pos
 /// <summary>
 ///    Represents a position that is a combination of two other positions.
 /// </summary>
-/// <param name="add"></param>
-/// <param name="left"></param>
-/// <param name="right"></param>
+/// <param name="add">Indicates whether the two positions are added or subtracted. If <see langword="true"/>, the positions are added, otherwise they are subtracted.</param>
+/// <param name="left">The left position.</param>
+/// <param name="right">The right position.</param>
 public class PosCombine (bool add, Pos left, Pos right) : Pos
 {
     /// <summary>

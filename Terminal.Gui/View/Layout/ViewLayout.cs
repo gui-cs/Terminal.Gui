@@ -901,8 +901,8 @@ public partial class View
 
                 return;
             case DimCombine dc:
-                CollectDim (dc._left, from, ref nNodes, ref nEdges);
-                CollectDim (dc._right, from, ref nNodes, ref nEdges);
+                CollectDim (dc.Left, from, ref nNodes, ref nEdges);
+                CollectDim (dc.Right, from, ref nNodes, ref nEdges);
 
                 break;
         }
@@ -1123,8 +1123,8 @@ public partial class View
 
                 case Dim dim and DimCombine:
                     // Recursively check for not Absolute or not View
-                    ThrowInvalid (view, (dim as DimCombine)._left, name);
-                    ThrowInvalid (view, (dim as DimCombine)._right, name);
+                    ThrowInvalid (view, (dim as DimCombine).Left, name);
+                    ThrowInvalid (view, (dim as DimCombine).Right, name);
 
                     break;
             }

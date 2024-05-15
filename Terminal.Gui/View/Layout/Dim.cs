@@ -493,19 +493,38 @@ public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumCont
     public override string ToString () { return $"Auto({Style},{MinimumContentDim},{MaximumContentDim})"; }
 }
 
-internal class DimCombine (bool add, Dim left, Dim right) : Dim
+/// <summary>
+///    Represents a dimension that is a combination of two other dimensions.
+/// </summary>
+/// <param name="add">Indicates whether the two dimensions are added or subtracted. If <see langword="true"/>, the dimensions are added, otherwise they are subtracted. </param>
+/// <param name="left">The left dimension.</param>
+/// <param name="right">The right dimension.</param>
+public class DimCombine (bool add, Dim left, Dim right) : Dim
 {
-    internal bool _add = add;
-    internal Dim _left = left, _right = right;
+    /// <summary>
+    /// Gets whether the two dimensions are added or subtracted.
+    /// </summary>
+    public bool Add { get; } = add;
 
-    public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
+    /// <summary>
+    /// Gets the left dimension.
+    /// </summary>
+    public Dim Left { get; } = left;
+
+    /// <summary>
+    /// Gets the right dimension.
+    /// </summary>
+    public Dim Right { get; } = right;
+
+    /// <inheritdoc />
+    public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
 
     internal override int Anchor (int width)
     {
-        int la = _left.Anchor (width);
-        int ra = _right.Anchor (width);
+        int la = Left.Anchor (width);
+        int ra = Right.Anchor (width);
 
-        if (_add)
+        if (Add)
         {
             return la + ra;
         }
@@ -515,12 +534,12 @@ internal class DimCombine (bool add, Dim left, Dim right) : Dim
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        int leftNewDim = _left.Calculate (location, superviewContentSize, us, dimension);
-        int rightNewDim = _right.Calculate (location, superviewContentSize, us, dimension);
+        int leftNewDim = Left.Calculate (location, superviewContentSize, us, dimension);
+        int rightNewDim = Right.Calculate (location, superviewContentSize, us, dimension);
 
         int newDimension;
 
-        if (_add)
+        if (Add)
         {
             newDimension = leftNewDim + rightNewDim;
         }
@@ -538,12 +557,12 @@ internal class DimCombine (bool add, Dim left, Dim right) : Dim
     /// <returns></returns>
     internal override bool ReferencesOtherViews ()
     {
-        if (_left.ReferencesOtherViews ())
+        if (Left.ReferencesOtherViews ())
         {
             return true;
         }
 
-        if (_right.ReferencesOtherViews ())
+        if (Right.ReferencesOtherViews ())
         {
             return true;
         }
