@@ -178,14 +178,6 @@ public class Dim
         return new DimAuto (style, minimumContentDim, maximumContentDim);
     }
 
-    /// <summary>Determines whether the specified object is equal to the current object.</summary>
-    /// <param name="other">The object to compare with the current object. </param>
-    /// <returns>
-    ///     <see langword="true"/> if the specified object  is equal to the current object; otherwise,
-    ///     <see langword="false"/>.
-    /// </returns>
-    public override bool Equals (object other) { return other is Dim abs && abs == this; }
-
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified number of columns for a
     ///     margin.
@@ -202,14 +194,52 @@ public class Dim
     /// <returns>The <see cref="Dim"/> returned from the function.</returns>
     public static Dim Function (Func<int> function) { return new DimFunc (function); }
 
-    /// <summary>Serves as the default hash function. </summary>
-    /// <returns>A hash code for the current object.</returns>
-    public override int GetHashCode () { return Anchor (0).GetHashCode (); }
-
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Height of the specified <see cref="View"/>.</summary>
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
     public static Dim Height (View view) { return new DimView (view, Dimension.Height); }
+
+
+    /// <summary>Creates a percentage <see cref="Dim"/> object that is a percentage of the width or height of the SuperView.</summary>
+    /// <returns>The percent <see cref="Dim"/> object.</returns>
+    /// <param name="percent">A value between 0 and 100 representing the percentage.</param>
+    /// <param name="usePosition">
+    ///     If <see langword="true"/> the dimension is computed using the View's position (<see cref="View.X"/> or
+    ///     <see cref="View.Y"/>).
+    ///     If <see langword="false"/> the dimension is computed using the View's <see cref="View.ContentSize"/>.
+    /// </param>
+    /// <example>
+    ///     This initializes a <see cref="TextField"/> that will be centered horizontally, is 50% of the way down, is 30% the
+    ///     height,
+    ///     and is 80% the width of the SuperView.
+    ///     <code>
+    ///  var textView = new TextField {
+    ///     X = Pos.Center (),
+    ///     Y = Pos.Percent (50),
+    ///     Width = Dim.Percent (80),
+    ///     Height = Dim.Percent (30),
+    ///  };
+    ///  </code>
+    /// </example>
+    public static Dim Percent (float percent, bool usePosition = false)
+    {
+        if (percent is < 0 or > 100)
+        {
+            throw new ArgumentException ("Percent value must be between 0 and 100");
+        }
+
+        return new DimFactor (percent / 100, usePosition);
+    }
+
+    /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
+    /// <returns>The Absolute <see cref="Dim"/>.</returns>
+    /// <param name="size">The value to convert to the <see cref="Dim"/>.</param>
+    public static Dim Sized (int size) { return new DimAbsolute (size); }
+
+    /// <summary>Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.</summary>
+    /// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>
+    /// <param name="view">The view that will be tracked.</param>
+    public static Dim Width (View view) { return new DimView (view, Dimension.Width); }
 
     /// <summary>Adds a <see cref="Dim"/> to a <see cref="Dim"/>, yielding a new <see cref="Dim"/>.</summary>
     /// <param name="left">The first <see cref="Dim"/> to add.</param>
@@ -253,47 +283,6 @@ public class Dim
         return newDim;
     }
 
-    /// <summary>Creates a percentage <see cref="Dim"/> object that is a percentage of the width or height of the SuperView.</summary>
-    /// <returns>The percent <see cref="Dim"/> object.</returns>
-    /// <param name="percent">A value between 0 and 100 representing the percentage.</param>
-    /// <param name="usePosition">
-    ///     If <see langword="true"/> the dimension is computed using the View's position (<see cref="View.X"/> or
-    ///     <see cref="View.Y"/>).
-    ///     If <see langword="false"/> the dimension is computed using the View's <see cref="View.ContentSize"/>.
-    /// </param>
-    /// <example>
-    ///     This initializes a <see cref="TextField"/> that will be centered horizontally, is 50% of the way down, is 30% the
-    ///     height,
-    ///     and is 80% the width of the SuperView.
-    ///     <code>
-    ///  var textView = new TextField {
-    ///     X = Pos.Center (),
-    ///     Y = Pos.Percent (50),
-    ///     Width = Dim.Percent (80),
-    ///     Height = Dim.Percent (30),
-    ///  };
-    ///  </code>
-    /// </example>
-    public static Dim Percent (float percent, bool usePosition = false)
-    {
-        if (percent is < 0 or > 100)
-        {
-            throw new ArgumentException ("Percent value must be between 0 and 100");
-        }
-
-        return new DimFactor (percent / 100, usePosition);
-    }
-
-    /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
-    /// <returns>The Absolute <see cref="Dim"/>.</returns>
-    /// <param name="n">The value to convert to the <see cref="Dim"/>.</param>
-    public static Dim Sized (int n) { return new DimAbsolute (n); }
-
-    /// <summary>Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.</summary>
-    /// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>
-    /// <param name="view">The view that will be tracked.</param>
-    public static Dim Width (View view) { return new DimView (view, Dimension.Width); }
-
     /// <summary>
     ///     Gets a dimension that is anchored to a certain point in the layout.
     ///     This method is typically used internally by the layout system to determine the size of a View.
@@ -332,15 +321,36 @@ public class Dim
     /// </summary>
     /// <returns></returns>
     internal virtual bool ReferencesOtherViews () { return false; }
+
+    /// <inheritdoc />
+    public override bool Equals (object other) { return other is Dim abs && abs == this; }
+
+    /// <inheritdoc />
+    public override int GetHashCode () { return Anchor (0).GetHashCode (); }
+
 }
 
-internal class DimAbsolute (int n) : Dim
+/// <summary>
+///     Represents a dimension that is a fixed size.
+/// </summary>
+/// <param name="size"></param>
+public class DimAbsolute (int size) : Dim
 {
-    private readonly int _n = n;
-    public override bool Equals (object other) { return other is DimAbsolute abs && abs._n == _n; }
-    public override int GetHashCode () { return _n.GetHashCode (); }
-    public override string ToString () { return $"Absolute({_n})"; }
-    internal override int Anchor (int width) { return _n; }
+    /// <summary>
+    /// Gets the size of the dimension.
+    /// </summary>
+    public int Size { get; } = size;
+
+    /// <inheritdoc />
+    public override bool Equals (object other) { return other is DimAbsolute abs && abs.Size == Size; }
+
+    /// <inheritdoc />
+    public override int GetHashCode () { return Size.GetHashCode (); }
+
+    /// <inheritdoc />
+    public override string ToString () { return $"Absolute({Size})"; }
+
+    internal override int Anchor (int width) { return Size; }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
@@ -594,11 +604,11 @@ internal class DimView : Dim
         }
 
         string sideString = _side switch
-                            {
-                                Dimension.Height => "Height",
-                                Dimension.Width => "Width",
-                                _ => "unknown"
-                            };
+        {
+            Dimension.Height => "Height",
+            Dimension.Width => "Width",
+            _ => "unknown"
+        };
 
         return $"View({sideString},{Target})";
     }
@@ -606,11 +616,11 @@ internal class DimView : Dim
     internal override int Anchor (int width)
     {
         return _side switch
-               {
-                   Dimension.Height => Target.Frame.Height,
-                   Dimension.Width => Target.Frame.Width,
-                   _ => 0
-               };
+        {
+            Dimension.Height => Target.Frame.Height,
+            Dimension.Width => Target.Frame.Width,
+            _ => 0
+        };
     }
 
     internal override bool ReferencesOtherViews () { return true; }
