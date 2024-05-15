@@ -33,7 +33,7 @@ public class TextField : View
         CaptionColor = new Color (Color.DarkGray);
         ReadOnly = false;
         Autocomplete = new TextFieldAutocomplete ();
-        Height = 1; // BUGBUG: This should either be Dim.Auto or we should enforce ContentSize.Height = 1
+        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
@@ -43,8 +43,6 @@ public class TextField : View
         _historyText.ChangeText += HistoryText_ChangeText;
 
         Initialized += TextField_Initialized;
-
-        LayoutComplete += TextField_LayoutComplete;
 
         // Things this view knows how to do
         AddCommand (
@@ -1857,15 +1855,6 @@ public class TextField : View
 
         Autocomplete.HostControl = this;
         Autocomplete.PopupInsideContainer = false;
-    }
-
-    private void TextField_LayoutComplete (object sender, LayoutEventArgs e)
-    {
-        // Don't let height > 1
-        if (Frame.Height > 1)
-        {
-            Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
-        }
     }
 }
 
