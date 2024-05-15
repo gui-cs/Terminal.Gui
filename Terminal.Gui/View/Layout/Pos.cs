@@ -480,19 +480,38 @@ public class PosCenter : Pos
     }
 }
 
-internal class PosCombine (bool add, Pos left, Pos right) : Pos
+/// <summary>
+///    Represents a position that is a combination of two other positions.
+/// </summary>
+/// <param name="add"></param>
+/// <param name="left"></param>
+/// <param name="right"></param>
+public class PosCombine (bool add, Pos left, Pos right) : Pos
 {
-    internal bool _add = add;
-    internal Pos _left = left, _right = right;
+    /// <summary>
+    /// Gets whether the two positions are added or subtracted. If <see langword="true"/>, the positions are added, otherwise they are subtracted.
+    /// </summary>
+    public bool Add { get; } = add;
 
-    public override string ToString () { return $"Combine({_left}{(_add ? '+' : '-')}{_right})"; }
+    /// <summary>
+    /// Gets the left position.
+    /// </summary>
+    public new Pos Left { get; } = left;
+
+    /// <summary>
+    /// Gets the right position.
+    /// </summary>
+    public new Pos Right { get; } = right;
+
+    /// <inheritdoc />
+    public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
 
     internal override int Anchor (int width)
     {
-        int la = _left.Anchor (width);
-        int ra = _right.Anchor (width);
+        int la = Left.Anchor (width);
+        int ra = Right.Anchor (width);
 
-        if (_add)
+        if (Add)
         {
             return la + ra;
         }
@@ -503,10 +522,10 @@ internal class PosCombine (bool add, Pos left, Pos right) : Pos
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
         int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
-        int left = _left.Calculate (superviewDimension, dim, us, dimension);
-        int right = _right.Calculate (superviewDimension, dim, us, dimension);
+        int left = Left.Calculate (superviewDimension, dim, us, dimension);
+        int right = Right.Calculate (superviewDimension, dim, us, dimension);
 
-        if (_add)
+        if (Add)
         {
             return left + right;
         }
@@ -514,18 +533,14 @@ internal class PosCombine (bool add, Pos left, Pos right) : Pos
         return left - right;
     }
 
-    /// <summary>
-    ///     Diagnostics API to determine if this Pos object references other views.
-    /// </summary>
-    /// <returns></returns>
     internal override bool ReferencesOtherViews ()
     {
-        if (_left.ReferencesOtherViews ())
+        if (Left.ReferencesOtherViews ())
         {
             return true;
         }
 
-        if (_right.ReferencesOtherViews ())
+        if (Right.ReferencesOtherViews ())
         {
             return true;
         }
@@ -563,13 +578,13 @@ internal class PosView (View view, Side side) : Pos
     public override string ToString ()
     {
         string sideString = side switch
-                            {
-                                Side.Left => "left",
-                                Side.Top => "top",
-                                Side.Right => "right",
-                                Side.Bottom => "bottom",
-                                _ => "unknown"
-                            };
+        {
+            Side.Left => "left",
+            Side.Top => "top",
+            Side.Right => "right",
+            Side.Bottom => "bottom",
+            _ => "unknown"
+        };
 
         if (Target == null)
         {
@@ -582,13 +597,13 @@ internal class PosView (View view, Side side) : Pos
     internal override int Anchor (int width)
     {
         return side switch
-               {
-                   Side.Left => Target.Frame.X,
-                   Side.Top => Target.Frame.Y,
-                   Side.Right => Target.Frame.Right,
-                   Side.Bottom => Target.Frame.Bottom,
-                   _ => 0
-               };
+        {
+            Side.Left => Target.Frame.X,
+            Side.Top => Target.Frame.Y,
+            Side.Right => Target.Frame.Right,
+            Side.Bottom => Target.Frame.Bottom,
+            _ => 0
+        };
     }
 
     /// <summary>

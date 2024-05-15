@@ -225,13 +225,13 @@ public class PosTests (ITestOutputHelper output)
         Assert.Equal (10, posAbsolute.Anchor (0));
 
         var posCombine = new PosCombine (true, posFactor, posAbsolute);
-        Assert.Equal (posCombine._left, posFactor);
-        Assert.Equal (posCombine._right, posAbsolute);
+        Assert.Equal (posCombine.Left, posFactor);
+        Assert.Equal (posCombine.Right, posAbsolute);
         Assert.Equal (20, posCombine.Anchor (100));
 
         posCombine = new (true, posAbsolute, posFactor);
-        Assert.Equal (posCombine._left, posAbsolute);
-        Assert.Equal (posCombine._right, posFactor);
+        Assert.Equal (posCombine.Left, posAbsolute);
+        Assert.Equal (posCombine.Right, posFactor);
         Assert.Equal (20, posCombine.Anchor (100));
 
         var view = new View { Frame = new (20, 10, 20, 1) };
