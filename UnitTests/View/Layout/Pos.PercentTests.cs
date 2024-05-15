@@ -52,13 +52,13 @@ public class PosPercentTests (ITestOutputHelper output)
     {
         float f = 0;
         Pos pos = Pos.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
+        Assert.Equal ($"Percent({f / 100:0.###})", pos.ToString ());
         f = 0.5F;
         pos = Pos.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
+        Assert.Equal ($"Percent({f / 100:0.###})", pos.ToString ());
         f = 100;
         pos = Pos.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
+        Assert.Equal ($"Percent({f / 100:0.###})", pos.ToString ());
     }
 
     [Fact]

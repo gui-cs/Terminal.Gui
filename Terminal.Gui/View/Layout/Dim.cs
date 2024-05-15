@@ -544,7 +544,7 @@ internal class DimFactor (float factor, bool remaining = false) : Dim
     public override bool Equals (object other) { return other is DimFactor f && f._factor == _factor && f._remaining == _remaining; }
     public override int GetHashCode () { return _factor.GetHashCode (); }
     public bool IsFromRemaining () { return _remaining; }
-    public override string ToString () { return $"Factor({_factor},{_remaining})"; }
+    public override string ToString () { return $"Percent({_factor},{_remaining})"; }
     internal override int Anchor (int width) { return (int)(width * _factor); }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)

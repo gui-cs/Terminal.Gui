@@ -567,19 +567,32 @@ public class PosPercent (float factor) : Pos
     public override int GetHashCode () { return Factor.GetHashCode (); }
 
     /// <inheritdoc />
-    public override string ToString () { return $"Factor({Factor})"; }
+    public override string ToString () { return $"Percent({Factor})"; }
 
     internal override int Anchor (int width) { return (int)(width * Factor); }
 }
 
-// Helper class to provide dynamic value by the execution of a function that returns an integer.
-internal class PosFunc (Func<int> n) : Pos
+/// <summary>
+///    Represents a position that is computed by executing a function that returns an integer position.
+/// </summary>
+/// <param name="pos">The position.</param>
+public class PosFunc (Func<int> pos) : Pos
 {
-    private readonly Func<int> _function = n;
-    public override bool Equals (object other) { return other is PosFunc f && f._function () == _function (); }
-    public override int GetHashCode () { return _function.GetHashCode (); }
-    public override string ToString () { return $"PosFunc({_function ()})"; }
-    internal override int Anchor (int width) { return _function (); }
+    /// <summary>
+    ///    Gets the function that computes the position.
+    /// </summary>
+    public Func<int> Func { get; } = pos;
+
+    /// <inheritdoc />
+    public override bool Equals (object other) { return other is PosFunc f && f.Func () == Func (); }
+
+    /// <inheritdoc />
+    public override int GetHashCode () { return Func.GetHashCode (); }
+
+    /// <inheritdoc />
+    public override string ToString () { return $"PosFunc({Func ()})"; }
+
+    internal override int Anchor (int width) { return Func (); }
 }
 
 internal class PosView (View view, Side side) : Pos

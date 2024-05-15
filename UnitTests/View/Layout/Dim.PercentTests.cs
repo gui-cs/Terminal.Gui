@@ -163,13 +163,13 @@ public class DimPercentTests
     {
         float f = 0;
         Dim dim = Dim.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###},{false})", dim.ToString ());
+        Assert.Equal ($"Percent({f / 100:0.###},{false})", dim.ToString ());
         f = 0.5F;
         dim = Dim.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###},{false})", dim.ToString ());
+        Assert.Equal ($"Percent({f / 100:0.###},{false})", dim.ToString ());
         f = 100;
         dim = Dim.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###},{false})", dim.ToString ());
+        Assert.Equal ($"Percent({f / 100:0.###},{false})", dim.ToString ());
     }
 
 }
