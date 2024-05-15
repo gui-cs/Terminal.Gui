@@ -635,14 +635,28 @@ public class DimFill (int margin) : Dim
     internal override int Anchor (int width) { return width - Margin; }
 }
 
-// Helper class to provide dynamic value by the execution of a function that returns an integer.
-internal class DimFunc (Func<int> n) : Dim
+
+/// <summary>
+/// Represents a function <see cref="Dim"/> object that computes the dimension by executing the provided function.
+/// </summary>
+/// <param name="dim"></param>
+public class DimFunc (Func<int> dim) : Dim
 {
-    private readonly Func<int> _function = n;
-    public override bool Equals (object other) { return other is DimFunc f && f._function () == _function (); }
-    public override int GetHashCode () { return _function.GetHashCode (); }
-    public override string ToString () { return $"DimFunc({_function ()})"; }
-    internal override int Anchor (int width) { return _function (); }
+    /// <summary>
+    ///   Gets the function that computes the dimension.
+    /// </summary>
+    public Func<int> Func { get; } = dim;
+
+    /// <inheritdoc />
+    public override bool Equals (object other) { return other is DimFunc f && f.Func () == Func (); }
+
+    /// <inheritdoc />
+    public override int GetHashCode () { return Func.GetHashCode (); }
+
+    /// <inheritdoc />
+    public override string ToString () { return $"DimFunc({Func ()})"; }
+
+    internal override int Anchor (int width) { return Func (); }
 }
 
 internal class DimView : Dim
