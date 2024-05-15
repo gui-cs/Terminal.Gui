@@ -104,8 +104,8 @@ public class SpinnerViewTests
         top.Add (view);
         Application.Begin (top);
 
-        Assert.Equal (1, view.Width);
-        Assert.Equal (1, view.Height);
+        Assert.Equal (1, view.Frame.Width);
+        Assert.Equal (1, view.Frame.Height);
 
         return view;
     }

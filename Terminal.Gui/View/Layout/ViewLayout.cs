@@ -1030,30 +1030,30 @@ public partial class View
     // Diagnostics to highlight when X or Y is read before the view has been initialized
     private Pos VerifyIsInitialized (Pos pos, string member)
     {
-//#if DEBUG
-//        if (pos.ReferencesOtherViews () && !IsInitialized)
-//        {
-//            Debug.WriteLine (
-//                             $"WARNING: {member} = {pos} of {this} is dependent on other views and {member} "
-//                             + $"is being accessed before the View has been initialized. This is likely a bug."
-//                            );
-//        }
-//#endif // DEBUG
+        //#if DEBUG
+        //        if (pos.ReferencesOtherViews () && !IsInitialized)
+        //        {
+        //            Debug.WriteLine (
+        //                             $"WARNING: {member} = {pos} of {this} is dependent on other views and {member} "
+        //                             + $"is being accessed before the View has been initialized. This is likely a bug."
+        //                            );
+        //        }
+        //#endif // DEBUG
         return pos;
     }
 
     // Diagnostics to highlight when Width or Height is read before the view has been initialized
     private Dim VerifyIsInitialized (Dim dim, string member)
     {
-//#if DEBUG
-//        if (dim.ReferencesOtherViews () && !IsInitialized)
-//        {
-//            Debug.WriteLine (
-//                             $"WARNING: {member} = {dim} of {this} is dependent on other views and {member} "
-//                             + $"is being accessed before the View has been initialized. This is likely a bug."
-//                            );
-//        }
-//#endif // DEBUG
+        //#if DEBUG
+        //        if (dim.ReferencesOtherViews () && !IsInitialized)
+        //        {
+        //            Debug.WriteLine (
+        //                             $"WARNING: {member} = {dim} of {this} is dependent on other views and {member} "
+        //                             + $"is being accessed before the View has been initialized. This is likely a bug."
+        //                            );
+        //        }
+        //#endif // DEBUG
         return dim;
     }
 
@@ -1075,21 +1075,24 @@ public partial class View
     /// <exception cref="InvalidOperationException"></exception>
     private void CheckDimAuto ()
     {
-        if (!ValidatePosDim || !IsInitialized || (Width is not DimAuto && Height is not DimAuto))
+        if (!ValidatePosDim || !IsInitialized)
         {
             return;
         }
 
+        DimAuto? widthAuto = Width as DimAuto;
+        DimAuto? heightAuto = Height as DimAuto;
+
         // Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
         foreach (View view in Subviews)
         {
-            if (Width is DimAuto { MinimumContentDim: null })
+            if (widthAuto is { } && widthAuto.Style.HasFlag (DimAutoStyle.Content) && _contentSize is null)
             {
                 ThrowInvalid (view, view.Width, nameof (view.Width));
                 ThrowInvalid (view, view.X, nameof (view.X));
             }
 
-            if (Height is DimAuto { MinimumContentDim: null })
+            if (heightAuto is { } && heightAuto.Style.HasFlag (DimAutoStyle.Content) && _contentSize is null)
             {
                 ThrowInvalid (view, view.Height, nameof (view.Height));
                 ThrowInvalid (view, view.Y, nameof (view.Y));

@@ -9,12 +9,28 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Dialogs")]
 public class MessageBoxes : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
-        var frame = new FrameView { X = Pos.Center (), Y = 1, Width = Dim.Percent (75), Title = "MessageBox Options" };
-        Win.Add (frame);
+        Application.Init ();
 
-        var label = new Label { X = 0, Y = 0, TextAlignment = TextAlignment.Right, Text = "Width:" };
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
+
+        var frame = new FrameView
+        {
+            X = Pos.Center (),
+            Y = 1,
+            Width = Dim.Percent (75),
+            Height = Dim.Auto (DimAutoStyle.Content),
+            Title = "MessageBox Options"
+
+        };
+        app.Add (frame);
+
+        // TODO: Use Pos.Align her to demo aligning labels and fields
+        var label = new Label { X = 0, Y = 0, Width = 15, TextAlignment = TextAlignment.Right, Text = "Width:" };
         frame.Add (label);
 
         var widthEdit = new TextField
@@ -27,7 +43,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (widthEdit);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -62,7 +78,7 @@ public class MessageBoxes : Scenario
                    }
                   );
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -84,7 +100,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (titleEdit);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -106,7 +122,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (messageEdit);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (messageEdit),
@@ -128,7 +144,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (numButtonsEdit);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -150,7 +166,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (defaultButtonEdit);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -174,30 +190,13 @@ public class MessageBoxes : Scenario
         };
         frame.Add (ckbWrapMessage);
 
-        frame.ValidatePosDim = true;
+        //frame.ValidatePosDim = true;
 
-        void Top_LayoutComplete (object sender, EventArgs args)
-        {
-            frame.Height =
-                widthEdit.Frame.Height
-                + heightEdit.Frame.Height
-                + titleEdit.Frame.Height
-                + messageEdit.Frame.Height
-                + numButtonsEdit.Frame.Height
-                + defaultButtonEdit.Frame.Height
-                + styleRadioGroup.Frame.Height
-                + ckbWrapMessage.Frame.Height
-                + frame.GetAdornmentsThickness ().Vertical;
-            Top.Loaded -= Top_LayoutComplete;
-        }
-
-        Top.LayoutComplete += Top_LayoutComplete;
-
-        label = new()
+        label = new ()
         {
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, TextAlignment = TextAlignment.Right, Text = "Button Pressed:"
         };
-        Win.Add (label);
+        app.Add (label);
 
         var buttonPressedLabel = new Label
         {
@@ -235,8 +234,7 @@ public class MessageBoxes : Scenario
                                                if (styleRadioGroup.SelectedItem == 0)
                                                {
                                                    buttonPressedLabel.Text =
-                                                       $"{
-                                                           MessageBox.Query (
+                                                       $"{MessageBox.Query (
                                                                              width,
                                                                              height,
                                                                              titleEdit.Text,
@@ -244,14 +242,12 @@ public class MessageBoxes : Scenario
                                                                              defaultButton,
                                                                              (bool)ckbWrapMessage.Checked,
                                                                              btns.ToArray ()
-                                                                            )
-                                                       }";
+                                                                            )}";
                                                }
                                                else
                                                {
                                                    buttonPressedLabel.Text =
-                                                       $"{
-                                                           MessageBox.ErrorQuery (
+                                                       $"{MessageBox.ErrorQuery (
                                                                                   width,
                                                                                   height,
                                                                                   titleEdit.Text,
@@ -259,8 +255,7 @@ public class MessageBoxes : Scenario
                                                                                   defaultButton,
                                                                                   (bool)ckbWrapMessage.Checked,
                                                                                   btns.ToArray ()
-                                                                                 )
-                                                       }";
+                                                                                 )}";
                                                }
                                            }
                                            catch (FormatException)
@@ -268,8 +263,13 @@ public class MessageBoxes : Scenario
                                                buttonPressedLabel.Text = "Invalid Options";
                                            }
                                        };
-        Win.Add (showMessageBoxButton);
+        app.Add (showMessageBoxButton);
 
-        Win.Add (buttonPressedLabel);
+        app.Add (buttonPressedLabel);
+
+        Application.Run (app);
+        app.Dispose ();
+
+        Application.Shutdown ();
     }
 }
