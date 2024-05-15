@@ -137,7 +137,7 @@ public class Dialog : Window
         }
 
         button.X = Pos.Align (ButtonAlignment);
-        button.Y = Pos.AnchorEnd () - 1;
+        button.Y = Pos.AnchorEnd ();
 
         _buttons.Add (button);
         Add (button);
