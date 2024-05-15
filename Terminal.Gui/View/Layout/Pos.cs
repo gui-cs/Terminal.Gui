@@ -595,16 +595,37 @@ public class PosFunc (Func<int> pos) : Pos
     internal override int Anchor (int width) { return Func (); }
 }
 
-internal class PosView (View view, Side side) : Pos
+/// <summary>
+///     Represents a position that is anchored to the side of another view.
+/// </summary>
+/// <param name="view">The View the position is anchored to.</param>
+/// <param name="side">The side of the View the position is anchored to.</param>
+public class PosView (View view, Side side) : Pos
 {
-    public readonly View Target = view;
+    /// <summary>
+    /// Gets the View the position is anchored to.
+    /// </summary>
+    public View Target { get; } = view;
 
+    /// <summary>
+    /// Gets the side of the View the position is anchored to.
+    /// </summary>
+    public Side Side { get; } = side;
+
+    /// <inheritdoc />
     public override bool Equals (object other) { return other is PosView abs && abs.Target == Target; }
+
+    /// <inheritdoc />
     public override int GetHashCode () { return Target.GetHashCode (); }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="NullReferenceException"></exception>
     public override string ToString ()
     {
-        string sideString = side switch
+        string sideString = Side switch
         {
             Side.Left => "left",
             Side.Top => "top",
@@ -623,7 +644,7 @@ internal class PosView (View view, Side side) : Pos
 
     internal override int Anchor (int width)
     {
-        return side switch
+        return Side switch
         {
             Side.Left => Target.Frame.X,
             Side.Top => Target.Frame.Y,
