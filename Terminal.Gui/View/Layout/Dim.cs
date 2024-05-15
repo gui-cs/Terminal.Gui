@@ -330,6 +330,12 @@ public class Dim
 /// <summary>
 ///     Represents a dimension that is a fixed size.
 /// </summary>
+/// <remarks>
+///     <para>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
+///     </para>
+/// </remarks>
 /// <param name="size"></param>
 public class DimAbsolute (int size) : Dim
 {
@@ -362,6 +368,10 @@ public class DimAbsolute (int size) : Dim
 /// <remarks>
 ///     <para>
 ///         See <see cref="DimAutoStyle"/>.
+///     </para>
+///     <para>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 ///     </para>
 /// </remarks>
 /// <param name="style">
@@ -497,6 +507,10 @@ public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumCont
 ///     Indicates whether the two dimensions are added or subtracted. If <see langword="true"/>, the dimensions are added,
 ///     otherwise they are subtracted.
 /// </param>
+/// <remarks>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
+/// </remarks>
 /// <param name="left">The left dimension.</param>
 /// <param name="right">The right dimension.</param>
 public class DimCombine (bool add, Dim left, Dim right) : Dim
@@ -574,6 +588,10 @@ public class DimCombine (bool add, Dim left, Dim right) : Dim
 /// <summary>
 ///     Represents a dimension that is a percentage of the width or height of the SuperView.
 /// </summary>
+/// <remarks>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
+/// </remarks>
 /// <param name="percent">The percentage.</param>
 /// <param name="usePosition">
 ///     If <see langword="true"/> the dimension is computed using the View's position (<see cref="View.X"/> or
@@ -614,6 +632,10 @@ public class DimPercent (float percent, bool usePosition = false) : Dim
 /// <summary>
 ///     Represents a dimension that fills the dimension, leaving the specified margin.
 /// </summary>
+/// <remarks>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
+/// </remarks>
 /// <param name="margin">The margin to not fill.</param>
 public class DimFill (int margin) : Dim
 {
@@ -637,6 +659,10 @@ public class DimFill (int margin) : Dim
 /// <summary>
 ///     Represents a function <see cref="Dim"/> object that computes the dimension by executing the provided function.
 /// </summary>
+/// <remarks>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
+/// </remarks>
 /// <param name="dim"></param>
 public class DimFunc (Func<int> dim) : Dim
 {
@@ -660,6 +686,10 @@ public class DimFunc (Func<int> dim) : Dim
 /// <summary>
 ///     Represents a dimension that tracks the Height or Width of the specified View.
 /// </summary>
+/// <remarks>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
+/// </remarks>
 public class DimView : Dim
 {
     /// <summary>

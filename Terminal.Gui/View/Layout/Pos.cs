@@ -382,6 +382,12 @@ public class Pos
 /// <summary>
 ///    Represents an absolute position in the layout. This is used to specify a fixed position in the layout.
 /// </summary>
+/// <remarks>
+///     <para>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///     </para>
+/// </remarks>
 /// <param name="position"></param>
 public class PosAbsolute (int position) : Pos
 {
@@ -405,6 +411,12 @@ public class PosAbsolute (int position) : Pos
 /// <summary>
 ///     Represents a position anchored to the end (right side or bottom).
 /// </summary>
+/// <remarks>
+///     <para>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///     </para>
+/// </remarks>
 public class PosAnchorEnd : Pos
 {
     /// <summary>
@@ -483,6 +495,12 @@ public class PosCenter : Pos
 /// <summary>
 ///    Represents a position that is a combination of two other positions.
 /// </summary>
+/// <remarks>
+///     <para>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///     </para>
+/// </remarks>
 /// <param name="add">Indicates whether the two positions are added or subtracted. If <see langword="true"/>, the positions are added, otherwise they are subtracted.</param>
 /// <param name="left">The left position.</param>
 /// <param name="right">The right position.</param>
@@ -552,6 +570,12 @@ public class PosCombine (bool add, Pos left, Pos right) : Pos
 /// <summary>
 ///     Represents a position that is a percentage of the width or height of the SuperView.
 /// </summary>
+/// <remarks>
+///     <para>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///     </para>
+/// </remarks>
 /// <param name="percent"></param>
 public class PosPercent (float percent) : Pos
 {
@@ -575,6 +599,12 @@ public class PosPercent (float percent) : Pos
 /// <summary>
 ///    Represents a position that is computed by executing a function that returns an integer position.
 /// </summary>
+/// <remarks>
+///     <para>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///     </para>
+/// </remarks>
 /// <param name="pos">The position.</param>
 public class PosFunc (Func<int> pos) : Pos
 {
@@ -598,6 +628,12 @@ public class PosFunc (Func<int> pos) : Pos
 /// <summary>
 ///     Represents a position that is anchored to the side of another view.
 /// </summary>
+/// <remarks>
+///     <para>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///     </para>
+/// </remarks>
 /// <param name="view">The View the position is anchored to.</param>
 /// <param name="side">The side of the View the position is anchored to.</param>
 public class PosView (View view, Side side) : Pos
@@ -618,11 +654,7 @@ public class PosView (View view, Side side) : Pos
     /// <inheritdoc />
     public override int GetHashCode () { return Target.GetHashCode (); }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="NullReferenceException"></exception>
+    /// <inheritdoc />
     public override string ToString ()
     {
         string sideString = Side switch
