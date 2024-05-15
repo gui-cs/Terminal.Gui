@@ -275,7 +275,7 @@ public class Buttons : Scenario
             X = Pos.Left (absoluteFrame) + 1,
             Y = Pos.Bottom (radioGroup) + 1,
             Height = 1,
-            Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
+            Width = Dim.Width (absoluteFrame) - 2,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = muhkb
         };

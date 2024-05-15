@@ -610,7 +610,7 @@ public class Slider<T> : View
     /// <summary>Adjust the dimensions of the Slider to the best value.</summary>
     public void SetContentSizeBestFit ()
     {
-        if (!IsInitialized || /*!(Height is DimAuto && Width is DimAuto) || */_options.Count == 0)
+        if (/*!IsInitialized ||*/ /*!(Height is DimAuto && Width is DimAuto) || */_options.Count == 0)
         {
             return;
         }

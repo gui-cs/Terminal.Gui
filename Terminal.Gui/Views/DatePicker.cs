@@ -206,7 +206,7 @@ public class DatePicker : View
         {
             X = Pos.Right (_dateLabel),
             Y = 0,
-            Width = 12,//Dim.Width (_calendar) - Dim.Width(_dateLabel), // BUGBUG: Fix when Dim.Auto(subviews) fully works
+            Width = Dim.Width (_calendar) - Dim.Width (_dateLabel),
             Height = 1,
             Culture = Culture
         };
@@ -236,7 +236,7 @@ public class DatePicker : View
             Y = Pos.Bottom (_calendar) - 1,
             Height = 1,
             Width = 2,
-            Text = GetForwardButtonText(),
+            Text = GetForwardButtonText (),
             WantContinuousButtonPressed = true,
             NoPadding = true,
             NoDecorations = true
@@ -277,7 +277,7 @@ public class DatePicker : View
         Width = Dim.Auto ();
 
         // BUGBUG: Remove when Dim.Auto(subviews) fully works
-        SetContentSize(new (_calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7, _calendar.Frame.Height + 1));
+        SetContentSize (new (_calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7, _calendar.Frame.Height + 1));
 
         _dateField.DateChanged += DateField_DateChanged;
 
@@ -287,35 +287,35 @@ public class DatePicker : View
     private static string StandardizeDateFormat (string format)
     {
         return format switch
-               {
-                   "MM/dd/yyyy" => "MM/dd/yyyy",
-                   "yyyy-MM-dd" => "yyyy-MM-dd",
-                   "yyyy/MM/dd" => "yyyy/MM/dd",
-                   "dd/MM/yyyy" => "dd/MM/yyyy",
-                   "d?/M?/yyyy" => "dd/MM/yyyy",
-                   "dd.MM.yyyy" => "dd.MM.yyyy",
-                   "dd-MM-yyyy" => "dd-MM-yyyy",
-                   "dd/MM yyyy" => "dd/MM/yyyy",
-                   "d. M. yyyy" => "dd.MM.yyyy",
-                   "yyyy.MM.dd" => "yyyy.MM.dd",
-                   "g yyyy/M/d" => "yyyy/MM/dd",
-                   "d/M/yyyy" => "dd/MM/yyyy",
-                   "d?/M?/yyyy g" => "dd/MM/yyyy",
-                   "d-M-yyyy" => "dd-MM-yyyy",
-                   "d.MM.yyyy" => "dd.MM.yyyy",
-                   "d.MM.yyyy '?'." => "dd.MM.yyyy",
-                   "M/d/yyyy" => "MM/dd/yyyy",
-                   "d. M. yyyy." => "dd.MM.yyyy",
-                   "d.M.yyyy." => "dd.MM.yyyy",
-                   "g yyyy-MM-dd" => "yyyy-MM-dd",
-                   "d.M.yyyy" => "dd.MM.yyyy",
-                   "d/MM/yyyy" => "dd/MM/yyyy",
-                   "yyyy/M/d" => "yyyy/MM/dd",
-                   "dd. MM. yyyy." => "dd.MM.yyyy",
-                   "yyyy. MM. dd." => "yyyy.MM.dd",
-                   "yyyy. M. d." => "yyyy.MM.dd",
-                   "d. MM. yyyy" => "dd.MM.yyyy",
-                   _ => "dd/MM/yyyy"
-               };
+        {
+            "MM/dd/yyyy" => "MM/dd/yyyy",
+            "yyyy-MM-dd" => "yyyy-MM-dd",
+            "yyyy/MM/dd" => "yyyy/MM/dd",
+            "dd/MM/yyyy" => "dd/MM/yyyy",
+            "d?/M?/yyyy" => "dd/MM/yyyy",
+            "dd.MM.yyyy" => "dd.MM.yyyy",
+            "dd-MM-yyyy" => "dd-MM-yyyy",
+            "dd/MM yyyy" => "dd/MM/yyyy",
+            "d. M. yyyy" => "dd.MM.yyyy",
+            "yyyy.MM.dd" => "yyyy.MM.dd",
+            "g yyyy/M/d" => "yyyy/MM/dd",
+            "d/M/yyyy" => "dd/MM/yyyy",
+            "d?/M?/yyyy g" => "dd/MM/yyyy",
+            "d-M-yyyy" => "dd-MM-yyyy",
+            "d.MM.yyyy" => "dd.MM.yyyy",
+            "d.MM.yyyy '?'." => "dd.MM.yyyy",
+            "M/d/yyyy" => "MM/dd/yyyy",
+            "d. M. yyyy." => "dd.MM.yyyy",
+            "d.M.yyyy." => "dd.MM.yyyy",
+            "g yyyy-MM-dd" => "yyyy-MM-dd",
+            "d.M.yyyy" => "dd.MM.yyyy",
+            "d/MM/yyyy" => "dd/MM/yyyy",
+            "yyyy/M/d" => "yyyy/MM/dd",
+            "dd. MM. yyyy." => "dd.MM.yyyy",
+            "yyyy. MM. dd." => "yyyy.MM.dd",
+            "yyyy. M. d." => "yyyy.MM.dd",
+            "d. MM. yyyy" => "dd.MM.yyyy",
+            _ => "dd/MM/yyyy"
+        };
     }
 }

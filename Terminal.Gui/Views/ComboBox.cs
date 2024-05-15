@@ -605,6 +605,7 @@ public class ComboBox : View
         return true;
     }
 
+    // TODO: Upgrade Combobox to use Dim.Auto instead of all this stuff.
     private void ProcessLayout ()
     {
         if (Viewport.Height < _minimumHeight && (Height is null || Height is DimAbsolute))

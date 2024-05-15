@@ -329,44 +329,6 @@ public partial class View
                 return new (_viewportLocation, Frame.Size);
             }
 
-            //// BUGBUG: This is a hack. Viewport_get should not have side effects.
-            //if (Frame.Size == Size.Empty)
-            //{
-            //    // The Frame has not been set yet (e.g. the view has not been added to a SuperView yet).
-            //    // 
-            //    // Use _width & _height instead of Width & Height to avoid debug spew
-            //    DimAuto widthAuto = _width as DimAuto;
-            //    DimAuto heightAuto = _height as DimAuto;
-
-            //    if ((widthAuto is { } && widthAuto._style.HasFlag (DimAutoStyle.Text))
-            //        || (heightAuto is { } && heightAuto._style.HasFlag (DimAutoStyle.Text)))
-            //    {
-            //        //if (TextFormatter.NeedsFormat)
-            //        {
-            //            // We always use TF in autosize = false mode
-            //            TextFormatter.AutoSize = false;
-
-            //            var size = TextFormatter.GetAutoSize ();
-            //            if (widthAuto is null || !widthAuto._style.HasFlag (DimAutoStyle.Text))
-            //            {
-            //                size.Width = _width.Anchor (0);
-            //            }
-
-            //            if (heightAuto is null || !heightAuto._style.HasFlag (DimAutoStyle.Text))
-            //            {
-            //                size.Height = _height.Anchor (0);
-            //            }
-
-            //            // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
-            //            //ContentSize = size;//TextFormatter.Size == Size.Empty ? null : TextFormatter.Size;
-            //            TextFormatter.Size = size; ;
-
-            //            // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
-            //            ContentSize = TextFormatter.Size == Size.Empty ? null : TextFormatter.Size;
-            //        }
-            //    }
-            //}
-
             Thickness thickness = GetAdornmentsThickness ();
             return new (
                         _viewportLocation,

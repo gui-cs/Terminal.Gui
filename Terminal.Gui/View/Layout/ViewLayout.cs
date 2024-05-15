@@ -868,8 +868,7 @@ public partial class View
 
     internal void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        // BUGBUG: This should really only work on initialized subviews
-        foreach (View v in from.InternalSubviews /*.Where(v => v.IsInitialized)*/)
+        foreach (View v in from.InternalSubviews)
         {
             nNodes.Add (v);
 
