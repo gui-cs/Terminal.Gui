@@ -190,7 +190,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (ckbWrapMessage);
 
-        //frame.ValidatePosDim = true;
+        frame.ValidatePosDim = true;
 
         label = new ()
         {

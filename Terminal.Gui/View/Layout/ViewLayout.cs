@@ -1119,6 +1119,9 @@ public partial class View
 
                     break;
 
+                case Dim dim and DimAuto:
+                    break;
+
                 case Dim dim and not DimAbsolute and not DimView and not DimCombine:
                     bad = dim;
 
