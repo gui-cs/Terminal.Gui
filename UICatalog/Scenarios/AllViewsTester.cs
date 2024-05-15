@@ -12,10 +12,10 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Top Level Windows")]
 public class AllViewsTester : Scenario
 {
-    private readonly List<string> _dimNames = new () { "Auto", "Factor", "Fill", "Absolute" };
+    private readonly List<string> _dimNames = new () { "Auto", "Percent", "Fill", "Absolute" };
 
     // TODO: This is missing some
-    private readonly List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
+    private readonly List<string> _posNames = new () { "Percent", "AnchorEnd", "Center", "Absolute" };
     private ListView _classListView;
     private View _curView;
     private FrameView _hostPane;
