@@ -10,9 +10,23 @@ public class Dialogs : Scenario
 {
     private static readonly int CODE_POINT = '你'; // We know this is a wide char
 
-    public override void Setup ()
+    public override void Main ()
     {
-        var frame = new FrameView { X = Pos.Center (), Y = 1, Width = Dim.Percent (75), Title = "Dialog Options" };
+        Application.Init ();
+
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
+
+        var frame = new FrameView
+        {
+            X = Pos.Center (),
+            Y = 1,
+            Width = Dim.Percent (75),
+            Height = Dim.Auto (DimAutoStyle.Content),
+            Title = "Dialog Options"
+        };
 
         var numButtonsLabel = new Label
         {
@@ -42,7 +56,7 @@ public class Dialogs : Scenario
         };
         frame.Add (widthEdit);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -76,7 +90,7 @@ public class Dialogs : Scenario
                    }
                   );
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -120,7 +134,7 @@ public class Dialogs : Scenario
         };
         frame.Add (glyphsNotWords);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (glyphsNotWords),
@@ -141,27 +155,13 @@ public class Dialogs : Scenario
 
         frame.ValidatePosDim = true;
 
-        void Top_LayoutComplete (object sender, EventArgs args)
-        {
-            frame.Height =
-                widthEdit.Frame.Height
-                + heightEdit.Frame.Height
-                + titleEdit.Frame.Height
-                + numButtonsEdit.Frame.Height
-                + glyphsNotWords.Frame.Height
-                + styleRadioGroup.Frame.Height
-                + frame.GetAdornmentsThickness ().Vertical;
-        }
+        app.Add (frame);
 
-        Top.LayoutComplete += Top_LayoutComplete;
-
-        Win.Add (frame);
-
-        label = new()
+        label = new ()
         {
             X = Pos.Center (), Y = Pos.Bottom (frame) + 4, TextAlignment = TextAlignment.Right, Text = "Button Pressed:"
         };
-        Win.Add (label);
+        app.Add (label);
 
         var buttonPressedLabel = new Label
         {
@@ -193,9 +193,14 @@ public class Dialogs : Scenario
                                        dlg.Dispose ();
                                    };
 
-        Win.Add (showDialogButton);
+        app.Add (showDialogButton);
 
-        Win.Add (buttonPressedLabel);
+        app.Add (buttonPressedLabel);
+
+        Application.Run (app);
+        app.Dispose ();
+
+        Application.Shutdown ();
     }
 
     private Dialog CreateDemoDialog (
@@ -231,7 +236,7 @@ public class Dialogs : Scenario
                 {
                     buttonId = i;
 
-                    button = new()
+                    button = new ()
                     {
                         Text = NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
                         IsDefault = buttonId == 0
@@ -239,7 +244,7 @@ public class Dialogs : Scenario
                 }
                 else
                 {
-                    button = new() { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                    button = new () { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
                 }
 
                 button.Accept += (s, e) =>
@@ -260,7 +265,7 @@ public class Dialogs : Scenario
 
             // This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
             // the buttons are laid out correctly
-            dialog = new()
+            dialog = new ()
             {
                 Title = titleEdit.Text,
                 ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem,
@@ -282,7 +287,7 @@ public class Dialogs : Scenario
 
                               if (glyphsNotWords.Checked == true)
                               {
-                                  button = new()
+                                  button = new ()
                                   {
                                       Text = NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
                                       IsDefault = buttonId == 0
@@ -290,7 +295,7 @@ public class Dialogs : Scenario
                               }
                               else
                               {
-                                  button = new() { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                                  button = new () { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
                               }
 
                               button.Accept += (s, e) =>
