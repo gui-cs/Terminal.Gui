@@ -2699,13 +2699,8 @@ public class TextView : View
                 CurrentRow = 0;
                 _savedHeight = Height;
 
-                //var prevLayoutStyle = LayoutStyle;
-                //if (LayoutStyle == LayoutStyle.Computed) {
-                //	LayoutStyle = LayoutStyle.Absolute;
-                //}
-                Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
+                Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
-                //LayoutStyle = prevLayoutStyle;
                 if (!IsInitialized)
                 {
                     _model.LoadString (Text);
@@ -2715,13 +2710,7 @@ public class TextView : View
             }
             else if (_multiline && _savedHeight is { })
             {
-                //var lyout = LayoutStyle;
-                //if (LayoutStyle == LayoutStyle.Computed) {
-                //	LayoutStyle = LayoutStyle.Absolute;
-                //}
                 Height = _savedHeight;
-
-                //LayoutStyle = lyout;
                 SetNeedsDisplay ();
             }
         }
