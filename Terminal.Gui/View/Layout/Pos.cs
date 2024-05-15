@@ -462,9 +462,14 @@ public class PosAnchorEnd : Pos
     }
 }
 
-internal class PosCenter : Pos
+/// <summary>
+///     Represents a position that is centered.
+/// </summary>
+public class PosCenter : Pos
 {
+    /// <inheritdoc />
     public override string ToString () { return "Center"; }
+
     internal override int Anchor (int width) { return width / 2; }
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
