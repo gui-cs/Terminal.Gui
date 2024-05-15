@@ -228,7 +228,7 @@ public class Dim
             throw new ArgumentException ("Percent value must be between 0 and 100");
         }
 
-        return new DimFactor (percent / 100, usePosition);
+        return new DimPercent (percent / 100, usePosition);
     }
 
     /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
@@ -571,20 +571,44 @@ public class DimCombine (bool add, Dim left, Dim right) : Dim
     }
 }
 
-internal class DimFactor (float factor, bool remaining = false) : Dim
+/// <summary>
+///     Represents a dimension that is a percentage of the width or height of the SuperView.
+/// </summary>
+/// <param name="percent">The percentage.</param>
+/// <param name="usePosition">
+///     If <see langword="true"/> the dimension is computed using the View's position (<see cref="View.X"/> or
+///     <see cref="View.Y"/>).
+///     If <see langword="false"/> the dimension is computed using the View's <see cref="View.ContentSize"/>.
+/// </param>
+public class DimPercent (float percent, bool usePosition = false) : Dim
 {
-    private readonly float _factor = factor;
-    private readonly bool _remaining = remaining;
+    /// <summary>
+    /// Gets the percentage.
+    /// </summary>
+    public new float Percent { get; } = percent;
 
-    public override bool Equals (object other) { return other is DimFactor f && f._factor == _factor && f._remaining == _remaining; }
-    public override int GetHashCode () { return _factor.GetHashCode (); }
-    public bool IsFromRemaining () { return _remaining; }
-    public override string ToString () { return $"Percent({_factor},{_remaining})"; }
-    internal override int Anchor (int width) { return (int)(width * _factor); }
+    /// <summary>
+    /// Gets whether the dimension is computed using the View's position or ContentSize.
+    /// </summary>
+    public bool UsePosition { get; } = usePosition;
+
+    /// <inheritdoc />
+    public override bool Equals (object other) { return other is DimPercent f && f.Percent == Percent && f.UsePosition == UsePosition; }
+
+    /// <inheritdoc />
+    public override int GetHashCode () { return Percent.GetHashCode (); }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString () { return $"Percent({Percent},{UsePosition})"; }
+
+    internal override int Anchor (int width) { return (int)(width * Percent); }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        return _remaining ? Math.Max (Anchor (superviewContentSize - location), 0) : Anchor (superviewContentSize);
+        return UsePosition ? Math.Max (Anchor (superviewContentSize - location), 0) : Anchor (superviewContentSize);
     }
 }
 

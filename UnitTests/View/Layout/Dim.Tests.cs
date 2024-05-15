@@ -345,7 +345,7 @@ public class DimTests
     [TestRespondersDisposed]
     public void Internal_Tests ()
     {
-        var dimFactor = new DimFactor (0.10F);
+        var dimFactor = new DimPercent (0.10F);
         Assert.Equal (10, dimFactor.Anchor (100));
 
         var dimAbsolute = new DimAbsolute (10);
