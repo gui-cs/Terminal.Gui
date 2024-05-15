@@ -204,7 +204,7 @@ public class ScenarioTests : TestsAllViews
             Title = "Size (Dim)"
         };
 
-        radioItems = new [] { "Auto()", "Percent(width)", "Fill(width)", "Sized(width)" };
+        radioItems = new [] { "Auto()", "Percent(width)", "Fill(width)", "Absolute(width)" };
         label = new () { X = 0, Y = 0, Text = "width:" };
         _sizeFrame.Add (label);
         _wRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
@@ -212,7 +212,7 @@ public class ScenarioTests : TestsAllViews
         _sizeFrame.Add (_wText);
         _sizeFrame.Add (_wRadioGroup);
 
-        radioItems = new [] { "Auto()", "Percent(height)", "Fill(height)", "Sized(height)" };
+        radioItems = new [] { "Auto()", "Percent(height)", "Fill(height)", "Absolute(height)" };
         label = new () { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "height:" };
         _sizeFrame.Add (label);
         _hText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
@@ -408,7 +408,7 @@ public class ScenarioTests : TestsAllViews
 
                         break;
                     case 2:
-                        view.Width = Dim.Sized (_wVal);
+                        view.Width = Dim.Absolute (_wVal);
 
                         break;
                 }
@@ -424,7 +424,7 @@ public class ScenarioTests : TestsAllViews
 
                         break;
                     case 2:
-                        view.Height = Dim.Sized (_hVal);
+                        view.Height = Dim.Absolute (_hVal);
 
                         break;
                 }

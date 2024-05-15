@@ -215,7 +215,7 @@ public class DimTests
     {
         var t = new View { Width = 80, Height = 25, Text = "top" };
 
-        var w = new Window { Width = Dim.Fill (), Height = Dim.Sized (10) };
+        var w = new Window { Width = Dim.Fill (), Height = Dim.Absolute (10) };
         var v = new View { Width = Dim.Width (w) - 2, Height = Dim.Percent (10), Text = "v" };
 
         w.Add (v);
@@ -292,7 +292,7 @@ public class DimTests
     {
         var t = new View { Width = 80, Height = 25, Text = "top" };
 
-        var w = new Window { Width = Dim.Fill (), Height = Dim.Sized (10) };
+        var w = new Window { Width = Dim.Fill (), Height = Dim.Absolute (10) };
         var v = new View { Width = Dim.Width (w) - 2, Height = Dim.Percent (10), Text = "v" };
 
         w.Add (v);
@@ -434,8 +434,8 @@ public class DimTests
 
         var v4 = new Button
         {
-            Width = Dim.Sized (50),
-            Height = Dim.Sized (50),
+            Width = Dim.Absolute (50),
+            Height = Dim.Absolute (50),
             ValidatePosDim = true,
             Text = "v4"
         };
@@ -641,39 +641,39 @@ public class DimTests
     {
         var n1 = 0;
         var n2 = 0;
-        Dim dim1 = Dim.Sized (n1);
-        Dim dim2 = Dim.Sized (n2);
+        Dim dim1 = Dim.Absolute (n1);
+        Dim dim2 = Dim.Absolute (n2);
         Assert.Equal (dim1, dim2);
 
         n1 = n2 = 1;
-        dim1 = Dim.Sized (n1);
-        dim2 = Dim.Sized (n2);
+        dim1 = Dim.Absolute (n1);
+        dim2 = Dim.Absolute (n2);
         Assert.Equal (dim1, dim2);
 
         n1 = n2 = -1;
-        dim1 = Dim.Sized (n1);
-        dim2 = Dim.Sized (n2);
+        dim1 = Dim.Absolute (n1);
+        dim2 = Dim.Absolute (n2);
         Assert.Equal (dim1, dim2);
 
         n1 = 0;
         n2 = 1;
-        dim1 = Dim.Sized (n1);
-        dim2 = Dim.Sized (n2);
+        dim1 = Dim.Absolute (n1);
+        dim2 = Dim.Absolute (n2);
         Assert.NotEqual (dim1, dim2);
     }
 
     [Fact]
     public void DimSized_SetsValue ()
     {
-        Dim dim = Dim.Sized (0);
+        Dim dim = Dim.Absolute (0);
         Assert.Equal ("Absolute(0)", dim.ToString ());
 
         var testVal = 5;
-        dim = Dim.Sized (testVal);
+        dim = Dim.Absolute (testVal);
         Assert.Equal ($"Absolute({testVal})", dim.ToString ());
 
         testVal = -1;
-        dim = Dim.Sized (testVal);
+        dim = Dim.Absolute (testVal);
         Assert.Equal ($"Absolute({testVal})", dim.ToString ());
     }
 

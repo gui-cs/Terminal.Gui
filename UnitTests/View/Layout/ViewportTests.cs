@@ -190,8 +190,8 @@ public class ViewportTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
         Assert.Equal (Pos.Absolute (1), v.X);
         Assert.Equal (Pos.Absolute (2), v.Y);
-        Assert.Equal (Dim.Sized (30), v.Width);
-        Assert.Equal (Dim.Sized (40), v.Height);
+        Assert.Equal (Dim.Absolute (30), v.Width);
+        Assert.Equal (Dim.Absolute (40), v.Height);
 
         newViewport = new Rectangle (0, 0, 3, 4);
         v.Viewport = newViewport;
@@ -200,8 +200,8 @@ public class ViewportTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
         Assert.Equal (Pos.Absolute (1), v.X);
         Assert.Equal (Pos.Absolute (2), v.Y);
-        Assert.Equal (Dim.Sized (3), v.Width);
-        Assert.Equal (Dim.Sized (4), v.Height);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
 
         v.BorderStyle = LineStyle.Single;
 
@@ -212,8 +212,8 @@ public class ViewportTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (1, 2, 3, 4), v.Frame);
         Assert.Equal (Pos.Absolute (1), v.X);
         Assert.Equal (Pos.Absolute (2), v.Y);
-        Assert.Equal (Dim.Sized (3), v.Width);
-        Assert.Equal (Dim.Sized (4), v.Height);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
 
         // Now set bounds bigger as before
         newViewport = new Rectangle (0, 0, 3, 4);
@@ -225,8 +225,8 @@ public class ViewportTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
         Assert.Equal (Pos.Absolute (1), v.X);
         Assert.Equal (Pos.Absolute (2), v.Y);
-        Assert.Equal (Dim.Sized (5), v.Width);
-        Assert.Equal (Dim.Sized (6), v.Height);
+        Assert.Equal (Dim.Absolute (5), v.Width);
+        Assert.Equal (Dim.Absolute (6), v.Height);
     }
 
     [Theory]

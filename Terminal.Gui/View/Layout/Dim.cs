@@ -232,7 +232,7 @@ public class Dim
     /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Dim"/>.</returns>
     /// <param name="size">The value to convert to the <see cref="Dim"/>.</param>
-    public static Dim Sized (int size) { return new DimAbsolute (size); }
+    public static Dim Absolute (int size) { return new DimAbsolute (size); }
 
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.</summary>
     /// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>

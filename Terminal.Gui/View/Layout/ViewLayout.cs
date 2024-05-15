@@ -240,7 +240,7 @@ public partial class View
         }
     }
 
-    private Dim _height = Dim.Sized (0);
+    private Dim _height = Dim.Absolute (0);
 
     /// <summary>Gets or sets the height dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
@@ -286,7 +286,7 @@ public partial class View
         }
     }
 
-    private Dim _width = Dim.Sized (0);
+    private Dim _width = Dim.Absolute (0);
 
     /// <summary>Gets or sets the width dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>

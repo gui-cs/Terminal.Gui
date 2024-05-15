@@ -1011,8 +1011,8 @@ public class DimAutoTests (ITestOutputHelper output)
         {
             X = subViewOffset,
             Y = subViewOffset,
-            Width = Dim.Sized (dimAbsoluteSize),
-            Height = Dim.Sized (dimAbsoluteSize)
+            Width = Dim.Absolute (dimAbsoluteSize),
+            Height = Dim.Absolute (dimAbsoluteSize)
         };
         view.Add (subview);
 
