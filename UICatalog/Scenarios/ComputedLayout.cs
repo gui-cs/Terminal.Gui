@@ -64,7 +64,7 @@ public class ComputedLayout : Scenario
         app.Add (verticalRuler);
 
         // Demonstrate At - Using Pos.At to locate a view in an absolute location
-        var atButton = new Button { Text = "At(2,1)", X = Pos.At (2), Y = Pos.At (1) };
+        var atButton = new Button { Text = "At(2,1)", X = Pos.Absolute (2), Y = Pos.Absolute (1) };
         app.Add (atButton);
 
         // Throw in a literal absolute - Should function identically to above

@@ -16,7 +16,7 @@ public class PosTests (ITestOutputHelper output)
 
         Toplevel t = new ();
 
-        var w = new Window { X = Pos.Left (t) + 2, Y = Pos.At (2) };
+        var w = new Window { X = Pos.Left (t) + 2, Y = Pos.Absolute (2) };
 
         var v = new View { X = Pos.Center (), Y = Pos.Percent (10) };
 
@@ -78,26 +78,26 @@ public class PosTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void PosAt_Equal ()
+    public void PosAbsolute_Equal ()
     {
         var n1 = 0;
         var n2 = 0;
 
-        Pos pos1 = Pos.At (n1);
-        Pos pos2 = Pos.At (n2);
+        Pos pos1 = Pos.Absolute (n1);
+        Pos pos2 = Pos.Absolute (n2);
         Assert.Equal (pos1, pos2);
     }
 
     [Fact]
-    public void PosAt_SetsValue ()
+    public void PosAbsolute_SetsValue ()
     {
-        Pos pos = Pos.At (0);
+        Pos pos = Pos.Absolute (0);
         Assert.Equal ("Absolute(0)", pos.ToString ());
 
-        pos = Pos.At (5);
+        pos = Pos.Absolute (5);
         Assert.Equal ("Absolute(5)", pos.ToString ());
 
-        pos = Pos.At (-1);
+        pos = Pos.Absolute (-1);
         Assert.Equal ("Absolute(-1)", pos.ToString ());
     }
 

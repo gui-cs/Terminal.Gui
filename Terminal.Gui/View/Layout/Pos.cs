@@ -84,7 +84,7 @@ public enum Side
 ///             </item>
 ///             <item>
 ///                 <term>
-///                     <see cref="Pos.At(int)"/>
+///                     <see cref="Absolute"/>
 ///                 </term>
 ///                 <description>
 ///                     Creates a <see cref="Pos"/> object that is an absolute position based on the specified
@@ -192,8 +192,8 @@ public class Pos
 
     /// <summary>Creates a <see cref="Pos"/> object that is an absolute position based on the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Pos"/>.</returns>
-    /// <param name="n">The value to convert to the <see cref="Pos"/>.</param>
-    public static Pos At (int n) { return new PosAbsolute (n); }
+    /// <param name="position">The value to convert to the <see cref="Pos"/>.</param>
+    public static Pos Absolute (int position) { return new PosAbsolute (position); }
 
     /// <summary>Creates a <see cref="Pos"/> object that can be used to center the <see cref="View"/>.</summary>
     /// <returns>The center Pos.</returns>
@@ -379,13 +379,27 @@ public class Pos
     internal virtual bool ReferencesOtherViews () { return false; }
 }
 
-internal class PosAbsolute (int n) : Pos
+/// <summary>
+///    Represents an absolute position in the layout. This is used to specify a fixed position in the layout.
+/// </summary>
+/// <param name="position"></param>
+public class PosAbsolute (int position) : Pos
 {
-    private readonly int _n = n;
-    public override bool Equals (object other) { return other is PosAbsolute abs && abs._n == _n; }
-    public override int GetHashCode () { return _n.GetHashCode (); }
-    public override string ToString () { return $"Absolute({_n})"; }
-    internal override int Anchor (int width) { return _n; }
+    /// <summary>
+    ///    The position of the <see cref="View"/> in the layout.
+    /// </summary>
+    public int Position { get; } = position;
+
+    /// <inheritdoc />
+    public override bool Equals (object other) { return other is PosAbsolute abs && abs.Position == Position; }
+
+    /// <inheritdoc />
+    public override int GetHashCode () { return Position.GetHashCode (); }
+
+    /// <inheritdoc />
+    public override string ToString () { return $"Absolute({Position})"; }
+
+    internal override int Anchor (int width) { return Position; }
 }
 
 internal class PosAnchorEnd : Pos

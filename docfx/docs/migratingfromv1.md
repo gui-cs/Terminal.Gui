@@ -83,12 +83,13 @@ In v1, `Application.Init` automatically created a toplevel view and set `Applica
 
 ## `Pos` and `Dim` types are no-longer internal nested classes
 
-In v1, the `Pos` and `Dim` types (e.g. `Pos.PosView`) were nested classes and marked `internal`. In v2, they are no longer nested, and have appropriate public APIs.
+In v1, the `Pos` and `Dim` types (e.g. `Pos.PosView`) were nested classes and marked `internal`. In v2, they are no longer nested, and have appropriate public APIs. As part of this, the static method that creates a `PosAbsolute`, `Pos.At`, was renamed to `Pos.Absoulte` for consistency
 
 ### How to Fix
 
 * Search and replace `Pos.Pos` -> `Pos`.
 * Search and replace `Dim.Dim` -> `Dim`.
+* Search and replace `Pos.At` -> `Pos.Absolute`
 
 ## Layout Improvements
 

@@ -29,8 +29,8 @@ public class AbsoluteLayoutTests
                       new Rectangle (0, 0, newFrame.Width, newFrame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal ($"Absolute({newFrame.Height})", v.Height.ToString ());
         Assert.Equal ($"Absolute({newFrame.Width})", v.Width.ToString ());
         v.Dispose ();
@@ -178,8 +178,8 @@ public class AbsoluteLayoutTests
                       new Rectangle (0, 0, frame.Width, frame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.At (0), v.X);
-        Assert.Equal (Pos.At (0), v.Y);
+        Assert.Equal (Pos.Absolute (0), v.X);
+        Assert.Equal (Pos.Absolute (0), v.Y);
         Assert.Equal (Dim.Sized (0), v.Width);
         Assert.Equal (Dim.Sized (0), v.Height);
         v.Dispose ();
@@ -193,8 +193,8 @@ public class AbsoluteLayoutTests
                       new Rectangle (0, 0, frame.Width, frame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Sized (3), v.Width);
         Assert.Equal (Dim.Sized (4), v.Height);
         v.Dispose ();
@@ -207,8 +207,8 @@ public class AbsoluteLayoutTests
                       new Rectangle (0, 0, frame.Width, frame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Sized (3), v.Width);
         Assert.Equal (Dim.Sized (4), v.Height);
         v.Dispose ();
@@ -221,8 +221,8 @@ public class AbsoluteLayoutTests
         // and the size wasn't set on the initializer
         Assert.Equal (new Rectangle (frame.X, frame.Y, 0, 0), v.Frame);
         Assert.Equal (new Rectangle (0, 0, 0, 0), v.Viewport); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Sized (0), v.Width);
         Assert.Equal (Dim.Sized (0), v.Height);
         v.Dispose ();
@@ -231,8 +231,8 @@ public class AbsoluteLayoutTests
         Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
         Assert.Equal (new Rectangle (0, 0, 0, 0), v.Frame);
         Assert.Equal (new Rectangle (0, 0, 0, 0), v.Viewport); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.At (0), v.X);
-        Assert.Equal (Pos.At (0), v.Y);
+        Assert.Equal (Pos.Absolute (0), v.X);
+        Assert.Equal (Pos.Absolute (0), v.Y);
         Assert.Equal (Dim.Sized (0), v.Width);
         Assert.Equal (Dim.Sized (0), v.Height);
         v.Dispose ();
@@ -241,8 +241,8 @@ public class AbsoluteLayoutTests
         Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
         Assert.Equal (new Rectangle (frame.X, frame.Y, 3, 4), v.Frame);
         Assert.Equal (new Rectangle (0, 0, 3, 4), v.Viewport); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Sized (3), v.Width);
         Assert.Equal (Dim.Sized (4), v.Height);
         v.Dispose ();

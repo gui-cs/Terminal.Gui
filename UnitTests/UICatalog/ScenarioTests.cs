@@ -372,7 +372,7 @@ public class ScenarioTests : TestsAllViews
 
                         break;
                     case 3:
-                        view.X = Pos.At (_xVal);
+                        view.X = Pos.Absolute (_xVal);
 
                         break;
                 }
@@ -392,7 +392,7 @@ public class ScenarioTests : TestsAllViews
 
                         break;
                     case 3:
-                        view.Y = Pos.At (_yVal);
+                        view.Y = Pos.Absolute (_yVal);
 
                         break;
                 }

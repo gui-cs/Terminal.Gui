@@ -188,8 +188,8 @@ public class ViewportTests (ITestOutputHelper output)
         Assert.Equal (newViewport, v.Viewport);
         Assert.Equal (new Rectangle (1, 2, newViewport.Width, newViewport.Height), v.Frame);
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Sized (30), v.Width);
         Assert.Equal (Dim.Sized (40), v.Height);
 
@@ -198,8 +198,8 @@ public class ViewportTests (ITestOutputHelper output)
         Assert.Equal (newViewport, v.Viewport);
         Assert.Equal (new Rectangle (1, 2, newViewport.Width, newViewport.Height), v.Frame);
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Sized (3), v.Width);
         Assert.Equal (Dim.Sized (4), v.Height);
 
@@ -210,8 +210,8 @@ public class ViewportTests (ITestOutputHelper output)
 
         // Frame should not change
         Assert.Equal (new Rectangle (1, 2, 3, 4), v.Frame);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Sized (3), v.Width);
         Assert.Equal (Dim.Sized (4), v.Height);
 
@@ -223,8 +223,8 @@ public class ViewportTests (ITestOutputHelper output)
         // Frame grows because there's now a border
         Assert.Equal (new Rectangle (1, 2, 5, 6), v.Frame);
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Sized (5), v.Width);
         Assert.Equal (Dim.Sized (6), v.Height);
     }

@@ -426,7 +426,7 @@ public class AllViewsTester : Scenario
                 0 => Pos.Percent (_xVal),
                 1 => Pos.AnchorEnd (),
                 2 => Pos.Center (),
-                3 => Pos.At (_xVal),
+                3 => Pos.Absolute (_xVal),
                 _ => view.X
             };
 
@@ -435,7 +435,7 @@ public class AllViewsTester : Scenario
                 0 => Pos.Percent (_yVal),
                 1 => Pos.AnchorEnd (),
                 2 => Pos.Center (),
-                3 => Pos.At (_yVal),
+                3 => Pos.Absolute (_yVal),
                 _ => view.Y
             };
 

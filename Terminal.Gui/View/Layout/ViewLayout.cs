@@ -163,7 +163,7 @@ public partial class View
         return frame;
     }
 
-    private Pos _x = Pos.At (0);
+    private Pos _x = Pos.Absolute (0);
 
     /// <summary>Gets or sets the X position for the view (the column).</summary>
     /// <value>The <see cref="Pos"/> object representing the X position.</value>
@@ -202,7 +202,7 @@ public partial class View
         }
     }
 
-    private Pos _y = Pos.At (0);
+    private Pos _y = Pos.Absolute (0);
 
     /// <summary>Gets or sets the Y position for the view (the row).</summary>
     /// <value>The <see cref="Pos"/> object representing the Y position.</value>

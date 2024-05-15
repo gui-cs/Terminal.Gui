@@ -1127,7 +1127,7 @@ public class DimAutoTests (ITestOutputHelper output)
     public void With_Subview_At_PosAt ()
     {
         var view = new View ();
-        var subview = new View () { X = Pos.At (10), Y = Pos.At (5), Width = 20, Height = 10 };
+        var subview = new View () { X = Pos.Absolute (10), Y = Pos.Absolute (5), Width = 20, Height = 10 };
         view.Add (subview);
 
         var dimWidth = Dim.Auto ();
