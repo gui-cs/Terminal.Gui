@@ -65,8 +65,6 @@ public class DatePicker : View
         base.Dispose (disposing);
     }
 
-    private int CalculateCalendarWidth () { return _calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7; }
-
     private void ChangeDayDate (int day)
     {
         _date = new DateTime (_date.Year, _date.Month, day);
@@ -160,7 +158,8 @@ public class DatePicker : View
             _table.Columns.Add (abbreviatedDayName);
         }
 
-        _calendar.Width = CalculateCalendarWidth ();
+        // TODO: Get rid of the +7 which is hackish
+        _calendar.Width = _calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7;
     }
 
     private string GetBackButtonText () { return Glyphs.LeftArrow + Glyphs.LeftArrow.ToString (); }
@@ -189,15 +188,6 @@ public class DatePicker : View
         Date = date;
         _dateLabel = new Label { X = 0, Y = 0, Text = "Date: " };
 
-        _dateField = new DateField (DateTime.Now)
-        {
-            X = Pos.Right (_dateLabel),
-            Y = 0,
-            Width = Dim.Fill (1),
-            Height = 1,
-            Culture = Culture
-        };
-
         _calendar = new TableView
         {
             X = 0,
@@ -210,6 +200,15 @@ public class DatePicker : View
                 ShowVerticalCellLines = true,
                 ExpandLastColumn = true
             }
+        };
+
+        _dateField = new DateField (DateTime.Now)
+        {
+            X = Pos.Right (_dateLabel),
+            Y = 0,
+            Width = 12,//Dim.Width (_calendar) - Dim.Width(_dateLabel), // BUGBUG: Fix when Dim.Auto(subviews) fully works
+            Height = 1,
+            Culture = Culture
         };
 
         _previousMonthButton = new Button
@@ -274,8 +273,11 @@ public class DatePicker : View
                                        Text = _date.ToString (Format);
                                    };
 
-        Width = CalculateCalendarWidth () + 2;
-        Height = _calendar.Height + 3;
+        Height = Dim.Auto ();
+        Width = Dim.Auto ();
+
+        // BUGBUG: Remove when Dim.Auto(subviews) fully works
+        SetContentSize(new (_calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7, _calendar.Frame.Height + 1));
 
         _dateField.DateChanged += DateField_DateChanged;
 
