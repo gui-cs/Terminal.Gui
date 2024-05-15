@@ -56,7 +56,7 @@ public class PosTests (ITestOutputHelper output)
     [Fact]
     public void PosFactor_Calculate_ReturnsExpectedValue ()
     {
-        var posFactor = new PosFactor (0.5f);
+        var posFactor = new PosPercent (0.5f);
         var result = posFactor.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (5, result);
     }
@@ -212,7 +212,7 @@ public class PosTests (ITestOutputHelper output)
     [TestRespondersDisposed]
     public void Internal_Tests ()
     {
-        var posFactor = new PosFactor (0.10F);
+        var posFactor = new PosPercent (0.10F);
         Assert.Equal (10, posFactor.Anchor (100));
 
         var posAnchorEnd = new PosAnchorEnd (1);

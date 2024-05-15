@@ -303,7 +303,7 @@ public class Pos
             throw new ArgumentException ("Percent value must be between 0 and 100.");
         }
 
-        return new PosFactor (percent / 100);
+        return new PosPercent (percent / 100);
     }
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
@@ -549,13 +549,27 @@ public class PosCombine (bool add, Pos left, Pos right) : Pos
     }
 }
 
-internal class PosFactor (float factor) : Pos
+/// <summary>
+///     Represents a position that is a percentage of the width or height of the SuperView.
+/// </summary>
+/// <param name="factor"></param>
+public class PosPercent (float factor) : Pos
 {
-    private readonly float _factor = factor;
-    public override bool Equals (object other) { return other is PosFactor f && f._factor == _factor; }
-    public override int GetHashCode () { return _factor.GetHashCode (); }
-    public override string ToString () { return $"Factor({_factor})"; }
-    internal override int Anchor (int width) { return (int)(width * _factor); }
+    /// <summary>
+    ///     Gets the factor that represents the percentage of the width or height of the SuperView.
+    /// </summary>
+    public float Factor { get; } = factor;
+
+    /// <inheritdoc />
+    public override bool Equals (object other) { return other is PosPercent f && f.Factor == Factor; }
+
+    /// <inheritdoc />
+    public override int GetHashCode () { return Factor.GetHashCode (); }
+
+    /// <inheritdoc />
+    public override string ToString () { return $"Factor({Factor})"; }
+
+    internal override int Anchor (int width) { return (int)(width * Factor); }
 }
 
 // Helper class to provide dynamic value by the execution of a function that returns an integer.

@@ -417,7 +417,7 @@ public class TileView : View
     /// </summary>
     public bool SetSplitterPos (int idx, Pos value)
     {
-        if (!(value is PosAbsolute) && !(value is PosFactor))
+        if (!(value is PosAbsolute) && !(value is PosPercent))
         {
             throw new ArgumentException (
                                          $"Only Percent and Absolute values are supported. Passed value was {value.GetType ().Name}"
@@ -991,11 +991,11 @@ public class TileView : View
 
         /// <summary>
         ///     <para>
-        ///         Determines the absolute position of <paramref name="p"/> and returns a <see cref="PosFactor"/> that
+        ///         Determines the absolute position of <paramref name="p"/> and returns a <see cref="PosPercent"/> that
         ///         describes the percentage of that.
         ///     </para>
         ///     <para>
-        ///         Effectively turning any <see cref="Pos"/> into a <see cref="PosFactor"/> (as if created with
+        ///         Effectively turning any <see cref="Pos"/> into a <see cref="PosPercent"/> (as if created with
         ///         <see cref="Pos.Percent(float)"/>)
         ///     </para>
         /// </summary>
@@ -1007,7 +1007,7 @@ public class TileView : View
             // calculate position in the 'middle' of the cell at p distance along parentLength
             float position = p.Anchor (parentLength) + 0.5f;
 
-            return new PosFactor (position / parentLength);
+            return new PosPercent (position / parentLength);
         }
 
         /// <summary>
@@ -1025,7 +1025,7 @@ public class TileView : View
         /// <param name="newValue"></param>
         private bool FinalisePosition (Pos oldValue, Pos newValue)
         {
-            if (oldValue is PosFactor)
+            if (oldValue is PosPercent)
             {
                 if (Orientation == Orientation.Horizontal)
                 {
