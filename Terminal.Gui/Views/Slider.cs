@@ -35,7 +35,7 @@ public class SliderOption<T>
     public string Legend { get; set; }
 
     /// <summary>
-    ///     Abbreviation of the Legend. When the <see cref="Slider{T}.InnerSpacing"/> too small to fit
+    ///     Abbreviation of the Legend. When the <see cref="Slider{T}.MinimumInnerSpacing"/> too small to fit
     ///     <see cref="Legend"/>.
     /// </summary>
     public Rune LegendAbbr { get; set; }
@@ -153,7 +153,8 @@ internal class SliderConfiguration
 {
     internal bool _allowEmpty;
     internal int _endSpacing;
-    internal int _innerSpacing;
+    internal int _minInnerSpacing = 1;
+    internal int _cachedInnerSpacing; // Currently calculated
     internal Orientation _legendsOrientation = Orientation.Horizontal;
     internal bool _rangeAllowSingle;
     internal bool _showEndSpacing;
@@ -162,6 +163,7 @@ internal class SliderConfiguration
     internal Orientation _sliderOrientation = Orientation.Horizontal;
     internal int _startSpacing;
     internal SliderType _type = SliderType.Single;
+    internal bool _useMinimumSize;
 }
 
 /// <summary><see cref="EventArgs"/> for <see cref="Slider{T}"/> events.</summary>
@@ -252,8 +254,6 @@ public class Slider<T> : View
         _options = options ?? new List<SliderOption<T>> ();
 
         _config._sliderOrientation = orientation;
-
-        _config._showLegends = true;
 
         SetDefaultStyle ();
         SetCommands ();
@@ -399,16 +399,15 @@ public class Slider<T> : View
         }
     }
 
-    // BUGBUG: InnerSpacing is ignored; SetContentSize overwrites it.
-    /// <summary>Gets or sets the number of rows/columns between <see cref="Options"/></summary>
-    public int InnerSpacing
+    /// <summary>Gets or sets the minimum number of rows/columns between <see cref="Options"/>. The default is 1.</summary>
+    public int MinimumInnerSpacing
     {
-        get => _config._innerSpacing;
+        get => _config._minInnerSpacing;
         set
         {
-            _config._innerSpacing = value;
+            _config._minInnerSpacing = value;
 
-           // SetContentSize ();
+            SetContentSize ();
         }
     }
 
@@ -450,6 +449,18 @@ public class Slider<T> : View
         if (!args.Cancel)
         {
             _config._sliderOrientation = newOrientation;
+            switch (_config._sliderOrientation)
+            {
+                case Orientation.Horizontal:
+                    Style.SpaceChar = new Cell { Rune = Glyphs.HLine }; // '─'
+
+                    break;
+                case Orientation.Vertical:
+                    Style.SpaceChar = new Cell { Rune = Glyphs.VLine };
+
+                    break;
+            }
+
             SetKeyBindings ();
             SetContentSize ();
         }
@@ -529,17 +540,17 @@ public class Slider<T> : View
         }
     }
 
-    private bool _useMinimumSizeForDimAuto;
+
 
     /// <summary>
-    /// Gets or sets whether the minimum or ideal size will be used when Height or Width are set to Dim.Auto.
+    /// Gets or sets whether the minimum or ideal size will be used when calculating the size of the slider.
     /// </summary>
-    public bool UseMinimumSizeForDimAuto
+    public bool UseMinimumSize
     {
-        get => _useMinimumSizeForDimAuto;
+        get => _config._useMinimumSize;
         set
         {
-            _useMinimumSizeForDimAuto = value;
+            _config._useMinimumSize = value;
             SetContentSize ();
         }
     }
@@ -602,6 +613,8 @@ public class Slider<T> : View
     // TODO: Make configurable via ConfigurationManager
     private void SetDefaultStyle ()
     {
+        _config._showLegends = true;
+
         switch (_config._sliderOrientation)
         {
             case Orientation.Horizontal:
@@ -658,12 +671,13 @@ public class Slider<T> : View
 
         bool horizontal = _config._sliderOrientation == Orientation.Horizontal;
 
-        if (UseMinimumSizeForDimAuto)
+        if (UseMinimumSize)
         {
-            CalcSpacingConfig (0);
+            CalcSpacingConfig (CalcMinLength ());
         }
         else
         {
+            //SetRelativeLayout (SuperView.ContentSize);
             CalcSpacingConfig (horizontal ? Viewport.Width : Viewport.Height);
         }
         SetContentSize (new (GetIdealWidth (), GetIdealHeight ()));
@@ -672,7 +686,7 @@ public class Slider<T> : View
 
         void CalcSpacingConfig (int size)
         {
-            _config._innerSpacing = 0;
+            _config._cachedInnerSpacing = 0;
             _config._startSpacing = 0;
             _config._endSpacing = 0;
 
@@ -736,12 +750,14 @@ public class Slider<T> : View
 
             if (_options.Count == 1)
             {
-                _config._innerSpacing = max_legend;
+                _config._cachedInnerSpacing = max_legend;
             }
             else
             {
-                _config._innerSpacing = Math.Max (0, (int)Math.Floor ((double)width / (_options.Count - 1)) - 1);
+                _config._cachedInnerSpacing = Math.Max (0, (int)Math.Floor ((double)width / (_options.Count - 1)) - 1);
             }
+
+            _config._cachedInnerSpacing = Math.Max (_config._minInnerSpacing, _config._cachedInnerSpacing);
 
             _config._endSpacing = last_right;
         }
@@ -759,7 +775,7 @@ public class Slider<T> : View
         var length = 0;
         length += _config._startSpacing + _config._endSpacing;
         length += _options.Count;
-        length += (_options.Count - 1) * _config._innerSpacing;
+        length += (_options.Count - 1) * _config._minInnerSpacing;
 
         return length;
     }
@@ -770,7 +786,7 @@ public class Slider<T> : View
     /// <returns></returns>
     public int GetIdealWidth ()
     {
-        if (UseMinimumSizeForDimAuto)
+        if (UseMinimumSize)
         {
             return Orientation == Orientation.Horizontal ? CalcMinLength () : CalcIdealThickness ();
 
@@ -784,7 +800,7 @@ public class Slider<T> : View
     /// <returns></returns>
     public int GetIdealHeight ()
     {
-        if (UseMinimumSizeForDimAuto)
+        if (UseMinimumSize)
         {
             return Orientation == Orientation.Horizontal ? CalcIdealThickness () : CalcMinLength ();
         }
@@ -802,6 +818,7 @@ public class Slider<T> : View
             return 0;
         }
 
+        bool isVertical = Orientation == Orientation.Vertical;
         var length = 0;
 
         if (_config._showLegends)
@@ -812,16 +829,24 @@ public class Slider<T> : View
             {
                 // Each legend should be centered in a space the width of the longest legend, with one space between.
                 // Calculate the total length required for all legends.
-                max_legend = int.Max (_options.Max (s => s.Legend?.GetColumns () ?? 1), 1);
-                length = max_legend * _options.Count + (_options.Count - 1);
+                //if (!isVertical)
+                {
+                    max_legend = int.Max (_options.Max (s => s.Legend?.GetColumns () ?? 1), 1);
+                    length = max_legend * _options.Count + (_options.Count - 1);
+                }
+                //
+                //{
+                //    length = CalcMinLength ();
+                //}
+
             }
             else
             {
-                length += _options.Count;
+                length = CalcMinLength ();
             }
         }
 
-        return length;
+        return Math.Max (length, CalcMinLength ());
     }
 
     /// <summary>
@@ -858,7 +883,7 @@ public class Slider<T> : View
 
         var offset = 0;
         offset += _config._startSpacing;
-        offset += option * (_config._innerSpacing + 1);
+        offset += option * (_config._cachedInnerSpacing + 1);
 
         if (_config._sliderOrientation == Orientation.Vertical)
         {
@@ -895,8 +920,8 @@ public class Slider<T> : View
                 int cx = xx;
                 cx -= _config._startSpacing;
 
-                int option = cx / (_config._innerSpacing + 1);
-                bool valid = cx % (_config._innerSpacing + 1) == 0;
+                int option = cx / (_config._cachedInnerSpacing + 1);
+                bool valid = cx % (_config._cachedInnerSpacing + 1) == 0;
 
                 if (!valid || option < 0 || option > _options.Count - 1)
                 {
@@ -920,8 +945,8 @@ public class Slider<T> : View
                 int cy = yy;
                 cy -= _config._startSpacing;
 
-                int option = cy / (_config._innerSpacing + 1);
-                bool valid = cy % (_config._innerSpacing + 1) == 0;
+                int option = cy / (_config._cachedInnerSpacing + 1);
+                bool valid = cy % (_config._cachedInnerSpacing + 1) == 0;
 
                 if (!valid || option < 0 || option > _options.Count - 1)
                 {
@@ -950,7 +975,7 @@ public class Slider<T> : View
             {
                 Move (position.x, position.y);
 
-                return new (position.x, position.x);
+                return new (position.x, position.y);
             }
         }
         return base.PositionCursor ();
@@ -1185,7 +1210,7 @@ public class Slider<T> : View
                                               : Style.SpaceChar.Attribute ?? normalAttr
                                          );
 
-                    for (var s = 0; s < _config._innerSpacing; s++)
+                    for (var s = 0; s < _config._cachedInnerSpacing; s++)
                     {
                         MoveAndAdd (x, y, drawRange && isSet ? Style.RangeChar.Rune : Style.SpaceChar.Rune);
 
@@ -1357,7 +1382,7 @@ public class Slider<T> : View
                     switch (_config._legendsOrientation)
                     {
                         case Orientation.Horizontal:
-                            text = AlignText (text, _config._innerSpacing + 1, TextAlignment.Centered);
+                            text = AlignText (text, _config._cachedInnerSpacing + 1, TextAlignment.Centered);
 
                             break;
                         case Orientation.Vertical:
@@ -1375,7 +1400,7 @@ public class Slider<T> : View
 
                             break;
                         case Orientation.Vertical:
-                            text = AlignText (text, _config._innerSpacing + 1, TextAlignment.Centered);
+                            text = AlignText (text, _config._cachedInnerSpacing + 1, TextAlignment.Centered);
 
                             break;
                     }
@@ -1462,12 +1487,12 @@ public class Slider<T> : View
             if (_config._sliderOrientation == Orientation.Horizontal
                 && _config._legendsOrientation == Orientation.Vertical)
             {
-                x += _config._innerSpacing + 1;
+                x += _config._cachedInnerSpacing + 1;
             }
             else if (_config._sliderOrientation == Orientation.Vertical
                      && _config._legendsOrientation == Orientation.Horizontal)
             {
-                y += _config._innerSpacing + 1;
+                y += _config._cachedInnerSpacing + 1;
             }
         }
     }
@@ -1506,7 +1531,7 @@ public class Slider<T> : View
             if (Orientation == Orientation.Horizontal)
             {
                 int left = _config._startSpacing;
-                int width = _options.Count + (_options.Count - 1) * _config._innerSpacing;
+                int width = _options.Count + (_options.Count - 1) * _config._cachedInnerSpacing;
                 int right = left + width - 1;
                 int clampedX = Clamp (position.X, left, right);
                 position = new Point (clampedX, 0);
@@ -1514,7 +1539,7 @@ public class Slider<T> : View
             else
             {
                 int top = _config._startSpacing;
-                int height = _options.Count + (_options.Count - 1) * _config._innerSpacing;
+                int height = _options.Count + (_options.Count - 1) * _config._cachedInnerSpacing;
                 int bottom = top + height - 1;
                 int clampedY = Clamp (position.Y, top, bottom);
                 position = new Point (0, clampedY);
@@ -1553,11 +1578,11 @@ public class Slider<T> : View
             // how far has user dragged from original location?						
             if (Orientation == Orientation.Horizontal)
             {
-                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
             else
             {
-                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
 
             if (!_config._allowEmpty && success)
@@ -1587,11 +1612,11 @@ public class Slider<T> : View
 
             if (Orientation == Orientation.Horizontal)
             {
-                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
             else
             {
-                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._innerSpacing / 2), out option);
+                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
 
             if (success)

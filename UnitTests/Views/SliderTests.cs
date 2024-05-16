@@ -155,7 +155,7 @@ public class SliderTests
         Assert.True (slider.ShowLegends);
         Assert.False (slider.ShowEndSpacing);
         Assert.Equal (SliderType.Single, slider.Type);
-        Assert.Equal (0, slider.InnerSpacing);
+        Assert.Equal (1, slider.MinimumInnerSpacing);
         Assert.True (slider.Width is DimAuto);
         Assert.True (slider.Height is DimAuto);
         Assert.Equal (0, slider.FocusedOption);
@@ -174,7 +174,7 @@ public class SliderTests
         // Assert
         // 0123456789
         // 1 2 3
-        Assert.Equal (0, slider.InnerSpacing);
+        Assert.Equal (1, slider.MinimumInnerSpacing);
         Assert.Equal (new Size (5, 2), slider.ContentSize);
         Assert.Equal (new Size (5, 2), slider.Frame.Size);
         Assert.NotNull (slider);
@@ -350,7 +350,7 @@ public class SliderTests
         // 0123456789
         // 1234
 
-        slider.InnerSpacing = 2;
+        slider.MinimumInnerSpacing = 2;
 
         // 0123456789
         // 1--2--3--4
@@ -379,7 +379,7 @@ public class SliderTests
         slider.Orientation = Orientation.Vertical;
 
         // Set auto size to true to enable testing
-        slider.InnerSpacing = 2;
+        slider.MinimumInnerSpacing = 2;
 
         // 0 1
         // 1 |
@@ -426,7 +426,7 @@ public class SliderTests
         Slider<int> slider = new (new () { 1, 2, 3, 4 });
 
         // Set auto size to true to enable testing
-        slider.InnerSpacing = 2;
+        slider.MinimumInnerSpacing = 2;
 
         // 0123456789
         // 1--2--3--4
@@ -451,7 +451,7 @@ public class SliderTests
         slider.Orientation = Orientation.Vertical;
 
         // Set auto size to true to enable testing
-        slider.InnerSpacing = 2;
+        slider.MinimumInnerSpacing = 2;
 
         // Act
         bool result = slider.TryGetPositionByOption (option, out (int x, int y) position);
@@ -517,7 +517,7 @@ public class SliderTests
 
         Size expectedSize = slider.Frame.Size;
 
-        Assert.Equal (new (6, 2), expectedSize);
+        Assert.Equal (new (6, 3), expectedSize);
 
         view.SetContentSize (new (1, 1));
 
@@ -583,7 +583,7 @@ public class SliderTests
 
         Size expectedSize = slider.Frame.Size;
 
-        Assert.Equal (new (10, 2), expectedSize);
+        Assert.Equal (new (10, 3), expectedSize);
 
         view.SetContentSize (new (1, 1));
 

@@ -26,6 +26,7 @@ public class Sliders : Scenario
                 Type = type,
                 AllowEmpty = true
             };
+            view.Padding.Thickness = new (0,1,0,0);
             v.Add (view);
             prev = view;
         }
@@ -228,7 +229,7 @@ public class Sliders : Scenario
 
         CheckBox dimAutoUsesMin = new ()
         {
-            Text = "DimAuto uses minimum size (vs. ideal)",
+            Text = "Use minimum size (vs. ideal)",
             X = 0,
             Y = Pos.Bottom (optionsSlider)
         };
@@ -237,11 +238,11 @@ public class Sliders : Scenario
                                   {
                                       foreach (Slider s in app.Subviews.OfType<Slider> ())
                                       {
-                                          s.UseMinimumSizeForDimAuto = !s.UseMinimumSizeForDimAuto;
+                                          s.UseMinimumSize = !s.UseMinimumSize;
                                       }
                                   };
         configView.Add (dimAutoUsesMin);
-
+    
         #region Slider Orientation Slider
 
         Slider<string> orientationSlider = new (new List<string> { "Horizontal", "Vertical" })
@@ -386,6 +387,53 @@ public class Sliders : Scenario
 
         #endregion Legends Orientation Slider
 
+
+        #region Spacing Options
+
+        FrameView spacingOptions = new ()
+        {
+            Title = "Spacing Options",
+            X = Pos.Right(orientationSlider),
+            Y = Pos.Top (orientationSlider),
+            Width = Dim.Fill (),
+            Height = Dim.Auto (),
+            BorderStyle = LineStyle.Single
+        };
+
+        Label label = new ()
+        {
+            Text = "Min _Inner Spacing:",
+        };
+
+        Buttons.NumericUpDown<int> innerSpacingUpDown = new ()
+        {
+           X = Pos.Right(label) + 1
+        };
+
+        innerSpacingUpDown.Value = app.Subviews.OfType<Slider> ().First ().MinimumInnerSpacing;
+
+        innerSpacingUpDown.ValueChanging += (sender, e) =>
+                                            {
+                                                if (e.NewValue < 0)
+                                                {
+                                                    e.Cancel = true;
+
+                                                    return;
+                                                }
+
+                                                foreach (Slider s in app.Subviews.OfType<Slider> ())
+                                                {
+                                                    s.MinimumInnerSpacing = e.NewValue;
+                                                }
+                                            };
+
+
+
+        spacingOptions.Add(label, innerSpacingUpDown);
+        configView.Add(spacingOptions);
+
+        #endregion
+
         #region Color Slider
 
         foreach (Slider s in app.Subviews.OfType<Slider> ())
@@ -409,6 +457,8 @@ public class Sliders : Scenario
             AllowEmpty = false,
             Orientation = Orientation.Vertical,
             LegendsOrientation = Orientation.Horizontal,
+            MinimumInnerSpacing = 0,
+            UseMinimumSize = true
         };
 
         sliderFGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
@@ -480,6 +530,8 @@ public class Sliders : Scenario
             AllowEmpty = false,
             Orientation = Orientation.Vertical,
             LegendsOrientation = Orientation.Horizontal,
+            MinimumInnerSpacing = 0,
+            UseMinimumSize = true
         };
 
         sliderBGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
