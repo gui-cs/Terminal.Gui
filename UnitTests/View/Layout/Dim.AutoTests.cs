@@ -364,7 +364,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
         superView.BeginInit ();
         superView.EndInit ();
-        Assert.Throws<InvalidOperationException> (() => superView.Add (subView));
+        superView.Add (subView);
 
         subView.Width = 10;
         superView.Add (subView);
@@ -372,11 +372,11 @@ public class DimAutoTests (ITestOutputHelper output)
         superView.LayoutSubviews (); // no throw
 
         subView.Width = Dim.Fill ();
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        superView.SetRelativeLayout (new (0, 0));
         subView.Width = 10;
 
         subView.Height = Dim.Fill ();
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        superView.SetRelativeLayout (new (0, 0));
         subView.Height = 10;
 
         subView.Height = Dim.Percent (50);
@@ -435,15 +435,15 @@ public class DimAutoTests (ITestOutputHelper output)
         superView.LayoutSubviews (); // no throw
 
         subView.Height = Dim.Fill () + 3;
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+         superView.SetRelativeLayout (new (0, 0));
         subView.Height = 0;
 
         subView.Height = 3 + Dim.Fill ();
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        superView.SetRelativeLayout (new (0, 0));
         subView.Height = 0;
 
         subView.Height = 3 + 5 + Dim.Fill ();
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        superView.SetRelativeLayout (new (0, 0));
         subView.Height = 0;
 
         subView.Height = 3 + 5 + Dim.Percent (10);

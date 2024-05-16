@@ -412,7 +412,7 @@ public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumCont
         {
             Debug.WriteLine ($"WARNING: DimAuto specifies a min size ({autoMin}), but the SuperView's bounds are smaller ({superviewContentSize}).");
 
-            return superviewContentSize;
+            //return superviewContentSize;
         }
 
         if (Style.HasFlag (DimAutoStyle.Text))
@@ -478,7 +478,7 @@ public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumCont
         }
 
         // If max: is set, clamp the return - BUGBUG: Not tested
-        return int.Min (max, MaximumContentDim?.Anchor (superviewContentSize) ?? superviewContentSize);
+        return int.Min (max, MaximumContentDim?.Anchor (superviewContentSize) ?? max);
     }
 
     internal override bool ReferencesOtherViews ()

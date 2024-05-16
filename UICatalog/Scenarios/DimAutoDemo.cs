@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using Terminal.Gui;
-using static Terminal.Gui.Dim;
 
 namespace UICatalog.Scenarios;
 
@@ -17,89 +17,119 @@ public class DimAutoDemo : Scenario
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
         };
+
+        // For diagnostics
         appWindow.Padding.Thickness = new Thickness (1);
 
-        var view = new FrameView
+        FrameView dimAutoFrameView = CreateDimAutoContentFrameView ();
+
+        FrameView sliderFrameView = CreateSliderFrameView ();
+        sliderFrameView.X = Pos.Right(dimAutoFrameView) + 1;
+        sliderFrameView.Width = Dim.Fill ();
+        sliderFrameView.Height = Dim.Fill ();
+
+
+        //var dlgButton = new Button
+        //{
+        //    Text = "Open Test _Dialog",
+        //    X = Pos.Right (dimAutoFrameView),
+        //    Y = Pos.Top (dimAutoFrameView)
+        //};
+        //dlgButton.Accept += DlgButton_Clicked;
+
+        appWindow.Add (dimAutoFrameView, sliderFrameView /*dlgButton*/);
+
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
+    }
+
+    private static FrameView CreateDimAutoContentFrameView ()
+    {
+        var dimAutoFrameView = new FrameView
         {
             Title = "Type to make View grow",
             X = 0,
             Y = 0,
-            Width = Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (25)),
-            Height = Auto (DimAutoStyle.Content, minimumContentDim: 10)
+            Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (25)),
+            Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 10)
         };
-        view.Margin.Thickness = new Thickness (1);
-        view.ValidatePosDim = true;
+        dimAutoFrameView.Margin.Thickness = new Thickness (1);
+        dimAutoFrameView.ValidatePosDim = true;
 
         var textEdit = new TextView
         {
             Text = "",
             X = 0, Y = 0, Width = 20, Height = 4
         };
-        view.Add (textEdit);
+        dimAutoFrameView.Add (textEdit);
 
         var vlabel = new Label
         {
             Text = textEdit.Text,
             X = Pos.Left (textEdit),
             Y = Pos.Bottom (textEdit) + 1,
-            Width = Auto (DimAutoStyle.Text, 1),
-            Height = Auto (DimAutoStyle.Text, 8),
+            Width = Dim.Auto (DimAutoStyle.Text, 1),
+            Height = Dim.Auto (DimAutoStyle.Text, 8),
             ColorScheme = Colors.ColorSchemes ["Error"],
             TextDirection = TextDirection.TopBottom_LeftRight
         };
         vlabel.Id = "vlabel";
-        view.Add (vlabel);
+        dimAutoFrameView.Add (vlabel);
 
         var hlabel = new Label
         {
             Text = textEdit.Text,
             X = Pos.Right (vlabel) + 1,
             Y = Pos.Bottom (textEdit),
-            Width = Auto (DimAutoStyle.Text, 20),
-            Height = Auto (DimAutoStyle.Text, 1),
+            Width = Dim.Auto (DimAutoStyle.Text, 20),
+            Height = Dim.Auto (DimAutoStyle.Text, 1),
             ColorScheme = Colors.ColorSchemes ["Error"]
         };
         hlabel.Id = "hlabel";
-        view.Add (hlabel);
+        dimAutoFrameView.Add (hlabel);
 
         var heightAuto = new View
         {
             X = Pos.Right (vlabel) + 1,
             Y = Pos.Bottom (hlabel) + 1,
             Width = 20,
-            Height = Auto (),
+            Height = Dim.Auto (),
             ColorScheme = Colors.ColorSchemes ["Error"],
             Title = "W: 20, H: Auto",
             BorderStyle = LineStyle.Rounded
         };
         heightAuto.Id = "heightAuto";
-        view.Add (heightAuto);
+        dimAutoFrameView.Add (heightAuto);
 
         var widthAuto = new View
         {
             X = Pos.Right (heightAuto) + 1,
             Y = Pos.Bottom (hlabel) + 1,
-            Width = Auto (),
+            Width = Dim.Auto (),
             Height = 5,
             ColorScheme = Colors.ColorSchemes ["Error"],
             Title = "W: Auto, H: 5",
             BorderStyle = LineStyle.Rounded
         };
         widthAuto.Id = "widthAuto";
-        view.Add (widthAuto);
+        dimAutoFrameView.Add (widthAuto);
 
         var bothAuto = new View
         {
             X = Pos.Right (widthAuto) + 1,
             Y = Pos.Bottom (hlabel) + 1,
-            Width = Auto (),
-            Height = Auto (),
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
             ColorScheme = Colors.ColorSchemes ["Error"],
             Title = "W: Auto, H: Auto",
             BorderStyle = LineStyle.Rounded
         };
         bothAuto.Id = "bothAuto";
-        view.Add (bothAuto);
+        dimAutoFrameView.Add (bothAuto);
 
         textEdit.ContentsChanged += (s, e) =>
                                     {
@@ -117,7 +147,7 @@ public class DimAutoDemo : Scenario
             Y = Pos.Bottom (vlabel)
         };
         movingButton.Accept += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
-        view.Add (movingButton);
+        dimAutoFrameView.Add (movingButton);
 
         var resetButton = new Button
         {
@@ -127,24 +157,31 @@ public class DimAutoDemo : Scenario
         };
 
         resetButton.Accept += (s, e) => { movingButton.Y = Pos.Bottom (hlabel); };
-        view.Add (resetButton);
+        dimAutoFrameView.Add (resetButton);
 
-        var dlgButton = new Button
+        return dimAutoFrameView;
+    }
+
+    private static FrameView CreateSliderFrameView ()
+    {
+        var sliderFrameView = new FrameView
         {
-            Text = "Open Test _Dialog",
-            X = Pos.Right (view),
-            Y = Pos.Top (view)
+            Title = "Slider - Example of a DimAuto View",
         };
-        dlgButton.Accept += DlgButton_Clicked;
 
-        appWindow.Add (view, dlgButton);
+        List<object> options = new () { "One", "Two", "Three", "Four" };
+        Slider slider = new (options)
+        {
+            X = 0,
+            Y = 0,
+            Type = SliderType.Multiple,
+            AllowEmpty = false,
+            BorderStyle = LineStyle.Double,
+            Title = "_Slider"
+        };
+        sliderFrameView.Add (slider);
 
-        // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        return sliderFrameView;
     }
 
     private void DlgButton_Clicked (object sender, EventArgs e)
@@ -152,7 +189,7 @@ public class DimAutoDemo : Scenario
         var dlg = new Dialog
         {
             Title = "Test Dialog",
-            Width = Auto (minimumContentDim: Percent (10))
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (10))
 
             //Height = Dim.Auto (min: Dim.Percent (50))
         };
@@ -163,7 +200,7 @@ public class DimAutoDemo : Scenario
             TextFormatter = new () { WordWrap = true },
             X = 0,
             Y = 0, //Pos.Bottom (label) + 1,
-            Width = Fill (10),
+            Width = Dim.Fill (10),
             Height = 1
         };
 

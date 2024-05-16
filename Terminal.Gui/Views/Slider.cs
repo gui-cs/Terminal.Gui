@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using Microsoft.CodeAnalysis.Options;
+
+namespace Terminal.Gui;
 
 /// <summary><see cref="EventArgs"/> for <see cref="Slider{T}"/> <see cref="SliderOption{T}"/> events.</summary>
 public class SliderOptionEventArgs : EventArgs
@@ -256,17 +258,16 @@ public class Slider<T> : View
         SetDefaultStyle ();
         SetCommands ();
 
-        Enter += (s, e) => { };
-
+        SetContentSize ();
         // BUGBUG: This should not be needed - Need to ensure SetRelativeLayout gets called during EndInit
         Initialized += (s, e) =>
-                         {
-                             SetContentSizeBestFit ();
-                         };
+                       {
+                           SetContentSize ();
+                       };
 
         LayoutStarted += (s, e) =>
                           {
-                              SetContentSizeBestFit ();
+                              SetContentSize ();
                           };
 
     }
@@ -357,6 +358,32 @@ public class Slider<T> : View
 
     #region Properties
 
+    /// <inheritdoc />
+    public override string Text
+    {
+        get
+        {
+            if (_options.Count == 0)
+            {
+                return string.Empty;
+            }
+            // Return labels as a CSV string
+            return string.Join (",", _options);
+        }
+        set
+        {
+            if (string.IsNullOrEmpty (value))
+            {
+                Options = [];
+            }
+            else
+            {
+                var list = value.Split (',').Select (x => x.Trim ());
+                Options = list.Select (x => new SliderOption<T> { Legend = x }).ToList ();
+            }
+        }
+    }
+
     /// <summary>Allow no selection.</summary>
     public bool AllowEmpty
     {
@@ -372,6 +399,7 @@ public class Slider<T> : View
         }
     }
 
+    // BUGBUG: InnerSpacing is ignored; SetContentSize overwrites it.
     /// <summary>Gets or sets the number of rows/columns between <see cref="Options"/></summary>
     public int InnerSpacing
     {
@@ -380,7 +408,7 @@ public class Slider<T> : View
         {
             _config._innerSpacing = value;
 
-            SetContentSizeBestFit ();
+           // SetContentSize ();
         }
     }
 
@@ -423,8 +451,7 @@ public class Slider<T> : View
         {
             _config._sliderOrientation = newOrientation;
             SetKeyBindings ();
-
-            SetContentSizeBestFit ();
+            SetContentSize ();
         }
 
         return args.Cancel;
@@ -438,7 +465,7 @@ public class Slider<T> : View
         {
             _config._legendsOrientation = value;
 
-            SetContentSizeBestFit ();
+            SetContentSize ();
         }
     }
 
@@ -465,12 +492,11 @@ public class Slider<T> : View
             // _options should never be null
             _options = value ?? throw new ArgumentNullException (nameof (value));
 
-            if (!IsInitialized || _options.Count == 0)
+            if (_options.Count == 0)
             {
                 return;
             }
-
-            SetContentSizeBestFit ();
+            SetContentSize ();
         }
     }
 
@@ -488,7 +514,7 @@ public class Slider<T> : View
         set
         {
             _config._showEndSpacing = value;
-            SetNeedsDisplay ();
+            SetContentSize ();
         }
     }
 
@@ -499,7 +525,22 @@ public class Slider<T> : View
         set
         {
             _config._showLegends = value;
-            SetContentSizeBestFit ();
+            SetContentSize ();
+        }
+    }
+
+    private bool _useMinimumSizeForDimAuto;
+
+    /// <summary>
+    /// Gets or sets whether the minimum or ideal size will be used when Height or Width are set to Dim.Auto.
+    /// </summary>
+    public bool UseMinimumSizeForDimAuto
+    {
+        get => _useMinimumSizeForDimAuto;
+        set
+        {
+            _useMinimumSizeForDimAuto = value;
+            SetContentSize ();
         }
     }
 
@@ -607,69 +648,61 @@ public class Slider<T> : View
         // Last = '┤',
     }
 
-    /// <summary>Adjust the dimensions of the Slider to the best value.</summary>
-    public void SetContentSizeBestFit ()
+    /// <summary>Sets the dimensions of the Slider to the ideal values.</summary>
+    public void SetContentSize ()
     {
-        if (/*!IsInitialized ||*/ /*!(Height is DimAuto && Width is DimAuto) || */_options.Count == 0)
+        if (_options.Count == 0)
         {
             return;
         }
 
-        CalcSpacingConfig ();
+        bool horizontal = _config._sliderOrientation == Orientation.Horizontal;
 
-        Thickness adornmentsThickness = GetAdornmentsThickness ();
-
-        var svWidth = SuperView?.ContentSize.Width ?? 0;
-        var svHeight = SuperView?.ContentSize.Height ?? 0;
-
-        if (_config._sliderOrientation == Orientation.Horizontal)
+        if (UseMinimumSizeForDimAuto)
         {
-            SetContentSize (new (int.Min (svWidth, CalcBestLength ()), int.Min (svHeight, CalcThickness ())));
+            CalcSpacingConfig (0);
         }
         else
         {
-            SetContentSize (new (int.Min (svWidth, CalcThickness ()), int.Min (svHeight, CalcBestLength ())));
+            CalcSpacingConfig (horizontal ? Viewport.Width : Viewport.Height);
         }
+        SetContentSize (new (GetIdealWidth (), GetIdealHeight ()));
 
         return;
 
-        void CalcSpacingConfig ()
+        void CalcSpacingConfig (int size)
         {
             _config._innerSpacing = 0;
             _config._startSpacing = 0;
             _config._endSpacing = 0;
 
-            int size = 0;
-            if (ContentSize is { })
-            {
-                size = _config._sliderOrientation == Orientation.Horizontal ? ContentSize.Width : ContentSize.Height;
-            }
-
             int max_legend; // Because the legends are centered, the longest one determines inner spacing
 
             if (_config._sliderOrientation == _config._legendsOrientation)
             {
-                max_legend = int.Max (_options.Max (s => s.Legend?.Length ?? 1), 1);
+                max_legend = int.Max (_options.Max (s => s.Legend?.GetColumns () ?? 1), 1);
             }
             else
             {
                 max_legend = 1;
             }
 
-            int min_size_that_fits_legends = _options.Count == 1 ? max_legend : max_legend / (_options.Count - 1);
+            int min_size_that_fits_legends = _options.Count == 1 ? max_legend : _options.Sum (o => o.Legend.GetColumns ());
 
             string first;
             string last;
 
-            if (max_legend >= size)
+            if (min_size_that_fits_legends > size)
             {
+                _config._showLegendsAbbr = false;
+
                 if (_config._sliderOrientation == _config._legendsOrientation)
                 {
                     _config._showLegendsAbbr = true;
 
                     foreach (SliderOption<T> o in _options.Where (op => op.LegendAbbr == default (Rune)))
                     {
-                        o.LegendAbbr = (Rune)(o.Legend?.Length > 0 ? o.Legend [0] : ' ');
+                        o.LegendAbbr = (Rune)(o.Legend?.GetColumns () > 0 ? o.Legend [0] : ' ');
                     }
                 }
 
@@ -731,9 +764,38 @@ public class Slider<T> : View
         return length;
     }
 
-    /// <summary>Calculates the ideal dimension required for all options, inner spacing, and legends (non-abbreviated).</summary>
+    /// <summary>
+    /// Gets the ideal width of the slider. The ideal width is the minimum width required to display all options and inner spacing.
+    /// </summary>
     /// <returns></returns>
-    private int CalcBestLength ()
+    public int GetIdealWidth ()
+    {
+        if (UseMinimumSizeForDimAuto)
+        {
+            return Orientation == Orientation.Horizontal ? CalcMinLength () : CalcIdealThickness ();
+
+        }
+        return Orientation == Orientation.Horizontal ? CalcIdealLength () : CalcIdealThickness ();
+    }
+
+    /// <summary>
+    /// Gets the ideal height of the slider. The ideal height is the minimum height required to display all options and inner spacing.
+    /// </summary>
+    /// <returns></returns>
+    public int GetIdealHeight ()
+    {
+        if (UseMinimumSizeForDimAuto)
+        {
+            return Orientation == Orientation.Horizontal ? CalcIdealThickness () : CalcMinLength ();
+        }
+        return Orientation == Orientation.Horizontal ? CalcIdealThickness () : CalcIdealLength ();
+    }
+
+    /// <summary>
+    /// Calculates the ideal dimension required for all options, inner spacing, and legends (non-abbreviated, with one space between).
+    /// </summary>
+    /// <returns></returns>
+    private int CalcIdealLength ()
     {
         if (_options.Count == 0)
         {
@@ -748,23 +810,25 @@ public class Slider<T> : View
 
             if (_config._legendsOrientation == _config._sliderOrientation && _options.Count > 0)
             {
-                max_legend = int.Max (_options.Max (s => s.Legend?.Length + 1 ?? 1), 1);
-                length += max_legend * _options.Count;
-
-                //length += (max_legend / 2);
+                // Each legend should be centered in a space the width of the longest legend, with one space between.
+                // Calculate the total length required for all legends.
+                max_legend = int.Max (_options.Max (s => s.Legend?.GetColumns () ?? 1), 1);
+                length = max_legend * _options.Count + (_options.Count - 1);
             }
             else
             {
-                length += 1;
+                length += _options.Count;
             }
         }
 
-        return int.Max (length, CalcMinLength ());
+        return length;
     }
 
-    /// <summary>Calculates the min dimension required for the slider and legends</summary>
+    /// <summary>
+    /// Calculates the minimum dimension required for the slider and legends.
+    /// </summary>
     /// <returns></returns>
-    private int CalcThickness ()
+    private int CalcIdealThickness ()
     {
         var thickness = 1; // Always show the slider.
 
@@ -772,7 +836,7 @@ public class Slider<T> : View
         {
             if (_config._legendsOrientation != _config._sliderOrientation && _options.Count > 0)
             {
-                thickness += _options.Max (s => s.Legend?.Length ?? 0);
+                thickness += _options.Max (s => s.Legend?.GetColumns () ?? 0);
             }
             else
             {
