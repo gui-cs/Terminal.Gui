@@ -21,7 +21,7 @@ public class PosAbsoluteTests (ITestOutputHelper output)
     public void PosAbsolute_Calculate_ReturnsExpectedValue ()
     {
         var posAbsolute = new PosAbsolute (5);
-        var result = posAbsolute.Calculate (10, new DimAbsolute (2), null, Dimension.None);
+        int result = posAbsolute.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (5, result);
     }
 
@@ -31,9 +31,7 @@ public class PosAbsoluteTests (ITestOutputHelper output)
     [InlineData (1)]
     public void PosAbsolute_SetsPosition (int position)
     {
-        PosAbsolute pos = Pos.Absolute (position) as PosAbsolute;
+        var pos = Pos.Absolute (position) as PosAbsolute;
         Assert.Equal (position, pos!.Position);
-
     }
-
 }
