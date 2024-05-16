@@ -3,7 +3,7 @@ using System.Text;
 using Xunit.Abstractions;
 using static Terminal.Gui.Dim;
 
-namespace Terminal.Gui.PosDimTests;
+namespace Terminal.Gui.LayoutTests;
 
 public class DimPercentTests
 {

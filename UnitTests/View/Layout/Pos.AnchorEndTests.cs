@@ -2,7 +2,7 @@
 using static Terminal.Gui.Dim;
 using static Terminal.Gui.Pos;
 
-namespace Terminal.Gui.PosDimTests;
+namespace Terminal.Gui.LayoutTests;
 
 public class PosAnchorEndTests (ITestOutputHelper output)
 {

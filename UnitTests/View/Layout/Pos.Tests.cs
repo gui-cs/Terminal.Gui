@@ -2,7 +2,7 @@
 using static Terminal.Gui.Dim;
 using static Terminal.Gui.Pos;
 
-namespace Terminal.Gui.PosDimTests;
+namespace Terminal.Gui.LayoutTests;
 
 public class PosTests (ITestOutputHelper output)
 {
@@ -38,14 +38,6 @@ public class PosTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void PosAbsolute_Calculate_ReturnsExpectedValue ()
-    {
-        var posAbsolute = new PosAbsolute (5);
-        var result = posAbsolute.Calculate (10, new DimAbsolute (2), null, Dimension.None);
-        Assert.Equal (5, result);
-    }
-
-    [Fact]
     public void PosCombine_Calculate_ReturnsExpectedValue ()
     {
         var posCombine = new PosCombine (true, new PosAbsolute (5), new PosAbsolute (3));
@@ -75,30 +67,6 @@ public class PosTests (ITestOutputHelper output)
         var posView = new PosView (new View { Frame = new Rectangle (5, 5, 10, 10) }, 0);
         var result = posView.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (5, result);
-    }
-
-    [Fact]
-    public void PosAbsolute_Equal ()
-    {
-        var n1 = 0;
-        var n2 = 0;
-
-        Pos pos1 = Pos.Absolute (n1);
-        Pos pos2 = Pos.Absolute (n2);
-        Assert.Equal (pos1, pos2);
-    }
-
-    [Fact]
-    public void PosAbsolute_SetsValue ()
-    {
-        Pos pos = Pos.Absolute (0);
-        Assert.Equal ("Absolute(0)", pos.ToString ());
-
-        pos = Pos.Absolute (5);
-        Assert.Equal ("Absolute(5)", pos.ToString ());
-
-        pos = Pos.Absolute (-1);
-        Assert.Equal ("Absolute(-1)", pos.ToString ());
     }
 
 
