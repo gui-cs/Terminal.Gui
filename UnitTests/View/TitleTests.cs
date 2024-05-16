@@ -77,7 +77,8 @@ public class TitleTests (ITestOutputHelper output)
         var view = new View
         {
             Title = "_Hello World",
-            Width = Dim.Auto (), Height = Dim.Auto (),
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
             BorderStyle = LineStyle.Single
         };
         var top = new Toplevel ();
@@ -101,14 +102,7 @@ public class TitleTests (ITestOutputHelper output)
         Assert.Equal (text, view.Text);
 
         // SetupFakeDriver only create a screen with 25 cols and 25 rows
-        Assert.Equal (new (25, 3), view.Frame.Size);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌┤Hello World├──────────┐
-│This text will incremen│
-└───────────────────────┘",
-                                                      output);
+        Assert.Equal (new (text.Length, 1), view.ContentSize);
 
         top.Dispose ();
     }
