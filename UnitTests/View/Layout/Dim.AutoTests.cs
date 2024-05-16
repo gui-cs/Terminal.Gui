@@ -787,11 +787,11 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.Alignment = TextAlignment.Justified;
+        view.TextFormatter.Alignment = Alignment.Justified;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.VerticalAlignment = VerticalTextAlignment.Middle;
+        view.TextFormatter.VerticalAlignment = Alignment.Centered;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
@@ -815,11 +815,11 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextAlignment = TextAlignment.Justified;
+        view.TextAlignment = Alignment.Justified;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.VerticalTextAlignment = VerticalTextAlignment.Middle;
+        view.VerticalTextAlignment = Alignment.Centered;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
@@ -844,7 +844,7 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
-        view.TextAlignment = TextAlignment.Justified;
+        view.TextAlignment = Alignment.Justified;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
@@ -853,7 +853,7 @@ public class DimAutoTests (ITestOutputHelper output)
             Text = "_1234",
             Width = Dim.Auto ()
         };
-        view.VerticalTextAlignment = VerticalTextAlignment.Middle;
+        view.VerticalTextAlignment = Alignment.Centered;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
@@ -1002,7 +1002,6 @@ public class DimAutoTests (ITestOutputHelper output)
     [Theory]
     [InlineData (0, 15, 15)]
     [InlineData (1, 15, 16)]
-    [InlineData (0, 15, 15)]
     [InlineData (-1, 15, 14)]
     public void With_Subview_Using_DimAbsolute (int subViewOffset, int dimAbsoluteSize, int expectedSize)
     {

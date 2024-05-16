@@ -1265,6 +1265,7 @@ public class TabView : View
                         tab.Margin.Thickness = new Thickness (0, 0, 0, 0);
                     }
 
+                    // BUGBUG: Dim.Anchor is internal. This should do something else to get the width.
                     tab.Width = Math.Max (tab.Width.Anchor (0) - 1, 1);
                 }
                 else
@@ -1280,6 +1281,7 @@ public class TabView : View
                         tab.Margin.Thickness = new Thickness (0, 0, 0, 0);
                     }
 
+                    // BUGBUG: Dim.Anchor is internal. This should do something else to get the width.
                     tab.Width = Math.Max (tab.Width.Anchor (0) - 1, 1);
                 }
 

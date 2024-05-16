@@ -8,10 +8,10 @@
 public class ColumnStyle
 {
     /// <summary>
-    ///     Defines a delegate for returning custom alignment per cell based on cell values.  When specified this will
+    ///     Defines a delegate for returning custom alignment per cell based on cell values. When specified this will
     ///     override <see cref="Alignment"/>
     /// </summary>
-    public Func<object, TextAlignment> AlignmentGetter;
+    public Func<object, Alignment> AlignmentGetter;
 
     /// <summary>
     ///     Defines a delegate for returning a custom color scheme per cell based on cell values. Return null for the
@@ -20,26 +20,26 @@ public class ColumnStyle
     public CellColorGetterDelegate ColorGetter;
 
     /// <summary>
-    ///     Defines a delegate for returning custom representations of cell values.  If not set then
-    ///     <see cref="object.ToString()"/> is used.  Return values from your delegate may be truncated e.g. based on
+    ///     Defines a delegate for returning custom representations of cell values. If not set then
+    ///     <see cref="object.ToString()"/> is used. Return values from your delegate may be truncated e.g. based on
     ///     <see cref="MaxWidth"/>
     /// </summary>
     public Func<object, string> RepresentationGetter;
 
-    private bool visible = true;
+    private bool _visible = true;
 
     /// <summary>
-    ///     Defines the default alignment for all values rendered in this column.  For custom alignment based on cell
+    ///     Defines the default alignment for all values rendered in this column. For custom alignment based on cell
     ///     contents use <see cref="AlignmentGetter"/>.
     /// </summary>
-    public TextAlignment Alignment { get; set; }
+    public Alignment Alignment { get; set; }
 
     /// <summary>Defines the format for values e.g. "yyyy-MM-dd" for dates</summary>
     public string Format { get; set; }
 
     /// <summary>
-    ///     Set the maximum width of the column in characters.  This value will be ignored if more than the tables
-    ///     <see cref="TableView.MaxCellWidth"/>.  Defaults to <see cref="TableView.DefaultMaxCellWidth"/>
+    ///     Set the maximum width of the column in characters. This value will be ignored if more than the tables
+    ///     <see cref="TableView.MaxCellWidth"/>. Defaults to <see cref="TableView.DefaultMaxCellWidth"/>
     /// </summary>
     public int MaxWidth { get; set; } = TableView.DefaultMaxCellWidth;
 
@@ -47,7 +47,7 @@ public class ColumnStyle
     public int MinAcceptableWidth { get; set; } = TableView.DefaultMinAcceptableWidth;
 
     /// <summary>
-    ///     Set the minimum width of the column in characters.  Setting this will ensure that even when a column has short
+    ///     Set the minimum width of the column in characters. Setting this will ensure that even when a column has short
     ///     content/header it still fills a given width of the control.
     ///     <para>
     ///         This value will be ignored if more than the tables <see cref="TableView.MaxCellWidth"/> or the
@@ -64,8 +64,8 @@ public class ColumnStyle
     /// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
     public bool Visible
     {
-        get => MaxWidth >= 0 && visible;
-        set => visible = value;
+        get => MaxWidth >= 0 && _visible;
+        set => _visible = value;
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class ColumnStyle
     /// </summary>
     /// <param name="cellValue"></param>
     /// <returns></returns>
-    public TextAlignment GetAlignment (object cellValue)
+    public Alignment GetAlignment (object cellValue)
     {
         if (AlignmentGetter is { })
         {

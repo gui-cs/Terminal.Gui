@@ -601,10 +601,12 @@ public class TileView : View
 
         TileViewLineView nextSplitter = visibleSplitterLines [i];
         Pos nextSplitterPos = Orientation == Orientation.Vertical ? nextSplitter.X : nextSplitter.Y;
+        // BUGBUG: Pos.Anchor is an internal API. TileView should not be using it and should do something different to get the value.
         int nextSplitterDistance = nextSplitterPos.Anchor (space);
 
         TileViewLineView lastSplitter = i >= 1 ? visibleSplitterLines [i - 1] : null;
         Pos lastSplitterPos = Orientation == Orientation.Vertical ? lastSplitter?.X : lastSplitter?.Y;
+        // BUGBUG: Pos.Anchor is an internal API. TileView should not be using it and should do something different to get the value.
         int lastSplitterDistance = lastSplitterPos?.Anchor (space) ?? 0;
 
         int distance = nextSplitterDistance - lastSplitterDistance;
@@ -848,6 +850,7 @@ public class TileView : View
         {
             Dim spaceDim = Tile.ContentView.Width;
 
+            // BUGBUG: Dim.Anchor is internal. This should do something else to get the width.
             int spaceAbs = spaceDim.Anchor (Parent.Viewport.Width);
 
             var title = $" {Tile.Title} ";
