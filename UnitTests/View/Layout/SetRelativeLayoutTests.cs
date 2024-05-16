@@ -403,7 +403,7 @@ public class SetRelativeLayoutTests
             Width = Auto (DimAutoStyle.Text),
             Height = Auto (DimAutoStyle.Text)
         };
-        view.X = Pos.AnchorEnd (0) - Pos.Function (GetViewWidth);
+        view.X = Pos.AnchorEnd (0) - Pos.Func (GetViewWidth);
 
         int GetViewWidth () { return view.Frame.Width; }
 

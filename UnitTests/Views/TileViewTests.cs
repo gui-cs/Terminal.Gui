@@ -1663,7 +1663,7 @@ public class TileViewTests
         var ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Right (tileView)));
         Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosView", ex.Message);
 
-        ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Function (() => 1)));
+        ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Func (() => 1)));
         Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosFunc", ex.Message);
 
         // Also not allowed because this results in a PosCombine

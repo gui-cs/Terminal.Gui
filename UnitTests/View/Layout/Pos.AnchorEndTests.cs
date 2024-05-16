@@ -195,7 +195,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
 
         int Btn_Width () { return btn?.Viewport.Width ?? 0; }
 
-        btn = new () { Text = "Ok", X = Pos.AnchorEnd (0) - Pos.Function (Btn_Width) };
+        btn = new () { Text = "Ok", X = Pos.AnchorEnd (0) - Pos.Func (Btn_Width) };
 
         var view = new View
         {

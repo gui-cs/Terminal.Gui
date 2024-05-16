@@ -51,7 +51,7 @@ public enum Side
 ///             </listheader>
 ///             <item>
 ///                 <term>
-///                     <see cref="Pos.Function(Func{int})"/>
+///                     <see cref="Func"/>
 ///                 </term>
 ///                 <description>
 ///                     Creates a <see cref="Pos"/> object that computes the position by executing the provided
@@ -220,7 +220,7 @@ public class Pos
     /// </summary>
     /// <param name="function">The function to be executed.</param>
     /// <returns>The <see cref="Pos"/> returned from the function.</returns>
-    public static Pos Function (Func<int> function) { return new PosFunc (function); }
+    public static Pos Func (Func<int> function) { return new PosFunc (function); }
 
     /// <summary>Creates a percentage <see cref="Pos"/> object</summary>
     /// <returns>The percent <see cref="Pos"/> object.</returns>

@@ -185,12 +185,12 @@ public class PosTests (ITestOutputHelper output)
         Func<int> f1 = () => 0;
         Func<int> f2 = () => 0;
 
-        Pos pos1 = Pos.Function (f1);
-        Pos pos2 = Pos.Function (f2);
+        Pos pos1 = Pos.Func (f1);
+        Pos pos2 = Pos.Func (f2);
         Assert.Equal (pos1, pos2);
 
         f2 = () => 1;
-        pos2 = Pos.Function (f2);
+        pos2 = Pos.Func (f2);
         Assert.NotEqual (pos1, pos2);
     }
 
@@ -198,7 +198,7 @@ public class PosTests (ITestOutputHelper output)
     public void PosFunction_SetsValue ()
     {
         var text = "Test";
-        Pos pos = Pos.Function (() => text.Length);
+        Pos pos = Pos.Func (() => text.Length);
         Assert.Equal ("PosFunc(4)", pos.ToString ());
 
         text = "New Test";

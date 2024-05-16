@@ -224,7 +224,7 @@ public class Adornments : Scenario
 
             _leftEdit = new ()
             {
-                X = Pos.Left (_topEdit) - Pos.Function (() => _topEdit.Digits) - 2, Y = Pos.Bottom (_topEdit)
+                X = Pos.Left (_topEdit) - Pos.Func (() => _topEdit.Digits) - 2, Y = Pos.Bottom (_topEdit)
             };
 
             _leftEdit.ValueChanging += Left_ValueChanging;
