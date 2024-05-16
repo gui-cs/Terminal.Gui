@@ -26,7 +26,7 @@ public class Sliders : Scenario
                 Type = type,
                 AllowEmpty = true
             };
-            view.Padding.Thickness = new (0,1,0,0);
+            //view.Padding.Thickness = new (0,1,0,0);
             v.Add (view);
             prev = view;
         }
