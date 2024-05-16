@@ -394,7 +394,7 @@ public class SetRelativeLayoutTests
     }
 
     [Fact]
-    public void PosDimFunction ()
+    public void PosDimFunc ()
     {
         var screen = new Size (30, 1);
         var view = new View

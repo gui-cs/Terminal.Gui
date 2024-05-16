@@ -3,13 +3,13 @@ using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui.PosDimTests;
 
-public class DimFunctionTests (ITestOutputHelper output)
+public class DimFuncTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
 
     [Fact]
-    public void DimFunction_Equal ()
+    public void DimFunc_Equal ()
     {
         Func<int> f1 = () => 0;
         Func<int> f2 = () => 0;
@@ -24,7 +24,7 @@ public class DimFunctionTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void DimFunction_SetsValue ()
+    public void DimFunc_SetsValue ()
     {
         var text = "Test";
         Dim dim = Dim.Func (() => text.Length);
@@ -39,7 +39,7 @@ public class DimFunctionTests (ITestOutputHelper output)
 
 
     [Fact]
-    public void DimFunction_Calculate_ReturnsCorrectValue ()
+    public void DimFunc_Calculate_ReturnsCorrectValue ()
     {
         var dim = new DimFunc (() => 10);
         var result = dim.Calculate (0, 100, null, Dimension.None);
