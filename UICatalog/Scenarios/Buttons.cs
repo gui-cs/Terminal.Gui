@@ -420,7 +420,7 @@ public class Buttons : Scenario
 
             // TODO: Use Dim.Auto for the Width and Height
             Height = 1;
-            Width = Dim.Function (() => Digits + 2); // button + 3 for number + button
+            Width = Dim.Func (() => Digits + 2); // button + 3 for number + button
 
             _down = new ()
             {
@@ -438,7 +438,7 @@ public class Buttons : Scenario
                 Text = Value.ToString (),
                 X = Pos.Right (_down),
                 Y = Pos.Top (_down),
-                Width = Dim.Function (() => Digits),
+                Width = Dim.Func (() => Digits),
                 Height = 1,
                 TextAlignment = TextAlignment.Centered,
                 CanFocus = true

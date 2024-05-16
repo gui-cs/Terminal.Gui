@@ -94,7 +94,7 @@ public enum Dimension
 ///             </item>
 ///             <item>
 ///                 <term>
-///                     <see cref="Dim.Function(Func{int})"/>
+///                     <see cref="Func"/>
 ///                 </term>
 ///                 <description>
 ///                     Creates a <see cref="Dim"/> object that computes the dimension by executing the provided
@@ -143,8 +143,10 @@ public enum Dimension
 /// </remarks>
 public class Dim
 {
+    #region static Dim creation methods
+
     /// <summary>
-    ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all the view's SubViews and/or Text.
+    ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all the view's Content, Subviews, and/or Text.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -191,7 +193,7 @@ public class Dim
     /// </summary>
     /// <param name="function">The function to be executed.</param>
     /// <returns>The <see cref="Dim"/> returned from the function.</returns>
-    public static Dim Function (Func<int> function) { return new DimFunc (function); }
+    public static Dim Func (Func<int> function) { return new DimFunc (function); }
 
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Height of the specified <see cref="View"/>.</summary>
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
@@ -239,6 +241,47 @@ public class Dim
     /// <param name="view">The view that will be tracked.</param>
     public static Dim Width (View view) { return new DimView (view, Dimension.Width); }
 
+    #endregion static Dim creation methods
+
+    #region virtual methods
+
+    /// <summary>
+    ///     Gets a dimension that is anchored to a certain point in the layout.
+    ///     This method is typically used internally by the layout system to determine the size of a View.
+    /// </summary>
+    /// <param name="width">The width of the area where the View is being sized (Superview.ContentSize).</param>
+    /// <returns>
+    ///     An integer representing the calculated dimension. The way this dimension is calculated depends on the specific
+    ///     subclass of Dim that is used. For example, DimAbsolute returns a fixed dimension, DimFactor returns a
+    ///     dimension that is a certain percentage of the super view's size, and so on.
+    /// </returns>
+    internal virtual int Anchor (int size) { return 0; }
+
+    /// <summary>
+    ///     Calculates and returns the dimension of a <see cref="View"/> object. It takes into account the location of the
+    ///     <see cref="View"/>, it's SuperView's ContentSize, and whether it should automatically adjust its size based on its
+    ///     content.
+    /// </summary>
+    /// <param name="location">
+    ///     The starting point from where the size calculation begins. It could be the left edge for width calculation or the
+    ///     top edge for height calculation.
+    /// </param>
+    /// <param name="superviewContentSize">The size of the SuperView's content. It could be width or height.</param>
+    /// <param name="us">The View that holds this Pos object.</param>
+    /// <param name="dimension">Width or Height</param>
+    /// <returns>
+    ///     The calculated size of the View. The way this size is calculated depends on the specific subclass of Dim that
+    ///     is used.
+    /// </returns>
+    internal virtual int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
+    {
+        return Math.Max (Anchor (superviewContentSize - location), 0);
+    }
+
+    #endregion virtual methods
+
+    #region operators
+
     /// <summary>Adds a <see cref="Dim"/> to a <see cref="Dim"/>, yielding a new <see cref="Dim"/>.</summary>
     /// <param name="left">The first <see cref="Dim"/> to add.</param>
     /// <param name="right">The second <see cref="Dim"/> to add.</param>
@@ -281,38 +324,9 @@ public class Dim
         return newDim;
     }
 
-    /// <summary>
-    ///     Gets a dimension that is anchored to a certain point in the layout.
-    ///     This method is typically used internally by the layout system to determine the size of a View.
-    /// </summary>
-    /// <param name="width">The width of the area where the View is being sized (Superview.ContentSize).</param>
-    /// <returns>
-    ///     An integer representing the calculated dimension. The way this dimension is calculated depends on the specific
-    ///     subclass of Dim that is used. For example, DimAbsolute returns a fixed dimension, DimFactor returns a
-    ///     dimension that is a certain percentage of the super view's size, and so on.
-    /// </returns>
-    internal virtual int Anchor (int size) { return 0; }
+    #endregion operators
 
-    /// <summary>
-    ///     Calculates and returns the dimension of a <see cref="View"/> object. It takes into account the location of the
-    ///     <see cref="View"/>, it's SuperView's ContentSize, and whether it should automatically adjust its size based on its
-    ///     content.
-    /// </summary>
-    /// <param name="location">
-    ///     The starting point from where the size calculation begins. It could be the left edge for width calculation or the
-    ///     top edge for height calculation.
-    /// </param>
-    /// <param name="superviewContentSize">The size of the SuperView's content. It could be width or height.</param>
-    /// <param name="us">The View that holds this Pos object.</param>
-    /// <param name="dimension">Width or Height</param>
-    /// <returns>
-    ///     The calculated size of the View. The way this size is calculated depends on the specific subclass of Dim that
-    ///     is used.
-    /// </returns>
-    internal virtual int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
-    {
-        return Math.Max (Anchor (superviewContentSize - location), 0);
-    }
+    #region overrides
 
     /// <summary>
     ///     Diagnostics API to determine if this Dim object references other views.
@@ -325,6 +339,8 @@ public class Dim
 
     /// <inheritdoc/>
     public override int GetHashCode () { return Anchor (0).GetHashCode (); }
+
+    #endregion overrides
 }
 
 /// <summary>
@@ -332,8 +348,8 @@ public class Dim
 /// </summary>
 /// <remarks>
 ///     <para>
-///     This is a low-level API that is typically used internally by the layout system. Use the various static
-///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
+///         This is a low-level API that is typically used internally by the layout system. Use the various static
+///         methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 ///     </para>
 /// </remarks>
 /// <param name="size"></param>
@@ -370,8 +386,8 @@ public class DimAbsolute (int size) : Dim
 ///         See <see cref="DimAutoStyle"/>.
 ///     </para>
 ///     <para>
-///     This is a low-level API that is typically used internally by the layout system. Use the various static
-///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
+///         This is a low-level API that is typically used internally by the layout system. Use the various static
+///         methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 ///     </para>
 /// </remarks>
 /// <param name="style">

@@ -204,7 +204,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
             // Dim.Fill (1) fills remaining space minus 1 (16 - 1 = 15)
             // Dim.Function (Btn_Width) is 6
             // Width should be 15 - 6 = 9
-            Width = Dim.Fill (1) - Dim.Function (Btn_Width),
+            Width = Dim.Fill (1) - Dim.Func (Btn_Width),
             Height = 1
         };
 

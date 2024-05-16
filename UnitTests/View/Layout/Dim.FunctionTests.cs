@@ -14,12 +14,12 @@ public class DimFunctionTests (ITestOutputHelper output)
         Func<int> f1 = () => 0;
         Func<int> f2 = () => 0;
 
-        Dim dim1 = Dim.Function (f1);
-        Dim dim2 = Dim.Function (f2);
+        Dim dim1 = Dim.Func (f1);
+        Dim dim2 = Dim.Func (f2);
         Assert.Equal (dim1, dim2);
 
         f2 = () => 1;
-        dim2 = Dim.Function (f2);
+        dim2 = Dim.Func (f2);
         Assert.NotEqual (dim1, dim2);
     }
 
@@ -27,7 +27,7 @@ public class DimFunctionTests (ITestOutputHelper output)
     public void DimFunction_SetsValue ()
     {
         var text = "Test";
-        Dim dim = Dim.Function (() => text.Length);
+        Dim dim = Dim.Func (() => text.Length);
         Assert.Equal ("DimFunc(4)", dim.ToString ());
 
         text = "New Test";

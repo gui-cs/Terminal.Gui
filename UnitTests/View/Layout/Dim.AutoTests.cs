@@ -1086,7 +1086,7 @@ public class DimAutoTests (ITestOutputHelper output)
     public void With_Subview_Using_DimFunc ()
     {
         var view = new View ();
-        var subview = new View () { Width = Dim.Function (() => 20), Height = Dim.Function (() => 25) };
+        var subview = new View () { Width = Dim.Func (() => 20), Height = Dim.Func (() => 25) };
         view.Add (subview);
 
         subview.SetRelativeLayout (new (100, 100));
