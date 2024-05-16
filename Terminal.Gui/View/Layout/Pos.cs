@@ -150,9 +150,16 @@ public enum Side
 /// </remarks>
 public class Pos
 {
+    #region static Pos creation methods
+
+    /// <summary>Creates a <see cref="Pos"/> object that is an absolute position based on the specified integer value.</summary>
+    /// <returns>The Absolute <see cref="Pos"/>.</returns>
+    /// <param name="position">The value to convert to the <see cref="Pos"/>.</param>
+    public static Pos Absolute (int position) { return new PosAbsolute (position); }
+
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or
-    ///     bottom) of the SuperView, minus the respective dimension of the View. This is equivalent to using
+    ///     bottom) of the SuperView's Content Area, minus the respective size of the View. This is equivalent to using
     ///     <see cref="Pos.AnchorEnd(int)"/>,
     ///     with an offset equivalent to the View's respective dimension.
     /// </summary>
@@ -167,7 +174,8 @@ public class Pos
     public static Pos AnchorEnd () { return new PosAnchorEnd (); }
 
     /// <summary>
-    ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the SuperView,
+    ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the SuperView's Content
+    ///     Area,
     ///     useful to flush the layout from the right or bottom. See also <see cref="Pos.AnchorEnd()"/>, which uses the view
     ///     dimension to ensure the view is fully visible.
     /// </summary>
@@ -190,11 +198,6 @@ public class Pos
         return new PosAnchorEnd (offset);
     }
 
-    /// <summary>Creates a <see cref="Pos"/> object that is an absolute position based on the specified integer value.</summary>
-    /// <returns>The Absolute <see cref="Pos"/>.</returns>
-    /// <param name="position">The value to convert to the <see cref="Pos"/>.</param>
-    public static Pos Absolute (int position) { return new PosAbsolute (position); }
-
     /// <summary>Creates a <see cref="Pos"/> object that can be used to center the <see cref="View"/>.</summary>
     /// <returns>The center Pos.</returns>
     /// <example>
@@ -211,14 +214,6 @@ public class Pos
     /// </example>
     public static Pos Center () { return new PosCenter (); }
 
-    /// <summary>Determines whether the specified object is equal to the current object.</summary>
-    /// <param name="other">The object to compare with the current object. </param>
-    /// <returns>
-    ///     <see langword="true"/> if the specified object  is equal to the current object; otherwise,
-    ///     <see langword="false"/>.
-    /// </returns>
-    public override bool Equals (object other) { return other is Pos abs && abs == this; }
-
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that computes the position by executing the provided function. The function
     ///     will be called every time the position is needed.
@@ -226,60 +221,6 @@ public class Pos
     /// <param name="function">The function to be executed.</param>
     /// <returns>The <see cref="Pos"/> returned from the function.</returns>
     public static Pos Function (Func<int> function) { return new PosFunc (function); }
-
-    /// <summary>Serves as the default hash function. </summary>
-    /// <returns>A hash code for the current object.</returns>
-    public override int GetHashCode () { return Anchor (0).GetHashCode (); }
-
-    /// <summary>Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.</summary>
-    /// <param name="left">The first <see cref="Terminal.Gui.Pos"/> to add.</param>
-    /// <param name="right">The second <see cref="Terminal.Gui.Pos"/> to add.</param>
-    /// <returns>The <see cref="Pos"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
-    public static Pos operator + (Pos left, Pos right)
-    {
-        if (left is PosAbsolute && right is PosAbsolute)
-        {
-            return new PosAbsolute (left.Anchor (0) + right.Anchor (0));
-        }
-
-        var newPos = new PosCombine (true, left, right);
-
-        if (left is PosView view)
-        {
-            view.Target.SetNeedsLayout ();
-        }
-
-        return newPos;
-    }
-
-    /// <summary>Creates an Absolute <see cref="Pos"/> from the specified integer value.</summary>
-    /// <returns>The Absolute <see cref="Pos"/>.</returns>
-    /// <param name="n">The value to convert to the <see cref="Pos"/> .</param>
-    public static implicit operator Pos (int n) { return new PosAbsolute (n); }
-
-    /// <summary>
-    ///     Subtracts a <see cref="Terminal.Gui.Pos"/> from a <see cref="Terminal.Gui.Pos"/>, yielding a new
-    ///     <see cref="Pos"/>.
-    /// </summary>
-    /// <param name="left">The <see cref="Terminal.Gui.Pos"/> to subtract from (the minuend).</param>
-    /// <param name="right">The <see cref="Terminal.Gui.Pos"/> to subtract (the subtrahend).</param>
-    /// <returns>The <see cref="Pos"/> that is the <c>left</c> minus <c>right</c>.</returns>
-    public static Pos operator - (Pos left, Pos right)
-    {
-        if (left is PosAbsolute && right is PosAbsolute)
-        {
-            return new PosAbsolute (left.Anchor (0) - right.Anchor (0));
-        }
-
-        var newPos = new PosCombine (false, left, right);
-
-        if (left is PosView view)
-        {
-            view.Target.SetNeedsLayout ();
-        }
-
-        return newPos;
-    }
 
     /// <summary>Creates a percentage <see cref="Pos"/> object</summary>
     /// <returns>The percent <see cref="Pos"/> object.</returns>
@@ -342,22 +283,32 @@ public class Pos
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
     public static Pos Right (View view) { return new PosView (view, Side.Right); }
 
+    #endregion static Pos creation methods
+
+    #region virtual methods
+
     /// <summary>
-    ///     Gets a position that is anchored to a certain point in the layout. This method is typically used
+    ///     Calculates and returns the starting point of an element based on the size of the parent element (typically
+    ///     <c>Superview.ContentSize</c>).
+    ///     This method is meant to be overridden by subclasses to provide different ways of calculating the starting point.
+    ///     This method is used
     ///     internally by the layout system to determine where a View should be positioned.
     /// </summary>
-    /// <param name="width">The width of the area where the View is being positioned (Superview.ContentSize).</param>
+    /// <param name="size">The size of the parent element (typically <c>Superview.ContentSize</c>).</param>
     /// <returns>
     ///     An integer representing the calculated position. The way this position is calculated depends on the specific
     ///     subclass of Pos that is used. For example, PosAbsolute returns a fixed position, PosAnchorEnd returns a
     ///     position that is anchored to the end of the layout, and so on.
     /// </returns>
-    internal virtual int Anchor (int width) { return 0; }
+    internal virtual int Anchor (int size) { return 0; }
 
     /// <summary>
-    ///     Calculates and returns the position of a <see cref="View"/> object. It takes into account the dimension of the
+    ///     Calculates and returns the final position of a <see cref="View"/> object. It takes into account the dimension of
+    ///     the
     ///     superview and the dimension of the view itself.
     /// </summary>
+    /// <remarks>
+    /// </remarks>
     /// <param name="superviewDimension">
     ///     The dimension of the superview. This could be the width for x-coordinate calculation or the
     ///     height for y-coordinate calculation.
@@ -377,35 +328,102 @@ public class Pos
     /// </summary>
     /// <returns></returns>
     internal virtual bool ReferencesOtherViews () { return false; }
+
+    #endregion virtual methods
+
+    #region operators
+
+    /// <summary>Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.</summary>
+    /// <param name="left">The first <see cref="Terminal.Gui.Pos"/> to add.</param>
+    /// <param name="right">The second <see cref="Terminal.Gui.Pos"/> to add.</param>
+    /// <returns>The <see cref="Pos"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
+    public static Pos operator + (Pos left, Pos right)
+    {
+        if (left is PosAbsolute && right is PosAbsolute)
+        {
+            return new PosAbsolute (left.Anchor (0) + right.Anchor (0));
+        }
+
+        var newPos = new PosCombine (true, left, right);
+
+        if (left is PosView view)
+        {
+            view.Target.SetNeedsLayout ();
+        }
+
+        return newPos;
+    }
+
+    /// <summary>Creates an Absolute <see cref="Pos"/> from the specified integer value.</summary>
+    /// <returns>The Absolute <see cref="Pos"/>.</returns>
+    /// <param name="n">The value to convert to the <see cref="Pos"/> .</param>
+    public static implicit operator Pos (int n) { return new PosAbsolute (n); }
+
+    /// <summary>
+    ///     Subtracts a <see cref="Terminal.Gui.Pos"/> from a <see cref="Terminal.Gui.Pos"/>, yielding a new
+    ///     <see cref="Pos"/>.
+    /// </summary>
+    /// <param name="left">The <see cref="Terminal.Gui.Pos"/> to subtract from (the minuend).</param>
+    /// <param name="right">The <see cref="Terminal.Gui.Pos"/> to subtract (the subtrahend).</param>
+    /// <returns>The <see cref="Pos"/> that is the <c>left</c> minus <c>right</c>.</returns>
+    public static Pos operator - (Pos left, Pos right)
+    {
+        if (left is PosAbsolute && right is PosAbsolute)
+        {
+            return new PosAbsolute (left.Anchor (0) - right.Anchor (0));
+        }
+
+        var newPos = new PosCombine (false, left, right);
+
+        if (left is PosView view)
+        {
+            view.Target.SetNeedsLayout ();
+        }
+
+        return newPos;
+    }
+
+    #endregion operators
+
+    #region overrides
+
+    /// <inheritdoc/>
+    public override bool Equals (object other) { return other is Pos abs && abs == this; }
+
+    /// <summary>Serves as the default hash function. </summary>
+    /// <returns>A hash code for the current object.</returns>
+    public override int GetHashCode () { return Anchor (0).GetHashCode (); }
+
+    #endregion overrides
 }
 
 /// <summary>
-///    Represents an absolute position in the layout. This is used to specify a fixed position in the layout.
+///     Represents an absolute position in the layout. This is used to specify a fixed position in the layout.
 /// </summary>
 /// <remarks>
 ///     <para>
-///     This is a low-level API that is typically used internally by the layout system. Use the various static
-///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///         This is a low-level API that is typically used internally by the layout system. Use the various static
+///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
 ///     </para>
 /// </remarks>
 /// <param name="position"></param>
 public class PosAbsolute (int position) : Pos
 {
     /// <summary>
-    ///    The position of the <see cref="View"/> in the layout.
+    ///     The position of the <see cref="View"/> in the layout.
     /// </summary>
     public int Position { get; } = position;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool Equals (object other) { return other is PosAbsolute abs && abs.Position == Position; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override int GetHashCode () { return Position.GetHashCode (); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string ToString () { return $"Absolute({Position})"; }
 
-    internal override int Anchor (int width) { return Position; }
+    internal override int Anchor (int size) { return Position; }
 }
 
 /// <summary>
@@ -413,14 +431,14 @@ public class PosAbsolute (int position) : Pos
 /// </summary>
 /// <remarks>
 ///     <para>
-///     This is a low-level API that is typically used internally by the layout system. Use the various static
-///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///         This is a low-level API that is typically used internally by the layout system. Use the various static
+///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
 ///     </para>
 /// </remarks>
 public class PosAnchorEnd : Pos
 {
     /// <summary>
-    /// Gets the offset of the position from the right/bottom.
+    ///     Gets the offset of the position from the right/bottom.
     /// </summary>
     public int Offset { get; }
 
@@ -437,10 +455,10 @@ public class PosAnchorEnd : Pos
     /// <param name="offset"></param>
     public PosAnchorEnd (int offset) { Offset = offset; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool Equals (object other) { return other is PosAnchorEnd anchorEnd && anchorEnd.Offset == Offset; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override int GetHashCode () { return Offset.GetHashCode (); }
 
     /// <summary>
@@ -448,17 +466,17 @@ public class PosAnchorEnd : Pos
     /// </summary>
     public bool UseDimForOffset { get; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string ToString () { return UseDimForOffset ? "AnchorEnd()" : $"AnchorEnd({Offset})"; }
 
-    internal override int Anchor (int width)
+    internal override int Anchor (int size)
     {
         if (UseDimForOffset)
         {
-            return width;
+            return size;
         }
 
-        return width - Offset;
+        return size - Offset;
     }
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
@@ -479,10 +497,10 @@ public class PosAnchorEnd : Pos
 /// </summary>
 public class PosCenter : Pos
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string ToString () { return "Center"; }
 
-    internal override int Anchor (int width) { return width / 2; }
+    internal override int Anchor (int size) { return size / 2; }
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
@@ -493,41 +511,45 @@ public class PosCenter : Pos
 }
 
 /// <summary>
-///    Represents a position that is a combination of two other positions.
+///     Represents a position that is a combination of two other positions.
 /// </summary>
 /// <remarks>
 ///     <para>
-///     This is a low-level API that is typically used internally by the layout system. Use the various static
-///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///         This is a low-level API that is typically used internally by the layout system. Use the various static
+///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
 ///     </para>
 /// </remarks>
-/// <param name="add">Indicates whether the two positions are added or subtracted. If <see langword="true"/>, the positions are added, otherwise they are subtracted.</param>
+/// <param name="add">
+///     Indicates whether the two positions are added or subtracted. If <see langword="true"/>, the positions are added,
+///     otherwise they are subtracted.
+/// </param>
 /// <param name="left">The left position.</param>
 /// <param name="right">The right position.</param>
 public class PosCombine (bool add, Pos left, Pos right) : Pos
 {
     /// <summary>
-    /// Gets whether the two positions are added or subtracted. If <see langword="true"/>, the positions are added, otherwise they are subtracted.
+    ///     Gets whether the two positions are added or subtracted. If <see langword="true"/>, the positions are added,
+    ///     otherwise they are subtracted.
     /// </summary>
     public bool Add { get; } = add;
 
     /// <summary>
-    /// Gets the left position.
+    ///     Gets the left position.
     /// </summary>
     public new Pos Left { get; } = left;
 
     /// <summary>
-    /// Gets the right position.
+    ///     Gets the right position.
     /// </summary>
     public new Pos Right { get; } = right;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
 
-    internal override int Anchor (int width)
+    internal override int Anchor (int size)
     {
-        int la = Left.Anchor (width);
-        int ra = Right.Anchor (width);
+        int la = Left.Anchor (size);
+        int ra = Right.Anchor (size);
 
         if (Add)
         {
@@ -539,7 +561,6 @@ public class PosCombine (bool add, Pos left, Pos right) : Pos
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
-        int newDimension = dim.Calculate (0, superviewDimension, us, dimension);
         int left = Left.Calculate (superviewDimension, dim, us, dimension);
         int right = Right.Calculate (superviewDimension, dim, us, dimension);
 
@@ -572,8 +593,8 @@ public class PosCombine (bool add, Pos left, Pos right) : Pos
 /// </summary>
 /// <remarks>
 ///     <para>
-///     This is a low-level API that is typically used internally by the layout system. Use the various static
-///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///         This is a low-level API that is typically used internally by the layout system. Use the various static
+///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
 ///     </para>
 /// </remarks>
 /// <param name="percent"></param>
@@ -584,45 +605,45 @@ public class PosPercent (float percent) : Pos
     /// </summary>
     public new float Percent { get; } = percent;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool Equals (object other) { return other is PosPercent f && f.Percent == Percent; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override int GetHashCode () { return Percent.GetHashCode (); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string ToString () { return $"Percent({Percent})"; }
 
-    internal override int Anchor (int width) { return (int)(width * Percent); }
+    internal override int Anchor (int size) { return (int)(size * Percent); }
 }
 
 /// <summary>
-///    Represents a position that is computed by executing a function that returns an integer position.
+///     Represents a position that is computed by executing a function that returns an integer position.
 /// </summary>
 /// <remarks>
 ///     <para>
-///     This is a low-level API that is typically used internally by the layout system. Use the various static
-///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///         This is a low-level API that is typically used internally by the layout system. Use the various static
+///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
 ///     </para>
 /// </remarks>
 /// <param name="pos">The position.</param>
 public class PosFunc (Func<int> pos) : Pos
 {
     /// <summary>
-    ///    Gets the function that computes the position.
+    ///     Gets the function that computes the position.
     /// </summary>
     public Func<int> Func { get; } = pos;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool Equals (object other) { return other is PosFunc f && f.Func () == Func (); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override int GetHashCode () { return Func.GetHashCode (); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string ToString () { return $"PosFunc({Func ()})"; }
 
-    internal override int Anchor (int width) { return Func (); }
+    internal override int Anchor (int size) { return Func (); }
 }
 
 /// <summary>
@@ -630,8 +651,8 @@ public class PosFunc (Func<int> pos) : Pos
 /// </summary>
 /// <remarks>
 ///     <para>
-///     This is a low-level API that is typically used internally by the layout system. Use the various static
-///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///         This is a low-level API that is typically used internally by the layout system. Use the various static
+///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
 ///     </para>
 /// </remarks>
 /// <param name="view">The View the position is anchored to.</param>
@@ -639,32 +660,32 @@ public class PosFunc (Func<int> pos) : Pos
 public class PosView (View view, Side side) : Pos
 {
     /// <summary>
-    /// Gets the View the position is anchored to.
+    ///     Gets the View the position is anchored to.
     /// </summary>
     public View Target { get; } = view;
 
     /// <summary>
-    /// Gets the side of the View the position is anchored to.
+    ///     Gets the side of the View the position is anchored to.
     /// </summary>
     public Side Side { get; } = side;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool Equals (object other) { return other is PosView abs && abs.Target == Target; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override int GetHashCode () { return Target.GetHashCode (); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string ToString ()
     {
         string sideString = Side switch
-        {
-            Side.Left => "left",
-            Side.Top => "top",
-            Side.Right => "right",
-            Side.Bottom => "bottom",
-            _ => "unknown"
-        };
+                            {
+                                Side.Left => "left",
+                                Side.Top => "top",
+                                Side.Right => "right",
+                                Side.Bottom => "bottom",
+                                _ => "unknown"
+                            };
 
         if (Target == null)
         {
@@ -674,21 +695,17 @@ public class PosView (View view, Side side) : Pos
         return $"View(side={sideString},target={Target})";
     }
 
-    internal override int Anchor (int width)
+    internal override int Anchor (int size)
     {
         return Side switch
-        {
-            Side.Left => Target.Frame.X,
-            Side.Top => Target.Frame.Y,
-            Side.Right => Target.Frame.Right,
-            Side.Bottom => Target.Frame.Bottom,
-            _ => 0
-        };
+               {
+                   Side.Left => Target.Frame.X,
+                   Side.Top => Target.Frame.Y,
+                   Side.Right => Target.Frame.Right,
+                   Side.Bottom => Target.Frame.Bottom,
+                   _ => 0
+               };
     }
 
-    /// <summary>
-    ///     Diagnostics API to determine if this Pos object references other views.
-    /// </summary>
-    /// <returns></returns>
     internal override bool ReferencesOtherViews () { return true; }
 }

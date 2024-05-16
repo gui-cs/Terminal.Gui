@@ -291,7 +291,7 @@ public class Dim
     ///     subclass of Dim that is used. For example, DimAbsolute returns a fixed dimension, DimFactor returns a
     ///     dimension that is a certain percentage of the super view's size, and so on.
     /// </returns>
-    internal virtual int Anchor (int width) { return 0; }
+    internal virtual int Anchor (int size) { return 0; }
 
     /// <summary>
     ///     Calculates and returns the dimension of a <see cref="View"/> object. It takes into account the location of the
@@ -353,11 +353,11 @@ public class DimAbsolute (int size) : Dim
     /// <inheritdoc/>
     public override string ToString () { return $"Absolute({Size})"; }
 
-    internal override int Anchor (int width) { return Size; }
+    internal override int Anchor (int size) { return Size; }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        // DimAbsolute.Anchor (int width) ignores width and returns n
+        // DimAbsolute.Anchor (int size) ignores width and returns n
         return Math.Max (Anchor (0), 0);
     }
 }
@@ -533,10 +533,10 @@ public class DimCombine (bool add, Dim left, Dim right) : Dim
     /// <inheritdoc/>
     public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
 
-    internal override int Anchor (int width)
+    internal override int Anchor (int size)
     {
-        int la = Left.Anchor (width);
-        int ra = Right.Anchor (width);
+        int la = Left.Anchor (size);
+        int ra = Right.Anchor (size);
 
         if (Add)
         {
@@ -621,7 +621,7 @@ public class DimPercent (float percent, bool usePosition = false) : Dim
     /// <returns></returns>
     public override string ToString () { return $"Percent({Percent},{UsePosition})"; }
 
-    internal override int Anchor (int width) { return (int)(width * Percent); }
+    internal override int Anchor (int size) { return (int)(size * Percent); }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
@@ -653,7 +653,7 @@ public class DimFill (int margin) : Dim
     /// <inheritdoc/>
     public override string ToString () { return $"Fill({Margin})"; }
 
-    internal override int Anchor (int width) { return width - Margin; }
+    internal override int Anchor (int size) { return size - Margin; }
 }
 
 /// <summary>
@@ -680,7 +680,7 @@ public class DimFunc (Func<int> dim) : Dim
     /// <inheritdoc/>
     public override string ToString () { return $"DimFunc({Func ()})"; }
 
-    internal override int Anchor (int width) { return Func (); }
+    internal override int Anchor (int size) { return Func (); }
 }
 
 /// <summary>
@@ -737,7 +737,7 @@ public class DimView : Dim
         return $"View({dimString},{Target})";
     }
 
-    internal override int Anchor (int width)
+    internal override int Anchor (int size)
     {
         return Dimension switch
                {
