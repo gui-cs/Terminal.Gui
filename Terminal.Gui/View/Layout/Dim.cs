@@ -724,7 +724,7 @@ public class DimView : Dim
     public Dimension Dimension { get; }
 
     /// <inheritdoc/>
-    public override bool Equals (object other) { return other is DimView abs && abs.Target == Target; }
+    public override bool Equals (object other) { return other is DimView abs && abs.Target == Target && abs.Dimension == Dimension; }
 
     /// <inheritdoc/>
     public override int GetHashCode () { return Target.GetHashCode (); }

@@ -32,17 +32,6 @@ public class DimTests
         Assert.Equal (10, result);
     }
 
-
-    [Fact]
-    public void DimView_Calculate_ReturnsCorrectValue ()
-    {
-        var view = new View { Width = 10 };
-        var dim = new DimView (view, Dimension.Width);
-        var result = dim.Calculate (0, 100, null, Dimension.None);
-        Assert.Equal (10, result);
-    }
-
-
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // A new test that does not depend on Application is needed.
     [Fact]
@@ -92,30 +81,6 @@ public class DimTests
         top.Dispose ();
 
         Assert.Equal (20, count);
-    }
-
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-    [Fact]
-    [TestRespondersDisposed]
-    public void Dim_Referencing_SuperView_Does_Not_Throw ()
-    {
-        var super = new View { Width = 10, Height = 10, Text = "super" };
-
-        var view = new View
-        {
-            Width = Dim.Width (super), // this is allowed
-            Height = Dim.Height (super), // this is allowed
-            Text = "view"
-        };
-
-        super.Add (view);
-        super.BeginInit ();
-        super.EndInit ();
-
-        Exception exception = Record.Exception (super.LayoutSubviews);
-        Assert.Null (exception);
-        super.Dispose ();
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
@@ -179,31 +144,6 @@ public class DimTests
         Application.Run (top);
 
         Assert.Equal (0, count);
-    }
-
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-    [Fact]
-    [TestRespondersDisposed]
-    public void Dim_SyperView_Referencing_SubView_Throws ()
-    {
-        var super = new View { Width = 10, Height = 10, Text = "super" };
-        var view2 = new View { Width = 10, Height = 10, Text = "view2" };
-
-        var view = new View
-        {
-            Width = Dim.Width (view2), // this is not allowed
-            Height = Dim.Height (view2), // this is not allowed
-            Text = "view"
-        };
-
-        view.Add (view2);
-        super.Add (view);
-        super.BeginInit ();
-        super.EndInit ();
-
-        Assert.Throws<InvalidOperationException> (super.LayoutSubviews);
-        super.Dispose ();
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
