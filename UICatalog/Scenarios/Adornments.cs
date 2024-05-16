@@ -212,6 +212,8 @@ public class Adornments : Scenario
 
         private void AdornmentEditor_Initialized (object sender, EventArgs e)
         {
+            SuperViewRendersLineCanvas = true;
+
             _topEdit = new ()
             {
                 X = Pos.Center (), Y = 0
@@ -282,11 +284,9 @@ public class Adornments : Scenario
             _rightEdit.Value = Thickness.Right;
             _bottomEdit.Value = Thickness.Bottom;
 
-            // TODO: Use Dim.Auto(subviews) when ready
-            Width = Dim.Auto ();// GetAdornmentsThickness ().Horizontal + _foregroundColorPicker.Frame.Width * 2 - 3;
-            Height = Dim.Auto (); //GetAdornmentsThickness ().Vertical + 4 + 3;
+            Width = Dim.Auto () - 1;
+            Height = Dim.Auto () - 1;
             LayoutSubviews ();
-            SetContentSize (new (_foregroundColorPicker.Frame.Width * 2 + 1, 4 + 3 ));
         }
 
         private void Top_ValueChanging (object sender, StateEventArgs<int> e)
