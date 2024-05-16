@@ -670,7 +670,7 @@ public class PosView (View view, Side side) : Pos
     public Side Side { get; } = side;
 
     /// <inheritdoc/>
-    public override bool Equals (object other) { return other is PosView abs && abs.Target == Target; }
+    public override bool Equals (object other) { return other is PosView abs && abs.Target == Target && abs.Side == Side; }
 
     /// <inheritdoc/>
     public override int GetHashCode () { return Target.GetHashCode (); }
