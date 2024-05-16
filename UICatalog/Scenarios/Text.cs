@@ -28,9 +28,6 @@ public class Text : Scenario
             X = Pos.Right (label) + 1,
             Y = 0,
             Width = Dim.Percent (50) - 1,
-
-            // Height will be replaced with 1
-            Height = 2,
             Text = "TextField with test text. Unicode shouldn't 𝔹Aℝ𝔽!"
         };
 
@@ -66,7 +63,10 @@ public class Text : Scenario
 
         var textView = new TextView
         {
-            X = Pos.Right (label) + 1, Y = Pos.Bottom (textField) + 1, Width = Dim.Percent (50) - 1, Height = Dim.Percent (30)
+            X = Pos.Right (label) + 1, 
+            Y = Pos.Top (label), 
+            Width = Dim.Percent (50) - 1, 
+            Height = Dim.Percent (20)
         };
         textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
         textView.DrawContent += TextView_DrawContent;

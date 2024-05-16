@@ -1227,6 +1227,10 @@ public class TextField : View
             return;
         }
 
+        // TODO: This is a lame prototype proving it should be easy for TextField to 
+        // TODO: support Width = Dim.Auto (DimAutoStyle: Content).
+        //SetContentSize(new (TextModel.DisplaySize (_text).size, 1));
+
         int offB = OffSetBackground ();
         bool need = NeedsDisplay || !Used;
 

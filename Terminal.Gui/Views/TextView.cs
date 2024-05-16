@@ -680,6 +680,14 @@ internal class TextModel
         return (size, len);
     }
 
+    internal Size GetDisplaySize ()
+    {
+        Size size = Size.Empty;
+
+
+        return size;
+    }
+
     internal (Point current, bool found) FindNextText (
         string text,
         out bool gaveFullTurn,
@@ -3566,6 +3574,7 @@ public class TextView : View
 
         ProcessInheritsPreviousColorScheme (CurrentRow, CurrentColumn);
         ProcessAutocomplete ();
+
     }
 
     /// <inheritdoc/>
