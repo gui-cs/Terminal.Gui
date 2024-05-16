@@ -120,7 +120,7 @@ In v1, `View.AutoSize` was used to size a view to its `Text`. In v2, `View.AutoS
 
 ### How to Fix
 
-* Replace `View.AutoSize = true` with `View.Width = Dim.Auto` or `View.Height = Dim.Auto` as needed.
+* Replace `View.AutoSize = true` with `View.Width = Dim.Auto` or `View.Height = Dim.Auto` as needed. See the [DimAuto Deep Dive](dimauto.md) for more information.
 
 ## Adornments
 
