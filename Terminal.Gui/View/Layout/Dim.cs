@@ -145,6 +145,11 @@ public class Dim
 {
     #region static Dim creation methods
 
+    /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
+    /// <returns>The Absolute <see cref="Dim"/>.</returns>
+    /// <param name="size">The value to convert to the <see cref="Dim"/>.</param>
+    public static Dim Absolute (int size) { return new DimAbsolute (size); }
+
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all the view's Content, Subviews, and/or Text.
     /// </summary>
@@ -180,8 +185,7 @@ public class Dim
     }
 
     /// <summary>
-    ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified number of columns for a
-    ///     margin.
+    ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified margin.
     /// </summary>
     /// <returns>The Fill dimension.</returns>
     /// <param name="margin">Margin to use.</param>
@@ -230,11 +234,6 @@ public class Dim
 
         return new DimPercent (percent / 100, usePosition);
     }
-
-    /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
-    /// <returns>The Absolute <see cref="Dim"/>.</returns>
-    /// <param name="size">The value to convert to the <see cref="Dim"/>.</param>
-    public static Dim Absolute (int size) { return new DimAbsolute (size); }
 
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.</summary>
     /// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>
@@ -355,16 +354,16 @@ public class Dim
 /// <param name="size"></param>
 public class DimAbsolute (int size) : Dim
 {
-    /// <summary>
-    ///     Gets the size of the dimension.
-    /// </summary>
-    public int Size { get; } = size;
-
     /// <inheritdoc/>
     public override bool Equals (object other) { return other is DimAbsolute abs && abs.Size == Size; }
 
     /// <inheritdoc/>
     public override int GetHashCode () { return Size.GetHashCode (); }
+
+    /// <summary>
+    ///     Gets the size of the dimension.
+    /// </summary>
+    public int Size { get; } = size;
 
     /// <inheritdoc/>
     public override string ToString () { return $"Absolute({Size})"; }
@@ -397,10 +396,14 @@ public class DimAbsolute (int size) : Dim
 /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.</param>
 public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumContentDim) : Dim
 {
-    /// <summary>
-    ///     Gets the minimum dimension the View's ContentSize will be constrained to.
-    /// </summary>
-    public Dim MinimumContentDim { get; } = minimumContentDim;
+    /// <inheritdoc/>
+    public override bool Equals (object other)
+    {
+        return other is DimAuto auto && auto.MinimumContentDim == MinimumContentDim && auto.MaximumContentDim == MaximumContentDim && auto.Style == Style;
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), MinimumContentDim, MaximumContentDim, Style); }
 
     /// <summary>
     ///     Gets the maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.
@@ -408,9 +411,17 @@ public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumCont
     public Dim MaximumContentDim { get; } = maximumContentDim;
 
     /// <summary>
+    ///     Gets the minimum dimension the View's ContentSize will be constrained to.
+    /// </summary>
+    public Dim MinimumContentDim { get; } = minimumContentDim;
+
+    /// <summary>
     ///     Gets the style of the DimAuto.
     /// </summary>
     public DimAutoStyle Style { get; } = style;
+
+    /// <inheritdoc/>
+    public override string ToString () { return $"Auto({Style},{MinimumContentDim},{MaximumContentDim})"; }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
@@ -502,18 +513,6 @@ public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumCont
         // BUGBUG: This is not correct. _contentSize may be null.
         return false; //_style.HasFlag (DimAutoStyle.Content);
     }
-
-    /// <inheritdoc/>
-    public override bool Equals (object other)
-    {
-        return other is DimAuto auto && auto.MinimumContentDim == MinimumContentDim && auto.MaximumContentDim == MaximumContentDim && auto.Style == Style;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), MinimumContentDim, MaximumContentDim, Style); }
-
-    /// <inheritdoc/>
-    public override string ToString () { return $"Auto({Style},{MinimumContentDim},{MaximumContentDim})"; }
 }
 
 /// <summary>
@@ -616,16 +615,6 @@ public class DimCombine (bool add, Dim left, Dim right) : Dim
 /// </param>
 public class DimPercent (float percent, bool usePosition = false) : Dim
 {
-    /// <summary>
-    ///     Gets the percentage.
-    /// </summary>
-    public new float Percent { get; } = percent;
-
-    /// <summary>
-    ///     Gets whether the dimension is computed using the View's position or ContentSize.
-    /// </summary>
-    public bool UsePosition { get; } = usePosition;
-
     /// <inheritdoc/>
     public override bool Equals (object other) { return other is DimPercent f && f.Percent == Percent && f.UsePosition == UsePosition; }
 
@@ -633,9 +622,19 @@ public class DimPercent (float percent, bool usePosition = false) : Dim
     public override int GetHashCode () { return Percent.GetHashCode (); }
 
     /// <summary>
+    ///     Gets the percentage.
+    /// </summary>
+    public new float Percent { get; } = percent;
+
+    /// <summary>
     /// </summary>
     /// <returns></returns>
     public override string ToString () { return $"Percent({Percent},{UsePosition})"; }
+
+    /// <summary>
+    ///     Gets whether the dimension is computed using the View's position or ContentSize.
+    /// </summary>
+    public bool UsePosition { get; } = usePosition;
 
     internal override int Anchor (int size) { return (int)(size * Percent); }
 
@@ -655,16 +654,16 @@ public class DimPercent (float percent, bool usePosition = false) : Dim
 /// <param name="margin">The margin to not fill.</param>
 public class DimFill (int margin) : Dim
 {
-    /// <summary>
-    ///     Gets the margin to not fill.
-    /// </summary>
-    public int Margin { get; } = margin;
-
     /// <inheritdoc/>
     public override bool Equals (object other) { return other is DimFill fill && fill.Margin == Margin; }
 
     /// <inheritdoc/>
     public override int GetHashCode () { return Margin.GetHashCode (); }
+
+    /// <summary>
+    ///     Gets the margin to not fill.
+    /// </summary>
+    public int Margin { get; } = margin;
 
     /// <inheritdoc/>
     public override string ToString () { return $"Fill({Margin})"; }
@@ -682,13 +681,13 @@ public class DimFill (int margin) : Dim
 /// <param name="dim"></param>
 public class DimFunc (Func<int> dim) : Dim
 {
+    /// <inheritdoc/>
+    public override bool Equals (object other) { return other is DimFunc f && f.Func () == Func (); }
+
     /// <summary>
     ///     Gets the function that computes the dimension.
     /// </summary>
     public Func<int> Func { get; } = dim;
-
-    /// <inheritdoc/>
-    public override bool Equals (object other) { return other is DimFunc f && f.Func () == Func (); }
 
     /// <inheritdoc/>
     public override int GetHashCode () { return Func.GetHashCode (); }
@@ -709,11 +708,6 @@ public class DimFunc (Func<int> dim) : Dim
 public class DimView : Dim
 {
     /// <summary>
-    ///     Gets the indicated dimension of the View.
-    /// </summary>
-    public Dimension Dimension { get; }
-
-    /// <summary>
     ///     Initializes a new instance of the <see cref="DimView"/> class.
     /// </summary>
     /// <param name="view">The view the dimension is anchored to.</param>
@@ -725,15 +719,20 @@ public class DimView : Dim
     }
 
     /// <summary>
-    ///     Gets the View the dimension is anchored to.
+    ///     Gets the indicated dimension of the View.
     /// </summary>
-    public View Target { get; init; }
+    public Dimension Dimension { get; }
 
     /// <inheritdoc/>
     public override bool Equals (object other) { return other is DimView abs && abs.Target == Target; }
 
     /// <inheritdoc/>
     public override int GetHashCode () { return Target.GetHashCode (); }
+
+    /// <summary>
+    ///     Gets the View the dimension is anchored to.
+    /// </summary>
+    public View Target { get; init; }
 
     /// <inheritdoc/>
     public override string ToString ()
