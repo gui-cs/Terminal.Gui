@@ -37,28 +37,22 @@ public class PosCombine (AddOrSubtract add, Pos left, Pos right) : Pos
 
     internal override int GetAnchor (int size)
     {
-        int la = Left.GetAnchor (size);
-        int ra = Right.GetAnchor (size);
-
         if (Add == AddOrSubtract.Add)
         {
-            return la + ra;
+            return Left.GetAnchor (size) + Right.GetAnchor (size);
         }
 
-        return la - ra;
+        return Left.GetAnchor (size) - Right.GetAnchor (size);
     }
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
-        int left = Left.Calculate (superviewDimension, dim, us, dimension);
-        int right = Right.Calculate (superviewDimension, dim, us, dimension);
-
         if (Add == AddOrSubtract.Add)
         {
-            return left + right;
+            return Left.Calculate (superviewDimension, dim, us, dimension) + Right.Calculate (superviewDimension, dim, us, dimension);
         }
 
-        return left - right;
+        return Left.Calculate (superviewDimension, dim, us, dimension) - Right.Calculate (superviewDimension, dim, us, dimension);
     }
 
     internal override bool ReferencesOtherViews ()

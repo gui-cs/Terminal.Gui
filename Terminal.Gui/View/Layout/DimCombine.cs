@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 ///     Represents a dimension that is a combination of two other dimensions.
 /// </summary>
 /// <param name="add">
-///     Indicates whether the two dimensions are added or subtracted. 
+///     Indicates whether the two dimensions are added or subtracted.
 /// </param>
 /// <remarks>
 ///     This is a low-level API that is typically used internally by the layout system. Use the various static
@@ -35,31 +35,28 @@ public class DimCombine (AddOrSubtract add, Dim? left, Dim? right) : Dim
 
     internal override int GetAnchor (int size)
     {
-        int la = Left!.GetAnchor (size);
-        int ra = Right!.GetAnchor (size);
-
         if (Add == AddOrSubtract.Add)
         {
-            return la + ra;
+            return Left!.GetAnchor (size) + Right!.GetAnchor (size);
         }
 
-        return la - ra;
+        return Left!.GetAnchor (size) - Right!.GetAnchor (size);
     }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        int leftNewDim = Left!.Calculate (location, superviewContentSize, us, dimension);
-        int rightNewDim = Right!.Calculate (location, superviewContentSize, us, dimension);
-
         int newDimension;
 
         if (Add == AddOrSubtract.Add)
         {
-            newDimension = leftNewDim + rightNewDim;
+            newDimension = Left!.Calculate (location, superviewContentSize, us, dimension) + Right!.Calculate (location, superviewContentSize, us, dimension);
         }
         else
         {
-            newDimension = Math.Max (0, leftNewDim - rightNewDim);
+            newDimension = Math.Max (
+                                     0,
+                                     Left!.Calculate (location, superviewContentSize, us, dimension)
+                                     - Right!.Calculate (location, superviewContentSize, us, dimension));
         }
 
         return newDimension;
