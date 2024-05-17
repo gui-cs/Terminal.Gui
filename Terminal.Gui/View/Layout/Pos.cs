@@ -510,16 +510,14 @@ public class PosCenter : Pos
 ///     </para>
 /// </remarks>
 /// <param name="add">
-///     Indicates whether the two positions are added or subtracted. If <see langword="true"/>, the positions are added,
-///     otherwise they are subtracted.
+///     Indicates whether the two positions are added or subtracted.
 /// </param>
 /// <param name="left">The left position.</param>
 /// <param name="right">The right position.</param>
 public class PosCombine (AddOrSubtract add, Pos left, Pos right) : Pos
 {
     /// <summary>
-    ///     Gets whether the two positions are added or subtracted. If <see langword="true"/>, the positions are added,
-    ///     otherwise they are subtracted.
+    ///     Gets whether the two positions are added or subtracted.
     /// </summary>
     public AddOrSubtract Add { get; } = add;
 

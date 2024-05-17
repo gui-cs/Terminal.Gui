@@ -566,27 +566,10 @@ public class DimAuto () : Dim
 }
 
 /// <summary>
-/// Describes whether an operation should add or subtract values.
-/// </summary>
-public enum AddOrSubtract
-{
-    /// <summary>
-    /// The operation should use addition.
-    /// </summary>
-    Add = 0,
-
-    /// <summary>
-    /// The operation should use subtraction.
-    /// </summary>
-    Subtract = 1
-}
-
-/// <summary>
 ///     Represents a dimension that is a combination of two other dimensions.
 /// </summary>
 /// <param name="add">
-///     Indicates whether the two dimensions are added or subtracted. If <see langword="true"/>, the dimensions are added,
-///     otherwise they are subtracted.
+///     Indicates whether the two dimensions are added or subtracted. 
 /// </param>
 /// <remarks>
 ///     This is a low-level API that is typically used internally by the layout system. Use the various static
