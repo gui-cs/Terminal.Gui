@@ -632,7 +632,7 @@ public class PosFunc (Func<int> pos) : Pos
     /// <summary>
     ///     Gets the function that computes the position.
     /// </summary>
-    public Func<int> Func { get; } = pos;
+    public new Func<int> Func { get; } = pos;
 
     /// <inheritdoc/>
     public override bool Equals (object other) { return other is PosFunc f && f.Func () == Func (); }

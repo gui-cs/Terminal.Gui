@@ -730,7 +730,7 @@ public class DimFunc (Func<int> dim) : Dim
     /// <summary>
     ///     Gets the function that computes the dimension.
     /// </summary>
-    public Func<int> Func { get; } = dim;
+    public new Func<int> Func { get; } = dim;
 
     /// <inheritdoc/>
     public override int GetHashCode () { return Func.GetHashCode (); }
