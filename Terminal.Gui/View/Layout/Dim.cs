@@ -401,7 +401,10 @@ public class DimAuto (DimAutoStyle style, Dim? minimumContentDim, Dim? maximumCo
     }
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (base.GetHashCode (), MinimumContentDim, MaximumContentDim, Style); }
+    public override int GetHashCode ()
+    {
+        return HashCode.Combine (MinimumContentDim, MaximumContentDim, Style);
+    }
 
     /// <summary>
     ///     Gets the maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.
@@ -423,7 +426,7 @@ public class DimAuto (DimAutoStyle style, Dim? minimumContentDim, Dim? maximumCo
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        if (us == null)
+        if (us is null)
         {
             return MaximumContentDim?.GetAnchor (0) ?? 0;
         }
