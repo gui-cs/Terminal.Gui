@@ -325,7 +325,10 @@ public static class MessageBox
 
             foreach (string s in buttons)
             {
-                var b = new Button { Text = s };
+                var b = new Button
+                {
+                    Text = s,
+                };
 
                 if (count == defaultButton)
                 {
@@ -337,9 +340,9 @@ public static class MessageBox
             }
         }
 
-        Dialog d;
-
-        d = new Dialog
+        Alignment buttonJust = Dialog.DefaultButtonAlignment;
+        Dialog.DefaultButtonAlignment = Alignment.Centered;
+        var d = new Dialog
         {
             Buttons = buttonList.ToArray (),
             Title = title,
@@ -347,6 +350,7 @@ public static class MessageBox
             Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent(60)),
             Height = Dim.Auto (DimAutoStyle.Content),
         };
+        Dialog.DefaultButtonAlignment = buttonJust;
 
         if (width != 0)
         {
@@ -370,7 +374,7 @@ public static class MessageBox
         var messageLabel = new Label
         {
             Text = message,
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Centered,
             X = Pos.Center (),
             Y = 0,
            // ColorScheme = Colors.ColorSchemes ["Error"]

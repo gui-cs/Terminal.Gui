@@ -1,4 +1,6 @@
 #nullable enable
+using System.ComponentModel;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -24,6 +26,14 @@ namespace Terminal.Gui;
 ///             <listheader>
 ///                 <term>Pos Object</term> <description>Description</description>
 ///             </listheader>
+///             <item>
+///                 <term>
+///                     <see cref="Pos.Align"/>
+///                 </term>
+///                 <description>
+///                     Creates a <see cref="Pos"/> object that aligns a set of views.
+///                 </description>
+///             </item>
 ///             <item>
 ///                 <term>
 ///                     <see cref="Func"/>
@@ -125,12 +135,17 @@ namespace Terminal.Gui;
 /// </remarks>
 public abstract class Pos
 {
-    #region static Pos creation methods
 
-    /// <summary>Creates a <see cref="Pos"/> object that is an absolute position based on the specified integer value.</summary>
-    /// <returns>The Absolute <see cref="Pos"/>.</returns>
-    /// <param name="position">The value to convert to the <see cref="Pos"/>.</param>
-    public static Pos Absolute (int position) { return new PosAbsolute (position); }
+    /// <summary>
+    ///     Creates a <see cref="Pos"/> object that aligns a set of views according to the specified alignment setting.
+    /// </summary>
+    /// <param name="alignment"></param>
+    /// <param name="groupId">
+    ///     The optional, unique identifier for the set of views to align according to
+    ///     <paramref name="alignment"/>.
+    /// </param>
+    /// <returns></returns>
+    public static Pos Align (Alignment alignment, int groupId = 0) { return new PosAlign (alignment, groupId); }
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or
@@ -303,20 +318,85 @@ public abstract class Pos
     /// </summary>
     /// <returns></returns>
     internal virtual bool ReferencesOtherViews () { return false; }
+}
 
-    #endregion virtual methods
+/// <summary>
+///    Represents an absolute position in the layout. This is used to specify a fixed position in the layout.
+/// </summary>
+/// <remarks>
+///     <para>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///     </para>
+/// </remarks>
+/// <param name="position"></param>
+public class PosAbsolute (int position) : Pos
+{
+    /// <summary>
+    ///    The position of the <see cref="View"/> in the layout.
+    /// </summary>
+    public int Position { get; } = position;
 
-    #region operators
+    /// <inheritdoc />
+    public override bool Equals (object other) { return other is PosAbsolute abs && abs.Position == Position; }
 
-    /// <summary>Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.</summary>
-    /// <param name="left">The first <see cref="Terminal.Gui.Pos"/> to add.</param>
-    /// <param name="right">The second <see cref="Terminal.Gui.Pos"/> to add.</param>
-    /// <returns>The <see cref="Pos"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
-    public static Pos operator + (Pos left, Pos right)
+    /// <inheritdoc />
+    public override int GetHashCode () { return Position.GetHashCode (); }
+
+    /// <inheritdoc />
+    public override string ToString () { return $"Absolute({Position})"; }
+
+    internal override int Anchor (int width) { return Position; }
+}
+
+/// <summary>
+///     Represents a position anchored to the end (right side or bottom).
+/// </summary>
+/// <remarks>
+///     <para>
+///     This is a low-level API that is typically used internally by the layout system. Use the various static
+///     methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///     </para>
+/// </remarks>
+public class PosAnchorEnd : Pos
+{
+    /// <summary>
+    /// Gets the offset of the position from the right/bottom.
+    /// </summary>
+    public int Offset { get; }
+
+    /// <summary>
+    ///     Constructs a new position anchored to the end (right side or bottom) of the SuperView,
+    ///     minus the respective dimension of the View. This is equivalent to using <see cref="PosAnchorEnd(int)"/>,
+    ///     with an offset equivalent to the View's respective dimension.
+    /// </summary>
+    public PosAnchorEnd () { UseDimForOffset = true; }
+
+    /// <summary>
+    ///     Constructs a new position anchored to the end (right side or bottom) of the SuperView,
+    /// </summary>
+    /// <param name="offset"></param>
+    public PosAnchorEnd (int offset) { Offset = offset; }
+
+    /// <inheritdoc />
+    public override bool Equals (object other) { return other is PosAnchorEnd anchorEnd && anchorEnd.Offset == Offset; }
+
+    /// <inheritdoc />
+    public override int GetHashCode () { return Offset.GetHashCode (); }
+
+    /// <summary>
+    ///     If true, the offset is the width of the view, if false, the offset is the offset value.
+    /// </summary>
+    public bool UseDimForOffset { get; }
+
+    /// <inheritdoc />
+    public override string ToString () { return UseDimForOffset ? "AnchorEnd()" : $"AnchorEnd({Offset})"; }
+
+    internal override int Anchor (int width)
     {
-        if (left is PosAbsolute && right is PosAbsolute)
+        if (UseDimForOffset)
         {
-            return new PosAbsolute (left.GetAnchor (0) + right.GetAnchor (0));
+            return width;
         }
 
         var newPos = new PosCombine (AddOrSubtract.Add, left, right);

@@ -54,23 +54,6 @@ public class Wizard : Dialog
     private readonly LinkedList<WizardStep> _steps = new ();
     private WizardStep _currentStep;
     private bool _finishedPressed;
-
-    ///// <summary>
-    ///// The title of the Wizard, shown at the top of the Wizard with " - currentStep.Title" appended.
-    ///// </summary>
-    ///// <remarks>
-    ///// The Title is only displayed when the <see cref="Wizard"/> <see cref="Wizard.Modal"/> is set to <c>false</c>.
-    ///// </remarks>
-    //public new string Title {
-    //	get {
-    //		// The base (Dialog) Title holds the full title ("Wizard Title - Step Title")
-    //		return base.Title;
-    //	}
-    //	set {
-    //		wizardTitle = value;
-    //		base.Title = $"{wizardTitle}{(steps.Count > 0 && currentStep is { } ? " - " + currentStep.Title : string.Empty)}";
-    //	}
-    //}
     private string _wizardTitle = string.Empty;
 
     /// <summary>
@@ -83,9 +66,8 @@ public class Wizard : Dialog
     /// </remarks>
     public Wizard ()
     {
-        // Using Justify causes the Back and Next buttons to be hard justified against
-        // the left and right edge
-        ButtonAlignment = ButtonAlignments.Justify;
+        // TODO: LastRightRestLeft will enable a "Quit" button to always appear at the far left
+        ButtonAlignment = Alignment.LastRightRestLeft;
         BorderStyle = LineStyle.Double;
 
         //// Add a horiz separator
