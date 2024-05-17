@@ -30,7 +30,7 @@ public enum DimAutoStyle
     ///         The corresponding dimension of the view's <see cref="View.Text"/> will be ignored.
     ///     </para>
     /// </summary>
-    Content = 1,
+    Content = 0,
 
     /// <summary>
     ///     <para>
@@ -42,7 +42,7 @@ public enum DimAutoStyle
     ///         The corresponding dimensions of the <see cref="View.Subviews"/> will be ignored.
     ///     </para>
     /// </summary>
-    Text = 2
+    Text = 1
 }
 
 /// <summary>
