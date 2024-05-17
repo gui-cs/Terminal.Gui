@@ -148,7 +148,7 @@ public enum Side
 ///         </list>
 ///     </para>
 /// </remarks>
-public class Pos
+public abstract class Pos
 {
     #region static Pos creation methods
 

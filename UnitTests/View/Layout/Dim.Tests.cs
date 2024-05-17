@@ -308,13 +308,6 @@ public class DimTests
         view.Dispose ();
     }
 
-    [Fact]
-    public void New_Works ()
-    {
-        var dim = new Dim ();
-        Assert.Equal ("Terminal.Gui.Dim", dim.ToString ());
-    }
-
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]

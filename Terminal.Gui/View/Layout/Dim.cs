@@ -142,7 +142,7 @@ public enum Dimension
 ///     </para>
 ///     <para></para>
 /// </remarks>
-public class Dim
+public abstract class Dim
 {
     #region static Dim creation methods
 

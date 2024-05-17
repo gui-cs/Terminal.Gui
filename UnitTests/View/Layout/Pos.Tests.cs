@@ -301,13 +301,6 @@ public class PosTests ()
     }
 
     [Fact]
-    public void New_Works ()
-    {
-        var pos = new Pos ();
-        Assert.Equal ("Terminal.Gui.Pos", pos.ToString ());
-    }
-
-    [Fact]
     public void PosPercent_Equal ()
     {
         float n1 = 0;
