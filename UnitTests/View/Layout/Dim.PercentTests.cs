@@ -43,13 +43,13 @@ public class DimPercentTests
         Assert.Equal (dim1, dim2);
 
         n1 = n2 = 30;
-        dim1 = Dim.Percent (n1, true);
-        dim2 = Dim.Percent (n2, true);
+        dim1 = Dim.Percent (n1, DimPercentMode.Position);
+        dim2 = Dim.Percent (n2, DimPercentMode.Position);
         Assert.Equal (dim1, dim2);
 
         n1 = n2 = 30;
         dim1 = Dim.Percent (n1);
-        dim2 = Dim.Percent (n2, true);
+        dim2 = Dim.Percent (n2, DimPercentMode.Position);
         Assert.NotEqual (dim1, dim2);
 
         n1 = 0;
@@ -76,20 +76,20 @@ public class DimPercentTests
     }
 
     [Theory]
-    [InlineData (0, false, true, 12)]
-    [InlineData (0, false, false, 12)]
-    [InlineData (1, false, true, 12)]
-    [InlineData (1, false, false, 12)]
-    [InlineData (2, false, true, 12)]
-    [InlineData (2, false, false, 12)]
+    [InlineData (0, DimPercentMode.ContentSize, true, 12)]
+    [InlineData (0, DimPercentMode.ContentSize, false, 12)]
+    [InlineData (1, DimPercentMode.ContentSize, true, 12)]
+    [InlineData (1, DimPercentMode.ContentSize, false, 12)]
+    [InlineData (2, DimPercentMode.ContentSize, true, 12)]
+    [InlineData (2, DimPercentMode.ContentSize, false, 12)]
 
-    [InlineData (0, true, true, 12)]
-    [InlineData (0, true, false, 12)]
-    [InlineData (1, true, true, 12)]
-    [InlineData (1, true, false, 12)]
-    [InlineData (2, true, true, 11)]
-    [InlineData (2, true, false, 11)]
-    public void DimPercent_Position (int position, bool usePosition, bool width, int expected)
+    [InlineData (0, DimPercentMode.Position, true, 12)]
+    [InlineData (0, DimPercentMode.Position, false, 12)]
+    [InlineData (1, DimPercentMode.Position, true, 12)]
+    [InlineData (1, DimPercentMode.Position, false, 12)]
+    [InlineData (2, DimPercentMode.Position, true, 11)]
+    [InlineData (2, DimPercentMode.Position, false, 11)]
+    public void DimPercent_Position (int position, DimPercentMode mode, bool width, int expected)
     {
         var super = new View { Width = 25, Height = 25 };
 
@@ -97,8 +97,8 @@ public class DimPercentTests
         {
             X = width ? position : 0,
             Y = width ? 0 : position,
-            Width = width ? Dim.Percent (50, usePosition) : 1,
-            Height = width ? 1 : Dim.Percent (50, usePosition)
+            Width = width ? Dim.Percent (50, mode) : 1,
+            Height = width ? 1 : Dim.Percent (50, mode)
         };
 
         super.Add (view);
@@ -168,7 +168,7 @@ public class DimPercentTests
     public void DimPercent_SetsValue (int percent)
     {
         Dim dim = Dim.Percent (percent);
-        Assert.Equal ($"Percent({percent},{false})", dim.ToString ());
+        Assert.Equal ($"Percent({percent},ContentSize)", dim.ToString ());
     }
 
 }

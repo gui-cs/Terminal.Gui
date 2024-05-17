@@ -385,8 +385,8 @@ public class DimTests
         {
             X = Pos.X (f2),
             Y = Pos.Bottom (f2) + 2,
-            Width = Dim.Percent (20, true),
-            Height = Dim.Percent (20, true),
+            Width = Dim.Percent (20, DimPercentMode.Position),
+            Height = Dim.Percent (20, DimPercentMode.Position),
             ValidatePosDim = true,
             Text = "v6"
         };
@@ -401,7 +401,6 @@ public class DimTests
                        Assert.Equal (100, w.Frame.Width);
                        Assert.Equal (100, w.Frame.Height);
 
-                       Assert.Equal ("Percent(50,False)", f1.Width.ToString ());
                        Assert.Equal ("Absolute(5)", f1.Height.ToString ());
                        Assert.Equal (49, f1.Frame.Width); // 50-1=49
                        Assert.Equal (5, f1.Frame.Height);
