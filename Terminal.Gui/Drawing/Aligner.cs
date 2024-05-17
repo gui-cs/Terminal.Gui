@@ -28,7 +28,7 @@ public enum Alignment
     ///         111 2222 33333
     ///     </c>
     /// </example>
-    Left,
+    Left = 0,
 
     /// <summary>
     ///     The items will be aligned to the top.
