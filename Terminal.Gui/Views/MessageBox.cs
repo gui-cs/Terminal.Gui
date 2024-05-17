@@ -344,8 +344,8 @@ public static class MessageBox
             Buttons = buttonList.ToArray (),
             Title = title,
             BorderStyle = DefaultBorderStyle,
-            Width = Dim.Auto (DimAutoStyle.Content),
-            Height = Dim.Auto (DimAutoStyle.Content), 
+            Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent(60)),
+            Height = Dim.Auto (DimAutoStyle.Content),
         };
 
         if (width != 0)

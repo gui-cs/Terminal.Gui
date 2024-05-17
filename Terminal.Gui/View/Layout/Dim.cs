@@ -517,7 +517,7 @@ public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumCont
 
                     if (dimension == Dimension.Width)
                     {
-                        v.SetRelativeLayout (new Size (subviewsSize, 0));
+                        v.SetRelativeLayout (new Size (autoMin - subviewsSize, 0));
                     }
                     else
                     {
