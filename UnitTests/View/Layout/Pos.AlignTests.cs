@@ -43,7 +43,7 @@ public class PosAlignTests ()
         var width = 50;
         var expectedAnchor = -width;
 
-        Assert.Equal (expectedAnchor, posAlign.Anchor (width));
+        Assert.Equal (expectedAnchor, posAlign.GetAnchor (width));
     }
 
     [Fact]

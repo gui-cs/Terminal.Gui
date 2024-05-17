@@ -222,32 +222,6 @@ public class PosTests ()
     [TestRespondersDisposed]
     public void LeftTopBottomRight_Win_ShouldNotThrow ()
     {
-        // Setup Fake driver
-        (Toplevel top, Window win, Button button) Setup ()
-        {
-            Application.Init (new FakeDriver ());
-            Application.Iteration += (s, a) => { Application.RequestStop (); };
-            var win = new Window { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
-            var top = new Toplevel ();
-            top.Add (win);
-
-            var button = new Button { X = Pos.Center (), Text = "button" };
-            win.Add (button);
-
-            return (top, win, button);
-        }
-
-        void Cleanup (RunState rs)
-        {
-            // Cleanup
-            Application.End (rs);
-
-            Application.Top.Dispose ();
-
-            // Shutdown must be called to safely clean up Application if Init has been called
-            Application.Shutdown ();
-        }
-
         // Test cases:
         (Toplevel top, Window win, Button button) app = Setup ();
         app.button.Y = Pos.Left (app.win);

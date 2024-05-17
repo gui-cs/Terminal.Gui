@@ -1365,7 +1365,7 @@ public class Slider<T> : View
                     switch (_config._legendsOrientation)
                     {
                         case Orientation.Horizontal:
-                            text = AlignText (text, _config._cachedInnerSpacing + 1, TextAlignment.Centered);
+                            text = AlignText (text, _config._cachedInnerSpacing + 1, Alignment.Centered);
 
                             break;
                         case Orientation.Vertical:
@@ -1383,7 +1383,7 @@ public class Slider<T> : View
 
                             break;
                         case Orientation.Vertical:
-                            text = AlignText (text, _config._cachedInnerSpacing + 1, TextAlignment.Centered);
+                            text = AlignText (text, _config._cachedInnerSpacing + 1, Alignment.Centered);
 
                             break;
                     }

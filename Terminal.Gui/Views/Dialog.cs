@@ -64,12 +64,6 @@ public class Dialog : Window
                     });
         KeyBindings.Add (Key.Esc, Command.QuitToplevel);
 
-        Initialized += Dialog_Initialized; ;
-    }
-
-    private void Dialog_Initialized (object sender, EventArgs e)
-    {
-        LayoutButtons ();
     }
 
     private bool _canceled;
