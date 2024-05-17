@@ -42,14 +42,14 @@ public class AllViewsTester : Scenario
     private string _demoText = "This, that, and the other thing.";
     private TextView _demoTextView;
 
-    public override void Init ()
+    public override void Main ()
     {
         // Don't create a sub-win (Scenario.Win); just use Application.Top
         Application.Init ();
-        ConfigurationManager.Themes.Theme = Theme;
         ConfigurationManager.Apply ();
-        Top = new ();
-        Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+
+        var app = new Window ();
+        app.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 
         var statusBar = new StatusBar (
                                        new StatusItem []
@@ -66,7 +66,7 @@ public class AllViewsTester : Scenario
                                                 {
                                                     View.Diagnostics ^=
                                                         ViewDiagnosticFlags.Ruler;
-                                                    Top.SetNeedsDisplay ();
+                                                    app.SetNeedsDisplay ();
                                                 }
                                                ),
                                            new (
@@ -76,12 +76,12 @@ public class AllViewsTester : Scenario
                                                 {
                                                     View.Diagnostics ^=
                                                         ViewDiagnosticFlags.Padding;
-                                                    Top.SetNeedsDisplay ();
+                                                    app.SetNeedsDisplay ();
                                                 }
                                                )
                                        }
                                       );
-        Top.Add (statusBar);
+        app.Add (statusBar);
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
@@ -145,7 +145,7 @@ public class AllViewsTester : Scenario
         {
             X = 0,
             Y = 0,
-            Height = Dim.Auto (), 
+            Height = Dim.Auto (),
             Width = Dim.Auto (),
             Title = "Location (Pos)"
         };
@@ -279,7 +279,7 @@ public class AllViewsTester : Scenario
         };
         _orientation.SelectedItemChanged += (s, selected) =>
                                             {
-                                                if (_curView?.GetType ().GetProperty ("Orientation") is {} prop)
+                                                if (_curView?.GetType ().GetProperty ("Orientation") is { } prop)
                                                 {
                                                     prop.GetSetMethod ()?.Invoke (_curView, new object [] { _orientation.SelectedItem });
                                                 }
@@ -312,9 +312,13 @@ public class AllViewsTester : Scenario
             ColorScheme = Colors.ColorSchemes ["Dialog"]
         };
 
-        Top.Add (_leftPane, _settingsPane, _hostPane);
+        app.Add (_leftPane, _settingsPane, _hostPane);
 
         _curView = CreateClass (_viewClasses.First ().Value);
+
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
     }
 
     // TODO: Add Command.HotKey handler (pop a message box?)
@@ -389,9 +393,9 @@ public class AllViewsTester : Scenario
         }
 
         // If the view supports a Title property, set it so we have something to look at
-        if (view?.GetType ().GetProperty ("Orientation") is {} prop)
+        if (view?.GetType ().GetProperty ("Orientation") is { } prop)
         {
-            _orientation.SelectedItem = (int)prop.GetGetMethod()!.Invoke (view, null)!;
+            _orientation.SelectedItem = (int)prop.GetGetMethod ()!.Invoke (view, null)!;
             _orientation.Enabled = true;
         }
         else
