@@ -150,10 +150,10 @@ public abstract class Dim
     /// <summary>Creates a percentage <see cref="Dim"/> object that is a percentage of the width or height of the SuperView.</summary>
     /// <returns>The percent <see cref="Dim"/> object.</returns>
     /// <param name="percent">A value between 0 and 100 representing the percentage.</param>
-    /// <param name="usePosition">
-    ///     If <see langword="true"/> the dimension is computed using the View's position (<see cref="View.X"/> or
+    /// <param name="mode">
+    ///     If <see cref="DimPercentMode.Position"/> the dimension is computed using the View's position (<see cref="View.X"/> or
     ///     <see cref="View.Y"/>).
-    ///     If <see langword="false"/> the dimension is computed using the View's <see cref="View.ContentSize"/>.
+    ///     If <see cref="DimPercentMode.ContentSize"/> the dimension is computed using the View's <see cref="View.ContentSize"/>.
     /// </param>
     /// <example>
     ///     This initializes a <see cref="TextField"/> that will be centered horizontally, is 50% of the way down, is 30% the
