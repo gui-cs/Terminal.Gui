@@ -385,16 +385,6 @@ public abstract class Pos
 
     #endregion operators
 
-    #region overrides
-
-    /// <inheritdoc/>
-    public override bool Equals (object other) { return other is Pos abs && abs == this; }
-
-    /// <summary>Serves as the default hash function. </summary>
-    /// <returns>A hash code for the current object.</returns>
-    public override int GetHashCode () { return GetAnchor (0).GetHashCode (); }
-
-    #endregion overrides
 }
 
 /// <summary>

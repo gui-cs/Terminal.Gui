@@ -278,6 +278,12 @@ public abstract class Dim
         return Math.Max (GetAnchor (superviewContentSize - location), 0);
     }
 
+    /// <summary>
+    ///     Diagnostics API to determine if this Dim object references other views.
+    /// </summary>
+    /// <returns></returns>
+    internal virtual bool ReferencesOtherViews () { return false; }
+
     #endregion virtual methods
 
     #region operators
@@ -326,21 +332,6 @@ public abstract class Dim
 
     #endregion operators
 
-    #region overrides
-
-    /// <summary>
-    ///     Diagnostics API to determine if this Dim object references other views.
-    /// </summary>
-    /// <returns></returns>
-    internal virtual bool ReferencesOtherViews () { return false; }
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is Dim abs && abs == this; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return GetAnchor (0).GetHashCode (); }
-
-    #endregion overrides
 }
 
 /// <summary>
