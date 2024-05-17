@@ -364,7 +364,6 @@ public class DimAbsolute (int size) : Dim
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        // DimAbsolute.Anchor (int size) ignores width and returns n
         return Math.Max (GetAnchor (0), 0);
     }
 }
