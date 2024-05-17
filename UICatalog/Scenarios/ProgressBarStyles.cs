@@ -157,7 +157,7 @@ public class ProgressBarStyles : Scenario
         {
             BorderStyle = LineStyle.Single,
             Title = "ProgressBarFormat",
-            X = Pos.Left (pbList),
+            X = Pos.Center (),
             Y = Pos.Align (Alignment.Top),
             RadioLabels = pbFormatEnum.Select (e => e.ToString ()).ToArray ()
         };
@@ -251,7 +251,7 @@ public class ProgressBarStyles : Scenario
             Title = "Marquee Continuous",
             X = Pos.Center (),
             Y = Pos.Align (Alignment.Top),
-            Width = Dim.Width (pbList),
+            Width = Dim.Percent (50),
             ProgressBarStyle = ProgressBarStyle.MarqueeContinuous,
             BorderStyle = LineStyle.Single,
             CanFocus = true
