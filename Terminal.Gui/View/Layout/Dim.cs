@@ -41,7 +41,7 @@ namespace Terminal.Gui;
 ///             </item>
 ///             <item>
 ///                 <term>
-///                     <see cref="Dim.Percent(int, bool)"/>
+///                     <see cref="Dim.Percent(int, DimPercentMode)"/>
 ///                 </term>
 ///                 <description>
 ///                     Creates a <see cref="Dim"/> object that is a percentage of the width or height of the
