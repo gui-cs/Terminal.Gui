@@ -426,22 +426,10 @@ public class DimAuto (DimAutoStyle style, Dim? minimumContentDim, Dim? maximumCo
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        if (us is null)
-        {
-            return MaximumContentDim?.GetAnchor (0) ?? 0;
-        }
-
         var textSize = 0;
         var subviewsSize = 0;
 
         int autoMin = MinimumContentDim?.GetAnchor (superviewContentSize) ?? 0;
-
-        if (superviewContentSize < autoMin)
-        {
-            Debug.WriteLine ($"WARNING: DimAuto specifies a min size ({autoMin}), but the SuperView's bounds are smaller ({superviewContentSize}).");
-
-            //return superviewContentSize;
-        }
 
         if (Style.HasFlag (DimAutoStyle.Text))
         {
@@ -456,8 +444,7 @@ public class DimAuto (DimAutoStyle style, Dim? minimumContentDim, Dim? maximumCo
             }
             else
             {
-                // TODO: AnchorEnd needs work
-                // TODO: If _min > 0 we can SetRelativeLayout for the subviews?
+                // TODO: This whole body of code is a WIP (for https://github.com/gui-cs/Terminal.Gui/pull/3451).
                 subviewsSize = 0;
 
                 List<View> subviews;
@@ -529,7 +516,7 @@ public class DimAuto (DimAutoStyle style, Dim? minimumContentDim, Dim? maximumCo
         }
 
         // All sizes here are content-relative; ignoring adornments.
-        // We take the larger of text and content.
+        // We take the largest of text and content.
         int max = int.Max (textSize, subviewsSize);
 
         // And, if min: is set, it wins if larger
