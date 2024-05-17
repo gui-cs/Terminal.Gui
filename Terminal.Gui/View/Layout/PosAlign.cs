@@ -44,12 +44,7 @@ public class PosAlign : Pos
     /// <param name="size"></param>
     private static void AlignGroup (int groupId, IList<View> views, Dimension dimension, int size)
     {
-        if (views is null)
-        {
-            return;
-        }
-
-        Aligner firstInGroup = null;
+        Aligner? firstInGroup = null;
         List<int> dimensionsList = new ();
 
         List<View> viewsInGroup = views.Where (
@@ -76,7 +71,7 @@ public class PosAlign : Pos
 
         foreach (View view in viewsInGroup)
         {
-            PosAlign posAlign = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
+            PosAlign? posAlign = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
 
             if (posAlign is { })
             {
@@ -100,7 +95,7 @@ public class PosAlign : Pos
         for (var index = 0; index < viewsInGroup.Count; index++)
         {
             View view = viewsInGroup [index];
-            PosAlign align = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
+            PosAlign? align = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
 
             if (align is { })
             {
@@ -125,13 +120,16 @@ public class PosAlign : Pos
     private void Aligner_PropertyChanged (object? sender, PropertyChangedEventArgs e) { _location = null; }
 
     /// <inheritdoc/>
-    public override bool Equals (object other)
+    public override bool Equals (object? other)
     {
-        return other is PosAlign align && _groupId == align._groupId && _location == align._location && align.Aligner.Alignment == Aligner.Alignment;
+        return other is PosAlign align &&
+               _groupId == align._groupId &&
+               _location == align._location &&
+               align.Aligner.Alignment == Aligner.Alignment;
     }
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return Aligner.GetHashCode () ^ _groupId.GetHashCode (); }
+    public override int GetHashCode () { return HashCode.Combine (Aligner, _groupId); }
 
     /// <inheritdoc/>
     public override string ToString () { return $"Align(groupId={_groupId}, alignment={Aligner.Alignment})"; }
