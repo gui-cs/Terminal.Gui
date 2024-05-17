@@ -527,14 +527,13 @@ public class DimAuto () : Dim
         // Factor in adornments
         Thickness thickness = us.GetAdornmentsThickness ();
 
-        if (dimension == Dimension.Width)
-        {
-            max += thickness.Horizontal;
-        }
-        else
-        {
-            max += thickness.Vertical;
-        }
+        max += dimension switch
+               {
+                   Dimension.Width => thickness.Horizontal,
+                   Dimension.Height => thickness.Vertical,
+                   Dimension.None => 0,
+                   _ => throw new ArgumentOutOfRangeException (nameof (dimension), dimension, null)
+               };
 
         // If max: is set, clamp the return - BUGBUG: Not tested
         return int.Min (max, MaximumContentDim?.GetAnchor (superviewContentSize) ?? max);
