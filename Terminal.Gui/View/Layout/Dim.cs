@@ -390,7 +390,14 @@ public class DimAuto (DimAutoStyle style, Dim? minimumContentDim, Dim? maximumCo
     /// <inheritdoc/>
     public override bool Equals (object? other)
     {
-        return other is DimAuto auto && auto.MinimumContentDim == MinimumContentDim && auto.MaximumContentDim == MaximumContentDim && auto.Style == Style;
+        if (other is not DimAuto auto)
+        {
+            return false;
+        }
+
+        return auto.MinimumContentDim == MinimumContentDim &&
+               auto.MaximumContentDim == MaximumContentDim &&
+               auto.Style == Style;
     }
 
     /// <inheritdoc/>
