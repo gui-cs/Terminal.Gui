@@ -168,14 +168,14 @@ public abstract class Dim
     ///  };
     ///  </code>
     /// </example>
-    public static Dim? Percent (float percent, bool usePosition = false)
+    public static Dim? Percent (int percent, bool usePosition = false)
     {
-        if (percent is < 0 or > 100)
+        if (percent is < 0 /*or > 100*/)
         {
-            throw new ArgumentException ("Percent value must be between 0 and 100");
+            throw new ArgumentException ("Percent value must be positive.");
         }
 
-        return new DimPercent (percent / 100, usePosition);
+        return new DimPercent (percent, usePosition);
     }
 
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.</summary>

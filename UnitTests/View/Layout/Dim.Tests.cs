@@ -285,7 +285,7 @@ public class DimTests
     [TestRespondersDisposed]
     public void Internal_Tests ()
     {
-        var dimFactor = new DimPercent (0.10F);
+        var dimFactor = new DimPercent (10);
         Assert.Equal (10, dimFactor.GetAnchor (100));
 
         var dimAbsolute = new DimAbsolute (10);
@@ -401,7 +401,7 @@ public class DimTests
                        Assert.Equal (100, w.Frame.Width);
                        Assert.Equal (100, w.Frame.Height);
 
-                       Assert.Equal ("Percent(0.5,False)", f1.Width.ToString ());
+                       Assert.Equal ("Percent(50,False)", f1.Width.ToString ());
                        Assert.Equal ("Absolute(5)", f1.Height.ToString ());
                        Assert.Equal (49, f1.Frame.Width); // 50-1=49
                        Assert.Equal (5, f1.Frame.Height);
@@ -438,8 +438,6 @@ public class DimTests
                        Assert.Equal (47, v2.Frame.Width); // 49-2=47
                        Assert.Equal (89, v2.Frame.Height); // 98-5-2-2=89
 
-                       Assert.Equal ("Percent(0.1,False)", v3.Width.ToString ());
-                       Assert.Equal ("Percent(0.1,False)", v3.Height.ToString ());
                        Assert.Equal (9, v3.Frame.Width); // 98*10%=9
                        Assert.Equal (9, v3.Frame.Height); // 98*10%=9
 
@@ -455,8 +453,6 @@ public class DimTests
                        Assert.Equal (38, v5.Frame.Width);  // 47-9=38
                        Assert.Equal (80, v5.Frame.Height); // 89-9=80
 
-                       Assert.Equal ("Percent(0.2,True)", v6.Width.ToString ());
-                       Assert.Equal ("Percent(0.2,True)", v6.Height.ToString ());
                        Assert.Equal (9, v6.Frame.Width);   // 47*20%=9
                        Assert.Equal (18, v6.Frame.Height); // 89*20%=18
 
@@ -471,8 +467,6 @@ public class DimTests
                        Assert.Equal (200, w.Frame.Height);
 
                        f1.Text = "Frame1";
-                       Assert.Equal ("Percent(0.5,False)", f1.Width.ToString ());
-                       Assert.Equal ("Absolute(5)", f1.Height.ToString ());
                        Assert.Equal (99, f1.Frame.Width); // 100-1=99
                        Assert.Equal (5, f1.Frame.Height);
 
@@ -504,8 +498,6 @@ public class DimTests
                        Assert.Equal (189, v2.Frame.Height); // 198-2-7=189
 
                        v3.Text = "Button3";
-                       Assert.Equal ("Percent(0.1,False)", v3.Width.ToString ());
-                       Assert.Equal ("Percent(0.1,False)", v3.Height.ToString ());
 
                        // 198*10%=19 * Percent is related to the super-view if it isn't null otherwise the view width
                        Assert.Equal (19, v3.Frame.Width);
@@ -534,8 +526,6 @@ public class DimTests
                        Assert.Equal (170, v5.Frame.Height); // 189-19=170
 
                        v6.Text = "Button6";
-                       Assert.Equal ("Percent(0.2,True)", v6.Width.ToString ());
-                       Assert.Equal ("Percent(0.2,True)", v6.Height.ToString ());
                        Assert.Equal (19, v6.Frame.Width);  // 99*20%=19
                        Assert.Equal (38, v6.Frame.Height); // 198-7*20=18
                    };

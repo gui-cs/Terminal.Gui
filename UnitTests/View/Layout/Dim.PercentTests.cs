@@ -12,7 +12,7 @@ public class DimPercentTests
     [Fact]
     public void DimFactor_Calculate_ReturnsCorrectValue ()
     {
-        var dim = new DimPercent (0.5f);
+        var dim = new DimPercent (50);
         var result = dim.Calculate (0, 100, null, Dimension.None);
         Assert.Equal (50, result);
     }
@@ -21,8 +21,8 @@ public class DimPercentTests
     [Fact]
     public void DimPercent_Equals ()
     {
-        float n1 = 0;
-        float n2 = 0;
+        int n1 = 0;
+        int n2 = 0;
         Dim dim1 = Dim.Percent (n1);
         Dim dim2 = Dim.Percent (n2);
         Assert.Equal (dim1, dim2);
@@ -32,22 +32,22 @@ public class DimPercentTests
         dim2 = Dim.Percent (n2);
         Assert.Equal (dim1, dim2);
 
-        n1 = n2 = 0.5f;
+        n1 = n2 = 50;
         dim1 = Dim.Percent (n1);
         dim2 = Dim.Percent (n2);
         Assert.Equal (dim1, dim2);
 
-        n1 = n2 = 100f;
+        n1 = n2 = 100;
         dim1 = Dim.Percent (n1);
         dim2 = Dim.Percent (n2);
         Assert.Equal (dim1, dim2);
 
-        n1 = n2 = 0.3f;
+        n1 = n2 = 30;
         dim1 = Dim.Percent (n1, true);
         dim2 = Dim.Percent (n2, true);
         Assert.Equal (dim1, dim2);
 
-        n1 = n2 = 0.3f;
+        n1 = n2 = 30;
         dim1 = Dim.Percent (n1);
         dim2 = Dim.Percent (n2, true);
         Assert.NotEqual (dim1, dim2);
@@ -58,8 +58,8 @@ public class DimPercentTests
         dim2 = Dim.Percent (n2);
         Assert.NotEqual (dim1, dim2);
 
-        n1 = 0.5f;
-        n2 = 1.5f;
+        n1 = 50;
+        n2 = 150;
         dim1 = Dim.Percent (n1);
         dim2 = Dim.Percent (n2);
         Assert.NotEqual (dim1, dim2);
@@ -70,9 +70,9 @@ public class DimPercentTests
     {
         Dim dim = Dim.Percent (0);
         Assert.Throws<ArgumentException> (() => dim = Dim.Percent (-1));
-        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (101));
-        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (100.0001F));
-        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (1000001));
+        //Assert.Throws<ArgumentException> (() => dim = Dim.Percent (101));
+        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (-1000001));
+        //Assert.Throws<ArgumentException> (() => dim = Dim.Percent (1000001));
     }
 
     [Theory]
@@ -158,18 +158,17 @@ public class DimPercentTests
         }
     }
 
-    [Fact]
-    public void DimPercent_SetsValue ()
+    [Theory]
+    [InlineData(0)]
+    [InlineData (1)]
+    [InlineData (50)]
+    [InlineData (100)]
+    [InlineData (101)]
+
+    public void DimPercent_SetsValue (int percent)
     {
-        float f = 0;
-        Dim dim = Dim.Percent (f);
-        Assert.Equal ($"Percent({f / 100:0.###},{false})", dim.ToString ());
-        f = 0.5F;
-        dim = Dim.Percent (f);
-        Assert.Equal ($"Percent({f / 100:0.###},{false})", dim.ToString ());
-        f = 100;
-        dim = Dim.Percent (f);
-        Assert.Equal ($"Percent({f / 100:0.###},{false})", dim.ToString ());
+        Dim dim = Dim.Percent (percent);
+        Assert.Equal ($"Percent({percent},{false})", dim.ToString ());
     }
 
 }

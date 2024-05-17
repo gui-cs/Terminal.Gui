@@ -14,7 +14,7 @@ namespace Terminal.Gui;
 ///     <see cref="View.Y"/>).
 ///     If <see langword="false"/> the dimension is computed using the View's <see cref="View.ContentSize"/>.
 /// </param>
-public class DimPercent (float percent, bool usePosition = false) : Dim
+public class DimPercent (int percent, bool usePosition = false) : Dim
 {
     /// <inheritdoc/>
     public override bool Equals (object? other) { return other is DimPercent f && f.Percent == Percent && f.UsePosition == UsePosition; }
@@ -25,7 +25,7 @@ public class DimPercent (float percent, bool usePosition = false) : Dim
     /// <summary>
     ///     Gets the percentage.
     /// </summary>
-    public new float Percent { get; } = percent;
+    public new int Percent { get; } = percent;
 
     /// <summary>
     /// </summary>
@@ -37,7 +37,7 @@ public class DimPercent (float percent, bool usePosition = false) : Dim
     /// </summary>
     public bool UsePosition { get; } = usePosition;
 
-    internal override int GetAnchor (int size) { return (int)(size * Percent); }
+    internal override int GetAnchor (int size) { return (int)(size * (Percent / 100f)); }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
