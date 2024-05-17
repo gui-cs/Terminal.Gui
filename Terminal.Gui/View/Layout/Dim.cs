@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Drawing;
 
 namespace Terminal.Gui;
 
@@ -176,10 +177,10 @@ public class Dim
     /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.</param>
     public static Dim Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim minimumContentDim = null, Dim maximumContentDim = null)
     {
-        if (maximumContentDim != null)
-        {
-            throw new NotImplementedException (@"maximumContentDim is not implemented");
-        }
+        //if (maximumContentDim != null)
+        //{
+        //    throw new NotImplementedException (@"maximumContentDim is not implemented");
+        //}
 
         return new DimAuto (style, minimumContentDim, maximumContentDim);
     }
@@ -459,29 +460,71 @@ public class DimAuto (DimAutoStyle style, Dim minimumContentDim, Dim maximumCont
                 // TODO: If _min > 0 we can SetRelativeLayout for the subviews?
                 subviewsSize = 0;
 
-                if (us.Subviews.Count > 0)
+                List<View> subviews;
+
+                if (dimension == Dimension.Width)
                 {
-                    for (var i = 0; i < us.Subviews.Count; i++)
+                    subviews = us.Subviews.Where (v => v.X is not PosAnchorEnd && v.Width is not DimFill).ToList ();
+                }
+                else
+                {
+                    subviews = us.Subviews.Where (v => v.Y is not PosAnchorEnd && v.Height is not DimFill).ToList ();
+                }
+
+                for (var i = 0; i < subviews.Count; i++)
+                {
+                    View v = subviews [i];
+
+                    int size = dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
+
+                    if (size > subviewsSize)
                     {
-                        View v = us.Subviews [i];
-                        bool isNotPosAnchorEnd = dimension == Dimension.Width ? v.X is not PosAnchorEnd : v.Y is not PosAnchorEnd;
-
-                        //if (!isNotPosAnchorEnd)
-                        //{
-                        //    v.SetRelativeLayout(dimension == Dimension.Width ? (new Size (autoMin, 0)) : new Size (0, autoMin));
-                        //}
-
-                        if (isNotPosAnchorEnd)
-                        {
-                            int size = dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
-
-                            if (size > subviewsSize)
-                            {
-                                subviewsSize = size;
-                            }
-                        }
+                        subviewsSize = size;
                     }
                 }
+
+                if (dimension == Dimension.Width)
+                {
+                    subviews = us.Subviews.Where (v => v.X is PosAnchorEnd).ToList ();
+                }
+                else
+                {
+                    subviews = us.Subviews.Where (v => v.Y is PosAnchorEnd).ToList ();
+                }
+
+                int maxAnchorEnd = 0;
+                for (var i = 0; i < subviews.Count; i++)
+                {
+                    View v = subviews [i];
+                    maxAnchorEnd = dimension == Dimension.Width ? v.Frame.Width : v.Frame.Height;
+                }
+
+                subviewsSize += maxAnchorEnd;
+
+
+                if (dimension == Dimension.Width)
+                {
+                    subviews = us.Subviews.Where (v => v.Width is DimFill).ToList ();
+                }
+                else
+                {
+                    subviews = us.Subviews.Where (v => v.Height is DimFill).ToList ();
+                }
+
+                for (var i = 0; i < subviews.Count; i++)
+                {
+                    View v = subviews [i];
+
+                    if (dimension == Dimension.Width)
+                    {
+                        v.SetRelativeLayout (new Size (subviewsSize, 0));
+                    }
+                    else
+                    {
+                        v.SetRelativeLayout (new Size (0, autoMin - subviewsSize));
+                    }
+                }
+
             }
         }
 
@@ -743,11 +786,11 @@ public class DimView : Dim
         }
 
         string dimString = Dimension switch
-                           {
-                               Dimension.Height => "Height",
-                               Dimension.Width => "Width",
-                               _ => "unknown"
-                           };
+        {
+            Dimension.Height => "Height",
+            Dimension.Width => "Width",
+            _ => "unknown"
+        };
 
         return $"View({dimString},{Target})";
     }
@@ -755,11 +798,11 @@ public class DimView : Dim
     internal override int Anchor (int size)
     {
         return Dimension switch
-               {
-                   Dimension.Height => Target.Frame.Height,
-                   Dimension.Width => Target.Frame.Width,
-                   _ => 0
-               };
+        {
+            Dimension.Height => Target.Frame.Height,
+            Dimension.Width => Target.Frame.Width,
+            _ => 0
+        };
     }
 
     internal override bool ReferencesOtherViews () { return true; }

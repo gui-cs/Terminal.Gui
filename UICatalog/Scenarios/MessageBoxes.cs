@@ -114,7 +114,7 @@ public class MessageBoxes : Scenario
 
         var messageEdit = new TextView
         {
-            Text = "Message",
+            Text = "Message line 1.\nMessage line two. This is a really long line to force wordwrap. It needs to be long for it to work.",
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Width = Dim.Fill (),
@@ -186,7 +186,7 @@ public class MessageBoxes : Scenario
 
         var ckbWrapMessage = new CheckBox
         {
-            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", Checked = true
+            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", Checked = false
         };
         frame.Add (ckbWrapMessage);
 

@@ -75,8 +75,14 @@ public class Dialog : Window
                                               return true;
                                           });
         KeyBindings.Add (Key.Esc, Command.QuitToplevel);
+
+        Initialized += Dialog_Initialized; ;
     }
 
+    private void Dialog_Initialized (object sender, EventArgs e)
+    {
+        LayoutButtons ();
+    }
 
     private bool _canceled;
 
@@ -158,18 +164,19 @@ public class Dialog : Window
     }
 
     /// <inheritdoc/>
-    public override void LayoutSubviews ()
-    {
-        if (_inLayout)
-        {
-            return;
-        }
+    //public override void LayoutSubviews ()
+    //{
+    //    if (_inLayout)
+    //    {
+    //        return;
+    //    }
 
-        _inLayout = true;
-        LayoutButtons ();
-        base.LayoutSubviews ();
-        _inLayout = false;
-    }
+    //    _inLayout = true;
+    //    SetRelativeLayout(SuperView?.ContentSize ?? Driver.Screen.Size);
+    //    LayoutButtons ();
+    //    base.LayoutSubviews ();
+    //    _inLayout = false;
+    //}
 
     // Get the width of all buttons, not including any Margin.
     internal int GetButtonsWidth ()
@@ -216,7 +223,7 @@ public class Dialog : Window
                         button.X = Viewport.Width - shiftLeft;
                     }
 
-                    button.Y = Pos.AnchorEnd (1);
+                    button.Y = Pos.AnchorEnd ();
                 }
 
                 break;
@@ -251,7 +258,7 @@ public class Dialog : Window
                         }
                     }
 
-                    button.Y = Pos.AnchorEnd (1);
+                    button.Y = Pos.AnchorEnd ();
                 }
 
                 break;
@@ -283,7 +290,7 @@ public class Dialog : Window
                     Button button = _buttons [i];
                     shiftLeft += button.Frame.Width + 1;
                     button.X = Pos.AnchorEnd (shiftLeft);
-                    button.Y = Pos.AnchorEnd (1);
+                    button.Y = Pos.AnchorEnd ();
                 }
 
                 break;

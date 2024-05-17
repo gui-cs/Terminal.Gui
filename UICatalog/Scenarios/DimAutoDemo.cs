@@ -153,7 +153,7 @@ public class DimAutoDemo : Scenario
         {
             Text = "_Reset Button (AnchorEnd)",
             X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd ()
+            Y = Pos.AnchorEnd (1)
         };
 
         resetButton.Accept += (s, e) => { movingButton.Y = Pos.Bottom (hlabel); };

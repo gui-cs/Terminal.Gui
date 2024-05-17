@@ -314,14 +314,14 @@ public partial class View
     {
         get
         {
-#if DEBUG
-            if ((_width.ReferencesOtherViews () || _height.ReferencesOtherViews ()) && !IsInitialized)
-            {
-                Debug.WriteLine (
-                                 $"WARNING: The dimensions of {this} are dependent on other views and Viewport is being accessed before the View has been initialized. This is likely a bug."
-                                );
-            }
-#endif // DEBUG
+//#if DEBUG
+//            if ((_width.ReferencesOtherViews () || _height.ReferencesOtherViews ()) && !IsInitialized)
+//            {
+//                Debug.WriteLine (
+//                                 $"WARNING: The dimensions of {this} are dependent on other views and Viewport is being accessed before the View has been initialized. This is likely a bug."
+//                                );
+//            }
+//#endif // DEBUG
 
             if (Margin is null || Border is null || Padding is null)
             {
