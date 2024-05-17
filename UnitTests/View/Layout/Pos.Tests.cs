@@ -40,7 +40,7 @@ public class PosTests ()
     [Fact]
     public void PosCombine_Calculate_ReturnsExpectedValue ()
     {
-        var posCombine = new PosCombine (true, new PosAbsolute (5), new PosAbsolute (3));
+        var posCombine = new PosCombine (AddOrSubtract.Add, new PosAbsolute (5), new PosAbsolute (3));
         var result = posCombine.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (8, result);
     }
@@ -192,12 +192,12 @@ public class PosTests ()
         var posAbsolute = new PosAbsolute (10);
         Assert.Equal (10, posAbsolute.GetAnchor (0));
 
-        var posCombine = new PosCombine (true, posFactor, posAbsolute);
+        var posCombine = new PosCombine (AddOrSubtract.Add, posFactor, posAbsolute);
         Assert.Equal (posCombine.Left, posFactor);
         Assert.Equal (posCombine.Right, posAbsolute);
         Assert.Equal (20, posCombine.GetAnchor (100));
 
-        posCombine = new (true, posAbsolute, posFactor);
+        posCombine = new (AddOrSubtract.Add, posAbsolute, posFactor);
         Assert.Equal (posCombine.Left, posAbsolute);
         Assert.Equal (posCombine.Right, posFactor);
         Assert.Equal (20, posCombine.GetAnchor (100));

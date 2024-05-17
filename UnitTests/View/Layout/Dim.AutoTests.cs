@@ -451,7 +451,7 @@ public class DimAutoTests (ITestOutputHelper output)
         subView.Height = 0;
 
         // Tests nested Combine
-        subView.Height = 5 + new DimCombine (true, 3, new DimCombine (true, Dim.Percent (10), 9));
+        subView.Height = 5 + new DimCombine (AddOrSubtract.Add, 3, new DimCombine (AddOrSubtract.Add, Dim.Percent (10), 9));
         Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
     }
 
@@ -497,7 +497,7 @@ public class DimAutoTests (ITestOutputHelper output)
         superView.SetRelativeLayout (new (0, 0)); // no throw
         superView.LayoutSubviews (); // no throw
 
-        subView.X = new PosCombine (true, Pos.Right (subView2), new PosCombine (true, 7, 9));
+        subView.X = new PosCombine (AddOrSubtract.Add, Pos.Right (subView2), new PosCombine (AddOrSubtract.Add, 7, 9));
         superView.SetRelativeLayout (new (0, 0)); // no throw
 
         subView.X = Pos.Center () + 3;
@@ -521,7 +521,7 @@ public class DimAutoTests (ITestOutputHelper output)
         subView.X = 0;
 
         // Tests nested Combine
-        subView.X = 5 + new PosCombine (true, Pos.Right (subView2), new PosCombine (true, Pos.Center (), 9));
+        subView.X = 5 + new PosCombine (AddOrSubtract.Add, Pos.Right (subView2), new PosCombine (AddOrSubtract.Add, Pos.Center (), 9));
         Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
         subView.X = 0;
     }

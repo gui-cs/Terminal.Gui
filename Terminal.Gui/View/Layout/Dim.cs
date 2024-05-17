@@ -304,7 +304,7 @@ public abstract class Dim
             return new DimAbsolute (left.GetAnchor (0) + right.GetAnchor (0));
         }
 
-        var newDim = new DimCombine (true, left, right);
+        var newDim = new DimCombine (AddOrSubtract.Add, left, right);
         (left as DimView)?.Target.SetNeedsLayout ();
 
         return newDim;
@@ -329,7 +329,7 @@ public abstract class Dim
             return new DimAbsolute (left.GetAnchor (0) - right.GetAnchor (0));
         }
 
-        var newDim = new DimCombine (false, left, right);
+        var newDim = new DimCombine (AddOrSubtract.Subtract, left, right);
         (left as DimView)?.Target.SetNeedsLayout ();
 
         return newDim;
@@ -535,7 +535,6 @@ public class DimAuto () : Dim
                    _ => throw new ArgumentOutOfRangeException (nameof (dimension), dimension, null)
                };
 
-        // If max: is set, clamp the return - BUGBUG: Not tested
         return int.Min (max, MaximumContentDim?.GetAnchor (superviewContentSize) ?? max);
     }
 
@@ -567,6 +566,22 @@ public class DimAuto () : Dim
 }
 
 /// <summary>
+/// Describes whether an operation should add or subtract values.
+/// </summary>
+public enum AddOrSubtract
+{
+    /// <summary>
+    /// The operation should use addition.
+    /// </summary>
+    Add = 0,
+
+    /// <summary>
+    /// The operation should use subtraction.
+    /// </summary>
+    Subtract = 1
+}
+
+/// <summary>
 ///     Represents a dimension that is a combination of two other dimensions.
 /// </summary>
 /// <param name="add">
@@ -579,12 +594,12 @@ public class DimAuto () : Dim
 /// </remarks>
 /// <param name="left">The left dimension.</param>
 /// <param name="right">The right dimension.</param>
-public class DimCombine (bool add, Dim? left, Dim? right) : Dim
+public class DimCombine (AddOrSubtract add, Dim? left, Dim? right) : Dim
 {
     /// <summary>
     ///     Gets whether the two dimensions are added or subtracted.
     /// </summary>
-    public bool Add { get; } = add;
+    public AddOrSubtract Add { get; } = add;
 
     /// <summary>
     ///     Gets the left dimension.
@@ -597,14 +612,14 @@ public class DimCombine (bool add, Dim? left, Dim? right) : Dim
     public Dim? Right { get; } = right;
 
     /// <inheritdoc/>
-    public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
+    public override string ToString () { return $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})"; }
 
     internal override int GetAnchor (int size)
     {
         int la = Left!.GetAnchor (size);
         int ra = Right!.GetAnchor (size);
 
-        if (Add)
+        if (Add == AddOrSubtract.Add)
         {
             return la + ra;
         }
@@ -619,7 +634,7 @@ public class DimCombine (bool add, Dim? left, Dim? right) : Dim
 
         int newDimension;
 
-        if (Add)
+        if (Add == AddOrSubtract.Add)
         {
             newDimension = leftNewDim + rightNewDim;
         }

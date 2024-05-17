@@ -294,7 +294,7 @@ public class DimTests
         var dimFill = new DimFill (1);
         Assert.Equal (99, dimFill.GetAnchor (100));
 
-        var dimCombine = new DimCombine (true, dimFactor, dimAbsolute);
+        var dimCombine = new DimCombine (AddOrSubtract.Add, dimFactor, dimAbsolute);
         Assert.Equal (dimCombine.Left, dimFactor);
         Assert.Equal (dimCombine.Right, dimAbsolute);
         Assert.Equal (20, dimCombine.GetAnchor (100));

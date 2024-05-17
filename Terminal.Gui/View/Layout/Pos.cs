@@ -344,7 +344,7 @@ public abstract class Pos
             return new PosAbsolute (left.GetAnchor (0) + right.GetAnchor (0));
         }
 
-        var newPos = new PosCombine (true, left, right);
+        var newPos = new PosCombine (AddOrSubtract.Add, left, right);
 
         if (left is PosView view)
         {
@@ -373,7 +373,7 @@ public abstract class Pos
             return new PosAbsolute (left.GetAnchor (0) - right.GetAnchor (0));
         }
 
-        var newPos = new PosCombine (false, left, right);
+        var newPos = new PosCombine (AddOrSubtract.Subtract, left, right);
 
         if (left is PosView view)
         {
@@ -515,13 +515,13 @@ public class PosCenter : Pos
 /// </param>
 /// <param name="left">The left position.</param>
 /// <param name="right">The right position.</param>
-public class PosCombine (bool add, Pos left, Pos right) : Pos
+public class PosCombine (AddOrSubtract add, Pos left, Pos right) : Pos
 {
     /// <summary>
     ///     Gets whether the two positions are added or subtracted. If <see langword="true"/>, the positions are added,
     ///     otherwise they are subtracted.
     /// </summary>
-    public bool Add { get; } = add;
+    public AddOrSubtract Add { get; } = add;
 
     /// <summary>
     ///     Gets the left position.
@@ -534,14 +534,14 @@ public class PosCombine (bool add, Pos left, Pos right) : Pos
     public new Pos Right { get; } = right;
 
     /// <inheritdoc/>
-    public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
+    public override string ToString () { return $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})"; }
 
     internal override int GetAnchor (int size)
     {
         int la = Left.GetAnchor (size);
         int ra = Right.GetAnchor (size);
 
-        if (Add)
+        if (Add == AddOrSubtract.Add)
         {
             return la + ra;
         }
@@ -554,7 +554,7 @@ public class PosCombine (bool add, Pos left, Pos right) : Pos
         int left = Left.Calculate (superviewDimension, dim, us, dimension);
         int right = Right.Calculate (superviewDimension, dim, us, dimension);
 
-        if (Add)
+        if (Add == AddOrSubtract.Add)
         {
             return left + right;
         }
