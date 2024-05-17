@@ -996,18 +996,22 @@ public class TileView : View
         ///     </para>
         ///     <para>
         ///         Effectively turning any <see cref="Pos"/> into a <see cref="PosPercent"/> (as if created with
-        ///         <see cref="Pos.Percent(float)"/>)
+        ///         <see cref="Pos.Percent(int)"/>)
         ///     </para>
         /// </summary>
-        /// <param name="p">The <see cref="Pos"/> to convert to <see cref="Pos.Percent(float)"/></param>
+        /// <param name="p">The <see cref="Pos"/> to convert to <see cref="Pos.Percent(int)"/></param>
         /// <param name="parentLength">The Height/Width that <paramref name="p"/> lies within</param>
         /// <returns></returns>
-        private Pos ConvertToPosFactor (Pos p, int parentLength)
+        private Pos ConvertToPosPercent (Pos p, int parentLength)
         {
-            // calculate position in the 'middle' of the cell at p distance along parentLength
+            // Calculate position in the 'middle' of the cell at p distance along parentLength
             float position = p.GetAnchor (parentLength) + 0.5f;
 
-            return new PosPercent (position / parentLength);
+            // Calculate the percentage
+            int percent = (int)Math.Round ((position / parentLength) * 100);
+
+            // Return a new PosPercent object
+            return Pos.Percent (percent);
         }
 
         /// <summary>
@@ -1029,10 +1033,10 @@ public class TileView : View
             {
                 if (Orientation == Orientation.Horizontal)
                 {
-                    return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Viewport.Height));
+                    return Parent.SetSplitterPos (Idx, ConvertToPosPercent (newValue, Parent.Viewport.Height));
                 }
 
-                return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Viewport.Width));
+                return Parent.SetSplitterPos (Idx, ConvertToPosPercent (newValue, Parent.Viewport.Width));
             }
 
             return Parent.SetSplitterPos (Idx, newValue);

@@ -1758,7 +1758,7 @@ public class TileViewTests
         Assert.False (tileView.SetSplitterPos (0, 0));
 
         // position should remain where it was, at 50%
-        Assert.Equal (Pos.Percent (50f), tileView.SplitterDistances.ElementAt (0));
+        Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
 
         tileView.Draw ();
 

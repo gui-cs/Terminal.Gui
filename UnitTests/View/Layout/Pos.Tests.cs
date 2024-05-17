@@ -48,7 +48,7 @@ public class PosTests ()
     [Fact]
     public void PosFactor_Calculate_ReturnsExpectedValue ()
     {
-        var posFactor = new PosPercent (0.5f);
+        var posFactor = new PosPercent (50);
         var result = posFactor.Calculate (10, new DimAbsolute (2), null, Dimension.None);
         Assert.Equal (5, result);
     }
@@ -180,7 +180,7 @@ public class PosTests ()
     [TestRespondersDisposed]
     public void Internal_Tests ()
     {
-        var posFactor = new PosPercent (0.10F);
+        var posFactor = new PosPercent (10);
         Assert.Equal (10, posFactor.GetAnchor (100));
 
         var posAnchorEnd = new PosAnchorEnd (1);
@@ -303,8 +303,8 @@ public class PosTests ()
     [Fact]
     public void PosPercent_Equal ()
     {
-        float n1 = 0;
-        float n2 = 0;
+        int n1 = 0;
+        int n2 = 0;
         Pos pos1 = Pos.Percent (n1);
         Pos pos2 = Pos.Percent (n2);
         Assert.Equal (pos1, pos2);
@@ -314,12 +314,12 @@ public class PosTests ()
         pos2 = Pos.Percent (n2);
         Assert.Equal (pos1, pos2);
 
-        n1 = n2 = 0.5f;
+        n1 = n2 = 50;
         pos1 = Pos.Percent (n1);
         pos2 = Pos.Percent (n2);
         Assert.Equal (pos1, pos2);
 
-        n1 = n2 = 100f;
+        n1 = n2 = 100;
         pos1 = Pos.Percent (n1);
         pos2 = Pos.Percent (n2);
         Assert.Equal (pos1, pos2);
@@ -330,8 +330,8 @@ public class PosTests ()
         pos2 = Pos.Percent (n2);
         Assert.NotEqual (pos1, pos2);
 
-        n1 = 0.5f;
-        n2 = 1.5f;
+        n1 = 50;
+        n2 = 150;
         pos1 = Pos.Percent (n1);
         pos2 = Pos.Percent (n2);
         Assert.NotEqual (pos1, pos2);

@@ -35,7 +35,7 @@ namespace Terminal.Gui;
 ///             </item>
 ///             <item>
 ///                 <term>
-///                     <see cref="Pos.Percent(float)"/>
+///                     <see cref="Pos.Percent(int)"/>
 ///                 </term>
 ///                 <description>
 ///                     Creates a <see cref="Pos"/> object that is a percentage of the width or height of the
@@ -212,14 +212,14 @@ public abstract class Pos
     ///  };
     ///  </code>
     /// </example>
-    public static Pos Percent (float percent)
+    public static Pos Percent (int percent)
     {
-        if (percent is < 0 or > 100)
+        if (percent is < 0)
         {
-            throw new ArgumentException ("Percent value must be between 0 and 100.");
+            throw new ArgumentException ("Percent value must be positive.");
         }
 
-        return new PosPercent (percent / 100);
+        return new PosPercent (percent);
     }
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>

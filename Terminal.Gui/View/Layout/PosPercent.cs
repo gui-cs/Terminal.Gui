@@ -11,15 +11,15 @@ namespace Terminal.Gui;
 ///     </para>
 /// </remarks>
 /// <param name="percent"></param>
-public class PosPercent (float percent) : Pos
+public class PosPercent (int percent) : Pos
 {
     /// <summary>
-    ///     Gets the factor that represents the percentage of the width or height of the SuperView.
+    ///     Gets the percentage of the width or height of the SuperView.
     /// </summary>
-    public new float Percent { get; } = percent;
+    public new int Percent { get; } = percent;
 
     /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is PosPercent f && f.Percent == Percent; }
+    public override bool Equals (object? other) { return other is PosPercent i && i.Percent == Percent; }
 
     /// <inheritdoc/>
     public override int GetHashCode () { return Percent.GetHashCode (); }
@@ -27,5 +27,5 @@ public class PosPercent (float percent) : Pos
     /// <inheritdoc/>
     public override string ToString () { return $"Percent({Percent})"; }
 
-    internal override int GetAnchor (int size) { return (int)(size * Percent); }
+    internal override int GetAnchor (int size) { return (int)(size * (Percent / 100f)); }
 }
