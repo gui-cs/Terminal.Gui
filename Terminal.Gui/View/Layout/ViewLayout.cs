@@ -1,3 +1,4 @@
+#nullable enable
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 
@@ -240,7 +241,7 @@ public partial class View
         }
     }
 
-    private Dim _height = Dim.Absolute (0);
+    private Dim? _height = Dim.Absolute (0);
 
     /// <summary>Gets or sets the height dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
@@ -264,7 +265,7 @@ public partial class View
     ///     </para>
     ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
     /// </remarks>
-    public Dim Height
+    public Dim? Height
     {
         get => VerifyIsInitialized (_height, nameof (Height));
         set
@@ -286,7 +287,7 @@ public partial class View
         }
     }
 
-    private Dim _width = Dim.Absolute (0);
+    private Dim? _width = Dim.Absolute (0);
 
     /// <summary>Gets or sets the width dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
@@ -310,7 +311,7 @@ public partial class View
     ///     </para>
     ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
     /// </remarks>
-    public Dim Width
+    public Dim? Width
     {
         get => VerifyIsInitialized (_width, nameof (Width));
         set
@@ -394,7 +395,6 @@ public partial class View
     /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
     public virtual bool Contains (in Point location) { return Frame.Contains (location); }
 
-#nullable enable
     /// <summary>Finds the first Subview of <paramref name="start"/> that is visible at the provided location.</summary>
     /// <remarks>
     ///     <para>
@@ -469,8 +469,6 @@ public partial class View
         return null;
     }
 
-#nullable restore
-
     /// <summary>
     ///     Gets a new location of the <see cref="View"/> that is within the Viewport of the <paramref name="viewToMove"/>'s
     ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.
@@ -501,7 +499,7 @@ public partial class View
     {
         int maxDimension;
         View superView;
-        statusBar = null;
+        statusBar = null!;
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
@@ -511,11 +509,11 @@ public partial class View
         else
         {
             // Use the SuperView's Viewport, not Frame
-            maxDimension = viewToMove.SuperView.Viewport.Width;
+            maxDimension = viewToMove!.SuperView.Viewport.Width;
             superView = viewToMove.SuperView;
         }
 
-        if (superView?.Margin is { } && superView == viewToMove.SuperView)
+        if (superView?.Margin is { } && superView == viewToMove!.SuperView)
         {
             maxDimension -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
@@ -545,7 +543,7 @@ public partial class View
         }
         else
         {
-            View t = viewToMove.SuperView;
+            View t = viewToMove!.SuperView;
 
             while (t is { } and not Toplevel)
             {
@@ -572,21 +570,21 @@ public partial class View
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
             statusVisible = Application.Top?.StatusBar?.Visible == true;
-            statusBar = Application.Top?.StatusBar;
+            statusBar = Application.Top?.StatusBar!;
         }
         else
         {
-            View t = viewToMove.SuperView;
+            View t = viewToMove!.SuperView;
 
             while (t is { } and not Toplevel)
             {
                 t = t.SuperView;
             }
 
-            if (t is Toplevel toplevel)
+            if (t is Toplevel topLevel)
             {
-                statusVisible = toplevel.StatusBar?.Visible == true;
-                statusBar = toplevel.StatusBar;
+                statusVisible = topLevel.StatusBar?.Visible == true;
+                statusBar = topLevel.StatusBar!;
             }
         }
 
@@ -596,7 +594,7 @@ public partial class View
         }
         else
         {
-            maxDimension = statusVisible ? viewToMove.SuperView.Viewport.Height - 1 : viewToMove.SuperView.Viewport.Height;
+            maxDimension = statusVisible ? viewToMove!.SuperView.Viewport.Height - 1 : viewToMove!.SuperView.Viewport.Height;
         }
 
         if (superView?.Margin is { } && superView == viewToMove?.SuperView)
@@ -620,7 +618,7 @@ public partial class View
 
         //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 
-        return superView;
+        return superView!;
     }
 
     /// <summary>Fired after the View's <see cref="LayoutSubviews"/> method has completed.</summary>
@@ -868,7 +866,7 @@ public partial class View
 
     internal void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        foreach (View v in from.InternalSubviews)
+        foreach (View? v in from.InternalSubviews)
         {
             nNodes.Add (v);
 
@@ -884,7 +882,7 @@ public partial class View
         }
     }
 
-    internal void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
+    internal void CollectDim (Dim? dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
         switch (dim)
         {
@@ -1042,7 +1040,7 @@ public partial class View
     }
 
     // Diagnostics to highlight when Width or Height is read before the view has been initialized
-    private Dim VerifyIsInitialized (Dim dim, string member)
+    private Dim? VerifyIsInitialized (Dim? dim, string member)
     {
         //#if DEBUG
         //        if (dim.ReferencesOtherViews () && !IsInitialized)
@@ -1100,9 +1098,9 @@ public partial class View
 
         return;
 
-        void ThrowInvalid (View view, object checkPosDim, string name)
+        void ThrowInvalid (View view, object? checkPosDim, string name)
         {
-            object bad = null;
+            object? bad = null;
 
             switch (checkPosDim)
             {
@@ -1116,8 +1114,8 @@ public partial class View
 
                 case Pos pos and PosCombine:
                     // Recursively check for not Absolute or not View
-                    ThrowInvalid (view, (pos as PosCombine).Left, name);
-                    ThrowInvalid (view, (pos as PosCombine).Right, name);
+                    ThrowInvalid (view, (pos as PosCombine)?.Left, name);
+                    ThrowInvalid (view, (pos as PosCombine)?.Right, name);
 
                     break;
 
@@ -1134,8 +1132,8 @@ public partial class View
 
                 case Dim dim and DimCombine:
                     // Recursively check for not Absolute or not View
-                    ThrowInvalid (view, (dim as DimCombine).Left, name);
-                    ThrowInvalid (view, (dim as DimCombine).Right, name);
+                    ThrowInvalid (view, (dim as DimCombine)?.Left, name);
+                    ThrowInvalid (view, (dim as DimCombine)?.Right, name);
 
                     break;
             }

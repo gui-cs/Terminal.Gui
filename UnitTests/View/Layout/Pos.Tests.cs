@@ -4,7 +4,7 @@ using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui.LayoutTests;
 
-public class PosTests (ITestOutputHelper output)
+public class PosTests ()
 {
     // Was named AutoSize_Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
     // but doesn't actually have anything to do with AutoSize.

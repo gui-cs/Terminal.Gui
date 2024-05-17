@@ -7,7 +7,7 @@ namespace Terminal.Gui.LayoutTests;
 
 public class DimPercentTests
 {
-    private readonly ITestOutputHelper _output;
+    //private readonly ITestOutputHelper _output;
 
     [Fact]
     public void DimFactor_Calculate_ReturnsCorrectValue ()
