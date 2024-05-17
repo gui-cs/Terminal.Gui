@@ -288,7 +288,7 @@ public class Pos
     #region virtual methods
 
     /// <summary>
-    ///     Calculates and returns the starting point of an element based on the size of the parent element (typically
+    ///     Gets the starting point of an element based on the size of the parent element (typically
     ///     <c>Superview.ContentSize</c>).
     ///     This method is meant to be overridden by subclasses to provide different ways of calculating the starting point.
     ///     This method is used
@@ -300,7 +300,7 @@ public class Pos
     ///     subclass of Pos that is used. For example, PosAbsolute returns a fixed position, PosAnchorEnd returns a
     ///     position that is anchored to the end of the layout, and so on.
     /// </returns>
-    internal virtual int Anchor (int size) { return 0; }
+    internal virtual int GetAnchor (int size) { return 0; }
 
     /// <summary>
     ///     Calculates and returns the final position of a <see cref="View"/> object. It takes into account the dimension of
@@ -321,7 +321,7 @@ public class Pos
     ///     that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension) { return Anchor (superviewDimension); }
+    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension) { return GetAnchor (superviewDimension); }
 
     /// <summary>
     ///     Diagnostics API to determine if this Pos object references other views.
@@ -341,7 +341,7 @@ public class Pos
     {
         if (left is PosAbsolute && right is PosAbsolute)
         {
-            return new PosAbsolute (left.Anchor (0) + right.Anchor (0));
+            return new PosAbsolute (left.GetAnchor (0) + right.GetAnchor (0));
         }
 
         var newPos = new PosCombine (true, left, right);
@@ -370,7 +370,7 @@ public class Pos
     {
         if (left is PosAbsolute && right is PosAbsolute)
         {
-            return new PosAbsolute (left.Anchor (0) - right.Anchor (0));
+            return new PosAbsolute (left.GetAnchor (0) - right.GetAnchor (0));
         }
 
         var newPos = new PosCombine (false, left, right);
@@ -392,7 +392,7 @@ public class Pos
 
     /// <summary>Serves as the default hash function. </summary>
     /// <returns>A hash code for the current object.</returns>
-    public override int GetHashCode () { return Anchor (0).GetHashCode (); }
+    public override int GetHashCode () { return GetAnchor (0).GetHashCode (); }
 
     #endregion overrides
 }
@@ -423,7 +423,7 @@ public class PosAbsolute (int position) : Pos
     /// <inheritdoc/>
     public override string ToString () { return $"Absolute({Position})"; }
 
-    internal override int Anchor (int size) { return Position; }
+    internal override int GetAnchor (int size) { return Position; }
 }
 
 /// <summary>
@@ -469,7 +469,7 @@ public class PosAnchorEnd : Pos
     /// <inheritdoc/>
     public override string ToString () { return UseDimForOffset ? "AnchorEnd()" : $"AnchorEnd({Offset})"; }
 
-    internal override int Anchor (int size)
+    internal override int GetAnchor (int size)
     {
         if (UseDimForOffset)
         {
@@ -481,11 +481,11 @@ public class PosAnchorEnd : Pos
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
-        int newLocation = Anchor (superviewDimension);
+        int newLocation = GetAnchor (superviewDimension);
 
         if (UseDimForOffset)
         {
-            newLocation -= dim.Anchor (superviewDimension);
+            newLocation -= dim.GetAnchor (superviewDimension);
         }
 
         return newLocation;
@@ -500,13 +500,13 @@ public class PosCenter : Pos
     /// <inheritdoc/>
     public override string ToString () { return "Center"; }
 
-    internal override int Anchor (int size) { return size / 2; }
+    internal override int GetAnchor (int size) { return size / 2; }
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
         int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension), 0);
 
-        return Anchor (superviewDimension - newDimension);
+        return GetAnchor (superviewDimension - newDimension);
     }
 }
 
@@ -546,10 +546,10 @@ public class PosCombine (bool add, Pos left, Pos right) : Pos
     /// <inheritdoc/>
     public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
 
-    internal override int Anchor (int size)
+    internal override int GetAnchor (int size)
     {
-        int la = Left.Anchor (size);
-        int ra = Right.Anchor (size);
+        int la = Left.GetAnchor (size);
+        int ra = Right.GetAnchor (size);
 
         if (Add)
         {
@@ -614,7 +614,7 @@ public class PosPercent (float percent) : Pos
     /// <inheritdoc/>
     public override string ToString () { return $"Percent({Percent})"; }
 
-    internal override int Anchor (int size) { return (int)(size * Percent); }
+    internal override int GetAnchor (int size) { return (int)(size * Percent); }
 }
 
 /// <summary>
@@ -643,7 +643,7 @@ public class PosFunc (Func<int> pos) : Pos
     /// <inheritdoc/>
     public override string ToString () { return $"PosFunc({Func ()})"; }
 
-    internal override int Anchor (int size) { return Func (); }
+    internal override int GetAnchor (int size) { return Func (); }
 }
 
 /// <summary>
@@ -695,7 +695,7 @@ public class PosView (View view, Side side) : Pos
         return $"View(side={sideString},target={Target})";
     }
 
-    internal override int Anchor (int size)
+    internal override int GetAnchor (int size)
     {
         return Side switch
                {

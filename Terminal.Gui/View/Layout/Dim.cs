@@ -255,7 +255,7 @@ public class Dim
     ///     subclass of Dim that is used. For example, DimAbsolute returns a fixed dimension, DimFactor returns a
     ///     dimension that is a certain percentage of the super view's size, and so on.
     /// </returns>
-    internal virtual int Anchor (int size) { return 0; }
+    internal virtual int GetAnchor (int size) { return 0; }
 
     /// <summary>
     ///     Calculates and returns the dimension of a <see cref="View"/> object. It takes into account the location of the
@@ -275,7 +275,7 @@ public class Dim
     /// </returns>
     internal virtual int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        return Math.Max (Anchor (superviewContentSize - location), 0);
+        return Math.Max (GetAnchor (superviewContentSize - location), 0);
     }
 
     #endregion virtual methods
@@ -290,7 +290,7 @@ public class Dim
     {
         if (left is DimAbsolute && right is DimAbsolute)
         {
-            return new DimAbsolute (left.Anchor (0) + right.Anchor (0));
+            return new DimAbsolute (left.GetAnchor (0) + right.GetAnchor (0));
         }
 
         var newDim = new DimCombine (true, left, right);
@@ -315,7 +315,7 @@ public class Dim
     {
         if (left is DimAbsolute && right is DimAbsolute)
         {
-            return new DimAbsolute (left.Anchor (0) - right.Anchor (0));
+            return new DimAbsolute (left.GetAnchor (0) - right.GetAnchor (0));
         }
 
         var newDim = new DimCombine (false, left, right);
@@ -338,7 +338,7 @@ public class Dim
     public override bool Equals (object? other) { return other is Dim abs && abs == this; }
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return Anchor (0).GetHashCode (); }
+    public override int GetHashCode () { return GetAnchor (0).GetHashCode (); }
 
     #endregion overrides
 }
@@ -369,12 +369,12 @@ public class DimAbsolute (int size) : Dim
     /// <inheritdoc/>
     public override string ToString () { return $"Absolute({Size})"; }
 
-    internal override int Anchor (int size) { return Size; }
+    internal override int GetAnchor (int size) { return Size; }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
         // DimAbsolute.Anchor (int size) ignores width and returns n
-        return Math.Max (Anchor (0), 0);
+        return Math.Max (GetAnchor (0), 0);
     }
 }
 
@@ -428,13 +428,13 @@ public class DimAuto (DimAutoStyle style, Dim? minimumContentDim, Dim? maximumCo
     {
         if (us == null)
         {
-            return MaximumContentDim?.Anchor (0) ?? 0;
+            return MaximumContentDim?.GetAnchor (0) ?? 0;
         }
 
         var textSize = 0;
         var subviewsSize = 0;
 
-        int autoMin = MinimumContentDim?.Anchor (superviewContentSize) ?? 0;
+        int autoMin = MinimumContentDim?.GetAnchor (superviewContentSize) ?? 0;
 
         if (superviewContentSize < autoMin)
         {
@@ -548,7 +548,7 @@ public class DimAuto (DimAutoStyle style, Dim? minimumContentDim, Dim? maximumCo
         }
 
         // If max: is set, clamp the return - BUGBUG: Not tested
-        return int.Min (max, MaximumContentDim?.Anchor (superviewContentSize) ?? max);
+        return int.Min (max, MaximumContentDim?.GetAnchor (superviewContentSize) ?? max);
     }
 
     internal override bool ReferencesOtherViews ()
@@ -591,10 +591,10 @@ public class DimCombine (bool add, Dim? left, Dim? right) : Dim
     /// <inheritdoc/>
     public override string ToString () { return $"Combine({Left}{(Add ? '+' : '-')}{Right})"; }
 
-    internal override int Anchor (int size)
+    internal override int GetAnchor (int size)
     {
-        int la = Left!.Anchor (size);
-        int ra = Right!.Anchor (size);
+        int la = Left!.GetAnchor (size);
+        int ra = Right!.GetAnchor (size);
 
         if (Add)
         {
@@ -679,11 +679,11 @@ public class DimPercent (float percent, bool usePosition = false) : Dim
     /// </summary>
     public bool UsePosition { get; } = usePosition;
 
-    internal override int Anchor (int size) { return (int)(size * Percent); }
+    internal override int GetAnchor (int size) { return (int)(size * Percent); }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        return UsePosition ? Math.Max (Anchor (superviewContentSize - location), 0) : Anchor (superviewContentSize);
+        return UsePosition ? Math.Max (GetAnchor (superviewContentSize - location), 0) : GetAnchor (superviewContentSize);
     }
 }
 
@@ -711,7 +711,7 @@ public class DimFill (int margin) : Dim
     /// <inheritdoc/>
     public override string ToString () { return $"Fill({Margin})"; }
 
-    internal override int Anchor (int size) { return size - Margin; }
+    internal override int GetAnchor (int size) { return size - Margin; }
 }
 
 /// <summary>
@@ -738,7 +738,7 @@ public class DimFunc (Func<int> dim) : Dim
     /// <inheritdoc/>
     public override string ToString () { return $"DimFunc({Func ()})"; }
 
-    internal override int Anchor (int size) { return Func (); }
+    internal override int GetAnchor (int size) { return Func (); }
 }
 
 /// <summary>
@@ -795,7 +795,7 @@ public class DimView : Dim
         return $"View({dimString},{Target})";
     }
 
-    internal override int Anchor (int size)
+    internal override int GetAnchor (int size)
     {
         return Dimension switch
         {

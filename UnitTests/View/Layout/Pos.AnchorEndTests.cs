@@ -46,13 +46,13 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void PosAnchorEnd_Anchor ()
+    public void PosAnchorEnd_GetAnchor ()
     {
         var posAnchorEnd = new PosAnchorEnd (10);
         var width = 50;
         var expectedAnchor = width - 10;
 
-        Assert.Equal (expectedAnchor, posAnchorEnd.Anchor (width));
+        Assert.Equal (expectedAnchor, posAnchorEnd.GetAnchor (width));
     }
 
     [Fact]
@@ -73,10 +73,10 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     [Theory]
     [InlineData (0)]
     [InlineData (1)]
-    public void  PosAnchorEnd_SetsValue_Anchor_Is_Negative (int offset)
+    public void  PosAnchorEnd_SetsValue_GetAnchor_Is_Negative (int offset)
     {
         Pos pos = Pos.AnchorEnd (offset);
-        Assert.Equal (offset, -pos.Anchor (0));
+        Assert.Equal (offset, -pos.GetAnchor (0));
     }
 
     [Theory]
@@ -119,10 +119,10 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void  PosAnchorEnd_UseDimForOffset_SetsValue_Anchor_Is_Negative ()
+    public void  PosAnchorEnd_UseDimForOffset_SetsValue_GetAnchor_Is_Negative ()
     {
         Pos pos = Pos.AnchorEnd ();
-        Assert.Equal (-10, -pos.Anchor (10));
+        Assert.Equal (-10, -pos.GetAnchor (10));
     }
 
     [Theory]

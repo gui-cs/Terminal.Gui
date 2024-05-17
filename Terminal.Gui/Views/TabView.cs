@@ -1265,7 +1265,7 @@ public class TabView : View
                         tab.Margin.Thickness = new Thickness (0, 0, 0, 0);
                     }
 
-                    tab.Width = Math.Max (tab.Width.Anchor (0) - 1, 1);
+                    tab.Width = Math.Max (tab.Width.GetAnchor (0) - 1, 1);
                 }
                 else
                 {
@@ -1280,7 +1280,7 @@ public class TabView : View
                         tab.Margin.Thickness = new Thickness (0, 0, 0, 0);
                     }
 
-                    tab.Width = Math.Max (tab.Width.Anchor (0) - 1, 1);
+                    tab.Width = Math.Max (tab.Width.GetAnchor (0) - 1, 1);
                 }
 
                 tab.Text = toRender.TextToRender;

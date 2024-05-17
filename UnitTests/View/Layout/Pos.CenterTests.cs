@@ -38,13 +38,13 @@ public class PosCenterTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void PosCenter_Anchor ()
+    public void PosCenter_GetAnchor ()
     {
         var posCenter = new PosCenter ();
         var width = 50;
         var expectedAnchor = width / 2;
 
-        Assert.Equal (expectedAnchor, posCenter.Anchor (width));
+        Assert.Equal (expectedAnchor, posCenter.GetAnchor (width));
     }
 
     [Fact]

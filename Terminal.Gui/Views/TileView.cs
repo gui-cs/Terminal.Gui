@@ -601,11 +601,11 @@ public class TileView : View
 
         TileViewLineView nextSplitter = visibleSplitterLines [i];
         Pos nextSplitterPos = Orientation == Orientation.Vertical ? nextSplitter.X : nextSplitter.Y;
-        int nextSplitterDistance = nextSplitterPos.Anchor (space);
+        int nextSplitterDistance = nextSplitterPos.GetAnchor (space);
 
         TileViewLineView lastSplitter = i >= 1 ? visibleSplitterLines [i - 1] : null;
         Pos lastSplitterPos = Orientation == Orientation.Vertical ? lastSplitter?.X : lastSplitter?.Y;
-        int lastSplitterDistance = lastSplitterPos?.Anchor (space) ?? 0;
+        int lastSplitterDistance = lastSplitterPos?.GetAnchor (space) ?? 0;
 
         int distance = nextSplitterDistance - lastSplitterDistance;
 
@@ -656,8 +656,8 @@ public class TileView : View
 
     private bool IsValidNewSplitterPos (int idx, Pos value, int fullSpace)
     {
-        int newSize = value.Anchor (fullSpace);
-        bool isGettingBigger = newSize > _splitterDistances [idx].Anchor (fullSpace);
+        int newSize = value.GetAnchor (fullSpace);
+        bool isGettingBigger = newSize > _splitterDistances [idx].GetAnchor (fullSpace);
         int lastSplitterOrBorder = HasBorder () ? 1 : 0;
         int nextSplitterOrBorder = HasBorder () ? fullSpace - 1 : fullSpace;
 
@@ -682,7 +682,7 @@ public class TileView : View
         // Do not allow splitter to move left of the one before
         if (idx > 0)
         {
-            int posLeft = _splitterDistances [idx - 1].Anchor (fullSpace);
+            int posLeft = _splitterDistances [idx - 1].GetAnchor (fullSpace);
 
             if (newSize <= posLeft)
             {
@@ -695,7 +695,7 @@ public class TileView : View
         // Do not allow splitter to move right of the one after
         if (idx + 1 < _splitterDistances.Count)
         {
-            int posRight = _splitterDistances [idx + 1].Anchor (fullSpace);
+            int posRight = _splitterDistances [idx + 1].GetAnchor (fullSpace);
 
             if (newSize >= posRight)
             {
@@ -848,7 +848,7 @@ public class TileView : View
         {
             Dim spaceDim = Tile.ContentView.Width;
 
-            int spaceAbs = spaceDim.Anchor (Parent.Viewport.Width);
+            int spaceAbs = spaceDim.GetAnchor (Parent.Viewport.Width);
 
             var title = $" {Tile.Title} ";
 
@@ -1005,7 +1005,7 @@ public class TileView : View
         private Pos ConvertToPosFactor (Pos p, int parentLength)
         {
             // calculate position in the 'middle' of the cell at p distance along parentLength
-            float position = p.Anchor (parentLength) + 0.5f;
+            float position = p.GetAnchor (parentLength) + 0.5f;
 
             return new PosPercent (position / parentLength);
         }
@@ -1066,7 +1066,7 @@ public class TileView : View
 
         private Pos Offset (Pos pos, int delta)
         {
-            int posAbsolute = pos.Anchor (
+            int posAbsolute = pos.GetAnchor (
                                           Orientation == Orientation.Horizontal
                                               ? Parent.Viewport.Height
                                               : Parent.Viewport.Width

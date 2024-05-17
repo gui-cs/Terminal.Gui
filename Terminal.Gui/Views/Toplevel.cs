@@ -419,7 +419,7 @@ public partial class Toplevel : View
             && !top.Subviews.Contains (sb)
             && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
             && top.Height is DimFill
-            && -top.Height.Anchor (0) < 1)
+            && -top.Height.GetAnchor (0) < 1)
         {
             top.Height = Dim.Fill (sb.Visible ? 1 : 0);
             layoutSubviews = true;

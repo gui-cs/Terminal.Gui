@@ -81,9 +81,11 @@ In v1, `Application.Init` automatically created a toplevel view and set `Applica
 * Update any code that assumed `Application.Init` automatically created a toplevel view and set `Applicaton.Top`.
 * Update any code that assumed `Application.Init` automatically disposed of the toplevel view when the application exited.
 
-## `Pos` and `Dim` types are no-longer internal nested classes
+## `Pos` and `Dim` types now adhere to standard C# idioms
 
 * In v1, the `Pos` and `Dim` types (e.g. `Pos.PosView`) were nested classes and marked `internal`. In v2, they are no longer nested, and have appropriate public APIs. 
+* Nullabilty is enabled.
+* Methods & properties follow standards.
 * The static method that creates a `PosAbsolute`, `Pos.At`, was renamed to `Pos.Absolute` for consistency.
 * The static method that crates as `DimAbsoulte`, `Dim.Sized`, was renamed to `Dim.Absolute` for consistency.
 
@@ -93,6 +95,8 @@ In v1, `Application.Init` automatically created a toplevel view and set `Applica
 * Search and replace `Dim.Dim` -> `Dim`.
 * Search and replace `Pos.At` -> `Pos.Absolute`
 * Search and replace `Dim.Sized` -> `Dim.Absolute`
+* Search and replace `Dim.Anchor` -> `Dim.GetAnchor`
+* Search and replace `Pos.Anchor` -> `Pos.GetAnchor`
 
 ## Layout Improvements
 

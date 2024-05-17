@@ -181,36 +181,36 @@ public class PosTests ()
     public void Internal_Tests ()
     {
         var posFactor = new PosPercent (0.10F);
-        Assert.Equal (10, posFactor.Anchor (100));
+        Assert.Equal (10, posFactor.GetAnchor (100));
 
         var posAnchorEnd = new PosAnchorEnd (1);
-        Assert.Equal (99, posAnchorEnd.Anchor (100));
+        Assert.Equal (99, posAnchorEnd.GetAnchor (100));
 
         var posCenter = new PosCenter ();
-        Assert.Equal (50, posCenter.Anchor (100));
+        Assert.Equal (50, posCenter.GetAnchor (100));
 
         var posAbsolute = new PosAbsolute (10);
-        Assert.Equal (10, posAbsolute.Anchor (0));
+        Assert.Equal (10, posAbsolute.GetAnchor (0));
 
         var posCombine = new PosCombine (true, posFactor, posAbsolute);
         Assert.Equal (posCombine.Left, posFactor);
         Assert.Equal (posCombine.Right, posAbsolute);
-        Assert.Equal (20, posCombine.Anchor (100));
+        Assert.Equal (20, posCombine.GetAnchor (100));
 
         posCombine = new (true, posAbsolute, posFactor);
         Assert.Equal (posCombine.Left, posAbsolute);
         Assert.Equal (posCombine.Right, posFactor);
-        Assert.Equal (20, posCombine.Anchor (100));
+        Assert.Equal (20, posCombine.GetAnchor (100));
 
         var view = new View { Frame = new (20, 10, 20, 1) };
         var posViewX = new PosView (view, Side.Left);
-        Assert.Equal (20, posViewX.Anchor (0));
+        Assert.Equal (20, posViewX.GetAnchor (0));
         var posViewY = new PosView (view, Side.Top);
-        Assert.Equal (10, posViewY.Anchor (0));
+        Assert.Equal (10, posViewY.GetAnchor (0));
         var posRight = new PosView (view, Side.Right);
-        Assert.Equal (40, posRight.Anchor (0));
+        Assert.Equal (40, posRight.GetAnchor (0));
         var posViewBottom = new PosView (view, Side.Bottom);
-        Assert.Equal (11, posViewBottom.Anchor (0));
+        Assert.Equal (11, posViewBottom.GetAnchor (0));
 
         view.Dispose ();
     }

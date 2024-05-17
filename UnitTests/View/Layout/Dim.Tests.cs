@@ -286,24 +286,24 @@ public class DimTests
     public void Internal_Tests ()
     {
         var dimFactor = new DimPercent (0.10F);
-        Assert.Equal (10, dimFactor.Anchor (100));
+        Assert.Equal (10, dimFactor.GetAnchor (100));
 
         var dimAbsolute = new DimAbsolute (10);
-        Assert.Equal (10, dimAbsolute.Anchor (0));
+        Assert.Equal (10, dimAbsolute.GetAnchor (0));
 
         var dimFill = new DimFill (1);
-        Assert.Equal (99, dimFill.Anchor (100));
+        Assert.Equal (99, dimFill.GetAnchor (100));
 
         var dimCombine = new DimCombine (true, dimFactor, dimAbsolute);
         Assert.Equal (dimCombine.Left, dimFactor);
         Assert.Equal (dimCombine.Right, dimAbsolute);
-        Assert.Equal (20, dimCombine.Anchor (100));
+        Assert.Equal (20, dimCombine.GetAnchor (100));
 
         var view = new View { Frame = new Rectangle (20, 10, 20, 1) };
         var dimViewHeight = new DimView (view, Dimension.Height);
-        Assert.Equal (1, dimViewHeight.Anchor (0));
+        Assert.Equal (1, dimViewHeight.GetAnchor (0));
         var dimViewWidth = new DimView (view, Dimension.Width);
-        Assert.Equal (20, dimViewWidth.Anchor (0));
+        Assert.Equal (20, dimViewWidth.GetAnchor (0));
 
         view.Dispose ();
     }
