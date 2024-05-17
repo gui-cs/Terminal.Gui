@@ -177,12 +177,17 @@ public abstract class Dim
     /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.</param>
     public static Dim? Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim? minimumContentDim = null, Dim? maximumContentDim = null)
     {
-        //if (maximumContentDim != null)
-        //{
-        //    throw new NotImplementedException (@"maximumContentDim is not implemented");
-        //}
+        if (maximumContentDim is { })
+        {
+            Debug.WriteLine (@"WARNING: maximumContentDim is not fully implemented.");
+        }
 
-        return new DimAuto (style, minimumContentDim, maximumContentDim);
+        return new DimAuto ()
+        {
+            MinimumContentDim = minimumContentDim,
+            MaximumContentDim = maximumContentDim,
+            Style = style
+        };
     }
 
     /// <summary>
@@ -380,46 +385,43 @@ public class DimAbsolute (int size) : Dim
 ///         methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 ///     </para>
 /// </remarks>
-/// <param name="style">
-///     Specifies how <see cref="DimAuto"/> will compute the dimension. The default is <see cref="DimAutoStyle.Auto"/>.
-/// </param>
-/// <param name="minimumContentDim">The minimum dimension the View's ContentSize will be constrained to.</param>
-/// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.</param>
-public class DimAuto (DimAutoStyle style, Dim? minimumContentDim, Dim? maximumContentDim) : Dim
+public class DimAuto () : Dim
 {
-    /// <inheritdoc/>
-    public override bool Equals (object? other)
-    {
-        if (other is not DimAuto auto)
-        {
-            return false;
-        }
-
-        return auto.MinimumContentDim == MinimumContentDim &&
-               auto.MaximumContentDim == MaximumContentDim &&
-               auto.Style == Style;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode ()
-    {
-        return HashCode.Combine (MinimumContentDim, MaximumContentDim, Style);
-    }
+    private readonly Dim? _maximumContentDim;
 
     /// <summary>
     ///     Gets the maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.
     /// </summary>
-    public Dim? MaximumContentDim { get; } = maximumContentDim;
+    // ReSharper disable once ConvertToAutoProperty
+    public required Dim? MaximumContentDim
+    {
+        get => _maximumContentDim;
+        init => _maximumContentDim = value;
+    }
+
+    private readonly Dim? _minimumContentDim;
 
     /// <summary>
     ///     Gets the minimum dimension the View's ContentSize will be constrained to.
     /// </summary>
-    public Dim? MinimumContentDim { get; } = minimumContentDim;
+    // ReSharper disable once ConvertToAutoProperty
+    public required Dim? MinimumContentDim
+    {
+        get => _minimumContentDim;
+        init => _minimumContentDim = value;
+    }
+
+    private readonly DimAutoStyle _style;
 
     /// <summary>
     ///     Gets the style of the DimAuto.
     /// </summary>
-    public DimAutoStyle Style { get; } = style;
+    // ReSharper disable once ConvertToAutoProperty
+    public required DimAutoStyle Style
+    {
+        get => _style;
+        init => _style = value;
+    }
 
     /// <inheritdoc/>
     public override string ToString () { return $"Auto({Style},{MinimumContentDim},{MaximumContentDim})"; }
@@ -543,6 +545,26 @@ public class DimAuto (DimAutoStyle style, Dim? minimumContentDim, Dim? maximumCo
         // BUGBUG: This is not correct. _contentSize may be null.
         return false; //_style.HasFlag (DimAutoStyle.Content);
     }
+
+    /// <inheritdoc/>
+    public override bool Equals (object? other)
+    {
+        if (other is not DimAuto auto)
+        {
+            return false;
+        }
+
+        return auto.MinimumContentDim == MinimumContentDim &&
+               auto.MaximumContentDim == MaximumContentDim &&
+               auto.Style == Style;
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode ()
+    {
+        return HashCode.Combine (MinimumContentDim, MaximumContentDim, Style);
+    }
+
 }
 
 /// <summary>
