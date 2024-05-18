@@ -122,7 +122,7 @@ public class Dialog : Window
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Right;
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
 
     /// <summary>
     ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the

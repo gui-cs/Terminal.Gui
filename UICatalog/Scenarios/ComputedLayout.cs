@@ -91,7 +91,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = Alignment.Left,
+                           TextAlignment = Alignment.Start,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -103,7 +103,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = Alignment.Right,
+                           TextAlignment = Alignment.End,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -115,7 +115,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = Alignment.Centered,
+                           TextAlignment = Alignment.Center,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -127,7 +127,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = Alignment.Justified,
+                           TextAlignment = Alignment.Fill,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -153,7 +153,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = Alignment.Left,
+                           TextAlignment = Alignment.Start,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -165,7 +165,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = Alignment.Right,
+                           TextAlignment = Alignment.End,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -177,7 +177,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = Alignment.Centered,
+                           TextAlignment = Alignment.Center,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -189,7 +189,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = Alignment.Justified,
+                           TextAlignment = Alignment.Fill,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -324,7 +324,7 @@ public class ComputedLayout : Scenario
         var anchorEndLabel1 = new Label
         {
             Text = "This Label should be the 3rd to last line (AnchorEnd (3)).",
-            TextAlignment = Alignment.Centered,
+            TextAlignment = Alignment.Center,
             ColorScheme = Colors.ColorSchemes ["Menu"],
             Width = Dim.Fill (5),
             X = 5,
@@ -338,7 +338,7 @@ public class ComputedLayout : Scenario
         {
             Text =
                 "This TextField should be the 4th to last line (AnchorEnd (3) - 1).",
-            TextAlignment = Alignment.Left,
+            TextAlignment = Alignment.Start,
             ColorScheme = Colors.ColorSchemes ["Menu"],
             Width = Dim.Fill (5),
             X = 5,
@@ -397,9 +397,9 @@ public class ComputedLayout : Scenario
 
 
         // Center three buttons with 
-        leftButton.X = Pos.Align (Alignment.Centered);
-        centerButton.X = Pos.Align (Alignment.Centered);
-        rightButton.X = Pos.Align (Alignment.Centered);
+        leftButton.X = Pos.Align (Alignment.Center);
+        centerButton.X = Pos.Align (Alignment.Center);
+        rightButton.X = Pos.Align (Alignment.Center);
 
         Application.Run (app);
         app.Dispose ();

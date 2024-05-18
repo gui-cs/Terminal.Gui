@@ -341,7 +341,7 @@ public static class MessageBox
         }
 
         Alignment buttonJust = Dialog.DefaultButtonAlignment;
-        Dialog.DefaultButtonAlignment = Alignment.Centered;
+        Dialog.DefaultButtonAlignment = Alignment.Center;
         var d = new Dialog
         {
             Buttons = buttonList.ToArray (),
@@ -374,7 +374,7 @@ public static class MessageBox
         var messageLabel = new Label
         {
             Text = message,
-            TextAlignment = Alignment.Centered,
+            TextAlignment = Alignment.Center,
             X = Pos.Center (),
             Y = 0,
            // ColorScheme = Colors.ColorSchemes ["Error"]

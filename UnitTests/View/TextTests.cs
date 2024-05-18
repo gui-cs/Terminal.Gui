@@ -850,7 +850,7 @@ Y
             Y = 1,
             Width = width,
             Height = 1,
-            TextAlignment = Alignment.Centered
+            TextAlignment = Alignment.Center
         };
 
         if (autoSize)
@@ -865,7 +865,7 @@ Y
             Y = 2,
             Width = width,
             Height = 1,
-            TextAlignment = Alignment.Right
+            TextAlignment = Alignment.End
         };
 
         if (autoSize)
@@ -880,7 +880,7 @@ Y
             Y = 3,
             Width = width,
             Height = 1,
-            TextAlignment = Alignment.Justified
+            TextAlignment = Alignment.Fill
         };
 
         if (autoSize)
@@ -974,7 +974,7 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextAlignment = Alignment.Centered
+            VerticalTextAlignment = Alignment.Center
         };
 
         if (autoSize)
@@ -990,7 +990,7 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextAlignment = Alignment.Bottom
+            VerticalTextAlignment = Alignment.End
         };
 
         if (autoSize)
@@ -1006,7 +1006,7 @@ Y
             Width = 1,
             Height = height,
             TextDirection = TextDirection.TopBottom_LeftRight,
-            VerticalTextAlignment = Alignment.Justified
+            VerticalTextAlignment = Alignment.Fill
         };
 
         if (autoSize)
@@ -1227,7 +1227,7 @@ Y
         {
             Text = "01234",
             TextDirection = TextDirection.LeftRight_TopBottom,
-            TextAlignment = Alignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 10,
             Height = Dim.Auto (DimAutoStyle.Text)
         };

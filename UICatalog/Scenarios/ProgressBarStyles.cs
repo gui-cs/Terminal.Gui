@@ -50,7 +50,7 @@ public class ProgressBarStyles : Scenario
         var pbList = new ListView
         {
             Title = "Focused ProgressBar",
-            Y = Pos.Align (Alignment.Top),
+            Y = Pos.Align (Alignment.Start),
             X = Pos.Center (),
             Width = Dim.Auto (),
             Height = Dim.Auto (),
@@ -98,7 +98,7 @@ public class ProgressBarStyles : Scenario
         {
             Text = "Foreground HotNormal Color",
             X = Pos.Center (),
-            Y = Pos.Align (Alignment.Top),
+            Y = Pos.Align (Alignment.Start),
         };
         container.Add (fgColorPickerBtn);
 
@@ -124,7 +124,7 @@ public class ProgressBarStyles : Scenario
         var bgColorPickerBtn = new Button
         {
             X = Pos.Center (),
-            Y = Pos.Align (Alignment.Top),
+            Y = Pos.Align (Alignment.Start),
             Text = "Background HotNormal Color"
         };
         container.Add (bgColorPickerBtn);
@@ -158,7 +158,7 @@ public class ProgressBarStyles : Scenario
             BorderStyle = LineStyle.Single,
             Title = "ProgressBarFormat",
             X = Pos.Center (),
-            Y = Pos.Align (Alignment.Top),
+            Y = Pos.Align (Alignment.Start),
             RadioLabels = pbFormatEnum.Select (e => e.ToString ()).ToArray ()
         };
         container.Add (rbPBFormat);
@@ -166,7 +166,7 @@ public class ProgressBarStyles : Scenario
         var button = new Button
         {
             X = Pos.Center (),
-            Y = Pos.Align (Alignment.Top),
+            Y = Pos.Align (Alignment.Start),
             Text = "Start timer"
         };
         container.Add (button);
@@ -175,7 +175,7 @@ public class ProgressBarStyles : Scenario
         {
             Title = "Blocks",
             X = Pos.Center (),
-            Y = Pos.Align (Alignment.Top),
+            Y = Pos.Align (Alignment.Start),
             Width = Dim.Percent (50),
             BorderStyle = LineStyle.Single,
             CanFocus = true
@@ -188,7 +188,7 @@ public class ProgressBarStyles : Scenario
         {
             Title = "Continuous",
             X = Pos.Center (),
-            Y = Pos.Align (Alignment.Top),
+            Y = Pos.Align (Alignment.Start),
             Width = Dim.Percent (50),
             ProgressBarStyle = ProgressBarStyle.Continuous,
             BorderStyle = LineStyle.Single,
@@ -238,7 +238,7 @@ public class ProgressBarStyles : Scenario
         {
             Title = "Marquee Blocks",
             X = Pos.Center (),
-            Y = Pos.Align (Alignment.Top),
+            Y = Pos.Align (Alignment.Start),
             Width = Dim.Percent (50),
             ProgressBarStyle = ProgressBarStyle.MarqueeBlocks,
             BorderStyle = LineStyle.Single,
@@ -250,7 +250,7 @@ public class ProgressBarStyles : Scenario
         {
             Title = "Marquee Continuous",
             X = Pos.Center (),
-            Y = Pos.Align (Alignment.Top),
+            Y = Pos.Align (Alignment.Start),
             Width = Dim.Percent (50),
             ProgressBarStyle = ProgressBarStyle.MarqueeContinuous,
             BorderStyle = LineStyle.Single,

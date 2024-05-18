@@ -155,13 +155,13 @@ public class CheckBox : View
     {
         switch (TextAlignment)
         {
-            case Alignment.Left:
-            case Alignment.Centered:
-            case Alignment.Justified:
+            case Alignment.Start:
+            case Alignment.Center:
+            case Alignment.Fill:
                 TextFormatter.Text = $"{GetCheckedState ()} {Text}";
 
                 break;
-            case Alignment.Right:
+            case Alignment.End:
                 TextFormatter.Text = $"{Text} {GetCheckedState ()}";
 
                 break;

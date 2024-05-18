@@ -816,18 +816,18 @@ public class Slider<T> : View
         // Note: The formatter doesn't handle all of this ???
         switch (alignment)
         {
-            case Alignment.Justified:
+            case Alignment.Fill:
                 return TextFormatter.Justify (text, width);
-            case Alignment.Left:
+            case Alignment.Start:
                 return text + s1 + s1 + s2;
-            case Alignment.Centered:
+            case Alignment.Center:
                 if (text.Length % 2 != 0)
                 {
                     return s1 + text + s1 + s2;
                 }
 
                 return s1 + s2 + text + s1;
-            case Alignment.Right:
+            case Alignment.End:
                 return s1 + s1 + s2 + text;
             default:
                 return text;
@@ -934,12 +934,6 @@ public class Slider<T> : View
                             }
 
                             break;
-                        case SliderType.Single:
-                            break;
-                        case SliderType.Multiple:
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException ();
                     }
                 }
 
@@ -1160,7 +1154,7 @@ public class Slider<T> : View
                     switch (_config._legendsOrientation)
                     {
                         case Orientation.Horizontal:
-                            text = AlignText (text, _config._cachedInnerSpacing + 1, Alignment.Centered);
+                            text = AlignText (text, _config._cachedInnerSpacing + 1, Alignment.Center);
 
                             break;
                         case Orientation.Vertical:
@@ -1178,7 +1172,7 @@ public class Slider<T> : View
 
                             break;
                         case Orientation.Vertical:
-                            text = AlignText (text, _config._cachedInnerSpacing + 1, Alignment.Centered);
+                            text = AlignText (text, _config._cachedInnerSpacing + 1, Alignment.Center);
 
                             break;
                     }

@@ -290,7 +290,7 @@ public class Text : Scenario
             X = Pos.Right (regexProvider) + 1,
             Y = Pos.Y (regexProvider),
             Width = 30,
-            TextAlignment = Alignment.Centered,
+            TextAlignment = Alignment.Center,
             Provider = provider2
         };
         Win.Add (regexProviderField);

@@ -57,7 +57,7 @@ public class TimeAndDate : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (longDate) + 1,
-            TextAlignment = Alignment.Centered,
+            TextAlignment = Alignment.Center,
 
             Width = Dim.Fill (),
             Text = "Old Time: "
@@ -68,7 +68,7 @@ public class TimeAndDate : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblOldTime) + 1,
-            TextAlignment = Alignment.Centered,
+            TextAlignment = Alignment.Center,
 
             Width = Dim.Fill (),
             Text = "New Time: "
@@ -79,7 +79,7 @@ public class TimeAndDate : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblNewTime) + 1,
-            TextAlignment = Alignment.Centered,
+            TextAlignment = Alignment.Center,
 
             Width = Dim.Fill (),
             Text = "Time Format: "
@@ -90,7 +90,7 @@ public class TimeAndDate : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblTimeFmt) + 2,
-            TextAlignment = Alignment.Centered,
+            TextAlignment = Alignment.Center,
 
             Width = Dim.Fill (),
             Text = "Old Date: "
@@ -101,7 +101,7 @@ public class TimeAndDate : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblOldDate) + 1,
-            TextAlignment = Alignment.Centered,
+            TextAlignment = Alignment.Center,
 
             Width = Dim.Fill (),
             Text = "New Date: "
@@ -112,7 +112,7 @@ public class TimeAndDate : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblNewDate) + 1,
-            TextAlignment = Alignment.Centered,
+            TextAlignment = Alignment.Center,
 
             Width = Dim.Fill (),
             Text = "Date Format: "

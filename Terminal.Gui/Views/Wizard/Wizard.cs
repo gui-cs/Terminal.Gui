@@ -67,7 +67,7 @@ public class Wizard : Dialog
     public Wizard ()
     {
         // TODO: LastRightRestLeft will enable a "Quit" button to always appear at the far left
-        ButtonAlignment = Alignment.LastRightRestLeft;
+        ButtonAlignment = Alignment.LastEndRestStart;
         BorderStyle = LineStyle.Double;
 
         //// Add a horiz separator

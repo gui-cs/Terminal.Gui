@@ -75,7 +75,7 @@ public class TextFormatterDemo : Scenario
             }
         }
 
-        List<Alignment> alignments = new () { Alignment.Left, Alignment.Right, Alignment.Centered, Alignment.Justified };
+        List<Alignment> alignments = new () { Alignment.Start, Alignment.End, Alignment.Center, Alignment.Fill };
         Label [] singleLines = new Label [alignments.Count];
         Label [] multipleLines = new Label [alignments.Count];
 

@@ -47,7 +47,7 @@ public sealed class PosAlignDemo : Scenario
         {
             X = Pos.Align (_horizAligner.Alignment),
             Y = Pos.Center (),
-            RadioLabels = new [] { "Left", "Right", "Centered", "Justified", "FirstLeftRestRight", "LastRightRestLeft" },
+            RadioLabels = new [] { "Start", "End", "Center", "Fill", "FirstLeftRestRight", "LastRightRestLeft" },
             ColorScheme = colorScheme
         };
 
@@ -192,7 +192,7 @@ public sealed class PosAlignDemo : Scenario
         {
             X = 0,
             Y = Pos.Align (_vertAligner.Alignment),
-            RadioLabels = new [] { "Top", "Bottom", "Centered", "Justified", "FirstTopRestBottom", "LastBottomRestTop" },
+            RadioLabels = new [] { "Start", "End", "Center", "Fill", "FirstStartRestEnd", "LastEndRestStart" },
             ColorScheme = colorScheme
         };
 
@@ -358,8 +358,8 @@ public sealed class PosAlignDemo : Scenario
                 Width = 5
             };
 
-            v.X = Pos.Align (Alignment.Right, i / 3);
-            v.Y = Pos.Align (Alignment.Justified, i % 3 + 10);
+            v.X = Pos.Align (Alignment.End, i / 3);
+            v.Y = Pos.Align (Alignment.Fill, i % 3 + 10);
 
             container.Add (v);
         }

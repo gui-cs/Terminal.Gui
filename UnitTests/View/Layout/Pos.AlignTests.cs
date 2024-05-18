@@ -1,7 +1,4 @@
-﻿using Xunit.Abstractions;
-using static Terminal.Gui.Dim;
-using static Terminal.Gui.Pos;
-
+﻿
 namespace Terminal.Gui.PosDimTests;
 
 public class PosAlignTests ()
@@ -9,15 +6,15 @@ public class PosAlignTests ()
     [Fact]
     public void PosAlign_Constructor ()
     {
-        var posAlign = new PosAlign (Alignment.Justified);
+        var posAlign = new PosAlign (Alignment.Fill);
         Assert.NotNull (posAlign);
     }
 
     [Theory]
-    [InlineData (Alignment.Left, Alignment.Left, true)]
-    [InlineData (Alignment.Centered, Alignment.Centered, true)]
-    [InlineData (Alignment.Left, Alignment.Centered, false)]
-    [InlineData (Alignment.Centered, Alignment.Left, false)]
+    [InlineData (Alignment.Start, Alignment.Start, true)]
+    [InlineData (Alignment.Center, Alignment.Center, true)]
+    [InlineData (Alignment.Start, Alignment.Center, false)]
+    [InlineData (Alignment.Center, Alignment.Start, false)]
     public void PosAlign_Equals (Alignment align1, Alignment align2, bool expectedEquals)
     {
         var posAlign1 = new PosAlign (align1);
@@ -30,8 +27,8 @@ public class PosAlignTests ()
     [Fact]
     public void PosAlign_ToString ()
     {
-        var posAlign = new PosAlign (Alignment.Justified);
-        var expectedString = "Align(groupId=0, alignment=Justified)";
+        var posAlign = new PosAlign (Alignment.Fill);
+        var expectedString = "Align(groupId=0, alignment=Fill)";
 
         Assert.Equal (expectedString, posAlign.ToString ());
     }
@@ -39,7 +36,7 @@ public class PosAlignTests ()
     [Fact]
     public void PosAlign_Anchor ()
     {
-        var posAlign = new PosAlign (Alignment.Left);
+        var posAlign = new PosAlign (Alignment.Start);
         var width = 50;
         var expectedAnchor = -width;
 
@@ -49,7 +46,7 @@ public class PosAlignTests ()
     [Fact]
     public void PosAlign_CreatesCorrectInstance ()
     {
-        var pos = Pos.Align (Alignment.Left);
+        var pos = Pos.Align (Alignment.Start);
         Assert.IsType<PosAlign> (pos);
     }
 

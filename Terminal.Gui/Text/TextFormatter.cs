@@ -17,9 +17,9 @@ public class TextFormatter
     private Size _size;
     private int _tabWidth = 4;
     private string _text;
-    private Alignment _textAlignment = Alignment.Left;
+    private Alignment _textAlignment = Alignment.Start;
     private TextDirection _textDirection;
-    private Alignment _textVerticalAlignment = Alignment.Top;
+    private Alignment _textVerticalAlignment = Alignment.Start;
     private bool _wordWrap = true;
 
     /// <summary>Get or sets the horizontal text alignment.</summary>
@@ -34,7 +34,7 @@ public class TextFormatter
     /// <remarks>
     ///     <para>Used when <see cref="View"/> is using <see cref="Dim.Auto"/> to resize the view's <see cref="View.Viewport"/> to fit <see cref="Size"/>.</para>
     ///     <para>
-    ///         AutoSize is ignored if <see cref="Alignment.Justified"/> is used.
+    ///         AutoSize is ignored if <see cref="Gui.Alignment.Fill"/> is used.
     ///     </para>
     /// </remarks>
     public bool AutoSize
@@ -322,7 +322,7 @@ public class TextFormatter
             int x = 0, y = 0;
 
             // Horizontal Alignment
-            if (Alignment is Alignment.Right)
+            if (Alignment is Alignment.End)
             {
                 if (isVertical)
                 {
@@ -337,7 +337,7 @@ public class TextFormatter
                     CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
             }
-            else if (Alignment is Alignment.Left)
+            else if (Alignment is Alignment.Start)
             {
                 if (isVertical)
                 {
@@ -353,7 +353,7 @@ public class TextFormatter
 
                 CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
             }
-            else if (Alignment is Alignment.Justified)
+            else if (Alignment is Alignment.Fill)
             {
                 if (isVertical)
                 {
@@ -376,7 +376,7 @@ public class TextFormatter
 
                 CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
             }
-            else if (Alignment is Alignment.Centered)
+            else if (Alignment is Alignment.Center)
             {
                 if (isVertical)
                 {
@@ -402,7 +402,7 @@ public class TextFormatter
             }
 
             // Vertical Alignment
-            if (VerticalAlignment is Alignment.Bottom)
+            if (VerticalAlignment is Alignment.End)
             {
                 if (isVertical)
                 {
@@ -413,7 +413,7 @@ public class TextFormatter
                     y = screen.Bottom - linesFormatted.Count + line;
                 }
             }
-            else if (VerticalAlignment is Alignment.Top)
+            else if (VerticalAlignment is Alignment.Start)
             {
                 if (isVertical)
                 {
@@ -424,7 +424,7 @@ public class TextFormatter
                     y = screen.Top + line;
                 }
             }
-            else if (VerticalAlignment is Alignment.Justified)
+            else if (VerticalAlignment is Alignment.Fill)
             {
                 if (isVertical)
                 {
@@ -438,7 +438,7 @@ public class TextFormatter
                         line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
                 }
             }
-            else if (VerticalAlignment is Alignment.Centered)
+            else if (VerticalAlignment is Alignment.Center)
             {
                 if (isVertical)
                 {
@@ -476,8 +476,8 @@ public class TextFormatter
                 {
                     if (idx < 0
                         || (isVertical
-                                ? VerticalAlignment != Alignment.Bottom && current < 0
-                                : Alignment != Alignment.Right && x + current + colOffset < 0))
+                                ? VerticalAlignment != Alignment.End && current < 0
+                                : Alignment != Alignment.End && x + current + colOffset < 0))
                     {
                         current++;
 
@@ -566,7 +566,7 @@ public class TextFormatter
 
                 if (HotKeyPos > -1 && idx == HotKeyPos)
                 {
-                    if ((isVertical && VerticalAlignment == Alignment.Justified) || (!isVertical && Alignment == Alignment.Justified))
+                    if ((isVertical && VerticalAlignment == Alignment.Fill) || (!isVertical && Alignment == Alignment.Fill))
                     {
                         CursorPosition = idx - start;
                     }
@@ -704,7 +704,7 @@ public class TextFormatter
                 _lines = Format (
                                  text,
                                  Size.Height,
-                                 VerticalAlignment == Alignment.Justified,
+                                 VerticalAlignment == Alignment.Fill,
                                  Size.Width > colsWidth && WordWrap,
                                  PreserveTrailingSpaces,
                                  TabWidth,
@@ -728,7 +728,7 @@ public class TextFormatter
                 _lines = Format (
                                  text,
                                  Size.Width,
-                                 Alignment == Alignment.Justified,
+                                 Alignment == Alignment.Fill,
                                  Size.Height > 1 && WordWrap,
                                  PreserveTrailingSpaces,
                                  TabWidth,
@@ -1036,7 +1036,7 @@ public class TextFormatter
         List<Rune> runes = StripCRLF (text).ToRuneList ();
 
         int start = Math.Max (
-                              !runes.Contains ((Rune)' ') && textFormatter is { VerticalAlignment: Alignment.Bottom } && IsVerticalDirection (textDirection)
+                              !runes.Contains ((Rune)' ') && textFormatter is { VerticalAlignment: Alignment.End } && IsVerticalDirection (textDirection)
                                   ? runes.Count - width
                                   : 0,
                               0);
@@ -1268,7 +1268,7 @@ public class TextFormatter
         TextFormatter textFormatter = null
     )
     {
-        return ClipAndJustify (text, width, textAlignment == Alignment.Justified, textDirection, tabWidth, textFormatter);
+        return ClipAndJustify (text, width, textAlignment == Alignment.Fill, textDirection, tabWidth, textFormatter);
     }
 
     /// <summary>Justifies text within a specified width.</summary>
@@ -1309,12 +1309,12 @@ public class TextFormatter
         {
             if (IsHorizontalDirection (textDirection))
             {
-                if (textFormatter is { Alignment: Alignment.Right })
+                if (textFormatter is { Alignment: Alignment.End })
                 {
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
                 }
 
-                if (textFormatter is { Alignment: Alignment.Centered })
+                if (textFormatter is { Alignment: Alignment.Center })
                 {
                     return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
                 }
@@ -1324,12 +1324,12 @@ public class TextFormatter
 
             if (IsVerticalDirection (textDirection))
             {
-                if (textFormatter is { VerticalAlignment: Alignment.Bottom })
+                if (textFormatter is { VerticalAlignment: Alignment.End })
                 {
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
                 }
 
-                if (textFormatter is { VerticalAlignment: Alignment.Centered })
+                if (textFormatter is { VerticalAlignment: Alignment.Center })
                 {
                     return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
                 }
@@ -1347,14 +1347,14 @@ public class TextFormatter
 
         if (IsHorizontalDirection (textDirection))
         {
-            if (textFormatter is { Alignment: Alignment.Right })
+            if (textFormatter is { Alignment: Alignment.End })
             {
                 if (GetRuneWidth (text, tabWidth, textDirection) > width)
                 {
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
                 }
             }
-            else if (textFormatter is { Alignment: Alignment.Centered })
+            else if (textFormatter is { Alignment: Alignment.Center })
             {
                 return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
             }
@@ -1366,14 +1366,14 @@ public class TextFormatter
 
         if (IsVerticalDirection (textDirection))
         {
-            if (textFormatter is { VerticalAlignment: Alignment.Bottom })
+            if (textFormatter is { VerticalAlignment: Alignment.End })
             {
                 if (runes.Count - zeroLength > width)
                 {
                     return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
                 }
             }
-            else if (textFormatter is { VerticalAlignment: Alignment.Centered })
+            else if (textFormatter is { VerticalAlignment: Alignment.Center })
             {
                 return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
             }
@@ -1515,7 +1515,7 @@ public class TextFormatter
         return Format (
                        text,
                        width,
-                       textAlignment == Alignment.Justified,
+                       textAlignment == Alignment.Fill,
                        wordWrap,
                        preserveTrailingSpaces,
                        tabWidth,

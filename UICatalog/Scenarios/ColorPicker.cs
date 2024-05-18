@@ -69,8 +69,8 @@ public class ColorPickers : Scenario
         {
             Title = "Color Sample",
             Text = "Lorem Ipsum",
-            TextAlignment = Alignment.Centered,
-            VerticalTextAlignment = Alignment.Centered,
+            TextAlignment = Alignment.Center,
+            VerticalTextAlignment = Alignment.Center,
             BorderStyle = LineStyle.Heavy,
             X = Pos.Center (),
             Y = Pos.Center (),

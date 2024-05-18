@@ -21,7 +21,7 @@ public class Wizards : Scenario
         };
         Win.Add (frame);
 
-        var label = new Label { X = 0, Y = 0, TextAlignment = Alignment.Right, Text = "Width:" };
+        var label = new Label { X = 0, Y = 0, TextAlignment = Alignment.End, Text = "Width:" };
         frame.Add (label);
 
         var widthEdit = new TextField
@@ -41,7 +41,7 @@ public class Wizards : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextAlignment = Alignment.Right,
+            TextAlignment = Alignment.End,
             Text = "Height:"
         };
         frame.Add (label);
@@ -63,7 +63,7 @@ public class Wizards : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextAlignment = Alignment.Right,
+            TextAlignment = Alignment.End,
             Text = "Title:"
         };
         frame.Add (label);
@@ -88,7 +88,7 @@ public class Wizards : Scenario
 
         label = new()
         {
-            X = Pos.Center (), Y = Pos.AnchorEnd (1), TextAlignment = Alignment.Right, Text = "Action:"
+            X = Pos.Center (), Y = Pos.AnchorEnd (1), TextAlignment = Alignment.End, Text = "Action:"
         };
         Win.Add (label);
 

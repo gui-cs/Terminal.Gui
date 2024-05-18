@@ -787,11 +787,11 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.Alignment = Alignment.Justified;
+        view.TextFormatter.Alignment = Alignment.Fill;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.VerticalAlignment = Alignment.Centered;
+        view.TextFormatter.VerticalAlignment = Alignment.Center;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
@@ -815,11 +815,11 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextAlignment = Alignment.Justified;
+        view.TextAlignment = Alignment.Fill;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.VerticalTextAlignment = Alignment.Centered;
+        view.VerticalTextAlignment = Alignment.Center;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
@@ -844,7 +844,7 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
-        view.TextAlignment = Alignment.Justified;
+        view.TextAlignment = Alignment.Fill;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
@@ -853,7 +853,7 @@ public class DimAutoTests (ITestOutputHelper output)
             Text = "_1234",
             Width = Dim.Auto ()
         };
-        view.VerticalTextAlignment = Alignment.Centered;
+        view.VerticalTextAlignment = Alignment.Center;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 

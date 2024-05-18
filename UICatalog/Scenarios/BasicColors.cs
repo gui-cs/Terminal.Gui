@@ -32,7 +32,7 @@ public class BasicColors : Scenario
                 Y = 0,
                 Width = 1,
                 Height = 13,
-                VerticalTextAlignment = Alignment.Bottom,
+                VerticalTextAlignment = Alignment.End,
                 ColorScheme = new ColorScheme { Normal = attr },
                 Text = bg.ToString (),
                 TextDirection = TextDirection.TopBottom_LeftRight
@@ -45,7 +45,7 @@ public class BasicColors : Scenario
                 Y = y,
                 Width = 13,
                 Height = 1,
-                TextAlignment = Alignment.Right,
+                TextAlignment = Alignment.End,
                 ColorScheme = new ColorScheme { Normal = attr },
                 Text = bg.ToString ()
             };

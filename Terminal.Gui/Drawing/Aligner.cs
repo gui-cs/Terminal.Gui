@@ -114,8 +114,7 @@ public class Aligner : INotifyPropertyChanged
 
         switch (alignment)
         {
-            case Alignment.Left:
-            case Alignment.Top:
+            case Alignment.Start:
                 var currentPosition = 0;
 
                 for (var i = 0; i < sizes.Length; i++)
@@ -137,9 +136,7 @@ public class Aligner : INotifyPropertyChanged
 
                 break;
 
-            case Alignment.Right:
-            case Alignment.Bottom:
-
+            case Alignment.End:
                 currentPosition = containerSize - totalItemsSize - spaces;
 
                 for (var i = 0; i < sizes.Length; i++)
@@ -153,7 +150,7 @@ public class Aligner : INotifyPropertyChanged
 
                 break;
 
-            case Alignment.Centered:
+            case Alignment.Center:
                 if (sizes.Length > 1)
                 {
                     // remaining space to be distributed before first and after the items
@@ -184,7 +181,7 @@ public class Aligner : INotifyPropertyChanged
 
                 break;
 
-            case Alignment.Justified:
+            case Alignment.Fill:
                 int spaceBetween = sizes.Length > 1 ? (containerSize - totalItemsSize) / (sizes.Length - 1) : 0;
                 int remainder = sizes.Length > 1 ? (containerSize - totalItemsSize) % (sizes.Length - 1) : 0;
                 currentPosition = 0;
@@ -200,8 +197,7 @@ public class Aligner : INotifyPropertyChanged
                 break;
 
             // 111 2222        33333
-            case Alignment.LastRightRestLeft:
-            case Alignment.LastBottomRestTop:
+            case Alignment.LastEndRestStart:
                 if (sizes.Length > 1)
                 {
                     if (totalItemsSize > containerSize)
@@ -238,8 +234,7 @@ public class Aligner : INotifyPropertyChanged
                 break;
 
             // 111        2222 33333
-            case Alignment.FirstLeftRestRight:
-            case Alignment.FirstTopRestBottom:
+            case Alignment.FirstStartRestEnd:
                 if (sizes.Length > 1)
                 {
                     currentPosition = 0;
