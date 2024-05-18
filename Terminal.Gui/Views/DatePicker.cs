@@ -271,8 +271,8 @@ public class DatePicker : View
                                        Text = _date.ToString (Format);
                                    };
 
-        Height = Dim.Auto ();
-        Width = Dim.Auto ();
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content);
 
         // BUGBUG: Remove when Dim.Auto(subviews) fully works
         SetContentSize (new (_calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7, _calendar.Frame.Height + 1));
