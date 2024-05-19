@@ -63,24 +63,26 @@ public sealed class PosAlignDemo : Scenario
                                                    if (dimension == Dimension.Width)
                                                    {
                                                        _horizAligner.Alignment =
-                                                         (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
+                                                           (Alignment)Enum.Parse (
+                                                                                  typeof (Alignment),
+                                                                                  alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
                                                        UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
                                                    }
                                                    else
                                                    {
                                                        _vertAligner.Alignment =
-                                                         (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
+                                                           (Alignment)Enum.Parse (
+                                                                                  typeof (Alignment),
+                                                                                  alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
                                                        UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
                                                    }
-
                                                };
         appWindow.Add (alignRadioGroup);
-
 
         CheckBox ignoreFirstOrLast = new ()
         {
             ColorScheme = colorScheme,
-            Text = "IgnoreFirstOrLast",
+            Text = "IgnoreFirstOrLast"
         };
 
         if (dimension == Dimension.Width)
@@ -97,30 +99,30 @@ public sealed class PosAlignDemo : Scenario
         }
 
         ignoreFirstOrLast.Toggled += (s, e) =>
-                               {
-                                   if (dimension == Dimension.Width)
-                                   {
-                                       _horizAligner.AlignmentModes = e.NewValue is { } &&
-                                                                 e.NewValue.Value ?
-                                                                     _horizAligner.AlignmentModes | AlignmentModes.IgnoreFirstOrLast :
-                                                                     _horizAligner.AlignmentModes & ~AlignmentModes.IgnoreFirstOrLast;
-                                       UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
-                                   }
-                                   else
-                                   {
-                                       _vertAligner.AlignmentModes = e.NewValue is { } &&
-                                                                 e.NewValue.Value ?
-                                                                     _vertAligner.AlignmentModes | AlignmentModes.IgnoreFirstOrLast :
-                                                                     _vertAligner.AlignmentModes & ~AlignmentModes.IgnoreFirstOrLast;
-                                       UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
-                                   }
-                               };
+                                     {
+                                         if (dimension == Dimension.Width)
+                                         {
+                                             _horizAligner.AlignmentModes =
+                                                 e.NewValue is { } && e.NewValue.Value
+                                                     ? _horizAligner.AlignmentModes | AlignmentModes.IgnoreFirstOrLast
+                                                     : _horizAligner.AlignmentModes & ~AlignmentModes.IgnoreFirstOrLast;
+                                             UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
+                                         }
+                                         else
+                                         {
+                                             _vertAligner.AlignmentModes =
+                                                 e.NewValue is { } && e.NewValue.Value
+                                                     ? _vertAligner.AlignmentModes | AlignmentModes.IgnoreFirstOrLast
+                                                     : _vertAligner.AlignmentModes & ~AlignmentModes.IgnoreFirstOrLast;
+                                             UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
+                                         }
+                                     };
         appWindow.Add (ignoreFirstOrLast);
 
         CheckBox addSpacesBetweenItems = new ()
         {
             ColorScheme = colorScheme,
-            Text = "AddSpaceBetweenItems",
+            Text = "AddSpaceBetweenItems"
         };
 
         if (dimension == Dimension.Width)
@@ -137,25 +139,24 @@ public sealed class PosAlignDemo : Scenario
         }
 
         addSpacesBetweenItems.Toggled += (s, e) =>
-                             {
-                                 if (dimension == Dimension.Width)
-                                 {
-                                     _horizAligner.AlignmentModes = e.NewValue is { } &&
-                                                             e.NewValue.Value ?
-                                                                 _horizAligner.AlignmentModes | AlignmentModes.AddSpaceBetweenItems :
-                                                                 _horizAligner.AlignmentModes & ~AlignmentModes.AddSpaceBetweenItems;
-                                     UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
-                                 }
-                                 else
-                                 {
-                                     _vertAligner.AlignmentModes = e.NewValue is { } &&
-                                                             e.NewValue.Value ?
-                                                                 _vertAligner.AlignmentModes | AlignmentModes.AddSpaceBetweenItems :
-                                                                 _vertAligner.AlignmentModes & ~AlignmentModes.AddSpaceBetweenItems;
-                                     UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
-                                 }
-
-                             };
+                                         {
+                                             if (dimension == Dimension.Width)
+                                             {
+                                                 _horizAligner.AlignmentModes =
+                                                     e.NewValue is { } && e.NewValue.Value
+                                                         ? _horizAligner.AlignmentModes | AlignmentModes.AddSpaceBetweenItems
+                                                         : _horizAligner.AlignmentModes & ~AlignmentModes.AddSpaceBetweenItems;
+                                                 UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
+                                             }
+                                             else
+                                             {
+                                                 _vertAligner.AlignmentModes =
+                                                     e.NewValue is { } && e.NewValue.Value
+                                                         ? _vertAligner.AlignmentModes | AlignmentModes.AddSpaceBetweenItems
+                                                         : _vertAligner.AlignmentModes & ~AlignmentModes.AddSpaceBetweenItems;
+                                                 UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
+                                             }
+                                         };
 
         appWindow.Add (addSpacesBetweenItems);
 
@@ -194,14 +195,14 @@ public sealed class PosAlignDemo : Scenario
         List<Button> addedViews =
         [
             new ()
-                                                       {
-                                                           X = dimension == Dimension.Width ? Pos.Align (_horizAligner.Alignment) : Pos.Left (alignRadioGroup),
-                                                           Y = dimension == Dimension.Width ? Pos.Top(alignRadioGroup): Pos.Align (_vertAligner.Alignment),
-                                                           Text = NumberToWords.Convert (0)
-                                                       }
+            {
+                X = dimension == Dimension.Width ? Pos.Align (_horizAligner.Alignment) : Pos.Left (alignRadioGroup),
+                Y = dimension == Dimension.Width ? Pos.Top (alignRadioGroup) : Pos.Align (_vertAligner.Alignment),
+                Text = NumberToWords.Convert (0)
+            }
         ];
 
-        Buttons.NumericUpDown<int> addedViewsUpDown = new Buttons.NumericUpDown<int>
+        Buttons.NumericUpDown<int> addedViewsUpDown = new()
         {
             Width = 9,
             Title = "Added",
@@ -279,22 +280,22 @@ public sealed class PosAlignDemo : Scenario
                 // BUGBUG: of changes in the Pos object. See https://github.com/gui-cs/Terminal.Gui/issues/3485
                 if (dimension == Dimension.Width)
                 {
-                    PosAlign posAlign = view.X as PosAlign;
-                    view.X = new PosAlign (
-                                           aligner.Alignment,
-                                           aligner.AlignmentModes,
-                                           posAlign!.GroupId);
-                    view.Margin.Thickness = new (_leftMargin, 0, 0, 0);
+                    var posAlign = view.X as PosAlign;
 
+                    view.X = Pos.Align (
+                                        aligner.Alignment,
+                                        aligner.AlignmentModes,
+                                        posAlign!.GroupId);
+                    view.Margin.Thickness = new (_leftMargin, 0, 0, 0);
                 }
                 else
                 {
-                    PosAlign posAlign = view.Y as PosAlign;
-                    view.Y = new PosAlign (
-                                           aligner.Alignment,
-                                           aligner.AlignmentModes,
-                                           posAlign!.GroupId);
+                    var posAlign = view.Y as PosAlign;
 
+                    view.Y = Pos.Align (
+                                        aligner.Alignment,
+                                        aligner.AlignmentModes,
+                                        posAlign!.GroupId);
 
                     view.Margin.Thickness = new (0, _topMargin, 0, 0);
                 }
@@ -305,13 +306,13 @@ public sealed class PosAlignDemo : Scenario
     }
 
     /// <summary>
-    /// Creates a 3x3 grid of views with two GroupIds: One for aligning X and one for aligning Y.
-    /// Demonstrates using PosAlign to create a grid of views that flow.
+    ///     Creates a 3x3 grid of views with two GroupIds: One for aligning X and one for aligning Y.
+    ///     Demonstrates using PosAlign to create a grid of views that flow.
     /// </summary>
     /// <param name="appWindow"></param>
     private void Setup3By3Grid (View appWindow)
     {
-        var container = new FrameView ()
+        var container = new FrameView
         {
             Title = "3 by 3",
             X = Pos.AnchorEnd (),
@@ -319,26 +320,30 @@ public sealed class PosAlignDemo : Scenario
             Width = Dim.Percent (40),
             Height = Dim.Percent (40)
         };
-        container.Padding.Thickness = new Thickness (8, 1, 0, 0);
+        container.Padding.Thickness = new (8, 1, 0, 0);
         container.Padding.ColorScheme = Colors.ColorSchemes ["error"];
 
         Aligner widthAligner = new () { AlignmentModes = AlignmentModes.StartToEnd };
+
         RadioGroup widthAlignRadioGroup = new ()
         {
             RadioLabels = Enum.GetNames<Alignment> (),
             Orientation = Orientation.Horizontal,
-            X = Pos.Center (),
+            X = Pos.Center ()
         };
         container.Padding.Add (widthAlignRadioGroup);
 
         widthAlignRadioGroup.SelectedItemChanged += (sender, e) =>
-        {
-            widthAligner.Alignment =
-                (Alignment)Enum.Parse (typeof (Alignment), widthAlignRadioGroup.RadioLabels [widthAlignRadioGroup.SelectedItem]);
-            UpdatePosAlignObjects (container, Dimension.Width, widthAligner);
-        };
+                                                    {
+                                                        widthAligner.Alignment =
+                                                            (Alignment)Enum.Parse (
+                                                                                   typeof (Alignment),
+                                                                                   widthAlignRadioGroup.RadioLabels [widthAlignRadioGroup.SelectedItem]);
+                                                        UpdatePosAlignObjects (container, Dimension.Width, widthAligner);
+                                                    };
 
         Aligner heightAligner = new () { AlignmentModes = AlignmentModes.StartToEnd };
+
         RadioGroup heightAlignRadioGroup = new ()
         {
             RadioLabels = Enum.GetNames<Alignment> (),
@@ -348,11 +353,13 @@ public sealed class PosAlignDemo : Scenario
         container.Padding.Add (heightAlignRadioGroup);
 
         heightAlignRadioGroup.SelectedItemChanged += (sender, e) =>
-        {
-            heightAligner.Alignment =
-                (Alignment)Enum.Parse (typeof (Alignment), heightAlignRadioGroup.RadioLabels [heightAlignRadioGroup.SelectedItem]);
-            UpdatePosAlignObjects (container, Dimension.Height, heightAligner);
-        };
+                                                     {
+                                                         heightAligner.Alignment =
+                                                             (Alignment)Enum.Parse (
+                                                                                    typeof (Alignment),
+                                                                                    heightAlignRadioGroup.RadioLabels [heightAlignRadioGroup.SelectedItem]);
+                                                         UpdatePosAlignObjects (container, Dimension.Height, heightAligner);
+                                                     };
 
         for (var i = 0; i < 9; i++)
 
@@ -365,8 +372,8 @@ public sealed class PosAlignDemo : Scenario
                 Width = 5
             };
 
-            v.X = Pos.Align (widthAligner.Alignment, widthAligner.AlignmentModes, groupId: i / 3);
-            v.Y = Pos.Align (heightAligner.Alignment,heightAligner.AlignmentModes, groupId: i % 3 + 10);
+            v.X = Pos.Align (widthAligner.Alignment, widthAligner.AlignmentModes, i / 3);
+            v.Y = Pos.Align (heightAligner.Alignment, heightAligner.AlignmentModes, i % 3 + 10);
 
             container.Add (v);
         }

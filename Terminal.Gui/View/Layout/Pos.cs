@@ -1,6 +1,4 @@
 #nullable enable
-using System.ComponentModel;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -136,24 +134,34 @@ namespace Terminal.Gui;
 public abstract class Pos
 {
     #region static Pos creation methods
+
     /// <summary>Creates a <see cref="Pos"/> object that is an absolute position based on the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Pos"/>.</returns>
     /// <param name="position">The value to convert to the <see cref="Pos"/>.</param>
     public static Pos Absolute (int position) { return new PosAbsolute (position); }
 
     /// <summary>
-    ///     Creates a <see cref="Pos"/> object that aligns a set of views according to the specified alignment setting.
+    ///     Creates a <see cref="Pos"/> object that aligns a set of views according to the specified <see cref="Alignment"/>
+    ///     and <see cref="AlignmentModes"/>.
     /// </summary>
     /// <param name="alignment">The alignment.</param>
     /// <param name="modes">The optional alignment modes.</param>
     /// <param name="groupId">
-    ///     The optional, unique identifier for the set of views to align according to
-    ///     <paramref name="alignment"/>.
+    ///     The optional identifier of a set of views that should be aligned together. When only a single
+    ///     set of views in a SuperView is aligned, this parameter is optional.
     /// </param>
     /// <returns></returns>
     public static Pos Align (Alignment alignment, AlignmentModes modes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, int groupId = 0)
     {
-        return new PosAlign (alignment, modes, groupId);
+        return new PosAlign
+        {
+            Aligner = new ()
+            {
+                Alignment = alignment,
+                AlignmentModes = modes
+            },
+            GroupId = groupId
+        };
     }
 
     /// <summary>
