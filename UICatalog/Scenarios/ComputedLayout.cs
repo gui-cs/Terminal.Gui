@@ -305,7 +305,7 @@ public class ComputedLayout : Scenario
         app.Add (oddballButton);
 
         // Demonstrate AnchorEnd - Button is anchored to bottom/right
-        var anchorButton = new Button { Text = "Button using AnchorEnd", Y = Pos.AnchorEnd ()};
+        var anchorButton = new Button { Text = "Button using AnchorEnd", Y = Pos.AnchorEnd () };
         anchorButton.X = Pos.AnchorEnd ();
 
         anchorButton.Accept += (s, e) =>
@@ -346,9 +346,14 @@ public class ComputedLayout : Scenario
         };
         app.Add (anchorEndLabel2);
 
+        // Demonstrate AnchorEnd() in combination with Pos.Align to align a set of buttons centered across the
+        // bottom - 1
+        // This is intentionally convoluted to illustrate potential bugs.
         var leftButton = new Button
         {
-            Text = "Left", Y = Pos.AnchorEnd () - 1
+            Text = "Left",
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.AnchorEnd () - 1
         };
 
         leftButton.Accept += (s, e) =>
@@ -364,7 +369,9 @@ public class ComputedLayout : Scenario
         // show positioning vertically using Pos.AnchorEnd
         var centerButton = new Button
         {
-            Text = "Center", Y = Pos.AnchorEnd (2) // Pos.AnchorEnd(1)
+            Text = "Center",
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.AnchorEnd (2),
         };
 
         centerButton.Accept += (s, e) =>
@@ -378,7 +385,12 @@ public class ComputedLayout : Scenario
                                 };
 
         // show positioning vertically using another window and Pos.Bottom
-        var rightButton = new Button { Text = "Right", Y = Pos.Y (centerButton) };
+        var rightButton = new Button
+        {
+            Text = "Right",
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.Y (centerButton)
+        };
 
         rightButton.Accept += (s, e) =>
                                {
@@ -394,12 +406,6 @@ public class ComputedLayout : Scenario
         app.Add (leftButton);
         app.Add (centerButton);
         app.Add (rightButton);
-
-
-        // Center three buttons with 
-        leftButton.X = Pos.Align (Alignment.Center);
-        centerButton.X = Pos.Align (Alignment.Center);
-        rightButton.X = Pos.Align (Alignment.Center);
 
         Application.Run (app);
         app.Dispose ();

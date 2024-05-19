@@ -5,7 +5,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Pos.Align", "Shows off Pos.Align")]
+[ScenarioMetadata ("Pos.Align", "Demonstrates Pos.Align")]
 [ScenarioCategory ("Layout")]
 public sealed class PosAlignDemo : Scenario
 {
@@ -25,11 +25,11 @@ public sealed class PosAlignDemo : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()} - {GetDescription ()}"
         };
 
-        SetupControls (appWindow, Dimension.Width, Colors.ColorSchemes ["Toplevel"]);
+        SetupControls (appWindow, Dimension.Width, Colors.ColorSchemes ["TopLevel"]);
 
         SetupControls (appWindow, Dimension.Height, Colors.ColorSchemes ["Error"]);
 
-        //Setup3by3Grid (appWindow);
+        Setup3By3Grid (appWindow);
 
         // Run - Start the application.
         Application.Run (appWindow);
@@ -266,11 +266,11 @@ public sealed class PosAlignDemo : Scenario
         appWindow.Add (addedViews [0]);
     }
 
-    private void UpdatePosAlignObjects (Window appWindow, Dimension dimension, Aligner aligner)
+    private void UpdatePosAlignObjects (View superView, Dimension dimension, Aligner aligner)
     {
-        foreach (View view in appWindow.Subviews.Where (v => dimension == Dimension.Width ? v.X is PosAlign : v.Y is PosAlign))
+        foreach (View view in superView.Subviews.Where (v => dimension == Dimension.Width ? v.X is PosAlign : v.Y is PosAlign))
         {
-            if (dimension == Dimension.Width ? view.X is PosAlign posAlign : view.Y is PosAlign)
+            if (dimension == Dimension.Width ? view.X is PosAlign : view.Y is PosAlign)
             {
                 //posAlign.Aligner.Alignment = _horizAligner.Alignment;
                 //posAlign.Aligner.AlignmentMode = _horizAligner.AlignmentMode;
@@ -279,23 +279,98 @@ public sealed class PosAlignDemo : Scenario
                 // BUGBUG: of changes in the Pos object. See https://github.com/gui-cs/Terminal.Gui/issues/3485
                 if (dimension == Dimension.Width)
                 {
+                    PosAlign posAlign = view.X as PosAlign;
                     view.X = new PosAlign (
                                            aligner.Alignment,
-                                           aligner.AlignmentMode);
+                                           aligner.AlignmentMode,
+                                           posAlign!.GroupId);
                     view.Margin.Thickness = new (_leftMargin, 0, 0, 0);
 
                 }
                 else
                 {
+                    PosAlign posAlign = view.Y as PosAlign;
                     view.Y = new PosAlign (
                                            aligner.Alignment,
-                                           aligner.AlignmentMode);
+                                           aligner.AlignmentMode,
+                                           posAlign!.GroupId);
+
 
                     view.Margin.Thickness = new (0, _topMargin, 0, 0);
                 }
             }
         }
 
-        appWindow.LayoutSubviews ();
+        superView.LayoutSubviews ();
+    }
+
+    /// <summary>
+    /// Creates a 3x3 grid of views with two GroupIds: One for aligning X and one for aligning Y.
+    /// Demonstrates using PosAlign to create a grid of views that flow.
+    /// </summary>
+    /// <param name="appWindow"></param>
+    private void Setup3By3Grid (View appWindow)
+    {
+        var container = new FrameView ()
+        {
+            Title = "3 by 3",
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Percent (40),
+            Height = Dim.Percent (40)
+        };
+        container.Padding.Thickness = new Thickness (8, 1, 0, 0);
+        container.Padding.ColorScheme = Colors.ColorSchemes ["error"];
+
+        Aligner widthAligner = new () { AlignmentMode = AlignmentModes.StartToEnd };
+        RadioGroup widthAlignRadioGroup = new ()
+        {
+            RadioLabels = Enum.GetNames<Alignment> (),
+            Orientation = Orientation.Horizontal,
+            X = Pos.Center (),
+        };
+        container.Padding.Add (widthAlignRadioGroup);
+
+        widthAlignRadioGroup.SelectedItemChanged += (sender, e) =>
+        {
+            widthAligner.Alignment =
+                (Alignment)Enum.Parse (typeof (Alignment), widthAlignRadioGroup.RadioLabels [widthAlignRadioGroup.SelectedItem]);
+            UpdatePosAlignObjects (container, Dimension.Width, widthAligner);
+        };
+
+        Aligner heightAligner = new () { AlignmentMode = AlignmentModes.StartToEnd };
+        RadioGroup heightAlignRadioGroup = new ()
+        {
+            RadioLabels = Enum.GetNames<Alignment> (),
+            Orientation = Orientation.Vertical,
+            Y = Pos.Center ()
+        };
+        container.Padding.Add (heightAlignRadioGroup);
+
+        heightAlignRadioGroup.SelectedItemChanged += (sender, e) =>
+        {
+            heightAligner.Alignment =
+                (Alignment)Enum.Parse (typeof (Alignment), heightAlignRadioGroup.RadioLabels [heightAlignRadioGroup.SelectedItem]);
+            UpdatePosAlignObjects (container, Dimension.Height, heightAligner);
+        };
+
+        for (var i = 0; i < 9; i++)
+
+        {
+            var v = new View
+            {
+                Title = $"{i}",
+                BorderStyle = LineStyle.Dashed,
+                Height = 3,
+                Width = 5
+            };
+
+            v.X = Pos.Align (widthAligner.Alignment, widthAligner.AlignmentMode, groupId: i / 3);
+            v.Y = Pos.Align (heightAligner.Alignment,heightAligner.AlignmentMode, groupId: i % 3 + 10);
+
+            container.Add (v);
+        }
+
+        appWindow.Add (container);
     }
 }

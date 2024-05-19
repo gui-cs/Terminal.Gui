@@ -30,6 +30,12 @@ public class PosAlign : Pos
     /// </summary>
     private readonly int _groupId;
 
+    public int GroupId
+    {
+        get => _groupId;
+        init => _groupId = value;
+    }
+
     /// <summary>
     ///     Gets the alignment settings.
     /// </summary>
