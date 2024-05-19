@@ -14,7 +14,7 @@ public class Aligner : INotifyPropertyChanged
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         <see cref="AlignmentMode"/> provides additional options for aligning items in a container.
+    ///         <see cref="AlignmentModes"/> provides additional options for aligning items in a container.
     ///     </para>
     /// </remarks>
     public Alignment Alignment
@@ -32,13 +32,13 @@ public class Aligner : INotifyPropertyChanged
     /// <summary>
     ///     Gets or sets the modes controlling <see cref="Alignment"/>.
     /// </summary>
-    public AlignmentModes AlignmentMode
+    public AlignmentModes AlignmentModes
     {
         get => _alignmentMode;
         set
         {
             _alignmentMode = value;
-            PropertyChanged?.Invoke (this, new (nameof (AlignmentMode)));
+            PropertyChanged?.Invoke (this, new (nameof (AlignmentModes)));
         }
     }
 
@@ -62,11 +62,11 @@ public class Aligner : INotifyPropertyChanged
 
     /// <summary>
     ///     Takes a list of item sizes and returns a list of the positions of those items when aligned within <see name="ContainerSize"/>
-    ///     using the <see cref="Alignment"/> and <see cref="AlignmentMode"/> settings.
+    ///     using the <see cref="Alignment"/> and <see cref="AlignmentModes"/> settings.
     /// </summary>
     /// <param name="sizes">The sizes of the items to align.</param>
     /// <returns>The locations of the items, from left/top to right/bottom.</returns>
-    public int [] Align (int [] sizes) { return Align (Alignment, AlignmentMode, ContainerSize, sizes); }
+    public int [] Align (int [] sizes) { return Align (Alignment, AlignmentModes, ContainerSize, sizes); }
 
     /// <summary>
     ///     Takes a list of item sizes and returns a list of the  positions of those items when aligned within <paramref name="containerSize"/>

@@ -383,7 +383,7 @@ public class AlignerTests (ITestOutputHelper output)
         int [] positions = new Aligner
         {
             Alignment = alignment,
-            AlignmentMode = AlignmentModes.StartToEnd | modes,
+            AlignmentModes = AlignmentModes.StartToEnd | modes,
             ContainerSize = containerSize
         }.Align (sizes);
         AssertAlignment (alignment, sizes, containerSize, positions, expected);

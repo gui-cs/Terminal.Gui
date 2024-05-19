@@ -114,12 +114,12 @@ public class PosAlign : Pos
     ///     Enables alignment of a set of views.
     /// </summary>
     /// <param name="alignment"></param>
-    /// <param name="mode"></param>
+    /// <param name="modes"></param>
     /// <param name="groupId">The unique identifier for the set of views to align according to <paramref name="alignment"/>.</param>
-    public PosAlign (Alignment alignment, AlignmentModes mode = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, int groupId = 0)
+    public PosAlign (Alignment alignment, AlignmentModes modes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, int groupId = 0)
     {
         Aligner.Alignment = alignment;
-        Aligner.AlignmentMode = mode;
+        Aligner.AlignmentModes = modes;
         _groupId = groupId;
         Aligner.PropertyChanged += Aligner_PropertyChanged;
     }

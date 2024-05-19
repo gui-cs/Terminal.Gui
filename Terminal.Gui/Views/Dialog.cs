@@ -52,6 +52,7 @@ public class Dialog : Window
 
         Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
+        ButtonAlignmentModes = DefaultButtonAlignmentModes;
 
         AddCommand (
                     Command.QuitToplevel,
@@ -100,6 +101,11 @@ public class Dialog : Window
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
     public Alignment ButtonAlignment { get; set; }
 
+    /// <summary>
+    /// Gets or sets the alignment modes for the dialog's buttons.
+    /// </summary>
+    public AlignmentModes ButtonAlignmentModes { get; set; }
+
     /// <summary>Optional buttons to lay out at the bottom of the dialog.</summary>
     public Button [] Buttons
     {
@@ -124,6 +130,12 @@ public class Dialog : Window
     [JsonConverter (typeof (JsonStringEnumConverter))]
     public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
 
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
+
     /// <summary>
     ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
     ///     <see cref="Dialog"/>
@@ -136,7 +148,8 @@ public class Dialog : Window
             return;
         }
 
-        button.X = Pos.Align (ButtonAlignment);
+        // Use a distinct GroupId so users can use Pos.Align for other views in the Dialog
+        button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, groupId: GetHashCode ());
         button.Y = Pos.AnchorEnd ();
 
         _buttons.Add (button);

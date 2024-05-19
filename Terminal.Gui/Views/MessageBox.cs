@@ -340,17 +340,16 @@ public static class MessageBox
             }
         }
 
-        Alignment buttonJust = Dialog.DefaultButtonAlignment;
-        Dialog.DefaultButtonAlignment = Alignment.Center;
         var d = new Dialog
         {
+            ButtonAlignment = Alignment.Center,
+            ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems,
             Buttons = buttonList.ToArray (),
             Title = title,
             BorderStyle = DefaultBorderStyle,
             Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent(60)),
             Height = Dim.Auto (DimAutoStyle.Content),
         };
-        Dialog.DefaultButtonAlignment = buttonJust;
 
         if (width != 0)
         {
