@@ -13,6 +13,9 @@ public enum Alignment
     ///         If the container is smaller than the total size of the items, the end items will be clipped (their locations
     ///         will be greater than the container size).
     ///     </para>
+    ///     <para>
+    ///         The <see cref="AlignmentModes"/> enumeration provides additional options for aligning items in a container.
+    ///     </para>
     /// </remarks>
     /// <example>
     ///     <c>
@@ -28,6 +31,9 @@ public enum Alignment
     ///     <para>
     ///         If the container is smaller than the total size of the items, the start items will be clipped (their locations
     ///         will be negative).
+    ///     </para>
+    ///     <para>
+    ///         The <see cref="AlignmentModes"/> enumeration provides additional options for aligning items in a container.
     ///     </para>
     /// </remarks>
     /// <example>
@@ -69,36 +75,4 @@ public enum Alignment
     ///     </c>
     /// </example>
     Fill,
-
-    /// <summary>
-    ///     The first item will be aligned to the start and the remaining will aligned to the end.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         If the container is smaller than the total size of the items, the end items will be clipped (their locations
-    ///         will be greater than the container size).
-    ///     </para>
-    /// </remarks>
-    /// <example>
-    ///     <c>
-    ///         |111     2222 33333|
-    ///     </c>
-    /// </example>
-    FirstStartRestEnd,
-
-    /// <summary>
-    ///     The last item will be aligned to the end and the remaining will aligned to the start.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         If the container is smaller than the total size of the items, the start items will be clipped (their locations
-    ///         will be negative).
-    ///     </para>
-    /// </remarks>
-    /// <example>
-    ///     <c>
-    ///         |111 2222      33333|
-    ///     </c>
-    /// </example>
-    LastEndRestStart
 }

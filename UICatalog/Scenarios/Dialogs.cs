@@ -146,7 +146,7 @@ public class Dialogs : Scenario
         };
         frame.Add (label);
 
-        var labels = new [] { "Left", "Centered", "Right", "Justified", "FirstLeftRestRight", "LastRightRestLeft" };
+        var labels = new [] { "Start", "End", "Center", "Fill", "FirstStartRestEnd", "LastEndRestStart" };
         var alignmentGroup = new RadioGroup
         {
             X = Pos.Right (label) + 1,

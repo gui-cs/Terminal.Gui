@@ -133,7 +133,7 @@ public class UnicodeInMenu : Scenario
             Width = Dim.Percent (50),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = $"Justify Right - {gitString}"
+            Text = $"End - {gitString}"
         };
         Win.Add (checkBox, checkBoxRight);
 

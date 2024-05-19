@@ -33,44 +33,44 @@ public class TextAlignmentAndDirection : Scenario
         {
             X = 1,
             Y = 1,
-            Width = 9,
+            Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
             ColorScheme = Colors.ColorSchemes ["Dialog"],
-            Text = "Left"
+            Text = "Start"
         };
 
         var labelHC = new Label
         {
             X = 1,
             Y = 2,
-            Width = 9,
+            Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
             ColorScheme = Colors.ColorSchemes ["Dialog"],
-            Text = "Centered"
+            Text = "Center"
         };
 
         var labelHR = new Label
         {
             X = 1,
             Y = 3,
-            Width = 9,
+            Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
             ColorScheme = Colors.ColorSchemes ["Dialog"],
-            Text = "Right"
+            Text = "End"
         };
 
         var labelHJ = new Label
         {
             X = 1,
             Y = 4,
-            Width = 9,
+            Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
             ColorScheme = Colors.ColorSchemes ["Dialog"],
-            Text = "Justified"
+            Text = "Fill"
         };
 
         var txtLabelHL = new Label
@@ -138,11 +138,11 @@ public class TextAlignmentAndDirection : Scenario
             X = Pos.AnchorEnd (8),
             Y = 1,
             Width = 2,
-            Height = 9,
+            Height = 6,
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
-            Text = "Top"
+            Text = "Start"
         };
         labelVT.TextFormatter.WordWrap = false;
 
@@ -151,11 +151,11 @@ public class TextAlignmentAndDirection : Scenario
             X = Pos.AnchorEnd (6),
             Y = 1,
             Width = 2,
-            Height = 9,
+            Height = 6,
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
-            Text = "Centered"
+            Text = "Center"
         };
         labelVM.TextFormatter.WordWrap = false;
 
@@ -164,11 +164,11 @@ public class TextAlignmentAndDirection : Scenario
             X = Pos.AnchorEnd (4),
             Y = 1,
             Width = 2,
-            Height = 9,
+            Height = 6,
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
-            Text = "Bottom"
+            Text = "End"
         };
         labelVB.TextFormatter.WordWrap = false;
 
@@ -177,11 +177,11 @@ public class TextAlignmentAndDirection : Scenario
             X = Pos.AnchorEnd (2),
             Y = 1,
             Width = 2,
-            Height = 9,
+            Height = 6,
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
-            Text = "Justified"
+            Text = "Fill"
         };
         labelVJ.TextFormatter.WordWrap = false;
 
@@ -459,7 +459,7 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Y (container) + 1,
             Width = Dim.Fill (10),
             Height = 1,
-            Text = "Justify"
+            Text = "Fill"
         };
 
         app.Add (justifyCheckbox);
@@ -471,7 +471,7 @@ public class TextAlignmentAndDirection : Scenario
             X = Pos.Left (justifyCheckbox) + 1,
             Y = Pos.Y (justifyCheckbox) + 1,
             Width = Dim.Fill (11),
-            RadioLabels = ["Current direction", "Opposite direction", "Justify Both"],
+            RadioLabels = ["Current direction", "Opposite direction", "FIll Both"],
             Enabled = false
         };
 

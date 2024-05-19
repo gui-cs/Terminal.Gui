@@ -218,7 +218,7 @@ public class Buttons : Scenario
             X = 4,
             Y = Pos.Bottom (label) + 1,
             SelectedItem = 2,
-            RadioLabels = new [] { "Left", "Right", "Centered", "Justified" }
+            RadioLabels = new [] { "Start", "End", "Center", "Fill" }
         };
         main.Add (radioGroup);
 

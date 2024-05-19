@@ -25,11 +25,11 @@ public sealed class PosAlignDemo : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()} - {GetDescription ()}"
         };
 
-        SetupHorizontalControls (appWindow);
+        SetupControls (appWindow, Dimension.Width, Colors.ColorSchemes ["Toplevel"]);
 
-        SetupVerticalControls (appWindow);
+        SetupControls (appWindow, Dimension.Height, Colors.ColorSchemes ["Error"]);
 
-        Setup3by3Grid (appWindow);
+        //Setup3by3Grid (appWindow);
 
         // Run - Start the application.
         Application.Run (appWindow);
@@ -39,82 +39,154 @@ public sealed class PosAlignDemo : Scenario
         Application.Shutdown ();
     }
 
-    private void SetupHorizontalControls (Window appWindow)
+    private void SetupControls (Window appWindow, Dimension dimension, ColorScheme colorScheme)
     {
-        ColorScheme colorScheme = Colors.ColorSchemes ["Toplevel"];
-
         RadioGroup alignRadioGroup = new ()
         {
-            X = Pos.Align (_horizAligner.Alignment),
-            Y = Pos.Center (),
-            RadioLabels = new [] { "Start", "End", "Center", "Fill", "FirstLeftRestRight", "LastRightRestLeft" },
+            RadioLabels = Enum.GetNames<Alignment> (),
             ColorScheme = colorScheme
         };
 
-        alignRadioGroup.SelectedItemChanged += (s, e) =>
-                                             {
-                                                 _horizAligner.Alignment =
-                                                     (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
+        if (dimension == Dimension.Width)
+        {
+            alignRadioGroup.X = Pos.Align (_horizAligner.Alignment);
+            alignRadioGroup.Y = Pos.Center ();
+        }
+        else
+        {
+            alignRadioGroup.X = Pos.Center ();
+            alignRadioGroup.Y = Pos.Align (_vertAligner.Alignment);
+        }
 
-                                                 foreach (View view in appWindow.Subviews.Where (v => v.X is PosAlign))
-                                                 {
-                                                     if (view.X is PosAlign j)
-                                                     {
-                                                         var newJust = new PosAlign (_horizAligner.Alignment)
-                                                         {
-                                                             Aligner =
-                                                             {
-                                                                 SpaceBetweenItems = _horizAligner.SpaceBetweenItems
-                                                             }
-                                                         };
-                                                         view.X = newJust;
-                                                     }
-                                                 }
-                                             };
+        alignRadioGroup.SelectedItemChanged += (s, e) =>
+                                               {
+                                                   if (dimension == Dimension.Width)
+                                                   {
+                                                       _horizAligner.Alignment =
+                                                         (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
+                                                       UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
+                                                   }
+                                                   else
+                                                   {
+                                                       _vertAligner.Alignment =
+                                                         (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
+                                                       UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
+                                                   }
+
+                                               };
         appWindow.Add (alignRadioGroup);
 
-        CheckBox putSpaces = new ()
+
+        CheckBox ignoreFirstOrLast = new ()
         {
-            X = Pos.Align (_horizAligner.Alignment),
-            Y = Pos.Top (alignRadioGroup),
             ColorScheme = colorScheme,
-            Text = "Spaces",
-            Checked = true
+            Text = "IgnoreFirstOrLast",
         };
 
-        putSpaces.Toggled += (s, e) =>
-                             {
-                                 _horizAligner.SpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
+        if (dimension == Dimension.Width)
+        {
+            ignoreFirstOrLast.Checked = _horizAligner.AlignmentMode.HasFlag (AlignmentModes.IgnoreFirstOrLast);
+            ignoreFirstOrLast.X = Pos.Align (_horizAligner.Alignment);
+            ignoreFirstOrLast.Y = Pos.Top (alignRadioGroup);
+        }
+        else
+        {
+            ignoreFirstOrLast.Checked = _vertAligner.AlignmentMode.HasFlag (AlignmentModes.IgnoreFirstOrLast);
+            ignoreFirstOrLast.X = Pos.Left (alignRadioGroup);
+            ignoreFirstOrLast.Y = Pos.Align (_vertAligner.Alignment);
+        }
 
-                                 foreach (View view in appWindow.Subviews.Where (v => v.X is PosAlign))
+        ignoreFirstOrLast.Toggled += (s, e) =>
+                               {
+                                   if (dimension == Dimension.Width)
+                                   {
+                                       _horizAligner.AlignmentMode = e.NewValue is { } &&
+                                                                 e.NewValue.Value ?
+                                                                     _horizAligner.AlignmentMode | AlignmentModes.IgnoreFirstOrLast :
+                                                                     _horizAligner.AlignmentMode & ~AlignmentModes.IgnoreFirstOrLast;
+                                       UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
+                                   }
+                                   else
+                                   {
+                                       _vertAligner.AlignmentMode = e.NewValue is { } &&
+                                                                 e.NewValue.Value ?
+                                                                     _vertAligner.AlignmentMode | AlignmentModes.IgnoreFirstOrLast :
+                                                                     _vertAligner.AlignmentMode & ~AlignmentModes.IgnoreFirstOrLast;
+                                       UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
+                                   }
+                               };
+        appWindow.Add (ignoreFirstOrLast);
+
+        CheckBox addSpacesBetweenItems = new ()
+        {
+            ColorScheme = colorScheme,
+            Text = "AddSpaceBetweenItems",
+        };
+
+        if (dimension == Dimension.Width)
+        {
+            addSpacesBetweenItems.Checked = _horizAligner.AlignmentMode.HasFlag (AlignmentModes.AddSpaceBetweenItems);
+            addSpacesBetweenItems.X = Pos.Align (_horizAligner.Alignment);
+            addSpacesBetweenItems.Y = Pos.Top (alignRadioGroup);
+        }
+        else
+        {
+            addSpacesBetweenItems.Checked = _vertAligner.AlignmentMode.HasFlag (AlignmentModes.AddSpaceBetweenItems);
+            addSpacesBetweenItems.X = Pos.Left (alignRadioGroup);
+            addSpacesBetweenItems.Y = Pos.Align (_vertAligner.Alignment);
+        }
+
+        addSpacesBetweenItems.Toggled += (s, e) =>
+                             {
+                                 if (dimension == Dimension.Width)
                                  {
-                                     if (view.X is PosAlign j)
-                                     {
-                                         j.Aligner.SpaceBetweenItems = _horizAligner.SpaceBetweenItems;
-                                     }
+                                     _horizAligner.AlignmentMode = e.NewValue is { } &&
+                                                             e.NewValue.Value ?
+                                                                 _horizAligner.AlignmentMode | AlignmentModes.AddSpaceBetweenItems :
+                                                                 _horizAligner.AlignmentMode & ~AlignmentModes.AddSpaceBetweenItems;
+                                     UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
                                  }
+                                 else
+                                 {
+                                     _vertAligner.AlignmentMode = e.NewValue is { } &&
+                                                             e.NewValue.Value ?
+                                                                 _vertAligner.AlignmentMode | AlignmentModes.AddSpaceBetweenItems :
+                                                                 _vertAligner.AlignmentMode & ~AlignmentModes.AddSpaceBetweenItems;
+                                     UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
+                                 }
+
                              };
-        appWindow.Add (putSpaces);
+
+        appWindow.Add (addSpacesBetweenItems);
 
         CheckBox margin = new ()
         {
-            X = Pos.Left (putSpaces),
-            Y = Pos.Bottom (putSpaces),
             ColorScheme = colorScheme,
             Text = "Margin"
         };
 
+        if (dimension == Dimension.Width)
+        {
+            margin.X = Pos.Align (_horizAligner.Alignment);
+            margin.Y = Pos.Top (alignRadioGroup);
+        }
+        else
+        {
+            margin.X = Pos.Left (addSpacesBetweenItems);
+            margin.Y = Pos.Align (_vertAligner.Alignment);
+        }
+
         margin.Toggled += (s, e) =>
                           {
-                              _leftMargin = e.NewValue is { } && e.NewValue.Value ? 1 : 0;
-
-                              foreach (View view in appWindow.Subviews.Where (v => v.X is PosAlign))
+                              if (dimension == Dimension.Width)
                               {
-                                  // Skip the justification radio group
-                                  if (view != alignRadioGroup)
-                                  {
-                                      view.Margin.Thickness = new (_leftMargin, 0, 0, 0);
-                                  }
+                                  _leftMargin = e.NewValue is { } && e.NewValue.Value ? 1 : 0;
+                                  UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
+                              }
+                              else
+                              {
+                                  _topMargin = e.NewValue is { } && e.NewValue.Value ? 1 : 0;
+                                  UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
                               }
                           };
         appWindow.Add (margin);
@@ -122,24 +194,34 @@ public sealed class PosAlignDemo : Scenario
         List<Button> addedViews =
         [
             new ()
-            {
-                X = Pos.Align (_horizAligner.Alignment),
-                Y = Pos.Center (),
-                Text = NumberToWords.Convert (0)
-            }
+                                                       {
+                                                           X = dimension == Dimension.Width ? Pos.Align (_horizAligner.Alignment) : Pos.Left (alignRadioGroup),
+                                                           Y = dimension == Dimension.Width ? Pos.Top(alignRadioGroup): Pos.Align (_vertAligner.Alignment),
+                                                           Text = NumberToWords.Convert (0)
+                                                       }
         ];
 
         Buttons.NumericUpDown<int> addedViewsUpDown = new Buttons.NumericUpDown<int>
         {
-            X = Pos.Align (_horizAligner.Alignment),
-            Y = Pos.Top (alignRadioGroup),
             Width = 9,
             Title = "Added",
             ColorScheme = colorScheme,
             BorderStyle = LineStyle.None,
             Value = addedViews.Count
         };
-        addedViewsUpDown.Border.Thickness = new (0, 1, 0, 0);
+
+        if (dimension == Dimension.Width)
+        {
+            addedViewsUpDown.X = Pos.Align (_horizAligner.Alignment);
+            addedViewsUpDown.Y = Pos.Top (alignRadioGroup);
+            addedViewsUpDown.Border.Thickness = new (0, 1, 0, 0);
+        }
+        else
+        {
+            addedViewsUpDown.X = Pos.Left (alignRadioGroup);
+            addedViewsUpDown.Y = Pos.Align (_vertAligner.Alignment);
+            addedViewsUpDown.Border.Thickness = new (1, 0, 0, 0);
+        }
 
         addedViewsUpDown.ValueChanging += (s, e) =>
                                           {
@@ -170,8 +252,8 @@ public sealed class PosAlignDemo : Scenario
                                                   {
                                                       var button = new Button
                                                       {
-                                                          X = Pos.Align (_horizAligner.Alignment),
-                                                          Y = Pos.Center (),
+                                                          X = dimension == Dimension.Width ? Pos.Align (_horizAligner.Alignment) : Pos.Left (alignRadioGroup),
+                                                          Y = dimension == Dimension.Width ? Pos.Top (alignRadioGroup) : Pos.Align (_vertAligner.Alignment),
                                                           Text = NumberToWords.Convert (i + 1)
                                                       };
                                                       appWindow.Add (button);
@@ -184,186 +266,36 @@ public sealed class PosAlignDemo : Scenario
         appWindow.Add (addedViews [0]);
     }
 
-    private void SetupVerticalControls (Window appWindow)
+    private void UpdatePosAlignObjects (Window appWindow, Dimension dimension, Aligner aligner)
     {
-        ColorScheme colorScheme = Colors.ColorSchemes ["Error"];
-
-        RadioGroup alignRadioGroup = new ()
+        foreach (View view in appWindow.Subviews.Where (v => dimension == Dimension.Width ? v.X is PosAlign : v.Y is PosAlign))
         {
-            X = 0,
-            Y = Pos.Align (_vertAligner.Alignment),
-            RadioLabels = new [] { "Start", "End", "Center", "Fill", "FirstStartRestEnd", "LastEndRestStart" },
-            ColorScheme = colorScheme
-        };
-
-        alignRadioGroup.SelectedItemChanged += (s, e) =>
-                                             {
-                                                 _vertAligner.Alignment =
-                                                     (Alignment)Enum.Parse (typeof (Alignment), alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
-
-                                                 foreach (View view in appWindow.Subviews.Where (v => v.Y is PosAlign))
-                                                 {
-                                                     if (view.Y is PosAlign j)
-                                                     {
-                                                         var newJust = new PosAlign (_vertAligner.Alignment)
-                                                         {
-                                                             Aligner =
-                                                             {
-                                                                 SpaceBetweenItems = _vertAligner.SpaceBetweenItems
-                                                             }
-                                                         };
-                                                         view.Y = newJust;
-                                                     }
-                                                 }
-                                             };
-        appWindow.Add (alignRadioGroup);
-
-        CheckBox putSpaces = new ()
-        {
-            X = 0,
-            Y = Pos.Align (_vertAligner.Alignment),
-            ColorScheme = colorScheme,
-            Text = "Spaces",
-            Checked = true
-        };
-
-        putSpaces.Toggled += (s, e) =>
-                             {
-                                 _vertAligner.SpaceBetweenItems = e.NewValue is { } && e.NewValue.Value;
-
-                                 foreach (View view in appWindow.Subviews.Where (v => v.Y is PosAlign))
-                                 {
-                                     if (view.Y is PosAlign j)
-                                     {
-                                         j.Aligner.SpaceBetweenItems = _vertAligner.SpaceBetweenItems;
-                                     }
-                                 }
-                             };
-        appWindow.Add (putSpaces);
-
-        CheckBox margin = new ()
-        {
-            X = Pos.Right (putSpaces) + 1,
-            Y = Pos.Top (putSpaces),
-            ColorScheme = colorScheme,
-            Text = "Margin"
-        };
-
-        margin.Toggled += (s, e) =>
-                          {
-                              _topMargin = e.NewValue is { } && e.NewValue.Value ? 1 : 0;
-
-                              foreach (View view in appWindow.Subviews.Where (v => v.Y is PosAlign))
-                              {
-                                  // Skip the justification radio group
-                                  if (view != alignRadioGroup)
-                                  {
-                                      // BUGBUG: This is a hack to work around #3469
-                                      if (view is CheckBox)
-                                      {
-                                          view.Height = 1 + _topMargin;
-                                      }
-
-                                      view.Margin.Thickness = new (0, _topMargin, 0, 0);
-                                  }
-                              }
-                          };
-        appWindow.Add (margin);
-
-        List<CheckBox> addedViews =
-        [
-            new ()
+            if (dimension == Dimension.Width ? view.X is PosAlign posAlign : view.Y is PosAlign)
             {
-                X = 0,
-                Y = Pos.Align (_vertAligner.Alignment),
-                Text = NumberToWords.Convert (0)
+                //posAlign.Aligner.Alignment = _horizAligner.Alignment;
+                //posAlign.Aligner.AlignmentMode = _horizAligner.AlignmentMode;
+
+                // BUGBUG: Create and assign a new Pos object because we currently have no way for X to be notified
+                // BUGBUG: of changes in the Pos object. See https://github.com/gui-cs/Terminal.Gui/issues/3485
+                if (dimension == Dimension.Width)
+                {
+                    view.X = new PosAlign (
+                                           aligner.Alignment,
+                                           aligner.AlignmentMode);
+                    view.Margin.Thickness = new (_leftMargin, 0, 0, 0);
+
+                }
+                else
+                {
+                    view.Y = new PosAlign (
+                                           aligner.Alignment,
+                                           aligner.AlignmentMode);
+
+                    view.Margin.Thickness = new (0, _topMargin, 0, 0);
+                }
             }
-        ];
-
-        Buttons.NumericUpDown<int> addedViewsUpDown = new Buttons.NumericUpDown<int>
-        {
-            X = 0,
-            Y = Pos.Align (_vertAligner.Alignment),
-            Width = 9,
-            Title = "Added",
-            ColorScheme = colorScheme,
-            BorderStyle = LineStyle.None,
-            Value = addedViews.Count
-        };
-        addedViewsUpDown.Border.Thickness = new (0, 1, 0, 0);
-
-        addedViewsUpDown.ValueChanging += (s, e) =>
-                                          {
-                                              if (e.NewValue < 0)
-                                              {
-                                                  e.Cancel = true;
-
-                                                  return;
-                                              }
-
-                                              // Add or remove buttons
-                                              if (e.NewValue < e.OldValue)
-                                              {
-                                                  // Remove buttons
-                                                  for (int i = e.OldValue - 1; i >= e.NewValue; i--)
-                                                  {
-                                                      CheckBox button = addedViews [i];
-                                                      appWindow.Remove (button);
-                                                      addedViews.RemoveAt (i);
-                                                      button.Dispose ();
-                                                  }
-                                              }
-
-                                              if (e.NewValue > e.OldValue)
-                                              {
-                                                  // Add buttons
-                                                  for (int i = e.OldValue; i < e.NewValue; i++)
-                                                  {
-                                                      var button = new CheckBox
-                                                      {
-                                                          X = 0,
-                                                          Y = Pos.Align (_vertAligner.Alignment),
-                                                          Text = NumberToWords.Convert (i + 1)
-                                                      };
-                                                      appWindow.Add (button);
-                                                      addedViews.Add (button);
-                                                  }
-                                              }
-                                          };
-        appWindow.Add (addedViewsUpDown);
-
-        appWindow.Add (addedViews [0]);
-    }
-
-    private void Setup3by3Grid (Window appWindow)
-    {
-        var container = new View
-        {
-            Title = "3 by 3",
-            BorderStyle = LineStyle.Single,
-            X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd (),
-            Width = Dim.Percent (30),
-            Height = Dim.Percent (30)
-        };
-
-        for (var i = 0; i < 9; i++)
-
-        {
-            var v = new View
-            {
-                Title = $"{i}",
-                BorderStyle = LineStyle.Dashed,
-                Height = 3,
-                Width = 5
-            };
-
-            v.X = Pos.Align (Alignment.End, i / 3);
-            v.Y = Pos.Align (Alignment.Fill, i % 3 + 10);
-
-            container.Add (v);
         }
 
-        appWindow.Add (container);
+        appWindow.LayoutSubviews ();
     }
 }

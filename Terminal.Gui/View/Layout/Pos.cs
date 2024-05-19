@@ -144,13 +144,17 @@ public abstract class Pos
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that aligns a set of views according to the specified alignment setting.
     /// </summary>
-    /// <param name="alignment"></param>
+    /// <param name="alignment">The alignment.</param>
+    /// <param name="mode">The optional alignment modes.</param>
     /// <param name="groupId">
     ///     The optional, unique identifier for the set of views to align according to
     ///     <paramref name="alignment"/>.
     /// </param>
     /// <returns></returns>
-    public static Pos Align (Alignment alignment, int groupId = 0) { return new PosAlign (alignment, groupId); }
+    public static Pos Align (Alignment alignment, AlignmentModes mode = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, int groupId = 0)
+    {
+        return new PosAlign (alignment, mode, groupId);
+    }
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or
