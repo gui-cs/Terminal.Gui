@@ -283,7 +283,7 @@ public class Aligner : INotifyPropertyChanged
         if (sizes.Length > 1)
         {
             // remaining space to be distributed before first and after the items
-            int remainingSpace = Math.Max (0, containerSize - totalItemsSize - spacesToGive);
+            int remainingSpace = containerSize - totalItemsSize - spacesToGive;
 
             for (var i = 0; i < sizes.Length; i++)
             {

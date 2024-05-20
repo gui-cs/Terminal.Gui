@@ -130,6 +130,11 @@ public class AlignerTests (ITestOutputHelper output)
                     new [] { 1, 2, 3 },
                     5,
                     new [] { 0, 1, 3 })] // 5 is too small to fit the items. The first item is at 0, the items to the right are clipped.
+    [InlineData (
+                    Alignment.Center, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems,
+                    new [] { 1, 2, 3 },
+                    4,
+                    new [] { -1, 0, 2 })] // 4 is too small to fit the items. The first item is at 0, the items to the right are clipped.
     [InlineData (Alignment.Center, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, new [] { 1, 2, 3, 4 }, 10, new [] { 0, 1, 3, 6 })]
     [InlineData (Alignment.Center, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, new [] { 1, 2, 3, 4 }, 11, new [] { 0, 2, 4, 7 })]
     [InlineData (Alignment.Center, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, new [] { 3, 3, 3 }, 9, new [] { 0, 3, 6 })]
@@ -289,11 +294,8 @@ public class AlignerTests (ITestOutputHelper output)
     [InlineData (Alignment.Center, AlignmentModes.StartToEnd, new [] { 3, 3, 3 }, 11, new [] { 1, 4, 7 })]
     [InlineData (Alignment.Center, AlignmentModes.StartToEnd, new [] { 3, 3, 3 }, 12, new [] { 1, 4, 7 })]
     [InlineData (Alignment.Center, AlignmentModes.StartToEnd, new [] { 3, 3, 3 }, 13, new [] { 2, 5, 8 })]
-    [InlineData (
-                    Alignment.Center, AlignmentModes.StartToEnd,
-                    new [] { 1, 2, 3 },
-                    5,
-                    new [] { 0, 1, 3 })] // 5 is too small to fit the items. The first item is at 0, the items to the right are clipped.
+    [InlineData (Alignment.Center, AlignmentModes.StartToEnd, new [] { 1, 2, 3 }, 5, new [] { 0, 1, 3 })] // 5 is too small to fit the items. The first item is at 0, the items to the right are clipped.
+    [InlineData (Alignment.Center, AlignmentModes.StartToEnd, new [] { 1, 2, 3 }, 4, new [] { -1, 0, 2 })] // 4 is too small to fit the items. The first item is at 0, the items to the right are clipped.
     [InlineData (Alignment.Center, AlignmentModes.StartToEnd, new [] { 33, 33, 33 }, 100, new [] { 0, 33, 66 })]
     [InlineData (Alignment.Center, AlignmentModes.StartToEnd, new [] { 33, 33, 33 }, 101, new [] { 1, 34, 67 })]
     [InlineData (Alignment.Center, AlignmentModes.StartToEnd, new [] { 33, 33, 33 }, 102, new [] { 1, 34, 67 })]
