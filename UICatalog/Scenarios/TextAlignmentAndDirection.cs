@@ -31,8 +31,8 @@ public class TextAlignmentAndDirection : Scenario
 
         var labelHL = new Label
         {
-            X = 1,
-            Y = 1,
+            X = 0,
+            Y = 0,
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
@@ -42,8 +42,8 @@ public class TextAlignmentAndDirection : Scenario
 
         var labelHC = new Label
         {
-            X = 1,
-            Y = 2,
+            X = 0,
+            Y = 1,
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
@@ -53,8 +53,8 @@ public class TextAlignmentAndDirection : Scenario
 
         var labelHR = new Label
         {
-            X = 1,
-            Y = 3,
+            X = 0,
+            Y = 2,
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
@@ -64,8 +64,8 @@ public class TextAlignmentAndDirection : Scenario
 
         var labelHJ = new Label
         {
-            X = 1,
-            Y = 4,
+            X = 0,
+            Y = 3,
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
@@ -77,7 +77,7 @@ public class TextAlignmentAndDirection : Scenario
         {
             X = Pos.Right (labelHL) + 1,
             Y = Pos.Y (labelHL),
-            Width = Dim.Fill (1) - 9,
+            Width = Dim.Fill (9),
             Height = 1,
             ColorScheme = color1,
             TextAlignment = Alignment.Start,
@@ -88,7 +88,7 @@ public class TextAlignmentAndDirection : Scenario
         {
             X = Pos.Right (labelHC) + 1,
             Y = Pos.Y (labelHC),
-            Width = Dim.Fill (1) - 9,
+            Width = Dim.Fill (9),
             Height = 1,
             ColorScheme = color2,
             TextAlignment = Alignment.Center,
@@ -99,7 +99,7 @@ public class TextAlignmentAndDirection : Scenario
         {
             X = Pos.Right (labelHR) + 1,
             Y = Pos.Y (labelHR),
-            Width = Dim.Fill (1) - 9,
+            Width = Dim.Fill (9),
             Height = 1,
             ColorScheme = color1,
             TextAlignment = Alignment.End,
@@ -110,7 +110,7 @@ public class TextAlignmentAndDirection : Scenario
         {
             X = Pos.Right (labelHJ) + 1,
             Y = Pos.Y (labelHJ),
-            Width = Dim.Fill (1) - 9,
+            Width = Dim.Fill (9),
             Height = 1,
             ColorScheme = color2,
             TextAlignment = Alignment.Fill,
@@ -135,8 +135,8 @@ public class TextAlignmentAndDirection : Scenario
 
         var labelVT = new Label
         {
-            X = Pos.AnchorEnd (8),
-            Y = 1,
+            X = Pos.AnchorEnd () - 6,
+            Y = 0,
             Width = 2,
             Height = 6,
             ColorScheme = color1,
@@ -148,8 +148,8 @@ public class TextAlignmentAndDirection : Scenario
 
         var labelVM = new Label
         {
-            X = Pos.AnchorEnd (6),
-            Y = 1,
+            X = Pos.AnchorEnd () - 4,
+            Y = 0,
             Width = 2,
             Height = 6,
             ColorScheme = color1,
@@ -161,8 +161,8 @@ public class TextAlignmentAndDirection : Scenario
 
         var labelVB = new Label
         {
-            X = Pos.AnchorEnd (4),
-            Y = 1,
+            X = Pos.AnchorEnd () - 2,
+            Y = 0,
             Width = 2,
             Height = 6,
             ColorScheme = color1,
@@ -174,8 +174,8 @@ public class TextAlignmentAndDirection : Scenario
 
         var labelVJ = new Label
         {
-            X = Pos.AnchorEnd (2),
-            Y = 1,
+            X = Pos.AnchorEnd (),
+            Y = 0,
             Width = 2,
             Height = 6,
             ColorScheme = color1,
@@ -190,7 +190,7 @@ public class TextAlignmentAndDirection : Scenario
             X = Pos.X (labelVT),
             Y = Pos.Bottom (labelVT) + 1,
             Width = 2,
-            Height = Dim.Fill (1),
+            Height = Dim.Fill (),
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Start,
@@ -203,7 +203,7 @@ public class TextAlignmentAndDirection : Scenario
             X = Pos.X (labelVM),
             Y = Pos.Bottom (labelVM) + 1,
             Width = 2,
-            Height = Dim.Fill (1),
+            Height = Dim.Fill (),
             ColorScheme = color2,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Center,
@@ -216,7 +216,7 @@ public class TextAlignmentAndDirection : Scenario
             X = Pos.X (labelVB),
             Y = Pos.Bottom (labelVB) + 1,
             Width = 2,
-            Height = Dim.Fill (1),
+            Height = Dim.Fill (),
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
@@ -229,7 +229,7 @@ public class TextAlignmentAndDirection : Scenario
             X = Pos.X (labelVJ),
             Y = Pos.Bottom (labelVJ) + 1,
             Width = 2,
-            Height = Dim.Fill (1),
+            Height = Dim.Fill (),
             ColorScheme = color2,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Fill,
@@ -259,12 +259,12 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Bottom (txtLabelHJ),
             Width = Dim.Fill (31),
             Height = Dim.Fill (4),
-            ColorScheme = color2
+            //ColorScheme = color2
         };
 
         var txtLabelTL = new Label
         {
-            X = 1 /*                    */,
+            X = 0 /*                    */,
             Y = 1,
             Width = Dim.Percent (100 / 3),
             Height = Dim.Percent (100 / 3),
@@ -411,13 +411,21 @@ public class TextAlignmentAndDirection : Scenario
 
         // Edit Text
 
-        var editText = new TextView
+        var label = new Label
         {
             X = 1,
             Y = Pos.Bottom (container) + 1,
-            Width = Dim.Fill (10),
-            Height = Dim.Fill (1),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            Width = 10,
+            Height = 1,
+            Text = "Edit Text:"
+        };
+
+        var editText = new TextView
+        {
+            X = Pos.Right(label) + 1,
+            Y = Pos.Top (label),
+            Width = Dim.Fill (31),
+            Height = 3,
             Text = txt
         };
 
@@ -449,7 +457,7 @@ public class TextAlignmentAndDirection : Scenario
 
         editText.SetFocus ();
 
-        app.Add (editText);
+        app.Add (label, editText);
 
         // JUSTIFY CHECKBOX
 
@@ -470,7 +478,7 @@ public class TextAlignmentAndDirection : Scenario
         {
             X = Pos.Left (justifyCheckbox) + 1,
             Y = Pos.Y (justifyCheckbox) + 1,
-            Width = Dim.Fill (11),
+            Width = Dim.Fill (9),
             RadioLabels = ["Current direction", "Opposite direction", "FIll Both"],
             Enabled = false
         };

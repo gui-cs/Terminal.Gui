@@ -152,7 +152,7 @@ public class Aligner : INotifyPropertyChanged
 
         for (var i = 0; i < sizes.Length; i++)
         {
-            CheckSizeCannotBeNegative (i, sizes);
+            CheckSizeCannotBeNegative (i, in sizes);
 
             if (i == 0)
             {
@@ -187,7 +187,7 @@ public class Aligner : INotifyPropertyChanged
 
             for (int i = sizes.Length - 1; i >= 0; i--)
             {
-                CheckSizeCannotBeNegative (i, sizes);
+                CheckSizeCannotBeNegative (i, in sizes);
 
                 if (i == sizes.Length - 1)
                 {
@@ -207,7 +207,7 @@ public class Aligner : INotifyPropertyChanged
         }
         else if (sizes.Length == 1)
         {
-            CheckSizeCannotBeNegative (0, sizes);
+            CheckSizeCannotBeNegative (0, in sizes);
             positions [0] = 0; // single item is flush left
         }
 
@@ -234,7 +234,7 @@ public class Aligner : INotifyPropertyChanged
 
             for (var i = 0; i < sizes.Length; i++)
             {
-                CheckSizeCannotBeNegative (i, sizes);
+                CheckSizeCannotBeNegative (i, in sizes);
 
                 if (i < sizes.Length - 1)
                 {
@@ -249,7 +249,7 @@ public class Aligner : INotifyPropertyChanged
         }
         else if (sizes.Length == 1)
         {
-            CheckSizeCannotBeNegative (0, sizes);
+            CheckSizeCannotBeNegative (0, in sizes);
 
             positions [0] = containerSize - sizes [0]; // single item is flush right
         }
@@ -267,7 +267,7 @@ public class Aligner : INotifyPropertyChanged
 
         for (var i = 0; i < sizes.Length; i++)
         {
-            CheckSizeCannotBeNegative (i, sizes);
+            CheckSizeCannotBeNegative (i, in sizes);
             positions [i] = currentPosition;
             int extraSpace = i < remainder ? 1 : 0;
             currentPosition += sizes [i] + spaceBetween + extraSpace;
@@ -287,7 +287,7 @@ public class Aligner : INotifyPropertyChanged
 
             for (var i = 0; i < sizes.Length; i++)
             {
-                CheckSizeCannotBeNegative (i, sizes);
+                CheckSizeCannotBeNegative (i, in sizes);
 
                 if (i == 0)
                 {
@@ -304,7 +304,7 @@ public class Aligner : INotifyPropertyChanged
         }
         else if (sizes.Length == 1)
         {
-            CheckSizeCannotBeNegative (0, sizes);
+            CheckSizeCannotBeNegative (0, in sizes);
             positions [0] = (containerSize - sizes [0]) / 2; // single item is centered
         }
 
@@ -318,7 +318,7 @@ public class Aligner : INotifyPropertyChanged
 
         for (var i = 0; i < sizes.Length; i++)
         {
-            CheckSizeCannotBeNegative (i, sizes);
+            CheckSizeCannotBeNegative (i, in sizes);
             int spaceBefore = spacesToGive-- > 0 ? maxSpaceBetweenItems : 0;
 
             positions [i] = currentPosition;
@@ -328,7 +328,7 @@ public class Aligner : INotifyPropertyChanged
         return positions;
     }
 
-    private static void CheckSizeCannotBeNegative (int i, IReadOnlyList<int> sizes)
+    private static void CheckSizeCannotBeNegative (int i, ref readonly int [] sizes)
     {
         if (sizes [i] < 0)
         {
