@@ -24,8 +24,8 @@ public class TextAlignmentAndDirection : Scenario
         var color1 = new ColorScheme { Normal = new (Color.Black, Color.Gray) };
         var color2 = new ColorScheme { Normal = new (Color.Black, Color.DarkGray) };
 
-        List<Label> txts = new (); // single line
-        List<Label> mtxts = new (); // multi line
+        List<Label> singleLineLabels = new (); // single line
+        List<Label> multiLineLabels = new (); // multi line
 
         // Horizontal Single-Line 
 
@@ -117,10 +117,10 @@ public class TextAlignmentAndDirection : Scenario
             Text = txt
         };
 
-        txts.Add (txtLabelHL);
-        txts.Add (txtLabelHC);
-        txts.Add (txtLabelHR);
-        txts.Add (txtLabelHJ);
+        singleLineLabels.Add (txtLabelHL);
+        singleLineLabels.Add (txtLabelHC);
+        singleLineLabels.Add (txtLabelHR);
+        singleLineLabels.Add (txtLabelHJ);
 
         app.Add (labelHL);
         app.Add (txtLabelHL);
@@ -237,10 +237,10 @@ public class TextAlignmentAndDirection : Scenario
         };
         txtLabelVJ.TextFormatter.WordWrap = false;
 
-        txts.Add (txtLabelVT);
-        txts.Add (txtLabelVM);
-        txts.Add (txtLabelVB);
-        txts.Add (txtLabelVJ);
+        singleLineLabels.Add (txtLabelVT);
+        singleLineLabels.Add (txtLabelVM);
+        singleLineLabels.Add (txtLabelVB);
+        singleLineLabels.Add (txtLabelVJ);
 
         app.Add (labelVT);
         app.Add (txtLabelVT);
@@ -258,7 +258,8 @@ public class TextAlignmentAndDirection : Scenario
             X = 0,
             Y = Pos.Bottom (txtLabelHJ),
             Width = Dim.Fill (31),
-            Height = Dim.Fill (4),
+            Height = Dim.Fill (4)
+
             //ColorScheme = color2
         };
 
@@ -379,18 +380,18 @@ public class TextAlignmentAndDirection : Scenario
         };
         txtLabelBR.TextFormatter.MultiLine = true;
 
-        mtxts.Add (txtLabelTL);
-        mtxts.Add (txtLabelTC);
-        mtxts.Add (txtLabelTR);
-        mtxts.Add (txtLabelML);
-        mtxts.Add (txtLabelMC);
-        mtxts.Add (txtLabelMR);
-        mtxts.Add (txtLabelBL);
-        mtxts.Add (txtLabelBC);
-        mtxts.Add (txtLabelBR);
+        multiLineLabels.Add (txtLabelTL);
+        multiLineLabels.Add (txtLabelTC);
+        multiLineLabels.Add (txtLabelTR);
+        multiLineLabels.Add (txtLabelML);
+        multiLineLabels.Add (txtLabelMC);
+        multiLineLabels.Add (txtLabelMR);
+        multiLineLabels.Add (txtLabelBL);
+        multiLineLabels.Add (txtLabelBC);
+        multiLineLabels.Add (txtLabelBR);
 
         // Save Alignment in Data
-        foreach (Label t in mtxts)
+        foreach (Label t in multiLineLabels)
         {
             t.Data = new { h = t.TextAlignment, v = t.VerticalTextAlignment };
         }
@@ -422,7 +423,7 @@ public class TextAlignmentAndDirection : Scenario
 
         var editText = new TextView
         {
-            X = Pos.Right(label) + 1,
+            X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Width = Dim.Fill (31),
             Height = 3,
@@ -431,12 +432,12 @@ public class TextAlignmentAndDirection : Scenario
 
         editText.MouseClick += (s, m) =>
                                {
-                                   foreach (Label v in txts)
+                                   foreach (Label v in singleLineLabels)
                                    {
                                        v.Text = editText.Text;
                                    }
 
-                                   foreach (Label v in mtxts)
+                                   foreach (Label v in multiLineLabels)
                                    {
                                        v.Text = editText.Text;
                                    }
@@ -444,12 +445,12 @@ public class TextAlignmentAndDirection : Scenario
 
         app.KeyUp += (s, m) =>
                      {
-                         foreach (Label v in txts)
+                         foreach (Label v in singleLineLabels)
                          {
                              v.Text = editText.Text;
                          }
 
-                         foreach (Label v in mtxts)
+                         foreach (Label v in multiLineLabels)
                          {
                              v.Text = editText.Text;
                          }
@@ -485,10 +486,7 @@ public class TextAlignmentAndDirection : Scenario
 
         justifyCheckbox.Toggled += (s, e) => ToggleJustify (e.OldValue is { } && (bool)e.OldValue);
 
-        justifyOptions.SelectedItemChanged += (s, e) =>
-                                              {
-                                                  ToggleJustify (false, true);
-                                              };
+        justifyOptions.SelectedItemChanged += (s, e) => { ToggleJustify (false, true); };
 
         app.Add (justifyOptions);
 
@@ -500,21 +498,22 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Bottom (justifyOptions),
             Width = Dim.Fill (10),
             Height = 1,
-            Text = "Word Wrap",
+            Text = "Word Wrap"
         };
         wrapCheckbox.Checked = wrapCheckbox.TextFormatter.WordWrap;
+
         wrapCheckbox.Toggled += (s, e) =>
                                 {
                                     if (e.OldValue == true)
                                     {
-                                        foreach (Label t in mtxts)
+                                        foreach (Label t in multiLineLabels)
                                         {
                                             t.TextFormatter.WordWrap = false;
                                         }
                                     }
                                     else
                                     {
-                                        foreach (Label t in mtxts)
+                                        foreach (Label t in multiLineLabels)
                                         {
                                             t.TextFormatter.WordWrap = true;
                                         }
@@ -531,21 +530,22 @@ public class TextAlignmentAndDirection : Scenario
             Y = Pos.Y (wrapCheckbox) + 1,
             Width = Dim.Fill (10),
             Height = 1,
-            Text = "AutoSize",
+            Text = "AutoSize"
         };
         autoSizeCheckbox.Checked = autoSizeCheckbox.TextFormatter.AutoSize;
+
         autoSizeCheckbox.Toggled += (s, e) =>
                                     {
                                         if (e.OldValue == true)
                                         {
-                                            foreach (Label t in mtxts)
+                                            foreach (Label t in multiLineLabels)
                                             {
                                                 t.TextFormatter.AutoSize = false;
                                             }
                                         }
                                         else
                                         {
-                                            foreach (Label t in mtxts)
+                                            foreach (Label t in multiLineLabels)
                                             {
                                                 t.TextFormatter.AutoSize = true;
                                             }
@@ -570,15 +570,18 @@ public class TextAlignmentAndDirection : Scenario
 
         directionOptions.SelectedItemChanged += (s, ev) =>
                                                 {
-                                                    var justChecked = justifyCheckbox.Checked is { } && (bool)justifyCheckbox.Checked;
+                                                    bool justChecked = justifyCheckbox.Checked is { } && (bool)justifyCheckbox.Checked;
+
                                                     if (justChecked)
                                                     {
                                                         ToggleJustify (true);
                                                     }
-                                                    foreach (Label v in mtxts)
+
+                                                    foreach (Label v in multiLineLabels)
                                                     {
                                                         v.TextDirection = (TextDirection)ev.SelectedItem;
                                                     }
+
                                                     if (justChecked)
                                                     {
                                                         ToggleJustify (false);
@@ -592,14 +595,14 @@ public class TextAlignmentAndDirection : Scenario
 
         void ToggleJustify (bool oldValue, bool wasJustOptions = false)
         {
-            if (oldValue == true)
+            if (oldValue)
             {
                 if (!wasJustOptions)
                 {
                     justifyOptions.Enabled = false;
                 }
 
-                foreach (Label t in mtxts)
+                foreach (Label t in multiLineLabels)
                 {
                     t.TextAlignment = (Alignment)((dynamic)t.Data).h;
                     t.VerticalTextAlignment = (Alignment)((dynamic)t.Data).v;
@@ -607,7 +610,7 @@ public class TextAlignmentAndDirection : Scenario
             }
             else
             {
-                foreach (Label t in mtxts)
+                foreach (Label t in multiLineLabels)
                 {
                     if (!wasJustOptions)
                     {
@@ -621,14 +624,17 @@ public class TextAlignmentAndDirection : Scenario
                             case 0:
                                 t.VerticalTextAlignment = Alignment.Fill;
                                 t.TextAlignment = ((dynamic)t.Data).h;
+
                                 break;
                             case 1:
                                 t.VerticalTextAlignment = (Alignment)((dynamic)t.Data).v;
                                 t.TextAlignment = Alignment.Fill;
+
                                 break;
                             case 2:
                                 t.VerticalTextAlignment = Alignment.Fill;
                                 t.TextAlignment = Alignment.Fill;
+
                                 break;
                         }
                     }
@@ -639,14 +645,17 @@ public class TextAlignmentAndDirection : Scenario
                             case 0:
                                 t.TextAlignment = Alignment.Fill;
                                 t.VerticalTextAlignment = ((dynamic)t.Data).v;
+
                                 break;
                             case 1:
                                 t.TextAlignment = (Alignment)((dynamic)t.Data).h;
                                 t.VerticalTextAlignment = Alignment.Fill;
+
                                 break;
                             case 2:
                                 t.TextAlignment = Alignment.Fill;
                                 t.VerticalTextAlignment = Alignment.Fill;
+
                                 break;
                         }
                     }
