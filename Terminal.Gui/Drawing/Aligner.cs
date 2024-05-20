@@ -146,7 +146,7 @@ public class Aligner : INotifyPropertyChanged
         return [];
     }
 
-    private static int [] Start (ref readonly int [] sizes, int maxSpaceBetweenItems, int spacesToGive)
+    internal static int [] Start (ref readonly int [] sizes, int maxSpaceBetweenItems, int spacesToGive)
     {
         var positions = new int [sizes.Length]; // positions of the items. the return value.
 
@@ -170,7 +170,7 @@ public class Aligner : INotifyPropertyChanged
         return positions;
     }
 
-    private static int [] IgnoreFirst (
+    internal static int [] IgnoreFirst (
         ref readonly int [] sizes,
         int containerSize,
         int totalItemsSize,
@@ -214,7 +214,7 @@ public class Aligner : INotifyPropertyChanged
         return positions;
     }
 
-    private static int [] IgnoreLast (
+    internal static int [] IgnoreLast (
         ref readonly int [] sizes,
         int containerSize,
         int totalItemsSize,
@@ -257,7 +257,7 @@ public class Aligner : INotifyPropertyChanged
         return positions;
     }
 
-    private static int [] Fill (ref readonly int [] sizes, int containerSize, int totalItemsSize)
+    internal static int [] Fill (ref readonly int [] sizes, int containerSize, int totalItemsSize)
     {
         var positions = new int [sizes.Length]; // positions of the items. the return value.
 
@@ -276,7 +276,7 @@ public class Aligner : INotifyPropertyChanged
         return positions;
     }
 
-    private static int [] Center (ref readonly int [] sizes, int containerSize, int totalItemsSize, int maxSpaceBetweenItems, int spacesToGive)
+    internal static int [] Center (ref readonly int [] sizes, int containerSize, int totalItemsSize, int maxSpaceBetweenItems, int spacesToGive)
     {
         var positions = new int [sizes.Length]; // positions of the items. the return value.
 
@@ -311,7 +311,7 @@ public class Aligner : INotifyPropertyChanged
         return positions;
     }
 
-    private static int [] End (ref readonly int [] sizes, int containerSize, int totalItemsSize, int maxSpaceBetweenItems, int spacesToGive)
+    internal static int [] End (ref readonly int [] sizes, int containerSize, int totalItemsSize, int maxSpaceBetweenItems, int spacesToGive)
     {
         var positions = new int [sizes.Length]; // positions of the items. the return value.
         int currentPosition = containerSize - totalItemsSize - spacesToGive;
