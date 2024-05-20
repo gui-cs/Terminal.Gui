@@ -16,7 +16,11 @@
   ![PoshDotnetDumpAnalyzerViewer.png](docfx/images/PoshDotnetDumpAnalyzerViewer.png)  
   ⠀
 * **[TerminalGuiDesigner](https://github.com/tznind/TerminalGuiDesigner)** - Cross platform view designer for building Terminal.Gui applications.
-  ![TerminalGuiDesigner.gif](docfx/images/TerminalGuiDesigner.gif)  
+  ![TerminalGuiDesigner.gif](docfx/images/TerminalGuiDesigner.gif)
+
+* **[Capital and Cargo](https://github.com/dhorions/Capital-and-Cargo)** - A retro console game where you buy, sell, produce and transport goods built with Terminal.Gui
+ ![image](https://github.com/gui-cs/Terminal.Gui/assets/1682004/ed89f3d6-020f-4a8a-ae18-e057514f4c43)
+
   
 # Examples #
 

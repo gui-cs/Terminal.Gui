@@ -282,7 +282,7 @@ namespace Terminal.Gui {
 				} else if (SuperView?.tabIndexes == null || SuperView?.tabIndexes.Count == 1) {
 					tabIndex = 0;
 					return;
-				} else if (tabIndex == value) {
+				} else if (tabIndex == value && TabIndexes.IndexOf (this) == value) {
 					return;
 				}
 				tabIndex = value > SuperView.tabIndexes.Count - 1 ? SuperView.tabIndexes.Count - 1 : value < 0 ? 0 : value;
@@ -2894,9 +2894,14 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new MouseEventArgs (mouseEvent);
-			if (OnMouseClick (args))
-				return true;
+			if ((mouseEvent.Flags & MouseFlags.Button1Clicked) != 0 || (mouseEvent.Flags & MouseFlags.Button2Clicked) != 0
+				|| (mouseEvent.Flags & MouseFlags.Button3Clicked) != 0 || (mouseEvent.Flags & MouseFlags.Button4Clicked) != 0) {
+
+				var args = new MouseEventArgs (mouseEvent);
+				if (OnMouseClick (args)) {
+					return true;
+				}
+			}
 			if (MouseEvent (mouseEvent))
 				return true;
 
