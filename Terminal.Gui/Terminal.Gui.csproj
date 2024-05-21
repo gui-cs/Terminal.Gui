@@ -20,7 +20,7 @@
     <DebugType>portable</DebugType>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFrameworks>net472;netstandard2.1;net8.0</TargetFrameworks>
+    <TargetFrameworks>net472;netstandard2.1;net7.0;net8.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
