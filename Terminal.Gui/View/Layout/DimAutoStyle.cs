@@ -1,16 +1,15 @@
+using Terminal.Gui.Analyzers.Internal.Attributes;
+
 namespace Terminal.Gui;
 
 /// <summary>
 ///     Specifies how <see cref="Dim.Auto"/> will compute the dimension.
 /// </summary>
+[GenerateEnumExtensionMethods]
 [Flags]
 public enum DimAutoStyle
 {
-    /// <summary>
-    ///     The dimension will be computed using both the view's <see cref="View.Text"/> and
-    ///     <see cref="View.Subviews"/> (whichever is larger).
-    /// </summary>
-    Auto = Content | Text,
+
 
     /// <summary>
     ///     The dimensions will be computed based on the View's non-Text content.
@@ -39,5 +38,11 @@ public enum DimAutoStyle
     ///         The corresponding dimensions of the <see cref="View.Subviews"/> will be ignored.
     ///     </para>
     /// </summary>
-    Text = 1
+    Text = 1,
+
+    /// <summary>
+    ///     The dimension will be computed using both the view's <see cref="View.Text"/> and
+    ///     <see cref="View.Subviews"/> (whichever is larger).
+    /// </summary>
+    Auto = Content | Text,
 }
