@@ -9,8 +9,6 @@ namespace Terminal.Gui;
 [Flags]
 public enum DimAutoStyle
 {
-
-
     /// <summary>
     ///     The dimensions will be computed based on the View's non-Text content.
     ///     <para>
