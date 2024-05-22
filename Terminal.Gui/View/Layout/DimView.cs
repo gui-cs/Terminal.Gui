@@ -45,14 +45,7 @@ public class DimView : Dim
             throw new NullReferenceException ();
         }
 
-        string dimString = Dimension switch
-                           {
-                               Dimension.Height => "Height",
-                               Dimension.Width => "Width",
-                               _ => "unknown"
-                           };
-
-        return $"View({dimString},{Target})";
+        return $"View({Dimension},{Target})";
     }
 
     internal override int GetAnchor (int size)

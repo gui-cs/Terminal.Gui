@@ -1,3 +1,5 @@
+using Terminal.Gui.Analyzers.Internal.Attributes;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -13,6 +15,7 @@ namespace Terminal.Gui;
 ///         time.
 ///     </para>
 /// </summary>
+[GenerateEnumExtensionMethods]
 public enum LayoutStyle
 {
     /// <summary>

@@ -33,21 +33,14 @@ public class PosView (View view, Side side) : Pos
     /// <inheritdoc/>
     public override string ToString ()
     {
-        string sideString = Side switch
-                            {
-                                Side.Left => "left",
-                                Side.Top => "top",
-                                Side.Right => "right",
-                                Side.Bottom => "bottom",
-                                _ => "unknown"
-                            };
+        string sideString = Side.ToString ();
 
         if (Target == null)
         {
             throw new NullReferenceException (nameof (Target));
         }
 
-        return $"View(side={sideString},target={Target})";
+        return $"View(Side={sideString},Target={Target})";
     }
 
     internal override int GetAnchor (int size)
