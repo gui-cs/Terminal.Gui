@@ -87,7 +87,7 @@ public partial class View
     ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
-    public virtual TextAlignment TextAlignment
+    public virtual Alignment TextAlignment
     {
         get => TextFormatter.Alignment;
         set
@@ -105,7 +105,7 @@ public partial class View
     /// <remarks>
     ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
-    /// <value>The text alignment.</value>
+    /// <value>The text direction.</value>
     public virtual TextDirection TextDirection
     {
         get => TextFormatter.Direction;
@@ -129,8 +129,8 @@ public partial class View
     /// <remarks>
     ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
     /// </remarks>
-    /// <value>The text alignment.</value>
-    public virtual VerticalTextAlignment VerticalTextAlignment
+    /// <value>The vertical text alignment.</value>
+    public virtual Alignment VerticalTextAlignment
     {
         get => TextFormatter.VerticalAlignment;
         set

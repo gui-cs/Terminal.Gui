@@ -882,7 +882,7 @@ public class Editor : Scenario
         {
             Y = 1,
             Width = lblWidth,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
 
             Text = "Find:"
         };
@@ -903,7 +903,7 @@ public class Editor : Scenario
             Y = Pos.Top (label),
             Width = 20,
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             IsDefault = true,
 
             Text = "Find _Next"
@@ -917,7 +917,7 @@ public class Editor : Scenario
             Y = Pos.Top (btnFindNext) + 1,
             Width = 20,
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
 
             Text = "Find _Previous"
         };
@@ -937,7 +937,7 @@ public class Editor : Scenario
             X = Pos.Right (txtToFind) + 1,
             Y = Pos.Top (btnFindPrevious) + 2,
             Width = 20,
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
 
             Text = "Cancel"
         };
@@ -1134,7 +1134,7 @@ public class Editor : Scenario
         {
             Y = 1,
             Width = lblWidth,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
 
             Text = "Find:"
         };
@@ -1155,7 +1155,7 @@ public class Editor : Scenario
             Y = Pos.Top (label),
             Width = 20,
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             IsDefault = true,
 
             Text = "Replace _Next"
@@ -1181,7 +1181,7 @@ public class Editor : Scenario
             Y = Pos.Top (btnFindNext) + 1,
             Width = 20,
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
 
             Text = "Replace _Previous"
         };
@@ -1194,7 +1194,7 @@ public class Editor : Scenario
             Y = Pos.Top (btnFindPrevious) + 1,
             Width = 20,
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
 
             Text = "Replace _All"
         };
@@ -1215,7 +1215,7 @@ public class Editor : Scenario
             X = Pos.Right (txtToFind) + 1,
             Y = Pos.Top (btnReplaceAll) + 1,
             Width = 20,
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
 
             Text = "Cancel"
         };

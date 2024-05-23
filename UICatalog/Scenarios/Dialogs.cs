@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -31,7 +32,7 @@ public class Dialogs : Scenario
         var numButtonsLabel = new Label
         {
             X = 0,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
             Text = "_Number of Buttons:"
         };
 
@@ -41,7 +42,7 @@ public class Dialogs : Scenario
             Y = 0,
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
             Text = "_Width:"
         };
         frame.Add (label);
@@ -62,7 +63,7 @@ public class Dialogs : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
             Text = "_Height:"
         };
         frame.Add (label);
@@ -96,7 +97,7 @@ public class Dialogs : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
             Text = "_Title:"
         };
         frame.Add (label);
@@ -128,7 +129,7 @@ public class Dialogs : Scenario
         {
             X = Pos.Right (numButtonsLabel) + 1,
             Y = Pos.Bottom (numButtonsLabel),
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
             Text = $"_Add {char.ConvertFromUtf32 (CODE_POINT)} to button text to stress wide char support",
             Checked = false
         };
@@ -140,18 +141,20 @@ public class Dialogs : Scenario
             Y = Pos.Bottom (glyphsNotWords),
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
-            TextAlignment = TextAlignment.Right,
-            Text = "Button St_yle:"
+            TextAlignment = Alignment.End,
+            Text = "Button A_lignment:"
         };
         frame.Add (label);
 
-        var styleRadioGroup = new RadioGroup
+        var labels = Enum.GetNames<Alignment> ();
+        var alignmentGroup = new RadioGroup
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            RadioLabels = new [] { "_Center", "_Justify", "_Left", "_Right" }
+            RadioLabels = labels.ToArray (),
         };
-        frame.Add (styleRadioGroup);
+        frame.Add (alignmentGroup);
+        alignmentGroup.SelectedItem = labels.ToList ().IndexOf (Dialog.DefaultButtonAlignment.ToString ());
 
         frame.ValidatePosDim = true;
 
@@ -159,7 +162,7 @@ public class Dialogs : Scenario
 
         label = new ()
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 4, TextAlignment = TextAlignment.Right, Text = "Button Pressed:"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 4, TextAlignment = Alignment.End, Text = "Button Pressed:"
         };
         app.Add (label);
 
@@ -186,7 +189,7 @@ public class Dialogs : Scenario
                                                                       titleEdit,
                                                                       numButtonsEdit,
                                                                       glyphsNotWords,
-                                                                      styleRadioGroup,
+                                                                      alignmentGroup,
                                                                       buttonPressedLabel
                                                                      );
                                        Application.Run (dlg);
@@ -209,7 +212,7 @@ public class Dialogs : Scenario
         TextField titleEdit,
         TextField numButtonsEdit,
         CheckBox glyphsNotWords,
-        RadioGroup styleRadioGroup,
+        RadioGroup alignmentRadioGroup,
         Label buttonPressedLabel
     )
     {
@@ -268,7 +271,8 @@ public class Dialogs : Scenario
             dialog = new ()
             {
                 Title = titleEdit.Text,
-                ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem,
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem]),
+
                 Buttons = buttons.ToArray ()
             };
 

@@ -325,7 +325,10 @@ public static class MessageBox
 
             foreach (string s in buttons)
             {
-                var b = new Button { Text = s };
+                var b = new Button
+                {
+                    Text = s,
+                };
 
                 if (count == defaultButton)
                 {
@@ -337,10 +340,10 @@ public static class MessageBox
             }
         }
 
-        Dialog d;
-
-        d = new Dialog
+        var d = new Dialog
         {
+            ButtonAlignment = Alignment.Center,
+            ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems,
             Buttons = buttonList.ToArray (),
             Title = title,
             BorderStyle = DefaultBorderStyle,
@@ -370,7 +373,7 @@ public static class MessageBox
         var messageLabel = new Label
         {
             Text = message,
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             X = Pos.Center (),
             Y = 0,
            // ColorScheme = Colors.ColorSchemes ["Error"]

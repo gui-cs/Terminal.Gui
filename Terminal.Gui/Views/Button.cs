@@ -37,8 +37,8 @@ public class Button : View
     /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
     public Button ()
     {
-        TextAlignment = TextAlignment.Centered;
-        VerticalTextAlignment = VerticalTextAlignment.Middle;
+        TextAlignment = Alignment.Center;
+        VerticalTextAlignment = Alignment.Center;
 
         _leftBracket = Glyphs.LeftBracket;
         _rightBracket = Glyphs.RightBracket;
