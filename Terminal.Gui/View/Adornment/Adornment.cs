@@ -242,7 +242,7 @@ public class Adornment : View
         return base.OnMouseEnter (mouseEvent);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc/>   
     protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
     {
         // Invert Normal

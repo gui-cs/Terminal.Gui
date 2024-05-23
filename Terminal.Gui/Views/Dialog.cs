@@ -43,8 +43,6 @@ public class Dialog : Window
     //};
     private readonly List<Button> _buttons = new ();
 
-    private bool _inLayout;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/>
     ///     positioning with no <see cref="Button"/>s.

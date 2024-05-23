@@ -5,8 +5,8 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Specifies how <see cref="Dim.Auto"/> will compute the dimension.
 /// </summary>
-[GenerateEnumExtensionMethods]
 [Flags]
+[GenerateEnumExtensionMethods (FastHasFlags = true)]
 public enum DimAutoStyle
 {
     /// <summary>

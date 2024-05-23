@@ -60,13 +60,13 @@ public class DimAuto () : Dim
         var subviewsSize = 0;
 
         int autoMin = MinimumContentDim?.GetAnchor (superviewContentSize) ?? 0;
-
-        if (Style.HasFlag (DimAutoStyle.Text))
+        
+        if (Style.FastHasFlags (DimAutoStyle.Text))
         {
             textSize = int.Max (autoMin, dimension == Dimension.Width ? us.TextFormatter.Size.Width : us.TextFormatter.Size.Height);
         }
 
-        if (Style.HasFlag (DimAutoStyle.Content))
+        if (Style.FastHasFlags (DimAutoStyle.Content))
         {
             if (us._contentSize is { })
             {

@@ -411,7 +411,7 @@ public class TileView : View
     ///         <see cref="Tile.MinSize"/>, location of other splitters etc.
     ///     </para>
     ///     <para>
-    ///         Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(float)"/>) are supported for
+    ///         Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(int)"/>) are supported for
     ///         this property.
     ///     </para>
     /// </summary>
