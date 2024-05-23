@@ -8,7 +8,7 @@ public class DialogTests
     private readonly ITestOutputHelper _output;
     public DialogTests (ITestOutputHelper output) { _output = output; }
 
-    [Fact (Skip = "Dim.Auto WIP")]
+    [Fact]
     [AutoInitShutdown]
     public void Add_Button_Works ()
     {
@@ -243,7 +243,7 @@ public class DialogTests
 
         // Default - Center
         buttonRow =
-            $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} yes {CM.Glyphs.RightBracket}{btn2}{btn3}{CM.Glyphs.LeftBracket} neve{CM.Glyphs.VLine}";
+            $"{CM.Glyphs.VLine} yes {CM.Glyphs.RightBracket}{btn2}{btn3}{CM.Glyphs.LeftBracket} never{CM.Glyphs.VLine}";
 
         (runstate, Dialog dlg) = RunButtonTestDialog (
                                                       title,
@@ -868,7 +868,7 @@ public class DialogTests
         dlg.Dispose ();
     }
 
-    [Fact (Skip = "Dim.Auto WIP")]
+    [Fact]
     [AutoInitShutdown]
     public void Dialog_In_Window_With_Size_One_Button_Aligns ()
     {
@@ -910,7 +910,7 @@ public class DialogTests
         Run (win);
     }
 
-    [Theory (Skip = "Dim.Auto WIP")]
+    [Theory]
     [AutoInitShutdown]
     [InlineData (
                     5,
