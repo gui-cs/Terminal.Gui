@@ -15,6 +15,32 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Dialog : Window
 {
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
+
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
+
+    /// <summary>
+    ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumWidth { get; set; } = 25;
+
+    /// <summary>
+    ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumHeight { get; set; } = 25;
+
 
     // TODO: Reenable once border/borderframe design is settled
     /// <summary>
@@ -42,10 +68,9 @@ public class Dialog : Window
         Arrangement = ViewArrangement.Movable;
         X = Pos.Center ();
         Y = Pos.Center ();
-        //ValidatePosDim = true;
 
-        Width = Dim.Percent (85);
-        Height = Dim.Percent (85);
+        Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
+        Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;
@@ -122,18 +147,6 @@ public class Dialog : Window
         }
     }
 
-    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
-    /// <remarks>This property can be set in a Theme.</remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
-
-    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
-    /// <remarks>This property can be set in a Theme.</remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
-
     /// <summary>
     ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
     ///     <see cref="Dialog"/>
@@ -159,34 +172,5 @@ public class Dialog : Window
         {
             LayoutSubviews ();
         }
-    }
-
-    /// <inheritdoc/>
-    //public override void LayoutSubviews ()
-    //{
-    //    if (_inLayout)
-    //    {
-    //        return;
-    //    }
-
-    //    _inLayout = true;
-    //    SetRelativeLayout(SuperView?.ContentSize ?? Driver.Screen.Size);
-    //    LayoutButtons ();
-    //    base.LayoutSubviews ();
-    //    _inLayout = false;
-    //}
-
-    // Get the width of all buttons, not including any Margin.
-    internal int GetButtonsWidth ()
-    {
-        if (_buttons.Count == 0)
-        {
-            return 0;
-        }
-
-        //var widths = buttons.Select (b => b.TextFormatter.GetFormattedSize ().Width + b.BorderFrame.Thickness.Horizontal + b.Padding.Thickness.Horizontal);
-        IEnumerable<int> widths = _buttons.Select (b => b.Frame.Width);
-
-        return widths.Sum ();
     }
 }

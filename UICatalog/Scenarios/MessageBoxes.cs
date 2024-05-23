@@ -186,7 +186,7 @@ public class MessageBoxes : Scenario
 
         var ckbWrapMessage = new CheckBox
         {
-            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", Checked = false
+            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", Checked = true
         };
         frame.Add (ckbWrapMessage);
 
@@ -207,8 +207,6 @@ public class MessageBoxes : Scenario
             Text = " "
         };
 
-        //var btnText = new [] { "_Zero", "_One", "T_wo", "_Three", "_Four", "Fi_ve", "Si_x", "_Seven", "_Eight", "_Nine" };
-
         var showMessageBoxButton = new Button
         {
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show MessageBox"
@@ -227,7 +225,6 @@ public class MessageBoxes : Scenario
 
                                                for (var i = 0; i < numButtons; i++)
                                                {
-                                                   //btns.Add(btnText[i % 10]);
                                                    btns.Add (NumberToWords.Convert (i));
                                                }
 

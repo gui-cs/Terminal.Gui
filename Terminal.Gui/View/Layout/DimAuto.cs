@@ -60,7 +60,8 @@ public class DimAuto () : Dim
         var subviewsSize = 0;
 
         int autoMin = MinimumContentDim?.GetAnchor (superviewContentSize) ?? 0;
-        
+        int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? int.MaxValue;
+
         if (Style.FastHasFlags (DimAutoStyle.Text))
         {
             textSize = int.Max (autoMin, dimension == Dimension.Width ? us.TextFormatter.Size.Width : us.TextFormatter.Size.Height);
@@ -79,13 +80,31 @@ public class DimAuto () : Dim
 
                 List<View> subviews;
 
+                #region Not Anchored and Are Not Dependent
+                // Start with subviews that are not anchored to the end, aligned, or dependent on content size
+                // [x] PosAnchorEnd
+                // [x] PosAlign
+                // [ ] PosCenter
+                // [ ] PosPercent
+                // [ ] PosView
+                // [ ] PosFunc
+                // [x] DimFill
+                // [ ] DimPercent
+                // [ ] DimFunc
+                // [ ] DimView
                 if (dimension == Dimension.Width)
                 {
-                    subviews = us.Subviews.Where (v => v.X is not PosAnchorEnd && v.Width is not DimFill).ToList ();
+                    subviews = us.Subviews.Where (v => v.X is not PosAnchorEnd
+                                                       && v.X is not PosAlign
+                                                       && v.X is not PosCenter
+                                                       && v.Width is not DimFill).ToList ();
                 }
                 else
                 {
-                    subviews = us.Subviews.Where (v => v.Y is not PosAnchorEnd && v.Height is not DimFill).ToList ();
+                    subviews = us.Subviews.Where (v => v.Y is not PosAnchorEnd
+                                                       && v.Y is not PosAlign
+                                                       && v.Y is not PosCenter
+                                                       && v.Height is not DimFill).ToList ();
                 }
 
                 for (var i = 0; i < subviews.Count; i++)
@@ -96,10 +115,15 @@ public class DimAuto () : Dim
 
                     if (size > subviewsSize)
                     {
+                        // BUGBUG: Should we break here? Or choose min/max?
                         subviewsSize = size;
                     }
                 }
+                #endregion Not Anchored and Are Not Dependent
 
+                #region Anchored
+                // Now, handle subviews that are anchored to the end
+                // [x] PosAnchorEnd
                 if (dimension == Dimension.Width)
                 {
                     subviews = us.Subviews.Where (v => v.X is PosAnchorEnd).ToList ();
@@ -117,8 +141,33 @@ public class DimAuto () : Dim
                 }
 
                 subviewsSize += maxAnchorEnd;
+                #endregion Anchored
 
+                #region Center
+                // Now, handle subviews that are Centered
+                if (dimension == Dimension.Width)
+                {
+                    subviews = us.Subviews.Where (v => v.X is PosCenter).ToList ();
+                }
+                else
+                {
+                    subviews = us.Subviews.Where (v => v.Y is PosCenter).ToList ();
+                }
 
+                int maxCenter = 0;
+                for (var i = 0; i < subviews.Count; i++)
+                {
+                    View v = subviews [i];
+                    maxCenter = dimension == Dimension.Width ? v.Frame.Width : v.Frame.Height;
+                }
+
+                subviewsSize += maxCenter;
+                #endregion Center
+
+                #region Are Dependent
+                // Now, go back to those that are dependent on content size
+                // [x] DimFill
+                // [ ] DimPercent
                 if (dimension == Dimension.Width)
                 {
                     subviews = us.Subviews.Where (v => v.Width is DimFill).ToList ();
@@ -128,20 +177,24 @@ public class DimAuto () : Dim
                     subviews = us.Subviews.Where (v => v.Height is DimFill).ToList ();
                 }
 
+                int maxFill = 0;
                 for (var i = 0; i < subviews.Count; i++)
                 {
                     View v = subviews [i];
 
                     if (dimension == Dimension.Width)
                     {
-                        v.SetRelativeLayout (new Size (autoMin - subviewsSize, 0));
+                        v.SetRelativeLayout (new Size (autoMax - subviewsSize, 0));
                     }
                     else
                     {
-                        v.SetRelativeLayout (new Size (0, autoMin - subviewsSize));
+                        v.SetRelativeLayout (new Size (0, autoMax - subviewsSize));
                     }
+                    maxFill = dimension == Dimension.Width ? v.Frame.Width : v.Frame.Height;
                 }
 
+                subviewsSize += maxFill;
+                #endregion Are Dependent
             }
         }
 
@@ -156,14 +209,14 @@ public class DimAuto () : Dim
         Thickness thickness = us.GetAdornmentsThickness ();
 
         max += dimension switch
-               {
-                   Dimension.Width => thickness.Horizontal,
-                   Dimension.Height => thickness.Vertical,
-                   Dimension.None => 0,
-                   _ => throw new ArgumentOutOfRangeException (nameof (dimension), dimension, null)
-               };
+        {
+            Dimension.Width => thickness.Horizontal,
+            Dimension.Height => thickness.Vertical,
+            Dimension.None => 0,
+            _ => throw new ArgumentOutOfRangeException (nameof (dimension), dimension, null)
+        };
 
-        return int.Min (max, MaximumContentDim?.GetAnchor (superviewContentSize) ?? max);
+        return int.Min (max, autoMax);
     }
 
     internal override bool ReferencesOtherViews ()

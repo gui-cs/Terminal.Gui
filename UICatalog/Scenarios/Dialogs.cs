@@ -171,11 +171,6 @@ public class Dialogs : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 5, ColorScheme = Colors.ColorSchemes ["Error"], Text = " "
         };
 
-        // glyphsNotWords
-        // false:var btnText = new [] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" };
-        // true: var btnText = new [] { "0", "\u2780", "➁", "\u2783", "\u2784", "\u2785", "\u2786", "\u2787", "\u2788", "\u2789" };
-        // \u2781 is ➁ dingbats \ufb70 is	
-
         var showDialogButton = new Button
         {
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Dialog"
@@ -258,14 +253,6 @@ public class Dialogs : Scenario
                 buttons.Add (button);
             }
 
-            //if (buttons.Count > 1) {
-            //	buttons [1].Text = "Accept";
-            //	buttons [1].IsDefault = true;
-            //	buttons [0].Visible = false;
-            //	buttons [0].Text = "_Back";
-            //	buttons [0].IsDefault = false;
-            //}
-
             // This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
             // the buttons are laid out correctly
             dialog = new ()
@@ -282,7 +269,12 @@ public class Dialogs : Scenario
                 dialog.Width = width;
             }
 
-            var add = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "_Add a button" };
+            var add = new Button
+            {
+                X = Pos.Center (),
+                Y = Pos.Center (),
+                Text = "_Add a button"
+            };
 
             add.Accept += (s, e) =>
                           {
@@ -321,7 +313,7 @@ public class Dialogs : Scenario
             {
                 X = Pos.Center (),
                 Y = Pos.Center () + 1,
-                Text = $"A_dd a {char.ConvertFromUtf32 (CODE_POINT)} to each button"
+                Text = $"A_dd a {char.ConvertFromUtf32 (CODE_POINT)} to each button. This text is really long for a reason."
             };
 
             addChar.Accept += (s, e) =>
