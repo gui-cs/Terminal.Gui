@@ -1,8 +1,12 @@
+using Terminal.Gui.Analyzers.Internal.Attributes;
+
 namespace Terminal.Gui;
 
 /// <summary>
 ///     Determines the position of items when arranged in a container.
 /// </summary>
+[GenerateEnumExtensionMethods (FastHasFlags = true)]
+
 public enum Alignment
 {
     /// <summary>

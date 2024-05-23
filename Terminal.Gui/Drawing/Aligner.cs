@@ -88,12 +88,12 @@ public class Aligner : INotifyPropertyChanged
         }
 
         var sizesCopy = sizes;
-        if (alignmentMode.HasFlag (AlignmentModes.EndToStart))
+        if (alignmentMode.FastHasFlags (AlignmentModes.EndToStart))
         {
             sizesCopy = sizes.Reverse ().ToArray ();
         }
 
-        int maxSpaceBetweenItems = alignmentMode.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? 1 : 0;
+        int maxSpaceBetweenItems = alignmentMode.FastHasFlags (AlignmentModes.AddSpaceBetweenItems) ? 1 : 0;
         int totalItemsSize = sizes.Sum ();
         int totalGaps = sizes.Length - 1; // total gaps between items
         int totalItemsAndSpaces = totalItemsSize + totalGaps * maxSpaceBetweenItems; // total size of items and spacesToGive if we had enough room
