@@ -4,6 +4,20 @@ This document provides an overview of the changes between Terminal.Gui v1 and v2
 
 For detailed breaking change documentation check out this Discussion: https://github.com/gui-cs/Terminal.Gui/discussions/2448
 
+## View Constructors -> Initializers
+
+In v1, `View` and most sub-classes, had multiple constructors that took a variety of parameters. In v2, the constructors have been replaced with initializers. This change was made to simplify the API and make it easier to use. In addition, the v1 constructors drove a false (and needlessly compplex) distinction between "Absoulte" and "Computed" layout. In v2, the layout system is much simpler and more intuitive.
+
+### How to Fix
+
+Replace the constructor calls with initializer calls.
+
+```diff
+- var myView = new View (new Rect (10, 10, 40, 10));
++ var myView = new View { X = 10, Y = 10, Width = 40, Height = 10 };
+```
+
+
 ## TrueColor Support - 24-bit Color is the default
 
 Terminal.Gui v2 now supports 24-bit color by default. This means that the colors you use in your application will be more accurate and vibrant. If you are using custom colors in your application, you may need to update them to use the new 24-bit color format.
