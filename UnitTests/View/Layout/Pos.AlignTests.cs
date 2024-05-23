@@ -1,18 +1,30 @@
-﻿
-using static Unix.Terminal.Delegates;
+﻿namespace Terminal.Gui.LayoutTests;
 
-namespace Terminal.Gui.PosDimTests;
-
-public class PosAlignTests ()
+public class PosAlignTests
 {
     [Fact]
     public void PosAlign_Constructor ()
     {
-        var posAlign = new PosAlign ()
+        var posAlign = new PosAlign
         {
-            Aligner = new Aligner(),
+            Aligner = new ()
         };
         Assert.NotNull (posAlign);
+
+        Assert.Equal (Alignment.Start, posAlign.Aligner.Alignment);
+        Assert.Equal (AlignmentModes.StartToEnd, posAlign.Aligner.AlignmentModes);
+        Assert.Equal (0, posAlign.Aligner.ContainerSize);
+    }
+
+    [Fact]
+    public void PosAlign_StaticFactory_Defaults ()
+    {
+        var posAlign = Pos.Align (Alignment.Start) as PosAlign;
+        Assert.NotNull (posAlign);
+
+        Assert.Equal (Alignment.Start, posAlign.Aligner.Alignment);
+        Assert.Equal (AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, posAlign.Aligner.AlignmentModes);
+        Assert.Equal (0, posAlign.Aligner.ContainerSize);
     }
 
     [Theory]
@@ -23,17 +35,18 @@ public class PosAlignTests ()
     [InlineData (Alignment.Start, Alignment.Start, AlignmentModes.StartToEnd, AlignmentModes.AddSpaceBetweenItems, false)]
     public void PosAlign_Equals (Alignment align1, Alignment align2, AlignmentModes mode1, AlignmentModes mode2, bool expectedEquals)
     {
-        var posAlign1 = new PosAlign ()
+        var posAlign1 = new PosAlign
         {
-            Aligner = new Aligner ()
+            Aligner = new()
             {
                 Alignment = align1,
                 AlignmentModes = mode1
             }
         };
-        var posAlign2 = new PosAlign ()
+
+        var posAlign2 = new PosAlign
         {
-            Aligner = new Aligner ()
+            Aligner = new()
             {
                 Alignment = align2,
                 AlignmentModes = mode2
@@ -55,22 +68,22 @@ public class PosAlignTests ()
         View view = new ();
         superView.Add (view);
 
-        var posAlign1 = Pos.Align (Alignment.Center, AlignmentModes.AddSpaceBetweenItems);
+        Pos posAlign1 = Pos.Align (Alignment.Center);
         view.X = posAlign1;
-        var pos1 =  posAlign1.Calculate (10, Dim.Absolute(0)!, view, Dimension.Width);
+        int pos1 = posAlign1.Calculate (10, Dim.Absolute (0)!, view, Dimension.Width);
 
-        var posAlign2 = Pos.Align (Alignment.Center, AlignmentModes.AddSpaceBetweenItems);
+        Pos posAlign2 = Pos.Align (Alignment.Center);
         view.Y = posAlign2;
-        var pos2 = posAlign2.Calculate (25, Dim.Absolute (0)!, view, Dimension.Height);
+        int pos2 = posAlign2.Calculate (25, Dim.Absolute (0)!, view, Dimension.Height);
 
-        Assert.NotEqual(pos1, pos2);
+        Assert.NotEqual (pos1, pos2);
         Assert.Equal (posAlign1, posAlign2);
     }
 
     [Fact]
     public void PosAlign_ToString ()
     {
-        var posAlign = Pos.Align (Alignment.Fill);
+        Pos posAlign = Pos.Align (Alignment.Fill);
         var expectedString = "Align(alignment=Fill,modes=AddSpaceBetweenItems,groupId=0)";
 
         Assert.Equal (expectedString, posAlign.ToString ());
@@ -79,9 +92,9 @@ public class PosAlignTests ()
     [Fact]
     public void PosAlign_Anchor ()
     {
-        var posAlign = Pos.Align (Alignment.Start);
+        Pos posAlign = Pos.Align (Alignment.Start);
         var width = 50;
-        var expectedAnchor = -width;
+        int expectedAnchor = -width;
 
         Assert.Equal (expectedAnchor, posAlign.GetAnchor (width));
     }
@@ -89,7 +102,7 @@ public class PosAlignTests ()
     [Fact]
     public void PosAlign_CreatesCorrectInstance ()
     {
-        var pos = Pos.Align (Alignment.Start);
+        Pos pos = Pos.Align (Alignment.Start);
         Assert.IsType<PosAlign> (pos);
     }
 

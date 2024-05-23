@@ -144,7 +144,7 @@ public abstract class Pos
     ///     Creates a <see cref="Pos"/> object that aligns a set of views according to the specified <see cref="Alignment"/>
     ///     and <see cref="AlignmentModes"/>.
     /// </summary>
-    /// <param name="alignment">The alignment.</param>
+    /// <param name="alignment">The alignment. The default includes <see cref="AlignmentModes.AddSpaceBetweenItems"/>.</param>
     /// <param name="modes">The optional alignment modes.</param>
     /// <param name="groupId">
     ///     The optional identifier of a set of views that should be aligned together. When only a single

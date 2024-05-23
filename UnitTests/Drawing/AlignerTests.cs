@@ -26,6 +26,15 @@ public class AlignerTests (ITestOutputHelper output)
         Assert.Equal (alignment, deserialized);
     }
 
+    [Fact]
+    public void Aligner_Defaults ()
+    {
+        var aligner = new Aligner ();
+        Assert.Equal (Alignment.Start, aligner.Alignment);
+        Assert.Equal (AlignmentModes.StartToEnd, aligner.AlignmentModes);
+        Assert.Equal (0, aligner.ContainerSize);
+    }
+
     [Theory]
     [MemberData (nameof (AlignmentEnumValues))]
     public void NoItems_Works (Alignment alignment)

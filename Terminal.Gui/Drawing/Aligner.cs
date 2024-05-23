@@ -28,7 +28,7 @@ public class Aligner : INotifyPropertyChanged
         }
     }
 
-    private AlignmentModes _alignmentMode = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
+    private AlignmentModes _alignmentMode = AlignmentModes.StartToEnd;
 
     /// <summary>
     ///     Gets or sets the modes controlling <see cref="Alignment"/>.
