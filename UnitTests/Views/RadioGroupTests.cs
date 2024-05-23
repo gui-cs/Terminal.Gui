@@ -20,7 +20,6 @@ public class RadioGroupTests
         rg = new RadioGroup { RadioLabels = new [] { "Test" } };
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
         rg = new RadioGroup
@@ -206,8 +205,8 @@ public class RadioGroupTests
         Assert.Equal (2, rg.HorizontalSpace);
         Assert.Equal (0, rg.X);
         Assert.Equal (0, rg.Y);
-        Assert.Equal (21, rg.Width);
-        Assert.Equal (1, rg.Height);
+        Assert.Equal (21, rg.Frame.Width);
+        Assert.Equal (1, rg.Frame.Height);
 
         expected = @$"
 ┌────────────────────────────┐
@@ -231,8 +230,8 @@ public class RadioGroupTests
         Assert.Equal (4, rg.HorizontalSpace);
         Assert.Equal (0, rg.X);
         Assert.Equal (0, rg.Y);
-        Assert.Equal (23, rg.Width);
-        Assert.Equal (1, rg.Height);
+        Assert.Equal (23, rg.Frame.Width);
+        Assert.Equal (1, rg.Frame.Height);
 
         expected = @$"
 ┌────────────────────────────┐

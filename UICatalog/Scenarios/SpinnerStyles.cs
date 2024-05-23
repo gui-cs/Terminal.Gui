@@ -10,8 +10,16 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Progress")]
 public class SpinnerViewStyles : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+    
+        Application.Init ();
+
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
+
         const int DEFAULT_DELAY = 130;
         const string DEFAULT_CUSTOM = @"-\|/";
         Dictionary<int, KeyValuePair<string, Type>> styleDict = new ();
@@ -33,7 +41,7 @@ public class SpinnerViewStyles : Scenario
             //Title = "Preview",
             BorderStyle = LineStyle.Single
         };
-        Win.Add (preview);
+        app.Add (preview);
 
         var spinner = new SpinnerView { X = Pos.Center (), Y = 0 };
         preview.Add (spinner);
@@ -47,7 +55,7 @@ public class SpinnerViewStyles : Scenario
             Checked = true,
             Text = "Ascii Only"
         };
-        Win.Add (ckbAscii);
+        app.Add (ckbAscii);
 
         var ckbNoSpecial = new CheckBox
         {
@@ -57,28 +65,28 @@ public class SpinnerViewStyles : Scenario
             Checked = true,
             Text = "No Special"
         };
-        Win.Add (ckbNoSpecial);
+        app.Add (ckbNoSpecial);
 
         var ckbReverse = new CheckBox
         {
             X = Pos.Center () - 22, Y = Pos.Bottom (preview) + 1, Checked = false, Text = "Reverse"
         };
-        Win.Add (ckbReverse);
+        app.Add (ckbReverse);
 
         var ckbBounce = new CheckBox
         {
             X = Pos.Right (ckbReverse) + 2, Y = Pos.Bottom (preview) + 1, Checked = false, Text = "Bounce"
         };
-        Win.Add (ckbBounce);
+        app.Add (ckbBounce);
 
         var delayLabel = new Label { X = Pos.Right (ckbBounce) + 2, Y = Pos.Bottom (preview) + 1, Text = "Delay:" };
-        Win.Add (delayLabel);
+        app.Add (delayLabel);
 
         var delayField = new TextField
         {
             X = Pos.Right (delayLabel), Y = Pos.Bottom (preview) + 1, Width = 5, Text = DEFAULT_DELAY.ToString ()
         };
-        Win.Add (delayField);
+        app.Add (delayField);
 
         delayField.TextChanged += (s, e) =>
                                   {
@@ -89,13 +97,13 @@ public class SpinnerViewStyles : Scenario
                                   };
 
         var customLabel = new Label { X = Pos.Right (delayField) + 2, Y = Pos.Bottom (preview) + 1, Text = "Custom:" };
-        Win.Add (customLabel);
+        app.Add (customLabel);
 
         var customField = new TextField
         {
             X = Pos.Right (customLabel), Y = Pos.Bottom (preview) + 1, Width = 12, Text = DEFAULT_CUSTOM
         };
-        Win.Add (customField);
+        app.Add (customField);
 
         string [] styleArray = styleDict.Select (e => e.Value.Key).ToArray ();
 
@@ -110,7 +118,7 @@ public class SpinnerViewStyles : Scenario
         };
         styles.SetSource (styleArray);
         styles.SelectedItem = 0; // SpinnerStyle.Custom;
-        Win.Add (styles);
+        app.Add (styles);
         SetCustom ();
 
         customField.TextChanged += (s, e) =>
@@ -159,7 +167,7 @@ public class SpinnerViewStyles : Scenario
 
         ckbBounce.Toggled += (s, e) => { spinner.SpinBounce = (bool)!e.OldValue; };
 
-        Top.Unloaded += Top_Unloaded;
+        app.Unloaded += App_Unloaded;
 
         void SetCustom ()
         {
@@ -192,7 +200,7 @@ public class SpinnerViewStyles : Scenario
             }
         }
 
-        void Top_Unloaded (object sender, EventArgs args)
+        void App_Unloaded (object sender, EventArgs args)
         {
             if (spinner != null)
             {
@@ -200,12 +208,13 @@ public class SpinnerViewStyles : Scenario
                 spinner = null;
             }
 
-            Top.Unloaded -= Top_Unloaded;
+            app.Unloaded -= App_Unloaded;
         }
-    }
 
-    private class Property
-    {
-        public string Name { get; set; }
+
+        Application.Run (app);
+        app.Dispose ();
+
+        Application.Shutdown ();
     }
 }

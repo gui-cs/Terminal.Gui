@@ -605,9 +605,10 @@ public class ComboBox : View
         return true;
     }
 
+    // TODO: Upgrade Combobox to use Dim.Auto instead of all this stuff.
     private void ProcessLayout ()
     {
-        if (Viewport.Height < _minimumHeight && (Height is null || Height is Dim.DimAbsolute))
+        if (Viewport.Height < _minimumHeight && (Height is null || Height is DimAbsolute))
         {
             Height = _minimumHeight;
         }
@@ -618,8 +619,8 @@ public class ComboBox : View
         {
             _search.Width = _listview.Width = _autoHide ? Viewport.Width - 1 : Viewport.Width;
             _listview.Height = CalculatetHeight ();
-            _search.SetRelativeLayout (ContentSize.GetValueOrDefault());
-            _listview.SetRelativeLayout (ContentSize.GetValueOrDefault ());
+            _search.SetRelativeLayout (ContentSize);
+            _listview.SetRelativeLayout (ContentSize);
         }
     }
 

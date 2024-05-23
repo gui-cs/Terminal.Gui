@@ -1663,7 +1663,7 @@ public class TileViewTests
         var ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Right (tileView)));
         Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosView", ex.Message);
 
-        ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Function (() => 1)));
+        ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Func (() => 1)));
         Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosFunc", ex.Message);
 
         // Also not allowed because this results in a PosCombine
@@ -1758,7 +1758,7 @@ public class TileViewTests
         Assert.False (tileView.SetSplitterPos (0, 0));
 
         // position should remain where it was, at 50%
-        Assert.Equal (Pos.Percent (50f), tileView.SplitterDistances.ElementAt (0));
+        Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
 
         tileView.Draw ();
 
@@ -1959,7 +1959,7 @@ public class TileViewTests
     {
         TileView tileView = Get11By3TileView (out LineView line);
         tileView.SetSplitterPos (0, Pos.Percent (50));
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
         tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
 
         tileView.Draw ();
@@ -1983,7 +1983,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Even when moving the splitter location it should stay a Percentage based one
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
 
         // and 2 to the left
         line.NewKeyDownEvent (Key.CursorLeft);
@@ -1998,7 +1998,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Even when moving the splitter location it should stay a Percentage based one
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
     }
 
     [Fact]

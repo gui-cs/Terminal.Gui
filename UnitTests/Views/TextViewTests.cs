@@ -6897,8 +6897,6 @@ This is the second line.
         Assert.True (_textView.AllowsReturn);
         Assert.Equal (4, _textView.TabWidth);
         Assert.True (_textView.AllowsTab);
-        Assert.Equal ("Absolute(30)", _textView.Width.ToString ());
-        Assert.Equal ("Absolute(10)", _textView.Height.ToString ());
         Assert.False (_textView.WordWrap);
 
         _textView.WordWrap = true;
@@ -6908,8 +6906,6 @@ This is the second line.
         Assert.False (_textView.AllowsReturn);
         Assert.Equal (0, _textView.TabWidth);
         Assert.False (_textView.AllowsTab);
-        Assert.Equal ("Absolute(30)", _textView.Width.ToString ());
-        Assert.Equal ("Absolute(1)", _textView.Height.ToString ());
         Assert.False (_textView.WordWrap);
 
         _textView.WordWrap = true;
@@ -6919,8 +6915,6 @@ This is the second line.
         Assert.True (_textView.AllowsReturn);
         Assert.Equal (4, _textView.TabWidth);
         Assert.True (_textView.AllowsTab);
-        Assert.Equal ("Absolute(30)", _textView.Width.ToString ());
-        Assert.Equal ("Absolute(10)", _textView.Height.ToString ());
         Assert.False (_textView.WordWrap);
     }
 

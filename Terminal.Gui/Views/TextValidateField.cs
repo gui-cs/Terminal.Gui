@@ -397,7 +397,7 @@ namespace Terminal.Gui
         /// </summary>
         public TextValidateField ()
         {
-            Height = 1;
+            Height = Dim.Auto (minimumContentDim: 1);
             CanFocus = true;
 
             // Things this view knows how to do
@@ -533,7 +533,7 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        protected internal override bool OnMouseEvent  (MouseEvent mouseEvent)
+        protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {

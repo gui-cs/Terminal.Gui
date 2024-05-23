@@ -264,7 +264,7 @@ public class ListView : View
             }
             _source = value;
 
-            ContentSize = new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width);
+            SetContentSize (new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width));
             if (IsInitialized)
             {
                 Viewport = Viewport with { Y = 0 };
@@ -336,7 +336,7 @@ public class ListView : View
             }
             else if (Viewport.Height > 0 && _selected >= Viewport.Y + Viewport.Height)
             {
-                Viewport = Viewport with { Y = _selected - Viewport.Height + 1};
+                Viewport = Viewport with { Y = _selected - Viewport.Height + 1 };
             }
 
             LayoutStarted -= ListView_LayoutStarted;
@@ -408,7 +408,7 @@ public class ListView : View
 
         if (me.Flags == MouseFlags.WheeledLeft)
         {
-            ScrollHorizontal(-1);
+            ScrollHorizontal (-1);
 
             return true;
         }

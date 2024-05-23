@@ -69,7 +69,6 @@ When measuring the screen space taken up by a `string` you can use the extension
 + myString.GetColumns();
 ```
 
-
 ## `View Life Cycle Management
 
 In v1, `View` was derived from `Responder` which supported `IDisposable`. In v2, `Responder` has been removed and `View` is the base-class supporting `IDisposable`. 
@@ -81,6 +80,23 @@ In v1, `Application.Init` automatically created a toplevel view and set `Applica
 * Replace `Responder` with `View`
 * Update any code that assumed `Application.Init` automatically created a toplevel view and set `Applicaton.Top`.
 * Update any code that assumed `Application.Init` automatically disposed of the toplevel view when the application exited.
+
+## `Pos` and `Dim` types now adhere to standard C# idioms
+
+* In v1, the `Pos` and `Dim` types (e.g. `Pos.PosView`) were nested classes and marked `internal`. In v2, they are no longer nested, and have appropriate public APIs. 
+* Nullabilty is enabled.
+* Methods & properties follow standards.
+* The static method that creates a `PosAbsolute`, `Pos.At`, was renamed to `Pos.Absolute` for consistency.
+* The static method that crates as `DimAbsoulte`, `Dim.Sized`, was renamed to `Dim.Absolute` for consistency.
+
+### How to Fix
+
+* Search and replace `Pos.Pos` -> `Pos`.
+* Search and replace `Dim.Dim` -> `Dim`.
+* Search and replace `Pos.At` -> `Pos.Absolute`
+* Search and replace `Dim.Sized` -> `Dim.Absolute`
+* Search and replace `Dim.Anchor` -> `Dim.GetAnchor`
+* Search and replace `Pos.Anchor` -> `Pos.GetAnchor`
 
 ## Layout Improvements
 
@@ -108,7 +124,7 @@ In v1, `View.AutoSize` was used to size a view to its `Text`. In v2, `View.AutoS
 
 ### How to Fix
 
-* Replace `View.AutoSize = true` with `View.Width = Dim.Auto` or `View.Height = Dim.Auto` as needed.
+* Replace `View.AutoSize = true` with `View.Width = Dim.Auto` or `View.Height = Dim.Auto` as needed. See the [DimAuto Deep Dive](dimauto.md) for more information.
 
 ## Adornments
 

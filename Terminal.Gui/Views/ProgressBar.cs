@@ -42,7 +42,8 @@ public class ProgressBar : View
     private int _delta;
     private float _fraction;
     private bool _isActivity;
-    private ProgressBarStyle _progressBarStyle;
+    private ProgressBarStyle _progressBarStyle = ProgressBarStyle.Blocks;
+    private ProgressBarFormat _progressBarFormat = ProgressBarFormat.Simple;
     private Rune _segmentCharacter = Glyphs.BlocksMeterSegment;
 
     /// <summary>
@@ -58,11 +59,7 @@ public class ProgressBar : View
     public bool BidirectionalMarquee
     {
         get => _bidirectionalMarquee;
-        set
-        {
-            _bidirectionalMarquee = value;
-            SetNeedsDisplay ();
-        }
+        set => _bidirectionalMarquee = value;
     }
 
     /// <summary>Gets or sets the <see cref="ProgressBar"/> fraction to display, must be a value between 0 and 1.</summary>
@@ -74,12 +71,15 @@ public class ProgressBar : View
         {
             _fraction = Math.Min (value, 1);
             _isActivity = false;
-            SetNeedsDisplay ();
         }
     }
 
     /// <summary>Specifies the format that a <see cref="ProgressBar"/> uses to indicate the visual presentation.</summary>
-    public ProgressBarFormat ProgressBarFormat { get; set; }
+    public ProgressBarFormat ProgressBarFormat
+    {
+        get => _progressBarFormat;
+        set => _progressBarFormat = value;
+    }
 
     /// <summary>Gets/Sets the progress bar style based on the <see cref="Terminal.Gui.ProgressBarStyle"/></summary>
     public ProgressBarStyle ProgressBarStyle
@@ -108,8 +108,6 @@ public class ProgressBar : View
 
                     break;
             }
-
-            SetNeedsDisplay ();
         }
     }
 
@@ -117,11 +115,7 @@ public class ProgressBar : View
     public Rune SegmentCharacter
     {
         get => _segmentCharacter;
-        set
-        {
-            _segmentCharacter = value;
-            SetNeedsDisplay ();
-        }
+        set => _segmentCharacter = value;
     }
 
     /// <summary>
@@ -181,7 +175,7 @@ public class ProgressBar : View
 
         if (ProgressBarFormat != ProgressBarFormat.Simple && !_isActivity)
         {
-            var tf = new TextFormatter { Alignment = TextAlignment.Centered, Text = Text };
+            var tf = new TextFormatter { Alignment = TextAlignment.Centered, Text = Text, AutoSize = true };
             var attr = new Attribute (ColorScheme.HotNormal.Foreground, ColorScheme.HotNormal.Background);
 
             if (_fraction > .5)
@@ -275,18 +269,12 @@ public class ProgressBar : View
         };
     }
 
-    private void ProgressBar_LayoutStarted (object sender, EventArgs e)
-    {
-        // TODO: use Dim.Auto
-        Height = 1 + GetAdornmentsThickness ().Vertical;
-    }
-
     private void SetInitialProperties ()
     {
-        Height = 1; // This will be updated when Viewport is updated in ProgressBar_LayoutStarted
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1);
         CanFocus = false;
         _fraction = 0;
-        LayoutStarted += ProgressBar_LayoutStarted;
         Initialized += ProgressBar_Initialized;
     }
 }

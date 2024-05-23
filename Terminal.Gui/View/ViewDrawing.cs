@@ -106,7 +106,7 @@ public partial class View
 
         if (ViewportSettings.HasFlag (ViewportSettings.ClearContentOnly))
         {
-            Rectangle visibleContent = ViewportToScreen (new Rectangle (new (-Viewport.X, -Viewport.Y), ContentSize.GetValueOrDefault ()));
+            Rectangle visibleContent = ViewportToScreen (new Rectangle (new (-Viewport.X, -Viewport.Y), ContentSize));
             toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
@@ -172,7 +172,7 @@ public partial class View
         if (ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly))
         {
             // Clamp the Clip to the just content area that is within the viewport
-            Rectangle visibleContent = ViewportToScreen (new Rectangle (new (-Viewport.X, -Viewport.Y), ContentSize.GetValueOrDefault ()));
+            Rectangle visibleContent = ViewportToScreen (new Rectangle (new (-Viewport.X, -Viewport.Y), ContentSize));
             clip = Rectangle.Intersect (clip, visibleContent);
         }
 
@@ -475,7 +475,7 @@ public partial class View
 
             // This should NOT clear 
             // TODO: If the output is not in the Viewport, do nothing
-            var drawRect = new Rectangle (ContentToScreen (Point.Empty), ContentSize.GetValueOrDefault ());
+            var drawRect = new Rectangle (ContentToScreen (Point.Empty), ContentSize);
 
             TextFormatter?.Draw (
                                  drawRect,

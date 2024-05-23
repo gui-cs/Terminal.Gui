@@ -68,7 +68,7 @@ public class FileDialog : Dialog
 
         _btnOk = new Button
         {
-            Y = Pos.AnchorEnd (1), X = Pos.Function (CalculateOkButtonPosX), IsDefault = true, Text = Style.OkButtonText
+            Y = Pos.AnchorEnd (1), X = Pos.Func (CalculateOkButtonPosX), IsDefault = true, Text = Style.OkButtonText
         };
         _btnOk.Accept += (s, e) => Accept (true);
 
@@ -457,7 +457,7 @@ public class FileDialog : Dialog
 
         if (Style.FlipOkCancelButtonLayoutOrder)
         {
-            _btnCancel.X = Pos.Function (CalculateOkButtonPosX);
+            _btnCancel.X = Pos.Func (CalculateOkButtonPosX);
             _btnOk.X = Pos.Right (_btnCancel) + 1;
 
             // Flip tab order too for consistency

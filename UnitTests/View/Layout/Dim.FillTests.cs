@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.PosDimTests;
+namespace Terminal.Gui.LayoutTests;
 
 public class DimFillTests (ITestOutputHelper output)
 {
@@ -141,8 +141,28 @@ public class DimFillTests (ITestOutputHelper output)
     public void DimFill_Calculate_ReturnsCorrectValue ()
     {
         var dim = Dim.Fill ();
-        var result = dim.Calculate (0, 100, null, Dim.Dimension.None);
+        var result = dim.Calculate (0, 100, null, Dimension.None);
         Assert.Equal (100, result);
     }
 
+    [Fact]
+    public void ResizeView_With_Dim_Fill_After_IsInitialized ()
+    {
+        var super = new View { Frame = new (0, 0, 30, 80) };
+        var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        super.Add (view);
+
+        view.Text = "New text\nNew line";
+        super.LayoutSubviews ();
+        Rectangle expectedViewBounds = new (0, 0, 30, 80);
+
+        Assert.Equal (expectedViewBounds, view.Viewport);
+        Assert.False (view.IsInitialized);
+
+        super.BeginInit ();
+        super.EndInit ();
+
+        Assert.True (view.IsInitialized);
+        Assert.Equal (expectedViewBounds, view.Viewport);
+    }
 }

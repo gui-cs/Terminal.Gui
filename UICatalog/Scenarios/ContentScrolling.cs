@@ -27,7 +27,7 @@ public class ContentScrolling : Scenario
             BorderStyle = LineStyle.Rounded;
             Arrangement = ViewArrangement.Fixed;
 
-            ContentSize = new (60, 40);
+            SetContentSize (new (60, 40));
             ViewportSettings |= ViewportSettings.ClearContentOnly;
             ViewportSettings |= ViewportSettings.ClipContentOnly;
 
@@ -227,7 +227,7 @@ public class ContentScrolling : Scenario
 
         var contentSizeWidth = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.GetValueOrDefault ().Width,
+            Value = view.ContentSize.Width,
             X = Pos.Right (labelContentSize) + 1,
             Y = Pos.Top (labelContentSize)
         };
@@ -242,7 +242,7 @@ public class ContentScrolling : Scenario
                 return;
             }
 
-            view.ContentSize = view.ContentSize.GetValueOrDefault () with { Width = e.NewValue };
+            view.SetContentSize (view.ContentSize with { Width = e.NewValue });
         }
 
         var labelComma = new Label
@@ -254,7 +254,7 @@ public class ContentScrolling : Scenario
 
         var contentSizeHeight = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.GetValueOrDefault ().Height,
+            Value = view.ContentSize.Height,
             X = Pos.Right (labelComma) + 1,
             Y = Pos.Top (labelContentSize),
             CanFocus = false
@@ -270,7 +270,7 @@ public class ContentScrolling : Scenario
                 return;
             }
 
-            view.ContentSize = view.ContentSize.GetValueOrDefault () with { Height = e.NewValue };
+            view.SetContentSize (view.ContentSize with { Height = e.NewValue });
         }
 
         var cbClearOnlyVisible = new CheckBox

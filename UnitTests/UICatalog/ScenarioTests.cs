@@ -122,8 +122,8 @@ public class ScenarioTests : TestsAllViews
         RadioGroup _hRadioGroup;
         TextField _hText;
         var _hVal = 0;
-        List<string> posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
-        List<string> dimNames = new () { "Auto", "Factor", "Fill", "Absolute" };
+        List<string> posNames = new () { "Percent", "AnchorEnd", "Center", "Absolute" };
+        List<string> dimNames = new () { "Auto", "Percent", "Fill", "Absolute" };
 
         Application.Init (new FakeDriver ());
 
@@ -167,7 +167,7 @@ public class ScenarioTests : TestsAllViews
         _computedCheckBox = new () { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
         _settingsPane.Add (_computedCheckBox);
 
-        var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
+        var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "Absolute(x)" };
 
         _locationFrame = new ()
         {
@@ -187,7 +187,7 @@ public class ScenarioTests : TestsAllViews
 
         _locationFrame.Add (_xRadioGroup);
 
-        radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
+        radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "Absolute(y)" };
         label = new () { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "y:" };
         _locationFrame.Add (label);
         _yText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
@@ -204,7 +204,7 @@ public class ScenarioTests : TestsAllViews
             Title = "Size (Dim)"
         };
 
-        radioItems = new [] { "Auto()", "Percent(width)", "Fill(width)", "Sized(width)" };
+        radioItems = new [] { "Auto()", "Percent(width)", "Fill(width)", "Absolute(width)" };
         label = new () { X = 0, Y = 0, Text = "width:" };
         _sizeFrame.Add (label);
         _wRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
@@ -212,7 +212,7 @@ public class ScenarioTests : TestsAllViews
         _sizeFrame.Add (_wText);
         _sizeFrame.Add (_wRadioGroup);
 
-        radioItems = new [] { "Auto()", "Percent(height)", "Fill(height)", "Sized(height)" };
+        radioItems = new [] { "Auto()", "Percent(height)", "Fill(height)", "Absolute(height)" };
         label = new () { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "height:" };
         _sizeFrame.Add (label);
         _hText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
@@ -372,7 +372,7 @@ public class ScenarioTests : TestsAllViews
 
                         break;
                     case 3:
-                        view.X = Pos.At (_xVal);
+                        view.X = Pos.Absolute (_xVal);
 
                         break;
                 }
@@ -392,7 +392,7 @@ public class ScenarioTests : TestsAllViews
 
                         break;
                     case 3:
-                        view.Y = Pos.At (_yVal);
+                        view.Y = Pos.Absolute (_yVal);
 
                         break;
                 }
@@ -408,7 +408,7 @@ public class ScenarioTests : TestsAllViews
 
                         break;
                     case 2:
-                        view.Width = Dim.Sized (_wVal);
+                        view.Width = Dim.Absolute (_wVal);
 
                         break;
                 }
@@ -424,7 +424,7 @@ public class ScenarioTests : TestsAllViews
 
                         break;
                     case 2:
-                        view.Height = Dim.Sized (_hVal);
+                        view.Height = Dim.Absolute (_hVal);
 
                         break;
                 }
@@ -482,12 +482,12 @@ public class ScenarioTests : TestsAllViews
                 return null;
             }
 
-            if (view.Width is not Dim.DimAuto)
+            if (view.Width is not DimAuto)
             {
                 view.Width = Dim.Percent (75);
             }
 
-            if (view.Height is not Dim.DimAuto)
+            if (view.Height is not DimAuto)
             {
                 view.Height = Dim.Percent (75);
             }

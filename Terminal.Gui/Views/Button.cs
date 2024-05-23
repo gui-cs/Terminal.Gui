@@ -45,8 +45,8 @@ public class Button : View
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
-        Height = 1;
-        Width = Dim.Auto (Dim.DimAutoStyle.Text);
+        Width = Dim.Auto (DimAutoStyle.Text);
+        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
         CanFocus = true;
         HighlightStyle |= HighlightStyle.Pressed;

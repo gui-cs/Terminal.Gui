@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 using static Terminal.Gui.Dim;
 using static Terminal.Gui.Pos;
 
-namespace Terminal.Gui.PosDimTests;
+namespace Terminal.Gui.LayoutTests;
 
 public class PosPercentTests (ITestOutputHelper output)
 {
@@ -50,15 +50,15 @@ public class PosPercentTests (ITestOutputHelper output)
     [Fact]
     public void PosPercent_SetsValue ()
     {
-        float f = 0;
+        int f = 0;
         Pos pos = Pos.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
-        f = 0.5F;
+        Assert.Equal ($"Percent({f})", pos.ToString ());
+        f = 50;
         pos = Pos.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
+        Assert.Equal ($"Percent({f})", pos.ToString ());
         f = 100;
         pos = Pos.Percent (f);
-        Assert.Equal ($"Factor({f / 100:0.###})", pos.ToString ());
+        Assert.Equal ($"Percent({f})", pos.ToString ());
     }
 
     [Fact]
@@ -66,9 +66,8 @@ public class PosPercentTests (ITestOutputHelper output)
     {
         Pos pos = Pos.Percent (0);
         Assert.Throws<ArgumentException> (() => pos = Pos.Percent (-1));
-        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (101));
-        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (100.0001F));
-        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (1000001));
+        //Assert.Throws<ArgumentException> (() => pos = Pos.Percent (101));
+        //Assert.Throws<ArgumentException> (() => pos = Pos.Percent (1000001));
     }
 
 }

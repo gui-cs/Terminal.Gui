@@ -20,7 +20,7 @@ public class ProgressBarTests
                       new Attribute (pb.ColorScheme.HotNormal.Foreground, pb.ColorScheme.HotNormal.Background)
                      );
         Assert.Equal (Colors.ColorSchemes ["Base"].Normal, pb.ColorScheme.Normal);
-        Assert.Equal (1, pb.Height);
+        Assert.Equal (1, pb.Frame.Height);
         Assert.Equal (ProgressBarStyle.Blocks, pb.ProgressBarStyle);
         Assert.Equal (ProgressBarFormat.Simple, pb.ProgressBarFormat);
         Assert.Equal (CM.Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
@@ -111,17 +111,17 @@ public class ProgressBarTests
 
         pb1.ProgressBarFormat = ProgressBarFormat.Simple;
         Assert.Equal (ProgressBarFormat.Simple, pb1.ProgressBarFormat);
-        Assert.Equal (1, pb1.Height);
+        Assert.Equal (1, pb1.Frame.Height);
         pb2.ProgressBarFormat = ProgressBarFormat.Simple;
         Assert.Equal (ProgressBarFormat.Simple, pb2.ProgressBarFormat);
-        Assert.Equal (1, pb2.Height);
+        Assert.Equal (1, pb2.Frame.Height);
 
         pb1.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
         Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb1.ProgressBarFormat);
-        Assert.Equal (1, pb1.Height);
+        Assert.Equal (1, pb1.Frame.Height);
         pb2.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
         Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb2.ProgressBarFormat);
-        Assert.Equal (1, pb2.Height);
+        Assert.Equal (1, pb2.Frame.Height);
     }
 
     [Fact]
@@ -131,10 +131,10 @@ public class ProgressBarTests
         var pb = new ProgressBar ();
 
         pb.ProgressBarFormat = ProgressBarFormat.Simple;
-        Assert.Equal (1, pb.Height);
+        Assert.Equal (1, pb.Frame.Height);
 
         pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
-        Assert.Equal (1, pb.Height);
+        Assert.Equal (1, pb.Frame.Height);
     }
 
     [Fact]

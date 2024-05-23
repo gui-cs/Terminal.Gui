@@ -411,13 +411,13 @@ public class TileView : View
     ///         <see cref="Tile.MinSize"/>, location of other splitters etc.
     ///     </para>
     ///     <para>
-    ///         Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(float)"/>) are supported for
+    ///         Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(int)"/>) are supported for
     ///         this property.
     ///     </para>
     /// </summary>
     public bool SetSplitterPos (int idx, Pos value)
     {
-        if (!(value is Pos.PosAbsolute) && !(value is Pos.PosFactor))
+        if (!(value is PosAbsolute) && !(value is PosPercent))
         {
             throw new ArgumentException (
                                          $"Only Percent and Absolute values are supported. Passed value was {value.GetType ().Name}"
@@ -601,11 +601,11 @@ public class TileView : View
 
         TileViewLineView nextSplitter = visibleSplitterLines [i];
         Pos nextSplitterPos = Orientation == Orientation.Vertical ? nextSplitter.X : nextSplitter.Y;
-        int nextSplitterDistance = nextSplitterPos.Anchor (space);
+        int nextSplitterDistance = nextSplitterPos.GetAnchor (space);
 
         TileViewLineView lastSplitter = i >= 1 ? visibleSplitterLines [i - 1] : null;
         Pos lastSplitterPos = Orientation == Orientation.Vertical ? lastSplitter?.X : lastSplitter?.Y;
-        int lastSplitterDistance = lastSplitterPos?.Anchor (space) ?? 0;
+        int lastSplitterDistance = lastSplitterPos?.GetAnchor (space) ?? 0;
 
         int distance = nextSplitterDistance - lastSplitterDistance;
 
@@ -656,8 +656,8 @@ public class TileView : View
 
     private bool IsValidNewSplitterPos (int idx, Pos value, int fullSpace)
     {
-        int newSize = value.Anchor (fullSpace);
-        bool isGettingBigger = newSize > _splitterDistances [idx].Anchor (fullSpace);
+        int newSize = value.GetAnchor (fullSpace);
+        bool isGettingBigger = newSize > _splitterDistances [idx].GetAnchor (fullSpace);
         int lastSplitterOrBorder = HasBorder () ? 1 : 0;
         int nextSplitterOrBorder = HasBorder () ? fullSpace - 1 : fullSpace;
 
@@ -682,7 +682,7 @@ public class TileView : View
         // Do not allow splitter to move left of the one before
         if (idx > 0)
         {
-            int posLeft = _splitterDistances [idx - 1].Anchor (fullSpace);
+            int posLeft = _splitterDistances [idx - 1].GetAnchor (fullSpace);
 
             if (newSize <= posLeft)
             {
@@ -695,7 +695,7 @@ public class TileView : View
         // Do not allow splitter to move right of the one after
         if (idx + 1 < _splitterDistances.Count)
         {
-            int posRight = _splitterDistances [idx + 1].Anchor (fullSpace);
+            int posRight = _splitterDistances [idx + 1].GetAnchor (fullSpace);
 
             if (newSize >= posRight)
             {
@@ -848,7 +848,7 @@ public class TileView : View
         {
             Dim spaceDim = Tile.ContentView.Width;
 
-            int spaceAbs = spaceDim.Anchor (Parent.Viewport.Width);
+            int spaceAbs = spaceDim.GetAnchor (Parent.Viewport.Width);
 
             var title = $" {Tile.Title} ";
 
@@ -991,23 +991,27 @@ public class TileView : View
 
         /// <summary>
         ///     <para>
-        ///         Determines the absolute position of <paramref name="p"/> and returns a <see cref="Pos.PosFactor"/> that
+        ///         Determines the absolute position of <paramref name="p"/> and returns a <see cref="PosPercent"/> that
         ///         describes the percentage of that.
         ///     </para>
         ///     <para>
-        ///         Effectively turning any <see cref="Pos"/> into a <see cref="Pos.PosFactor"/> (as if created with
-        ///         <see cref="Pos.Percent(float)"/>)
+        ///         Effectively turning any <see cref="Pos"/> into a <see cref="PosPercent"/> (as if created with
+        ///         <see cref="Pos.Percent(int)"/>)
         ///     </para>
         /// </summary>
-        /// <param name="p">The <see cref="Pos"/> to convert to <see cref="Pos.Percent(float)"/></param>
+        /// <param name="p">The <see cref="Pos"/> to convert to <see cref="Pos.Percent(int)"/></param>
         /// <param name="parentLength">The Height/Width that <paramref name="p"/> lies within</param>
         /// <returns></returns>
-        private Pos ConvertToPosFactor (Pos p, int parentLength)
+        private Pos ConvertToPosPercent (Pos p, int parentLength)
         {
-            // calculate position in the 'middle' of the cell at p distance along parentLength
-            float position = p.Anchor (parentLength) + 0.5f;
+            // Calculate position in the 'middle' of the cell at p distance along parentLength
+            float position = p.GetAnchor (parentLength) + 0.5f;
 
-            return new Pos.PosFactor (position / parentLength);
+            // Calculate the percentage
+            int percent = (int)Math.Round ((position / parentLength) * 100);
+
+            // Return a new PosPercent object
+            return Pos.Percent (percent);
         }
 
         /// <summary>
@@ -1025,14 +1029,14 @@ public class TileView : View
         /// <param name="newValue"></param>
         private bool FinalisePosition (Pos oldValue, Pos newValue)
         {
-            if (oldValue is Pos.PosFactor)
+            if (oldValue is PosPercent)
             {
                 if (Orientation == Orientation.Horizontal)
                 {
-                    return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Viewport.Height));
+                    return Parent.SetSplitterPos (Idx, ConvertToPosPercent (newValue, Parent.Viewport.Height));
                 }
 
-                return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Viewport.Width));
+                return Parent.SetSplitterPos (Idx, ConvertToPosPercent (newValue, Parent.Viewport.Width));
             }
 
             return Parent.SetSplitterPos (Idx, newValue);
@@ -1066,7 +1070,7 @@ public class TileView : View
 
         private Pos Offset (Pos pos, int delta)
         {
-            int posAbsolute = pos.Anchor (
+            int posAbsolute = pos.GetAnchor (
                                           Orientation == Orientation.Horizontal
                                               ? Parent.Viewport.Height
                                               : Parent.Viewport.Width

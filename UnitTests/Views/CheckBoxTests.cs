@@ -136,8 +136,8 @@ public class CheckBoxTests
     public void Constructors_Defaults ()
     {
         var ckb = new CheckBox ();
-        Assert.True (ckb.Width is Dim.DimAuto);
-        Assert.Equal (Dim.Sized (1), ckb.Height);
+        Assert.True (ckb.Width is DimAuto);
+        Assert.True (ckb.Height is DimAuto);
         Assert.False (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
         Assert.Equal (string.Empty, ckb.Text);
@@ -146,8 +146,8 @@ public class CheckBoxTests
         Assert.Equal (new Rectangle (0, 0, 2, 1), ckb.Frame);
 
         ckb = new CheckBox { Text = "Test", Checked = true };
-        Assert.True (ckb.Width is Dim.DimAuto);
-        Assert.Equal (Dim.Sized (1), ckb.Height);
+        Assert.True (ckb.Width is DimAuto);
+        Assert.True (ckb.Height is DimAuto);
         Assert.True (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
         Assert.Equal ("Test", ckb.Text);
@@ -156,8 +156,8 @@ public class CheckBoxTests
         Assert.Equal (new Rectangle (0, 0, 6, 1), ckb.Frame);
 
         ckb = new CheckBox { Text = "Test", X = 1, Y = 2 };
-        Assert.True (ckb.Width is Dim.DimAuto);
-        Assert.Equal (Dim.Sized (1), ckb.Height);
+        Assert.True (ckb.Width is DimAuto);
+        Assert.True (ckb.Height is DimAuto);
         Assert.False (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
         Assert.Equal ("Test", ckb.Text);
@@ -166,8 +166,8 @@ public class CheckBoxTests
         Assert.Equal (new Rectangle (1, 2, 6, 1), ckb.Frame);
 
         ckb = new CheckBox { Text = "Test", X = 3, Y = 4, Checked = true };
-        Assert.True (ckb.Width is Dim.DimAuto);
-        Assert.Equal (Dim.Sized (1), ckb.Height);
+        Assert.True (ckb.Width is DimAuto);
+        Assert.True (ckb.Height is DimAuto);
         Assert.True (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
         Assert.Equal ("Test", ckb.Text);

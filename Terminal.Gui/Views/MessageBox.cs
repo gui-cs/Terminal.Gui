@@ -344,8 +344,8 @@ public static class MessageBox
             Buttons = buttonList.ToArray (),
             Title = title,
             BorderStyle = DefaultBorderStyle,
-            Width = Dim.Percent (60),
-            Height = 5 // Border + one line of text + vspace + buttons
+            Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent(60)),
+            Height = Dim.Auto (DimAutoStyle.Content),
         };
 
         if (width != 0)
@@ -372,17 +372,26 @@ public static class MessageBox
             Text = message,
             TextAlignment = TextAlignment.Centered,
             X = Pos.Center (),
-            Y = 0
+            Y = 0,
+           // ColorScheme = Colors.ColorSchemes ["Error"]
         };
+
+        messageLabel.TextFormatter.WordWrap = wrapMessage;
+        messageLabel.TextFormatter.MultiLine = !wrapMessage;
 
         if (wrapMessage)
         {
             messageLabel.Width = Dim.Fill ();
             messageLabel.Height = Dim.Fill (1);
+            int GetWrapSize ()
+            {
+                // A bit of a hack to get the height of the wrapped text.
+                messageLabel.TextFormatter.Size = new (d.ContentSize.Width, 1000);
+                return messageLabel.TextFormatter.FormatAndGetSize ().Height;
+            }
+            d.Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Func (GetWrapSize) + 1);
         }
 
-        messageLabel.TextFormatter.WordWrap = wrapMessage;
-        messageLabel.TextFormatter.MultiLine = !wrapMessage;
         d.Add (messageLabel);
 
         // Setup actions
@@ -405,69 +414,11 @@ public static class MessageBox
             }
         }
 
-        d.Loaded += Dialog_Loaded;
-
         // Run the modal; do not shutdown the mainloop driver when done
         Application.Run (d);
         d.Dispose ();
 
         return Clicked;
 
-        void Dialog_Loaded (object s, EventArgs e)
-        {
-            if (width != 0 || height != 0)
-            {
-                return;
-            }
-
-            // TODO: replace with Dim.Fit when implemented
-            Rectangle maxBounds = d.SuperView?.Viewport ?? Application.Top.Viewport;
-
-            Thickness adornmentsThickness = d.GetAdornmentsThickness ();
-
-            if (wrapMessage)
-            {
-                messageLabel.TextFormatter.Size = new (
-                                                       maxBounds.Size.Width
-                                                       - adornmentsThickness.Horizontal,
-                                                       maxBounds.Size.Height
-                                                       - adornmentsThickness.Vertical);
-            }
-
-            string msg = messageLabel.TextFormatter.Format ();
-            Size messageSize = messageLabel.TextFormatter.FormatAndGetSize ();
-
-            // Ensure the width fits the text + buttons
-            int newWidth = Math.Max (
-                                     width,
-                                     Math.Max (
-                                               messageSize.Width + adornmentsThickness.Horizontal,
-                                               d.GetButtonsWidth () + d.Buttons.Length + adornmentsThickness.Horizontal));
-
-            if (newWidth > d.Frame.Width)
-            {
-                d.Width = newWidth;
-            }
-
-            // Ensure height fits the text + vspace + buttons
-            if (messageSize.Height == 0)
-            {
-                d.Height = Math.Max (height, 3 + adornmentsThickness.Vertical);
-            }
-            else
-            {
-                string lastLine = messageLabel.TextFormatter.GetLines () [^1];
-
-                // INTENT: Instead of the check against \n or \r\n, how about just Environment.NewLine?
-                d.Height = Math.Max (
-                                     height,
-                                     messageSize.Height
-                                     + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2)
-                                     + adornmentsThickness.Vertical);
-            }
-
-            d.SetRelativeLayout (d.SuperView?.ContentSize.GetValueOrDefault () ?? Application.Top.ContentSize.GetValueOrDefault ());
-            d.LayoutSubviews ();
-        }
     }
 }

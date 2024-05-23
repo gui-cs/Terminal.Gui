@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 using static Terminal.Gui.Dim;
 using static Terminal.Gui.Pos;
 
-namespace Terminal.Gui.PosDimTests;
+namespace Terminal.Gui.LayoutTests;
 
 public class PosCenterTests (ITestOutputHelper output)
 {
@@ -38,13 +38,13 @@ public class PosCenterTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void PosCenter_Anchor ()
+    public void PosCenter_GetAnchor ()
     {
         var posCenter = new PosCenter ();
         var width = 50;
         var expectedAnchor = width / 2;
 
-        Assert.Equal (expectedAnchor, posCenter.Anchor (width));
+        Assert.Equal (expectedAnchor, posCenter.GetAnchor (width));
     }
 
     [Fact]

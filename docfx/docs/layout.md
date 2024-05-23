@@ -4,7 +4,6 @@ Terminal.Gui provides a rich system for how `View` objects are laid out relative
 
 ## Coordinates
 
-
 * **Screen-Relative** - Describes the dimensions and characteristics of the underlying terminal. Currently Terminal.Gui only supports applications that run "full-screen", meaning they fill the entire terminal when running. As the user resizes their terminal, the `Screen` changes size and the applicaiton will be resized to fit. *Screen-Relative* means an origin (`0, 0`) at the top-left corner of the terminal. `ConsoleDriver`s operate exclusively on *Screen-Relative* coordinates.
 * **Application.Relative** - The dimensions and characteristics of the application. Because only full-screen apps are currently supported, `Application` is effectively the same as `Screen` from a layout perspective. *Application-Relative* currently means an origin (`0, 0`) at the top-left corner of the terminal. `Applicaiton.Top` is a `View` with a top-left corner fixed at the *Application.Relative* coordinate of (`0, 0`) and is the size of `Screen`.
 * **Frame-Relative**  - The `Frame` property of a `View` is a rectangle that describes the current location and size of the view relative to the `Superview`'s content area. *Frame-Relative* means a coordinate is relative to the top-left corner of the View in question. `View.FrameToScreen ()` and `View.ScreenToFrame ()` are helper methods for translating a *Frame-Relative* coordinate to a *Screen-Relative* coordinate and vice-versa.
@@ -17,15 +16,15 @@ The `Frame` property of a `View` is a rectangle that describes the current locat
 
 ## The Content Area
 
- The content area is the area where the view's content is drawn. Content can be any combination of the `View.Text` property, `Subviews`, and other content drawn by the View. The `View.ContentSize` property defines the size of the content area of the view. *Content Area* refers to the rectangle with a location of `0,0` with a size of `ContentSize`.
+ The content area is the area where the view's content is drawn. Content can be any combination of the `View.Text` property, `Subviews`, and other content drawn by the View. The `View.ContentSize` property gets the size of the content area of the view. *Content Area* refers to the rectangle with a location of `0,0` with a size of `ContentSize`.
 
- `ContentSize` is `null` by default. If `ContentSize` is `null`, the content area is the size of the `Viewport`. If `ContentSize` is set, the content area is the size of `ContentSize`. If `ContentSize` is larger than the `Viewport`, scrolling is enabled. 
+ `ContentSize` tracks the size of the `Viewport` by default. If `ContentSize` is set via `SetContentSize()`, the content area is the provided size. If `ContentSize` is larger than the `Viewport`, scrolling is enabled. 
 
 ## The Viewport
 
 The Viewport (`View.Viewport`) is a rectangle describing the portion of the *Content Area* that is currently visible to the user. It is a "portal" into the content. The `Viewport.Location` is relative to the top-left corner of the inner rectangle of `View.Padding`. If `Viewport.Size` is the same as `View.ContentSize`, `Viewport.Location` will be `0,0`. 
 
-To enable scrolling set `View.ContentSize` and then set `Viewport.Location` to positive values. Making `Viewport.Location` positive moves the Viewport down and to the right in the content. 
+To enable scrolling call `View.SetContentSize()` and then set `Viewport.Location` to positive values. Making `Viewport.Location` positive moves the Viewport down and to the right in the content. 
 
 The `View.ViewportSettings` property controls how the Viewport is constrained. By default, the `ViewportSettings` is set to `ViewportSettings.None`. To enable the viewport to be moved up-and-to-the-left of the content, use `ViewportSettings.AllowNegativeX` and or `ViewportSettings.AllowNegativeY`. 
 
@@ -74,7 +73,6 @@ All `Pos` coordinates are relative to the Superview's content area.
 ```cs
 // Set the X coordinate to 10 characters left from the center
 view.X = Pos.Center () - 10;
-
 view.Y = Pos.Percent (20);
 
 anotherView.X = AnchorEnd (10);

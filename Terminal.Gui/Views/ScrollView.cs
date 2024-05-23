@@ -88,10 +88,10 @@ public class ScrollView : View
         AddCommand (Command.PageDown, () => ScrollDown (Viewport.Height));
         AddCommand (Command.PageLeft, () => ScrollLeft (Viewport.Width));
         AddCommand (Command.PageRight, () => ScrollRight (Viewport.Width));
-        AddCommand (Command.TopHome, () => ScrollUp (ContentSize.Value.Height));
-        AddCommand (Command.BottomEnd, () => ScrollDown (ContentSize.Value.Height));
-        AddCommand (Command.LeftHome, () => ScrollLeft (ContentSize.Value.Width));
-        AddCommand (Command.RightEnd, () => ScrollRight (ContentSize.Value.Width));
+        AddCommand (Command.TopHome, () => ScrollUp (ContentSize.Height));
+        AddCommand (Command.BottomEnd, () => ScrollDown (ContentSize.Height));
+        AddCommand (Command.LeftHome, () => ScrollLeft (ContentSize.Width));
+        AddCommand (Command.RightEnd, () => ScrollRight (ContentSize.Width));
 
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
@@ -127,7 +127,7 @@ public class ScrollView : View
                            }
 
                            SetContentOffset (_contentOffset);
-                           _contentView.Frame = new Rectangle (ContentOffset, ContentSize.GetValueOrDefault ());
+                           _contentView.Frame = new Rectangle (ContentOffset, ContentSize);
 
                            // PERF: How about calls to Point.Offset instead?
                            _vertical.ChangedPosition += delegate { ContentOffset = new Point (ContentOffset.X, _vertical.Position); };
@@ -244,26 +244,26 @@ public class ScrollView : View
                 _horizontal.OtherScrollBarView.KeepContentAlwaysInViewport = value;
                 Point p = default;
 
-                if (value && -_contentOffset.X + Viewport.Width > ContentSize.GetValueOrDefault ().Width)
+                if (value && -_contentOffset.X + Viewport.Width > ContentSize.Width)
                 {
                     p = new Point (
-                                   ContentSize.GetValueOrDefault ().Width - Viewport.Width + (_showVerticalScrollIndicator ? 1 : 0),
+                                   ContentSize.Width - Viewport.Width + (_showVerticalScrollIndicator ? 1 : 0),
                                    -_contentOffset.Y
                                   );
                 }
 
-                if (value && -_contentOffset.Y + Viewport.Height > ContentSize.GetValueOrDefault ().Height)
+                if (value && -_contentOffset.Y + Viewport.Height > ContentSize.Height)
                 {
                     if (p == default (Point))
                     {
                         p = new Point (
                                        -_contentOffset.X,
-                                       ContentSize.GetValueOrDefault ().Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0)
+                                       ContentSize.Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0)
                                       );
                     }
                     else
                     {
-                        p.Y = ContentSize.GetValueOrDefault ().Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0);
+                        p.Y = ContentSize.Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0);
                     }
                 }
 
@@ -607,7 +607,7 @@ public class ScrollView : View
     {
         // INTENT: Unclear intent. How about a call to Offset?
         _contentOffset = new Point (-Math.Abs (offset.X), -Math.Abs (offset.Y));
-        _contentView.Frame = new Rectangle (_contentOffset, ContentSize.GetValueOrDefault ());
+        _contentView.Frame = new Rectangle (_contentOffset, ContentSize);
         int p = Math.Max (0, -_contentOffset.Y);
 
         if (_vertical.Position != p)
@@ -638,7 +638,7 @@ public class ScrollView : View
         bool v = false, h = false;
         var p = false;
 
-        if (ContentSize is { } && (Viewport.Height == 0 || Viewport.Height > ContentSize.Value.Height))
+        if (ContentSize is { } && (Viewport.Height == 0 || Viewport.Height > ContentSize.Height))
         {
             if (ShowVerticalScrollIndicator)
             {
@@ -647,7 +647,7 @@ public class ScrollView : View
 
             v = false;
         }
-        else if (ContentSize is { } && Viewport.Height > 0 && Viewport.Height == ContentSize.Value.Height)
+        else if (ContentSize is { } && Viewport.Height > 0 && Viewport.Height == ContentSize.Height)
         {
             p = true;
         }
@@ -661,7 +661,7 @@ public class ScrollView : View
             v = true;
         }
 
-        if (ContentSize is { } && (Viewport.Width == 0 || Viewport.Width > ContentSize.Value.Width))
+        if (ContentSize is { } && (Viewport.Width == 0 || Viewport.Width > ContentSize.Width))
         {
             if (ShowHorizontalScrollIndicator)
             {
@@ -670,7 +670,7 @@ public class ScrollView : View
 
             h = false;
         }
-        else if (ContentSize is { } && Viewport.Width > 0 && Viewport.Width == ContentSize.Value.Width && p)
+        else if (ContentSize is { } && Viewport.Width > 0 && Viewport.Width == ContentSize.Width && p)
         {
             if (ShowHorizontalScrollIndicator)
             {

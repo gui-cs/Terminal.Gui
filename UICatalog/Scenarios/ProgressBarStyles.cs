@@ -52,8 +52,8 @@ public class ProgressBarStyles : Scenario
             Title = "Focused ProgressBar",
             Y = 0,
             X = Pos.Center (),
-            Width = 30,
-            Height = 7,
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
             BorderStyle = LineStyle.Single
         };
 
@@ -168,18 +168,20 @@ public class ProgressBarStyles : Scenario
             Title = "Blocks",
             X = Pos.Center (),
             Y = Pos.Bottom (button) + 1,
-            Width = Dim.Width (pbList),
+            Width = Dim.Percent (50),
             BorderStyle = LineStyle.Single,
             CanFocus = true
         };
         container.Add (blocksPB);
+
+        rbPBFormat.SelectedItem = (int)blocksPB.ProgressBarFormat;
 
         var continuousPB = new ProgressBar
         {
             Title = "Continuous",
             X = Pos.Center (),
             Y = Pos.Bottom (blocksPB) + 1,
-            Width = Dim.Width (pbList),
+            Width = Dim.Percent (50),
             ProgressBarStyle = ProgressBarStyle.Continuous,
             BorderStyle = LineStyle.Single,
             CanFocus = true
@@ -229,7 +231,7 @@ public class ProgressBarStyles : Scenario
             Title = "Marquee Blocks",
             X = Pos.Center (),
             Y = Pos.Bottom (ckbBidirectional) + 1,
-            Width = Dim.Width (pbList),
+            Width = Dim.Percent (50),
             ProgressBarStyle = ProgressBarStyle.MarqueeBlocks,
             BorderStyle = LineStyle.Single,
             CanFocus = true
@@ -241,7 +243,7 @@ public class ProgressBarStyles : Scenario
             Title = "Marquee Continuous",
             X = Pos.Center (),
             Y = Pos.Bottom (marqueesBlocksPB) + 1,
-            Width = Dim.Width (pbList),
+            Width = Dim.Percent (50),
             ProgressBarStyle = ProgressBarStyle.MarqueeContinuous,
             BorderStyle = LineStyle.Single,
             CanFocus = true

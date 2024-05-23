@@ -50,7 +50,7 @@ public class TextFormatter
         }
     }
 
-    private Size GetAutoSize ()
+    internal Size GetAutoSize ()
     {
         Size size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
         return size with

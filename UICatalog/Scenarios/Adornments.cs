@@ -102,7 +102,7 @@ public class Adornments : Scenario
                                   window.Padding.Add (labelInPadding);
 
                                   var textFieldInPadding = new TextField
-                                      { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
+                                  { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
                                   textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
                                   window.Padding.Add (textFieldInPadding);
 
@@ -212,6 +212,8 @@ public class Adornments : Scenario
 
         private void AdornmentEditor_Initialized (object sender, EventArgs e)
         {
+            SuperViewRendersLineCanvas = true;
+
             _topEdit = new ()
             {
                 X = Pos.Center (), Y = 0
@@ -222,7 +224,7 @@ public class Adornments : Scenario
 
             _leftEdit = new ()
             {
-                X = Pos.Left (_topEdit) - Pos.Function (() => _topEdit.Digits) - 2, Y = Pos.Bottom (_topEdit)
+                X = Pos.Left (_topEdit) - Pos.Func (() => _topEdit.Digits) - 2, Y = Pos.Bottom (_topEdit)
             };
 
             _leftEdit.ValueChanging += Left_ValueChanging;
@@ -282,9 +284,9 @@ public class Adornments : Scenario
             _rightEdit.Value = Thickness.Right;
             _bottomEdit.Value = Thickness.Bottom;
 
+            Width = Dim.Auto () - 1;
+            Height = Dim.Auto () - 1;
             LayoutSubviews ();
-            Height = GetAdornmentsThickness ().Vertical + 4 + 3;
-            Width = GetAdornmentsThickness ().Horizontal + _foregroundColorPicker.Frame.Width * 2 - 3;
         }
 
         private void Top_ValueChanging (object sender, StateEventArgs<int> e)
@@ -470,7 +472,7 @@ public class Adornments : Scenario
                 _paddingEditor.AttributeChanged += Editor_AttributeChanged;
                 Add (_paddingEditor);
 
-                _diagCheckBox = new() { Text = "_Diagnostics", Y = Pos.Bottom (_paddingEditor) };
+                _diagCheckBox = new () { Text = "_Diagnostics", Y = Pos.Bottom (_paddingEditor) };
                 _diagCheckBox.Checked = Diagnostics != ViewDiagnosticFlags.Off;
 
                 _diagCheckBox.Toggled += (s, e) =>

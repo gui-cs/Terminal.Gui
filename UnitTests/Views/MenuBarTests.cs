@@ -180,7 +180,7 @@ public class MenuBarTests
         menuBar = new MenuBar ();
         Assert.Equal (0, menuBar.X);
         Assert.Equal (0, menuBar.Y);
-        Assert.IsType<Dim.DimFill> (menuBar.Width);
+        Assert.IsType<DimFill> (menuBar.Width);
         Assert.Equal (1, menuBar.Height);
         Assert.Empty (menuBar.Menus);
         Assert.Equal (Colors.ColorSchemes ["Menu"], menuBar.ColorScheme);
@@ -190,7 +190,7 @@ public class MenuBarTests
         menuBar = new MenuBar { Menus = [] };
         Assert.Equal (0, menuBar.X);
         Assert.Equal (0, menuBar.Y);
-        Assert.IsType<Dim.DimFill> (menuBar.Width);
+        Assert.IsType<DimFill> (menuBar.Width);
         Assert.Equal (1, menuBar.Height);
         Assert.Empty (menuBar.Menus);
         Assert.Equal (Colors.ColorSchemes ["Menu"], menuBar.ColorScheme);

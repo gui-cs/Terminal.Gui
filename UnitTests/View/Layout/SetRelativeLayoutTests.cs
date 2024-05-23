@@ -394,7 +394,7 @@ public class SetRelativeLayoutTests
     }
 
     [Fact]
-    public void PosDimFunction ()
+    public void PosDimFunc ()
     {
         var screen = new Size (30, 1);
         var view = new View
@@ -403,7 +403,7 @@ public class SetRelativeLayoutTests
             Width = Auto (DimAutoStyle.Text),
             Height = Auto (DimAutoStyle.Text)
         };
-        view.X = Pos.AnchorEnd (0) - Pos.Function (GetViewWidth);
+        view.X = Pos.AnchorEnd (0) - Pos.Func (GetViewWidth);
 
         int GetViewWidth () { return view.Frame.Width; }
 
@@ -418,7 +418,7 @@ public class SetRelativeLayoutTests
         Assert.Equal (1, view.Frame.Height);
 
         var tf = new TextField { Text = "01234567890123456789" };
-        tf.Width = Dim.Fill (1) - Dim.Function (GetViewWidth);
+        tf.Width = Dim.Fill (1) - Dim.Func (GetViewWidth);
 
         // tf will fill the screen minus 1 minus the width of view (3).
         // so it's width will be 26 (30 - 1 - 3).

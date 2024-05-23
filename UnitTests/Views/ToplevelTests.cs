@@ -397,7 +397,7 @@ public class ToplevelTests
     {
         var isRunning = false;
 
-        var win1 = new Window { Id = "win1", Width = Dim.Percent (50f), Height = Dim.Fill () };
+        var win1 = new Window { Id = "win1", Width = Dim.Percent (50), Height = Dim.Fill () };
         var lblTf1W1 = new Label { Id = "lblTf1W1", Text = "Enter text in TextField on Win1:" };
 
         var tf1W1 = new TextField
@@ -428,7 +428,7 @@ public class ToplevelTests
 
         var win2 = new Window
         {
-            Id = "win2", X = Pos.Right (win1) + 1, Width = Dim.Percent (50f), Height = Dim.Fill ()
+            Id = "win2", X = Pos.Right (win1) + 1, Width = Dim.Percent (50), Height = Dim.Fill ()
         };
         var lblTf1W2 = new Label { Id = "lblTf1W2", Text = "Enter text in TextField on Win2:" };
 
@@ -568,7 +568,7 @@ public class ToplevelTests
 
         var isRunning = true;
 
-        var win1 = new Window { Id = "win1", Width = Dim.Percent (50f), Height = Dim.Fill () };
+        var win1 = new Window { Id = "win1", Width = Dim.Percent (50), Height = Dim.Fill () };
         var lblTf1W1 = new Label { Text = "Enter text in TextField on Win1:" };
         var tf1W1 = new TextField { X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill (), Text = "Text1 on Win1" };
         var lblTvW1 = new Label { Y = Pos.Bottom (lblTf1W1) + 1, Text = "Enter text in TextView on Win1:" };
@@ -581,7 +581,7 @@ public class ToplevelTests
         var tf2W1 = new TextField { X = Pos.Left (tf1W1), Width = Dim.Fill (), Text = "Text2 on Win1" };
         win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
 
-        var win2 = new Window { Id = "win2", Width = Dim.Percent (50f), Height = Dim.Fill () };
+        var win2 = new Window { Id = "win2", Width = Dim.Percent (50), Height = Dim.Fill () };
         var lblTf1W2 = new Label { Text = "Enter text in TextField on Win2:" };
         var tf1W2 = new TextField { X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill (), Text = "Text1 on Win2" };
         var lblTvW2 = new Label { Y = Pos.Bottom (lblTf1W2) + 1, Text = "Enter text in TextView on Win2:" };
@@ -1320,8 +1320,8 @@ public class ToplevelTests
             Y = 3,
             Width = 40,
             Height = 16,
-            ContentSize = new (200, 100)
         };
+        scrollView.SetContentSize (new (200, 100));
         var win = new Window { X = 3, Y = 3, Width = Dim.Fill (3), Height = Dim.Fill (3), Arrangement = ViewArrangement.Movable };
         scrollView.Add (win);
         Toplevel top = new ();

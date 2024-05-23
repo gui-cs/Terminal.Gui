@@ -54,10 +54,10 @@ public class FrameTests (ITestOutputHelper output)
                       new Rectangle (0, 0, newFrame.Width, newFrame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
-        Assert.Equal (Dim.Sized (30), v.Width);
-        Assert.Equal (Dim.Sized (40), v.Height);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (30), v.Width);
+        Assert.Equal (Dim.Absolute (40), v.Height);
         v.Dispose ();
 
         v = new View { X = frame.X, Y = frame.Y, Text = "v" };
@@ -69,10 +69,10 @@ public class FrameTests (ITestOutputHelper output)
                       new Rectangle (0, 0, newFrame.Width, newFrame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
-        Assert.Equal (Dim.Sized (30), v.Width);
-        Assert.Equal (Dim.Sized (40), v.Height);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (30), v.Width);
+        Assert.Equal (Dim.Absolute (40), v.Height);
         v.Dispose ();
 
         newFrame = new Rectangle (10, 20, 30, 40);
@@ -85,10 +85,10 @@ public class FrameTests (ITestOutputHelper output)
                       new Rectangle (0, 0, newFrame.Width, newFrame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.At (10), v.X);
-        Assert.Equal (Pos.At (20), v.Y);
-        Assert.Equal (Dim.Sized (30), v.Width);
-        Assert.Equal (Dim.Sized (40), v.Height);
+        Assert.Equal (Pos.Absolute (10), v.X);
+        Assert.Equal (Pos.Absolute (20), v.Y);
+        Assert.Equal (Dim.Absolute (30), v.Width);
+        Assert.Equal (Dim.Absolute (40), v.Height);
         v.Dispose ();
 
         v = new View { X = frame.X, Y = frame.Y, Text = "v" };
@@ -100,10 +100,10 @@ public class FrameTests (ITestOutputHelper output)
                       new Rectangle (0, 0, newFrame.Width, newFrame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
-        Assert.Equal (Pos.At (10), v.X);
-        Assert.Equal (Pos.At (20), v.Y);
-        Assert.Equal (Dim.Sized (30), v.Width);
-        Assert.Equal (Dim.Sized (40), v.Height);
+        Assert.Equal (Pos.Absolute (10), v.X);
+        Assert.Equal (Pos.Absolute (20), v.Y);
+        Assert.Equal (Dim.Absolute (30), v.Width);
+        Assert.Equal (Dim.Absolute (40), v.Height);
         v.Dispose ();
     }
 }

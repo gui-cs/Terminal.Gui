@@ -20,8 +20,8 @@ public class CheckBox : View
         _charChecked = Glyphs.Checked;
         _charUnChecked = Glyphs.UnChecked;
 
-        Height = 1;
-        Width = Dim.Auto (Dim.DimAutoStyle.Text);
+        Width = Dim.Auto (DimAutoStyle.Text);
+        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
         CanFocus = true;
 
@@ -158,11 +158,11 @@ public class CheckBox : View
             case TextAlignment.Left:
             case TextAlignment.Centered:
             case TextAlignment.Justified:
-                TextFormatter.Text = $"{GetCheckedState ()} {GetFormatterText ()}";
+                TextFormatter.Text = $"{GetCheckedState ()} {Text}";
 
                 break;
             case TextAlignment.Right:
-                TextFormatter.Text = $"{GetFormatterText ()} {GetCheckedState ()}";
+                TextFormatter.Text = $"{Text} {GetCheckedState ()}";
 
                 break;
         }
@@ -176,15 +176,5 @@ public class CheckBox : View
             false => _charUnChecked,
             var _ => _charNullChecked
         };
-    }
-
-    private string GetFormatterText ()
-    {
-        if (Width is Dim.DimAuto || string.IsNullOrEmpty (Title) || ContentSize?.Width <= 2)
-        {
-            return Text;
-        }
-
-        return ContentSize is null ? Text : Text [..Math.Min (ContentSize.Value.Width - 2, Text.GetRuneCount ())];
     }
 }

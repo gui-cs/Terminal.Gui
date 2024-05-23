@@ -188,20 +188,20 @@ public class ViewportTests (ITestOutputHelper output)
         Assert.Equal (newViewport, v.Viewport);
         Assert.Equal (new Rectangle (1, 2, newViewport.Width, newViewport.Height), v.Frame);
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
-        Assert.Equal (Dim.Sized (30), v.Width);
-        Assert.Equal (Dim.Sized (40), v.Height);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (30), v.Width);
+        Assert.Equal (Dim.Absolute (40), v.Height);
 
         newViewport = new Rectangle (0, 0, 3, 4);
         v.Viewport = newViewport;
         Assert.Equal (newViewport, v.Viewport);
         Assert.Equal (new Rectangle (1, 2, newViewport.Width, newViewport.Height), v.Frame);
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
-        Assert.Equal (Dim.Sized (3), v.Width);
-        Assert.Equal (Dim.Sized (4), v.Height);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
 
         v.BorderStyle = LineStyle.Single;
 
@@ -210,10 +210,10 @@ public class ViewportTests (ITestOutputHelper output)
 
         // Frame should not change
         Assert.Equal (new Rectangle (1, 2, 3, 4), v.Frame);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
-        Assert.Equal (Dim.Sized (3), v.Width);
-        Assert.Equal (Dim.Sized (4), v.Height);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
 
         // Now set bounds bigger as before
         newViewport = new Rectangle (0, 0, 3, 4);
@@ -223,10 +223,10 @@ public class ViewportTests (ITestOutputHelper output)
         // Frame grows because there's now a border
         Assert.Equal (new Rectangle (1, 2, 5, 6), v.Frame);
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
-        Assert.Equal (Dim.Sized (5), v.Width);
-        Assert.Equal (Dim.Sized (6), v.Height);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (5), v.Width);
+        Assert.Equal (Dim.Absolute (6), v.Height);
     }
 
     [Theory]
@@ -279,7 +279,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange
         var view = new View ();
-        view.ContentSize = new Size (100, 100);
+        view.SetContentSize (new (100, 100));
         var newViewport = new Rectangle (0, 0, 200, 200);
         view.ViewportSettings = ViewportSettings.AllowLocationGreaterThanContentSize;
 

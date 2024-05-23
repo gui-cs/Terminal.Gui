@@ -680,6 +680,14 @@ internal class TextModel
         return (size, len);
     }
 
+    internal Size GetDisplaySize ()
+    {
+        Size size = Size.Empty;
+
+
+        return size;
+    }
+
     internal (Point current, bool found) FindNextText (
         string text,
         out bool gaveFullTurn,
@@ -2699,13 +2707,8 @@ public class TextView : View
                 CurrentRow = 0;
                 _savedHeight = Height;
 
-                //var prevLayoutStyle = LayoutStyle;
-                //if (LayoutStyle == LayoutStyle.Computed) {
-                //	LayoutStyle = LayoutStyle.Absolute;
-                //}
-                Height = 1;
+                Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
-                //LayoutStyle = prevLayoutStyle;
                 if (!IsInitialized)
                 {
                     _model.LoadString (Text);
@@ -2715,13 +2718,7 @@ public class TextView : View
             }
             else if (_multiline && _savedHeight is { })
             {
-                //var lyout = LayoutStyle;
-                //if (LayoutStyle == LayoutStyle.Computed) {
-                //	LayoutStyle = LayoutStyle.Absolute;
-                //}
                 Height = _savedHeight;
-
-                //LayoutStyle = lyout;
                 SetNeedsDisplay ();
             }
         }
@@ -3577,6 +3574,7 @@ public class TextView : View
 
         ProcessInheritsPreviousColorScheme (CurrentRow, CurrentColumn);
         ProcessAutocomplete ();
+
     }
 
     /// <inheritdoc/>

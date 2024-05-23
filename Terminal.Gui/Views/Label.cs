@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     The Label <see cref="View"/> displays a string at a given position and supports multiple lines separated by
@@ -15,9 +13,8 @@ public class Label : View
     /// <inheritdoc/>
     public Label ()
     {
-        Height = Dim.Auto (Dim.DimAutoStyle.Text);
-        Width = Dim.Auto (Dim.DimAutoStyle.Text);
-        TextFormatter.AutoSize = true;
+        Height = Dim.Auto (DimAutoStyle.Text);
+        Width = Dim.Auto (DimAutoStyle.Text);
 
         // Things this view knows how to do
         AddCommand (Command.HotKey, FocusNext);

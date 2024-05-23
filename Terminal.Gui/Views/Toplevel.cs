@@ -401,13 +401,13 @@ public partial class Toplevel : View
             // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
             && (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) /*&& top.LayoutStyle == LayoutStyle.Computed*/)
         {
-            if ((top.X is null || top.X is Pos.PosAbsolute) && top.Frame.X != nx)
+            if ((top.X is null || top.X is PosAbsolute) && top.Frame.X != nx)
             {
                 top.X = nx;
                 layoutSubviews = true;
             }
 
-            if ((top.Y is null || top.Y is Pos.PosAbsolute) && top.Frame.Y != ny)
+            if ((top.Y is null || top.Y is PosAbsolute) && top.Frame.Y != ny)
             {
                 top.Y = ny;
                 layoutSubviews = true;
@@ -418,8 +418,8 @@ public partial class Toplevel : View
         if (sb != null
             && !top.Subviews.Contains (sb)
             && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-            && top.Height is Dim.DimFill
-            && -top.Height.Anchor (0) < 1)
+            && top.Height is DimFill
+            && -top.Height.GetAnchor (0) < 1)
         {
             top.Height = Dim.Fill (sb.Visible ? 1 : 0);
             layoutSubviews = true;

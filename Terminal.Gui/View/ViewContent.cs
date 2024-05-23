@@ -2,120 +2,6 @@
 
 namespace Terminal.Gui;
 
-/// <summary>
-///     Settings for how the <see cref="View.Viewport"/> behaves relative to the View's Content area.
-/// </summary>
-[Flags]
-public enum ViewportSettings
-{
-    /// <summary>
-    ///     No settings.
-    /// </summary>
-    None = 0,
-
-    /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set to negative values enabling scrolling beyond the left of
-    ///     the
-    ///     content area.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to positive values.
-    ///     </para>
-    /// </remarks>
-    AllowNegativeX = 1,
-
-    /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set to negative values enabling scrolling beyond the top of the
-    ///     content area.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to positive values.
-    ///     </para>
-    /// </remarks>
-    AllowNegativeY = 2,
-
-    /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set to negative coordinates enabling scrolling beyond the
-    ///     top-left of the
-    ///     content area.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         When not set, <see cref="View.Viewport"/><c>.Size</c> is constrained to positive coordinates.
-    ///     </para>
-    /// </remarks>
-    AllowNegativeLocation = AllowNegativeX | AllowNegativeY,
-
-    /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set values greater than <see cref="View.ContentSize"/>
-    ///     <c>.Width</c> enabling scrolling beyond the right
-    ///     of the content area.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to <see cref="View.ContentSize"/>
-    ///         <c>.Width - 1</c>.
-    ///         This means the last column of the content will remain visible even if there is an attempt to scroll the
-    ///         Viewport past the last column.
-    ///     </para>
-    ///     <para>
-    ///         The practical effect of this is that the last column of the content will always be visible.
-    ///     </para>
-    /// </remarks>
-    AllowXGreaterThanContentWidth = 4,
-
-    /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set values greater than <see cref="View.ContentSize"/>
-    ///     <c>.Height</c> enabling scrolling beyond the right
-    ///     of the content area.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to <see cref="View.ContentSize"/>
-    ///         <c>.Height - 1</c>.
-    ///         This means the last row of the content will remain visible even if there is an attempt to scroll the Viewport
-    ///         past the last row.
-    ///     </para>
-    ///     <para>
-    ///         The practical effect of this is that the last row of the content will always be visible.
-    ///     </para>
-    /// </remarks>
-    AllowYGreaterThanContentHeight = 8,
-
-    /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set values greater than <see cref="View.ContentSize"/>
-    ///     enabling scrolling beyond the bottom-right
-    ///     of the content area.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         When not set, <see cref="View.Viewport"/> is constrained to <see cref="View.ContentSize"/><c> -1</c>.
-    ///         This means the last column and row of the content will remain visible even if there is an attempt to
-    ///         scroll the Viewport past the last column or row.
-    ///     </para>
-    /// </remarks>
-    AllowLocationGreaterThanContentSize = AllowXGreaterThanContentWidth | AllowYGreaterThanContentHeight,
-
-    /// <summary>
-    ///     By default, clipping is applied to the <see cref="View.Viewport"/>. Setting this flag will cause clipping to be
-    ///     applied to the visible content area.
-    /// </summary>
-    ClipContentOnly = 16,
-
-    /// <summary>
-    ///     If set <see cref="View.Clear()"/> will clear only the portion of the content
-    ///     area that is visible within the <see cref="View.Viewport"/>. This is useful for views that have a
-    ///     content area larger than the Viewport and want the area outside the content to be visually distinct.
-    /// </summary>
-    /// <remarks>
-    ///     <see cref="ClipContentOnly"/> must be set for this setting to work (clipping beyond the visible area must be
-    ///     disabled).
-    /// </remarks>
-    ClearContentOnly = 32
-}
-
 public partial class View
 {
     #region Content Area
@@ -123,44 +9,66 @@ public partial class View
     internal Size? _contentSize;
 
     /// <summary>
-    ///     Gets or sets the size of the View's content. If <see langword="null"/>, the value will be the same as the size of <see cref="Viewport"/>,
-    ///     and <c>Viewport.Location</c> will always be <c>0, 0</c>.
+    ///     Sets the size of the View's content.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If a size is provided, <see cref="Viewport"/> describes the portion of the content currently visible
-    ///         to the view. This enables virtual scrolling.
+    ///         By default, the content size is set to <see langword="null"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="contentSize">
+    ///     <para>
+    ///         If <see langword="null"/>, and the View has no visible subviews, <see cref="ContentSize"/> will track the size of <see cref="Viewport"/>.
     ///     </para>
     ///     <para>
-    ///         If a size is provided, the behavior of <see cref="Dim.DimAutoStyle.Content"/> will be to use the ContentSize
+    ///         If <see langword="null"/>, and the View has visible subviews, <see cref="ContentSize"/> will track the maximum position plus size of any
+    ///         visible Subviews
+    ///         and <c>Viewport.Location</c>  will track the minimum position and size of any visible Subviews.
+    ///     </para>
+    ///     <para>
+    ///         If not <see langword="null"/>, <see cref="ContentSize"/> is set to the passed value and <see cref="Viewport"/> describes the portion of the content currently visible
+    ///         to the user. This enables virtual scrolling.
+    ///     </para>
+    ///     <para>
+    ///         If not <see langword="null"/>, <see cref="ContentSize"/> is set to the passed value and the behavior of <see cref="DimAutoStyle.Content"/> will be to use the ContentSize
     ///         to determine the size of the view.
     ///     </para>
     ///     <para>
     ///         Negative sizes are not supported.
     ///     </para>
-    /// </remarks>
-    public Size? ContentSize
+    /// </param>
+    public void SetContentSize (Size? contentSize)
     {
-        get => _contentSize ?? Viewport.Size;
-        set
+        if (ContentSize.Width < 0 || ContentSize.Height < 0)
         {
-            if (value?.Width < 0 || value?.Height < 0)
-            {
-                throw new ArgumentException (@"ContentSize cannot be negative.", nameof (value));
-            }
-
-            if (value == _contentSize)
-            {
-                return;
-            }
-
-            _contentSize = value;
-            OnContentSizeChanged (new (_contentSize));
+            throw new ArgumentException (@"ContentSize cannot be negative.", nameof (contentSize));
         }
+
+        if (contentSize == _contentSize)
+        {
+            return;
+        }
+
+        _contentSize = contentSize;
+        OnContentSizeChanged (new (_contentSize));
     }
 
     /// <summary>
-    ///     Called when <see cref="ContentSize"/> changes. Invokes the <see cref="ContentSizeChanged"/> event.
+    ///     Gets the size of the View's content.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Use <see cref="SetContentSize"/> to change to change the content size.
+    ///     </para>
+    ///     <para>
+    ///         If the content size has not been explicitly set with <see cref="SetContentSize"/>, the value tracks
+    ///         <see cref="Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    public Size ContentSize => _contentSize ?? Viewport.Size;
+
+    /// <summary>
+    /// Called when <see cref="ContentSize"/> has changed.
     /// </summary>
     /// <param name="e"></param>
     /// <returns></returns>
@@ -292,38 +200,10 @@ public partial class View
     {
         get
         {
-#if DEBUG
-            if ((_width.ReferencesOtherViews () || _height.ReferencesOtherViews ()) && !IsInitialized)
-            {
-                Debug.WriteLine (
-                                 $"WARNING: The dimensions of {this} are dependent on other views and Viewport is being accessed before the View has been initialized. This is likely a bug."
-                                );
-            }
-#endif // DEBUG
-
             if (Margin is null || Border is null || Padding is null)
             {
                 // CreateAdornments has not been called yet.
                 return new (_viewportLocation, Frame.Size);
-            }
-
-            // BUGBUG: This is a hack. Viewport_get should not have side effects.
-            if (Frame.Size == Size.Empty)
-            {
-                // The Frame has not been set yet (e.g. the view has not been added to a SuperView yet).
-                // 
-                if ((Width is Dim.DimAuto widthAuto && widthAuto._style.HasFlag(Dim.DimAutoStyle.Text))
-                    || (Height is Dim.DimAuto heightAuto && heightAuto._style.HasFlag (Dim.DimAutoStyle.Text)))
-                {
-                    if (TextFormatter.NeedsFormat)
-                    {
-                        // This updates TextFormatter.Size to the text size
-                        TextFormatter.AutoSize = true;
-
-                        // Whenever DimAutoStyle.Text is set, ContentSize will match TextFormatter.Size.
-                        ContentSize = TextFormatter.Size == Size.Empty ? null : TextFormatter.Size;
-                    }
-                }
             }
 
             Thickness thickness = GetAdornmentsThickness ();
@@ -374,9 +254,9 @@ public partial class View
         {
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth))
             {
-                if (newViewport.X >= ContentSize.GetValueOrDefault ().Width)
+                if (newViewport.X >= ContentSize.Width)
                 {
-                    newViewport.X = ContentSize.GetValueOrDefault ().Width - 1;
+                    newViewport.X = ContentSize.Width - 1;
                 }
             }
 
@@ -391,9 +271,9 @@ public partial class View
 
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight))
             {
-                if (newViewport.Y >= ContentSize.GetValueOrDefault().Height)
+                if (newViewport.Y >= ContentSize.Height)
                 {
-                    newViewport.Y = ContentSize.GetValueOrDefault ().Height - 1;
+                    newViewport.Y = ContentSize.Height - 1;
                 }
             }
 

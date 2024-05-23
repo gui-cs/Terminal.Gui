@@ -135,6 +135,11 @@ public partial class View
     /// <summary>
     ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     The <see cref="Viewport"/> is offset from the <see cref="Frame"/> by the thickness returned by this method.
+    /// </para>
+    /// </remarks>
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
     public Thickness GetAdornmentsThickness ()
     {

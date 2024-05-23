@@ -235,7 +235,7 @@ public class ASCIICustomButtonTest : Scenario
                 pages++;
             }
 
-            _scrollView.ContentSize = new (25, pages * BUTTONS_ON_PAGE * BUTTON_HEIGHT);
+            _scrollView.SetContentSize (new (25, pages * BUTTONS_ON_PAGE * BUTTON_HEIGHT));
 
             if (_smallerWindow)
             {
@@ -269,7 +269,7 @@ public class ASCIICustomButtonTest : Scenario
                 case KeyCode.End:
                     _scrollView.ContentOffset = new Point (
                                                            _scrollView.ContentOffset.X,
-                                                           -(_scrollView.ContentSize.GetValueOrDefault ().Height
+                                                           -(_scrollView.ContentSize.Height
                                                              - _scrollView.Frame.Height
                                                              + (_scrollView.ShowHorizontalScrollIndicator ? 1 : 0))
                                                           );
@@ -287,7 +287,7 @@ public class ASCIICustomButtonTest : Scenario
                                                            Math.Max (
                                                                      _scrollView.ContentOffset.Y
                                                                      - _scrollView.Frame.Height,
-                                                                     -(_scrollView.ContentSize.GetValueOrDefault ().Height
+                                                                     -(_scrollView.ContentSize.Height
                                                                        - _scrollView.Frame.Height
                                                                        + (_scrollView.ShowHorizontalScrollIndicator
                                                                               ? 1

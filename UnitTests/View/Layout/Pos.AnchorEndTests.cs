@@ -2,7 +2,7 @@
 using static Terminal.Gui.Dim;
 using static Terminal.Gui.Pos;
 
-namespace Terminal.Gui.PosDimTests;
+namespace Terminal.Gui.LayoutTests;
 
 public class PosAnchorEndTests (ITestOutputHelper output)
 {
@@ -46,13 +46,13 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void PosAnchorEnd_Anchor ()
+    public void PosAnchorEnd_GetAnchor ()
     {
         var posAnchorEnd = new PosAnchorEnd (10);
         var width = 50;
         var expectedAnchor = width - 10;
 
-        Assert.Equal (expectedAnchor, posAnchorEnd.Anchor (width));
+        Assert.Equal (expectedAnchor, posAnchorEnd.GetAnchor (width));
     }
 
     [Fact]
@@ -73,10 +73,10 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     [Theory]
     [InlineData (0)]
     [InlineData (1)]
-    public void  PosAnchorEnd_SetsValue_Anchor_Is_Negative (int offset)
+    public void  PosAnchorEnd_SetsValue_GetAnchor_Is_Negative (int offset)
     {
         Pos pos = Pos.AnchorEnd (offset);
-        Assert.Equal (offset, -pos.Anchor (0));
+        Assert.Equal (offset, -pos.GetAnchor (0));
     }
 
     [Theory]
@@ -119,10 +119,10 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void  PosAnchorEnd_UseDimForOffset_SetsValue_Anchor_Is_Negative ()
+    public void  PosAnchorEnd_UseDimForOffset_SetsValue_GetAnchor_Is_Negative ()
     {
         Pos pos = Pos.AnchorEnd ();
-        Assert.Equal (-10, -pos.Anchor (10));
+        Assert.Equal (-10, -pos.GetAnchor (10));
     }
 
     [Theory]
@@ -195,7 +195,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
 
         int Btn_Width () { return btn?.Viewport.Width ?? 0; }
 
-        btn = new () { Text = "Ok", X = Pos.AnchorEnd (0) - Pos.Function (Btn_Width) };
+        btn = new () { Text = "Ok", X = Pos.AnchorEnd (0) - Pos.Func (Btn_Width) };
 
         var view = new View
         {
@@ -204,7 +204,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
             // Dim.Fill (1) fills remaining space minus 1 (16 - 1 = 15)
             // Dim.Function (Btn_Width) is 6
             // Width should be 15 - 6 = 9
-            Width = Dim.Fill (1) - Dim.Function (Btn_Width),
+            Width = Dim.Fill (1) - Dim.Func (Btn_Width),
             Height = 1
         };
 
@@ -303,4 +303,12 @@ public class PosAnchorEndTests (ITestOutputHelper output)
         Assert.Equal (5, result);
     }
 
+    [Fact]
+    public void PosAnchorEnd_MinusOne_Combine_Works ()
+    {
+        var pos = AnchorEnd () - 1;
+        var result = pos.Calculate (10, new DimAbsolute (2), null, Dimension.None);
+        Assert.Equal (7, result);
+
+    }
 }

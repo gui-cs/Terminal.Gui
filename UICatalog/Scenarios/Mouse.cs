@@ -25,7 +25,9 @@ public class Mouse : Scenario
             Y = 0,
             BorderStyle = LineStyle.Single,
             Type = SliderType.Multiple,
-            Orientation = Orientation.Vertical
+            Orientation = Orientation.Vertical,
+            UseMinimumSize = true,
+            MinimumInnerSpacing = 0
         };
 
         filterSlider.Options = Enum.GetValues (typeof (MouseFlags))
