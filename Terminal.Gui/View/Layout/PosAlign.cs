@@ -73,11 +73,11 @@ public class PosAlign : Pos
                                                v =>
                                                {
                                                    return dimension switch
-                                                          {
-                                                              Dimension.Width when v.X is PosAlign alignX => alignX.GroupId == groupId,
-                                                              Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId == groupId,
-                                                              _ => false
-                                                          };
+                                                   {
+                                                       Dimension.Width when v.X is PosAlign alignX => alignX.GroupId == groupId,
+                                                       Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId == groupId,
+                                                       _ => false
+                                                   };
                                                })
                                        .ToList ();
 

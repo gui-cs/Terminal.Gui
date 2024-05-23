@@ -121,6 +121,9 @@ public class Aligner : INotifyPropertyChanged
 
                     case AlignmentModes.EndToStart:
                         return End (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray ();
+
+                    case AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast:
+                        return IgnoreFirst (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray (); ;
                 }
 
                 break;
@@ -137,6 +140,8 @@ public class Aligner : INotifyPropertyChanged
                     case AlignmentModes.EndToStart:
                         return Start (in sizesCopy, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray ();
 
+                    case AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast:
+                        return IgnoreLast (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray (); ;
                 }
 
                 break;
