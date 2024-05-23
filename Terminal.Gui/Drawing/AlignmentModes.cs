@@ -1,3 +1,5 @@
+using Terminal.Gui.Analyzers.Internal.Attributes;
+
 namespace Terminal.Gui;
 
 /// <summary>

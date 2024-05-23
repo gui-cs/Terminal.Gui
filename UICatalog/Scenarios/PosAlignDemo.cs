@@ -9,9 +9,9 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Layout")]
 public sealed class PosAlignDemo : Scenario
 {
-    private readonly Aligner _horizAligner = new ();
+    private readonly Aligner _horizAligner = new () { AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems};
     private int _leftMargin;
-    private readonly Aligner _vertAligner = new ();
+    private readonly Aligner _vertAligner = new () { AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems };
     private int _topMargin;
 
     public override void Main ()
@@ -78,6 +78,46 @@ public sealed class PosAlignDemo : Scenario
                                                    }
                                                };
         appWindow.Add (alignRadioGroup);
+
+        CheckBox endToStartCheckBox = new ()
+        {
+            ColorScheme = colorScheme,
+            Text = "EndToStart"
+        };
+
+        if (dimension == Dimension.Width)
+        {
+            endToStartCheckBox.Checked = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart);
+            endToStartCheckBox.X = Pos.Align (_horizAligner.Alignment);
+            endToStartCheckBox.Y = Pos.Top (alignRadioGroup);
+        }
+        else
+        {
+            endToStartCheckBox.Checked = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart);
+            endToStartCheckBox.X = Pos.Left (alignRadioGroup);
+            endToStartCheckBox.Y = Pos.Align (_vertAligner.Alignment);
+        }
+
+        endToStartCheckBox.Toggled += (s, e) =>
+                                      {
+                                          if (dimension == Dimension.Width)
+                                          {
+                                              _horizAligner.AlignmentModes =
+                                                  e.NewValue is { } && e.NewValue.Value
+                                                      ? _horizAligner.AlignmentModes | AlignmentModes.EndToStart
+                                                      : _horizAligner.AlignmentModes & ~AlignmentModes.EndToStart;
+                                              UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
+                                          }
+                                          else
+                                          {
+                                              _vertAligner.AlignmentModes =
+                                                  e.NewValue is { } && e.NewValue.Value
+                                                      ? _vertAligner.AlignmentModes | AlignmentModes.EndToStart
+                                                      : _vertAligner.AlignmentModes & ~AlignmentModes.EndToStart;
+                                              UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
+                                          }
+                                      };
+        appWindow.Add (endToStartCheckBox);
 
         CheckBox ignoreFirstOrLast = new ()
         {

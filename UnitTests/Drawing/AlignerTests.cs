@@ -70,6 +70,23 @@ public class AlignerTests (ITestOutputHelper output)
                                           }.Align (new [] { 10, 20, -30 }));
     }
 
+    // TODO: This test is woefully inadequate. Expand it to cover more cases.
+    [Theory]
+    [InlineData (Alignment.Start, new [] {9, 7, 4})]
+    [InlineData (Alignment.End, new [] { 5, 3, 0 })]
+    [InlineData (Alignment.Center, new [] { 7, 5, 2 })]
+    [InlineData (Alignment.Fill, new [] { 9, 5, 0 })]
+    public void EndToStart_Reverses (Alignment alignment, int [] expected)
+    {
+        int [] sizes = { 1, 2, 3 };
+        //int [] positions = Aligner.Align (alignment, AlignmentModes.StartToEnd, 10, sizes);
+        //Assert.Equal (new [] { 0, 1, 3 }, positions);
+
+        int [] positions = Aligner.Align (alignment, AlignmentModes.EndToStart, 10, sizes);
+        Assert.Equal (expected, positions);
+
+    }
+
     [Theory]
     [InlineData (Alignment.Start, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, new [] { 0 }, 1, new [] { 0 })]
     [InlineData (Alignment.Start, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, new [] { 0, 0 }, 1, new [] { 0, 1 })]

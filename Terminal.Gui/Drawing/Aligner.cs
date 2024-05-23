@@ -82,14 +82,15 @@ public class Aligner : INotifyPropertyChanged
     /// <returns>The positions of the items, from left/top to right/bottom.</returns>
     public static int [] Align (in Alignment alignment, in AlignmentModes alignmentMode, in int containerSize, in int [] sizes)
     {
-        if (alignmentMode.HasFlag (AlignmentModes.EndToStart))
-        {
-            throw new NotImplementedException ("EndToStart is not implemented.");
-        }
-
         if (sizes.Length == 0)
         {
             return [];
+        }
+
+        var sizesCopy = sizes;
+        if (alignmentMode.HasFlag (AlignmentModes.EndToStart))
+        {
+            sizesCopy = sizes.Reverse ().ToArray ();
         }
 
         int maxSpaceBetweenItems = alignmentMode.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? 1 : 0;
@@ -113,10 +114,13 @@ public class Aligner : INotifyPropertyChanged
                 switch (alignmentMode & ~AlignmentModes.AddSpaceBetweenItems)
                 {
                     case AlignmentModes.StartToEnd:
-                        return Start (in sizes, maxSpaceBetweenItems, spacesToGive);
+                        return Start (in sizesCopy, maxSpaceBetweenItems, spacesToGive);
 
                     case AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast:
-                        return IgnoreLast (in sizes, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive);
+                        return IgnoreLast (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive);
+
+                    case AlignmentModes.EndToStart:
+                        return End (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray ();
                 }
 
                 break;
@@ -125,19 +129,41 @@ public class Aligner : INotifyPropertyChanged
                 switch (alignmentMode & ~AlignmentModes.AddSpaceBetweenItems)
                 {
                     case AlignmentModes.StartToEnd:
-                        return End (in sizes, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive);
+                        return End (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive);
 
                     case AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast:
-                        return IgnoreFirst (in sizes, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive);
+                        return IgnoreFirst (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive);
+
+                    case AlignmentModes.EndToStart:
+                        return Start (in sizesCopy, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray ();
+
                 }
 
                 break;
 
             case Alignment.Center:
-                return Center (in sizes, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive);
+                switch (alignmentMode & ~AlignmentModes.AddSpaceBetweenItems)
+                {
+                    case AlignmentModes.StartToEnd:
+                        return Center (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive);
+
+                    case AlignmentModes.EndToStart:
+                        return Center (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray ();
+                }
+
+                break;
 
             case Alignment.Fill:
-                return Fill (in sizes, containerSize, totalItemsSize);
+                switch (alignmentMode & ~AlignmentModes.AddSpaceBetweenItems)
+                {
+                    case AlignmentModes.StartToEnd:
+                        return Fill (in sizesCopy, containerSize, totalItemsSize);
+
+                    case AlignmentModes.EndToStart:
+                        return Fill (in sizesCopy, containerSize, totalItemsSize).Reverse ().ToArray ();
+                }
+
+                break;
 
             default:
                 throw new ArgumentOutOfRangeException (nameof (alignment), alignment, null);
