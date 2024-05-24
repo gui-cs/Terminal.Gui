@@ -92,6 +92,7 @@ public class ScrollDemo : Scenario
                                                  {
                                                      scroll.Orientation = Orientation.Vertical;
                                                      scroll.X = Pos.AnchorEnd ();
+                                                     scroll.Y = 0;
                                                      scroll.Width = scrollWidthHeight.Value;
                                                      scroll.Height = Dim.Fill ();
                                                      scroll.Size /= 3;
@@ -99,6 +100,7 @@ public class ScrollDemo : Scenario
                                                  else
                                                  {
                                                      scroll.Orientation = Orientation.Horizontal;
+                                                     scroll.X = 0;
                                                      scroll.Y = Pos.AnchorEnd ();
                                                      scroll.Width = Dim.Fill ();
                                                      scroll.Height = scrollWidthHeight.Value;
@@ -218,7 +220,7 @@ public class ScrollDemo : Scenario
         editor.Initialized += (s, e) =>
                               {
                                   scroll.Size = int.Max (app.ContentSize.Height * 2, app.ContentSize.Width * 2);
-                                  editor.ViewToEdit = view;
+                                  editor.ViewToEdit = scroll;
                               };
 
         app.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;

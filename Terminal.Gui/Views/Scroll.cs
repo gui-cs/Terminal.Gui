@@ -21,7 +21,7 @@ public class Scroll : View
         CanFocus = false;
         Orientation = Orientation.Vertical;
         Width = Dim.Auto (DimAutoStyle.Content, 1);
-        Height = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content, 1);
 
         _slider = new ()
         {
@@ -69,7 +69,7 @@ public class Scroll : View
         get => _position;
         set
         {
-            int barSize = Orientation == Orientation.Vertical ? Frame.Height : Frame.Width;
+            int barSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
 
             if (value < 0 || (value > 0 && value + barSize > Size))
             {
@@ -232,7 +232,7 @@ public class Scroll : View
     {
         MouseEvent me = e.MouseEvent;
         int location = Orientation == Orientation.Vertical ? me.Position.Y : me.Position.X;
-        int barSize = Orientation == Orientation.Vertical ? Frame.Height : Frame.Width;
+        int barSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
 
         (int topLeft, int bottomRight) sliderPos = _orientation == Orientation.Vertical
                                                        ? new (_slider.Frame.Y, _slider.Frame.Bottom - 1)
@@ -285,13 +285,13 @@ public class Scroll : View
         Text = string.Concat (
                               Enumerable.Repeat (
                                                  Glyphs.Stipple.ToString (),
-                                                 Frame.Width * Frame.Height));
+                                                 ContentSize.Width * ContentSize.Height));
         _slider.TextDirection = Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
 
         _slider.Text = string.Concat (
                                       Enumerable.Repeat (
                                                          Glyphs.ContinuousMeterSegment.ToString (),
-                                                         _slider.Frame.Width * _slider.Frame.Height));
+                                                         _slider.ContentSize.Width * _slider.ContentSize.Height));
     }
 
     private void AdjustSlider ()
@@ -318,7 +318,7 @@ public class Scroll : View
     {
         MouseEvent me = e.MouseEvent;
         int location = Orientation == Orientation.Vertical ? me.Position.Y : me.Position.X;
-        int barSize = Orientation == Orientation.Vertical ? Frame.Height : Frame.Width;
+        int barSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
         int offset = _lastLocation > -1 ? location - _lastLocation : 0;
 
         if (me.Flags == MouseFlags.Button1Pressed)
