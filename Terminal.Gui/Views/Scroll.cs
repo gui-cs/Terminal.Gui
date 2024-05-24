@@ -17,12 +17,18 @@ public class Scroll : View
     public Scroll ()
     {
         WantContinuousButtonPressed = true;
-        ClearOnVisibleFalse = false;
+        //ClearOnVisibleFalse = false;
         CanFocus = false;
         Orientation = Orientation.Vertical;
-        Width = 1;
+        Width = Dim.Auto (DimAutoStyle.Content, 1);
+        Height = Dim.Auto (DimAutoStyle.Content);
 
-        _slider = new () { Id = "slider" };
+        _slider = new ()
+        {
+            Id = "slider",
+            Width = Dim.Auto (DimAutoStyle.Content),
+            Height = Dim.Auto (DimAutoStyle.Content)
+        };
         Add (_slider);
 
         Added += Scroll_Added;
@@ -35,14 +41,12 @@ public class Scroll : View
     }
 
     private readonly View _slider;
-    private int _lastLocation = -1;
 
-    private Orientation _orientation;
-    private int _size;
-    private int _position;
+    private int _lastLocation = -1;
 
     private bool _wasSliderMouse;
 
+    private Orientation _orientation;
     /// <summary>
     ///     Determines the Orientation of the scroll.
     /// </summary>
@@ -52,10 +56,11 @@ public class Scroll : View
         set
         {
             _orientation = value;
-            SetWidthHeight ();
+            AdjustSlider();
         }
     }
 
+    private int _position;
     /// <summary>
     ///     The position, relative to <see cref="Size"/>, to set the scrollbar at.
     /// </summary>
@@ -84,7 +89,7 @@ public class Scroll : View
 
             if (!_wasSliderMouse)
             {
-                SetWidthHeight ();
+                AdjustSlider ();
             }
         }
     }
@@ -95,6 +100,7 @@ public class Scroll : View
     /// <summary>This event is raised when the position on the scrollbar is changing.</summary>
     public event EventHandler<StateEventArgs<int>> PositionChanging;
 
+    private int _size;
     /// <summary>
     ///     The size of content the scroll represents.
     /// </summary>
@@ -106,7 +112,7 @@ public class Scroll : View
             int oldSize = _size;
             _size = value;
             OnSizeChanged (oldSize);
-            SetWidthHeight ();
+            AdjustSlider ();
         }
     }
 
@@ -143,24 +149,24 @@ public class Scroll : View
 
     private int GetPositionFromSliderLocation (int location)
     {
-        if (Frame.Height == 0 || Frame.Width == 0)
+        if (ContentSize.Height == 0 || ContentSize.Width == 0)
         {
             return 0;
         }
 
-        int barSize = Orientation == Orientation.Vertical ? Frame.Height : Frame.Width;
+        int barSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
 
         return Math.Min (location * Size / barSize, Size - barSize);
     }
 
     private (int Location, int Dimension) GetSliderLocationDimensionFromPosition ()
     {
-        if (Frame.Height == 0 || Frame.Width == 0)
+        if (ContentSize.Height == 0 || ContentSize.Width == 0)
         {
             return new (0, 0);
         }
 
-        int barSize = Orientation == Orientation.Vertical ? Frame.Height : Frame.Width;
+        int barSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
         int location;
         int dimension;
 
@@ -194,7 +200,7 @@ public class Scroll : View
     {
         if (!_wasSliderMouse)
         {
-            SetWidthHeight ();
+            AdjustSlider ();
         }
         else
         {
@@ -217,7 +223,10 @@ public class Scroll : View
 
     private void Scroll_DrawContent (object sender, DrawEventArgs e) { SetColorSchemeWithSuperview (sender as View); }
 
-    private void Scroll_Initialized (object sender, EventArgs e) { SetWidthHeight (); }
+    private void Scroll_Initialized (object sender, EventArgs e)
+    {
+        AdjustSlider ();
+    }
 
     private void Scroll_MouseEvent (object sender, MouseEventEventArgs e)
     {
@@ -251,6 +260,7 @@ public class Scroll : View
         }
     }
 
+    // TODO: Just override GetNormalColor instead of having this method
     private static void SetColorSchemeWithSuperview (View view)
     {
         if (view.SuperView is { })
@@ -284,7 +294,7 @@ public class Scroll : View
                                                          _slider.Frame.Width * _slider.Frame.Height));
     }
 
-    private void SetWidthHeight ()
+    private void AdjustSlider ()
     {
         if (!IsInitialized)
         {
@@ -294,8 +304,12 @@ public class Scroll : View
         (int Location, int Dimension) slider = GetSliderLocationDimensionFromPosition ();
         _slider.X = Orientation == Orientation.Vertical ? 0 : slider.Location;
         _slider.Y = Orientation == Orientation.Vertical ? slider.Location : 0;
-        _slider.Width = Orientation == Orientation.Vertical ? Dim.Fill () : slider.Dimension;
-        _slider.Height = Orientation == Orientation.Vertical ? slider.Dimension : Dim.Fill ();
+
+        _slider.SetContentSize (
+                                new (
+                                     Orientation == Orientation.Vertical ? ContentSize.Width : slider.Dimension,
+                                     Orientation == Orientation.Vertical ? slider.Dimension : ContentSize.Height
+                                    ));
 
         SetSliderText ();
     }

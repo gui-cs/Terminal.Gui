@@ -36,8 +36,7 @@ public class ScrollDemo : Scenario
         var scroll = new Scroll
         {
             X = Pos.AnchorEnd (),
-            Width = 1,
-            Height = Dim.Fill ()
+            Height = Dim.Fill (),
         };
         view.Add (scroll);
 
@@ -47,7 +46,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblWidthHeight);
 
-        Buttons.NumericUpDown<int> scrollWidthHeight = new()
+        Buttons.NumericUpDown<int> scrollWidthHeight = new ()
         {
             Value = scroll.Frame.Width,
             X = Pos.Right (lblWidthHeight) + 1,
@@ -114,7 +113,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblSize);
 
-        Buttons.NumericUpDown<int> scrollSize = new()
+        Buttons.NumericUpDown<int> scrollSize = new ()
         {
             Value = scroll.Size,
             X = Pos.Right (lblSize) + 1,
@@ -144,7 +143,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblPosition);
 
-        Buttons.NumericUpDown<int> scrollPosition = new()
+        Buttons.NumericUpDown<int> scrollPosition = new ()
         {
             Value = scroll.Position,
             X = Pos.Right (lblPosition) + 1,
@@ -218,7 +217,7 @@ public class ScrollDemo : Scenario
 
         editor.Initialized += (s, e) =>
                               {
-                                  scroll.Size = 40;
+                                  scroll.Size = int.Max (app.ContentSize.Height * 2, app.ContentSize.Width * 2);
                                   editor.ViewToEdit = view;
                               };
 
