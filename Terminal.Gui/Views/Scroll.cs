@@ -147,6 +147,13 @@ public class Scroll : View
 
         int barSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
 
+        // Ensure the Position is valid if the slider is at end
+        if ((Orientation == Orientation.Vertical && location + _slider.Frame.Height == barSize)
+            || (Orientation == Orientation.Horizontal && location + _slider.Frame.Width == barSize))
+        {
+            return Size - barSize;
+        }
+
         return Math.Min (location * Size / barSize, Size - barSize);
     }
 
