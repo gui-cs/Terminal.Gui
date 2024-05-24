@@ -17,7 +17,6 @@ public class Scroll : View
     public Scroll ()
     {
         WantContinuousButtonPressed = true;
-        //ClearOnVisibleFalse = false;
         CanFocus = false;
         Orientation = Orientation.Vertical;
         Width = Dim.Auto (DimAutoStyle.Content, 1);

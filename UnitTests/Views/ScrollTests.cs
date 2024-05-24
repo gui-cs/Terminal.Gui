@@ -186,7 +186,6 @@ public class ScrollTests
     {
         var scroll = new Scroll ();
         Assert.True (scroll.WantContinuousButtonPressed);
-        Assert.False (scroll.ClearOnVisibleFalse);
         Assert.False (scroll.CanFocus);
         Assert.Equal (Orientation.Vertical, scroll.Orientation);
         Assert.Equal (0, scroll.Size);
