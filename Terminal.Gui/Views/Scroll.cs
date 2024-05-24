@@ -28,9 +28,9 @@ public class Scroll : View
         Added += Scroll_Added;
         Removed += Scroll_Removed;
         Initialized += Scroll_Initialized;
-        DrawContent += SubViews_DrawContent;
-        MouseEvent += SliderContainer_MouseEvent;
-        _slider.DrawContent += SubViews_DrawContent;
+        DrawContent += Scroll_DrawContent;
+        MouseEvent += Scroll_MouseEvent;
+        _slider.DrawContent += Scroll_DrawContent;
         _slider.MouseEvent += Slider_MouseEvent;
     }
 
@@ -118,9 +118,9 @@ public class Scroll : View
     {
         Added -= Scroll_Added;
         Initialized -= Scroll_Initialized;
-        DrawContent -= SubViews_DrawContent;
-        MouseEvent -= SliderContainer_MouseEvent;
-        _slider.DrawContent -= SubViews_DrawContent;
+        DrawContent -= Scroll_DrawContent;
+        MouseEvent -= Scroll_MouseEvent;
+        _slider.DrawContent -= Scroll_DrawContent;
         _slider.MouseEvent -= Slider_MouseEvent;
 
         base.Dispose (disposing);
@@ -215,7 +215,29 @@ public class Scroll : View
         parent.MouseLeave += Parent_MouseLeave;
     }
 
+    private void Scroll_DrawContent (object sender, DrawEventArgs e) { SetColorSchemeWithSuperview (sender as View); }
+
     private void Scroll_Initialized (object sender, EventArgs e) { SetWidthHeight (); }
+
+    private void Scroll_MouseEvent (object sender, MouseEventEventArgs e)
+    {
+        MouseEvent me = e.MouseEvent;
+        int location = Orientation == Orientation.Vertical ? me.Position.Y : me.Position.X;
+        int barSize = Orientation == Orientation.Vertical ? Frame.Height : Frame.Width;
+
+        (int topLeft, int bottomRight) sliderPos = _orientation == Orientation.Vertical
+                                                       ? new (_slider.Frame.Y, _slider.Frame.Bottom - 1)
+                                                       : new (_slider.Frame.X, _slider.Frame.Right - 1);
+
+        if (me.Flags == MouseFlags.Button1Pressed && location < sliderPos.topLeft)
+        {
+            Position = Math.Max (Position - barSize, 0);
+        }
+        else if (me.Flags == MouseFlags.Button1Pressed && location > sliderPos.bottomRight)
+        {
+            Position = Math.Min (Position + barSize, Size - barSize);
+        }
+    }
 
     private void Scroll_Removed (object sender, SuperViewChangedEventArgs e)
     {
@@ -330,26 +352,4 @@ public class Scroll : View
 
         e.Handled = true;
     }
-
-    private void SliderContainer_MouseEvent (object sender, MouseEventEventArgs e)
-    {
-        MouseEvent me = e.MouseEvent;
-        int location = Orientation == Orientation.Vertical ? me.Position.Y : me.Position.X;
-        int barSize = Orientation == Orientation.Vertical ? Frame.Height : Frame.Width;
-
-        (int topLeft, int bottomRight) sliderPos = _orientation == Orientation.Vertical
-                                                       ? new (_slider.Frame.Y, _slider.Frame.Bottom - 1)
-                                                       : new (_slider.Frame.X, _slider.Frame.Right - 1);
-
-        if (me.Flags == MouseFlags.Button1Pressed && location < sliderPos.topLeft)
-        {
-            Position = Math.Max (Position - barSize, 0);
-        }
-        else if (me.Flags == MouseFlags.Button1Pressed && location > sliderPos.bottomRight)
-        {
-            Position = Math.Min (Position + barSize, Size - barSize);
-        }
-    }
-
-    private void SubViews_DrawContent (object sender, DrawEventArgs e) { SetColorSchemeWithSuperview (sender as View); }
 }
