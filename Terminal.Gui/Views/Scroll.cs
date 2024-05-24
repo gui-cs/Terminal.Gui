@@ -237,6 +237,16 @@ public class Scroll : View
         {
             Position = Math.Min (Position + barSize, Size - barSize);
         }
+        else if ((me.Flags == MouseFlags.WheeledDown && Orientation == Orientation.Vertical)
+                 || (me.Flags == MouseFlags.WheeledRight && Orientation == Orientation.Horizontal))
+        {
+            Position = Math.Min (Position + 1, Size - barSize);
+        }
+        else if ((me.Flags == MouseFlags.WheeledUp && Orientation == Orientation.Vertical)
+                 || (me.Flags == MouseFlags.WheeledLeft && Orientation == Orientation.Horizontal))
+        {
+            Position = Math.Max (Position - 1, 0);
+        }
     }
 
     private void Scroll_Removed (object sender, SuperViewChangedEventArgs e)
@@ -349,6 +359,16 @@ public class Scroll : View
             {
                 Application.UngrabMouse ();
             }
+        }
+        else if ((me.Flags == MouseFlags.WheeledDown && Orientation == Orientation.Vertical)
+                 || (me.Flags == MouseFlags.WheeledRight && Orientation == Orientation.Horizontal))
+        {
+            Position = Math.Min (Position + 1, Size - barSize);
+        }
+        else if ((me.Flags == MouseFlags.WheeledUp && Orientation == Orientation.Vertical)
+                 || (me.Flags == MouseFlags.WheeledLeft && Orientation == Orientation.Horizontal))
+        {
+            Position = Math.Max (Position - 1, 0);
         }
         else
         {
