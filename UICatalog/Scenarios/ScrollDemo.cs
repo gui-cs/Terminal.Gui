@@ -36,13 +36,47 @@ public class ScrollDemo : Scenario
         var scroll = new Scroll
         {
             X = Pos.AnchorEnd (),
-            Width = Dim.Fill (),
+            Width = 1,
             Height = Dim.Fill ()
         };
         view.Add (scroll);
 
+        var lblWidthHeight = new Label
+        {
+            Text = "Width/Height:"
+        };
+        view.Add (lblWidthHeight);
+
+        Buttons.NumericUpDown<int> scrollWidthHeight = new()
+        {
+            Value = scroll.Frame.Width,
+            X = Pos.Right (lblWidthHeight) + 1,
+            Y = Pos.Top (lblWidthHeight)
+        };
+        view.Add (scrollWidthHeight);
+
+        scrollWidthHeight.ValueChanging += (s, e) =>
+                                           {
+                                               if (e.NewValue < 1)
+                                               {
+                                                   e.Cancel = true;
+
+                                                   return;
+                                               }
+
+                                               if (scroll.Orientation == Orientation.Vertical)
+                                               {
+                                                   scroll.Width = e.NewValue;
+                                               }
+                                               else
+                                               {
+                                                   scroll.Height = e.NewValue;
+                                               }
+                                           };
+
         var rgOrientation = new RadioGroup
         {
+            Y = Pos.Bottom (lblWidthHeight),
             RadioLabels = ["Vertical", "Horizontal"],
             Orientation = Orientation.Horizontal
         };
@@ -59,6 +93,7 @@ public class ScrollDemo : Scenario
                                                  {
                                                      scroll.Orientation = Orientation.Vertical;
                                                      scroll.X = Pos.AnchorEnd ();
+                                                     scroll.Width = scrollWidthHeight.Value;
                                                      scroll.Height = Dim.Fill ();
                                                      scroll.Size /= 3;
                                                  }
@@ -67,6 +102,7 @@ public class ScrollDemo : Scenario
                                                      scroll.Orientation = Orientation.Horizontal;
                                                      scroll.Y = Pos.AnchorEnd ();
                                                      scroll.Width = Dim.Fill ();
+                                                     scroll.Height = scrollWidthHeight.Value;
                                                      scroll.Size *= 3;
                                                  }
                                              };
@@ -78,7 +114,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblSize);
 
-        Buttons.NumericUpDown<int> scrollSize = new Buttons.NumericUpDown<int>
+        Buttons.NumericUpDown<int> scrollSize = new()
         {
             Value = scroll.Size,
             X = Pos.Right (lblSize) + 1,
@@ -108,7 +144,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblPosition);
 
-        Buttons.NumericUpDown<int> scrollPosition = new Buttons.NumericUpDown<int>
+        Buttons.NumericUpDown<int> scrollPosition = new()
         {
             Value = scroll.Position,
             X = Pos.Right (lblPosition) + 1,

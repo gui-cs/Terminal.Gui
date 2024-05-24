@@ -158,6 +158,7 @@ public class ScrollTests
 
         scroll.Orientation = Orientation.Horizontal;
         scroll.Width = 10;
+        scroll.Height = 1;
         scroll.Position = 0;
         scroll.Size = size;
         Application.Refresh ();
@@ -272,7 +273,13 @@ public class ScrollTests
 ░░░░░██░░░")]
     public void Mouse_On_The_Container (Orientation orientation, int size, int position, int location, string output, int expectedPos, string expectedOut)
     {
-        var scroll = new Scroll { Width = 10, Height = 10, Orientation = orientation, Size = size, Position = position };
+        var scroll = new Scroll
+        {
+            Width = orientation == Orientation.Vertical ? 1 : 10,
+            Height = orientation == Orientation.Vertical ? 10 : 1,
+            Orientation = orientation, Size = size,
+            Position = position
+        };
         var top = new Toplevel ();
         top.Add (scroll);
         Application.Begin (top);
@@ -641,7 +648,13 @@ public class ScrollTests
         string expectedOut
     )
     {
-        var scroll = new Scroll { Width = 10, Height = 10, Orientation = orientation, Size = size, Position = position };
+        var scroll = new Scroll
+        {
+            Width = orientation == Orientation.Vertical ? 1 : 10,
+            Height = orientation == Orientation.Vertical ? 10 : 1,
+            Orientation = orientation,
+            Size = size, Position = position
+        };
         var top = new Toplevel ();
         top.Add (scroll);
         Application.Begin (top);
@@ -759,6 +772,7 @@ public class ScrollTests
     [InlineData (
                     3,
                     10,
+                    1,
                     Orientation.Vertical,
                     @"
 ┌─┐
@@ -774,12 +788,40 @@ public class ScrollTests
     [InlineData (
                     10,
                     3,
+                    1,
                     Orientation.Horizontal,
                     @"
 ┌────────┐
 │███░░░░░│
 └────────┘")]
-    public void Vertical_Horizontal_Draws_Correctly (int width, int height, Orientation orientation, string expected)
+    [InlineData (
+                    3,
+                    10,
+                    3,
+                    Orientation.Vertical,
+                    @"
+┌───┐
+│███│
+│███│
+│███│
+│░░░│
+│░░░│
+│░░░│
+│░░░│
+│░░░│
+└───┘")]
+    [InlineData (
+                    10,
+                    3,
+                    3,
+                    Orientation.Horizontal,
+                    @"
+┌────────┐
+│███░░░░░│
+│███░░░░░│
+│███░░░░░│
+└────────┘")]
+    public void Vertical_Horizontal_Draws_Correctly (int sizeWidth, int sizeHeight, int widthHeight, Orientation orientation, string expected)
     {
         var super = new Window { Id = "super", Width = Dim.Fill (), Height = Dim.Fill () };
         var top = new Toplevel ();
@@ -788,14 +830,17 @@ public class ScrollTests
         var scroll = new Scroll
         {
             Orientation = orientation,
-            Size = orientation == Orientation.Vertical ? height * 2 : width * 2,
-            Width = orientation == Orientation.Vertical ? 1 : Dim.Fill (),
-            Height = orientation == Orientation.Vertical ? Dim.Fill () : 1
+            Size = orientation == Orientation.Vertical ? sizeHeight * 2 : sizeWidth * 2,
+            Width = orientation == Orientation.Vertical ? widthHeight : Dim.Fill (),
+            Height = orientation == Orientation.Vertical ? Dim.Fill () : widthHeight
         };
         super.Add (scroll);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (width, height);
+
+        ((FakeDriver)Application.Driver).SetBufferSize (
+                                                        sizeWidth + (orientation == Orientation.Vertical ? widthHeight - 1 : 0),
+                                                        sizeHeight + (orientation == Orientation.Vertical ? 0 : widthHeight - 1));
 
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
     }

@@ -20,22 +20,20 @@ public class Scroll : View
         ClearOnVisibleFalse = false;
         CanFocus = false;
         Orientation = Orientation.Vertical;
+        Width = 1;
 
-        _sliderContainer = new () { Width = Dim.Fill (), Height = Dim.Fill (), WantContinuousButtonPressed = true };
         _slider = new () { Id = "slider" };
-        _sliderContainer.Add (_slider);
-        Add (_sliderContainer);
+        Add (_slider);
 
         Added += Scroll_Added;
         Removed += Scroll_Removed;
         Initialized += Scroll_Initialized;
-        _sliderContainer.DrawContent += SubViews_DrawContent;
-        _sliderContainer.MouseEvent += SliderContainer_MouseEvent;
+        DrawContent += SubViews_DrawContent;
+        MouseEvent += SliderContainer_MouseEvent;
         _slider.DrawContent += SubViews_DrawContent;
         _slider.MouseEvent += Slider_MouseEvent;
     }
 
-    private readonly View _sliderContainer;
     private readonly View _slider;
     private int _lastLocation = -1;
 
@@ -120,8 +118,8 @@ public class Scroll : View
     {
         Added -= Scroll_Added;
         Initialized -= Scroll_Initialized;
-        _sliderContainer.DrawContent -= SubViews_DrawContent;
-        _sliderContainer.MouseEvent -= SliderContainer_MouseEvent;
+        DrawContent -= SubViews_DrawContent;
+        MouseEvent -= SliderContainer_MouseEvent;
         _slider.DrawContent -= SubViews_DrawContent;
         _slider.MouseEvent -= Slider_MouseEvent;
 
@@ -250,48 +248,32 @@ public class Scroll : View
 
     private void SetSliderText ()
     {
-        _sliderContainer.TextDirection = Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
+        TextDirection = Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
 
-        _sliderContainer.Text = string.Concat (
-                                               Enumerable.Repeat (
-                                                                  Glyphs.Stipple.ToString (),
-                                                                  Orientation == Orientation.Vertical
-                                                                      ? _sliderContainer.Frame.Height
-                                                                      : _sliderContainer.Frame.Width));
+        Text = string.Concat (
+                              Enumerable.Repeat (
+                                                 Glyphs.Stipple.ToString (),
+                                                 Frame.Width * Frame.Height));
         _slider.TextDirection = Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
 
         _slider.Text = string.Concat (
                                       Enumerable.Repeat (
                                                          Glyphs.ContinuousMeterSegment.ToString (),
-                                                         Orientation == Orientation.Vertical
-                                                             ? _sliderContainer.Frame.Height
-                                                             : _slider.Frame.Width));
+                                                         _slider.Frame.Width * _slider.Frame.Height));
     }
 
     private void SetWidthHeight ()
     {
-        if (Orientation == Orientation.Vertical)
-        {
-            Width = 1;
-        }
-        else
-        {
-            Height = 1;
-        }
-
         if (!IsInitialized)
         {
             return;
         }
 
-        _sliderContainer.Width = Orientation == Orientation.Vertical ? 1 : Dim.Fill ();
-        _sliderContainer.Height = Orientation == Orientation.Vertical ? Dim.Fill () : 1;
-
         (int Location, int Dimension) slider = GetSliderLocationDimensionFromPosition ();
         _slider.X = Orientation == Orientation.Vertical ? 0 : slider.Location;
         _slider.Y = Orientation == Orientation.Vertical ? slider.Location : 0;
-        _slider.Width = Orientation == Orientation.Vertical ? 1 : slider.Dimension;
-        _slider.Height = Orientation == Orientation.Vertical ? slider.Dimension : 1;
+        _slider.Width = Orientation == Orientation.Vertical ? Dim.Fill () : slider.Dimension;
+        _slider.Height = Orientation == Orientation.Vertical ? slider.Dimension : Dim.Fill ();
 
         SetSliderText ();
     }
