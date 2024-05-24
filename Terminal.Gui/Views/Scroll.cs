@@ -1,12 +1,4 @@
-﻿//
-// Scroll.cs: Vertical or horizontal scroll
-//
-// Author: BDisp
-//
-// Licensed under the MIT license
-//
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     Represents the "inside part" of a scroll bar, minus the arrows.
