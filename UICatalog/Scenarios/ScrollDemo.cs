@@ -215,7 +215,25 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblScrollFrame);
 
-        scroll.LayoutComplete += (s, e) => lblScrollFrame.Text = $"Scroll Frame: {scroll.Frame.ToString ()}";
+        var lblScrollViewport = new Label
+        {
+            Y = Pos.Bottom (lblScrollFrame)
+        };
+        view.Add (lblScrollViewport);
+
+        var lblScrollContentSize = new Label
+        {
+            Y = Pos.Bottom (lblScrollViewport)
+        };
+        view.Add (lblScrollContentSize);
+
+
+        scroll.LayoutComplete += (s, e) =>
+                                 {
+                                     lblScrollFrame.Text = $"Scroll Frame: {scroll.Frame.ToString ()}";
+                                     lblScrollViewport.Text = $"Scroll Viewport: {scroll.Viewport.ToString ()}";
+                                     lblScrollContentSize.Text = $"Scroll ContentSize: {scroll.ContentSize.ToString ()}";
+                                 };
 
         editor.Initialized += (s, e) =>
                               {
