@@ -19,13 +19,13 @@ public class SubviewTests
                    {
                        Assert.Same (v.SuperView, e.Parent);
                        Assert.Same (t, e.Parent);
-                       Assert.Same (v, e.Child);
+                       Assert.Same (v, e.SubView);
                    };
 
         v.Removed += (s, e) =>
                      {
                          Assert.Same (t, e.Parent);
-                         Assert.Same (v, e.Child);
+                         Assert.Same (v, e.SubView);
                          Assert.True (v.SuperView == null);
                      };
 

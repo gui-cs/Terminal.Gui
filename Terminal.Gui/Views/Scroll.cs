@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Represents the "inside part" of a scroll bar, minus the arrows.
+///     Provides a proportional control for scrolling through content. Used within a <see cref="ScrollBar"/>.
 /// </summary>
 public class Scroll : View
 {
@@ -39,7 +39,7 @@ public class Scroll : View
 
     private Orientation _orientation;
     /// <summary>
-    ///     Determines the Orientation of the scroll.
+    ///     Gets or sets if the Scroll is oriented vertically or horizontally.
     /// </summary>
     public Orientation Orientation
     {
@@ -53,7 +53,7 @@ public class Scroll : View
 
     private int _position;
     /// <summary>
-    ///     The position, relative to <see cref="Size"/>, to set the scrollbar at.
+    ///     Gets or sets the position of the start of the Scroll slider, relative to <see cref="Size"/>.
     /// </summary>
     public int Position
     {
@@ -74,26 +74,39 @@ public class Scroll : View
                 return;
             }
 
-            int oldPos = _position;
-            _position = value;
-            OnPositionChanged (oldPos);
 
             if (!_wasSliderMouse)
             {
                 AdjustSlider ();
             }
+
+            int oldPos = _position;
+            _position = value;
+            OnPositionChanged (oldPos);
         }
     }
 
-    /// <summary>This event is raised when the position on the scrollbar has changed.</summary>
+    /// <summary>Raised when the <see cref="Position"/> has changed.</summary>
     public event EventHandler<StateEventArgs<int>> PositionChanged;
 
-    /// <summary>This event is raised when the position on the scrollbar is changing.</summary>
+    /// <summary>Raised when the <see cref="Position"/> is changing. Set <see cref="StateEventArgs{T}.Cancel"/> to <see langword="true"/> to prevent the position from being changed.</summary>
     public event EventHandler<StateEventArgs<int>> PositionChanging;
+
+    /// <summary>Virtual method called when <see cref="Position"/> has changed. Fires <see cref="PositionChanged"/>.</summary>
+    protected virtual void OnPositionChanged (int oldPos) { PositionChanged?.Invoke (this, new (oldPos, Position)); }
+
+    /// <summary>Virtual method called when <see cref="Position"/> is changing. Fires <see cref="PositionChanging"/>, which is cancelable.</summary>
+    protected virtual StateEventArgs<int> OnPositionChanging (int oldPos, int newPos)
+    {
+        StateEventArgs<int> args = new (oldPos, newPos);
+        PositionChanging?.Invoke (this, args);
+
+        return args;
+    }
 
     private int _size;
     /// <summary>
-    ///     The size of content the scroll represents.
+    ///     Gets or sets the size of the Scroll. This is the total size of the content that can be scrolled through.
     /// </summary>
     public int Size
     {
@@ -107,35 +120,10 @@ public class Scroll : View
         }
     }
 
-    /// <summary>This event is raised when the size of the scroll has changed.</summary>
+    /// <summary>Raised when <see cref="Size"/> has changed.</summary>
     public event EventHandler<StateEventArgs<int>> SizeChanged;
 
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        Added -= Scroll_Added;
-        Initialized -= Scroll_Initialized;
-        DrawContent -= Scroll_DrawContent;
-        MouseEvent -= Scroll_MouseEvent;
-        _slider.DrawContent -= Scroll_DrawContent;
-        _slider.MouseEvent -= Slider_MouseEvent;
-
-        base.Dispose (disposing);
-    }
-
-    /// <summary>Virtual method to invoke the <see cref="PositionChanged"/> event handler.</summary>
-    protected virtual void OnPositionChanged (int oldPos) { PositionChanged?.Invoke (this, new (oldPos, Position)); }
-
-    /// <summary>Virtual method to invoke the cancelable <see cref="PositionChanging"/> event handler.</summary>
-    protected virtual StateEventArgs<int> OnPositionChanging (int oldPos, int newPos)
-    {
-        StateEventArgs<int> args = new (oldPos, newPos);
-        PositionChanging?.Invoke (this, args);
-
-        return args;
-    }
-
-    /// <summary>Virtual method to invoke the <see cref="SizeChanged"/> event handler.</summary>
+    /// <summary>Virtual method called when <see cref="Size"/> has changed. Fires <see cref="SizeChanged"/>.</summary>
     protected void OnSizeChanged (int oldSize) { SizeChanged?.Invoke (this, new (oldSize, Size)); }
 
     private int GetPositionFromSliderLocation (int location)
@@ -145,18 +133,20 @@ public class Scroll : View
             return 0;
         }
 
-        int barSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
+        int scrollSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
 
         // Ensure the Position is valid if the slider is at end
-        if ((Orientation == Orientation.Vertical && location + _slider.Frame.Height == barSize)
-            || (Orientation == Orientation.Horizontal && location + _slider.Frame.Width == barSize))
+        // We use Frame here instead of ContentSize because even if the slider has a margin or border, Frame indicates the actual size
+        if ((Orientation == Orientation.Vertical && location + _slider.Frame.Height == scrollSize)
+            || (Orientation == Orientation.Horizontal && location + _slider.Frame.Width == scrollSize))
         {
-            return Size - barSize;
+            return Size - scrollSize;
         }
 
-        return Math.Min (location * Size / barSize, Size - barSize);
+        return Math.Min (location * Size / scrollSize, Size - scrollSize);
     }
 
+    // QUESTION: This method is only called from one place. Should it be inlined? Or, should it be made internal and unit tests be provided?
     private (int Location, int Dimension) GetSliderLocationDimensionFromPosition ()
     {
         if (ContentSize.Height == 0 || ContentSize.Width == 0)
@@ -164,37 +154,38 @@ public class Scroll : View
             return new (0, 0);
         }
 
-        int barSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
+        int scrollSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
         int location;
         int dimension;
 
         if (Size > 0)
         {
-            dimension = Math.Min (Math.Max (barSize * barSize / Size, 1), barSize);
+            dimension = Math.Min (Math.Max (scrollSize * scrollSize / Size, 1), scrollSize);
 
             // Ensure the Position is valid
-            if (Position > 0 && Position + barSize > Size)
+            if (Position > 0 && Position + scrollSize > Size)
             {
-                Position = Size - barSize;
+                Position = Size - scrollSize;
             }
 
-            location = Math.Min (Position * barSize / Size, barSize - dimension);
+            location = Math.Min (Position * scrollSize / Size, scrollSize - dimension);
 
-            if (Position == Size - barSize && location + dimension < barSize)
+            if (Position == Size - scrollSize && location + dimension < scrollSize)
             {
-                location = barSize - dimension;
+                location = scrollSize - dimension;
             }
         }
         else
         {
             location = 0;
-            dimension = barSize;
+            dimension = scrollSize;
         }
 
         return new (location, dimension);
     }
 
-    private void Parent_LayoutComplete (object sender, LayoutEventArgs e)
+    // TODO: This is unnecessary. If Scroll.Width/Height is Dim.Auto, the Superview will get resized automatically.
+    private void SuperView_LayoutComplete (object sender, LayoutEventArgs e)
     {
         if (!_wasSliderMouse)
         {
@@ -206,19 +197,23 @@ public class Scroll : View
         }
     }
 
-    private void Parent_MouseEnter (object sender, MouseEventEventArgs e) { OnMouseEnter (e.MouseEvent); }
+    private void SuperView_MouseEnter (object sender, MouseEventEventArgs e) { OnMouseEnter (e.MouseEvent); }
 
-    private void Parent_MouseLeave (object sender, MouseEventEventArgs e) { OnMouseLeave (e.MouseEvent); }
+    private void SuperView_MouseLeave (object sender, MouseEventEventArgs e) { OnMouseLeave (e.MouseEvent); }
 
     private void Scroll_Added (object sender, SuperViewChangedEventArgs e)
     {
-        View parent = e.Parent is Adornment adornment ? adornment.Parent : e.Parent;
+        View parent = e.SuperView is Adornment adornment ? adornment.Parent : e.SuperView;
 
-        parent.LayoutComplete += Parent_LayoutComplete;
-        parent.MouseEnter += Parent_MouseEnter;
-        parent.MouseLeave += Parent_MouseLeave;
+        parent.LayoutComplete += SuperView_LayoutComplete;
+
+        // QUESTION: I really don't like this. It feels like a hack that a subview needs to track its parent's mouse events.
+        // QUESTION: Can we figure out a way to do this without tracking the parent's mouse events?
+        parent.MouseEnter += SuperView_MouseEnter;
+        parent.MouseLeave += SuperView_MouseLeave;
     }
 
+    // TODO: Just override GetNormalColor instead of having this method (make Slider a View sub-class that overrides GetNormalColor)
     private void Scroll_DrawContent (object sender, DrawEventArgs e) { SetColorSchemeWithSuperview (sender as View); }
 
     private void Scroll_Initialized (object sender, EventArgs e)
@@ -226,6 +221,9 @@ public class Scroll : View
         AdjustSlider ();
     }
 
+    // TODO: I think you should create a new `internal` view named "ScrollSlider" with an `Orientation` property. It should inherit from View and override GetNormalColor and the mouse events
+    // that can be moved within it's Superview, constrained to move only horizontally or vertically depending on Orientation.
+    // This will really simplify a lot of this.
     private void Scroll_MouseEvent (object sender, MouseEventEventArgs e)
     {
         MouseEvent me = e.MouseEvent;
@@ -258,13 +256,13 @@ public class Scroll : View
 
     private void Scroll_Removed (object sender, SuperViewChangedEventArgs e)
     {
-        if (e.Parent is { })
+        if (e.SuperView is { })
         {
-            View parent = e.Parent is Adornment adornment ? adornment.Parent : e.Parent;
+            View parent = e.SuperView is Adornment adornment ? adornment.Parent : e.SuperView;
 
-            parent.LayoutComplete -= Parent_LayoutComplete;
-            parent.MouseEnter -= Parent_MouseEnter;
-            parent.MouseLeave -= Parent_MouseLeave;
+            parent.LayoutComplete -= SuperView_LayoutComplete;
+            parent.MouseEnter -= SuperView_MouseEnter;
+            parent.MouseLeave -= SuperView_MouseLeave;
         }
     }
 
@@ -290,6 +288,7 @@ public class Scroll : View
     {
         TextDirection = Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
 
+        // QUESTION: Should these Glyphs be configurable via CM?
         Text = string.Concat (
                               Enumerable.Repeat (
                                                  Glyphs.Stipple.ToString (),
@@ -318,10 +317,12 @@ public class Scroll : View
                                      Orientation == Orientation.Vertical ? ContentSize.Width : slider.Dimension,
                                      Orientation == Orientation.Vertical ? slider.Dimension : ContentSize.Height
                                     ));
-
         SetSliderText ();
     }
 
+    // TODO: Move this into "ScrollSlider" and override it there. Scroll can then subscribe to _slider.LayoutComplete and call AdjustSlider.
+    // QUESTION: I've been meaning to add a "View.FrameChanged" event (fired from LayoutComplete only if Frame has changed). Should we do that as part of this PR?
+    // QUESTION: Note I *did* add "View.ViewportChanged" in a previous PR.
     private void Slider_MouseEvent (object sender, MouseEventEventArgs e)
     {
         MouseEvent me = e.MouseEvent;
@@ -384,4 +385,18 @@ public class Scroll : View
 
         e.Handled = true;
     }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        Added -= Scroll_Added;
+        Initialized -= Scroll_Initialized;
+        DrawContent -= Scroll_DrawContent;
+        MouseEvent -= Scroll_MouseEvent;
+        _slider.DrawContent -= Scroll_DrawContent;
+        _slider.MouseEvent -= Slider_MouseEvent;
+
+        base.Dispose (disposing);
+    }
+
 }

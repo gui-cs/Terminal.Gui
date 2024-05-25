@@ -208,7 +208,7 @@ internal class KeyBindingsDialog : Dialog
             // (and always was wrong). Parents don't get to be told when new views are added
             // to them
 
-            view.Added += (s, e) => RecordView (e.Child);
+            view.Added += (s, e) => RecordView (e.SubView);
         }
     }
 }
