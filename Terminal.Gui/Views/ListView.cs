@@ -749,6 +749,11 @@ namespace Terminal.Gui {
 		public void EnsureSelectedItemVisible ()
 		{
 			SuperView?.LayoutSubviews ();
+			// If last item is selected and is removed, ensures a valid selected item
+			if (Source != null && selected > Source.Count - 1) {
+				SelectedItem = Source.Count - 1;
+				SetNeedsDisplay ();
+			}
 			if (selected < top) {
 				top = selected;
 			} else if (Frame.Height > 0 && selected >= top + Frame.Height) {
@@ -831,10 +836,29 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public int Count => src != null ? src.Count : 0;
+		public int Count {
+			get {
+				CheckAndResizeMarksIfRequired ();
+				return src?.Count ?? 0;
+			}
+		}
 
 		/// <inheritdoc/>
 		public int Length => len;
+
+		void CheckAndResizeMarksIfRequired ()
+		{
+			if (count != src.Count) {
+				count = src.Count;
+				BitArray newMarks = new BitArray (count);
+				for (var i = 0; i < Math.Min (marks.Length, newMarks.Length); i++) {
+					newMarks [i] = marks [i];
+				}
+				marks = newMarks;
+
+				len = GetMaxLengthItem ();
+			}
+		}
 
 		int GetMaxLengthItem ()
 		{
@@ -896,7 +920,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public bool IsMarked (int item)
 		{
-			if (item >= 0 && item < count)
+			if (item >= 0 && item < Count)
 				return marks [item];
 			return false;
 		}
@@ -904,7 +928,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public void SetMark (int item, bool value)
 		{
-			if (item >= 0 && item < count)
+			if (item >= 0 && item < Count)
 				marks [item] = value;
 		}
 
