@@ -848,7 +848,7 @@ namespace Terminal.Gui {
 
 		void CheckAndResizeMarksIfRequired ()
 		{
-			if (count != src.Count) {
+			if (src != null && count != src.Count) {
 				count = src.Count;
 				BitArray newMarks = new BitArray (count);
 				for (var i = 0; i < Math.Min (marks.Length, newMarks.Length); i++) {
