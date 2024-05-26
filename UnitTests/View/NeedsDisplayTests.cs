@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewTests;
 
 [Trait("Category","Output")]
-public class NeedsDisplayTests (ITestOutputHelper output)
+public class NeedsDisplayTests ()
 {
     [Fact]
     public void NeedsDisplay_False_If_Width_Height_Zero ()

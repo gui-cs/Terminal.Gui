@@ -215,7 +215,6 @@ public class DatePicker : View
         {
             X = Pos.Center () - 2,
             Y = Pos.Bottom (_calendar) - 1,
-            Height = 1,
             Width = 2,
             Text = GetBackButtonText (),
             WantContinuousButtonPressed = true,
@@ -234,7 +233,6 @@ public class DatePicker : View
         {
             X = Pos.Right (_previousMonthButton) + 2,
             Y = Pos.Bottom (_calendar) - 1,
-            Height = 1,
             Width = 2,
             Text = GetForwardButtonText (),
             WantContinuousButtonPressed = true,
@@ -273,8 +271,8 @@ public class DatePicker : View
                                        Text = _date.ToString (Format);
                                    };
 
-        Height = Dim.Auto ();
-        Width = Dim.Auto ();
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content);
 
         // BUGBUG: Remove when Dim.Auto(subviews) fully works
         SetContentSize (new (_calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7, _calendar.Frame.Height + 1));

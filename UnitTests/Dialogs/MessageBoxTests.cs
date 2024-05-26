@@ -120,7 +120,7 @@ public class MessageBoxTests
         Assert.Equal (1, result);
     }
 
-    [Fact (Skip = "Dim.Auto WIP")]
+    [Fact (Skip = "Pos.Align WIP")]
     [AutoInitShutdown]
     public void Location_Default ()
     {
@@ -155,7 +155,7 @@ public class MessageBoxTests
         Application.Run ().Dispose ();
     }
 
-    [Theory (Skip = "Dim.Auto WIP")]
+    [Theory (Skip = "Pos.Align WIP")]
     [AutoInitShutdown]
     [InlineData (" ", true, 1)]
     [InlineData (" ", false, 1)]
@@ -236,7 +236,7 @@ public class MessageBoxTests
         Application.Run ().Dispose ();
     }
 
-    [Fact (Skip = "Dim.Auto WIP")]
+    [Fact (Skip = "Pos.Align WIP")]
     [AutoInitShutdown]
     public void Message_Long_Without_Spaces_WrapMessage_True ()
     {
@@ -278,7 +278,7 @@ public class MessageBoxTests
 │ffffffffffffffffff│
 │  ffffffffffffff  │
 │                  │
-│     {btn}    │
+│    {btn}     │
 └──────────────────┘",
                                                                                        _output
                                                                                       );
@@ -302,7 +302,7 @@ public class MessageBoxTests
 │ffffffffffffffffff│
 │ffffffffffffffffff│
 │ffffffffffffffffff│
-│     {btn}    │",
+│    {btn}     │",
                                                                                        _output
                                                                                       );
                                          Application.RequestStop ();
@@ -312,7 +312,7 @@ public class MessageBoxTests
         Application.Run (top);
     }
 
-    [Fact (Skip = "Dim.Auto WIP")]
+    [Fact (Skip = "Pos.Align WIP")]
     [AutoInitShutdown]
     public void Message_With_Spaces_WrapMessage_False ()
     {
@@ -377,7 +377,7 @@ ff ff ff ff ff ff ff
 ────────────────────
 ffffffffffffffffffff
                     
-      ⟦► btn ◄⟧     
+     ⟦► btn ◄⟧      
 ────────────────────
 ",
                                                                                        _output
@@ -389,7 +389,7 @@ ffffffffffffffffffff
         Application.Run (top);
     }
 
-    [Fact (Skip = "Dim.Auto WIP")]
+    [Fact (Skip = "Pos.Align WIP")]
     [AutoInitShutdown]
     public void Message_With_Spaces_WrapMessage_True ()
     {
@@ -459,7 +459,7 @@ ffffffffffffffffffff
 │ffffffffffffffffff│
 │ffffffffffffffffff│
 │ffffffffffffffffff│
-│     {btn}    │",
+│    {btn}     │",
                                                                                        _output
                                                                                       );
                                          Application.RequestStop ();
@@ -470,7 +470,7 @@ ffffffffffffffffffff
         top.Dispose ();
     }
 
-    [Fact (Skip = "Dim.Auto WIP")]
+    [Fact (Skip = "Pos.Align WIP")]
     [AutoInitShutdown]
     public void Message_Without_Spaces_WrapMessage_False ()
     {
@@ -509,7 +509,7 @@ ffffffffffffffffffff
 ────────────────────
 ffffffffffffffffffff
                     
-      ⟦► btn ◄⟧     
+     ⟦► btn ◄⟧      
 ────────────────────
 ",
                                                                                        _output
@@ -529,7 +529,7 @@ ffffffffffffffffffff
 ────────────────────
 ffffffffffffffffffff
                     
-      ⟦► btn ◄⟧     
+     ⟦► btn ◄⟧      
 ────────────────────
 ",
                                                                                        _output
@@ -542,7 +542,7 @@ ffffffffffffffffffff
         Application.Run (top);
     }
 
-    [Fact (Skip = "Dim.Auto WIP")]
+    [Fact (Skip = "Pos.Align WIP")]
     [AutoInitShutdown]
     public void Size_Default ()
     {
@@ -575,7 +575,7 @@ ffffffffffffffffffff
         Application.Run ().Dispose ();
     }
 
-    [Fact (Skip = "Dim.Auto WIP")]
+    [Fact (Skip = "Pos.Align WIP")]
     [AutoInitShutdown]
     public void Size_JustBigEnough_Fixed_Size ()
     {
@@ -626,7 +626,7 @@ ffffffffffffffffffff
         Application.Run ().Dispose ();
     }
 
-    [Fact (Skip = "Dim.Auto WIP")]
+    [Fact (Skip = "Pos.Align WIP")]
     [AutoInitShutdown]
     public void Size_No_With_Button ()
     {
@@ -686,7 +686,7 @@ ffffffffffffffffffff
         top.Dispose ();
     }
 
-    [Fact (Skip = "Dim.Auto WIP")]
+    [Fact (Skip = "Pos.Align WIP")]
     [AutoInitShutdown]
     public void Size_None_No_Buttons ()
     {

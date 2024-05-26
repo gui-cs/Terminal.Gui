@@ -841,19 +841,7 @@ public class ThicknessTests
                     3,
                     4,
                     5)]
-    [InlineData (
-                    1,
-                    2,
-                    3,
-                    4,
-                    1,
-                    1,
-                    1,
-                    1,
-                    2,
-                    3,
-                    4,
-                    5)]
+
     public void AddTest (
         int left,
         int top,

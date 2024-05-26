@@ -958,7 +958,7 @@ internal class CharMap : View
             Y = 1,
             Width = Dim.Fill (),
             Height = Dim.Fill (1),
-            TextAlignment = TextAlignment.Centered
+            TextAlignment = Alignment.Center
         };
         var spinner = new SpinnerView { X = Pos.Center (), Y = Pos.Center (), Style = new Aesthetic () };
         spinner.AutoSpin = true;
@@ -1081,7 +1081,7 @@ internal class CharMap : View
             };
             dlg.Add (label);
 
-            var json = new TextView
+            var json = new TextView ()
             {
                 X = 0,
                 Y = Pos.Bottom (label),
@@ -1090,6 +1090,7 @@ internal class CharMap : View
                 ReadOnly = true,
                 Text = decResponse
             };
+
             dlg.Add (json);
 
             Application.Run (dlg);

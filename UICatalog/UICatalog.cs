@@ -303,7 +303,7 @@ internal class UICatalogApp
         _aboutMessage = new ();
         _aboutMessage.AppendLine (@"A comprehensive sample library for");
         _aboutMessage.AppendLine (@"");
-        _aboutMessage.AppendLine (@"  _______                  _             _   _____       _  ");
+        _aboutMessage.AppendLine (@" _______                  _             _   _____       _   ");
         _aboutMessage.AppendLine (@" |__   __|                (_)           | | / ____|     (_) ");
         _aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ");
         _aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ");
@@ -345,7 +345,6 @@ internal class UICatalogApp
         // 'app' closed cleanly.
         foreach (Responder? inst in Responder.Instances)
         {
-            
             Debug.Assert (inst.WasDisposed);
         }
 
@@ -810,24 +809,24 @@ internal class UICatalogApp
             string GetDiagnosticsTitle (Enum diag)
             {
                 return Enum.GetName (_diagnosticFlags.GetType (), diag) switch
-                       {
-                           "Off" => OFF,
-                           "Ruler" => RULER,
-                           "Padding" => PADDING,
-                           "MouseEnter" => MOUSEENTER,
-                           _ => ""
-                       };
+                {
+                    "Off" => OFF,
+                    "Ruler" => RULER,
+                    "Padding" => PADDING,
+                    "MouseEnter" => MOUSEENTER,
+                    _ => ""
+                };
             }
 
             Enum GetDiagnosticsEnumValue (string title)
             {
                 return title switch
-                       {
-                           RULER => ViewDiagnosticFlags.Ruler,
-                           PADDING => ViewDiagnosticFlags.Padding,
-                           MOUSEENTER => ViewDiagnosticFlags.MouseEnter,
-                           _ => null!
-                       };
+                {
+                    RULER => ViewDiagnosticFlags.Ruler,
+                    PADDING => ViewDiagnosticFlags.Padding,
+                    MOUSEENTER => ViewDiagnosticFlags.MouseEnter,
+                    _ => null!
+                };
             }
 
             void SetDiagnosticsFlag (Enum diag, bool add)

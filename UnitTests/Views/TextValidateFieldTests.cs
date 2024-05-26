@@ -10,7 +10,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             ****
@@ -44,7 +44,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Left,
+            TextAlignment = Alignment.Start,
             Width = 30,
 
             //                                             ****
@@ -81,7 +81,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             ****
@@ -115,7 +115,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             *
@@ -137,7 +137,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             *
@@ -161,7 +161,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             ****
@@ -179,7 +179,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             ****
@@ -196,7 +196,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             ****
@@ -214,7 +214,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             *
@@ -233,7 +233,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             *
@@ -253,7 +253,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             ** **
@@ -283,7 +283,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             *
@@ -308,7 +308,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Left,
+            TextAlignment = Alignment.Start,
             Width = 30,
 
             //                                             ****
@@ -338,7 +338,7 @@ public class TextValidateField_NET_Provider_Tests
 
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Left, Width = 30, Provider = new NetMaskedTextProvider ("--(0000)--")
+            TextAlignment = Alignment.Start, Width = 30, Provider = new NetMaskedTextProvider ("--(0000)--")
         };
 
         field.Provider.TextChanged += (sender, e) => wasTextChanged = true;
@@ -356,7 +356,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             *
@@ -381,7 +381,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Left,
+            TextAlignment = Alignment.Start,
             Width = 30,
 
             //                                             ****
@@ -400,7 +400,7 @@ public class TextValidateField_NET_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
 
             //                                             ****
@@ -540,7 +540,7 @@ public class TextValidateField_Regex_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
             Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
         };
@@ -596,7 +596,7 @@ public class TextValidateField_Regex_Provider_Tests
 
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
             Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
         };
@@ -616,7 +616,7 @@ public class TextValidateField_Regex_Provider_Tests
     {
         var field = new TextValidateField
         {
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Width = 20,
             Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
         };

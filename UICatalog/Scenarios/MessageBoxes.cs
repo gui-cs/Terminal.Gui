@@ -30,7 +30,7 @@ public class MessageBoxes : Scenario
         app.Add (frame);
 
         // TODO: Use Pos.Align her to demo aligning labels and fields
-        var label = new Label { X = 0, Y = 0, Width = 15, TextAlignment = TextAlignment.Right, Text = "Width:" };
+        var label = new Label { X = 0, Y = 0, Width = 15, TextAlignment = Alignment.End, Text = "Width:" };
         frame.Add (label);
 
         var widthEdit = new TextField
@@ -50,7 +50,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
             Text = "Height:"
         };
         frame.Add (label);
@@ -85,7 +85,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
             Text = "Title:"
         };
         frame.Add (label);
@@ -107,7 +107,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
             Text = "Message:"
         };
         frame.Add (label);
@@ -129,7 +129,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
             Text = "Num Buttons:"
         };
         frame.Add (label);
@@ -151,7 +151,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
             Text = "Default Button:"
         };
         frame.Add (label);
@@ -173,7 +173,7 @@ public class MessageBoxes : Scenario
 
             Width = Dim.Width (label),
             Height = 1,
-            TextAlignment = TextAlignment.Right,
+            TextAlignment = Alignment.End,
             Text = "Style:"
         };
         frame.Add (label);
@@ -186,7 +186,7 @@ public class MessageBoxes : Scenario
 
         var ckbWrapMessage = new CheckBox
         {
-            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", Checked = false
+            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", Checked = true
         };
         frame.Add (ckbWrapMessage);
 
@@ -194,7 +194,7 @@ public class MessageBoxes : Scenario
 
         label = new ()
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, TextAlignment = TextAlignment.Right, Text = "Button Pressed:"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, TextAlignment = Alignment.End, Text = "Button Pressed:"
         };
         app.Add (label);
 
@@ -203,11 +203,9 @@ public class MessageBoxes : Scenario
             X = Pos.Center (),
             Y = Pos.Bottom (label) + 1,
             ColorScheme = Colors.ColorSchemes ["Error"],
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             Text = " "
         };
-
-        //var btnText = new [] { "_Zero", "_One", "T_wo", "_Three", "_Four", "Fi_ve", "Si_x", "_Seven", "_Eight", "_Nine" };
 
         var showMessageBoxButton = new Button
         {
@@ -227,7 +225,6 @@ public class MessageBoxes : Scenario
 
                                                for (var i = 0; i < numButtons; i++)
                                                {
-                                                   //btns.Add(btnText[i % 10]);
                                                    btns.Add (NumberToWords.Convert (i));
                                                }
 
