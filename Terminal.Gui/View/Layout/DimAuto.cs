@@ -78,6 +78,7 @@ public class DimAuto () : Dim
                 // TODO: This whole body of code is a WIP (for https://github.com/gui-cs/Terminal.Gui/pull/3451).
                 subviewsSize = 0;
 
+                List<View> visibleSubviews = us.Subviews.Where (v => v.Visible).ToList ();
                 List<View> subviews;
 
                 #region Not Anchored and Are Not Dependent
@@ -94,17 +95,17 @@ public class DimAuto () : Dim
                 // [ ] DimView
                 if (dimension == Dimension.Width)
                 {
-                    subviews = us.Subviews.Where (v => v.X is not PosAnchorEnd
-                                                       && v.X is not PosAlign
-                                                       && v.X is not PosCenter
-                                                       && v.Width is not DimFill).ToList ();
+                    subviews = visibleSubviews.Where (v => v.X is not PosAnchorEnd
+                                                           && v.X is not PosAlign
+                                                           // && v.X is not PosCenter
+                                                           && v.Width is not DimFill).ToList ();
                 }
                 else
                 {
-                    subviews = us.Subviews.Where (v => v.Y is not PosAnchorEnd
-                                                       && v.Y is not PosAlign
-                                                       && v.Y is not PosCenter
-                                                       && v.Height is not DimFill).ToList ();
+                    subviews = visibleSubviews.Where (v => v.Y is not PosAnchorEnd
+                                                           && v.Y is not PosAlign
+                                                           // && v.Y is not PosCenter
+                                                           && v.Height is not DimFill).ToList ();
                 }
 
                 for (var i = 0; i < subviews.Count; i++)
@@ -126,11 +127,11 @@ public class DimAuto () : Dim
                 // [x] PosAnchorEnd
                 if (dimension == Dimension.Width)
                 {
-                    subviews = us.Subviews.Where (v => v.X is PosAnchorEnd).ToList ();
+                    subviews = visibleSubviews.Where (v => v.X is PosAnchorEnd).ToList ();
                 }
                 else
                 {
-                    subviews = us.Subviews.Where (v => v.Y is PosAnchorEnd).ToList ();
+                    subviews = visibleSubviews.Where (v => v.Y is PosAnchorEnd).ToList ();
                 }
 
                 int maxAnchorEnd = 0;
@@ -143,26 +144,26 @@ public class DimAuto () : Dim
                 subviewsSize += maxAnchorEnd;
                 #endregion Anchored
 
-                #region Center
-                // Now, handle subviews that are Centered
-                if (dimension == Dimension.Width)
-                {
-                    subviews = us.Subviews.Where (v => v.X is PosCenter).ToList ();
-                }
-                else
-                {
-                    subviews = us.Subviews.Where (v => v.Y is PosCenter).ToList ();
-                }
+                //#region Center
+                //// Now, handle subviews that are Centered
+                //if (dimension == Dimension.Width)
+                //{
+                //    subviews = us.Subviews.Where (v => v.X is PosCenter).ToList ();
+                //}
+                //else
+                //{
+                //    subviews = us.Subviews.Where (v => v.Y is PosCenter).ToList ();
+                //}
 
-                int maxCenter = 0;
-                for (var i = 0; i < subviews.Count; i++)
-                {
-                    View v = subviews [i];
-                    maxCenter = dimension == Dimension.Width ? v.Frame.Width : v.Frame.Height;
-                }
+                //int maxCenter = 0;
+                //for (var i = 0; i < subviews.Count; i++)
+                //{
+                //    View v = subviews [i];
+                //    maxCenter = dimension == Dimension.Width ? v.Frame.Width : v.Frame.Height;
+                //}
 
-                subviewsSize += maxCenter;
-                #endregion Center
+                //subviewsSize += maxCenter;
+                //#endregion Center
 
                 #region Are Dependent
                 // Now, go back to those that are dependent on content size
@@ -170,11 +171,15 @@ public class DimAuto () : Dim
                 // [ ] DimPercent
                 if (dimension == Dimension.Width)
                 {
-                    subviews = us.Subviews.Where (v => v.Width is DimFill).ToList ();
+                    subviews = visibleSubviews.Where (v => v.Width is DimFill
+                                                      // || v.X is PosCenter
+                                                     ).ToList ();
                 }
                 else
                 {
-                    subviews = us.Subviews.Where (v => v.Height is DimFill).ToList ();
+                    subviews = visibleSubviews.Where (v => v.Height is DimFill
+                                                      //|| v.Y is PosCenter
+                                                     ).ToList ();
                 }
 
                 int maxFill = 0;
