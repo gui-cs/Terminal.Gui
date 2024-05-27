@@ -973,6 +973,22 @@ public class DimAutoTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void DimAutoStyle_Content_IgnoresSubviews_When_ContentSize_Is_Set ()
+    {
+        var view = new View ();
+        var subview = new View () {
+                Frame = new Rectangle (50, 50, 1, 1)
+        };
+        view.ContentSize = new (10, 5);
+
+        var dim = Dim.Auto (DimAutoStyle.Content);
+
+        int calculatedWidth = dim.Calculate (0, 100, view, Dimension.Width);
+
+        Assert.Equal (10, calculatedWidth);
+    }
+
+    [Fact]
     public void DimAutoStyle_Content_IgnoresText_WhenContentSizeNotSet ()
     {
         var view = new View () { Text = "This is a test" };

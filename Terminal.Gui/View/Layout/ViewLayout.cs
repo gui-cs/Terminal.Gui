@@ -1072,13 +1072,13 @@ public partial class View
         // Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
         foreach (View view in Subviews)
         {
-            if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Content) && _contentSize is null)
+            if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Content) && ContentSizeTracksViewport)
             {
                 ThrowInvalid (view, view.Width, nameof (view.Width));
                 ThrowInvalid (view, view.X, nameof (view.X));
             }
 
-            if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Content) && _contentSize is null)
+            if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Content) && ContentSizeTracksViewport)
             {
                 ThrowInvalid (view, view.Height, nameof (view.Height));
                 ThrowInvalid (view, view.Y, nameof (view.Y));
