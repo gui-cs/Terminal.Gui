@@ -526,12 +526,8 @@ public static partial class Application
             MoveCurrent (Current);
         }
 
-        //if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
         toplevel.SetRelativeLayout (Driver.Screen.Size);
 
-        //}
-
-        // BUGBUG: This call is likely not needed.
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
         toplevel.FocusFirst ();

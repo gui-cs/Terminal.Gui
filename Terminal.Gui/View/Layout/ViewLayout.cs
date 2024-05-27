@@ -315,6 +315,29 @@ public partial class View
 
     // EndLayout
 
+    private bool _excludeFromLayout;
+
+    /// <summary>
+    ///  Gets or sets whether this View will be excluded from layout computations. 
+    /// </summary>
+    /// <remarks>
+    /// If set to <see langword="true"/>, the layout engine will ignore this view. Any subviews of this view will still be laid out.
+    /// Any views that have Pos or Dim objects that reference this view must have <see cref="ExcludeFromLayout"/> set to <see langword="true"/> as well
+    /// </remarks>
+    public bool ExcludeFromLayout
+    {
+        get => _excludeFromLayout;
+        set
+        {
+            if (value == _excludeFromLayout)
+            {
+                return;
+            }
+            _excludeFromLayout = value;
+            SetNeedsLayout();
+        }
+    }
+
     /// <summary>
     ///     Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is
     ///     set to <see cref="LayoutStyle.Absolute"/>, LayoutSubviews does not change the <see cref="Frame"/>. If the style is

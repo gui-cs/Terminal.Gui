@@ -501,7 +501,7 @@ public class BorderTests
             case 1:
                 //Assert.Equal (new (0, 0, 17, 0), subview.Frame);
                 expected = @"
-────────────────────";
+─┤1234├─────────────";
 
                 break;
             case 2:

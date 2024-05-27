@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
-using static UICatalog.Scenarios.Adornments;
 
 namespace UICatalog.Scenarios;
 
@@ -22,7 +19,9 @@ public class ContentScrolling : Scenario
             Width = Dim.Fill ();
             Height = Dim.Fill ();
             ColorScheme = Colors.ColorSchemes ["Base"];
-            Text = "Text (ScrollingDemoView.Text). This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
+
+            Text =
+                "Text (ScrollingDemoView.Text). This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
             CanFocus = true;
             BorderStyle = LineStyle.Rounded;
             Arrangement = ViewArrangement.Fixed;
@@ -105,11 +104,15 @@ public class ContentScrolling : Scenario
         Window app = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+
             // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
             ColorScheme = Colors.ColorSchemes ["Toplevel"]
         };
 
-        var editor = new AdornmentsEditor ();
+        var editor = new AdornmentsEditor
+        {
+            AutoSelectViewToEdit = true
+        };
         app.Add (editor);
 
         var view = new ScrollingDemoView
@@ -225,7 +228,7 @@ public class ContentScrolling : Scenario
             Y = Pos.Bottom (cbAllowYGreaterThanContentHeight)
         };
 
-        var contentSizeWidth = new Buttons.NumericUpDown<int>
+        Buttons.NumericUpDown<int> contentSizeWidth = new Buttons.NumericUpDown<int>
         {
             Value = view.ContentSize.Width,
             X = Pos.Right (labelContentSize) + 1,
@@ -252,7 +255,7 @@ public class ContentScrolling : Scenario
             Y = Pos.Top (labelContentSize)
         };
 
-        var contentSizeHeight = new Buttons.NumericUpDown<int>
+        Buttons.NumericUpDown<int> contentSizeHeight = new Buttons.NumericUpDown<int>
         {
             Value = view.ContentSize.Height,
             X = Pos.Right (labelComma) + 1,
@@ -352,8 +355,8 @@ public class ContentScrolling : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (textView) + 1,
-            Width = 30,
-            Height = 10
+            Width = Dim.Auto(DimAutoStyle.Content, maximumContentDim: Dim.Func (() => view.ContentSize.Width)),
+            Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent(20)),
         };
 
         charMap.Accept += (s, e) =>
@@ -386,6 +389,7 @@ public class ContentScrolling : Scenario
         view.Add (longLabel);
 
         List<object> options = new () { "Option 1", "Option 2", "Option 3" };
+
         Slider slider = new (options)
         {
             X = 0,

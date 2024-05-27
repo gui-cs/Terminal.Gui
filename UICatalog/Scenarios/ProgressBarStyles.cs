@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -20,20 +21,21 @@ public class ProgressBarStyles : Scenario
     private const uint _timerTick = 20;
     private Timer _fractionTimer;
     private Timer _pulseTimer;
-    private ViewDiagnosticFlags _diagnosticFlags;
+    private ListView _pbList;
 
     public override void Main ()
     {
         Application.Init ();
-
-        _diagnosticFlags = View.Diagnostics;
 
         Window app = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}", BorderStyle = LineStyle.Single,
         };
 
-        var editor = new AdornmentsEditor ();
+        var editor = new AdornmentsEditor ()
+        {
+            AutoSelectViewToEdit = false
+        };
         app.Add (editor);
 
         View container = new ()
@@ -47,7 +49,7 @@ public class ProgressBarStyles : Scenario
 
         const float fractionStep = 0.01F;
 
-        var pbList = new ListView
+        _pbList = new ListView
         {
             Title = "Focused ProgressBar",
             Y = Pos.Align (Alignment.Start),
@@ -56,7 +58,7 @@ public class ProgressBarStyles : Scenario
             Height = Dim.Auto (),
             BorderStyle = LineStyle.Single
         };
-        container.Add (pbList);
+        container.Add (_pbList);
 
         #region ColorPicker
 
@@ -69,8 +71,8 @@ public class ProgressBarStyles : Scenario
             dialog.Initialized += (sender, args) =>
                                      {
                                          // TODO: Replace with Dim.Auto
-                                         dialog.X = pbList.Frame.X;
-                                         dialog.Y = pbList.Frame.Height;
+                                         dialog.X = _pbList.Frame.X;
+                                         dialog.Y = _pbList.Frame.Height;
                                      };
 
             dialog.LayoutComplete += (sender, args) =>
@@ -258,13 +260,13 @@ public class ProgressBarStyles : Scenario
         };
         container.Add (marqueesContinuousPB);
 
-        pbList.SetSource (
+        _pbList.SetSource (
                           container.Subviews.Where (v => v.GetType () == typeof (ProgressBar))
                                    .Select (v => v.Title)
                                    .ToList ()
                          );
 
-        pbList.SelectedItemChanged += (sender, e) =>
+        _pbList.SelectedItemChanged += (sender, e) =>
                                       {
                                           editor.ViewToEdit = container.Subviews.First (
                                                                                         v =>
@@ -272,7 +274,7 @@ public class ProgressBarStyles : Scenario
                                                                                             && v.Title == (string)e.Value
                                                                                        );
                                       };
-        pbList.SelectedItem = 0;
+        
 
         rbPBFormat.SelectedItemChanged += (s, e) =>
                                           {
@@ -288,6 +290,11 @@ public class ProgressBarStyles : Scenario
                                                                        marqueesContinuousPB.BidirectionalMarquee = (bool)!e.OldValue;
                                     };
 
+
+
+        app.Initialized += App_Initialized;
+        app.Unloaded += App_Unloaded;
+
         _pulseTimer = new Timer (
                                  _ =>
                                  {
@@ -300,9 +307,6 @@ public class ProgressBarStyles : Scenario
                                  0,
                                  300
                                 );
-
-        app.Unloaded += App_Unloaded;
-
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();
@@ -325,5 +329,10 @@ public class ProgressBarStyles : Scenario
 
             app.Unloaded -= App_Unloaded;
         }
+    }
+
+    private void App_Initialized (object sender, EventArgs e)
+    {
+        _pbList.SelectedItem = 0;
     }
 }
