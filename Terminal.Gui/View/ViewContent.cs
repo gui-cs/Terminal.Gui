@@ -37,7 +37,7 @@ public partial class View
     ///         Negative sizes are not supported.
     ///     </para>
     /// </param>
-    public void SetContentSize (Size? contentSize)
+    private void SetContentSize (Size? contentSize)
     {
         if (ContentSize.Width < 0 || ContentSize.Height < 0)
         {
@@ -65,7 +65,11 @@ public partial class View
     ///         <see cref="Viewport"/>.
     ///     </para>
     /// </remarks>
-    public Size ContentSize => _contentSize ?? Viewport.Size;
+    public Size ContentSize
+    {
+        get => _contentSize ?? Viewport.Size;
+        set => SetContentSize (value);
+    }
 
     /// <summary>
     /// Called when <see cref="ContentSize"/> has changed.

@@ -1321,7 +1321,7 @@ public class ToplevelTests
             Width = 40,
             Height = 16,
         };
-        scrollView.SetContentSize (new (200, 100));
+        scrollView.ContentSize = new (200, 100);
         var win = new Window { X = 3, Y = 3, Width = Dim.Fill (3), Height = Dim.Fill (3), Arrangement = ViewArrangement.Movable };
         scrollView.Add (win);
         Toplevel top = new ();

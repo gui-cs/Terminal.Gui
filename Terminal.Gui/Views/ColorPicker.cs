@@ -39,7 +39,7 @@ public class ColorPicker : View
 
         Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
         Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
-        SetContentSize(new (_boxWidth * _cols, _boxHeight * _rows));
+        ContentSize = new (_boxWidth * _cols, _boxHeight * _rows);
 
         MouseClick += ColorPicker_MouseClick;
     }
@@ -67,7 +67,7 @@ public class ColorPicker : View
                 _boxHeight = value;
                 Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
                 Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
-                SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
+                ContentSize = new (_boxWidth * _cols, _boxHeight * _rows);
                 SetNeedsLayout ();
             }
         }
@@ -84,7 +84,7 @@ public class ColorPicker : View
                 _boxWidth = value;
                 Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
                 Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
-                SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
+                ContentSize = new (_boxWidth * _cols, _boxHeight * _rows);
                 SetNeedsLayout ();
             }
         }
@@ -178,9 +178,9 @@ public class ColorPicker : View
         Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
         var colorIndex = 0;
 
-        for (var y = 0; y < Math.Max(2, viewport.Height / BoxHeight); y++)
+        for (var y = 0; y < Math.Max (2, viewport.Height / BoxHeight); y++)
         {
-            for (var x = 0; x < Math.Max(8, viewport.Width / BoxWidth); x++)
+            for (var x = 0; x < Math.Max (8, viewport.Width / BoxWidth); x++)
             {
                 int foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
                 Driver.SetAttribute (new Attribute ((ColorName)foregroundColorIndex, (ColorName)colorIndex));

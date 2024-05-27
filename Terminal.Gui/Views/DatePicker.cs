@@ -275,7 +275,7 @@ public class DatePicker : View
         Height = Dim.Auto (DimAutoStyle.Content);
 
         // BUGBUG: Remove when Dim.Auto(subviews) fully works
-        SetContentSize (new (_calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7, _calendar.Frame.Height + 1));
+        ContentSize = new (_calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7, _calendar.Frame.Height + 1);
 
         _dateField.DateChanged += DateField_DateChanged;
 

@@ -456,7 +456,7 @@ private void SetContentSize ()
                 width = Math.Max (s.GetColumns () + 2, width);
             }
 
-            SetContentSize (new (width, _radioLabels.Count));
+            ContentSize = new (width, _radioLabels.Count);
             break;
 
         case Orientation.Horizontal:
@@ -471,7 +471,7 @@ private void SetContentSize ()
                 length = _radioLabels [i].GetColumns () + 2 + (i < _radioLabels.Count - 1 ? _horizontalSpace : 0);
                 _horizontal.Add ((start, length));
             }
-            SetContentSize (new (_horizontal.Sum (item => item.length), 1));
+            ContentSize = new (_horizontal.Sum (item => item.length), 1);
             break;
     }
 }

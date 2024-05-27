@@ -83,7 +83,7 @@ public class DimAutoTests (ITestOutputHelper output)
             ValidatePosDim = true
         };
 
-        view.SetContentSize (new (contentSize, 0));
+        view.ContentSize = new (contentSize, 0);
 
         Assert.Equal (expected, view.Frame.Width);
     }
@@ -102,7 +102,7 @@ public class DimAutoTests (ITestOutputHelper output)
             ValidatePosDim = true
         };
 
-        view.SetContentSize (new (contentSize, 0));
+        view.ContentSize = new (contentSize, 0);
         view.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (expected, view.Frame.Width);
@@ -124,7 +124,7 @@ public class DimAutoTests (ITestOutputHelper output)
             ValidatePosDim = true
         };
 
-        view.SetContentSize (new (contentSize, 0));
+        view.ContentSize = new (contentSize, 0);
         view.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (expected, view.Frame.Width);
@@ -766,7 +766,7 @@ public class DimAutoTests (ITestOutputHelper output)
         var view = new View ();
         view.Width = Auto (DimAutoStyle.Text);
         view.Height = Auto (DimAutoStyle.Text);
-        view.SetContentSize (new (1, 1));
+        view.ContentSize = new (1, 1);
         view.Text = text;
         Assert.Equal (new (expectedW, expectedH), view.TextFormatter.Size);
     }
@@ -963,7 +963,7 @@ public class DimAutoTests (ITestOutputHelper output)
     public void DimAutoStyle_Content_UsesContentSize_WhenSet ()
     {
         var view = new View ();
-        view.SetContentSize (new (10, 5));
+        view.ContentSize = new (10, 5);
 
         var dim = Dim.Auto (DimAutoStyle.Content);
 
@@ -1299,7 +1299,7 @@ public class DimAutoTests (ITestOutputHelper output)
     public void DimAutoStyle_Content_UsesContentSize_If_No_Subviews ()
     {
         DimAutoTestView view = new (Auto (DimAutoStyle.Content), Auto (DimAutoStyle.Content));
-        view.SetContentSize (new (5, 5));
+        view.ContentSize = new (5, 5);
         view.SetRelativeLayout (new (10, 10));
 
         Assert.Equal (new (5, 5), view.Frame.Size);

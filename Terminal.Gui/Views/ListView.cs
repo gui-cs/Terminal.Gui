@@ -264,7 +264,7 @@ public class ListView : View
             }
             _source = value;
 
-            SetContentSize (new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width));
+            ContentSize = new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width);
             if (IsInitialized)
             {
                 Viewport = Viewport with { Y = 0 };

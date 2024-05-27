@@ -416,11 +416,8 @@ public class AllViewsTester : Scenario
             return;
         }
 
-        LayoutStyle layout = view.LayoutStyle;
-
         try
         {
-            //view.LayoutStyle = LayoutStyle.Absolute;
 
             view.X = _xRadioGroup.SelectedItem switch
                      {

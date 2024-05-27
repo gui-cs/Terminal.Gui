@@ -32,7 +32,7 @@ public class TextTests (ITestOutputHelper output)
     public void TextFormatter_Size_Tracks_ContentSize (string text, int expectedW, int expectedH)
     {
         var view = new View ();
-        view.SetContentSize(new (1,1));
+        view.ContentSize = new (1,1);
         view.Text = text;
         Assert.Equal (new (expectedW, expectedH), view.TextFormatter.Size);
     }

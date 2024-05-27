@@ -12,7 +12,7 @@ public class ScrollViewTests
     public void Adding_Views ()
     {
         var sv = new ScrollView { Width = 20, Height = 10 };
-        sv.SetContentSize (new (30, 20));
+        sv.ContentSize = new (30, 20);
 
         sv.Add (
                 new View { Width = 10, Height = 5 },
@@ -187,7 +187,7 @@ public class ScrollViewTests
             Height = 10,
             KeepContentAlwaysInViewport = false
         };
-        sv.SetContentSize (new (23, 23));
+        sv.ContentSize = new (23, 23);
         var bottomLabel = new Label { X = 15, Y = 15, Text = "At 15,15" };
         var top = new Toplevel ();
         top.Add (topLabel, sv, bottomLabel);
@@ -378,7 +378,7 @@ public class ScrollViewTests
             Height = 5,
             ColorScheme = new ColorScheme { Normal = new Attribute (Color.Red, Color.Green) }
         };
-        sv.SetContentSize (size);
+        sv.ContentSize = size;
         string text = null;
 
         for (var i = 0; i < size.Height; i++)
@@ -447,7 +447,7 @@ public class ScrollViewTests
         {
             Width = 10, Height = 10,
         };
-        sv.SetContentSize (new (50, 50));
+        sv.ContentSize = new (50, 50);
         sv.ContentOffset = new (25, 25);
 
         var top = new Toplevel ();
@@ -482,7 +482,7 @@ public class ScrollViewTests
     public void ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
     {
         var sv = new ScrollView { Width = 10, Height = 10, };
-        sv.SetContentSize (new (50, 50));
+        sv.ContentSize = new (50, 50);
 
         var top = new Toplevel ();
         top.Add (sv);
@@ -546,7 +546,7 @@ public class ScrollViewTests
             ShowHorizontalScrollIndicator = true,
             ShowVerticalScrollIndicator = true
         };
-        scrollView.SetContentSize (size);
+        scrollView.ContentSize = size;
         scrollView.Add (view);
         var win = new Window { X = 1, Y = 1, Width = 20, Height = 14 };
         win.Add (scrollView);
@@ -871,7 +871,7 @@ public class ScrollViewTests
             Width = 10,
             Height = 10,
         };
-        sv.SetContentSize (new (50, 50));
+        sv.ContentSize = new (50, 50);
 
         for (var i = 0; i < 8; i++)
         {
@@ -921,7 +921,7 @@ public class ScrollViewTests
     public void KeyBindings_Command ()
     {
         var sv = new ScrollView { Width = 20, Height = 10, };
-        sv.SetContentSize (new (40, 20));
+        sv.ContentSize = new (40, 20);
 
         sv.Add (
                 new View { Width = 20, Height = 5 },
@@ -1056,7 +1056,7 @@ public class ScrollViewTests
     public void Remove_Added_View_Is_Allowed ()
     {
         var sv = new ScrollView { Width = 20, Height = 20, };
-        sv.SetContentSize (new (100, 100));
+        sv.ContentSize = new (100, 100);
 
         sv.Add (
                 new View { Width = Dim.Fill (), Height = Dim.Fill (50), Id = "View1" },

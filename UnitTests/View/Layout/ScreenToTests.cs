@@ -108,7 +108,7 @@ public class ScreenToTests
             BorderStyle = LineStyle.Single,
         };
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
-        view.SetContentSize (new (6, 6));
+        view.ContentSize = new (6, 6);
         super.Add (view);
 
         view.Viewport = new (1, 1, 5, 5);
@@ -164,7 +164,7 @@ public class ScreenToTests
             X = viewX, Y = viewY, Width = 5, Height = 5,
             BorderStyle = LineStyle.Single,
         };
-        view.SetContentSize (new (10, 10));
+        view.ContentSize = new (10, 10);
         super.Add (view);
 
         view.Viewport = view.Viewport with { Location = new (1, 1) };

@@ -44,7 +44,7 @@ public class Scrolling : Scenario
             ShowVerticalScrollIndicator = true,
             ShowHorizontalScrollIndicator = true
         };
-        scrollView.SetContentSize (new (120, 40));
+        scrollView.ContentSize = new (120, 40);
         scrollView.Padding.Thickness = new (1);
 
         label.Text = $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
