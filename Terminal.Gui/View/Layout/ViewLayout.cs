@@ -1,6 +1,5 @@
 #nullable enable
 using System.Diagnostics;
-using Microsoft.CodeAnalysis;
 
 namespace Terminal.Gui;
 
@@ -779,12 +778,6 @@ public partial class View
         foreach (View? v in from.InternalSubviews)
         {
             nNodes.Add (v);
-
-            //if (v.LayoutStyle != LayoutStyle.Computed)
-            //{
-            //    continue;
-            //}
-
             CollectPos (v.X, v, ref nNodes, ref nEdges);
             CollectPos (v.Y, v, ref nNodes, ref nEdges);
             CollectDim (v.Width, v, ref nNodes, ref nEdges);
