@@ -2014,7 +2014,7 @@ public class TableView : View
 
     /// <summary>
     ///     Returns true if the <see cref="Table"/> is not set or all the columns in the <see cref="Table"/> have an
-    ///     explicit <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.visible"/> <see langword="false"/>.
+    ///     explicit <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.Visible"/> <see langword="false"/>.
     /// </summary>
     /// <returns></returns>
     private bool TableIsNullOrInvisible ()

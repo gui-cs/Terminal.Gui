@@ -428,7 +428,7 @@ public class DrawTests (ITestOutputHelper _output)
 
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (string.Empty, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre ("──", _output);
     }
 
     [Fact]
@@ -497,12 +497,7 @@ public class DrawTests (ITestOutputHelper _output)
 
         view.Draw ();
 
-        // BUGBUG: Wha? Is this right? Shouldn't it be "└┘"???
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      """
-
-                                                      ┌┐
-                                                      """,
+        TestHelpers.AssertDriverContentsWithFrameAre ("││",
                                                       _output
                                                      );
     }

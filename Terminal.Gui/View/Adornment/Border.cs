@@ -196,6 +196,26 @@ public class Border : Adornment
         set => _lineStyle = value;
     }
 
+    private bool _showTitle = true;
+
+    /// <summary>
+    ///     Gets or sets whether the title should be shown. The default is <see langword="true"/>.
+    /// </summary>
+    public bool ShowTitle
+    {
+        get => _showTitle;
+        set
+        {
+            if (value == _showTitle)
+            {
+                return;
+            }
+            _showTitle = value;
+
+            Parent?.SetNeedsDisplay ();
+        }
+    }
+
     #region Mouse Support
 
     private Color? _savedForeColor;
@@ -358,7 +378,7 @@ public class Border : Adornment
         }
     }
 
-#endregion Mouse Support
+    #endregion Mouse Support
 
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
@@ -394,12 +414,13 @@ public class Border : Adornment
                                                 Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
                                                )
                                      );
+
         Parent.TitleTextFormatter.Size = new (maxTitleWidth, 1);
 
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };
 
-        if (!string.IsNullOrEmpty (Parent?.Title))
+        if (ShowTitle)
         {
             if (Thickness.Top == 2)
             {
@@ -431,13 +452,13 @@ public class Border : Adornment
             }
         }
 
-        if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
+        if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && ShowTitle && !string.IsNullOrEmpty (Parent?.Title))
         {
-            var focus = Parent.GetNormalColor();
+            var focus = Parent.GetNormalColor ();
             if (Parent.SuperView is { } && Parent.SuperView?.Subviews!.Count (s => s.CanFocus) > 1)
             {
                 // Only use focus color if there are multiple focusable views
-                focus = Parent.GetFocusColor() ;
+                focus = Parent.GetFocusColor ();
             }
 
             Parent.TitleTextFormatter.Draw (
@@ -450,9 +471,9 @@ public class Border : Adornment
         {
             LineCanvas lc = Parent?.LineCanvas;
 
-            bool drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1;
+            bool drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height >= 1;
             bool drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
-            bool drawBottom = Thickness.Bottom > 0 && Frame.Width > 1;
+            bool drawBottom = Thickness.Bottom > 0 && Frame.Width > 1 && Frame.Height > 1;
             bool drawRight = Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0);
 
             Attribute prevAttr = Driver.GetAttribute ();
@@ -470,7 +491,7 @@ public class Border : Adornment
             {
                 // ╔╡Title╞═════╗
                 // ╔╡╞═════╗
-                if (borderBounds.Width < 4 || string.IsNullOrEmpty (Parent?.Title))
+                if (borderBounds.Width < 4 || !ShowTitle || string.IsNullOrEmpty (Parent?.Title))
                 {
                     // ╔╡╞╗ should be ╔══╗
                     lc.AddLine (
@@ -620,7 +641,7 @@ public class Border : Adornment
                 }
 
                 // Redraw title 
-                if (drawTop && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title))
+                if (drawTop && maxTitleWidth > 0 && ShowTitle)
                 {
                     Parent.TitleTextFormatter.Draw (
                                                     new (borderBounds.X + 2, titleY, maxTitleWidth, 1),

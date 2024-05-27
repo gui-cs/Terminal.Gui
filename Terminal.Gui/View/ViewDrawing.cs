@@ -236,6 +236,16 @@ public partial class View
 
         OnRenderLineCanvas ();
 
+        // TODO: This is a hack to force the border subviews to draw.
+        if (Border?.Subviews is { })
+        {
+            foreach (View view in Border.Subviews)
+            {
+                view.SetNeedsDisplay ();
+                view.Draw ();
+            }
+        }
+
         // Invoke DrawContentCompleteEvent
         OnDrawContentComplete (Viewport);
 
@@ -329,7 +339,7 @@ public partial class View
     public virtual Attribute GetFocusColor ()
     {
         ColorScheme cs = ColorScheme;
-        if (ColorScheme is null)
+        if (cs is null)
         {
             cs = new ();
         }
@@ -347,7 +357,7 @@ public partial class View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme is null)
+        if (cs is null)
         {
             cs = new ();
         }
@@ -365,7 +375,7 @@ public partial class View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme is null)
+        if (cs is null)
         {
             cs = new ();
         }

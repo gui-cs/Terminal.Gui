@@ -528,7 +528,6 @@ public static partial class Application
 
         toplevel.SetRelativeLayout (Driver.Screen.Size);
 
-        // BUGBUG: This call is likely not needed.
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
         toplevel.FocusFirst ();

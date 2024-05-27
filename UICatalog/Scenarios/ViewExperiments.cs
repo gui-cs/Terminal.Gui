@@ -232,13 +232,11 @@ public class ViewExperiments : Scenario
 
         view.X = Pos.Center ();
 
-        var editor = new Adornments.AdornmentsEditor
+        var editor = new AdornmentsEditor
         {
-            Title = "Adornments Editor",
             X = 0,
             Y = Pos.Bottom (containerLabel),
-            Width = Dim.Fill (),
-            ViewToEdit = view
+            AutoSelectViewToEdit = true
         };
 
         app.Add (editor);

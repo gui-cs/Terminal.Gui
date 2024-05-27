@@ -485,12 +485,12 @@ public class MenuBar : View
 
             if (i == _selected && IsMenuOpen)
             {
-                hotColor = i == _selected ? ColorScheme.HotFocus : ColorScheme.HotNormal;
-                normalColor = i == _selected ? ColorScheme.Focus : GetNormalColor ();
+                hotColor = i == _selected ? ColorScheme.HotFocus : GetHotNormalColor ();
+                normalColor = i == _selected ? GetFocusColor() : GetNormalColor ();
             }
             else
             {
-                hotColor = ColorScheme.HotNormal;
+                hotColor = GetHotNormalColor ();
                 normalColor = GetNormalColor ();
             }
 
