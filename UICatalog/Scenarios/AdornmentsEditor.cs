@@ -24,13 +24,12 @@ public class AdornmentsEditor : View
 
     public AdornmentsEditor ()
     {
-        ColorScheme = Colors.ColorSchemes ["Dialog"];
+        //ColorScheme = Colors.ColorSchemes ["Dialog"];
         Title = $"AdornmentsEditor";
 
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
-        BorderStyle = LineStyle.Double;
         //SuperViewRendersLineCanvas = true;
 
         Application.MouseEvent += Application_MouseEvent;
@@ -45,6 +44,8 @@ public class AdornmentsEditor : View
 
     private void AdornmentsEditor_Initialized (object sender, EventArgs e)
     {
+        BorderStyle = LineStyle.Dotted;
+
         ExpanderButton expandButton = new ExpanderButton ()
         {
             Orientation = Orientation.Horizontal
@@ -123,6 +124,9 @@ public class AdornmentsEditor : View
 
         Add (_diagRulerCheckBox);
         _diagRulerCheckBox.Y = Pos.Bottom (_diagPaddingCheckBox);
+
+        // BUGBUG: This should not be needed. There's some bug in the layout system that doesn't update the layout.
+        SuperView.LayoutSubviews();
 
     }
 

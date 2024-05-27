@@ -15,7 +15,8 @@ namespace UICatalog.Scenarios;
 ///     <para>
 ///         If <see cref="Orientation"/> is set to <see cref="Terminal.Gui.Orientation.Vertical"/>, the button will appear
 ///         at the top/right.
-///         If <see cref="Orientation"/> is set to <see cref="Orientation.Horizontal"/>, the button will appear at the
+///         If <see cref="Orientation"/> is set to <see cref="Terminal.Gui.Orientation.Horizontal"/>, the button will
+///         appear at the
 ///         bottom/left.
 ///     </para>
 /// </remarks>
@@ -118,7 +119,7 @@ public class ExpanderButton : Button
     /// </summary>
     public Rune ExpandedGlyph { get; set; }
 
-    private bool _collapsed = false;
+    private bool _collapsed;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the view is collapsed.
@@ -144,7 +145,6 @@ public class ExpanderButton : Button
             ExpandOrCollapse (_collapsed);
 
             View superView = SuperView;
-
             if (superView is Adornment adornment)
             {
                 superView = adornment.Parent;
@@ -160,7 +160,6 @@ public class ExpanderButton : Button
             superView.SuperView?.LayoutSubviews ();
         }
 
-
         return args.Cancel;
     }
 
@@ -169,7 +168,7 @@ public class ExpanderButton : Button
     ///     <see cref="OrientationEventArgs.Cancel"/> to true.
     /// </summary>
     public event EventHandler<StateEventArgs<bool>> CollapsedChanging;
-    
+
     /// <summary>
     ///     Collapses or Expands the view.
     /// </summary>
@@ -186,7 +185,6 @@ public class ExpanderButton : Button
     private void ExpandOrCollapse (bool collapse)
     {
         View superView = SuperView;
-
         if (superView is Adornment adornment)
         {
             superView = adornment.Parent;
