@@ -66,7 +66,16 @@ public class AdornmentEditor : View
 
                                           };
             }
+
+            OnAdornmentChanged ();
         }
+    }
+
+    public event EventHandler<EventArgs> AdornmentChanged;
+
+    public void OnAdornmentChanged ()
+    {
+        AdornmentChanged?.Invoke (this, EventArgs.Empty);
     }
 
     private Buttons.NumericUpDown<int> _topEdit;

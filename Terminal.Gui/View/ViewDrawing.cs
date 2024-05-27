@@ -339,7 +339,7 @@ public partial class View
     public virtual Attribute GetFocusColor ()
     {
         ColorScheme cs = ColorScheme;
-        if (ColorScheme is null)
+        if (cs is null)
         {
             cs = new ();
         }
@@ -357,7 +357,7 @@ public partial class View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme is null)
+        if (cs is null)
         {
             cs = new ();
         }

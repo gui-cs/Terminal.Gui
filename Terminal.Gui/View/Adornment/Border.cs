@@ -198,6 +198,9 @@ public class Border : Adornment
 
     private bool _showTitle = true;
 
+    /// <summary>
+    ///     Gets or sets whether the title should be shown. The default is <see langword="true"/>.
+    /// </summary>
     public bool ShowTitle
     {
         get => _showTitle;

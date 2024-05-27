@@ -7,10 +7,21 @@ namespace UICatalog.Scenarios;
 
 public class BorderEditor : AdornmentEditor
 {
+    private CheckBox _ckbTitle;
+    private RadioGroup _rbBorderStyle;
+
     public BorderEditor ()
     {
         Title = "_Border";
         Initialized += BorderEditor_Initialized;
+        AdornmentChanged += BorderEditor_AdornmentChanged;
+
+    }
+
+    private void BorderEditor_AdornmentChanged (object sender, EventArgs e)
+    {
+        _ckbTitle.Checked = ((Border)AdornmentToEdit).ShowTitle;
+        _rbBorderStyle.SelectedItem = (int)((Border)AdornmentToEdit).LineStyle;
     }
 
     private void BorderEditor_Initialized (object sender, EventArgs e)
@@ -18,7 +29,7 @@ public class BorderEditor : AdornmentEditor
 
         List<LineStyle> borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
 
-        var rbBorderStyle = new RadioGroup
+        _rbBorderStyle = new RadioGroup
         {
             X = 0,
             Y = Pos.Bottom (Subviews [^1]),
@@ -30,14 +41,14 @@ public class BorderEditor : AdornmentEditor
             Enabled = AdornmentToEdit is { },
             RadioLabels = borderStyleEnum.Select (e => e.ToString ()).ToArray ()
         };
-        Add (rbBorderStyle);
+        Add (_rbBorderStyle);
 
-        rbBorderStyle.SelectedItemChanged += OnRbBorderStyleOnSelectedItemChanged;
+        _rbBorderStyle.SelectedItemChanged += OnRbBorderStyleOnSelectedItemChanged;
 
-        var ckbTitle = new CheckBox
+        _ckbTitle = new CheckBox
         {
             X = 0,
-            Y = Pos.Bottom (rbBorderStyle),
+            Y = Pos.Bottom (_rbBorderStyle),
 
             Checked = true,
             SuperViewRendersLineCanvas = true,
@@ -46,8 +57,8 @@ public class BorderEditor : AdornmentEditor
         };
 
 
-        ckbTitle.Toggled += OnCkbTitleOnToggled;
-        Add (ckbTitle);
+        _ckbTitle.Toggled += OnCkbTitleOnToggled;
+        Add (_ckbTitle);
 
         return;
 
