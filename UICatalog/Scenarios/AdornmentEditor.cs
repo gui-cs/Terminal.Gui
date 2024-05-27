@@ -85,6 +85,9 @@ public class AdornmentEditor : View
 
     public AdornmentEditor ()
     {
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content);
+
         BorderStyle = LineStyle.Dashed;
         Initialized += AdornmentEditor_Initialized;
     }
@@ -166,10 +169,6 @@ public class AdornmentEditor : View
         {
             subview.Enabled = AdornmentToEdit is { };
         }
-
-        Width = Dim.Auto (minimumContentDim: Dim.Func (() => expandButton.Widest));
-        Height = Dim.Auto ();
-        LayoutSubviews ();
     }
 
     private EventHandler<ColorEventArgs> ColorPickerColorChanged ()

@@ -355,8 +355,8 @@ public class ContentScrolling : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (textView) + 1,
-            Width = 30,
-            Height = 10
+            Width = Dim.Auto(DimAutoStyle.Content, maximumContentDim: Dim.Func (() => view.ContentSize.Width)),
+            Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent(20)),
         };
 
         charMap.Accept += (s, e) =>

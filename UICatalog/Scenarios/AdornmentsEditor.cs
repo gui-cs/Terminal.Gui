@@ -27,8 +27,8 @@ public class AdornmentsEditor : View
         ColorScheme = Colors.ColorSchemes ["Dialog"];
         Title = $"AdornmentsEditor";
 
-        Width = Dim.Auto ();
-        Height = Dim.Fill ();
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content);
 
         BorderStyle = LineStyle.Double;
         //SuperViewRendersLineCanvas = true;
@@ -123,6 +123,7 @@ public class AdornmentsEditor : View
 
         Add (_diagRulerCheckBox);
         _diagRulerCheckBox.Y = Pos.Bottom (_diagPaddingCheckBox);
+
     }
 
     private void Application_MouseEvent (object sender, MouseEvent e)

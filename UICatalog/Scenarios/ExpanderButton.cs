@@ -45,7 +45,10 @@ public class ExpanderButton : Button
         Initialized += ExpanderButton_Initialized;
     }
 
-    private void ExpanderButton_Initialized (object sender, EventArgs e) { Orient (); }
+    private void ExpanderButton_Initialized (object sender, EventArgs e)
+    {
+        ExpandOrCollapse (Collapsed);
+    }
 
     private Orientation _orientation = Orientation.Horizontal;
 
@@ -76,7 +79,24 @@ public class ExpanderButton : Button
         {
             _orientation = newOrientation;
 
-            Orient ();
+            if (Orientation == Orientation.Vertical)
+            {
+                X = Pos.AnchorEnd ();
+                Y = 0;
+                CollapsedGlyph = new ('\u21d1'); // ⇑
+                ExpandedGlyph = new ('\u21d3'); // ⇓
+            }
+            else
+            {
+                X = 0;
+                Y = Pos.AnchorEnd ();
+                CollapsedGlyph = new ('\u21d0'); // ⇐
+                ExpandedGlyph = new ('\u21d2'); // ⇒
+            }
+
+            Text = $"{(Collapsed ? CollapsedGlyph : ExpandedGlyph)}";
+
+            ExpandOrCollapse (Collapsed);
         }
 
         return args.Cancel;
@@ -98,7 +118,7 @@ public class ExpanderButton : Button
     /// </summary>
     public Rune ExpandedGlyph { get; set; }
 
-    private bool _collapsed = true;
+    private bool _collapsed = false;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the view is collapsed.
@@ -121,6 +141,8 @@ public class ExpanderButton : Button
         {
             _collapsed = newValue;
 
+            ExpandOrCollapse (_collapsed);
+
             View superView = SuperView;
 
             if (superView is Adornment adornment)
@@ -128,16 +150,16 @@ public class ExpanderButton : Button
                 superView = adornment.Parent;
             }
 
-            bool expanded = Orientation == Orientation.Vertical ? superView.Viewport.Height > 0 : superView.Viewport.Width > 0;
-            Orient ();
-
             foreach (View subview in superView.Subviews)
             {
-                subview.Visible = !expanded;
+                subview.Visible = !Collapsed;
+                subview.Enabled = !Collapsed;
             }
 
-            Text = $"{(Collapsed ? CollapsedGlyph : ExpandedGlyph)}";
+            // BUGBUG: This should not be needed. There's some bug in the layout system that doesn't update the layout.
+            superView.SuperView?.LayoutSubviews ();
         }
+
 
         return args.Cancel;
     }
@@ -147,13 +169,7 @@ public class ExpanderButton : Button
     ///     <see cref="OrientationEventArgs.Cancel"/> to true.
     /// </summary>
     public event EventHandler<StateEventArgs<bool>> CollapsedChanging;
-
-    // TODO: This is a workaround for Dim.Auto() not working as expected.
-    /// <summary>
-    ///     Gets or sets the widest/tallest dimension of the view.
-    /// </summary>
-    public int Widest { get; set; }
-
+    
     /// <summary>
     ///     Collapses or Expands the view.
     /// </summary>
@@ -165,13 +181,10 @@ public class ExpanderButton : Button
         return true;
     }
 
-    private void Orient ()
-    {
-        if (!IsInitialized)
-        {
-            return;
-        }
+    private Dim _previousDim;
 
+    private void ExpandOrCollapse (bool collapse)
+    {
         View superView = SuperView;
 
         if (superView is Adornment adornment)
@@ -179,48 +192,41 @@ public class ExpanderButton : Button
             superView = adornment.Parent;
         }
 
-        bool expanded = Orientation == Orientation.Vertical ? superView.Viewport.Height > 0 : superView.Viewport.Width > 0;
-
-        if (expanded)
+        if (superView is null)
         {
+            return;
+        }
+
+        if (collapse)
+        {
+            // Collapse
             if (Orientation == Orientation.Vertical)
             {
-                Widest = superView.ContentSize.Width;
+                _previousDim = superView.Height;
                 superView.Height = 1;
             }
             else
             {
-                Widest = superView.ContentSize.Height;
+                _previousDim = superView.Width;
                 superView.Width = 1;
             }
         }
         else
         {
+            if (_previousDim is null)
+            {
+                return;
+            }
+
+            // Expand
             if (Orientation == Orientation.Vertical)
             {
-                superView.Height = Dim.Auto ();
+                superView.Height = _previousDim;
             }
             else
             {
-                superView.Width = Dim.Auto ();
+                superView.Width = _previousDim;
             }
         }
-
-        if (Orientation == Orientation.Vertical)
-        {
-            X = Pos.AnchorEnd ();
-            Y = 0;
-            CollapsedGlyph = new ('\u21d1'); // ⇑
-            ExpandedGlyph = new ('\u21d3'); // ⇓
-        }
-        else
-        {
-            X = 0;
-            Y = Pos.AnchorEnd ();
-            CollapsedGlyph = new ('\u21d0'); // ⇐
-            ExpandedGlyph = new ('\u21d2'); // ⇒
-        }
-
-        Text = $"{(Collapsed ? CollapsedGlyph : ExpandedGlyph)}";
     }
 }
