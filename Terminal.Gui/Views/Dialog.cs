@@ -55,13 +55,11 @@ public class Dialog : Window
     private readonly List<Button> _buttons = new ();
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning with no <see cref="Button"/>s.
+    ///     Initializes a new instance of the <see cref="Dialog"/> class.
     /// </summary>
     /// <remarks>
-    ///     By default, <see cref="View.X"/> and <see cref="View.Y"/> are set to <c>Pos.Center ()</c> and
-    ///     <see cref="View.Width"/> and <see cref="View.Height"/> are set to <c>Width = Dim.Percent (85)</c>, centering the
-    ///     Dialog vertically and horizontally.
+    ///     By default, <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> are set
+    ///     such that the dialog will be centered and no larger than 90% of the container's width and height.
     /// </remarks>
     public Dialog ()
     {

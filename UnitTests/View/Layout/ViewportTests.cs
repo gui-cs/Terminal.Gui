@@ -181,10 +181,8 @@ public class ViewportTests (ITestOutputHelper output)
         var newViewport = new Rectangle (0, 0, 30, 40);
 
         var v = new View { Frame = frame };
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 
         v.Viewport = newViewport;
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
         Assert.Equal (newViewport, v.Viewport);
         Assert.Equal (new Rectangle (1, 2, newViewport.Width, newViewport.Height), v.Frame);
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);

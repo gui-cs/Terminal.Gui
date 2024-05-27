@@ -392,8 +392,7 @@ namespace Terminal.Gui
         private ITextValidateProvider _provider;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="TextValidateField"/> class using
-        ///     <see cref="LayoutStyle.Computed"/> positioning.
+        ///     Initializes a new instance of the <see cref="TextValidateField"/> class.
         /// </summary>
         public TextValidateField ()
         {

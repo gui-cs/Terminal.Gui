@@ -37,12 +37,12 @@ public class TableView : View
     private TableStyle style = new ();
     private ITableSource table;
 
-    /// <summary>Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="TableView"/> class.</summary>
     /// <param name="table">The table to display in the control</param>
     public TableView (ITableSource table) : this () { Table = table; }
 
     /// <summary>
-    ///     Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. Set the
+    ///     Initializes a <see cref="TableView"/> class. Set the
     ///     <see cref="Table"/> property to begin editing
     /// </summary>
     public TableView ()

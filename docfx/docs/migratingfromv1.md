@@ -37,7 +37,6 @@ Static class `Attribute.Make` has been removed. Use constructor instead
 + var c = Color.Yellow;
 ```
 
-
 ## Low-Level Type Changes
 
 * `Rect` -> `Rectangle`
@@ -115,6 +114,7 @@ In v1, [Application.Init](~/api/Terminal.Gui./Terminal.Gui.Application.Init) aut
 
 In v2, the layout system has been improved to make it easier to create complex user interfaces. If you are using custom layouts in your application, you may need to update them to use the new layout system.
 
+* The distinction between `Absoulte Layout` and `Computed Layout` has been removed, as has the `LayoutStyle` enum. v1 drew a false distinction between these styles. 
 * [View.Frame](~/api/Terminal.Gui.View.Frame.yml) now represents the position and size of the view in the superview's coordinate system. The `Frame` property is of type `Rectangle`.
 * [View.Bounds](~/api/Terminal.Gui.View.Bounds.yml) has been replaced by [View.Viewport](~/api/Terminal.Gui.View.Viewport.yml). The `Viewport` property represents the visible area of the view in its own coordinate system. The `Viewport` property is of type `Rectangle`.
 * [View.ContentSize](~/api/Terminal.Gui.View.ContentSize.yml) represents the size of the view's content. The `ContentSize` property is of type `Size`. This replaces `ScrollView` and `ScrollBarView` in v1. See more below.
@@ -123,6 +123,7 @@ In v2, the layout system has been improved to make it easier to create complex u
 
 ### `Bounds` -> `Viewport`
 
+* Remove all references ot `LayoutStyle`.
 * Rename `Bounds` to `Viewport`. The `Location` property of `Bounds` can now have non-zero values.
 * Update any code that assumed `Bounds.Location` was always `Point.Empty`.
 * Update any code that used `Bounds` to refer to the size of the view's content. Use `ContentSize` instead.

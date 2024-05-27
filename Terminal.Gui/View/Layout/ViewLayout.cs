@@ -20,7 +20,6 @@ public partial class View
     ///     <para>
     ///         Setting Frame will set <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> to the
     ///         values of the corresponding properties of the <paramref name="value"/> parameter.
-    ///         This causes <see cref="LayoutStyle"/> to be <see cref="LayoutStyle.Absolute"/>.
     ///     </para>
     ///     <para>
     ///         Altering the Frame will eventually (when the view hierarchy is next laid out via  see
@@ -41,8 +40,7 @@ public partial class View
 
             SetFrame (value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) });
 
-            // If Frame gets set, by definition, the View is now LayoutStyle.Absolute, so
-            // set all Pos/Dim to Absolute values.
+            // If Frame gets set, set all Pos/Dim to Absolute values.
             _x = _frame.X;
             _y = _frame.Y;
             _width = _frame.Width;
@@ -148,8 +146,7 @@ public partial class View
     ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
-    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
-    ///         <see cref="PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
     ///     <para>The default value is <c>Pos.At (0)</c>.</para>
     /// </remarks>
@@ -187,8 +184,7 @@ public partial class View
     ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
-    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
-    ///         <see cref="PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
     ///     <para>The default value is <c>Pos.At (0)</c>.</para>
     /// </remarks>
@@ -226,8 +222,7 @@ public partial class View
     ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
-    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
-    ///         <see cref="DimAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
     ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
     /// </remarks>
@@ -272,8 +267,7 @@ public partial class View
     ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
-    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
-    ///         <see cref="DimAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
     ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
     /// </remarks>
@@ -302,55 +296,6 @@ public partial class View
     #endregion Frame
 
     #region Layout Engine
-
-
-    // @tig Notes on layout flow. Ignore for now.
-    // BeginLayout
-    //   If !LayoutNeeded return
-    //   If !SizeNeeded return
-    //   Call OnLayoutStarted
-    //      Views and subviews can update things
-    //   
-
-
-    // EndLayout
-
-    /// <summary>
-    ///     Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is
-    ///     set to <see cref="LayoutStyle.Absolute"/>, LayoutSubviews does not change the <see cref="Frame"/>. If the style is
-    ///     <see cref="LayoutStyle.Computed"/> the <see cref="Frame"/> is updated using the <see cref="X"/>, <see cref="Y"/>,
-    ///     <see cref="Width"/>, and <see cref="Height"/> properties.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Setting this property to <see cref="LayoutStyle.Absolute"/> will cause <see cref="Frame"/> to determine the
-    ///         size and position of the view. <see cref="X"/> and <see cref="Y"/> will be set to <see cref="DimAbsolute"/>
-    ///         using <see cref="Frame"/>.
-    ///     </para>
-    ///     <para>
-    ///         Setting this property to <see cref="LayoutStyle.Computed"/> will cause the view to use the
-    ///         <see cref="LayoutSubviews"/> method to size and position of the view. If either of the <see cref="X"/> and
-    ///         <see cref="Y"/> properties are `null` they will be set to <see cref="PosAbsolute"/> using the current value
-    ///         of <see cref="Frame"/>. If either of the <see cref="Width"/> and <see cref="Height"/> properties are `null`
-    ///         they will be set to <see cref="DimAbsolute"/> using <see cref="Frame"/>.
-    ///     </para>
-    /// </remarks>
-    /// <value>The layout style.</value>
-    public LayoutStyle LayoutStyle
-    {
-        get
-        {
-            if (_x is PosAbsolute
-                && _y is PosAbsolute
-                && _width is DimAbsolute
-                && _height is DimAbsolute)
-            {
-                return LayoutStyle.Absolute;
-            }
-
-            return LayoutStyle.Computed;
-        }
-    }
 
     #endregion Layout Engine
 
@@ -796,8 +741,7 @@ public partial class View
 
         if (Frame != newFrame)
         {
-            // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
-            // the view LayoutStyle.Absolute.
+            // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height
             SetFrame (newFrame);
 
             if (_x is PosAbsolute)
@@ -836,10 +780,10 @@ public partial class View
         {
             nNodes.Add (v);
 
-            if (v.LayoutStyle != LayoutStyle.Computed)
-            {
-                continue;
-            }
+            //if (v.LayoutStyle != LayoutStyle.Computed)
+            //{
+            //    continue;
+            //}
 
             CollectPos (v.X, v, ref nNodes, ref nEdges);
             CollectPos (v.Y, v, ref nNodes, ref nEdges);

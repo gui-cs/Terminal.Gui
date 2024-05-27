@@ -40,14 +40,11 @@ public class FrameTests (ITestOutputHelper output)
         var newFrame = new Rectangle (1, 2, 30, 40);
 
         var v = new View ();
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
         v.Dispose ();
 
         v = new View { Frame = frame };
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 
         v.Frame = newFrame;
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
         Assert.Equal (newFrame, v.Frame);
 
         Assert.Equal (
@@ -62,7 +59,6 @@ public class FrameTests (ITestOutputHelper output)
 
         v = new View { X = frame.X, Y = frame.Y, Text = "v" };
         v.Frame = newFrame;
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
         Assert.Equal (newFrame, v.Frame);
 
         Assert.Equal (
@@ -78,7 +74,6 @@ public class FrameTests (ITestOutputHelper output)
         newFrame = new Rectangle (10, 20, 30, 40);
         v = new View { Frame = frame };
         v.Frame = newFrame;
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
         Assert.Equal (newFrame, v.Frame);
 
         Assert.Equal (
@@ -93,7 +88,6 @@ public class FrameTests (ITestOutputHelper output)
 
         v = new View { X = frame.X, Y = frame.Y, Text = "v" };
         v.Frame = newFrame;
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
         Assert.Equal (newFrame, v.Frame);
 
         Assert.Equal (

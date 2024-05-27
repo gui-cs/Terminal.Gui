@@ -38,8 +38,7 @@ public class ScrollView : View
     private bool _showVerticalScrollIndicator;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="Gui.ScrollView"/> class.
     /// </summary>
     public ScrollView ()
     {

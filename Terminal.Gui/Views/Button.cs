@@ -33,8 +33,8 @@ public class Button : View
     private readonly Rune _rightDefault;
     private bool _isDefault;
 
-    /// <summary>Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
-    /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
+    /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
+    /// <remarks>The width and height of the <see cref="Button"/> is computed based on the text.</remarks>
     public Button ()
     {
         TextAlignment = Alignment.Center;

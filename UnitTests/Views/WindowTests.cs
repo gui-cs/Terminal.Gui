@@ -130,7 +130,6 @@ public class WindowTests
         Assert.Equal (string.Empty, defaultWindow.Title);
 
         // Toplevels have Width/Height set to Dim.Fill
-        Assert.Equal (LayoutStyle.Computed, defaultWindow.LayoutStyle);
 
         // If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
         Assert.Equal ($"Window(){defaultWindow.Frame}", defaultWindow.ToString ());
@@ -156,17 +155,6 @@ public class WindowTests
         using var windowWithFrameRectEmpty = new Window { Frame = Rectangle.Empty, Title = "title" };
         Assert.NotNull (windowWithFrameRectEmpty);
         Assert.Equal ("title", windowWithFrameRectEmpty.Title);
-        Assert.Equal (LayoutStyle.Absolute, windowWithFrameRectEmpty.LayoutStyle);
-        Assert.Equal ("title", windowWithFrameRectEmpty.Title);
-        Assert.Equal (LayoutStyle.Absolute, windowWithFrameRectEmpty.LayoutStyle);
-        // TODO: Fix things so that this works in release and debug
-        // BUG: This also looks like it might be unintended behavior.
-        // Can actually also be removed, since the tests below make it redundant.
-    #if DEBUG
-        Assert.Equal ($"Window(title){windowWithFrameRectEmpty.Frame}", windowWithFrameRectEmpty.ToString ());
-    #else
-        Assert.Equal ($"Window(){windowWithFrameRectEmpty.Frame}", windowWithFrameRectEmpty.ToString ());
-    #endif
         Assert.True (windowWithFrameRectEmpty.CanFocus);
         Assert.False (windowWithFrameRectEmpty.HasFocus);
         Assert.Equal (Rectangle.Empty, windowWithFrameRectEmpty.Viewport);
@@ -193,8 +181,6 @@ public class WindowTests
         windowWithFrame1234.Title = "title";
         Assert.Equal ("title", windowWithFrame1234.Title);
         Assert.NotNull (windowWithFrame1234);
-        Assert.Equal (LayoutStyle.Absolute, windowWithFrame1234.LayoutStyle);
-        Assert.Equal (LayoutStyle.Absolute, windowWithFrame1234.LayoutStyle);
     #if DEBUG
         Assert.Equal ($"Window(title){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
     #else
