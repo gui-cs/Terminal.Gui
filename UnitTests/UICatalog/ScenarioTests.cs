@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Reflection;
 using Xunit.Abstractions;
 
@@ -150,7 +151,7 @@ public class ScenarioTests : TestsAllViews
             Height = Dim.Fill (),
             AllowsMarking = false,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            Source = new ListWrapper (_viewClasses.Keys.ToList ())
+            Source = new ListWrapper<string> (new (_viewClasses.Keys.ToList ()))
         };
         _leftPane.Add (_classListView);
 
@@ -527,7 +528,7 @@ public class ScenarioTests : TestsAllViews
                 && view.GetType ().GetProperty ("Source") != null
                 && view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource))
             {
-                var source = new ListWrapper (new List<string> { "Test Text #1", "Test Text #2", "Test Text #3" });
+                var source = new ListWrapper<string> (["Test Text #1", "Test Text #2", "Test Text #3"]);
                 view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
             }
 
@@ -555,10 +556,10 @@ public class ScenarioTests : TestsAllViews
     [Fact]
     public void Run_Generic ()
     {
-        List<Scenario> scenarios = Scenario.GetScenarios ();
+        ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
         Assert.NotEmpty (scenarios);
 
-        int item = scenarios.FindIndex (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
+        int item = scenarios.IndexOf (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
         Scenario generic = scenarios [item];
 
         Application.Init (new FakeDriver ());

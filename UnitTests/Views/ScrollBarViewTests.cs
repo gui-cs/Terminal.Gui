@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.ObjectModel;
+using System.Reflection;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -370,7 +371,7 @@ This is a tes
 
                                               var win = new Window { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
-                                              List<string> source = new ();
+                                              ObservableCollection<string> source = [];
 
                                               for (var i = 0; i < 50; i++)
                                               {
@@ -391,7 +392,7 @@ This is a tes
                                                   Y = 0,
                                                   Width = Dim.Fill (),
                                                   Height = Dim.Fill (),
-                                                  Source = new ListWrapper (source)
+                                                  Source = new ListWrapper<string> (source)
                                               };
                                               win.Add (listView);
 
@@ -458,7 +459,7 @@ This is a tes
                                                     Application.Init (new FakeDriver ());
                                                     Toplevel top = new ();
                                                     var win = new Window { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
-                                                    List<string> source = new ();
+                                                    ObservableCollection<string> source = [];
 
                                                     for (var i = 0; i < 50; i++)
                                                     {
@@ -471,7 +472,7 @@ This is a tes
                                                         Y = 0,
                                                         Width = Dim.Fill (),
                                                         Height = Dim.Fill (),
-                                                        Source = new ListWrapper (source)
+                                                        Source = new ListWrapper<string> (source)
                                                     };
                                                     win.Add (listView);
                                                     var newScrollBarView = new ScrollBarView (listView, true, false) { KeepContentAlwaysInViewport = true };

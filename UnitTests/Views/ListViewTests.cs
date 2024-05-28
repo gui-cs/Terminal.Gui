@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using Xunit.Abstractions;
 
@@ -17,7 +19,7 @@ public class ListViewTests
         Assert.True (lv.CanFocus);
         Assert.Equal (-1, lv.SelectedItem);
 
-        lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
 
@@ -27,7 +29,7 @@ public class ListViewTests
 
         lv = new ListView
         {
-            Y = 1, Width = 10, Height = 20, Source = new ListWrapper (new List<string> { "One", "Two", "Three" })
+            Y = 1, Width = 10, Height = 20, Source = new ListWrapper<string> (["One", "Two", "Three"])
         };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
@@ -43,14 +45,14 @@ public class ListViewTests
     [AutoInitShutdown]
     public void Ensures_Visibility_SelectedItem_On_MoveDown_And_MoveUp ()
     {
-        List<string> source = new ();
+        ObservableCollection<string> source = [];
 
         for (var i = 0; i < 20; i++)
         {
             source.Add ($"Line{i}");
         }
 
-        var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill (), Source = new ListWrapper (source) };
+        var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill (), Source = new ListWrapper<string> (source) };
         var win = new Window ();
         win.Add (lv);
         var top = new Toplevel ();
@@ -293,14 +295,14 @@ public class ListViewTests
     [AutoInitShutdown]
     public void EnsureSelectedItemVisible_SelectedItem ()
     {
-        List<string> source = new ();
+        ObservableCollection<string> source = [];
 
         for (var i = 0; i < 10; i++)
         {
             source.Add ($"Item {i}");
         }
 
-        var lv = new ListView { Width = 10, Height = 5, Source = new ListWrapper (source) };
+        var lv = new ListView { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
         var top = new Toplevel ();
         top.Add (lv);
         Application.Begin (top);
@@ -334,8 +336,8 @@ Item 6",
     [AutoInitShutdown]
     public void EnsureSelectedItemVisible_Top ()
     {
-        List<string> source = new () { "First", "Second" };
-        var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper (source) };
+        ObservableCollection<string> source = ["First", "Second"];
+        var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper<string> (source) };
         lv.SelectedItem = 1;
         var top = new Toplevel ();
         top.Add (lv);
@@ -366,8 +368,8 @@ Item 6",
     [Fact]
     public void KeyBindings_Command ()
     {
-        List<string> source = new () { "One", "Two", "Three" };
-        var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper (source) };
+        ObservableCollection<string> source = ["One", "Two", "Three"];
+        var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper<string> (source) };
         lv.BeginInit ();
         lv.EndInit ();
         Assert.Equal (-1, lv.SelectedItem);
@@ -424,8 +426,8 @@ Item 6",
     [Fact]
     public void Accept_Command_Accepts_and_Opens_Selected_Item ()
     {
-        List<string> source = ["One", "Two", "Three"];
-        var listView = new ListView { Source = new ListWrapper (source) };
+        ObservableCollection<string> source = ["One", "Two", "Three"];
+        var listView = new ListView { Source = new ListWrapper<string> (source) };
         listView.SelectedItem = 0;
 
         var accepted = false;
@@ -454,8 +456,8 @@ Item 6",
     [Fact]
     public void Accept_Cancel_Event_Prevents_OpenSelectedItem ()
     {
-        List<string> source = ["One", "Two", "Three"];
-        var listView = new ListView { Source = new ListWrapper (source) };
+        ObservableCollection<string> source = ["One", "Two", "Three"];
+        var listView = new ListView { Source = new ListWrapper<string> (source) };
         listView.SelectedItem = 0;
 
         var accepted = false;
@@ -493,7 +495,7 @@ Item 6",
     [Fact]
     public void ListViewProcessKeyReturnValue_WithMultipleCommands ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three", "Four" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three", "Four"]) };
 
         Assert.NotNull (lv.Source);
 
@@ -511,7 +513,7 @@ Item 6",
         Assert.Equal (1, lv.SelectedItem);
 
         // clear the items
-        lv.SetSource (null);
+        lv.SetSource<string> (null);
 
         // Press key combo again - return should be false this time as none of the Commands are allowable
         Assert.False (lv.NewKeyDownEvent (ev), "We cannot move down so will not respond to this");
@@ -520,7 +522,7 @@ Item 6",
     [Fact]
     public void ListViewSelectThenDown ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         lv.AllowsMarking = true;
 
         Assert.NotNull (lv.Source);
@@ -584,7 +586,7 @@ Item 6",
     [Fact]
     public void ListWrapper_StartsWith ()
     {
-        var lw = new ListWrapper (new List<string> { "One", "Two", "Three" });
+        var lw = new ListWrapper<string> (["One", "Two", "Three"]);
 
         Assert.Equal (1, lw.StartsWith ("t"));
         Assert.Equal (1, lw.StartsWith ("tw"));
@@ -593,7 +595,7 @@ Item 6",
         Assert.Equal (1, lw.StartsWith ("TW"));
         Assert.Equal (2, lw.StartsWith ("TH"));
 
-        lw = new ListWrapper (new List<string> { "One", "Two", "Three" });
+        lw = new (["One", "Two", "Three"]);
 
         Assert.Equal (1, lw.StartsWith ("t"));
         Assert.Equal (1, lw.StartsWith ("tw"));
@@ -618,7 +620,7 @@ Item 6",
     public void RowRender_Event ()
     {
         var rendered = false;
-        List<string> source = new () { "one", "two", "three" };
+        ObservableCollection<string> source = ["one", "two", "three"];
         var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
         lv.RowRender += (s, _) => rendered = true;
         var top = new Toplevel ();
@@ -634,7 +636,7 @@ Item 6",
     [Fact]
     public void SelectedItem_Get_Set ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.Equal (-1, lv.SelectedItem);
         Assert.Throws<ArgumentException> (() => lv.SelectedItem = 3);
         Exception exception = Record.Exception (() => lv.SelectedItem = -1);
@@ -644,32 +646,34 @@ Item 6",
     [Fact]
     public void SetSource_Preserves_ListWrapper_Instance_If_Not_Null ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two"]) };
 
         Assert.NotNull (lv.Source);
 
-        lv.SetSource (null);
+        lv.SetSource<string> (null);
         Assert.NotNull (lv.Source);
 
         lv.Source = null;
         Assert.Null (lv.Source);
 
-        lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two" }) };
+        lv = new ListView { Source = new ListWrapper<string> (["One", "Two"]) };
         Assert.NotNull (lv.Source);
 
-        lv.SetSourceAsync (null);
+        lv.SetSourceAsync<string> (null);
         Assert.NotNull (lv.Source);
     }
 
     [Fact]
     public void SettingEmptyKeybindingThrows ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (Key.Space));
     }
 
     private class NewListDataSource : IListDataSource
     {
+        /// <inheritdoc />
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
         public int Count => 0;
         public int Length => 0;
         public bool IsMarked (int item) { throw new NotImplementedException (); }
@@ -703,7 +707,7 @@ Item 6",
             Width = 7,
             BorderStyle = LineStyle.Single
         };
-        lv.SetSource (new List<string> { "One", "Two", "Three", "Four" });
+        lv.SetSource (["One", "Two", "Three", "Four"]);
         lv.SelectedItemChanged += (s, e) => selected = e.Value.ToString ();
         var top = new Toplevel ();
         top.Add (lv);
@@ -756,7 +760,7 @@ Item 6",
     [AutoInitShutdown]
     public void LeftItem_TopItem_Tests ()
     {
-        var source = new List<string> ();
+        ObservableCollection<string> source = [];
         for (int i = 0; i < 5; i++) {
             source.Add ($"Item {i}");
         }
@@ -764,7 +768,7 @@ Item 6",
             X = 1,
             Width = 10,
             Height = 5,
-            Source = new ListWrapper (source)
+            Source = new ListWrapper<string> (source)
         };
         var top = new Toplevel ();
         top.Add (lv);
