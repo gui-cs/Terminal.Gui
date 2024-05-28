@@ -100,7 +100,7 @@ public partial class View
     public Size ContentSize
     {
         get => _contentSize ?? Viewport.Size;
-        set => SetContentSize (value);
+        protected internal set => SetContentSize (value);
     }
 
     /// <summary>

@@ -44,6 +44,7 @@ public class Scrolling : Scenario
             ShowVerticalScrollIndicator = true,
             ShowHorizontalScrollIndicator = true
         };
+        // BUGBUG: set_ContentSize is supposed to be `protected`. 
         scrollView.ContentSize = new (120, 40);
         scrollView.Padding.Thickness = new (1);
 

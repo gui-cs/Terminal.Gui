@@ -29,6 +29,7 @@ public class Clipping : Scenario
 
         var scrollView = new ScrollView { X = 3, Y = 3, Width = 50, Height = 20 };
         scrollView.ColorScheme = Colors.ColorSchemes ["Menu"];
+        // BUGBUG: set_ContentSize is supposed to be `protected`. 
         scrollView.ContentSize = new (200, 100);
 
         //ContentOffset = Point.Empty,

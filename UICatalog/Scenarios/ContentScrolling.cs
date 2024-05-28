@@ -244,7 +244,7 @@ public class ContentScrolling : Scenario
 
                 return;
             }
-
+            // BUGBUG: set_ContentSize is supposed to be `protected`. 
             view.ContentSize = view.ContentSize with { Width = e.NewValue };
         }
 
@@ -272,7 +272,7 @@ public class ContentScrolling : Scenario
 
                 return;
             }
-
+            // BUGBUG: set_ContentSize is supposed to be `protected`. 
             view.ContentSize = view.ContentSize with { Height = e.NewValue };
         }
 

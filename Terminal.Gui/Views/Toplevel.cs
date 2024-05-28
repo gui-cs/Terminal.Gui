@@ -23,7 +23,7 @@ namespace Terminal.Gui;
 public partial class Toplevel : View
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout,
+    ///     Initializes a new instance of the <see cref="Toplevel"/> class,
     ///     defaulting to full screen. The <see cref="View.Width"/> and <see cref="View.Height"/> properties will be set to the
     ///     dimensions of the terminal using <see cref="Dim.Fill"/>.
     /// </summary>
