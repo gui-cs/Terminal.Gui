@@ -790,4 +790,43 @@ Item 6",
  tem 3
  tem 4", _output);
     }
+
+    [Fact]
+    public void CollectionChanged_Event ()
+    {
+        var added = 0;
+        var removed = 0;
+        ObservableCollection<string> source = [];
+        var lv = new ListView { Source = new ListWrapper<string> (source) };
+
+        lv.CollectionChanged += (sender, args) =>
+                                {
+                                    if (args.Action == NotifyCollectionChangedAction.Add)
+                                    {
+                                        added++;
+                                    }
+                                    else if (args.Action == NotifyCollectionChangedAction.Remove)
+                                    {
+                                        removed++;
+                                    }
+                                };
+
+        for (int i = 0; i < 3; i++)
+        {
+            source.Add ($"Item{i}");
+        }
+        Assert.Equal (3, added);
+        Assert.Equal (0, removed);
+
+        added = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            source.Remove (source [0]);
+        }
+
+        Assert.Equal (0, added);
+        Assert.Equal (3, removed);
+        Assert.Empty (source);
+    }
 }
