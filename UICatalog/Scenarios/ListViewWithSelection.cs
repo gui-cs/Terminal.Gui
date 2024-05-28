@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Text;
 using JetBrains.Annotations;
 using Terminal.Gui;
@@ -15,7 +17,7 @@ public class ListViewWithSelection : Scenario
     public CheckBox _allowMultipleCB;
     public CheckBox _customRenderCB;
     public ListView _listView;
-    public List<Scenario> _scenarios;
+    public ObservableCollection<Scenario> _scenarios;
 
     public override void Setup ()
     {
@@ -160,10 +162,10 @@ public class ListViewWithSelection : Scenario
         private readonly int _nameColumnWidth = 30;
         private int count;
         private BitArray marks;
-        private List<Scenario> scenarios;
-        public ScenarioListDataSource (List<Scenario> itemList) { Scenarios = itemList; }
+        private ObservableCollection<Scenario> scenarios;
+        public ScenarioListDataSource (ObservableCollection<Scenario> itemList) { Scenarios = itemList; }
 
-        public List<Scenario> Scenarios
+        public ObservableCollection<Scenario> Scenarios
         {
             get => scenarios;
             set
@@ -188,6 +190,8 @@ public class ListViewWithSelection : Scenario
             return false;
         }
 
+        /// <inheritdoc />
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
         public int Count => Scenarios != null ? Scenarios.Count : 0;
         public int Length { get; private set; }
 

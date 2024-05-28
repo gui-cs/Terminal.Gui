@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -284,7 +283,7 @@ public class DynamicStatusBar : Scenario
                                       TextTitle.Text = string.Empty;
                                       Application.RequestStop ();
                                   };
-            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel] };
+            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel], Height = Dim.Auto (DimAutoStyle.Content, 17, Driver.Rows) };
 
             Width = Dim.Fill ();
             Height = Dim.Fill () - 1;
@@ -375,7 +374,7 @@ public class DynamicStatusBar : Scenario
             _frmStatusBar.Add (_btnRemoveStatusBar);
 
             var _btnAdd = new Button { Y = Pos.Top (_btnRemoveStatusBar) + 2, Text = " Add  " };
-            _btnAdd.X = Pos.AnchorEnd (0);
+            _btnAdd.X = Pos.AnchorEnd ();
             _frmStatusBar.Add (_btnAdd);
 
             _lstItems = new ListView
@@ -384,17 +383,17 @@ public class DynamicStatusBar : Scenario
                 Y = Pos.Top (_btnAddStatusBar) + 2,
                 Width = Dim.Fill () - Dim.Width (_btnAdd) - 1,
                 Height = Dim.Fill (),
-                Source = new ListWrapper (new List<DynamicStatusItemList> ())
+                Source = new ListWrapper<DynamicStatusItemList> ([])
             };
             _frmStatusBar.Add (_lstItems);
 
             var _btnRemove = new Button { X = Pos.Left (_btnAdd), Y = Pos.Top (_btnAdd) + 1, Text = "Remove" };
             _frmStatusBar.Add (_btnRemove);
 
-            var _btnUp = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (_btnRemove) + 2, Text = "^" };
+            var _btnUp = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (_btnRemove) + 2, Text = CM.Glyphs.UpArrow.ToString () };
             _frmStatusBar.Add (_btnUp);
 
-            var _btnDown = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (_btnUp) + 1, Text = "v" };
+            var _btnDown = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (_btnUp) + 1, Text = CM.Glyphs.DownArrow.ToString () };
             _frmStatusBar.Add (_btnDown);
 
             Add (_frmStatusBar);
@@ -569,7 +568,7 @@ public class DynamicStatusBar : Scenario
 
                                                Remove (_statusBar);
                                                _statusBar = null;
-                                               DataContext.Items = new List<DynamicStatusItemList> ();
+                                               DataContext.Items = [];
                                                _currentStatusItem = null;
                                                _currentSelectedStatusBar = -1;
                                                SetListViewSource (_currentStatusItem, true);
@@ -579,7 +578,7 @@ public class DynamicStatusBar : Scenario
             SetFrameDetails ();
 
             var ustringConverter = new UStringValueConverter ();
-            var listWrapperConverter = new ListWrapperConverter ();
+            var listWrapperConverter = new ListWrapperConverter<DynamicStatusItemList> ();
 
             var lstItems = new Binding (this, "Items", _lstItems, "Source", listWrapperConverter);
 
@@ -611,7 +610,7 @@ public class DynamicStatusBar : Scenario
 
             void SetListViewSource (StatusItem _currentStatusItem, bool fill = false)
             {
-                DataContext.Items = new List<DynamicStatusItemList> ();
+                DataContext.Items = [];
                 StatusItem statusItem = _currentStatusItem;
 
                 if (!fill)
@@ -681,10 +680,9 @@ public class DynamicStatusBar : Scenario
             if (split.Length > 1)
             {
                 txt = split [2].Trim ();
-                ;
             }
 
-            if (string.IsNullOrEmpty (shortcut))
+            if (string.IsNullOrEmpty (shortcut) || shortcut == "Null")
             {
                 return txt;
             }
@@ -717,11 +715,11 @@ public class DynamicStatusBar : Scenario
 
     public class DynamicStatusItemModel : INotifyPropertyChanged
     {
-        private List<DynamicStatusItemList> _items;
+        private ObservableCollection<DynamicStatusItemList> _items;
         private string _statusBar;
         public DynamicStatusItemModel () { Items = []; }
 
-        public List<DynamicStatusItemList> Items
+        public ObservableCollection<DynamicStatusItemList> Items
         {
             get => _items;
             set
@@ -768,9 +766,9 @@ public class DynamicStatusBar : Scenario
         object Convert (object value, object parameter = null);
     }
 
-    public class ListWrapperConverter : IValueConverter
+    public class ListWrapperConverter<T> : IValueConverter
     {
-        public object Convert (object value, object parameter = null) { return new ListWrapper ((IList)value); }
+        public object Convert (object value, object parameter = null) { return new ListWrapper<T> ((ObservableCollection<T>)value); }
     }
 
     public class UStringValueConverter : IValueConverter

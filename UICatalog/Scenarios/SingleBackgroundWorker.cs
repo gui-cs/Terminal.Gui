@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Threading;
 using Terminal.Gui;
 
@@ -24,7 +24,7 @@ public class SingleBackgroundWorker : Scenario
     public class MainApp : Toplevel
     {
         private readonly ListView _listLog;
-        private readonly List<string> _log = new ();
+        private readonly ObservableCollection<string> _log = [];
         private DateTime? _startStaging;
         private BackgroundWorker _worker;
 
@@ -90,7 +90,7 @@ public class SingleBackgroundWorker : Scenario
                 Y = 2,
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
-                Source = new ListWrapper (_log)
+                Source = new ListWrapper<string> (_log)
             };
             workerLogTop.Add (_listLog);
             Add (workerLogTop);
@@ -194,7 +194,7 @@ public class SingleBackgroundWorker : Scenario
                                                   Application.Refresh ();
 
                                                   var builderUI =
-                                                      new StagingUIController (_startStaging, e.Result as List<string>);
+                                                      new StagingUIController (_startStaging, e.Result as ObservableCollection<string>);
                                                   var top = Application.Top;
                                                   top.Visible = false;
                                                   Application.Current.Visible = false;
@@ -215,7 +215,7 @@ public class SingleBackgroundWorker : Scenario
     {
         private Toplevel _top;
 
-        public StagingUIController (DateTime? start, List<string> list)
+        public StagingUIController (DateTime? start, ObservableCollection<string> list)
         {
             _top = new Toplevel
             {
@@ -302,7 +302,7 @@ public class SingleBackgroundWorker : Scenario
                      Y = 0,
                      Width = Dim.Fill (),
                      Height = Dim.Fill (),
-                     Source = new ListWrapper (list)
+                     Source = new ListWrapper<string> (list)
                  }
                 );
 

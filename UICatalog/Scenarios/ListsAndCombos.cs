@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Terminal.Gui;
@@ -15,19 +15,19 @@ public class ListsAndCombos : Scenario
     public override void Setup ()
     {
         //TODO: Duplicated code in Demo.cs Consider moving to shared assembly
-        List<string> items = new ();
+        ObservableCollection<string> items = [];
 
         foreach (string dir in new [] { "/etc", @$"{Environment.GetEnvironmentVariable ("SystemRoot")}\System32" })
         {
             if (Directory.Exists (dir))
             {
-                items = Directory.GetFiles (dir)
-                                 .Union (Directory.GetDirectories (dir))
-                                 .Select (Path.GetFileName)
-                                 .Where (x => char.IsLetterOrDigit (x [0]))
-                                 .OrderBy (x => x)
-                                 .Select (x => x)
-                                 .ToList ();
+                items = new (Directory.GetFiles (dir)
+                                      .Union (Directory.GetDirectories (dir))
+                                      .Select (Path.GetFileName)
+                                      .Where (x => char.IsLetterOrDigit (x [0]))
+                                      .OrderBy (x => x)
+                                      .Select (x => x)
+                                      .ToList ());
             }
         }
 
@@ -47,7 +47,7 @@ public class ListsAndCombos : Scenario
             Y = Pos.Bottom (lbListView) + 1,
             Height = Dim.Fill (2),
             Width = Dim.Percent (40),
-            Source = new ListWrapper (items)
+            Source = new ListWrapper<string> (items)
         };
         listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem];
         Win.Add (lbListView, listview);
