@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
@@ -6,6 +8,11 @@ namespace Terminal.Gui;
 /// <summary>Implement <see cref="IListDataSource"/> to provide custom rendering for a <see cref="ListView"/>.</summary>
 public interface IListDataSource
 {
+    /// <summary>
+    /// Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
+    /// </summary>
+    event NotifyCollectionChangedEventHandler CollectionChanged;
+
     /// <summary>Returns the number of elements to display</summary>
     int Count { get; }
 
