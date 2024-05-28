@@ -236,7 +236,7 @@ public class ASCIICustomButtonTest : Scenario
             }
 
             // BUGBUG: set_ContentSize is supposed to be `protected`. 
-            _scrollView.ContentSize = new (25, pages * BUTTONS_ON_PAGE * BUTTON_HEIGHT);
+            _scrollView.SetContentSize (new (25, pages * BUTTONS_ON_PAGE * BUTTON_HEIGHT));
 
             if (_smallerWindow)
             {

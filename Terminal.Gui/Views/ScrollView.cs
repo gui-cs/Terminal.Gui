@@ -136,6 +136,13 @@ public class ScrollView : View
         ContentSizeChanged += ScrollViewContentSizeChanged;
     }
 
+    [ObsoleteAttribute ("This method is obsolete and will be removed in v2.", false)]
+    public void SetContentSize (Size contentSize)
+    {
+        ContentSize = contentSize;
+    }
+
+
     private void ScrollViewContentSizeChanged (object sender, SizeChangedEventArgs e)
     {
         if (e.Size is null)

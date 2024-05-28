@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
@@ -49,6 +50,12 @@ public class ContentScrolling : Scenario
             LayoutComplete += VirtualDemoView_LayoutComplete;
 
             MouseEvent += VirtualDemoView_MouseEvent;
+        }
+
+        [ObsoleteAttribute ("This method is obsolete and will be removed in v2.", false)]
+        public void SetContentSize (Size contentSize)
+        {
+            ContentSize = contentSize;
         }
 
         private void VirtualDemoView_MouseEvent (object sender, MouseEventEventArgs e)
@@ -245,7 +252,7 @@ public class ContentScrolling : Scenario
                 return;
             }
             // BUGBUG: set_ContentSize is supposed to be `protected`. 
-            view.ContentSize = view.ContentSize with { Width = e.NewValue };
+            view.SetContentSize (view.ContentSize with { Width = e.NewValue });
         }
 
         var labelComma = new Label
@@ -273,7 +280,7 @@ public class ContentScrolling : Scenario
                 return;
             }
             // BUGBUG: set_ContentSize is supposed to be `protected`. 
-            view.ContentSize = view.ContentSize with { Height = e.NewValue };
+            view.SetContentSize (view.ContentSize with { Height = e.NewValue });
         }
 
         var cbClearOnlyVisible = new CheckBox
@@ -355,8 +362,8 @@ public class ContentScrolling : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (textView) + 1,
-            Width = Dim.Auto(DimAutoStyle.Content, maximumContentDim: Dim.Func (() => view.ContentSize.Width)),
-            Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent(20)),
+            Width = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (() => view.ContentSize.Width)),
+            Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent (20)),
         };
 
         charMap.Accept += (s, e) =>
