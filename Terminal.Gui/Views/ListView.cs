@@ -71,7 +71,7 @@ public interface IListDataSource
 ///     </para>
 ///     <para>
 ///         By default <see cref="ListView"/> uses <see cref="object.ToString"/> to render the items of any
-///         <see cref="IList"/> object (e.g. arrays, <see cref="List{T}"/>, and other collections). Alternatively, an
+///         <see cref="ObservableCollection{T}"/> object (e.g. arrays, <see cref="List{T}"/>, and other collections). Alternatively, an
 ///         object that implements <see cref="IListDataSource"/> can be provided giving full control of what is rendered.
 ///     </para>
 ///     <para>
@@ -271,6 +271,11 @@ public class ListView : View
             }
             _source = value;
 
+            if (_source is { })
+            {
+                _source.CollectionChanged += Source_CollectionChanged;
+            }
+
             SetContentSize (new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width));
             if (IsInitialized)
             {
@@ -282,6 +287,18 @@ public class ListView : View
             _lastSelectedItem = -1;
             SetNeedsDisplay ();
         }
+    }
+
+    private void Source_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (Source is { Count: > 0 } && _selected > Source.Count - 1)
+        {
+            SelectedItem = Source.Count - 1;
+        }
+
+        SetNeedsDisplay ();
+
+        OnCollectionChanged (e);
     }
 
     /// <summary>Gets or sets the index of the item that will appear at the top of the <see cref="View.Viewport"/>.</summary>
@@ -803,21 +820,26 @@ public class ListView : View
     /// <summary>This event is raised when the selected item in the <see cref="ListView"/> has changed.</summary>
     public event EventHandler<ListViewItemEventArgs> SelectedItemChanged;
 
+    /// <summary>
+    /// Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
+    /// </summary>
+    public event NotifyCollectionChangedEventHandler CollectionChanged;
+
     /// <summary>Sets the source of the <see cref="ListView"/> to an <see cref="IList"/>.</summary>
     /// <value>An object implementing the IList interface.</value>
     /// <remarks>
-    ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome
+    ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custom
     ///     rendering.
     /// </remarks>
-    public void SetSource (IList source)
+    public void SetSource<T> (ObservableCollection<T> source)
     {
-        if (source is null && (Source is null || !(Source is ListWrapper)))
+        if (source is null && Source is not ListWrapper<T>)
         {
             Source = null;
         }
         else
         {
-            Source = new ListWrapper (source);
+            Source = new ListWrapper<T> (source);
         }
     }
 
@@ -827,18 +849,18 @@ public class ListView : View
     ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custom
     ///     rendering.
     /// </remarks>
-    public Task SetSourceAsync (IList source)
+    public Task SetSourceAsync<T> (ObservableCollection<T> source)
     {
         return Task.Factory.StartNew (
                                       () =>
                                       {
-                                          if (source is null && (Source is null || !(Source is ListWrapper)))
+                                          if (source is null && (Source is null || !(Source is ListWrapper<T>)))
                                           {
                                               Source = null;
                                           }
                                           else
                                           {
-                                              Source = new ListWrapper (source);
+                                              Source = new ListWrapper<T> (source);
                                           }
 
                                           return source;
@@ -850,35 +872,64 @@ public class ListView : View
     }
 
     private void ListView_LayoutStarted (object sender, LayoutEventArgs e) { EnsureSelectedItemVisible (); }
+    /// <summary>
+    /// Call the event to raise when an item is added, removed, or moved, or the entire list is refreshed.
+    /// </summary>
+    /// <param name="e"></param>
+    protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e) { CollectionChanged?.Invoke (this, e); }
 }
 
 /// <summary>
 ///     Provides a default implementation of <see cref="IListDataSource"/> that renders <see cref="ListView"/> items
 ///     using <see cref="object.ToString()"/>.
 /// </summary>
-public class ListWrapper : IListDataSource
+public class ListWrapper<T> : IListDataSource
 {
-    private readonly int _count;
-    private readonly BitArray _marks;
-    private readonly IList _source;
+    private int _count;
+    private BitArray _marks;
+    private readonly ObservableCollection<T> _source;
 
     /// <inheritdoc/>
-    public ListWrapper (IList source)
+    public ListWrapper (ObservableCollection<T> source)
     {
         if (source is { })
         {
             _count = source.Count;
             _marks = new BitArray (_count);
             _source = source;
+            _source.CollectionChanged += (s, e) =>
+                                         {
+                                             CheckAndResizeMarksIfRequired ();
+                                             CollectionChanged?.Invoke (s, e);
+                                         };
             Length = GetMaxLengthItem ();
         }
     }
 
-    /// <inheritdoc/>
-    public int Count => _source is { } ? _source.Count : 0;
+    /// <inheritdoc />
+    public event NotifyCollectionChangedEventHandler CollectionChanged;
 
     /// <inheritdoc/>
-    public int Length { get; }
+    public int Count => _source?.Count ?? 0;
+
+    /// <inheritdoc/>
+    public int Length { get; private set; }
+
+    void CheckAndResizeMarksIfRequired ()
+    {
+        if (_source != null && _count != _source.Count)
+        {
+            _count = _source.Count;
+            BitArray newMarks = new BitArray (_count);
+            for (var i = 0; i < Math.Min (_marks.Length, newMarks.Length); i++)
+            {
+                newMarks [i] = _marks [i];
+            }
+            _marks = newMarks;
+
+            Length = GetMaxLengthItem ();
+        }
+    }
 
     /// <inheritdoc/>
     public void Render (
@@ -893,25 +944,25 @@ public class ListWrapper : IListDataSource
     )
     {
         container.Move (Math.Max (col - start, 0), line);
-        object t = _source? [item];
 
-        if (t is null)
+        if (_source is { })
         {
-            RenderUstr (driver, "", col, line, width);
-        }
-        else
-        {
-            if (t is string u)
+            object t = _source [item];
+
+            if (t is null)
             {
-                RenderUstr (driver, u, col, line, width, start);
-            }
-            else if (t is string s)
-            {
-                RenderUstr (driver, s, col, line, width, start);
+                RenderUstr (driver, "", col, line, width);
             }
             else
             {
-                RenderUstr (driver, t.ToString (), col, line, width, start);
+                if (t is string s)
+                {
+                    RenderUstr (driver, s, col, line, width, start);
+                }
+                else
+                {
+                    RenderUstr (driver, t.ToString (), col, line, width, start);
+                }
             }
         }
     }
