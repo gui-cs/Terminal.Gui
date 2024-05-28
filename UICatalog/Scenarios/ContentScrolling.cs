@@ -5,7 +5,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Content Scrolling", "Demonstrates using View.Viewport and View.ContentSize to scroll content.")]
+[ScenarioMetadata ("Content Scrolling", "Demonstrates using View.Viewport and View.GetContentSize () to scroll content.")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Drawing")]
 [ScenarioCategory ("Scrolling")]
@@ -27,7 +27,7 @@ public class ContentScrolling : Scenario
             BorderStyle = LineStyle.Rounded;
             Arrangement = ViewArrangement.Fixed;
 
-            ContentSize = new (60, 40);
+            SetContentSize (new (60, 40));
             ViewportSettings |= ViewportSettings.ClearContentOnly;
             ViewportSettings |= ViewportSettings.ClipContentOnly;
 
@@ -50,12 +50,6 @@ public class ContentScrolling : Scenario
             LayoutComplete += VirtualDemoView_LayoutComplete;
 
             MouseEvent += VirtualDemoView_MouseEvent;
-        }
-
-        [ObsoleteAttribute ("This method is obsolete and will be removed in v2.", false)]
-        public void SetContentSize (Size contentSize)
-        {
-            ContentSize = contentSize;
         }
 
         private void VirtualDemoView_MouseEvent (object sender, MouseEventEventArgs e)
@@ -93,7 +87,7 @@ public class ContentScrolling : Scenario
 
             if (status is { })
             {
-                status.Title = $"Frame: {Frame}\n\nViewport: {Viewport}, ContentSize = {ContentSize}";
+                status.Title = $"Frame: {Frame}\n\nViewport: {Viewport}, ContentSize = {GetContentSize ()}";
                 status.Width = Border.Frame.Width - status.Frame.X - Border.Thickness.Right;
                 status.Height = Border.Thickness.Top;
             }
@@ -237,7 +231,7 @@ public class ContentScrolling : Scenario
 
         Buttons.NumericUpDown<int> contentSizeWidth = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.Width,
+            Value = view.GetContentSize ().Width,
             X = Pos.Right (labelContentSize) + 1,
             Y = Pos.Top (labelContentSize)
         };
@@ -252,7 +246,7 @@ public class ContentScrolling : Scenario
                 return;
             }
             // BUGBUG: set_ContentSize is supposed to be `protected`. 
-            view.SetContentSize (view.ContentSize with { Width = e.NewValue });
+            view.SetContentSize (view.GetContentSize () with { Width = e.NewValue });
         }
 
         var labelComma = new Label
@@ -264,7 +258,7 @@ public class ContentScrolling : Scenario
 
         Buttons.NumericUpDown<int> contentSizeHeight = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.Height,
+            Value = view.GetContentSize ().Height,
             X = Pos.Right (labelComma) + 1,
             Y = Pos.Top (labelContentSize),
             CanFocus = false
@@ -280,7 +274,7 @@ public class ContentScrolling : Scenario
                 return;
             }
             // BUGBUG: set_ContentSize is supposed to be `protected`. 
-            view.SetContentSize (view.ContentSize with { Height = e.NewValue });
+            view.SetContentSize (view.GetContentSize () with { Height = e.NewValue });
         }
 
         var cbClearOnlyVisible = new CheckBox
@@ -362,7 +356,7 @@ public class ContentScrolling : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (textView) + 1,
-            Width = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (() => view.ContentSize.Width)),
+            Width = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (() => view.GetContentSize ().Width)),
             Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent (20)),
         };
 

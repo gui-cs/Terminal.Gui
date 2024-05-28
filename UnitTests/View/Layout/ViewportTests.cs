@@ -279,7 +279,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange
         var view = new View ();
-        view.ContentSize = new (100, 100);
+        view.SetContentSize (new (100, 100));
         var newViewport = new Rectangle (0, 0, 200, 200);
         view.ViewportSettings = ViewportSettings.AllowLocationGreaterThanContentSize;
 
@@ -348,7 +348,7 @@ public class ViewportTests (ITestOutputHelper output)
             Height = 1
         };
         Assert.True (view.ContentSizeTracksViewport);
-        Assert.Equal (view.Viewport.Size, view.ContentSize);
+        Assert.Equal (view.Viewport.Size, view.GetContentSize ());
     }
 
     [Fact]
@@ -358,10 +358,10 @@ public class ViewportTests (ITestOutputHelper output)
         {
             Width = 1,
             Height = 1,
-            ContentSize = new Size (5, 5)
         };
+        view.SetContentSize (new Size (5, 5));
         Assert.False (view.ContentSizeTracksViewport);
-        Assert.NotEqual (view.Viewport.Size, view.ContentSize);
+        Assert.NotEqual (view.Viewport.Size, view.GetContentSize ());
     }
 
     [Fact]
@@ -371,11 +371,11 @@ public class ViewportTests (ITestOutputHelper output)
         {
             Width = 1,
             Height = 1,
-            ContentSize = new Size (5, 5)
         };
+        view.SetContentSize (new Size (5, 5));
         view.Viewport = new (0, 0, 10, 10);
         view.ContentSizeTracksViewport = true;
-        Assert.Equal (view.Viewport.Size, view.ContentSize);
+        Assert.Equal (view.Viewport.Size, view.GetContentSize ());
     }
 
 
@@ -386,11 +386,11 @@ public class ViewportTests (ITestOutputHelper output)
         {
             Width = 1,
             Height = 1,
-            ContentSize = new Size (5, 5)
         };
+        view.SetContentSize (new Size (5, 5));
         view.Viewport = new (0, 0, 10, 10);
         view.ContentSizeTracksViewport = false;
-        Assert.NotEqual (view.Viewport.Size, view.ContentSize);
+        Assert.NotEqual (view.Viewport.Size, view.GetContentSize ());
     }
 
     //[Theory]

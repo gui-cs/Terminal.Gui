@@ -328,7 +328,7 @@ internal class CharMap : View
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
 
-        ContentSize = new (RowWidth, (MaxCodePoint / 16 + 2) * _rowHeight);
+        SetContentSize (new (RowWidth, (MaxCodePoint / 16 + 2) * _rowHeight));
 
         AddCommand (
                     Command.ScrollUp,

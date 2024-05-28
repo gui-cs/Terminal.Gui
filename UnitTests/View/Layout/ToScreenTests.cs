@@ -336,7 +336,7 @@ public class ToScreenTests (ITestOutputHelper output)
             Width = 10,
             Height = 10
         };
-        view.ContentSize = new (20, 20);
+        view.SetContentSize (new (20, 20));
 
         Point testPoint = new (0, 0);
         Assert.Equal (new Point (1, 1), view.ContentToScreen (testPoint));
@@ -362,7 +362,7 @@ public class ToScreenTests (ITestOutputHelper output)
 
         var view = new View ();
         view.Frame = frame;
-        view.ContentSize = new (20, 20);
+        view.SetContentSize (new (20, 20));
         view.BorderStyle = LineStyle.Single;
 
         // Act
@@ -403,7 +403,7 @@ public class ToScreenTests (ITestOutputHelper output)
 
         var view = new View ();
         view.Frame = frame;
-        view.ContentSize = new (20, 20);
+        view.SetContentSize (new (20, 20));
 
         superView.Add (view);
         superView.LayoutSubviews ();
@@ -608,7 +608,7 @@ public class ToScreenTests (ITestOutputHelper output)
 
     //    var view = new View ();
     //    view.Frame = frame;
-    //    view.ContentSize = new (11, 11);
+    //    view.SetContentSize (new (11, 11));
     //    view.Content = view.Content with { Location = new (1, 1) };
 
     //    superView.Add (view);
@@ -928,7 +928,7 @@ public class ToScreenTests (ITestOutputHelper output)
 
         var view = new View ();
         view.Frame = frame;
-        view.ContentSize = new (11, 11);
+        view.SetContentSize (new (11, 11));
         view.Viewport = view.Viewport with { Location = new (1, 1) };
 
         superView.Add (view);

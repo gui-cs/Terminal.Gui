@@ -39,7 +39,7 @@ public class ColorPicker : View
 
         Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
         Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
-        ContentSize = new (_boxWidth * _cols, _boxHeight * _rows);
+        SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
 
         MouseClick += ColorPicker_MouseClick;
     }
@@ -67,7 +67,7 @@ public class ColorPicker : View
                 _boxHeight = value;
                 Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
                 Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
-                ContentSize = new (_boxWidth * _cols, _boxHeight * _rows);
+                SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
                 SetNeedsLayout ();
             }
         }
@@ -84,7 +84,7 @@ public class ColorPicker : View
                 _boxWidth = value;
                 Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
                 Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
-                ContentSize = new (_boxWidth * _cols, _boxHeight * _rows);
+                SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
                 SetNeedsLayout ();
             }
         }

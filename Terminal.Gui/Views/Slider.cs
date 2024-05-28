@@ -464,7 +464,7 @@ public class Slider<T> : View
             CalcSpacingConfig (horizontal ? Viewport.Width : Viewport.Height);
         }
 
-        ContentSize = new (GetIdealWidth (), GetIdealHeight ());
+        SetContentSize (new (GetIdealWidth (), GetIdealHeight ()));
 
         return;
 

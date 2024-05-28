@@ -921,7 +921,7 @@ public class DrawTests (ITestOutputHelper _output)
             Height = Dim.Fill (),
             ViewportSettings = ViewportSettings.ClipContentOnly
         };
-        view.ContentSize = new Size (10, 10);
+        view.SetContentSize (new Size (10, 10));
         view.Border.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
@@ -953,7 +953,7 @@ public class DrawTests (ITestOutputHelper _output)
             Width = Dim.Fill (),
             Height = Dim.Fill (),
         };
-        view.ContentSize = new Size (10, 10);
+        view.SetContentSize (new Size (10, 10));
         view.Border.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();

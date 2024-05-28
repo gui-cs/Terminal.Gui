@@ -83,7 +83,7 @@ public class DimAutoTests (ITestOutputHelper output)
             ValidatePosDim = true
         };
 
-        view.ContentSize = new (contentSize, 0);
+        view.SetContentSize (new (contentSize, 0));
 
         Assert.Equal (expected, view.Frame.Width);
     }
@@ -102,7 +102,7 @@ public class DimAutoTests (ITestOutputHelper output)
             ValidatePosDim = true
         };
 
-        view.ContentSize = new (contentSize, 0);
+        view.SetContentSize (new (contentSize, 0));
         view.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (expected, view.Frame.Width);
@@ -124,7 +124,7 @@ public class DimAutoTests (ITestOutputHelper output)
             ValidatePosDim = true
         };
 
-        view.ContentSize = new (contentSize, 0);
+        view.SetContentSize (new (contentSize, 0));
         view.SetRelativeLayout (new (100, 100));
 
         Assert.Equal (expected, view.Frame.Width);
@@ -671,7 +671,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
         superView.BeginInit ();
         superView.EndInit ();
-        superView.SetRelativeLayout (superView.ContentSize);
+        superView.SetRelativeLayout (superView.GetContentSize ());
 
         superView.LayoutSubviews ();
         Assert.Equal (expectedSubWidth, subView.Frame.Width);
@@ -720,7 +720,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
         superView.BeginInit ();
         superView.EndInit ();
-        superView.SetRelativeLayout (superView.ContentSize);
+        superView.SetRelativeLayout (superView.GetContentSize ());
 
         superView.LayoutSubviews ();
         Assert.Equal (expectedSubWidth, subView.Frame.Width);
@@ -745,7 +745,7 @@ public class DimAutoTests (ITestOutputHelper output)
         super.Add (view);
 
         Rectangle expectedViewport = new (0, 0, 8, 1);
-        Assert.Equal (expectedViewport.Size, view.ContentSize);
+        Assert.Equal (expectedViewport.Size, view.GetContentSize ());
         Assert.Equal (expectedViewport, view.Frame);
         Assert.Equal (expectedViewport, view.Viewport);
 
@@ -766,7 +766,7 @@ public class DimAutoTests (ITestOutputHelper output)
         var view = new View ();
         view.Width = Auto (DimAutoStyle.Text);
         view.Height = Auto (DimAutoStyle.Text);
-        view.ContentSize = new (1, 1);
+        view.SetContentSize (new (1, 1));
         view.Text = text;
         Assert.Equal (new (expectedW, expectedH), view.TextFormatter.Size);
     }
@@ -943,19 +943,19 @@ public class DimAutoTests (ITestOutputHelper output)
         };
 
         Assert.Equal (new Rectangle (0, 0, 5, 1), view.Frame);
-        Assert.Equal (new Size (5, 1), view.ContentSize);
+        Assert.Equal (new Size (5, 1), view.GetContentSize ());
 
         // Change text to a longer string
         view.Text = "0123456789";
 
         Assert.Equal (new Rectangle (0, 0, 10, 1), view.Frame);
-        Assert.Equal (new Size (10, 1), view.ContentSize);
+        Assert.Equal (new Size (10, 1), view.GetContentSize ());
 
         // If ContentSize was reset, these should cause it to update
         view.Width = 5;
         view.Height = 1;
 
-        Assert.Equal (new Size (5, 1), view.ContentSize);
+        Assert.Equal (new Size (5, 1), view.GetContentSize ());
     }
 
     // DimAutoStyle.Content tests
@@ -963,7 +963,7 @@ public class DimAutoTests (ITestOutputHelper output)
     public void DimAutoStyle_Content_UsesContentSize_WhenSet ()
     {
         var view = new View ();
-        view.ContentSize = new (10, 5);
+        view.SetContentSize (new (10, 5));
 
         var dim = Dim.Auto (DimAutoStyle.Content);
 
@@ -979,7 +979,7 @@ public class DimAutoTests (ITestOutputHelper output)
         var subview = new View () {
                 Frame = new Rectangle (50, 50, 1, 1)
         };
-        view.ContentSize = new (10, 5);
+        view.SetContentSize (new (10, 5));
 
         var dim = Dim.Auto (DimAutoStyle.Content);
 
@@ -1315,7 +1315,7 @@ public class DimAutoTests (ITestOutputHelper output)
     public void DimAutoStyle_Content_UsesContentSize_If_No_Subviews ()
     {
         DimAutoTestView view = new (Auto (DimAutoStyle.Content), Auto (DimAutoStyle.Content));
-        view.ContentSize = new (5, 5);
+        view.SetContentSize (new (5, 5));
         view.SetRelativeLayout (new (10, 10));
 
         Assert.Equal (new (5, 5), view.Frame.Size);

@@ -296,12 +296,12 @@ public abstract class Pos
 
     /// <summary>
     ///     Gets the starting point of an element based on the size of the parent element (typically
-    ///     <c>Superview.ContentSize</c>).
+    ///     <c>Superview.GetContentSize ()</c>).
     ///     This method is meant to be overridden by subclasses to provide different ways of calculating the starting point.
     ///     This method is used
     ///     internally by the layout system to determine where a View should be positioned.
     /// </summary>
-    /// <param name="size">The size of the parent element (typically <c>Superview.ContentSize</c>).</param>
+    /// <param name="size">The size of the parent element (typically <c>Superview.GetContentSize ()</c>).</param>
     /// <returns>
     ///     An integer representing the calculated position. The way this position is calculated depends on the specific
     ///     subclass of Pos that is used. For example, PosAbsolute returns a fixed position, PosAnchorEnd returns a

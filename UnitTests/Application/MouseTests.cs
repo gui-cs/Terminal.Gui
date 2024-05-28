@@ -236,7 +236,7 @@ public class MouseTests
     {
         var tf = new TextField { Width = 10 };
         var sv = new ScrollView { Width = Dim.Fill (), Height = Dim.Fill () };
-        sv.ContentSize = new (100, 100);
+        sv.SetContentSize (new (100, 100));
 
         sv.Add (tf);
         var top = new Toplevel ();

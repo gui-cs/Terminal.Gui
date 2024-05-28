@@ -270,7 +270,7 @@ public class ASCIICustomButtonTest : Scenario
                 case KeyCode.End:
                     _scrollView.ContentOffset = new Point (
                                                            _scrollView.ContentOffset.X,
-                                                           -(_scrollView.ContentSize.Height
+                                                           -(_scrollView.GetContentSize ().Height
                                                              - _scrollView.Frame.Height
                                                              + (_scrollView.ShowHorizontalScrollIndicator ? 1 : 0))
                                                           );
@@ -288,7 +288,7 @@ public class ASCIICustomButtonTest : Scenario
                                                            Math.Max (
                                                                      _scrollView.ContentOffset.Y
                                                                      - _scrollView.Frame.Height,
-                                                                     -(_scrollView.ContentSize.Height
+                                                                     -(_scrollView.GetContentSize ().Height
                                                                        - _scrollView.Frame.Height
                                                                        + (_scrollView.ShowHorizontalScrollIndicator
                                                                               ? 1

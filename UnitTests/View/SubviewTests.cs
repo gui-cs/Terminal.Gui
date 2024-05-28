@@ -338,7 +338,7 @@ public class SubviewTests
     public void Add_Does_Not_Impact_ContentSize ()
     {
         var view = new View ();
-        view.ContentSize = new Size (1, 1);
+        view.SetContentSize (new Size (1, 1));
 
         var subview = new View ()
         {
@@ -346,16 +346,16 @@ public class SubviewTests
             Y = 10
         };
 
-        Assert.Equal (new Size (1, 1), view.ContentSize);
+        Assert.Equal (new Size (1, 1), view.GetContentSize ());
         view.Add (subview);
-        Assert.Equal (new Size (1, 1), view.ContentSize);
+        Assert.Equal (new Size (1, 1), view.GetContentSize ());
     }
 
     [Fact]
     public void Remove_Does_Not_Impact_ContentSize ()
     {
         var view = new View ();
-        view.ContentSize = new Size (1, 1);
+        view.SetContentSize (new Size (1, 1));
 
         var subview = new View ()
         {
@@ -363,14 +363,14 @@ public class SubviewTests
             Y = 10
         };
 
-        Assert.Equal (new Size (1, 1), view.ContentSize);
+        Assert.Equal (new Size (1, 1), view.GetContentSize ());
         view.Add (subview);
-        Assert.Equal (new Size (1, 1), view.ContentSize);
+        Assert.Equal (new Size (1, 1), view.GetContentSize ());
 
-        view.ContentSize = new Size (5, 5);
-        Assert.Equal (new Size (5, 5), view.ContentSize);
+        view.SetContentSize (new Size (5, 5));
+        Assert.Equal (new Size (5, 5), view.GetContentSize ());
 
         view.Remove (subview);
-        Assert.Equal (new Size (5, 5), view.ContentSize);
+        Assert.Equal (new Size (5, 5), view.GetContentSize ());
     }
 }

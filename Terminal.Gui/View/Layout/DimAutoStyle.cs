@@ -10,9 +10,9 @@ namespace Terminal.Gui;
 public enum DimAutoStyle
 {
     /// <summary>
-    ///     The dimensions will be computed based on the View's <see cref="View.ContentSize"/> and/or <see cref="View.Subviews"/>.
+    ///     The dimensions will be computed based on the View's <see cref="View.GetContentSize ()"/> and/or <see cref="View.Subviews"/>.
     ///     <para>
-    ///         If <see cref="View.ContentSizeTracksViewport"/> is <see langword="true"/>, <see cref="View.ContentSize"/> will be used to determine the dimension.
+    ///         If <see cref="View.GetContentSize ()TracksViewport"/> is <see langword="true"/>, <see cref="View.GetContentSize ()"/> will be used to determine the dimension.
     ///     </para>
     ///     <para>
     ///         Otherwise, the Subview in <see cref="View.Subviews"/> with the largest corresponding position plus dimension
@@ -31,13 +31,13 @@ public enum DimAutoStyle
     ///         will be used to determine the dimension.
     ///     </para>
     ///     <para>
-    ///         The corresponding dimensions of <see cref="View.ContentSize"/> and/or <see cref="View.Subviews"/> will be ignored.
+    ///         The corresponding dimensions of <see cref="View.GetContentSize ()"/> and/or <see cref="View.Subviews"/> will be ignored.
     ///     </para>
     /// </summary>
     Text = 2,
 
     /// <summary>
-    ///     The dimension will be computed using the largest of the view's <see cref="View.Text"/>, <see cref="View.ContentSize"/>, and
+    ///     The dimension will be computed using the largest of the view's <see cref="View.Text"/>, <see cref="View.GetContentSize ()"/>, and
     ///     <see cref="View.Subviews"/> corresponding dimension
     /// </summary>
     Auto = Content | Text,

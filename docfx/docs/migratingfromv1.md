@@ -117,7 +117,7 @@ In v2, the layout system has been improved to make it easier to create complex u
 
 * [View.Frame](~/api/Terminal.Gui.View.Frame.yml) now represents the position and size of the view in the superview's coordinate system. The `Frame` property is of type `Rectangle`.
 * [View.Bounds](~/api/Terminal.Gui.View.Bounds.yml) has been replaced by [View.Viewport](~/api/Terminal.Gui.View.Viewport.yml). The `Viewport` property represents the visible area of the view in its own coordinate system. The `Viewport` property is of type `Rectangle`.
-* [View.ContentSize](~/api/Terminal.Gui.View.ContentSize.yml) represents the size of the view's content. The `ContentSize` property is of type `Size`. This replaces `ScrollView` and `ScrollBarView` in v1. See more below.
+* [View.GetContentSize()](~/api/Terminal.Gui.View.GetContentSize.yml) represents the size of the view's content. This replaces `ScrollView` and `ScrollBarView` in v1. See more below.
 
 ### How to Fix
 
@@ -125,7 +125,7 @@ In v2, the layout system has been improved to make it easier to create complex u
 
 * Rename `Bounds` to `Viewport`. The `Location` property of `Bounds` can now have non-zero values.
 * Update any code that assumed `Bounds.Location` was always `Point.Empty`.
-* Update any code that used `Bounds` to refer to the size of the view's content. Use `ContentSize` instead.
+* Update any code that used `Bounds` to refer to the size of the view's content. Use `GetContentSize()` instead.
 * Update any code that assumed `Bounds.Size` was the same as `Frame.Size`. `Frame.Size` defines the size of the view in the superview's coordinate system, while `Viewport.Size` defines the visible area of the view in its own coordinate system.
 * Use [View.GetAdornmentsThickness](~/api/Terminal.Gui.View.GetAdornmentsThickness.yml) to get the total thickness of the view's border, margin, and padding.
 * Not assume a View can draw outside of 'Viewport'. Use the 'Margin', 'Border', and 'Padding' Adornments to do things outside of `Viewport`. View subclasses should not implement their own concept of padding or margins but leverage these `Adornments` instead. 
@@ -149,13 +149,13 @@ In v2, the `Border`, `Margin`, and `Padding` properties have been added to all v
 
 ## Built-in Scrolling
 
-In v1, scrolling was enabled by using `ScrollView` or `ScrollBarView`. In v2, the base [View](~/api/Terminal.Gui.View.yml) class supports scrolling inherently. The area of a view visible to the user at a given moment was previously a rectangle called `Bounds`. `Bounds.Location` was always `Point.Empty`. In v2 the visible area is a rectangle called `Viewport` which is a protal into the Views content, which can be bigger (or smaller) than the area visible to the user. Causing a view to scroll is as simple as changing `View.Viewport.Location`. The View's content described by [View.ContentSize](~/api/Terminal.Gui.View.ContentSize.yml). See [Layout](layout.md) for details.
+In v1, scrolling was enabled by using `ScrollView` or `ScrollBarView`. In v2, the base [View](~/api/Terminal.Gui.View.yml) class supports scrolling inherently. The area of a view visible to the user at a given moment was previously a rectangle called `Bounds`. `Bounds.Location` was always `Point.Empty`. In v2 the visible area is a rectangle called `Viewport` which is a protal into the Views content, which can be bigger (or smaller) than the area visible to the user. Causing a view to scroll is as simple as changing `View.Viewport.Location`. The View's content described by [View.GetContentSize()](~/api/Terminal.Gui.View.GetContentSize.yml). See [Layout](layout.md) for details.
 
 ### How to Fix
 
-* Replace `ScrollView` with [View](~/api/Terminal.Gui.View.yml) and use the `Viewport` and `ContentSize` properties to control scrolling.
+* Replace `ScrollView` with [View](~/api/Terminal.Gui.View.yml) and use `Viewport` and [View.GetContentSize()](~/api/Terminal.Gui.View.GetContentSize.yml) to control scrolling.
 * Update any code that assumed `Bounds.Location` was always `Point.Empty`.
-* Update any code that used `Bounds` to refer to the size of the view's content. Use `ContentSize` instead.
+* Update any code that used `Bounds` to refer to the size of the view's content. Use [View.GetContentSize()](~/api/Terminal.Gui.View.GetContentSize.yml) instead.
 * Update any code that assumed `Bounds.Size` was the same as `Frame.Size`. `Frame.Size` defines the size of the view in the superview's coordinate system, while `Viewport.Size` defines the visible area of the view in its own coordinate system.
 
 ## Updated Keyboard API

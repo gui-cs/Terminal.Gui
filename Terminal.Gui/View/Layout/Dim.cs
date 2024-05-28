@@ -187,7 +187,7 @@ public abstract class Dim
     ///     Gets a dimension that is anchored to a certain point in the layout.
     ///     This method is typically used internally by the layout system to determine the size of a View.
     /// </summary>
-    /// <param name="size">The width of the area where the View is being sized (Superview.ContentSize).</param>
+    /// <param name="size">The width of the area where the View is being sized (Superview.GetContentSize ()).</param>
     /// <returns>
     ///     An integer representing the calculated dimension. The way this dimension is calculated depends on the specific
     ///     subclass of Dim that is used. For example, DimAbsolute returns a fixed dimension, DimFactor returns a

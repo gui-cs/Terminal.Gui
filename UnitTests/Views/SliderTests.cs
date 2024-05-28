@@ -175,7 +175,7 @@ public class SliderTests
         // 0123456789
         // 1 2 3
         Assert.Equal (1, slider.MinimumInnerSpacing);
-        Assert.Equal (new Size (5, 2), slider.ContentSize);
+        Assert.Equal (new Size (5, 2), slider.GetContentSize ());
         Assert.Equal (new Size (5, 2), slider.Frame.Size);
         Assert.NotNull (slider);
         Assert.NotNull (slider.Options);
@@ -519,7 +519,7 @@ public class SliderTests
 
         Assert.Equal (new (6, 3), expectedSize);
 
-        view.ContentSize = new (1, 1);
+        view.SetContentSize (new (1, 1));
 
         view.LayoutSubviews ();
         slider.SetRelativeLayout (view.Viewport.Size);
@@ -552,7 +552,7 @@ public class SliderTests
 
         Assert.Equal (new (6, 10), expectedSize);
 
-        view.ContentSize = new (1, 1);
+        view.SetContentSize (new (1, 1));
 
         view.LayoutSubviews ();
         slider.SetRelativeLayout (view.Viewport.Size);
@@ -585,7 +585,7 @@ public class SliderTests
 
         Assert.Equal (new (10, 3), expectedSize);
 
-        view.ContentSize = new (1, 1);
+        view.SetContentSize (new (1, 1));
 
         view.LayoutSubviews ();
         slider.SetRelativeLayout (view.Viewport.Size);

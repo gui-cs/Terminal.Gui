@@ -72,7 +72,7 @@ public class DimAuto () : Dim
             if (!us.ContentSizeTracksViewport)
             {
                 // ContentSize was explicitly set. Ignore subviews.
-                subviewsSize = dimension == Dimension.Width ? us.ContentSize.Width : us.ContentSize.Height;
+                subviewsSize = dimension == Dimension.Width ? us.GetContentSize ().Width : us.GetContentSize ().Height;
             }
             else
             {

@@ -23,7 +23,7 @@ public class Clipping : Scenario
         //Win.Height = Dim.Fill () - 2;
         var label = new Label
         {
-            X = 0, Y = 0, Text = "ScrollView (new Rectangle (3, 3, 50, 20)) with a 200, 100 ContentSize..."
+            X = 0, Y = 0, Text = "ScrollView (new Rectangle (3, 3, 50, 20)) with a 200, 100 GetContentSize ()..."
         };
         Top.Add (label);
 
