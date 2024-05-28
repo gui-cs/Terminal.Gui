@@ -44,17 +44,6 @@ public class ScenarioTests : TestsAllViews
         //FakeConsole.PushMockKeyPress (Key.Space);
         FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
-        // The only key we care about is the QuitKey
-        Application.KeyDown += (sender, args) =>
-                               {
-                                   _output.WriteLine ($"  Keypress: {args.KeyCode}");
-
-                                   // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-                                   // by adding this Space it seems to work.
-                                   // See #2474 for why this is commented out
-                                   Assert.Equal (Application.QuitKey.KeyCode, args.KeyCode);
-                               };
-
         uint abortTime = 500;
 
         // If the scenario doesn't close within 500ms, this will force it to quit
@@ -77,6 +66,9 @@ public class ScenarioTests : TestsAllViews
 
         Application.Iteration += (s, a) =>
                                  {
+                                     // Press QuitKey 
+                                     Assert.Empty (FakeConsole.MockKeyPresses);
+                                     FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
                                      //output.WriteLine ($"  iteration {++iterations}");
                                      if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
                                      {

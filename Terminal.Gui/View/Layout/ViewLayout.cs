@@ -334,7 +334,7 @@ public partial class View
                 return;
             }
             _excludeFromLayout = value;
-            SetNeedsLayout();
+            SetNeedsLayout ();
         }
     }
 

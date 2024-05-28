@@ -21,21 +21,29 @@ using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironm
 namespace UICatalog;
 
 /// <summary>
-///     UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the
-///     catalog of scenarios.
+///     UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of
+///     scenarios.
 /// </summary>
 /// <remarks>
-///     <para>UI Catalog attempts to satisfy the following goals:</para>
+///     <para>
+///         UI Catalog attempts to satisfy the following goals:
+///     </para>
 ///     <para>
 ///         <list type="number">
 ///             <item>
-///                 <description>Be an easy to use showcase for Terminal.Gui concepts and features.</description>
+///                 <description>
+///                     Be an easy to use showcase for Terminal.Gui concepts and features.
+///                 </description>
 ///             </item>
 ///             <item>
-///                 <description>Provide sample code that illustrates how to properly implement said concepts & features.</description>
+///                 <description>
+///                     Provide sample code that illustrates how to properly implement said concepts & features.
+///                 </description>
 ///             </item>
 ///             <item>
-///                 <description>Make it easy for contributors to add additional samples in a structured way.</description>
+///                 <description>
+///                     Make it easy for contributors to add additional samples in a structured way.
+///                 </description>
 ///             </item>
 ///         </list>
 ///     </para>
@@ -55,17 +63,21 @@ internal class UICatalogApp
     private static int _cachedScenarioIndex;
     private static string? _cachedTheme = string.Empty;
     private static List<string>? _categories;
+
     private static readonly FileSystemWatcher _currentDirWatcher = new ();
     private static ViewDiagnosticFlags _diagnosticFlags;
     private static string _forceDriver = string.Empty;
     private static readonly FileSystemWatcher _homeDirWatcher = new ();
     private static bool _isFirstRunning = true;
+
     private static Options _options;
+
     private static List<Scenario>? _scenarios;
 
     // If set, holds the scenario the user selected
     private static Scenario? _selectedScenario;
     private static MenuBarItem? _themeMenuBarItem;
+
     private static MenuItem []? _themeMenuItems;
     private static string _topLevelColorScheme = string.Empty;
 
@@ -101,12 +113,10 @@ internal class UICatalogApp
         // Process command line args
         // "UICatalog [-driver <driver>] [scenario name]"
         // If no driver is provided, the default driver is used.
-        Option<string> driverOption = new Option<string> ("--driver", "The ConsoleDriver to use.").FromAmong (
-             Application.GetDriverTypes ()
-                        .Select (d => d.Name)
-                        .ToArray ()
-            );
-
+        Option<string> driverOption = new Option<string> (
+                                                          "--driver",
+                                                          "The ConsoleDriver to use."
+                                                         ).FromAmong (Application.GetDriverTypes ().Select (d => d.Name).ToArray ());
         driverOption.AddAlias ("-d");
         driverOption.AddAlias ("--d");
 
@@ -114,14 +124,13 @@ internal class UICatalogApp
                                                                   "scenario",
                                                                   description: "The name of the scenario to run.",
                                                                   getDefaultValue: () => "none"
-                                                                 ).FromAmong (
-                                                                              _scenarios.Select (s => s.GetName ())
-                                                                                        .Append ("none")
-                                                                                        .ToArray ()
-                                                                             );
+                                                                 ).FromAmong (_scenarios.Select (s => s.GetName ()).Append ("none").ToArray ());
 
-        var rootCommand =
-            new RootCommand ("A comprehensive sample library for Terminal.Gui") { scenarioArgument, driverOption };
+        var rootCommand = new RootCommand ("A comprehensive sample library for Terminal.Gui")
+        {
+            scenarioArgument,
+            driverOption
+        };
 
         rootCommand.SetHandler (
                                 context =>
@@ -135,8 +144,8 @@ internal class UICatalogApp
 
                                     // See https://github.com/dotnet/command-line-api/issues/796 for the rationale behind this hackery
                                     _options = options;
-                                }
-                               );
+                                    ;
+                                });
 
         rootCommand.Invoke (args);
 
@@ -175,8 +184,9 @@ internal class UICatalogApp
     }
 
     /// <summary>
-    ///     Shows the UI Catalog selection UI. When the user selects a Scenario to run, the UI Catalog main app UI is
-    ///     killed and the Scenario is run as though it were Application.Top. When the Scenario exits, this function exits.
+    ///     Shows the UI Catalog selection UI. When the user selects a Scenario to run, the
+    ///     UI Catalog main app UI is killed and the Scenario is run as though it were Application.Top.
+    ///     When the Scenario exits, this function exits.
     /// </summary>
     /// <returns></returns>
     private static Scenario RunUICatalogTopLevel ()
@@ -280,11 +290,7 @@ internal class UICatalogApp
         {
             _topLevelColorScheme = "Base";
 
-            int item = _scenarios!.FindIndex (
-                                              s =>
-                                                  s.GetName ()
-                                                   .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
-                                             );
+            int item = _scenarios!.FindIndex (s => s.GetName ().Equals (options.Scenario, StringComparison.OrdinalIgnoreCase));
             _selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ())!;
 
             Application.Init (driverName: _forceDriver);
@@ -369,18 +375,18 @@ internal class UICatalogApp
     public class UICatalogTopLevel : Toplevel
     {
         public ListView CategoryList;
-        public StatusItem DriverName;
-        public MenuItem? miForce16Colors;
+
+        public Shortcut DriverName;
         public MenuItem? miIsMenuBorderDisabled;
         public MenuItem? miIsMouseDisabled;
         public MenuItem? miUseSubMenusSingleFrame;
-        public StatusItem OS;
+        public Shortcut OS;
 
         // UI Catalog uses TableView for the scenario list instead of a ListView to demonstate how
         // TableView works. There's no real reason not to use ListView. Because we use TableView, and TableView
         // doesn't (currently) have CollectionNavigator support built in, we implement it here, within the app.
         public TableView ScenarioList;
-
+        public Bar StatusBar;
         private readonly CollectionNavigator _scenarioCollectionNav = new ();
 
         public UICatalogTopLevel ()
@@ -444,41 +450,73 @@ internal class UICatalogApp
                 ]
             };
 
-            DriverName = new (Key.Empty, "Driver:", null);
-            OS = new (Key.Empty, "OS:", null);
-
-            StatusBar = new () { Visible = ShowStatusBar };
-
-            StatusBar.Items = new []
+            StatusBar = new Bar
             {
-                new (
-                     Application.QuitKey,
-                     $"~{Application.QuitKey} to quit",
-                     () =>
-                     {
-                         if (_selectedScenario is null)
-                         {
-                             // This causes GetScenarioToRun to return null
-                             _selectedScenario = null;
-                             RequestStop ();
-                         }
-                     }
-                    ),
-                new (
-                     Key.F10,
-                     "~F10~ Status Bar",
-                     () =>
-                     {
-                         StatusBar.Visible = !StatusBar.Visible;
-
-                         //ContentPane!.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
-                         LayoutSubviews ();
-                         SetSubViewNeedsDisplay ();
-                     }
-                    ),
-                DriverName,
-                OS
+                Visible = ShowStatusBar,
+                StatusBarStyle = true,
+                Y = Pos.AnchorEnd (1),
+                Height = 1,
+                Width = Dim.Fill ()
             };
+
+            var quitKeyShortcut = new Shortcut
+            {
+                Title = "Quit",
+                Key = Application.QuitKey,
+                KeyBindingScope = KeyBindingScope.Application,
+                Command = Command.QuitToplevel
+            };
+            StatusBar.Add (quitKeyShortcut);
+
+            var force16ColorsShortcut = new Shortcut
+            {
+                Key = Key.F6,
+                KeyBindingScope = KeyBindingScope.HotKey,
+                Command = Command.Accept,
+                CommandView = new CheckBox { Text = "Force 16 Colors" }
+            };
+            var cb = force16ColorsShortcut.CommandView as CheckBox;
+            cb.Checked = Application.Force16Colors;
+
+            cb.Toggled += (s, e) =>
+                          {
+                              var cb = s as CheckBox;
+                              Application.Force16Colors = cb!.Checked == true;
+                              Application.Refresh ();
+                          };
+            StatusBar.Add (force16ColorsShortcut);
+
+            var toggleSB = new Shortcut
+            {
+                Key = Key.F10,
+                Title = "Show/Hide",
+                KeyBindingScope = KeyBindingScope.HotKey,
+                Command = Command.Accept
+            };
+
+            toggleSB.Accept += (s, e) =>
+                               {
+                                   StatusBar.Visible = !StatusBar.Visible;
+                                   LayoutSubviews ();
+                                   SetSubViewNeedsDisplay ();
+                               };
+
+            StatusBar.Add (toggleSB);
+
+            DriverName = new Shortcut
+            {
+                Key = Key.Empty,
+                Title = "Driver:"
+            };
+
+            OS = new Shortcut
+            {
+                Key = Key.Empty,
+                Title = "OS:"
+            };
+
+            StatusBar.Add (DriverName);
+            StatusBar.Add (OS);
 
             // Create the Category list view. This list never changes.
             CategoryList = new ()
@@ -538,12 +576,8 @@ internal class UICatalogApp
              * max widths as ColumnStyles
              */
             int longestName = _scenarios!.Max (s => s.GetName ().Length);
-
-            ScenarioList.Style.ColumnStyles.Add (
-                                                 0,
-                                                 new () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
-                                                );
-            ScenarioList.Style.ColumnStyles.Add (1, new () { MaxWidth = 1 });
+            ScenarioList.Style.ColumnStyles.Add (0, new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
+            ScenarioList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1 });
 
             // Enable user to find & select a scenario by typing text
             // TableView does not (currently) have built-in CollectionNavigator support (the ability for the 
@@ -552,11 +586,7 @@ internal class UICatalogApp
                                     {
                                         if (CollectionNavigatorBase.IsCompatibleKey (a))
                                         {
-                                            int? newItem =
-                                                _scenarioCollectionNav?.GetNextMatchingItem (
-                                                                                             ScenarioList.SelectedRow,
-                                                                                             (char)a
-                                                                                            );
+                                            int? newItem = _scenarioCollectionNav?.GetNextMatchingItem (ScenarioList.SelectedRow, (char)a);
 
                                             if (newItem is int v && newItem != -1)
                                             {
@@ -618,8 +648,8 @@ internal class UICatalogApp
             ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
             MenuBar.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
-            StatusBar.Items [0].Shortcut = Application.QuitKey;
-            StatusBar.Items [0].Title = $"~{Application.QuitKey} to quit";
+
+            ((Shortcut)StatusBar.Subviews [0]).Key = Application.QuitKey;
 
             miIsMouseDisabled!.Checked = Application.IsMouseDisabled;
 
@@ -634,8 +664,7 @@ internal class UICatalogApp
 
         public MenuItem []? CreateThemeMenuItems ()
         {
-            List<MenuItem> menuItems = CreateForce16ColorItems ().ToList ();
-            menuItems.Add (null!);
+            List<MenuItem> menuItems = new ();
 
             var schemeCount = 0;
 
@@ -644,8 +673,7 @@ internal class UICatalogApp
                 var item = new MenuItem
                 {
                     Title = $"_{theme.Key}",
-                    Shortcut = (KeyCode)new Key ((KeyCode)((uint)KeyCode.D1 + schemeCount++))
-                        .WithCtrl
+                    Shortcut = (KeyCode)new Key ((KeyCode)((uint)KeyCode.D1 + schemeCount++)).WithCtrl
                 };
                 item.CheckType |= MenuItemCheckStyle.Checked;
                 item.Checked = theme.Key == _cachedTheme; // CM.Themes.Theme;
@@ -662,7 +690,11 @@ internal class UICatalogApp
 
             foreach (KeyValuePair<string, ColorScheme> sc in Colors.ColorSchemes)
             {
-                var item = new MenuItem { Title = $"_{sc.Key}", Data = sc.Key };
+                var item = new MenuItem
+                {
+                    Title = $"_{sc.Key}",
+                    Data = sc.Key
+                };
                 item.CheckType |= MenuItemCheckStyle.Radio;
                 item.Checked = sc.Key == _topLevelColorScheme;
 
@@ -708,9 +740,9 @@ internal class UICatalogApp
                                                                       newlist,
                                                                       new ()
                                                                       {
-                                                                          { "Name", s => s.GetName () }, { "Description", s => s.GetDescription () }
-                                                                      }
-                                                                     );
+                                                                          { "Name", s => s.GetName () },
+                                                                          { "Description", s => s.GetDescription () }
+                                                                      });
 
             // Create a collection of just the scenario names (the 1st column in our TableView)
             // for CollectionNavigator. 
@@ -740,7 +772,8 @@ internal class UICatalogApp
             {
                 var item = new MenuItem
                 {
-                    Title = GetDiagnosticsTitle (diag), Shortcut = (KeyCode)new Key (index.ToString () [0]).WithAlt
+                    Title = GetDiagnosticsTitle (diag),
+                    Shortcut = (KeyCode)new Key (index.ToString () [0]).WithAlt
                 };
                 index++;
                 item.CheckType |= MenuItemCheckStyle.Checked;
@@ -903,10 +936,7 @@ internal class UICatalogApp
             miIsMenuBorderDisabled.Action += () =>
                                              {
                                                  miIsMenuBorderDisabled.Checked = (bool)!miIsMenuBorderDisabled.Checked!;
-
-                                                 MenuBar.MenusBorderStyle = !(bool)miIsMenuBorderDisabled.Checked
-                                                                                ? LineStyle.Single
-                                                                                : LineStyle.None;
+                                                 MenuBar.MenusBorderStyle = !(bool)miIsMenuBorderDisabled.Checked ? LineStyle.Single : LineStyle.None;
                                              };
             menuItems.Add (miIsMenuBorderDisabled);
 
@@ -921,12 +951,7 @@ internal class UICatalogApp
             miIsMouseDisabled.Shortcut =
                 (KeyCode)new Key (miIsMouseDisabled!.Title!.Substring (1, 1) [0]).WithAlt.WithCtrl.NoShift;
             miIsMouseDisabled.CheckType |= MenuItemCheckStyle.Checked;
-
-            miIsMouseDisabled.Action += () =>
-                                        {
-                                            miIsMouseDisabled.Checked =
-                                                Application.IsMouseDisabled = (bool)!miIsMouseDisabled.Checked!;
-                                        };
+            miIsMouseDisabled.Action += () => { miIsMouseDisabled.Checked = Application.IsMouseDisabled = (bool)!miIsMouseDisabled.Checked!; };
             menuItems.Add (miIsMouseDisabled);
 
             return menuItems.ToArray ();
@@ -954,33 +979,15 @@ internal class UICatalogApp
             return menuItems.ToArray ();
         }
 
-        private MenuItem [] CreateForce16ColorItems ()
-        {
-            List<MenuItem> menuItems = new ();
-
-            miForce16Colors = new ()
-            {
-                Title = "Force _16 Colors",
-                Shortcut = (KeyCode)Key.F6,
-                Checked = Application.Force16Colors,
-                CanExecute = () => Application.Driver.SupportsTrueColor
-            };
-            miForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
-
-            miForce16Colors.Action += () =>
-                                      {
-                                          miForce16Colors.Checked = Application.Force16Colors = (bool)!miForce16Colors.Checked!;
-                                          Application.Refresh ();
-                                      };
-            menuItems.Add (miForce16Colors);
-
-            return menuItems.ToArray ();
-        }
-
         private MenuItem [] CreateKeyBindingsMenuItems ()
         {
             List<MenuItem> menuItems = new ();
-            var item = new MenuItem { Title = "_Key Bindings", Help = "Change which keys do what" };
+
+            var item = new MenuItem
+            {
+                Title = "_Key Bindings",
+                Help = "Change which keys do what"
+            };
 
             item.Action += () =>
                            {
@@ -1001,9 +1008,7 @@ internal class UICatalogApp
 
             miIsMouseDisabled!.Checked = Application.IsMouseDisabled;
             DriverName.Title = $"Driver: {Driver.GetVersionInfo ()}";
-
-            OS.Title =
-                $"OS: {RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}";
+            OS.Title = $"OS: {RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}";
 
             if (_selectedScenario != null)
             {
@@ -1034,7 +1039,9 @@ internal class UICatalogApp
             ScenarioList.EnsureSelectedCellIsVisible ();
         }
 
-        /// <summary>Launches the selected scenario, setting the global _selectedScenario</summary>
+        /// <summary>
+        ///     Launches the selected scenario, setting the global _selectedScenario
+        /// </summary>
         /// <param name="e"></param>
         private void ScenarioView_OpenSelectedItem (object? sender, EventArgs? e)
         {
@@ -1046,14 +1053,7 @@ internal class UICatalogApp
 
                 // Create new instance of scenario (even though Scenarios contains instances)
                 var selectedScenarioName = (string)ScenarioList.Table [ScenarioList.SelectedRow, 0];
-
-                _selectedScenario = (Scenario)Activator.CreateInstance (
-                                                                        _scenarios!.FirstOrDefault (
-                                                                                                    s => s.GetName ()
-                                                                                                         == selectedScenarioName
-                                                                                                   )!
-                                                                                   .GetType ()
-                                                                       )!;
+                _selectedScenario = (Scenario)Activator.CreateInstance (_scenarios!.FirstOrDefault (s => s.GetName () == selectedScenarioName)!.GetType ())!;
 
                 // Tell the main app to stop
                 Application.RequestStop ();
