@@ -19,13 +19,13 @@ jobs:
         fetch-depth: 0 # fetch-depth is needed for GitVersion
 
     - name: Install GitVersion 
-      uses: gittools/actions/gitversion/setup@v0
+      uses: gittools/actions/gitversion/setup@v1
       with:
           versionSpec: '5.x'
           includePrerelease: true
 
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0
+      uses: gittools/actions/gitversion/execute@v1
       with:
         useConfigFile: true
         #additionalArguments: /b develop
@@ -34,7 +34,7 @@ jobs:
     - name: Setup dotnet
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 7.0
+        dotnet-version: 8.0
         dotnet-quality: 'ga'
         
     - name: Install dependencies

@@ -372,6 +372,79 @@ namespace Terminal.Gui.ViewTests {
 		}
 
 		[Fact]
+		public void TabIndex_Invert_Order ()
+		{
+			var r = new View ();
+			var v1 = new View () { Id = "1", CanFocus = true };
+			var v2 = new View () { Id = "2", CanFocus = true };
+			var v3 = new View () { Id = "3", CanFocus = true };
+
+			r.Add (v1, v2, v3);
+
+			v1.TabIndex = 2;
+			v2.TabIndex = 1;
+			v3.TabIndex = 0;
+			Assert.True (r.TabIndexes.IndexOf (v1) == 2);
+			Assert.True (r.TabIndexes.IndexOf (v2) == 1);
+			Assert.True (r.TabIndexes.IndexOf (v3) == 0);
+
+			Assert.True (r.Subviews.IndexOf (v1) == 0);
+			Assert.True (r.Subviews.IndexOf (v2) == 1);
+			Assert.True (r.Subviews.IndexOf (v3) == 2);
+		}
+
+		[Fact]
+		public void TabIndex_Invert_Order_Added_One_By_One_Does_Not_Do_What_Is_Expected ()
+		{
+			var r = new View ();
+			var v1 = new View () { Id = "1", CanFocus = true };
+			r.Add (v1);
+			v1.TabIndex = 2;
+			var v2 = new View () { Id = "2", CanFocus = true };
+			r.Add (v2);
+			v2.TabIndex = 1;
+			var v3 = new View () { Id = "3", CanFocus = true };
+			r.Add (v3);
+			v3.TabIndex = 0;
+
+			Assert.False (r.TabIndexes.IndexOf (v1) == 2);
+			Assert.True (r.TabIndexes.IndexOf (v1) == 1);
+			Assert.False (r.TabIndexes.IndexOf (v2) == 1);
+			Assert.True (r.TabIndexes.IndexOf (v2) == 2);
+			// Only the last is in the expected index
+			Assert.True (r.TabIndexes.IndexOf (v3) == 0);
+
+			Assert.True (r.Subviews.IndexOf (v1) == 0);
+			Assert.True (r.Subviews.IndexOf (v2) == 1);
+			Assert.True (r.Subviews.IndexOf (v3) == 2);
+		}
+
+		[Fact]
+		public void TabIndex_Invert_Order_Mixed ()
+		{
+			var r = new View ();
+			var vl1 = new View () { Id = "vl1" };
+			var v1 = new View () { Id = "v1", CanFocus = true };
+			var vl2 = new View () { Id = "vl2" };
+			var v2 = new View () { Id = "v2", CanFocus = true };
+			var vl3 = new View () { Id = "vl3" };
+			var v3 = new View () { Id = "v3", CanFocus = true };
+
+			r.Add (vl1, v1, vl2, v2, vl3, v3);
+
+			v1.TabIndex = 2;
+			v2.TabIndex = 1;
+			v3.TabIndex = 0;
+			Assert.True (r.TabIndexes.IndexOf (v1) == 4);
+			Assert.True (r.TabIndexes.IndexOf (v2) == 2);
+			Assert.True (r.TabIndexes.IndexOf (v3) == 0);
+
+			Assert.True (r.Subviews.IndexOf (v1) == 1);
+			Assert.True (r.Subviews.IndexOf (v2) == 3);
+			Assert.True (r.Subviews.IndexOf (v3) == 5);
+		}
+
+		[Fact]
 		public void TabStop_And_CanFocus_Are_All_True ()
 		{
 			var r = new View ();
@@ -1172,6 +1245,10 @@ namespace Terminal.Gui.ViewTests {
 			};
 
 			Application.Run ();
+
+			// Ensures cleaning any keystroke.
+			// This was conflicting with the TestVKPacket unit test
+			Console.MockKeyPresses.Clear ();
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
