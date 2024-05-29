@@ -3350,15 +3350,15 @@ public class TextView : View
 
             if (_model.Count > 0 && _shiftSelecting && Selecting)
             {
-                if (CurrentRow - _topRow >= Frame.Height - 1 && _model.Count > _topRow + CurrentRow)
+                if (CurrentRow - _topRow >= Viewport.Height - 1 && _model.Count > _topRow + CurrentRow)
                 {
-                    ScrollTo (_topRow + Frame.Height);
+                    ScrollTo (_topRow + Viewport.Height);
                 }
                 else if (_topRow > 0 && CurrentRow <= _topRow)
                 {
-                    ScrollTo (_topRow - Frame.Height);
+                    ScrollTo (_topRow - Viewport.Height);
                 }
-                else if (ev.Position.Y >= Frame.Height)
+                else if (ev.Position.Y >= Viewport.Height)
                 {
                     ScrollTo (_model.Count);
                 }
@@ -3367,15 +3367,15 @@ public class TextView : View
                     ScrollTo (0);
                 }
 
-                if (CurrentColumn - _leftColumn >= Frame.Width - 1 && line.Count > _leftColumn + CurrentColumn)
+                if (CurrentColumn - _leftColumn >= Viewport.Width - 1 && line.Count > _leftColumn + CurrentColumn)
                 {
-                    ScrollTo (_leftColumn + Frame.Width, false);
+                    ScrollTo (_leftColumn + Viewport.Width, false);
                 }
                 else if (_leftColumn > 0 && CurrentColumn <= _leftColumn)
                 {
-                    ScrollTo (_leftColumn - Frame.Width, false);
+                    ScrollTo (_leftColumn - Viewport.Width, false);
                 }
-                else if (ev.Position.X >= Frame.Width)
+                else if (ev.Position.X >= Viewport.Width)
                 {
                     ScrollTo (line.Count, false);
                 }
@@ -3546,8 +3546,8 @@ public class TextView : View
         SetNormalColor ();
 
         (int width, int height) offB = OffSetBackground ();
-        int right = Frame.Width + offB.width;
-        int bottom = Frame.Height + offB.height;
+        int right = Viewport.Width + offB.width;
+        int bottom = Viewport.Height + offB.height;
         var row = 0;
 
         for (int idxRow = _topRow; idxRow < _model.Count; idxRow++)
@@ -3787,9 +3787,9 @@ public class TextView : View
         if (Application.MouseGrabView == this && Selecting)
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-            //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
-            //var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
-            //SetNeedsDisplay (new (0, minRow, Frame.Width, maxRow));
+            //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Viewport.Height);
+            //var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Viewport.Height);
+            //SetNeedsDisplay (new (0, minRow, Viewport.Width, maxRow));
             SetNeedsDisplay ();
         }
 
@@ -3812,7 +3812,7 @@ public class TextView : View
                     cols += TabWidth + 1;
                 }
 
-                if (!TextModel.SetCol (ref col, Frame.Width, cols))
+                if (!TextModel.SetCol (ref col, Viewport.Width, cols))
                 {
                     col = CurrentColumn;
 
@@ -3824,7 +3824,7 @@ public class TextView : View
         int posX = CurrentColumn - _leftColumn;
         int posY = CurrentRow - _topRow;
 
-        if (posX > -1 && col >= posX && posX < Frame.Width && _topRow <= CurrentRow && posY < Frame.Height)
+        if (posX > -1 && col >= posX && posX < Viewport.Width && _topRow <= CurrentRow && posY < Viewport.Height)
         {
             Move (col, CurrentRow - _topRow);
             return new (col, CurrentRow - _topRow);
@@ -3895,7 +3895,7 @@ public class TextView : View
         else if (!_wordWrap)
         {
             int maxlength =
-                _model.GetMaxVisibleLine (_topRow, _topRow + Frame.Height, TabWidth);
+                _model.GetMaxVisibleLine (_topRow, _topRow + Viewport.Height, TabWidth);
             _leftColumn = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
         }
 
@@ -4074,18 +4074,18 @@ public class TextView : View
             need = true;
         }
         else if (!_wordWrap
-                 && (CurrentColumn - _leftColumn > Frame.Width + offB.width || dSize.size >= Frame.Width + offB.width))
+                 && (CurrentColumn - _leftColumn > Viewport.Width + offB.width || dSize.size >= Viewport.Width + offB.width))
         {
             _leftColumn = TextModel.CalculateLeftColumn (
                                                          line,
                                                          _leftColumn,
                                                          CurrentColumn,
-                                                         Frame.Width + offB.width,
+                                                         Viewport.Width + offB.width,
                                                          TabWidth
                                                         );
             need = true;
         }
-        else if ((_wordWrap && _leftColumn > 0) || (dSize.size < Frame.Width + offB.width && tSize.size < Frame.Width + offB.width))
+        else if ((_wordWrap && _leftColumn > 0) || (dSize.size < Viewport.Width + offB.width && tSize.size < Viewport.Width + offB.width))
         {
             if (_leftColumn > 0)
             {
@@ -4099,9 +4099,9 @@ public class TextView : View
             _topRow = CurrentRow;
             need = true;
         }
-        else if (CurrentRow - _topRow >= Frame.Height + offB.height)
+        else if (CurrentRow - _topRow >= Viewport.Height + offB.height)
         {
-            _topRow = Math.Min (Math.Max (CurrentRow - Frame.Height + 1, 0), CurrentRow);
+            _topRow = Math.Min (Math.Max (CurrentRow - Viewport.Height + 1, 0), CurrentRow);
             need = true;
         }
         else if (_topRow > 0 && CurrentRow < _topRow)
@@ -4246,7 +4246,7 @@ public class TextView : View
             {
                 //QUESTION: Is the below comment still relevant?
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new (0, startRow - topRow, Frame.Width, startRow - topRow + 1));
+                //SetNeedsDisplay (new (0, startRow - topRow, Viewport.Width, startRow - topRow + 1));
                 SetNeedsDisplay ();
             }
 
@@ -4342,7 +4342,7 @@ public class TextView : View
             else
             {
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new (0, currentRow - topRow, 1, Frame.Width));
+                //SetNeedsDisplay (new (0, currentRow - topRow, 1, Viewport.Width));
                 SetNeedsDisplay ();
             }
         }
@@ -4434,7 +4434,7 @@ public class TextView : View
                 _wrapNeeded = true;
             }
 
-            DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, CurrentRow - _topRow + 1));
+            DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Viewport.Width, CurrentRow - _topRow + 1));
         }
         else
         {
@@ -4457,7 +4457,7 @@ public class TextView : View
                                new (
                                     CurrentColumn - _leftColumn,
                                     CurrentRow - _topRow,
-                                    Frame.Width,
+                                    Viewport.Width,
                                     CurrentRow - _topRow + 1
                                    )
                               );
@@ -4752,7 +4752,7 @@ public class TextView : View
         if (!_wrapNeeded)
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-            //SetNeedsDisplay (new (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
+            //SetNeedsDisplay (new (0, prow, Math.Max (Viewport.Width, 0), Math.Max (prow + 1, 0)));
             SetNeedsDisplay ();
         }
     }
@@ -4789,9 +4789,9 @@ public class TextView : View
                               HistoryText.LineStatus.Replaced
                              );
 
-            if (!_wordWrap && CurrentColumn - _leftColumn > Frame.Width)
+            if (!_wordWrap && CurrentColumn - _leftColumn > Viewport.Width)
             {
-                _leftColumn = Math.Max (CurrentColumn - Frame.Width + 1, 0);
+                _leftColumn = Math.Max (CurrentColumn - Viewport.Width + 1, 0);
             }
 
             if (_wordWrap)
@@ -4801,7 +4801,7 @@ public class TextView : View
             else
             {
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new (0, currentRow - topRow, Frame.Width, Math.Max (currentRow - topRow + 1, 0)));
+                //SetNeedsDisplay (new (0, currentRow - topRow, Viewport.Width, Math.Max (currentRow - topRow + 1, 0)));
                 SetNeedsDisplay ();
             }
 
@@ -4897,7 +4897,7 @@ public class TextView : View
                 Insert (new () { Rune = a.AsRune, ColorScheme = colorScheme });
                 CurrentColumn++;
 
-                if (CurrentColumn >= _leftColumn + Frame.Width)
+                if (CurrentColumn >= _leftColumn + Viewport.Width)
                 {
                     _leftColumn++;
                     SetNeedsDisplay ();
@@ -5015,7 +5015,7 @@ public class TextView : View
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -5122,7 +5122,7 @@ public class TextView : View
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -5192,7 +5192,7 @@ public class TextView : View
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
         DoNeededAction ();
     }
 
@@ -5251,7 +5251,7 @@ public class TextView : View
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
         DoNeededAction ();
     }
 
@@ -5267,7 +5267,7 @@ public class TextView : View
         if (!_multiline && !IsInitialized)
         {
             CurrentColumn = Text.GetRuneCount ();
-            _leftColumn = CurrentColumn > Frame.Width + 1 ? CurrentColumn - Frame.Width + 1 : 0;
+            _leftColumn = CurrentColumn > Viewport.Width + 1 ? CurrentColumn - Viewport.Width + 1 : 0;
         }
     }
 
@@ -5301,7 +5301,7 @@ public class TextView : View
 
             CurrentRow++;
 
-            if (CurrentRow >= _topRow + Frame.Height)
+            if (CurrentRow >= _topRow + Viewport.Height)
             {
                 _topRow++;
                 SetNeedsDisplay ();
@@ -5310,7 +5310,7 @@ public class TextView : View
             TrackColumn ();
             PositionCursor ();
         }
-        else if (CurrentRow > Frame.Height)
+        else if (CurrentRow > Viewport.Height)
         {
             Adjust ();
         }
@@ -5365,7 +5365,7 @@ public class TextView : View
 
     private void MovePageDown ()
     {
-        int nPageDnShift = Frame.Height - 1;
+        int nPageDnShift = Viewport.Height - 1;
 
         if (CurrentRow >= 0 && CurrentRow < _model.Count)
         {
@@ -5395,7 +5395,7 @@ public class TextView : View
 
     private void MovePageUp ()
     {
-        int nPageUpShift = Frame.Height - 1;
+        int nPageUpShift = Viewport.Height - 1;
 
         if (CurrentRow > 0)
         {
@@ -5444,7 +5444,7 @@ public class TextView : View
                 CurrentRow++;
                 CurrentColumn = 0;
 
-                if (CurrentRow >= _topRow + Frame.Height)
+                if (CurrentRow >= _topRow + Viewport.Height)
                 {
                     _topRow++;
                     SetNeedsDisplay ();
@@ -5545,14 +5545,14 @@ public class TextView : View
         var w = 0;
         var h = 0;
 
-        if (SuperView?.Frame.Right - Frame.Right < 0)
+        if (SuperView?.Viewport.Right - Viewport.Right < 0)
         {
-            w = SuperView!.Frame.Right - Frame.Right - 1;
+            w = SuperView!.Viewport.Right - Viewport.Right - 1;
         }
 
-        if (SuperView?.Frame.Bottom - Frame.Bottom < 0)
+        if (SuperView?.Viewport.Bottom - Viewport.Bottom < 0)
         {
-            h = SuperView!.Frame.Bottom - Frame.Bottom - 1;
+            h = SuperView!.Viewport.Bottom - Viewport.Bottom - 1;
         }
 
         return (w, h);
@@ -6087,7 +6087,7 @@ public class TextView : View
 
         var fullNeedsDisplay = false;
 
-        if (CurrentRow >= _topRow + Frame.Height)
+        if (CurrentRow >= _topRow + Viewport.Height)
         {
             _topRow++;
             fullNeedsDisplay = true;
@@ -6114,7 +6114,7 @@ public class TextView : View
         else
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-            //SetNeedsDisplay (new (0, currentRow - topRow, 2, Frame.Height));
+            //SetNeedsDisplay (new (0, currentRow - topRow, 2, Viewport.Height));
             SetNeedsDisplay ();
         }
 
