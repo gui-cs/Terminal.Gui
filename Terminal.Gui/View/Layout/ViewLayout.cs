@@ -12,10 +12,10 @@ public partial class View
     /// <summary>Gets or sets the absolute location and dimension of the view.</summary>
     /// <value>
     ///     The rectangle describing absolute location and dimension of the view, in coordinates relative to the
-    ///     <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///     <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>.
     /// </value>
     /// <remarks>
-    ///     <para>Frame is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.</para>
+    ///     <para>Frame is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>.</para>
     ///     <para>
     ///         Setting Frame will set <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> to the
     ///         values of the corresponding properties of the <paramref name="value"/> parameter.
@@ -133,7 +133,7 @@ public partial class View
     /// <value>The <see cref="Pos"/> object representing the X position.</value>
     /// <remarks>
     ///     <para>
-    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>.
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
@@ -171,7 +171,7 @@ public partial class View
     /// <value>The <see cref="Pos"/> object representing the Y position.</value>
     /// <remarks>
     ///     <para>
-    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>.
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
@@ -208,7 +208,7 @@ public partial class View
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
     /// <remarks>
     ///     <para>
-    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>
+    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>
     ///         .
     ///     </para>
     ///     <para>
@@ -253,7 +253,7 @@ public partial class View
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
     /// <remarks>
     ///     <para>
-    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>
+    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>
     ///         .
     ///     </para>
     ///     <para>
@@ -570,7 +570,7 @@ public partial class View
 
         CheckDimAuto ();
 
-        var contentSize = ContentSize;
+        var contentSize = GetContentSize ();
         OnLayoutStarted (new (contentSize));
 
         LayoutAdornments ();
@@ -594,7 +594,7 @@ public partial class View
         {
             foreach ((View from, View to) in edges)
             {
-                LayoutSubview (to, from.ContentSize);
+                LayoutSubview (to, from.GetContentSize ());
             }
         }
 
@@ -647,8 +647,8 @@ public partial class View
         // Determine our container's ContentSize - 
         //  First try SuperView.Viewport, then Application.Top, then Driver.Viewport.
         //  Finally, if none of those are valid, use int.MaxValue (for Unit tests).
-        Size superViewContentSize = SuperView is { IsInitialized: true } ? SuperView.ContentSize :
-                           Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.ContentSize :
+        Size superViewContentSize = SuperView is { IsInitialized: true } ? SuperView.GetContentSize () :
+                           Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.GetContentSize () :
                            Application.Driver?.Screen.Size ?? new (int.MaxValue, int.MaxValue);
 
         SetTextFormatterSize ();
@@ -690,7 +690,7 @@ public partial class View
 
     /// <summary>
     ///     Adjusts <see cref="Frame"/> given the SuperView's ContentSize (nominally the same as
-    ///     <c>this.SuperView.ContentSize</c>)
+    ///     <c>this.SuperView.GetContentSize ()</c>)
     ///     and the position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and
     ///     <see cref="Height"/>).
     /// </summary>
@@ -702,7 +702,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="superviewContentSize">
-    ///     The size of the SuperView's content (nominally the same as <c>this.SuperView.ContentSize</c>).
+    ///     The size of the SuperView's content (nominally the same as <c>this.SuperView.GetContentSize ()</c>).
     /// </param>
     internal void SetRelativeLayout (Size superviewContentSize)
     {
@@ -986,13 +986,13 @@ public partial class View
         // Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
         foreach (View view in Subviews)
         {
-            if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Content) && _contentSize is null)
+            if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Content) && ContentSizeTracksViewport)
             {
                 ThrowInvalid (view, view.Width, nameof (view.Width));
                 ThrowInvalid (view, view.X, nameof (view.X));
             }
 
-            if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Content) && _contentSize is null)
+            if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Content) && ContentSizeTracksViewport)
             {
                 ThrowInvalid (view, view.Height, nameof (view.Height));
                 ThrowInvalid (view, view.Y, nameof (view.Y));

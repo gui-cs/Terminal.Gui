@@ -15,7 +15,7 @@ public enum DimPercentMode
     Position = 0,
 
     /// <summary>
-    /// The dimension is computed using the View's <see cref="View.ContentSize"/>.
+    /// The dimension is computed using the View's <see cref="View.GetContentSize ()"/>.
     /// </summary>
     ContentSize = 1
 }

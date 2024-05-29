@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 /// <param name="percent">The percentage.</param>
 /// <param name="mode">
 ///     If <see cref="DimPercentMode.Position"/> the dimension is computed using the View's position (<see cref="View.X"/> or
-///     <see cref="View.Y"/>); otherwise, the dimension is computed using the View's <see cref="View.ContentSize"/>.
+///     <see cref="View.Y"/>); otherwise, the dimension is computed using the View's <see cref="View.GetContentSize ()"/>.
 /// </param>
 public class DimPercent (int percent, DimPercentMode mode = DimPercentMode.ContentSize) : Dim
 {
@@ -32,7 +32,7 @@ public class DimPercent (int percent, DimPercentMode mode = DimPercentMode.Conte
     public override string ToString () { return $"Percent({Percent},{Mode})"; }
 
     /// <summary>
-    ///     Gets whether the dimension is computed using the View's position or ContentSize.
+    ///     Gets whether the dimension is computed using the View's position or GetContentSize ().
     /// </summary>
     public DimPercentMode Mode { get; } = mode;
 

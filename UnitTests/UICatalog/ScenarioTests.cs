@@ -341,7 +341,6 @@ public class ScenarioTests : TestsAllViews
 
             try
             {
-
                 switch (_xRadioGroup.SelectedItem)
                 {
                     case 0:

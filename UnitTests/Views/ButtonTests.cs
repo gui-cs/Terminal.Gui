@@ -62,7 +62,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
-        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.ContentSize);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.GetContentSize ());
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.Size);
 
         btn1.Dispose ();
@@ -204,7 +204,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.Equal (10, btn.TextFormatter.Format ().Length);
         Assert.Equal (new (10, 1), btn.TextFormatter.Size);
-        Assert.Equal (new (10, 1), btn.ContentSize);
+        Assert.Equal (new (10, 1), btn.GetContentSize ());
         Assert.Equal (new (0, 0, 10, 1), btn.Viewport);
         Assert.Equal (new (0, 0, 10, 1), btn.Frame);
         Assert.Equal (KeyCode.T, btn.HotKey);
