@@ -291,6 +291,8 @@ public class ListView : View
 
     private void Source_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
     {
+        SetContentSize (new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width));
+
         if (Source is { Count: > 0 } && _selected > Source.Count - 1)
         {
             SelectedItem = Source.Count - 1;
@@ -528,7 +530,6 @@ public class ListView : View
                 int offset = _selected < Viewport.Height - 1
                                  ? Math.Max (Viewport.Height - _selected + 1, 0)
                                  : Math.Max (_selected - Viewport.Height - +1, 0);
-                SetContentSize (Viewport.Size with { Height = Viewport.Height + offset });
                 Viewport = Viewport with { Y = offset };
             }
 

@@ -255,9 +255,9 @@ public class ListViewTests
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
-│Line17    │
-│Line18    │
 │Line19    │
+│          │
+│          │
 │          │
 │          │
 │          │
