@@ -175,7 +175,7 @@ public class SliderTests
         // 0123456789
         // 1 2 3
         Assert.Equal (1, slider.MinimumInnerSpacing);
-        Assert.Equal (new Size (5, 2), slider.ContentSize);
+        Assert.Equal (new Size (5, 2), slider.GetContentSize ());
         Assert.Equal (new Size (5, 2), slider.Frame.Size);
         Assert.NotNull (slider);
         Assert.NotNull (slider.Options);

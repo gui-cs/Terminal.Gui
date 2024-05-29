@@ -19,7 +19,7 @@ public class ScrollViewTests
                 new View { X = 12, Y = 7, Width = 10, Height = 5 }
                );
 
-        Assert.Equal (new (30, 20), sv.ContentSize);
+        Assert.Equal (new (30, 20), sv.GetContentSize ());
         Assert.Equal (2, sv.Subviews [0].Subviews.Count);
     }
 
@@ -345,7 +345,7 @@ public class ScrollViewTests
         Assert.Equal (new Rectangle (0, 0, 0, 0), sv.Frame);
         Assert.Equal (Rectangle.Empty, sv.Frame);
         Assert.Equal (Point.Empty, sv.ContentOffset);
-        Assert.Equal (Size.Empty, sv.ContentSize);
+        Assert.Equal (Size.Empty, sv.GetContentSize ());
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.KeepContentAlwaysInViewport);
 
@@ -353,7 +353,7 @@ public class ScrollViewTests
         Assert.True (sv.CanFocus);
         Assert.Equal (new Rectangle (1, 2, 20, 10), sv.Frame);
         Assert.Equal (Point.Empty, sv.ContentOffset);
-        Assert.Equal (sv.Viewport.Size, sv.ContentSize);
+        Assert.Equal (sv.Viewport.Size, sv.GetContentSize ());
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.KeepContentAlwaysInViewport);
     }
@@ -453,7 +453,7 @@ public class ScrollViewTests
         Application.Begin (top);
 
         Assert.Equal (new (-25, -25), sv.ContentOffset);
-        Assert.Equal (new (50, 50), sv.ContentSize);
+        Assert.Equal (new (50, 50), sv.GetContentSize ());
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.ShowHorizontalScrollIndicator);
         Assert.True (sv.ShowVerticalScrollIndicator);
@@ -486,8 +486,8 @@ public class ScrollViewTests
         top.Add (sv);
         Application.Begin (top);
 
-        Assert.Equal (50, sv.ContentSize.Width);
-        Assert.Equal (50, sv.ContentSize.Height);
+        Assert.Equal (50, sv.GetContentSize ().Width);
+        Assert.Equal (50, sv.GetContentSize ().Height);
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.ShowHorizontalScrollIndicator);
         Assert.True (sv.ShowVerticalScrollIndicator);

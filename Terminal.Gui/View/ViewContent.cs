@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 public partial class View
 {
@@ -13,33 +11,31 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         By default, the content size is set to <see langword="null"/>.
-    ///     </para>
-    /// </remarks>
-    /// <param name="contentSize">
-    ///     <para>
-    ///         If <see langword="null"/>, and the View has no visible subviews, <see cref="ContentSize"/> will track the size of <see cref="Viewport"/>.
-    ///     </para>
-    ///     <para>
-    ///         If <see langword="null"/>, and the View has visible subviews, <see cref="ContentSize"/> will track the maximum position plus size of any
-    ///         visible Subviews
-    ///         and <c>Viewport.Location</c>  will track the minimum position and size of any visible Subviews.
-    ///     </para>
-    ///     <para>
-    ///         If not <see langword="null"/>, <see cref="ContentSize"/> is set to the passed value and <see cref="Viewport"/> describes the portion of the content currently visible
-    ///         to the user. This enables virtual scrolling.
-    ///     </para>
-    ///     <para>
-    ///         If not <see langword="null"/>, <see cref="ContentSize"/> is set to the passed value and the behavior of <see cref="DimAutoStyle.Content"/> will be to use the ContentSize
-    ///         to determine the size of the view.
-    ///     </para>
-    ///     <para>
     ///         Negative sizes are not supported.
     ///     </para>
-    /// </param>
+    ///     <para>
+    ///         If not explicitly set, and the View has no visible subviews, <see cref="GetContentSize ()"/> will return the
+    ///         size of
+    ///         <see cref="Viewport"/>.
+    ///     </para>
+    ///     <para>
+    ///         If not explicitly set, and the View has visible subviews, <see cref="GetContentSize ()"/> will return the
+    ///         maximum
+    ///         position + dimension of the Subviews, supporting <see cref="Dim.Auto"/> with the
+    ///         <see cref="DimAutoStyle.Content"/> flag set.
+    ///     </para>
+    ///     <para>
+    ///         If set <see cref="Viewport"/> describes the portion of the content currently visible to the user. This enables
+    ///         virtual scrolling.
+    ///     </para>
+    ///     <para>
+    ///         If set the behavior of <see cref="DimAutoStyle.Content"/> will be to use the ContentSize to determine the size
+    ///         of the view.
+    ///     </para>
+    /// </remarks>
     public void SetContentSize (Size? contentSize)
     {
-        if (ContentSize.Width < 0 || ContentSize.Height < 0)
+        if (contentSize is { } && (contentSize.Value.Width < 0 || contentSize.Value.Height < 0))
         {
             throw new ArgumentException (@"ContentSize cannot be negative.", nameof (contentSize));
         }
@@ -56,19 +52,86 @@ public partial class View
     /// <summary>
     ///     Gets the size of the View's content.
     /// </summary>
-    /// <remarks>
+    /// <remarks>a>
     ///     <para>
-    ///         Use <see cref="SetContentSize"/> to change to change the content size.
-    ///     </para>
-    ///     <para>
-    ///         If the content size has not been explicitly set with <see cref="SetContentSize"/>, the value tracks
+    ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, and the View has no visible subviews, <see cref="GetContentSize ()"/> will return the
+    ///         size of
     ///         <see cref="Viewport"/>.
     ///     </para>
+    ///     <para>
+    ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, and the View has visible subviews, <see cref="GetContentSize ()"/> will return the
+    ///         maximum
+    ///         position + dimension of the Subviews, supporting <see cref="Dim.Auto"/> with the
+    ///         <see cref="DimAutoStyle.Content"/> flag set.
+    ///     </para>
+    ///     <para>
+    ///         If set <see cref="Viewport"/> describes the portion of the content currently visible to the user. This enables
+    ///         virtual scrolling.
+    ///     </para>
+    ///     <para>
+    ///         If set the behavior of <see cref="DimAutoStyle.Content"/> will be to use the ContentSize to determine the size
+    ///         of the view.
+    ///     </para>
     /// </remarks>
-    public Size ContentSize => _contentSize ?? Viewport.Size;
+    /// <returns>
+    ///     If the content size was not explicitly set by <see cref="SetContentSize"/>, <see cref="GetContentSize ()"/> will
+    ///     return the size of the <see cref="Viewport"/> and <see cref="ContentSizeTracksViewport"/> will be <see langword="true"/>.
+    /// </returns>
+    public Size GetContentSize () { return _contentSize ?? Viewport.Size; }
 
     /// <summary>
-    /// Called when <see cref="ContentSize"/> has changed.
+    ///     Gets or sets a value indicating whether the view's content size tracks the <see cref="Viewport"/>'s
+    ///     size or not.
+    /// </summary>
+    /// <remarks>
+    ///     <list type="bullet">
+    ///         <listheader>
+    ///             <term>Value</term> <description>Result</description>
+    ///         </listheader>
+    ///         <item>
+    ///             <term>
+    ///                 <see langword="true"/>
+    ///             </term>
+    ///             <description>
+    ///                 <para>
+    ///                     <see cref="GetContentSize ()"/> will return the <see cref="Viewport"/>'s size. Content scrolling
+    ///                     will be
+    ///                     disabled.
+    ///                 </para>
+    ///                 <para>
+    ///                     The behavior of <see cref="DimAutoStyle.Content"/> will be to use position and size of the Subviews
+    ///                     to
+    ///                     determine the size of the view, ignoring <see cref="GetContentSize ()"/>.
+    ///                 </para>
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <term>
+    ///                 <see langword="false"/>
+    ///             </term>
+    ///             <description>
+    ///                 <para>
+    ///                     The return value of <see cref="GetContentSize ()"/> is independent of <see cref="Viewport"/> and <see cref="Viewport"/>
+    ///                     describes the portion of the content currently visible to the user enabling content scrolling.
+    ///                 </para>
+    ///                 <para>
+    ///                     The behavior of <see cref="DimAutoStyle.Content"/> will be to use <see cref="GetContentSize ()"/>
+    ///                     to
+    ///                     determine the
+    ///                     size of the view, ignoring the position and size of the Subviews.
+    ///                 </para>
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </remarks>
+    public bool ContentSizeTracksViewport
+    {
+        get => _contentSize is null;
+        set => _contentSize = value ? null : _contentSize;
+    }
+
+    /// <summary>
+    ///     Called when <see cref="GetContentSize ()"/> has changed.
     /// </summary>
     /// <param name="e"></param>
     /// <returns></returns>
@@ -79,6 +142,7 @@ public partial class View
         if (e.Cancel != true)
         {
             OnResizeNeeded ();
+
             //SetNeedsLayout ();
             //SetNeedsDisplay ();
         }
@@ -87,7 +151,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Event raised when the <see cref="ContentSize"/> changes.
+    ///     Event raised when the <see cref="GetContentSize ()"/> changes.
     /// </summary>
     public event EventHandler<SizeChangedEventArgs> ContentSizeChanged;
 
@@ -155,32 +219,35 @@ public partial class View
     /// <summary>
     ///     The location of the viewport into the view's content (0,0) is the top-left corner of the content. The Content
     ///     area's size
-    ///     is <see cref="ContentSize"/>.
+    ///     is <see cref="GetContentSize ()"/>.
     /// </summary>
     private Point _viewportLocation;
 
     /// <summary>
     ///     Gets or sets the rectangle describing the portion of the View's content that is visible to the user.
     ///     The viewport Location is relative to the top-left corner of the inner rectangle of <see cref="Padding"/>.
-    ///     If the viewport Size is the same as <see cref="ContentSize"/>, or <see cref="ContentSize"/> is
+    ///     If the viewport Size is the same as <see cref="GetContentSize ()"/>, or <see cref="GetContentSize ()"/> is
     ///     <see langword="null"/> the Location will be <c>0, 0</c>.
     /// </summary>
     /// <value>
     ///     The rectangle describing the location and size of the viewport into the View's virtual content, described by
-    ///     <see cref="ContentSize"/>.
+    ///     <see cref="GetContentSize ()"/>.
     /// </value>
     /// <remarks>
     ///     <para>
     ///         Positive values for the location indicate the visible area is offset into (down-and-right) the View's virtual
-    ///         <see cref="ContentSize"/>. This enables scrolling down and to the right (e.g. in a <see cref="ListView"/>.
+    ///         <see cref="GetContentSize ()"/>. This enables scrolling down and to the right (e.g. in a <see cref="ListView"/>
+    ///         .
     ///     </para>
     ///     <para>
     ///         Negative values for the location indicate the visible area is offset above (up-and-left) the View's virtual
-    ///         <see cref="ContentSize"/>. This enables scrolling up and to the left (e.g. in an image viewer that supports zoom
+    ///         <see cref="GetContentSize ()"/>. This enables scrolling up and to the left (e.g. in an image viewer that
+    ///         supports
+    ///         zoom
     ///         where the image stays centered).
     ///     </para>
     ///     <para>
-    ///         The <see cref="ViewportSettings"/> property controls how scrolling is handled. 
+    ///         The <see cref="ViewportSettings"/> property controls how scrolling is handled.
     ///     </para>
     ///     <para>
     ///         Updates to the Viewport Size updates <see cref="Frame"/>, and has the same impact as updating the
@@ -202,6 +269,7 @@ public partial class View
             }
 
             Thickness thickness = GetAdornmentsThickness ();
+
             return new (
                         _viewportLocation,
                         new (
@@ -234,6 +302,7 @@ public partial class View
             }
 
             OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
+
             return;
         }
 
@@ -249,9 +318,9 @@ public partial class View
         {
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth))
             {
-                if (newViewport.X >= ContentSize.Width)
+                if (newViewport.X >= GetContentSize ().Width)
                 {
-                    newViewport.X = ContentSize.Width - 1;
+                    newViewport.X = GetContentSize ().Width - 1;
                 }
             }
 
@@ -266,9 +335,9 @@ public partial class View
 
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight))
             {
-                if (newViewport.Y >= ContentSize.Height)
+                if (newViewport.Y >= GetContentSize ().Height)
                 {
-                    newViewport.Y = ContentSize.Height - 1;
+                    newViewport.Y = GetContentSize ().Height - 1;
                 }
             }
 
@@ -284,7 +353,8 @@ public partial class View
     }
 
     /// <summary>
-    ///     Fired when the <see cref="Viewport"/> changes. This event is fired after the <see cref="Viewport"/> has been updated.
+    ///     Fired when the <see cref="Viewport"/> changes. This event is fired after the <see cref="Viewport"/> has been
+    ///     updated.
     /// </summary>
     [CanBeNull]
     public event EventHandler<DrawEventArgs> ViewportChanged;
@@ -293,10 +363,7 @@ public partial class View
     ///     Called when the <see cref="Viewport"/> changes. Invokes the <see cref="ViewportChanged"/> event.
     /// </summary>
     /// <param name="e"></param>
-    protected virtual void OnViewportChanged (DrawEventArgs e)
-    {
-        ViewportChanged?.Invoke (this, e);
-    }
+    protected virtual void OnViewportChanged (DrawEventArgs e) { ViewportChanged?.Invoke (this, e); }
 
     /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location and size to a screen-relative location and size.
@@ -306,10 +373,7 @@ public partial class View
     /// </remarks>
     /// <param name="viewport">Viewport-relative location and size.</param>
     /// <returns>Screen-relative location and size.</returns>
-    public Rectangle ViewportToScreen (in Rectangle viewport)
-    {
-        return viewport with { Location = ViewportToScreen (viewport.Location) };
-    }
+    public Rectangle ViewportToScreen (in Rectangle viewport) { return viewport with { Location = ViewportToScreen (viewport.Location) }; }
 
     /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location to a screen-relative location.
@@ -362,7 +426,7 @@ public partial class View
     /// <returns><see langword="true"/> if the <see cref="Viewport"/> was changed.</returns>
     public bool? ScrollVertical (int rows)
     {
-        if (ContentSize == Size.Empty || ContentSize == Viewport.Size)
+        if (GetContentSize () == Size.Empty || GetContentSize () == Viewport.Size)
         {
             return false;
         }
@@ -383,7 +447,7 @@ public partial class View
     /// <returns><see langword="true"/> if the <see cref="Viewport"/> was changed.</returns>
     public bool? ScrollHorizontal (int cols)
     {
-        if (ContentSize == Size.Empty || ContentSize == Viewport.Size)
+        if (GetContentSize () == Size.Empty || GetContentSize () == Viewport.Size)
         {
             return false;
         }

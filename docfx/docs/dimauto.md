@@ -7,7 +7,7 @@ Like all `Dim` types, `Dim.Auto` is used to set the `Width` or `Height` of a vie
 The `DimAutoStyle` enum defines the different ways that `Dim.Auto` can be used to size a view. The `DimAutoStyle` enum has the following values:
 
 * `Text` - The view is sized based on the `Text` property and `TextFormatter` settings.
-* `Content` - The view is sized based on either the `ContentSize` or the `Subviews` property. If `ContentSize` is not explicitly set (via `View.SetContentSize()`), the view is sized based on the Subview with the largest relvant dimension plus location. If `ContentSize` is explicitly set, the view is sized based on the `ContentSize`.
+* `Content` - The view is sized based on either the value returned by `View.SetContentSize()` or the `Subviews` property. If the content size is not explicitly set (via `View.SetContentSize()`), the view is sized based on the Subview with the largest relvant dimension plus location. If the content size is explicitly set, the view is sized based on the value returned by `View.SetContentSize()`.
 * `Auto` -  The view is sized based on both the text and content, whichever is larger.
 
 ## Using Dim.Auto
@@ -113,6 +113,6 @@ view.Add (slider);
 
 Note the developer does not need to specify the size of the `Slider`, it will size itself based on the number of options and the orientation. 
 
-Views like `Slider` do this by setting `Width` and `Height` to `Dim.Auto (DimAutoStyle.Content)` in the constructor and calling `SetContentSize ()` whenever the desired content size changes. The View will then be sized to be big enough to fit the content.
+Views like `Slider` do this by setting `Width` and `Height` to `Dim.Auto (DimAutoStyle.Content)` in the constructor and calling `SetContentSize()` whenever the desired content size changes. The View will then be sized to be big enough to fit the content.
 
 Views that use `Text` for their content can just set `Width` and `Height` to `Dim.Auto (DimAutoStyle.Text)`. It is recommended to use `Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1)` to ensure the View can show at least one line of text.

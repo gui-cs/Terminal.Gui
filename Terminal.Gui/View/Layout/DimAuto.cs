@@ -69,12 +69,15 @@ public class DimAuto () : Dim
 
         if (Style.FastHasFlags (DimAutoStyle.Content))
         {
-            if (us._contentSize is { })
+            if (!us.ContentSizeTracksViewport)
             {
-                subviewsSize = dimension == Dimension.Width ? us.ContentSize.Width : us.ContentSize.Height;
+                // ContentSize was explicitly set. Ignore subviews.
+                subviewsSize = dimension == Dimension.Width ? us.GetContentSize ().Width : us.GetContentSize ().Height;
             }
             else
             {
+                // ContentSize was NOT explicitly set. Use subviews to determine size.
+
                 // TODO: This whole body of code is a WIP (for https://github.com/gui-cs/Terminal.Gui/pull/3451).
                 subviewsSize = 0;
 

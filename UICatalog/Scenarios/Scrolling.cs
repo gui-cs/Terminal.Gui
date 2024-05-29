@@ -44,10 +44,11 @@ public class Scrolling : Scenario
             ShowVerticalScrollIndicator = true,
             ShowHorizontalScrollIndicator = true
         };
+        // BUGBUG: set_ContentSize is supposed to be `protected`. 
         scrollView.SetContentSize (new (120, 40));
         scrollView.Padding.Thickness = new (1);
 
-        label.Text = $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
+        label.Text = $"{scrollView}\nContentSize: {scrollView.GetContentSize ()}\nContentOffset: {scrollView.ContentOffset}";
 
         const string rule = "0123456789";
 
