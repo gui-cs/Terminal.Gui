@@ -527,10 +527,12 @@ public class ListView : View
 
             if (Viewport.Y + _selected > Viewport.Height - 1)
             {
-                int offset = _selected < Viewport.Height - 1
-                                 ? Math.Max (Viewport.Height - _selected + 1, 0)
-                                 : Math.Max (_selected - Viewport.Height - +1, 0);
-                Viewport = Viewport with { Y = offset };
+                Viewport = Viewport with
+                {
+                    Y = _selected < Viewport.Height - 1
+                            ? Math.Max (Viewport.Height - _selected + 1, 0)
+                            : Math.Max (_selected - Viewport.Height + 1, 0)
+                };
             }
 
             OnSelectedChanged ();
