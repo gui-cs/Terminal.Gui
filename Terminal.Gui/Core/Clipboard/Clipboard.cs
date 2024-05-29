@@ -51,8 +51,8 @@ namespace Terminal.Gui {
 						Application.Driver.Clipboard.SetClipboardData (value.ToString ());
 					}
 					contents = value;
-				} catch (NotSupportedException e) {
-					throw e;
+				} catch (NotSupportedException) {
+					throw;
 				} catch (Exception) {
 					contents = value;
 				}
