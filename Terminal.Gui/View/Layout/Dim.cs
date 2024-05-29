@@ -6,8 +6,7 @@ namespace Terminal.Gui;
 /// <summary>
 ///     <para>
 ///         A Dim object describes the dimensions of a <see cref="View"/>. Dim is the type of the
-///         <see cref="View.Width"/> and <see cref="View.Height"/> properties of <see cref="View"/>. Dim objects enable
-///         automatic management of the dimensions of a view.
+///         <see cref="View.Width"/> and <see cref="View.Height"/> properties of <see cref="View"/>.
 ///     </para>
 ///     <para>
 ///         Integer values are implicitly convertible to an absolute <see cref="Dim"/>. These objects are created using

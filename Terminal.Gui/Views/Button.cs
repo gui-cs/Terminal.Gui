@@ -34,7 +34,6 @@ public class Button : View
     private bool _isDefault;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
-    /// <remarks>The width and height of the <see cref="Button"/> is computed based on the text.</remarks>
     public Button ()
     {
         TextAlignment = Alignment.Center;
