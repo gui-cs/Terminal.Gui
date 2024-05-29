@@ -21,7 +21,7 @@ public class TabView : View
     private TabToRender [] _tabLocations;
     private int _tabScrollOffset;
 
-    /// <summary>Initializes a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="TabView"/> class.</summary>
     public TabView ()
     {
         CanFocus = true;

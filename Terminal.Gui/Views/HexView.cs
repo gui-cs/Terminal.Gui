@@ -38,7 +38,7 @@ public class HexView : View
     private static readonly Rune SpaceCharRune = new (' ');
     private static readonly Rune PeriodCharRune = new ('.');
 
-    /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="HexView"/> class.</summary>
     /// <param name="source">
     ///     The <see cref="Stream"/> to view and edit as hex, this <see cref="Stream"/> must support seeking,
     ///     or an exception will be thrown.
@@ -98,7 +98,7 @@ public class HexView : View
         LayoutComplete += HexView_LayoutComplete;
     }
 
-    /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="HexView"/> class.</summary>
     public HexView () : this (new MemoryStream ()) { }
 
     /// <summary>

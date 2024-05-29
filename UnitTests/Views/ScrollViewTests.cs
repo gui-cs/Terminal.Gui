@@ -341,7 +341,6 @@ public class ScrollViewTests
     public void Constructors_Defaults ()
     {
         var sv = new ScrollView ();
-        Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
         Assert.True (sv.CanFocus);
         Assert.Equal (new Rectangle (0, 0, 0, 0), sv.Frame);
         Assert.Equal (Rectangle.Empty, sv.Frame);
@@ -351,7 +350,6 @@ public class ScrollViewTests
         Assert.True (sv.KeepContentAlwaysInViewport);
 
         sv = new ScrollView { X = 1, Y = 2, Width = 20, Height = 10 };
-        Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
         Assert.True (sv.CanFocus);
         Assert.Equal (new Rectangle (1, 2, 20, 10), sv.Frame);
         Assert.Equal (Point.Empty, sv.ContentOffset);

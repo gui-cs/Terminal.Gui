@@ -21,8 +21,7 @@ public class TextField : View
     private List<Rune> _text;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="TextField"/> class.
     /// </summary>
     public TextField ()
     {

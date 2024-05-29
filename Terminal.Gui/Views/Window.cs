@@ -15,8 +15,7 @@ namespace Terminal.Gui;
 public class Window : Toplevel
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Window"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="Window"/> class.
     /// </summary>
     public Window ()
     {

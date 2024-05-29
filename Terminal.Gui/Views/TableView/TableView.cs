@@ -37,12 +37,12 @@ public class TableView : View
     private TableStyle style = new ();
     private ITableSource table;
 
-    /// <summary>Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="TableView"/> class.</summary>
     /// <param name="table">The table to display in the control</param>
     public TableView (ITableSource table) : this () { Table = table; }
 
     /// <summary>
-    ///     Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. Set the
+    ///     Initializes a <see cref="TableView"/> class. Set the
     ///     <see cref="Table"/> property to begin editing
     /// </summary>
     public TableView ()
@@ -2014,7 +2014,7 @@ public class TableView : View
 
     /// <summary>
     ///     Returns true if the <see cref="Table"/> is not set or all the columns in the <see cref="Table"/> have an
-    ///     explicit <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.visible"/> <see langword="false"/>.
+    ///     explicit <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.Visible"/> <see langword="false"/>.
     /// </summary>
     /// <returns></returns>
     private bool TableIsNullOrInvisible ()

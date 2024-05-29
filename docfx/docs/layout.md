@@ -54,8 +54,6 @@ var label2 = new Label () {
 
 The `Frame` property is a rectangle that provides the current location and size of the view relative to the View's `Superview`'s Content area. 
 
-The `View.LayoutStyle` property can be used to determine how the View is treated. If the style is `Absolute`, the `X`, `Y`, `Width`, and `Height` objects are all absolute values. If the style is `Computed`, one or more of the `X`, `Y`, `Width`, and `Height` objects describe a computed value.
-
 ## The `Pos` Type
 
 The [Pos](~/api/Terminal.Gui.Pos.yml) is the type of `View.X` and `View.Y` and supports the following sub-types:

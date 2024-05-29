@@ -183,11 +183,6 @@ public partial class View
     ///         The <see cref="ViewportSettings"/> property controls how scrolling is handled. 
     ///     </para>
     ///     <para>
-    ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Viewport is indeterminate until
-    ///         the view has been initialized ( <see cref="IsInitialized"/> is true) and <see cref="LayoutSubviews"/> has been
-    ///         called.
-    ///     </para>
-    ///     <para>
     ///         Updates to the Viewport Size updates <see cref="Frame"/>, and has the same impact as updating the
     ///         <see cref="Frame"/>.
     ///     </para>
