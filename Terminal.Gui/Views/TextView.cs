@@ -2717,6 +2717,7 @@ public class TextView : View
                 _isReadOnly = value;
 
                 SetNeedsDisplay ();
+                WrapTextModel ();
                 Adjust ();
             }
         }
@@ -2859,7 +2860,7 @@ public class TextView : View
             if (_wordWrap)
             {
                 _wrapManager = new (_model);
-                _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
+                WrapTextModel ();
             }
             else if (!_wordWrap && _wrapManager is { })
             {
@@ -4074,7 +4075,7 @@ public class TextView : View
             need = true;
         }
         else if (!_wordWrap
-                 && (CurrentColumn - _leftColumn > Viewport.Width + offB.width || dSize.size >= Viewport.Width + offB.width))
+                 && (CurrentColumn - _leftColumn + 1 > Viewport.Width + offB.width || dSize.size + 1 >= Viewport.Width + offB.width))
         {
             _leftColumn = TextModel.CalculateLeftColumn (
                                                          line,
@@ -4458,7 +4459,7 @@ public class TextView : View
                                     CurrentColumn - _leftColumn,
                                     CurrentRow - _topRow,
                                     Viewport.Width,
-                                    CurrentRow - _topRow + 1
+                                    Math.Max (CurrentRow - _topRow + 1, 0)
                                    )
                               );
         }
@@ -5321,7 +5322,7 @@ public class TextView : View
     private void MoveEndOfLine ()
     {
         List<RuneCell> currentLine = GetCurrentLine ();
-        CurrentColumn = currentLine.Count;
+        CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
         Adjust ();
         DoNeededAction ();
     }
@@ -5345,7 +5346,7 @@ public class TextView : View
                 }
 
                 List<RuneCell> currentLine = GetCurrentLine ();
-                CurrentColumn = currentLine.Count;
+                CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
             }
         }
 
@@ -5433,7 +5434,7 @@ public class TextView : View
     {
         List<RuneCell> currentLine = GetCurrentLine ();
 
-        if (CurrentColumn < currentLine.Count)
+        if ((ReadOnly ? CurrentColumn + 1 : CurrentColumn) < currentLine.Count)
         {
             CurrentColumn++;
         }
@@ -5801,7 +5802,7 @@ public class TextView : View
 
             if (idx - _leftColumn >= r.Count)
             {
-                CurrentColumn = Math.Max (r.Count - _leftColumn, 0);
+                CurrentColumn = Math.Max (r.Count - _leftColumn - (ReadOnly ? 1 : 0), 0);
             }
             else
             {
@@ -6445,7 +6446,7 @@ public class TextView : View
         if (_wordWrap && _wrapManager is { })
         {
             _model = _wrapManager.WrapModel (
-                                             Viewport.Width,
+                                             Math.Max (Viewport.Width - (ReadOnly ? 0 : 1), 0), // For the cursor on the last column of a line
                                              out int nRow,
                                              out int nCol,
                                              out int nStartRow,
