@@ -405,7 +405,7 @@ public static class MessageBox
             Size GetWrapSize ()
             {
                 // A bit of a hack to get the height of the wrapped text.
-                messageLabel.TextFormatter.Size = d.ContentSize with { Height = 1000 };
+                messageLabel.TextFormatter.Size = d.GetContentSize () with { Height = 1000 };
                 return messageLabel.TextFormatter.FormatAndGetSize ();
             }
         }

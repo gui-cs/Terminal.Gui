@@ -150,39 +150,6 @@ public class DimTests
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
     [TestRespondersDisposed]
-    public void
-        Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
-    {
-        var t = new View { Width = 80, Height = 25, Text = "top" };
-
-        var w = new Window { Width = Dim.Fill (), Height = Dim.Absolute (10) };
-        var v = new View { Width = Dim.Width (w) - 2, Height = Dim.Percent (10), Text = "v" };
-
-        w.Add (v);
-        t.Add (w);
-
-        Assert.Equal (LayoutStyle.Absolute, t.LayoutStyle);
-        Assert.Equal (LayoutStyle.Computed, w.LayoutStyle);
-        Assert.Equal (LayoutStyle.Computed, v.LayoutStyle);
-
-        t.LayoutSubviews ();
-        Assert.Equal (2, v.Width = 2);
-        Assert.Equal (2, v.Height = 2);
-
-        // Force v to be LayoutStyle.Absolute;
-        v.Frame = new Rectangle (0, 1, 3, 4);
-        Assert.Equal (LayoutStyle.Absolute, v.LayoutStyle);
-        t.LayoutSubviews ();
-
-        Assert.Equal (2, v.Width = 2);
-        Assert.Equal (2, v.Height = 2);
-        t.Dispose ();
-    }
-
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-    [Fact]
-    [TestRespondersDisposed]
     public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Null ()
     {
         var t = new View { Width = 80, Height = 25, Text = "top" };
@@ -202,60 +169,6 @@ public class DimTests
         Assert.Equal (4, w.Height = 4);
         t.Dispose ();
     }
-
-
-    // See #2461
-    //[Fact]
-    //public void Dim_Referencing_SuperView_Throws ()
-    //{
-    //	var super = new View ("super") {
-    //		Width = 10,
-    //		Height = 10
-    //	};
-    //	var view = new View ("view") {
-    //		Width = Dim.Width (super),	// this is not allowed
-    //		Height = Dim.Height (super),    // this is not allowed
-    //	};
-
-    //	super.Add (view);
-    //	super.BeginInit ();
-    //	super.EndInit ();
-    //	Assert.Throws<InvalidOperationException> (() => super.LayoutSubviews ());
-    //}
-
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-    [Fact]
-    [TestRespondersDisposed]
-    public void
-        Dim_Validation_Does_Not_Throw_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
-    {
-        var t = new View { Width = 80, Height = 25, Text = "top" };
-
-        var w = new Window { Width = Dim.Fill (), Height = Dim.Absolute (10) };
-        var v = new View { Width = Dim.Width (w) - 2, Height = Dim.Percent (10), Text = "v" };
-
-        w.Add (v);
-        t.Add (w);
-
-        Assert.Equal (LayoutStyle.Absolute, t.LayoutStyle);
-        Assert.Equal (LayoutStyle.Computed, w.LayoutStyle);
-        Assert.Equal (LayoutStyle.Computed, v.LayoutStyle);
-
-        t.LayoutSubviews ();
-        Assert.Equal (2, v.Width = 2);
-        Assert.Equal (2, v.Height = 2);
-
-        // Force v to be LayoutStyle.Absolute;
-        v.Frame = new Rectangle (0, 1, 3, 4);
-        Assert.Equal (LayoutStyle.Absolute, v.LayoutStyle);
-        t.LayoutSubviews ();
-
-        Assert.Equal (2, v.Width = 2);
-        Assert.Equal (2, v.Height = 2);
-        t.Dispose ();
-    }
-
 
     [Fact]
     public void DimHeight_Set_To_Null_Throws ()

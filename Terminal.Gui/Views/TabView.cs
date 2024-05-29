@@ -21,7 +21,7 @@ public class TabView : View
     private TabToRender [] _tabLocations;
     private int _tabScrollOffset;
 
-    /// <summary>Initializes a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="TabView"/> class.</summary>
     public TabView ()
     {
         CanFocus = true;
@@ -564,7 +564,7 @@ public class TabView : View
             _host = host;
 
             CanFocus = true;
-            Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
+            Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == GetContentSize ().
             Width = Dim.Fill ();
 
             _rightScrollIndicator = new View

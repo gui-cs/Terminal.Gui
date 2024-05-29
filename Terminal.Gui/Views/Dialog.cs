@@ -9,7 +9,8 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
-///     <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>. This will execute the dialog until it terminates via the
+///     <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>. This will execute the dialog until
+///     it terminates via the
 ///     [ESC] or [CTRL-Q] key, or when one of the views or buttons added to the dialog calls
 ///     <see cref="Application.RequestStop"/>.
 /// </remarks>
@@ -41,7 +42,6 @@ public class Dialog : Window
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     public static int DefaultMinimumHeight { get; set; } = 25;
 
-
     // TODO: Reenable once border/borderframe design is settled
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
@@ -55,13 +55,12 @@ public class Dialog : Window
     private readonly List<Button> _buttons = new ();
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning with no <see cref="Button"/>s.
+    ///     Initializes a new instance of the <see cref="Dialog"/> class with no <see cref="Button"/>s.
     /// </summary>
     /// <remarks>
-    ///     By default, <see cref="View.X"/> and <see cref="View.Y"/> are set to <c>Pos.Center ()</c> and
-    ///     <see cref="View.Width"/> and <see cref="View.Height"/> are set to <c>Width = Dim.Percent (85)</c>, centering the
-    ///     Dialog vertically and horizontally.
+    ///     By default, <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> are
+    ///     set
+    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of the screen dimensions.
     /// </remarks>
     public Dialog ()
     {
@@ -69,8 +68,8 @@ public class Dialog : Window
         X = Pos.Center ();
         Y = Pos.Center ();
 
-        Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
-        Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
+        Width = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
+        Height = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;
@@ -87,7 +86,6 @@ public class Dialog : Window
                         return true;
                     });
         KeyBindings.Add (Key.Esc, Command.QuitToplevel);
-
     }
 
     private bool _canceled;
@@ -115,8 +113,6 @@ public class Dialog : Window
             }
 #endif
             _canceled = value;
-
-            return;
         }
     }
 
@@ -125,7 +121,7 @@ public class Dialog : Window
     public Alignment ButtonAlignment { get; set; }
 
     /// <summary>
-    /// Gets or sets the alignment modes for the dialog's buttons.
+    ///     Gets or sets the alignment modes for the dialog's buttons.
     /// </summary>
     public AlignmentModes ButtonAlignmentModes { get; set; }
 
@@ -160,7 +156,7 @@ public class Dialog : Window
         }
 
         // Use a distinct GroupId so users can use Pos.Align for other views in the Dialog
-        button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, groupId: GetHashCode ());
+        button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
         button.Y = Pos.AnchorEnd ();
 
         _buttons.Add (button);

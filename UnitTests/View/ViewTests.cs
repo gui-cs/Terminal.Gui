@@ -251,7 +251,6 @@ At 0,0
 
         view.Frame = new Rectangle (3, 3, 10, 1);
         Assert.Equal (new Rectangle (3, 3, 10, 1), view.Frame);
-        Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
         Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
         top.Draw ();
@@ -347,7 +346,6 @@ At 0,0
 
         view.Frame = new Rectangle (1, 1, 10, 1);
         Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
-        Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
         Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
         top.Draw ();
@@ -654,7 +652,6 @@ At 0,0
 
         view.Frame = new Rectangle (1, 1, 10, 1);
         Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
-        Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
         Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
         view.Draw ();
@@ -751,7 +748,6 @@ At 0,0
         Assert.True (r.Enabled);
         Assert.True (r.Visible);
 
-        Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
         Assert.Equal ($"View(){r.Viewport}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
@@ -776,7 +772,6 @@ At 0,0
         // Empty Rect
         r = new View { Frame = Rectangle.Empty };
         Assert.NotNull (r);
-        Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
         Assert.Equal ($"View(){r.Viewport}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
@@ -801,7 +796,6 @@ At 0,0
         // Rect with values
         r = new View { Frame = new Rectangle (1, 2, 3, 4) };
         Assert.NotNull (r);
-        Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
         Assert.Equal ($"View(){r.Frame}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
@@ -832,7 +826,6 @@ At 0,0
             Height = Dim.Auto ()
         }; // BUGBUG: AutoSize or Height need be set
         Assert.NotNull (r);
-        Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
 
         // BUGBUG: IsInitialized must be true to process calculation
         r.BeginInit ();

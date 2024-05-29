@@ -256,7 +256,7 @@ public class MenuBar : View
         X = 0;
         Y = 0;
         Width = Dim.Fill ();
-        Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == ContentSize
+        Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == GetContentSize ().
         Menus = new MenuBarItem [] { };
 
         //CanFocus = true;

@@ -23,12 +23,13 @@ public class Clipping : Scenario
         //Win.Height = Dim.Fill () - 2;
         var label = new Label
         {
-            X = 0, Y = 0, Text = "ScrollView (new Rectangle (3, 3, 50, 20)) with a 200, 100 ContentSize..."
+            X = 0, Y = 0, Text = "ScrollView (new Rectangle (3, 3, 50, 20)) with a 200, 100 GetContentSize ()..."
         };
         Top.Add (label);
 
         var scrollView = new ScrollView { X = 3, Y = 3, Width = 50, Height = 20 };
         scrollView.ColorScheme = Colors.ColorSchemes ["Menu"];
+        // BUGBUG: set_ContentSize is supposed to be `protected`. 
         scrollView.SetContentSize (new (200, 100));
 
         //ContentOffset = Point.Empty,
