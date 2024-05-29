@@ -794,30 +794,6 @@ This is a test
                                                             textView.SetNeedsDisplay ();
                                                         };
 
-        scrollBar.VisibleChanged += (s, e) =>
-                                    {
-                                        if (scrollBar.Visible && textView.RightOffset == 0)
-                                        {
-                                            textView.RightOffset = 1;
-                                        }
-                                        else if (!scrollBar.Visible && textView.RightOffset == 1)
-                                        {
-                                            textView.RightOffset = 0;
-                                        }
-                                    };
-
-        scrollBar.OtherScrollBarView.VisibleChanged += (s, e) =>
-                                                       {
-                                                           if (scrollBar.OtherScrollBarView.Visible && textView.BottomOffset == 0)
-                                                           {
-                                                               textView.BottomOffset = 1;
-                                                           }
-                                                           else if (!scrollBar.OtherScrollBarView.Visible && textView.BottomOffset == 1)
-                                                           {
-                                                               textView.BottomOffset = 0;
-                                                           }
-                                                       };
-
         textView.LayoutComplete += (s, e) =>
                                    {
                                        scrollBar.Size = textView.Lines;
