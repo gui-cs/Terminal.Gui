@@ -877,7 +877,7 @@ public class ListView : View
 
     private void ListView_LayoutStarted (object sender, LayoutEventArgs e) { EnsureSelectedItemVisible (); }
     /// <summary>
-    /// Call the event to raise when an item is added, removed, or moved, or the entire list is refreshed.
+    /// Call the event to raises the <see cref="CollectionChanged"/>.
     /// </summary>
     /// <param name="e"></param>
     protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e) { CollectionChanged?.Invoke (this, e); }
