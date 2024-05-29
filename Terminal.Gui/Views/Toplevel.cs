@@ -1,3 +1,5 @@
+#define UNIX_KEY_BINDINGS
+
 using System.Net.Mime;
 
 namespace Terminal.Gui;
