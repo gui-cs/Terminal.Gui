@@ -2678,7 +2678,7 @@ public class TextView : View
     public int Lines => _model.Count;
 
     /// <summary>Gets the maximum visible length line.</summary>
-    public int Maxlength => _model.GetMaxVisibleLine (_topRow, _topRow + Frame.Height, TabWidth);
+    public int Maxlength => _model.GetMaxVisibleLine (_topRow, _topRow + Viewport.Height, TabWidth);
 
     /// <summary>Gets or sets a value indicating whether this <see cref="TextView"/> is a multiline text view.</summary>
     public bool Multiline
@@ -2852,7 +2852,7 @@ public class TextView : View
             if (_wordWrap)
             {
                 _wrapManager = new (_model);
-                _model = _wrapManager.WrapModel (_frameWidth, out _, out _, out _, out _);
+                _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
             }
 
             OnTextChanged (old, Text);
@@ -2897,7 +2897,7 @@ public class TextView : View
             if (_wordWrap)
             {
                 _wrapManager = new (_model);
-                _model = _wrapManager.WrapModel (_frameWidth, out _, out _, out _, out _);
+                _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
             }
             else if (!_wordWrap && _wrapManager is { })
             {
@@ -2908,7 +2908,6 @@ public class TextView : View
         }
     }
 
-    private int _frameWidth => Math.Max (Frame.Width - (RightOffset != 0 ? 2 : 1), 0);
 
     /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItem"/> items updating the original text.</summary>
     public void ClearHistoryChanges () { _historyText?.Clear (Text); }
@@ -6484,7 +6483,7 @@ public class TextView : View
         if (_wordWrap && _wrapManager is { })
         {
             _model = _wrapManager.WrapModel (
-                                             _frameWidth,
+                                             Viewport.Width,
                                              out int nRow,
                                              out int nCol,
                                              out int nStartRow,
