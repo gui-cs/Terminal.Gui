@@ -601,10 +601,12 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MoveEnd ()
 		{
-			if (source.Count > 0 && selected != source.Count - 1) {
+			if (source?.Count > 0 && selected != source.Count - 1) {
 				selected = source.Count - 1;
 				if (top + selected > Frame.Height - 1) {
-					top = selected;
+					top = selected < Frame.Height - 1
+						? Math.Max (Frame.Height - selected + 1, 0)
+						: Math.Max (selected - Frame.Height + 1, 0);
 				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
