@@ -129,16 +129,16 @@ public class ListViewTests
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
+│Line10    │
+│Line11    │
+│Line12    │
+│Line13    │
+│Line14    │
+│Line15    │
+│Line16    │
+│Line17    │
+│Line18    │
 │Line19    │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
 └──────────┘",
                                                       _output
                                                      );
@@ -255,9 +255,9 @@ public class ListViewTests
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
+│Line17    │
+│Line18    │
 │Line19    │
-│          │
-│          │
 │          │
 │          │
 │          │
