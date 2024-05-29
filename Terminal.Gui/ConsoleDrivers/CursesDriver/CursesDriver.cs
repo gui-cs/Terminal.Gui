@@ -505,6 +505,7 @@ namespace Terminal.Gui {
 					keyHandler (key);
 				} else {
 					k = Key.Esc;
+					keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 					keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				}
 			} else if (wch == Curses.KeyTab) {
