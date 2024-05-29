@@ -296,18 +296,6 @@ public class Wizards : Scenario
                                                                             someText.SetNeedsDisplay ();
                                                                         };
 
-                                           scrollBar.VisibleChanged += (s, e) =>
-                                                                       {
-                                                                           if (scrollBar.Visible && someText.RightOffset == 0)
-                                                                           {
-                                                                               someText.RightOffset = 1;
-                                                                           }
-                                                                           else if (!scrollBar.Visible && someText.RightOffset == 1)
-                                                                           {
-                                                                               someText.RightOffset = 0;
-                                                                           }
-                                                                       };
-
                                            someText.DrawContent += (s, e) =>
                                                                    {
                                                                        scrollBar.Size = someText.Lines;

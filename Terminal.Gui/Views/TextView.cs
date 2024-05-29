@@ -2588,25 +2588,6 @@ public class TextView : View
     /// </summary>
     public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
-    /// <summary>
-    ///     The bottom offset needed to use a horizontal scrollbar or for another reason. This is only needed with the
-    ///     keyboard navigation.
-    /// </summary>
-    public int BottomOffset
-    {
-        get => _bottomOffset;
-        set
-        {
-            if (CurrentRow == Lines - 1 && _bottomOffset > 0 && value == 0)
-            {
-                _topRow = Math.Max (_topRow - _bottomOffset, 0);
-            }
-
-            _bottomOffset = value;
-            Adjust ();
-        }
-    }
-
     /// <summary>Get the <see cref="ContextMenu"/> for this view.</summary>
     public ContextMenu? ContextMenu { get; }
 
@@ -2738,25 +2719,6 @@ public class TextView : View
                 SetNeedsDisplay ();
                 Adjust ();
             }
-        }
-    }
-
-    /// <summary>
-    ///     The right offset needed to use a vertical scrollbar or for another reason. This is only needed with the
-    ///     keyboard navigation.
-    /// </summary>
-    public int RightOffset
-    {
-        get => _rightOffset;
-        set
-        {
-            if (!_wordWrap && CurrentColumn == GetCurrentLine ().Count && _rightOffset > 0 && value == 0)
-            {
-                _leftColumn = Math.Max (_leftColumn - _rightOffset, 0);
-            }
-
-            _rightOffset = value;
-            Adjust ();
         }
     }
 
@@ -3388,7 +3350,7 @@ public class TextView : View
 
             if (_model.Count > 0 && _shiftSelecting && Selecting)
             {
-                if (CurrentRow - _topRow + BottomOffset >= Frame.Height - 1 && _model.Count + BottomOffset > _topRow + CurrentRow)
+                if (CurrentRow - _topRow >= Frame.Height - 1 && _model.Count > _topRow + CurrentRow)
                 {
                     ScrollTo (_topRow + Frame.Height);
                 }
@@ -3398,14 +3360,14 @@ public class TextView : View
                 }
                 else if (ev.Position.Y >= Frame.Height)
                 {
-                    ScrollTo (_model.Count + BottomOffset);
+                    ScrollTo (_model.Count);
                 }
                 else if (ev.Position.Y < 0 && _topRow > 0)
                 {
                     ScrollTo (0);
                 }
 
-                if (CurrentColumn - _leftColumn + RightOffset >= Frame.Width - 1 && line.Count + RightOffset > _leftColumn + CurrentColumn)
+                if (CurrentColumn - _leftColumn >= Frame.Width - 1 && line.Count > _leftColumn + CurrentColumn)
                 {
                     ScrollTo (_leftColumn + Frame.Width, false);
                 }
@@ -3415,7 +3377,7 @@ public class TextView : View
                 }
                 else if (ev.Position.X >= Frame.Width)
                 {
-                    ScrollTo (line.Count + RightOffset, false);
+                    ScrollTo (line.Count, false);
                 }
                 else if (ev.Position.X < 0 && _leftColumn > 0)
                 {
@@ -3584,8 +3546,8 @@ public class TextView : View
         SetNormalColor ();
 
         (int width, int height) offB = OffSetBackground ();
-        int right = Frame.Width + offB.width + RightOffset;
-        int bottom = Frame.Height + offB.height + BottomOffset;
+        int right = Frame.Width + offB.width;
+        int bottom = Frame.Height + offB.height;
         var row = 0;
 
         for (int idxRow = _topRow; idxRow < _model.Count; idxRow++)
@@ -3862,7 +3824,7 @@ public class TextView : View
         int posX = CurrentColumn - _leftColumn;
         int posY = CurrentRow - _topRow;
 
-        if (posX > -1 && col >= posX && posX < Frame.Width - RightOffset && _topRow <= CurrentRow && posY < Frame.Height - BottomOffset)
+        if (posX > -1 && col >= posX && posX < Frame.Width && _topRow <= CurrentRow && posY < Frame.Height)
         {
             Move (col, CurrentRow - _topRow);
             return new (col, CurrentRow - _topRow);
@@ -3933,7 +3895,7 @@ public class TextView : View
         else if (!_wordWrap)
         {
             int maxlength =
-                _model.GetMaxVisibleLine (_topRow, _topRow + Frame.Height + RightOffset, TabWidth);
+                _model.GetMaxVisibleLine (_topRow, _topRow + Frame.Height, TabWidth);
             _leftColumn = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
         }
 
@@ -4112,18 +4074,18 @@ public class TextView : View
             need = true;
         }
         else if (!_wordWrap
-                 && (CurrentColumn - _leftColumn + RightOffset > Frame.Width + offB.width || dSize.size + RightOffset >= Frame.Width + offB.width))
+                 && (CurrentColumn - _leftColumn > Frame.Width + offB.width || dSize.size >= Frame.Width + offB.width))
         {
             _leftColumn = TextModel.CalculateLeftColumn (
                                                          line,
                                                          _leftColumn,
                                                          CurrentColumn,
-                                                         Frame.Width + offB.width - RightOffset,
+                                                         Frame.Width + offB.width,
                                                          TabWidth
                                                         );
             need = true;
         }
-        else if ((_wordWrap && _leftColumn > 0) || (dSize.size + RightOffset < Frame.Width + offB.width && tSize.size + RightOffset < Frame.Width + offB.width))
+        else if ((_wordWrap && _leftColumn > 0) || (dSize.size < Frame.Width + offB.width && tSize.size < Frame.Width + offB.width))
         {
             if (_leftColumn > 0)
             {
@@ -4137,9 +4099,9 @@ public class TextView : View
             _topRow = CurrentRow;
             need = true;
         }
-        else if (CurrentRow - _topRow + BottomOffset >= Frame.Height + offB.height)
+        else if (CurrentRow - _topRow >= Frame.Height + offB.height)
         {
-            _topRow = Math.Min (Math.Max (CurrentRow - Frame.Height + 1 + BottomOffset, 0), CurrentRow);
+            _topRow = Math.Min (Math.Max (CurrentRow - Frame.Height + 1, 0), CurrentRow);
             need = true;
         }
         else if (_topRow > 0 && CurrentRow < _topRow)
@@ -5339,7 +5301,7 @@ public class TextView : View
 
             CurrentRow++;
 
-            if (CurrentRow + BottomOffset >= _topRow + Frame.Height)
+            if (CurrentRow >= _topRow + Frame.Height)
             {
                 _topRow++;
                 SetNeedsDisplay ();
@@ -5837,9 +5799,9 @@ public class TextView : View
             r = GetCurrentLine ();
             int idx = TextModel.GetColFromX (r, _leftColumn, Math.Max (ev.Position.X, 0), TabWidth);
 
-            if (idx - _leftColumn >= r.Count + RightOffset)
+            if (idx - _leftColumn >= r.Count)
             {
-                CurrentColumn = Math.Max (r.Count - _leftColumn + RightOffset, 0);
+                CurrentColumn = Math.Max (r.Count - _leftColumn, 0);
             }
             else
             {
