@@ -16,7 +16,7 @@ ENV LANG=en_US.UTF-8 \
 	DISPLAY=:0
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["Terminal.Gui/Directory.Build.props", "Terminal.Gui/"]
 COPY ["UICatalog/UICatalog.csproj", "UICatalog/"]
