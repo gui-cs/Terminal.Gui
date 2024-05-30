@@ -78,6 +78,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         Application.OnMouseEvent (new () { Position = new (xy + 1, xy + 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
 
         Assert.Equal (expectedMoved, new Point (5, 5) == testView.Frame.Location);
+        top.Dispose ();
     }
 
     [Theory]
