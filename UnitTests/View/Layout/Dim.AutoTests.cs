@@ -976,8 +976,9 @@ public class DimAutoTests (ITestOutputHelper output)
     public void DimAutoStyle_Content_IgnoresSubviews_When_ContentSize_Is_Set ()
     {
         var view = new View ();
-        var subview = new View () {
-                Frame = new Rectangle (50, 50, 1, 1)
+        var subview = new View ()
+        {
+            Frame = new Rectangle (50, 50, 1, 1)
         };
         view.SetContentSize (new (10, 5));
 
@@ -1090,7 +1091,7 @@ public class DimAutoTests (ITestOutputHelper output)
         };
         view.Add (subview);
         //view.LayoutSubviews ();
-        view.SetRelativeLayout(new (200,200));
+        view.SetRelativeLayout (new (200, 200));
 
         Assert.Equal (expectedSize, view.Frame.Width);
     }
@@ -1321,6 +1322,32 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (new (5, 5), view.Frame.Size);
 
 
+    }
+
+    [Fact]
+    public void Nested_Text_Within_Content ()
+    {
+        DimAutoTestView superView = new (Auto (DimAutoStyle.Content), Auto (DimAutoStyle.Content));
+
+        DimAutoTestView subView1 = new (Auto (DimAutoStyle.Text), Auto (DimAutoStyle.Text))
+        {
+            Text = "01234"
+        };
+
+        DimAutoTestView subView2 = new (Auto (DimAutoStyle.Text), Auto (DimAutoStyle.Text))
+        {
+            Text = "ABCD",
+            X = Pos.Right (subView1)
+        };
+
+        superView.Add (subView1, subView2);
+
+        superView.SetRelativeLayout (new (10, 10));
+        superView.LayoutSubviews ();
+
+        Assert.Equal (new (5, 1), subView1.Frame.Size);
+        Assert.Equal (new (4, 1), subView2.Frame.Size);
+        Assert.Equal (new (9, 1), superView.Frame.Size);
     }
 
     // Test variations of Frame

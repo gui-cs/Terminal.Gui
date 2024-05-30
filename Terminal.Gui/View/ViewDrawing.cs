@@ -557,6 +557,7 @@ public partial class View
 
         if (Subviews.Any (s => s.SuperViewRendersLineCanvas))
         {
+            // BUGBUG: Should this be s => s.Enabled && s.Super...?
             foreach (View subview in Subviews.Where (s => s.SuperViewRendersLineCanvas))
             {
                 // Combine the LineCanvas'
