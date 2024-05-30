@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Xunit.Abstractions;
-using static Terminal.Gui.Dim;
+﻿using Xunit.Abstractions;
 using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui.LayoutTests;
@@ -12,7 +10,6 @@ public class PosPercentTests (ITestOutputHelper output)
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Theory]
-    [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
     public void PosPercent_PlusOne (bool testHorizontal)
@@ -21,8 +18,8 @@ public class PosPercentTests (ITestOutputHelper output)
 
         var view = new View
         {
-            X = testHorizontal ? Pos.Percent (50) + Pos.Percent (10) + 1 : 1,
-            Y = testHorizontal ? 1 : Pos.Percent (50) + Pos.Percent (10) + 1,
+            X = testHorizontal ? Percent (50) + Percent (10) + 1 : 1,
+            Y = testHorizontal ? 1 : Percent (50) + Percent (10) + 1,
             Width = 10,
             Height = 10
         };
@@ -45,29 +42,31 @@ public class PosPercentTests (ITestOutputHelper output)
             Assert.Equal (1, view.Frame.X);
             Assert.Equal (61, view.Frame.Y);
         }
+
+        top.Dispose ();
     }
 
     [Fact]
     public void PosPercent_SetsValue ()
     {
-        int f = 0;
-        Pos pos = Pos.Percent (f);
+        var f = 0;
+        Pos pos = Percent (f);
         Assert.Equal ($"Percent({f})", pos.ToString ());
         f = 50;
-        pos = Pos.Percent (f);
+        pos = Percent (f);
         Assert.Equal ($"Percent({f})", pos.ToString ());
         f = 100;
-        pos = Pos.Percent (f);
+        pos = Percent (f);
         Assert.Equal ($"Percent({f})", pos.ToString ());
     }
 
     [Fact]
     public void PosPercent_ThrowsOnIvalid ()
     {
-        Pos pos = Pos.Percent (0);
-        Assert.Throws<ArgumentException> (() => pos = Pos.Percent (-1));
+        Pos pos = Percent (0);
+        Assert.Throws<ArgumentException> (() => pos = Percent (-1));
+
         //Assert.Throws<ArgumentException> (() => pos = Pos.Percent (101));
         //Assert.Throws<ArgumentException> (() => pos = Pos.Percent (1000001));
     }
-
 }
