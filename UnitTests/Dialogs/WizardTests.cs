@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.DialogTests;
 
-public class WizardTests (ITestOutputHelper output)
+public class WizardTests ()
 {
     // =========== Wizard Tests
     [Fact]

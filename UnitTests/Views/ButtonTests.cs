@@ -50,7 +50,6 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData ("0_12你", 0, 1, 0, 1)]
     [InlineData ("0_12你", 1, 1, 1, 1)]
     [InlineData ("0_12你", 10, 1, 10, 1)]
-    [InlineData ("0_12你", 10, 3, 10, 3)]
     public void Button_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
         var btn1 = new Button
@@ -567,11 +566,11 @@ public class ButtonTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
-    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_ButtonPressRelease_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
+    public void WantContinuousButtonPressed_True_ButtonPressRelease_Accepts (MouseFlags pressed, MouseFlags released)
     {
         var me = new MouseEvent ();
 

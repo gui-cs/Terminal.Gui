@@ -1394,7 +1394,7 @@ oot two
 
         Assert.True (accepted);
         Assert.False (activated);
-        Assert.Equal (null, selectedObject);
+        Assert.Null (selectedObject);
 
         return;
 

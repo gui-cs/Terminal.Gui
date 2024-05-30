@@ -10,8 +10,6 @@ namespace Terminal.Gui.ViewTests;
 /// </summary>
 public class TextTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     // TextFormatter.Size should be empty unless DimAuto is set or ContentSize is set
     [Theory]
     [InlineData ("", 0, 0)]

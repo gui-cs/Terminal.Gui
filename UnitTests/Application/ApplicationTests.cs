@@ -267,8 +267,6 @@ public class ApplicationTests
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel topLevel = null;
-
         Assert.Throws<InvalidOperationException> (
                                                   () =>
                                                       Application.InternalInit (
@@ -282,7 +280,6 @@ public class ApplicationTests
         Assert.Null (Application.Driver);
 
         // Now try the other way
-        topLevel = null;
         Application.InternalInit (new FakeDriver ());
 
         Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver ()));

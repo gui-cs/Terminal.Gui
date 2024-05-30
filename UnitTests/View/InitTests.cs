@@ -125,11 +125,11 @@ public class InitTests
         var superView = new View ();
         superView.Add (view);
 
-        var initialized = false;
-        view.Initialized += (s, e) => initialized = true;
+        //var initialized = false;
+        //view.Initialized += (s, e) => initialized = true;
 
-        var superViewInitialized = false;
-        superView.Initialized += (s, e) => superViewInitialized = true;
+        //var superViewInitialized = false;
+        //superView.Initialized += (s, e) => superViewInitialized = true;
 
         Assert.False (view.IsInitialized, "View should not be initialized");
         Assert.False (superView.IsInitialized, "SuperView should not be initialized");

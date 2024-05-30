@@ -155,12 +155,9 @@ public class DrawTests (ITestOutputHelper _output)
                                                       _output);
     }
 
-    [Theory]
-    [InlineData (0, 0, 1, 1)]
-    [InlineData (0, 0, 2, 2)]
-    [InlineData (-1, -1, 2, 2)]
+    [Fact]
     [SetupFakeDriver]
-    public void Clear_ClearsEntireViewport (int x, int y, int width, int height)
+    public void Clear_ClearsEntireViewport ()
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -193,12 +190,9 @@ public class DrawTests (ITestOutputHelper _output)
                                                       _output);
     }
 
-    [Theory]
-    [InlineData (0, 0, 1, 1)]
-    [InlineData (0, 0, 2, 2)]
-    [InlineData (-1, -1, 2, 2)]
+    [Fact]
     [SetupFakeDriver]
-    public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly (int x, int y, int width, int height)
+    public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly ()
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -388,7 +382,7 @@ public class DrawTests (ITestOutputHelper _output)
                                                0
                                                """,
                                                Application.Driver,
-                                               Colors.ColorSchemes ["Base"].Normal
+                                               Colors.ColorSchemes ["Base"]!.Normal
                                               );
         top.Dispose ();
     }
@@ -686,8 +680,6 @@ public class DrawTests (ITestOutputHelper _output)
 
         // BUGBUG: v2 - it's bogus to reference .Frame before BeginInit. And why is the clip being set anyway???
 
-        void Top_LayoutComplete (object sender, LayoutEventArgs e) { Application.Driver.Clip = container.Frame; }
-
         top.LayoutComplete += Top_LayoutComplete;
         Application.Begin (top);
 
@@ -732,6 +724,10 @@ public class DrawTests (ITestOutputHelper _output)
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
         top.Dispose ();
+
+        return;
+
+        void Top_LayoutComplete (object? sender, LayoutEventArgs e) { Application.Driver.Clip = container.Frame; }
     }
 
     [Fact]
