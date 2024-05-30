@@ -13,7 +13,7 @@ public class ColorPickerTests
         colorPicker.BeginInit ();
         colorPicker.EndInit ();
         colorPicker.LayoutSubviews ();
-        Assert.Equal (new Rectangle (0, 0, 32, 4), colorPicker.Frame);
+        Assert.Equal (new (0, 0, 32, 4), colorPicker.Frame);
     }
 
     [Fact]
@@ -51,9 +51,9 @@ public class ColorPickerTests
         top.Add (colorPicker);
         Application.Begin (top);
 
-        Assert.False (colorPicker.NewMouseEvent (new MouseEvent ()));
+        Assert.False (colorPicker.NewMouseEvent (new ()));
 
-        Assert.True (colorPicker.NewMouseEvent (new MouseEvent { Position = new (4, 1), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (colorPicker.NewMouseEvent (new() { Position = new (4, 1), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (ColorName.Blue, colorPicker.SelectedColor);
         top.Dispose ();
     }
@@ -70,7 +70,7 @@ public class ColorPickerTests
         Assert.Equal (0, colorPicker.Cursor.X);
         Assert.Equal (0, colorPicker.Cursor.Y);
 
-        colorPicker.Cursor = new Point (7, 1);
+        colorPicker.Cursor = new (7, 1);
         Assert.Equal (ColorName.White, colorPicker.SelectedColor);
 
         colorPicker.Cursor = Point.Empty;
