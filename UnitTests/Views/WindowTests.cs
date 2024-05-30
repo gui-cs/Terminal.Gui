@@ -26,6 +26,7 @@ public class WindowTests
 
         Exception exception = Record.Exception (() => win.NewKeyDownEvent (KeyCode.AltMask));
         Assert.Null (exception);
+        top.Dispose ();
     }
 
     [Fact]
@@ -119,6 +120,7 @@ public class WindowTests
 └──────────────────┘",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -224,5 +226,6 @@ public class WindowTests
         Assert.True (view1.HasFocus);
         Assert.False (win2.HasFocus);
         Assert.False (view2.HasFocus);
+        win1.Dispose ();
     }
 }
