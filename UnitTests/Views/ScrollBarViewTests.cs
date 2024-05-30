@@ -15,7 +15,8 @@ public class ScrollBarViewTests
     [ScrollBarAutoInitShutdown]
     public void AutoHideScrollBars_Check ()
     {
-        Hosting_A_View_To_A_ScrollBarView ();
+        _scrollBar = new ScrollBarView (_hostView, true);
+        Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
 
@@ -132,6 +133,7 @@ public class ScrollBarViewTests
         Assert.Equal (79, _scrollBar.OtherScrollBarView.Viewport.Width);
         Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
         Assert.Equal (1, _scrollBar.OtherScrollBarView.Viewport.Height);
+        _hostView.SuperView.Dispose ();
     }
 
     [Fact]
@@ -214,13 +216,15 @@ public class ScrollBarViewTests
 │▼│
 └─┘";
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        top.Dispose ();
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
     public void ChangedPosition_Negative_Value ()
     {
-        Hosting_A_View_To_A_ScrollBarView ();
+        _scrollBar = new ScrollBarView (_hostView, true);
+        Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
 
@@ -231,13 +235,16 @@ public class ScrollBarViewTests
         _scrollBar.OtherScrollBarView.Position = -50;
         Assert.Equal (0, _scrollBar.OtherScrollBarView.Position);
         Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
+
+        _hostView.SuperView.Dispose ();
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
     public void ChangedPosition_Scrolling ()
     {
-        Hosting_A_View_To_A_ScrollBarView ();
+        _scrollBar = new ScrollBarView (_hostView, true);
+        Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
 
@@ -264,13 +271,15 @@ public class ScrollBarViewTests
             _scrollBar.OtherScrollBarView.Position -= 1;
             Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
         }
+        _hostView.SuperView.Dispose ();
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
     public void ChangedPosition_Update_The_Hosted_View ()
     {
-        Hosting_A_View_To_A_ScrollBarView ();
+        _scrollBar = new ScrollBarView (_hostView, true);
+        Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
 
@@ -279,6 +288,7 @@ public class ScrollBarViewTests
 
         _scrollBar.OtherScrollBarView.Position = 5;
         Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
+        _hostView.SuperView.Dispose ();
     }
 
     [Fact]
@@ -355,6 +365,7 @@ This is a tes
 ",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -605,6 +616,7 @@ This is a tes▼
 ",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -654,13 +666,15 @@ This is a test
 ",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
     public void DrawContent_Update_The_ScrollBarView_Position ()
     {
-        Hosting_A_View_To_A_ScrollBarView ();
+        _scrollBar = new ScrollBarView (_hostView, true);
+        Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
 
@@ -671,6 +685,7 @@ This is a test
         _hostView.Left = 6;
         _hostView.Draw ();
         Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
+        _hostView.SuperView.Dispose ();
     }
 
     [Fact]
@@ -694,6 +709,7 @@ This is a test
 │◄├────────────────┤░░░░░░░░░░░░░░░░░░►│
 └──────────────────────────────────────┘";
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -733,7 +749,6 @@ This is a test
         RemoveHandlers ();
 
         _scrollBar = new ScrollBarView (_hostView, true);
-
         Application.Begin (_hostView.SuperView as Toplevel);
 
         Assert.True (_scrollBar.IsVertical);
@@ -752,6 +767,7 @@ This is a test
         Assert.Equal (_scrollBar.Size, _hostView.Lines);
         Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
         Assert.Equal (_scrollBar.OtherScrollBarView.Size, _hostView.Cols);
+        _hostView.SuperView.Dispose ();
     }
 
     [Fact]
@@ -914,6 +930,7 @@ This is a test
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (0, 0, 10, 10), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -928,6 +945,8 @@ This is a test
 
         Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
         Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);
+        top.Dispose ();
+
     }
 
     [Fact]
@@ -942,6 +961,7 @@ This is a test
 
         Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
         Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);
+        top.Dispose ();
     }
 
     [Fact]
@@ -994,15 +1014,19 @@ This is a test
         Assert.Equal (99, max);
         Assert.True (sbv.Visible);
         Assert.True (sbv.OtherScrollBarView.Visible);
+        top.Dispose ();
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
     public void KeepContentAlwaysInViewport_False ()
     {
-        Hosting_A_View_To_A_ScrollBarView ();
+        _scrollBar = new ScrollBarView (_hostView, true);
+        Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
+        _hostView.SuperView.LayoutSubviews ();
+        _hostView.Draw ();
 
         _scrollBar.KeepContentAlwaysInViewport = false;
         _scrollBar.Position = 50;
@@ -1016,16 +1040,20 @@ This is a test
         Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
         Assert.Equal (99, _scrollBar.OtherScrollBarView.Position);
         Assert.Equal (99, _hostView.Left);
+        _hostView.SuperView.Dispose ();
+
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
     public void KeepContentAlwaysInViewport_True ()
     {
-        Hosting_A_View_To_A_ScrollBarView ();
+        _scrollBar = new ScrollBarView (_hostView, true);
+        Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
-
+        _hostView.SuperView.LayoutSubviews ();
+        _hostView.Draw ();
         Assert.Equal (80, _hostView.Viewport.Width);
         Assert.Equal (25, _hostView.Viewport.Height);
         Assert.Equal (79, _scrollBar.OtherScrollBarView.Viewport.Width);
@@ -1060,19 +1088,22 @@ This is a test
         Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
         Assert.True (_scrollBar.Visible);
         Assert.True (_scrollBar.OtherScrollBarView.Visible);
+        _hostView.SuperView.Dispose ();
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
     public void OtherScrollBarView_Not_Null ()
     {
-        Hosting_A_View_To_A_ScrollBarView ();
+        _scrollBar = new ScrollBarView (_hostView, true);
+        Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
 
         Assert.NotNull (_scrollBar.OtherScrollBarView);
         Assert.NotEqual (_scrollBar, _scrollBar.OtherScrollBarView);
         Assert.Equal (_scrollBar.OtherScrollBarView.OtherScrollBarView, _scrollBar);
+        _hostView.SuperView.Dispose ();
     }
 
     [Fact]
@@ -1082,18 +1113,23 @@ This is a test
         var sbv = new ScrollBarView { Position = 1 };
         Assert.Equal (1, sbv.Position);
         Assert.NotEqual (0, sbv.Position);
+        sbv.Dispose ();
     }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
     public void ShowScrollIndicator_Check ()
     {
-        Hosting_A_View_To_A_ScrollBarView ();
+        _scrollBar = new ScrollBarView (_hostView, true);
+        Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
+        _hostView.SuperView.LayoutSubviews ();
+        _hostView.Draw ();
 
         Assert.True (_scrollBar.ShowScrollIndicator);
         Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
+        _hostView.SuperView.Dispose ();
     }
 
     [Fact]
@@ -1165,6 +1201,7 @@ This is a test             ",
         Assert.Equal (5, sbv.Size);
         Assert.False (sbv.ShowScrollIndicator);
         Assert.False (sbv.Visible);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1235,6 +1272,7 @@ This is a test             ",
 │▼│
 └─┘";
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        top.Dispose ();
     }
 
     private void _hostView_DrawContent (object sender, DrawEventArgs e)

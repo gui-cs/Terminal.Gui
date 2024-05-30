@@ -260,6 +260,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 80, 25), win.Frame);
         Assert.Equal (new (68, 22, 10, 1), tv.Frame);
         Application.End (rs);
+        top.Dispose ();
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
@@ -293,6 +294,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
         Assert.Equal (new (68, 20, 10, 1), tv.Frame);
 
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]

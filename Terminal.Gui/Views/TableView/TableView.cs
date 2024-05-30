@@ -908,10 +908,10 @@ public class TableView : View
         // What columns to render at what X offset in viewport
         ColumnToRender [] columnsToRender = CalculateViewport (Viewport).ToArray ();
 
-        Driver.SetAttribute (GetNormalColor ());
+        Driver?.SetAttribute (GetNormalColor ());
 
         //invalidate current row (prevents scrolling around leaving old characters in the frame
-        Driver.AddStr (new string (' ', Viewport.Width));
+        Driver?.AddStr (new string (' ', Viewport.Width));
 
         var line = 0;
 

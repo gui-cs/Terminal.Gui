@@ -172,6 +172,7 @@ public class KeyboardTests
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
+        top.Dispose ();
     }
 
     [Fact]
@@ -224,6 +225,7 @@ public class KeyboardTests
         Assert.True (win2.CanFocus);
         Assert.False (win2.HasFocus);
         Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
+        top.Dispose ();
     }
 
     [Fact]
@@ -358,6 +360,7 @@ public class KeyboardTests
         Assert.True (view.ApplicationCommand);
         Assert.True (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);
+        top.Dispose ();
     }
 
     [Fact]
@@ -385,6 +388,7 @@ public class KeyboardTests
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);
+        top.Dispose ();
     }
 
     [Fact]
@@ -423,6 +427,7 @@ public class KeyboardTests
 
         // Reset the QuitKey to avoid throws errors on another tests
         Application.QuitKey = Key.Q.WithCtrl;
+        top.Dispose ();
     }
 
     // test Application key Bindings

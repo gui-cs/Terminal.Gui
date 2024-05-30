@@ -3,10 +3,6 @@ using System.Text;
 using Xunit.Abstractions;
 using static Terminal.Gui.Dim;
 
-
-// Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
-
 namespace Terminal.Gui.LayoutTests;
 
 public class DimTests
@@ -28,7 +24,7 @@ public class DimTests
     public void DimAbsolute_Calculate_ReturnsCorrectValue ()
     {
         var dim = new DimAbsolute (10);
-        var result = dim.Calculate (0, 100, null, Dimension.None);
+        int result = dim.Calculate (0, 100, null, Dimension.None);
         Assert.Equal (10, result);
     }
 
@@ -144,6 +140,7 @@ public class DimTests
         Application.Run (top);
 
         Assert.Equal (0, count);
+        top.Dispose ();
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
@@ -173,7 +170,7 @@ public class DimTests
     [Fact]
     public void DimHeight_Set_To_Null_Throws ()
     {
-        Dim dim = Dim.Height (null);
+        Dim dim = Height (null);
         Assert.Throws<NullReferenceException> (() => dim.ToString ());
     }
 
@@ -183,13 +180,13 @@ public class DimTests
     {
         var testVal = Rectangle.Empty;
         var testValview = new View { Frame = testVal };
-        Dim dim = Dim.Height (testValview);
+        Dim dim = Height (testValview);
         Assert.Equal ($"View(Height,View(){testVal})", dim.ToString ());
         testValview.Dispose ();
 
-        testVal = new Rectangle (1, 2, 3, 4);
-        testValview = new View { Frame = testVal };
-        dim = Dim.Height (testValview);
+        testVal = new (1, 2, 3, 4);
+        testValview = new() { Frame = testVal };
+        dim = Height (testValview);
         Assert.Equal ($"View(Height,View(){testVal})", dim.ToString ());
         testValview.Dispose ();
     }
@@ -212,7 +209,7 @@ public class DimTests
         Assert.Equal (dimCombine.Right, dimAbsolute);
         Assert.Equal (20, dimCombine.GetAnchor (100));
 
-        var view = new View { Frame = new Rectangle (20, 10, 20, 1) };
+        var view = new View { Frame = new (20, 10, 20, 1) };
         var dimViewHeight = new DimView (view, Dimension.Height);
         Assert.Equal (1, dimViewHeight.GetAnchor (0));
         var dimViewWidth = new DimView (view, Dimension.Width);
@@ -236,7 +233,7 @@ public class DimTests
         {
             X = 0,
             Y = 0,
-            Width = Dim.Percent (50),
+            Width = Percent (50),
             Height = 5,
             Title = "f1"
         };
@@ -245,7 +242,7 @@ public class DimTests
         {
             X = Pos.Right (f1),
             Y = 0,
-            Width = Dim.Fill (),
+            Width = Fill (),
             Height = 5,
             Title = "f2"
         };
@@ -254,8 +251,8 @@ public class DimTests
         {
             X = Pos.X (f1) + 2,
             Y = Pos.Bottom (f1) + 2,
-            Width = Dim.Width (f1) - 2,
-            Height = Dim.Fill () - 2,
+            Width = Width (f1) - 2,
+            Height = Fill () - 2,
             ValidatePosDim = true,
             Text = "v1"
         };
@@ -264,32 +261,32 @@ public class DimTests
         {
             X = Pos.X (f2) + 2,
             Y = Pos.Bottom (f2) + 2,
-            Width = Dim.Width (f2) - 2,
-            Height = Dim.Fill () - 2,
+            Width = Width (f2) - 2,
+            Height = Fill () - 2,
             ValidatePosDim = true,
             Text = "v2"
         };
 
         var v3 = new Button
         {
-            Width = Dim.Percent (10),
-            Height = Dim.Percent (10),
+            Width = Percent (10),
+            Height = Percent (10),
             ValidatePosDim = true,
             Text = "v3"
         };
 
         var v4 = new Button
         {
-            Width = Dim.Absolute (50),
-            Height = Dim.Absolute (50),
+            Width = Absolute (50),
+            Height = Absolute (50),
             ValidatePosDim = true,
             Text = "v4"
         };
 
         var v5 = new Button
         {
-            Width = Dim.Width (v1) - Dim.Width (v3),
-            Height = Dim.Height (v1) - Dim.Height (v3),
+            Width = Width (v1) - Width (v3),
+            Height = Height (v1) - Height (v3),
             ValidatePosDim = true,
             Text = "v5"
         };
@@ -298,8 +295,8 @@ public class DimTests
         {
             X = Pos.X (f2),
             Y = Pos.Bottom (f2) + 2,
-            Width = Dim.Percent (20, DimPercentMode.Position),
-            Height = Dim.Percent (20, DimPercentMode.Position),
+            Width = Percent (20, DimPercentMode.Position),
+            Height = Percent (20, DimPercentMode.Position),
             ValidatePosDim = true,
             Text = "v6"
         };
@@ -362,10 +359,10 @@ public class DimTests
 #else
                        Assert.Equal ($"Combine(View(Height,Button(){v1.Frame})-View(Height,Button(){v3.Viewport}))", v5.Height.ToString ( ));
 #endif
-                       Assert.Equal (38, v5.Frame.Width);  // 47-9=38
+                       Assert.Equal (38, v5.Frame.Width); // 47-9=38
                        Assert.Equal (80, v5.Frame.Height); // 89-9=80
 
-                       Assert.Equal (9, v6.Frame.Width);   // 47*20%=9
+                       Assert.Equal (9, v6.Frame.Width); // 47*20%=9
                        Assert.Equal (18, v6.Frame.Height); // 89*20%=18
 
                        w.Width = 200;
@@ -395,7 +392,7 @@ public class DimTests
                        Assert.Equal ($"Combine(View(Width,FrameView(){f1.Frame})-Absolute(2))", v1.Width.ToString ());
 #endif
                        Assert.Equal ("Combine(Fill(0)-Absolute(2))", v1.Height.ToString ());
-                       Assert.Equal (97, v1.Frame.Width);   // 99-2=97
+                       Assert.Equal (97, v1.Frame.Width); // 99-2=97
                        Assert.Equal (189, v1.Frame.Height); // 198-2-7=189
 
                        v2.Text = "Button2";
@@ -406,21 +403,22 @@ public class DimTests
                        Assert.Equal ($"Combine(View(Width,FrameView(){f2.Frame})-Absolute(2))", v2.Width.ToString ());
 #endif
                        Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
-                       Assert.Equal (97, v2.Frame.Width);   // 99-2=97
+                       Assert.Equal (97, v2.Frame.Width); // 99-2=97
                        Assert.Equal (189, v2.Frame.Height); // 198-2-7=189
 
                        v3.Text = "Button3";
 
                        // 198*10%=19 * Percent is related to the super-view if it isn't null otherwise the view width
                        Assert.Equal (19, v3.Frame.Width);
+
                        // 199*10%=19
                        Assert.Equal (19, v3.Frame.Height);
 
                        v4.Text = "Button4";
-                       v4.Width = Auto(DimAutoStyle.Text);
+                       v4.Width = Auto (DimAutoStyle.Text);
                        v4.Height = Auto (DimAutoStyle.Text);
-                       Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Width);
-                       Assert.Equal (Dim.Auto (DimAutoStyle.Text), v4.Height);
+                       Assert.Equal (Auto (DimAutoStyle.Text), v4.Width);
+                       Assert.Equal (Auto (DimAutoStyle.Text), v4.Height);
                        Assert.Equal (11, v4.Frame.Width); // 11 is the text length and because is DimAbsolute
                        Assert.Equal (1, v4.Frame.Height); // 1 because is DimAbsolute
 
@@ -434,17 +432,18 @@ public class DimTests
                        Assert.Equal ($"Combine(View(Height,Button(){v1.Frame})-View(Height,Button(){v3.Frame}))", v5.Height.ToString ());
 #endif
 
-                       Assert.Equal (78, v5.Frame.Width);   // 97-9=78
+                       Assert.Equal (78, v5.Frame.Width); // 97-9=78
                        Assert.Equal (170, v5.Frame.Height); // 189-19=170
 
                        v6.Text = "Button6";
-                       Assert.Equal (19, v6.Frame.Width);  // 99*20%=19
+                       Assert.Equal (19, v6.Frame.Width); // 99*20%=19
                        Assert.Equal (38, v6.Frame.Height); // 198-7*20=18
                    };
 
         Application.Iteration += (s, a) => Application.RequestStop ();
 
         Application.Run (t);
+        t.Dispose ();
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
@@ -457,8 +456,8 @@ public class DimTests
 
         var view = new View
         {
-            Width = Dim.Width (super), // this is allowed
-            Height = Dim.Height (super), // this is allowed
+            Width = Width (super), // this is allowed
+            Height = Height (super), // this is allowed
             Text = "view"
         };
 
@@ -476,39 +475,39 @@ public class DimTests
     {
         var n1 = 0;
         var n2 = 0;
-        Dim dim1 = Dim.Absolute (n1);
-        Dim dim2 = Dim.Absolute (n2);
+        Dim dim1 = Absolute (n1);
+        Dim dim2 = Absolute (n2);
         Assert.Equal (dim1, dim2);
 
         n1 = n2 = 1;
-        dim1 = Dim.Absolute (n1);
-        dim2 = Dim.Absolute (n2);
+        dim1 = Absolute (n1);
+        dim2 = Absolute (n2);
         Assert.Equal (dim1, dim2);
 
         n1 = n2 = -1;
-        dim1 = Dim.Absolute (n1);
-        dim2 = Dim.Absolute (n2);
+        dim1 = Absolute (n1);
+        dim2 = Absolute (n2);
         Assert.Equal (dim1, dim2);
 
         n1 = 0;
         n2 = 1;
-        dim1 = Dim.Absolute (n1);
-        dim2 = Dim.Absolute (n2);
+        dim1 = Absolute (n1);
+        dim2 = Absolute (n2);
         Assert.NotEqual (dim1, dim2);
     }
 
     [Fact]
     public void DimSized_SetsValue ()
     {
-        Dim dim = Dim.Absolute (0);
+        Dim dim = Absolute (0);
         Assert.Equal ("Absolute(0)", dim.ToString ());
 
         var testVal = 5;
-        dim = Dim.Absolute (testVal);
+        dim = Absolute (testVal);
         Assert.Equal ($"Absolute({testVal})", dim.ToString ());
 
         testVal = -1;
-        dim = Dim.Absolute (testVal);
+        dim = Absolute (testVal);
         Assert.Equal ($"Absolute({testVal})", dim.ToString ());
     }
 
@@ -523,8 +522,8 @@ public class DimTests
 
         var view = new View
         {
-            Width = Dim.Width (view2), // this is not allowed
-            Height = Dim.Height (view2), // this is not allowed
+            Width = Width (view2), // this is not allowed
+            Height = Height (view2), // this is not allowed
             Text = "view"
         };
 
@@ -570,39 +569,39 @@ public class DimTests
         var testRect2 = Rectangle.Empty;
         var view2 = new View { Frame = testRect2 };
 
-        Dim dim1 = Dim.Width (view1);
-        Dim dim2 = Dim.Width (view1);
+        Dim dim1 = Width (view1);
+        Dim dim2 = Width (view1);
 
         // FIXED: Dim.Width should support Equals() and this should change to Equal.
         Assert.Equal (dim1, dim2);
 
-        dim2 = Dim.Width (view2);
+        dim2 = Width (view2);
         Assert.NotEqual (dim1, dim2);
 
-        testRect1 = new Rectangle (0, 1, 2, 3);
-        view1 = new View { Frame = testRect1 };
-        testRect2 = new Rectangle (0, 1, 2, 3);
-        dim1 = Dim.Width (view1);
-        dim2 = Dim.Width (view1);
+        testRect1 = new (0, 1, 2, 3);
+        view1 = new() { Frame = testRect1 };
+        testRect2 = new (0, 1, 2, 3);
+        dim1 = Width (view1);
+        dim2 = Width (view1);
 
         // FIXED: Dim.Width should support Equals() and this should change to Equal.
         Assert.Equal (dim1, dim2);
 
-        testRect1 = new Rectangle (0, -1, 2, 3);
-        view1 = new View { Frame = testRect1 };
-        testRect2 = new Rectangle (0, -1, 2, 3);
-        dim1 = Dim.Width (view1);
-        dim2 = Dim.Width (view1);
+        testRect1 = new (0, -1, 2, 3);
+        view1 = new() { Frame = testRect1 };
+        testRect2 = new (0, -1, 2, 3);
+        dim1 = Width (view1);
+        dim2 = Width (view1);
 
         // FIXED: Dim.Width should support Equals() and this should change to Equal.
         Assert.Equal (dim1, dim2);
 
-        testRect1 = new Rectangle (0, -1, 2, 3);
-        view1 = new View { Frame = testRect1 };
+        testRect1 = new (0, -1, 2, 3);
+        view1 = new() { Frame = testRect1 };
         testRect2 = Rectangle.Empty;
-        view2 = new View { Frame = testRect2 };
-        dim1 = Dim.Width (view1);
-        dim2 = Dim.Width (view2);
+        view2 = new() { Frame = testRect2 };
+        dim1 = Width (view1);
+        dim2 = Width (view2);
         Assert.NotEqual (dim1, dim2);
 #if DEBUG_IDISPOSABLE
 
@@ -615,7 +614,7 @@ public class DimTests
     [Fact]
     public void DimWidth_Set_To_Null_Throws ()
     {
-        Dim dim = Dim.Width (null);
+        Dim dim = Width (null);
         Assert.Throws<NullReferenceException> (() => dim.ToString ());
     }
 
@@ -625,13 +624,13 @@ public class DimTests
     {
         var testVal = Rectangle.Empty;
         var testValView = new View { Frame = testVal };
-        Dim dim = Dim.Width (testValView);
+        Dim dim = Width (testValView);
         Assert.Equal ($"View(Width,View(){testVal})", dim.ToString ());
         testValView.Dispose ();
 
-        testVal = new Rectangle (1, 2, 3, 4);
-        testValView = new View { Frame = testVal };
-        dim = Dim.Width (testValView);
+        testVal = new (1, 2, 3, 4);
+        testValView = new() { Frame = testVal };
+        dim = Width (testValView);
         Assert.Equal ($"View(Width,View(){testVal})", dim.ToString ());
         testValView.Dispose ();
     }

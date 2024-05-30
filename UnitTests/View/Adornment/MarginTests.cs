@@ -2,11 +2,8 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class MarginTests
+public class MarginTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public MarginTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [SetupFakeDriver]
     public void Margin_Uses_SuperView_ColorScheme ()
@@ -39,7 +36,7 @@ public class MarginTests
 MMM
 M M
 MMM",
-                                             _output
+                                             output
                                             );
         TestHelpers.AssertDriverAttributesAre ("0", null, superView.GetNormalColor ());
     }

@@ -2,11 +2,8 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class BorderTests
+public class BorderTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public BorderTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [SetupFakeDriver]
     public void Border_Parent_HasFocus_Title_Uses_FocusAttribute ()
@@ -18,13 +15,13 @@ public class BorderTests
         var view = new View { Title = "A", Height = 2, Width = 5 };
         superView.Add (view);
 
-        view.Border.Thickness = new Thickness (0, 1, 0, 0);
+        view.Border.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.ColorScheme = new ColorScheme
+        view.ColorScheme = new()
         {
-            Normal = new Attribute (Color.Red, Color.Green), 
-            Focus = new Attribute (Color.Green, Color.Red)
+            Normal = new (Color.Red, Color.Green),
+            Focus = new (Color.Green, Color.Red)
         };
         Assert.NotEqual (view.ColorScheme.Normal.Foreground, view.ColorScheme.Focus.Foreground);
         Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ());
@@ -36,7 +33,7 @@ public class BorderTests
         superView.Draw ();
 
         var expected = @"─┤A├─";
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        TestHelpers.AssertDriverContentsAre (expected, output);
         TestHelpers.AssertDriverAttributesAre ("00000", null, view.ColorScheme.Normal);
 
         view.CanFocus = true;
@@ -53,12 +50,12 @@ public class BorderTests
     public void Border_Uses_Parent_ColorScheme ()
     {
         var view = new View { Title = "A", Height = 2, Width = 5 };
-        view.Border.Thickness = new Thickness (0, 1, 0, 0);
+        view.Border.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.ColorScheme = new ColorScheme
+        view.ColorScheme = new()
         {
-            Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red)
+            Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         };
         Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ());
         Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor ());
@@ -70,7 +67,7 @@ public class BorderTests
         view.Draw ();
 
         var expected = @"─┤A├─";
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        TestHelpers.AssertDriverContentsAre (expected, output);
         TestHelpers.AssertDriverAttributesAre ("00000", null, view.ColorScheme.Normal);
     }
 
@@ -105,7 +102,7 @@ public class BorderTests
         switch (width)
         {
             case 1:
-                Assert.Equal (new Rectangle (0, 0, 1, 5), win.Frame);
+                Assert.Equal (new (0, 0, 1, 5), win.Frame);
 
                 expected = @"
 ║
@@ -114,7 +111,7 @@ public class BorderTests
 
                 break;
             case 2:
-                Assert.Equal (new Rectangle (0, 0, 2, 5), win.Frame);
+                Assert.Equal (new (0, 0, 2, 5), win.Frame);
 
                 expected = @"
 ╔╗
@@ -123,7 +120,7 @@ public class BorderTests
 
                 break;
             case 3:
-                Assert.Equal (new Rectangle (0, 0, 3, 5), win.Frame);
+                Assert.Equal (new (0, 0, 3, 5), win.Frame);
 
                 expected = @"
 ╔═╗
@@ -132,7 +129,7 @@ public class BorderTests
 
                 break;
             case 4:
-                Assert.Equal (new Rectangle (0, 0, 4, 5), win.Frame);
+                Assert.Equal (new (0, 0, 4, 5), win.Frame);
 
                 expected = @"
  ╒╕ 
@@ -142,7 +139,7 @@ public class BorderTests
 
                 break;
             case 5:
-                Assert.Equal (new Rectangle (0, 0, 5, 5), win.Frame);
+                Assert.Equal (new (0, 0, 5, 5), win.Frame);
 
                 expected = @"
  ╒═╕ 
@@ -152,7 +149,7 @@ public class BorderTests
 
                 break;
             case 6:
-                Assert.Equal (new Rectangle (0, 0, 6, 5), win.Frame);
+                Assert.Equal (new (0, 0, 6, 5), win.Frame);
 
                 expected = @"
  ╒══╕ 
@@ -162,7 +159,7 @@ public class BorderTests
 
                 break;
             case 7:
-                Assert.Equal (new Rectangle (0, 0, 7, 5), win.Frame);
+                Assert.Equal (new (0, 0, 7, 5), win.Frame);
 
                 expected = @"
  ╒═══╕ 
@@ -172,7 +169,7 @@ public class BorderTests
 
                 break;
             case 8:
-                Assert.Equal (new Rectangle (0, 0, 8, 5), win.Frame);
+                Assert.Equal (new (0, 0, 8, 5), win.Frame);
 
                 expected = @"
  ╒════╕ 
@@ -182,7 +179,7 @@ public class BorderTests
 
                 break;
             case 9:
-                Assert.Equal (new Rectangle (0, 0, 9, 5), win.Frame);
+                Assert.Equal (new (0, 0, 9, 5), win.Frame);
 
                 expected = @"
  ╒════╕  
@@ -192,7 +189,7 @@ public class BorderTests
 
                 break;
             case 10:
-                Assert.Equal (new Rectangle (0, 0, 10, 5), win.Frame);
+                Assert.Equal (new (0, 0, 10, 5), win.Frame);
 
                 expected = @"
  ╒════╕   
@@ -203,8 +200,9 @@ public class BorderTests
                 break;
         }
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        win.Dispose ();
     }
 
     [Theory]
@@ -238,7 +236,7 @@ public class BorderTests
         switch (width)
         {
             case 1:
-                Assert.Equal (new Rectangle (0, 0, 1, 4), win.Frame);
+                Assert.Equal (new (0, 0, 1, 4), win.Frame);
 
                 expected = @"
 ║
@@ -247,7 +245,7 @@ public class BorderTests
 
                 break;
             case 2:
-                Assert.Equal (new Rectangle (0, 0, 2, 4), win.Frame);
+                Assert.Equal (new (0, 0, 2, 4), win.Frame);
 
                 expected = @"
 ╔╗
@@ -256,7 +254,7 @@ public class BorderTests
 
                 break;
             case 3:
-                Assert.Equal (new Rectangle (0, 0, 3, 4), win.Frame);
+                Assert.Equal (new (0, 0, 3, 4), win.Frame);
 
                 expected = @"
 ╔═╗
@@ -265,7 +263,7 @@ public class BorderTests
 
                 break;
             case 4:
-                Assert.Equal (new Rectangle (0, 0, 4, 4), win.Frame);
+                Assert.Equal (new (0, 0, 4, 4), win.Frame);
 
                 expected = @"
  ╒╕ 
@@ -275,7 +273,7 @@ public class BorderTests
 
                 break;
             case 5:
-                Assert.Equal (new Rectangle (0, 0, 5, 4), win.Frame);
+                Assert.Equal (new (0, 0, 5, 4), win.Frame);
 
                 expected = @"
  ╒═╕ 
@@ -285,7 +283,7 @@ public class BorderTests
 
                 break;
             case 6:
-                Assert.Equal (new Rectangle (0, 0, 6, 4), win.Frame);
+                Assert.Equal (new (0, 0, 6, 4), win.Frame);
 
                 expected = @"
  ╒══╕ 
@@ -295,7 +293,7 @@ public class BorderTests
 
                 break;
             case 7:
-                Assert.Equal (new Rectangle (0, 0, 7, 4), win.Frame);
+                Assert.Equal (new (0, 0, 7, 4), win.Frame);
 
                 expected = @"
  ╒═══╕ 
@@ -305,7 +303,7 @@ public class BorderTests
 
                 break;
             case 8:
-                Assert.Equal (new Rectangle (0, 0, 8, 4), win.Frame);
+                Assert.Equal (new (0, 0, 8, 4), win.Frame);
 
                 expected = @"
  ╒════╕ 
@@ -315,7 +313,7 @@ public class BorderTests
 
                 break;
             case 9:
-                Assert.Equal (new Rectangle (0, 0, 9, 4), win.Frame);
+                Assert.Equal (new (0, 0, 9, 4), win.Frame);
 
                 expected = @"
  ╒════╕  
@@ -325,7 +323,7 @@ public class BorderTests
 
                 break;
             case 10:
-                Assert.Equal (new Rectangle (0, 0, 10, 4), win.Frame);
+                Assert.Equal (new (0, 0, 10, 4), win.Frame);
 
                 expected = @"
  ╒════╕   
@@ -336,8 +334,9 @@ public class BorderTests
                 break;
         }
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        win.Dispose ();
     }
 
     [Theory]
@@ -371,7 +370,7 @@ public class BorderTests
         switch (width)
         {
             case 1:
-                Assert.Equal (new Rectangle (0, 0, 1, 4), win.Frame);
+                Assert.Equal (new (0, 0, 1, 4), win.Frame);
 
                 expected = @"
 ║
@@ -380,7 +379,7 @@ public class BorderTests
 
                 break;
             case 2:
-                Assert.Equal (new Rectangle (0, 0, 2, 4), win.Frame);
+                Assert.Equal (new (0, 0, 2, 4), win.Frame);
 
                 expected = @"
 ╔╗
@@ -389,7 +388,7 @@ public class BorderTests
 
                 break;
             case 3:
-                Assert.Equal (new Rectangle (0, 0, 3, 4), win.Frame);
+                Assert.Equal (new (0, 0, 3, 4), win.Frame);
 
                 expected = @"
 ╔═╗
@@ -398,7 +397,7 @@ public class BorderTests
 
                 break;
             case 4:
-                Assert.Equal (new Rectangle (0, 0, 4, 4), win.Frame);
+                Assert.Equal (new (0, 0, 4, 4), win.Frame);
 
                 expected = @"
  ╒╕ 
@@ -408,7 +407,7 @@ public class BorderTests
 
                 break;
             case 5:
-                Assert.Equal (new Rectangle (0, 0, 5, 4), win.Frame);
+                Assert.Equal (new (0, 0, 5, 4), win.Frame);
 
                 expected = @"
  ╒═╕ 
@@ -418,7 +417,7 @@ public class BorderTests
 
                 break;
             case 6:
-                Assert.Equal (new Rectangle (0, 0, 6, 4), win.Frame);
+                Assert.Equal (new (0, 0, 6, 4), win.Frame);
 
                 expected = @"
  ╒══╕ 
@@ -428,7 +427,7 @@ public class BorderTests
 
                 break;
             case 7:
-                Assert.Equal (new Rectangle (0, 0, 7, 4), win.Frame);
+                Assert.Equal (new (0, 0, 7, 4), win.Frame);
 
                 expected = @"
  ╒═══╕ 
@@ -438,7 +437,7 @@ public class BorderTests
 
                 break;
             case 8:
-                Assert.Equal (new Rectangle (0, 0, 8, 4), win.Frame);
+                Assert.Equal (new (0, 0, 8, 4), win.Frame);
 
                 expected = @"
  ╒════╕ 
@@ -448,7 +447,7 @@ public class BorderTests
 
                 break;
             case 9:
-                Assert.Equal (new Rectangle (0, 0, 9, 4), win.Frame);
+                Assert.Equal (new (0, 0, 9, 4), win.Frame);
 
                 expected = @"
  ╒════╕  
@@ -458,7 +457,7 @@ public class BorderTests
 
                 break;
             case 10:
-                Assert.Equal (new Rectangle (0, 0, 10, 4), win.Frame);
+                Assert.Equal (new (0, 0, 10, 4), win.Frame);
 
                 expected = @"
  ╒════╕   
@@ -469,8 +468,9 @@ public class BorderTests
                 break;
         }
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        win.Dispose ();
     }
 
     [Theory]
@@ -523,8 +523,9 @@ public class BorderTests
                 break;
         }
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        win.Dispose ();
     }
 
     [Theory]
@@ -636,7 +637,8 @@ public class BorderTests
                 break;
         }
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        win.Dispose ();
     }
 
     [Theory]
@@ -736,8 +738,9 @@ public class BorderTests
 ║└─┘║
 ╚═══╝";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]
@@ -762,8 +765,9 @@ public class BorderTests
 ║└──────┘║
 ╚════════╝";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]
@@ -783,7 +787,8 @@ public class BorderTests
 │ │
 └─┘";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        win.Dispose ();
     }
 
     [Fact]
@@ -801,11 +806,11 @@ public class BorderTests
         var view = new View ();
         view.BorderStyle = LineStyle.Single;
         Assert.Equal (LineStyle.Single, view.BorderStyle);
-        Assert.Equal (new Thickness (1), view.Border.Thickness);
+        Assert.Equal (new (1), view.Border.Thickness);
 
         view.BorderStyle = LineStyle.Double;
         Assert.Equal (LineStyle.Double, view.BorderStyle);
-        Assert.Equal (new Thickness (1), view.Border.Thickness);
+        Assert.Equal (new (1), view.Border.Thickness);
 
         view.BorderStyle = LineStyle.None;
         Assert.Equal (LineStyle.None, view.BorderStyle);

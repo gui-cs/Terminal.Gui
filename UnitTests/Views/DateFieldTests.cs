@@ -30,7 +30,7 @@ public class DateFieldTests
 
     [Fact]
     [TestDate]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void Copy_Paste ()
     {
         var df1 = new DateField (DateTime.Parse ("12/12/1971"));

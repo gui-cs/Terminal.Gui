@@ -793,7 +793,6 @@ public class TileViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringInsertTile ()
     {
         TileView tv = GetTileView (20, 10);
@@ -822,7 +821,6 @@ public class TileViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRebuildForTileCount ()
     {
         TileView tv = GetTileView (20, 10);
@@ -850,7 +848,6 @@ public class TileViewTests
     }
 
     [Theory]
-    [AutoInitShutdown]
     [InlineData (0)]
     [InlineData (1)]
     public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRemoveTile (int idx)
