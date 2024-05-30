@@ -1027,6 +1027,16 @@ namespace Terminal.Gui {
 
 		public override void Suspend ()
 		{
+			if (Environment.OSVersion.Platform != PlatformID.Unix) {
+				return;
+			}
+
+			StopReportingMouseMoves ();
+			Console.ResetColor ();
+			Console.Clear ();
+			Platform.Suspend ();
+			Application.Refresh ();
+			StartReportingMouseMoves ();
 		}
 
 
