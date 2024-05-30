@@ -22,6 +22,7 @@ public class DimFillTests (ITestOutputHelper output)
         //view.SetRelativeLayout (new (0, 0, 32, 5));
         Assert.Equal (32, view.Frame.Width);
         Assert.Equal (5, view.Frame.Height);
+        top.Dispose ();
     }
 
 
