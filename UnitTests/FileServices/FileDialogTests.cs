@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.InteropServices;
 using Xunit.Abstractions;
@@ -421,7 +420,7 @@ public class FileDialogTests (ITestOutputHelper output)
         FileDialog fd = GetLinuxDialog ();
         fd.Title = string.Empty;
 
-        fd.Style.Culture = new CultureInfo ("en-US");
+        fd.Style.Culture = new ("en-US");
 
         fd.Draw ();
 
@@ -479,7 +478,7 @@ public class FileDialogTests (ITestOutputHelper output)
         FileDialog fd = GetWindowsDialog ();
         fd.Title = string.Empty;
 
-        fd.Style.Culture = new CultureInfo ("en-US");
+        fd.Style.Culture = new ("en-US");
 
         fd.Draw ();
 
@@ -582,21 +581,21 @@ public class FileDialogTests (ITestOutputHelper output)
     {
         // Arrange
         var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), "/");
-        fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
+        fileSystem.MockTime (() => new (2010, 01, 01, 11, 12, 43));
 
         fileSystem.AddFile (
                             @"/myfile.txt",
-                            new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
+                            new ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
                            );
 
         fileSystem.AddFile (
                             @"/demo/jQuery.js",
-                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+                            new ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
                            );
 
         fileSystem.AddFile (
                             @"/demo/image.gif",
-                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            new (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
                             {
                                 LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
                             }
@@ -604,11 +603,11 @@ public class FileDialogTests (ITestOutputHelper output)
 
         var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"/demo/subfolder");
         m.Create ();
-        m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
+        m.LastWriteTime = new (2002, 01, 01, 22, 42, 10);
 
         fileSystem.AddFile (
                             @"/demo/subfolder/image2.gif",
-                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            new (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
                             {
                                 LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
                             }
@@ -625,26 +624,26 @@ public class FileDialogTests (ITestOutputHelper output)
     {
         // Arrange
         var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), @"c:\");
-        fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
+        fileSystem.MockTime (() => new (2010, 01, 01, 11, 12, 43));
 
         fileSystem.AddFile (
                             @"c:\myfile.txt",
-                            new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
+                            new ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
                            );
 
         fileSystem.AddFile (
                             @"c:\demo\jQuery.js",
-                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+                            new ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
                            );
 
         fileSystem.AddFile (
                             @"c:\demo\mybinary.exe",
-                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+                            new ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
                            );
 
         fileSystem.AddFile (
                             @"c:\demo\image.gif",
-                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            new (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
                             {
                                 LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
                             }
@@ -652,11 +651,11 @@ public class FileDialogTests (ITestOutputHelper output)
 
         var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"c:\demo\subfolder");
         m.Create ();
-        m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
+        m.LastWriteTime = new (2002, 01, 01, 22, 42, 10);
 
         fileSystem.AddFile (
                             @"c:\demo\subfolder\image2.gif",
-                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            new (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
                             {
                                 LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
                             }
