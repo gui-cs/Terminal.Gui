@@ -268,6 +268,7 @@ public class DrawTests (ITestOutputHelper _output)
         TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, _output);
 
         TestHelpers.AssertDriverContentsAre (expectedOutput, _output);
+        top.Dispose ();
 
         // This test has nothing to do with color - removing as it is not relevant and fragile
     }
@@ -327,6 +328,7 @@ public class DrawTests (ITestOutputHelper _output)
 
         Application.End (rsDiag);
         Application.End (rsTop);
+        top.Dispose ();
     }
 
     [Fact]
@@ -387,6 +389,7 @@ public class DrawTests (ITestOutputHelper _output)
                                                Application.Driver,
                                                Colors.ColorSchemes ["Base"].Normal
                                               );
+        top.Dispose ();
     }
 
     [Fact]
@@ -647,6 +650,7 @@ public class DrawTests (ITestOutputHelper _output)
         content.Y = 0;
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -726,6 +730,7 @@ public class DrawTests (ITestOutputHelper _output)
         content.Y = 0;
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -849,6 +854,7 @@ public class DrawTests (ITestOutputHelper _output)
         content.Y = 0;
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+        top.Dispose ();
     }
 
     [Theory]
@@ -898,7 +904,7 @@ public class DrawTests (ITestOutputHelper _output)
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
         TestHelpers.AssertDriverContentsAre (expected, _output);
-
+        top.Dispose ();
         // This test has nothing to do with color - removing as it is not relevant and fragile
     }
 
