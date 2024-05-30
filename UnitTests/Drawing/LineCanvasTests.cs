@@ -3,13 +3,9 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests;
 
-public class LineCanvasTests
+public class LineCanvasTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper output;
-    public LineCanvasTests (ITestOutputHelper output) { this.output = output; }
-
     [Theory]
-    [AutoInitShutdown]
 
     // Horizontal lines with a vertical zero-length
     [InlineData (
@@ -299,6 +295,7 @@ public class LineCanvasTests
         lc.AddLine (new Point (x2, y2), len2, o2, s2);
 
         TestHelpers.AssertEqual (output, expected, lc.ToString ());
+        v.Dispose ();
     }
 
     [InlineData (
@@ -731,7 +728,6 @@ public class LineCanvasTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestLineCanvas_LeaveMargin_Top1_Left1 ()
     {
         var canvas = new LineCanvas ();
@@ -748,7 +744,7 @@ public class LineCanvasTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestLineCanvas_Window_Heavy ()
     {
         View v = GetCanvas (out LineCanvas canvas);
@@ -772,10 +768,11 @@ public class LineCanvasTests
 ┃    ┃   ┃
 ┗━━━━┻━━━┛";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [InlineData (LineStyle.Single)]
     [InlineData (LineStyle.Rounded)]
     public void TestLineCanvas_Window_HeavyTop_ThinSides (LineStyle thinStyle)
@@ -802,10 +799,11 @@ public class LineCanvasTests
 ┕━━━━┷━━━┙
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [InlineData (LineStyle.Single)]
     [InlineData (LineStyle.Rounded)]
     public void TestLineCanvas_Window_ThinTop_HeavySides (LineStyle thinStyle)
@@ -833,6 +831,7 @@ public class LineCanvasTests
 
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     [Fact]
@@ -976,7 +975,7 @@ public class LineCanvasTests
     [InlineData (0, 0, 2, Orientation.Vertical, LineStyle.Double, "║\n║")]
     [InlineData (0, 0, 2, Orientation.Horizontal, LineStyle.Single, "──")]
     [InlineData (0, 0, 2, Orientation.Vertical, LineStyle.Single, "│\n│")]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [Theory]
     public void View_Draws_1LineTests (
         int x1,
@@ -997,11 +996,12 @@ public class LineCanvasTests
         v.Draw ();
 
         TestHelpers.AssertDriverContentsAre (expected, output);
+        v.Dispose ();
     }
 
     /// <summary>This test demonstrates how to correctly trigger a corner.  By overlapping the lines in the same cell</summary>
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void View_Draws_Corner_Correct ()
     {
         View v = GetCanvas (out LineCanvas canvas);
@@ -1015,6 +1015,7 @@ public class LineCanvasTests
 ┌─
 │";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     /// <summary>
@@ -1022,7 +1023,7 @@ public class LineCanvasTests
     ///     another.
     /// </summary>
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void View_Draws_Corner_NoOverlap ()
     {
         View v = GetCanvas (out LineCanvas canvas);
@@ -1037,12 +1038,13 @@ public class LineCanvasTests
 │
 │";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     [InlineData (LineStyle.Single)]
     [InlineData (LineStyle.Rounded)]
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void View_Draws_Horizontal (LineStyle style)
     {
         View v = GetCanvas (out LineCanvas canvas);
@@ -1054,10 +1056,11 @@ public class LineCanvasTests
             @"    
 ──";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void View_Draws_Horizontal_Double ()
     {
         View v = GetCanvas (out LineCanvas canvas);
@@ -1069,12 +1072,13 @@ public class LineCanvasTests
             @" 
 ══";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     [InlineData (LineStyle.Single)]
     [InlineData (LineStyle.Rounded)]
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void View_Draws_Vertical (LineStyle style)
     {
         View v = GetCanvas (out LineCanvas canvas);
@@ -1087,10 +1091,11 @@ public class LineCanvasTests
 │
 │";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void View_Draws_Vertical_Double ()
     {
         View v = GetCanvas (out LineCanvas canvas);
@@ -1103,10 +1108,11 @@ public class LineCanvasTests
 ║
 ║";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void View_Draws_Window_Double ()
     {
         View v = GetCanvas (out LineCanvas canvas);
@@ -1130,10 +1136,11 @@ public class LineCanvasTests
 ║    ║   ║
 ╚════╩═══╝";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [InlineData (LineStyle.Single)]
     [InlineData (LineStyle.Rounded)]
     public void View_Draws_Window_DoubleTop_SingleSides (LineStyle thinStyle)
@@ -1160,6 +1167,7 @@ public class LineCanvasTests
 ╘════╧═══╛
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     /// <summary>
@@ -1168,7 +1176,7 @@ public class LineCanvasTests
     ///     used.
     /// </summary>
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void View_Draws_Window_Rounded ()
     {
         View v = GetCanvas (out LineCanvas canvas);
@@ -1196,12 +1204,13 @@ public class LineCanvasTests
 │    │   │
 ╰────┴───╯";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     [Theory]
-    [AutoInitShutdown]
     [InlineData (LineStyle.Single)]
     [InlineData (LineStyle.Rounded)]
+    [SetupFakeDriver]
     public void View_Draws_Window_SingleTop_DoubleSides (LineStyle thinStyle)
     {
         View v = GetCanvas (out LineCanvas canvas);
@@ -1227,6 +1236,7 @@ public class LineCanvasTests
 
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, output);
+        v.Dispose ();
     }
 
     [Fact]
@@ -1305,9 +1315,6 @@ public class LineCanvasTests
     private View GetCanvas (out LineCanvas canvas, int offsetX = 0, int offsetY = 0)
     {
         var v = new View { Width = 10, Height = 5, Viewport = new Rectangle (0, 0, 10, 5) };
-        var top = new Toplevel ();
-        top.Add (v);
-        Application.Begin (top);
 
         LineCanvas canvasCopy = canvas = new LineCanvas ();
 
