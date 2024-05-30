@@ -24,6 +24,7 @@ public class TreeViewTests
     }
 
     [Fact]
+    [SetupFakeDriver]
     public void ContentWidth_BiggerAfterExpand ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
@@ -31,8 +32,6 @@ public class TreeViewTests
         tree.EndInit ();
 
         tree.Viewport = new Rectangle (0, 0, 10, 10);
-
-        InitFakeDriver ();
 
         //-+Factory
         Assert.Equal (9, tree.GetContentWidth (true));
@@ -49,10 +48,10 @@ public class TreeViewTests
         //-+Factory
         Assert.Equal (9, tree.GetContentWidth (true));
 
-        Application.Shutdown ();
     }
 
     [Fact]
+    [SetupFakeDriver]
     public void ContentWidth_VisibleVsAll ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out Car car2);
@@ -61,8 +60,6 @@ public class TreeViewTests
 
         // control only allows 1 row to be viewed at once
         tree.Viewport = new Rectangle (0, 0, 20, 1);
-
-        InitFakeDriver ();
 
         //-+Factory
         Assert.Equal (9, tree.GetContentWidth (true));
@@ -95,12 +92,10 @@ public class TreeViewTests
         tree.ScrollOffsetVertical = 5;
         Assert.Equal (0, tree.GetContentWidth (true));
         Assert.Equal (13, tree.GetContentWidth (false));
-
-        Application.Shutdown ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void CursorVisibility_MultiSelect ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -290,7 +285,6 @@ public class TreeViewTests
 
         Assert.False (tree.IsExpanded (c));
 
-        Application.Shutdown ();
     }
 
     /// <summary>Tests that <see cref="TreeView.Expand(object)"/> and <see cref="TreeView.IsExpanded(object)"/> are consistent</summary>
@@ -354,11 +348,10 @@ public class TreeViewTests
     }
 
     [Fact]
+    [SetupFakeDriver]
     public void ObjectActivated_Called ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
-
-        InitFakeDriver ();
 
         object activated = null;
         var called = false;
@@ -385,16 +378,14 @@ public class TreeViewTests
 
         Assert.True (called);
         Assert.Same (f, activated);
-
-        Application.Shutdown ();
     }
 
     [Fact]
+    [SetupFakeDriver]
+
     public void ObjectActivated_CustomKey ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
-
-        InitFakeDriver ();
 
         tree.ObjectActivationKey = KeyCode.Delete;
         object activated = null;
@@ -430,15 +421,13 @@ public class TreeViewTests
         Assert.True (called);
         Assert.Same (f, activated);
 
-        Application.Shutdown ();
     }
 
     [Fact]
+    [SetupFakeDriver]
     public void ObjectActivationButton_DoubleClick ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
-
-        InitFakeDriver ();
 
         object activated = null;
         var called = false;
@@ -459,15 +448,13 @@ public class TreeViewTests
         Assert.Same (f, activated);
         Assert.Same (f, tree.SelectedObject);
 
-        Application.Shutdown ();
     }
 
     [Fact]
+    [SetupFakeDriver]
     public void ObjectActivationButton_RightClick ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
-
-        InitFakeDriver ();
 
         tree.ObjectActivationButton = MouseFlags.Button2Clicked;
         tree.ExpandAll ();
@@ -495,16 +482,14 @@ public class TreeViewTests
         Assert.True (called);
         Assert.Same (car1, activated);
         Assert.Same (car1, tree.SelectedObject);
-
-        Application.Shutdown ();
     }
 
     [Fact]
+    [SetupFakeDriver]
     public void ObjectActivationButton_SetToNull ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
-        InitFakeDriver ();
 
         // disable activation
         tree.ObjectActivationButton = null;
@@ -527,8 +512,6 @@ public class TreeViewTests
         Assert.False (called);
         Assert.Null (activated);
         Assert.Null (tree.SelectedObject);
-
-        Application.Shutdown ();
     }
 
     /// <summary>
@@ -716,7 +699,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestBottomlessTreeView_MaxDepth_3 ()
     {
         TreeView<string> tv = new () { Width = 20, Height = 10 };
@@ -754,7 +737,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestBottomlessTreeView_MaxDepth_5 ()
     {
         TreeView<string> tv = new () { Width = 20, Height = 10 };
@@ -821,7 +804,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestGetObjectOnRow ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -876,7 +859,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestGetObjectRow ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -944,7 +927,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeView_DrawLineEvent ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1010,7 +993,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeView_DrawLineEvent_Handled ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1056,7 +1039,7 @@ FFFFFFFFFF
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeView_DrawLineEvent_WithScrolling ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1119,7 +1102,7 @@ oot two
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeView_Filter ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1203,7 +1186,7 @@ oot two
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeViewColor ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1301,13 +1284,6 @@ oot two
 
         tree.Expand (root);
         Assert.Equal (2, tree.GetChildren (root).Count ());
-    }
-
-    private void InitFakeDriver ()
-    {
-        var driver = new FakeDriver ();
-        Application.Init (driver);
-        driver.Init ();
     }
 
     /// <summary>Test object which considers for equality only <see cref="Name"/></summary>
