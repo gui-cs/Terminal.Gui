@@ -4,11 +4,8 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-public class ViewTests
+public class ViewTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public ViewTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [AutoInitShutdown]
     public void Clear_Viewport_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
@@ -18,7 +15,7 @@ public class ViewTests
         view.DrawContent += (s, e) =>
                             {
                                 Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new Rectangle (1, 1, view.Viewport.Width, view.Viewport.Height);
+                                Application.Driver.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
 
                                 for (var row = 0; row < view.Viewport.Height; row++)
                                 {
@@ -51,8 +48,8 @@ public class ViewTests
 └──────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 20, 10), pos);
 
         view.FillRect (view.Viewport);
 
@@ -69,7 +66,7 @@ public class ViewTests
 └──────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         top.Dispose ();
     }
 
@@ -82,7 +79,7 @@ public class ViewTests
         view.DrawContent += (s, e) =>
                             {
                                 Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new Rectangle (1, 1, view.Viewport.Width, view.Viewport.Height);
+                                Application.Driver.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
 
                                 for (var row = 0; row < view.Viewport.Height; row++)
                                 {
@@ -115,8 +112,8 @@ public class ViewTests
 └──────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 20, 10), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 20, 10), pos);
 
         view.FillRect (view.Viewport);
 
@@ -133,7 +130,7 @@ public class ViewTests
 └──────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
         top.Dispose ();
     }
@@ -147,8 +144,8 @@ public class ViewTests
         var root = new View { Width = 20, Height = 10, ColorScheme = Colors.ColorSchemes ["Base"] };
 
         View v = label
-                     ? new Label { Text = new string ('c', 100) }
-                     : new TextView { Height = 1, Text = new string ('c', 100), Width = Dim.Fill () };
+                     ? new Label { Text = new ('c', 100) }
+                     : new TextView { Height = 1, Text = new ('c', 100), Width = Dim.Fill () };
 
         root.Add (v);
 
@@ -159,18 +156,19 @@ public class ViewTests
         if (label)
         {
             Assert.False (v.CanFocus);
+
             //Assert.Equal (new Rectangle (0, 0, 20, 1), v.Frame);
         }
         else
         {
             Assert.True (v.CanFocus);
-            Assert.Equal (new Rectangle (0, 0, 20, 1), v.Frame);
+            Assert.Equal (new (0, 0, 20, 1), v.Frame);
         }
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 cccccccccccccccccccc",
-                                                      _output
+                                                      output
                                                      );
 
         Attribute [] attributes =
@@ -220,6 +218,7 @@ cccccccccccccccccccc",
         }
 
         Application.End (runState);
+        top.Dispose ();
     }
 
     [Fact]
@@ -246,13 +245,13 @@ At 0,0
                              
   A text with some long width
    and also with two lines.  ",
-                                                      _output
+                                                      output
                                                      );
 
-        view.Frame = new Rectangle (3, 3, 10, 1);
-        Assert.Equal (new Rectangle (3, 3, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
+        view.Frame = new (3, 3, 10, 1);
+        Assert.Equal (new (3, 3, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDisplayRect);
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -261,9 +260,10 @@ At 0,0
              
              
    A text wit",
-                                                      _output
+                                                      output
                                                      );
         Application.End (runState);
+        top.Dispose ();
     }
 
     [Fact]
@@ -292,16 +292,16 @@ At 0,0
                              
   A text with some long width
    and also with two lines.  ",
-                                                      _output
+                                                      output
                                                      );
 
         view.X = 3;
         view.Y = 3;
         view.Width = 10;
         view.Height = 1;
-        Assert.Equal (new Rectangle (3, 3, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new (3, 3, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 30, 2), view._needsDisplayRect);
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -310,9 +310,10 @@ At 0,0
              
              
    A text wit",
-                                                      _output
+                                                      output
                                                      );
         Application.End (runState);
+        top.Dispose ();
     }
 
     [Fact]
@@ -341,22 +342,23 @@ At 0,0
                              
   A text with some long width
    and also with two lines.  ",
-                                                      _output
+                                                      output
                                                      );
 
-        view.Frame = new Rectangle (1, 1, 10, 1);
-        Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
+        view.Frame = new (1, 1, 10, 1);
+        Assert.Equal (new (1, 1, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDisplayRect);
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 At 0,0     
  A text wit",
-                                                      _output
+                                                      output
                                                      );
         Application.End (runState);
+        top.Dispose ();
     }
 
     [Fact]
@@ -385,25 +387,26 @@ At 0,0
                              
   A text with some long width
    and also with two lines.  ",
-                                                      _output
+                                                      output
                                                      );
 
         view.X = 1;
         view.Y = 1;
         view.Width = 10;
         view.Height = 1;
-        Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new (1, 1, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 30, 2), view._needsDisplayRect);
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 At 0,0     
  A text wit",
-                                                      _output
+                                                      output
                                                      );
         Application.End (runState);
+        top.Dispose ();
     }
 
     [Fact]
@@ -443,6 +446,7 @@ At 0,0
 
         Assert.True (viewCalled);
         Assert.True (tvCalled);
+        top.Dispose ();
     }
 
     [Fact]
@@ -476,33 +480,33 @@ At 0,0
 
         RunState runState = Application.Begin (top);
 
-        top.LayoutComplete += (s, e) => { Assert.Equal (new Rectangle (0, 0, 80, 25), top._needsDisplayRect); };
+        top.LayoutComplete += (s, e) => { Assert.Equal (new (0, 0, 80, 25), top._needsDisplayRect); };
 
-        frame.LayoutComplete += (s, e) => { Assert.Equal (new Rectangle (0, 0, 40, 8), frame._needsDisplayRect); };
+        frame.LayoutComplete += (s, e) => { Assert.Equal (new (0, 0, 40, 8), frame._needsDisplayRect); };
 
-        label.LayoutComplete += (s, e) => { Assert.Equal (new Rectangle (0, 0, 38, 1), label._needsDisplayRect); };
+        label.LayoutComplete += (s, e) => { Assert.Equal (new (0, 0, 38, 1), label._needsDisplayRect); };
 
-        button.LayoutComplete += (s, e) => { Assert.Equal (new Rectangle (0, 0, 13, 1), button._needsDisplayRect); };
+        button.LayoutComplete += (s, e) => { Assert.Equal (new (0, 0, 13, 1), button._needsDisplayRect); };
 
-        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new Rectangle (20, 8, 40, 8), frame.Frame);
+        Assert.Equal (new (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new (20, 8, 40, 8), frame.Frame);
 
         Assert.Equal (
-                      new Rectangle (20, 8, 60, 16),
+                      new (20, 8, 60, 16),
                       new Rectangle (
-                                frame.Frame.Left,
-                                frame.Frame.Top,
-                                frame.Frame.Right,
-                                frame.Frame.Bottom
-                               )
+                                     frame.Frame.Left,
+                                     frame.Frame.Top,
+                                     frame.Frame.Right,
+                                     frame.Frame.Bottom
+                                    )
                      );
-        Assert.Equal (new Rectangle (0, 0, 30, 1), label.Frame);
-        Assert.Equal (new Rectangle (0, 1, 13, 1), button.Frame); // this proves frame was set
+        Assert.Equal (new (0, 0, 30, 1), label.Frame);
+        Assert.Equal (new (0, 1, 13, 1), button.Frame); // this proves frame was set
         Application.End (runState);
+        top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void GetHotNormalColor_ColorScheme ()
     {
         var view = new View { ColorScheme = Colors.ColorSchemes ["Base"] };
@@ -515,7 +519,6 @@ At 0,0
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void GetNormalColor_ColorScheme ()
     {
         var view = new View { ColorScheme = Colors.ColorSchemes ["Base"] };
@@ -553,12 +556,12 @@ At 0,0
                              
   A text with some long width
    and also with two lines.  ",
-                                                      _output
+                                                      output
                                                      );
 
-        view.Frame = new Rectangle (3, 3, 10, 1);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
+        view.Frame = new (3, 3, 10, 1);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDisplayRect);
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -567,9 +570,10 @@ At 0,0
                              
   A text with some long width
    A text witith two lines.  ",
-                                                      _output
+                                                      output
                                                      );
         Application.End (runState);
+        top.Dispose ();
     }
 
     [Fact]
@@ -598,16 +602,16 @@ At 0,0
                              
   A text with some long width
    and also with two lines.  ",
-                                                      _output
+                                                      output
                                                      );
 
         view.X = 3;
         view.Y = 3;
         view.Width = 10;
         view.Height = 1;
-        Assert.Equal (new Rectangle (3, 3, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new (3, 3, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 30, 2), view._needsDisplayRect);
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -616,9 +620,10 @@ At 0,0
                              
   A text with some long width
    A text witith two lines.  ",
-                                                      _output
+                                                      output
                                                      );
         Application.End (runState);
+        top.Dispose ();
     }
 
     [Fact]
@@ -647,13 +652,13 @@ At 0,0
                              
   A text with some long width
    and also with two lines.  ",
-                                                      _output
+                                                      output
                                                      );
 
-        view.Frame = new Rectangle (1, 1, 10, 1);
-        Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view._needsDisplayRect);
+        view.Frame = new (1, 1, 10, 1);
+        Assert.Equal (new (1, 1, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDisplayRect);
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -662,9 +667,10 @@ At 0,0
  A text wit                  
   A text with some long width
    and also with two lines.  ",
-                                                      _output
+                                                      output
                                                      );
         Application.End (runState);
+        top.Dispose ();
     }
 
     [Fact]
@@ -693,16 +699,16 @@ At 0,0
                              
   A text with some long width
    and also with two lines.  ",
-                                                      _output
+                                                      output
                                                      );
 
         view.X = 1;
         view.Y = 1;
         view.Width = 10;
         view.Height = 1;
-        Assert.Equal (new Rectangle (1, 1, 10, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new (1, 1, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 30, 2), view._needsDisplayRect);
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -711,9 +717,10 @@ At 0,0
  A text wit                  
   A text with some long width
    and also with two lines.  ",
-                                                      _output
+                                                      output
                                                      );
         Application.End (runState);
+        top.Dispose ();
     }
 
     [Fact]
@@ -735,7 +742,7 @@ At 0,0
         view.EndInit ();
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (text, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (text, output);
     }
 
     [Fact]
@@ -751,8 +758,8 @@ At 0,0
         Assert.Equal ($"View(){r.Viewport}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Frame);
+        Assert.Equal (new (0, 0, 0, 0), r.Viewport);
+        Assert.Equal (new (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.Equal (0, r.Width);
@@ -770,13 +777,13 @@ At 0,0
         r.Dispose ();
 
         // Empty Rect
-        r = new View { Frame = Rectangle.Empty };
+        r = new() { Frame = Rectangle.Empty };
         Assert.NotNull (r);
         Assert.Equal ($"View(){r.Viewport}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), r.Frame);
+        Assert.Equal (new (0, 0, 0, 0), r.Viewport);
+        Assert.Equal (new (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.Equal (0, r.Width);
@@ -794,13 +801,13 @@ At 0,0
         r.Dispose ();
 
         // Rect with values
-        r = new View { Frame = new Rectangle (1, 2, 3, 4) };
+        r = new() { Frame = new (1, 2, 3, 4) };
         Assert.NotNull (r);
         Assert.Equal ($"View(){r.Frame}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 3, 4), r.Viewport);
-        Assert.Equal (new Rectangle (1, 2, 3, 4), r.Frame);
+        Assert.Equal (new (0, 0, 3, 4), r.Viewport);
+        Assert.Equal (new (1, 2, 3, 4), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.Equal (3, r.Width);
@@ -818,7 +825,7 @@ At 0,0
         r.Dispose ();
 
         // Initializes a view with a vertical direction
-        r = new View
+        r = new()
         {
             Text = "Vertical View",
             TextDirection = TextDirection.TopBottom_LeftRight,
@@ -832,8 +839,8 @@ At 0,0
         r.EndInit ();
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 1, 13), r.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 1, 13), r.Frame);
+        Assert.Equal (new (0, 0, 1, 13), r.Viewport);
+        Assert.Equal (new (0, 0, 1, 13), r.Frame);
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.False (r.IsCurrentTop);
@@ -857,13 +864,13 @@ At 0,0
     {
         var r = new View ();
 
-        Assert.False (r.OnKeyDown (new Key { KeyCode = KeyCode.Null }));
+        Assert.False (r.OnKeyDown (new() { KeyCode = KeyCode.Null }));
 
         //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
-        Assert.False (r.OnKeyUp (new Key { KeyCode = KeyCode.Null }));
-        Assert.False (r.NewMouseEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
-        Assert.False (r.NewMouseEnterEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
-        Assert.False (r.NewMouseLeaveEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.OnKeyUp (new() { KeyCode = KeyCode.Null }));
+        Assert.False (r.NewMouseEvent (new() { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.NewMouseEnterEvent (new() { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.NewMouseLeaveEvent (new() { Flags = MouseFlags.AllEvents }));
 
         var v1 = new View ();
         Assert.False (r.OnEnter (v1));
@@ -882,7 +889,7 @@ At 0,0
     [AutoInitShutdown]
     public void Test_Nested_Views_With_Height_Equal_To_One ()
     {
-        var v = new View { Width = 11, Height = 3, ColorScheme = new ColorScheme () };
+        var v = new View { Width = 11, Height = 3, ColorScheme = new () };
 
         var top = new View { Width = Dim.Fill (), Height = 1 };
         var bottom = new View { Width = Dim.Fill (), Height = 1, Y = 2 };
@@ -903,7 +910,7 @@ At 0,0
 111
 ───────────
 222";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, output);
         v.Dispose ();
         top.Dispose ();
         bottom.Dispose ();
@@ -917,7 +924,7 @@ At 0,0
         var view = new View { X = 1, Y = 2, Width = 3, Height = 4 };
 
         // Object Initializer Absolute
-        var super = new View { Frame = new Rectangle (0, 0, 10, 10) };
+        var super = new View { Frame = new (0, 0, 10, 10) };
         super.Add (view);
         super.BeginInit ();
         super.EndInit ();
@@ -928,9 +935,9 @@ At 0,0
         Assert.Equal (3, view.Width);
         Assert.Equal (4, view.Height);
         Assert.False (view.Frame.IsEmpty);
-        Assert.Equal (new Rectangle (1, 2, 3, 4), view.Frame);
+        Assert.Equal (new (1, 2, 3, 4), view.Frame);
         Assert.False (view.Viewport.IsEmpty);
-        Assert.Equal (new Rectangle (0, 0, 3, 4), view.Viewport);
+        Assert.Equal (new (0, 0, 3, 4), view.Viewport);
 
         view.LayoutSubviews ();
 
@@ -947,7 +954,7 @@ At 0,0
 #endif
 
         // Default Constructor
-        view = new View ();
+        view = new ();
         Assert.Equal (0, view.X);
         Assert.Equal (0, view.Y);
         Assert.Equal (0, view.Width);
@@ -957,7 +964,7 @@ At 0,0
         view.Dispose ();
 
         // Object Initializer
-        view = new View { X = 1, Y = 2, Text = "" };
+        view = new() { X = 1, Y = 2, Text = "" };
         Assert.Equal (1, view.X);
         Assert.Equal (2, view.Y);
         Assert.Equal (0, view.Width);
@@ -967,12 +974,12 @@ At 0,0
         view.Dispose ();
 
         // Default Constructor and post assignment equivalent to Object Initializer
-        view = new View ();
+        view = new ();
         view.X = 1;
         view.Y = 2;
         view.Width = 3;
         view.Height = 4;
-        super = new View { Frame = new Rectangle (0, 0, 10, 10) };
+        super = new() { Frame = new (0, 0, 10, 10) };
         super.Add (view);
         super.BeginInit ();
         super.EndInit ();
@@ -982,9 +989,9 @@ At 0,0
         Assert.Equal (3, view.Width);
         Assert.Equal (4, view.Height);
         Assert.False (view.Frame.IsEmpty);
-        Assert.Equal (new Rectangle (1, 2, 3, 4), view.Frame);
+        Assert.Equal (new (1, 2, 3, 4), view.Frame);
         Assert.False (view.Viewport.IsEmpty);
-        Assert.Equal (new Rectangle (0, 0, 3, 4), view.Viewport);
+        Assert.Equal (new (0, 0, 3, 4), view.Viewport);
         super.Dispose ();
     }
 
@@ -1017,7 +1024,7 @@ At 0,0
 │                            │
 └────────────────────────────┘
 ",
-                                                      _output
+                                                      output
                                                      );
 
         view.Visible = false;
@@ -1033,9 +1040,10 @@ At 0,0
 │                            │
 └────────────────────────────┘
 ",
-                                                      _output
+                                                      output
                                                      );
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1089,7 +1097,7 @@ At 0,0
                                  };
 
         Application.Run (top);
-
+        top.Dispose ();
         Assert.Equal (1, iterations);
 
         int RunesCount ()
@@ -1187,6 +1195,7 @@ At 0,0
         Assert.True (accepted);
 
         return;
+
         void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
@@ -1198,11 +1207,12 @@ At 0,0
 
         view.Accept += ViewOnAccept;
 
-        var ret = view.InvokeCommand (Command.Accept);
+        bool? ret = view.InvokeCommand (Command.Accept);
         Assert.True (ret);
         Assert.True (acceptInvoked);
 
         return;
+
         void ViewOnAccept (object sender, CancelEventArgs e)
         {
             acceptInvoked = true;
@@ -1222,6 +1232,7 @@ At 0,0
         Assert.True (accepted);
 
         return;
+
         void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 

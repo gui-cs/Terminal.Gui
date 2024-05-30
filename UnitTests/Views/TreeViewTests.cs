@@ -24,7 +24,6 @@ public class TreeViewTests
     }
 
     [Fact]
-    [SetupFakeDriver]
     public void ContentWidth_BiggerAfterExpand ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
@@ -51,7 +50,6 @@ public class TreeViewTests
     }
 
     [Fact]
-    [SetupFakeDriver]
     public void ContentWidth_VisibleVsAll ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out Car car2);
@@ -95,7 +93,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void CursorVisibility_MultiSelect ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -119,6 +117,7 @@ public class TreeViewTests
         Application.Driver.GetCursorVisibility (out CursorVisibility visibility);
         Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
         Assert.Equal (CursorVisibility.Default, visibility);
+        top.Dispose ();
     }
 
     [Fact]
@@ -348,7 +347,6 @@ public class TreeViewTests
     }
 
     [Fact]
-    [SetupFakeDriver]
     public void ObjectActivated_Called ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
@@ -381,7 +379,6 @@ public class TreeViewTests
     }
 
     [Fact]
-    [SetupFakeDriver]
 
     public void ObjectActivated_CustomKey ()
     {
@@ -424,7 +421,6 @@ public class TreeViewTests
     }
 
     [Fact]
-    [SetupFakeDriver]
     public void ObjectActivationButton_DoubleClick ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
@@ -451,7 +447,6 @@ public class TreeViewTests
     }
 
     [Fact]
-    [SetupFakeDriver]
     public void ObjectActivationButton_RightClick ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
@@ -485,7 +480,6 @@ public class TreeViewTests
     }
 
     [Fact]
-    [SetupFakeDriver]
     public void ObjectActivationButton_SetToNull ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);

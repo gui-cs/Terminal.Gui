@@ -93,13 +93,10 @@ public class CheckBoxTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void AllowNullChecked_Get_Set ()
     {
         var checkBox = new CheckBox { Text = "Check this out 你" };
-        Toplevel top = new ();
-        top.Add (checkBox);
-        Application.Begin (top);
 
         Assert.False (checkBox.Checked);
         Assert.True (checkBox.NewKeyDownEvent (Key.Space));
@@ -110,7 +107,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         checkBox.AllowNullChecked = true;
         Assert.True (checkBox.NewKeyDownEvent (Key.Space));
         Assert.Null (checkBox.Checked);
-        Application.Refresh ();
+        checkBox.Draw();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @$"
@@ -126,7 +123,6 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         checkBox.AllowNullChecked = false;
         Assert.False (checkBox.Checked);
-        top.Dispose ();
     }
 
     [Fact]

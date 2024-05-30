@@ -91,7 +91,6 @@ public class ButtonTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Button_HotKeyChanged_EventFires ()
     {
         var btn = new Button { Text = "_Yar" };
@@ -240,15 +239,11 @@ public class ButtonTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void HotKeyChange_Works ()
     {
         var clicked = false;
         var btn = new Button { Text = "_Test" };
         btn.Accept += (s, e) => clicked = true;
-        var top = new Toplevel ();
-        top.Add (btn);
-        Application.Begin (top);
 
         Assert.Equal (KeyCode.T, btn.HotKey);
         Assert.True (btn.NewKeyDownEvent (Key.T));
@@ -262,7 +257,6 @@ public class ButtonTests (ITestOutputHelper output)
         btn.HotKey = KeyCode.E;
         Assert.True (btn.NewKeyDownEvent (Key.E.WithAlt));
         Assert.True (clicked);
-        top.Dispose ();
     }
 
     /// <summary>
