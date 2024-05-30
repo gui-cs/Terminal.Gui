@@ -40,10 +40,12 @@ public class ApplicationTests
     public void Begin_Sets_Application_Top_To_Console_Size ()
     {
         Assert.Null (Application.Top);
-        Application.Begin (new ());
+        Toplevel top = new ();
+        Application.Begin (top);
         Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
         ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
         Assert.Equal (new (0, 0, 5, 5), Application.Top.Frame);
+        top.Dispose ();
     }
 
     [Fact]
@@ -347,6 +349,7 @@ public class ApplicationTests
         Assert.Null (Application.MouseGrabView); // public
         Assert.Null (Application.WantContinuousButtonPressedView); // public
         Assert.False (Application.MoveToOverlappedChild (Application.Top));
+        Application.Top.Dispose ();
     }
 
     // Invoke Tests
