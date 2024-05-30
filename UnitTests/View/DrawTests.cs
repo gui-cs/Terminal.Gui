@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewTests;
 
 [Trait ("Category", "Output")]
-public class DrawTests (ITestOutputHelper output)
+public class DrawTests (ITestOutputHelper _output)
 {
     [Fact]
     [SetupFakeDriver]
@@ -17,18 +17,18 @@ public class DrawTests (ITestOutputHelper output)
             Y = 1,
             Width = 3, Height = 3
         };
-        view.Margin.Thickness = new (1);
+        view.Margin.Thickness = new Thickness (1);
 
         // Only valid location w/in Viewport is 0, 0 (view) - 2, 2 (screen)
 
         view.Move (0, 0);
-        Assert.Equal (new (2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
+        Assert.Equal (new Point (2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
 
         view.Move (-1, -1);
-        Assert.Equal (new (2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
+        Assert.Equal (new Point (2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
 
         view.Move (1, 1);
-        Assert.Equal (new (2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
+        Assert.Equal (new Point (2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class DrawTests (ITestOutputHelper output)
             Y = 1,
             Width = 3, Height = 3
         };
-        view.Margin.Thickness = new (1);
+        view.Margin.Thickness = new Thickness (1);
         View.Diagnostics = ViewDiagnosticFlags.Padding;
         view.BeginInit ();
         view.EndInit ();
@@ -84,83 +84,75 @@ public class DrawTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         superView.Draw ();
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      output);
+                                                      _output);
 
         Rectangle toFill = new (x, y, width, height);
         view.FillRect (toFill);
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │ │
  └─┘",
-                                                      output);
+                                                      _output);
 
         // Now try to clear beyond Viewport (invalid; clipping should prevent)
         superView.SetNeedsDisplay ();
         superView.Draw ();
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      output);
+                                                      _output);
         toFill = new (-width, -height, width, height);
         view.FillRect (toFill);
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      output);
+                                                      _output);
 
         // Now try to clear beyond Viewport (valid)
         superView.SetNeedsDisplay ();
         superView.Draw ();
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      output);
+                                                      _output);
         toFill = new (-1, -1, width + 1, height + 1);
         view.FillRect (toFill);
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │ │
  └─┘",
-                                                      output);
+                                                      _output);
 
         // Now clear too much size
         superView.SetNeedsDisplay ();
         superView.Draw ();
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      output);
+                                                      _output);
         toFill = new (0, 0, width * 2, height * 2);
         view.FillRect (toFill);
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │ │
  └─┘",
-                                                      output);
+                                                      _output);
     }
 
     [Theory]
@@ -185,22 +177,20 @@ public class DrawTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         superView.Draw ();
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      output);
+                                                      _output);
 
         view.Clear ();
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │ │
  └─┘",
-                                                      output);
+                                                      _output);
     }
 
     [Theory]
@@ -226,23 +216,22 @@ public class DrawTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         superView.Draw ();
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      output);
+                                                      _output);
 
         view.Clear ();
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │ │
  └─┘",
-                                                      output);
+                                                      _output);
     }
+
 
     [Fact]
     [AutoInitShutdown]
@@ -260,7 +249,7 @@ public class DrawTests (ITestOutputHelper output)
         Assert.Equal (2, r.GetColumns ());
 
         var win = new Window { Title = us };
-        var view = new View { Text = r.ToString (), Height = Dim.Fill (), Width = Dim.Fill () };
+        var view = new View { Text = r.ToString (), Height = Dim.Fill (), Width = Dim.Fill ()};
         var tf = new TextField { Text = us, Y = 1, Width = 3 };
         win.Add (view, tf);
         Toplevel top = new ();
@@ -276,12 +265,12 @@ public class DrawTests (ITestOutputHelper output)
                                       │豈      │
                                       └────────┘
                                       """;
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, _output);
 
-        TestHelpers.AssertDriverContentsAre (expectedOutput, output);
-        top.Dispose ();
+        TestHelpers.AssertDriverContentsAre (expectedOutput, _output);
 
         // This test has nothing to do with color - removing as it is not relevant and fragile
+        top.Dispose ();
     }
 
     // TODO: Refactor this test to not depend on TextView etc... Make it as primitive as possible
@@ -334,10 +323,11 @@ public class DrawTests (ITestOutputHelper output)
                                       └────────────────────────────┘
                                       """;
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, output);
-        Assert.Equal (new (0, 0, 30, 10), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, _output);
+        Assert.Equal (new Rectangle (0, 0, 30, 10), pos);
 
         Application.End (rsDiag);
+        dg.Dispose ();
         Application.End (rsTop);
         top.Dispose ();
     }
@@ -374,16 +364,16 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                         Test
                                                             
                                                             
-                                                      T
-                                                      e
-                                                      s
-                                                      t
+                                                      T     
+                                                      e     
+                                                      s     
+                                                      t     
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         TestHelpers.AssertDriverAttributesAre (
@@ -423,7 +413,7 @@ public class DrawTests (ITestOutputHelper output)
                                                       ┌┐
                                                       └┘
                                                       """,
-                                                      output
+                                                      _output
                                                      );
     }
 
@@ -432,7 +422,7 @@ public class DrawTests (ITestOutputHelper output)
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Bottom ()
     {
         var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
-        view.Border.Thickness = new (1, 1, 1, 0);
+        view.Border.Thickness = new Thickness (1, 1, 1, 0);
         view.BeginInit ();
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Screen.Size);
@@ -442,7 +432,7 @@ public class DrawTests (ITestOutputHelper output)
 
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre ("──", output);
+        TestHelpers.AssertDriverContentsWithFrameAre ("──", _output);
     }
 
     [Fact]
@@ -450,7 +440,7 @@ public class DrawTests (ITestOutputHelper output)
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Left ()
     {
         var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
-        view.Border.Thickness = new (0, 1, 1, 1);
+        view.Border.Thickness = new Thickness (0, 1, 1, 1);
         view.BeginInit ();
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Screen.Size);
@@ -466,7 +456,7 @@ public class DrawTests (ITestOutputHelper output)
                                                       │
                                                       │
                                                       """,
-                                                      output
+                                                      _output
                                                      );
     }
 
@@ -475,7 +465,7 @@ public class DrawTests (ITestOutputHelper output)
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Right ()
     {
         var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
-        view.Border.Thickness = new (1, 1, 0, 1);
+        view.Border.Thickness = new Thickness (1, 1, 0, 1);
         view.BeginInit ();
         view.EndInit ();
         view.SetRelativeLayout (Application.Driver.Screen.Size);
@@ -491,7 +481,7 @@ public class DrawTests (ITestOutputHelper output)
                                                       │
                                                       │
                                                       """,
-                                                      output
+                                                      _output
                                                      );
     }
 
@@ -500,7 +490,7 @@ public class DrawTests (ITestOutputHelper output)
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Top ()
     {
         var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
-        view.Border.Thickness = new (1, 0, 1, 1);
+        view.Border.Thickness = new Thickness (1, 0, 1, 1);
 
         view.BeginInit ();
         view.EndInit ();
@@ -511,9 +501,8 @@ public class DrawTests (ITestOutputHelper output)
 
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      "││",
-                                                      output
+        TestHelpers.AssertDriverContentsWithFrameAre ("││",
+                                                      _output
                                                      );
     }
 
@@ -528,40 +517,40 @@ public class DrawTests (ITestOutputHelper output)
             Width = 1,
             Height = 7,
             Text = """
-                   s
-                   u
-                   b
-                   V
-                   i
-                   e
-                   w
-                   """
+            s
+            u
+            b
+            V
+            i
+            e
+            w
+            """
         };
 
         var view = new View
         {
             Id = "view", Width = 2, Height = 20, Text = """
-                                                        0
-                                                        1
-                                                        2
-                                                        3
-                                                        4
-                                                        5
-                                                        6
-                                                        7
-                                                        8
-                                                        9
-                                                        0
-                                                        1
-                                                        2
-                                                        3
-                                                        4
-                                                        5
-                                                        6
-                                                        7
-                                                        8
-                                                        9
-                                                        """
+            0
+            1
+            2
+            3
+            4
+            5
+            6
+            7
+            8
+            9
+            0
+            1
+            2
+            3
+            4
+            5
+            6
+            7
+            8
+            9
+            """
         };
         view.Add (subView);
         var content = new View { Id = "content", Width = 20, Height = 20 };
@@ -583,14 +572,14 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        0s
                                                        1u
                                                        2b
                                                        3V
                                                        4i
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.X = -1;
@@ -598,19 +587,19 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        s
                                                        u
                                                        b
                                                        V
                                                        i
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.X = -2;
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+        TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
 
         content.X = 0;
         content.Y = -1;
@@ -618,14 +607,14 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        1u
                                                        2b
                                                        3V
                                                        4i
                                                        5e
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.Y = -6;
@@ -633,14 +622,14 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        6w
-                                                       7
-                                                       8
-                                                       9
-                                                       0
+                                                       7 
+                                                       8 
+                                                       9 
+                                                       0 
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.Y = -19;
@@ -648,20 +637,20 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        9
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.Y = -20;
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+        TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 
         content.X = -2;
         content.Y = 0;
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+        TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
         top.Dispose ();
     }
 
@@ -704,11 +693,11 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        01234
                                                        subVi
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.X = -1;
@@ -716,11 +705,11 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        12345
                                                        ubVie
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.Y = -1;
@@ -728,20 +717,20 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        ubVie
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.Y = -2;
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+        TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 
         content.X = -20;
         content.Y = 0;
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+        TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
         top.Dispose ();
     }
 
@@ -787,14 +776,14 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        0s
                                                        1u
                                                        2b
                                                        3V
                                                        4i
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.X = -1;
@@ -802,19 +791,19 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        s
                                                        u
                                                        b
                                                        V
                                                        i
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.X = -2;
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+        TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
 
         content.X = 0;
         content.Y = -1;
@@ -822,14 +811,14 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        1u
                                                        2b
                                                        3V
                                                        4i
                                                        5e
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.Y = -6;
@@ -837,14 +826,14 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        6w
-                                                       7
-                                                       8
-                                                       9
-                                                       0
+                                                       7 
+                                                       8 
+                                                       9 
+                                                       0 
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.Y = -19;
@@ -852,20 +841,20 @@ public class DrawTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
-                                                      
+
                                                        9
                                                       """,
-                                                      output
+                                                      _output
                                                      );
 
         content.Y = -20;
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+        TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 
         content.X = -2;
         content.Y = 0;
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+        TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
         top.Dispose ();
     }
 
@@ -878,7 +867,7 @@ public class DrawTests (ITestOutputHelper output)
         var view = new View { Width = 10, Height = 1 };
         view.DrawHotString (expected, Attribute.Default, Attribute.Default);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
     }
 
     // TODO: The tests below that use Label should use View instead.
@@ -908,16 +897,15 @@ public class DrawTests (ITestOutputHelper output)
 
         var expected = """
 
-                       ┌┤𝔹├─────┐
-                       │𝔹       │
-                       │𝔹       │
-                       └────────┘
-                       """;
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+            ┌┤𝔹├─────┐
+            │𝔹       │
+            │𝔹       │
+            └────────┘
+            """;
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
         top.Dispose ();
-
         // This test has nothing to do with color - removing as it is not relevant and fragile
     }
 
@@ -933,16 +921,15 @@ public class DrawTests (ITestOutputHelper output)
         // Visible content is (1, 1, 10, 10)
         // Expected clip is (1, 1, 10, 10) - same as visible content
         Rectangle expectedClip = new (1, 1, 10, 10);
-
         // Arrange
-        var view = new View
+        var view = new View ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             ViewportSettings = ViewportSettings.ClipContentOnly
         };
         view.SetContentSize (new Size (10, 10));
-        view.Border.Thickness = new (1);
+        view.Border.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
         Assert.Equal (view.Frame, Application.Driver.Clip);
@@ -967,15 +954,14 @@ public class DrawTests (ITestOutputHelper output)
         // Visible content is (1, 1, 10, 10)
         // Expected clip is (1, 1, 23, 23) - same as Viewport
         Rectangle expectedClip = new (1, 1, 23, 23);
-
         // Arrange
-        var view = new View
+        var view = new View ()
         {
             Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            Height = Dim.Fill (),
         };
         view.SetContentSize (new Size (10, 10));
-        view.Border.Thickness = new (1);
+        view.Border.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
         Assert.Equal (view.Frame, Application.Driver.Clip);
@@ -989,6 +975,7 @@ public class DrawTests (ITestOutputHelper output)
         view.Dispose ();
     }
 
+
     [Fact]
     [TestRespondersDisposed]
     public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
@@ -1001,11 +988,11 @@ public class DrawTests (ITestOutputHelper output)
         top.Add (view);
 
         Application.Iteration += (s, a) =>
-                                 {
-                                     Assert.Equal (-2, view.X);
+        {
+            Assert.Equal (-2, view.X);
 
-                                     Application.RequestStop ();
-                                 };
+            Application.RequestStop ();
+        };
 
         try
         {
@@ -1018,8 +1005,8 @@ public class DrawTests (ITestOutputHelper output)
         }
 
         top.Dispose ();
-
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
+
 }
