@@ -177,7 +177,15 @@ namespace Terminal.Gui {
 			ConsoleKeyInfo newConsoleKeyInfo = default;
 
 			while (true) {
-				ConsoleKeyInfo consoleKeyInfo = Console.ReadKey (true);
+				ConsoleKeyInfo consoleKeyInfo;
+
+				try {
+					consoleKeyInfo = Console.ReadKey (true);
+				} catch (InvalidOperationException ex) {
+
+					return;
+				}
+
 				if ((consoleKeyInfo.KeyChar == (char)Key.Esc && !isEscSeq)
 					|| (consoleKeyInfo.KeyChar != (char)Key.Esc && isEscSeq)) {
 					if (cki == null && consoleKeyInfo.KeyChar != (char)Key.Esc && isEscSeq) {
