@@ -160,8 +160,7 @@ internal class NetEvents : IDisposable
 
     public InputResult? DequeueInput ()
     {
-        while (_inputReadyCancellationTokenSource != null
-               && !_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
+        while (_inputReadyCancellationTokenSource is { Token.IsCancellationRequested: false })
         {
             _waitForStart.Set ();
             _winChange.Set ();
@@ -199,22 +198,17 @@ internal class NetEvents : IDisposable
 
     private static ConsoleKeyInfo ReadConsoleKeyInfo (CancellationToken cancellationToken, bool intercept = true)
     {
-        // if there is a key available, return it without waiting
-        //  (or dispatching work to the thread queue)
-        if (Console.KeyAvailable)
+        // The Console.KeyAvailable must only be used if
+        // the console is reading an Ansi escape sequence
+        // Task.Delay must only be used on limited situations
+        // and not for the entire application execution, which
+        // case need to use async Task to really awaiting,
+        // like the CheckWindowSizeChange is using
+        try
         {
             return Console.ReadKey (intercept);
         }
-
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            Task.Delay (100);
-
-            if (Console.KeyAvailable)
-            {
-                return Console.ReadKey (intercept);
-            }
-        }
+        catch (InvalidOperationException) { }
 
         cancellationToken.ThrowIfCancellationRequested ();
 
@@ -310,7 +304,10 @@ internal class NetEvents : IDisposable
                         break;
                     }
 
-                    ProcessMapConsoleKeyInfo (consoleKeyInfo);
+                    if (consoleKeyInfo != default (ConsoleKeyInfo))
+                    {
+                        ProcessMapConsoleKeyInfo (consoleKeyInfo);
+                    }
 
                     break;
                 }
