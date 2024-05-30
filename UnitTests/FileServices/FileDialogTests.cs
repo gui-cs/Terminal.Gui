@@ -5,15 +5,12 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.FileServicesTests;
 
-public class FileDialogTests
+public class FileDialogTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper output;
-    public FileDialogTests (ITestOutputHelper output) { this.output = output; }
-
     [Theory]
-    [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
+    [AutoInitShutdown]
     public void CancelSelection (bool cancel)
     {
         FileDialog dlg = GetInitializedFileDialog ();
@@ -28,6 +25,7 @@ public class FileDialogTests
         Send ('\n', ConsoleKey.Enter);
 
         Assert.Equal (cancel, dlg.Canceled);
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -57,6 +55,7 @@ public class FileDialogTests
         Send ('\n', ConsoleKey.Enter);
         Assert.False (dlg.Canceled);
         Assert.Equal ("bob.csv", Path.GetFileName (dlg.Path));
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -90,6 +89,7 @@ public class FileDialogTests
         Send ('\n', ConsoleKey.Enter);
         Assert.False (dlg.Canceled);
         Assert.EndsWith ("xx" + Path.DirectorySeparatorChar, dlg.Path);
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -128,6 +128,7 @@ public class FileDialogTests
 
         // Dialog has not yet been confirmed with a choice
         Assert.False (dlg.Canceled);
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -166,6 +167,7 @@ public class FileDialogTests
 
         Assert.True (dlg.Canceled);
         Assert.False (selected);
+        dlg.Dispose ();
     }
 
     [Theory]
@@ -220,6 +222,7 @@ public class FileDialogTests
                              AssertIsTheSubfolder (eventMultiSelected.Single ());
                          }
                         );
+        dlg.Dispose ();
     }
 
     [Theory]
@@ -273,6 +276,7 @@ public class FileDialogTests
                              AssertIsTheSubfolder (eventMultiSelected.Single ());
                          }
                         );
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -301,6 +305,7 @@ public class FileDialogTests
         Assert.True (dlg.Canceled);
         Assert.Empty (dlg.MultiSelected);
         Assert.Null (eventMultiSelected);
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -312,6 +317,7 @@ public class FileDialogTests
         View tf = dlg.Subviews.FirstOrDefault (t => t.HasFocus);
         Assert.NotNull (tf);
         Assert.IsType<TextField> (tf);
+        dlg.Dispose ();
     }
 
     [Theory]
@@ -341,6 +347,7 @@ public class FileDialogTests
         Assert.False (dlg.Canceled);
 
         AssertIsTheSubfolder (dlg.Path);
+        dlg.Dispose ();
     }
 
     [Theory]
@@ -368,6 +375,7 @@ public class FileDialogTests
         Send ('\n', ConsoleKey.Enter);
         Assert.False (dlg.Canceled);
         AssertIsTheSubfolder (dlg.Path);
+        dlg.Dispose ();
     }
 
     [Theory]
@@ -456,6 +464,7 @@ public class FileDialogTests
 └─────────────────────────────────────────────────────────────────────────┘
 ";
         TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
+        fd.Dispose ();
     }
 
     [Fact]
@@ -513,6 +522,7 @@ public class FileDialogTests
 └─────────────────────────────────────────────────────────────────────────┘
 ";
         TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
+        fd.Dispose ();
     }
 
     private void AssertIsTheRootDirectory (string path)
