@@ -852,11 +852,25 @@ internal class NetDriver : ConsoleDriver
         { }
     }
 
-    #region Not Implemented
+    public override void Suspend ()
+    {
+        if (Environment.OSVersion.Platform != PlatformID.Unix)
+        {
+            return;
+        }
 
-    public override void Suspend () { throw new NotImplementedException (); }
+        StopReportingMouseMoves ();
 
-    #endregion
+        if (!RunningUnitTests)
+        {
+            Console.ResetColor ();
+            Console.Clear ();
+            Platform.Suspend ();
+            Application.Refresh ();
+        }
+
+        StartReportingMouseMoves ();
+    }
 
     public override void UpdateScreen ()
     {
