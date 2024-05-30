@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- Do not modify these. -->
     <!--<AssemblyVersion>1.14.0.0</AssemblyVersion>
@@ -11,7 +11,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
-    <PackageReference Include="ReactiveUI" Version="19.6.1" />
+    <PackageReference Include="ReactiveUI" Version="20.1.1" />
     <PackageReference Include="ReactiveMarbles.ObservableEvents.SourceGenerator" Version="1.3.1" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>

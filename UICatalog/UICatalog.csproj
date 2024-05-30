@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <StartupObject>UICatalog.UICatalogApp</StartupObject>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
@@ -22,7 +22,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
-    <PackageReference Include="CsvHelper" Version="32.0.1" />
+    <PackageReference Include="CsvHelper" Version="32.0.3" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
   </ItemGroup>
   <ItemGroup>
