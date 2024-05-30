@@ -1351,7 +1351,11 @@ namespace Terminal.Gui {
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
 			savedCursorVisibility = visibility;
-			return Console.CursorVisible = visibility == CursorVisibility.Default;
+			Console.Out.Write (visibility == CursorVisibility.Default
+				? "\x1b[?25h"
+				: "\x1b[?25l");
+
+			return visibility == CursorVisibility.Default;
 		}
 
 		/// <inheritdoc/>
