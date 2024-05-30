@@ -17,7 +17,6 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void KeyBindings_Command ()
     {
         var colorPicker = new ColorPicker ();
@@ -56,10 +55,10 @@ public class ColorPickerTests
 
         Assert.True (colorPicker.NewMouseEvent (new MouseEvent { Position = new (4, 1), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (ColorName.Blue, colorPicker.SelectedColor);
+        top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void SelectedColorAndCursor ()
     {
         var colorPicker = new ColorPicker ();
