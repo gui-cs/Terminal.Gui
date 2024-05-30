@@ -309,6 +309,7 @@ public class ThicknessTests
 └────|123456789|123456789|123456789|123456789",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
