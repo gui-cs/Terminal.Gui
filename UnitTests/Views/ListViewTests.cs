@@ -4,11 +4,8 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class ListViewTests
+public class ListViewTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public ListViewTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     public void Constructors_Defaults ()
     {
@@ -17,26 +14,26 @@ public class ListViewTests
         Assert.True (lv.CanFocus);
         Assert.Equal (-1, lv.SelectedItem);
 
-        lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        lv = new() { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
 
-        lv = new ListView { Source = new NewListDataSource () };
+        lv = new() { Source = new NewListDataSource () };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
 
-        lv = new ListView
+        lv = new()
         {
             Y = 1, Width = 10, Height = 20, Source = new ListWrapper (new List<string> { "One", "Two", "Three" })
         };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
-        Assert.Equal (new Rectangle (0, 1, 10, 20), lv.Frame);
+        Assert.Equal (new (0, 1, 10, 20), lv.Frame);
 
-        lv = new ListView { Y = 1, Width = 10, Height = 20, Source = new NewListDataSource () };
+        lv = new() { Y = 1, Width = 10, Height = 20, Source = new NewListDataSource () };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
-        Assert.Equal (new Rectangle (0, 1, 10, 20), lv.Frame);
+        Assert.Equal (new (0, 1, 10, 20), lv.Frame);
     }
 
     [Fact]
@@ -75,10 +72,10 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
-        Assert.True (lv.ScrollVertical(10));
+        Assert.True (lv.ScrollVertical (10));
         lv.Draw ();
         Assert.Equal (-1, lv.SelectedItem);
 
@@ -96,7 +93,7 @@ public class ListViewTests
 │Line18    │
 │Line19    │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveDown ());
@@ -117,7 +114,7 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveEnd ());
@@ -138,7 +135,7 @@ public class ListViewTests
 │          │
 │          │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.ScrollVertical (-20));
@@ -159,7 +156,7 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveDown ());
@@ -180,7 +177,7 @@ public class ListViewTests
 │Line18    │
 │Line19    │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.ScrollVertical (-20));
@@ -201,7 +198,7 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveDown ());
@@ -222,7 +219,7 @@ public class ListViewTests
 │Line18    │
 │Line19    │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveHome ());
@@ -243,7 +240,7 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.ScrollVertical (20));
@@ -264,7 +261,7 @@ public class ListViewTests
 │          │
 │          │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveUp ());
@@ -285,8 +282,9 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -312,7 +310,7 @@ Item 1
 Item 2
 Item 3
 Item 4",
-                                                      _output
+                                                      output
                                                      );
 
         // EnsureSelectedItemVisible is auto enabled on the OnSelectedChanged
@@ -326,8 +324,9 @@ Item 3
 Item 4
 Item 5
 Item 6",
-                                                      _output
+                                                      output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -342,13 +341,13 @@ Item 6",
         Application.Begin (top);
 
         Assert.Equal ("Second ", GetContents (0));
-        Assert.Equal (new string (' ', 7), GetContents (1));
+        Assert.Equal (new (' ', 7), GetContents (1));
 
         lv.MoveUp ();
         lv.Draw ();
 
         Assert.Equal ("First  ", GetContents (0));
-        Assert.Equal (new string (' ', 7), GetContents (1));
+        Assert.Equal (new (' ', 7), GetContents (1));
 
         string GetContents (int line)
         {
@@ -361,6 +360,7 @@ Item 6",
 
             return item;
         }
+        top.Dispose ();
     }
 
     [Fact]
@@ -417,9 +417,9 @@ Item 6",
         Assert.False (accepted);
 
         return;
+
         void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
-
 
     [Fact]
     public void Accept_Command_Accepts_and_Opens_Selected_Item ()
@@ -430,7 +430,7 @@ Item 6",
 
         var accepted = false;
         var opened = false;
-        string selectedValue = string.Empty;
+        var selectedValue = string.Empty;
 
         listView.Accept += Accept;
         listView.OpenSelectedItem += OpenSelectedItem;
@@ -448,6 +448,7 @@ Item 6",
             opened = true;
             selectedValue = e.Value.ToString ();
         }
+
         void Accept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
@@ -460,7 +461,7 @@ Item 6",
 
         var accepted = false;
         var opened = false;
-        string selectedValue = string.Empty;
+        var selectedValue = string.Empty;
 
         listView.Accept += Accept;
         listView.OpenSelectedItem += OpenSelectedItem;
@@ -503,7 +504,7 @@ Item 6",
         // bind shift down to move down twice in control
         lv.KeyBindings.Add (Key.CursorDown.WithShift, Command.LineDown, Command.LineDown);
 
-        var ev = Key.CursorDown.WithShift;
+        Key ev = Key.CursorDown.WithShift;
 
         Assert.True (lv.NewKeyDownEvent (ev), "The first time we move down 2 it should be possible");
 
@@ -535,7 +536,7 @@ Item 6",
 
         lv.KeyBindings.Add (Key.Space.WithShift, Command.Select, Command.LineDown);
 
-        var ev = Key.Space.WithShift;
+        Key ev = Key.Space.WithShift;
 
         // view should indicate that it has accepted and consumed the event
         Assert.True (lv.NewKeyDownEvent (ev));
@@ -593,7 +594,7 @@ Item 6",
         Assert.Equal (1, lw.StartsWith ("TW"));
         Assert.Equal (2, lw.StartsWith ("TH"));
 
-        lw = new ListWrapper (new List<string> { "One", "Two", "Three" });
+        lw = new (new List<string> { "One", "Two", "Three" });
 
         Assert.Equal (1, lw.StartsWith ("t"));
         Assert.Equal (1, lw.StartsWith ("tw"));
@@ -629,6 +630,7 @@ Item 6",
         lv.SetSource (source);
         lv.Draw ();
         Assert.True (rendered);
+        top.Dispose ();
     }
 
     [Fact]
@@ -654,7 +656,7 @@ Item 6",
         lv.Source = null;
         Assert.Null (lv.Source);
 
-        lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two" }) };
+        lv = new() { Source = new ListWrapper (new List<string> { "One", "Two" }) };
         Assert.NotNull (lv.Source);
 
         lv.SetSourceAsync (null);
@@ -697,6 +699,7 @@ Item 6",
     public void Clicking_On_Border_Is_Ignored ()
     {
         var selected = "";
+
         var lv = new ListView
         {
             Height = 5,
@@ -709,58 +712,70 @@ Item 6",
         top.Add (lv);
         Application.Begin (top);
 
-        Assert.Equal (new Thickness (1), lv.Border.Thickness);
+        Assert.Equal (new (1), lv.Border.Thickness);
         Assert.Equal (-1, lv.SelectedItem);
         Assert.Equal ("", lv.Text);
-        TestHelpers.AssertDriverContentsWithFrameAre (@"
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
 ┌─────┐
 │One  │
 │Two  │
 │Three│
-└─────┘", _output);
+└─────┘",
+                                                      output);
 
         Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.Equal ("", selected);
         Assert.Equal (-1, lv.SelectedItem);
 
-        Application.OnMouseEvent (new ()
-        {
-            Position = new (1, 1), Flags = MouseFlags.Button1Clicked
-        });
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = new (1, 1), Flags = MouseFlags.Button1Clicked
+                                  });
         Assert.Equal ("One", selected);
         Assert.Equal (0, lv.SelectedItem);
 
-        Application.OnMouseEvent (new ()
-        {
-            Position = new (1, 2), Flags = MouseFlags.Button1Clicked
-        });
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = new (1, 2), Flags = MouseFlags.Button1Clicked
+                                  });
         Assert.Equal ("Two", selected);
         Assert.Equal (1, lv.SelectedItem);
 
-        Application.OnMouseEvent (new ()
-        {
-            Position = new (1, 3), Flags = MouseFlags.Button1Clicked
-        });
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = new (1, 3), Flags = MouseFlags.Button1Clicked
+                                  });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
 
-        Application.OnMouseEvent (new ()
-        {
-            Position = new (1, 4), Flags = MouseFlags.Button1Clicked
-        });
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = new (1, 4), Flags = MouseFlags.Button1Clicked
+                                  });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
+        top.Dispose ();
     }
 
     [Fact]
     [AutoInitShutdown]
     public void LeftItem_TopItem_Tests ()
     {
-        var source = new List<string> ();
-        for (int i = 0; i < 5; i++) {
+        List<string> source = new List<string> ();
+
+        for (var i = 0; i < 5; i++)
+        {
             source.Add ($"Item {i}");
         }
-        var lv = new ListView () {
+
+        var lv = new ListView
+        {
             X = 1,
             Width = 10,
             Height = 5,
@@ -770,20 +785,26 @@ Item 6",
         top.Add (lv);
         Application.Begin (top);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (@"
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
  Item 0
  Item 1
  Item 2
  Item 3
- Item 4", _output);
+ Item 4",
+                                                      output);
 
         lv.LeftItem = 1;
         lv.TopItem = 1;
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre (@"
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
  tem 1
  tem 2
  tem 3
- tem 4", _output);
+ tem 4",
+                                                      output);
+        top.Dispose ();
     }
 }
