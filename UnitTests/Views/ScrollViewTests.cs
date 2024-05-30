@@ -132,6 +132,7 @@ public class ScrollViewTests
 ",
                                              _output
                                             );
+        top.Dispose ();
     }
 
     [Fact]
@@ -170,6 +171,7 @@ public class ScrollViewTests
 ",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     // There are still issue with the lower right corner of the scroll view
@@ -335,6 +337,7 @@ public class ScrollViewTests
                                                null,
                                                attributes
                                               );
+        top.Dispose ();
     }
 
     [Fact]
@@ -434,6 +437,7 @@ public class ScrollViewTests
                                                null,
                                                attrs
                                               );
+        top.Dispose ();
     }
 
     [Fact]
@@ -473,6 +477,7 @@ public class ScrollViewTests
 ",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -507,6 +512,7 @@ public class ScrollViewTests
 ",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -855,6 +861,7 @@ public class ScrollViewTests
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (1, 1, 21, 14), pos);
+        top.Dispose ();
     }
 
     // There still have an issue with lower right corner of the scroll view
@@ -913,6 +920,7 @@ public class ScrollViewTests
    ◄├─┤░░░░► ",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -1072,6 +1080,7 @@ public class ScrollViewTests
         Assert.Equal (4, sv.Subviews.Count);
         Assert.Single (sv.Subviews [0].Subviews);
         Assert.Equal ("View1", sv.Subviews [0].Subviews [0].Id);
+        top.Dispose ();
     }
 
     private class CustomButton : FrameView
