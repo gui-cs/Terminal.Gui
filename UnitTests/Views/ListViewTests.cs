@@ -674,6 +674,7 @@ Item 6",
     {
         /// <inheritdoc />
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+
         public int Count => 0;
         public int Length => 0;
         public bool IsMarked (int item) { throw new NotImplementedException (); }
@@ -694,6 +695,11 @@ Item 6",
 
         public void SetMark (int item, bool value) { throw new NotImplementedException (); }
         public IList ToList () { return new List<string> { "One", "Two", "Three" }; }
+
+        public void Dispose ()
+        {
+            throw new NotImplementedException ();
+        }
     }
 
     [Fact]
@@ -824,9 +830,228 @@ Item 6",
         {
             source.Remove (source [0]);
         }
-
         Assert.Equal (0, added);
         Assert.Equal (3, removed);
         Assert.Empty (source);
+    }
+
+    [Fact]
+    public void CollectionChanged_Event_Is_Only_Subscribed_Once ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        ObservableCollection<string> source1 = [];
+        var lv = new ListView { Source = new ListWrapper<string> (source1) };
+
+        lv.CollectionChanged += (sender, args) =>
+                                {
+                                    if (args.Action == NotifyCollectionChangedAction.Add)
+                                    {
+                                        added++;
+                                    }
+                                    else if (args.Action == NotifyCollectionChangedAction.Remove)
+                                    {
+                                        removed++;
+                                    }
+                                    else
+                                    {
+                                        otherActions++;
+                                    }
+                                };
+
+        ObservableCollection<string> source2 = [];
+        lv.Source = new ListWrapper<string> (source2);
+        ObservableCollection<string> source3 = [];
+        lv.Source = new ListWrapper<string> (source3);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+            source2.Add ($"Item{i}");
+            source3.Add ($"Item{i}");
+        }
+        Assert.Equal (3, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        added = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+            source2.Remove (source2 [0]);
+            source3.Remove (source3 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+        Assert.Empty (source2);
+        Assert.Empty (source3);
+    }
+
+    [Fact]
+    public void CollectionChanged_Event_UnSubscribe_Previous_If_New_Is_Null ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        ObservableCollection<string> source1 = [];
+        var lv = new ListView { Source = new ListWrapper<string> (source1) };
+
+        lv.CollectionChanged += (sender, args) =>
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                removed++;
+            }
+            else
+            {
+                otherActions++;
+            }
+        };
+
+        lv.Source = new ListWrapper<string> (null);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+    }
+
+    [Fact]
+    public void ListWrapper_CollectionChanged_Event_Is_Only_Subscribed_Once ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        ObservableCollection<string> source1 = [];
+        ListWrapper<string> lw = new (source1);
+
+        lw.CollectionChanged += (sender, args) =>
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                removed++;
+            }
+            else
+            {
+                otherActions++;
+            }
+        };
+
+        ObservableCollection<string> source2 = [];
+        lw = new (source2);
+        ObservableCollection<string> source3 = [];
+        lw = new (source3);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+            source2.Add ($"Item{i}");
+            source3.Add ($"Item{i}");
+        }
+
+        Assert.Equal (3, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        added = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+            source2.Remove (source2 [0]);
+            source3.Remove (source3 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+        Assert.Empty (source2);
+        Assert.Empty (source3);
+    }
+
+    [Fact]
+    public void ListWrapper_CollectionChanged_Event_UnSubscribe_Previous_If_New_Is_Null ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        ObservableCollection<string> source1 = [];
+        ListWrapper<string> lw = new (source1);
+
+        lw.CollectionChanged += Lw_CollectionChanged;
+
+        lw.Dispose ();
+        lw = new (null);
+        Assert.Equal (0, lw.Count);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+
+
+        void Lw_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                removed++;
+            }
+            else
+            {
+                otherActions++;
+            }
+        }
     }
 }

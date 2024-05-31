@@ -6,7 +6,7 @@ using static Terminal.Gui.SpinnerStyle;
 namespace Terminal.Gui;
 
 /// <summary>Implement <see cref="IListDataSource"/> to provide custom rendering for a <see cref="ListView"/>.</summary>
-public interface IListDataSource
+public interface IListDataSource: IDisposable
 {
     /// <summary>
     /// Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
@@ -265,10 +265,11 @@ public class ListView : View
         set
         {
             if (_source == value)
-
             {
                 return;
             }
+
+            _source?.Dispose ();
             _source = value;
 
             if (_source is { })
@@ -884,13 +885,21 @@ public class ListView : View
     /// </summary>
     /// <param name="e"></param>
     protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e) { CollectionChanged?.Invoke (this, e); }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        _source?.Dispose ();
+
+        base.Dispose (disposing);
+    }
 }
 
 /// <summary>
 ///     Provides a default implementation of <see cref="IListDataSource"/> that renders <see cref="ListView"/> items
 ///     using <see cref="object.ToString()"/>.
 /// </summary>
-public class ListWrapper<T> : IListDataSource
+public class ListWrapper<T> : IListDataSource, IDisposable
 {
     private int _count;
     private BitArray _marks;
@@ -904,13 +913,15 @@ public class ListWrapper<T> : IListDataSource
             _count = source.Count;
             _marks = new BitArray (_count);
             _source = source;
-            _source.CollectionChanged += (s, e) =>
-                                         {
-                                             CheckAndResizeMarksIfRequired ();
-                                             CollectionChanged?.Invoke (s, e);
-                                         };
+            _source.CollectionChanged += Source_CollectionChanged;
             Length = GetMaxLengthItem ();
         }
+    }
+
+    private void Source_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+    {
+        CheckAndResizeMarksIfRequired ();
+        CollectionChanged?.Invoke (sender, e);
     }
 
     /// <inheritdoc />
@@ -1074,6 +1085,15 @@ public class ListWrapper<T> : IListDataSource
         while (width-- > 0)
         {
             driver.AddRune ((Rune)' ');
+        }
+    }
+
+    /// <inheritdoc />
+    public void Dispose ()
+    {
+        if (_source is { })
+        {
+            _source.CollectionChanged -= Source_CollectionChanged;
         }
     }
 }

@@ -160,21 +160,21 @@ public class ListViewWithSelection : Scenario
     internal class ScenarioListDataSource : IListDataSource
     {
         private readonly int _nameColumnWidth = 30;
-        private int count;
-        private BitArray marks;
-        private ObservableCollection<Scenario> scenarios;
+        private int _count;
+        private BitArray _marks;
+        private ObservableCollection<Scenario> _scenarios;
         public ScenarioListDataSource (ObservableCollection<Scenario> itemList) { Scenarios = itemList; }
 
         public ObservableCollection<Scenario> Scenarios
         {
-            get => scenarios;
+            get => _scenarios;
             set
             {
                 if (value != null)
                 {
-                    count = value.Count;
-                    marks = new BitArray (count);
-                    scenarios = value;
+                    _count = value.Count;
+                    _marks = new BitArray (_count);
+                    _scenarios = value;
                     Length = GetMaxLengthItem ();
                 }
             }
@@ -182,9 +182,9 @@ public class ListViewWithSelection : Scenario
 
         public bool IsMarked (int item)
         {
-            if (item >= 0 && item < count)
+            if (item >= 0 && item < _count)
             {
-                return marks [item];
+                return _marks [item];
             }
 
             return false;
@@ -218,9 +218,9 @@ public class ListViewWithSelection : Scenario
 
         public void SetMark (int item, bool value)
         {
-            if (item >= 0 && item < count)
+            if (item >= 0 && item < _count)
             {
-                marks [item] = value;
+                _marks [item] = value;
             }
         }
 
@@ -228,17 +228,17 @@ public class ListViewWithSelection : Scenario
 
         private int GetMaxLengthItem ()
         {
-            if (scenarios?.Count == 0)
+            if (_scenarios?.Count == 0)
             {
                 return 0;
             }
 
             var maxLength = 0;
 
-            for (var i = 0; i < scenarios.Count; i++)
+            for (var i = 0; i < _scenarios.Count; i++)
             {
                 string s = string.Format (
-                                          string.Format ("{{0,{0}}}", -_nameColumnWidth),
+                                          $"{{0,{-_nameColumnWidth}}}",
                                           Scenarios [i].GetName ()
                                          );
                 var sc = $"{s}  {Scenarios [i].GetDescription ()}";
@@ -279,6 +279,11 @@ public class ListViewWithSelection : Scenario
                 driver.AddRune ((Rune)' ');
                 used++;
             }
+        }
+
+        public void Dispose ()
+        {
+            _scenarios = null;
         }
     }
 }
