@@ -3,46 +3,6 @@
 
 namespace Terminal.Gui;
 
-/// <summary>
-///     Defines the scope of a <see cref="Command"/> that has been bound to a key with
-///     <see cref="KeyBindings.Add(Key, Terminal.Gui.Command[])"/>.
-/// </summary>
-/// <remarks>
-///     <para>Key bindings are scoped to the most-focused view (<see cref="Focused"/>) by default.</para>
-/// </remarks>
-[Flags]
-public enum KeyBindingScope
-{
-    /// <summary>The key binding is scoped to just the view that has focus.</summary>
-    Focused = 1,
-
-    /// <summary>
-    ///     The key binding is scoped to the View's SuperView and will be triggered even when the View does not have focus, as
-    ///     long as the SuperView does have focus. This is typically used for <see cref="View.HotKey"/>s.
-    ///     <remarks>
-    ///         <para>
-    ///             Use for Views such as MenuBar and StatusBar which provide commands (shortcuts etc...) that trigger even
-    ///             when not focused.
-    ///         </para>
-    ///         <para>
-    ///             HotKey-scoped key bindings are only invoked if the key down event was not handled by the focused view or
-    ///             any of its subviews.
-    ///         </para>
-    ///     </remarks>
-    /// </summary>
-    HotKey = 2,
-
-    /// <summary>
-    ///     The key binding will be triggered regardless of which view has focus. This is typically used for global
-    ///     commands.
-    /// </summary>
-    /// <remarks>
-    ///     Application-scoped key bindings are only invoked if the key down event was not handled by the focused view or
-    ///     any of its subviews, and if the key down event was not bound to a <see cref="View.HotKey"/>.
-    /// </remarks>
-    Application = 4
-}
-
 /// <summary>Provides a collection of <see cref="Command"/> objects that are scoped to <see cref="KeyBindingScope"/>.</summary>
 public class KeyBinding
 {
