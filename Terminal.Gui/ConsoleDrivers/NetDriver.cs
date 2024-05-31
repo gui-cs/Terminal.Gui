@@ -208,7 +208,7 @@ internal class NetEvents : IDisposable
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            Task.Delay (100);
+            Task.Delay (100, cancellationToken).Wait (cancellationToken);
 
             if (Console.KeyAvailable)
             {
@@ -338,7 +338,7 @@ internal class NetEvents : IDisposable
             while (!cancellationToken.IsCancellationRequested)
             {
                 // Wait for a while then check if screen has changed sizes
-                Task.Delay (500, cancellationToken);
+                Task.Delay (500, cancellationToken).Wait (cancellationToken);
 
                 int buffHeight, buffWidth;
 
