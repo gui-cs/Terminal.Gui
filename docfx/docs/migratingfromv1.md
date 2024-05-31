@@ -161,16 +161,21 @@ In v1, scrolling was enabled by using `ScrollView` or `ScrollBarView`. In v2, th
 
 ## Updated Keyboard API
 
-The API for handling keyboard input is significantly improved. See [Keyboard API](keyboard.md).
+The API for handling keyboard input is significantly improved.
 
 * The [Key](~/api/Terminal.Gui.Key.yml) class replaces the `KeyEvent` struct and provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level [KeyCode](~/api/Terminal.Gui.KeyCode.yml) enum when possible. See [Key](~/api/Terminal.Gui.Key.yml) for more details.
 * The preferred way to handle single keystrokes is to use **Key Bindings**. Key Bindings map a key press to a [Command](~/api/Terminal.Gui.Command.yml). A view can declare which commands it supports, and provide a lambda that implements the functionality of the command, using `View.AddCommand()`. Use the [View.Keybindings](~/api/Terminal.Gui.View.Keybindings.yml) to configure the key bindings.
+
+See [Keyboard API](keyboard.md) for details.
 
 ### How to Fix
 
 * Replace `KeyEvent` with `Key`
 * Use [View.AddCommand](~/api/Terminal.Gui.View.AddCommand.yml) to define commands your view supports.
-* Use [View.Keybindings](~/api/Terminal.Gui.View.Keybindings.yml) to configure key bindings to `Command`s.
+* Use [View.Keybindings](~/api/Terminal.Gui.View.Keybindings.yml) to configure key bindings to `Command`s. 
+  * For accepting key input when the View is focused, use [KeyBindingScope.Focused](~/api/Terminal.Gui.KeyBindingScope.Focused.yml).
+  * For accepting key input when the View is not-focused, but visible, use [KeyBindingScope.HotKey](~/api/Terminal.Gui.KeyBindingScope.HotKey.yml).
+  * For accepting key input application-wide (a Shortcut), use [KeyBindingScope.Application](~/api/Terminal.Gui.KeyBindingScope.Application.yml).
 * It should be very uncommon for v2 code to override `OnKeyPressed` etc... 
 
 ## Updated Mouse API
