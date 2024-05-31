@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 
 public partial class View
 {
-    private string _text;
+    private string _text = string.Empty;
 
     /// <summary>
     ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved

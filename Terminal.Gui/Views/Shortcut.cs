@@ -7,21 +7,34 @@ namespace Terminal.Gui;
 // TODO: I tried `BarItem` but that's not great either as it implies it can only be used in `Bar`s.
 
 /// <summary>
-///      Displays a command, help text, and a key binding. Useful for displaying a command in <see cref="Bar"/> such as a menu, toolbar, or status bar.
+///     Displays a command, help text, and a key binding. Useful for displaying a command in <see cref="Bar"/> such as a
+///     menu, toolbar, or status bar.
 /// </summary>
 /// <remarks>
 ///     <para>
 ///         When the user clicks on the <see cref="Shortcut"/> or presses the key
-///         specified by <see cref="Key"/> the <see cref="Command.Accept"/> command is invoked, causing the <see cref="Accept"/> event to be fired
+///         specified by <see cref="Key"/> the <see cref="Command.Accept"/> command is invoked, causing the
+///         <see cref="Accept"/> event to be fired
 ///     </para>
 ///     <para>
 ///         If <see cref="KeyBindingScope"/> is <see cref="KeyBindingScope.Application"/>, the <see cref="Command"/>
 ///         be invoked regardless of what View has focus, enabling an application-wide keyboard shortcut.
 ///     </para>
+///     <para>
+///         Set <see cref="View.Title"/> to change the Command text displayed in the <see cref="Shortcut"/>.
+///         By default, the <see cref="Command"/> text is the <see cref="View.Title"/> of <see cref="CommandView"/>.
+///     </para>
+///     <para>
+///         Set <see cref="View.Text"/> to change the Help text displayed in the <see cref="Shortcut"/>.
+///     </para>
+///     <para>
+///         The text displayed for the <see cref="Key"/> is the string representation of the <see cref="Key"/>.
+///         If the <see cref="Key"/> is <see cref="Key.Empty"/>, the <see cref="Key"/> text is not displayed.
+///     </para>
 /// </remarks>
 public class Shortcut : View
 {
-    // Hosts the Command, Help, and Key Views. Needed (I think) to allow mouse clicks to be handled by the Shortcut.
+    // Hosts the Command, Help, and Key Views. Needed (IIRC - wrote a long time ago) to allow mouse clicks to be handled by the Shortcut.
     internal readonly View _container;
 
     /// <summary>
@@ -32,62 +45,56 @@ public class Shortcut : View
         CanFocus = true;
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
+
         //Height = Dim.Auto (minimumContentDim: 1, maximumContentDim: 1);
 
-        AddCommand (
-                    Gui.Command.HotKey,
-                    () =>
-                    {
-                        //SetFocus ();
-                        //SuperView?.FocusNext ();
-                        return true;
-                    });
-        AddCommand (Gui.Command.Accept, () => OnAccept ());
+        AddCommand (Gui.Command.HotKey, () => true);
+        AddCommand (Gui.Command.Accept, OnAccept);
         KeyBindings.Add (KeyCode.Space, Gui.Command.Accept);
         KeyBindings.Add (KeyCode.Enter, Gui.Command.Accept);
 
-        _container = new View
+        _container = new ()
         {
             Id = "_container",
             CanFocus = true,
-            Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1),
-            Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1)
+            Width = Dim.Auto (DimAutoStyle.Content, 1),
+            Height = Dim.Auto (DimAutoStyle.Content, 1)
         };
-        _container.MouseClick += Container_MouseClick;
+        _container.MouseClick += OnContainerMouseClick;
 
-        _commandView = new View
+        _commandView = new ()
         {
             Id = "_commandView",
             CanFocus = false,
             X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems),
-            Y = 0,// Pos.Center (),
+            Y = 0, // Pos.Center (),
             Width = Dim.Auto (DimAutoStyle.Text),
             Height = Dim.Auto (DimAutoStyle.Text),
-            HotKeySpecifier = new Rune ('_')
+            HotKeySpecifier = new ('_')
         };
         _container.Add (_commandView);
 
-        HelpView = new View
+        HelpView = new ()
         {
             Id = "_helpView",
             CanFocus = false,
             X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems),
-            Y = 0,// Pos.Center (),
+            Y = 0, // Pos.Center (),
             Width = Dim.Auto (DimAutoStyle.Text),
-            Height = Dim.Auto (DimAutoStyle.Text),
+            Height = Dim.Auto (DimAutoStyle.Text)
         };
         _container.Add (HelpView);
 
         //        HelpView.TextAlignment = Alignment.End;
         HelpView.MouseClick += SubView_MouseClick;
 
-        KeyView = new View
+        KeyView = new ()
         {
             Id = "_keyView", CanFocus = false,
             X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems),
-            Y = 0,// Pos.Center (),
+            Y = 0, // Pos.Center (),
             Width = Dim.Auto (DimAutoStyle.Text),
-            Height = Dim.Auto (DimAutoStyle.Text),
+            Height = Dim.Auto (DimAutoStyle.Text)
         };
         _container.Add (KeyView);
 
@@ -103,26 +110,59 @@ public class Shortcut : View
 
         //_commandView.MouseClick += SubView_MouseClick;
 
-        LayoutStarted += Shortcut_LayoutStarted;
         TitleChanged += Shortcut_TitleChanged;
-        Initialized += Shortcut_Initialized;
+        Initialized += OnInitialized;
 
         Add (_container);
-    }
 
-    private void SetSubViewLayout ()
-    {
+        return;
 
-        // if (Width is DimAuto)
+        void OnInitialized (object sender, EventArgs e)
         {
-            //_container.Width = Dim.Func (() => 1 + CommandView.Text.GetColumns () + 1 + HelpView.Text.GetColumns () + 1 + KeyView.Text.GetColumns () + 1);
+            if (ColorScheme != null)
+            {
+                var cs = new ColorScheme (ColorScheme)
+                {
+                    Normal = ColorScheme.HotNormal,
+                    HotNormal = ColorScheme.Normal
+                };
+                KeyView.ColorScheme = cs;
+            }
         }
 
-        //HelpView.X = Pos.AnchorEnd (KeyView.Text.GetColumns () + 1 + HelpView.Text.GetColumns () + 1) - 2;
-        //KeyView.X = Pos.AnchorEnd (KeyView.Text.GetColumns () + 1) - 1;
+        // When _container is clicked, we want to invoke the Accept command.
+        // This can happen if the subviews are aligned such that they don't cover the
+        // entire area of the Shortcut.
+        // TODO: Figure out why we can't just do the same thing using the MouseClick event on the Shortcut itself.
+        void OnContainerMouseClick (object sender, MouseEventEventArgs e)
+        {
+            bool? handled = OnAccept ();
+
+            if (handled.HasValue)
+            {
+                e.Handled = handled.Value;
+            }
+        }
     }
 
-    /// <inheritdoc />
+    // Intercept any mouse clicks on the subviews and invoke the Accept command.
+    // TODO: Figure out why we can't just subscribe to Accept on the subviews.
+    private void SubView_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        bool? handled = OnAccept ();
+
+        if (handled.HasValue)
+        {
+            e.Handled = handled.Value;
+        }
+
+        if (!e.Handled && CanFocus)
+        {
+            SetFocus ();
+        }
+    }
+
+    /// <inheritdoc/>
     public override ColorScheme ColorScheme
     {
         get
@@ -150,11 +190,13 @@ public class Shortcut : View
         }
     }
 
+    #region Command
 
     private Command? _command;
 
     /// <summary>
-    ///     Gets or sets the <see cref="Command"/> that will be invoked when the user clicks on the <see cref="Shortcut"/> or presses <see cref="Key"/>.
+    ///     Gets or sets the <see cref="Command"/> that will be invoked when the user clicks on the <see cref="Shortcut"/> or
+    ///     presses <see cref="Key"/>.
     /// </summary>
     public Command? Command
     {
@@ -172,9 +214,47 @@ public class Shortcut : View
     private View _commandView;
 
     /// <summary>
-    ///     The subview that displays the command text and hotkey.
+    ///     Gets or sets the View that displays the command text and hotkey.
     /// </summary>
-    // TODO: Should not be public
+    /// <remarks>
+    ///     <para>
+    ///         By default, the <see cref="View.Title"/> of the <see cref="CommandView"/> is displayed as the Shortcut's
+    ///         command text.
+    ///     </para>
+    ///     <para>
+    ///         By default, the CommandView is a <see cref="View"/> with <see cref="View.CanFocus"/> set to
+    ///         <see langword="false"/>.
+    ///     </para>
+    ///     <para>
+    ///         Setting the <see cref="CommandView"/> will add it to the <see cref="Shortcut"/> and remove any existing
+    ///         <see cref="CommandView"/>.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    ///     <para>
+    ///         This example illustrates how to add a <see cref="Shortcut"/> to a <see cref="StatusBar"/> that toggles the
+    ///         <see cref="Application.Force16Colors"/> property.
+    ///     </para>
+    ///     <code>
+    ///     var force16ColorsShortcut = new Shortcut
+    ///     {
+    ///         Key = Key.F6,
+    ///         KeyBindingScope = KeyBindingScope.HotKey,
+    ///         Command = Command.Accept,
+    ///         CommandView = new CheckBox { Text = "Force 16 Colors" }
+    ///     };
+    ///     var cb = force16ColorsShortcut.CommandView as CheckBox;
+    ///     cb.Checked = Application.Force16Colors;
+    /// 
+    ///     cb.Toggled += (s, e) =>
+    ///     {
+    ///         var cb = s as CheckBox;
+    ///         Application.Force16Colors = cb!.Checked == true;
+    ///         Application.Refresh();
+    ///     };
+    ///     StatusBar.Add(force16ColorsShortcut);
+    /// </code>
+    /// </example>
 
     public View CommandView
     {
@@ -197,10 +277,10 @@ public class Shortcut : View
             _commandView.Width = Dim.Auto (DimAutoStyle.Text);
             _commandView.Height = Dim.Auto (DimAutoStyle.Text);
             _commandView.X = X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems);
-            _commandView.Y = 0;//; Pos.Center ();
+            _commandView.Y = 0; //; Pos.Center ();
             _commandView.MouseClick += SubView_MouseClick;
             _commandView.Accept += SubView_DefaultCommand;
-            _commandView.Margin.Thickness = new Thickness (1, 0, 1, 0);
+            _commandView.Margin.Thickness = new (1, 0, 1, 0);
 
             _commandView.HotKeyChanged += (s, e) =>
                                           {
@@ -211,23 +291,67 @@ public class Shortcut : View
                                               }
                                           };
 
-            _commandView.HotKeySpecifier = new Rune ('_');
+            _commandView.HotKeySpecifier = new ('_');
             HelpView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
             _container.Add (_commandView);
-            SetSubViewLayout ();
         }
     }
 
+    private void Shortcut_TitleChanged (object sender, StateEventArgs<string> e)
+    {
+        // If the Title changes, update the CommandView text. This is a helper to make it easier to set the CommandView text.
+        // CommandView is public and replaceable, but this is a convenience.
+        _commandView.Text = Title;
+    }
+
+    private void SubView_DefaultCommand (object sender, CancelEventArgs e)
+    {
+        bool? handled = OnAccept ();
+
+        if (handled.HasValue)
+        {
+            e.Cancel = handled.Value;
+        }
+
+        if (!e.Cancel && CanFocus)
+        {
+            SetFocus ();
+        }
+    }
+
+    #endregion Command
+
+    #region Help
+
     /// <summary>
-    ///     The subview that displays the help text for the command.
+    ///     The subview that displays the help text for the command. Internal for unit testing.
     /// </summary>
-    // TODO: Should not be public
-    public View HelpView { get; set; }
+    internal View HelpView { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the help text displayed in the middle of the Shortcut.
+    /// </summary>
+    public override string Text
+    {
+        get => base.Text;
+        set
+        {
+            //base.Text = value;
+            if (HelpView != null)
+            {
+                HelpView.Text = value;
+            }
+        }
+    }
+
+    #endregion Help
+
+    #region Key
 
     private Key _key;
 
     /// <summary>
-    ///     Gets or sets the <see cref="Key"/> that will trigger the <see cref="Command.Accept"/> command.
+    ///     Gets or sets the <see cref="Key"/> that will be bound to the <see cref="Command.Accept"/> command.
     /// </summary>
     public Key Key
     {
@@ -271,27 +395,34 @@ public class Shortcut : View
     }
 
     /// <summary>
-    ///    Gets the subview that displays the key.
+    ///     Gets the subview that displays the key. Internal for unit testing.
     /// </summary>
-    // TODO: Should not be public
-    public View KeyView { get; }
 
+    internal View KeyView { get; }
 
-    /// <summary>
-    ///     Gets or sets the help text that will be displayed for the command.
-    /// </summary>
-    public override string Text
+    private void UpdateKeyBinding ()
     {
-        get => base.Text;
-        set
+        if (KeyBindingScope == KeyBindingScope.Application)
         {
-            //base.Text = value;
-            if (HelpView != null)
+            return;
+        }
+
+        if (Command != null && Key != null && Key != Key.Empty)
+        {
+            // Add a command and key binding for this command to this Shortcut
+            if (!GetSupportedCommands ().Contains (Command.Value))
             {
-                HelpView.Text = value;
+                // The action that will be taken will be to fire the OnClicked
+                // event. 
+                AddCommand (Command.Value, () => OnAccept ());
             }
+
+            KeyBindings.Remove (Key);
+            KeyBindings.Add (Key, KeyBindingScope, Command.Value);
         }
     }
+
+    #endregion Key
 
     /// <summary>
     ///     The event fired when the <see cref="Command.Accept"/> command is received. This
@@ -306,6 +437,10 @@ public class Shortcut : View
     /// </summary>
     protected new bool? OnAccept ()
     {
+        // TODO: This is not completely thought through.
+
+
+
         if (Key == null || Key == Key.Empty)
         {
             return false;
@@ -342,11 +477,10 @@ public class Shortcut : View
         return handled;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
+        // TODO: This is a hack. Need to refine this.
         var cs = new ColorScheme (ColorScheme)
         {
             Normal = ColorScheme.Focus,
@@ -355,7 +489,7 @@ public class Shortcut : View
 
         _container.ColorScheme = cs;
 
-        cs = new ColorScheme (ColorScheme)
+        cs = new (ColorScheme)
         {
             Normal = ColorScheme.HotFocus,
             HotNormal = ColorScheme.Focus
@@ -365,9 +499,10 @@ public class Shortcut : View
         return base.OnEnter (view);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool OnLeave (View view)
     {
+        // TODO: This is a hack. Need to refine this.
         var cs = new ColorScheme (ColorScheme)
         {
             Normal = ColorScheme.Normal,
@@ -376,7 +511,7 @@ public class Shortcut : View
 
         _container.ColorScheme = cs;
 
-        cs = new ColorScheme (ColorScheme)
+        cs = new (ColorScheme)
         {
             Normal = ColorScheme.HotNormal,
             HotNormal = ColorScheme.Normal
@@ -384,88 +519,5 @@ public class Shortcut : View
         KeyView.ColorScheme = cs;
 
         return base.OnLeave (view);
-    }
-
-    private void Container_MouseClick (object sender, MouseEventEventArgs e)
-    {
-        bool? handled = OnAccept ();
-
-        if (handled.HasValue)
-        {
-            e.Handled = handled.Value;
-        }
-    }
-
-
-    private void Shortcut_Initialized (object sender, EventArgs e)
-    {
-        if (ColorScheme != null)
-        {
-            var cs = new ColorScheme (ColorScheme)
-            {
-                Normal = ColorScheme.HotNormal,
-                HotNormal = ColorScheme.Normal
-            };
-            KeyView.ColorScheme = cs;
-        }
-    }
-
-    private void Shortcut_LayoutStarted (object sender, LayoutEventArgs e)
-    {
-        SetSubViewLayout ();
-    }
-
-    private void Shortcut_TitleChanged (object sender, StateEventArgs<string> e) { _commandView.Text = Title; }
-
-    private void SubView_MouseClick (object sender, MouseEventEventArgs e)
-    {
-        bool? handled = OnAccept ();
-
-        if (handled.HasValue)
-        {
-            e.Handled = handled.Value;
-        }
-
-        if (!e.Handled && CanFocus)
-        {
-            SetFocus ();
-        }
-    }
-
-    private void SubView_DefaultCommand (object sender, CancelEventArgs e)
-    {
-        bool? handled = OnAccept ();
-
-        if (handled.HasValue)
-        {
-            e.Cancel = handled.Value;
-        }
-
-        if (!e.Cancel && CanFocus)
-        {
-            SetFocus ();
-        }
-    }
-
-    private void UpdateKeyBinding ()
-    {
-        if (KeyBindingScope == KeyBindingScope.Application)
-        {
-            return;
-        }
-
-        if (Command != null && Key != null && Key != Key.Empty)
-        {
-            // Add a command and key binding for this command to this Shortcut
-            if (!GetSupportedCommands ().Contains (Command.Value))
-            {
-                // The action that will be taken will be to fire the OnClicked
-                // event. 
-                AddCommand (Command.Value, () => OnAccept ());
-            }
-
-            KeyBindings.Remove (Key);
-            KeyBindings.Add (Key, KeyBindingScope, Command.Value);
-        }
     }
 }

@@ -126,22 +126,21 @@ public partial class View : Responder, ISupportInitializeNotification
         CreateAdornments ();
 
         HotKeySpecifier = (Rune)'_';
-        TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
-
         TextDirection = TextDirection.LeftRight_TopBottom;
-        Text = string.Empty;
 
         CanFocus = false;
         TabIndex = -1;
         TabStop = false;
+
+        TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
 
         AddCommands ();
     }
 
     /// <summary>
     ///     Event called only once when the <see cref="View"/> is being initialized for the first time. Allows
-    ///     configurations and assignments to be performed before the <see cref="View"/> being shown. This derived from
-    ///     <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
+    ///     configurations and assignments to be performed before the <see cref="View"/> being shown.
+    ///     View implements <see cref="ISupportInitializeNotification"/> to allow for more sophisticated initialization.
     /// </summary>
     public event EventHandler Initialized;
 
