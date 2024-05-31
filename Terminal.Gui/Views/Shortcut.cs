@@ -21,12 +21,12 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Shortcut : View
 {
+    // Hosts the Command, Help, and Key Views. Needed (I think) to allow mouse clicks to be handled by the Shortcut.
     internal readonly View _container;
-    private Command? _command;
-    private View _commandView;
-    private Key _key;
-    private KeyBindingScope _keyBindingScope;
 
+    /// <summary>
+    ///     Creates a new instance of <see cref="Shortcut"/>.
+    /// </summary>
     public Shortcut ()
     {
         CanFocus = true;
@@ -78,7 +78,7 @@ public class Shortcut : View
         };
         _container.Add (HelpView);
 
-//        HelpView.TextAlignment = Alignment.End;
+        //        HelpView.TextAlignment = Alignment.End;
         HelpView.MouseClick += SubView_MouseClick;
 
         KeyView = new View
@@ -122,7 +122,7 @@ public class Shortcut : View
         //KeyView.X = Pos.AnchorEnd (KeyView.Text.GetColumns () + 1) - 1;
     }
 
-
+    /// <inheritdoc />
     public override ColorScheme ColorScheme
     {
         get
@@ -150,6 +150,12 @@ public class Shortcut : View
         }
     }
 
+
+    private Command? _command;
+
+    /// <summary>
+    ///     Gets or sets the <see cref="Command"/> that will be invoked when the user clicks on the <see cref="Shortcut"/> or presses <see cref="Key"/>.
+    /// </summary>
     public Command? Command
     {
         get => _command;
@@ -162,6 +168,13 @@ public class Shortcut : View
             }
         }
     }
+
+    private View _commandView;
+
+    /// <summary>
+    ///     The subview that displays the command text and hotkey.
+    /// </summary>
+    // TODO: Should not be public
 
     public View CommandView
     {
@@ -205,10 +218,16 @@ public class Shortcut : View
         }
     }
 
-    public View HelpView { get; }
+    /// <summary>
+    ///     The subview that displays the help text for the command.
+    /// </summary>
+    // TODO: Should not be public
+    public View HelpView { get; set; }
+
+    private Key _key;
 
     /// <summary>
-    ///     The shortcut key.
+    ///     Gets or sets the <see cref="Key"/> that will trigger the <see cref="Command.Accept"/> command.
     /// </summary>
     public Key Key
     {
@@ -232,6 +251,11 @@ public class Shortcut : View
         }
     }
 
+    private KeyBindingScope _keyBindingScope;
+
+    /// <summary>
+    ///     Gets or sets the scope for the key binding for how <see cref="Key"/> is bound to <see cref="Command"/>.
+    /// </summary>
     public KeyBindingScope KeyBindingScope
     {
         get => _keyBindingScope;
@@ -246,8 +270,16 @@ public class Shortcut : View
         }
     }
 
+    /// <summary>
+    ///    Gets the subview that displays the key.
+    /// </summary>
+    // TODO: Should not be public
     public View KeyView { get; }
 
+
+    /// <summary>
+    ///     Gets or sets the help text that will be displayed for the command.
+    /// </summary>
     public override string Text
     {
         get => base.Text;
@@ -263,22 +295,16 @@ public class Shortcut : View
 
     /// <summary>
     ///     The event fired when the <see cref="Command.Accept"/> command is received. This
-    ///     occurs if the user clicks on the Bar with the mouse or presses the key bound to
-    ///     Command.Accept (Space by default).
+    ///     occurs if the user clicks on the Shortcut or presses <see cref="Key"/>.
     /// </summary>
-    /// <remarks>
-    ///     Client code can hook up to this event, it is
-    ///     raised when the button is activated either with
-    ///     the mouse or the keyboard.
-    /// </remarks>
-    public event EventHandler<HandledEventArgs> Accept;
+    public new event EventHandler<HandledEventArgs> Accept;
 
     /// <summary>
     ///     Called when the <see cref="Command.Accept"/> command is received. This
     ///     occurs if the user clicks on the Bar with the mouse or presses the key bound to
     ///     Command.Accept (Space by default).
     /// </summary>
-    public virtual bool OnAccept ()
+    protected new bool? OnAccept ()
     {
         if (Key == null || Key == Key.Empty)
         {
@@ -316,6 +342,7 @@ public class Shortcut : View
         return handled;
     }
 
+    /// <inheritdoc />
     public override bool OnEnter (View view)
     {
         Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
@@ -338,6 +365,7 @@ public class Shortcut : View
         return base.OnEnter (view);
     }
 
+    /// <inheritdoc />
     public override bool OnLeave (View view)
     {
         var cs = new ColorScheme (ColorScheme)
@@ -358,7 +386,15 @@ public class Shortcut : View
         return base.OnLeave (view);
     }
 
-    private void Container_MouseClick (object sender, MouseEventEventArgs e) { e.Handled = OnAccept (); }
+    private void Container_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        bool? handled = OnAccept ();
+
+        if (handled.HasValue)
+        {
+            e.Handled = handled.Value;
+        }
+    }
 
 
     private void Shortcut_Initialized (object sender, EventArgs e)
@@ -383,7 +419,12 @@ public class Shortcut : View
 
     private void SubView_MouseClick (object sender, MouseEventEventArgs e)
     {
-        e.Handled = OnAccept ();
+        bool? handled = OnAccept ();
+
+        if (handled.HasValue)
+        {
+            e.Handled = handled.Value;
+        }
 
         if (!e.Handled && CanFocus)
         {
@@ -393,7 +434,12 @@ public class Shortcut : View
 
     private void SubView_DefaultCommand (object sender, CancelEventArgs e)
     {
-        e.Cancel = OnAccept ();
+        bool? handled = OnAccept ();
+
+        if (handled.HasValue)
+        {
+            e.Cancel = handled.Value;
+        }
 
         if (!e.Cancel && CanFocus)
         {
