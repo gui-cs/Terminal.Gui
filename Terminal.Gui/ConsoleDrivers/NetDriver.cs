@@ -328,36 +328,14 @@ internal class NetEvents : IDisposable
         }
     }
 
-    private async Task CheckWindowSizeChange ()
+    private void CheckWindowSizeChange ()
     {
-        while (true)
-        {
-            if (_inputReadyCancellationTokenSource.IsCancellationRequested)
-            {
-                return;
-            }
-
-            try
-            {
-                _winChange.Wait (_inputReadyCancellationTokenSource.Token);
-                _winChange.Reset ();
-
-                await RequestWindowSize (_inputReadyCancellationTokenSource.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-
-            _inputReady.Set ();
-        }
-
-        async Task RequestWindowSize (CancellationToken cancellationToken)
+        void RequestWindowSize (CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
                 // Wait for a while then check if screen has changed sizes
-                await Task.Delay (500, cancellationToken);
+                Task.Delay (500, cancellationToken);
 
                 int buffHeight, buffWidth;
 
@@ -384,6 +362,28 @@ internal class NetEvents : IDisposable
             }
 
             cancellationToken.ThrowIfCancellationRequested ();
+        }
+
+        while (true)
+        {
+            if (_inputReadyCancellationTokenSource.IsCancellationRequested)
+            {
+                return;
+            }
+
+            try
+            {
+                _winChange.Wait (_inputReadyCancellationTokenSource.Token);
+                _winChange.Reset ();
+
+                RequestWindowSize (_inputReadyCancellationTokenSource.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            _inputReady.Set ();
         }
     }
 
