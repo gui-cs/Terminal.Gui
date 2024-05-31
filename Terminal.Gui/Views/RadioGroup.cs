@@ -11,8 +11,7 @@ public class RadioGroup : View
     private int _selected;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     layout.
+    ///     Initializes a new instance of the <see cref="RadioGroup"/> class.
     /// </summary>
     public RadioGroup ()
     {

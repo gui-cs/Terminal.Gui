@@ -26,9 +26,10 @@ public class TreeTableSourceTests : IDisposable
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeTableSource_BasicExpanding_WithKeyboard ()
     {
+        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
@@ -84,9 +85,11 @@ public class TreeTableSourceTests : IDisposable
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeTableSource_BasicExpanding_WithMouse ()
     {
+        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
@@ -223,6 +226,7 @@ public class TreeTableSourceTests : IDisposable
 
         Assert.Equal ("Ford Trans-Am", selected.Name);
         Assert.Equal ("Talking thunderbird car", selected.Description);
+        top.Dispose ();
     }
 
     private TableView GetTreeTable (out TreeView<IDescribedThing> tree)

@@ -3,13 +3,9 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class ComboBoxTests
+public class ComboBoxTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public ComboBoxTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
-    [AutoInitShutdown]
     public void Constructor_With_Source_Initialize_With_The_Passed_SelectedItem ()
     {
         var cb = new ComboBox
@@ -74,7 +70,6 @@ public class ComboBoxTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void EnsureKeyEventsDoNotCauseExceptions ()
     {
         var comboBox = new ComboBox { Text = "0" };
@@ -121,6 +116,7 @@ public class ComboBoxTests
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -175,6 +171,7 @@ public class ComboBoxTests
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -210,6 +207,7 @@ public class ComboBoxTests
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -269,6 +267,7 @@ public class ComboBoxTests
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -370,6 +369,7 @@ public class ComboBoxTests
         Assert.False (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -488,6 +488,7 @@ public class ComboBoxTests
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -524,7 +525,7 @@ public class ComboBoxTests
 One   
 Two   
 Three ",
-                                                      _output
+                                                      output
                                                      );
 
         Attribute [] attributes =
@@ -645,6 +646,7 @@ Three ",
         Assert.False (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -707,6 +709,7 @@ Three ",
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -764,6 +767,7 @@ Three ",
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -799,6 +803,7 @@ Three ",
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -877,7 +882,7 @@ Three ",
 One      ▼
 One       
 ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (cb.NewKeyDownEvent (Key.PageDown));
@@ -891,7 +896,7 @@ One
 Two      ▼
 Two       
 ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (cb.NewKeyDownEvent (Key.PageDown));
@@ -905,7 +910,7 @@ Two
 Three    ▼
 Three     
 ",
-                                                      _output
+                                                      output
                                                      );
         Assert.True (cb.NewKeyDownEvent (Key.PageUp));
         Assert.True (cb.IsShow);
@@ -959,10 +964,10 @@ Three
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
         Assert.Equal (3, cb.Source.Count);
+        top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Source_Equal_Null_Or_Count_Equal_Zero_Sets_SelectedItem_Equal_To_Minus_One ()
     {
         var cb = new ComboBox ();

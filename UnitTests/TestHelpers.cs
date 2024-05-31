@@ -77,7 +77,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         if (AutoInit)
         {
             // TODO: This Dispose call is here until all unit tests that don't correctly dispose Toplevel's they create are fixed.
-            Application.Top?.Dispose ();
+            //Application.Top?.Dispose ();
             Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
             if (Responder.Instances.Count == 0)
@@ -171,6 +171,8 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
         Assert.Null (Application.Driver);
         Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
+        Assert.Equal (FakeConsole.BufferWidth, Application.Driver.Cols);
+        Assert.Equal (FakeConsole.BufferHeight, Application.Driver.Rows);
         base.Before (methodUnderTest);
     }
 }

@@ -60,9 +60,7 @@ public class Editor : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BottomOffset = 1,
-            RightOffset = 1
+            Height = Dim.Fill ()
         };
 
         CreateDemoFile (_fileName);
@@ -296,30 +294,6 @@ public class Editor : Scenario
 
                                                              _textView.SetNeedsDisplay ();
                                                          };
-
-        _scrollBar.VisibleChanged += (s, e) =>
-                                     {
-                                         if (_scrollBar.Visible && _textView.RightOffset == 0)
-                                         {
-                                             _textView.RightOffset = 1;
-                                         }
-                                         else if (!_scrollBar.Visible && _textView.RightOffset == 1)
-                                         {
-                                             _textView.RightOffset = 0;
-                                         }
-                                     };
-
-        _scrollBar.OtherScrollBarView.VisibleChanged += (s, e) =>
-                                                        {
-                                                            if (_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 0)
-                                                            {
-                                                                _textView.BottomOffset = 1;
-                                                            }
-                                                            else if (!_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 1)
-                                                            {
-                                                                _textView.BottomOffset = 0;
-                                                            }
-                                                        };
 
         _textView.DrawContent += (s, e) =>
                                  {
@@ -834,11 +808,6 @@ public class Editor : Scenario
                            if (_textView.WordWrap)
                            {
                                _scrollBar.OtherScrollBarView.ShowScrollIndicator = false;
-                               _textView.BottomOffset = 0;
-                           }
-                           else
-                           {
-                               _textView.BottomOffset = 1;
                            }
                        };
 

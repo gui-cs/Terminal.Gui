@@ -11,8 +11,7 @@ public class CheckBox : View
     private bool? _checked = false;
 
     /// <summary>
-    ///     Initializes a new instance of <see cref="CheckBox"/> based on the given text, using
-    ///     <see cref="LayoutStyle.Computed"/> layout.
+    ///     Initializes a new instance of <see cref="CheckBox"/>.
     /// </summary>
     public CheckBox ()
     {

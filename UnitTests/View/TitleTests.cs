@@ -102,7 +102,7 @@ public class TitleTests (ITestOutputHelper output)
         Assert.Equal (text, view.Text);
 
         // SetupFakeDriver only create a screen with 25 cols and 25 rows
-        Assert.Equal (new (text.Length, 1), view.ContentSize);
+        Assert.Equal (new (text.Length, 1), view.GetContentSize ());
 
         top.Dispose ();
     }

@@ -50,7 +50,6 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData ("0_12你", 0, 1, 0, 1)]
     [InlineData ("0_12你", 1, 1, 1, 1)]
     [InlineData ("0_12你", 10, 1, 10, 1)]
-    [InlineData ("0_12你", 10, 3, 10, 3)]
     public void Button_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
         var btn1 = new Button
@@ -62,7 +61,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
-        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.ContentSize);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.GetContentSize ());
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.Size);
 
         btn1.Dispose ();
@@ -91,7 +90,6 @@ public class ButtonTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Button_HotKeyChanged_EventFires ()
     {
         var btn = new Button { Text = "_Yar" };
@@ -204,7 +202,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.Equal (10, btn.TextFormatter.Format ().Length);
         Assert.Equal (new (10, 1), btn.TextFormatter.Size);
-        Assert.Equal (new (10, 1), btn.ContentSize);
+        Assert.Equal (new (10, 1), btn.GetContentSize ());
         Assert.Equal (new (0, 0, 10, 1), btn.Viewport);
         Assert.Equal (new (0, 0, 10, 1), btn.Frame);
         Assert.Equal (KeyCode.T, btn.HotKey);
@@ -240,15 +238,11 @@ public class ButtonTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void HotKeyChange_Works ()
     {
         var clicked = false;
         var btn = new Button { Text = "_Test" };
         btn.Accept += (s, e) => clicked = true;
-        var top = new Toplevel ();
-        top.Add (btn);
-        Application.Begin (top);
 
         Assert.Equal (KeyCode.T, btn.HotKey);
         Assert.True (btn.NewKeyDownEvent (Key.T));
@@ -262,7 +256,6 @@ public class ButtonTests (ITestOutputHelper output)
         btn.HotKey = KeyCode.E;
         Assert.True (btn.NewKeyDownEvent (Key.E.WithAlt));
         Assert.True (clicked);
-        top.Dispose ();
     }
 
     /// <summary>
@@ -573,11 +566,11 @@ public class ButtonTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
-    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_ButtonPressRelease_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
+    public void WantContinuousButtonPressed_True_ButtonPressRelease_Accepts (MouseFlags pressed, MouseFlags released)
     {
         var me = new MouseEvent ();
 

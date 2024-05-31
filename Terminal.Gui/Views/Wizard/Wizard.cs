@@ -57,8 +57,7 @@ public class Wizard : Dialog
     private string _wizardTitle = string.Empty;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="Wizard"/> class.
     /// </summary>
     /// <remarks>
     ///     The Wizard will be vertically and horizontally centered in the container. After initialization use <c>X</c>,

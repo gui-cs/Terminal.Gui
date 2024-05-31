@@ -107,7 +107,6 @@ public class ScenarioTests : TestsAllViews
 
         // Settings
         FrameView _settingsPane;
-        CheckBox _computedCheckBox;
         FrameView _locationFrame;
         RadioGroup _xRadioGroup;
         TextField _xText;
@@ -165,15 +164,13 @@ public class ScenarioTests : TestsAllViews
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Title = "Settings"
         };
-        _computedCheckBox = new () { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
-        _settingsPane.Add (_computedCheckBox);
 
         var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "Absolute(x)" };
 
         _locationFrame = new ()
         {
-            X = Pos.Left (_computedCheckBox),
-            Y = Pos.Bottom (_computedCheckBox),
+            X = 0,
+            Y = 0,
             Height = 3 + radioItems.Length,
             Width = 36,
             Title = "Location (Pos)"
@@ -249,15 +246,6 @@ public class ScenarioTests : TestsAllViews
 
                                                   _curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
                                               };
-
-        _computedCheckBox.Toggled += (s, e) =>
-                                     {
-                                         if (_curView != null)
-                                         {
-                                             //_curView.LayoutStyle = e.OldValue == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
-                                             _hostPane.LayoutSubviews ();
-                                         }
-                                     };
 
         _xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
@@ -352,12 +340,8 @@ public class ScenarioTests : TestsAllViews
                 return;
             }
 
-            LayoutStyle layout = view.LayoutStyle;
-
             try
             {
-                //view.LayoutStyle = LayoutStyle.Absolute;
-
                 switch (_xRadioGroup.SelectedItem)
                 {
                     case 0:
@@ -531,9 +515,6 @@ public class ScenarioTests : TestsAllViews
                 var source = new ListWrapper<string> (["Test Text #1", "Test Text #2", "Test Text #3"]);
                 view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
             }
-
-            // Set Settings
-            _computedCheckBox.Checked = view.LayoutStyle == LayoutStyle.Computed;
 
             // Add
             _hostPane.Add (view);

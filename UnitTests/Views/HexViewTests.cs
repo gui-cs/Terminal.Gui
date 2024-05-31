@@ -86,7 +86,7 @@ public class HexViewTests
         Assert.True (hv.CanFocus);
         Assert.True (hv.AllowEdits);
 
-        hv = new HexView (new MemoryStream ());
+        hv = new (new MemoryStream ());
         Assert.NotNull (hv.Source);
         Assert.IsAssignableFrom<Stream> (hv.Source);
         Assert.True (hv.CanFocus);
@@ -102,7 +102,7 @@ public class HexViewTests
         top.Add (hv);
         Application.Begin (top);
 
-        Assert.Equal (new Point (1, 1), hv.CursorPosition);
+        Assert.Equal (new (1, 1), hv.CursorPosition);
 
         Assert.True (hv.NewKeyDownEvent (Key.Enter));
         Assert.True (hv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
@@ -110,16 +110,17 @@ public class HexViewTests
         Assert.True (hv.NewKeyDownEvent (Key.Home));
 
         Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (new Point (2, 1), hv.CursorPosition);
+        Assert.Equal (new (2, 1), hv.CursorPosition);
 
         Assert.True (hv.NewKeyDownEvent (Key.CursorDown));
-        Assert.Equal (new Point (2, 2), hv.CursorPosition);
+        Assert.Equal (new (2, 2), hv.CursorPosition);
 
         Assert.True (hv.NewKeyDownEvent (Key.End));
         int col = hv.CursorPosition.X;
         int line = hv.CursorPosition.Y;
         int offset = (line - 1) * (hv.BytesPerLine - col);
         Assert.Equal (hv.Position, col * line + offset);
+        top.Dispose ();
     }
 
     [Fact]
@@ -131,7 +132,7 @@ public class HexViewTests
         top.Add (hv);
         Application.Begin (top);
 
-        Assert.Equal (new Point (1, 1), hv.CursorPosition);
+        Assert.Equal (new (1, 1), hv.CursorPosition);
 
         Assert.True (hv.NewKeyDownEvent (Key.Enter));
         Assert.True (hv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
@@ -139,16 +140,17 @@ public class HexViewTests
         Assert.True (hv.NewKeyDownEvent (Key.Home));
 
         Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (new Point (2, 1), hv.CursorPosition);
+        Assert.Equal (new (2, 1), hv.CursorPosition);
 
         Assert.True (hv.NewKeyDownEvent (Key.CursorDown));
-        Assert.Equal (new Point (2, 2), hv.CursorPosition);
+        Assert.Equal (new (2, 2), hv.CursorPosition);
 
         Assert.True (hv.NewKeyDownEvent (Key.End));
         int col = hv.CursorPosition.X;
         int line = hv.CursorPosition.Y;
         int offset = (line - 1) * (hv.BytesPerLine - col);
         Assert.Equal (hv.Position, col * line + offset);
+        top.Dispose ();
     }
 
     [Fact]
@@ -200,7 +202,7 @@ public class HexViewTests
         hv.LayoutSubviews ();
 
         KeyValuePair<long, byte> keyValuePair = default;
-        hv.Edited += (s, e) => keyValuePair = new KeyValuePair<long, byte> (e.Position, e.NewValue);
+        hv.Edited += (s, e) => keyValuePair = new (e.Position, e.NewValue);
 
         Assert.True (hv.NewKeyDownEvent (Key.D4));
         Assert.True (hv.NewKeyDownEvent (Key.D6));
@@ -248,7 +250,7 @@ public class HexViewTests
         Assert.True (hv.NewKeyDownEvent (Key.V.WithCtrl));
         Assert.Equal (41, hv.Position);
 
-        Assert.True (hv.NewKeyDownEvent (new Key (Key.V.WithAlt)));
+        Assert.True (hv.NewKeyDownEvent (new (Key.V.WithAlt)));
         Assert.Equal (1, hv.Position);
 
         Assert.True (hv.NewKeyDownEvent (Key.PageDown));
@@ -274,6 +276,7 @@ public class HexViewTests
 
         Assert.True (hv.NewKeyDownEvent (Key.CursorUp.WithCtrl));
         Assert.Equal (1, hv.Position);
+        top.Dispose ();
     }
 
     [Fact]
@@ -360,8 +363,9 @@ public class HexViewTests
         Assert.True (hv.NewKeyDownEvent (Key.CursorDown));
 
         Assert.Equal (12, hexViewEventArgs.BytesPerLine);
-        Assert.Equal (new Point (2, 2), hexViewEventArgs.CursorPosition);
+        Assert.Equal (new (2, 2), hexViewEventArgs.CursorPosition);
         Assert.Equal (14, hexViewEventArgs.Position);
+        top.Dispose ();
     }
 
     [Fact]
@@ -395,6 +399,7 @@ public class HexViewTests
         hv.Source = new MemoryStream ();
         Assert.Equal (0, hv.DisplayStart);
         Assert.Equal (0, hv.Position - 1);
+        top.Dispose ();
     }
 
     private Stream LoadStream (bool unicode = false)

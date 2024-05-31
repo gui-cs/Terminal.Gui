@@ -181,10 +181,8 @@ public class ViewportTests (ITestOutputHelper output)
         var newViewport = new Rectangle (0, 0, 30, 40);
 
         var v = new View { Frame = frame };
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 
         v.Viewport = newViewport;
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
         Assert.Equal (newViewport, v.Viewport);
         Assert.Equal (new Rectangle (1, 2, newViewport.Width, newViewport.Height), v.Frame);
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
@@ -340,14 +338,57 @@ public class ViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void ContentSize_Matches_ViewportSize_If_Not_Set ()
+    public void ContentSize_Tracks_ViewportSize_If_Not_Set ()
     {
         View view = new ()
         {
             Width = 1,
             Height = 1
         };
-        Assert.Equal (view.Viewport.Size, view.ContentSize);
+        Assert.True (view.ContentSizeTracksViewport);
+        Assert.Equal (view.Viewport.Size, view.GetContentSize ());
+    }
+
+    [Fact]
+    public void ContentSize_Ignores_ViewportSize_If_Set ()
+    {
+        View view = new ()
+        {
+            Width = 1,
+            Height = 1,
+        };
+        view.SetContentSize (new Size (5, 5));
+        Assert.False (view.ContentSizeTracksViewport);
+        Assert.NotEqual (view.Viewport.Size, view.GetContentSize ());
+    }
+
+    [Fact]
+    public void ContentSize_Tracks_ViewportSize_If_ContentSizeTracksViewport_Is_True ()
+    {
+        View view = new ()
+        {
+            Width = 1,
+            Height = 1,
+        };
+        view.SetContentSize (new Size (5, 5));
+        view.Viewport = new (0, 0, 10, 10);
+        view.ContentSizeTracksViewport = true;
+        Assert.Equal (view.Viewport.Size, view.GetContentSize ());
+    }
+
+
+    [Fact]
+    public void ContentSize_Ignores_ViewportSize_If_ContentSizeTracksViewport_Is_False ()
+    {
+        View view = new ()
+        {
+            Width = 1,
+            Height = 1,
+        };
+        view.SetContentSize (new Size (5, 5));
+        view.Viewport = new (0, 0, 10, 10);
+        view.ContentSizeTracksViewport = false;
+        Assert.NotEqual (view.Viewport.Size, view.GetContentSize ());
     }
 
     //[Theory]

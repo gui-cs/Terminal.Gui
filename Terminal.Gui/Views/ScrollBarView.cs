@@ -33,8 +33,7 @@ public class ScrollBarView : View
     private bool _vertical;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using
-    ///     <see cref="LayoutStyle.Computed"/> layout.
+    ///     Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class.
     /// </summary>
     public ScrollBarView ()
     {
@@ -46,8 +45,7 @@ public class ScrollBarView : View
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using
-    ///     <see cref="LayoutStyle.Computed"/> layout.
+    ///     Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class.
     /// </summary>
     /// <param name="host">The view that will host this scrollbar.</param>
     /// <param name="isVertical">If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</param>

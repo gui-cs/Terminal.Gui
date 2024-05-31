@@ -906,8 +906,10 @@ public class DialogTests
                                         };
 
                           Run (dlg);
+                          dlg.Dispose ();
                       };
         Run (win);
+        win.Dispose ();
     }
 
     [Theory]
@@ -988,6 +990,7 @@ public class DialogTests
                                  Height = Dim.Percent (85)
                              };
                              Run (dlg);
+                             dlg.Dispose ();
                          }
                          else if (iterations == 1)
                          {
@@ -1001,6 +1004,7 @@ public class DialogTests
                      };
 
         Run (win);
+        win.Dispose ();
     }
 
     [Fact]
@@ -1134,6 +1138,7 @@ public class DialogTests
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         var expected = 7;
         Assert.Equal (new (expected, expected), d.Frame.Location);
+        d.Dispose ();
     }
 
     [Fact]
@@ -1147,6 +1152,7 @@ public class DialogTests
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         var expected = 1;
         Assert.Equal (new (expected, expected), d.Frame.Location);
+        d.Dispose ();
     }
 
     [Fact]
@@ -1170,6 +1176,7 @@ public class DialogTests
      └───┘",
                                                       _output
                                                      );
+        d.Dispose ();
     }
 
     [Fact]
@@ -1263,6 +1270,7 @@ public class DialogTests
 
         ((FakeDriver)Driver).SetBufferSize (20, 10);
         Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1282,7 +1290,7 @@ public class DialogTests
         int width = buttonRow.Length;
         d.SetBufferSize (buttonRow.Length, 10);
 
-        (runstate, Dialog _) = RunButtonTestDialog (
+        (runstate, Dialog dlg) = RunButtonTestDialog (
                                                     title,
                                                     width,
                                                     Alignment.Center,
@@ -1290,6 +1298,7 @@ public class DialogTests
                                                    );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
+        dlg.Dispose ();
     }
 
     [Fact]
