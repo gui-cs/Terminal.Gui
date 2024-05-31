@@ -10,8 +10,6 @@ namespace Terminal.Gui.ViewTests;
 /// </summary>
 public class TextTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     // TextFormatter.Size should be empty unless DimAuto is set or ContentSize is set
     [Theory]
     [InlineData ("", 0, 0)]
@@ -32,7 +30,7 @@ public class TextTests (ITestOutputHelper output)
     public void TextFormatter_Size_Tracks_ContentSize (string text, int expectedW, int expectedH)
     {
         var view = new View ();
-        view.SetContentSize (new (1,1));
+        view.SetContentSize (new (1, 1));
         view.Text = text;
         Assert.Equal (new (expectedW, expectedH), view.TextFormatter.Size);
     }
@@ -135,6 +133,7 @@ Y
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]
@@ -394,6 +393,7 @@ Y
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]
@@ -422,7 +422,7 @@ Y
 
         Assert.Equal (new (0, 0, 1, 5), view.Frame);
         Assert.Equal (new (1, 5), view.TextFormatter.Size);
-        Assert.Equal (new() { "Views" }, view.TextFormatter.GetLines ());
+        Assert.Equal (new () { "Views" }, view.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 4, 10), win.Frame);
         Assert.Equal (new (0, 0, 4, 10), Application.Top.Frame);
 
@@ -468,6 +468,7 @@ Y
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 4, 10), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -493,7 +494,7 @@ Y
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 2, 5), view.Frame);
         Assert.Equal (new (2, 5), view.TextFormatter.Size);
-        Assert.Equal (new() { "界View" }, view.TextFormatter.GetLines ());
+        Assert.Equal (new () { "界View" }, view.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 4, 10), win.Frame);
         Assert.Equal (new (0, 0, 4, 10), Application.Top.Frame);
 
@@ -524,7 +525,7 @@ Y
 
         Exception exception = Record.Exception (
                                                 () => Assert.Equal (
-                                                                    new() { "界View" },
+                                                                    new () { "界View" },
                                                                     view.TextFormatter.GetLines ()
                                                                    )
                                                );
@@ -545,6 +546,7 @@ Y
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 4, 10), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -641,6 +643,7 @@ Y
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]
@@ -737,6 +740,7 @@ Y
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]
@@ -772,6 +776,7 @@ Y
         }
 
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]
@@ -820,6 +825,7 @@ Y
         Assert.Equal (new (0, 0, 2, 10), verticalView.Frame);
         Assert.Equal (new (2, 10), verticalView.GetSizeNeededForTextWithoutHotKey ());
         Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
+        top.Dispose ();
     }
 
     [Theory]
@@ -942,6 +948,7 @@ Y
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, width + 2, 6), pos);
+        top.Dispose ();
     }
 
     [Theory]
@@ -1099,6 +1106,7 @@ Y
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 9, height + 2), pos);
+        top.Dispose ();
     }
 
     // Test that View.PreserveTrailingSpaces removes trailing spaces

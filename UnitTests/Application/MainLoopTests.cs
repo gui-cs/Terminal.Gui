@@ -640,6 +640,7 @@ public class MainLoopTests
         await task; // Propagate exception if any occurred
 
         Assert.Equal (numIncrements * numPasses, tbCounter);
+        top.Dispose ();
     }
 
     [Theory]
@@ -714,6 +715,7 @@ public class MainLoopTests
                                  };
 
         Application.Run (top);
+        top.Dispose ();
 
         Assert.True (taskCompleted);
         Assert.Equal (clickMe, btn.Text);

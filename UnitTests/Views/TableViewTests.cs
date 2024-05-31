@@ -6,11 +6,8 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class TableViewTests
+public class TableViewTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper output;
-    public TableViewTests (ITestOutputHelper output) { this.output = output; }
-
     /// <summary>Builds a simple list with the requested number of string items</summary>
     /// <param name="items"></param>
     /// <returns></returns>
@@ -34,7 +31,7 @@ public class TableViewTests
     /// <returns></returns>
     public static DataTableSource BuildTable (int cols, int rows, out DataTable dt)
     {
-        dt = new DataTable ();
+        dt = new ();
 
         for (var c = 0; c < cols; c++)
         {
@@ -53,7 +50,7 @@ public class TableViewTests
             dt.Rows.Add (newRow);
         }
 
-        return new DataTableSource (dt);
+        return new (dt);
     }
 
     [Fact]
@@ -118,6 +115,7 @@ public class TableViewTests
 01111101101111111110
 ";
         TestHelpers.AssertDriverAttributesAre (expected, Application.Driver, tv.ColorScheme.Normal, color);
+        top.Dispose ();
     }
 
     [Fact]
@@ -126,7 +124,7 @@ public class TableViewTests
         // create a 4 by 4 table
         var tableView = new TableView
         {
-            Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Viewport = new (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -153,7 +151,7 @@ public class TableViewTests
         // create a 4 by 4 table
         var tableView = new TableView
         {
-            Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Viewport = new (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -162,7 +160,7 @@ public class TableViewTests
 
         // select the last row
         tableView.MultiSelectedRegions.Clear ();
-        tableView.MultiSelectedRegions.Push (new TableSelection (new Point (0, 3), new Rectangle (0, 3, 4, 1)));
+        tableView.MultiSelectedRegions.Push (new (new (0, 3), new (0, 3, 4, 1)));
 
         Assert.Equal (4, tableView.GetAllSelectedCells ().Count ());
 
@@ -181,7 +179,7 @@ public class TableViewTests
         var tableView = new TableView ();
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.Viewport = new Rectangle (0, 0, 25, 10);
+        tableView.Viewport = new (0, 0, 25, 10);
 
         Assert.Equal (0, tableView.RowOffset);
         Assert.Equal (0, tableView.ColumnOffset);
@@ -223,7 +221,7 @@ public class TableViewTests
         Assert.Equal (0, tableView.ColumnOffset);
 
         // Set empty table
-        tableView.Table = new DataTableSource (new DataTable ());
+        tableView.Table = new DataTableSource (new ());
 
         // Since table has no rows or columns scroll offset should default to 0
         tableView.EnsureValidScrollOffsets ();
@@ -238,7 +236,7 @@ public class TableViewTests
     {
         var tableView = new TableView
         {
-            Table = BuildTable (3, 3), MultiSelect = multiSelect, Viewport = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (3, 3), MultiSelect = multiSelect, Viewport = new (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -246,7 +244,7 @@ public class TableViewTests
         tableView.SetSelection (1, 1, false);
 
         Assert.Single (tableView.GetAllSelectedCells ());
-        Assert.Equal (new Point (1, 1), tableView.GetAllSelectedCells ().Single ());
+        Assert.Equal (new (1, 1), tableView.GetAllSelectedCells ().Single ());
     }
 
     [Fact]
@@ -254,7 +252,7 @@ public class TableViewTests
     {
         var tableView = new TableView
         {
-            Table = BuildTable (3, 3), MultiSelect = true, FullRowSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (3, 3), MultiSelect = true, FullRowSelect = true, Viewport = new (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -268,12 +266,12 @@ public class TableViewTests
         Point [] selected = tableView.GetAllSelectedCells ().ToArray ();
 
         Assert.Equal (6, selected.Length);
-        Assert.Equal (new Point (0, 1), selected [0]);
-        Assert.Equal (new Point (1, 1), selected [1]);
-        Assert.Equal (new Point (2, 1), selected [2]);
-        Assert.Equal (new Point (0, 2), selected [3]);
-        Assert.Equal (new Point (1, 2), selected [4]);
-        Assert.Equal (new Point (2, 2), selected [5]);
+        Assert.Equal (new (0, 1), selected [0]);
+        Assert.Equal (new (1, 1), selected [1]);
+        Assert.Equal (new (2, 1), selected [2]);
+        Assert.Equal (new (0, 2), selected [3]);
+        Assert.Equal (new (1, 2), selected [4]);
+        Assert.Equal (new (2, 2), selected [5]);
     }
 
     [Fact]
@@ -281,7 +279,7 @@ public class TableViewTests
     {
         var tableView = new TableView
         {
-            Table = BuildTable (3, 3), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (3, 3), MultiSelect = true, Viewport = new (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -295,10 +293,10 @@ public class TableViewTests
         Point [] selected = tableView.GetAllSelectedCells ().ToArray ();
 
         Assert.Equal (4, selected.Length);
-        Assert.Equal (new Point (1, 1), selected [0]);
-        Assert.Equal (new Point (2, 1), selected [1]);
-        Assert.Equal (new Point (1, 2), selected [2]);
-        Assert.Equal (new Point (2, 2), selected [3]);
+        Assert.Equal (new (1, 1), selected [0]);
+        Assert.Equal (new (2, 1), selected [1]);
+        Assert.Equal (new (1, 2), selected [2]);
+        Assert.Equal (new (2, 2), selected [3]);
     }
 
     [Fact]
@@ -306,7 +304,7 @@ public class TableViewTests
     {
         var tableView = new TableView
         {
-            Table = BuildTable (20, 20), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (20, 20), MultiSelect = true, Viewport = new (0, 0, 10, 5)
         };
         tableView.BeginInit ();
         tableView.EndInit ();
@@ -322,8 +320,8 @@ public class TableViewTests
         */
 
         tableView.MultiSelectedRegions.Clear ();
-        tableView.MultiSelectedRegions.Push (new TableSelection (new Point (1, 1), new Rectangle (1, 1, 2, 2)));
-        tableView.MultiSelectedRegions.Push (new TableSelection (new Point (7, 3), new Rectangle (7, 3, 2, 1)));
+        tableView.MultiSelectedRegions.Push (new (new (1, 1), new (1, 1, 2, 2)));
+        tableView.MultiSelectedRegions.Push (new (new (7, 3), new (7, 3, 2, 1)));
 
         tableView.SelectedColumn = 8;
         tableView.SelectedRow = 3;
@@ -332,12 +330,12 @@ public class TableViewTests
 
         Assert.Equal (6, selected.Length);
 
-        Assert.Equal (new Point (1, 1), selected [0]);
-        Assert.Equal (new Point (2, 1), selected [1]);
-        Assert.Equal (new Point (1, 2), selected [2]);
-        Assert.Equal (new Point (2, 2), selected [3]);
-        Assert.Equal (new Point (7, 3), selected [4]);
-        Assert.Equal (new Point (8, 3), selected [5]);
+        Assert.Equal (new (1, 1), selected [0]);
+        Assert.Equal (new (2, 1), selected [1]);
+        Assert.Equal (new (1, 2), selected [2]);
+        Assert.Equal (new (2, 2), selected [3]);
+        Assert.Equal (new (7, 3), selected [4]);
+        Assert.Equal (new (8, 3), selected [5]);
     }
 
     [Fact]
@@ -425,7 +423,7 @@ public class TableViewTests
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 25 characters can be printed into table
-        tableView.Viewport = new Rectangle (0, 0, 25, 5);
+        tableView.Viewport = new (0, 0, 25, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -526,7 +524,7 @@ public class TableViewTests
         var driver = (FakeDriver)Application.Driver;
         driver.ClearContents ();
 
-        tableView.Viewport = new Rectangle (0, 0, 9, 5);
+        tableView.Viewport = new (0, 0, 9, 5);
         tableView.LayoutSubviews ();
         tableView.Draw ();
 
@@ -543,7 +541,7 @@ public class TableViewTests
         // setting width to 10 leaves just enough space for the column to
         // meet MinAcceptableWidth of 5.  Column width includes terminator line
         // symbol (e.g. ┤ or │)
-        tableView.Viewport = new Rectangle (0, 0, 10, 5);
+        tableView.Viewport = new (0, 0, 10, 5);
         tableView.LayoutSubviews ();
         tableView.Draw ();
 
@@ -556,7 +554,7 @@ public class TableViewTests
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
 
-        tableView.Viewport = new Rectangle (0, 0, 25, 5);
+        tableView.Viewport = new (0, 0, 25, 5);
 
         // revert style change
         style.MinAcceptableWidth = TableView.DefaultMinAcceptableWidth;
@@ -596,6 +594,7 @@ public class TableViewTests
 
         top.Dispose ();
         Application.Shutdown ();
+        top.Dispose ();
     }
 
     [AutoInitShutdown]
@@ -604,7 +603,7 @@ public class TableViewTests
     {
         var tableView = new TableView
         {
-            Table = BuildTable (25, 50), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5)
+            Table = BuildTable (25, 50), MultiSelect = true, Viewport = new (0, 0, 10, 5)
         };
 
         // Header should take up 2 lines
@@ -633,15 +632,16 @@ public class TableViewTests
 
         Assert.Equal (8, tableView.SelectedRow);
         Assert.Equal (4, tableView.RowOffset);
+        top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void Redraw_EmptyTable ()
     {
         var tableView = new TableView ();
-        tableView.ColorScheme = new ColorScheme ();
-        tableView.Viewport = new Rectangle (0, 0, 25, 10);
+        tableView.ColorScheme = new ();
+        tableView.Viewport = new (0, 0, 25, 10);
 
         // Set a table with 1 column
         tableView.Table = BuildTable (1, 50, out DataTable dt);
@@ -652,7 +652,6 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void ScrollDown_OneLineAtATime ()
     {
         var tableView = new TableView ();
@@ -663,7 +662,7 @@ public class TableViewTests
         tableView.Table = BuildTable (25, 50);
 
         // 1 header + 4 rows visible
-        tableView.Viewport = new Rectangle (0, 0, 25, 5);
+        tableView.Viewport = new (0, 0, 25, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = false;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -672,7 +671,7 @@ public class TableViewTests
         tableView.SelectedRow = 3; // row is 0 indexed so this is the 4th visible row
 
         // Scroll down
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorDown });
 
         // Scrolled off the page by 1 row so it should only have moved down 1 line of RowOffset
         Assert.Equal (4, tableView.SelectedRow);
@@ -680,7 +679,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ScrollIndicators ()
     {
         var tableView = new TableView ();
@@ -690,7 +689,7 @@ public class TableViewTests
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visibile
-        tableView.Viewport = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -724,7 +723,7 @@ public class TableViewTests
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         // Scroll right
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
 
         // since A is now pushed off screen we get indicator showing
         // that user can scroll left to see first column
@@ -739,8 +738,8 @@ public class TableViewTests
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         // Scroll right twice more (to end of columns)
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorRight });
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
 
         tableView.Draw ();
 
@@ -757,7 +756,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ScrollRight_SmoothScrolling ()
     {
         var tableView = new TableView ();
@@ -768,7 +767,7 @@ public class TableViewTests
         tableView.LayoutSubviews ();
 
         // 3 columns are visibile
-        tableView.Viewport = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = false;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -799,7 +798,7 @@ public class TableViewTests
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         // Scroll right
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
 
         tableView.Draw ();
 
@@ -816,13 +815,10 @@ public class TableViewTests
 │2│3│4│";
 
         TestHelpers.AssertDriverContentsAre (expected, output);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ScrollRight_WithoutSmoothScrolling ()
     {
         var tableView = new TableView ();
@@ -831,7 +827,7 @@ public class TableViewTests
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visibile
-        tableView.Viewport = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = false;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -862,7 +858,7 @@ public class TableViewTests
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         // Scroll right
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
 
         tableView.Draw ();
 
@@ -879,8 +875,6 @@ public class TableViewTests
 
         TestHelpers.AssertDriverContentsAre (expected, output);
 
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -940,7 +934,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowHorizontalBottomLine_NoCellLines ()
     {
         TableView tableView = GetABCDEFTableView (out _);
@@ -948,7 +942,7 @@ public class TableViewTests
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visibile
-        tableView.Viewport = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -971,7 +965,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowHorizontalBottomLine_WithVerticalCellLines ()
     {
         TableView tableView = GetABCDEFTableView (out _);
@@ -979,7 +973,7 @@ public class TableViewTests
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visibile
-        tableView.Viewport = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -1037,10 +1031,11 @@ public class TableViewTests
         tv.CellActivationKey = KeyCode.Z;
         tv.NewKeyDownEvent (Key.Z);
         Assert.Equal ("R0C0", activatedValue);
+        top.Dispose ();
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorsTest_ColorGetter (bool focused)
@@ -1049,7 +1044,7 @@ public class TableViewTests
         tv.LayoutSubviews ();
 
         // width exactly matches the max col widths
-        tv.Viewport = new Rectangle (0, 0, 5, 4);
+        tv.Viewport = new (0, 0, 5, 4);
 
         // Create a style for column B
         ColumnStyle bStyle = tv.Style.GetOrCreateColumnStyle (1);
@@ -1057,12 +1052,12 @@ public class TableViewTests
         // when B is 2 use the custom highlight color
         var cellHighlight = new ColorScheme
         {
-            Normal = new Attribute (Color.BrightCyan, Color.DarkGray),
-            HotNormal = new Attribute (Color.Green, Color.Blue),
-            Focus = new Attribute (Color.Cyan, Color.Magenta),
+            Normal = new (Color.BrightCyan, Color.DarkGray),
+            HotNormal = new (Color.Green, Color.Blue),
+            Focus = new (Color.Cyan, Color.Magenta),
 
             // Not used by TableView
-            HotFocus = new Attribute (Color.BrightYellow, Color.White)
+            HotFocus = new (Color.BrightYellow, Color.White)
         };
 
         bStyle.ColorGetter = a => Convert.ToInt32 (a.CellValue) == 2 ? cellHighlight : null;
@@ -1131,13 +1126,10 @@ public class TableViewTests
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
                                               );
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorsTest_RowColorGetter (bool focused)
@@ -1146,16 +1138,16 @@ public class TableViewTests
         tv.LayoutSubviews ();
 
         // width exactly matches the max col widths
-        tv.Viewport = new Rectangle (0, 0, 5, 4);
+        tv.Viewport = new (0, 0, 5, 4);
 
         var rowHighlight = new ColorScheme
         {
-            Normal = new Attribute (Color.BrightCyan, Color.DarkGray),
-            HotNormal = new Attribute (Color.Green, Color.Blue),
-            Focus = new Attribute (Color.BrightYellow, Color.White),
+            Normal = new (Color.BrightCyan, Color.DarkGray),
+            HotNormal = new (Color.Green, Color.Blue),
+            Focus = new (Color.BrightYellow, Color.White),
 
             // Not used by TableView
-            HotFocus = new Attribute (Color.Cyan, Color.Magenta)
+            HotFocus = new (Color.Cyan, Color.Magenta)
         };
 
         // when B is 2 use the custom highlight color for the row
@@ -1225,13 +1217,10 @@ public class TableViewTests
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
                                               );
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorTests_FocusedOrNot (bool focused)
@@ -1240,7 +1229,7 @@ public class TableViewTests
         tv.LayoutSubviews ();
 
         // width exactly matches the max col widths
-        tv.Viewport = new Rectangle (0, 0, 5, 4);
+        tv.Viewport = new (0, 0, 5, 4);
 
         // private method for forcing the view to be focused/not focused
         MethodInfo setFocusMethod =
@@ -1273,11 +1262,10 @@ public class TableViewTests
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
                                               );
 
-        Application.Shutdown ();
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorTests_InvertSelectedCellFirstCharacter (bool focused)
@@ -1287,7 +1275,7 @@ public class TableViewTests
         tv.LayoutSubviews ();
 
         // width exactly matches the max col widths
-        tv.Viewport = new Rectangle (0, 0, 5, 4);
+        tv.Viewport = new (0, 0, 5, 4);
 
         // private method for forcing the view to be focused/not focused
         MethodInfo setFocusMethod =
@@ -1323,11 +1311,10 @@ public class TableViewTests
                                                focused ? invertFocus : invertHotNormal
                                               );
 
-        Application.Shutdown ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TableView_ExpandLastColumn_False ()
     {
         TableView tv = SetUpMiniTable ();
@@ -1345,12 +1332,10 @@ public class TableViewTests
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
 
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TableView_ExpandLastColumn_False_ExactBounds ()
     {
         TableView tv = SetUpMiniTable ();
@@ -1359,7 +1344,7 @@ public class TableViewTests
         tv.Style.ExpandLastColumn = false;
 
         // width exactly matches the max col widths
-        tv.Viewport = new Rectangle (0, 0, 5, 4);
+        tv.Viewport = new (0, 0, 5, 4);
 
         tv.Draw ();
 
@@ -1370,13 +1355,10 @@ public class TableViewTests
 │1│2│
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TableView_ExpandLastColumn_True ()
     {
         TableView tv = SetUpMiniTable ();
@@ -1393,17 +1375,14 @@ public class TableViewTests
 │1│2     │
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TableView_ShowHeadersFalse_AllLines ()
     {
         TableView tv = GetABCDEFTableView (out _);
-        tv.Viewport = new Rectangle (0, 0, 5, 5);
+        tv.Viewport = new (0, 0, 5, 5);
 
         tv.Style.ShowHeaders = false;
         tv.Style.ShowHorizontalHeaderOverline = true;
@@ -1423,11 +1402,11 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TableView_ShowHeadersFalse_AndNoHeaderLines ()
     {
         TableView tv = GetABCDEFTableView (out _);
-        tv.Viewport = new Rectangle (0, 0, 5, 5);
+        tv.Viewport = new (0, 0, 5, 5);
 
         tv.Style.ShowHeaders = false;
         tv.Style.ShowHorizontalHeaderOverline = false;
@@ -1442,11 +1421,11 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TableView_ShowHeadersFalse_OverlineTrue ()
     {
         TableView tv = GetABCDEFTableView (out _);
-        tv.Viewport = new Rectangle (0, 0, 5, 5);
+        tv.Viewport = new (0, 0, 5, 5);
 
         tv.Style.ShowHeaders = false;
         tv.Style.ShowHorizontalHeaderOverline = true;
@@ -1462,11 +1441,11 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TableView_ShowHeadersFalse_UnderlineTrue ()
     {
         TableView tv = GetABCDEFTableView (out _);
-        tv.Viewport = new Rectangle (0, 0, 5, 5);
+        tv.Viewport = new (0, 0, 5, 5);
 
         tv.Style.ShowHeaders = false;
         tv.Style.ShowHorizontalHeaderOverline = false;
@@ -1485,7 +1464,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TableViewMultiSelect_CannotFallOffBottom ()
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
@@ -1497,21 +1476,19 @@ public class TableViewTests
         tv.NewKeyDownEvent (Key.CursorRight.WithShift);
         tv.NewKeyDownEvent (Key.CursorDown.WithShift);
 
-        Assert.Equal (new Rectangle (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rectangle);
+        Assert.Equal (new (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rectangle);
 
         // this next moves should be ignored because we already selected the whole table
         tv.NewKeyDownEvent (Key.CursorRight.WithShift);
         tv.NewKeyDownEvent (Key.CursorDown.WithShift);
 
-        Assert.Equal (new Rectangle (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rectangle);
+        Assert.Equal (new (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rectangle);
         Assert.Equal (1, tv.SelectedColumn);
         Assert.Equal (1, tv.SelectedRow);
-
-        Application.Shutdown ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TableViewMultiSelect_CannotFallOffLeft ()
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
@@ -1522,21 +1499,19 @@ public class TableViewTests
         tv.SelectedRow = 1;
         tv.NewKeyDownEvent (Key.CursorLeft.WithShift);
 
-        Assert.Equal (new Rectangle (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rectangle);
+        Assert.Equal (new (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rectangle);
 
         // this next shift left should be ignored because we are already at the bounds
         tv.NewKeyDownEvent (Key.CursorLeft.WithShift);
 
-        Assert.Equal (new Rectangle (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rectangle);
+        Assert.Equal (new (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rectangle);
 
         Assert.Equal (0, tv.SelectedColumn);
         Assert.Equal (1, tv.SelectedRow);
-
-        Application.Shutdown ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TableViewMultiSelect_CannotFallOffRight ()
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
@@ -1547,21 +1522,19 @@ public class TableViewTests
         tv.SelectedRow = 1;
         tv.NewKeyDownEvent (Key.CursorRight.WithShift);
 
-        Assert.Equal (new Rectangle (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rectangle);
+        Assert.Equal (new (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rectangle);
 
         // this next shift right should be ignored because we are already at the right bounds
         tv.NewKeyDownEvent (Key.CursorRight.WithShift);
 
-        Assert.Equal (new Rectangle (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rectangle);
+        Assert.Equal (new (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rectangle);
 
         Assert.Equal (1, tv.SelectedColumn);
         Assert.Equal (1, tv.SelectedRow);
-
-        Application.Shutdown ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TableViewMultiSelect_CannotFallOffTop ()
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
@@ -1574,17 +1547,16 @@ public class TableViewTests
         tv.NewKeyDownEvent (Key.CursorLeft.WithShift);
         tv.NewKeyDownEvent (Key.CursorUp.WithShift);
 
-        Assert.Equal (new Rectangle (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rectangle);
+        Assert.Equal (new (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rectangle);
 
         // this next moves should be ignored because we already selected the whole table
         tv.NewKeyDownEvent (Key.CursorLeft.WithShift);
         tv.NewKeyDownEvent (Key.CursorUp.WithShift);
 
-        Assert.Equal (new Rectangle (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rectangle);
+        Assert.Equal (new (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rectangle);
         Assert.Equal (0, tv.SelectedColumn);
         Assert.Equal (0, tv.SelectedRow);
 
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -1593,11 +1565,11 @@ public class TableViewTests
     {
         var tv = new TableView ();
         tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tv.Viewport = new Rectangle (0, 0, 50, 7);
+        tv.Viewport = new (0, 0, 50, 7);
 
         tv.Table = new EnumerableTableSource<string> (
                                                       new [] { "fish", "troll", "trap", "zoo" },
-                                                      new Dictionary<string, Func<string, object>> { { "Name", t => t }, { "EndsWith", t => t.Last () } }
+                                                      new() { { "Name", t => t }, { "EndsWith", t => t.Last () } }
                                                      );
 
         tv.LayoutSubviews ();
@@ -1622,11 +1594,11 @@ public class TableViewTests
         Assert.False (tv.HasFocus);
 
         // already on fish
-        tv.NewKeyDownEvent (new Key { KeyCode = KeyCode.F });
+        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.F });
         Assert.Equal (0, tv.SelectedRow);
 
         // not focused
-        tv.NewKeyDownEvent (new Key { KeyCode = KeyCode.Z });
+        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.Z });
         Assert.Equal (0, tv.SelectedRow);
 
         // ensure that TableView has the input focus
@@ -1638,43 +1610,44 @@ public class TableViewTests
         Assert.True (tv.HasFocus);
 
         // already on fish
-        tv.NewKeyDownEvent (new Key { KeyCode = KeyCode.F });
+        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.F });
         Assert.Equal (0, tv.SelectedRow);
 
         // move to zoo
-        tv.NewKeyDownEvent (new Key { KeyCode = KeyCode.Z });
+        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.Z });
         Assert.Equal (3, tv.SelectedRow);
 
         // move to troll
-        tv.NewKeyDownEvent (new Key { KeyCode = KeyCode.T });
+        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.T });
         Assert.Equal (1, tv.SelectedRow);
 
         // move to trap
-        tv.NewKeyDownEvent (new Key { KeyCode = KeyCode.T });
+        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.T });
         Assert.Equal (2, tv.SelectedRow);
 
         // change columns to navigate by column 2
         Assert.Equal (0, tv.SelectedColumn);
         Assert.Equal (2, tv.SelectedRow);
-        tv.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorRight });
+        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
         Assert.Equal (1, tv.SelectedColumn);
         Assert.Equal (2, tv.SelectedRow);
 
         // nothing ends with t so stay where you are
-        tv.NewKeyDownEvent (new Key { KeyCode = KeyCode.T });
+        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.T });
         Assert.Equal (2, tv.SelectedRow);
 
         //jump to fish which ends in h
-        tv.NewKeyDownEvent (new Key { KeyCode = KeyCode.H });
+        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.H });
         Assert.Equal (0, tv.SelectedRow);
 
         // jump to zoo which ends in o
-        tv.NewKeyDownEvent (new Key { KeyCode = KeyCode.O });
+        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.O });
         Assert.Equal (3, tv.SelectedRow);
+        top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void Test_ScreenToCell ()
     {
         TableView tableView = GetTwoRowSixColumnTable ();
@@ -1754,7 +1727,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void Test_ScreenToCell_DataColumnOverload ()
     {
         TableView tableView = GetTwoRowSixColumnTable ();
@@ -1865,7 +1838,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestColumnStyle_AllColumnsVisibleFalse_BehavesAsTableNull ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -1895,7 +1868,7 @@ public class TableViewTests
     [InlineData (true)]
     [InlineData (false)]
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestColumnStyle_FirstColumnVisibleFalse_CursorStaysAt1 (bool useHome)
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -1911,7 +1884,7 @@ public class TableViewTests
         Assert.Equal (1, tableView.SelectedColumn);
 
         tableView.NewKeyDownEvent (
-                                   new Key { KeyCode = useHome ? KeyCode.Home : KeyCode.CursorLeft }
+                                   new() { KeyCode = useHome ? KeyCode.Home : KeyCode.CursorLeft }
                                   );
 
         // Expect the cursor to stay at 1
@@ -1919,7 +1892,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestColumnStyle_FirstColumnVisibleFalse_IsNotRendered ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -1943,7 +1916,7 @@ public class TableViewTests
     [InlineData (true)]
     [InlineData (false)]
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestColumnStyle_LastColumnVisibleFalse_CursorStaysAt2 (bool useEnd)
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -1962,7 +1935,7 @@ public class TableViewTests
         Assert.Equal (2, tableView.SelectedColumn);
 
         tableView.NewKeyDownEvent (
-                                   new Key { KeyCode = useEnd ? KeyCode.End : KeyCode.CursorRight }
+                                   new() { KeyCode = useEnd ? KeyCode.End : KeyCode.CursorRight }
                                   );
 
         // Expect the cursor to stay at 2
@@ -1970,7 +1943,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestColumnStyle_PreceedingColumnsInvisible_NoScrollIndicator ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -2016,7 +1989,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestColumnStyle_RemainingColumnsInvisible_NoScrollIndicator ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -2050,7 +2023,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestColumnStyle_VisibleFalse_CursorStepsOverInvisibleColumns ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -2059,19 +2032,19 @@ public class TableViewTests
         tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
         tableView.SelectedColumn = 0;
 
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
 
         // Expect the cursor navigation to skip over the invisible column(s)
         Assert.Equal (2, tableView.SelectedColumn);
 
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorLeft });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorLeft });
 
         // Expect the cursor navigation backwards to skip over invisible column too
         Assert.Equal (0, tableView.SelectedColumn);
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [InlineData (true, true)]
     [InlineData (false, true)]
     [InlineData (true, false)]
@@ -2112,7 +2085,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestColumnStyle_VisibleFalse_IsNotRendered ()
     {
         TableView tableView = GetABCDEFTableView (out _);
@@ -2130,7 +2103,7 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestColumnStyle_VisibleFalse_MultiSelected ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -2138,10 +2111,10 @@ public class TableViewTests
 
         // user has rectangular selection 
         tableView.MultiSelectedRegions.Push (
-                                             new TableSelection (
-                                                                 Point.Empty,
-                                                                 new Rectangle (0, 0, 3, 1)
-                                                                )
+                                             new (
+                                                  Point.Empty,
+                                                  new (0, 0, 3, 1)
+                                                 )
                                             );
 
         Assert.Equal (3, tableView.GetAllSelectedCells ().Count ());
@@ -2160,11 +2133,11 @@ public class TableViewTests
         Assert.True (tableView.IsSelected (2, 0));
         Assert.False (tableView.IsSelected (3, 0));
 
-        Assert.DoesNotContain (new Point (1, 0), tableView.GetAllSelectedCells ());
+        Assert.DoesNotContain (new (1, 0), tableView.GetAllSelectedCells ());
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestColumnStyle_VisibleFalse_MultiSelectingStepsOverInvisibleColumns ()
     {
         TableView tableView = GetABCDEFTableView (out _);
@@ -2182,11 +2155,11 @@ public class TableViewTests
         Assert.True (tableView.IsSelected (2, 0));
         Assert.False (tableView.IsSelected (3, 0));
 
-        Assert.DoesNotContain (new Point (1, 0), tableView.GetAllSelectedCells ());
+        Assert.DoesNotContain (new (1, 0), tableView.GetAllSelectedCells ());
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestControlClick_MultiSelect_ThreeRowTable_FullRowSelect ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
@@ -2197,16 +2170,16 @@ public class TableViewTests
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                       new MouseEvent { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
-                      );
+                          new() { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                         );
 
         // should select that row
         Assert.Equal (2, tv.SelectedRow);
 
         // shift clicking top row
         tv.NewMouseEvent (
-                       new MouseEvent { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl }
-                      );
+                          new() { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl }
+                         );
 
         // should extend the selection
         // to include bottom and top row but not middle
@@ -2215,21 +2188,22 @@ public class TableViewTests
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
         Assert.Contains (Point.Empty, selected);
-        Assert.DoesNotContain (new Point (0, 1), selected);
-        Assert.Contains (new Point (0, 2), selected);
+        Assert.DoesNotContain (new (0, 1), selected);
+        Assert.Contains (new (0, 2), selected);
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestEnumerableDataSource_BasicTypes ()
     {
+        ((FakeDriver)Application.Driver).SetBufferSize(100,100);
         var tv = new TableView ();
         tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tv.Viewport = new Rectangle (0, 0, 50, 6);
+        tv.Viewport = new (0, 0, 50, 6);
 
         tv.Table = new EnumerableTableSource<Type> (
                                                     new [] { typeof (string), typeof (int), typeof (float) },
-                                                    new Dictionary<string, Func<Type, object>>
+                                                    new()
                                                     {
                                                         { "Name", t => t.Name }, { "Namespace", t => t.Namespace },
                                                         { "BaseType", t => t.BaseType }
@@ -2253,14 +2227,14 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestFullRowSelect_AlwaysUseNormalColorForVerticalCellLines ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-        tv.Viewport = new Rectangle (0, 0, 7, 6);
-        tv.Frame = new Rectangle (0, 0, 7, 6);
+        tv.Viewport = new (0, 0, 7, 6);
+        tv.Frame = new (0, 0, 7, 6);
         tv.LayoutSubviews ();
 
         tv.FullRowSelect = true;
@@ -2269,8 +2243,8 @@ public class TableViewTests
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                       new MouseEvent { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
-                      );
+                          new() { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                         );
 
         // should select that row
         Assert.Equal (2, tv.SelectedRow);
@@ -2289,7 +2263,7 @@ public class TableViewTests
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         Attribute normal = tv.ColorScheme.Normal;
-        tv.ColorScheme = new ColorScheme (tv.ColorScheme) { Focus = new Attribute (Color.Magenta, Color.White) };
+        tv.ColorScheme = new (tv.ColorScheme) { Focus = new (Color.Magenta, Color.White) };
         Attribute focus = tv.ColorScheme.Focus;
 
         tv.Draw ();
@@ -2309,14 +2283,14 @@ public class TableViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestFullRowSelect_SelectionColorDoesNotStop_WhenShowVerticalCellLinesIsFalse ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tv.LayoutSubviews ();
 
-        tv.Viewport = new Rectangle (0, 0, 7, 6);
+        tv.Viewport = new (0, 0, 7, 6);
 
         tv.FullRowSelect = true;
         tv.Style.ShowVerticalCellLines = false;
@@ -2324,8 +2298,8 @@ public class TableViewTests
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                       new MouseEvent { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
-                      );
+                          new() { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                         );
 
         // should select that row
         Assert.Equal (2, tv.SelectedRow);
@@ -2343,7 +2317,7 @@ A B C
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         Attribute normal = tv.ColorScheme.Normal;
-        tv.ColorScheme = new ColorScheme (tv.ColorScheme) { Focus = new Attribute (Color.Magenta, Color.White) };
+        tv.ColorScheme = new (tv.ColorScheme) { Focus = new (Color.Magenta, Color.White) };
         Attribute focus = tv.ColorScheme.Focus;
         tv.Draw ();
 
@@ -2362,14 +2336,14 @@ A B C
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestFullRowSelect_SelectionColorStopsAtTableEdge_WithCellLines ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-        tv.Viewport = new Rectangle (0, 0, 7, 6);
-        tv.Frame = new Rectangle (0, 0, 7, 6);
+        tv.Viewport = new (0, 0, 7, 6);
+        tv.Frame = new (0, 0, 7, 6);
         tv.LayoutSubviews ();
 
         tv.FullRowSelect = true;
@@ -2377,8 +2351,8 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                       new MouseEvent { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
-                      );
+                          new() { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                         );
 
         // should select that row
         Assert.Equal (2, tv.SelectedRow);
@@ -2397,7 +2371,7 @@ A B C
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         Attribute normal = tv.ColorScheme.Normal;
-        tv.ColorScheme = new ColorScheme (tv.ColorScheme) { Focus = new Attribute (Color.Magenta, Color.White) };
+        tv.ColorScheme = new (tv.ColorScheme) { Focus = new (Color.Magenta, Color.White) };
         Attribute focus = tv.ColorScheme.Focus;
 
         tv.Draw ();
@@ -2418,7 +2392,7 @@ A B C
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [InlineData (Orientation.Horizontal, false)]
     [InlineData (Orientation.Vertical, false)]
     [InlineData (Orientation.Horizontal, true)]
@@ -2431,9 +2405,9 @@ A B C
 
         //tv.BeginInit (); tv.EndInit ();
         tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tv.Viewport = new Rectangle (0, 0, 25, 4);
+        tv.Viewport = new (0, 0, 25, 4);
 
-        tv.Style = new TableStyle
+        tv.Style = new()
         {
             ShowHeaders = false, ShowHorizontalHeaderOverline = false, ShowHorizontalHeaderUnderline = false
         };
@@ -2504,7 +2478,7 @@ A B C
     [InlineData (true)]
     [InlineData (false)]
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestMoveStartEnd_WithFullRowSelect (bool withFullRowSelect)
     {
         TableView tableView = GetTwoRowSixColumnTable ();
@@ -2530,9 +2504,9 @@ A B C
         }
 
         tableView.NewKeyDownEvent (
-                                   new Key (
-                                            KeyCode.End | KeyCode.CtrlMask
-                                           )
+                                   new (
+                                        KeyCode.End | KeyCode.CtrlMask
+                                       )
                                   );
 
         if (withFullRowSelect)
@@ -2548,7 +2522,7 @@ A B C
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestShiftClick_MultiSelect_TwoRowTable_FullRowSelect ()
     {
         TableView tv = GetTwoRowSixColumnTable ();
@@ -2558,16 +2532,16 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                       new MouseEvent { Position = new (1, 3), Flags = MouseFlags.Button1Clicked }
-                      );
+                          new() { Position = new (1, 3), Flags = MouseFlags.Button1Clicked }
+                         );
 
         // should select that row
         Assert.Equal (1, tv.SelectedRow);
 
         // shift clicking top row
         tv.NewMouseEvent (
-                       new MouseEvent { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift }
-                      );
+                          new() { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift }
+                         );
 
         // should extend the selection
         Assert.Equal (0, tv.SelectedRow);
@@ -2575,11 +2549,11 @@ A B C
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
         Assert.Contains (Point.Empty, selected);
-        Assert.Contains (new Point (0, 1), selected);
+        Assert.Contains (new (0, 1), selected);
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTableViewCheckboxes_ByObject ()
     {
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
@@ -2669,7 +2643,7 @@ A B C
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTableViewCheckboxes_MultiSelectIsUnion_WhenToggling ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
@@ -2733,7 +2707,7 @@ A B C
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTableViewCheckboxes_SelectAllToggle ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
@@ -2782,7 +2756,7 @@ A B C
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTableViewCheckboxes_SelectAllToggle_ByObject ()
     {
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
@@ -2839,7 +2813,7 @@ A B C
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTableViewCheckboxes_Simple ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
@@ -2919,7 +2893,7 @@ A B C
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTableViewRadioBoxes_Simple_ByObject ()
     {
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
@@ -3011,7 +2985,6 @@ A B C
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestToggleCells_MultiSelectOn ()
     {
         // 2 row table
@@ -3027,7 +3000,7 @@ A B C
         Assert.Equal (0, selectedCell.Y);
 
         // Go Right
-        tableView.NewKeyDownEvent (Key.CursorRight );
+        tableView.NewKeyDownEvent (Key.CursorRight);
 
         selectedCell = tableView.GetAllSelectedCells ().Single ();
         Assert.Equal (1, selectedCell.X);
@@ -3056,7 +3029,7 @@ A B C
         Assert.Equal (0, s2.Y);
 
         // Go Down
-        tableView.NewKeyDownEvent (Key.CursorDown );
+        tableView.NewKeyDownEvent (Key.CursorDown);
 
         // Both Toggled and Moved to should be selected but not 0,0
         // which we moved down from
@@ -3069,14 +3042,14 @@ A B C
         Assert.Equal (1, s2.Y);
 
         // Go back to the toggled cell
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorRight });
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorUp });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorUp });
 
         // Toggle off 
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
 
         // Go Left
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorLeft });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorLeft });
 
         selectedCell = tableView.GetAllSelectedCells ().Single ();
         Assert.Equal (0, selectedCell.X);
@@ -3084,7 +3057,6 @@ A B C
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestToggleCells_MultiSelectOn_FullRowSelect ()
     {
         // 2 row table
@@ -3096,10 +3068,10 @@ A B C
         tableView.KeyBindings.Add (Key.Space, Command.Select);
 
         // Toggle Select Cell 0,0
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
 
         // Go Down
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorDown });
 
         TableSelection m = tableView.MultiSelectedRegions.Single ();
         Assert.True (m.IsToggled);
@@ -3109,19 +3081,18 @@ A B C
         //First row toggled and Second row active = 12 selected cells
         Assert.Equal (12, tableView.GetAllSelectedCells ().Count ());
 
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorRight });
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorUp });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorUp });
 
         Assert.Single (tableView.MultiSelectedRegions.Where (r => r.IsToggled));
 
         // Can untoggle at 1,0 even though 0,0 was initial toggle because FullRowSelect is on
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
 
         Assert.Empty (tableView.MultiSelectedRegions.Where (r => r.IsToggled));
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestToggleCells_MultiSelectOn_SquareSelectToggled ()
     {
         // 3 row table
@@ -3133,16 +3104,16 @@ A B C
         tableView.KeyBindings.Add (Key.Space, Command.Select);
 
         // Make a square selection
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
 
         Assert.Equal (4, tableView.GetAllSelectedCells ().Count ());
 
         // Toggle the square selected region on
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
 
         // Go Right
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
 
         //Toggled on square + the active cell (x=2,y=1)
         Assert.Equal (5, tableView.GetAllSelectedCells ().Count ());
@@ -3151,16 +3122,15 @@ A B C
 
         // Untoggle the rectangular region by hitting toggle in
         // any cell in that rect
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorUp });
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorLeft });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorUp });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorLeft });
 
         Assert.Equal (4, tableView.GetAllSelectedCells ().Count ());
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
         Assert.Single (tableView.GetAllSelectedCells ());
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestToggleCells_MultiSelectOn_Two_SquareSelects_BothToggled ()
     {
         // 6 row table
@@ -3175,17 +3145,17 @@ A B C
         tableView.KeyBindings.Add (Key.Space, Command.Select);
 
         // Make first square selection (0,0 to 1,1)
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
         Assert.Equal (4, tableView.GetAllSelectedCells ().Count ());
 
         // Make second square selection leaving 1 unselected line between them
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorLeft });
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorDown });
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.CursorDown });
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
-        tableView.NewKeyDownEvent (new Key { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorLeft });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
 
         // 2 square selections
         Assert.Equal (8, tableView.GetAllSelectedCells ().Count ());
@@ -3200,13 +3170,13 @@ A B C
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visible
-        tableView.Viewport = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = false;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
         tableView.Style.SmoothHorizontalScrolling = false;
 
-        dt = new DataTable ();
+        dt = new ();
         dt.Columns.Add ("A");
         dt.Columns.Add ("B");
         dt.Columns.Add ("C");
@@ -3224,22 +3194,22 @@ A B C
     {
         var tv = new TableView ();
         tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tv.Viewport = new Rectangle (0, 0, 25, 6);
+        tv.Viewport = new (0, 0, 25, 6);
 
         List<PickablePet> pets = new ()
         {
-            new PickablePet (false, "Tammy", "Cat"),
-            new PickablePet (false, "Tibbles", "Cat"),
-            new PickablePet (false, "Ripper", "Dog")
+            new (false, "Tammy", "Cat"),
+            new (false, "Tibbles", "Cat"),
+            new (false, "Ripper", "Dog")
         };
 
-        tv.Table = source = new EnumerableTableSource<PickablePet> (
-                                                                    pets,
-                                                                    new Dictionary<string, Func<PickablePet, object>>
-                                                                    {
-                                                                        { "Name", p => p.Name }, { "Kind", p => p.Kind }
-                                                                    }
-                                                                   );
+        tv.Table = source = new (
+                                 pets,
+                                 new()
+                                 {
+                                     { "Name", p => p.Name }, { "Kind", p => p.Kind }
+                                 }
+                                );
 
         tv.LayoutSubviews ();
 
@@ -3254,13 +3224,13 @@ A B C
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
         // 3 columns are visible
-        tableView.Viewport = new Rectangle (0, 0, 7, 5);
+        tableView.Viewport = new (0, 0, 7, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
         tableView.Style.SmoothHorizontalScrolling = true;
 
-        dt = new DataTable ();
+        dt = new ();
         dt.Columns.Add ("A");
         dt.Columns.Add ("B");
         dt.Columns.Add ("C");
@@ -3283,9 +3253,9 @@ A B C
         var tv = new TableView ();
         tv.BeginInit ();
         tv.EndInit ();
-        tv.Viewport = new Rectangle (0, 0, 10, 4);
+        tv.Viewport = new (0, 0, 10, 4);
 
-        dt = new DataTable ();
+        dt = new ();
         dt.Columns.Add ("A");
         dt.Columns.Add ("B");
         dt.Rows.Add (1, 2);

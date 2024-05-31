@@ -155,12 +155,9 @@ public class DrawTests (ITestOutputHelper _output)
                                                       _output);
     }
 
-    [Theory]
-    [InlineData (0, 0, 1, 1)]
-    [InlineData (0, 0, 2, 2)]
-    [InlineData (-1, -1, 2, 2)]
+    [Fact]
     [SetupFakeDriver]
-    public void Clear_ClearsEntireViewport (int x, int y, int width, int height)
+    public void Clear_ClearsEntireViewport ()
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -193,12 +190,9 @@ public class DrawTests (ITestOutputHelper _output)
                                                       _output);
     }
 
-    [Theory]
-    [InlineData (0, 0, 1, 1)]
-    [InlineData (0, 0, 2, 2)]
-    [InlineData (-1, -1, 2, 2)]
+    [Fact]
     [SetupFakeDriver]
-    public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly (int x, int y, int width, int height)
+    public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly ()
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -270,6 +264,7 @@ public class DrawTests (ITestOutputHelper _output)
         TestHelpers.AssertDriverContentsAre (expectedOutput, _output);
 
         // This test has nothing to do with color - removing as it is not relevant and fragile
+        top.Dispose ();
     }
 
     // TODO: Refactor this test to not depend on TextView etc... Make it as primitive as possible
@@ -326,7 +321,9 @@ public class DrawTests (ITestOutputHelper _output)
         Assert.Equal (new Rectangle (0, 0, 30, 10), pos);
 
         Application.End (rsDiag);
+        dg.Dispose ();
         Application.End (rsTop);
+        top.Dispose ();
     }
 
     [Fact]
@@ -385,8 +382,9 @@ public class DrawTests (ITestOutputHelper _output)
                                                0
                                                """,
                                                Application.Driver,
-                                               Colors.ColorSchemes ["Base"].Normal
+                                               Colors.ColorSchemes ["Base"]!.Normal
                                               );
+        top.Dispose ();
     }
 
     [Fact]
@@ -647,6 +645,7 @@ public class DrawTests (ITestOutputHelper _output)
         content.Y = 0;
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -680,8 +679,6 @@ public class DrawTests (ITestOutputHelper _output)
         top.Add (container);
 
         // BUGBUG: v2 - it's bogus to reference .Frame before BeginInit. And why is the clip being set anyway???
-
-        void Top_LayoutComplete (object sender, LayoutEventArgs e) { Application.Driver.Clip = container.Frame; }
 
         top.LayoutComplete += Top_LayoutComplete;
         Application.Begin (top);
@@ -726,6 +723,11 @@ public class DrawTests (ITestOutputHelper _output)
         content.Y = 0;
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+        top.Dispose ();
+
+        return;
+
+        void Top_LayoutComplete (object? sender, LayoutEventArgs e) { Application.Driver.Clip = container.Frame; }
     }
 
     [Fact]
@@ -849,6 +851,7 @@ public class DrawTests (ITestOutputHelper _output)
         content.Y = 0;
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+        top.Dispose ();
     }
 
     [Theory]
@@ -898,7 +901,7 @@ public class DrawTests (ITestOutputHelper _output)
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
         TestHelpers.AssertDriverContentsAre (expected, _output);
-
+        top.Dispose ();
         // This test has nothing to do with color - removing as it is not relevant and fragile
     }
 

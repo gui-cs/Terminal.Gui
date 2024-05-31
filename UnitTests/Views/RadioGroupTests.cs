@@ -3,11 +3,8 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class RadioGroupTests
+public class RadioGroupTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public RadioGroupTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     public void Constructors_Defaults ()
     {
@@ -17,12 +14,12 @@ public class RadioGroupTests
         Assert.Equal (Rectangle.Empty, rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
-        rg = new RadioGroup { RadioLabels = new [] { "Test" } };
+        rg = new() { RadioLabels = new [] { "Test" } };
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
         Assert.Equal (0, rg.SelectedItem);
 
-        rg = new RadioGroup
+        rg = new()
         {
             X = 1,
             Y = 2,
@@ -32,10 +29,10 @@ public class RadioGroupTests
         };
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
-        Assert.Equal (new Rectangle (1, 2, 20, 5), rg.Frame);
+        Assert.Equal (new (1, 2, 20, 5), rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
-        rg = new RadioGroup { X = 1, Y = 2, RadioLabels = new [] { "Test" } };
+        rg = new() { X = 1, Y = 2, RadioLabels = new [] { "Test" } };
 
         var view = new View { Width = 30, Height = 40 };
         view.Add (rg);
@@ -45,7 +42,7 @@ public class RadioGroupTests
 
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
-        Assert.Equal (new Rectangle (1, 2, 6, 1), rg.Frame);
+        Assert.Equal (new (1, 2, 6, 1), rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
     }
 
@@ -145,6 +142,7 @@ public class RadioGroupTests
         Assert.False (accepted);
 
         return;
+
         void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
@@ -160,6 +158,7 @@ public class RadioGroupTests
         Assert.True (accepted);
 
         return;
+
         void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
@@ -195,8 +194,8 @@ public class RadioGroupTests
 └────────────────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
 
         rg.Orientation = Orientation.Horizontal;
         Application.Refresh ();
@@ -220,8 +219,8 @@ public class RadioGroupTests
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
 
         rg.HorizontalSpace = 4;
         Application.Refresh ();
@@ -245,8 +244,9 @@ public class RadioGroupTests
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
+        top.Dispose ();
     }
 
     [Fact]
