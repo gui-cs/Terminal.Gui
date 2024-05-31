@@ -841,8 +841,8 @@ Item 6",
         var added = 0;
         var removed = 0;
         var otherActions = 0;
-        ObservableCollection<string> source1 = [];
-        var lv = new ListView { Source = new ListWrapper<string> (source1) };
+        IList<string> source1 = [];
+        var lv = new ListView { Source = new ListWrapper<string> (new ( source1)) };
 
         lv.CollectionChanged += (sender, args) =>
                                 {
