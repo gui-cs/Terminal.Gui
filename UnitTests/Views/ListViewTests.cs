@@ -1024,7 +1024,7 @@ Item 6",
     }
 
     [Fact]
-    public void ListWrapper_CollectionChanged_Event_UnSubscribe_Previous_If_New_Is_Null ()
+    public void ListWrapper_CollectionChanged_Event_UnSubscribe_Previous_Is_Disposed ()
     {
         var added = 0;
         var removed = 0;
