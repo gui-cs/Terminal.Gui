@@ -2,6 +2,9 @@
 
 namespace Terminal.Gui;
 
+// TODO: I don't love the name Shortcut, but I can't think of a better one right now. Shortcut is a bit overloaded.
+// TODO: It can mean "Application-scoped key binding" or "A key binding that is displayed in a visual way".
+
 /// <summary>
 ///      Defines an Application-scoped <see cref="KeyBinding"/>, displaying the command, help text, and they key binding.
 /// </summary>
