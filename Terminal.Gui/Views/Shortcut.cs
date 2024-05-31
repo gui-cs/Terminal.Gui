@@ -4,13 +4,19 @@ namespace Terminal.Gui;
 
 // TODO: I don't love the name Shortcut, but I can't think of a better one right now. Shortcut is a bit overloaded.
 // TODO: It can mean "Application-scoped key binding" or "A key binding that is displayed in a visual way".
+// TODO: I tried `BarItem` but that's not great either as it implies it can only be used in `Bar`s.
 
 /// <summary>
-///      Defines an Application-scoped <see cref="KeyBinding"/>, displaying the command, help text, and they key binding.
+///      Displays a command, help text, and a key binding. Useful for displaying a command in <see cref="Bar"/> such as a menu, toolbar, or status bar.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Used by <see cref="Bar"/>.
+///         When the user clicks on the <see cref="Shortcut"/> or presses the key
+///         specified by <see cref="Key"/> the <see cref="Command.Accept"/> command is invoked, causing the <see cref="Accept"/> event to be fired
+///     </para>
+///     <para>
+///         If <see cref="KeyBindingScope"/> is <see cref="KeyBindingScope.Application"/>, the <see cref="Command"/>
+///         be invoked regardless of what View has focus, enabling an application-wide keyboard shortcut.
 ///     </para>
 /// </remarks>
 public class Shortcut : View
