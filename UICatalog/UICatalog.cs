@@ -303,7 +303,7 @@ internal class UICatalogApp
         _aboutMessage = new ();
         _aboutMessage.AppendLine (@"A comprehensive sample library for");
         _aboutMessage.AppendLine (@"");
-        _aboutMessage.AppendLine (@" _______                  _             _   _____       _   ");
+        _aboutMessage.AppendLine (@"  _______                  _             _   _____       _  ");
         _aboutMessage.AppendLine (@" |__   __|                (_)           | | / ____|     (_) ");
         _aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ");
         _aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ");
