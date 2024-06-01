@@ -1034,11 +1034,21 @@ namespace Terminal.Gui {
 			StopReportingMouseMoves ();
 			Console.ResetColor ();
 			Console.Clear ();
+
+			//Disable alternative screen buffer.
+			Console.Out.Write ("\x1b[?1049l");
+
+			//Set cursor key to cursor.
+			Console.Out.Write ("\x1b[?25h");
+
 			Platform.Suspend ();
+
+			//Enable alternative screen buffer.
+			Console.Out.Write ("\x1b[?1049h");
+
 			Application.Refresh ();
 			StartReportingMouseMoves ();
 		}
-
 
 		public override void SetAttribute (Attribute c)
 		{
