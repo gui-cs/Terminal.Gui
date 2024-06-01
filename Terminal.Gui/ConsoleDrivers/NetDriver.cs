@@ -865,8 +865,20 @@ internal class NetDriver : ConsoleDriver
         {
             Console.ResetColor ();
             Console.Clear ();
+
+            //Disable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+            //Set cursor key to cursor.
+            Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+
             Platform.Suspend ();
-            Application.Refresh ();
+
+            //Enable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+
+            SetContentsAsDirty ();
+            Refresh ();
         }
 
         StartReportingMouseMoves ();
