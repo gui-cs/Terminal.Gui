@@ -903,7 +903,7 @@ internal class NetDriver : ConsoleDriver
         Attribute? redrawAttr = null;
         int lastCol = -1;
 
-        CursorVisibility? savedVisibitity = _cachedCursorVisibility;
+        CursorVisibility? savedVisibility = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
 
         for (int row = top; row < rows; row++)
@@ -1032,7 +1032,7 @@ internal class NetDriver : ConsoleDriver
 
         SetCursorPosition (0, 0);
 
-        _cachedCursorVisibility = savedVisibitity;
+        _cachedCursorVisibility = savedVisibility;
 
         void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
         {
@@ -1359,12 +1359,9 @@ internal class NetDriver : ConsoleDriver
     {
         _cachedCursorVisibility = visibility;
 
-        bool isVisible = RunningUnitTests
-                             ? visibility == CursorVisibility.Default
-                             : Console.CursorVisible = visibility == CursorVisibility.Default;
-        Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+        Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
 
-        return isVisible;
+        return visibility == CursorVisibility.Default;
     }
 
     public override bool EnsureCursorVisibility ()
