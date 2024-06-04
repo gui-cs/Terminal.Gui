@@ -1690,7 +1690,7 @@ internal class NetMainLoop : IMainLoopDriver
     private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
     private readonly Queue<InputResult?> _resultQueue = new ();
     private readonly ManualResetEventSlim _waitForProbe = new (false);
-    private CancellationTokenSource _eventReadyTokenSource = new ();
+    private readonly CancellationTokenSource _eventReadyTokenSource = new ();
     private MainLoop _mainLoop;
 
     /// <summary>Initializes the class with the console driver.</summary>
@@ -1742,13 +1742,12 @@ internal class NetMainLoop : IMainLoopDriver
             _eventReady.Reset ();
         }
 
+        _eventReadyTokenSource.Token.ThrowIfCancellationRequested ();
+
         if (!_eventReadyTokenSource.IsCancellationRequested)
         {
             return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
         }
-
-        _eventReadyTokenSource.Dispose ();
-        _eventReadyTokenSource = new CancellationTokenSource ();
 
         return true;
     }
@@ -1806,26 +1805,21 @@ internal class NetMainLoop : IMainLoopDriver
                 return;
             }
 
+            _inputHandlerTokenSource.Token.ThrowIfCancellationRequested ();
+
             if (_resultQueue.Count == 0)
             {
                 _resultQueue.Enqueue (_netEvents.DequeueInput ());
             }
 
-            try
+            while (_resultQueue.Count > 0 && _resultQueue.Peek () is null)
             {
-                while (_resultQueue.Peek () is null)
-                {
-                    _resultQueue.Dequeue ();
-                }
-
-                if (_resultQueue.Count > 0)
-                {
-                    _eventReady.Set ();
-                }
+                _resultQueue.Dequeue ();
             }
-            catch (InvalidOperationException)
+
+            if (_resultQueue.Count > 0)
             {
-                // Ignore
+                _eventReady.Set ();
             }
         }
     }
