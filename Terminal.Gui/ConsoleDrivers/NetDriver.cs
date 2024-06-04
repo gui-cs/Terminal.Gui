@@ -223,7 +223,7 @@ internal class NetEvents : IDisposable
 
     private void ProcessInputQueue ()
     {
-        while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
+        while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
         {
             try
             {
@@ -242,13 +242,8 @@ internal class NetEvents : IDisposable
                 ConsoleModifiers mod = 0;
                 ConsoleKeyInfo newConsoleKeyInfo = default;
 
-                while (true)
+                while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
                 {
-                    if (_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
                     ConsoleKeyInfo consoleKeyInfo;
 
                     try
@@ -367,13 +362,8 @@ internal class NetEvents : IDisposable
             cancellationToken.ThrowIfCancellationRequested ();
         }
 
-        while (true)
+        while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
         {
-            if (_inputReadyCancellationTokenSource.IsCancellationRequested)
-            {
-                return;
-            }
-
             try
             {
                 _winChange.Wait (_inputReadyCancellationTokenSource.Token);
