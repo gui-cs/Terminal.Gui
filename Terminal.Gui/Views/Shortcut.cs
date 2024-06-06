@@ -56,59 +56,53 @@ public class Shortcut : View
         _container = new ()
         {
             Id = "_container",
+            // Only the Shortcut (_container) should be able to have focus, not any subviews.
             CanFocus = true,
             Width = Dim.Auto (DimAutoStyle.Content, 1),
             Height = Dim.Auto (DimAutoStyle.Content, 1)
         };
         _container.MouseClick += OnContainerMouseClick;
 
-        _commandView = new ()
-        {
-            Id = "_commandView",
-            CanFocus = false,
-            X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems),
-            Y = 0, // Pos.Center (),
-            Width = Dim.Auto (DimAutoStyle.Text),
-            Height = Dim.Auto (DimAutoStyle.Text),
-            HotKeySpecifier = new ('_')
-        };
-        _container.Add (_commandView);
+        CommandView = new ();
 
         HelpView = new ()
         {
             Id = "_helpView",
+            // Only the Shortcut should be able to have focus, not any subviews
             CanFocus = false,
             X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems),
-            Y = 0, // Pos.Center (),
+            Y = Pos.Center (),
             Width = Dim.Auto (DimAutoStyle.Text),
             Height = Dim.Auto (DimAutoStyle.Text)
         };
         _container.Add (HelpView);
 
         //        HelpView.TextAlignment = Alignment.End;
-        HelpView.MouseClick += SubView_MouseClick;
+        HelpView.MouseClick += Shortcut_MouseClick;
 
         KeyView = new ()
         {
-            Id = "_keyView", CanFocus = false,
+            Id = "_keyView",
+            // Only the Shortcut should be able to have focus, not any subviews
+            CanFocus = false,
             X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems),
-            Y = 0, // Pos.Center (),
+            Y = Pos.Center (),
             Width = Dim.Auto (DimAutoStyle.Text),
             Height = Dim.Auto (DimAutoStyle.Text)
         };
         _container.Add (KeyView);
 
-        KeyView.MouseClick += SubView_MouseClick;
+        KeyView.MouseClick += Shortcut_MouseClick;
 
-        //CommandView.Margin.Thickness = new Thickness (1, 0, 1, 0);
-        //HelpView.Margin.Thickness = new Thickness (1, 0, 1, 0);
-        //KeyView.Margin.Thickness = new Thickness (1, 0, 1, 0);
+        CommandView.Margin.Thickness = new Thickness (1, 0, 1, 0);
+        HelpView.Margin.Thickness = new Thickness (1, 0, 1, 0);
+        KeyView.Margin.Thickness = new Thickness (1, 0, 1, 0);
 
         //CommandView.CanFocus = CanFocus;
         //HelpView.CanFocus = CanFocus;
         //KeyView.CanFocus = CanFocus;
 
-        //_commandView.MouseClick += SubView_MouseClick;
+        MouseClick += Shortcut_MouseClick;
 
         TitleChanged += Shortcut_TitleChanged;
         Initialized += OnInitialized;
@@ -136,29 +130,41 @@ public class Shortcut : View
         // TODO: Figure out why we can't just do the same thing using the MouseClick event on the Shortcut itself.
         void OnContainerMouseClick (object sender, MouseEventEventArgs e)
         {
-            bool? handled = OnAccept ();
+            //bool? handled = OnAccept ();
+
+            //if (handled.HasValue)
+            //{
+            //    e.Handled = handled.Value;
+            //}
+        }
+    }
+
+    private void Shortcut_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        View view = sender as View;
+        // When the Shortcut is clicked, we want to invoke the Command and Set focus
+        if (Command.HasValue)
+        {
+            bool? handled = false;
+
+            if (sender == _commandView)
+            {
+                //handled = _commandView.InvokeCommand (Command.Value);
+            }
+            else
+            {
+                //handled = InvokeCommand (Command.Value);
+            }
 
             if (handled.HasValue)
             {
                 e.Handled = handled.Value;
             }
-        }
-    }
 
-    // Intercept any mouse clicks on the subviews and invoke the Accept command.
-    // TODO: Figure out why we can't just subscribe to Accept on the subviews.
-    private void SubView_MouseClick (object sender, MouseEventEventArgs e)
-    {
-        bool? handled = OnAccept ();
-
-        if (handled.HasValue)
-        {
-            e.Handled = handled.Value;
-        }
-
-        if (!e.Handled && CanFocus)
-        {
-            SetFocus ();
+            if (!e.Handled && CanFocus)
+            {
+                SetFocus ();
+            }
         }
     }
 
@@ -272,14 +278,25 @@ public class Shortcut : View
                 _commandView?.Dispose ();
             }
 
+
             _commandView = value;
             _commandView.Id = "_commandView";
+
+            // TODO: Determine if it makes sense to allow the CommandView to be focusable.
+            // Right now, we don't set CanFocus to false here.
+            _commandView.CanFocus = false;
+
             _commandView.Width = Dim.Auto (DimAutoStyle.Text);
             _commandView.Height = Dim.Auto (DimAutoStyle.Text);
             _commandView.X = X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems);
-            _commandView.Y = 0; //; Pos.Center ();
-            _commandView.MouseClick += SubView_MouseClick;
-            _commandView.Accept += SubView_DefaultCommand;
+            _commandView.Y = Pos.Center ();
+
+            //// Prevent the CommandView from handling mouse events. We want the Shortcut to handle them.
+            //_commandView.MouseEvent += _commandView_MouseEvent;
+            _commandView.MouseClick += Shortcut_MouseClick;
+            _commandView.Accept += CommandView_Accept;
+
+            //_commandView.Accept += CommandView_Accept;
             _commandView.Margin.Thickness = new (1, 0, 1, 0);
 
             _commandView.HotKeyChanged += (s, e) =>
@@ -292,9 +309,17 @@ public class Shortcut : View
                                           };
 
             _commandView.HotKeySpecifier = new ('_');
-            HelpView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
-            _container.Add (_commandView);
+
+            _container.Remove (HelpView);
+            _container.Remove (KeyView);
+            _container.Add (_commandView, HelpView, KeyView);
+
         }
+    }
+
+    private void _commandView_MouseEvent (object sender, MouseEventEventArgs e)
+    {
+        e.Handled = true;
     }
 
     private void Shortcut_TitleChanged (object sender, StateEventArgs<string> e)
@@ -304,18 +329,21 @@ public class Shortcut : View
         _commandView.Text = Title;
     }
 
-    private void SubView_DefaultCommand (object sender, CancelEventArgs e)
+    private void CommandView_Accept (object sender, CancelEventArgs e)
     {
-        bool? handled = OnAccept ();
+        // When the CommandView fires its Accept event, we want to act as though the
+        // Shortcut was clicked.
+        var args = new HandledEventArgs ();
+        //Accept?.Invoke (this, args);
 
-        if (handled.HasValue)
+        if (args.Handled)
         {
-            e.Cancel = handled.Value;
+            e.Cancel = args.Handled;
         }
 
         if (!e.Cancel && CanFocus)
         {
-            SetFocus ();
+            //SetFocus ();
         }
     }
 
@@ -409,16 +437,17 @@ public class Shortcut : View
 
         if (Command != null && Key != null && Key != Key.Empty)
         {
-            // Add a command and key binding for this command to this Shortcut
-            if (!GetSupportedCommands ().Contains (Command.Value))
+            // CommandView holds our command/keybinding
+            // Add a key binding for this command to this Shortcut
+            if (CommandView.GetSupportedCommands ().Contains (Command.Value))
             {
-                // The action that will be taken will be to fire the OnClicked
-                // event. 
-                AddCommand (Command.Value, () => OnAccept ());
+                CommandView.KeyBindings.Remove (Key);
+                CommandView.KeyBindings.Add (Key, KeyBindingScope, Command.Value);
             }
-
-            KeyBindings.Remove (Key);
-            KeyBindings.Add (Key, KeyBindingScope, Command.Value);
+            else
+            {
+                throw new InvalidOperationException ($"CommandView does not support the command {Command.Value}");
+            }
         }
     }
 
@@ -457,14 +486,20 @@ public class Shortcut : View
 
                 break;
             case KeyBindingScope.Focused:
-                //throw new InvalidOperationException ();
+                handled = InvokeCommand (Command.Value) == true;
                 handled = false;
 
                 break;
             case KeyBindingScope.HotKey:
-                handled = _commandView.InvokeCommand (Gui.Command.Accept) == true;
+                if (Command.HasValue)
+                {
+                    handled = _commandView.InvokeCommand (Command.Value) == true;
+                    handled = false;
+                }
 
-                break;
+                // handled = _commandView.InvokeCommand (Gui.Command.Accept) == true;
+
+                    break;
         }
 
         if (handled == false)

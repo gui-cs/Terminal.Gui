@@ -1,4 +1,6 @@
 #nullable enable
+using System.Drawing;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -210,18 +212,24 @@ public class DimAuto () : Dim
                 {
                     View v = subviews [i];
 
-                    if (dimension == Dimension.Width)
+                    //if (dimension == Dimension.Width)
+                    //{
+                    //    v.SetRelativeLayout (new Size (autoMax - subviewsSize, 0));
+                    //}
+                    //else
+                    //{
+                    //    v.SetRelativeLayout (new Size (0, autoMax - subviewsSize));
+                    //}
+                    maxAuto = dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
+
+                    if (maxAuto > subviewsSize)
                     {
-                        v.SetRelativeLayout (new Size (autoMax - subviewsSize, 0));
+                        // BUGBUG: Should we break here? Or choose min/max?
+                        subviewsSize = maxAuto;
                     }
-                    else
-                    {
-                        v.SetRelativeLayout (new Size (0, autoMax - subviewsSize));
-                    }
-                    maxAuto = dimension == Dimension.Width ? v.Frame.Width : v.Frame.Height;
                 }
 
-                subviewsSize += maxAuto;
+//                subviewsSize += maxAuto;
 
                 #endregion Auto
 

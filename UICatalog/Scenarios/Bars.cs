@@ -55,7 +55,8 @@ public class Bars : Scenario
         //Application.Top.Add (shortcut1, shortcut2);
         //shortcut1.SetFocus ();
 
-        Application.Top.Add (new Label () { X = 30, Y = 8, Text = "Marker"});
+        var lastEvent = new Label () { X = 30, Y = 8, Text = "Last Event" };
+        Application.Top.Add (lastEvent);
 
         var shortcut3 = new Shortcut
         {
@@ -66,6 +67,11 @@ public class Bars : Scenario
             Command = Command.Accept,
         };
 
+        shortcut3.Accept += (s, e) =>
+                            {
+                                lastEvent.Text = $"Last Event: {s}";
+                            };
+
         var shortcut4 = new Shortcut
         {
             Title = "Shortcut4",
@@ -74,6 +80,25 @@ public class Bars : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
             Command = Command.Accept,
         };
+
+
+
+        var cb = new CheckBox ()
+        {
+            Title = "Hello",// shortcut4.Text
+        };
+
+        cb.Toggled += (s, e) =>
+                     {
+                         lastEvent.Text = $"Last Event: {s}";
+                     };
+
+        shortcut4.CommandView = cb;
+
+        shortcut4.Accept += (s, e) =>
+                            {
+                                lastEvent.Text = $"Last Event: {s}";
+                            };
 
         var bar = new Bar
         {
@@ -88,11 +113,11 @@ public class Bars : Scenario
         Application.Top.Add (bar);
 
         // BUGBUG: This should not be needed
-       // Application.Top.LayoutSubviews ();
+        //Application.Top.LayoutSubviews ();
 
         //SetupMenuBar ();
         //SetupContentMenu ();
-        SetupStatusBar ();
+       // SetupStatusBar ();
     }
 
     private void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
