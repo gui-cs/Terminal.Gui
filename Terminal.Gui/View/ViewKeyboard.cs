@@ -704,6 +704,27 @@ public partial class View
         return false;
     }
 
+    // Function to search the subview heirarchy for the first view that has a KeyBindingScope.Application binding for the key
+    internal static View FindViewWithApplicationKeyBinding (View start, Key keyEvent)
+    {
+        if (start.KeyBindings.TryGet (keyEvent, KeyBindingScope.Application, out KeyBinding binding))
+        {
+            return start;
+        }
+
+        foreach (View subview in start.Subviews)
+        {
+            View found = FindViewWithApplicationKeyBinding (subview, keyEvent);
+
+            if (found is { })
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>
     ///     Invoked when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
     ///     stop the key from being processed by other views.

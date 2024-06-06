@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Terminal.Gui;
 
@@ -28,6 +29,17 @@ public class Bars : Scenario
         Application.QuitKey = Key.Z.WithCtrl;
         Application.Top.Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}";
 
+        List<string> eventSource = new ();
+        ListView eventLog = new ListView ()
+        {
+            X = Pos.AnchorEnd (),
+            Width = 50,
+            Height = Dim.Fill (),
+            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            Source = new ListWrapper (eventSource)
+        };
+        Application.Top.Add (eventLog);
+
         //var shortcut1 = new Shortcut
         //{
         //    Title = "_Zigzag",
@@ -55,33 +67,29 @@ public class Bars : Scenario
         //Application.Top.Add (shortcut1, shortcut2);
         //shortcut1.SetFocus ();
 
-        var lastEvent = new Label () { X = 30, Y = 8, Text = "Last Event" };
-        Application.Top.Add (lastEvent);
-
         var shortcut3 = new Shortcut
         {
             Title = "Shortcut3",
             Key = Key.D3.WithCtrl,
             Text = "Number Three",
-            KeyBindingScope = KeyBindingScope.HotKey,
+            KeyBindingScope = KeyBindingScope.Application,
             Command = Command.Accept,
         };
 
         shortcut3.Accept += (s, e) =>
                             {
-                                lastEvent.Text = $"Last Event: {s}";
+                                eventSource.Add ($"Accept: {s}");
+                                eventLog.MoveDown ();
                             };
 
         var shortcut4 = new Shortcut
         {
             Title = "Shortcut4",
             Text = "Number 4",
-            Key = Key.D4.WithCtrl,
-            KeyBindingScope = KeyBindingScope.HotKey,
+            Key = Key.F4,
+            KeyBindingScope = KeyBindingScope.Application,
             Command = Command.Accept,
         };
-
-
 
         var cb = new CheckBox ()
         {
@@ -90,25 +98,38 @@ public class Bars : Scenario
 
         cb.Toggled += (s, e) =>
                      {
-                         lastEvent.Text = $"Last Event: {s}";
+                         eventSource.Add ($"Toggled: {s}");
+                         eventLog.MoveDown ();
                      };
 
         shortcut4.CommandView = cb;
 
         shortcut4.Accept += (s, e) =>
                             {
-                                lastEvent.Text = $"Last Event: {s}";
+                                eventSource.Add ($"Accept: {s}");
+                                eventLog.MoveDown ();
                             };
 
         var bar = new Bar
         {
-            X = 30,
-            Y = 10,
+            X = 2,
+            Y = 2,
             Orientation = Orientation.Vertical,
             StatusBarStyle = false,
             Width = Dim.Percent(40)
         };
         bar.Add (shortcut3, shortcut4);
+
+        CheckBox hello = new ()
+        {
+            Title = "Hello",
+        };
+        Application.Top.Add (hello);
+        hello.Toggled += (s, e) =>
+                         {
+                             eventSource.Add ($"Toggled: {s}");
+                             eventLog.MoveDown ();
+                         };
 
         Application.Top.Add (bar);
 
