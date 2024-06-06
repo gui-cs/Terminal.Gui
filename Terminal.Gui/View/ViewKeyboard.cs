@@ -704,7 +704,10 @@ public partial class View
         return false;
     }
 
-    // Function to search the subview heirarchy for the first view that has a KeyBindingScope.Application binding for the key
+    // Function to search the subview hierarchy for the first view that has a KeyBindingScope.Application binding for the key.
+    // Called from Application.OnKeyDown
+    // TODO: Unwind recursion
+    // QUESTION: Should this return a list of views? As is, it will only return the first view that has the binding.
     internal static View FindViewWithApplicationKeyBinding (View start, Key keyEvent)
     {
         if (start.KeyBindings.TryGet (keyEvent, KeyBindingScope.Application, out KeyBinding binding))
