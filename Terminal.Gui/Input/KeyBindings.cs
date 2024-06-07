@@ -37,7 +37,7 @@ public class KeyBindings
             //throw new ArgumentException ("Invalid Key", nameof (commands));
             return;
         }
-        
+
         if (commands.Length == 0)
         {
             throw new ArgumentException (@"At least one command must be specified", nameof (commands));
@@ -45,11 +45,11 @@ public class KeyBindings
 
         if (TryGet (key, out KeyBinding _))
         {
-            Bindings [key] = new KeyBinding (commands, scope);
+            Bindings [key] = new (commands, scope);
         }
         else
         {
-            Bindings.Add (key, new KeyBinding (commands, scope));
+            Bindings.Add (key, new (commands, scope));
         }
     }
 
@@ -89,9 +89,10 @@ public class KeyBindings
     /// <param name="command"></param>
     public void Clear (params Command [] command)
     {
-        var kvps = Bindings
-                   .Where (kvp => kvp.Value.Commands.SequenceEqual (command))
-                   .ToArray ();
+        KeyValuePair<Key, KeyBinding> [] kvps = Bindings
+                                                .Where (kvp => kvp.Value.Commands.SequenceEqual (command))
+                                                .ToArray ();
+
         foreach (KeyValuePair<Key, KeyBinding> kvp in kvps)
         {
             Bindings.Remove (kvp.Key);
@@ -167,7 +168,7 @@ public class KeyBindings
             return Bindings.TryGetValue (key, out binding);
         }
 
-        binding = new KeyBinding (Array.Empty<Command> (), KeyBindingScope.Focused);
+        binding = new (Array.Empty<Command> (), KeyBindingScope.Focused);
 
         return false;
     }
@@ -191,7 +192,7 @@ public class KeyBindings
             }
         }
 
-        binding = new KeyBinding (Array.Empty<Command> (), KeyBindingScope.Focused);
+        binding = new (Array.Empty<Command> (), KeyBindingScope.Focused);
 
         return false;
     }
