@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using static System.Formats.Asn1.AsnWriter;
+
+namespace Terminal.Gui;
 
 /// <summary>Provides a collection of <see cref="KeyBinding"/> objects bound to a <see cref="Key"/>.</summary>
 public class KeyBindings
@@ -27,7 +29,18 @@ public class KeyBindings
     /// <param name="binding"></param>
     public void Add (Key key, KeyBinding binding)
     {
-        Bindings.Add (key, binding);
+        if (TryGet (key, out KeyBinding _))
+        {
+            Bindings [key] = binding;
+        }
+        else
+        {
+            Bindings.Add (key, binding);
+            if (binding.Scope.HasFlag (KeyBindingScope.Application))
+            {
+                Application.AddKeyBinding (key, BoundView);
+            }
+        }
     }
 
     /// <summary>
@@ -99,7 +112,10 @@ public class KeyBindings
     ///     multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike will be
     ///     consumed if any took effect.
     /// </param>
-    public void Add (Key key, params Command [] commands) { Add (key, KeyBindingScope.Focused, commands); }
+    public void Add (Key key, params Command [] commands)
+    {
+        Add (key, KeyBindingScope.Focused, commands);
+    }
 
     /// <summary>Removes all <see cref="KeyBinding"/> objects from the collection.</summary>
     public void Clear ()
@@ -170,18 +186,18 @@ public class KeyBindings
 
     /// <summary>Replaces a key combination already bound to a set of <see cref="Command"/>s.</summary>
     /// <remarks></remarks>
-    /// <param name="fromKey">The key to be replaced.</param>
-    /// <param name="toKey">The new key to be used.</param>
-    public void Replace (Key fromKey, Key toKey)
+    /// <param name="oldKey">The key to be replaced.</param>
+    /// <param name="newKey">The new key to be used.</param>
+    public void Replace (Key oldKey, Key newKey)
     {
-        if (!TryGet (fromKey, out KeyBinding _))
+        if (!TryGet (oldKey, out KeyBinding _))
         {
             return;
         }
 
-        KeyBinding value = Bindings [fromKey];
-        Remove (fromKey);
-        Add (toKey, value);
+        KeyBinding value = Bindings [oldKey];
+        Remove (oldKey);
+        Add (newKey, value);
     }
 
     /// <summary>Gets the commands bound with the specified Key.</summary>

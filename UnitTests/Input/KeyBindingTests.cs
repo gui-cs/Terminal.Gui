@@ -160,6 +160,40 @@ public class KeyBindingTests
         Assert.Equal (Key.A, resultKey);
     }
 
+    // Add should not allow duplicates
+    [Fact]
+    public void Add_Replaces_If_Exists ()
+    {
+        var keyBindings = new KeyBindings ();
+        keyBindings.Add (Key.A, Command.HotKey);
+        keyBindings.Add (Key.A, Command.Accept);
+
+        Command [] resultCommands = keyBindings.GetCommands (Key.A);
+        Assert.DoesNotContain (Command.HotKey, resultCommands);
+
+        keyBindings = new KeyBindings ();
+        keyBindings.Add (Key.A, KeyBindingScope.Focused, Command.HotKey);
+        keyBindings.Add (Key.A, KeyBindingScope.Focused, Command.Accept);
+
+        resultCommands = keyBindings.GetCommands (Key.A);
+        Assert.DoesNotContain (Command.HotKey, resultCommands);
+        
+        keyBindings = new KeyBindings ();
+        keyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.HotKey);
+        keyBindings.Add (Key.A, KeyBindingScope.Focused, Command.Accept);
+
+        resultCommands = keyBindings.GetCommands (Key.A);
+        Assert.DoesNotContain (Command.HotKey, resultCommands);
+
+        keyBindings = new KeyBindings ();
+        keyBindings.Add (Key.A, new KeyBinding (new [] { Command.HotKey }, KeyBindingScope.HotKey));
+        keyBindings.Add (Key.A, new KeyBinding (new [] { Command.Accept }, KeyBindingScope.HotKey));
+
+        resultCommands = keyBindings.GetCommands (Key.A);
+        Assert.DoesNotContain (Command.HotKey, resultCommands);
+
+    }
+
     [Fact]
     public void Replace_Key ()
     {
@@ -173,17 +207,17 @@ public class KeyBindingTests
         Assert.Empty (keyBindings.GetCommands (Key.A));
         Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.E));
 
-        keyBindings.Replace (Key.B, Key.E);
+        keyBindings.Replace (Key.B, Key.F);
         Assert.Empty (keyBindings.GetCommands (Key.B));
-        Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.E));
+        Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.F));
 
-        keyBindings.Replace (Key.C, Key.E);
+        keyBindings.Replace (Key.C, Key.G);
         Assert.Empty (keyBindings.GetCommands (Key.C));
-        Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.E));
+        Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.G));
 
-        keyBindings.Replace (Key.D, Key.E);
+        keyBindings.Replace (Key.D, Key.H);
         Assert.Empty (keyBindings.GetCommands (Key.D));
-        Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.E));
+        Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.H));
     }
 
     // Add with scope does the right things
