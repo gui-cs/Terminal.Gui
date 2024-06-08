@@ -1,5 +1,4 @@
-﻿using UICatalog.Scenarios;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.InputTests;
 
@@ -171,27 +170,26 @@ public class KeyBindingTests
         Command [] resultCommands = keyBindings.GetCommands (Key.A);
         Assert.DoesNotContain (Command.HotKey, resultCommands);
 
-        keyBindings = new KeyBindings ();
+        keyBindings = new ();
         keyBindings.Add (Key.A, KeyBindingScope.Focused, Command.HotKey);
         keyBindings.Add (Key.A, KeyBindingScope.Focused, Command.Accept);
 
         resultCommands = keyBindings.GetCommands (Key.A);
         Assert.DoesNotContain (Command.HotKey, resultCommands);
-        
-        keyBindings = new KeyBindings ();
+
+        keyBindings = new ();
         keyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.HotKey);
         keyBindings.Add (Key.A, KeyBindingScope.Focused, Command.Accept);
 
         resultCommands = keyBindings.GetCommands (Key.A);
         Assert.DoesNotContain (Command.HotKey, resultCommands);
 
-        keyBindings = new KeyBindings ();
+        keyBindings = new ();
         keyBindings.Add (Key.A, new KeyBinding (new [] { Command.HotKey }, KeyBindingScope.HotKey));
         keyBindings.Add (Key.A, new KeyBinding (new [] { Command.Accept }, KeyBindingScope.HotKey));
 
         resultCommands = keyBindings.GetCommands (Key.A);
         Assert.DoesNotContain (Command.HotKey, resultCommands);
-
     }
 
     [Fact]
@@ -265,7 +263,7 @@ public class KeyBindingTests
         Assert.Contains (Command.Left, binding.Commands);
 
         // negative test
-        binding = keyBindings.Get (key, (KeyBindingScope)0);
+        binding = keyBindings.Get (key, 0);
         Assert.Null (binding);
 
         Command [] resultCommands = keyBindings.GetCommands (key);
@@ -293,7 +291,7 @@ public class KeyBindingTests
         Assert.Contains (Command.Left, binding.Commands);
 
         // negative test
-        success = keyBindings.TryGet (key, (KeyBindingScope)0, out binding);
+        success = keyBindings.TryGet (key, 0, out binding);
         Assert.False (success);
 
         Command [] resultCommands = keyBindings.GetCommands (key);

@@ -9,10 +9,11 @@ public partial class View
     /// </summary>
     private void SetupText ()
     {
+        Text = string.Empty;
         TextDirection = TextDirection.LeftRight_TopBottom;
     }
 
-    private string _text = string.Empty;
+    private string _text;
 
     /// <summary>
     ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
