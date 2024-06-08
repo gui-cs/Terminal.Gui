@@ -289,6 +289,5 @@ partial class Application
     /// <remarks>
     ///     This is an internal method used by the <see cref="View"/> class to remove Application key bindings.
     /// </remarks>
-    /// <param name="view">The view that is bound to the key.</param>
     internal static void ClearKeyBindings () { _keyBindings.Clear (); }
 }
