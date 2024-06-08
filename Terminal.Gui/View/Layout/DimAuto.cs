@@ -65,7 +65,7 @@ public class DimAuto () : Dim
         var subviewsSize = 0;
 
         int autoMin = MinimumContentDim?.GetAnchor (superviewContentSize) ?? 0;
-        int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? superviewContentSize;
+        int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? int.MaxValue;
 
         if (Style.FastHasFlags (DimAutoStyle.Text))
         {
