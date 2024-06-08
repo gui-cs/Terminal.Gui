@@ -59,7 +59,8 @@ public class Shortcut : View
             // Only the Shortcut (_container) should be able to have focus, not any subviews.
             CanFocus = true,
             Width = Dim.Auto (DimAutoStyle.Content, 1),
-            Height = Dim.Auto (DimAutoStyle.Content, 1)
+            Height = Dim.Auto (DimAutoStyle.Content, 1),
+            BorderStyle = LineStyle.Dashed
         };
 
         CommandView = new ();
@@ -71,8 +72,11 @@ public class Shortcut : View
             CanFocus = false,
             X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems),
             Y = Pos.Center (),
+
+            // Helpview is the only subview that doesn't have a min width
             Width = Dim.Auto (DimAutoStyle.Text),
-            Height = Dim.Auto (DimAutoStyle.Text)
+            Height = Dim.Auto (DimAutoStyle.Text),
+            ColorScheme = Colors.ColorSchemes ["Error"]
         };
         _container.Add (HelpView);
 
@@ -86,8 +90,10 @@ public class Shortcut : View
             CanFocus = false,
             X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems),
             Y = Pos.Center (),
+
+            // Bar will set the width of all KeyViews to the width of the widest KeyView.
             Width = Dim.Auto (DimAutoStyle.Text),
-            Height = Dim.Auto (DimAutoStyle.Text)
+            Height = Dim.Auto (DimAutoStyle.Text),
         };
         _container.Add (KeyView);
 
@@ -259,6 +265,7 @@ public class Shortcut : View
             // Right now, we don't set CanFocus to false here.
             _commandView.CanFocus = false;
 
+            // Bar will set the width of all CommandViews to the width of the widest CommandViews.
             _commandView.Width = Dim.Auto (DimAutoStyle.Text);
             _commandView.Height = Dim.Auto (DimAutoStyle.Text);
             _commandView.X = X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems);

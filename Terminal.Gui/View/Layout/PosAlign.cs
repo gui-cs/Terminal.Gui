@@ -198,6 +198,7 @@ public class PosAlign : Pos
         for (var index = 0; index < viewsInGroup.Count; index++)
         {
             View view = viewsInGroup [index];
+
             PosAlign? posAlign = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
 
             if (posAlign is { })

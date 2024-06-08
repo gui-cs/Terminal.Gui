@@ -40,17 +40,21 @@ public class Bars : Scenario
         };
         Application.Top.Add (eventLog);
 
-        //var shortcut1 = new Shortcut
-        //{
-        //    Title = "_Zigzag",
-        //    Key = Key.Z.WithAlt,
-        //    Text = "Gonna zig zag",
-        //    KeyBindingScope = KeyBindingScope.HotKey,
-        //    Command = Command.Accept,
-        //    X = 10,// Pos.Center (),
-        //    Y = 10,//Pos.Center ()
-        //    //Width = Dim.Auto(DimAutoStyle.Content, minimumContentDim: 50),
-        //};
+        var shortcut1 = new Shortcut
+        {
+            Title = "_Zigzag",
+            Key = Key.Z.WithAlt,
+            Text = "Gonna zig zag",
+            KeyBindingScope = KeyBindingScope.HotKey,
+            Command = Command.Accept,
+        };
+        shortcut1.Accept += (s, e) =>
+                            {
+                                eventSource.Add ($"Accept: {s}");
+                                eventLog.MoveDown ();
+                            };
+        Application.Top.Add (shortcut1);
+        shortcut1.SetFocus ();
 
         //var shortcut2 = new Shortcut
         //{
@@ -64,74 +68,74 @@ public class Bars : Scenario
         //    //Width = 50,
         //};
 
-        //Application.Top.Add (shortcut1, shortcut2);
-        //shortcut1.SetFocus ();
 
-        var shortcut3 = new Shortcut
-        {
-            Title = "Shortcut3",
-            Key = Key.D3.WithCtrl,
-            Text = "Number Three",
-            KeyBindingScope = KeyBindingScope.Application,
-            Command = Command.Accept,
-        };
+        //var shortcut3 = new Shortcut
+        //{
+        //    Title = "Shortcut3",
+        //    Key = Key.D3.WithCtrl,
+        //    Text = "Number Three",
+        //    KeyBindingScope = KeyBindingScope.Application,
+        //    Command = Command.Accept,
+        //};
 
-        shortcut3.Accept += (s, e) =>
-                            {
-                                eventSource.Add ($"Accept: {s}");
-                                eventLog.MoveDown ();
-                            };
+        //shortcut3.Accept += (s, e) =>
+        //                    {
+        //                        eventSource.Add ($"Accept: {s}");
+        //                        eventLog.MoveDown ();
+        //                    };
 
-        var shortcut4 = new Shortcut
-        {
-            Title = "Shortcut4",
-            Text = "Number 4",
-            Key = Key.F4,
-            KeyBindingScope = KeyBindingScope.Application,
-            Command = Command.Accept,
-        };
+        //var shortcut4 = new Shortcut
+        //{
+        //    Title = "Shortcut4",
+        //    Text = "Number 4",
+        //    Key = Key.F4,
+        //    KeyBindingScope = KeyBindingScope.Application,
+        //    Command = Command.Accept,
+        //};
 
-        var cb = new CheckBox ()
-        {
-            Title = "Hello",// shortcut4.Text
-        };
+        //var cb = new CheckBox ()
+        //{
+        //    Title = "Hello",// shortcut4.Text
+        //};
 
-        cb.Toggled += (s, e) =>
-                     {
-                         eventSource.Add ($"Toggled: {s}");
-                         eventLog.MoveDown ();
-                     };
+        //cb.Toggled += (s, e) =>
+        //             {
+        //                 eventSource.Add ($"Toggled: {s}");
+        //                 eventLog.MoveDown ();
+        //             };
 
-        shortcut4.CommandView = cb;
+        //shortcut4.CommandView = cb;
 
-        shortcut4.Accept += (s, e) =>
-                            {
-                                eventSource.Add ($"Accept: {s}");
-                                eventLog.MoveDown ();
-                            };
+        //shortcut4.Accept += (s, e) =>
+        //                    {
+        //                        eventSource.Add ($"Accept: {s}");
+        //                        eventLog.MoveDown ();
+        //                    };
 
-        var bar = new Bar
-        {
-            X = 2,
-            Y = 2,
-            Orientation = Orientation.Vertical,
-            StatusBarStyle = false,
-            Width = Dim.Percent(40)
-        };
-        bar.Add (shortcut3, shortcut4);
+        //var bar = new Bar
+        //{
+        //    X = 2,
+        //    Y = Pos.Bottom(shortcut1),
+        //    Orientation = Orientation.Vertical,
+        //    StatusBarStyle = false,
+        //    Width = Dim.Percent(40)
+        //};
+        //bar.Add (shortcut3, shortcut4);
 
-        CheckBox hello = new ()
-        {
-            Title = "Hello",
-        };
-        Application.Top.Add (hello);
-        hello.Toggled += (s, e) =>
-                         {
-                             eventSource.Add ($"Toggled: {s}");
-                             eventLog.MoveDown ();
-                         };
+        ////CheckBox hello = new ()
+        ////{
+        ////    Title = "Hello",
+        ////    X = 0,
+        ////    Y = 1,
+        ////};
+        ////Application.Top.Add (hello);
+        ////hello.Toggled += (s, e) =>
+        ////                 {
+        ////                     eventSource.Add ($"Toggled: {s}");
+        ////                     eventLog.MoveDown ();
+        ////                 };
 
-        Application.Top.Add (bar);
+        //Application.Top.Add (bar);
 
         // BUGBUG: This should not be needed
         //Application.Top.LayoutSubviews ();

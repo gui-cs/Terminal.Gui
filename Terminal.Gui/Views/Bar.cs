@@ -99,13 +99,45 @@ public class Bar : View
                     }
 
                     barItem.Y = Pos.Center ();
-                    barItem.SetRelativeLayout(new Size(int.MaxValue, int.MaxValue));
+                    barItem.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
                     prevBarItem = barItem;
                 }
 
                 break;
 
             case Orientation.Vertical:
+                // CommandView is aligned left, HelpView is aligned right, KeyView is aligned right
+                // All CommandView's are the same width, all HelpView's are the same width,
+                // all KeyView's are the same width
+
+                int maxCommandWidth = 0;
+                int maxHelpWidth = 0;
+
+                List<Shortcut> shortcuts = Subviews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
+
+                foreach (Shortcut shortcut in shortcuts)
+                {
+                    // Let AutoSize do its thing to get the minimum width of each CommandView and HelpView
+                    shortcut.CommandView.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
+                    shortcut.KeyView.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
+                    shortcut.HelpView.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
+                }
+
+                maxCommandWidth = shortcuts.Max (s => s.CommandView.Frame.Width);
+                maxHelpWidth = shortcuts.Max (s => s.HelpView.Frame.Width);
+
+                // Set the width of all CommandView's and HelpView's to the max width
+                foreach (Shortcut shortcut in shortcuts)
+                {
+                    shortcut.CommandView.Width = Dim.Auto (minimumContentDim: maxCommandWidth);
+                    shortcut.KeyView.Width = Dim.Auto ();
+                    shortcut.HelpView.Width = Dim.Auto (minimumContentDim: maxHelpWidth);
+
+                   // shortcut.LayoutSubviews ();
+                }
+
+                // Set the overall size of the Bar and arrange the views vertically
+
                 var maxBarItemWidth = 0;
 
                 for (var index = 0; index < Subviews.Count; index++)
@@ -128,6 +160,7 @@ public class Bar : View
                     }
 
                     prevBarItem = barItem;
+
                     if (barItem is Shortcut shortcut)
                     {
                         //shortcut.SetRelativeLayout (new (int.MaxValue, int.MaxValue));
@@ -137,32 +170,51 @@ public class Bar : View
                     {
                         maxBarItemWidth = Math.Max (maxBarItemWidth, barItem.Frame.Width);
                     }
+
                     barItem.X = 0;
                 }
 
-                for (var index = 0; index < Subviews.Count; index++)
+                foreach (Shortcut shortcut in shortcuts)
                 {
-                    var shortcut = Subviews [index] as Shortcut;
-
-                    if (shortcut is { Visible: false })
-                    {
-                        continue;
-                    }
-
                     if (Width is DimAuto)
                     {
-                        shortcut._container.Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: maxBarItemWidth);
+                        shortcut.Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: maxBarItemWidth);
                     }
                     else
                     {
-                        shortcut._container.Width = Dim.Fill ();
-                        shortcut.Width = Dim.Fill ();
+                        //shortcut._container.Width = Dim.Fill ();
+                       // shortcut.Width = Dim.Fill ();
                     }
 
-                    //shortcut.SetContentSize (new (maxBarItemWidth, 1));
-                    //shortcut.Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: int.Max(maxBarItemWidth, GetContentSize().Width));
-
+                    shortcut.LayoutSubviews ();
                 }
+                
+
+                //for (var index = 0; index < Subviews.Count; index++)
+                //{
+                //    var shortcut = Subviews [index] as Shortcut;
+
+                //    if (shortcut is { Visible: false })
+                //    {
+                //        continue;
+                //    }
+
+                //    if (Width is DimAuto)
+                //    {
+                //        shortcut._container.Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: maxBarItemWidth);
+                //    }
+                //    else
+                //    {
+                //        shortcut._container.Width = Dim.Fill ();
+                //        shortcut.Width = Dim.Fill ();
+                //    }
+
+                //    //shortcut.SetContentSize (new (maxBarItemWidth, 1));
+                //    //shortcut.Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: int.Max(maxBarItemWidth, GetContentSize().Width));
+
+                //}
+
+
 
                 break;
         }
