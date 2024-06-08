@@ -157,6 +157,7 @@ public static partial class Application
         KeyDown = null;
         KeyUp = null;
         SizeChanging = null;
+        ClearKeyBindings ();
 
         Colors.Reset ();
 
@@ -1949,6 +1950,32 @@ public static partial class Application
     }
 
     /// <summary>
+    ///    Gets the list of Views that have <see cref="KeyBindingScope.Application"/> key bindings.
+    /// </summary>
+    /// <remarks>
+    ///     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
+    /// </remarks>
+    /// <returns>The list of Views that have Application-scoped key bindings.</returns>
+    internal static List<View> GetViewsWithKeyBindings ()
+    {
+        return _keyBindings.Values.SelectMany (v => v).ToList ();
+    }
+
+    /// <summary>
+    ///    Gets the list of Views that have <see cref="KeyBindingScope.Application"/> key bindings for the specified key.
+    /// </summary>
+    /// <remarks>
+    ///     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
+    /// </remarks>
+    /// <param name="key">The key to check.</param>
+    /// <param name="views">Outputs the list of views bound to <paramref name="key"/></param>
+    /// <returns><see langword="True"/> if successful.</returns>
+    internal static bool TryGetKeyBindings (Key key, out List<View> views)
+    {
+        return _keyBindings.TryGetValue (key, out views);
+    }
+
+    /// <summary>
     ///     Removes an <see cref="KeyBindingScope.Application"/> scoped key binding.
     /// </summary>
     /// <remarks>
@@ -1958,9 +1985,14 @@ public static partial class Application
     /// <param name="view">The view that is bound to the key.</param>
     internal static void RemoveKeyBinding (Key key, View view)
     {
-        if (_keyBindings.TryGetValue (key, out List<View> binding))
+        if (_keyBindings.TryGetValue (key, out List<View> views))
         {
-            binding.Remove (view);
+            views.Remove (view);
+
+            if (views.Count == 0)
+            {
+                _keyBindings.Remove (key);
+            }
         }
     }
 
@@ -1971,12 +2003,24 @@ public static partial class Application
     ///     This is an internal method used by the <see cref="View"/> class to remove Application key bindings.
     /// </remarks>
     /// <param name="view">The view that is bound to the key.</param>
-    internal static void RemoveAllKeyBindings (View view)
+    internal static void ClearKeyBindings (View view)
     {
         foreach (Key key in _keyBindings.Keys)
         {
             _keyBindings [key].Remove (view);
         }
+    }
+
+    /// <summary>
+    ///     Removes all <see cref="KeyBindingScope.Application"/> scoped key bindings for the specified view.
+    /// </summary>
+    /// <remarks>
+    ///     This is an internal method used by the <see cref="View"/> class to remove Application key bindings.
+    /// </remarks>
+    /// <param name="view">The view that is bound to the key.</param>
+    internal static void ClearKeyBindings ()
+    {
+        _keyBindings.Clear ();
     }
 
     #endregion Keyboard handling

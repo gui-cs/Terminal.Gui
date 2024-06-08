@@ -81,10 +81,6 @@ public class KeyBindings
         else
         {
             Add (key, new KeyBinding (commands, scope));
-            if (scope.FastHasFlags (KeyBindingScope.Application))
-            {
-                Application.AddKeyBinding (key, BoundView);
-            }
         }
     }
 
@@ -120,7 +116,7 @@ public class KeyBindings
     /// <summary>Removes all <see cref="KeyBinding"/> objects from the collection.</summary>
     public void Clear ()
     {
-        Application.RemoveAllKeyBindings (BoundView);
+        Application.ClearKeyBindings (BoundView);
 
         Bindings.Clear ();
     }
