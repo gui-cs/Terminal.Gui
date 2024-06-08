@@ -534,6 +534,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     {
         var view = new View ()
         {
+            CanFocus = true,
             HighlightStyle = highlightOnPress,
             Height = 1,
             Width = 1
@@ -588,6 +589,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     {
         var view = new View ()
         {
+            CanFocus = true,
             HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside,
             Height = 1,
             Width = 1
