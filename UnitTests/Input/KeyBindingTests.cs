@@ -261,14 +261,14 @@ public class KeyBindingTests
         binding = keyBindings.Get (key, scope);
         Assert.Contains (Command.Right, binding.Commands);
         Assert.Contains (Command.Left, binding.Commands);
+    }
 
-        // negative test
-        binding = keyBindings.Get (key, 0);
-        Assert.Null (binding);
-
-        Command [] resultCommands = keyBindings.GetCommands (key);
-        Assert.Contains (Command.Right, resultCommands);
-        Assert.Contains (Command.Left, resultCommands);
+    [Fact]
+    public void Get_Binding_Not_Found_Throws ()
+    {
+        var keyBindings = new KeyBindings ();
+        Assert.Throws<InvalidOperationException> (() => keyBindings.Get (Key.A));
+        Assert.Throws<InvalidOperationException> (() => keyBindings.Get (Key.B, KeyBindingScope.Application));
     }
 
     [Theory]

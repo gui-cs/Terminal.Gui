@@ -1,4 +1,4 @@
-﻿using static System.Formats.Asn1.AsnWriter;
+﻿#nullable enable
 
 namespace Terminal.Gui;
 
@@ -36,7 +36,7 @@ public class KeyBindings
         else
         {
             Bindings.Add (key, binding);
-            if (binding.Scope.HasFlag (KeyBindingScope.Application))
+            if (binding.Scope.FastHasFlags (KeyBindingScope.Application))
             {
                 Application.AddKeyBinding (key, BoundView);
             }
@@ -81,7 +81,7 @@ public class KeyBindings
         else
         {
             Add (key, new KeyBinding (commands, scope));
-            if (scope.HasFlag (KeyBindingScope.Application))
+            if (scope.FastHasFlags (KeyBindingScope.Application))
             {
                 Application.AddKeyBinding (key, BoundView);
             }
@@ -145,13 +145,27 @@ public class KeyBindings
     /// <summary>Gets the <see cref="KeyBinding"/> for the specified <see cref="Key"/>.</summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public KeyBinding Get (Key key) { return TryGet (key, out KeyBinding binding) ? binding : null; }
+    public KeyBinding Get (Key key)
+    {
+        if (TryGet (key, out KeyBinding binding))
+        {
+            return binding;
+        }
+        throw new InvalidOperationException ($"Key {key} is not bound.");
+    }
 
     /// <summary>Gets the <see cref="KeyBinding"/> for the specified <see cref="Key"/>.</summary>
     /// <param name="key"></param>
     /// <param name="scope"></param>
     /// <returns></returns>
-    public KeyBinding Get (Key key, KeyBindingScope scope) { return TryGet (key, scope, out KeyBinding binding) ? binding : null; }
+    public KeyBinding Get (Key key, KeyBindingScope scope)
+    {
+        if (TryGet (key, scope, out KeyBinding binding))
+        {
+            return binding;
+        }
+        throw new InvalidOperationException ($"Key {key}/{scope} is not bound.");
+    }
 
     /// <summary>Gets the array of <see cref="Command"/>s bound to <paramref name="key"/> if it exists.</summary>
     /// <param name="key">The key to check.</param>
