@@ -17,7 +17,7 @@ public class KeyBindings
     /// <summary>
     ///     The view that the <see cref="KeyBindings"/> are bound to.
     /// </summary>
-    public View BoundView { get; }
+    public View? BoundView { get; }
 
     // TODO: Add a dictionary comparer that ignores Scope
     // TODO: This should not be public!

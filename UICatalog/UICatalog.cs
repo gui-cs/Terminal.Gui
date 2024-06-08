@@ -128,7 +128,7 @@ internal class UICatalogApp
                                 {
                                     var options = new Options
                                     {
-                                        Driver = context.ParseResult.GetValueForOption (driverOption),
+                                        Driver = context.ParseResult.GetValueForOption (driverOption) ?? string.Empty,
                                         Scenario = context.ParseResult.GetValueForArgument (scenarioArgument)
                                         /* etc. */
                                     };
@@ -660,7 +660,7 @@ internal class UICatalogApp
 
             List<MenuItem> schemeMenuItems = new ();
 
-            foreach (KeyValuePair<string, ColorScheme> sc in Colors.ColorSchemes)
+            foreach (KeyValuePair<string, ColorScheme?> sc in Colors.ColorSchemes)
             {
                 var item = new MenuItem { Title = $"_{sc.Key}", Data = sc.Key };
                 item.CheckType |= MenuItemCheckStyle.Radio;
