@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui;
@@ -10,7 +10,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Threading")]
 public class Threading : Scenario
 {
-    private readonly List<string> _log = [];
+    private readonly ObservableCollection<string> _log = [];
     private Action _action;
     private Button _btnActionCancel;
     private CancellationTokenSource _cancellationTokenSource;
@@ -28,7 +28,7 @@ public class Threading : Scenario
                   {
                       _itemsList.Source = null;
                       LogJob ("Loading task lambda");
-                      List<string> items = await LoadDataAsync ();
+                      ObservableCollection<string> items = await LoadDataAsync ();
                       LogJob ("Returning from task lambda");
                       await _itemsList.SetSourceAsync (items);
                   };
@@ -37,7 +37,7 @@ public class Threading : Scenario
                    {
                        _itemsList.Source = null;
                        LogJob ("Loading task handler");
-                       List<string> items = await LoadDataAsync ();
+                       ObservableCollection<string> items = await LoadDataAsync ();
                        LogJob ("Returning from task handler");
                        await _itemsList.SetSourceAsync (items);
                    };
@@ -47,7 +47,7 @@ public class Threading : Scenario
                     _itemsList.Source = null;
                     LogJob ("Loading task synchronous");
 
-                    List<string> items =
+                    ObservableCollection<string> items =
                         ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
                     LogJob ("Returning from task synchronous");
                     _itemsList.SetSource (items);
@@ -76,7 +76,7 @@ public class Threading : Scenario
             Width = 50,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            Source = new ListWrapper (_log)
+            Source = new ListWrapper<string> (_log)
         };
 
         var text = new TextField { X = 1, Y = 3, Width = 100, Text = "Type anything after press the button" };
@@ -148,7 +148,7 @@ public class Threading : Scenario
             }
 
             LogJob ($"Calling task Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
-            List<string> items = await Task.Run (LoadItemsAsync, _cancellationTokenSource.Token);
+            ObservableCollection<string> items = await Task.Run (LoadItemsAsync, _cancellationTokenSource.Token);
 
             if (!_cancellationTokenSource.IsCancellationRequested)
             {
@@ -177,12 +177,12 @@ public class Threading : Scenario
     {
         _itemsList.Source = null;
         LogJob ("Loading task");
-        List<string> items = await LoadDataAsync ();
+        ObservableCollection<string> items = await LoadDataAsync ();
         LogJob ("Returning from task");
         await _itemsList.SetSourceAsync (items);
     }
 
-    private async Task<List<string>> LoadDataAsync ()
+    private async Task<ObservableCollection<string>> LoadDataAsync ()
     {
         _itemsList.Source = null;
         LogJob ("Starting delay");
@@ -211,7 +211,7 @@ public class Threading : Scenario
         ];
     }
 
-    private async Task<List<string>> LoadItemsAsync ()
+    private async Task<ObservableCollection<string>> LoadItemsAsync ()
     {
         // Do something that takes lot of times.
         LogJob ($"Starting delay Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
@@ -231,7 +231,7 @@ public class Threading : Scenario
     {
         _itemsList.Source = null;
         LogJob ("Loading task method");
-        List<string> items = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+        ObservableCollection<string> items = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
         await Task.Delay (3000);
         LogJob ("Returning from task method");
         await _itemsList.SetSourceAsync (items);

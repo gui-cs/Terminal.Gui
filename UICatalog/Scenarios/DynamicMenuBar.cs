@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -440,7 +439,7 @@ public class DynamicMenuBar : Scenario
                                     TextTitle.Text = string.Empty;
                                     Application.RequestStop ();
                                 };
-            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel] };
+            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel], Height = Dim.Auto (DimAutoStyle.Content, 22, Driver.Rows) };
 
             Width = Dim.Fill ();
             Height = Dim.Fill () - 1;
@@ -596,10 +595,10 @@ public class DynamicMenuBar : Scenario
             var _btnAddMenuBar = new Button { Y = 1, Text = "Add a MenuBar" };
             _frmMenu.Add (_btnAddMenuBar);
 
-            var _btnMenuBarUp = new Button { X = Pos.Center (), Text = "^" };
+            var _btnMenuBarUp = new Button { X = Pos.Center (), Text = CM.Glyphs.UpArrow.ToString () };
             _frmMenu.Add (_btnMenuBarUp);
 
-            var _btnMenuBarDown = new Button { X = Pos.Center (), Y = Pos.Bottom (_btnMenuBarUp), Text = "v" };
+            var _btnMenuBarDown = new Button { X = Pos.Center (), Y = Pos.Bottom (_btnMenuBarUp), Text = CM.Glyphs.DownArrow.ToString () };
             _frmMenu.Add (_btnMenuBarDown);
 
             var _btnRemoveMenuBar = new Button { Y = 1, Text = "Remove a MenuBar" };
@@ -609,7 +608,7 @@ public class DynamicMenuBar : Scenario
 
             var _btnPrevious = new Button
             {
-                X = Pos.Left (_btnAddMenuBar), Y = Pos.Top (_btnAddMenuBar) + 2, Text = "<"
+                X = Pos.Left (_btnAddMenuBar), Y = Pos.Top (_btnAddMenuBar) + 2, Text = CM.Glyphs.LeftArrow.ToString ()
             };
             _frmMenu.Add (_btnPrevious);
 
@@ -617,7 +616,7 @@ public class DynamicMenuBar : Scenario
             _btnAdd.X = Pos.AnchorEnd ();
             _frmMenu.Add (_btnAdd);
 
-            var _btnNext = new Button { X = Pos.X (_btnAdd), Y = Pos.Top (_btnPrevious), Text = ">" };
+            var _btnNext = new Button { X = Pos.X (_btnAdd), Y = Pos.Top (_btnPrevious), Text = CM.Glyphs.RightArrow.ToString () };
             _frmMenu.Add (_btnNext);
 
             var _lblMenuBar = new Label
@@ -657,7 +656,7 @@ public class DynamicMenuBar : Scenario
                 Y = Pos.Top (_btnPrevious) + 2,
                 Width = _lblMenuBar.Width,
                 Height = Dim.Fill (),
-                Source = new ListWrapper (new List<DynamicMenuItemList> ())
+                Source = new ListWrapper<DynamicMenuItemList> ([])
             };
             _frmMenu.Add (_lstMenus);
 
@@ -669,10 +668,10 @@ public class DynamicMenuBar : Scenario
             var _btnRemove = new Button { X = Pos.Left (_btnAdd), Y = Pos.Top (_btnAdd) + 1, Text = "Remove" };
             _frmMenu.Add (_btnRemove);
 
-            var _btnUp = new Button { X = Pos.Right (_lstMenus) + 2, Y = Pos.Top (_btnRemove) + 2, Text = "^" };
+            var _btnUp = new Button { X = Pos.Right (_lstMenus) + 2, Y = Pos.Top (_btnRemove) + 2, Text = CM.Glyphs.UpArrow.ToString () };
             _frmMenu.Add (_btnUp);
 
-            var _btnDown = new Button { X = Pos.Right (_lstMenus) + 2, Y = Pos.Top (_btnUp) + 1, Text = "v" };
+            var _btnDown = new Button { X = Pos.Right (_lstMenus) + 2, Y = Pos.Top (_btnUp) + 1, Text = CM.Glyphs.DownArrow.ToString () };
             _frmMenu.Add (_btnDown);
 
             Add (_frmMenu);
@@ -857,7 +856,7 @@ public class DynamicMenuBar : Scenario
                                       return;
                                   }
 
-                                  if (!(_currentMenuBarItem is MenuBarItem))
+                                  if (_currentMenuBarItem is not MenuBarItem)
                                   {
                                       var parent = _currentMenuBarItem.Parent as MenuBarItem;
                                       int idx = parent.GetChildrenIndex (_currentMenuBarItem);
@@ -1109,7 +1108,7 @@ public class DynamicMenuBar : Scenario
             SetFrameDetails ();
 
             var ustringConverter = new UStringValueConverter ();
-            var listWrapperConverter = new ListWrapperConverter ();
+            var listWrapperConverter = new ListWrapperConverter<DynamicMenuItemList> ();
 
             var lblMenuBar = new Binding (this, "MenuBar", _lblMenuBar, "Text", ustringConverter);
             var lblParent = new Binding (this, "Parent", _lblParent, "Text", ustringConverter);
@@ -1160,7 +1159,7 @@ public class DynamicMenuBar : Scenario
 
             void SetListViewSource (MenuItem _currentMenuBarItem, bool fill = false)
             {
-                DataContext.Menus = new ();
+                DataContext.Menus = [];
                 var menuBarItem = _currentMenuBarItem as MenuBarItem;
 
                 if (menuBarItem != null && menuBarItem?.Children == null)
@@ -1344,7 +1343,7 @@ public class DynamicMenuBar : Scenario
     public class DynamicMenuItemModel : INotifyPropertyChanged
     {
         private string _menuBar;
-        private List<DynamicMenuItemList> _menus;
+        private ObservableCollection<DynamicMenuItemList> _menus;
         private string _parent;
         public DynamicMenuItemModel () { Menus = []; }
 
@@ -1367,7 +1366,7 @@ public class DynamicMenuBar : Scenario
             }
         }
 
-        public List<DynamicMenuItemList> Menus
+        public ObservableCollection<DynamicMenuItemList> Menus
         {
             get => _menus;
             set
@@ -1414,9 +1413,9 @@ public class DynamicMenuBar : Scenario
         object Convert (object value, object parameter = null);
     }
 
-    public class ListWrapperConverter : IValueConverter
+    public class ListWrapperConverter<T> : IValueConverter
     {
-        public object Convert (object value, object parameter = null) { return new ListWrapper ((IList)value); }
+        public object Convert (object value, object parameter = null) { return new ListWrapper<T> ((ObservableCollection<T>)value); }
     }
 
     public class UStringValueConverter : IValueConverter
