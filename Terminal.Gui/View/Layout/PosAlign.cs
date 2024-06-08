@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.ComponentModel;
+using System.Drawing;
 
 namespace Terminal.Gui;
 
@@ -165,5 +166,56 @@ public class PosAlign : Pos
         }
 
         return 0;
+    }
+
+    internal int CalculateMinDimension (int groupId, IList<View> views, Dimension dimension)
+    {
+        List<int> dimensionsList = new ();
+
+        // PERF: If this proves a perf issue, consider caching a ref to this list in each item
+        List<View> viewsInGroup = views.Where (
+                                               v =>
+                                               {
+                                                   return dimension switch
+                                                          {
+                                                              Dimension.Width when v.X is PosAlign alignX => alignX.GroupId == groupId,
+                                                              Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId == groupId,
+                                                              _ => false
+                                                          };
+                                               })
+                                       .ToList ();
+
+        if (viewsInGroup.Count == 0)
+        {
+            return 0;
+        }
+
+        // PERF: We iterate over viewsInGroup multiple times here.
+
+        Aligner? firstInGroup = null;
+
+        // Update the dimensionList with the sizes of the views
+        for (var index = 0; index < viewsInGroup.Count; index++)
+        {
+            View view = viewsInGroup [index];
+            PosAlign? posAlign = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
+
+            if (posAlign is { })
+            {
+                if (index == 0)
+                {
+                    firstInGroup = posAlign.Aligner;
+                }
+
+                dimensionsList.Add (dimension == Dimension.Width ? view.Frame.Width : view.Frame.Height);
+            }
+        }
+
+        // Align
+        var aligner = firstInGroup;
+        aligner.ContainerSize = dimensionsList.Sum();
+        int [] locations = aligner.Align (dimensionsList.ToArray ());
+
+        return locations.Sum ();
     }
 }

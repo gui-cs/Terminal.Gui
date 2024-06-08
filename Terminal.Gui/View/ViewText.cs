@@ -4,7 +4,15 @@ namespace Terminal.Gui;
 
 public partial class View
 {
-    private string _text;
+    /// <summary>
+    ///    Initializes the Text of the View. Called by the constructor.
+    /// </summary>
+    private void SetupText ()
+    {
+        TextDirection = TextDirection.LeftRight_TopBottom;
+    }
+
+    private string _text = string.Empty;
 
     /// <summary>
     ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved

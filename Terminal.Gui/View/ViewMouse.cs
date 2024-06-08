@@ -447,6 +447,10 @@ public partial class View
     internal bool SetHighlight (HighlightStyle style)
     {
         // TODO: Make the highlight colors configurable
+        if (!CanFocus)
+        {
+            return false;
+        }
 
         // Enable override via virtual method and/or event
         if (OnHighlight (style) == true)
