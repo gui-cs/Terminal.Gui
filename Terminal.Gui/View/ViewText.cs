@@ -4,6 +4,14 @@ namespace Terminal.Gui;
 
 public partial class View
 {
+    /// <summary>
+    ///    Initializes the Text of the View. Called by the constructor.
+    /// </summary>
+    private void SetupText ()
+    {
+        TextDirection = TextDirection.LeftRight_TopBottom;
+    }
+
     private string _text = string.Empty;
 
     /// <summary>

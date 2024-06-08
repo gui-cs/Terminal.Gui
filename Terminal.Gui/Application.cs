@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Terminal.Gui;
 
@@ -100,7 +99,6 @@ public static partial class Application
         // Don't dispose the Top. It's up to caller dispose it
         if (Top is { })
         {
-
             Debug.Assert (Top.WasDisposed);
 
             // If End wasn't called _cachedRunStateToplevel may be null
@@ -540,6 +538,7 @@ public static partial class Application
             toplevel.SetNeedsDisplay ();
             toplevel.Draw ();
             Driver.UpdateScreen ();
+
             if (PositionCursor (toplevel))
             {
                 Driver.UpdateCursor ();
@@ -552,13 +551,14 @@ public static partial class Application
     }
 
     /// <summary>
-    /// Calls <see cref="View.PositionCursor"/> on the most focused view in the view starting with <paramref name="view"/>.
+    ///     Calls <see cref="View.PositionCursor"/> on the most focused view in the view starting with <paramref name="view"/>.
     /// </summary>
     /// <remarks>
-    /// Does nothing if <paramref name="view"/> is <see langword="null"/> or if the most focused view is not visible or enabled.
-    /// <para>
-    /// If the most focused view is not visible within it's superview, the cursor will be hidden.
-    /// </para>
+    ///     Does nothing if <paramref name="view"/> is <see langword="null"/> or if the most focused view is not visible or
+    ///     enabled.
+    ///     <para>
+    ///         If the most focused view is not visible within it's superview, the cursor will be hidden.
+    ///     </para>
     /// </remarks>
     /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
     internal static bool PositionCursor (View view)
@@ -582,6 +582,7 @@ public static partial class Application
         if (!mostFocused.Visible || !mostFocused.Enabled)
         {
             Driver.GetCursorVisibility (out CursorVisibility current);
+
             if (current != CursorVisibility.Invisible)
             {
                 Driver.SetCursorVisibility (CursorVisibility.Invisible);
@@ -593,6 +594,7 @@ public static partial class Application
         // If the view is not visible within it's superview, don't position the cursor
         Rectangle mostFocusedViewport = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = Point.Empty });
         Rectangle superViewViewport = mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver.Screen;
+
         if (!superViewViewport.IntersectsWith (mostFocusedViewport))
         {
             return false;
@@ -674,7 +676,7 @@ public static partial class Application
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
-        where T : Toplevel, new()
+        where T : Toplevel, new ()
     {
         var top = new T ();
 
@@ -961,6 +963,7 @@ public static partial class Application
         {
             state.Toplevel.Draw ();
             Driver.UpdateScreen ();
+
             //Driver.UpdateCursor ();
         }
 
@@ -1605,7 +1608,6 @@ public static partial class Application
             WantContinuousButtonPressedView = null;
         }
 
-
         if (view is not Adornment)
         {
             if ((view is null || view == OverlappedTop)
@@ -1855,20 +1857,18 @@ public static partial class Application
             }
         }
 
-        // Invoke any Global KeyBindings
-        foreach (Toplevel topLevel in _topLevels.ToList ())
+        // Invoke any global (Application-scoped) KeyBindings.
+        // The first view that handles the key will stop the loop.
+        foreach (KeyValuePair<Key, List<View>> binding in _keyBindings.Where (b => b.Key == keyEvent.KeyCode))
         {
-            View viewWithAppKeyBinding = View.FindViewWithApplicationKeyBinding (topLevel, keyEvent);
-
-            if (viewWithAppKeyBinding is null)
+            foreach (View view in binding.Value)
             {
-                continue;
-            }
-            bool? handled = viewWithAppKeyBinding.OnInvokingKeyBindings (keyEvent);
+                bool? handled = view?.OnInvokingKeyBindings (keyEvent);
 
-            if (handled is { } && (bool)handled)
-            {
-                return true;
+                if (handled != null && (bool)handled)
+                {
+                    return true;
+                }
             }
         }
 
@@ -1924,6 +1924,59 @@ public static partial class Application
         }
 
         return false;
+    }
+
+    /// <summary>
+    ///     The <see cref="KeyBindingScope.Application"/> key bindings.
+    /// </summary>
+    private static readonly Dictionary<Key, List<View>> _keyBindings = new ();
+
+    /// <summary>
+    ///     Adds an  <see cref="KeyBindingScope.Application"/> scoped key binding.
+    /// </summary>
+    /// <remarks>
+    ///     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
+    /// </remarks>
+    /// <param name="key">The key being bound.</param>
+    /// <param name="view">The view that is bound to the key.</param>
+    internal static void AddKeyBinding (Key key, View view)
+    {
+        if (!_keyBindings.ContainsKey (key))
+        {
+            _keyBindings [key] = [];
+        }
+        _keyBindings [key].Add (view);
+    }
+
+    /// <summary>
+    ///     Removes an <see cref="KeyBindingScope.Application"/> scoped key binding.
+    /// </summary>
+    /// <remarks>
+    ///     This is an internal method used by the <see cref="View"/> class to remove Application key bindings.
+    /// </remarks>
+    /// <param name="key">The key that was bound.</param>
+    /// <param name="view">The view that is bound to the key.</param>
+    internal static void RemoveKeyBinding (Key key, View view)
+    {
+        if (_keyBindings.TryGetValue (key, out List<View> binding))
+        {
+            binding.Remove (view);
+        }
+    }
+
+    /// <summary>
+    ///     Removes all <see cref="KeyBindingScope.Application"/> scoped key bindings for the specified view.
+    /// </summary>
+    /// <remarks>
+    ///     This is an internal method used by the <see cref="View"/> class to remove Application key bindings.
+    /// </remarks>
+    /// <param name="view">The view that is bound to the key.</param>
+    internal static void RemoveAllKeyBindings (View view)
+    {
+        foreach (Key key in _keyBindings.Keys)
+        {
+            _keyBindings [key].Remove (view);
+        }
     }
 
     #endregion Keyboard handling

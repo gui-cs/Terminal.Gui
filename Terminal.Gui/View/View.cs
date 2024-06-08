@@ -123,18 +123,14 @@ public partial class View : Responder, ISupportInitializeNotification
     /// </remarks>
     public View ()
     {
-        CreateAdornments ();
-
-        HotKeySpecifier = (Rune)'_';
-        TextDirection = TextDirection.LeftRight_TopBottom;
+        SetupAdornments ();
+        SetupKeyboard ();
+        //SetupMouse ();
+        SetupText ();
 
         CanFocus = false;
         TabIndex = -1;
         TabStop = false;
-
-        TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
-
-        AddCommands ();
     }
 
     /// <summary>
@@ -507,6 +503,7 @@ public partial class View : Responder, ISupportInitializeNotification
     {
         LineCanvas.Dispose ();
 
+        DisposeKeyboard ();
         DisposeAdornments ();
 
         for (int i = InternalSubviews.Count - 1; i >= 0; i--)

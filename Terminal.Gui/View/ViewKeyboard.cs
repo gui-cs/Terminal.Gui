@@ -4,13 +4,29 @@ namespace Terminal.Gui;
 
 public partial class View
 {
-    private void AddCommands ()
+    /// <summary>
+    ///  Helper to configure all things keyboard related for a View. Called from the View constructor.
+    /// </summary>
+    private void SetupKeyboard ()
     {
+        KeyBindings = new (this);
+        HotKeySpecifier = (Rune)'_';
+        TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
+
         // By default, the HotKey command sets the focus
         AddCommand (Command.HotKey, OnHotKey);
 
         // By default, the Accept command raises the Accept event
         AddCommand (Command.Accept, OnAccept);
+    }
+
+    /// <summary>
+    ///    Helper to dispose all things keyboard related for a View. Called from the View Dispose method.
+    /// </summary>
+    private void DisposeKeyboard ()
+    {
+        TitleTextFormatter.HotKeyChanged -= TitleTextFormatter_HotKeyChanged;
+        KeyBindings.Clear ();
     }
 
     #region HotKey Support
@@ -601,7 +617,7 @@ public partial class View
     #region Key Bindings
 
     /// <summary>Gets the key bindings for this view.</summary>
-    public KeyBindings KeyBindings { get; } = new ();
+    public KeyBindings KeyBindings { get; internal set; }
 
     private Dictionary<Command, Func<bool?>> CommandImplementations { get; } = new ();
 

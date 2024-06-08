@@ -39,7 +39,7 @@ public enum KeyBindingScope
     /// <remarks>
     ///     <para>
     ///         Application-scoped key bindings are only invoked if the key down event was not handled by the focused view or
-    ///         any of its subviews, and if the key down event was not bound to a <see cref="View.HotKey"/>.
+    ///         any of its subviews, and if the key was not bound to a <see cref="View.HotKey"/>.
     ///     </para>
     ///     <para>
     ///         <see cref="Shortcut"/> makes it easy to add Application-scoped key bindings with a visual indicator. See also <see cref="Bar"/>.

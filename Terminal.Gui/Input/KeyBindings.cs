@@ -1,16 +1,34 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>A class that provides a collection of <see cref="KeyBinding"/> objects bound to a <see cref="Key"/>.</summary>
+/// <summary>Provides a collection of <see cref="KeyBinding"/> objects bound to a <see cref="Key"/>.</summary>
 public class KeyBindings
 {
+    /// <summary>
+    ///     Initializes a new instance. This constructor is used when the <see cref="KeyBindings"/> are not bound to a
+    ///     <see cref="View"/>, such as in unit tests.
+    /// </summary>
+    public KeyBindings () { }
+
+    /// <summary>Initializes a new instance bound to <paramref name="boundView"/>.</summary>
+    public KeyBindings (View boundView) { BoundView = boundView; }
+
+    /// <summary>
+    ///     The view that the <see cref="KeyBindings"/> are bound to.
+    /// </summary>
+    public View BoundView { get; }
+
     // TODO: Add a dictionary comparer that ignores Scope
+    // TODO: This should not be public!
     /// <summary>The collection of <see cref="KeyBinding"/> objects.</summary>
     public Dictionary<Key, KeyBinding> Bindings { get; } = new ();
 
     /// <summary>Adds a <see cref="KeyBinding"/> to the collection.</summary>
     /// <param name="key"></param>
     /// <param name="binding"></param>
-    public void Add (Key key, KeyBinding binding) { Bindings.Add (key, binding); }
+    public void Add (Key key, KeyBinding binding)
+    {
+        Bindings.Add (key, binding);
+    }
 
     /// <summary>
     ///     <para>Adds a new key combination that will trigger the commands in <paramref name="commands"/>.</para>
@@ -49,7 +67,11 @@ public class KeyBindings
         }
         else
         {
-            Bindings.Add (key, new (commands, scope));
+            Add (key, new KeyBinding (commands, scope));
+            if (scope.HasFlag (KeyBindingScope.Application))
+            {
+                Application.AddKeyBinding (key, BoundView);
+            }
         }
     }
 
@@ -80,7 +102,12 @@ public class KeyBindings
     public void Add (Key key, params Command [] commands) { Add (key, KeyBindingScope.Focused, commands); }
 
     /// <summary>Removes all <see cref="KeyBinding"/> objects from the collection.</summary>
-    public void Clear () { Bindings.Clear (); }
+    public void Clear ()
+    {
+        Application.RemoveAllKeyBindings (BoundView);
+
+        Bindings.Clear ();
+    }
 
     /// <summary>
     ///     Removes all key bindings that trigger the given command set. Views can have multiple different keys bound to
@@ -95,7 +122,7 @@ public class KeyBindings
 
         foreach (KeyValuePair<Key, KeyBinding> kvp in kvps)
         {
-            Bindings.Remove (kvp.Key);
+            Remove (kvp.Key);
         }
     }
 
@@ -135,7 +162,11 @@ public class KeyBindings
 
     /// <summary>Removes a <see cref="KeyBinding"/> from the collection.</summary>
     /// <param name="key"></param>
-    public void Remove (Key key) { Bindings.Remove (key); }
+    public void Remove (Key key)
+    {
+        Bindings.Remove (key);
+        Application.RemoveKeyBinding (key, BoundView);
+    }
 
     /// <summary>Replaces a key combination already bound to a set of <see cref="Command"/>s.</summary>
     /// <remarks></remarks>
@@ -149,8 +180,8 @@ public class KeyBindings
         }
 
         KeyBinding value = Bindings [fromKey];
-        Bindings.Remove (fromKey);
-        Bindings [toKey] = value;
+        Remove (fromKey);
+        Add (toKey, value);
     }
 
     /// <summary>Gets the commands bound with the specified Key.</summary>
