@@ -25,8 +25,8 @@ public class CheckBox : View
         CanFocus = true;
 
         // Things this view knows how to do
-        AddCommand (Command.Accept, OnToggled);
-        AddCommand (Command.HotKey, OnToggled);
+        AddCommand (Command.Accept, ctx => OnToggled ());
+        AddCommand (Command.HotKey, ctx => OnToggled ());
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.Accept);
