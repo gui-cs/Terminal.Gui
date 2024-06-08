@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using Xunit.Abstractions;
 
@@ -39,9 +40,6 @@ public class ScenarioTests : TestsAllViews
         // Press QuitKey 
         Assert.Empty (FakeConsole.MockKeyPresses);
 
-        // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-        // by adding this Space it seems to work.
-        //FakeConsole.PushMockKeyPress (Key.Space);
         FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
         uint abortTime = 500;
@@ -69,6 +67,7 @@ public class ScenarioTests : TestsAllViews
                                      // Press QuitKey 
                                      Assert.Empty (FakeConsole.MockKeyPresses);
                                      FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
+
                                      //output.WriteLine ($"  iteration {++iterations}");
                                      if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
                                      {
@@ -417,15 +416,27 @@ public class ScenarioTests : TestsAllViews
         {
             var x = view.X.ToString ();
             var y = view.Y.ToString ();
-            _xRadioGroup.SelectedItem = posNames.IndexOf (posNames.Where (s => x.Contains (s)).First ());
-            _yRadioGroup.SelectedItem = posNames.IndexOf (posNames.Where (s => y.Contains (s)).First ());
+
+            try
+            {
+                _xRadioGroup.SelectedItem = posNames.IndexOf (posNames.First (s => x.Contains (s)));
+                _yRadioGroup.SelectedItem = posNames.IndexOf (posNames.First (s => y.Contains (s)));
+            }
+            catch (InvalidOperationException e)
+            {
+                // This is a hack to work around the fact that the Pos enum doesn't have an "Align" value yet
+                Debug.WriteLine ($"{e}");
+            }
+
             _xText.Text = $"{view.Frame.X}";
             _yText.Text = $"{view.Frame.Y}";
 
             var w = view.Width.ToString ();
             var h = view.Height.ToString ();
-            _wRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.Where (s => w.Contains (s)).First ());
-            _hRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.Where (s => h.Contains (s)).First ());
+
+            _wRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.First (s => w.Contains (s)));
+            _hRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.First (s => h.Contains (s)));
+
             _wText.Text = $"{view.Frame.Width}";
             _hText.Text = $"{view.Frame.Height}";
         }

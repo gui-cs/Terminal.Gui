@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Terminal.Gui;
@@ -516,15 +517,25 @@ public class AllViewsTester : Scenario
 
         var x = view.X.ToString ();
         var y = view.Y.ToString ();
-        _xRadioGroup.SelectedItem = _posNames.IndexOf (_posNames.Where (s => x.Contains (s)).First ());
-        _yRadioGroup.SelectedItem = _posNames.IndexOf (_posNames.Where (s => y.Contains (s)).First ());
+
+        try
+        {
+            _xRadioGroup.SelectedItem = _posNames.IndexOf (_posNames.First (s => x.Contains (s)));
+            _yRadioGroup.SelectedItem = _posNames.IndexOf (_posNames.First (s => y.Contains (s)));
+        }
+        catch (InvalidOperationException e)
+        {
+            // This is a hack to work around the fact that the Pos enum doesn't have an "Align" value yet
+            Debug.WriteLine($"{e}");
+        }
+
         _xText.Text = $"{view.Frame.X}";
         _yText.Text = $"{view.Frame.Y}";
 
         var w = view.Width.ToString ();
         var h = view.Height.ToString ();
-        _wRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.Where (s => w.Contains (s)).First ());
-        _hRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.Where (s => h.Contains (s)).First ());
+        _wRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => w.Contains (s)));
+        _hRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => h.Contains (s)));
 
         if (view.Width is DimAuto)
         {
