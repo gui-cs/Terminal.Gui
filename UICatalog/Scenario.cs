@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Terminal.Gui;
 
@@ -97,7 +98,7 @@ public class Scenario : IDisposable
     ///     <see cref="ScenarioMetadata.Name"/>.
     ///     https://stackoverflow.com/questions/5411694/get-all-inherited-classes-of-an-abstract-class
     /// </summary>
-    public static List<Scenario> GetScenarios ()
+    public static ObservableCollection<Scenario> GetScenarios ()
     {
         List<Scenario> objects = new ();
 
@@ -113,7 +114,7 @@ public class Scenario : IDisposable
             _maxScenarioNameLen = Math.Max (_maxScenarioNameLen, scenario.GetName ().Length + 1);
         }
 
-        return objects.OrderBy (s => s.GetName ()).ToList ();
+        return new (objects.OrderBy (s => s.GetName ()).ToList ());
     }
 
     /// <summary>
@@ -239,24 +240,26 @@ public class Scenario : IDisposable
     #endregion IDispose
 
     /// <summary>Returns a list of all Categories set by all of the <see cref="Scenario"/>s defined in the project.</summary>
-    internal static List<string> GetAllCategories ()
+    internal static ObservableCollection<string> GetAllCategories ()
     {
-        List<string> categories = new ();
+        List<string> aCategories = [];
 
-        categories = typeof (Scenario).Assembly.GetTypes ()
-                                      .Where (
-                                              myType => myType.IsClass
-                                                        && !myType.IsAbstract
-                                                        && myType.IsSubclassOf (typeof (Scenario)))
-                                      .Select (type => System.Attribute.GetCustomAttributes (type).ToList ())
-                                      .Aggregate (
-                                                  categories,
-                                                  (current, attrs) => current
-                                                                      .Union (attrs.Where (a => a is ScenarioCategory).Select (a => ((ScenarioCategory)a).Name))
-                                                                      .ToList ());
+        aCategories = typeof (Scenario).Assembly.GetTypes ()
+                                       .Where (
+                                               myType => myType.IsClass
+                                                         && !myType.IsAbstract
+                                                         && myType.IsSubclassOf (typeof (Scenario)))
+                                       .Select (type => System.Attribute.GetCustomAttributes (type).ToList ())
+                                       .Aggregate (
+                                                   aCategories,
+                                                   (current, attrs) => current
+                                                                       .Union (
+                                                                               attrs.Where (a => a is ScenarioCategory)
+                                                                                    .Select (a => ((ScenarioCategory)a).Name))
+                                                                       .ToList ());
 
         // Sort
-        categories = categories.OrderBy (c => c).ToList ();
+        ObservableCollection<string> categories = new (aCategories.OrderBy (c => c).ToList ());
 
         // Put "All" at the top
         categories.Insert (0, "All Scenarios");
@@ -264,7 +267,7 @@ public class Scenario : IDisposable
         return categories;
     }
 
-    /// <summary>Defines the category names used to catagorize a <see cref="Scenario"/></summary>
+    /// <summary>Defines the category names used to categorize a <see cref="Scenario"/></summary>
     [AttributeUsage (AttributeTargets.Class, AllowMultiple = true)]
     public class ScenarioCategory (string Name) : System.Attribute
     {

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -9,8 +9,8 @@ public class Keys : Scenario
 {
     public override void Setup ()
     {
-        List<string> keyPressedList = new ();
-        List<string> invokingKeyBindingsList = new ();
+        ObservableCollection<string> keyPressedList = [];
+        ObservableCollection<string> invokingKeyBindingsList = new ();
 
         var editLabel = new Label { X = 0, Y = 0, Text = "Type text here:" };
         Win.Add (editLabel);
@@ -57,7 +57,7 @@ public class Keys : Scenario
         Win.Add (keyLogLabel);
         int maxKeyString = Key.CursorRight.WithAlt.WithCtrl.WithShift.ToString ().Length;
         var yOffset = 1;
-        List<string> keyEventlist = new ();
+        ObservableCollection<string> keyEventlist = new ();
 
         var keyEventListView = new ListView
         {
@@ -65,7 +65,7 @@ public class Keys : Scenario
             Y = Pos.Top (keyLogLabel) + yOffset,
             Width = "Key Down:".Length + maxKeyString,
             Height = Dim.Fill (),
-            Source = new ListWrapper (keyEventlist)
+            Source = new ListWrapper<string> (keyEventlist)
         };
         keyEventListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         Win.Add (keyEventListView);
@@ -85,7 +85,7 @@ public class Keys : Scenario
             Y = Pos.Top (onKeyPressedLabel) + yOffset,
             Width = maxKeyString,
             Height = Dim.Fill (),
-            Source = new ListWrapper (keyPressedList)
+            Source = new ListWrapper<string> (keyPressedList)
         };
         onKeyPressedListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         Win.Add (onKeyPressedListView);
@@ -105,7 +105,7 @@ public class Keys : Scenario
             Y = Pos.Top (onInvokingKeyBindingsLabel) + yOffset,
             Width = Dim.Fill (1),
             Height = Dim.Fill (),
-            Source = new ListWrapper (invokingKeyBindingsList)
+            Source = new ListWrapper<string> (invokingKeyBindingsList)
         };
         onInvokingKeyBindingsListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         Win.Add (onInvokingKeyBindingsListView);

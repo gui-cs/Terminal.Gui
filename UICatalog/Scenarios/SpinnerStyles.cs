@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Terminal.Gui;
 
@@ -116,7 +117,7 @@ public class SpinnerViewStyles : Scenario
         {
             X = Pos.Center (), Y = Pos.Bottom (preview) + 2, Height = Dim.Fill (), Width = Dim.Fill (1)
         };
-        styles.SetSource (styleArray);
+        styles.SetSource (new ObservableCollection<string> (styleArray));
         styles.SelectedItem = 0; // SpinnerStyle.Custom;
         app.Add (styles);
         SetCustom ();
