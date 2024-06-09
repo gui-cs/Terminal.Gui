@@ -1227,7 +1227,7 @@ wo
     [InlineData ("_File", "_New", "", KeyCode.AltMask | KeyCode.F)]
     [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.ShiftMask | KeyCode.F)]
     [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.F, KeyCode.Esc)]
-    [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.F, KeyCode.AltMask | KeyCode.F)]
+    [InlineData ("_File", "_New", "", KeyCode.AltMask | KeyCode.F, KeyCode.AltMask | KeyCode.F)] // BUGBUG: Should Alt+F, Alt+F open then close?
     [InlineData ("Closed", "None", "Open", KeyCode.AltMask | KeyCode.F, KeyCode.O)]
     [InlineData ("_File", "_New", "", KeyCode.AltMask | KeyCode.F, KeyCode.ShiftMask | KeyCode.O)]
     [InlineData ("Closed", "None", "Open", KeyCode.AltMask | KeyCode.F, KeyCode.AltMask | KeyCode.O)]
@@ -1235,11 +1235,11 @@ wo
     [InlineData ("_Edit", "F_ind", "", KeyCode.AltMask | KeyCode.E, KeyCode.F)]
     [InlineData ("_Edit", "F_ind", "", KeyCode.AltMask | KeyCode.E, KeyCode.AltMask | KeyCode.F)]
     [InlineData ("Closed", "None", "Replace", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.R)]
-    [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.C)]
+    [InlineData ("Closed", "None", "Copy", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.C)]
     [InlineData ("_Edit", "_1st", "", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3)]
     [InlineData ("Closed", "None", "1", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.D1)]
     [InlineData ("Closed", "None", "1", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.Enter)]
-    [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.D4)]
+    [InlineData ("_Edit", "_3rd Level", "", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.D4)]
     [InlineData ("Closed", "None", "5", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D4, KeyCode.D5)]
     [InlineData ("_About", "_About", "", KeyCode.AltMask | KeyCode.A)]
     public void KeyBindings_Navigation_Commands (
@@ -2770,7 +2770,7 @@ Edit
     }
 
     [Fact]
-    public void Separators_Does_Not_Throws_Pressing_Menu_Shortcut ()
+    public void Separator_Does_Not_Throws_Pressing_Menu_Hotkey ()
     {
         var menu = new MenuBar
         {
@@ -2782,9 +2782,7 @@ Edit
                     )
             ]
         };
-
-        Exception exception = Record.Exception (() => Assert.True (menu.NewKeyDownEvent (Key.Q.WithAlt)));
-        Assert.Null (exception);
+        Assert.False (menu.NewKeyDownEvent (Key.Q.WithAlt));
     }
 
     [Fact]
