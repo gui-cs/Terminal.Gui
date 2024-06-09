@@ -13,15 +13,23 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Menus")]
 public class DynamicMenuBar : Scenario
 {
-    public override void Init ()
+    public override void Main ()
     {
+        // Init
         Application.Init ();
 
-        Top = new ();
+        // Setup - Create a top-level application window and configure it.
+        DynamicMenuBarSample appWindow = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
 
-        Top.Add (
-                 new DynamicMenuBarSample { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" }
-                );
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
     }
 
     public class Binding
@@ -106,31 +114,31 @@ public class DynamicMenuBar : Scenario
             var _lblTitle = new Label { Y = 1, Text = "Title:" };
             Add (_lblTitle);
 
-            TextTitle = new() { X = Pos.Right (_lblTitle) + 2, Y = Pos.Top (_lblTitle), Width = Dim.Fill () };
+            TextTitle = new () { X = Pos.Right (_lblTitle) + 2, Y = Pos.Top (_lblTitle), Width = Dim.Fill () };
             Add (TextTitle);
 
             var _lblHelp = new Label { X = Pos.Left (_lblTitle), Y = Pos.Bottom (_lblTitle) + 1, Text = "Help:" };
             Add (_lblHelp);
 
-            TextHelp = new() { X = Pos.Left (TextTitle), Y = Pos.Top (_lblHelp), Width = Dim.Fill () };
+            TextHelp = new () { X = Pos.Left (TextTitle), Y = Pos.Top (_lblHelp), Width = Dim.Fill () };
             Add (TextHelp);
 
             var _lblAction = new Label { X = Pos.Left (_lblTitle), Y = Pos.Bottom (_lblHelp) + 1, Text = "Action:" };
             Add (_lblAction);
 
-            TextAction = new()
+            TextAction = new ()
             {
                 X = Pos.Left (TextTitle), Y = Pos.Top (_lblAction), Width = Dim.Fill (), Height = 5
             };
             Add (TextAction);
 
-            CkbIsTopLevel = new()
+            CkbIsTopLevel = new ()
             {
                 X = Pos.Left (_lblTitle), Y = Pos.Bottom (_lblAction) + 5, Text = "IsTopLevel"
             };
             Add (CkbIsTopLevel);
 
-            CkbSubMenu = new()
+            CkbSubMenu = new ()
             {
                 X = Pos.Left (_lblTitle),
                 Y = Pos.Bottom (CkbIsTopLevel),
@@ -139,7 +147,7 @@ public class DynamicMenuBar : Scenario
             };
             Add (CkbSubMenu);
 
-            CkbNullCheck = new()
+            CkbNullCheck = new ()
             {
                 X = Pos.Left (_lblTitle), Y = Pos.Bottom (CkbSubMenu), Text = "Allow null checked"
             };
@@ -147,7 +155,7 @@ public class DynamicMenuBar : Scenario
 
             var _rChkLabels = new [] { "NoCheck", "Checked", "Radio" };
 
-            RbChkStyle = new()
+            RbChkStyle = new ()
             {
                 X = Pos.Left (_lblTitle), Y = Pos.Bottom (CkbSubMenu) + 1, RadioLabels = _rChkLabels
             };
@@ -159,7 +167,7 @@ public class DynamicMenuBar : Scenario
             };
             Add (_lblShortcut);
 
-            TextShortcut = new()
+            TextShortcut = new ()
             {
                 X = Pos.X (_lblShortcut), Y = Pos.Bottom (_lblShortcut), Width = Dim.Fill (), ReadOnly = true
             };
@@ -439,7 +447,9 @@ public class DynamicMenuBar : Scenario
                                     TextTitle.Text = string.Empty;
                                     Application.RequestStop ();
                                 };
-            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel], Height = Dim.Auto (DimAutoStyle.Content, 22, Driver.Rows) };
+
+            var dialog = new Dialog
+                { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel], Height = Dim.Auto (DimAutoStyle.Content, 22, Driver.Rows) };
 
             Width = Dim.Fill ();
             Height = Dim.Fill () - 1;
@@ -451,7 +461,7 @@ public class DynamicMenuBar : Scenario
 
             if (valid)
             {
-                return new()
+                return new ()
                 {
                     Title = TextTitle.Text,
                     Help = TextHelp.Text,
@@ -649,7 +659,7 @@ public class DynamicMenuBar : Scenario
             };
             _frmMenu.Add (_btnPreviowsParent);
 
-            _lstMenus = new()
+            _lstMenus = new ()
             {
                 ColorScheme = Colors.ColorSchemes ["Dialog"],
                 X = Pos.Right (_btnPrevious) + 1,
@@ -746,7 +756,7 @@ public class DynamicMenuBar : Scenario
                                          DataContext.Menus [i] = DataContext.Menus [i - 1];
 
                                          DataContext.Menus [i - 1] =
-                                             new() { Title = menuItem.Title, MenuItem = menuItem };
+                                             new () { Title = menuItem.Title, MenuItem = menuItem };
                                          _lstMenus.SelectedItem = i - 1;
                                      }
                                  }
@@ -768,7 +778,7 @@ public class DynamicMenuBar : Scenario
                                            DataContext.Menus [i] = DataContext.Menus [i + 1];
 
                                            DataContext.Menus [i + 1] =
-                                               new() { Title = menuItem.Title, MenuItem = menuItem };
+                                               new () { Title = menuItem.Title, MenuItem = menuItem };
                                            _lstMenus.SelectedItem = i + 1;
                                        }
                                    }
@@ -894,7 +904,7 @@ public class DynamicMenuBar : Scenario
                                           menuBarItem.Children = childrens;
                                       }
 
-                                      DataContext.Menus.Add (new() { Title = newMenu.Title, MenuItem = newMenu });
+                                      DataContext.Menus.Add (new () { Title = newMenu.Title, MenuItem = newMenu });
                                       _lstMenus.MoveDown ();
                                   }
                               };
@@ -937,7 +947,7 @@ public class DynamicMenuBar : Scenario
                                                                             _currentMenuBarItem.Help,
                                                                             _frmMenuDetails.CreateAction (
                                                                                                           _currentEditMenuBarItem,
-                                                                                                          new()
+                                                                                                          new ()
                                                                                                           {
                                                                                                               Title = _currentEditMenuBarItem
                                                                                                                   .Title
@@ -1108,7 +1118,7 @@ public class DynamicMenuBar : Scenario
             SetFrameDetails ();
 
             var ustringConverter = new UStringValueConverter ();
-            var listWrapperConverter = new ListWrapperConverter<DynamicMenuItemList> ();
+            ListWrapperConverter<DynamicMenuItemList> listWrapperConverter = new ListWrapperConverter<DynamicMenuItemList> ();
 
             var lblMenuBar = new Binding (this, "MenuBar", _lblMenuBar, "Text", ustringConverter);
             var lblParent = new Binding (this, "Parent", _lblParent, "Text", ustringConverter);
@@ -1297,7 +1307,7 @@ public class DynamicMenuBar : Scenario
                     if (DataContext.Menus.Count == 0)
                     {
                         DataContext.Menus.Add (
-                                               new()
+                                               new ()
                                                {
                                                    Title = _currentEditMenuBarItem.Title, MenuItem = _currentEditMenuBarItem
                                                }
@@ -1305,7 +1315,7 @@ public class DynamicMenuBar : Scenario
                     }
 
                     DataContext.Menus [index] =
-                        new()
+                        new ()
                         {
                             Title = _currentEditMenuBarItem.Title, MenuItem = _currentEditMenuBarItem
                         };

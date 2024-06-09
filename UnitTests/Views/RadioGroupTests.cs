@@ -14,12 +14,12 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (Rectangle.Empty, rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
-        rg = new() { RadioLabels = new [] { "Test" } };
+        rg = new () { RadioLabels = new [] { "Test" } };
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
         Assert.Equal (0, rg.SelectedItem);
 
-        rg = new()
+        rg = new ()
         {
             X = 1,
             Y = 2,
@@ -32,7 +32,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (new (1, 2, 20, 5), rg.Frame);
         Assert.Equal (0, rg.SelectedItem);
 
-        rg = new() { X = 1, Y = 2, RadioLabels = new [] { "Test" } };
+        rg = new () { X = 1, Y = 2, RadioLabels = new [] { "Test" } };
 
         var view = new View { Width = 30, Height = 40 };
         view.Add (rg);
@@ -131,6 +131,51 @@ public class RadioGroupTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void HotKey_For_View_SetsFocus ()
+    {
+        var superView = new View
+        {
+            CanFocus = true
+        };
+        superView.Add (new View { CanFocus = true });
+
+        var group = new RadioGroup
+        {
+            Title = "Radio_Group",
+            RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" }
+        };
+        superView.Add (group);
+
+        Assert.False (group.HasFocus);
+        Assert.Equal (0, group.SelectedItem);
+
+        group.NewKeyDownEvent (Key.G.WithAlt);
+
+        Assert.Equal (0, group.SelectedItem);
+        Assert.True (group.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_For_Item_SetsFocus ()
+    {
+        var superView = new View
+        {
+            CanFocus = true
+        };
+        superView.Add (new View { CanFocus = true });
+        var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+        superView.Add (group);
+
+        Assert.False (group.HasFocus);
+        Assert.Equal (0, group.SelectedItem);
+
+        group.NewKeyDownEvent (Key.R);
+
+        Assert.Equal (1, group.SelectedItem);
+        Assert.True (group.HasFocus);
+    }
+
+    [Fact]
     public void HotKey_Command_Does_Not_Accept ()
     {
         var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
@@ -184,12 +229,8 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         var expected = @$"
 ┌────────────────────────────┐
-│{
-    CM.Glyphs.Selected
-} Test                      │
-│{
-    CM.Glyphs.UnSelected
-} New Test 你               │
+│{CM.Glyphs.Selected} Test                      │
+│{CM.Glyphs.UnSelected} New Test 你               │
 │                            │
 └────────────────────────────┘
 ";
@@ -209,11 +250,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         expected = @$"
 ┌────────────────────────────┐
-│{
-    CM.Glyphs.Selected
-} Test  {
-    CM.Glyphs.UnSelected
-} New Test 你       │
+│{CM.Glyphs.Selected} Test  {CM.Glyphs.UnSelected} New Test 你       │
 │                            │
 │                            │
 └────────────────────────────┘
@@ -234,11 +271,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         expected = @$"
 ┌────────────────────────────┐
-│{
-    CM.Glyphs.Selected
-} Test    {
-    CM.Glyphs.UnSelected
-} New Test 你     │
+│{CM.Glyphs.Selected} Test    {CM.Glyphs.UnSelected} New Test 你     │
 │                            │
 │                            │
 └────────────────────────────┘

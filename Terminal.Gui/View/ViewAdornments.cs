@@ -2,7 +2,10 @@
 
 public partial class View
 {
-    private void CreateAdornments ()
+    /// <summary>
+    ///    Initializes the Adornments of the View. Called by the constructor.
+    /// </summary>
+    private void SetupAdornments ()
     {
         //// TODO: Move this to Adornment as a static factory method
         if (this is not Adornment)

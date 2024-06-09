@@ -1,64 +1,6 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     <see cref="StatusItem"/> objects are contained by <see cref="StatusBar"/> <see cref="View"/>s. Each
-///     <see cref="StatusItem"/> has a title, a shortcut (hotkey), and an <see cref="Command"/> that will be invoked when
-///     the <see cref="StatusItem.Shortcut"/> is pressed. The <see cref="StatusItem.Shortcut"/> will be a global hotkey for
-///     the application in the current context of the screen. The color of the <see cref="StatusItem.Title"/> will be
-///     changed after each ~. A <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using
-///     <see cref="ColorScheme.HotNormal"/> and *Help* as <see cref="ColorScheme.HotNormal"/>.
-/// </summary>
-public class StatusItem
-{
-    /// <summary>Initializes a new <see cref="StatusItem"/>.</summary>
-    /// <param name="shortcut">Shortcut to activate the <see cref="StatusItem"/>.</param>
-    /// <param name="title">Title for the <see cref="StatusItem"/>.</param>
-    /// <param name="action">Action to invoke when the <see cref="StatusItem"/> is activated.</param>
-    /// <param name="canExecute">Function to determine if the action can currently be executed.</param>
-    public StatusItem (Key shortcut, string title, Action action, Func<bool> canExecute = null)
-    {
-        Title = title ?? "";
-        Shortcut = shortcut;
-        Action = action;
-        CanExecute = canExecute;
-    }
-
-    /// <summary>Gets or sets the action to be invoked when the statusbar item is triggered</summary>
-    /// <value>Action to invoke.</value>
-    public Action Action { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the action to be invoked to determine if the <see cref="StatusItem"/> can be triggered. If
-    ///     <see cref="CanExecute"/> returns <see langword="true"/> the status item will be enabled. Otherwise, it will be
-    ///     disabled.
-    /// </summary>
-    /// <value>Function to determine if the action is can be executed or not.</value>
-    public Func<bool> CanExecute { get; set; }
-
-    /// <summary>Gets or sets arbitrary data for the status item.</summary>
-    /// <remarks>This property is not used internally.</remarks>
-    public object Data { get; set; }
-
-    /// <summary>Gets the global shortcut to invoke the action on the menu.</summary>
-    public Key Shortcut { get; set; }
-
-    /// <summary>Gets or sets the title.</summary>
-    /// <value>The title.</value>
-    /// <remarks>
-    ///     The colour of the <see cref="StatusItem.Title"/> will be changed after each ~. A
-    ///     <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using <see cref="ColorScheme.HotNormal"/> and
-    ///     *Help* as <see cref="ColorScheme.HotNormal"/>.
-    /// </remarks>
-    public string Title { get; set; }
-
-    /// <summary>
-    ///     Returns <see langword="true"/> if the status item is enabled. This method is a wrapper around
-    ///     <see cref="CanExecute"/>.
-    /// </summary>
-    public bool IsEnabled () { return CanExecute?.Invoke () ?? true; }
-}
-
-/// <summary>
 ///     A status bar is a <see cref="View"/> that snaps to the bottom of a <see cref="Toplevel"/> displaying set of
 ///     <see cref="StatusItem"/>s. The <see cref="StatusBar"/> should be context sensitive. This means, if the main menu
 ///     and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog
@@ -69,8 +11,7 @@ public class StatusBar : View
 {
     private static Rune _shortcutDelimiter = (Rune)'=';
 
-    private StatusItem [] _items = { };
-    private StatusItem _itemToInvoke;
+    private StatusItem [] _items = [];
 
     /// <summary>Initializes a new instance of the <see cref="StatusBar"/> class.</summary>
     public StatusBar () : this (new StatusItem [] { }) { }
@@ -91,10 +32,11 @@ public class StatusBar : View
         CanFocus = false;
         ColorScheme = Colors.ColorSchemes ["Menu"];
         X = 0;
-        Y = Pos.AnchorEnd (1);
+        Y = Pos.AnchorEnd ();
         Width = Dim.Fill ();
         Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == GetContentSize ().
-        AddCommand (Command.Accept, InvokeItem);
+
+        AddCommand (Command.Accept, ctx => InvokeItem ((StatusItem)ctx.KeyBinding?.Context));
     }
 
     /// <summary>The items that compose the <see cref="StatusBar"/></summary>
@@ -110,9 +52,10 @@ public class StatusBar : View
 
             _items = value;
 
-            foreach (StatusItem item in _items)
+            foreach (StatusItem item in _items.Where (i => i.Shortcut != Key.Empty))
             {
-                KeyBindings.Add (item.Shortcut, KeyBindingScope.HotKey, Command.Accept);
+                KeyBinding keyBinding = new (new [] { Command.Accept }, KeyBindingScope.HotKey, item);
+                KeyBindings.Add (item.Shortcut, keyBinding);
             }
         }
     }
@@ -142,7 +85,7 @@ public class StatusBar : View
     }
 
     ///<inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (me.Flags != MouseFlags.Button1Clicked)
         {
@@ -215,32 +158,6 @@ public class StatusBar : View
         }
     }
 
-    /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key keyEvent)
-    {
-        // This is a bit of a hack. We want to handle the key bindings for status bar but
-        // InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
-        // So before we call the base class we set SelectedItem appropriately.
-        Key key = new (keyEvent);
-
-        if (KeyBindings.TryGet (key, out _))
-        {
-            // Search RadioLabels 
-            foreach (StatusItem item in Items)
-            {
-                if (item.Shortcut == key)
-                {
-                    _itemToInvoke = item;
-                    //keyEvent.Scope = KeyBindingScope.HotKey;
-
-                    break;
-                }
-            }
-        }
-
-        return base.OnInvokingKeyBindings (keyEvent);
-    }
-
     /// <summary>Removes a <see cref="StatusItem"/> at specified index of <see cref="Items"/>.</summary>
     /// <param name="index">The zero-based index of the item to remove.</param>
     /// <returns>The <see cref="StatusItem"/> removed.</returns>
@@ -287,11 +204,11 @@ public class StatusBar : View
         return len;
     }
 
-    private bool? InvokeItem ()
+    private bool? InvokeItem (StatusItem itemToInvoke)
     {
-        if (_itemToInvoke is { Action: { } })
+        if (itemToInvoke is { Action: { } })
         {
-            _itemToInvoke.Action.Invoke ();
+            itemToInvoke.Action.Invoke ();
 
             return true;
         }
