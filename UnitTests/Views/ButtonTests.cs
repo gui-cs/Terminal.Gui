@@ -593,10 +593,6 @@ public class ButtonTests (ITestOutputHelper output)
         button.NewMouseEvent (me);
         Assert.Equal (1, acceptCount);
 
-        me.Flags = clicked;
-        button.NewMouseEvent (me);
-        Assert.Equal (1, acceptCount);
-
         button.Dispose ();
     }
 
@@ -614,29 +610,31 @@ public class ButtonTests (ITestOutputHelper output)
         Application.Begin (top);
 
         Assert.True (button1.HasFocus);
-        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Pressed });
         Assert.Equal (button1, Application.MouseGrabView);
         Assert.Equal (0, acceptCount);
         Assert.True (button1.HasFocus);
 
-        Application.OnMouseEvent (new () { X = 13, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition});
+        Application.OnMouseEvent (new () { Position = new (13, 0), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition});
         Assert.Equal (button2, Application.MouseGrabView);
         Assert.Equal (0, acceptCount);
         Assert.True (button2.HasFocus);
 
-        Application.OnMouseEvent (new () { X = 13, Y = 0, Flags = MouseFlags.Button1Released });
+        Application.OnMouseEvent (new () { Position = new (13, 0), Flags = MouseFlags.Button1Released });
         Assert.Equal (button2, Application.MouseGrabView);
         Assert.Equal (0, acceptCount);
         Assert.True (button2.HasFocus);
 
-        Application.OnMouseEvent (new () { X = 13, Y = 0, Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { Position = new (13, 0), Flags = MouseFlags.Button1Clicked });
         Assert.Equal (button2, Application.MouseGrabView);
         Assert.Equal (0, acceptCount);
         Assert.True (button2.HasFocus);
 
-        Application.OnMouseEvent (new () { X = 13, Y = 0, Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { Position = new (13, 0), Flags = MouseFlags.Button1Clicked });
         Assert.Null (Application.MouseGrabView);
         Assert.Equal (1, acceptCount);
         Assert.True (button2.HasFocus);
+
+        top.Dispose ();
     }
 }

@@ -1617,7 +1617,7 @@ public static partial class Application
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.Position,
-                View = MouseGrabView
+                View = MouseGrabView,
                 IsMouseDown = _isMouseDown
             };
 
@@ -1679,7 +1679,7 @@ public static partial class Application
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.Position,
-                View = view
+                View = view,
                 IsMouseDown = _isMouseDown
             };
         }
@@ -1692,7 +1692,7 @@ public static partial class Application
                 Position = viewportLocation,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.Position,
-                View = view
+                View = view,
                 IsMouseDown = _isMouseDown
             };
         }

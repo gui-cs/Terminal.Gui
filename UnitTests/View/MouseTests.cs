@@ -671,25 +671,27 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         top.Add (view);
         Application.Begin (top);
 
-        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.WheeledDown });
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.WheeledDown });
         Assert.True (onMouseEvent);
 
-        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Pressed });
         Assert.True (onMouseDown);
 
-        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         Assert.True (onMouseMove);
 
-        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Released });
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Released });
         Assert.True (onMouseUp);
 
-        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (onMouseClick);
 
-        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked });
         Assert.True (onMouseDoubleClick);
 
-        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1TripleClicked });
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1TripleClicked });
         Assert.True (onMouseTripleClick);
+
+        top.Dispose ();
     }
 }
