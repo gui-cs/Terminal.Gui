@@ -15,13 +15,14 @@ public class MenuBarScenario : Scenario
     private Label _lastKey;
 
     /// <summary>
-    ///     This method creates at test menu bar. It is called by the MenuBar unit tests so it's possible to do both unit
+    ///     This method creates at test menu bar. It is called by the MenuBar unit tests, so it's possible to do both unit
     ///     testing and user-experience testing with the same setup.
     /// </summary>
     /// <param name="actionFn"></param>
     /// <returns></returns>
     public static MenuBar CreateTestMenu (Func<string, bool> actionFn)
     {
+        // TODO: add a disabled menu item to this
         var mb = new MenuBar
         {
             Menus =
@@ -195,48 +196,50 @@ public class MenuBarScenario : Scenario
         return mb;
     }
 
-    // Don't create a Window, just return the top-level view
-    public override void Init ()
+    public override void Main ()
     {
+        // Init
         Application.Init ();
-        Top = new ();
-        Top.ColorScheme = Colors.ColorSchemes ["Base"];
-    }
 
-    public override void Setup ()
-    {
+        // Setup - Create a top-level application window and configure it.
+        Window appWindow = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            BorderStyle = LineStyle.None
+        };
+
         MenuItem mbiCurrent = null;
         MenuItem miCurrent = null;
 
         var label = new Label { X = 0, Y = 10, Text = "Last Key: " };
-        Top.Add (label);
+        appWindow.Add (label);
 
         _lastKey = new Label { X = Pos.Right (label), Y = Pos.Top (label), Text = "" };
 
-        Top.Add (_lastKey);
+        appWindow.Add (_lastKey);
         label = new Label { X = 0, Y = Pos.Bottom (label), Text = "Current MenuBarItem: " };
-        Top.Add (label);
+        appWindow.Add (label);
 
         _currentMenuBarItem = new Label { X = Pos.Right (label), Y = Pos.Top (label), Text = "" };
-        Top.Add (_currentMenuBarItem);
+        appWindow.Add (_currentMenuBarItem);
 
         label = new Label { X = 0, Y = Pos.Bottom (label), Text = "Current MenuItem: " };
-        Top.Add (label);
+        appWindow.Add (label);
 
         _currentMenuItem = new Label { X = Pos.Right (label), Y = Pos.Top (label), Text = "" };
-        Top.Add (_currentMenuItem);
+        appWindow.Add (_currentMenuItem);
 
         label = new Label { X = 0, Y = Pos.Bottom (label), Text = "Last Action: " };
-        Top.Add (label);
+        appWindow.Add (label);
 
         _lastAction = new Label { X = Pos.Right (label), Y = Pos.Top (label), Text = "" };
-        Top.Add (_lastAction);
+        appWindow.Add (_lastAction);
 
         label = new Label { X = 0, Y = Pos.Bottom (label), Text = "Focused View: " };
-        Top.Add (label);
+        appWindow.Add (label);
 
         _focusedView = new Label { X = Pos.Right (label), Y = Pos.Top (label), Text = "" };
-        Top.Add (_focusedView);
+        appWindow.Add (_focusedView);
 
         MenuBar menuBar = CreateTestMenu (
                                           s =>
@@ -277,21 +280,28 @@ public class MenuBarScenario : Scenario
                                };
 
         // There's no focus change event, so this is a bit of a hack.
-        menuBar.LayoutComplete += (s, e) => { _focusedView.Text = Top.MostFocused?.ToString () ?? "None"; };
+        menuBar.LayoutComplete += (s, e) => { _focusedView.Text = appWindow.MostFocused?.ToString () ?? "None"; };
 
         var openBtn = new Button { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true };
         openBtn.Accept += (s, e) => { menuBar.OpenMenu (); };
-        Top.Add (openBtn);
+        appWindow.Add (openBtn);
 
         var hideBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (openBtn), Text = "Toggle Menu._Visible" };
         hideBtn.Accept += (s, e) => { menuBar.Visible = !menuBar.Visible; };
-        Top.Add (hideBtn);
+        appWindow.Add (hideBtn);
 
         var enableBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (hideBtn), Text = "_Toggle Menu.Enable" };
         enableBtn.Accept += (s, e) => { menuBar.Enabled = !menuBar.Enabled; };
-        Top.Add (enableBtn);
+        appWindow.Add (enableBtn);
 
-        Top.Add (menuBar);
+        appWindow.Add (menuBar);
+
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
     }
 
     private void SetCurrentMenuBarItem (MenuItem mbi) { _currentMenuBarItem.Text = mbi != null ? mbi.Title : "Closed"; }
