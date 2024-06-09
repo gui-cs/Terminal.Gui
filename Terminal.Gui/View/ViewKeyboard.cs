@@ -129,9 +129,10 @@ public partial class View
     /// </remarks>
     /// <param name="prevHotKey">The HotKey <paramref name="hotKey"/> is replacing. Key bindings for this key will be removed.</param>
     /// <param name="hotKey">The new HotKey. If <see cref="Key.Empty"/> <paramref name="prevHotKey"/> bindings will be removed.</param>
+    /// <param name="context">Arbitrary context that can be associated with this key binding.</param>
     /// <returns><see langword="true"/> if the HotKey bindings were added.</returns>
     /// <exception cref="ArgumentException"></exception>
-    public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey)
+    public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey, [CanBeNull] object context = null)
     {
         if (_hotKey == hotKey)
         {
@@ -194,15 +195,16 @@ public partial class View
         // Add the new 
         if (newKey != Key.Empty)
         {
+            KeyBinding keyBinding = new ([Command.HotKey], KeyBindingScope.HotKey, context);
             // Add the base and Alt key
-            KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.HotKey);
-            KeyBindings.Add (newKey.WithAlt, KeyBindingScope.HotKey, Command.HotKey);
+            KeyBindings.Add (newKey, keyBinding);
+            KeyBindings.Add (newKey.WithAlt, keyBinding);
 
             // If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
             if (newKey.IsKeyCodeAtoZ)
             {
-                KeyBindings.Add (newKey.WithShift, KeyBindingScope.HotKey, Command.HotKey);
-                KeyBindings.Add (newKey.WithShift.WithAlt, KeyBindingScope.HotKey, Command.HotKey);
+                KeyBindings.Add (newKey.WithShift, keyBinding);
+                KeyBindings.Add (newKey.WithShift.WithAlt, keyBinding);
             }
         }
 
