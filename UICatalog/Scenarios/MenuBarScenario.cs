@@ -5,7 +5,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("MenuBar", "Demonstrates the MenuBar using the same menu used in unit tests.")]
 [ScenarioCategory ("Controls")]
-[ScenarioCategory ("Menu")]
+[ScenarioCategory ("Menus")]
 public class MenuBarScenario : Scenario
 {
     private Label _currentMenuBarItem;
