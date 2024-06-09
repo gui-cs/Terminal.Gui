@@ -26,29 +26,29 @@ public class TileViewNesting : Scenario
         Win.Y = 1;
 
         var lblViews = new Label { Text = "Number Of Views:" };
-        _textField = new TextField { X = Pos.Right (lblViews), Width = 10, Text = "2" };
+        _textField = new() { X = Pos.Right (lblViews), Width = 10, Text = "2" };
 
         _textField.TextChanged += (s, e) => SetupTileView ();
 
-        _cbHorizontal = new CheckBox { X = Pos.Right (_textField) + 1, Text = "Horizontal" };
+        _cbHorizontal = new() { X = Pos.Right (_textField) + 1, Text = "Horizontal" };
         _cbHorizontal.Toggled += (s, e) => SetupTileView ();
 
-        _cbBorder = new CheckBox { X = Pos.Right (_cbHorizontal) + 1, Text = "Border" };
+        _cbBorder = new() { X = Pos.Right (_cbHorizontal) + 1, Text = "Border" };
         _cbBorder.Toggled += (s, e) => SetupTileView ();
 
-        _cbTitles = new CheckBox { X = Pos.Right (_cbBorder) + 1, Text = "Titles" };
+        _cbTitles = new() { X = Pos.Right (_cbBorder) + 1, Text = "Titles" };
         _cbTitles.Toggled += (s, e) => SetupTileView ();
 
-        _cbUseLabels = new CheckBox { X = Pos.Right (_cbTitles) + 1, Text = "Use Labels" };
+        _cbUseLabels = new() { X = Pos.Right (_cbTitles) + 1, Text = "Use Labels" };
         _cbUseLabels.Toggled += (s, e) => SetupTileView ();
 
-        _workArea = new View { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill () };
+        _workArea = new() { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill () };
 
         var menu = new MenuBar
         {
             Menus =
             [
-                new MenuBarItem ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
+                new ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
             ]
         };
 
@@ -99,7 +99,7 @@ public class TileViewNesting : Scenario
         {
             Width = Dim.Fill (),
             Height = 1,
-            AutoSize = false,
+
             Text = number.ToString ().Repeat (1000),
             CanFocus = true
         };

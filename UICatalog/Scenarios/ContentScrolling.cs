@@ -1,12 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
-using static UICatalog.Scenarios.Adornments;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Content Scrolling", "Demonstrates using View.Viewport and View.ContentSize to scroll content.")]
+[ScenarioMetadata ("Content Scrolling", "Demonstrates using View.Viewport and View.GetContentSize () to scroll content.")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Drawing")]
 [ScenarioCategory ("Scrolling")]
@@ -21,12 +20,14 @@ public class ContentScrolling : Scenario
             Width = Dim.Fill ();
             Height = Dim.Fill ();
             ColorScheme = Colors.ColorSchemes ["Base"];
-            Text = "Text (ScrollingDemoView.Text). This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
+
+            Text =
+                "Text (ScrollingDemoView.Text). This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
             CanFocus = true;
             BorderStyle = LineStyle.Rounded;
             Arrangement = ViewArrangement.Fixed;
 
-            ContentSize = new (60, 40);
+            SetContentSize (new (60, 40));
             ViewportSettings |= ViewportSettings.ClearContentOnly;
             ViewportSettings |= ViewportSettings.ClipContentOnly;
 
@@ -45,7 +46,7 @@ public class ContentScrolling : Scenario
 
             // Add a status label to the border that shows Viewport and ContentSize values. Bit of a hack.
             // TODO: Move to Padding with controls
-            Border.Add (new Label { AutoSize = false, X = 20 });
+            Border.Add (new Label { X = 20 });
             LayoutComplete += VirtualDemoView_LayoutComplete;
 
             MouseEvent += VirtualDemoView_MouseEvent;
@@ -86,7 +87,7 @@ public class ContentScrolling : Scenario
 
             if (status is { })
             {
-                status.Title = $"Frame: {Frame}\n\nViewport: {Viewport}, ContentSize = {ContentSize}";
+                status.Title = $"Frame: {Frame}\n\nViewport: {Viewport}, ContentSize = {GetContentSize ()}";
                 status.Width = Border.Frame.Width - status.Frame.X - Border.Thickness.Right;
                 status.Height = Border.Thickness.Top;
             }
@@ -104,17 +105,21 @@ public class ContentScrolling : Scenario
         Window app = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+
             // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
             ColorScheme = Colors.ColorSchemes ["Toplevel"]
         };
 
-        var editor = new AdornmentsEditor ();
+        var editor = new AdornmentsEditor
+        {
+            AutoSelectViewToEdit = true
+        };
         app.Add (editor);
 
         var view = new ScrollingDemoView
         {
             Title = "Demo View",
-            X = Pos.Right(editor),
+            X = Pos.Right (editor),
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
@@ -224,9 +229,9 @@ public class ContentScrolling : Scenario
             Y = Pos.Bottom (cbAllowYGreaterThanContentHeight)
         };
 
-        var contentSizeWidth = new Buttons.NumericUpDown<int>
+        Buttons.NumericUpDown<int> contentSizeWidth = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.Width,
+            Value = view.GetContentSize ().Width,
             X = Pos.Right (labelContentSize) + 1,
             Y = Pos.Top (labelContentSize)
         };
@@ -240,8 +245,8 @@ public class ContentScrolling : Scenario
 
                 return;
             }
-
-            view.ContentSize = view.ContentSize with { Width = e.NewValue };
+            // BUGBUG: set_ContentSize is supposed to be `protected`. 
+            view.SetContentSize (view.GetContentSize () with { Width = e.NewValue });
         }
 
         var labelComma = new Label
@@ -251,9 +256,9 @@ public class ContentScrolling : Scenario
             Y = Pos.Top (labelContentSize)
         };
 
-        var contentSizeHeight = new Buttons.NumericUpDown<int>
+        Buttons.NumericUpDown<int> contentSizeHeight = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.Height,
+            Value = view.GetContentSize ().Height,
             X = Pos.Right (labelComma) + 1,
             Y = Pos.Top (labelContentSize),
             CanFocus = false
@@ -268,8 +273,8 @@ public class ContentScrolling : Scenario
 
                 return;
             }
-
-            view.ContentSize = view.ContentSize with { Height = e.NewValue };
+            // BUGBUG: set_ContentSize is supposed to be `protected`. 
+            view.SetContentSize (view.GetContentSize () with { Height = e.NewValue });
         }
 
         var cbClearOnlyVisible = new CheckBox
@@ -351,8 +356,8 @@ public class ContentScrolling : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (textView) + 1,
-            Width = 30,
-            Height = 10
+            Width = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (() => view.GetContentSize ().Width)),
+            Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent (20)),
         };
 
         charMap.Accept += (s, e) =>
@@ -383,6 +388,20 @@ public class ContentScrolling : Scenario
         };
         longLabel.TextFormatter.WordWrap = true;
         view.Add (longLabel);
+
+        List<object> options = new () { "Option 1", "Option 2", "Option 3" };
+
+        Slider slider = new (options)
+        {
+            X = 0,
+            Y = Pos.Bottom (textField) + 1,
+            Orientation = Orientation.Vertical,
+            Type = SliderType.Multiple,
+            AllowEmpty = false,
+            BorderStyle = LineStyle.Double,
+            Title = "_Slider"
+        };
+        view.Add (slider);
 
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 

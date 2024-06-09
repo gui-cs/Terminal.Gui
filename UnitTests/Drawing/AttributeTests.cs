@@ -12,7 +12,6 @@ public class AttributeTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void ColorAndColorNamesConstructor ()
     {
         // Arrange & Act
@@ -26,7 +25,6 @@ public class AttributeTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void ColorConstructor ()
     {
         // Arrange & Act
@@ -143,11 +141,8 @@ public class AttributeTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Equals_Initialized ()
     {
-        Assert.NotNull (Application.Driver);
-
         var attr1 = new Attribute (Color.Red, Color.Green);
         var attr2 = new Attribute (Color.Red, Color.Green);
 
@@ -324,7 +319,6 @@ public class AttributeTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void NotEquals_Initialized ()
     {
         var attr1 = new Attribute (Color.Red, Color.Green);

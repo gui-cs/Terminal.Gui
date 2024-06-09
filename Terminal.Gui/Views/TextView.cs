@@ -243,7 +243,7 @@ internal class TextModel
 
         foreach (Rune rune in str.EnumerateRunes ())
         {
-            cells.Add (new() { Rune = rune, ColorScheme = colorScheme });
+            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
         }
 
         return cells;
@@ -680,6 +680,14 @@ internal class TextModel
         return (size, len);
     }
 
+    internal Size GetDisplaySize ()
+    {
+        Size size = Size.Empty;
+
+
+        return size;
+    }
+
     internal (Point current, bool found) FindNextText (
         string text,
         out bool gaveFullTurn,
@@ -906,7 +914,7 @@ internal class TextModel
 
         foreach (Rune rune in str.ToRunes ())
         {
-            cells.Add (new() { Rune = rune, ColorScheme = colorScheme });
+            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
         }
 
         return cells;
@@ -918,7 +926,7 @@ internal class TextModel
 
         foreach (Rune rune in runes)
         {
-            cells.Add (new() { Rune = rune, ColorScheme = colorScheme });
+            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
         }
 
         return cells;
@@ -1776,7 +1784,7 @@ internal class WordWrapManager
                                                             TextFormatter.Format (
                                                                                   TextModel.ToString (line),
                                                                                   width,
-                                                                                  TextAlignment.Left,
+                                                                                  Alignment.Start,
                                                                                   true,
                                                                                   preserveTrailingSpaces,
                                                                                   tabWidth
@@ -1979,9 +1987,6 @@ public class TextView : View
     private WordWrapManager? _wrapManager;
     private bool _wrapNeeded;
 
-    /// <summary>Get or sets the cursor to be used when the text view has focus.</summary>
-
-    public CursorVisibility DesiredCursorVisibility { get; set; } = CursorVisibility.Default;
 
     /// <summary>
     ///     Initializes a <see cref="TextView"/> on the specified area, with dimensions controlled with the X, Y, Width
@@ -1990,6 +1995,7 @@ public class TextView : View
     public TextView ()
     {
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
         Used = true;
 
         _model.LinesLoaded += Model_LinesLoaded!;
@@ -2512,7 +2518,7 @@ public class TextView : View
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        ContextMenu = new() { MenuItems = BuildContextMenuBarItem () };
+        ContextMenu = new () { MenuItems = BuildContextMenuBarItem () };
         ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
         KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
@@ -2581,25 +2587,6 @@ public class TextView : View
     ///     <see cref="IAutocomplete.SuggestionGenerator"/> to enable this feature
     /// </summary>
     public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
-
-    /// <summary>
-    ///     The bottom offset needed to use a horizontal scrollbar or for another reason. This is only needed with the
-    ///     keyboard navigation.
-    /// </summary>
-    public int BottomOffset
-    {
-        get => _bottomOffset;
-        set
-        {
-            if (CurrentRow == Lines - 1 && _bottomOffset > 0 && value == 0)
-            {
-                _topRow = Math.Max (_topRow - _bottomOffset, 0);
-            }
-
-            _bottomOffset = value;
-            Adjust ();
-        }
-    }
 
     /// <summary>Get the <see cref="ContextMenu"/> for this view.</summary>
     public ContextMenu? ContextMenu { get; }
@@ -2672,7 +2659,7 @@ public class TextView : View
     public int Lines => _model.Count;
 
     /// <summary>Gets the maximum visible length line.</summary>
-    public int Maxlength => _model.GetMaxVisibleLine (_topRow, _topRow + Frame.Height, TabWidth);
+    public int Maxlength => _model.GetMaxVisibleLine (_topRow, _topRow + Viewport.Height, TabWidth);
 
     /// <summary>Gets or sets a value indicating whether this <see cref="TextView"/> is a multiline text view.</summary>
     public bool Multiline
@@ -2701,13 +2688,8 @@ public class TextView : View
                 CurrentRow = 0;
                 _savedHeight = Height;
 
-                //var prevLayoutStyle = LayoutStyle;
-                //if (LayoutStyle == LayoutStyle.Computed) {
-                //	LayoutStyle = LayoutStyle.Absolute;
-                //}
-                Height = 1;
+                Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
-                //LayoutStyle = prevLayoutStyle;
                 if (!IsInitialized)
                 {
                     _model.LoadString (Text);
@@ -2717,13 +2699,7 @@ public class TextView : View
             }
             else if (_multiline && _savedHeight is { })
             {
-                //var lyout = LayoutStyle;
-                //if (LayoutStyle == LayoutStyle.Computed) {
-                //	LayoutStyle = LayoutStyle.Absolute;
-                //}
                 Height = _savedHeight;
-
-                //LayoutStyle = lyout;
                 SetNeedsDisplay ();
             }
         }
@@ -2741,27 +2717,9 @@ public class TextView : View
                 _isReadOnly = value;
 
                 SetNeedsDisplay ();
+                WrapTextModel ();
                 Adjust ();
             }
-        }
-    }
-
-    /// <summary>
-    ///     The right offset needed to use a vertical scrollbar or for another reason. This is only needed with the
-    ///     keyboard navigation.
-    /// </summary>
-    public int RightOffset
-    {
-        get => _rightOffset;
-        set
-        {
-            if (!_wordWrap && CurrentColumn == GetCurrentLine ().Count && _rightOffset > 0 && value == 0)
-            {
-                _leftColumn = Math.Max (_leftColumn - _rightOffset, 0);
-            }
-
-            _rightOffset = value;
-            Adjust ();
         }
     }
 
@@ -2782,7 +2740,7 @@ public class TextView : View
         }
     }
 
-    /// <summary>Get or sets the selecting.</summary>
+    /// <summary>Get or sets whether the user is currently selecting text.</summary>
     public bool Selecting { get; set; }
 
     /// <summary>Start column position of the selected text.</summary>
@@ -2857,7 +2815,7 @@ public class TextView : View
             if (_wordWrap)
             {
                 _wrapManager = new (_model);
-                _model = _wrapManager.WrapModel (_frameWidth, out _, out _, out _, out _);
+                _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
             }
 
             OnTextChanged (old, Text);
@@ -2902,7 +2860,7 @@ public class TextView : View
             if (_wordWrap)
             {
                 _wrapManager = new (_model);
-                _model = _wrapManager.WrapModel (_frameWidth, out _, out _, out _, out _);
+                WrapTextModel ();
             }
             else if (!_wordWrap && _wrapManager is { })
             {
@@ -2913,7 +2871,6 @@ public class TextView : View
         }
     }
 
-    private int _frameWidth => Math.Max (Frame.Width - (RightOffset != 0 ? 2 : 1), 0);
 
     /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItem"/> items updating the original text.</summary>
     public void ClearHistoryChanges () { _historyText?.Clear (Text); }
@@ -2970,7 +2927,7 @@ public class TextView : View
             ClearRegion ();
 
             _historyText.Add (
-                              new() { new (GetCurrentLine ()) },
+                              new () { new (GetCurrentLine ()) },
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -3009,14 +2966,14 @@ public class TextView : View
 
         if (Selecting)
         {
-            _historyText.Add (new() { new (GetCurrentLine ()) }, CursorPosition);
+            _historyText.Add (new () { new (GetCurrentLine ()) }, CursorPosition);
 
             ClearSelectedRegion ();
 
             List<RuneCell> currentLine = GetCurrentLine ();
 
             _historyText.Add (
-                              new() { new (currentLine) },
+                              new () { new (currentLine) },
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -3053,14 +3010,14 @@ public class TextView : View
 
         if (Selecting)
         {
-            _historyText.Add (new() { new (GetCurrentLine ()) }, CursorPosition);
+            _historyText.Add (new () { new (GetCurrentLine ()) }, CursorPosition);
 
             ClearSelectedRegion ();
 
             List<RuneCell> currentLine = GetCurrentLine ();
 
             _historyText.Add (
-                              new() { new (currentLine) },
+                              new () { new (currentLine) },
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -3314,7 +3271,7 @@ public class TextView : View
             && !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
             && !ev.Flags.HasFlag (ContextMenu!.MouseFlags))
         {
-            return false;
+            return base.OnMouseEvent (ev);
         }
 
         if (!CanFocus)
@@ -3394,36 +3351,36 @@ public class TextView : View
 
             if (_model.Count > 0 && _shiftSelecting && Selecting)
             {
-                if (CurrentRow - _topRow + BottomOffset >= Frame.Height - 1 && _model.Count + BottomOffset > _topRow + CurrentRow)
+                if (CurrentRow - _topRow >= Viewport.Height - 1 && _model.Count > _topRow + CurrentRow)
                 {
-                    ScrollTo (_topRow + Frame.Height);
+                    ScrollTo (_topRow + Viewport.Height);
                 }
                 else if (_topRow > 0 && CurrentRow <= _topRow)
                 {
-                    ScrollTo (_topRow - Frame.Height);
+                    ScrollTo (_topRow - Viewport.Height);
                 }
-                else if (ev.Y >= Frame.Height)
+                else if (ev.Position.Y >= Viewport.Height)
                 {
-                    ScrollTo (_model.Count + BottomOffset);
+                    ScrollTo (_model.Count);
                 }
-                else if (ev.Y < 0 && _topRow > 0)
+                else if (ev.Position.Y < 0 && _topRow > 0)
                 {
                     ScrollTo (0);
                 }
 
-                if (CurrentColumn - _leftColumn + RightOffset >= Frame.Width - 1 && line.Count + RightOffset > _leftColumn + CurrentColumn)
+                if (CurrentColumn - _leftColumn >= Viewport.Width - 1 && line.Count > _leftColumn + CurrentColumn)
                 {
-                    ScrollTo (_leftColumn + Frame.Width, false);
+                    ScrollTo (_leftColumn + Viewport.Width, false);
                 }
                 else if (_leftColumn > 0 && CurrentColumn <= _leftColumn)
                 {
-                    ScrollTo (_leftColumn - Frame.Width, false);
+                    ScrollTo (_leftColumn - Viewport.Width, false);
                 }
-                else if (ev.X >= Frame.Width)
+                else if (ev.Position.X >= Viewport.Width)
                 {
-                    ScrollTo (line.Count + RightOffset, false);
+                    ScrollTo (line.Count, false);
                 }
-                else if (ev.X < 0 && _leftColumn > 0)
+                else if (ev.Position.X < 0 && _leftColumn > 0)
                 {
                     ScrollTo (0, false);
                 }
@@ -3540,7 +3497,7 @@ public class TextView : View
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
-            ContextMenu.Position = new (ev.X + 2, ev.Y + 2);
+            ContextMenu.Position = new (ev.Position.X + 2, ev.Position.Y + 2);
             ShowContextMenu ();
         }
 
@@ -3579,6 +3536,7 @@ public class TextView : View
 
         ProcessInheritsPreviousColorScheme (CurrentRow, CurrentColumn);
         ProcessAutocomplete ();
+
     }
 
     /// <inheritdoc/>
@@ -3589,8 +3547,8 @@ public class TextView : View
         SetNormalColor ();
 
         (int width, int height) offB = OffSetBackground ();
-        int right = Frame.Width + offB.width + RightOffset;
-        int bottom = Frame.Height + offB.height + BottomOffset;
+        int right = Viewport.Width + offB.width;
+        int bottom = Viewport.Height + offB.height;
         var row = 0;
 
         for (int idxRow = _topRow; idxRow < _model.Count; idxRow++)
@@ -3671,18 +3629,9 @@ public class TextView : View
             ClearRegion (viewport.Left, row, right, bottom);
         }
 
-        PositionCursor ();
+        //PositionCursor ();
 
         _isDrawing = false;
-    }
-
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        //TODO: Improve it by handling read only mode of the text field
-        Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
-
-        return base.OnEnter (view);
     }
 
     /// <inheritdoc/>
@@ -3777,7 +3726,7 @@ public class TextView : View
             List<RuneCell> runeList = contents is null ? new () : TextModel.ToRuneCellList (contents);
             List<RuneCell> currentLine = GetCurrentLine ();
 
-            _historyText.Add (new() { new (currentLine) }, CursorPosition);
+            _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
             List<List<RuneCell>> addedLine = new () { new (currentLine), runeList };
 
@@ -3791,7 +3740,7 @@ public class TextView : View
             CurrentRow++;
 
             _historyText.Add (
-                              new() { new (GetCurrentLine ()) },
+                              new () { new (GetCurrentLine ()) },
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -3812,7 +3761,7 @@ public class TextView : View
             if (Selecting)
             {
                 _historyText.ReplaceLast (
-                                          new() { new (GetCurrentLine ()) },
+                                          new () { new (GetCurrentLine ()) },
                                           CursorPosition,
                                           HistoryText.LineStatus.Original
                                          );
@@ -3836,12 +3785,12 @@ public class TextView : View
             return null;
         }
 
-        if (Selecting)
+        if (Application.MouseGrabView == this && Selecting)
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-            //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
-            //var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
-            //SetNeedsDisplay (new (0, minRow, Frame.Width, maxRow));
+            //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Viewport.Height);
+            //var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Viewport.Height);
+            //SetNeedsDisplay (new (0, minRow, Viewport.Width, maxRow));
             SetNeedsDisplay ();
         }
 
@@ -3864,7 +3813,7 @@ public class TextView : View
                     cols += TabWidth + 1;
                 }
 
-                if (!TextModel.SetCol (ref col, Frame.Width, cols))
+                if (!TextModel.SetCol (ref col, Viewport.Width, cols))
                 {
                     col = CurrentColumn;
 
@@ -3876,13 +3825,13 @@ public class TextView : View
         int posX = CurrentColumn - _leftColumn;
         int posY = CurrentRow - _topRow;
 
-        if (posX > -1 && col >= posX && posX < Frame.Width - RightOffset && _topRow <= CurrentRow && posY < Frame.Height - BottomOffset)
+        if (posX > -1 && col >= posX && posX < Viewport.Width && _topRow <= CurrentRow && posY < Viewport.Height)
         {
             Move (col, CurrentRow - _topRow);
             return new (col, CurrentRow - _topRow);
         }
 
-        return null;
+        return null; // Hide cursor
     }
 
     /// <summary>Redoes the latest changes.</summary>
@@ -3947,7 +3896,7 @@ public class TextView : View
         else if (!_wordWrap)
         {
             int maxlength =
-                _model.GetMaxVisibleLine (_topRow, _topRow + Frame.Height + RightOffset, TabWidth);
+                _model.GetMaxVisibleLine (_topRow, _topRow + Viewport.Height, TabWidth);
             _leftColumn = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
         }
 
@@ -4126,18 +4075,18 @@ public class TextView : View
             need = true;
         }
         else if (!_wordWrap
-                 && (CurrentColumn - _leftColumn + RightOffset > Frame.Width + offB.width || dSize.size + RightOffset >= Frame.Width + offB.width))
+                 && (CurrentColumn - _leftColumn + 1 > Viewport.Width + offB.width || dSize.size + 1 >= Viewport.Width + offB.width))
         {
             _leftColumn = TextModel.CalculateLeftColumn (
                                                          line,
                                                          _leftColumn,
                                                          CurrentColumn,
-                                                         Frame.Width + offB.width - RightOffset,
+                                                         Viewport.Width + offB.width,
                                                          TabWidth
                                                         );
             need = true;
         }
-        else if ((_wordWrap && _leftColumn > 0) || (dSize.size + RightOffset < Frame.Width + offB.width && tSize.size + RightOffset < Frame.Width + offB.width))
+        else if ((_wordWrap && _leftColumn > 0) || (dSize.size < Viewport.Width + offB.width && tSize.size < Viewport.Width + offB.width))
         {
             if (_leftColumn > 0)
             {
@@ -4151,9 +4100,9 @@ public class TextView : View
             _topRow = CurrentRow;
             need = true;
         }
-        else if (CurrentRow - _topRow + BottomOffset >= Frame.Height + offB.height)
+        else if (CurrentRow - _topRow >= Viewport.Height + offB.height)
         {
-            _topRow = Math.Min (Math.Max (CurrentRow - Frame.Height + 1 + BottomOffset, 0), CurrentRow);
+            _topRow = Math.Min (Math.Max (CurrentRow - Viewport.Height + 1, 0), CurrentRow);
             need = true;
         }
         else if (_topRow > 0 && CurrentRow < _topRow)
@@ -4174,7 +4123,10 @@ public class TextView : View
         }
         else
         {
-            PositionCursor ();
+            if (IsInitialized)
+            {
+                PositionCursor ();
+            }
         }
 
         OnUnwrappedCursorPosition ();
@@ -4276,7 +4228,7 @@ public class TextView : View
         var endCol = (int)(end & 0xffffffff);
         List<RuneCell> line = _model.GetLine (startRow);
 
-        _historyText.Add (new() { new (line) }, new (startCol, startRow));
+        _historyText.Add (new () { new (line) }, new (startCol, startRow));
 
         List<List<RuneCell>> removedLines = new ();
 
@@ -4295,7 +4247,7 @@ public class TextView : View
             {
                 //QUESTION: Is the below comment still relevant?
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new (0, startRow - topRow, Frame.Width, startRow - topRow + 1));
+                //SetNeedsDisplay (new (0, startRow - topRow, Viewport.Width, startRow - topRow + 1));
                 SetNeedsDisplay ();
             }
 
@@ -4366,7 +4318,7 @@ public class TextView : View
             // Delete backwards 
             List<RuneCell> currentLine = GetCurrentLine ();
 
-            _historyText.Add (new() { new (currentLine) }, CursorPosition);
+            _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
             currentLine.RemoveAt (CurrentColumn - 1);
 
@@ -4378,7 +4330,7 @@ public class TextView : View
             CurrentColumn--;
 
             _historyText.Add (
-                              new() { new (currentLine) },
+                              new () { new (currentLine) },
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -4391,7 +4343,7 @@ public class TextView : View
             else
             {
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new (0, currentRow - topRow, 1, Frame.Width));
+                //SetNeedsDisplay (new (0, currentRow - topRow, 1, Viewport.Width));
                 SetNeedsDisplay ();
             }
         }
@@ -4406,7 +4358,7 @@ public class TextView : View
             int prowIdx = CurrentRow - 1;
             List<RuneCell> prevRow = _model.GetLine (prowIdx);
 
-            _historyText.Add (new() { new (prevRow) }, CursorPosition);
+            _historyText.Add (new () { new (prevRow) }, CursorPosition);
 
             List<List<RuneCell>> removedLines = new () { new (prevRow) };
 
@@ -4430,7 +4382,7 @@ public class TextView : View
             CurrentRow--;
 
             _historyText.Add (
-                              new() { GetCurrentLine () },
+                              new () { GetCurrentLine () },
                               new (CurrentColumn, prowIdx),
                               HistoryText.LineStatus.Replaced
                              );
@@ -4459,7 +4411,7 @@ public class TextView : View
                 return true;
             }
 
-            _historyText.Add (new() { new (currentLine) }, CursorPosition);
+            _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
             List<List<RuneCell>> removedLines = new () { new (currentLine) };
 
@@ -4473,7 +4425,7 @@ public class TextView : View
             _model.RemoveLine (CurrentRow + 1);
 
             _historyText.Add (
-                              new() { new (currentLine) },
+                              new () { new (currentLine) },
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -4483,16 +4435,16 @@ public class TextView : View
                 _wrapNeeded = true;
             }
 
-            DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, CurrentRow - _topRow + 1));
+            DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Viewport.Width, CurrentRow - _topRow + 1));
         }
         else
         {
-            _historyText.Add ([[..currentLine]], CursorPosition);
+            _historyText.Add ([ [.. currentLine]], CursorPosition);
 
             currentLine.RemoveAt (CurrentColumn);
 
             _historyText.Add (
-                              [[..currentLine]],
+                              [ [.. currentLine]],
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -4506,8 +4458,8 @@ public class TextView : View
                                new (
                                     CurrentColumn - _leftColumn,
                                     CurrentRow - _topRow,
-                                    Frame.Width,
-                                    CurrentRow - _topRow + 1
+                                    Viewport.Width,
+                                    Math.Max (CurrentRow - _topRow + 1, 0)
                                    )
                               );
         }
@@ -4801,7 +4753,7 @@ public class TextView : View
         if (!_wrapNeeded)
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-            //SetNeedsDisplay (new (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
+            //SetNeedsDisplay (new (0, prow, Math.Max (Viewport.Width, 0), Math.Max (prow + 1, 0)));
             SetNeedsDisplay ();
         }
     }
@@ -4824,7 +4776,7 @@ public class TextView : View
 
         List<RuneCell> line = GetCurrentLine ();
 
-        _historyText.Add (new() { new (line) }, CursorPosition);
+        _historyText.Add (new () { new (line) }, CursorPosition);
 
         // Optimize single line
         if (lines.Count == 1)
@@ -4833,14 +4785,14 @@ public class TextView : View
             CurrentColumn += lines [0].Count;
 
             _historyText.Add (
-                              new() { new (line) },
+                              new () { new (line) },
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
 
-            if (!_wordWrap && CurrentColumn - _leftColumn > Frame.Width)
+            if (!_wordWrap && CurrentColumn - _leftColumn > Viewport.Width)
             {
-                _leftColumn = Math.Max (CurrentColumn - Frame.Width + 1, 0);
+                _leftColumn = Math.Max (CurrentColumn - Viewport.Width + 1, 0);
             }
 
             if (_wordWrap)
@@ -4850,7 +4802,7 @@ public class TextView : View
             else
             {
                 // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-                //SetNeedsDisplay (new (0, currentRow - topRow, Frame.Width, Math.Max (currentRow - topRow + 1, 0)));
+                //SetNeedsDisplay (new (0, currentRow - topRow, Viewport.Width, Math.Max (currentRow - topRow + 1, 0)));
                 SetNeedsDisplay ();
             }
 
@@ -4903,7 +4855,7 @@ public class TextView : View
         Adjust ();
 
         _historyText.Add (
-                          new() { new (line) },
+                          new () { new (line) },
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
@@ -4922,7 +4874,7 @@ public class TextView : View
 
         SetWrapModel ();
 
-        _historyText.Add (new() { new (GetCurrentLine ()) }, CursorPosition);
+        _historyText.Add (new () { new (GetCurrentLine ()) }, CursorPosition);
 
         if (Selecting)
         {
@@ -4943,10 +4895,10 @@ public class TextView : View
         {
             if (Used)
             {
-                Insert (new() { Rune = a.AsRune, ColorScheme = colorScheme });
+                Insert (new () { Rune = a.AsRune, ColorScheme = colorScheme });
                 CurrentColumn++;
 
-                if (CurrentColumn >= _leftColumn + Frame.Width)
+                if (CurrentColumn >= _leftColumn + Viewport.Width)
                 {
                     _leftColumn++;
                     SetNeedsDisplay ();
@@ -4954,13 +4906,13 @@ public class TextView : View
             }
             else
             {
-                Insert (new() { Rune = a.AsRune, ColorScheme = colorScheme });
+                Insert (new () { Rune = a.AsRune, ColorScheme = colorScheme });
                 CurrentColumn++;
             }
         }
 
         _historyText.Add (
-                          new() { new (GetCurrentLine ()) },
+                          new () { new (GetCurrentLine ()) },
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
@@ -4998,7 +4950,7 @@ public class TextView : View
             return;
         }
 
-        _historyText.Add (new() { new (currentLine) }, CursorPosition);
+        _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
         if (currentLine.Count == 0)
         {
@@ -5057,14 +5009,14 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          [[..GetCurrentLine ()]],
+                          [ [.. GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -5097,7 +5049,7 @@ public class TextView : View
             return;
         }
 
-        _historyText.Add ([[..currentLine]], CursorPosition);
+        _historyText.Add ([ [.. currentLine]], CursorPosition);
 
         if (currentLine.Count == 0)
         {
@@ -5135,7 +5087,7 @@ public class TextView : View
                 ];
 
                 _historyText.Add (
-                                  [..removedLine],
+                                  [.. removedLine],
                                   CursorPosition,
                                   HistoryText.LineStatus.Removed
                                  );
@@ -5164,14 +5116,14 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          [[..GetCurrentLine ()]],
+                          [ [.. GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -5188,14 +5140,14 @@ public class TextView : View
 
         List<RuneCell> currentLine = GetCurrentLine ();
 
-        _historyText.Add ([[..GetCurrentLine ()]], CursorPosition);
+        _historyText.Add ([ [.. GetCurrentLine ()]], CursorPosition);
 
         if (CurrentColumn == 0)
         {
             DeleteTextBackwards ();
 
             _historyText.ReplaceLast (
-                                      [[..GetCurrentLine ()]],
+                                      [ [.. GetCurrentLine ()]],
                                       CursorPosition,
                                       HistoryText.LineStatus.Replaced
                                      );
@@ -5234,14 +5186,14 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          [[..GetCurrentLine ()]],
+                          [ [.. GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
         DoNeededAction ();
     }
 
@@ -5256,14 +5208,14 @@ public class TextView : View
 
         List<RuneCell> currentLine = GetCurrentLine ();
 
-        _historyText.Add ([[..GetCurrentLine ()]], CursorPosition);
+        _historyText.Add ([ [.. GetCurrentLine ()]], CursorPosition);
 
         if (currentLine.Count == 0 || CurrentColumn == currentLine.Count)
         {
             DeleteTextForwards ();
 
             _historyText.ReplaceLast (
-                                      [[..GetCurrentLine ()]],
+                                      [ [.. GetCurrentLine ()]],
                                       CursorPosition,
                                       HistoryText.LineStatus.Replaced
                                      );
@@ -5293,14 +5245,14 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          [[..GetCurrentLine ()]],
+                          [ [.. GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
 
         UpdateWrapModel ();
 
-        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Frame.Width, Frame.Height));
+        DoSetNeedsDisplay (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
         DoNeededAction ();
     }
 
@@ -5316,7 +5268,7 @@ public class TextView : View
         if (!_multiline && !IsInitialized)
         {
             CurrentColumn = Text.GetRuneCount ();
-            _leftColumn = CurrentColumn > Frame.Width + 1 ? CurrentColumn - Frame.Width + 1 : 0;
+            _leftColumn = CurrentColumn > Viewport.Width + 1 ? CurrentColumn - Viewport.Width + 1 : 0;
         }
     }
 
@@ -5350,7 +5302,7 @@ public class TextView : View
 
             CurrentRow++;
 
-            if (CurrentRow + BottomOffset >= _topRow + Frame.Height)
+            if (CurrentRow >= _topRow + Viewport.Height)
             {
                 _topRow++;
                 SetNeedsDisplay ();
@@ -5359,7 +5311,7 @@ public class TextView : View
             TrackColumn ();
             PositionCursor ();
         }
-        else if (CurrentRow > Frame.Height)
+        else if (CurrentRow > Viewport.Height)
         {
             Adjust ();
         }
@@ -5370,7 +5322,7 @@ public class TextView : View
     private void MoveEndOfLine ()
     {
         List<RuneCell> currentLine = GetCurrentLine ();
-        CurrentColumn = currentLine.Count;
+        CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
         Adjust ();
         DoNeededAction ();
     }
@@ -5394,7 +5346,7 @@ public class TextView : View
                 }
 
                 List<RuneCell> currentLine = GetCurrentLine ();
-                CurrentColumn = currentLine.Count;
+                CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
             }
         }
 
@@ -5414,7 +5366,7 @@ public class TextView : View
 
     private void MovePageDown ()
     {
-        int nPageDnShift = Frame.Height - 1;
+        int nPageDnShift = Viewport.Height - 1;
 
         if (CurrentRow >= 0 && CurrentRow < _model.Count)
         {
@@ -5444,7 +5396,7 @@ public class TextView : View
 
     private void MovePageUp ()
     {
-        int nPageUpShift = Frame.Height - 1;
+        int nPageUpShift = Viewport.Height - 1;
 
         if (CurrentRow > 0)
         {
@@ -5482,7 +5434,7 @@ public class TextView : View
     {
         List<RuneCell> currentLine = GetCurrentLine ();
 
-        if (CurrentColumn < currentLine.Count)
+        if ((ReadOnly ? CurrentColumn + 1 : CurrentColumn) < currentLine.Count)
         {
             CurrentColumn++;
         }
@@ -5493,7 +5445,7 @@ public class TextView : View
                 CurrentRow++;
                 CurrentColumn = 0;
 
-                if (CurrentRow >= _topRow + Frame.Height)
+                if (CurrentRow >= _topRow + Viewport.Height)
                 {
                     _topRow++;
                     SetNeedsDisplay ();
@@ -5594,14 +5546,14 @@ public class TextView : View
         var w = 0;
         var h = 0;
 
-        if (SuperView?.Frame.Right - Frame.Right < 0)
+        if (SuperView?.Viewport.Right - Viewport.Right < 0)
         {
-            w = SuperView!.Frame.Right - Frame.Right - 1;
+            w = SuperView!.Viewport.Right - Viewport.Right - 1;
         }
 
-        if (SuperView?.Frame.Bottom - Frame.Bottom < 0)
+        if (SuperView?.Viewport.Bottom - Viewport.Bottom < 0)
         {
-            h = SuperView!.Frame.Bottom - Frame.Bottom - 1;
+            h = SuperView!.Viewport.Bottom - Viewport.Bottom - 1;
         }
 
         return (w, h);
@@ -5665,13 +5617,13 @@ public class TextView : View
 
             if (currentLine.Count > 0 && currentLine [CurrentColumn - 1].Rune.Value == '\t')
             {
-                _historyText.Add (new() { new (currentLine) }, CursorPosition);
+                _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
                 currentLine.RemoveAt (CurrentColumn - 1);
                 CurrentColumn--;
 
                 _historyText.Add (
-                                  new() { new (GetCurrentLine ()) },
+                                  new () { new (GetCurrentLine ()) },
                                   CursorPosition,
                                   HistoryText.LineStatus.Replaced
                                  );
@@ -5836,21 +5788,21 @@ public class TextView : View
         {
             int maxCursorPositionableLine = Math.Max (_model.Count - 1 - _topRow, 0);
 
-            if (Math.Max (ev.Y, 0) > maxCursorPositionableLine)
+            if (Math.Max (ev.Position.Y, 0) > maxCursorPositionableLine)
             {
                 CurrentRow = maxCursorPositionableLine + _topRow;
             }
             else
             {
-                CurrentRow = Math.Max (ev.Y + _topRow, 0);
+                CurrentRow = Math.Max (ev.Position.Y + _topRow, 0);
             }
 
             r = GetCurrentLine ();
-            int idx = TextModel.GetColFromX (r, _leftColumn, Math.Max (ev.X, 0), TabWidth);
+            int idx = TextModel.GetColFromX (r, _leftColumn, Math.Max (ev.Position.X, 0), TabWidth);
 
-            if (idx - _leftColumn >= r.Count + RightOffset)
+            if (idx - _leftColumn >= r.Count)
             {
-                CurrentColumn = Math.Max (r.Count - _leftColumn + RightOffset, 0);
+                CurrentColumn = Math.Max (r.Count - _leftColumn - (ReadOnly ? 1 : 0), 0);
             }
             else
             {
@@ -6112,7 +6064,7 @@ public class TextView : View
 
         List<RuneCell> currentLine = GetCurrentLine ();
 
-        _historyText.Add (new() { new (currentLine) }, CursorPosition);
+        _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
         if (Selecting)
         {
@@ -6136,7 +6088,7 @@ public class TextView : View
 
         var fullNeedsDisplay = false;
 
-        if (CurrentRow >= _topRow + Frame.Height)
+        if (CurrentRow >= _topRow + Viewport.Height)
         {
             _topRow++;
             fullNeedsDisplay = true;
@@ -6145,7 +6097,7 @@ public class TextView : View
         CurrentColumn = 0;
 
         _historyText.Add (
-                          new() { new (GetCurrentLine ()) },
+                          new () { new (GetCurrentLine ()) },
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
@@ -6163,7 +6115,7 @@ public class TextView : View
         else
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-            //SetNeedsDisplay (new (0, currentRow - topRow, 2, Frame.Height));
+            //SetNeedsDisplay (new (0, currentRow - topRow, 2, Viewport.Height));
             SetNeedsDisplay ();
         }
 
@@ -6494,7 +6446,7 @@ public class TextView : View
         if (_wordWrap && _wrapManager is { })
         {
             _model = _wrapManager.WrapModel (
-                                             _frameWidth,
+                                             Math.Max (Viewport.Width - (ReadOnly ? 0 : 1), 0), // For the cursor on the last column of a line
                                              out int nRow,
                                              out int nCol,
                                              out int nStartRow,

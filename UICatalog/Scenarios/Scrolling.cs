@@ -16,14 +16,16 @@ public class Scrolling : Scenario
         Application.Init ();
         _diagnosticFlags = View.Diagnostics;
         View.Diagnostics = ViewDiagnosticFlags.Ruler;
-        var app = new Window ()
+
+        var app = new Window
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+
             // Offset to stress clipping
             X = 3,
             Y = 3,
             Width = Dim.Fill (3),
-            Height = Dim.Fill (3),
+            Height = Dim.Fill (3)
         };
 
         var label = new Label { X = 0, Y = 0 };
@@ -37,15 +39,16 @@ public class Scrolling : Scenario
             Width = 60,
             Height = 20,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            ContentSize = new (120, 40),
 
             //ContentOffset = Point.Empty,
             ShowVerticalScrollIndicator = true,
             ShowHorizontalScrollIndicator = true
         };
+        // BUGBUG: set_ContentSize is supposed to be `protected`. 
+        scrollView.SetContentSize (new (120, 40));
         scrollView.Padding.Thickness = new (1);
 
-        label.Text = $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
+        label.Text = $"{scrollView}\nContentSize: {scrollView.GetContentSize ()}\nContentOffset: {scrollView.ContentOffset}";
 
         const string rule = "0123456789";
 
@@ -53,7 +56,7 @@ public class Scrolling : Scenario
         {
             X = 0,
             Y = 0,
-            AutoSize = false,
+
             Width = Dim.Fill (),
             Height = 2,
             ColorScheme = Colors.ColorSchemes ["Error"]
@@ -66,7 +69,7 @@ public class Scrolling : Scenario
         {
             X = 0,
             Y = 0,
-            AutoSize = false,
+
             Width = 1,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Error"]
@@ -81,7 +84,7 @@ public class Scrolling : Scenario
         {
             X = 3,
             Y = 4,
-            AutoSize = false,
+
             Width = Dim.Fill (3),
             Text = "A very long button. Should be wide enough to demo clipping!"
         };
@@ -95,7 +98,7 @@ public class Scrolling : Scenario
                             Y = 5,
                             Width = 50,
                             ColorScheme = Colors.ColorSchemes ["Dialog"],
-                            Text = "This is a test of...",
+                            Text = "This is a test of..."
                         }
                        );
 
@@ -106,7 +109,7 @@ public class Scrolling : Scenario
                             Y = 10,
                             Width = 50,
                             ColorScheme = Colors.ColorSchemes ["Dialog"],
-                            Text = "... the emergency broadcast system.",
+                            Text = "... the emergency broadcast system."
                         }
                        );
 
@@ -117,7 +120,7 @@ public class Scrolling : Scenario
                             Y = 99,
                             Width = 50,
                             ColorScheme = Colors.ColorSchemes ["Dialog"],
-                            Text = "Last line",
+                            Text = "Last line"
                         }
                        );
 
@@ -214,12 +217,12 @@ public class Scrolling : Scenario
         {
             X = Pos.Right (scrollView) + 1,
             Y = Pos.AnchorEnd (1),
-            AutoSize = false,
+
             Width = 50,
             Text = "Mouse: "
         };
         app.Add (mousePos);
-        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.X},{a.Y}) - {a.Flags} {count++}"; };
+        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.Position}) - {a.Flags} {count++}"; };
 
         // Add a progress bar to cause constant redraws
         var progress = new ProgressBar { X = Pos.Right (scrollView) + 1, Y = Pos.AnchorEnd (2), Width = 50 };

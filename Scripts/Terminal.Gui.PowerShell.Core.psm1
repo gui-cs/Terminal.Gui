@@ -73,12 +73,6 @@ Function Set-PowerShellEnvironment {
   New-Variable -Name InternalAnalyzersProjectDirectory -Value (Join-Path -Resolve $AnalyzersDirectory "Terminal.Gui.Analyzers.Internal") -Option ReadOnly -Scope Global -Visibility Public
   New-Variable -Name InternalAnalyzersProjectFilePath -Value (Join-Path -Resolve $InternalAnalyzersProjectDirectory "Terminal.Gui.Analyzers.Internal.csproj") -Option ReadOnly -Scope Global -Visibility Public
 
-  # Set a custom prompt to indicate we're in our modified environment.
-  # Save the normal one first, though.
-  # And save it as ReadOnly and without the -Force parameter, so this will be skipped if run more than once in the same session without a reset.
-  New-Variable -Name NormalPrompt -Option ReadOnly -Scope Global -Value (Get-Item Function:prompt).ScriptBlock -ErrorAction SilentlyContinue
-  Set-Item Function:prompt { "TGPS $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) "; }
-
   # Save existing PSModulePath for optional reset later.
   # If it is already saved, do not overwrite, but continue anyway.
   New-Variable -Name OriginalPSModulePath -Visibility Public -Option ReadOnly -Scope Global -Value ($Env:PSModulePath) -ErrorAction SilentlyContinue
@@ -130,11 +124,6 @@ Function Reset-PowerShellEnvironment {
 
   if($Exit) {
     [Environment]::Exit(0)
-  }
-
-  if(Get-Variable -Name NormalPrompt -Scope Global -ErrorAction SilentlyContinue){
-    Set-Item Function:prompt $NormalPrompt
-    Remove-Variable -Name NormalPrompt -Scope Global -Force -ErrorAction SilentlyContinue
   }
 
   if(Get-Variable -Name OriginalPSModulePath -Scope Global -ErrorAction SilentlyContinue){

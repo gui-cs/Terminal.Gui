@@ -40,10 +40,12 @@ public class ApplicationTests
     public void Begin_Sets_Application_Top_To_Console_Size ()
     {
         Assert.Null (Application.Top);
-        Application.Begin (new ());
+        Toplevel top = new ();
+        Application.Begin (top);
         Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
         ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
         Assert.Equal (new (0, 0, 5, 5), Application.Top.Frame);
+        top.Dispose ();
     }
 
     [Fact]
@@ -265,8 +267,6 @@ public class ApplicationTests
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel topLevel = null;
-
         Assert.Throws<InvalidOperationException> (
                                                   () =>
                                                       Application.InternalInit (
@@ -280,7 +280,6 @@ public class ApplicationTests
         Assert.Null (Application.Driver);
 
         // Now try the other way
-        topLevel = null;
         Application.InternalInit (new FakeDriver ());
 
         Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver ()));
@@ -347,6 +346,7 @@ public class ApplicationTests
         Assert.Null (Application.MouseGrabView); // public
         Assert.Null (Application.WantContinuousButtonPressedView); // public
         Assert.False (Application.MoveToOverlappedChild (Application.Top));
+        Application.Top.Dispose ();
     }
 
     // Invoke Tests
@@ -781,7 +781,7 @@ public class ApplicationTests
                                      }
                                      else if (iteration < 3)
                                      {
-                                         Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition });
+                                         Application.OnMouseEvent (new () { Flags = MouseFlags.ReportMousePosition });
                                          Assert.False (top.NeedsDisplay);
                                          Assert.False (top.SubViewNeedsDisplay);
                                          Assert.False (top.LayoutNeeded);
@@ -820,12 +820,12 @@ public class ApplicationTests
         // Don't use visuals to test as style of border can change over time.
         Assert.Equal (new Point (0, 0), w.Frame.Location);
 
-        Application.OnMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed });
+        Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
         Assert.Equal (w.Border, Application.MouseGrabView);
         Assert.Equal (new Point (0,0), w.Frame.Location);
 
         // Move down and to the right.
-        Application.OnMouseEvent (new () { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new () { Position = new (1,1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         Assert.Equal (new Point (1, 1), w.Frame.Location);
 
         Application.End (rs);

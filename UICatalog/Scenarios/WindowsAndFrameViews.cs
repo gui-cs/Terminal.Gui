@@ -121,7 +121,7 @@ public class WindowsAndFrameViews : Scenario
             {
                 X = Pos.Percent (50),
                 Y = 1,
-                Width = Dim.Percent (100, true), // Or Dim.Percent (50)
+                Width = Dim.Percent (100, DimPercentMode.Position), // Or Dim.Percent (50)
                 Height = 5,
                 ColorScheme = Colors.ColorSchemes ["Base"],
                 Text = "The Text in the FrameView",

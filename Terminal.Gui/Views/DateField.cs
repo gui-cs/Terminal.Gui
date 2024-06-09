@@ -21,10 +21,10 @@ public class DateField : TextField
     private string _format;
     private string _separator;
 
-    /// <summary>Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a new instance of <see cref="DateField"/>.</summary>
     public DateField () : this (DateTime.MinValue) { }
 
-    /// <summary>Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a new instance of <see cref="DateField"/>.</summary>
     /// <param name="date"></param>
     public DateField (DateTime date)
     {
@@ -120,8 +120,7 @@ public class DateField : TextField
 
         if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            int point = ev.X;
-            AdjCursorPosition (point);
+            AdjCursorPosition (ev.Position.X);
         }
 
         return result;

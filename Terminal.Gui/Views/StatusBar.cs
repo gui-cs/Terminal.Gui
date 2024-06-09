@@ -93,7 +93,7 @@ public class StatusBar : View
         X = 0;
         Y = Pos.AnchorEnd (1);
         Width = Dim.Fill ();
-        Height = 1;
+        Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == GetContentSize ().
         AddCommand (Command.Accept, InvokeItem);
     }
 
@@ -153,7 +153,7 @@ public class StatusBar : View
 
         for (var i = 0; i < Items.Length; i++)
         {
-            if (me.X >= pos && me.X < pos + GetItemTitleLength (Items [i].Title))
+            if (me.Position.X >= pos && me.Position.X < pos + GetItemTitleLength (Items [i].Title))
             {
                 StatusItem item = Items [i];
 
@@ -213,14 +213,6 @@ public class StatusBar : View
                 Driver.AddRune ((Rune)' ');
             }
         }
-    }
-
-    ///<inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
     }
 
     /// <inheritdoc/>

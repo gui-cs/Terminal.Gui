@@ -33,23 +33,21 @@ public class Button : View
     private readonly Rune _rightDefault;
     private bool _isDefault;
 
-    /// <summary>Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
-    /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
+    /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
     {
-        TextAlignment = TextAlignment.Centered;
-        VerticalTextAlignment = VerticalTextAlignment.Middle;
+        TextAlignment = Alignment.Center;
+        VerticalTextAlignment = Alignment.Center;
 
         _leftBracket = Glyphs.LeftBracket;
         _rightBracket = Glyphs.RightBracket;
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
-        // Ensures a height of 1 if AutoSize is set to false
-        Height = 1;
+        Width = Dim.Auto (DimAutoStyle.Text);
+        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
         CanFocus = true;
-        AutoSize = true;
         HighlightStyle |= HighlightStyle.Pressed;
 #if HOVER
         HighlightStyle |= HighlightStyle.Hover;
@@ -139,14 +137,6 @@ public class Button : View
     public bool NoPadding { get; set; }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
     public override Point? PositionCursor ()
     {
         if (HotKey.IsValid && Text != "")
@@ -156,8 +146,7 @@ public class Button : View
                 if (TextFormatter.Text [i] == Text [0])
                 {
                     Move (i, 0);
-
-                    return new (i,0);
+                    return null; // Don't show the cursor
                 }
             }
         }

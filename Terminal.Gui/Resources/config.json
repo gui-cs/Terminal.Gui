@@ -24,7 +24,8 @@
   "Themes": [
     {
       "Default": {
-        "Dialog.DefaultButtonAlignment": "Center",
+        "Dialog.DefaultButtonAlignment": "End",
+        "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
         "FrameView.DefaultBorderStyle": "Single",
         "Window.DefaultBorderStyle": "Single",
         "ColorSchemes": [

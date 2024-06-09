@@ -32,21 +32,15 @@ namespace Terminal.Gui;
 ///         <see cref="Enabled"/>, <see cref="Visible"/>, and <see cref="CanFocus"/> will receive focus.
 ///     </para>
 ///     <para>
-///         Views that are focusable should implement the <see cref="PositionCursor"/> to make sure that the cursor is
-///         placed in a location that makes sense. Unix terminals do not have a way of hiding the cursor, so it can be
+///         Views that are focusable should override <see cref="PositionCursor"/> to make sure that the cursor is
+///         placed in a location that makes sense. Some terminals do not have a way of hiding the cursor, so it can be
 ///         distracting to have the cursor left at the last focused view. So views should make sure that they place the
-///         cursor in a visually sensible place.
+///         cursor in a visually sensible place. The default implementation of <see cref="PositionCursor"/> will place the
+///         cursor at either the hotkey (if defined) or <c>0,0</c>.
 ///     </para>
 ///     <para>
 ///         The View defines the base functionality for user interface elements in Terminal.Gui. Views can contain one or
 ///         more subviews, can respond to user input and render themselves on the screen.
-///     </para>
-///     <para>
-///         View supports two layout styles: <see cref="LayoutStyle.Absolute"/> or <see cref="LayoutStyle.Computed"/>.
-///         The style is determined by the values of <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and
-///         <see cref="Height"/>. If any of these is set to non-absolute <see cref="Pos"/> or <see cref="Dim"/> object,
-///         then the layout style is <see cref="LayoutStyle.Computed"/>. Otherwise it is <see cref="LayoutStyle.Absolute"/>
-///         .
 ///     </para>
 ///     <para>
 ///         To create a View using Absolute layout, call a constructor that takes a Rect parameter to specify the
@@ -78,9 +72,7 @@ namespace Terminal.Gui;
 ///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 ///     </para>
 ///     <para>
-///         The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has changed. The default
-///         processing system will keep the size and dimensions for views that use the <see cref="LayoutStyle.Absolute"/>,
-///         and will recompute the Adornments for the views that use <see cref="LayoutStyle.Computed"/>.
+///         The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has changed.
 ///     </para>
 ///     <para>
 ///         Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews should use for
@@ -126,19 +118,13 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <remarks>
     ///     <para>
     ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view. The <see cref="View"/> will be created using
-    ///         <see cref="LayoutStyle.Absolute"/> coordinates. The initial size ( <see cref="View.Frame"/>) will be adjusted
-    ///         to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines.
-    ///     </para>
-    ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
-    ///     <para>
-    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>.
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view, changing it to <see cref="LayoutStyle.Computed"/>.
+    ///         control the size and location of the view.
     ///     </para>
     /// </remarks>
     public View ()
     {
+        CreateAdornments ();
+
         HotKeySpecifier = (Rune)'_';
         TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
 
@@ -150,8 +136,6 @@ public partial class View : Responder, ISupportInitializeNotification
         TabStop = false;
 
         AddCommands ();
-
-        CreateAdornments ();
     }
 
     /// <summary>
@@ -456,12 +440,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 _title = value;
                 TitleTextFormatter.Text = _title;
 
-                TitleTextFormatter.Size = new (
-                                               TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
-                                               - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                                                      ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                                                      : 0),
-                                               1);
+                SetTitleTextFormatterSize ();
                 SetHotKeyFromTitle ();
                 SetNeedsDisplay ();
 #if DEBUG
@@ -473,6 +452,16 @@ public partial class View : Responder, ISupportInitializeNotification
                 OnTitleChanged (old, _title);
             }
         }
+    }
+
+    private void SetTitleTextFormatterSize ()
+    {
+        TitleTextFormatter.Size = new (
+                                       TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
+                                       - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
+                                              ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                                              : 0),
+                                       1);
     }
 
     /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
@@ -514,9 +503,23 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <returns></returns>
     public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
 
-    /// <inheritdoc/>
+    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+    /// <remarks>
+    /// <para>
+    ///     Subviews added to this view via <see cref="Add(View)"/> have their lifetime owned by this view and <see cref="Dispose"/> will
+    ///     dispose them. To prevent this, and have the creator of the Subview instance handle disposal, use <see cref="Remove"/> to remove
+    ///     the subview first.
+    /// </para>
+    /// <para>
+    ///     If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and
+    ///     unmanaged resources can be disposed. If disposing equals false, the method has been called by the runtime from
+    ///     inside the finalizer, and you should not reference other objects. Only unmanaged resources can be disposed.
+    /// </para>
+    /// </remarks>
+    /// <param name="disposing"></param>
     protected override void Dispose (bool disposing)
     {
+        // BUGBUG: We should only dispose these objects if disposing == true
         LineCanvas.Dispose ();
 
         DisposeAdornments ();

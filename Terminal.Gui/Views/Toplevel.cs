@@ -1,5 +1,3 @@
-using System.Net.Mime;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -23,7 +21,7 @@ namespace Terminal.Gui;
 public partial class Toplevel : View
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout,
+    ///     Initializes a new instance of the <see cref="Toplevel"/> class,
     ///     defaulting to full screen. The <see cref="View.Width"/> and <see cref="View.Height"/> properties will be set to the
     ///     dimensions of the terminal using <see cref="Dim.Fill"/>.
     /// </summary>
@@ -124,8 +122,12 @@ public partial class Toplevel : View
         KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
         KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
+        if (Environment.OSVersion.Platform == PlatformID.Unix)
+        {
+            KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
+        }
+
 #if UNIX_KEY_BINDINGS
-        KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
         KeyBindings.Add (Key.L.WithCtrl, Command.Refresh); // Unix
         KeyBindings.Add (Key.F.WithCtrl, Command.NextView); // Unix
         KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
@@ -340,11 +342,6 @@ public partial class Toplevel : View
             if (Focused is null)
             {
                 EnsureFocus ();
-
-                if (Focused is null)
-                {
-                    Driver.SetCursorVisibility (CursorVisibility.Invisible);
-                }
             }
 
             return null;
@@ -368,11 +365,7 @@ public partial class Toplevel : View
 
         var cursor2 = base.PositionCursor ();
 
-        if (Focused is null)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-        return cursor2;
+        return null; 
     }
 
     /// <summary>
@@ -391,6 +384,12 @@ public partial class Toplevel : View
                                               out int ny,
                                               out StatusBar sb
                                              );
+
+        if (superView is null)
+        {
+            return;
+        }
+
         var layoutSubviews = false;
         var maxWidth = 0;
 
@@ -400,17 +399,15 @@ public partial class Toplevel : View
         }
 
         if ((superView != top || top?.SuperView is { } || (top != Application.Top && top.Modal) || (top?.SuperView is null && top.IsOverlapped))
-
-            // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
-            && (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) /*&& top.LayoutStyle == LayoutStyle.Computed*/)
+            && (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y))
         {
-            if ((top.X is null || top.X is Pos.PosAbsolute) && top.Frame.X != nx)
+            if ((top.X is null || top.X is PosAbsolute) && top.Frame.X != nx)
             {
                 top.X = nx;
                 layoutSubviews = true;
             }
 
-            if ((top.Y is null || top.Y is Pos.PosAbsolute) && top.Frame.Y != ny)
+            if ((top.Y is null || top.Y is PosAbsolute) && top.Frame.Y != ny)
             {
                 top.Y = ny;
                 layoutSubviews = true;
@@ -421,8 +418,8 @@ public partial class Toplevel : View
         if (sb != null
             && !top.Subviews.Contains (sb)
             && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-            && top.Height is Dim.DimFill
-            && -top.Height.Anchor (0) < 1)
+            && top.Height is DimFill
+            && -top.Height.GetAnchor (0) < 1)
         {
             top.Height = Dim.Fill (sb.Visible ? 1 : 0);
             layoutSubviews = true;

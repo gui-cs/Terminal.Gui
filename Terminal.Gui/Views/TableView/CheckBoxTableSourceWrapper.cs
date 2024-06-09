@@ -158,7 +158,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             return;
         }
 
-        Point? hit = tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? headerIfAny);
+        Point? hit = tableView.ScreenToCell (e.MouseEvent.Position.X, e.MouseEvent.Position.Y, out int? headerIfAny);
 
         if (headerIfAny.HasValue && headerIfAny.Value == 0)
         {

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -76,7 +77,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         if (AutoInit)
         {
             // TODO: This Dispose call is here until all unit tests that don't correctly dispose Toplevel's they create are fixed.
-            Application.Top?.Dispose ();
+            //Application.Top?.Dispose ();
             Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
             if (Responder.Instances.Count == 0)
@@ -170,6 +171,8 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
         Assert.Null (Application.Driver);
         Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
+        Assert.Equal (FakeConsole.BufferWidth, Application.Driver.Cols);
+        Assert.Equal (FakeConsole.BufferHeight, Application.Driver.Rows);
         base.Before (methodUnderTest);
     }
 }
@@ -521,64 +524,56 @@ internal partial class TestHelpers
         return sb.ToString ();
     }
 
-    // TODO: Update all tests that use GetALlViews to use GetAllViewsTheoryData instead
-    /// <summary>Gets a list of instances of all classes derived from View.</summary>
-    /// <returns>List of View objects</returns>
-    public static List<View> GetAllViews ()
-    {
-        return typeof (View).Assembly.GetTypes ()
-                            .Where (
-                                    type => type.IsClass
-                                            && !type.IsAbstract
-                                            && type.IsPublic
-                                            && type.IsSubclassOf (typeof (View))
-                                   )
-                            .Select (type => CreateView (type, type.GetConstructor (Array.Empty<Type> ())))
-                            .ToList ();
-    }
+    //// TODO: Update all tests that use GetALlViews to use GetAllViewsTheoryData instead
+    ///// <summary>Gets a list of instances of all classes derived from View.</summary>
+    ///// <returns>List of View objects</returns>
+    //public static List<View> GetAllViews ()
+    //{
+    //    return typeof (View).Assembly.GetTypes ()
+    //                        .Where (
+    //                                type => type.IsClass
+    //                                        && !type.IsAbstract
+    //                                        && type.IsPublic
+    //                                        && type.IsSubclassOf (typeof (View))
+    //                               )
+    //                        .Select (type => CreateView (type, type.GetConstructor (Array.Empty<Type> ())))
+    //                        .ToList ();
+    //}
 
-    public static TheoryData<View, string> GetAllViewsTheoryData ()
-    {
-        // TODO: Figure out how to simplify this. I couldn't figure out how to not have to iterate over ret.
-        (View view, string name)[] ret =
-            typeof (View).Assembly
-                               .GetTypes ()
-                               .Where (
-                                       type => type.IsClass
-                                               && !type.IsAbstract
-                                               && type.IsPublic
-                                               && type.IsSubclassOf (typeof (View))
-                                      )
-                               .Select (
-                                        type => (
-                                                    view: CreateView (
-                                                                   type, type.GetConstructor (Array.Empty<Type> ())),
-                                                    name: type.Name)
-                                        ).ToArray();
+    //public class AllViewsData : IEnumerable<object []>
+    //{
+    //    private Lazy<List<object []>> data;
 
-        TheoryData<View, string> td = new ();
-        foreach ((View view, string name) in ret)
-        {
-            td.Add(view, name);
-        }
+    //    public AllViewsData ()
+    //    {
+    //        data = new Lazy<List<object []>> (GetTestData);
+    //    }
 
-        return td;
-    }
+    //    public IEnumerator<object []> GetEnumerator ()
+    //    {
+    //        return data.Value.GetEnumerator ();
+    //    }
 
+    //    IEnumerator IEnumerable.GetEnumerator () => GetEnumerator ();
 
-    public static TheoryData<Scenario, string> GetAllScenarioTheoryData ()
-    {
-        // TODO: Figure out how to simplify this. I couldn't figure out how to not have to iterate over ret.
-        var scenarios = Scenario.GetScenarios ();
-        (Scenario scenario, string name) [] ret = scenarios.Select (s => (scenario: s, name: s.GetName ())).ToArray();
-        TheoryData<Scenario, string> td = new ();
-        foreach ((Scenario scenario, string name) in ret)
-        {
-            td.Add (scenario, name);
-        }
+    //    private List<object []> GetTestData ()
+    //    {
+    //        var viewTypes = typeof (View).Assembly
+    //                                     .GetTypes ()
+    //                                     .Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && type.IsSubclassOf (typeof (View)));
 
-        return td;
-    }
+    //        var testData = new List<object []> ();
+
+    //        foreach (var type in viewTypes)
+    //        {
+    //            var view = CreateView (type, type.GetConstructor (Array.Empty<Type> ()));
+    //            testData.Add (new object [] { view, type.Name });
+    //        }
+
+    //        return testData;
+    //    }
+    //}
+
 
     /// <summary>
     ///     Verifies the console used all the <paramref name="expectedColors"/> when rendering. If one or more of the
@@ -851,3 +846,25 @@ internal partial class TestHelpers
     [GeneratedRegex ("\\s+$", RegexOptions.Multiline)]
     private static partial Regex TrailingWhiteSpaceRegEx ();
 }
+
+public class TestsAllViews
+{
+    public static IEnumerable<object []> AllViewTypes =>
+        typeof (View).Assembly
+                     .GetTypes ()
+                     .Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && type.IsSubclassOf (typeof (View)))
+                     .Select (type => new object [] { type });
+
+    public static View CreateInstanceIfNotGeneric (Type type)
+    {
+        if (type.IsGenericType)
+        {
+            // Return null for generic types
+            return null;
+        }
+
+        return Activator.CreateInstance (type) as View;
+    }
+
+}
+

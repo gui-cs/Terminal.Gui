@@ -3,13 +3,11 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class ViewDisposalTest
+public class ViewDisposalTest (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
 #nullable enable
     private readonly Dictionary<Type, object? []?> _special_params = new ();
 #nullable restore
-    public ViewDisposalTest (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]
@@ -34,7 +32,7 @@ public class ViewDisposalTest
     private WeakReference DoTest ()
     {
         GetSpecialParams ();
-        var Container = new View ();
+        var container = new View ();
         Toplevel top = new ();
         List<Type> views = GetViews ();
 
@@ -53,11 +51,11 @@ public class ViewDisposalTest
             }
 
             Assert.NotNull (instance);
-            Container.Add (instance);
-            _output.WriteLine ($"Added instance of {view}!");
+            container.Add (instance);
+            output.WriteLine ($"Added instance of {view}!");
         }
 
-        top.Add (Container);
+        top.Add (container);
 
         // make sure the application is doing to the views whatever its supposed to do to the views
         for (var i = 0; i < 100; i++)
@@ -65,9 +63,9 @@ public class ViewDisposalTest
             Application.Refresh ();
         }
 
-        top.Remove (Container);
-        WeakReference reference = new (Container, true);
-        Container.Dispose ();
+        top.Remove (container);
+        WeakReference reference = new (container, true);
+        container.Dispose ();
 
         return reference;
     }
@@ -101,11 +99,11 @@ public class ViewDisposalTest
                                               }
                                              )) //end of body of anonymous check function
         { //body of the foreach loop
-            _output.WriteLine ($"Found Type {type.Name}");
+            output.WriteLine ($"Found Type {type.Name}");
             Assert.DoesNotContain (type, valid);
             Assert.True (type.IsAssignableTo (typeof (IDisposable))); // Just to be safe
             valid.Add (type);
-            _output.WriteLine ("	-Added!");
+            output.WriteLine ("	-Added!");
         } //end body of foreach loop
 
         return valid;

@@ -37,12 +37,12 @@ public class TableView : View
     private TableStyle style = new ();
     private ITableSource table;
 
-    /// <summary>Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="TableView"/> class.</summary>
     /// <param name="table">The table to display in the control</param>
     public TableView (ITableSource table) : this () { Table = table; }
 
     /// <summary>
-    ///     Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. Set the
+    ///     Initializes a <see cref="TableView"/> class. Set the
     ///     <see cref="Table"/> property to begin editing
     /// </summary>
     public TableView ()
@@ -841,8 +841,8 @@ public class TableView : View
                 return true;
         }
 
-        int boundsX = me.X;
-        int boundsY = me.Y;
+        int boundsX = me.Position.X;
+        int boundsY = me.Position.Y;
 
         if (me.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
@@ -908,10 +908,10 @@ public class TableView : View
         // What columns to render at what X offset in viewport
         ColumnToRender [] columnsToRender = CalculateViewport (Viewport).ToArray ();
 
-        Driver.SetAttribute (GetNormalColor ());
+        Driver?.SetAttribute (GetNormalColor ());
 
         //invalidate current row (prevents scrolling around leaving old characters in the frame
-        Driver.AddStr (new string (' ', Viewport.Width));
+        Driver?.AddStr (new string (' ', Viewport.Width));
 
         var line = 0;
 
@@ -978,8 +978,6 @@ public class TableView : View
     {
         if (TableIsNullOrInvisible ())
         {
-            PositionCursor ();
-
             return false;
         }
 
@@ -1029,14 +1027,15 @@ public class TableView : View
         if (screenPoint is { })
         {
             Move (screenPoint.Value.X, screenPoint.Value.Y);
-            return screenPoint;
+
+            return null;//screenPoint;
         }
 
         return null;
     }
 
     /// <summary>
-    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
     ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
     ///     bounds.
     /// </summary>
@@ -1044,6 +1043,15 @@ public class TableView : View
     /// <param name="clientY">Y offset from the top left of the control.</param>
     /// <returns>Cell clicked or null.</returns>
     public Point? ScreenToCell (int clientX, int clientY) { return ScreenToCell (clientX, clientY, out _, out _); }
+
+    /// <summary>
+    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
+    ///     bounds.
+    /// </summary>
+    /// <param name="client">offset from the top left of the control.</param>
+    /// <returns>The position.</returns>
+    public Point? ScreenToCell (Point client) { return ScreenToCell (client, out _, out _); }
 
     /// <summary>
     ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
@@ -1056,7 +1064,16 @@ public class TableView : View
     public Point? ScreenToCell (int clientX, int clientY, out int? headerIfAny) { return ScreenToCell (clientX, clientY, out headerIfAny, out _); }
 
     /// <summary>
-    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
+    ///     bounds.
+    /// </summary>
+    /// <param name="client">offset from the top left of the control.</param>
+    /// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
+    public Point? ScreenToCell (Point client, out int? headerIfAny) { return ScreenToCell (client, out headerIfAny, out _); }
+
+    /// <summary>
+    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
     ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
     ///     bounds.
     /// </summary>
@@ -1106,6 +1123,19 @@ public class TableView : View
         }
 
         return null;
+    }
+
+    /// <summary>
+    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
+    ///     bounds.
+    /// </summary>
+    /// <param name="client">offset from the top left of the control.</param>
+    /// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
+    /// <param name="offsetX">The horizontal offset of the click within the returned cell.</param>
+    public Point? ScreenToCell (Point client, out int? headerIfAny, out int? offsetX)
+    {
+        return ScreenToCell (client.X, client.Y, out headerIfAny, out offsetX);
     }
 
     /// <summary>
@@ -1529,7 +1559,6 @@ public class TableView : View
             SelectedRow = match;
             EnsureValidSelection ();
             EnsureSelectedCellIsVisible ();
-            PositionCursor ();
             SetNeedsDisplay ();
 
             return true;
@@ -1985,7 +2014,7 @@ public class TableView : View
 
     /// <summary>
     ///     Returns true if the <see cref="Table"/> is not set or all the columns in the <see cref="Table"/> have an
-    ///     explicit <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.visible"/> <see langword="false"/>.
+    ///     explicit <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.Visible"/> <see langword="false"/>.
     /// </summary>
     /// <returns></returns>
     private bool TableIsNullOrInvisible ()
@@ -2087,16 +2116,16 @@ public class TableView : View
                         - (representation.EnumerateRunes ().Sum (c => c.GetColumns ())
                            + 1 /*leave 1 space for cell boundary*/);
 
-            switch (colStyle?.GetAlignment (originalCellValue) ?? TextAlignment.Left)
+            switch (colStyle?.GetAlignment (originalCellValue) ?? Alignment.Start)
             {
-                case TextAlignment.Left:
+                case Alignment.Start:
                     return representation + new string (' ', toPad);
-                case TextAlignment.Right:
+                case Alignment.End:
                     return new string (' ', toPad) + representation;
 
                 // TODO: With single line cells, centered and justified are the same right?
-                case TextAlignment.Centered:
-                case TextAlignment.Justified:
+                case Alignment.Center:
+                case Alignment.Fill:
                     return
                         new string (' ', (int)Math.Floor (toPad / 2.0))
                         + // round down

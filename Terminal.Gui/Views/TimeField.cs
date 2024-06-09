@@ -21,7 +21,7 @@ public class TimeField : TextField
     private bool _isShort;
     private TimeSpan _time;
 
-    /// <summary>Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Computed"/> positioning.</summary>
+    /// <summary>Initializes a new instance of <see cref="TimeField"/>.</summary>
     public TimeField ()
     {
         CultureInfo cultureInfo = CultureInfo.CurrentCulture;
@@ -169,7 +169,7 @@ public class TimeField : TextField
 
         if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            int point = ev.X;
+            int point = ev.Position.X;
             AdjCursorPosition (point);
         }
 

@@ -21,8 +21,7 @@ public class TextField : View
     private List<Rune> _text;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="TextField"/> class.
     /// </summary>
     public TextField ()
     {
@@ -33,17 +32,16 @@ public class TextField : View
         CaptionColor = new Color (Color.DarkGray);
         ReadOnly = false;
         Autocomplete = new TextFieldAutocomplete ();
-        Height = 1;
+        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
         Used = true;
         WantMousePositionReports = true;
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
         Initialized += TextField_Initialized;
-
-        LayoutComplete += TextField_LayoutComplete;
 
         // Things this view knows how to do
         AddCommand (
@@ -756,11 +754,11 @@ public class TextField : View
     {
         foreach (char ch in toAdd)
         {
-            KeyCode key;
+            Key key;
 
             try
             {
-                key = (KeyCode)ch;
+                key = ch;
             }
             catch (Exception)
             {
@@ -769,7 +767,7 @@ public class TextField : View
                                             );
             }
 
-            InsertText (new Key { KeyCode = key }, useOldCursorPos);
+            InsertText (key, useOldCursorPos);
         }
     }
 
@@ -819,7 +817,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent ev)
+    protected internal override bool OnMouseEvent (MouseEvent ev)
     {
         if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed)
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
@@ -931,7 +929,7 @@ public class TextField : View
             ShowContextMenu ();
         }
 
-        SetNeedsDisplay ();
+        //SetNeedsDisplay ();
 
         return true;
 
@@ -1033,17 +1031,6 @@ public class TextField : View
         ProcessAutocomplete ();
 
         _isDrawing = false;
-    }
-
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-        }
-
-        return base.OnEnter (view);
     }
 
     /// <inheritdoc/>
@@ -1238,6 +1225,10 @@ public class TextField : View
         {
             return;
         }
+
+        // TODO: This is a lame prototype proving it should be easy for TextField to 
+        // TODO: support Width = Dim.Auto (DimAutoStyle: Content).
+        //SetContentSize(new (TextModel.DisplaySize (_text).size, 1));
 
         int offB = OffSetBackground ();
         bool need = NeedsDisplay || !Used;
@@ -1690,7 +1681,7 @@ public class TextField : View
 
     private int PositionCursor (MouseEvent ev)
     {
-        return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.X), false);
+        return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.Position.X), false);
     }
 
     private int PositionCursor (int x, bool getX = true)
@@ -1867,15 +1858,6 @@ public class TextField : View
 
         Autocomplete.HostControl = this;
         Autocomplete.PopupInsideContainer = false;
-    }
-
-    private void TextField_LayoutComplete (object sender, LayoutEventArgs e)
-    {
-        // Don't let height > 1
-        if (Frame.Height > 1)
-        {
-            Height = 1;
-        }
     }
 }
 

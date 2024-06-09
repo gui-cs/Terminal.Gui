@@ -31,7 +31,6 @@ public class HexView : View
     private const int displayWidth = 9;
 
     private int bpl;
-    private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
     private long displayStart, pos;
     private SortedDictionary<long, byte> edits = [];
     private bool firstNibble, leftSide;
@@ -39,7 +38,7 @@ public class HexView : View
     private static readonly Rune SpaceCharRune = new (' ');
     private static readonly Rune PeriodCharRune = new ('.');
 
-    /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="HexView"/> class.</summary>
     /// <param name="source">
     ///     The <see cref="Stream"/> to view and edit as hex, this <see cref="Stream"/> must support seeking,
     ///     or an exception will be thrown.
@@ -50,6 +49,7 @@ public class HexView : View
         // BUG: This will always call the most-derived definition of CanFocus.
         // Either seal it or don't set it here.
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
         leftSide = true;
         firstNibble = true;
 
@@ -98,7 +98,7 @@ public class HexView : View
         LayoutComplete += HexView_LayoutComplete;
     }
 
-    /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="HexView"/> class.</summary>
     public HexView () : this (new MemoryStream ()) { }
 
     /// <summary>
@@ -126,21 +126,6 @@ public class HexView : View
             int item = delta % bytesPerLine + 1;
 
             return new Point (item, line);
-        }
-    }
-
-    /// <summary>Get / Set the wished cursor when the field is focused</summary>
-    public CursorVisibility DesiredCursorVisibility
-    {
-        get => desiredCursorVisibility;
-        set
-        {
-            if (desiredCursorVisibility != value && HasFocus)
-            {
-                Application.Driver.SetCursorVisibility (value);
-            }
-
-            desiredCursorVisibility = value;
         }
     }
 
@@ -293,7 +278,7 @@ public class HexView : View
             return true;
         }
 
-        if (me.X < displayWidth)
+        if (me.Position.X < displayWidth)
         {
             return true;
         }
@@ -302,14 +287,14 @@ public class HexView : View
         int blocksSize = nblocks * 14;
         int blocksRightOffset = displayWidth + blocksSize - 1;
 
-        if (me.X > blocksRightOffset + bytesPerLine - 1)
+        if (me.Position.X > blocksRightOffset + bytesPerLine - 1)
         {
             return true;
         }
 
-        leftSide = me.X >= blocksRightOffset;
-        long lineStart = me.Y * bytesPerLine + displayStart;
-        int x = me.X - displayWidth + 1;
+        leftSide = me.Position.X >= blocksRightOffset;
+        long lineStart = me.Position.Y * bytesPerLine + displayStart;
+        int x = me.Position.X - displayWidth + 1;
         int block = x / 14;
         x -= block * 2;
         int empty = x % 3;
@@ -324,7 +309,7 @@ public class HexView : View
 
         if (leftSide)
         {
-            position = Math.Min (lineStart + me.X - blocksRightOffset, source.Length);
+            position = Math.Min (lineStart + me.Position.X - blocksRightOffset, source.Length);
         }
         else
         {
@@ -461,14 +446,6 @@ public class HexView : View
     /// <summary>Method used to invoke the <see cref="Edited"/> event passing the <see cref="KeyValuePair{TKey, TValue}"/>.</summary>
     /// <param name="e">The key value pair.</param>
     public virtual void OnEdited (HexViewEditEventArgs e) { Edited?.Invoke (this, e); }
-
-    ///<inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
-
-        return base.OnEnter (view);
-    }
 
     /// <summary>
     ///     Method used to invoke the <see cref="PositionChanged"/> event passing the <see cref="HexViewEventArgs"/>

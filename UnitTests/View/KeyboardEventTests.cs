@@ -4,26 +4,26 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class KeyboardEventTests (ITestOutputHelper output)
+public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
 {
-    public static TheoryData<View, string> AllViews => TestHelpers.GetAllViewsTheoryData ();
-
     /// <summary>
     ///     This tests that when a new key down event is sent to the view  will fire the 3 key-down related
     ///     events: KeyDown, InvokingKeyBindings, and ProcessKeyDown. Note that KeyUp is independent.
     /// </summary>
     [Theory]
-    [MemberData (nameof (AllViews))]
-    public void AllViews_KeyDown_All_EventsFire (View view, string viewName)
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_KeyDown_All_EventsFire (Type viewType)
     {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
         if (view == null)
         {
-            output.WriteLine ($"ERROR: Skipping generic view: {viewName}");
+            output.WriteLine ($"ERROR: Skipping generic view: {viewType}");
 
             return;
         }
 
-        output.WriteLine ($"Testing {viewName}");
+        output.WriteLine ($"Testing {viewType}");
 
         var keyDown = false;
 
@@ -60,32 +60,32 @@ public class KeyboardEventTests (ITestOutputHelper output)
     ///     This tests that when a new key up event is sent to the view the view will fire the 1 key-up related event:
     ///     KeyUp
     /// </summary>
-    [Fact]
-    public void AllViews_KeyUp_All_EventsFire ()
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_KeyUp_All_EventsFire (Type viewType)
     {
-        foreach (View view in TestHelpers.GetAllViews ())
+        var view = CreateInstanceIfNotGeneric (viewType);
+
+        if (view == null)
         {
-            if (view == null)
-            {
-                output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
+            output.WriteLine ($"ERROR: Generic view {viewType}");
 
-                continue;
-            }
-
-            output.WriteLine ($"Testing {view.GetType ().Name}");
-
-            var keyUp = false;
-
-            view.KeyUp += (s, a) =>
-                          {
-                              a.Handled = true;
-                              keyUp = true;
-                          };
-
-            Assert.True (view.NewKeyUpEvent (Key.A)); // this will be true because the KeyUp event handled it
-            Assert.True (keyUp);
-            view.Dispose ();
+            return;
         }
+
+        output.WriteLine ($"Testing {view.GetType ().Name}");
+
+        var keyUp = false;
+
+        view.KeyUp += (s, a) =>
+                      {
+                          a.Handled = true;
+                          keyUp = true;
+                      };
+
+        Assert.True (view.NewKeyUpEvent (Key.A)); // this will be true because the KeyUp event handled it
+        Assert.True (keyUp);
+        view.Dispose ();
     }
 
     [Theory]

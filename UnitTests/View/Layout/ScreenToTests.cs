@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace Terminal.Gui.LayoutTests;
 
 /// <summary>Tests for view coordinate mapping (e.g. <see cref="View.ScreenToFrame"/> etc...).</summary>
 public class ScreenToTests
@@ -32,7 +32,7 @@ public class ScreenToTests
             BorderStyle = LineStyle.Single
         };
 
-        Point actual = view.ScreenToViewport (x, y);
+        Point actual = view.ScreenToViewport (new (x, y));
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }
@@ -54,7 +54,7 @@ public class ScreenToTests
     {
         var view = new View { X = viewX, Y = viewY, Width = 10, Height = 10 };
 
-        Point actual = view.ScreenToViewport (x, y);
+        Point actual = view.ScreenToViewport (new (x, y));
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }
@@ -82,7 +82,7 @@ public class ScreenToTests
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
 
-        Point actual = view.ScreenToViewport (x, y);
+        Point actual = view.ScreenToViewport (new (x, y));
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }
@@ -108,12 +108,12 @@ public class ScreenToTests
             BorderStyle = LineStyle.Single,
         };
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
-        view.ContentSize = new (6, 6);
+        view.SetContentSize (new (6, 6));
         super.Add (view);
 
         view.Viewport = new (1, 1, 5, 5);
 
-        Point actual = view.ScreenToViewport (x, y);
+        Point actual = view.ScreenToViewport (new (x, y));
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }
@@ -134,7 +134,7 @@ public class ScreenToTests
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
 
-        Point actual = view.ScreenToViewport (x, y);
+        Point actual = view.ScreenToViewport (new (x, y));
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }
@@ -164,12 +164,12 @@ public class ScreenToTests
             X = viewX, Y = viewY, Width = 5, Height = 5,
             BorderStyle = LineStyle.Single,
         };
-        view.ContentSize = new (10, 10);
+        view.SetContentSize (new (10, 10));
         super.Add (view);
 
         view.Viewport = view.Viewport with { Location = new (1, 1) };
 
-        Point actual = view.ScreenToViewport (x, y);
+        Point actual = view.ScreenToViewport (new (x, y));
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }
@@ -198,7 +198,7 @@ public class ScreenToTests
             BorderStyle = LineStyle.Single
         };
 
-        Point actual = view.ScreenToFrame (x, y);
+        Point actual = view.ScreenToFrame (new (x, y));
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }
@@ -220,7 +220,7 @@ public class ScreenToTests
     {
         var view = new View { X = viewX, Y = viewY, Width = 10, Height = 10 };
 
-        Point actual = view.ScreenToFrame (x, y);
+        Point actual = view.ScreenToFrame (new (x, y));
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }
@@ -248,7 +248,7 @@ public class ScreenToTests
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
 
-        Point actual = view.ScreenToFrame (x, y);
+        Point actual = view.ScreenToFrame (new (x, y));
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }
@@ -269,7 +269,7 @@ public class ScreenToTests
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
 
-        Point actual = view.ScreenToFrame (x, y);
+        Point actual = view.ScreenToFrame (new (x, y));
         Assert.Equal (expectedX, actual.X);
         Assert.Equal (expectedY, actual.Y);
     }

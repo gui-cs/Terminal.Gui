@@ -2,10 +2,9 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class ViewKeyBindingTests
+public class ViewKeyBindingTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public ViewKeyBindingTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     [AutoInitShutdown]
@@ -42,6 +41,7 @@ public class ViewKeyBindingTests
         Assert.True (view.ApplicationCommand);
         Assert.True (view.HotKeyCommand);
         Assert.True (view.FocusedCommand);
+        top.Dispose ();
     }
 
     [Fact]
@@ -69,6 +69,7 @@ public class ViewKeyBindingTests
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);
+        top.Dispose ();
     }
 
     [Fact]
@@ -98,6 +99,7 @@ public class ViewKeyBindingTests
         Application.OnKeyDown (Key.Z); // new hot key
         Assert.True (invoked);
         Assert.True (view.HotKeyCommand);
+        top.Dispose ();
     }
 
     [Fact]
@@ -119,6 +121,7 @@ public class ViewKeyBindingTests
         invoked = false;
         Application.OnKeyDown (Key.F);
         Assert.False (view.HotKeyCommand);
+        top.Dispose ();
     }
 
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)

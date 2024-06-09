@@ -28,12 +28,11 @@ public class BasicColors : Scenario
 
             var vl = new Label
             {
-                AutoSize = false,
                 X = vx,
                 Y = 0,
                 Width = 1,
                 Height = 13,
-                VerticalTextAlignment = VerticalTextAlignment.Bottom,
+                VerticalTextAlignment = Alignment.End,
                 ColorScheme = new ColorScheme { Normal = attr },
                 Text = bg.ToString (),
                 TextDirection = TextDirection.TopBottom_LeftRight
@@ -42,12 +41,11 @@ public class BasicColors : Scenario
 
             var hl = new Label
             {
-                AutoSize = false,
                 X = 15,
                 Y = y,
                 Width = 13,
                 Height = 1,
-                TextAlignment = TextAlignment.Right,
+                TextAlignment = Alignment.End,
                 ColorScheme = new ColorScheme { Normal = attr },
                 Text = bg.ToString ()
             };

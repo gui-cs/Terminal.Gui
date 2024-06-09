@@ -1,17 +1,10 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
 
-//using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
-
-// Alias Console to MockConsole so we don't accidentally use Console
-
 namespace Terminal.Gui.DrawingTests;
 
-public class ThicknessTests
+public class ThicknessTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public ThicknessTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     public void Constructor_Defaults ()
     {
@@ -73,7 +66,7 @@ public class ThicknessTests
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
        Test (Left=0,Top=0,Right=0,Bottom=0)",
-                                                      _output
+                                                      output
                                                      );
 
         t = new Thickness (1, 1, 1, 1);
@@ -104,7 +97,7 @@ public class ThicknessTests
      T                                      T
      T                                      T
      TTTest (Left=1,Top=1,Right=1,Bottom=1)TT",
-                                                      _output
+                                                      output
                                                      );
 
         t = new Thickness (1, 2, 3, 4);
@@ -135,7 +128,7 @@ public class ThicknessTests
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      TTTest (Left=1,Top=2,Right=3,Bottom=4)TT",
-                                                      _output
+                                                      output
                                                      );
 
         t = new Thickness (-1, 1, 1, 1);
@@ -166,7 +159,7 @@ public class ThicknessTests
                                             T
                                             T
      TTest (Left=-1,Top=1,Right=1,Bottom=1)TT",
-                                                      _output
+                                                      output
                                                      );
     }
 
@@ -211,7 +204,7 @@ public class ThicknessTests
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                             _output
+                                             output
                                             );
 
         t = new Thickness (1, 1, 1, 1);
@@ -243,7 +236,7 @@ public class ThicknessTests
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                             _output
+                                             output
                                             );
 
         t = new Thickness (1, 2, 3, 4);
@@ -275,7 +268,7 @@ public class ThicknessTests
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         t = new Thickness (-1, 1, 1, 1);
@@ -307,8 +300,9 @@ public class ThicknessTests
 │                                           2
 │                                           3
 └────|123456789|123456789|123456789|123456789",
-                                                      _output
+                                                      output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -663,7 +657,7 @@ public class ThicknessTests
     {
         var rect = new Rectangle (x, y, width, height);
         var thickness = new Thickness (1, 1, 1, 1); // Uniform thickness for simplicity
-        bool result = thickness.Contains (rect, pointX, pointY);
+        bool result = thickness.Contains (rect, new (pointX, pointY));
         Assert.Equal (expected, result);
     }
 
@@ -702,7 +696,7 @@ public class ThicknessTests
     {
         var rect = new Rectangle (x, y, width, height);
         var thickness = new Thickness (2, 2, 2, 2); // Uniform thickness for simplicity
-        bool result = thickness.Contains (rect, pointX, pointY);
+        bool result = thickness.Contains (rect, new (pointX, pointY));
         Assert.Equal (expected, result);
     }
 
@@ -737,7 +731,7 @@ public class ThicknessTests
     {
         var rect = new Rectangle (x, y, width, height);
         var thickness = new Thickness (0, 0, 0, 0); // Uniform thickness for simplicity
-        bool result = thickness.Contains (rect, pointX, pointY);
+        bool result = thickness.Contains (rect, new (pointX, pointY));
         Assert.Equal (expected, result);
     }
 
@@ -841,19 +835,7 @@ public class ThicknessTests
                     3,
                     4,
                     5)]
-    [InlineData (
-                    1,
-                    2,
-                    3,
-                    4,
-                    1,
-                    1,
-                    1,
-                    1,
-                    2,
-                    3,
-                    4,
-                    5)]
+
     public void AddTest (
         int left,
         int top,

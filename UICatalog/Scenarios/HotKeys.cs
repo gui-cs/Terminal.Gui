@@ -35,10 +35,10 @@ public class HotKeys : Scenario
         };
         app.Add (view);
 
-        viewLabel = new() { Text = "Vi_ew:", X = 0, Y = Pos.Bottom (view) + 1 };
+        viewLabel = new () { Text = "Vi_ew:", X = 0, Y = Pos.Bottom (view) + 1 };
         app.Add (viewLabel);
 
-        view = new()
+        view = new ()
         {
             Title = "View (n_ot focusable)",
             Text = "Text renders _Underscore",
@@ -52,7 +52,6 @@ public class HotKeys : Scenario
 
         var labelWithFrameFocusable = new Label
         {
-            AutoSize = false,
             Title = "Label _with Frame (focusable)",
             CanFocus = true,
             X = Pos.Right (labelWithFrameLabel) + 1, Y = Pos.Top (labelWithFrameLabel), Width = 40, Height = 3,
@@ -60,12 +59,11 @@ public class HotKeys : Scenario
         };
         app.Add (labelWithFrameFocusable);
 
-        labelWithFrameLabel = new() { Text = "L_abel with Frame:", X = 0, Y = Pos.Bottom (labelWithFrameFocusable) + 1 };
+        labelWithFrameLabel = new () { Text = "L_abel with Frame:", X = 0, Y = Pos.Bottom (labelWithFrameFocusable) + 1 };
         app.Add (labelWithFrameLabel);
 
         var labelWithFrame = new Label
         {
-            AutoSize = false,
             Title = "Label with Frame (_not focusable)",
             X = Pos.Right (labelWithFrameLabel) + 1, Y = Pos.Top (labelWithFrameLabel), Width = 40, Height = 3,
             BorderStyle = LineStyle.Dashed
@@ -77,7 +75,6 @@ public class HotKeys : Scenario
 
         var buttonWithFrameFocusable = new Button
         {
-            AutoSize = false,
             Title = "B_utton with Frame (focusable)",
             CanFocus = true,
             X = Pos.Right (buttonWithFrameLabel) + 1, Y = Pos.Top (buttonWithFrameLabel), Width = 40, Height = 3,
@@ -85,12 +82,11 @@ public class HotKeys : Scenario
         };
         app.Add (buttonWithFrameFocusable);
 
-        buttonWithFrameLabel = new() { Text = "Butt_on with Frame:", X = 0, Y = Pos.Bottom (buttonWithFrameFocusable) + 1 };
+        buttonWithFrameLabel = new () { Text = "Butt_on with Frame:", X = 0, Y = Pos.Bottom (buttonWithFrameFocusable) + 1 };
         app.Add (buttonWithFrameLabel);
 
         var buttonWithFrame = new Button
         {
-            AutoSize = false,
             Title = "Button with Frame (not focusab_le)",
             X = Pos.Right (buttonWithFrameLabel) + 1, Y = Pos.Top (buttonWithFrameLabel), Width = 40, Height = 3,
             CanFocus = false,
@@ -103,7 +99,6 @@ public class HotKeys : Scenario
 
         var checkboxWithFrameFocusable = new CheckBox
         {
-            AutoSize = false,
             Title = "C_heckbox with Frame (focusable)",
             CanFocus = true,
             X = Pos.Right (checkboxWithFrameLabel) + 1, Y = Pos.Top (checkboxWithFrameLabel), Width = 40, Height = 3,
@@ -111,12 +106,11 @@ public class HotKeys : Scenario
         };
         app.Add (checkboxWithFrameFocusable);
 
-        checkboxWithFrameLabel = new() { Text = "Checkb_ox with Frame:", X = 0, Y = Pos.Bottom (checkboxWithFrameFocusable) + 1 };
+        checkboxWithFrameLabel = new () { Text = "Checkb_ox with Frame:", X = 0, Y = Pos.Bottom (checkboxWithFrameFocusable) + 1 };
         app.Add (checkboxWithFrameLabel);
 
         var checkboxWithFrame = new CheckBox
         {
-            AutoSize = false,
             Title = "Checkbox with Frame (not focusable)",
             X = Pos.Right (checkboxWithFrameLabel) + 1, Y = Pos.Top (checkboxWithFrameLabel), Width = 40, Height = 3,
             CanFocus = false,

@@ -392,12 +392,11 @@ namespace Terminal.Gui
         private ITextValidateProvider _provider;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="TextValidateField"/> class using
-        ///     <see cref="LayoutStyle.Computed"/> positioning.
+        ///     Initializes a new instance of the <see cref="TextValidateField"/> class.
         /// </summary>
         public TextValidateField ()
         {
-            Height = 1;
+            Height = Dim.Auto (minimumContentDim: 1);
             CanFocus = true;
 
             // Things this view knows how to do
@@ -533,13 +532,13 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        protected internal override bool OnMouseEvent  (MouseEvent mouseEvent)
+        protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {
-                int c = _provider.Cursor (mouseEvent.X - GetMargins (Viewport.Width).left);
+                int c = _provider.Cursor (mouseEvent.Position.X - GetMargins (Viewport.Width).left);
 
-                if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && Text.Length > 0)
+                if (_provider.Fixed == false && TextAlignment == Alignment.End && Text.Length > 0)
                 {
                     c++;
                 }
@@ -599,22 +598,6 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override bool OnEnter (View view)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-
-            return base.OnEnter (view);
-        }
-
-        /// <inheritdoc/>
-        public override bool OnLeave (View view)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-            return base.OnLeave (view);
-        }
-
-        /// <inheritdoc/>
         public override bool OnProcessKeyDown (Key a)
         {
             if (_provider is null)
@@ -649,7 +632,7 @@ namespace Terminal.Gui
             // When it's right-aligned and it's a normal input, the cursor behaves differently.
             int curPos;
 
-            if (_provider?.Fixed == false && TextAlignment == TextAlignment.Right)
+            if (_provider?.Fixed == false && TextAlignment == Alignment.End)
             {
                 curPos = _cursorPosition + left - 1;
             }
@@ -659,14 +642,6 @@ namespace Terminal.Gui
             }
             Move (curPos, 0);
 
-            if (curPos < 0 || curPos >= Viewport.Width)
-            {
-                Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-            }
-            else
-            {
-                Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-            }
             return new (curPos, 0);
         }
 
@@ -674,7 +649,7 @@ namespace Terminal.Gui
         /// <returns></returns>
         private bool BackspaceKeyHandler ()
         {
-            if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && _cursorPosition <= 1)
+            if (_provider.Fixed == false && TextAlignment == Alignment.End && _cursorPosition <= 1)
             {
                 return false;
             }
@@ -712,7 +687,7 @@ namespace Terminal.Gui
         /// <returns></returns>
         private bool DeleteKeyHandler ()
         {
-            if (_provider.Fixed == false && TextAlignment == TextAlignment.Right)
+            if (_provider.Fixed == false && TextAlignment == Alignment.End)
             {
                 _cursorPosition = _provider.CursorLeft (_cursorPosition);
             }
@@ -743,11 +718,11 @@ namespace Terminal.Gui
 
             switch (TextAlignment)
             {
-                case TextAlignment.Left:
+                case Alignment.Start:
                     return (0, total);
-                case TextAlignment.Centered:
+                case Alignment.Center:
                     return (total / 2, total / 2 + total % 2);
-                case TextAlignment.Right:
+                case Alignment.End:
                     return (total, 0);
                 default:
                     return (0, total);
