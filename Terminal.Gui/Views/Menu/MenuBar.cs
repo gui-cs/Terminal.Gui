@@ -300,13 +300,8 @@ public class MenuBar : View
                         return true;
                     }
                    );
-        AddCommand (Command.ToggleExpandCollapse, (ctx) => SelectOrRun (ctx.KeyBinding?.Context));
-        AddCommand (Command.Select, (ctx) =>
-                                    {
-                                        var item = ctx.KeyBinding?.Context as MenuItem;
-
-                                        return Run (item?.Action);
-                                    });//_menuItemToSelect?.Action));
+        AddCommand (Command.ToggleExpandCollapse, ctx => Select (ctx.KeyBinding?.Context));
+        AddCommand (Command.Select, ctx => Run ((ctx.KeyBinding?.Context as MenuItem)?.Action));
 
         // Default key bindings for this view
         KeyBindings.Add (Key.CursorLeft, Command.Left);
@@ -314,13 +309,16 @@ public class MenuBar : View
         KeyBindings.Add (Key.Esc, Command.Cancel);
         KeyBindings.Add (Key.CursorDown, Command.Accept);
         KeyBindings.Add (Key.Enter, Command.Accept);
-        KeyBindings.Add (Key, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 
-        KeyBindings.Add (
-                         KeyCode.CtrlMask | KeyCode.Space,
-                         KeyBindingScope.HotKey,
-                         Command.ToggleExpandCollapse
-                        );
+        KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, -1); // -1 indicates Key was used
+        KeyBindings.Add (Key, keyBinding);
+
+        // TODO: Why do we have two keybindings for opening the menu? Ctrl-Space and Key?
+        KeyBindings.Add (Key.Space.WithCtrl, keyBinding);
+
+        // TODO: Figure out how to make Alt work (on Windows)
+        //KeyBindings.Add (Key.WithAlt, keyBinding);
+
     }
 
     /// <summary><see langword="true"/> if the menu is open; otherwise <see langword="true"/>.</summary>
@@ -475,7 +473,7 @@ public class MenuBar : View
             if (i == _selected && IsMenuOpen)
             {
                 hotColor = i == _selected ? ColorScheme.HotFocus : GetHotNormalColor ();
-                normalColor = i == _selected ? GetFocusColor() : GetNormalColor ();
+                normalColor = i == _selected ? GetFocusColor () : GetNormalColor ();
             }
             else
             {
@@ -649,7 +647,6 @@ public class MenuBar : View
         }
 
         _openedByAltKey = false;
-        _openedByHotKey = false;
         IsMenuOpen = false;
         _selected = -1;
         CanFocus = _initialCanFocus;
@@ -693,7 +690,6 @@ public class MenuBar : View
 
         IsMenuOpen = false;
         _openedByAltKey = false;
-        _openedByHotKey = false;
         OnMenuAllClosed ();
     }
 
@@ -823,20 +819,6 @@ public class MenuBar : View
                     superViewFrame.X - sv.Frame.X - viewportOffset.X,
                     superViewFrame.Y - sv.Frame.Y - viewportOffset.Y
                    );
-    }
-
-    /// <summary>
-    ///     Gets the <see cref="Application.Current"/> location offset relative to the <see cref="ConsoleDriver"/>
-    ///     location.
-    /// </summary>
-    /// <returns>The location offset.</returns>
-    internal Point GetScreenOffsetFromCurrent ()
-    {
-        Rectangle screen = Driver.Screen;
-        Rectangle currentFrame = Application.Current.Frame;
-        Point viewportOffset = Application.Top.GetViewportOffsetFromFrame ();
-
-        return new (screen.X - currentFrame.X - viewportOffset.X, screen.Y - currentFrame.Y - viewportOffset.Y);
     }
 
     internal void NextMenu (bool isSubMenu = false, bool ignoreUseSubMenusSingleFrame = false)
@@ -985,7 +967,7 @@ public class MenuBar : View
                     locationOffset.Y += SuperView.Border.Thickness.Top;
                 }
 
-                _openMenu = new()
+                _openMenu = new ()
                 {
                     Host = this,
                     X = Frame.X + pos + locationOffset.X,
@@ -1002,8 +984,8 @@ public class MenuBar : View
                 }
                 else
                 {
-                    _openMenu.BeginInit();
-                    _openMenu.EndInit();
+                    _openMenu.BeginInit ();
+                    _openMenu.EndInit ();
                 }
                 _openMenu.SetFocus ();
 
@@ -1027,7 +1009,7 @@ public class MenuBar : View
                     {
                         locationOffset = GetLocationOffset ();
 
-                        openCurrentMenu = new()
+                        openCurrentMenu = new ()
                         {
                             Host = this,
                             X = last.Frame.Left + last.Frame.Width + locationOffset.X,
@@ -1042,7 +1024,7 @@ public class MenuBar : View
 
                         // 2 is for the parent and the separator
                         MenuItem [] mbi = new MenuItem [2 + subMenu.Children.Length];
-                        mbi [0] = new() { Title = subMenu.Title, Parent = subMenu };
+                        mbi [0] = new () { Title = subMenu.Title, Parent = subMenu };
                         mbi [1] = null;
 
                         for (var j = 0; j < subMenu.Children.Length; j++)
@@ -1052,7 +1034,7 @@ public class MenuBar : View
 
                         var newSubMenu = new MenuBarItem (mbi) { Parent = subMenu };
 
-                        openCurrentMenu = new()
+                        openCurrentMenu = new ()
                         {
                             Host = this, X = first.Frame.Left, Y = first.Frame.Top, BarItems = newSubMenu
                         };
@@ -1325,7 +1307,7 @@ public class MenuBar : View
 
         if (mi.IsTopLevel)
         {
-            var screen = ViewportToScreen (new Point (0 , i));
+            var screen = ViewportToScreen (new Point (0, i));
             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = mi };
             menu.Run (mi.Action);
             menu.Dispose ();
@@ -1438,7 +1420,8 @@ public class MenuBar : View
             }
 
             KeyBindings.Remove (_key);
-            KeyBindings.Add (value, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+            KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, -1);  // -1 indicates Key was used
+            KeyBindings.Add (value, keyBinding);
             _key = value;
         }
     }
@@ -1479,57 +1462,60 @@ public class MenuBar : View
     /// <summary>The specifier character for the hot keys.</summary>
     public new static Rune HotKeySpecifier => (Rune)'_';
 
-    // TODO: remove these global variables now that we're using context
-    private int _menuBarItemToActivate = -1;
-    private MenuItem _menuItemToSelect;
+    // TODO: This doesn't actually work. Figure out why.
     private bool _openedByAltKey;
-    private bool _openedByHotKey;
 
     /// <summary>
     ///     Called when a key bound to Command.Select is pressed. Either activates the menu item or runs it, depending on
     ///     whether it has a sub-menu. If the menu is open, it will close the menu bar.
     /// </summary>
     /// <returns></returns>
-    private bool SelectOrRun ([CanBeNull] object context)
+    private bool Select ([CanBeNull] object context)
     {
         if (!IsInitialized || !Visible)
         {
             return true;
         }
 
-        if (context is MenuBarItem menuBarItem)
-        {
-            _menuItemToSelect = menuBarItem;
-        }
-
         if (context is int index)
         {
-            _menuBarItemToActivate = index;
-        }
-
-        _openedByHotKey = true;
-
-        if (_menuBarItemToActivate != -1)
-        {
-            Activate (_menuBarItemToActivate);
-            _menuBarItemToActivate = -1;
-        }
-        else if (_menuItemToSelect is { })
-        {
-            Run (_menuItemToSelect.Action);
-        }
-        else
-        {
-            if (IsMenuOpen && _openMenu is { })
+            // If the menubar is open and the menu that's open is 'index' then close it. Otherwise activate it.
+            if (IsMenuOpen)
             {
-                CloseAllMenus ();
+                if (index == -1)
+                {
+                    CloseAllMenus ();
+
+                    return true;
+                }
+
+                // Find the index of the open submenu and close the menu if it matches
+                for (var i = 0; i < Menus.Length; i++)
+                {
+                    MenuBarItem open = Menus [i];
+
+                    if (open is { })
+                    {
+                        if (open == openCurrentMenu.BarItems)
+                        {
+                            if (i == index)
+                            {
+                                CloseAllMenus ();
+                            }
+                            return true;
+                        }
+                    }
+                }
             }
-            else
+            if (index == -1)
             {
                 OpenMenu ();
             }
+            else
+            {
+                Activate (index);
+            }
         }
-
         return true;
     }
 
@@ -1585,7 +1571,7 @@ public class MenuBar : View
                     {
                         if (Menus [i].IsTopLevel)
                         {
-                            var screen = ViewportToScreen (new Point(0 , i));
+                            var screen = ViewportToScreen (new Point (0, i));
                             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = Menus [i] };
                             menu.Run (Menus [i].Action);
                             menu.Dispose ();

@@ -1227,7 +1227,7 @@ wo
     [InlineData ("_File", "_New", "", KeyCode.AltMask | KeyCode.F)]
     [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.ShiftMask | KeyCode.F)]
     [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.F, KeyCode.Esc)]
-    [InlineData ("_File", "_New", "", KeyCode.AltMask | KeyCode.F, KeyCode.AltMask | KeyCode.F)] // BUGBUG: Should Alt+F, Alt+F open then close?
+    [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.F, KeyCode.AltMask | KeyCode.F)]
     [InlineData ("Closed", "None", "Open", KeyCode.AltMask | KeyCode.F, KeyCode.O)]
     [InlineData ("_File", "_New", "", KeyCode.AltMask | KeyCode.F, KeyCode.ShiftMask | KeyCode.O)]
     [InlineData ("Closed", "None", "Open", KeyCode.AltMask | KeyCode.F, KeyCode.AltMask | KeyCode.O)]
@@ -2246,7 +2246,6 @@ wo
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu.IsMenuOpen);
 
-        // BUGBUG: This is wrong -> The _New doc isn't enabled because it can't execute and so can't be selected
         // The _New doc is enabled but the sub-menu isn't enabled. Is show but can't be selected and executed
         Assert.Equal ("_New", miCurrent.Parent.Title);
         Assert.Equal ("_New doc", miCurrent.Title);
