@@ -2,6 +2,9 @@
 
 namespace Terminal.Gui.ApplicationTests;
 
+/// <summary>
+/// Application tests for keyboard support.
+/// </summary>
 public class KeyboardTests
 {
     private readonly ITestOutputHelper _output;
@@ -13,6 +16,46 @@ public class KeyboardTests
         Responder.Instances.Clear ();
         RunState.Instances.Clear ();
 #endif
+    }
+
+
+    [Fact]
+    [AutoInitShutdown]
+    public void QuitKey_Getter_Setter ()
+    {
+        Toplevel top = new ();
+        var isQuiting = false;
+
+        top.Closing += (s, e) =>
+                       {
+                           isQuiting = true;
+                           e.Cancel = true;
+                       };
+
+        Application.Begin (top);
+        top.Running = true;
+
+        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
+        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+        Assert.True (isQuiting);
+
+        isQuiting = false;
+        Application.OnKeyDown (Key.Q.WithCtrl);
+        Assert.True (isQuiting);
+
+        isQuiting = false;
+        Application.QuitKey = Key.C.WithCtrl;
+        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+        Assert.False (isQuiting);
+        Application.OnKeyDown (Key.Q.WithCtrl);
+        Assert.False (isQuiting);
+
+        Application.OnKeyDown (Application.QuitKey);
+        Assert.True (isQuiting);
+
+        // Reset the QuitKey to avoid throws errors on another tests
+        Application.QuitKey = Key.Q.WithCtrl;
+        top.Dispose ();
     }
 
     [Fact]
@@ -320,7 +363,7 @@ public class KeyboardTests
 
     [Fact]
     [AutoInitShutdown]
-    public void OnKeyDown_Application_KeyBinding ()
+    public void KeyBinding_OnKeyDown ()
     {
         var view = new ScopedKeyBindingView ();
         var invoked = false;
@@ -365,7 +408,7 @@ public class KeyboardTests
 
     [Fact]
     [AutoInitShutdown]
-    public void OnKeyDown_Application_KeyBinding_Negative ()
+    public void KeyBinding_OnKeyDown_Negative ()
     {
         var view = new ScopedKeyBindingView ();
         var invoked = false;
@@ -391,46 +434,73 @@ public class KeyboardTests
         top.Dispose ();
     }
 
+
     [Fact]
     [AutoInitShutdown]
-    public void QuitKey_Getter_Setter ()
+    public void KeyBinding_AddKeyBinding_Adds ()
     {
-        Toplevel top = new ();
-        var isQuiting = false;
+        View view1 = new ();
+        Application.AddKeyBinding (Key.A, view1);
 
-        top.Closing += (s, e) =>
-                       {
-                           isQuiting = true;
-                           e.Cancel = true;
-                       };
+        View view2 = new ();
+        Application.AddKeyBinding (Key.A, view2);
 
-        Application.Begin (top);
-        top.Running = true;
+        Assert.True (Application.TryGetKeyBindings (Key.A, out List<View> views));
+        Assert.Contains (view1, views);
+        Assert.Contains (view2, views);
 
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
-        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
-        Assert.True (isQuiting);
-
-        isQuiting = false;
-        Application.OnKeyDown (Key.Q.WithCtrl);
-        Assert.True (isQuiting);
-
-        isQuiting = false;
-        Application.QuitKey = Key.C.WithCtrl;
-        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
-        Assert.False (isQuiting);
-        Application.OnKeyDown (Key.Q.WithCtrl);
-        Assert.False (isQuiting);
-
-        Application.OnKeyDown (Application.QuitKey);
-        Assert.True (isQuiting);
-
-        // Reset the QuitKey to avoid throws errors on another tests
-        Application.QuitKey = Key.Q.WithCtrl;
-        top.Dispose ();
+        Assert.False (Application.TryGetKeyBindings (Key.B, out List<View> _));
     }
 
-    // test Application key Bindings
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBinding_ViewKeyBindings_Add_Adds ()
+    {
+        View view1 = new ();
+        view1.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Save);
+        view1.KeyBindings.Add (Key.B, KeyBindingScope.HotKey, Command.Left);
+        Assert.Single (Application.GetViewsWithKeyBindings ());
+
+        View view2 = new ();
+        view2.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Save);
+        view2.KeyBindings.Add (Key.B, KeyBindingScope.HotKey, Command.Left);
+
+        Assert.True (Application.TryGetKeyBindings (Key.A, out List<View> views));
+        Assert.Contains (view1, views);
+        Assert.Contains (view2, views);
+
+        Assert.False (Application.TryGetKeyBindings (Key.B, out List<View> _));
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBinding_RemoveKeyBinding_Removes ()
+    {
+        View view1 = new ();
+        Application.AddKeyBinding (Key.A, view1);
+
+        Assert.True (Application.TryGetKeyBindings (Key.A, out List<View> views));
+        Assert.Contains (view1, views);
+
+        Application.RemoveKeyBinding (Key.A, view1);
+        Assert.False (Application.TryGetKeyBindings (Key.A, out List<View> _));
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBinding_ViewKeyBindings_RemoveKeyBinding_Removes ()
+    {
+        View view1 = new ();
+        view1.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Save);
+
+        Assert.True (Application.TryGetKeyBindings (Key.A, out List<View> views));
+        Assert.Contains (view1, views);
+
+        view1.KeyBindings.Remove (Key.A);
+        Assert.False (Application.TryGetKeyBindings (Key.A, out List<View> _));
+    }
+
+    // Test View for testing Application key Bindings
     public class ScopedKeyBindingView : View
     {
         public ScopedKeyBindingView ()

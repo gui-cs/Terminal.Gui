@@ -123,25 +123,20 @@ public partial class View : Responder, ISupportInitializeNotification
     /// </remarks>
     public View ()
     {
-        CreateAdornments ();
-
-        HotKeySpecifier = (Rune)'_';
-        TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
-
-        TextDirection = TextDirection.LeftRight_TopBottom;
-        Text = string.Empty;
+        SetupAdornments ();
+        SetupKeyboard ();
+        //SetupMouse ();
+        SetupText ();
 
         CanFocus = false;
         TabIndex = -1;
         TabStop = false;
-
-        AddCommands ();
     }
 
     /// <summary>
     ///     Event called only once when the <see cref="View"/> is being initialized for the first time. Allows
-    ///     configurations and assignments to be performed before the <see cref="View"/> being shown. This derived from
-    ///     <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
+    ///     configurations and assignments to be performed before the <see cref="View"/> being shown.
+    ///     View implements <see cref="ISupportInitializeNotification"/> to allow for more sophisticated initialization.
     /// </summary>
     public event EventHandler Initialized;
 
@@ -503,25 +498,12 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <returns></returns>
     public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
 
-    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
-    /// <remarks>
-    /// <para>
-    ///     Subviews added to this view via <see cref="Add(View)"/> have their lifetime owned by this view and <see cref="Dispose"/> will
-    ///     dispose them. To prevent this, and have the creator of the Subview instance handle disposal, use <see cref="Remove"/> to remove
-    ///     the subview first.
-    /// </para>
-    /// <para>
-    ///     If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and
-    ///     unmanaged resources can be disposed. If disposing equals false, the method has been called by the runtime from
-    ///     inside the finalizer, and you should not reference other objects. Only unmanaged resources can be disposed.
-    /// </para>
-    /// </remarks>
-    /// <param name="disposing"></param>
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
-        // BUGBUG: We should only dispose these objects if disposing == true
         LineCanvas.Dispose ();
 
+        DisposeKeyboard ();
         DisposeAdornments ();
 
         for (int i = InternalSubviews.Count - 1; i >= 0; i--)
