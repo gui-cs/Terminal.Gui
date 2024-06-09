@@ -1,5 +1,3 @@
-using System.Net.Mime;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -124,8 +122,12 @@ public partial class Toplevel : View
         KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
         KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
+        if (Environment.OSVersion.Platform == PlatformID.Unix)
+        {
+            KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
+        }
+
 #if UNIX_KEY_BINDINGS
-        KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
         KeyBindings.Add (Key.L.WithCtrl, Command.Refresh); // Unix
         KeyBindings.Add (Key.F.WithCtrl, Command.NextView); // Unix
         KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
