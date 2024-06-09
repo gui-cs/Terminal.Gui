@@ -53,7 +53,7 @@ public class Button : View
         HighlightStyle |= HighlightStyle.Hover;
 #endif
         // Override default behavior of View
-        AddCommand (Command.HotKey, ctx =>
+        AddCommand (Command.HotKey, () =>
         {
             SetFocus ();
             return !OnAccept ();

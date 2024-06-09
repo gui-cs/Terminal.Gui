@@ -195,10 +195,10 @@ public class ColorPicker : View
     /// <summary>Add the commands.</summary>
     private void AddCommands ()
     {
-        AddCommand (Command.Left, (ctx) => MoveLeft ());
-        AddCommand (Command.Right, (ctx) => MoveRight ());
-        AddCommand (Command.LineUp, (ctx) => MoveUp ());
-        AddCommand (Command.LineDown, (ctx) => MoveDown ());
+        AddCommand (Command.Left, () => MoveLeft ());
+        AddCommand (Command.Right, () => MoveRight ());
+        AddCommand (Command.LineUp, () => MoveUp ());
+        AddCommand (Command.LineDown, () => MoveDown ());
     }
 
     /// <summary>Add the KeyBindinds.</summary>
