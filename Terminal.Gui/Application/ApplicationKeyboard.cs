@@ -210,6 +210,11 @@ partial class Application
     private static readonly Dictionary<Key, List<View>> _keyBindings = new ();
 
     /// <summary>
+    /// Gets the list of <see cref="KeyBindingScope.Application"/> key bindings.
+    /// </summary>
+    public static Dictionary<Key, List<View>> GetKeyBindings () { return _keyBindings; }
+
+    /// <summary>
     ///     Adds an  <see cref="KeyBindingScope.Application"/> scoped key binding.
     /// </summary>
     /// <remarks>

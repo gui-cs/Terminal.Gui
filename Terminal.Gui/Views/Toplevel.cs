@@ -108,7 +108,7 @@ public partial class Toplevel : View
                    );
 
         // Default keybindings for this view
-        KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
+        KeyBindings.Add (Application.QuitKey, KeyBindingScope.Application, Command.QuitToplevel);
 
         KeyBindings.Add (Key.CursorRight, Command.NextView);
         KeyBindings.Add (Key.CursorDown, Command.NextView);
@@ -120,7 +120,8 @@ public partial class Toplevel : View
         KeyBindings.Add (Key.Tab.WithCtrl, Command.NextViewOrTop);
         KeyBindings.Add (Key.Tab.WithShift.WithCtrl, Command.PreviousViewOrTop);
 
-        KeyBindings.Add (Key.F5, Command.Refresh);
+        // TODO: Refresh Key should be configurable
+        KeyBindings.Add (Key.F5, KeyBindingScope.Application, Command.Refresh);
         KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
         KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 

@@ -11,6 +11,9 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Mouse and Keyboard")]
 public sealed class KeyBindings : Scenario
 {
+    private readonly ObservableCollection<string> _focusedBindings = [];
+    private ListView _focusedBindingsListView;
+
     public override void Main ()
     {
         // Init
@@ -20,8 +23,8 @@ public sealed class KeyBindings : Scenario
         Window appWindow = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            SuperViewRendersLineCanvas = true,
         };
-
 
         Label label = new ()
         {
@@ -60,44 +63,98 @@ Pressing Ctrl-Q will cause it to quit the app.",
         };
         appWindow.Add (keyBindingsDemo);
 
-        ObservableCollection<string> bindingList = new ();
-        ListView keyBindingsListView = new ()
+        ObservableCollection<string> appBindings = new ();
+        ListView appBindingsListView = new ()
         {
-            X = 0,
+            Title = "_Application Bindings",
+            BorderStyle = LineStyle.Single,
+            X = -1,
             Y = Pos.Bottom (keyBindingsDemo) + 1,
-            Width = 60,
-            Height = Dim.Fill (1),
+            Width = Dim.Auto (),
+            Height = Dim.Fill () + 1,
             CanFocus = true,
-            Source = new ListWrapper<string> (bindingList),
+            Source = new ListWrapper<string> (appBindings),
+            SuperViewRendersLineCanvas = true
         };
-        appWindow.Add (keyBindingsListView);
+        appWindow.Add (appBindingsListView);
 
-        foreach (var binding in appWindow.KeyBindings.Bindings)
+        foreach (var appBinding in Application.GetKeyBindings ())
         {
-            bindingList.Add ($"{appWindow.GetType ().Name} - {binding.Key} - {binding.Value.Scope}: {binding.Value.Commands [0]}");
-        }
-
-        foreach (var subview in appWindow.Subviews)
-        {
-            foreach (var binding in subview.KeyBindings.Bindings)
+            foreach (var view in appBinding.Value)
             {
-                bindingList.Add ($"{subview.GetType ().Name} - {binding.Key} - {binding.Value.Scope}: {binding.Value.Commands [0]}");
+                var commands = view.KeyBindings.GetCommands (appBinding.Key);
+                appBindings.Add ($"{appBinding.Key} -> {view.GetType ().Name} - {commands [0]}");
             }
         }
 
-        keyBindingsListView.SelectedItem = 0;
-        //keyBindingsListView.MoveEnd ();
+        ObservableCollection<string> hotkeyBindings = new ();
+        ListView hotkeyBindingsListView = new ()
+        {
+            Title = "_Hotkey Bindings",
+            BorderStyle = LineStyle.Single,
+            X = Pos.Right (appBindingsListView) - 1,
+            Y = Pos.Bottom (keyBindingsDemo) + 1,
+            Width = Dim.Auto (),
+            Height = Dim.Fill () + 1,
+            CanFocus = true,
+            Source = new ListWrapper<string> (hotkeyBindings),
+            SuperViewRendersLineCanvas = true
 
-        //appWindow.Initialized += (s, e) =>
-        //{
-        //    keyBindingsListView.EnsureSelectedItemVisible ();
-        //};
+        };
+        appWindow.Add (hotkeyBindingsListView);
+
+        foreach (var subview in appWindow.Subviews)
+        {
+            foreach (var binding in subview.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.HotKey))
+            {
+                hotkeyBindings.Add ($"{binding.Key} -> {subview.GetType ().Name} - {binding.Value.Commands [0]}");
+            }
+        }
+
+        _focusedBindingsListView = new ()
+        {
+            Title = "_Focused Bindings",
+            BorderStyle = LineStyle.Single,
+            X = Pos.Right (hotkeyBindingsListView) - 1,
+            Y = Pos.Bottom (keyBindingsDemo) + 1,
+            Width = Dim.Auto (),
+            Height = Dim.Fill () + 1,
+            CanFocus = true,
+            Source = new ListWrapper<string> (_focusedBindings),
+            SuperViewRendersLineCanvas = true
+
+        };
+        appWindow.Add (_focusedBindingsListView);
+
+        appWindow.Leave += AppWindow_Leave;
+        appWindow.Enter += AppWindow_Leave;
+        appWindow.DrawContent += AppWindow_DrawContent;
+
         // Run - Start the application.
         Application.Run (appWindow);
         appWindow.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
+    }
+
+    private void AppWindow_DrawContent (object sender, DrawEventArgs e)
+    {
+        _focusedBindingsListView.Title = $"_Focused ({Application.Top.MostFocused.GetType ().Name}) Bindings";
+
+        _focusedBindings.Clear ();
+        foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
+        {
+            _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
+        }
+    }
+
+    private void AppWindow_Leave (object sender, FocusEventArgs e)
+    {
+        //foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
+        //{
+        //    _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
+        //}
     }
 }
 
