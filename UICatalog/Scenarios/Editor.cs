@@ -311,6 +311,7 @@ public class Editor : Scenario
 
         _appWindow.Closed += (s, e) => Thread.CurrentThread.CurrentUICulture = new ("en-US");
 
+        CreateFindReplace ();
 
         // Run - Start the application.
         Application.Run (_appWindow);
@@ -689,11 +690,13 @@ public class Editor : Scenario
         private TextView _textView;
         public FindReplaceWindow (TextView textView)
         {
+            Title = "Find and Replace";
+
             _textView = textView;
-            X = Pos.AnchorEnd ();
-            Y = 0;
-            Width = 55;
-            Height = 12;
+            X = Pos.AnchorEnd () - 1;
+            Y = 2;
+            Width = 57;
+            Height = 11;
             Arrangement = ViewArrangement.Movable;
 
             KeyBindings.Add (Key.Esc, KeyBindingScope.Focused, Command.Cancel);
@@ -705,6 +708,15 @@ public class Editor : Scenario
                                         });
             VisibleChanged += FindReplaceWindow_VisibleChanged;
             Initialized += FindReplaceWindow_Initialized;
+
+            //var btnCancel = new Button
+            //{
+            //    X = Pos.AnchorEnd (),
+            //    Y = Pos.AnchorEnd (),
+            //    Text = "Cancel"
+            //};
+            //btnCancel.Accept += (s, e) => { Visible = false; };
+            //Add (btnCancel);
         }
 
         private void FindReplaceWindow_VisibleChanged (object sender, EventArgs e)
@@ -713,47 +725,45 @@ public class Editor : Scenario
             {
                 _textView.SetFocus ();
             }
+            else
+            {
+                FocusFirst();
+            }
         }
 
         private void FindReplaceWindow_Initialized (object sender, EventArgs e)
         {
             Border.LineStyle = LineStyle.Dashed;
-            Border.Thickness = new (1, 2, 1, 1);
+            Border.Thickness = new (0, 1, 0, 0);
         }
     }
 
-    private void CreateFindReplace (bool isFind = true)
+    private void ShowFindReplace (bool isFind = true)
     {
-        if (_findReplaceWindow != null)
-        {
-            _findReplaceWindow.Visible = true;
-            _findReplaceWindow.SetFocus ();
-            _findReplaceWindow.Title = isFind ? "Find" : "Replace";
-            _tabView.SelectedTab = isFind ? _tabView.Tabs.ToArray () [0] : _tabView.Tabs.ToArray () [1];
-            _tabView.SelectedTab.View.FocusFirst ();
-            return;
-        }
+        _findReplaceWindow.Visible = true;
+        _findReplaceWindow.SuperView.BringSubviewToFront (_findReplaceWindow);
+        _tabView.SetFocus();
+        _tabView.SelectedTab = isFind ? _tabView.Tabs.ToArray () [0] : _tabView.Tabs.ToArray () [1];
+        _tabView.SelectedTab.View.FocusFirst ();
+    }
 
-        _findReplaceWindow = new (_textView)
-        {
-            Title = isFind ? "Find" : "Replace",
-        };
+    private void CreateFindReplace ()
+    {
+        _findReplaceWindow = new (_textView);
         _tabView = new ()
         {
             X = 0, Y = 0,
-            Width = Dim.Fill (), Height = Dim.Fill ()
+            Width = Dim.Fill (), Height = Dim.Fill (0)
         };
 
-        _tabView.AddTab (new () { DisplayText = "Find", View = FindTab () }, isFind);
-        View replace = ReplaceTab ();
-        _tabView.AddTab (new () { DisplayText = "Replace", View = replace }, !isFind);
+        _tabView.AddTab (new () { DisplayText = "Find", View = CreateFindTab () }, true);
+        _tabView.AddTab (new () { DisplayText = "Replace", View = CreateReplaceTab () }, false);
         _tabView.SelectedTabChanged += (s, e) => _tabView.SelectedTab.View.FocusFirst ();
         _findReplaceWindow.Add (_tabView);
 
+        _tabView.SelectedTab.View.FocusLast (); // Hack to get the first tab to be focused
+        _findReplaceWindow.Visible = false;
         _appWindow.Add (_findReplaceWindow);
-
-        _findReplaceWindow.SuperView.BringSubviewToFront (_findReplaceWindow);
-        _findReplaceWindow.SetFocus ();
     }
 
     private MenuItem [] CreateKeepChecked ()
@@ -823,11 +833,11 @@ public class Editor : Scenario
         }
     }
 
-    private void Find () { CreateFindReplace (); }
+    private void Find () { ShowFindReplace(true); }
     private void FindNext () { ContinueFind (); }
     private void FindPrevious () { ContinueFind (false); }
 
-    private View FindTab ()
+    private View CreateFindTab ()
     {
         var d = new View ()
         {
@@ -852,7 +862,7 @@ public class Editor : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Width = 20,
+            Width = Dim.Fill (1),
             Text = _textToFind
         };
         txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
@@ -860,8 +870,8 @@ public class Editor : Scenario
 
         var btnFindNext = new Button
         {
-            X = Pos.AnchorEnd (),
-            Y = Pos.Top (label),
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.AnchorEnd (),
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
             IsDefault = true,
 
@@ -872,8 +882,8 @@ public class Editor : Scenario
 
         var btnFindPrevious = new Button
         {
-            X = Pos.AnchorEnd (),
-            Y = Pos.Top (btnFindNext) + 1,
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.AnchorEnd (),
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
             Text = "Find _Previous"
         };
@@ -888,15 +898,6 @@ public class Editor : Scenario
                                      btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
                                  };
 
-        var btnCancel = new Button
-        {
-            X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd (),
-            Text = "Cancel"
-        };
-        btnCancel.Accept += (s, e) => { _findReplaceWindow.Visible = false; };
-        d.Add (btnCancel);
-
         var ckbMatchCase = new CheckBox
         {
             X = 0, Y = Pos.Top (txtToFind) + 2, Checked = _matchCase, Text = "Match c_ase"
@@ -910,7 +911,6 @@ public class Editor : Scenario
         };
         ckbMatchWholeWord.Toggled += (s, e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
         d.Add (ckbMatchWholeWord);
-
         return d;
     }
 
@@ -1034,7 +1034,7 @@ public class Editor : Scenario
         Application.RequestStop ();
     }
 
-    private void Replace () { CreateFindReplace (false); }
+    private void Replace () { ShowFindReplace (false); }
 
     private void ReplaceAll ()
     {
@@ -1066,7 +1066,7 @@ public class Editor : Scenario
     private void ReplaceNext () { ContinueFind (true, true); }
     private void ReplacePrevious () { ContinueFind (false, true); }
 
-    private View ReplaceTab ()
+    private View CreateReplaceTab ()
     {
         var d = new View ()
         {
@@ -1080,7 +1080,6 @@ public class Editor : Scenario
         {
             Width = lblWidth,
             TextAlignment = Alignment.End,
-
             Text = "Find:"
         };
         d.Add (label);
@@ -1091,7 +1090,7 @@ public class Editor : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Width = 20,
+            Width = Dim.Fill (1),
             Text = _textToFind
         };
         txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
@@ -1099,8 +1098,8 @@ public class Editor : Scenario
 
         var btnFindNext = new Button
         {
-            X = Pos.AnchorEnd (),
-            Y = Pos.Top (label),
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.AnchorEnd (),
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
             IsDefault = true,
             Text = "Replace _Next"
@@ -1122,7 +1121,7 @@ public class Editor : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Width = 20,
+            Width = Dim.Fill (1),
             Text = _textToReplace
         };
         txtToReplace.TextChanged += (s, e) => _textToReplace = txtToReplace.Text;
@@ -1130,8 +1129,8 @@ public class Editor : Scenario
 
         var btnFindPrevious = new Button
         {
-            X = Pos.AnchorEnd (),
-            Y = Pos.Top (btnFindNext) + 1,
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.AnchorEnd (),
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
             Text = "Replace _Previous"
         };
@@ -1140,8 +1139,8 @@ public class Editor : Scenario
 
         var btnReplaceAll = new Button
         {
-            X = Pos.AnchorEnd (),
-            Y = Pos.Top (btnFindPrevious) + 1,
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.AnchorEnd (),
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
             Text = "Replace _All"
         };
@@ -1156,15 +1155,6 @@ public class Editor : Scenario
                                      btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
                                      btnReplaceAll.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
                                  };
-
-        var btnCancel = new Button
-        {
-            X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd (),
-            Text = "Cancel"
-        };
-        btnCancel.Accept += (s, e) => { _findReplaceWindow.Visible = false; };
-        d.Add (btnCancel);
 
         var ckbMatchCase = new CheckBox
         {
