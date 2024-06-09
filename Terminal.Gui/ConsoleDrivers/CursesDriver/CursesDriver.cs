@@ -752,9 +752,9 @@ namespace Terminal.Gui {
 			contents = new int [Rows, Cols, 3];
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < Cols; col++) {
-					//Curses.move (row, col);
-					//Curses.attrset (Colors.TopLevel.Normal);
-					//Curses.addch ((int)(uint)' ');
+					Curses.move (row, col);
+					Curses.attrset (Colors.TopLevel.Normal);
+					Curses.addch ((int)(uint)' ');
 					contents [row, col, 0] = ' ';
 					contents [row, col, 1] = Colors.TopLevel.Normal;
 					contents [row, col, 2] = 0;

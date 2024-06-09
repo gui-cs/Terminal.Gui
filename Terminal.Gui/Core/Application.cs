@@ -1133,9 +1133,9 @@ namespace Terminal.Gui {
 
 			// BUGBUG: MdiTop is not cleared here, but it should be?
 
-			MainLoop = null;
 			Driver?.End ();
 			Driver = null;
+			MainLoop = null;
 			Iteration = null;
 			RootMouseEvent = null;
 			RootKeyEvent = null;
