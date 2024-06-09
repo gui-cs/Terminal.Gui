@@ -2398,7 +2398,7 @@ Edit
         menu.MenuOpened += (s, e) =>
                            {
                                miCurrent = e.MenuItem;
-                               mCurrent = menu.openCurrentMenu;
+                               mCurrent = menu.OpenCurrentMenu;
                            };
         var top = new Toplevel ();
         top.Add (menu);
@@ -3123,7 +3123,7 @@ Edit
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorDown));
         menu.Draw ();
         menu._openMenu.Draw ();
-        menu.openCurrentMenu.Draw ();
+        menu.OpenCurrentMenu.Draw ();
 
         expected = @"
  Numbers           
@@ -3416,7 +3416,7 @@ Edit
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.Enter));
         menu.Draw ();
         menu._openMenu.Draw ();
-        menu.openCurrentMenu.Draw ();
+        menu.OpenCurrentMenu.Draw ();
 
         expected = @"
  Numbers     

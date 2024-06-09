@@ -950,11 +950,11 @@ internal sealed class Menu : View
                 _currentChild = 0;
             }
 
-            if (this != _host.openCurrentMenu && _barItems.Children [_currentChild]?.IsFromSubMenu == true && _host._selectedSub > -1)
+            if (this != _host.OpenCurrentMenu && _barItems.Children [_currentChild]?.IsFromSubMenu == true && _host._selectedSub > -1)
             {
                 _host.PreviousMenu (true);
                 _host.SelectEnabledItem (_barItems.Children, _currentChild, out _currentChild);
-                _host.openCurrentMenu = this;
+                _host.OpenCurrentMenu = this;
             }
 
             MenuItem item = _barItems.Children [_currentChild];
@@ -1015,7 +1015,7 @@ internal sealed class Menu : View
 
             if (_host.UseKeysUpDownAsKeysLeftRight && !_host.UseSubMenusSingleFrame)
             {
-                if ((_currentChild == -1 || this != _host.openCurrentMenu)
+                if ((_currentChild == -1 || this != _host.OpenCurrentMenu)
                     && _barItems.Children [_currentChild + 1].IsFromSubMenu
                     && _host._selectedSub > -1)
                 {
@@ -1025,7 +1025,7 @@ internal sealed class Menu : View
                     if (_currentChild > 0)
                     {
                         _currentChild--;
-                        _host.openCurrentMenu = this;
+                        _host.OpenCurrentMenu = this;
                     }
 
                     break;
@@ -1204,8 +1204,8 @@ internal sealed class Menu : View
             }
 
             if (pos == -1
-                && this != _host.openCurrentMenu
-                && subMenu.Children != _host.openCurrentMenu._barItems.Children
+                && this != _host.OpenCurrentMenu
+                && subMenu.Children != _host.OpenCurrentMenu._barItems.Children
                 && !_host.CloseMenu (false, true))
             {
                 return false;
