@@ -2,7 +2,9 @@
 
 namespace Terminal.Gui;
 
-/// <summary>Provides a collection of <see cref="KeyBinding"/> objects bound to a <see cref="Key"/>.</summary>
+/// <summary>
+/// Provides a collection of <see cref="KeyBinding"/> objects bound to a <see cref="Key"/>.
+/// </summary>
 public class KeyBindings
 {
     /// <summary>

@@ -16,10 +16,12 @@ public record struct CommandContext
     /// </summary>
     /// <param name="command"></param>
     /// <param name="key"></param>
-    public CommandContext (Command command, Key? key)
+    /// <param name="keyBinding"></param>
+    public CommandContext (Command command, Key? key, KeyBinding? keyBinding = null)
     {
         Command = command;
         Key = key;
+        KeyBinding = keyBinding;
     }
 
     /// <summary>
@@ -31,4 +33,9 @@ public record struct CommandContext
     ///     The <see cref="Key"/> that is being invoked. This is the key that was pressed to invoke the <see cref="Command"/>.
     /// </summary>
     public Key? Key { get; set; }
+
+    /// <summary>
+    /// The KeyBinding that was used to invoke the <see cref="Command"/>, if any.
+    /// </summary>
+    public KeyBinding? KeyBinding { get; set; }
 }

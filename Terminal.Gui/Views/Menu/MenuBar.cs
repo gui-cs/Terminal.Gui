@@ -106,18 +106,16 @@ public class MenuBarItem : MenuItem
         {
             if (menuItem.HotKey != default (Rune))
             {
-                menuBar.KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
+                KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, menuItem);
 
-                menuBar.KeyBindings.Add (
-                                         (KeyCode)menuItem.HotKey.Value | KeyCode.AltMask,
-                                         KeyBindingScope.HotKey,
-                                         Command.ToggleExpandCollapse
-                                        );
+                menuBar.KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, keyBinding);
+                menuBar.KeyBindings.Add ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask, keyBinding);
             }
 
             if (menuItem.Shortcut != KeyCode.Null)
             {
-                menuBar.KeyBindings.Add (menuItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
+                KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuItem);
+                menuBar.KeyBindings.Add (menuItem.Shortcut, keyBinding);
             }
 
             SubMenu (menuItem)?.AddKeyBindings (menuBar);
@@ -308,8 +306,7 @@ public class MenuBar : View
                         return true;
                     }
                    );
-
-        AddCommand (Command.ToggleExpandCollapse, () => SelectOrRun ());
+        AddCommand (Command.ToggleExpandCollapse, (ctx) => SelectOrRun (ctx.KeyBinding?.Context));
         AddCommand (Command.Select, () => Run (_menuItemToSelect?.Action));
 
         // Default key bindings for this view
@@ -353,29 +350,25 @@ public class MenuBar : View
             // TODO: Bindings (esp for hotkey) should be added across and then down. This currently does down then across. 
             // TODO: As a result, _File._Save will have precedence over in "_File _Edit _ScrollbarView"
             // TODO: Also: Hotkeys should not work for sub-menus if they are not visible!
-            foreach (MenuBarItem menuBarItem in Menus?.Where (m => m is { })!)
+            for (int i = 0; i < Menus.Length; i++)
+//            foreach (MenuBarItem menuBarItem in Menus?.Where (m => m is { })!)
             {
-                if (menuBarItem.HotKey != default (Rune))
+                MenuBarItem menuBarItem = Menus [i];
+                if (menuBarItem?.HotKey != default (Rune))
                 {
-                    KeyBindings.Add (
-                                     (KeyCode)menuBarItem.HotKey.Value,
-                                     Command.ToggleExpandCollapse
-                                    );
-
-                    KeyBindings.Add (
-                                     (KeyCode)menuBarItem.HotKey.Value | KeyCode.AltMask,
-                                     KeyBindingScope.HotKey,
-                                     Command.ToggleExpandCollapse
-                                    );
+                    KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, i);
+                    KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value, keyBinding);
+                    KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value | KeyCode.AltMask, keyBinding);
                 }
 
-                if (menuBarItem.Shortcut != KeyCode.Null)
+                if (menuBarItem?.Shortcut != KeyCode.Null)
                 {
                     // Technically this will never run because MenuBarItems don't have shortcuts
-                    KeyBindings.Add (menuBarItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
+                    KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, i);
+                    KeyBindings.Add (menuBarItem.Shortcut, keyBinding);
                 }
 
-                menuBarItem.AddKeyBindings (this);
+                //menuBarItem?.AddKeyBindings (this);
             }
 #if SUPPORT_ALT_TO_ACTIVATE_MENU
             // Enable the Alt key as a menu activator
@@ -1491,7 +1484,7 @@ public class MenuBar : View
     public new static Rune HotKeySpecifier => (Rune)'_';
 
     // Set in OnInvokingKeyBindings. -1 means no menu item is selected for activation.
-    private int _menuBarItemToActivate;
+    private int _menuBarItemToActivate = -1;
 
     // Set in OnInvokingKeyBindings. null means no sub-menu is selected for activation.
     private MenuItem _menuItemToSelect;
@@ -1503,11 +1496,22 @@ public class MenuBar : View
     ///     whether it has a sub-menu. If the menu is open, it will close the menu bar.
     /// </summary>
     /// <returns></returns>
-    private bool SelectOrRun ()
+    private bool SelectOrRun ([CanBeNull] object context)
     {
         if (!IsInitialized || !Visible)
         {
             return true;
+        }
+
+        if (context is MenuBarItem menuBarItem)
+
+        {
+            _menuItemToSelect = menuBarItem;
+        }
+
+        if (context is int index)
+        {
+            _menuBarItemToActivate = index;
         }
 
         _openedByHotKey = true;
@@ -1515,6 +1519,7 @@ public class MenuBar : View
         if (_menuBarItemToActivate != -1)
         {
             Activate (_menuBarItemToActivate);
+            _menuBarItemToActivate = -1;
         }
         else if (_menuItemToSelect is { })
         {
@@ -1535,81 +1540,81 @@ public class MenuBar : View
         return true;
     }
 
-    /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key key)
-    {
-        // This is a bit of a hack. We want to handle the key bindings for menu bar but
-        // InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
-        // So before we call the base class we set SelectedItem appropriately.
-        // TODO: Figure out if there's a way to have KeyBindings pass context instead. Maybe a KeyBindingContext property?
+    ///// <inheritdoc/>
+    //public override bool? OnInvokingKeyBindings (Key key)
+    //{
+    //    // This is a bit of a hack. We want to handle the key bindings for menu bar but
+    //    // InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
+    //    // So before we call the base class we set SelectedItem appropriately.
+    //    // TODO: Figure out if there's a way to have KeyBindings pass context instead. Maybe a KeyBindingContext property?
 
-        if (KeyBindings.TryGet (key, out _))
-        {
-            _menuBarItemToActivate = -1;
-            _menuItemToSelect = null;
+    //    //if (KeyBindings.TryGet (key, out _))
+    //    //{
+    //    //    _menuBarItemToActivate = -1;
+    //    //    _menuItemToSelect = null;
 
-            // Search for shortcuts first. If there's a shortcut, we don't want to activate the menu item.
-            for (var i = 0; i < Menus.Length; i++)
-            {
-                // Recurse through the menu to find one with the shortcut.
-                if (FindShortcutInChildMenu (key.KeyCode, Menus [i], out _menuItemToSelect))
-                {
-                    _menuBarItemToActivate = i;
+    //    //    // Search for shortcuts first. If there's a shortcut, we don't want to activate the menu item.
+    //    //    for (var i = 0; i < Menus.Length; i++)
+    //    //    {
+    //    //        // Recurse through the menu to find one with the shortcut.
+    //    //        if (FindShortcutInChildMenu (key.KeyCode, Menus [i], out _menuItemToSelect))
+    //    //        {
+    //    //            _menuBarItemToActivate = i;
 
-                    //keyEvent.Scope = KeyBindingScope.HotKey;
+    //    //            //keyEvent.Scope = KeyBindingScope.HotKey;
 
-                    return base.OnInvokingKeyBindings (key);
-                }
+    //    //            return base.OnInvokingKeyBindings (key);
+    //    //        }
 
-                // Now see if any of the menu bar items have a hot key that matches
-                // Technically this is not possible because menu bar items don't have 
-                // shortcuts or Actions. But it's here for completeness. 
-                KeyCode? shortcut = Menus [i]?.Shortcut;
+    //    //        // Now see if any of the menu bar items have a hot key that matches
+    //    //        // Technically this is not possible because menu bar items don't have 
+    //    //        // shortcuts or Actions. But it's here for completeness. 
+    //    //        KeyCode? shortcut = Menus [i]?.Shortcut;
 
-                if (key == shortcut)
-                {
-                    throw new InvalidOperationException ("Menu bar items cannot have shortcuts");
-                }
-            }
+    //    //        if (key == shortcut)
+    //    //        {
+    //    //            throw new InvalidOperationException ("Menu bar items cannot have shortcuts");
+    //    //        }
+    //    //    }
 
-            // Search for hot keys next.
-            for (var i = 0; i < Menus.Length; i++)
-            {
-                if (IsMenuOpen)
-                {
-                    // We don't need to do anything because `Menu` will handle the key binding.
-                    //break;
-                }
+    //    //    // Search for hot keys next.
+    //    //    for (var i = 0; i < Menus.Length; i++)
+    //    //    {
+    //    //        if (IsMenuOpen)
+    //    //        {
+    //    //            // We don't need to do anything because `Menu` will handle the key binding.
+    //    //            //break;
+    //    //        }
 
-                // No submenu item matched (or the menu is closed)
+    //    //        // No submenu item matched (or the menu is closed)
 
-                // Check if one of the menu bar item has a hot key that matches
-                var hotKey = new Key ((char)Menus [i]?.HotKey.Value);
+    //    //        // Check if one of the menu bar item has a hot key that matches
+    //    //        var hotKey = new Key ((char)Menus [i]?.HotKey.Value);
 
-                if (hotKey != Key.Empty)
-                {
-                    bool matches = key == hotKey || key == hotKey.WithAlt || key == hotKey.NoShift.WithAlt;
+    //    //        if (hotKey != Key.Empty)
+    //    //        {
+    //    //            bool matches = key == hotKey || key == hotKey.WithAlt || key == hotKey.NoShift.WithAlt;
 
-                    if (IsMenuOpen)
-                    {
-                        // If the menu is open, only match if Alt is not pressed.
-                        matches = key == hotKey;
-                    }
+    //    //            if (IsMenuOpen)
+    //    //            {
+    //    //                // If the menu is open, only match if Alt is not pressed.
+    //    //                matches = key == hotKey;
+    //    //            }
 
-                    if (matches)
-                    {
-                        _menuBarItemToActivate = i;
+    //    //            if (matches)
+    //    //            {
+    //    //                _menuBarItemToActivate = i;
 
-                        //keyEvent.Scope = KeyBindingScope.HotKey;
+    //    //                //keyEvent.Scope = KeyBindingScope.HotKey;
 
-                        break;
-                    }
-                }
-            }
-        }
+    //    //                break;
+    //    //            }
+    //    //        }
+    //    //    }
+    //    //}
 
-        return base.OnInvokingKeyBindings (key);
-    }
+    //    return base.OnInvokingKeyBindings (key);
+    //}
 
     // TODO: Update to use Key instead of KeyCode
     // Recurse the child menus looking for a shortcut that matches the key

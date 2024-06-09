@@ -52,7 +52,7 @@ public class MenuItem
         Action = action;
         CanExecute = canExecute;
         Parent = parent;
-        _shortcutHelper = new ShortcutHelper ();
+        _shortcutHelper = new ();
 
         if (shortcut != KeyCode.Null)
         {
@@ -463,8 +463,8 @@ internal sealed class Menu : View
                     }
                    );
         AddCommand (Command.Select, () => _host?.SelectItem (_menuItemToSelect));
-        AddCommand (Command.ToggleExpandCollapse, () => SelectOrRun ());
-        AddCommand (Command.HotKey, () => _host?.SelectItem (_menuItemToSelect));
+        AddCommand (Command.ToggleExpandCollapse, (ctx) => SelectOrRun (ctx.KeyBinding?.Context));
+        AddCommand (Command.HotKey, (ctx) => _host?.SelectItem (ctx.KeyBinding?.Context as MenuItem));//_menuItemToSelect));
 
         // Default key bindings for this view
         KeyBindings.Add (Key.CursorUp, Command.LineUp);
@@ -503,16 +503,15 @@ internal sealed class Menu : View
 
         foreach (MenuItem menuItem in menuBarItem.Children.Where (m => m is { }))
         {
-            KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
+            KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, menuItem);
+            KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, keyBinding);
 
-            KeyBindings.Add (
-                             (KeyCode)menuItem.HotKey.Value | KeyCode.AltMask,
-                             Command.ToggleExpandCollapse
-                            );
+            KeyBindings.Add ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask, keyBinding);
 
             if (menuItem.Shortcut != KeyCode.Null)
             {
-                KeyBindings.Add (menuItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
+                keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuItem);
+                KeyBindings.Add (menuItem.Shortcut, keyBinding);
             }
 
             MenuBarItem subMenu = menuBarItem.SubMenu (menuItem);
@@ -525,11 +524,16 @@ internal sealed class Menu : View
 
     /// <summary>Called when a key bound to Command.Select is pressed. This means a hot key was pressed.</summary>
     /// <returns></returns>
-    private bool SelectOrRun ()
+    private bool SelectOrRun ([CanBeNull] object context)
     {
         if (!IsInitialized || !Visible)
         {
             return true;
+        }
+
+        if (context is MenuItem menuItem)
+        {
+            _menuItemToSelect = menuItem;
         }
 
         if (_menuBarItemToActivate != -1)
@@ -591,68 +595,69 @@ internal sealed class Menu : View
 
         KeyCode key = keyEvent.KeyCode;
 
-        if (KeyBindings.TryGet (key, out _))
-        {
-            _menuBarItemToActivate = -1;
-            _menuItemToSelect = null;
+        //if (KeyBindings.TryGet (key, out _))
+        //{
+        //    _menuBarItemToActivate = -1;
+        //    _menuItemToSelect = null;
 
-            MenuItem [] children = _barItems.Children;
+        //    MenuItem [] children = _barItems.Children;
 
-            if (children is null)
-            {
-                return base.OnInvokingKeyBindings (keyEvent);
-            }
+        //    if (children is null)
+        //    {
+        //        return base.OnInvokingKeyBindings (keyEvent);
+        //    }
 
-            // Search for shortcuts first. If there's a shortcut, we don't want to activate the menu item.
-            foreach (MenuItem c in children)
-            {
-                if (key == c?.Shortcut)
-                {
-                    _menuBarItemToActivate = -1;
-                    _menuItemToSelect = c;
-                    //keyEvent.Scope = KeyBindingScope.HotKey;
+        //    // Search for shortcuts first. If there's a shortcut, we don't want to activate the menu item.
+        //    foreach (MenuItem c in children)
+        //    {
+        //        if (key == c?.Shortcut)
+        //        {
+        //            _menuBarItemToActivate = -1;
+        //            _menuItemToSelect = c;
 
-                    return base.OnInvokingKeyBindings (keyEvent);
-                }
+        //            //keyEvent.Scope = KeyBindingScope.HotKey;
 
-                MenuBarItem subMenu = _barItems.SubMenu (c);
+        //            return base.OnInvokingKeyBindings (keyEvent);
+        //        }
 
-                if (FindShortcutInChildMenu (key, subMenu))
-                {
-                    //keyEvent.Scope = KeyBindingScope.HotKey;
+        //        MenuBarItem subMenu = _barItems.SubMenu (c);
 
-                    return base.OnInvokingKeyBindings (keyEvent);
-                }
-            }
+        //        if (FindShortcutInChildMenu (key, subMenu))
+        //        {
+        //            //keyEvent.Scope = KeyBindingScope.HotKey;
 
-            // Search for hot keys next.
-            for (var c = 0; c < children.Length; c++)
-            {
-                int hotKeyValue = children [c]?.HotKey.Value ?? default (int);
-                var hotKey = (KeyCode)hotKeyValue;
+        //            return base.OnInvokingKeyBindings (keyEvent);
+        //        }
+        //    }
 
-                if (hotKey == KeyCode.Null)
-                {
-                    continue;
-                }
+        //    // Search for hot keys next.
+        //    for (var c = 0; c < children.Length; c++)
+        //    {
+        //        int hotKeyValue = children [c]?.HotKey.Value ?? default (int);
+        //        var hotKey = (KeyCode)hotKeyValue;
 
-                bool matches = key == hotKey || key == (hotKey | KeyCode.AltMask);
+        //        if (hotKey == KeyCode.Null)
+        //        {
+        //            continue;
+        //        }
 
-                if (!_host.IsMenuOpen)
-                {
-                    // If the menu is open, only match if Alt is not pressed.
-                    matches = key == hotKey;
-                }
+        //        bool matches = key == hotKey || key == (hotKey | KeyCode.AltMask);
 
-                if (matches)
-                {
-                    _menuItemToSelect = children [c];
-                    _currentChild = c;
+        //        if (!_host.IsMenuOpen)
+        //        {
+        //            // If the menu is open, only match if Alt is not pressed.
+        //            matches = key == hotKey;
+        //        }
 
-                    return base.OnInvokingKeyBindings (keyEvent);
-                }
-            }
-        }
+        //        if (matches)
+        //        {
+        //            _menuItemToSelect = children [c];
+        //            _currentChild = c;
+
+        //            return base.OnInvokingKeyBindings (keyEvent);
+        //        }
+        //    }
+        //}
 
         bool? handled = base.OnInvokingKeyBindings (keyEvent);
 
@@ -727,6 +732,7 @@ internal sealed class Menu : View
         View view = a.View ?? this;
 
         Point boundsPoint = view.ScreenToViewport (new (a.Position.X, a.Position.Y));
+
         var me = new MouseEvent
         {
             Position = boundsPoint,
@@ -786,12 +792,12 @@ internal sealed class Menu : View
 
             Driver.SetAttribute (
                                  item is null ? GetNormalColor () :
-                                 i == _currentChild ? GetFocusColor() : GetNormalColor ()
+                                 i == _currentChild ? GetFocusColor () : GetNormalColor ()
                                 );
 
             if (item is null && BorderStyle != LineStyle.None)
             {
-                var s = ViewportToScreen (new Point (-1, i));
+                Point s = ViewportToScreen (new Point (-1, i));
                 Driver.Move (s.X, s.Y);
                 Driver.AddRune (Glyphs.LeftTee);
             }
@@ -839,7 +845,7 @@ internal sealed class Menu : View
             {
                 if (BorderStyle != LineStyle.None && SuperView?.Frame.Right - Frame.X > Frame.Width)
                 {
-                    var s = ViewportToScreen (new Point (Frame.Width - 2, i));
+                    Point s = ViewportToScreen (new Point (Frame.Width - 2, i));
                     Driver.Move (s.X, s.Y);
                     Driver.AddRune (Glyphs.RightTee);
                 }
@@ -876,7 +882,8 @@ internal sealed class Menu : View
                 textToDraw = item.Title;
             }
 
-            var screen = ViewportToScreen (new Point(0  , i));
+            Point screen = ViewportToScreen (new Point (0, i));
+
             if (screen.X < Driver.Cols)
             {
                 Driver.Move (screen.X + 1, screen.Y);
@@ -895,7 +902,7 @@ internal sealed class Menu : View
 
                     // The -3 is left/right border + one space (not sure what for)
                     tf.Draw (
-                             ViewportToScreen (new Rectangle(1, i, Frame.Width - 3, 1)),
+                             ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
                              i == _currentChild ? GetFocusColor () : GetNormalColor (),
                              i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
                              SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
@@ -934,7 +941,7 @@ internal sealed class Menu : View
 
         Driver.Clip = savedClip;
 
-       // PositionCursor ();
+        // PositionCursor ();
     }
 
     private void Current_DrawContentComplete (object sender, DrawEventArgs e)
@@ -953,13 +960,10 @@ internal sealed class Menu : View
             {
                 return _host?.PositionCursor ();
             }
-            else
-            {
-                Move (2, 1 + _currentChild);
 
-                return null; // Don't show the cursor
+            Move (2, 1 + _currentChild);
 
-            }
+            return null; // Don't show the cursor
         }
 
         return _host?.PositionCursor ();
@@ -1176,7 +1180,7 @@ internal sealed class Menu : View
         _host?.SetNeedsDisplay ();
     }
 
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (!_host._handled && !_host.HandleGrabView (me, this))
         {

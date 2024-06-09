@@ -755,7 +755,7 @@ public partial class View
             }
 
             // each command has its own return value
-            bool? thisReturn = InvokeCommand (command, key);
+            bool? thisReturn = InvokeCommand (command, key, binding);
 
             // if we haven't got anything yet, the current command result should be used
             toReturn ??= thisReturn;
@@ -780,7 +780,7 @@ public partial class View
     ///     <see langword="true"/> if the command was invoked and it handled the command.
     ///     <see langword="false"/> if the command was invoked and it did not handle the command.
     /// </returns>
-    public bool? InvokeCommands (Command [] commands, [CanBeNull] Key key = null)
+    public bool? InvokeCommands (Command [] commands, [CanBeNull] Key key = null, [CanBeNull] KeyBinding? keyBinding = null)
     {
         bool? toReturn = null;
 
@@ -792,7 +792,7 @@ public partial class View
             }
 
             // each command has its own return value
-            bool? thisReturn = InvokeCommand (command, key);
+            bool? thisReturn = InvokeCommand (command, key, keyBinding);
 
             // if we haven't got anything yet, the current command result should be used
             toReturn ??= thisReturn;
@@ -810,15 +810,16 @@ public partial class View
     /// <summary>Invokes the specified command.</summary>
     /// <param name="command">The command to invoke.</param>
     /// <param name="key">The key that caused the command to be invoked, if any.</param>
+    /// <param name="keyBinding"></param>
     /// <returns>
     ///     <see langword="null"/> if no command was found. <see langword="true"/> if the command was invoked, and it
     ///     handled the command. <see langword="false"/> if the command was invoked, and it did not handle the command.
     /// </returns>
-    public bool? InvokeCommand (Command command, [CanBeNull] Key key = null)
+    public bool? InvokeCommand (Command command, [CanBeNull] Key key = null, [CanBeNull] KeyBinding? keyBinding = null)
     {
         if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?> implementation))
         {
-            var context = new CommandContext (command, key); // Create the context here
+            var context = new CommandContext (command, key, keyBinding); // Create the context here
             return implementation (context);
         }
 
