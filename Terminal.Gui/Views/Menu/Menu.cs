@@ -121,15 +121,6 @@ internal sealed class Menu : View
                    );
 
         AddKeyBindings (_barItems);
-#if SUPPORT_ALT_TO_ACTIVATE_MENU
-        Initialized += (s, e) =>
-                       {
-                           if (SuperView is { })
-                           {
-                               SuperView.KeyUp += SuperView_KeyUp;
-                           }
-                       };
-#endif
     }
 
     public Menu ()
@@ -175,9 +166,9 @@ internal sealed class Menu : View
                         return true;
                     }
                    );
-        AddCommand (Command.Select, (ctx) => _host?.SelectItem (ctx.KeyBinding?.Context as MenuItem));
-        AddCommand (Command.ToggleExpandCollapse, (ctx) => SelectOrRun (ctx.KeyBinding?.Context));
-        AddCommand (Command.HotKey, (ctx) => _host?.SelectItem (ctx.KeyBinding?.Context as MenuItem));
+        AddCommand (Command.Select, ctx => _host?.SelectItem (ctx.KeyBinding?.Context as MenuItem));
+        AddCommand (Command.ToggleExpandCollapse, ctx => ExpandCollapse (ctx.KeyBinding?.Context as MenuItem));
+        AddCommand (Command.HotKey, ctx => _host?.SelectItem (ctx.KeyBinding?.Context as MenuItem));
 
         // Default key bindings for this view
         KeyBindings.Add (Key.CursorUp, Command.LineUp);
@@ -186,26 +177,7 @@ internal sealed class Menu : View
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.Esc, Command.Cancel);
         KeyBindings.Add (Key.Enter, Command.Accept);
-        KeyBindings.Add (Key.F9, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
-
-        KeyBindings.Add (
-                         KeyCode.CtrlMask | KeyCode.Space,
-                         KeyBindingScope.HotKey,
-                         Command.ToggleExpandCollapse
-                        );
     }
-
-#if SUPPORT_ALT_TO_ACTIVATE_MENU
-    void SuperView_KeyUp (object sender, KeyEventArgs e)
-    {
-        if (SuperView is null || SuperView.CanFocus == false || SuperView.Visible == false)
-        {
-            return;
-        }
-
-        _host.AltKeyUpHandler (e);
-    }
-#endif
 
     private void AddKeyBindings (MenuBarItem menuBarItem)
     {
@@ -235,35 +207,29 @@ internal sealed class Menu : View
         }
     }
 
-    // TODO: Remove these now that we're using context
-    private MenuItem _menuItemToSelect;
-
-    /// <summary>Called when a key bound to Command.Select is pressed. This means a hot key was pressed.</summary>
+    /// <summary>Called when a key bound to Command.ToggleExpandCollapse is pressed. This means a hot key was pressed.</summary>
     /// <returns></returns>
-    private bool SelectOrRun ([CanBeNull] object context)
+    private bool ExpandCollapse (MenuItem menuItem)
     {
         if (!IsInitialized || !Visible)
         {
             return true;
         }
 
-        if (context is MenuItem menuItem)
-        {
-            _menuItemToSelect = menuItem;
-            for (int c = 0; c < _barItems.Children.Length; c++)
-            {
-                if (_barItems.Children [c] == menuItem)
-                {
-                    _currentChild = c;
 
-                    break;
-                }
+        for (var c = 0; c < _barItems.Children.Length; c++)
+        {
+            if (_barItems.Children [c] == menuItem)
+            {
+                _currentChild = c;
+
+                break;
             }
         }
 
-        if (_menuItemToSelect is { })
+        if (menuItem is { })
         {
-            var m = _menuItemToSelect as MenuBarItem;
+            var m = menuItem as MenuBarItem;
 
             if (m?.Children?.Length > 0)
             {
@@ -291,7 +257,7 @@ internal sealed class Menu : View
             }
             else
             {
-                _host.SelectItem (_menuItemToSelect);
+                _host.SelectItem (menuItem);
             }
         }
         else if (_host.IsMenuOpen)
@@ -303,7 +269,6 @@ internal sealed class Menu : View
             _host.OpenMenu ();
         }
 
-        //_openedByHotKey = true;
         return true;
     }
 
@@ -344,7 +309,7 @@ internal sealed class Menu : View
             Application.MouseEvent -= Application_RootMouseEvent;
         }
     }
-    
+
     private void Application_RootMouseEvent (object sender, MouseEvent a)
     {
         if (a.View is { } and (MenuBar or not Menu))
@@ -937,33 +902,6 @@ internal sealed class Menu : View
         }
 
         return true;
-    }
-
-    private int GetSubMenuIndex (MenuBarItem subMenu)
-    {
-        int pos = -1;
-
-        if (Subviews.Count == 0)
-        {
-            return pos;
-        }
-
-        Menu v = null;
-
-        foreach (View menu in Subviews)
-        {
-            if (((Menu)menu)._barItems == subMenu)
-            {
-                v = (Menu)menu;
-            }
-        }
-
-        if (v is { })
-        {
-            pos = Subviews.IndexOf (v);
-        }
-
-        return pos;
     }
 
     protected override void Dispose (bool disposing)

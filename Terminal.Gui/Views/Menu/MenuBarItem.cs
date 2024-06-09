@@ -11,7 +11,7 @@ public class MenuBarItem : MenuItem
     /// <param name="help">Help text to display. Will be displayed next to the Title surrounded by parentheses.</param>
     /// <param name="action">Action to invoke when the menu item is activated.</param>
     /// <param name="canExecute">Function to determine if the action can currently be executed.</param>
-    /// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
+    /// <param name="parent">The parent <see cref="MenuItem"/> of this if any.</param>
     public MenuBarItem (
         string title,
         string help,
@@ -26,13 +26,13 @@ public class MenuBarItem : MenuItem
     /// <summary>Initializes a new <see cref="MenuBarItem"/>.</summary>
     /// <param name="title">Title for the menu item.</param>
     /// <param name="children">The items in the current menu.</param>
-    /// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
+    /// <param name="parent">The parent <see cref="MenuItem"/> of this if any.</param>
     public MenuBarItem (string title, MenuItem [] children, MenuItem parent = null) { SetInitialProperties (title, children, parent); }
 
     /// <summary>Initializes a new <see cref="MenuBarItem"/> with separate list of items.</summary>
     /// <param name="title">Title for the menu item.</param>
     /// <param name="children">The list of items in the current menu.</param>
-    /// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
+    /// <param name="parent">The parent <see cref="MenuItem"/> of this if any.</param>
     public MenuBarItem (string title, List<MenuItem []> children, MenuItem parent = null) { SetInitialProperties (title, children, parent); }
 
     /// <summary>Initializes a new <see cref="MenuBarItem"/>.</summary>
@@ -40,7 +40,7 @@ public class MenuBarItem : MenuItem
     public MenuBarItem (MenuItem [] children) : this ("", children) { }
 
     /// <summary>Initializes a new <see cref="MenuBarItem"/>.</summary>
-    public MenuBarItem () : this (new MenuItem [] { }) { }
+    public MenuBarItem () : this ([]) { }
 
     /// <summary>
     ///     Gets or sets an array of <see cref="MenuItem"/> objects that are the children of this
@@ -58,17 +58,19 @@ public class MenuBarItem : MenuItem
     {
         var i = 0;
 
-        if (Children is { })
+        if (Children is null)
         {
-            foreach (MenuItem child in Children)
-            {
-                if (child == children)
-                {
-                    return i;
-                }
+            return -1;
+        }
 
-                i++;
+        foreach (MenuItem child in Children)
+        {
+            if (child == children)
+            {
+                return i;
             }
+
+            i++;
         }
 
         return -1;
@@ -79,15 +81,7 @@ public class MenuBarItem : MenuItem
     /// <returns>Returns <c>true</c> if it is a submenu. <c>false</c> otherwise.</returns>
     public bool IsSubMenuOf (MenuItem menuItem)
     {
-        foreach (MenuItem child in Children)
-        {
-            if (child == menuItem && child.Parent == menuItem.Parent)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return Children.Any (child => child == menuItem && child.Parent == menuItem.Parent);
     }
 
     /// <summary>Check if a <see cref="MenuItem"/> is a <see cref="MenuBarItem"/>.</summary>
@@ -133,30 +127,35 @@ public class MenuBarItem : MenuItem
             Parent = parent;
         }
 
-        if (children is List<MenuItem []> childrenList)
+        switch (children)
         {
-            MenuItem [] newChildren = [];
-
-            foreach (MenuItem [] grandChild in childrenList)
+            case List<MenuItem []> childrenList:
             {
-                foreach (MenuItem child in grandChild)
-                {
-                    SetParent (grandChild);
-                    Array.Resize (ref newChildren, newChildren.Length + 1);
-                    newChildren [^1] = child;
-                }
-            }
+                MenuItem [] newChildren = [];
 
-            Children = newChildren;
-        }
-        else if (children is MenuItem [] items)
-        {
-            SetParent (items);
-            Children = items;
-        }
-        else
-        {
-            Children = null;
+                foreach (MenuItem [] grandChild in childrenList)
+                {
+                    foreach (MenuItem child in grandChild)
+                    {
+                        SetParent (grandChild);
+                        Array.Resize (ref newChildren, newChildren.Length + 1);
+                        newChildren [^1] = child;
+                    }
+                }
+
+                Children = newChildren;
+
+                break;
+            }
+            case MenuItem [] items:
+                SetParent (items);
+                Children = items;
+
+                break;
+            default:
+                Children = null;
+
+                break;
         }
     }
 
