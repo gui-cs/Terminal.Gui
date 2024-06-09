@@ -218,6 +218,7 @@ public class StatusBar : View
     /// <inheritdoc/>
     public override bool? OnInvokingKeyBindings (Key keyEvent)
     {
+        // TODO: Use CommandContext
         // This is a bit of a hack. We want to handle the key bindings for status bar but
         // InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
         // So before we call the base class we set SelectedItem appropriately.

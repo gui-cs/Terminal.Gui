@@ -314,6 +314,7 @@ public override void OnDrawContent (Rectangle viewport)
 /// <inheritdoc/>
 public override bool? OnInvokingKeyBindings (Key keyEvent)
 {
+    // TODO: Use CommandContext
     // This is a bit of a hack. We want to handle the key bindings for the radio group but
     // InvokeKeyBindings doesn't pass any context so we can't tell if the key binding is for
     // the radio group or for one of the radio buttons. So before we call the base class
