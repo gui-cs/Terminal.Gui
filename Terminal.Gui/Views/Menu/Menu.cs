@@ -462,9 +462,9 @@ internal sealed class Menu : View
                         return true;
                     }
                    );
-        AddCommand (Command.Select, () => _host?.SelectItem (_menuItemToSelect));
+        AddCommand (Command.Select, (ctx) => _host?.SelectItem (ctx.KeyBinding?.Context as MenuItem));
         AddCommand (Command.ToggleExpandCollapse, (ctx) => SelectOrRun (ctx.KeyBinding?.Context));
-        AddCommand (Command.HotKey, (ctx) => _host?.SelectItem (ctx.KeyBinding?.Context as MenuItem));//_menuItemToSelect));
+        AddCommand (Command.HotKey, (ctx) => _host?.SelectItem (ctx.KeyBinding?.Context as MenuItem));
 
         // Default key bindings for this view
         KeyBindings.Add (Key.CursorUp, Command.LineUp);
@@ -504,9 +504,12 @@ internal sealed class Menu : View
         foreach (MenuItem menuItem in menuBarItem.Children.Where (m => m is { }))
         {
             KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, menuItem);
-            KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, keyBinding);
 
-            KeyBindings.Add ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask, keyBinding);
+            if ((KeyCode)menuItem.HotKey.Value != KeyCode.Null)
+            {
+                KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, keyBinding);
+                KeyBindings.Add ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask, keyBinding);
+            }
 
             if (menuItem.Shortcut != KeyCode.Null)
             {
@@ -519,7 +522,7 @@ internal sealed class Menu : View
         }
     }
 
-    private int _menuBarItemToActivate = -1;
+    // TODO: Remove these now that we're using context
     private MenuItem _menuItemToSelect;
 
     /// <summary>Called when a key bound to Command.Select is pressed. This means a hot key was pressed.</summary>
@@ -534,13 +537,18 @@ internal sealed class Menu : View
         if (context is MenuItem menuItem)
         {
             _menuItemToSelect = menuItem;
+            for (int c = 0; c < _barItems.Children.Length; c++)
+            {
+                if (_barItems.Children [c] == menuItem)
+                {
+                    _currentChild = c;
+
+                    break;
+                }
+            }
         }
 
-        if (_menuBarItemToActivate != -1)
-        {
-            _host.Activate (1, _menuBarItemToActivate);
-        }
-        else if (_menuItemToSelect is { })
+        if (_menuItemToSelect is { })
         {
             var m = _menuItemToSelect as MenuBarItem;
 
@@ -589,76 +597,6 @@ internal sealed class Menu : View
     /// <inheritdoc/>
     public override bool? OnInvokingKeyBindings (Key keyEvent)
     {
-        // This is a bit of a hack. We want to handle the key bindings for menu bar but
-        // InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
-        // So before we call the base class we set SelectedItem appropriately.
-
-        KeyCode key = keyEvent.KeyCode;
-
-        //if (KeyBindings.TryGet (key, out _))
-        //{
-        //    _menuBarItemToActivate = -1;
-        //    _menuItemToSelect = null;
-
-        //    MenuItem [] children = _barItems.Children;
-
-        //    if (children is null)
-        //    {
-        //        return base.OnInvokingKeyBindings (keyEvent);
-        //    }
-
-        //    // Search for shortcuts first. If there's a shortcut, we don't want to activate the menu item.
-        //    foreach (MenuItem c in children)
-        //    {
-        //        if (key == c?.Shortcut)
-        //        {
-        //            _menuBarItemToActivate = -1;
-        //            _menuItemToSelect = c;
-
-        //            //keyEvent.Scope = KeyBindingScope.HotKey;
-
-        //            return base.OnInvokingKeyBindings (keyEvent);
-        //        }
-
-        //        MenuBarItem subMenu = _barItems.SubMenu (c);
-
-        //        if (FindShortcutInChildMenu (key, subMenu))
-        //        {
-        //            //keyEvent.Scope = KeyBindingScope.HotKey;
-
-        //            return base.OnInvokingKeyBindings (keyEvent);
-        //        }
-        //    }
-
-        //    // Search for hot keys next.
-        //    for (var c = 0; c < children.Length; c++)
-        //    {
-        //        int hotKeyValue = children [c]?.HotKey.Value ?? default (int);
-        //        var hotKey = (KeyCode)hotKeyValue;
-
-        //        if (hotKey == KeyCode.Null)
-        //        {
-        //            continue;
-        //        }
-
-        //        bool matches = key == hotKey || key == (hotKey | KeyCode.AltMask);
-
-        //        if (!_host.IsMenuOpen)
-        //        {
-        //            // If the menu is open, only match if Alt is not pressed.
-        //            matches = key == hotKey;
-        //        }
-
-        //        if (matches)
-        //        {
-        //            _menuItemToSelect = children [c];
-        //            _currentChild = c;
-
-        //            return base.OnInvokingKeyBindings (keyEvent);
-        //        }
-        //    }
-        //}
-
         bool? handled = base.OnInvokingKeyBindings (keyEvent);
 
         if (handled is { } && (bool)handled)
@@ -666,32 +604,9 @@ internal sealed class Menu : View
             return true;
         }
 
+        // TODO: Determine if there's a cleaner way to handle this
         // This supports the case where the menu bar is a context menu
         return _host.OnInvokingKeyBindings (keyEvent);
-    }
-
-    private bool FindShortcutInChildMenu (KeyCode key, MenuBarItem menuBarItem)
-    {
-        if (menuBarItem?.Children is null)
-        {
-            return false;
-        }
-
-        foreach (MenuItem menuItem in menuBarItem.Children)
-        {
-            if (key == menuItem?.Shortcut)
-            {
-                _menuBarItemToActivate = -1;
-                _menuItemToSelect = menuItem;
-
-                return true;
-            }
-
-            MenuBarItem subMenu = menuBarItem.SubMenu (menuItem);
-            FindShortcutInChildMenu (key, subMenu);
-        }
-
-        return false;
     }
 
     private void Current_TerminalResized (object sender, SizeChangedEventArgs e)
@@ -716,7 +631,7 @@ internal sealed class Menu : View
             Application.MouseEvent -= Application_RootMouseEvent;
         }
     }
-
+    
     private void Application_RootMouseEvent (object sender, MouseEvent a)
     {
         if (a.View is { } and (MenuBar or not Menu))
