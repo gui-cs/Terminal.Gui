@@ -154,10 +154,10 @@ public class MenuItem
                                : 0); // Pad two spaces before shortcut tag (which are also aligned right)
 
     /// <summary>Merely a debugging aid to see the interaction with main.</summary>
-    public bool GetMenuBarItem () { return IsFromSubMenu; }
+    internal bool GetMenuBarItem () { return IsFromSubMenu; }
 
     /// <summary>Merely a debugging aid to see the interaction with main.</summary>
-    public MenuItem GetMenuItem () { return this; }
+    internal MenuItem GetMenuItem () { return this; }
 
     /// <summary>
     ///     Returns <see langword="true"/> if the menu item is enabled. This method is a wrapper around
@@ -217,7 +217,6 @@ public class MenuItem
     ///     <para>See also <see cref="Shortcut"/> which enable global key-bindings to menu items.</para>
     /// </summary>
     public Rune HotKey { get; set; }
-
     private void GetHotKey ()
     {
         var nextIsHot = false;
