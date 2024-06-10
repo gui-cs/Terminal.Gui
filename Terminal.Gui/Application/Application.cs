@@ -99,7 +99,6 @@ public static partial class Application
         // Don't dispose the Top. It's up to caller dispose it
         if (Top is { })
         {
-
             Debug.Assert (Top.WasDisposed);
 
             // If End wasn't called _cachedRunStateToplevel may be null
@@ -158,6 +157,7 @@ public static partial class Application
         KeyDown = null;
         KeyUp = null;
         SizeChanging = null;
+        ClearKeyBindings ();
 
         Colors.Reset ();
 
@@ -539,6 +539,7 @@ public static partial class Application
             toplevel.SetNeedsDisplay ();
             toplevel.Draw ();
             Driver.UpdateScreen ();
+
             if (PositionCursor (toplevel))
             {
                 Driver.UpdateCursor ();
@@ -551,13 +552,14 @@ public static partial class Application
     }
 
     /// <summary>
-    /// Calls <see cref="View.PositionCursor"/> on the most focused view in the view starting with <paramref name="view"/>.
+    ///     Calls <see cref="View.PositionCursor"/> on the most focused view in the view starting with <paramref name="view"/>.
     /// </summary>
     /// <remarks>
-    /// Does nothing if <paramref name="view"/> is <see langword="null"/> or if the most focused view is not visible or enabled.
-    /// <para>
-    /// If the most focused view is not visible within it's superview, the cursor will be hidden.
-    /// </para>
+    ///     Does nothing if <paramref name="view"/> is <see langword="null"/> or if the most focused view is not visible or
+    ///     enabled.
+    ///     <para>
+    ///         If the most focused view is not visible within it's superview, the cursor will be hidden.
+    ///     </para>
     /// </remarks>
     /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
     internal static bool PositionCursor (View view)
@@ -581,6 +583,7 @@ public static partial class Application
         if (!mostFocused.Visible || !mostFocused.Enabled)
         {
             Driver.GetCursorVisibility (out CursorVisibility current);
+
             if (current != CursorVisibility.Invisible)
             {
                 Driver.SetCursorVisibility (CursorVisibility.Invisible);
@@ -592,6 +595,7 @@ public static partial class Application
         // If the view is not visible within it's superview, don't position the cursor
         Rectangle mostFocusedViewport = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = Point.Empty });
         Rectangle superViewViewport = mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver.Screen;
+
         if (!superViewViewport.IntersectsWith (mostFocusedViewport))
         {
             return false;
@@ -673,7 +677,7 @@ public static partial class Application
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
-        where T : Toplevel, new()
+        where T : Toplevel, new ()
     {
         var top = new T ();
 
@@ -960,6 +964,7 @@ public static partial class Application
         {
             state.Toplevel.Draw ();
             Driver.UpdateScreen ();
+
             //Driver.UpdateCursor ();
         }
 
@@ -1420,516 +1425,4 @@ public static partial class Application
     }
 
     #endregion Toplevel handling
-
-    #region Mouse handling
-
-    /// <summary>Disable or enable the mouse. The mouse is enabled by default.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static bool IsMouseDisabled { get; set; }
-
-    /// <summary>The current <see cref="View"/> object that wants continuous mouse button pressed events.</summary>
-    public static View WantContinuousButtonPressedView { get; private set; }
-
-    /// <summary>
-    ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to
-    ///     this view until the view calls <see cref="UngrabMouse"/> or the mouse is released.
-    /// </summary>
-    public static View MouseGrabView { get; private set; }
-
-    /// <summary>Invoked when a view wants to grab the mouse; can be canceled.</summary>
-    public static event EventHandler<GrabMouseEventArgs> GrabbingMouse;
-
-    /// <summary>Invoked when a view wants un-grab the mouse; can be canceled.</summary>
-    public static event EventHandler<GrabMouseEventArgs> UnGrabbingMouse;
-
-    /// <summary>Invoked after a view has grabbed the mouse.</summary>
-    public static event EventHandler<ViewEventArgs> GrabbedMouse;
-
-    /// <summary>Invoked after a view has un-grabbed the mouse.</summary>
-    public static event EventHandler<ViewEventArgs> UnGrabbedMouse;
-
-    /// <summary>
-    ///     Grabs the mouse, forcing all mouse events to be routed to the specified view until <see cref="UngrabMouse"/>
-    ///     is called.
-    /// </summary>
-    /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
-    public static void GrabMouse (View view)
-    {
-        if (view is null)
-        {
-            return;
-        }
-
-        if (!OnGrabbingMouse (view))
-        {
-            OnGrabbedMouse (view);
-            MouseGrabView = view;
-        }
-    }
-
-    /// <summary>Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.</summary>
-    public static void UngrabMouse ()
-    {
-        if (MouseGrabView is null)
-        {
-            return;
-        }
-
-        if (!OnUnGrabbingMouse (MouseGrabView))
-        {
-            View view = MouseGrabView;
-            MouseGrabView = null;
-            OnUnGrabbedMouse (view);
-        }
-    }
-
-    private static bool OnGrabbingMouse (View view)
-    {
-        if (view is null)
-        {
-            return false;
-        }
-
-        var evArgs = new GrabMouseEventArgs (view);
-        GrabbingMouse?.Invoke (view, evArgs);
-
-        return evArgs.Cancel;
-    }
-
-    private static bool OnUnGrabbingMouse (View view)
-    {
-        if (view is null)
-        {
-            return false;
-        }
-
-        var evArgs = new GrabMouseEventArgs (view);
-        UnGrabbingMouse?.Invoke (view, evArgs);
-
-        return evArgs.Cancel;
-    }
-
-    private static void OnGrabbedMouse (View view)
-    {
-        if (view is null)
-        {
-            return;
-        }
-
-        GrabbedMouse?.Invoke (view, new (view));
-    }
-
-    private static void OnUnGrabbedMouse (View view)
-    {
-        if (view is null)
-        {
-            return;
-        }
-
-        UnGrabbedMouse?.Invoke (view, new (view));
-    }
-
-#nullable enable
-
-    // Used by OnMouseEvent to track the last view that was clicked on.
-    internal static View? _mouseEnteredView;
-
-    /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Use this event to receive mouse events in screen coordinates. Use <see cref="MouseEvent"/> to
-    ///         receive mouse events relative to a <see cref="View.Viewport"/>.
-    ///     </para>
-    ///     <para>The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.</para>
-    /// </remarks>
-    public static event EventHandler<MouseEvent>? MouseEvent;
-
-    /// <summary>Called when a mouse event occurs. Raises the <see cref="MouseEvent"/> event.</summary>
-    /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
-    /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
-    internal static void OnMouseEvent (MouseEvent mouseEvent)
-    {
-        if (IsMouseDisabled)
-        {
-            return;
-        }
-
-        var view = View.FindDeepestView (Current, mouseEvent.Position);
-
-        if (view is { })
-        {
-            mouseEvent.View = view;
-        }
-
-        MouseEvent?.Invoke (null, mouseEvent);
-
-        if (mouseEvent.Handled)
-        {
-            return;
-        }
-
-        if (MouseGrabView is { })
-        {
-            // If the mouse is grabbed, send the event to the view that grabbed it.
-            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.Position);
-
-            var viewRelativeMouseEvent = new MouseEvent
-            {
-                Position = frameLoc,
-                Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.Position,
-                View = MouseGrabView
-            };
-
-            if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
-            {
-                // The mouse has moved outside the bounds of the view that grabbed the mouse
-                _mouseEnteredView?.NewMouseLeaveEvent (mouseEvent);
-            }
-
-            //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) == true)
-            {
-                return;
-            }
-        }
-
-        if (view is { WantContinuousButtonPressed: true })
-        {
-            WantContinuousButtonPressedView = view;
-        }
-        else
-        {
-            WantContinuousButtonPressedView = null;
-        }
-
-
-        if (view is not Adornment)
-        {
-            if ((view is null || view == OverlappedTop)
-                && Current is { Modal: false }
-                && OverlappedTop != null
-                && mouseEvent.Flags != MouseFlags.ReportMousePosition
-                && mouseEvent.Flags != 0)
-            {
-                // This occurs when there are multiple overlapped "tops"
-                // E.g. "Mdi" - in the Background Worker Scenario
-                View? top = FindDeepestTop (Top, mouseEvent.Position);
-                view = View.FindDeepestView (top, mouseEvent.Position);
-
-                if (view is { } && view != OverlappedTop && top != Current && top is { })
-                {
-                    MoveCurrent ((Toplevel)top);
-                }
-            }
-        }
-
-        if (view is null)
-        {
-            return;
-        }
-
-        MouseEvent? me = null;
-
-        if (view is Adornment adornment)
-        {
-            Point frameLoc = adornment.ScreenToFrame (mouseEvent.Position);
-
-            me = new ()
-            {
-                Position = frameLoc,
-                Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.Position,
-                View = view
-            };
-        }
-        else if (view.ViewportToScreen (Rectangle.Empty with { Size = view.Viewport.Size }).Contains (mouseEvent.Position))
-        {
-            Point viewportLocation = view.ScreenToViewport (mouseEvent.Position);
-
-            me = new ()
-            {
-                Position = viewportLocation,
-                Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.Position,
-                View = view
-            };
-        }
-
-        if (me is null)
-        {
-            return;
-        }
-
-        if (_mouseEnteredView is null)
-        {
-            _mouseEnteredView = view;
-            view.NewMouseEnterEvent (me);
-        }
-        else if (_mouseEnteredView != view)
-        {
-            _mouseEnteredView.NewMouseLeaveEvent (me);
-            view.NewMouseEnterEvent (me);
-            _mouseEnteredView = view;
-        }
-
-        if (!view.WantMousePositionReports && mouseEvent.Flags == MouseFlags.ReportMousePosition)
-        {
-            return;
-        }
-
-        WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
-
-        //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
-
-        while (view.NewMouseEvent (me) != true)
-        {
-            if (MouseGrabView is { })
-            {
-                break;
-            }
-
-            if (view is Adornment adornmentView)
-            {
-                view = adornmentView.Parent.SuperView;
-            }
-            else
-            {
-                view = view.SuperView;
-            }
-
-            if (view is null)
-            {
-                break;
-            }
-
-            Point boundsPoint = view.ScreenToViewport (mouseEvent.Position);
-
-            me = new ()
-            {
-                Position = boundsPoint,
-                Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.Position,
-                View = view
-            };
-        }
-
-        BringOverlappedTopToFront ();
-    }
-#nullable restore
-
-    #endregion Mouse handling
-
-    #region Keyboard handling
-
-    private static Key _alternateForwardKey = Key.Empty; // Defined in config.json
-
-    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key AlternateForwardKey
-    {
-        get => _alternateForwardKey;
-        set
-        {
-            if (_alternateForwardKey != value)
-            {
-                Key oldKey = _alternateForwardKey;
-                _alternateForwardKey = value;
-                OnAlternateForwardKeyChanged (new (oldKey, value));
-            }
-        }
-    }
-
-    private static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
-    {
-        foreach (Toplevel top in _topLevels.ToArray ())
-        {
-            top.OnAlternateForwardKeyChanged (e);
-        }
-    }
-
-    private static Key _alternateBackwardKey = Key.Empty; // Defined in config.json
-
-    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key AlternateBackwardKey
-    {
-        get => _alternateBackwardKey;
-        set
-        {
-            if (_alternateBackwardKey != value)
-            {
-                Key oldKey = _alternateBackwardKey;
-                _alternateBackwardKey = value;
-                OnAlternateBackwardKeyChanged (new (oldKey, value));
-            }
-        }
-    }
-
-    private static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey)
-    {
-        foreach (Toplevel top in _topLevels.ToArray ())
-        {
-            top.OnAlternateBackwardKeyChanged (oldKey);
-        }
-    }
-
-    private static Key _quitKey = Key.Empty; // Defined in config.json
-
-    /// <summary>Gets or sets the key to quit the application.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key QuitKey
-    {
-        get => _quitKey;
-        set
-        {
-            if (_quitKey != value)
-            {
-                Key oldKey = _quitKey;
-                _quitKey = value;
-                OnQuitKeyChanged (new (oldKey, value));
-            }
-        }
-    }
-
-    private static void OnQuitKeyChanged (KeyChangedEventArgs e)
-    {
-        // Duplicate the list so if it changes during enumeration we're safe
-        foreach (Toplevel top in _topLevels.ToArray ())
-        {
-            top.OnQuitKeyChanged (e);
-        }
-    }
-
-    /// <summary>
-    ///     Event fired when the user presses a key. Fired by <see cref="OnKeyDown"/>.
-    ///     <para>
-    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
-    ///         additional processing.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Curses) do not support firing the
-    ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
-    ///     <para>Fired after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.</para>
-    /// </remarks>
-    public static event EventHandler<Key> KeyDown;
-
-    /// <summary>
-    ///     Called by the <see cref="ConsoleDriver"/> when the user presses a key. Fires the <see cref="KeyDown"/> event
-    ///     then calls <see cref="View.NewKeyDownEvent"/> on all top level views. Called after <see cref="OnKeyDown"/> and
-    ///     before <see cref="OnKeyUp"/>.
-    /// </summary>
-    /// <remarks>Can be used to simulate key press events.</remarks>
-    /// <param name="keyEvent"></param>
-    /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool OnKeyDown (Key keyEvent)
-    {
-        if (!_initialized)
-        {
-            return true;
-        }
-
-        KeyDown?.Invoke (null, keyEvent);
-
-        if (keyEvent.Handled)
-        {
-            return true;
-        }
-
-        foreach (Toplevel topLevel in _topLevels.ToList ())
-        {
-            if (topLevel.NewKeyDownEvent (keyEvent))
-            {
-                return true;
-            }
-
-            if (topLevel.Modal)
-            {
-                break;
-            }
-        }
-
-        // Invoke any Global KeyBindings
-        foreach (Toplevel topLevel in _topLevels.ToList ())
-        {
-            foreach (View view in topLevel.Subviews.Where (
-                                                           v => v.KeyBindings.TryGet (
-                                                                                      keyEvent,
-                                                                                      KeyBindingScope.Application,
-                                                                                      out KeyBinding _
-                                                                                     )
-                                                          ))
-            {
-                if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out KeyBinding _))
-                {
-                    bool? handled = view.OnInvokingKeyBindings (keyEvent);
-
-                    if (handled is { } && (bool)handled)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    ///     Event fired when the user releases a key. Fired by <see cref="OnKeyUp"/>.
-    ///     <para>
-    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
-    ///         additional processing.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Curses) do not support firing the
-    ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
-    ///     <para>Fired after <see cref="KeyDown"/>.</para>
-    /// </remarks>
-    public static event EventHandler<Key> KeyUp;
-
-    /// <summary>
-    ///     Called by the <see cref="ConsoleDriver"/> when the user releases a key. Fires the <see cref="KeyUp"/> event
-    ///     then calls <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="OnKeyDown"/>.
-    /// </summary>
-    /// <remarks>Can be used to simulate key press events.</remarks>
-    /// <param name="a"></param>
-    /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool OnKeyUp (Key a)
-    {
-        if (!_initialized)
-        {
-            return true;
-        }
-
-        KeyUp?.Invoke (null, a);
-
-        if (a.Handled)
-        {
-            return true;
-        }
-
-        foreach (Toplevel topLevel in _topLevels.ToList ())
-        {
-            if (topLevel.NewKeyUpEvent (a))
-            {
-                return true;
-            }
-
-            if (topLevel.Modal)
-            {
-                break;
-            }
-        }
-
-        return false;
-    }
-
-    #endregion Keyboard handling
 }
