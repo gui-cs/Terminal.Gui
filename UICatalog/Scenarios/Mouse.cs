@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Terminal.Gui;
 
@@ -113,7 +113,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (demo)
         };
 
-        List<string> appLogList = new ();
+        ObservableCollection<string> appLogList = new ();
 
         var appLog = new ListView
         {
@@ -122,7 +122,7 @@ public class Mouse : Scenario
             Width = 50,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            Source = new ListWrapper (appLogList)
+            Source = new ListWrapper<string> (appLogList)
         };
         win.Add (label, appLog);
 
@@ -144,7 +144,7 @@ public class Mouse : Scenario
             X = Pos.Right (appLog) + 1,
             Y = Pos.Top (label)
         };
-        List<string> winLogList = new ();
+        ObservableCollection<string> winLogList = new ();
 
         var winLog = new ListView
         {
@@ -153,7 +153,7 @@ public class Mouse : Scenario
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            Source = new ListWrapper (winLogList)
+            Source = new ListWrapper<string> (winLogList)
         };
         win.Add (label, winLog);
 

@@ -112,10 +112,10 @@ public class Localization : Scenario
             Width = _cultureInfoNameSource.Select (cn => cn.Length + 3).Max (),
             Height = _cultureInfoNameSource.Length + 1,
             HideDropdownListOnClick = true,
-            Source = new ListWrapper (_cultureInfoNameSource),
+            Source = new ListWrapper<string> (new (_cultureInfoNameSource)),
             SelectedItem = _cultureInfoNameSource.Length - 1
         };
-        _languageComboBox.SetSource (_cultureInfoNameSource);
+        _languageComboBox.SetSource<string> (new (_cultureInfoNameSource));
         _languageComboBox.SelectedItemChanged += LanguageComboBox_SelectChanged;
         Win.Add (_languageComboBox);
 

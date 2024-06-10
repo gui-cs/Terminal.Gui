@@ -76,7 +76,7 @@ public class EscSeqRequests
                 return false;
             }
 
-            if (found is { } && found.NumOutstanding > 0)
+            if (found is { NumOutstanding: > 0 })
             {
                 return true;
             }

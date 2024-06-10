@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -10,14 +11,14 @@ public class ComboBoxIteration : Scenario
 {
     public override void Setup ()
     {
-        List<string> items = new () { "one", "two", "three" };
+        ObservableCollection<string> items = ["one", "two", "three"];
 
         var lbListView = new Label { Width = 10, Height = 1 };
         Win.Add (lbListView);
 
         var listview = new ListView
         {
-            Y = Pos.Bottom (lbListView) + 1, Width = 10, Height = Dim.Fill (2), Source = new ListWrapper (items)
+            Y = Pos.Bottom (lbListView) + 1, Width = 10, Height = Dim.Fill (2), Source = new ListWrapper<string> (items)
         };
         Win.Add (listview);
 
@@ -59,7 +60,7 @@ public class ComboBoxIteration : Scenario
 
         btnTwo.Accept += (s, e) =>
                           {
-                              items = new List<string> { "one", "two" };
+                              items = ["one", "two"];
                               comboBox.SetSource (items);
                               listview.SetSource (items);
                               listview.SelectedItem = 0;
@@ -70,7 +71,7 @@ public class ComboBoxIteration : Scenario
 
         btnThree.Accept += (s, e) =>
                             {
-                                items = new List<string> { "one", "two", "three" };
+                                items =["one", "two", "three"];
                                 comboBox.SetSource (items);
                                 listview.SetSource (items);
                                 listview.SelectedItem = 0;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -81,7 +82,7 @@ public class AllViewsTester : Scenario
             AllowsMarking = false,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             SelectedItem = 0,
-            Source = new ListWrapper (_viewClasses.Keys.ToList ())
+            Source = new ListWrapper<string> (new (_viewClasses.Keys.ToList ()))
         };
         _classListView.OpenSelectedItem += (s, a) => { _settingsPane.SetFocus (); };
 
@@ -386,8 +387,8 @@ public class AllViewsTester : Scenario
         // If the view supports a Source property, set it so we have something to look at
         if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource))
         {
-            var source = new ListWrapper (new List<string> { "Test Text #1", "Test Text #2", "Test Text #3" });
-            view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
+            var source = new ListWrapper<string> (["Test Text #1", "Test Text #2", "Test Text #3"]);
+            view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, [source]);
         }
 
         // If the view supports a Title property, set it so we have something to look at

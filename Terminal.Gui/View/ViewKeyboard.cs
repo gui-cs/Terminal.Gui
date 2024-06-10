@@ -129,9 +129,10 @@ public partial class View
     /// </remarks>
     /// <param name="prevHotKey">The HotKey <paramref name="hotKey"/> is replacing. Key bindings for this key will be removed.</param>
     /// <param name="hotKey">The new HotKey. If <see cref="Key.Empty"/> <paramref name="prevHotKey"/> bindings will be removed.</param>
+    /// <param name="context">Arbitrary context that can be associated with this key binding.</param>
     /// <returns><see langword="true"/> if the HotKey bindings were added.</returns>
     /// <exception cref="ArgumentException"></exception>
-    public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey)
+    public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey, [CanBeNull] object context = null)
     {
         if (_hotKey == hotKey)
         {
@@ -194,15 +195,16 @@ public partial class View
         // Add the new 
         if (newKey != Key.Empty)
         {
+            KeyBinding keyBinding = new ([Command.HotKey], KeyBindingScope.HotKey, context);
             // Add the base and Alt key
-            KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.HotKey);
-            KeyBindings.Add (newKey.WithAlt, KeyBindingScope.HotKey, Command.HotKey);
+            KeyBindings.Add (newKey, keyBinding);
+            KeyBindings.Add (newKey.WithAlt, keyBinding);
 
             // If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
             if (newKey.IsKeyCodeAtoZ)
             {
-                KeyBindings.Add (newKey.WithShift, KeyBindingScope.HotKey, Command.HotKey);
-                KeyBindings.Add (newKey.WithShift.WithAlt, KeyBindingScope.HotKey, Command.HotKey);
+                KeyBindings.Add (newKey.WithShift, keyBinding);
+                KeyBindings.Add (newKey.WithShift.WithAlt, keyBinding);
             }
         }
 
@@ -619,7 +621,7 @@ public partial class View
     /// <summary>Gets the key bindings for this view.</summary>
     public KeyBindings KeyBindings { get; internal set; }
 
-    private Dictionary<Command, Func<bool?>> CommandImplementations { get; } = new ();
+    private Dictionary<Command, Func<CommandContext, bool?>> CommandImplementations { get; } = new ();
 
     /// <summary>
     ///     Low-level API called when a user presses a key; invokes any key bindings set on the view. This is called
@@ -662,17 +664,17 @@ public partial class View
             return true;
         }
 
-        if (Margin is {} && ProcessAdornmentKeyBindings (Margin, keyEvent, ref handled))
+        if (Margin is { } && ProcessAdornmentKeyBindings (Margin, keyEvent, ref handled))
         {
             return true;
         }
 
-        if (Padding is {} && ProcessAdornmentKeyBindings (Padding, keyEvent, ref handled))
+        if (Padding is { } && ProcessAdornmentKeyBindings (Padding, keyEvent, ref handled))
         {
             return true;
         }
 
-        if (Border is {} && ProcessAdornmentKeyBindings (Border, keyEvent, ref handled))
+        if (Border is { } && ProcessAdornmentKeyBindings (Border, keyEvent, ref handled))
         {
             return true;
         }
@@ -720,30 +722,6 @@ public partial class View
         return false;
     }
 
-    // Function to search the subview hierarchy for the first view that has a KeyBindingScope.Application binding for the key.
-    // Called from Application.OnKeyDown
-    // TODO: Unwind recursion
-    // QUESTION: Should this return a list of views? As is, it will only return the first view that has the binding.
-    internal static View FindViewWithApplicationKeyBinding (View start, Key keyEvent)
-    {
-        if (start.KeyBindings.TryGet (keyEvent, KeyBindingScope.Application, out KeyBinding binding))
-        {
-            return start;
-        }
-
-        foreach (View subview in start.Subviews)
-        {
-            View found = FindViewWithApplicationKeyBinding (subview, keyEvent);
-
-            if (found is { })
-            {
-                return found;
-            }
-        }
-
-        return null;
-    }
-
     /// <summary>
     ///     Invoked when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
     ///     stop the key from being processed by other views.
@@ -779,7 +757,7 @@ public partial class View
             }
 
             // each command has its own return value
-            bool? thisReturn = InvokeCommand (command);
+            bool? thisReturn = InvokeCommand (command, key, binding);
 
             // if we haven't got anything yet, the current command result should be used
             toReturn ??= thisReturn;
@@ -798,12 +776,13 @@ public partial class View
     ///     Invokes the specified commands.
     /// </summary>
     /// <param name="commands"></param>
+    /// <param name="key">The key that caused the commands to be invoked, if any.</param>
     /// <returns>
     ///     <see langword="null"/> if no command was found.
     ///     <see langword="true"/> if the command was invoked and it handled the command.
     ///     <see langword="false"/> if the command was invoked and it did not handle the command.
     /// </returns>
-    public bool? InvokeCommands (Command [] commands)
+    public bool? InvokeCommands (Command [] commands, [CanBeNull] Key key = null, [CanBeNull] KeyBinding? keyBinding = null)
     {
         bool? toReturn = null;
 
@@ -815,7 +794,7 @@ public partial class View
             }
 
             // each command has its own return value
-            bool? thisReturn = InvokeCommand (command);
+            bool? thisReturn = InvokeCommand (command, key, keyBinding);
 
             // if we haven't got anything yet, the current command result should be used
             toReturn ??= thisReturn;
@@ -831,42 +810,68 @@ public partial class View
     }
 
     /// <summary>Invokes the specified command.</summary>
-    /// <param name="command"></param>
+    /// <param name="command">The command to invoke.</param>
+    /// <param name="key">The key that caused the command to be invoked, if any.</param>
+    /// <param name="keyBinding"></param>
     /// <returns>
-    ///     <see langword="null"/> if no command was found. <see langword="true"/> if the command was invoked and it
-    ///     handled the command. <see langword="false"/> if the command was invoked and it did not handle the command.
+    ///     <see langword="null"/> if no command was found. <see langword="true"/> if the command was invoked, and it
+    ///     handled the command. <see langword="false"/> if the command was invoked, and it did not handle the command.
     /// </returns>
-    public bool? InvokeCommand (Command command)
+    public bool? InvokeCommand (Command command, [CanBeNull] Key key = null, [CanBeNull] KeyBinding? keyBinding = null)
     {
-        if (!CommandImplementations.ContainsKey (command))
+        if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?> implementation))
         {
-            return null;
+            var context = new CommandContext (command, key, keyBinding); // Create the context here
+            return implementation (context);
         }
 
-        return CommandImplementations [command] ();
+        return null;
     }
 
     /// <summary>
     ///     <para>
     ///         Sets the function that will be invoked for a <see cref="Command"/>. Views should call
-    ///         <see cref="AddCommand"/> for each command they support.
+    ///        AddCommand for each command they support.
     ///     </para>
     ///     <para>
-    ///         If <see cref="AddCommand"/> has already been called for <paramref name="command"/> <paramref name="f"/> will
+    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
     ///         replace the old one.
     ///     </para>
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     This version of AddCommand is for commands that require <see cref="CommandContext"/>. Use <see cref="AddCommand(Command,Func{System.Nullable{bool}})"/>
+    ///     in cases where the command does not require a <see cref="CommandContext"/>.
+    /// </para>
+    /// </remarks>
+    /// <param name="command">The command.</param>
+    /// <param name="f">The function.</param>
+    protected void AddCommand (Command command, Func<CommandContext, bool?> f)
+    {
+        CommandImplementations [command] = f;
+    }
+
+    /// <summary>
+    ///     <para>
+    ///         Sets the function that will be invoked for a <see cref="Command"/>. Views should call
+    ///        AddCommand for each command they support.
+    ///     </para>
+    ///     <para>
+    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
+    ///         replace the old one.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     This version of AddCommand is for commands that do not require a <see cref="CommandContext"/>.
+    ///     If the command requires context, use <see cref="AddCommand(Command,Func{CommandContext,System.Nullable{bool}})"/>
+    /// </para>
+    /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="f">The function.</param>
     protected void AddCommand (Command command, Func<bool?> f)
     {
-        // if there is already an implementation of this command
-        // replace that implementation
-        // else record how to perform the action (this should be the normal case)
-        if (CommandImplementations is { })
-        {
-            CommandImplementations [command] = f;
-        }
+        CommandImplementations [command] = ctx => f (); ;
     }
 
     /// <summary>Returns all commands that are supported by this <see cref="View"/>.</summary>

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using Terminal.Gui;
@@ -140,7 +140,7 @@ public class UnicodeInMenu : Scenario
         label = new() { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1, Text = "ComboBox:" };
         Win.Add (label);
         var comboBox = new ComboBox { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
-        comboBox.SetSource (new List<string> { gitString, "Со_хранить" });
+        comboBox.SetSource (new ObservableCollection<string> { gitString, "Со_хранить" });
 
         Win.Add (comboBox);
         comboBox.Text = gitString;
@@ -163,9 +163,9 @@ public class UnicodeInMenu : Scenario
             Y = Pos.Y (label),
             Width = Dim.Percent (60),
             Height = 3,
-            Source = new ListWrapper (
-                                      new List<string> { "item #1", gitString, "Со_хранить", unicode }
-                                     )
+            Source = new ListWrapper<string> (
+                                              ["item #1", gitString, "Со_хранить", unicode]
+                                             )
         };
         Win.Add (listView);
 

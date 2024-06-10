@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using Xunit.Abstractions;
 
@@ -14,7 +16,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.True (lv.CanFocus);
         Assert.Equal (-1, lv.SelectedItem);
 
-        lv = new() { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        lv = new () { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
 
@@ -24,7 +26,7 @@ public class ListViewTests (ITestOutputHelper output)
 
         lv = new()
         {
-            Y = 1, Width = 10, Height = 20, Source = new ListWrapper (new List<string> { "One", "Two", "Three" })
+            Y = 1, Width = 10, Height = 20, Source = new ListWrapper<string> (["One", "Two", "Three"])
         };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
@@ -40,14 +42,14 @@ public class ListViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Ensures_Visibility_SelectedItem_On_MoveDown_And_MoveUp ()
     {
-        List<string> source = new ();
+        ObservableCollection<string> source = [];
 
         for (var i = 0; i < 20; i++)
         {
             source.Add ($"Line{i}");
         }
 
-        var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill (), Source = new ListWrapper (source) };
+        var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill (), Source = new ListWrapper<string> (source) };
         var win = new Window ();
         win.Add (lv);
         var top = new Toplevel ();
@@ -124,16 +126,16 @@ public class ListViewTests (ITestOutputHelper output)
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
+│Line10    │
+│Line11    │
+│Line12    │
+│Line13    │
+│Line14    │
+│Line15    │
+│Line16    │
+│Line17    │
+│Line18    │
 │Line19    │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
 └──────────┘",
                                                       output
                                                      );
@@ -291,14 +293,14 @@ public class ListViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void EnsureSelectedItemVisible_SelectedItem ()
     {
-        List<string> source = new ();
+        ObservableCollection<string> source = [];
 
         for (var i = 0; i < 10; i++)
         {
             source.Add ($"Item {i}");
         }
 
-        var lv = new ListView { Width = 10, Height = 5, Source = new ListWrapper (source) };
+        var lv = new ListView { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
         var top = new Toplevel ();
         top.Add (lv);
         Application.Begin (top);
@@ -333,8 +335,8 @@ Item 6",
     [AutoInitShutdown]
     public void EnsureSelectedItemVisible_Top ()
     {
-        List<string> source = new () { "First", "Second" };
-        var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper (source) };
+        ObservableCollection<string> source = ["First", "Second"];
+        var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper<string> (source) };
         lv.SelectedItem = 1;
         var top = new Toplevel ();
         top.Add (lv);
@@ -366,8 +368,8 @@ Item 6",
     [Fact]
     public void KeyBindings_Command ()
     {
-        List<string> source = new () { "One", "Two", "Three" };
-        var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper (source) };
+        ObservableCollection<string> source = ["One", "Two", "Three"];
+        var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper<string> (source) };
         lv.BeginInit ();
         lv.EndInit ();
         Assert.Equal (-1, lv.SelectedItem);
@@ -424,8 +426,8 @@ Item 6",
     [Fact]
     public void Accept_Command_Accepts_and_Opens_Selected_Item ()
     {
-        List<string> source = ["One", "Two", "Three"];
-        var listView = new ListView { Source = new ListWrapper (source) };
+        ObservableCollection<string> source = ["One", "Two", "Three"];
+        var listView = new ListView { Source = new ListWrapper<string> (source) };
         listView.SelectedItem = 0;
 
         var accepted = false;
@@ -455,8 +457,8 @@ Item 6",
     [Fact]
     public void Accept_Cancel_Event_Prevents_OpenSelectedItem ()
     {
-        List<string> source = ["One", "Two", "Three"];
-        var listView = new ListView { Source = new ListWrapper (source) };
+        ObservableCollection<string> source = ["One", "Two", "Three"];
+        var listView = new ListView { Source = new ListWrapper<string> (source) };
         listView.SelectedItem = 0;
 
         var accepted = false;
@@ -494,7 +496,7 @@ Item 6",
     [Fact]
     public void ListViewProcessKeyReturnValue_WithMultipleCommands ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three", "Four" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three", "Four"]) };
 
         Assert.NotNull (lv.Source);
 
@@ -512,7 +514,7 @@ Item 6",
         Assert.Equal (1, lv.SelectedItem);
 
         // clear the items
-        lv.SetSource (null);
+        lv.SetSource<string> (null);
 
         // Press key combo again - return should be false this time as none of the Commands are allowable
         Assert.False (lv.NewKeyDownEvent (ev), "We cannot move down so will not respond to this");
@@ -521,7 +523,7 @@ Item 6",
     [Fact]
     public void ListViewSelectThenDown ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         lv.AllowsMarking = true;
 
         Assert.NotNull (lv.Source);
@@ -585,7 +587,7 @@ Item 6",
     [Fact]
     public void ListWrapper_StartsWith ()
     {
-        var lw = new ListWrapper (new List<string> { "One", "Two", "Three" });
+        var lw = new ListWrapper<string> (["One", "Two", "Three"]);
 
         Assert.Equal (1, lw.StartsWith ("t"));
         Assert.Equal (1, lw.StartsWith ("tw"));
@@ -594,7 +596,7 @@ Item 6",
         Assert.Equal (1, lw.StartsWith ("TW"));
         Assert.Equal (2, lw.StartsWith ("TH"));
 
-        lw = new (new List<string> { "One", "Two", "Three" });
+        lw = new (["One", "Two", "Three"]);
 
         Assert.Equal (1, lw.StartsWith ("t"));
         Assert.Equal (1, lw.StartsWith ("tw"));
@@ -619,7 +621,7 @@ Item 6",
     public void RowRender_Event ()
     {
         var rendered = false;
-        List<string> source = new () { "one", "two", "three" };
+        ObservableCollection<string> source = ["one", "two", "three"];
         var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
         lv.RowRender += (s, _) => rendered = true;
         var top = new Toplevel ();
@@ -636,7 +638,7 @@ Item 6",
     [Fact]
     public void SelectedItem_Get_Set ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.Equal (-1, lv.SelectedItem);
         Assert.Throws<ArgumentException> (() => lv.SelectedItem = 3);
         Exception exception = Record.Exception (() => lv.SelectedItem = -1);
@@ -646,32 +648,35 @@ Item 6",
     [Fact]
     public void SetSource_Preserves_ListWrapper_Instance_If_Not_Null ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two"]) };
 
         Assert.NotNull (lv.Source);
 
-        lv.SetSource (null);
+        lv.SetSource<string> (null);
         Assert.NotNull (lv.Source);
 
         lv.Source = null;
         Assert.Null (lv.Source);
 
-        lv = new() { Source = new ListWrapper (new List<string> { "One", "Two" }) };
+        lv = new () { Source = new ListWrapper<string> (["One", "Two"]) };
         Assert.NotNull (lv.Source);
 
-        lv.SetSourceAsync (null);
+        lv.SetSourceAsync<string> (null);
         Assert.NotNull (lv.Source);
     }
 
     [Fact]
     public void SettingEmptyKeybindingThrows ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (Key.Space));
     }
 
     private class NewListDataSource : IListDataSource
     {
+        /// <inheritdoc />
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
         public int Count => 0;
         public int Length => 0;
         public bool IsMarked (int item) { throw new NotImplementedException (); }
@@ -692,6 +697,11 @@ Item 6",
 
         public void SetMark (int item, bool value) { throw new NotImplementedException (); }
         public IList ToList () { return new List<string> { "One", "Two", "Three" }; }
+
+        public void Dispose ()
+        {
+            throw new NotImplementedException ();
+        }
     }
 
     [Fact]
@@ -706,7 +716,7 @@ Item 6",
             Width = 7,
             BorderStyle = LineStyle.Single
         };
-        lv.SetSource (new List<string> { "One", "Two", "Three", "Four" });
+        lv.SetSource (["One", "Two", "Three", "Four"]);
         lv.SelectedItemChanged += (s, e) => selected = e.Value.ToString ();
         var top = new Toplevel ();
         top.Add (lv);
@@ -767,9 +777,9 @@ Item 6",
     [AutoInitShutdown]
     public void LeftItem_TopItem_Tests ()
     {
-        List<string> source = new List<string> ();
+        ObservableCollection<string> source = [];
 
-        for (var i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             source.Add ($"Item {i}");
         }
@@ -779,7 +789,7 @@ Item 6",
             X = 1,
             Width = 10,
             Height = 5,
-            Source = new ListWrapper (source)
+            Source = new ListWrapper<string> (source)
         };
         var top = new Toplevel ();
         top.Add (lv);
@@ -806,5 +816,263 @@ Item 6",
  tem 4",
                                                       output);
         top.Dispose ();
+    }
+
+    [Fact]
+    public void CollectionChanged_Event ()
+    {
+        var added = 0;
+        var removed = 0;
+        ObservableCollection<string> source = [];
+        var lv = new ListView { Source = new ListWrapper<string> (source) };
+
+        lv.CollectionChanged += (sender, args) =>
+                                {
+                                    if (args.Action == NotifyCollectionChangedAction.Add)
+                                    {
+                                        added++;
+                                    }
+                                    else if (args.Action == NotifyCollectionChangedAction.Remove)
+                                    {
+                                        removed++;
+                                    }
+                                };
+
+        for (int i = 0; i < 3; i++)
+        {
+            source.Add ($"Item{i}");
+        }
+        Assert.Equal (3, added);
+        Assert.Equal (0, removed);
+
+        added = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            source.Remove (source [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, removed);
+        Assert.Empty (source);
+    }
+
+    [Fact]
+    public void CollectionChanged_Event_Is_Only_Subscribed_Once ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        IList<string> source1 = [];
+        var lv = new ListView { Source = new ListWrapper<string> (new ( source1)) };
+
+        lv.CollectionChanged += (sender, args) =>
+                                {
+                                    if (args.Action == NotifyCollectionChangedAction.Add)
+                                    {
+                                        added++;
+                                    }
+                                    else if (args.Action == NotifyCollectionChangedAction.Remove)
+                                    {
+                                        removed++;
+                                    }
+                                    else
+                                    {
+                                        otherActions++;
+                                    }
+                                };
+
+        ObservableCollection<string> source2 = [];
+        lv.Source = new ListWrapper<string> (source2);
+        ObservableCollection<string> source3 = [];
+        lv.Source = new ListWrapper<string> (source3);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+            source2.Add ($"Item{i}");
+            source3.Add ($"Item{i}");
+        }
+        Assert.Equal (3, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        added = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+            source2.Remove (source2 [0]);
+            source3.Remove (source3 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+        Assert.Empty (source2);
+        Assert.Empty (source3);
+    }
+
+    [Fact]
+    public void CollectionChanged_Event_UnSubscribe_Previous_If_New_Is_Null ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        ObservableCollection<string> source1 = [];
+        var lv = new ListView { Source = new ListWrapper<string> (source1) };
+
+        lv.CollectionChanged += (sender, args) =>
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                removed++;
+            }
+            else
+            {
+                otherActions++;
+            }
+        };
+
+        lv.Source = new ListWrapper<string> (null);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+    }
+
+    [Fact]
+    public void ListWrapper_CollectionChanged_Event_Is_Only_Subscribed_Once ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        ObservableCollection<string> source1 = [];
+        ListWrapper<string> lw = new (source1);
+
+        lw.CollectionChanged += (sender, args) =>
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                removed++;
+            }
+            else
+            {
+                otherActions++;
+            }
+        };
+
+        ObservableCollection<string> source2 = [];
+        lw = new (source2);
+        ObservableCollection<string> source3 = [];
+        lw = new (source3);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+            source2.Add ($"Item{i}");
+            source3.Add ($"Item{i}");
+        }
+
+        Assert.Equal (3, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        added = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+            source2.Remove (source2 [0]);
+            source3.Remove (source3 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+        Assert.Empty (source2);
+        Assert.Empty (source3);
+    }
+
+    [Fact]
+    public void ListWrapper_CollectionChanged_Event_UnSubscribe_Previous_Is_Disposed ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        ObservableCollection<string> source1 = [];
+        ListWrapper<string> lw = new (source1);
+
+        lw.CollectionChanged += Lw_CollectionChanged;
+
+        lw.Dispose ();
+        lw = new (null);
+        Assert.Equal (0, lw.Count);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+
+
+        void Lw_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                removed++;
+            }
+            else
+            {
+                otherActions++;
+            }
+        }
     }
 }

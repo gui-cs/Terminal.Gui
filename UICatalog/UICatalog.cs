@@ -2,6 +2,7 @@ global using Attribute = Terminal.Gui.Attribute;
 global using CM = Terminal.Gui.ConfigurationManager;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.CommandLine;
 using System.Diagnostics;
 using System.Globalization;
@@ -54,14 +55,14 @@ internal class UICatalogApp
     // main app UI can be restored to previous state
     private static int _cachedScenarioIndex;
     private static string? _cachedTheme = string.Empty;
-    private static List<string>? _categories;
+    private static ObservableCollection<string>? _categories;
     private static readonly FileSystemWatcher _currentDirWatcher = new ();
     private static ViewDiagnosticFlags _diagnosticFlags;
     private static string _forceDriver = string.Empty;
     private static readonly FileSystemWatcher _homeDirWatcher = new ();
     private static bool _isFirstRunning = true;
     private static Options _options;
-    private static List<Scenario>? _scenarios;
+    private static ObservableCollection<Scenario>? _scenarios;
 
     // If set, holds the scenario the user selected
     private static Scenario? _selectedScenario;
@@ -128,7 +129,7 @@ internal class UICatalogApp
                                 {
                                     var options = new Options
                                     {
-                                        Driver = context.ParseResult.GetValueForOption (driverOption),
+                                        Driver = context.ParseResult.GetValueForOption (driverOption) ?? string.Empty,
                                         Scenario = context.ParseResult.GetValueForArgument (scenarioArgument)
                                         /* etc. */
                                     };
@@ -280,11 +281,12 @@ internal class UICatalogApp
         {
             _topLevelColorScheme = "Base";
 
-            int item = _scenarios!.FindIndex (
-                                              s =>
-                                                  s.GetName ()
-                                                   .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
-                                             );
+            int item = _scenarios!.IndexOf (
+                                            _scenarios!.FirstOrDefault (
+                                                                        s =>
+                                                                            s.GetName ()
+                                                                             .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
+                                                                       )!);
             _selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ())!;
 
             Application.Init (driverName: _forceDriver);
@@ -303,7 +305,7 @@ internal class UICatalogApp
         _aboutMessage = new ();
         _aboutMessage.AppendLine (@"A comprehensive sample library for");
         _aboutMessage.AppendLine (@"");
-        _aboutMessage.AppendLine (@" _______                  _             _   _____       _   ");
+        _aboutMessage.AppendLine (@"  _______                  _             _   _____       _  ");
         _aboutMessage.AppendLine (@" |__   __|                (_)           | | / ____|     (_) ");
         _aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ");
         _aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ");
@@ -492,7 +494,7 @@ internal class UICatalogApp
                 Title = "_Categories",
                 BorderStyle = LineStyle.Single,
                 SuperViewRendersLineCanvas = true,
-                Source = new ListWrapper (_categories)
+                Source = new ListWrapper<string> (_categories)
             };
             CategoryList.OpenSelectedItem += (s, a) => { ScenarioList!.SetFocus (); };
             CategoryList.SelectedItemChanged += CategoryView_SelectedChanged;
@@ -660,7 +662,7 @@ internal class UICatalogApp
 
             List<MenuItem> schemeMenuItems = new ();
 
-            foreach (KeyValuePair<string, ColorScheme> sc in Colors.ColorSchemes)
+            foreach (KeyValuePair<string, ColorScheme?> sc in Colors.ColorSchemes)
             {
                 var item = new MenuItem { Title = $"_{sc.Key}", Data = sc.Key };
                 item.CheckType |= MenuItemCheckStyle.Radio;
@@ -691,17 +693,16 @@ internal class UICatalogApp
         private void CategoryView_SelectedChanged (object? sender, ListViewItemEventArgs? e)
         {
             string item = _categories! [e!.Item];
-            List<Scenario> newlist;
+            ObservableCollection<Scenario> newlist;
 
             if (e.Item == 0)
             {
                 // First category is "All"
                 newlist = _scenarios!;
-                newlist = _scenarios!;
             }
             else
             {
-                newlist = _scenarios!.Where (s => s.GetCategories ().Contains (item)).ToList ();
+                newlist = new (_scenarios!.Where (s => s.GetCategories ().Contains (item)).ToList ());
             }
 
             ScenarioList.Table = new EnumerableTableSource<Scenario> (

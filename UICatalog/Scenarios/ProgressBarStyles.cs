@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using Terminal.Gui;
@@ -261,9 +262,10 @@ public class ProgressBarStyles : Scenario
         container.Add (marqueesContinuousPB);
 
         _pbList.SetSource (
-                          container.Subviews.Where (v => v.GetType () == typeof (ProgressBar))
-                                   .Select (v => v.Title)
-                                   .ToList ()
+                          new ObservableCollection<string> (
+                                                            container.Subviews.Where (v => v.GetType () == typeof (ProgressBar))
+                                                                     .Select (v => v.Title)
+                                                                     .ToList ())
                          );
 
         _pbList.SelectedItemChanged += (sender, e) =>

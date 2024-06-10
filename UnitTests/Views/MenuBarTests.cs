@@ -1235,11 +1235,11 @@ wo
     [InlineData ("_Edit", "F_ind", "", KeyCode.AltMask | KeyCode.E, KeyCode.F)]
     [InlineData ("_Edit", "F_ind", "", KeyCode.AltMask | KeyCode.E, KeyCode.AltMask | KeyCode.F)]
     [InlineData ("Closed", "None", "Replace", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.R)]
-    [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.C)]
+    [InlineData ("Closed", "None", "Copy", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.C)]
     [InlineData ("_Edit", "_1st", "", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3)]
     [InlineData ("Closed", "None", "1", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.D1)]
     [InlineData ("Closed", "None", "1", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.Enter)]
-    [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.D4)]
+    [InlineData ("_Edit", "_3rd Level", "", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.D4)]
     [InlineData ("Closed", "None", "5", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D4, KeyCode.D5)]
     [InlineData ("_About", "_About", "", KeyCode.AltMask | KeyCode.A)]
     public void KeyBindings_Navigation_Commands (
@@ -2246,7 +2246,6 @@ wo
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu.IsMenuOpen);
 
-        // BUGBUG: This is wrong -> The _New doc isn't enabled because it can't execute and so can't be selected
         // The _New doc is enabled but the sub-menu isn't enabled. Is show but can't be selected and executed
         Assert.Equal ("_New", miCurrent.Parent.Title);
         Assert.Equal ("_New doc", miCurrent.Title);
@@ -2399,7 +2398,7 @@ Edit
         menu.MenuOpened += (s, e) =>
                            {
                                miCurrent = e.MenuItem;
-                               mCurrent = menu.openCurrentMenu;
+                               mCurrent = menu.OpenCurrentMenu;
                            };
         var top = new Toplevel ();
         top.Add (menu);
@@ -2770,7 +2769,7 @@ Edit
     }
 
     [Fact]
-    public void Separators_Does_Not_Throws_Pressing_Menu_Shortcut ()
+    public void Separator_Does_Not_Throws_Pressing_Menu_Hotkey ()
     {
         var menu = new MenuBar
         {
@@ -2782,9 +2781,7 @@ Edit
                     )
             ]
         };
-
-        Exception exception = Record.Exception (() => Assert.True (menu.NewKeyDownEvent (Key.Q.WithAlt)));
-        Assert.Null (exception);
+        Assert.False (menu.NewKeyDownEvent (Key.Q.WithAlt));
     }
 
     [Fact]
@@ -3126,7 +3123,7 @@ Edit
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorDown));
         menu.Draw ();
         menu._openMenu.Draw ();
-        menu.openCurrentMenu.Draw ();
+        menu.OpenCurrentMenu.Draw ();
 
         expected = @"
  Numbers           
@@ -3419,7 +3416,7 @@ Edit
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.Enter));
         menu.Draw ();
         menu._openMenu.Draw ();
-        menu.openCurrentMenu.Draw ();
+        menu.OpenCurrentMenu.Draw ();
 
         expected = @"
  Numbers     
