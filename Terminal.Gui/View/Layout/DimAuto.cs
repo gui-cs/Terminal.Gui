@@ -151,49 +151,49 @@ public class DimAuto () : Dim
                 subviewsSize += maxAnchorEnd;
                 #endregion Anchored
 
-                #region Aligned
+                //#region Aligned
 
-                // Now, handle subviews that are anchored to the end
-                // [x] PosAnchorEnd
-                int maxAlign = 0;
-                if (dimension == Dimension.Width)
-                {
-                    // Use Linq to get a list of distinct GroupIds from the subviews
-                    List<int> groupIds = includedSubviews.Select (v => v.X is PosAlign posAlign ? posAlign.GroupId : -1).Distinct ().ToList ();
+                //// Now, handle subviews that are anchored to the end
+                //// [x] PosAnchorEnd
+                //int maxAlign = 0;
+                //if (dimension == Dimension.Width)
+                //{
+                //    // Use Linq to get a list of distinct GroupIds from the subviews
+                //    List<int> groupIds = includedSubviews.Select (v => v.X is PosAlign posAlign ? posAlign.GroupId : -1).Distinct ().ToList ();
 
-                    foreach (var groupId in groupIds)
-                    {
-                        List<int> dimensionsList = new ();
+                //    foreach (var groupId in groupIds)
+                //    {
+                //        List<int> dimensionsList = new ();
 
-                        // PERF: If this proves a perf issue, consider caching a ref to this list in each item
-                        List<PosAlign?> posAlignsInGroup = includedSubviews.Where (
-                            v =>
-                            {
-                                return dimension switch
-                                {
-                                    Dimension.Width when v.X is PosAlign alignX => alignX.GroupId == groupId,
-                                    Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId == groupId,
-                                    _ => false
-                                };
-                            })
-                            .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
-                            .ToList ();
+                //        // PERF: If this proves a perf issue, consider caching a ref to this list in each item
+                //        List<PosAlign?> posAlignsInGroup = includedSubviews.Where (
+                //            v =>
+                //            {
+                //                return dimension switch
+                //                {
+                //                    Dimension.Width when v.X is PosAlign alignX => alignX.GroupId == groupId,
+                //                    Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId == groupId,
+                //                    _ => false
+                //                };
+                //            })
+                //            .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
+                //            .ToList ();
 
-                        if (posAlignsInGroup.Count == 0)
-                        {
-                            continue;
-                        }
+                //        if (posAlignsInGroup.Count == 0)
+                //        {
+                //            continue;
+                //        }
 
-                        maxAlign = posAlignsInGroup [0].CalculateMinDimension (groupId, includedSubviews, dimension);
-                    }
-                }
-                else
-                {
-                    subviews = includedSubviews.Where (v => v.Y is PosAlign).ToList ();
-                }
+                //        maxAlign = PosAlign.CalculateMinDimension (groupId, includedSubviews, dimension);
+                //    }
+                //}
+                //else
+                //{
+                //    subviews = includedSubviews.Where (v => v.Y is PosAlign).ToList ();
+                //}
 
-                subviewsSize = int.Max (subviewsSize, maxAlign);
-                #endregion Aligned
+                //subviewsSize = int.Max (subviewsSize, maxAlign);
+                //#endregion Aligned
 
 
                 #region Auto
@@ -295,9 +295,11 @@ public class DimAuto () : Dim
         // And, if min: is set, it wins if larger
         max = int.Max (max, autoMin);
 
+        // And, if max: is set, it wins if smaller
+        max = int.Min (max, autoMax);
+
         // Factor in adornments
         Thickness thickness = us.GetAdornmentsThickness ();
-
         max += dimension switch
         {
             Dimension.Width => thickness.Horizontal,
@@ -306,7 +308,7 @@ public class DimAuto () : Dim
             _ => throw new ArgumentOutOfRangeException (nameof (dimension), dimension, null)
         };
 
-        return int.Min (max, autoMax);
+        return max;
     }
 
     internal override bool ReferencesOtherViews ()

@@ -168,7 +168,7 @@ public class PosAlign : Pos
         return 0;
     }
 
-    internal int CalculateMinDimension (int groupId, IList<View> views, Dimension dimension)
+    public static int CalculateMinDimension (int groupId, IList<View> views, Dimension dimension)
     {
         List<int> dimensionsList = new ();
 
@@ -217,6 +217,6 @@ public class PosAlign : Pos
         aligner.ContainerSize = dimensionsList.Sum();
         int [] locations = aligner.Align (dimensionsList.ToArray ());
 
-        return locations.Sum ();
+        return dimensionsList.Sum ();
     }
 }

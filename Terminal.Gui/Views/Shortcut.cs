@@ -34,34 +34,22 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Shortcut : View
 {
-    // Hosts the Command, Help, and Key Views. Needed (IIRC - wrote a long time ago) to allow mouse clicks to be handled by the Shortcut.
-    internal readonly View _container;
-
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
     /// </summary>
     public Shortcut ()
     {
+        Id= "_shortcut";
+        HighlightStyle = HighlightStyle.Pressed;
+        Highlight += Shortcut_Highlight;
         CanFocus = true;
-        Width = Dim.Auto (DimAutoStyle.Content);
-        Height = Dim.Auto (DimAutoStyle.Content);
+        Width = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)));
+        Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1);
 
-        //Height = Dim.Auto (minimumContentDim: 1, maximumContentDim: 1);
-
-        AddCommand (Gui.Command.HotKey, () => true);
+        AddCommand (Gui.Command.HotKey, OnAccept);
         AddCommand (Gui.Command.Accept, OnAccept);
         KeyBindings.Add (KeyCode.Space, Gui.Command.Accept);
         KeyBindings.Add (KeyCode.Enter, Gui.Command.Accept);
-
-        _container = new ()
-        {
-            Id = "_container",
-            // Only the Shortcut (_container) should be able to have focus, not any subviews.
-            CanFocus = true,
-            Width = Dim.Auto (DimAutoStyle.Content, 1),
-            Height = Dim.Auto (DimAutoStyle.Content, 1),
-            BorderStyle = LineStyle.Dashed
-        };
 
         CommandView = new ();
 
@@ -70,15 +58,15 @@ public class Shortcut : View
             Id = "_helpView",
             // Only the Shortcut should be able to have focus, not any subviews
             CanFocus = false,
-            X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems),
-            Y = Pos.Center (),
+            X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast),
+            Y = 0,//Pos.Center (),
 
             // Helpview is the only subview that doesn't have a min width
             Width = Dim.Auto (DimAutoStyle.Text),
             Height = Dim.Auto (DimAutoStyle.Text),
-            ColorScheme = Colors.ColorSchemes ["Error"]
         };
-        _container.Add (HelpView);
+        HelpView.Margin.Thickness = new Thickness (1, 0, 1, 0);
+        Add (HelpView);
 
         //        HelpView.TextAlignment = Alignment.End;
         HelpView.MouseClick += Shortcut_MouseClick;
@@ -88,27 +76,23 @@ public class Shortcut : View
             Id = "_keyView",
             // Only the Shortcut should be able to have focus, not any subviews
             CanFocus = false,
-            X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems),
-            Y = Pos.Center (),
+            X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast),
+            Y = 0,//Pos.Center (),
 
             // Bar will set the width of all KeyViews to the width of the widest KeyView.
             Width = Dim.Auto (DimAutoStyle.Text),
             Height = Dim.Auto (DimAutoStyle.Text),
         };
-        _container.Add (KeyView);
+        KeyView.Margin.Thickness = new Thickness (1, 0, 1, 0);
+        Add (KeyView);
 
         KeyView.MouseClick += Shortcut_MouseClick;
 
-        CommandView.Margin.Thickness = new Thickness (1, 0, 1, 0);
-        HelpView.Margin.Thickness = new Thickness (1, 0, 1, 0);
-        KeyView.Margin.Thickness = new Thickness (1, 0, 1, 0);
 
         MouseClick += Shortcut_MouseClick;
 
         TitleChanged += Shortcut_TitleChanged;
         Initialized += OnInitialized;
-
-        Add (_container);
 
         return;
 
@@ -124,6 +108,36 @@ public class Shortcut : View
                 KeyView.ColorScheme = cs;
             }
         }
+    }
+
+    private Color? _savedForeColor;
+
+    private void Shortcut_Highlight (object sender, HighlightEventArgs e)
+    {
+        if (e.HighlightStyle.HasFlag (HighlightStyle.Pressed))
+        {
+            if (!_savedForeColor.HasValue)
+            {
+                _savedForeColor = ColorScheme.Normal.Foreground;
+            }
+
+            ColorScheme cs = new ColorScheme (ColorScheme)
+            {
+                Normal = new Attribute (ColorScheme.Normal.Foreground.GetHighlightColor (), ColorScheme.Normal.Background)
+            };
+            ColorScheme = cs;
+        }
+
+        if (e.HighlightStyle == HighlightStyle.None && _savedForeColor.HasValue)
+        {
+            ColorScheme cs = new ColorScheme (ColorScheme)
+            {
+                Normal = new Attribute (_savedForeColor.Value, ColorScheme.Normal.Background)
+            };
+            ColorScheme = cs;
+        }
+        SuperView?.SetNeedsDisplay ();
+        e.Cancel = true;
     }
 
     private void Shortcut_MouseClick (object sender, MouseEventEventArgs e)
@@ -253,7 +267,7 @@ public class Shortcut : View
 
             if (_commandView is { })
             {
-                _container.Remove (_commandView);
+                Remove (_commandView);
                 _commandView?.Dispose ();
             }
 
@@ -268,8 +282,8 @@ public class Shortcut : View
             // Bar will set the width of all CommandViews to the width of the widest CommandViews.
             _commandView.Width = Dim.Auto (DimAutoStyle.Text);
             _commandView.Height = Dim.Auto (DimAutoStyle.Text);
-            _commandView.X = X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast | AlignmentModes.AddSpaceBetweenItems);
-            _commandView.Y = Pos.Center ();
+            _commandView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
+            _commandView.Y = 0;//Pos.Center ();
 
             _commandView.MouseClick += Shortcut_MouseClick;
             _commandView.Accept += CommandView_Accept;
@@ -287,11 +301,11 @@ public class Shortcut : View
 
             _commandView.HotKeySpecifier = new ('_');
 
-            _container.Remove (HelpView);
-            _container.Remove (KeyView);
-            _container.Add (_commandView, HelpView, KeyView);
+            Remove (HelpView);
+            Remove (KeyView);
+            Add (_commandView, HelpView, KeyView);
 
-            UpdateKeyBinding();
+            UpdateKeyBinding ();
 
         }
     }
@@ -319,6 +333,8 @@ public class Shortcut : View
         {
             e.Cancel = args.Handled;
         }
+
+        e.Cancel = true;
     }
 
     #endregion Command
@@ -406,7 +422,7 @@ public class Shortcut : View
     {
         if (KeyBindingScope == KeyBindingScope.Application)
         {
-          //  return;
+            //  return;
         }
 
         if (Command != null && Key != null && Key != Key.Empty)
@@ -420,7 +436,7 @@ public class Shortcut : View
             }
             else
             {
-               // throw new InvalidOperationException ($"CommandView does not support the command {Command.Value}");
+                // throw new InvalidOperationException ($"CommandView does not support the command {Command.Value}");
             }
         }
     }
@@ -480,7 +496,7 @@ public class Shortcut : View
             handled = args.Handled;
         }
 
-        return handled;
+        return true;
     }
 
     /// <inheritdoc/>
@@ -493,14 +509,14 @@ public class Shortcut : View
             HotNormal = ColorScheme.HotFocus
         };
 
-        _container.ColorScheme = cs;
+        // _container.ColorScheme = cs;
 
         cs = new (ColorScheme)
         {
             Normal = ColorScheme.HotFocus,
             HotNormal = ColorScheme.Focus
         };
-        KeyView.ColorScheme = cs;
+        //KeyView.ColorScheme = cs;
 
         return base.OnEnter (view);
     }
@@ -515,14 +531,14 @@ public class Shortcut : View
             HotNormal = ColorScheme.HotNormal
         };
 
-        _container.ColorScheme = cs;
+        //   _container.ColorScheme = cs;
 
         cs = new (ColorScheme)
         {
             Normal = ColorScheme.HotNormal,
             HotNormal = ColorScheme.Normal
         };
-        KeyView.ColorScheme = cs;
+        //KeyView.ColorScheme = cs;
 
         return base.OnLeave (view);
     }
