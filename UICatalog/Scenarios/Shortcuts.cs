@@ -124,6 +124,25 @@ public class Shortcuts : Scenario
                             };
         Application.Top.Add (shortcut3);
 
+
+        var shortcutH = new Shortcut
+        {
+            Y = Pos.Top (shortcut3),
+            X = Pos.Right (shortcut3),
+            Title = "Horizo_ntal",
+            Key = Key.F10,
+            Text = "Hey!",
+            KeyBindingScope = KeyBindingScope.HotKey,
+            BorderStyle = LineStyle.Dotted
+        };
+        shortcutH.Border.Thickness = new Thickness (0, 0, 1, 0);
+        shortcutH.Accept += (s, e) =>
+                            {
+                                eventSource.Add ($"Accept: {s}");
+                                eventLog.MoveDown ();
+                            };
+        Application.Top.Add (shortcutH);
+
         var shortcut4 = new Shortcut
         {
             X = 20,
