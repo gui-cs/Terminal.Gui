@@ -44,10 +44,9 @@ public class Bars : Scenario
         var shortcut1 = new Shortcut
         {
             Title = "_Zigzag",
-            Key = Key.Z.WithAlt,
+            Key = Key.G.WithCtrl,
             Text = "Gonna zig zag",
             KeyBindingScope = KeyBindingScope.HotKey,
-            Command = Command.Accept,
         };
         shortcut1.Accept += (s, e) =>
                             {
@@ -409,7 +408,7 @@ public class Bars : Scenario
             Title = "Q_uit",
             Key = Application.QuitKey,
             KeyBindingScope = KeyBindingScope.Application,
-            Command = Command.QuitToplevel,
+//            Command = Command.QuitToplevel,
             CanFocus = false
         };
 
@@ -421,7 +420,6 @@ public class Bars : Scenario
             Title = "Help",
             Key = Key.F1,
             KeyBindingScope = KeyBindingScope.HotKey,
-            Command = Command.Accept,
             CanFocus = false
         };
 
@@ -446,7 +444,7 @@ public class Bars : Scenario
             Title = "_Show/Hide",
             Key = Key.F10,
             KeyBindingScope = KeyBindingScope.HotKey,
-            Command = Command.ToggleExpandCollapse,
+            //Command = Command.ToggleExpandCollapse,
             CommandView = new CheckBox
             {
                 Text = "_Show/Hide"

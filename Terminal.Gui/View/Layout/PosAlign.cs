@@ -29,7 +29,7 @@ public class PosAlign : Pos
     /// <summary>
     ///     The cached location. Used to store the calculated location to minimize recalculating it.
     /// </summary>
-    private int? _cachedLocation;
+    public int? _cachedLocation;
 
     /// <summary>
     ///     Gets the identifier of a set of views that should be aligned together. When only a single
@@ -206,6 +206,12 @@ public class PosAlign : Pos
                 if (index == 0)
                 {
                     firstInGroup = posAlign.Aligner;
+
+                    //if (!posAlign._cachedLocation.HasValue)
+                    //{
+                    //    AlignAndUpdateGroup (groupId, viewsInGroup, dimension, firstInGroup.ContainerSize );
+                    //}
+
                 }
 
                 dimensionsList.Add (dimension == Dimension.Width ? view.Frame.Width : view.Frame.Height);

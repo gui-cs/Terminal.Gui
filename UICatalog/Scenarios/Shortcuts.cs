@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
@@ -43,13 +44,13 @@ public class Shortcuts : Scenario
 
         var shortcut1 = new Shortcut
         {
+            //Width =30,
             Title = "Zi_gzag",
             Key = Key.F1,
             Text = "Gonna zig zag",
-            KeyBindingScope = KeyBindingScope.HotKey,
-            Command = Command.Accept,
+            KeyBindingScope = KeyBindingScope.Application,
             BorderStyle = LineStyle.Dotted
-        };  
+        };
         shortcut1.Border.Thickness = new Thickness (1, 0, 1, 0);
         shortcut1.Accept += (s, e) =>
                             {
@@ -61,12 +62,11 @@ public class Shortcuts : Scenario
         var shortcut2 = new Shortcut
         {
             Y = Pos.Bottom (shortcut1),
-            Width = Dim.Width(shortcut1),
+            Width = Dim.Width (shortcut1),
             Title = "_Two",
             Key = Key.F2.WithAlt,
             Text = "Number two",
             KeyBindingScope = KeyBindingScope.HotKey,
-            Command = Command.Accept,
             BorderStyle = LineStyle.Dotted
         };
         shortcut2.Border.Thickness = new Thickness (1, 0, 1, 0);
@@ -81,23 +81,99 @@ public class Shortcuts : Scenario
         {
             Y = Pos.Bottom (shortcut2),
             Width = Dim.Width (shortcut1),
-            Title = "T_hree",
+            CommandView = new CheckBox () { Text = "_Align" },
             Key = Key.F3,
-            Text = "Number 3",
+            HelpText = "Alignment",
             KeyBindingScope = KeyBindingScope.HotKey,
-            Command = Command.Accept,
             BorderStyle = LineStyle.Dotted
         };
         shortcut3.Border.Thickness = new Thickness (1, 0, 1, 0);
 
+        ((CheckBox)shortcut3.CommandView).Toggled += (s, e) =>
+                            {
+                                eventSource.Add ($"Toggled: {s}");
+                                eventLog.MoveDown ();
+
+                                if (shortcut3.CommandView is CheckBox cb)
+                                {
+                                    int max = 0;
+                                    if (e.NewValue == true)
+                                    {
+                                        foreach (Shortcut peer in Application.Top.Subviews.Where (v => v is Shortcut)!)
+                                        {
+                                            max = Math.Max (max, peer.KeyView.Text.GetColumns ());
+                                        }
+
+                                    }
+                                    foreach (Shortcut peer in Application.Top.Subviews.Where (v => v is Shortcut)!)
+                                    {
+                                        peer.MinimumKeyViewSize = max;
+                                    }
+                                }
+
+                                //Application.Top.SetNeedsDisplay ();
+                                //Application.Top.LayoutSubviews ();
+                                //Application.Top.SetNeedsDisplay ();
+                                //Application.Top.Draw ();
+                            };
         shortcut3.Accept += (s, e) =>
                             {
                                 eventSource.Add ($"Accept: {s}");
                                 eventLog.MoveDown ();
+
                             };
         Application.Top.Add (shortcut3);
 
-        shortcut1.SetFocus ();
+        var shortcut4 = new Shortcut
+        {
+            X = 20,
+            Y = Pos.Bottom (shortcut3),
+            Width = Dim.Fill (50),
+            Title = "C",
+            Text = "H",
+            Key = Key.K,
+            KeyBindingScope = KeyBindingScope.HotKey,
+            //           Command = Command.Accept,
+            BorderStyle = LineStyle.Dotted
+        };
+        shortcut4.Border.Thickness = new Thickness (1, 0, 1, 0);
+        shortcut4.Margin.Thickness = new Thickness (0, 1, 0, 0);
+        View.Diagnostics = ViewDiagnosticFlags.Ruler;
+
+        shortcut4.Accept += (s, e) =>
+                            {
+                                eventSource.Add ($"Accept: {s}");
+                                eventLog.MoveDown ();
+                                MessageBox.Query ("Hi", $"You clicked {s}");
+                            };
+        Application.Top.Add (shortcut4);
+
+        var shortcut5 = new Shortcut
+        {
+            X = 20,
+            Y = Pos.Bottom (shortcut4),
+            Width = Dim.Fill (50),
+            Title = "Fi_ve",
+            Key = Key.F5.WithCtrl.WithAlt.WithShift,
+            Text = "Help text",
+            KeyBindingScope = KeyBindingScope.HotKey,
+            BorderStyle = LineStyle.Dotted
+        };
+        shortcut5.Border.Thickness = new Thickness (1, 0, 1, 0);
+        shortcut5.Margin.Thickness = new Thickness (0, 1, 0, 0);
+        View.Diagnostics = ViewDiagnosticFlags.Ruler;
+
+        shortcut5.Accept += (s, e) =>
+                            {
+                                eventSource.Add ($"Accept: {s}");
+                                eventLog.MoveDown ();
+                            };
+        Application.Top.Add (shortcut5);
+
+
+        ((CheckBox)shortcut3.CommandView).OnToggled ();
+
+        //shortcut1.SetFocus ();
 
     }
 
