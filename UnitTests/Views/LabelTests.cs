@@ -1,14 +1,10 @@
 ﻿using System.ComponentModel;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class LabelTests
+public class LabelTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public LabelTests (ITestOutputHelper output) { _output = output; }
-
     // Test that Title and Text are the same
     [Fact]
     public void Text_Mirrors_Title ()
@@ -37,9 +33,9 @@ public class LabelTests
     [Fact]
     public void HotKey_Command_SetsFocus_OnNextSubview ()
     {
-        var superView = new View () { CanFocus = true };
+        var superView = new View { CanFocus = true };
         var label = new Label ();
-        var nextSubview = new View () { CanFocus = true };
+        var nextSubview = new View { CanFocus = true };
         superView.Add (label, nextSubview);
         superView.BeginInit ();
         superView.EndInit ();
@@ -52,14 +48,13 @@ public class LabelTests
         Assert.True (nextSubview.HasFocus);
     }
 
-
     [Fact]
     public void MouseClick_SetsFocus_OnNextSubview ()
     {
-        var superView = new View () { CanFocus = true, Height = 1, Width = 15 };
-        var focusedView = new View () { CanFocus = true, Width = 1, Height = 1 };
-        var label = new Label () { X = 2, Title = "_x" };
-        var nextSubview = new View () { CanFocus = true, X = 4, Width = 4, Height = 1 };
+        var superView = new View { CanFocus = true, Height = 1, Width = 15 };
+        var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
+        var label = new Label { X = 2, Title = "_x" };
+        var nextSubview = new View { CanFocus = true, X = 4, Width = 4, Height = 1 };
         superView.Add (focusedView, label, nextSubview);
         superView.BeginInit ();
         superView.EndInit ();
@@ -68,7 +63,7 @@ public class LabelTests
         Assert.False (label.HasFocus);
         Assert.False (nextSubview.HasFocus);
 
-        label.NewMouseEvent (new MouseEvent () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        label.NewMouseEvent (new() { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
         Assert.True (nextSubview.HasFocus);
     }
@@ -85,6 +80,7 @@ public class LabelTests
         Assert.False (accepted);
 
         return;
+
         void LabelOnAccept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
@@ -100,8 +96,6 @@ public class LabelTests
         var top = new Toplevel ();
         top.Add (win);
 
-       
-
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
@@ -113,11 +107,10 @@ public class LabelTests
 └────────────────────────────┘
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-       
         label.Text = "Say Hello 你 changed";
-       
+
         Application.Refresh ();
 
         expected = @"
@@ -128,7 +121,8 @@ public class LabelTests
 └────────────────────────────┘
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -153,11 +147,10 @@ public class LabelTests
 └────────────────────────────┘
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-       
         label.Text = "Say Hello 你 changed";
-       
+
         Application.Refresh ();
 
         expected = @"
@@ -168,7 +161,8 @@ public class LabelTests
 └────────────────────────────┘
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -182,11 +176,7 @@ public class LabelTests
         var top = new Toplevel ();
         top.Add (win);
 
-       
-
         label.Text = "Say Hello 你";
-
-       
 
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
@@ -199,7 +189,8 @@ public class LabelTests
 └────────────────────────────┘
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -207,9 +198,9 @@ public class LabelTests
     {
         var label = new Label ();
         Assert.Equal (string.Empty, label.Text);
-        Assert.Equal (TextAlignment.Left, label.TextAlignment);
+        Assert.Equal (Alignment.Start, label.TextAlignment);
         Assert.False (label.CanFocus);
-        Assert.Equal (new Rectangle (0, 0, 0, 0), label.Frame);
+        Assert.Equal (new (0, 0, 0, 0), label.Frame);
         Assert.Equal (KeyCode.Null, label.HotKey);
     }
 
@@ -217,7 +208,7 @@ public class LabelTests
     [AutoInitShutdown]
     public void Label_Draw_Fill_Remaining_AutoSize_False ()
     {
-        Size tfSize = new Size (80, 1);
+        var tfSize = new Size (80, 1);
 
         var label = new Label { Text = "This label needs to be cleared before rewritten.", Width = tfSize.Width, Height = tfSize.Height };
 
@@ -238,16 +229,16 @@ public class LabelTests
         Assert.False (tf1.FillRemaining);
         Assert.True (tf2.FillRemaining);
 
-        tf1.Draw (new Rectangle (new Point (0, 1), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf1.Draw (new (new (0, 1), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
-        tf2.Draw (new Rectangle (new Point (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf2.Draw (new (new (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 This label needs to be cleared before rewritten.                       
 This TextFormatter (tf1) without fill will not be cleared on rewritten.
 This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.False (label.NeedsDisplay);
@@ -260,18 +251,19 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
         label.Draw ();
 
         tf1.Text = "This TextFormatter (tf1) is rewritten.";
-        tf1.Draw (new Rectangle (new Point (0, 1), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf1.Draw (new (new (0, 1), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         tf2.Text = "This TextFormatter (tf2) is rewritten.";
-        tf2.Draw (new Rectangle (new Point (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf2.Draw (new (new (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 This label is rewritten.                                               
 This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
 This TextFormatter (tf2) is rewritten.                                 ",
-                                                      _output
+                                                      output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -283,15 +275,15 @@ This TextFormatter (tf2) is rewritten.                                 ",
         top.Add (label);
         Application.Begin (top);
 
-       
-        Assert.Equal (new Rectangle (0, 0, 16, 1), label.Frame);
+        Assert.Equal (new (0, 0, 16, 1), label.Frame);
 
         var expected = @"
 Demo Simple Rune
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 16, 1), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 16, 1), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -325,8 +317,9 @@ n
 e
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 1, 16), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 1, 16), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -348,12 +341,12 @@ e
 ズ
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 2, 7), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 2, 7), pos);
+        top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Label_HotKeyChanged_EventFires ()
     {
         var label = new Label { Text = "Yar" };
@@ -375,7 +368,6 @@ e
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Label_HotKeyChanged_EventFires_WithNone ()
     {
         var label = new Label ();
@@ -427,7 +419,7 @@ e
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
-        Assert.Equal (new Rectangle (0, 0, 12, 1), label.Viewport);
+        Assert.Equal (new (0, 0, 12, 1), label.Viewport);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -436,8 +428,9 @@ e
 │                            │
 └────────────────────────────┘
 ";
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -458,7 +451,7 @@ e
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
-        Assert.Equal (new Rectangle (0, 0, 12, 1), label.Viewport);
+        Assert.Equal (new (0, 0, 12, 1), label.Viewport);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -468,18 +461,18 @@ e
 └────────────────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rectangle (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
+        top.Dispose ();
     }
-
 
     [Fact]
     [SetupFakeDriver]
     public void Full_Border ()
     {
-        var label = new Label { BorderStyle = LineStyle.Single , Text = "Test",} ;
-        label.BeginInit();
-        label.EndInit();
+        var label = new Label { BorderStyle = LineStyle.Single, Text = "Test" };
+        label.BeginInit ();
+        label.EndInit ();
         label.SetRelativeLayout (Application.Driver.Screen.Size);
 
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
@@ -492,7 +485,7 @@ e
 ┌┤Te├┐
 │Test│
 └────┘",
-                                                      _output
+                                                      output
                                                      );
         label.Dispose ();
     }
@@ -502,8 +495,8 @@ e
     public void With_Top_Margin_Without_Top_Border ()
     {
         var label = new Label { Text = "Test", /*Width = 6, Height = 3,*/ BorderStyle = LineStyle.Single };
-        label.Margin.Thickness = new Thickness (0, 1, 0, 0);
-        label.Border.Thickness = new Thickness (1, 0, 1, 1);
+        label.Margin.Thickness = new (0, 1, 0, 0);
+        label.Border.Thickness = new (1, 0, 1, 1);
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
@@ -516,8 +509,9 @@ e
                                                       @"
 │Test│
 └────┘",
-                                                      _output
+                                                      output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -525,7 +519,7 @@ e
     public void Without_Top_Border ()
     {
         var label = new Label { Text = "Test", /* Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        label.Border.Thickness = new Thickness (1, 0, 1, 1);
+        label.Border.Thickness = new (1, 0, 1, 1);
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
@@ -538,13 +532,14 @@ e
                                                       @"
 │Test│
 └────┘",
-                                                      _output
+                                                      output
                                                      );
+        top.Dispose ();
     }
 
     // These tests were formally in AutoSizetrue.cs. They are (poor) Label tests.
     private readonly string [] expecteds = new string [21]
-  {
+    {
         @"
 ┌────────────────────┐
 │View with long text │
@@ -860,7 +855,7 @@ e
 │Label 19            │
 │Label 19            │
 └────────────────────┘"
-  };
+    };
 
     private static readonly Size _size1x1 = new (1, 1);
 
@@ -889,9 +884,9 @@ e
         ((FakeDriver)Application.Driver).SetBufferSize (40, 10);
 
         Assert.Equal (29, label.Text.Length);
-        Assert.Equal (new Rectangle (0, 0, 40, 10), top.Frame);
-        Assert.Equal (new Rectangle (0, 0, 40, 10), win.Frame);
-        Assert.Equal (new Rectangle (0, 7, 29, 1), label.Frame);
+        Assert.Equal (new (0, 0, 40, 10), top.Frame);
+        Assert.Equal (new (0, 0, 40, 10), win.Frame);
+        Assert.Equal (new (0, 7, 29, 1), label.Frame);
 
         var expected = @"
 ┌──────────────────────────────────────┐
@@ -905,10 +900,11 @@ e
 │This should be the last line.         │
 └──────────────────────────────────────┘
 "
-        ;
+            ;
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]
@@ -935,11 +931,11 @@ e
         top.Add (win, menu, status);
         RunState rs = Application.Begin (top);
 
-        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new Rectangle (0, 0, 80, 1), menu.Frame);
-        Assert.Equal (new Rectangle (0, 24, 80, 1), status.Frame);
-        Assert.Equal (new Rectangle (0, 1, 80, 23), win.Frame);
-        Assert.Equal (new Rectangle (0, 20, 29, 1), label.Frame);
+        Assert.Equal (new (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new (0, 0, 80, 1), menu.Frame);
+        Assert.Equal (new (0, 24, 80, 1), status.Frame);
+        Assert.Equal (new (0, 1, 80, 23), win.Frame);
+        Assert.Equal (new (0, 20, 29, 1), label.Frame);
 
         var expected = @"
  Menu                                                                           
@@ -969,8 +965,9 @@ e
  F1 Help                                                                        
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        top.Dispose ();
     }
 
     // TODO: This is a Label test. Move to label tests if there's not already a test for this.
@@ -999,9 +996,9 @@ e
         RunState rs = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (40, 10);
 
-        Assert.Equal (new Rectangle (0, 0, 40, 10), top.Frame);
-        Assert.Equal (new Rectangle (0, 0, 40, 10), win.Frame);
-        Assert.Equal (new Rectangle (0, 7, 29, 1), label.Frame);
+        Assert.Equal (new (0, 0, 40, 10), top.Frame);
+        Assert.Equal (new (0, 0, 40, 10), win.Frame);
+        Assert.Equal (new (0, 7, 29, 1), label.Frame);
 
         var expected = @"
 ┌──────────────────────────────────────┐
@@ -1016,8 +1013,9 @@ e
 └──────────────────────────────────────┘
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        top.Dispose ();
     }
 
     // TODO: This is a Label test. Move to label tests if there's not already a test for this.
@@ -1047,11 +1045,11 @@ e
         top.Add (win, menu, status);
         RunState rs = Application.Begin (top);
 
-        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new Rectangle (0, 0, 80, 1), menu.Frame);
-        Assert.Equal (new Rectangle (0, 24, 80, 1), status.Frame);
-        Assert.Equal (new Rectangle (0, 1, 80, 23), win.Frame);
-        Assert.Equal (new Rectangle (0, 20, 29, 1), label.Frame);
+        Assert.Equal (new (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new (0, 0, 80, 1), menu.Frame);
+        Assert.Equal (new (0, 24, 80, 1), status.Frame);
+        Assert.Equal (new (0, 1, 80, 23), win.Frame);
+        Assert.Equal (new (0, 20, 29, 1), label.Frame);
 
         var expected = @"
  Menu                                                                           
@@ -1081,10 +1079,10 @@ e
  F1 Help                                                                        
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
+        top.Dispose ();
     }
-
 
     // TODO: This is a Dim test. Move to Dim tests.
 
@@ -1132,53 +1130,53 @@ e
         }
 
         field.KeyDown += (s, k) =>
-        {
-            if (k.KeyCode == KeyCode.Enter)
-            {
-                ((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
-                Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], _output);
-                Assert.Equal (new Rectangle (0, 0, 22, count + 4), pos);
+                         {
+                             if (k.KeyCode == KeyCode.Enter)
+                             {
+                                 ((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
+                                 Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
+                                 Assert.Equal (new (0, 0, 22, count + 4), pos);
 
-                if (count > 0)
-                {
-                    Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
-                    view.Remove (listLabels [count - 1]);
-                    listLabels [count - 1].Dispose ();
-                    listLabels.RemoveAt (count - 1);
-                    Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
-                    view.Height -= 1;
-                    count--;
+                                 if (count > 0)
+                                 {
+                                     Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
+                                     view.Remove (listLabels [count - 1]);
+                                     listLabels [count - 1].Dispose ();
+                                     listLabels.RemoveAt (count - 1);
+                                     Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
+                                     view.Height -= 1;
+                                     count--;
 
-                    if (listLabels.Count > 0)
-                    {
-                        field.Text = listLabels [count - 1].Text;
-                    }
-                    else
-                    {
-                        field.Text = string.Empty;
-                    }
-                }
+                                     if (listLabels.Count > 0)
+                                     {
+                                         field.Text = listLabels [count - 1].Text;
+                                     }
+                                     else
+                                     {
+                                         field.Text = string.Empty;
+                                     }
+                                 }
 
-                Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
-            }
-        };
+                                 Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
+                             }
+                         };
 
         Application.Iteration += (s, a) =>
-        {
-            while (count > -1)
-            {
-                field.NewKeyDownEvent (Key.Enter);
+                                 {
+                                     while (count > -1)
+                                     {
+                                         field.NewKeyDownEvent (Key.Enter);
 
-                if (count == 0)
-                {
-                    field.NewKeyDownEvent (Key.Enter);
+                                         if (count == 0)
+                                         {
+                                             field.NewKeyDownEvent (Key.Enter);
 
-                    break;
-                }
-            }
+                                             break;
+                                         }
+                                     }
 
-            Application.RequestStop ();
-        };
+                                     Application.RequestStop ();
+                                 };
 
         var win = new Window ();
         win.Add (view);
@@ -1190,6 +1188,7 @@ e
 
         Assert.Equal (0, count);
         Assert.Equal (count, listLabels.Count);
+        top.Dispose ();
     }
 
     // TODO: This is a Label test. Move to Label tests.
@@ -1200,9 +1199,10 @@ e
     {
         ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
         var text = "Label";
+
         var label = new Label
         {
-            Text = text,
+            Text = text
         };
         label.Width = Dim.Fill () - text.Length;
         label.Height = 0;
@@ -1216,6 +1216,7 @@ e
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 3, 0), label.Frame);
+
         //Assert.Equal (new (5, 1), label.TextFormatter.Size);
         Assert.Single (label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
@@ -1227,7 +1228,7 @@ e
 └────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
 
         text = "0123456789";
@@ -1238,6 +1239,7 @@ e
         win.Draw ();
 
         Assert.Equal (Rectangle.Empty, label.Frame);
+
         //        Assert.Equal (new (5, 1), label.TextFormatter.Size);
 
         //Exception exception = Record.Exception (
@@ -1255,7 +1257,7 @@ e
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
     }
 
@@ -1280,55 +1282,55 @@ e
         List<Label> listLabels = new ();
 
         field.KeyDown += (s, k) =>
-        {
-            if (k.KeyCode == KeyCode.Enter)
-            {
-                ((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
-                Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], _output);
-                Assert.Equal (new Rectangle (0, 0, 22, count + 4), pos);
+                         {
+                             if (k.KeyCode == KeyCode.Enter)
+                             {
+                                 ((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
+                                 Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
+                                 Assert.Equal (new (0, 0, 22, count + 4), pos);
 
-                if (count < 20)
-                {
-                    field.Text = $"Label {count}";
+                                 if (count < 20)
+                                 {
+                                     field.Text = $"Label {count}";
 
-                    // Label is AutoSize = true
-                    var label = new Label { Text = field.Text, X = 0, Y = view.Viewport.Height /*, Width = 10*/ };
-                    view.Add (label);
-                    Assert.Equal ($"Label {count}", label.Text);
-                    Assert.Equal ($"Absolute({count + 1})", label.Y.ToString ());
-                    listLabels.Add (label);
+                                     // Label is AutoSize = true
+                                     var label = new Label { Text = field.Text, X = 0, Y = view.Viewport.Height /*, Width = 10*/ };
+                                     view.Add (label);
+                                     Assert.Equal ($"Label {count}", label.Text);
+                                     Assert.Equal ($"Absolute({count + 1})", label.Y.ToString ());
+                                     listLabels.Add (label);
 
-                    //if (count == 0) {
-                    //	Assert.Equal ($"Absolute({count})", view.Height.ToString ());
-                    //	view.Height += 2;
-                    //} else {
-                    Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
-                    view.Height += 1;
+                                     //if (count == 0) {
+                                     //	Assert.Equal ($"Absolute({count})", view.Height.ToString ());
+                                     //	view.Height += 2;
+                                     //} else {
+                                     Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
+                                     view.Height += 1;
 
-                    //}
-                    count++;
-                }
+                                     //}
+                                     count++;
+                                 }
 
-                Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
-            }
-        };
+                                 Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
+                             }
+                         };
 
         Application.Iteration += (s, a) =>
-        {
-            while (count < 21)
-            {
-                field.NewKeyDownEvent (Key.Enter);
+                                 {
+                                     while (count < 21)
+                                     {
+                                         field.NewKeyDownEvent (Key.Enter);
 
-                if (count == 20)
-                {
-                    field.NewKeyDownEvent (Key.Enter);
+                                         if (count == 20)
+                                         {
+                                             field.NewKeyDownEvent (Key.Enter);
 
-                    break;
-                }
-            }
+                                             break;
+                                         }
+                                     }
 
-            Application.RequestStop ();
-        };
+                                     Application.RequestStop ();
+                                 };
 
         var win = new Window ();
         win.Add (view);
@@ -1340,9 +1342,8 @@ e
 
         Assert.Equal (20, count);
         Assert.Equal (count, listLabels.Count);
+        top.Dispose ();
     }
-
-
 
     [Fact]
     [AutoInitShutdown]
@@ -1376,7 +1377,7 @@ e
 └────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
 
         text = "0123456789";
@@ -1397,8 +1398,9 @@ e
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1434,7 +1436,7 @@ e
 └────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
 
         text = "0123456789";
@@ -1442,7 +1444,6 @@ e
 
         //label.Width = Dim.Fill () - text.Length;
         Application.Refresh ();
-
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.Size);
@@ -1455,14 +1456,15 @@ e
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
+        top.Dispose ();
     }
 
     [Fact]
     public void Label_ResizeView_With_Dim_Absolute ()
     {
-        var super = new View ()
+        var super = new View
         {
             Width = Dim.Fill (),
             Height = Dim.Fill ()
@@ -1477,5 +1479,4 @@ e
         Assert.Equal (expectedLabelBounds, label.Viewport);
         super.Dispose ();
     }
-
 }

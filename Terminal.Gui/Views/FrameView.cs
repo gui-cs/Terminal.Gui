@@ -3,13 +3,12 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     The FrameView is a container frame that draws a frame around the contents. It is similar to a GroupBox in
-///     Windows.
+///     The FrameView is a container View with a border around it. 
 /// </summary>
 public class FrameView : View
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Computed"/>
+    ///     Initializes a new instance of the <see cref="Gui.FrameView"/> class.
     ///     layout.
     /// </summary>
     public FrameView ()

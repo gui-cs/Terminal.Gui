@@ -60,7 +60,7 @@ public class ViewExperiments : Scenario
             Width = 17,
             Title = "Window 1",
             Text = "Window #2",
-            TextAlignment = TextAlignment.Centered
+            TextAlignment = Alignment.Center
         };
 
         window1.Margin.Thickness = new (0);
@@ -84,7 +84,7 @@ public class ViewExperiments : Scenario
             Width = 37,
             Title = "Window2",
             Text = "Window #2 (Right(window1)+1",
-            TextAlignment = TextAlignment.Centered
+            TextAlignment = Alignment.Center
         };
 
         //view3.InitializeFrames ();
@@ -109,7 +109,7 @@ public class ViewExperiments : Scenario
             Width = 37,
             Title = "View4",
             Text = "View #4 (Right(window2)+1",
-            TextAlignment = TextAlignment.Centered
+            TextAlignment = Alignment.Center
         };
 
         //view4.InitializeFrames ();
@@ -134,7 +134,7 @@ public class ViewExperiments : Scenario
             Width = Dim.Fill (),
             Title = "View5",
             Text = "View #5 (Right(view4)+1 Fill",
-            TextAlignment = TextAlignment.Centered
+            TextAlignment = Alignment.Center
         };
 
         //view5.InitializeFrames ();
@@ -181,7 +181,7 @@ public class ViewExperiments : Scenario
             X = Pos.Center (),
             Y = Pos.Percent (50),
             Width = 30,
-            TextAlignment = TextAlignment.Centered
+            TextAlignment = Alignment.Center
         };
         label50.Border.Thickness = new (1, 3, 1, 1);
         label50.Height = 5;
@@ -232,13 +232,11 @@ public class ViewExperiments : Scenario
 
         view.X = Pos.Center ();
 
-        var editor = new Adornments.AdornmentsEditor
+        var editor = new AdornmentsEditor
         {
-            Title = "Adornments Editor",
             X = 0,
             Y = Pos.Bottom (containerLabel),
-            Width = Dim.Fill (),
-            ViewToEdit = view
+            AutoSelectViewToEdit = true
         };
 
         app.Add (editor);

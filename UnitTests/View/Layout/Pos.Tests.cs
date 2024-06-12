@@ -78,7 +78,7 @@ public class PosTests ()
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel t = new Toplevel();
+        Toplevel t = new Toplevel ();
 
         var w = new Window { X = Pos.Left (t) + 2, Y = Pos.Top (t) + 2 };
         var f = new FrameView ();

@@ -26,6 +26,14 @@ namespace Terminal.Gui;
 ///             </listheader>
 ///             <item>
 ///                 <term>
+///                     <see cref="Pos.Align"/>
+///                 </term>
+///                 <description>
+///                     Creates a <see cref="Pos"/> object that aligns a set of views.
+///                 </description>
+///             </item>
+///             <item>
+///                 <term>
 ///                     <see cref="Func"/>
 ///                 </term>
 ///                 <description>
@@ -131,6 +139,30 @@ public abstract class Pos
     /// <returns>The Absolute <see cref="Pos"/>.</returns>
     /// <param name="position">The value to convert to the <see cref="Pos"/>.</param>
     public static Pos Absolute (int position) { return new PosAbsolute (position); }
+
+    /// <summary>
+    ///     Creates a <see cref="Pos"/> object that aligns a set of views according to the specified <see cref="Alignment"/>
+    ///     and <see cref="AlignmentModes"/>.
+    /// </summary>
+    /// <param name="alignment">The alignment. The default includes <see cref="AlignmentModes.AddSpaceBetweenItems"/>.</param>
+    /// <param name="modes">The optional alignment modes.</param>
+    /// <param name="groupId">
+    ///     The optional identifier of a set of views that should be aligned together. When only a single
+    ///     set of views in a SuperView is aligned, this parameter is optional.
+    /// </param>
+    /// <returns></returns>
+    public static Pos Align (Alignment alignment, AlignmentModes modes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, int groupId = 0)
+    {
+        return new PosAlign
+        {
+            Aligner = new ()
+            {
+                Alignment = alignment,
+                AlignmentModes = modes
+            },
+            GroupId = groupId
+        };
+    }
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or
@@ -264,12 +296,12 @@ public abstract class Pos
 
     /// <summary>
     ///     Gets the starting point of an element based on the size of the parent element (typically
-    ///     <c>Superview.ContentSize</c>).
+    ///     <c>Superview.GetContentSize ()</c>).
     ///     This method is meant to be overridden by subclasses to provide different ways of calculating the starting point.
     ///     This method is used
     ///     internally by the layout system to determine where a View should be positioned.
     /// </summary>
-    /// <param name="size">The size of the parent element (typically <c>Superview.ContentSize</c>).</param>
+    /// <param name="size">The size of the parent element (typically <c>Superview.GetContentSize ()</c>).</param>
     /// <returns>
     ///     An integer representing the calculated position. The way this position is calculated depends on the specific
     ///     subclass of Pos that is used. For example, PosAbsolute returns a fixed position, PosAnchorEnd returns a
@@ -359,5 +391,4 @@ public abstract class Pos
     }
 
     #endregion operators
-
 }

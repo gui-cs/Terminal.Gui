@@ -32,6 +32,7 @@
   "Themes": [
     {
       "UI Catalog Theme": {
+        "Dialog.DefaultButtonAlignment": "Fill",
         "ColorSchemes": [
           {
             "UI Catalog Scheme": {

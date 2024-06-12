@@ -1,5 +1,3 @@
-using System.Net.Mime;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -23,7 +21,7 @@ namespace Terminal.Gui;
 public partial class Toplevel : View
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout,
+    ///     Initializes a new instance of the <see cref="Toplevel"/> class,
     ///     defaulting to full screen. The <see cref="View.Width"/> and <see cref="View.Height"/> properties will be set to the
     ///     dimensions of the terminal using <see cref="Dim.Fill"/>.
     /// </summary>
@@ -108,7 +106,7 @@ public partial class Toplevel : View
                    );
 
         // Default keybindings for this view
-        KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
+        KeyBindings.Add (Application.QuitKey, KeyBindingScope.Application, Command.QuitToplevel);
 
         KeyBindings.Add (Key.CursorRight, Command.NextView);
         KeyBindings.Add (Key.CursorDown, Command.NextView);
@@ -120,12 +118,17 @@ public partial class Toplevel : View
         KeyBindings.Add (Key.Tab.WithCtrl, Command.NextViewOrTop);
         KeyBindings.Add (Key.Tab.WithShift.WithCtrl, Command.PreviousViewOrTop);
 
-        KeyBindings.Add (Key.F5, Command.Refresh);
+        // TODO: Refresh Key should be configurable
+        KeyBindings.Add (Key.F5, KeyBindingScope.Application, Command.Refresh);
         KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
         KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
+        if (Environment.OSVersion.Platform == PlatformID.Unix)
+        {
+            KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
+        }
+
 #if UNIX_KEY_BINDINGS
-        KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
         KeyBindings.Add (Key.L.WithCtrl, Command.Refresh); // Unix
         KeyBindings.Add (Key.F.WithCtrl, Command.NextView); // Unix
         KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
@@ -397,9 +400,7 @@ public partial class Toplevel : View
         }
 
         if ((superView != top || top?.SuperView is { } || (top != Application.Top && top.Modal) || (top?.SuperView is null && top.IsOverlapped))
-
-            // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
-            && (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) /*&& top.LayoutStyle == LayoutStyle.Computed*/)
+            && (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y))
         {
             if ((top.X is null || top.X is PosAbsolute) && top.Frame.X != nx)
             {

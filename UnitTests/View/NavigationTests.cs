@@ -1,15 +1,9 @@
 ﻿using Xunit.Abstractions;
 
-// Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
-
 namespace Terminal.Gui.ViewTests;
 
-public class NavigationTests
+public class NavigationTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public NavigationTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     public void BringSubviewForward_Subviews_vs_TabIndexes ()
     {
@@ -308,6 +302,7 @@ public class NavigationTests
         Assert.False (view.HasFocus);
         Assert.Null (Application.Current.Focused);
         Assert.Null (Application.Current.MostFocused);
+        top.Dispose ();
     }
 
     [Fact]
@@ -348,6 +343,7 @@ public class NavigationTests
         Assert.True (view2.HasFocus);
         Assert.Equal (win2, Application.Current.Focused);
         Assert.Equal (view2, Application.Current.MostFocused);
+        top.Dispose ();
     }
 
     [Fact]
@@ -390,6 +386,7 @@ public class NavigationTests
         Assert.True (view2.HasFocus);
         Assert.Equal (win2, Application.Current.Focused);
         Assert.Equal (view2, Application.Current.MostFocused);
+        top.Dispose ();
     }
 
     [Fact]
@@ -440,10 +437,10 @@ public class NavigationTests
         Assert.False (view2.HasFocus);
         Assert.Equal (win1, Application.Current.Focused);
         Assert.Equal (view12, Application.Current.MostFocused);
+        top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Enabled_False_Sets_HasFocus_To_False ()
     {
         var wasClicked = false;
@@ -529,6 +526,7 @@ public class NavigationTests
         Application.Run (top);
 
         Assert.Equal (1, iterations);
+        top.Dispose ();
     }
 
     [Fact]
@@ -619,6 +617,7 @@ public class NavigationTests
         Assert.Null (exception);
         Assert.True (removed);
         Assert.Null (view3);
+        top1.Dispose ();
     }
 
     [Fact]
@@ -694,6 +693,7 @@ public class NavigationTests
 // This test is now invalid because `win` is focused, so it will receive the keypress
         Assert.True (topQuiting);
 #endif
+        top.Dispose ();
     }
 
     [Fact]
@@ -745,9 +745,11 @@ public class NavigationTests
         Assert.True (sbQuiting);
         Assert.False (tfQuiting);
 #endif
+        top.Dispose ();
     }
 
     [Fact]
+    [SetupFakeDriver]
     public void Navigation_With_Null_Focused_View ()
     {
         // Non-regression test for #882 (NullReferenceException during keyboard navigation when Focused is null)
@@ -758,7 +760,7 @@ public class NavigationTests
         top.Ready += (s, e) => { Assert.Null (top.Focused); };
 
         // Keyboard navigation with tab
-        Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\t', ConsoleKey.Tab, false, false, false));
+        FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo ('\t', ConsoleKey.Tab, false, false, false));
 
         Application.Iteration += (s, a) => Application.RequestStop ();
 
@@ -805,6 +807,7 @@ public class NavigationTests
         Assert.True (container.HasFocus);
         Assert.Null (child);
         Assert.False (leave);
+        top.Dispose ();
     }
 
     [Fact]
@@ -847,7 +850,7 @@ public class NavigationTests
 │                  │
 │                  │
 └──────────────────┘",
-                                                          _output
+                                                          output
                                                          );
 
         // top
@@ -948,6 +951,7 @@ public class NavigationTests
         Assert.Equal (4, screen.Y);
         found = View.FindDeepestView (top, new (15, 4));
         Assert.Equal (top, found);
+        top.Dispose ();
     }
 
     [Fact]
@@ -997,7 +1001,7 @@ public class NavigationTests
    │                  │
    │                  │
    └──────────────────┘",
-                                                                   _output
+                                                                   output
                                                                   );
 
         // mean the output started at col 3 and line 2
@@ -1083,6 +1087,7 @@ public class NavigationTests
         Assert.Equal (24, screen.X);
         Assert.Equal (4, screen.Y);
         Assert.Null (View.FindDeepestView (top, new (24, 4)));
+        top.Dispose ();
     }
 
     [Fact]
@@ -1128,7 +1133,6 @@ public class NavigationTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void SetFocus_View_With_Null_Superview_Does_Not_Throw_Exception ()
     {
         var top = new Toplevel ();
@@ -1177,6 +1181,7 @@ public class NavigationTests
         Assert.False (subView1subView1Leave);
         Application.End (rs);
         subView1subView1.Dispose ();
+        top.Dispose ();
     }
 
     [Fact]

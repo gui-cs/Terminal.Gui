@@ -109,38 +109,6 @@ public class TextViewTests
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
-    public void BottomOffset_Sets_To_Zero_Adjust_TopRow ()
-    {
-        var text = "";
-
-        for (var i = 0; i < 12; i++)
-        {
-            text += $"This is the line {i}\n";
-        }
-
-        var tv = new TextView { Width = 10, Height = 10, BottomOffset = 1 };
-        tv.Text = text;
-
-        tv.NewKeyDownEvent (Key.End.WithCtrl);
-
-        Assert.Equal (4, tv.TopRow);
-        Assert.Equal (1, tv.BottomOffset);
-
-        tv.BottomOffset = 0;
-        Assert.Equal (3, tv.TopRow);
-        Assert.Equal (0, tv.BottomOffset);
-
-        tv.BottomOffset = 2;
-        Assert.Equal (5, tv.TopRow);
-        Assert.Equal (2, tv.BottomOffset);
-
-        tv.BottomOffset = 0;
-        Assert.Equal (3, tv.TopRow);
-        Assert.Equal (0, tv.BottomOffset);
-    }
-
-    [Fact]
-    [TextViewTestsAutoInitShutdown]
     public void CanFocus_False_Wont_Focus_With_Mouse ()
     {
         Toplevel top = new ();
@@ -6944,38 +6912,6 @@ This is the second line.
     }
 
     [Fact]
-    [TextViewTestsAutoInitShutdown]
-    public void RightOffset_Sets_To_Zero_Adjust_leftColumn ()
-    {
-        var text = "";
-
-        for (var i = 0; i < 12; i++)
-        {
-            text += $"{i.ToString () [^1]}";
-        }
-
-        var tv = new TextView { Width = 10, Height = 10, RightOffset = 1 };
-        tv.Text = text;
-
-        tv.NewKeyDownEvent (Key.End);
-
-        Assert.Equal (4, tv.LeftColumn);
-        Assert.Equal (1, tv.RightOffset);
-
-        tv.RightOffset = 0;
-        Assert.Equal (3, tv.LeftColumn);
-        Assert.Equal (0, tv.RightOffset);
-
-        tv.RightOffset = 2;
-        Assert.Equal (5, tv.LeftColumn);
-        Assert.Equal (2, tv.RightOffset);
-
-        tv.RightOffset = 0;
-        Assert.Equal (3, tv.LeftColumn);
-        Assert.Equal (0, tv.RightOffset);
-    }
-
-    [Fact]
     [AutoInitShutdown]
     public void ScrollDownTillCaretOffscreen_ThenType ()
     {
@@ -9008,13 +8944,12 @@ line.
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
-This is  
-the first
-line.    
-This is  
-the      
-second   
-line.    
+This is   
+the first 
+line.     
+This is   
+the second
+line.     
 ",
                                                       _output
                                                      );

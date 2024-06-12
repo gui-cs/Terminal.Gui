@@ -40,8 +40,7 @@ public class WizardStep : FrameView
     private readonly TextView _helpTextView = new ();
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="Wizard"/> class.
     /// </summary>
     public WizardStep ()
     {

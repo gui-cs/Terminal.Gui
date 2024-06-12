@@ -66,7 +66,6 @@ public class PosCombineTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void PosCombine_DimCombine_View_With_SubViews ()
     {
-        var clicked = false;
         Toplevel top = new Toplevel () { Width = 80, Height = 25 };
         var win1 = new Window { Id = "win1", Width = 20, Height = 10 };
         var view1 = new View
@@ -78,7 +77,9 @@ public class PosCombineTests (ITestOutputHelper output)
         };
         var win2 = new Window { Id = "win2", Y = Pos.Bottom (view1) + 1, Width = 10, Height = 3 };
         var view2 = new View { Id = "view2", Width = Dim.Fill (), Height = 1, CanFocus = true };
-        view2.MouseClick += (sender, e) => clicked = true;
+
+        //var clicked = false;
+        //view2.MouseClick += (sender, e) => clicked = true;
         var view3 = new View { Id = "view3", Width = Dim.Fill (1), Height = 1, CanFocus = true };
 
         view2.Add (view3);

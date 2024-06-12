@@ -4,6 +4,15 @@ namespace Terminal.Gui;
 
 public partial class View
 {
+    /// <summary>
+    ///    Initializes the Text of the View. Called by the constructor.
+    /// </summary>
+    private void SetupText ()
+    {
+        Text = string.Empty;
+        TextDirection = TextDirection.LeftRight_TopBottom;
+    }
+
     private string _text;
 
     /// <summary>
@@ -37,11 +46,11 @@ public partial class View
     ///         to <see cref="TextAlignment"/> and <see cref="TextDirection"/>.
     ///     </para>
     ///     <para>
-    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="ContentSize"/>'s height
+    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="GetContentSize ()"/>'s height
     ///         is 1, the text will be clipped.
     ///     </para>
     ///     <para>If <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>,
-    ///     the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
+    ///     the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
     ///     <para>When the text changes, the <see cref="TextChanged"/> is fired.</para>
     /// </remarks>
     public virtual string Text
@@ -84,10 +93,10 @@ public partial class View
     ///     redisplay the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
+    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
-    public virtual TextAlignment TextAlignment
+    public virtual Alignment TextAlignment
     {
         get => TextFormatter.Alignment;
         set
@@ -103,9 +112,9 @@ public partial class View
     ///     <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
+    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
     /// </remarks>
-    /// <value>The text alignment.</value>
+    /// <value>The text direction.</value>
     public virtual TextDirection TextDirection
     {
         get => TextFormatter.Direction;
@@ -127,10 +136,10 @@ public partial class View
     ///     the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="ContentSize"/> will be adjusted to fit the text.</para>
+    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
     /// </remarks>
-    /// <value>The text alignment.</value>
-    public virtual VerticalTextAlignment VerticalTextAlignment
+    /// <value>The vertical text alignment.</value>
+    public virtual Alignment VerticalTextAlignment
     {
         get => TextFormatter.VerticalAlignment;
         set
@@ -179,8 +188,8 @@ public partial class View
         // We need to ensure TextFormatter is accurate by calling it here.
         UpdateTextFormatterText ();
 
-        // Default is to use ContentSize.
-        var size = ContentSize;
+        // Default is to use GetContentSize ().
+        var size = GetContentSize ();
 
         // TODO: This is a hack. Figure out how to move this into DimDimAuto
         // Use _width & _height instead of Width & Height to avoid debug spew
@@ -193,12 +202,12 @@ public partial class View
 
             if (widthAuto is null || !widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
             {
-                size.Width = ContentSize.Width;
+                size.Width = GetContentSize ().Width;
             }
 
             if (heightAuto is null || !heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
             {
-                size.Height = ContentSize.Height;
+                size.Height = GetContentSize ().Height;
             }
         }
 

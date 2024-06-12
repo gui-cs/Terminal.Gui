@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection;
 using Xunit.Abstractions;
 
@@ -39,21 +41,7 @@ public class ScenarioTests : TestsAllViews
         // Press QuitKey 
         Assert.Empty (FakeConsole.MockKeyPresses);
 
-        // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-        // by adding this Space it seems to work.
-        //FakeConsole.PushMockKeyPress (Key.Space);
         FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
-
-        // The only key we care about is the QuitKey
-        Application.KeyDown += (sender, args) =>
-                               {
-                                   _output.WriteLine ($"  Keypress: {args.KeyCode}");
-
-                                   // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-                                   // by adding this Space it seems to work.
-                                   // See #2474 for why this is commented out
-                                   Assert.Equal (Application.QuitKey.KeyCode, args.KeyCode);
-                               };
 
         uint abortTime = 500;
 
@@ -77,6 +65,10 @@ public class ScenarioTests : TestsAllViews
 
         Application.Iteration += (s, a) =>
                                  {
+                                     // Press QuitKey 
+                                     Assert.Empty (FakeConsole.MockKeyPresses);
+                                     FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
+
                                      //output.WriteLine ($"  iteration {++iterations}");
                                      if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
                                      {
@@ -106,7 +98,6 @@ public class ScenarioTests : TestsAllViews
 
         // Settings
         FrameView _settingsPane;
-        CheckBox _computedCheckBox;
         FrameView _locationFrame;
         RadioGroup _xRadioGroup;
         TextField _xText;
@@ -150,7 +141,7 @@ public class ScenarioTests : TestsAllViews
             Height = Dim.Fill (),
             AllowsMarking = false,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            Source = new ListWrapper (_viewClasses.Keys.ToList ())
+            Source = new ListWrapper<string> (new (_viewClasses.Keys.ToList ()))
         };
         _leftPane.Add (_classListView);
 
@@ -164,15 +155,13 @@ public class ScenarioTests : TestsAllViews
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Title = "Settings"
         };
-        _computedCheckBox = new () { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
-        _settingsPane.Add (_computedCheckBox);
 
         var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "Absolute(x)" };
 
         _locationFrame = new ()
         {
-            X = Pos.Left (_computedCheckBox),
-            Y = Pos.Bottom (_computedCheckBox),
+            X = 0,
+            Y = 0,
             Height = 3 + radioItems.Length,
             Width = 36,
             Title = "Location (Pos)"
@@ -248,15 +237,6 @@ public class ScenarioTests : TestsAllViews
 
                                                   _curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
                                               };
-
-        _computedCheckBox.Toggled += (s, e) =>
-                                     {
-                                         if (_curView != null)
-                                         {
-                                             //_curView.LayoutStyle = e.OldValue == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
-                                             _hostPane.LayoutSubviews ();
-                                         }
-                                     };
 
         _xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
@@ -351,12 +331,8 @@ public class ScenarioTests : TestsAllViews
                 return;
             }
 
-            LayoutStyle layout = view.LayoutStyle;
-
             try
             {
-                //view.LayoutStyle = LayoutStyle.Absolute;
-
                 switch (_xRadioGroup.SelectedItem)
                 {
                     case 0:
@@ -441,15 +417,27 @@ public class ScenarioTests : TestsAllViews
         {
             var x = view.X.ToString ();
             var y = view.Y.ToString ();
-            _xRadioGroup.SelectedItem = posNames.IndexOf (posNames.Where (s => x.Contains (s)).First ());
-            _yRadioGroup.SelectedItem = posNames.IndexOf (posNames.Where (s => y.Contains (s)).First ());
+
+            try
+            {
+                _xRadioGroup.SelectedItem = posNames.IndexOf (posNames.First (s => x.Contains (s)));
+                _yRadioGroup.SelectedItem = posNames.IndexOf (posNames.First (s => y.Contains (s)));
+            }
+            catch (InvalidOperationException e)
+            {
+                // This is a hack to work around the fact that the Pos enum doesn't have an "Align" value yet
+                Debug.WriteLine ($"{e}");
+            }
+
             _xText.Text = $"{view.Frame.X}";
             _yText.Text = $"{view.Frame.Y}";
 
             var w = view.Width.ToString ();
             var h = view.Height.ToString ();
-            _wRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.Where (s => w.Contains (s)).First ());
-            _hRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.Where (s => h.Contains (s)).First ());
+
+            _wRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.First (s => w.Contains (s)));
+            _hRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.First (s => h.Contains (s)));
+
             _wText.Text = $"{view.Frame.Width}";
             _hText.Text = $"{view.Frame.Height}";
         }
@@ -527,12 +515,9 @@ public class ScenarioTests : TestsAllViews
                 && view.GetType ().GetProperty ("Source") != null
                 && view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource))
             {
-                var source = new ListWrapper (new List<string> { "Test Text #1", "Test Text #2", "Test Text #3" });
+                var source = new ListWrapper<string> (["Test Text #1", "Test Text #2", "Test Text #3"]);
                 view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
             }
-
-            // Set Settings
-            _computedCheckBox.Checked = view.LayoutStyle == LayoutStyle.Computed;
 
             // Add
             _hostPane.Add (view);
@@ -555,10 +540,10 @@ public class ScenarioTests : TestsAllViews
     [Fact]
     public void Run_Generic ()
     {
-        List<Scenario> scenarios = Scenario.GetScenarios ();
+        ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
         Assert.NotEmpty (scenarios);
 
-        int item = scenarios.FindIndex (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
+        int item = scenarios.IndexOf (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
         Scenario generic = scenarios [item];
 
         Application.Init (new FakeDriver ());

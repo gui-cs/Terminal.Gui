@@ -3,11 +3,8 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.TextTests;
 
-public class AutocompleteTests
+public class AutocompleteTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public AutocompleteTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [AutoInitShutdown]
     public void CursorLeft_CursorRight_Mouse_Button_Pressed_Does_Not_Show_Popup ()
@@ -34,7 +31,7 @@ public class AutocompleteTests
                 TestHelpers.AssertDriverContentsWithFrameAre (
                                                               @"
 This a long line and against TextView.",
-                                                              _output
+                                                              output
                                                              );
             }
             else
@@ -44,15 +41,15 @@ This a long line and against TextView.",
 This a long line and against TextView.
      and                              
      against                          ",
-                                                              _output
+                                                              output
                                                              );
             }
         }
 
         Assert.True (
                      tv.NewMouseEvent (
-                                    new MouseEvent { Position = new (6, 0), Flags = MouseFlags.Button1Pressed }
-                                   )
+                                       new() { Position = new (6, 0), Flags = MouseFlags.Button1Pressed }
+                                      )
                     );
         Application.Refresh ();
 
@@ -61,7 +58,7 @@ This a long line and against TextView.
 This a long line and against TextView.
      and                              
      against                          ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.G));
@@ -71,7 +68,7 @@ This a long line and against TextView.
                                                       @"
 This ag long line and against TextView.
      against                           ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
@@ -81,7 +78,7 @@ This ag long line and against TextView.
                                                       @"
 This ag long line and against TextView.
      against                           ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
@@ -91,7 +88,7 @@ This ag long line and against TextView.
                                                       @"
 This ag long line and against TextView.
      against                           ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
@@ -100,7 +97,7 @@ This ag long line and against TextView.
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 This ag long line and against TextView.",
-                                                      _output
+                                                      output
                                                      );
 
         for (var i = 0; i < 3; i++)
@@ -112,7 +109,7 @@ This ag long line and against TextView.",
                                                           @"
 This ag long line and against TextView.
      against                           ",
-                                                          _output
+                                                          output
                                                          );
         }
 
@@ -124,7 +121,7 @@ This ag long line and against TextView.
 This a long line and against TextView.
      and                              
      against                          ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.N));
@@ -134,7 +131,7 @@ This a long line and against TextView.
                                                       @"
 This an long line and against TextView.
      and                               ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
@@ -143,8 +140,9 @@ This an long line and against TextView.
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 This an long line and against TextView.",
-                                                      _output
+                                                      output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -175,7 +173,7 @@ This an long line and against TextView.",
         Assert.True (tv.NewKeyDownEvent (Key.F.WithShift));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new Point (1, 0), tv.CursorPosition);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
@@ -184,7 +182,7 @@ This an long line and against TextView.",
         Assert.True (tv.NewKeyDownEvent (Key.CursorDown));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new Point (1, 0), tv.CursorPosition);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
@@ -193,7 +191,7 @@ This an long line and against TextView.",
         Assert.True (tv.NewKeyDownEvent (Key.CursorDown));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new Point (1, 0), tv.CursorPosition);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
@@ -202,7 +200,7 @@ This an long line and against TextView.",
         Assert.True (tv.NewKeyDownEvent (Key.CursorUp));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new Point (1, 0), tv.CursorPosition);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
@@ -211,7 +209,7 @@ This an long line and against TextView.",
         Assert.True (tv.NewKeyDownEvent (Key.CursorUp));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new Point (1, 0), tv.CursorPosition);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
@@ -219,25 +217,26 @@ This an long line and against TextView.",
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
         Assert.True (tv.Autocomplete.Visible);
         top.Draw ();
-        Assert.True (tv.NewKeyDownEvent (new Key (tv.Autocomplete.CloseKey)));
+        Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.CloseKey)));
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new Point (1, 0), tv.CursorPosition);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Empty (tv.Autocomplete.Suggestions);
         Assert.Equal (3, g.AllSuggestions.Count);
         Assert.False (tv.Autocomplete.Visible);
         tv.PositionCursor ();
-        Assert.True (tv.NewKeyDownEvent (new Key (tv.Autocomplete.Reopen)));
+        Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.Reopen)));
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new Point (1, 0), tv.CursorPosition);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal (3, g.AllSuggestions.Count);
-        Assert.True (tv.NewKeyDownEvent (new Key (tv.Autocomplete.SelectionKey)));
+        Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.SelectionKey)));
         tv.PositionCursor ();
         Assert.Equal ("Fortunately Fortunately super feature.", tv.Text);
-        Assert.Equal (new Point (11, 0), tv.CursorPosition);
+        Assert.Equal (new (11, 0), tv.CursorPosition);
         Assert.Empty (tv.Autocomplete.Suggestions);
         Assert.Equal (3, g.AllSuggestions.Count);
         Assert.False (tv.Autocomplete.Visible);
+        top.Dispose ();
     }
 
     [Fact]
@@ -246,7 +245,7 @@ This an long line and against TextView.",
         var ac = new TextViewAutocomplete ();
 
         ((SingleWordSuggestionGenerator)ac.SuggestionGenerator).AllSuggestions =
-            new List<string> { "fish", "const", "Cobble" };
+            new() { "fish", "const", "Cobble" };
 
         var tv = new TextView ();
         tv.InsertText ("co");
@@ -254,10 +253,10 @@ This an long line and against TextView.",
         ac.HostControl = tv;
 
         ac.GenerateSuggestions (
-                                new AutocompleteContext (
-                                                         TextModel.ToRuneCellList (tv.Text),
-                                                         2
-                                                        )
+                                new (
+                                     TextModel.ToRuneCellList (tv.Text),
+                                     2
+                                    )
                                );
 
         Assert.Equal (2, ac.Suggestions.Count);
@@ -266,7 +265,6 @@ This an long line and against TextView.",
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestSettingColorSchemeOnAutocomplete ()
     {
         var tv = new TextView ();
@@ -275,19 +273,19 @@ This an long line and against TextView.",
         Assert.Same (Colors.ColorSchemes ["Menu"], tv.Autocomplete.ColorScheme);
 
         // allocate a new custom scheme
-        tv.Autocomplete.ColorScheme = new ColorScheme
+        tv.Autocomplete.ColorScheme = new()
         {
-            Normal = new Attribute (Color.Black, Color.Blue), Focus = new Attribute (Color.Black, Color.Cyan)
+            Normal = new (Color.Black, Color.Blue), Focus = new (Color.Black, Color.Cyan)
         };
 
         // should be separate instance
         Assert.NotSame (Colors.ColorSchemes ["Menu"], tv.Autocomplete.ColorScheme);
 
         // with the values we set on it
-        Assert.Equal (new Color (Color.Black), tv.Autocomplete.ColorScheme.Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), tv.Autocomplete.ColorScheme.Normal.Background);
+        Assert.Equal (new (Color.Black), tv.Autocomplete.ColorScheme.Normal.Foreground);
+        Assert.Equal (new (Color.Blue), tv.Autocomplete.ColorScheme.Normal.Background);
 
-        Assert.Equal (new Color (Color.Black), tv.Autocomplete.ColorScheme.Focus.Foreground);
-        Assert.Equal (new Color (Color.Cyan), tv.Autocomplete.ColorScheme.Focus.Background);
+        Assert.Equal (new (Color.Black), tv.Autocomplete.ColorScheme.Focus.Foreground);
+        Assert.Equal (new (Color.Cyan), tv.Autocomplete.ColorScheme.Focus.Background);
     }
 }

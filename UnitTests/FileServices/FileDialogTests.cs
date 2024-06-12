@@ -1,19 +1,15 @@
-using System.Globalization;
 using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.InteropServices;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.FileServicesTests;
 
-public class FileDialogTests
+public class FileDialogTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper output;
-    public FileDialogTests (ITestOutputHelper output) { this.output = output; }
-
     [Theory]
-    [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]
+    [AutoInitShutdown]
     public void CancelSelection (bool cancel)
     {
         FileDialog dlg = GetInitializedFileDialog ();
@@ -28,6 +24,7 @@ public class FileDialogTests
         Send ('\n', ConsoleKey.Enter);
 
         Assert.Equal (cancel, dlg.Canceled);
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -57,6 +54,7 @@ public class FileDialogTests
         Send ('\n', ConsoleKey.Enter);
         Assert.False (dlg.Canceled);
         Assert.Equal ("bob.csv", Path.GetFileName (dlg.Path));
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -90,6 +88,7 @@ public class FileDialogTests
         Send ('\n', ConsoleKey.Enter);
         Assert.False (dlg.Canceled);
         Assert.EndsWith ("xx" + Path.DirectorySeparatorChar, dlg.Path);
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -128,6 +127,7 @@ public class FileDialogTests
 
         // Dialog has not yet been confirmed with a choice
         Assert.False (dlg.Canceled);
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -166,6 +166,7 @@ public class FileDialogTests
 
         Assert.True (dlg.Canceled);
         Assert.False (selected);
+        dlg.Dispose ();
     }
 
     [Theory]
@@ -220,6 +221,7 @@ public class FileDialogTests
                              AssertIsTheSubfolder (eventMultiSelected.Single ());
                          }
                         );
+        dlg.Dispose ();
     }
 
     [Theory]
@@ -273,6 +275,7 @@ public class FileDialogTests
                              AssertIsTheSubfolder (eventMultiSelected.Single ());
                          }
                         );
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -301,6 +304,7 @@ public class FileDialogTests
         Assert.True (dlg.Canceled);
         Assert.Empty (dlg.MultiSelected);
         Assert.Null (eventMultiSelected);
+        dlg.Dispose ();
     }
 
     [Fact]
@@ -312,6 +316,7 @@ public class FileDialogTests
         View tf = dlg.Subviews.FirstOrDefault (t => t.HasFocus);
         Assert.NotNull (tf);
         Assert.IsType<TextField> (tf);
+        dlg.Dispose ();
     }
 
     [Theory]
@@ -341,6 +346,7 @@ public class FileDialogTests
         Assert.False (dlg.Canceled);
 
         AssertIsTheSubfolder (dlg.Path);
+        dlg.Dispose ();
     }
 
     [Theory]
@@ -368,6 +374,7 @@ public class FileDialogTests
         Send ('\n', ConsoleKey.Enter);
         Assert.False (dlg.Canceled);
         AssertIsTheSubfolder (dlg.Path);
+        dlg.Dispose ();
     }
 
     [Theory]
@@ -413,7 +420,7 @@ public class FileDialogTests
         FileDialog fd = GetLinuxDialog ();
         fd.Title = string.Empty;
 
-        fd.Style.Culture = new CultureInfo ("en-US");
+        fd.Style.Culture = new ("en-US");
 
         fd.Draw ();
 
@@ -456,6 +463,7 @@ public class FileDialogTests
 └─────────────────────────────────────────────────────────────────────────┘
 ";
         TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
+        fd.Dispose ();
     }
 
     [Fact]
@@ -470,7 +478,7 @@ public class FileDialogTests
         FileDialog fd = GetWindowsDialog ();
         fd.Title = string.Empty;
 
-        fd.Style.Culture = new CultureInfo ("en-US");
+        fd.Style.Culture = new ("en-US");
 
         fd.Draw ();
 
@@ -513,6 +521,7 @@ public class FileDialogTests
 └─────────────────────────────────────────────────────────────────────────┘
 ";
         TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
+        fd.Dispose ();
     }
 
     private void AssertIsTheRootDirectory (string path)
@@ -572,21 +581,21 @@ public class FileDialogTests
     {
         // Arrange
         var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), "/");
-        fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
+        fileSystem.MockTime (() => new (2010, 01, 01, 11, 12, 43));
 
         fileSystem.AddFile (
                             @"/myfile.txt",
-                            new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
+                            new ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
                            );
 
         fileSystem.AddFile (
                             @"/demo/jQuery.js",
-                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+                            new ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
                            );
 
         fileSystem.AddFile (
                             @"/demo/image.gif",
-                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            new (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
                             {
                                 LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
                             }
@@ -594,11 +603,11 @@ public class FileDialogTests
 
         var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"/demo/subfolder");
         m.Create ();
-        m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
+        m.LastWriteTime = new (2002, 01, 01, 22, 42, 10);
 
         fileSystem.AddFile (
                             @"/demo/subfolder/image2.gif",
-                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            new (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
                             {
                                 LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
                             }
@@ -615,26 +624,26 @@ public class FileDialogTests
     {
         // Arrange
         var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), @"c:\");
-        fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
+        fileSystem.MockTime (() => new (2010, 01, 01, 11, 12, 43));
 
         fileSystem.AddFile (
                             @"c:\myfile.txt",
-                            new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
+                            new ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) }
                            );
 
         fileSystem.AddFile (
                             @"c:\demo\jQuery.js",
-                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+                            new ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
                            );
 
         fileSystem.AddFile (
                             @"c:\demo\mybinary.exe",
-                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
+                            new ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) }
                            );
 
         fileSystem.AddFile (
                             @"c:\demo\image.gif",
-                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            new (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
                             {
                                 LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
                             }
@@ -642,11 +651,11 @@ public class FileDialogTests
 
         var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"c:\demo\subfolder");
         m.Create ();
-        m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
+        m.LastWriteTime = new (2002, 01, 01, 22, 42, 10);
 
         fileSystem.AddFile (
                             @"c:\demo\subfolder\image2.gif",
-                            new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
+                            new (new byte [] { 0x12, 0x34, 0x56, 0xd2 })
                             {
                                 LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10)
                             }

@@ -1,6 +1,5 @@
 #nullable enable
 using System.Diagnostics;
-using Microsoft.CodeAnalysis;
 
 namespace Terminal.Gui;
 
@@ -13,14 +12,13 @@ public partial class View
     /// <summary>Gets or sets the absolute location and dimension of the view.</summary>
     /// <value>
     ///     The rectangle describing absolute location and dimension of the view, in coordinates relative to the
-    ///     <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///     <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>.
     /// </value>
     /// <remarks>
-    ///     <para>Frame is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.</para>
+    ///     <para>Frame is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>.</para>
     ///     <para>
     ///         Setting Frame will set <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> to the
     ///         values of the corresponding properties of the <paramref name="value"/> parameter.
-    ///         This causes <see cref="LayoutStyle"/> to be <see cref="LayoutStyle.Absolute"/>.
     ///     </para>
     ///     <para>
     ///         Altering the Frame will eventually (when the view hierarchy is next laid out via  see
@@ -41,8 +39,7 @@ public partial class View
 
             SetFrame (value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) });
 
-            // If Frame gets set, by definition, the View is now LayoutStyle.Absolute, so
-            // set all Pos/Dim to Absolute values.
+            // If Frame gets set, set all Pos/Dim to Absolute values.
             _x = _frame.X;
             _y = _frame.Y;
             _width = _frame.Width;
@@ -136,7 +133,7 @@ public partial class View
     /// <value>The <see cref="Pos"/> object representing the X position.</value>
     /// <remarks>
     ///     <para>
-    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>.
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
@@ -148,8 +145,7 @@ public partial class View
     ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
-    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
-    ///         <see cref="PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
     ///     <para>The default value is <c>Pos.At (0)</c>.</para>
     /// </remarks>
@@ -175,7 +171,7 @@ public partial class View
     /// <value>The <see cref="Pos"/> object representing the Y position.</value>
     /// <remarks>
     ///     <para>
-    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>.
+    ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>.
     ///     </para>
     ///     <para>
     ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
@@ -187,8 +183,7 @@ public partial class View
     ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
-    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
-    ///         <see cref="PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
     ///     <para>The default value is <c>Pos.At (0)</c>.</para>
     /// </remarks>
@@ -213,7 +208,7 @@ public partial class View
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
     /// <remarks>
     ///     <para>
-    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>
+    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>
     ///         .
     ///     </para>
     ///     <para>
@@ -226,8 +221,7 @@ public partial class View
     ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
-    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
-    ///         <see cref="DimAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
     ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
     /// </remarks>
@@ -259,7 +253,7 @@ public partial class View
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
     /// <remarks>
     ///     <para>
-    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="ContentSize"/>
+    ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>
     ///         .
     ///     </para>
     ///     <para>
@@ -272,8 +266,7 @@ public partial class View
     ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
-    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
-    ///         <see cref="DimAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
     ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
     /// </remarks>
@@ -302,55 +295,6 @@ public partial class View
     #endregion Frame
 
     #region Layout Engine
-
-
-    // @tig Notes on layout flow. Ignore for now.
-    // BeginLayout
-    //   If !LayoutNeeded return
-    //   If !SizeNeeded return
-    //   Call OnLayoutStarted
-    //      Views and subviews can update things
-    //   
-
-
-    // EndLayout
-
-    /// <summary>
-    ///     Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is
-    ///     set to <see cref="LayoutStyle.Absolute"/>, LayoutSubviews does not change the <see cref="Frame"/>. If the style is
-    ///     <see cref="LayoutStyle.Computed"/> the <see cref="Frame"/> is updated using the <see cref="X"/>, <see cref="Y"/>,
-    ///     <see cref="Width"/>, and <see cref="Height"/> properties.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Setting this property to <see cref="LayoutStyle.Absolute"/> will cause <see cref="Frame"/> to determine the
-    ///         size and position of the view. <see cref="X"/> and <see cref="Y"/> will be set to <see cref="DimAbsolute"/>
-    ///         using <see cref="Frame"/>.
-    ///     </para>
-    ///     <para>
-    ///         Setting this property to <see cref="LayoutStyle.Computed"/> will cause the view to use the
-    ///         <see cref="LayoutSubviews"/> method to size and position of the view. If either of the <see cref="X"/> and
-    ///         <see cref="Y"/> properties are `null` they will be set to <see cref="PosAbsolute"/> using the current value
-    ///         of <see cref="Frame"/>. If either of the <see cref="Width"/> and <see cref="Height"/> properties are `null`
-    ///         they will be set to <see cref="DimAbsolute"/> using <see cref="Frame"/>.
-    ///     </para>
-    /// </remarks>
-    /// <value>The layout style.</value>
-    public LayoutStyle LayoutStyle
-    {
-        get
-        {
-            if (_x is PosAbsolute
-                && _y is PosAbsolute
-                && _width is DimAbsolute
-                && _height is DimAbsolute)
-            {
-                return LayoutStyle.Absolute;
-            }
-
-            return LayoutStyle.Computed;
-        }
-    }
 
     #endregion Layout Engine
 
@@ -626,7 +570,7 @@ public partial class View
 
         CheckDimAuto ();
 
-        var contentSize = ContentSize;
+        var contentSize = GetContentSize ();
         OnLayoutStarted (new (contentSize));
 
         LayoutAdornments ();
@@ -650,7 +594,7 @@ public partial class View
         {
             foreach ((View from, View to) in edges)
             {
-                LayoutSubview (to, from.ContentSize);
+                LayoutSubview (to, from.GetContentSize ());
             }
         }
 
@@ -703,8 +647,8 @@ public partial class View
         // Determine our container's ContentSize - 
         //  First try SuperView.Viewport, then Application.Top, then Driver.Viewport.
         //  Finally, if none of those are valid, use int.MaxValue (for Unit tests).
-        Size superViewContentSize = SuperView is { IsInitialized: true } ? SuperView.ContentSize :
-                           Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.ContentSize :
+        Size superViewContentSize = SuperView is { IsInitialized: true } ? SuperView.GetContentSize () :
+                           Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.GetContentSize () :
                            Application.Driver?.Screen.Size ?? new (int.MaxValue, int.MaxValue);
 
         SetTextFormatterSize ();
@@ -746,7 +690,7 @@ public partial class View
 
     /// <summary>
     ///     Adjusts <see cref="Frame"/> given the SuperView's ContentSize (nominally the same as
-    ///     <c>this.SuperView.ContentSize</c>)
+    ///     <c>this.SuperView.GetContentSize ()</c>)
     ///     and the position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and
     ///     <see cref="Height"/>).
     /// </summary>
@@ -758,7 +702,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="superviewContentSize">
-    ///     The size of the SuperView's content (nominally the same as <c>this.SuperView.ContentSize</c>).
+    ///     The size of the SuperView's content (nominally the same as <c>this.SuperView.GetContentSize ()</c>).
     /// </param>
     internal void SetRelativeLayout (Size superviewContentSize)
     {
@@ -796,8 +740,7 @@ public partial class View
 
         if (Frame != newFrame)
         {
-            // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
-            // the view LayoutStyle.Absolute.
+            // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height
             SetFrame (newFrame);
 
             if (_x is PosAbsolute)
@@ -835,12 +778,6 @@ public partial class View
         foreach (View? v in from.InternalSubviews)
         {
             nNodes.Add (v);
-
-            if (v.LayoutStyle != LayoutStyle.Computed)
-            {
-                continue;
-            }
-
             CollectPos (v.X, v, ref nNodes, ref nEdges);
             CollectPos (v.Y, v, ref nNodes, ref nEdges);
             CollectDim (v.Width, v, ref nNodes, ref nEdges);
@@ -1049,13 +986,13 @@ public partial class View
         // Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
         foreach (View view in Subviews)
         {
-            if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Content) && _contentSize is null)
+            if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Content) && ContentSizeTracksViewport)
             {
                 ThrowInvalid (view, view.Width, nameof (view.Width));
                 ThrowInvalid (view, view.X, nameof (view.X));
             }
 
-            if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Content) && _contentSize is null)
+            if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Content) && ContentSizeTracksViewport)
             {
                 ThrowInvalid (view, view.Height, nameof (view.Height));
                 ThrowInvalid (view, view.Y, nameof (view.Y));

@@ -50,7 +50,7 @@ public class DatePickerTests
         var datePicker = new DatePicker (date);
 
         var top = new Toplevel ();
-       top.Add (datePicker);
+        top.Add (datePicker);
         Application.Begin (top);
 
         // Set focus to next month button
@@ -65,6 +65,7 @@ public class DatePickerTests
         // Date should not change as next month button is disabled
         Assert.False (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (12, datePicker.Date.Month);
+        top.Dispose ();
     }
 
     [Fact]
@@ -90,5 +91,6 @@ public class DatePickerTests
         // Date should not change as previous month button is disabled
         Assert.False (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (1, datePicker.Date.Month);
+        top.Dispose ();
     }
 }

@@ -392,8 +392,7 @@ namespace Terminal.Gui
         private ITextValidateProvider _provider;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="TextValidateField"/> class using
-        ///     <see cref="LayoutStyle.Computed"/> positioning.
+        ///     Initializes a new instance of the <see cref="TextValidateField"/> class.
         /// </summary>
         public TextValidateField ()
         {
@@ -539,7 +538,7 @@ namespace Terminal.Gui
             {
                 int c = _provider.Cursor (mouseEvent.Position.X - GetMargins (Viewport.Width).left);
 
-                if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && Text.Length > 0)
+                if (_provider.Fixed == false && TextAlignment == Alignment.End && Text.Length > 0)
                 {
                     c++;
                 }
@@ -633,7 +632,7 @@ namespace Terminal.Gui
             // When it's right-aligned and it's a normal input, the cursor behaves differently.
             int curPos;
 
-            if (_provider?.Fixed == false && TextAlignment == TextAlignment.Right)
+            if (_provider?.Fixed == false && TextAlignment == Alignment.End)
             {
                 curPos = _cursorPosition + left - 1;
             }
@@ -650,7 +649,7 @@ namespace Terminal.Gui
         /// <returns></returns>
         private bool BackspaceKeyHandler ()
         {
-            if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && _cursorPosition <= 1)
+            if (_provider.Fixed == false && TextAlignment == Alignment.End && _cursorPosition <= 1)
             {
                 return false;
             }
@@ -688,7 +687,7 @@ namespace Terminal.Gui
         /// <returns></returns>
         private bool DeleteKeyHandler ()
         {
-            if (_provider.Fixed == false && TextAlignment == TextAlignment.Right)
+            if (_provider.Fixed == false && TextAlignment == Alignment.End)
             {
                 _cursorPosition = _provider.CursorLeft (_cursorPosition);
             }
@@ -719,11 +718,11 @@ namespace Terminal.Gui
 
             switch (TextAlignment)
             {
-                case TextAlignment.Left:
+                case Alignment.Start:
                     return (0, total);
-                case TextAlignment.Centered:
+                case Alignment.Center:
                     return (total / 2, total / 2 + total % 2);
-                case TextAlignment.Right:
+                case Alignment.End:
                     return (total, 0);
                 default:
                     return (0, total);

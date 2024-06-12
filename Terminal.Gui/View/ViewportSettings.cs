@@ -47,13 +47,13 @@ public enum ViewportSettings
     AllowNegativeLocation = AllowNegativeX | AllowNegativeY,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set values greater than <see cref="View.ContentSize"/>
+    ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set values greater than <see cref="View.GetContentSize ()"/>
     ///     <c>.Width</c> enabling scrolling beyond the right
     ///     of the content area.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to <see cref="View.ContentSize"/>
+    ///         When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to <see cref="View.GetContentSize ()"/>
     ///         <c>.Width - 1</c>.
     ///         This means the last column of the content will remain visible even if there is an attempt to scroll the
     ///         Viewport past the last column.
@@ -65,13 +65,13 @@ public enum ViewportSettings
     AllowXGreaterThanContentWidth = 4,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set values greater than <see cref="View.ContentSize"/>
+    ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set values greater than <see cref="View.GetContentSize ()"/>
     ///     <c>.Height</c> enabling scrolling beyond the right
     ///     of the content area.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to <see cref="View.ContentSize"/>
+    ///         When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to <see cref="View.GetContentSize ()"/>
     ///         <c>.Height - 1</c>.
     ///         This means the last row of the content will remain visible even if there is an attempt to scroll the Viewport
     ///         past the last row.
@@ -83,13 +83,13 @@ public enum ViewportSettings
     AllowYGreaterThanContentHeight = 8,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set values greater than <see cref="View.ContentSize"/>
+    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set values greater than <see cref="View.GetContentSize ()"/>
     ///     enabling scrolling beyond the bottom-right
     ///     of the content area.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         When not set, <see cref="View.Viewport"/> is constrained to <see cref="View.ContentSize"/><c> -1</c>.
+    ///         When not set, <see cref="View.Viewport"/> is constrained to <see cref="View.GetContentSize ()"/><c> -1</c>.
     ///         This means the last column and row of the content will remain visible even if there is an attempt to
     ///         scroll the Viewport past the last column or row.
     ///     </para>

@@ -671,7 +671,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
         superView.BeginInit ();
         superView.EndInit ();
-        superView.SetRelativeLayout (superView.ContentSize);
+        superView.SetRelativeLayout (superView.GetContentSize ());
 
         superView.LayoutSubviews ();
         Assert.Equal (expectedSubWidth, subView.Frame.Width);
@@ -720,7 +720,7 @@ public class DimAutoTests (ITestOutputHelper output)
 
         superView.BeginInit ();
         superView.EndInit ();
-        superView.SetRelativeLayout (superView.ContentSize);
+        superView.SetRelativeLayout (superView.GetContentSize ());
 
         superView.LayoutSubviews ();
         Assert.Equal (expectedSubWidth, subView.Frame.Width);
@@ -745,7 +745,7 @@ public class DimAutoTests (ITestOutputHelper output)
         super.Add (view);
 
         Rectangle expectedViewport = new (0, 0, 8, 1);
-        Assert.Equal (expectedViewport.Size, view.ContentSize);
+        Assert.Equal (expectedViewport.Size, view.GetContentSize ());
         Assert.Equal (expectedViewport, view.Frame);
         Assert.Equal (expectedViewport, view.Viewport);
 
@@ -787,11 +787,11 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.Alignment = TextAlignment.Justified;
+        view.TextFormatter.Alignment = Alignment.Fill;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextFormatter.VerticalAlignment = VerticalTextAlignment.Middle;
+        view.TextFormatter.VerticalAlignment = Alignment.Center;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
@@ -815,11 +815,11 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.TextAlignment = TextAlignment.Justified;
+        view.TextAlignment = Alignment.Fill;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
-        view.VerticalTextAlignment = VerticalTextAlignment.Middle;
+        view.VerticalTextAlignment = Alignment.Center;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.Equal (Size.Empty, view.Frame.Size);
 
@@ -844,7 +844,7 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
-        view.TextAlignment = TextAlignment.Justified;
+        view.TextAlignment = Alignment.Fill;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
@@ -853,7 +853,7 @@ public class DimAutoTests (ITestOutputHelper output)
             Text = "_1234",
             Width = Dim.Auto ()
         };
-        view.VerticalTextAlignment = VerticalTextAlignment.Middle;
+        view.VerticalTextAlignment = Alignment.Center;
         Assert.False (view.TextFormatter.AutoSize);
         Assert.NotEqual (Size.Empty, view.Frame.Size);
 
@@ -943,19 +943,19 @@ public class DimAutoTests (ITestOutputHelper output)
         };
 
         Assert.Equal (new Rectangle (0, 0, 5, 1), view.Frame);
-        Assert.Equal (new Size (5, 1), view.ContentSize);
+        Assert.Equal (new Size (5, 1), view.GetContentSize ());
 
         // Change text to a longer string
         view.Text = "0123456789";
 
         Assert.Equal (new Rectangle (0, 0, 10, 1), view.Frame);
-        Assert.Equal (new Size (10, 1), view.ContentSize);
+        Assert.Equal (new Size (10, 1), view.GetContentSize ());
 
         // If ContentSize was reset, these should cause it to update
         view.Width = 5;
         view.Height = 1;
 
-        Assert.Equal (new Size (5, 1), view.ContentSize);
+        Assert.Equal (new Size (5, 1), view.GetContentSize ());
     }
 
     // DimAutoStyle.Content tests
@@ -963,6 +963,22 @@ public class DimAutoTests (ITestOutputHelper output)
     public void DimAutoStyle_Content_UsesContentSize_WhenSet ()
     {
         var view = new View ();
+        view.SetContentSize (new (10, 5));
+
+        var dim = Dim.Auto (DimAutoStyle.Content);
+
+        int calculatedWidth = dim.Calculate (0, 100, view, Dimension.Width);
+
+        Assert.Equal (10, calculatedWidth);
+    }
+
+    [Fact]
+    public void DimAutoStyle_Content_IgnoresSubviews_When_ContentSize_Is_Set ()
+    {
+        var view = new View ();
+        var subview = new View () {
+                Frame = new Rectangle (50, 50, 1, 1)
+        };
         view.SetContentSize (new (10, 5));
 
         var dim = Dim.Auto (DimAutoStyle.Content);

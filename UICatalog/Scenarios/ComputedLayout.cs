@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
+using static Terminal.Gui.Dialog;
 
 namespace UICatalog.Scenarios;
 
@@ -85,12 +86,12 @@ public class ComputedLayout : Scenario
         var i = 1;
         var txt = "Resize the terminal to see computed layout in action.";
         List<Label> labelList = new ();
-        labelList.Add (new Label { Text = "The lines below show different TextAlignments" });
+        labelList.Add (new Label { Text = "The lines below show different alignment" });
 
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Left,
+                           TextAlignment = Alignment.Start,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -102,7 +103,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Right,
+                           TextAlignment = Alignment.End,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -114,7 +115,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Centered,
+                           TextAlignment = Alignment.Center,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -126,7 +127,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Justified,
+                           TextAlignment = Alignment.Fill,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -147,12 +148,12 @@ public class ComputedLayout : Scenario
                                  };
         i = 1;
         labelList = new List<Label> ();
-        labelList.Add (new Label { Text = "The lines below show different TextAlignments" });
+        labelList.Add (new Label { Text = "The lines below show different alignment" });
 
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Left,
+                           TextAlignment = Alignment.Start,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -164,7 +165,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Right,
+                           TextAlignment = Alignment.End,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -176,7 +177,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Centered,
+                           TextAlignment = Alignment.Center,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -188,7 +189,7 @@ public class ComputedLayout : Scenario
         labelList.Add (
                        new Label
                        {
-                           TextAlignment = TextAlignment.Justified,
+                           TextAlignment = Alignment.Fill,
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
@@ -304,7 +305,7 @@ public class ComputedLayout : Scenario
         app.Add (oddballButton);
 
         // Demonstrate AnchorEnd - Button is anchored to bottom/right
-        var anchorButton = new Button { Text = "Button using AnchorEnd", Y = Pos.AnchorEnd ()};
+        var anchorButton = new Button { Text = "Button using AnchorEnd", Y = Pos.AnchorEnd () };
         anchorButton.X = Pos.AnchorEnd ();
 
         anchorButton.Accept += (s, e) =>
@@ -322,12 +323,12 @@ public class ComputedLayout : Scenario
         // This is intentionally convoluted to illustrate potential bugs.
         var anchorEndLabel1 = new Label
         {
-            Text = "This Label should be the 2nd to last line (AnchorEnd (2)).",
-            TextAlignment = TextAlignment.Centered,
+            Text = "This Label should be the 3rd to last line (AnchorEnd (3)).",
+            TextAlignment = Alignment.Center,
             ColorScheme = Colors.ColorSchemes ["Menu"],
             Width = Dim.Fill (5),
             X = 5,
-            Y = Pos.AnchorEnd (2)
+            Y = Pos.AnchorEnd (3)
         };
         app.Add (anchorEndLabel1);
 
@@ -336,19 +337,23 @@ public class ComputedLayout : Scenario
         var anchorEndLabel2 = new TextField
         {
             Text =
-                "This TextField should be the 3rd to last line (AnchorEnd (2) - 1).",
-            TextAlignment = TextAlignment.Left,
+                "This TextField should be the 4th to last line (AnchorEnd (3) - 1).",
+            TextAlignment = Alignment.Start,
             ColorScheme = Colors.ColorSchemes ["Menu"],
             Width = Dim.Fill (5),
             X = 5,
-            Y = Pos.AnchorEnd (2) - 1 // Pos.Combine
+            Y = Pos.AnchorEnd (3) - 1 // Pos.Combine
         };
         app.Add (anchorEndLabel2);
 
-        // Show positioning vertically using Pos.AnchorEnd via Pos.Combine
+        // Demonstrate AnchorEnd() in combination with Pos.Align to align a set of buttons centered across the
+        // bottom - 1
+        // This is intentionally convoluted to illustrate potential bugs.
         var leftButton = new Button
         {
-            Text = "Left", Y = Pos.AnchorEnd (0) - 1 // Pos.Combine
+            Text = "Left",
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.AnchorEnd () - 1
         };
 
         leftButton.Accept += (s, e) =>
@@ -364,7 +369,9 @@ public class ComputedLayout : Scenario
         // show positioning vertically using Pos.AnchorEnd
         var centerButton = new Button
         {
-            Text = "Center", X = Pos.Center (), Y = Pos.AnchorEnd (1) // Pos.AnchorEnd(1)
+            Text = "Center",
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.AnchorEnd (2),
         };
 
         centerButton.Accept += (s, e) =>
@@ -378,7 +385,12 @@ public class ComputedLayout : Scenario
                                 };
 
         // show positioning vertically using another window and Pos.Bottom
-        var rightButton = new Button { Text = "Right", Y = Pos.Y (centerButton) };
+        var rightButton = new Button
+        {
+            Text = "Right",
+            X = Pos.Align (Alignment.Center),
+            Y = Pos.Y (centerButton)
+        };
 
         rightButton.Accept += (s, e) =>
                                {
@@ -390,10 +402,7 @@ public class ComputedLayout : Scenario
                                    app.LayoutSubviews ();
                                };
 
-        // Center three buttons with 5 spaces between them
-        leftButton.X = Pos.Left (centerButton) - (Pos.Right (leftButton) - Pos.Left (leftButton)) - 5;
-        rightButton.X = Pos.Right (centerButton) + 5;
-
+        View [] buttons = { leftButton, centerButton, rightButton };
         app.Add (leftButton);
         app.Add (centerButton);
         app.Add (rightButton);

@@ -6,8 +6,7 @@ namespace Terminal.Gui;
 /// <summary>
 ///     <para>
 ///         A Dim object describes the dimensions of a <see cref="View"/>. Dim is the type of the
-///         <see cref="View.Width"/> and <see cref="View.Height"/> properties of <see cref="View"/>. Dim objects enable
-///         Computed Layout (see <see cref="LayoutStyle.Computed"/>) to automatically manage the dimensions of a view.
+///         <see cref="View.Width"/> and <see cref="View.Height"/> properties of <see cref="View"/>.
 ///     </para>
 ///     <para>
 ///         Integer values are implicitly convertible to an absolute <see cref="Dim"/>. These objects are created using
@@ -150,7 +149,7 @@ public abstract class Dim
     /// <summary>Creates a percentage <see cref="Dim"/> object that is a percentage of the width or height of the SuperView.</summary>
     /// <returns>The percent <see cref="Dim"/> object.</returns>
     /// <param name="percent">A value between 0 and 100 representing the percentage.</param>
-    /// <param name="mode"></param>
+    /// <param name="mode">the mode. Defaults to <see cref="DimPercentMode.ContentSize"/>.</param>
     /// <example>
     ///     This initializes a <see cref="TextField"/> that will be centered horizontally, is 50% of the way down, is 30% the
     ///     height,
@@ -187,7 +186,7 @@ public abstract class Dim
     ///     Gets a dimension that is anchored to a certain point in the layout.
     ///     This method is typically used internally by the layout system to determine the size of a View.
     /// </summary>
-    /// <param name="size">The width of the area where the View is being sized (Superview.ContentSize).</param>
+    /// <param name="size">The width of the area where the View is being sized (Superview.GetContentSize ()).</param>
     /// <returns>
     ///     An integer representing the calculated dimension. The way this dimension is calculated depends on the specific
     ///     subclass of Dim that is used. For example, DimAbsolute returns a fixed dimension, DimFactor returns a

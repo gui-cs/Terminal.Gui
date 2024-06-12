@@ -75,7 +75,7 @@ public class SubviewTests
         w2.Dispose ();
         top2.Dispose ();
     }
-    
+
     [Fact]
     [TestRespondersDisposed]
     public void Initialized_Event_Comparing_With_Added_Event ()
@@ -331,5 +331,46 @@ public class SubviewTests
 
         top.Dispose ();
         view.Dispose ();
+    }
+
+    // TODO: Consider a feature that will change the ContentSize to fit the subviews.
+    [Fact]
+    public void Add_Does_Not_Impact_ContentSize ()
+    {
+        var view = new View ();
+        view.SetContentSize (new Size (1, 1));
+
+        var subview = new View ()
+        {
+            X = 10,
+            Y = 10
+        };
+
+        Assert.Equal (new Size (1, 1), view.GetContentSize ());
+        view.Add (subview);
+        Assert.Equal (new Size (1, 1), view.GetContentSize ());
+    }
+
+    [Fact]
+    public void Remove_Does_Not_Impact_ContentSize ()
+    {
+        var view = new View ();
+        view.SetContentSize (new Size (1, 1));
+
+        var subview = new View ()
+        {
+            X = 10,
+            Y = 10
+        };
+
+        Assert.Equal (new Size (1, 1), view.GetContentSize ());
+        view.Add (subview);
+        Assert.Equal (new Size (1, 1), view.GetContentSize ());
+
+        view.SetContentSize (new Size (5, 5));
+        Assert.Equal (new Size (5, 5), view.GetContentSize ());
+
+        view.Remove (subview);
+        Assert.Equal (new Size (5, 5), view.GetContentSize ());
     }
 }

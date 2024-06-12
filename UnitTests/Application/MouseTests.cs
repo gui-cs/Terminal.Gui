@@ -130,6 +130,7 @@ public class MouseTests
 
         Application.OnMouseEvent (mouseEvent);
         Assert.Equal (expectedClicked, clicked);
+        top.Dispose ();
     }
 
     /// <summary>
@@ -224,6 +225,7 @@ public class MouseTests
 
         Application.OnMouseEvent (mouseEvent);
         Assert.Equal (expectedClicked, clicked);
+        top.Dispose ();
     }
 
     #endregion mouse coordinate tests
@@ -290,6 +292,7 @@ public class MouseTests
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -396,6 +399,7 @@ public class MouseTests
         Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Pressed });
         Assert.Null (Application.MouseGrabView);
         Assert.Equal (0, count);
+        top.Dispose ();
     }
     #endregion
 }
