@@ -7,7 +7,8 @@ namespace Terminal.Gui;
 // TODO: I tried `BarItem` but that's not great either as it implies it can only be used in `Bar`s.
 
 /// <summary>
-///     Displays a command, help text, and a key binding. When the key is pressed, the command will be invoked. Useful for displaying a command in <see cref="Bar"/> such as a
+///     Displays a command, help text, and a key binding. When the key is pressed, the command will be invoked. Useful for
+///     displaying a command in <see cref="Bar"/> such as a
 ///     menu, toolbar, or status bar.
 /// </summary>
 /// <remarks>
@@ -17,14 +18,17 @@ namespace Terminal.Gui;
 ///         <see cref="Accept"/> event to be fired
 ///     </para>
 ///     <para>
-///         If <see cref="KeyBindingScope"/> is <see cref="KeyBindingScope.Application"/>, the <see cref="Command.Accept"/> command 
+///         If <see cref="KeyBindingScope"/> is <see cref="KeyBindingScope.Application"/>, the <see cref="Command.Accept"/>
+///         command
 ///         be invoked regardless of what View has focus, enabling an application-wide keyboard shortcut.
 ///     </para>
 ///     <para>
-///         A Shortcut displays the command text on the left side, the help text in the middle, and the key binding on the right side.
+///         A Shortcut displays the command text on the left side, the help text in the middle, and the key binding on the
+///         right side.
 ///     </para>
 ///     <para>
-///         The command text can be set by setting the <see cref="CommandView"/>'s Text property or by setting <see cref="View.Title"/>.
+///         The command text can be set by setting the <see cref="CommandView"/>'s Text property or by setting
+///         <see cref="View.Title"/>.
 ///     </para>
 ///     <para>
 ///         The help text can be set by setting the <see cref="HelpText"/> property or by setting <see cref="View.Text"/>.
@@ -48,28 +52,23 @@ public class Shortcut : View
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
 
-        AddCommand (Gui.Command.HotKey, OnAccept);
-        AddCommand (Gui.Command.Accept, OnAccept);
-        KeyBindings.Add (KeyCode.Space, Gui.Command.Accept);
-        KeyBindings.Add (KeyCode.Enter, Gui.Command.Accept);
+        AddCommand (Command.HotKey, OnAccept);
+        AddCommand (Command.Accept, OnAccept);
+        KeyBindings.Add (KeyCode.Space, Command.Accept);
+        KeyBindings.Add (KeyCode.Enter, Command.Accept);
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
-        CommandView = new View ();
+        CommandView = new ();
 
         HelpView.Id = "_helpView";
         HelpView.CanFocus = false;
         SetHelpViewDefaultLayout ();
         Add (HelpView);
-
-        //        HelpView.TextAlignment = Alignment.End;
         HelpView.MouseClick += Shortcut_MouseClick;
 
         KeyView.Id = "_keyView";
-
-        // Only the Shortcut should be able to have focus, not any subviews
         KeyView.CanFocus = false;
-
         SetKeyViewDefaultLayout ();
         Add (KeyView);
 
@@ -85,14 +84,18 @@ public class Shortcut : View
 
         void OnInitialized (object sender, EventArgs e)
         {
+            SuperViewRendersLineCanvas = true;
+            Border.ShowTitle = false;
+
             ShowHide ();
 
             // Force Width to DimAuto to calculate natural width and then set it back
             Dim savedDim = Width;
             Width = GetWidthDimAuto ();
-            _naturalWidth = Frame.Width;
+            _minimumDimAutoWidth = Frame.Width;
             Width = savedDim;
 
+            // Set KeyView's colors to show "hot"
             if (ColorScheme != null)
             {
                 var cs = new ColorScheme (ColorScheme)
@@ -105,11 +108,11 @@ public class Shortcut : View
             }
         }
 
+        // Helper to set Width consistently
         Dim GetWidthDimAuto ()
         {
             return Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)));
         }
-
     }
 
     // When one of the subviews is "empty" we don't want to show it. So we
@@ -118,27 +121,32 @@ public class Shortcut : View
     private void ShowHide ()
     {
         RemoveAll ();
+
         if (!string.IsNullOrEmpty (CommandView.Text))
         {
             Add (CommandView);
         }
+
         if (!string.IsNullOrEmpty (HelpView.Text))
         {
             Add (HelpView);
         }
+
         if (Key != Key.Empty)
         {
             Add (KeyView);
         }
     }
 
-    private int? _naturalWidth;
+    // This is used to calculate the minimum width of the Shortcut when the width is NOT Dim.Auto
+    private int? _minimumDimAutoWidth;
 
+    // When layout starts, we need to adjust the layout of the HelpView and KeyView
     private void OnLayoutStarted (object sender, LayoutEventArgs e)
     {
         if (Width is DimAuto widthAuto)
         {
-            _naturalWidth = Frame.Width;
+            _minimumDimAutoWidth = Frame.Width;
         }
         else
         {
@@ -150,9 +158,9 @@ public class Shortcut : View
             int currentWidth = Frame.Width;
 
             // If our width is smaller than the natural then reduce width of HelpView.
-            if (currentWidth < _naturalWidth)
+            if (currentWidth < _minimumDimAutoWidth)
             {
-                int delta = _naturalWidth.Value - currentWidth;
+                int delta = _minimumDimAutoWidth.Value - currentWidth;
                 int maxHelpWidth = int.Max (0, HelpView.Text.GetColumns () + 2 - delta);
 
                 switch (maxHelpWidth)
@@ -235,6 +243,7 @@ public class Shortcut : View
     {
         // When the Shortcut is clicked, we want to invoke the Command and Set focus
         var view = sender as View;
+
         if (view != CommandView)
         {
             CommandView.InvokeCommand (Command.Accept);
@@ -261,34 +270,6 @@ public class Shortcut : View
         }
 
         e.Handled = true;
-    }
-
-    /// <inheritdoc/>
-    public override ColorScheme ColorScheme
-    {
-        get
-        {
-            if (base.ColorScheme == null)
-            {
-                return SuperView?.ColorScheme ?? base.ColorScheme;
-            }
-
-            return base.ColorScheme;
-        }
-        set
-        {
-            base.ColorScheme = value;
-
-            if (ColorScheme != null)
-            {
-                var cs = new ColorScheme (ColorScheme)
-                {
-                    Normal = ColorScheme.HotNormal,
-                    HotNormal = ColorScheme.Normal
-                };
-                KeyView.ColorScheme = cs;
-            }
-        }
     }
 
     #region Command
@@ -386,7 +367,7 @@ public class Shortcut : View
             _commandView.TextChanged += CommandViewTextChanged;
 
             SetHelpViewDefaultLayout ();
-            SetKeyViewDefaultLayout();
+            SetKeyViewDefaultLayout ();
             ShowHide ();
             UpdateKeyBinding ();
 
@@ -440,10 +421,9 @@ public class Shortcut : View
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
         HelpView.Y = 0; //Pos.Center (),    
         HelpView.Width = Dim.Auto (DimAutoStyle.Text);
-        HelpView.Height = Dim.Height(CommandView);
+        HelpView.Height = Dim.Height (CommandView);
         HelpView.Visible = true;
         HelpView.VerticalTextAlignment = Alignment.Center;
-
     }
 
     /// <summary>
@@ -531,8 +511,8 @@ public class Shortcut : View
     public View KeyView { get; } = new ();
 
     private int _minimumKeyViewSize;
+
     /// <summary>
-    /// 
     /// </summary>
     public int MinimumKeyViewSize
     {
@@ -543,9 +523,10 @@ public class Shortcut : View
             {
                 //return;
             }
+
             _minimumKeyViewSize = value;
-            SetKeyViewDefaultLayout();
-            CommandView.SetNeedsLayout();
+            SetKeyViewDefaultLayout ();
+            CommandView.SetNeedsLayout ();
             HelpView.SetNeedsLayout ();
             KeyView.SetNeedsLayout ();
             SetSubViewNeedsDisplay ();
@@ -558,33 +539,30 @@ public class Shortcut : View
     {
         KeyView.Margin.Thickness = new (1, 0, 1, 0);
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
+
         //KeyView.Y = Pos.Center ();
-        KeyView.Width = Dim.Auto (DimAutoStyle.Text, minimumContentDim: Dim.Func(GetMinimumKeyViewSize));
-        KeyView.Height = Dim.Height(CommandView);
+        KeyView.Width = Dim.Auto (DimAutoStyle.Text, Dim.Func (GetMinimumKeyViewSize));
+        KeyView.Height = Dim.Height (CommandView);
         KeyView.Visible = true;
+
         // Right align the text in the keyview
         KeyView.TextAlignment = Alignment.End;
         KeyView.VerticalTextAlignment = Alignment.Center;
+        KeyView.KeyBindings.Clear ();
     }
 
     private void UpdateKeyBinding ()
     {
-        if (KeyBindingScope == KeyBindingScope.Application)
-        {
-            //  return;
-        }
-
         if (Key != null)
         {
-            // CommandView holds our command/keybinding
-            // Add a key binding for this command to this Shortcut
-
-            CommandView.KeyBindings.Remove (Key);
-            CommandView.KeyBindings.Add (Key, KeyBindingScope, Command.Accept);
+            KeyBindings.Remove (Key);
+            KeyBindings.Add (Key, KeyBindingScope, Command.Accept);
         }
     }
 
     #endregion Key
+
+    #region Accept Handling
 
     /// <summary>
     ///     The event fired when the <see cref="Command.Accept"/> command is received. This
@@ -599,39 +577,26 @@ public class Shortcut : View
     /// </summary>
     protected new bool? OnAccept ()
     {
-        // TODO: This is not completely thought through.
+        var handled = true;
 
-        if (Key == null || Key == Key.Empty)
+        switch (KeyBindingScope)
         {
-            return false;
+            case KeyBindingScope.Application:
+                break;
+
+            case KeyBindingScope.Focused:
+                // TODO: Figure this out
+                handled = false;
+
+                break;
+            case KeyBindingScope.HotKey:
+                handled = _commandView.InvokeCommand (Command.HotKey) == true;
+                handled = false;
+
+                break;
         }
 
-        var handled = false;
-        var keyCopy = new Key (Key);
-
-        //switch (KeyBindingScope)
-        //{
-        //    case KeyBindingScope.Application:
-        //        // Simulate a key down to invoke the Application scoped key binding
-        //        handled = Application.OnKeyDown (keyCopy);
-
-        //        break;
-        //    case KeyBindingScope.Focused:
-        //        handled = InvokeCommand (Command.Value) == true;
-        //        handled = false;
-
-        //        break;
-        //    case KeyBindingScope.HotKey:
-        //        if (Command.HasValue)
-        //        {
-        //            //handled = _commandView.InvokeCommand (Gui.Command.HotKey) == true;
-        //            //handled = false;
-        //        }
-
-        //        break;
-        //}
-
-        //if (handled == false)
+        if (handled == false)
         {
             var args = new HandledEventArgs ();
             Accept?.Invoke (this, args);
@@ -641,25 +606,56 @@ public class Shortcut : View
         return true;
     }
 
+    #endregion Accept Handling
+
+    #region Focus
+
+    /// <inheritdoc/>
+    public override ColorScheme ColorScheme
+    {
+        get
+        {
+            if (base.ColorScheme == null)
+            {
+                return SuperView?.ColorScheme ?? base.ColorScheme;
+            }
+
+            return base.ColorScheme;
+        }
+        set
+        {
+            base.ColorScheme = value;
+
+            if (CommandView.CanFocus)
+            {
+                CommandView.ColorScheme = SuperView?.ColorScheme ?? ColorScheme;
+            }
+
+            if (ColorScheme != null)
+            {
+                var cs = new ColorScheme (ColorScheme)
+                {
+                    Normal = ColorScheme.HotNormal,
+                    HotNormal = ColorScheme.Normal
+                };
+                KeyView.ColorScheme = cs;
+            }
+
+            Border.ColorScheme = SuperView?.ColorScheme ?? ColorScheme;
+        }
+    }
+
     /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
-        // TODO: This is a hack. Need to refine this.
-        var cs = new ColorScheme (ColorScheme)
+        if (SuperView is { })
         {
-            Normal = ColorScheme.Focus,
-            HotNormal = ColorScheme.HotFocus
-        };
-
-        // _container.ColorScheme = cs;
-
-        cs = new (ColorScheme)
-        {
-            Normal = ColorScheme.HotFocus,
-            HotNormal = ColorScheme.Focus
-        };
-
-        //KeyView.ColorScheme = cs;
+            ColorScheme = new (SuperView?.ColorScheme)
+            {
+                Normal = SuperView.ColorScheme.Focus,
+                HotNormal = SuperView.ColorScheme.HotFocus
+            };
+        }
 
         return base.OnEnter (view);
     }
@@ -667,24 +663,42 @@ public class Shortcut : View
     /// <inheritdoc/>
     public override bool OnLeave (View view)
     {
-        // TODO: This is a hack. Need to refine this.
-        var cs = new ColorScheme (ColorScheme)
+        ColorScheme = null;
+
+        return base.OnLeave (view);
+        if (SuperView is { })
         {
-            Normal = ColorScheme.Normal,
-            HotNormal = ColorScheme.HotNormal
-        };
-
-        //   _container.ColorScheme = cs;
-
-        cs = new (ColorScheme)
-        {
-            Normal = ColorScheme.HotNormal,
-            HotNormal = ColorScheme.Normal
-        };
-
-        //KeyView.ColorScheme = cs;
+            ColorScheme = new (SuperView?.ColorScheme)
+            {
+                Normal = SuperView.ColorScheme.Normal,
+                HotNormal = SuperView.ColorScheme.HotNormal
+            };
+        }
 
         return base.OnLeave (view);
     }
-}
 
+    #endregion Focus
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            if (CommandView?.IsAdded == false)
+            {
+                CommandView.Dispose ();
+            }
+            if (HelpView?.IsAdded == false)
+            {
+                HelpView.Dispose ();
+            }
+            if (KeyView?.IsAdded == false)
+            {
+                KeyView.Dispose ();
+            }
+        }
+        base.Dispose (disposing);
+
+    }
+}

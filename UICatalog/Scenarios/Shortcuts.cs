@@ -50,13 +50,13 @@ public class Shortcuts : Scenario
             KeyBindingScope = KeyBindingScope.Application,
             BorderStyle = LineStyle.Dotted
         };
-        shortcut1.Border.Thickness = new (1, 0, 1, 0);
+        shortcut1.Border.Thickness = new (1, 1, 1, 1);
         Application.Top.Add (shortcut1);
 
         var shortcut2 = new Shortcut
         {
             X = 20,
-            Y = Pos.Bottom (shortcut1),
+            Y = Pos.Bottom (shortcut1) - 1,
             Width = Dim.Width (shortcut1),
             Key = Key.F2,
             Text = "Width is ^",
@@ -78,7 +78,7 @@ public class Shortcuts : Scenario
         shortcut2.Accept += (o, args) =>
                             {
                                 // Cycle to next item. If at end, set 0
-                                if (((RadioGroup)shortcut2.CommandView).SelectedItem < ((RadioGroup)shortcut2.CommandView).RadioLabels.Length-1)
+                                if (((RadioGroup)shortcut2.CommandView).SelectedItem < ((RadioGroup)shortcut2.CommandView).RadioLabels.Length - 1)
                                 {
                                     ((RadioGroup)shortcut2.CommandView).SelectedItem++;
                                 }
@@ -87,7 +87,7 @@ public class Shortcuts : Scenario
                                     ((RadioGroup)shortcut2.CommandView).SelectedItem = 0;
                                 }
                             };
-        shortcut2.Border.Thickness = new (1, 0, 1, 0);
+        shortcut2.Border.Thickness = new (1, 1, 1, 1);
         Application.Top.Add (shortcut2);
 
         var shortcut3 = new Shortcut
@@ -101,7 +101,8 @@ public class Shortcuts : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
             BorderStyle = LineStyle.Dotted
         };
-        shortcut3.Border.Thickness = new (1, 0, 1, 0);
+        shortcut3.CommandView.CanFocus = true;
+        shortcut3.Border.Thickness = new (1, 1, 1, 0);
 
         ((CheckBox)shortcut3.CommandView).Toggled += (s, e) =>
                                                      {
@@ -135,23 +136,24 @@ public class Shortcuts : Scenario
             Width = Dim.Width (shortcut3),
             CommandView = new Button
             {
-                Title = "_Button"
+                Title = "B_utton",
             },
             HelpText = "Width is Fill",
             Key = Key.K,
             KeyBindingScope = KeyBindingScope.HotKey,
             BorderStyle = LineStyle.Dotted
         };
-
+        Button button = (Button)shortcut4.CommandView;
         shortcut4.CommandView.Accept += Button_Clicked;
-        shortcut4.Border.Thickness = new (1, 0, 1, 0);
+        shortcut4.CommandView.CanFocus = true;
+        shortcut4.Border.Thickness = new (1, 0, 1,0);
 
         Application.Top.Add (shortcut4);
 
         var shortcut5 = new Shortcut
         {
             X = 20,
-            Y = Pos.Bottom (shortcut4),
+            Y = Pos.Bottom (shortcut4) ,
             Width = Dim.Width (shortcut4),
 
             Title = "Fi_ve",
@@ -160,14 +162,14 @@ public class Shortcuts : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
             BorderStyle = LineStyle.Dotted
         };
-        shortcut5.Border.Thickness = new (1, 0, 1, 0);
+        shortcut5.Border.Thickness = new (1, 0, 1, 1);
 
         Application.Top.Add (shortcut5);
 
         var shortcutSlider = new Shortcut
         {
             X = 20,
-            Y = Pos.Bottom (shortcut5),
+            Y = Pos.Bottom (shortcut5) - 1,
             Key = Key.F5,
             HelpText = "Width is Fill",
             Width = Dim.Width (shortcut5),
@@ -181,9 +183,9 @@ public class Shortcuts : Scenario
             }
         };
 
-        ((Slider<string>)shortcutSlider.CommandView).Options = new() { new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" } };
+        ((Slider<string>)shortcutSlider.CommandView).Options = new () { new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" } };
         ((Slider<string>)shortcutSlider.CommandView).SetOption (0);
-        shortcutSlider.Border.Thickness = new (1, 0, 1, 0);
+        shortcutSlider.Border.Thickness = new (1, 1, 1, 1);
 
         ((Slider<string>)shortcutSlider.CommandView).OptionsChanged += (o, args) =>
                                                                        {
@@ -193,20 +195,32 @@ public class Shortcuts : Scenario
 
         Application.Top.Add (shortcutSlider);
 
+        var shortcut6 = new Shortcut
+        {
+            X = 20,
+            Y = Pos.Bottom (shortcutSlider) - 1,
+            Width = Dim.Width (shortcutSlider),
+
+            Title = "_No Key",
+            HelpText = "Keyless",
+            BorderStyle = LineStyle.Dotted
+        };
+        shortcut6.Border.Thickness = new (1, 1, 1, 1);
+
+        Application.Top.Add (shortcut6);
+
         foreach (View sh in Application.Top.Subviews.Where (v => v is Shortcut)!)
         {
             if (sh is Shortcut shortcut)
             {
                 shortcut.Accept += (o, args) =>
                                    {
+                                       var x = button;
                                        eventSource.Add ($"Accept: {shortcut!.CommandView.Text}");
                                        eventLog.MoveDown ();
                                    };
             }
         }
-
-        //shortcut1.SetFocus ();
-        //View.Diagnostics = ViewDiagnosticFlags.Ruler;
     }
 
     private void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
