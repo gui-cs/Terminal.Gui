@@ -35,7 +35,7 @@ public class Shortcuts : Scenario
         ListView eventLog = new ListView ()
         {
             X = Pos.AnchorEnd (),
-            Width = 50,
+            Width = 40,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Toplevel"],
             Source = new ListWrapper<string> (eventSource)
@@ -44,10 +44,11 @@ public class Shortcuts : Scenario
 
         var shortcut1 = new Shortcut
         {
-            //Width =30,
+            X = 20,
+            Width = 30,
             Title = "Zi_gzag",
             Key = Key.F1,
-            Text = "Gonna zig zag",
+            Text = "Width is 30",
             KeyBindingScope = KeyBindingScope.Application,
             BorderStyle = LineStyle.Dotted
         };
@@ -61,14 +62,20 @@ public class Shortcuts : Scenario
 
         var shortcut2 = new Shortcut
         {
+            X = 20,
             Y = Pos.Bottom (shortcut1),
             Width = Dim.Width (shortcut1),
-            Title = "_Two",
-            Key = Key.F2.WithAlt,
-            Text = "Number two",
+            Key = Key.F2,
+            Text = "Width is ^",
             KeyBindingScope = KeyBindingScope.HotKey,
-            BorderStyle = LineStyle.Dotted
+            BorderStyle = LineStyle.Dotted,
+            CommandView = new RadioGroup ()
+            {
+                Orientation = Orientation.Vertical,
+                RadioLabels = ["One", "Two", "Three", "Four"],
+            },
         };
+
         shortcut2.Border.Thickness = new Thickness (1, 0, 1, 0);
         shortcut2.Accept += (s, e) =>
                             {
@@ -79,11 +86,12 @@ public class Shortcuts : Scenario
 
         var shortcut3 = new Shortcut
         {
+            X = 20,
             Y = Pos.Bottom (shortcut2),
-            Width = Dim.Width (shortcut1),
             CommandView = new CheckBox () { Text = "_Align" },
             Key = Key.F3,
-            HelpText = "Alignment",
+            HelpText = "Width is Fill",
+            Width = Dim.Fill () - Dim.Width (eventLog),
             KeyBindingScope = KeyBindingScope.HotKey,
             BorderStyle = LineStyle.Dotted
         };
@@ -124,40 +132,19 @@ public class Shortcuts : Scenario
                             };
         Application.Top.Add (shortcut3);
 
-
-        var shortcutH = new Shortcut
-        {
-            Y = Pos.Top (shortcut3),
-            X = Pos.Right (shortcut3),
-            Title = "Horizo_ntal",
-            Key = Key.F10,
-            Text = "Hey!",
-            KeyBindingScope = KeyBindingScope.HotKey,
-            BorderStyle = LineStyle.Dotted
-        };
-        shortcutH.Border.Thickness = new Thickness (0, 0, 1, 0);
-        shortcutH.Accept += (s, e) =>
-                            {
-                                eventSource.Add ($"Accept: {s}");
-                                eventLog.MoveDown ();
-                            };
-        Application.Top.Add (shortcutH);
-
         var shortcut4 = new Shortcut
         {
             X = 20,
             Y = Pos.Bottom (shortcut3),
-            Width = Dim.Fill (50),
+            Width = Dim.Width (shortcut3),
             Title = "C",
-            Text = "H",
+            HelpText = "Width is Fill",
             Key = Key.K,
             KeyBindingScope = KeyBindingScope.HotKey,
             //           Command = Command.Accept,
             BorderStyle = LineStyle.Dotted
         };
         shortcut4.Border.Thickness = new Thickness (1, 0, 1, 0);
-        shortcut4.Margin.Thickness = new Thickness (0, 1, 0, 0);
-        View.Diagnostics = ViewDiagnosticFlags.Ruler;
 
         shortcut4.Accept += (s, e) =>
                             {
@@ -171,16 +158,15 @@ public class Shortcuts : Scenario
         {
             X = 20,
             Y = Pos.Bottom (shortcut4),
-            Width = Dim.Fill (50),
+            Width = Dim.Width (shortcut4),
+
             Title = "Fi_ve",
             Key = Key.F5.WithCtrl.WithAlt.WithShift,
-            Text = "Help text",
+            HelpText = "Width is Fill",
             KeyBindingScope = KeyBindingScope.HotKey,
             BorderStyle = LineStyle.Dotted
         };
         shortcut5.Border.Thickness = new Thickness (1, 0, 1, 0);
-        shortcut5.Margin.Thickness = new Thickness (0, 1, 0, 0);
-        View.Diagnostics = ViewDiagnosticFlags.Ruler;
 
         shortcut5.Accept += (s, e) =>
                             {
@@ -190,9 +176,40 @@ public class Shortcuts : Scenario
         Application.Top.Add (shortcut5);
 
 
+        var shortcutSlider = new Shortcut
+        {
+            X = 20,
+            Y = Pos.Bottom (shortcut5),
+            Key = Key.F5,
+            HelpText = "Width is Fill",
+            Width = Dim.Width (shortcut5),
+
+            KeyBindingScope = KeyBindingScope.HotKey,
+            BorderStyle = LineStyle.Dotted,
+            CommandView = new Slider<string> ()
+            {
+                Orientation = Orientation.Vertical,
+                AllowEmpty = false,
+            }
+        };
+
+
+        ((Slider<string>)shortcutSlider.CommandView).Options = new List<SliderOption<string>> ()
+            { new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" } };
+        ((Slider<string>)shortcutSlider.CommandView).SetOption (0);
+        shortcutSlider.Border.Thickness = new Thickness (1, 0, 1, 0);
+
+        shortcutSlider.Accept += (s, e) =>
+                            {
+                                eventSource.Add ($"Accept: {s}");
+                                eventLog.MoveDown ();
+                            };
+        Application.Top.Add (shortcutSlider);
+        ;
         ((CheckBox)shortcut3.CommandView).OnToggled ();
 
         //shortcut1.SetFocus ();
+        //View.Diagnostics = ViewDiagnosticFlags.Ruler;
 
     }
 

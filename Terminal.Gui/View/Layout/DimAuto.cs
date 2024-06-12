@@ -272,6 +272,10 @@ public class DimAuto () : Dim
                 {
                     View v = subviews [i];
 
+                    if (autoMax == int.MaxValue)
+                    {
+                        autoMax = superviewContentSize;
+                    }
                     if (dimension == Dimension.Width)
                     {
                         v.SetRelativeLayout (new Size (autoMax - subviewsSize, 0));

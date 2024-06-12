@@ -70,9 +70,6 @@ public class Shortcut : View
         // Only the Shortcut should be able to have focus, not any subviews
         KeyView.CanFocus = false;
 
-        // Right align the text in the keyview
-        KeyView.TextAlignment = Alignment.End;
-
         SetKeyViewDefaultLayout ();
         Add (KeyView);
 
@@ -88,9 +85,7 @@ public class Shortcut : View
 
         void OnInitialized (object sender, EventArgs e)
         {
-            ShowHide (CommandView);
-            ShowHide (HelpView);
-            ShowHide (KeyView);
+            ShowHide ();
 
             // Force Width to DimAuto to calculate natural width and then set it back
             Dim savedDim = Width;
@@ -120,7 +115,7 @@ public class Shortcut : View
     // When one of the subviews is "empty" we don't want to show it. So we
     // Use Add/Remove. We need to be careful to add them in the right order
     // so Pos.Align works correctly.
-    private void ShowHide (View subView)
+    private void ShowHide ()
     {
         RemoveAll ();
         if (!string.IsNullOrEmpty (CommandView.Text))
@@ -366,8 +361,8 @@ public class Shortcut : View
             _commandView.CanFocus = false;
 
             // Bar will set the width of all CommandViews to the width of the widest CommandViews.
-            _commandView.Width = Dim.Auto (DimAutoStyle.Text);
-            _commandView.Height = Dim.Auto (DimAutoStyle.Text);
+            _commandView.Width = Dim.Auto ();
+            _commandView.Height = Dim.Auto ();
             _commandView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
             _commandView.Y = 0; //Pos.Center ();
 
@@ -394,7 +389,7 @@ public class Shortcut : View
             Remove (KeyView);
             Add (_commandView, HelpView, KeyView);
 
-            ShowHide (_commandView);
+            ShowHide ();
             UpdateKeyBinding ();
 
             return;
@@ -404,7 +399,7 @@ public class Shortcut : View
             void CommandViewTextChanged (object sender, StateEventArgs<string> e)
             {
                 Title = _commandView.Text;
-                ShowHide (_commandView);
+                ShowHide ();
             }
 
             void CommandViewAccept (object sender, CancelEventArgs e)
@@ -445,10 +440,12 @@ public class Shortcut : View
     {
         HelpView.Margin.Thickness = new (1, 0, 1, 0);
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
-        HelpView.Y = 0; //Pos.Center (),
+        HelpView.Y = 0; //Pos.Center (),    
         HelpView.Width = Dim.Auto (DimAutoStyle.Text);
-        HelpView.Height = Dim.Auto (DimAutoStyle.Text);
+        HelpView.Height = Dim.Height(CommandView);
         HelpView.Visible = true;
+        HelpView.VerticalTextAlignment = Alignment.Center;
+
     }
 
     /// <summary>
@@ -463,7 +460,7 @@ public class Shortcut : View
             if (HelpView != null)
             {
                 HelpView.Text = value;
-                ShowHide (HelpView);
+                ShowHide ();
             }
         }
     }
@@ -479,7 +476,7 @@ public class Shortcut : View
             if (HelpView != null)
             {
                 HelpView.Text = value;
-                ShowHide (HelpView);
+                ShowHide ();
             }
         }
     }
@@ -508,7 +505,7 @@ public class Shortcut : View
             UpdateKeyBinding ();
 
             KeyView.Text = Key == Key.Empty ? string.Empty : $"{Key}";
-            ShowHide (KeyView);
+            ShowHide ();
         }
     }
 
@@ -563,10 +560,13 @@ public class Shortcut : View
     {
         KeyView.Margin.Thickness = new (1, 0, 1, 0);
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
-        KeyView.Y = 0; //Pos.Center (),
+        //KeyView.Y = Pos.Center ();
         KeyView.Width = Dim.Auto (DimAutoStyle.Text, minimumContentDim: Dim.Func(GetMinimumKeyViewSize));
-        KeyView.Height = Dim.Auto (DimAutoStyle.Text);
+        KeyView.Height = Dim.Height(CommandView);
         KeyView.Visible = true;
+        // Right align the text in the keyview
+        KeyView.TextAlignment = Alignment.End;
+        KeyView.VerticalTextAlignment = Alignment.Center;
     }
 
     private void UpdateKeyBinding ()
