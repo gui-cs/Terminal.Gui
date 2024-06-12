@@ -20,7 +20,7 @@ public class ScrollDemo : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
         };
 
-        var editor = new Adornments.AdornmentsEditor ();
+        var editor = new AdornmentsEditor ();
         app.Add (editor);
 
         var view = new FrameView
@@ -232,12 +232,12 @@ public class ScrollDemo : Scenario
                                  {
                                      lblScrollFrame.Text = $"Scroll Frame: {scroll.Frame.ToString ()}";
                                      lblScrollViewport.Text = $"Scroll Viewport: {scroll.Viewport.ToString ()}";
-                                     lblScrollContentSize.Text = $"Scroll ContentSize: {scroll.ContentSize.ToString ()}";
+                                     lblScrollContentSize.Text = $"Scroll ContentSize: {scroll.GetContentSize ().ToString ()}";
                                  };
 
         editor.Initialized += (s, e) =>
                               {
-                                  scroll.Size = int.Max (app.ContentSize.Height * 2, app.ContentSize.Width * 2);
+                                  scroll.Size = int.Max (app.GetContentSize ().Height * 2, app.GetContentSize ().Width * 2);
                                   editor.ViewToEdit = scroll;
                               };
 

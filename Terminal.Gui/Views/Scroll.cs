@@ -60,7 +60,7 @@ public class Scroll : View
         get => _position;
         set
         {
-            int barSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
+            int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
 
             if (value < 0 || (value > 0 && value + barSize > Size))
             {
@@ -128,12 +128,12 @@ public class Scroll : View
 
     private int GetPositionFromSliderLocation (int location)
     {
-        if (ContentSize.Height == 0 || ContentSize.Width == 0)
+        if (GetContentSize ().Height == 0 || GetContentSize ().Width == 0)
         {
             return 0;
         }
 
-        int scrollSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
+        int scrollSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
 
         // Ensure the Position is valid if the slider is at end
         // We use Frame here instead of ContentSize because even if the slider has a margin or border, Frame indicates the actual size
@@ -149,12 +149,12 @@ public class Scroll : View
     // QUESTION: This method is only called from one place. Should it be inlined? Or, should it be made internal and unit tests be provided?
     private (int Location, int Dimension) GetSliderLocationDimensionFromPosition ()
     {
-        if (ContentSize.Height == 0 || ContentSize.Width == 0)
+        if (GetContentSize ().Height == 0 || GetContentSize ().Width == 0)
         {
             return new (0, 0);
         }
 
-        int scrollSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
+        int scrollSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
         int location;
         int dimension;
 
@@ -228,7 +228,7 @@ public class Scroll : View
     {
         MouseEvent me = e.MouseEvent;
         int location = Orientation == Orientation.Vertical ? me.Position.Y : me.Position.X;
-        int barSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
+        int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
 
         (int topLeft, int bottomRight) sliderPos = _orientation == Orientation.Vertical
                                                        ? new (_slider.Frame.Y, _slider.Frame.Bottom - 1)
@@ -292,13 +292,13 @@ public class Scroll : View
         Text = string.Concat (
                               Enumerable.Repeat (
                                                  Glyphs.Stipple.ToString (),
-                                                 ContentSize.Width * ContentSize.Height));
+                                                 GetContentSize ().Width * GetContentSize ().Height));
         _slider.TextDirection = Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
 
         _slider.Text = string.Concat (
                                       Enumerable.Repeat (
                                                          Glyphs.ContinuousMeterSegment.ToString (),
-                                                         _slider.ContentSize.Width * _slider.ContentSize.Height));
+                                                         _slider.GetContentSize ().Width * _slider.GetContentSize ().Height));
     }
 
     private void AdjustSlider ()
@@ -314,8 +314,8 @@ public class Scroll : View
 
         _slider.SetContentSize (
                                 new (
-                                     Orientation == Orientation.Vertical ? ContentSize.Width : slider.Dimension,
-                                     Orientation == Orientation.Vertical ? slider.Dimension : ContentSize.Height
+                                     Orientation == Orientation.Vertical ? GetContentSize ().Width : slider.Dimension,
+                                     Orientation == Orientation.Vertical ? slider.Dimension : GetContentSize ().Height
                                     ));
         SetSliderText ();
     }
@@ -327,7 +327,7 @@ public class Scroll : View
     {
         MouseEvent me = e.MouseEvent;
         int location = Orientation == Orientation.Vertical ? me.Position.Y : me.Position.X;
-        int barSize = Orientation == Orientation.Vertical ? ContentSize.Height : ContentSize.Width;
+        int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
         int offset = _lastLocation > -1 ? location - _lastLocation : 0;
 
         if (me.Flags == MouseFlags.Button1Pressed)
