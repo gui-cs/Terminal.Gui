@@ -355,7 +355,11 @@ public class RadioGroup : View
     /// <param name="selectedItem"></param>
     /// <param name="previousSelectedItem"></param>
     public virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem)
-    {
+    { 
+        if (_selected == selectedItem)
+        {
+            return;
+        }
         _selected = selectedItem;
         SelectedItemChanged?.Invoke (this, new (selectedItem, previousSelectedItem));
     }

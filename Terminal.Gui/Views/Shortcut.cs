@@ -385,10 +385,8 @@ public class Shortcut : View
             Title = _commandView.Text;
             _commandView.TextChanged += CommandViewTextChanged;
 
-            Remove (HelpView);
-            Remove (KeyView);
-            Add (_commandView, HelpView, KeyView);
-
+            SetHelpViewDefaultLayout ();
+            SetKeyViewDefaultLayout();
             ShowHide ();
             UpdateKeyBinding ();
 
