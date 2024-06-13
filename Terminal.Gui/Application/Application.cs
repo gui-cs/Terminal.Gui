@@ -713,9 +713,9 @@ public static partial class Application
     ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
     ///         return control immediately.
     ///     </para>
-    ///     <para>Calling <see cref="Init"/> first is not needed if only <see cref="Run{T}"/> or
+    ///     <para>When using <see cref="Run{T}"/> or
     ///         <see cref="Run(System.Func{System.Exception,bool},Terminal.Gui.ConsoleDriver)"/>
-    ///         has been used, otherwise it's needed to call <see cref="Init"/> first.
+    ///         <see cref="Init"/> will be called automatically.
     ///     </para>
     ///     <para>
     ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
