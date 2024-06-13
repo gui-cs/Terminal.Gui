@@ -8,12 +8,14 @@ namespace CommunityToolkitExample;
 internal partial class LoginViewModel : ObservableObject
 {
     private const string DEFAULT_LOGIN_PROGRESS_MESSAGE = "Press 'Login' to log in.";
+    private const string INVALID_LOGIN_MESSAGE = "Please enter a valid user name and password.";
     private const string LOGGING_IN_PROGRESS_MESSAGE = "Logging in...";
     private const string VALID_LOGIN_MESSAGE = "The input is valid!";
-    private const string INVALID_LOGIN_MESSAGE = "Please enter a valid user name and password.";
-
     [ObservableProperty]
     private bool _canLogin;
+
+    [ObservableProperty]
+    private string _loginProgressMessage;
 
     private string _password;
 
@@ -24,16 +26,11 @@ internal partial class LoginViewModel : ObservableObject
 
     [ObservableProperty]
     private string _usernameLengthMessage;
-
-    [ObservableProperty]
-    private string _loginProgressMessage;
-
-    [ObservableProperty]
-    private string _validationMessage;
-
     [ObservableProperty]
     private ColorScheme? _validationColorScheme;
 
+    [ObservableProperty]
+    private string _validationMessage;
     public LoginViewModel ()
     {
         Username = string.Empty;
@@ -64,12 +61,6 @@ internal partial class LoginViewModel : ObservableObject
         }
     }
 
-    private void ValidateLogin ()
-    {
-        CanLogin = !string.IsNullOrEmpty (Username) && !string.IsNullOrEmpty (Password);
-        SendMessage (LoginAction.Validation);
-    }
-
     public string Username
     {
         get => _username;
@@ -79,6 +70,11 @@ internal partial class LoginViewModel : ObservableObject
             UsernameLengthMessage = $"_Username ({_username.Length} characters):";
             ValidateLogin ();
         }
+    }
+
+    public void Initialized ()
+    {
+        Clear ();
     }
 
     private void Clear ()
@@ -111,8 +107,9 @@ internal partial class LoginViewModel : ObservableObject
         WeakReferenceMessenger.Default.Send (new Message<LoginAction> { Value = loginAction });
     }
 
-    public void Initialized ()
+    private void ValidateLogin ()
     {
-        Clear ();
+        CanLogin = !string.IsNullOrEmpty (Username) && !string.IsNullOrEmpty (Password);
+        SendMessage (LoginAction.Validation);
     }
 }
