@@ -5,7 +5,7 @@ namespace CommunityToolkitExample;
 
 public static class Program
 {
-    public static IServiceProvider Services { get; private set; }
+    public static IServiceProvider? Services { get; private set; }
 
     private static void Main (string [] args)
     {

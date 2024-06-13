@@ -11,6 +11,7 @@ internal partial class LoginViewModel : ObservableObject
     private const string INVALID_LOGIN_MESSAGE = "Please enter a valid user name and password.";
     private const string LOGGING_IN_PROGRESS_MESSAGE = "Logging in...";
     private const string VALID_LOGIN_MESSAGE = "The input is valid!";
+
     [ObservableProperty]
     private bool _canLogin;
 
@@ -26,6 +27,7 @@ internal partial class LoginViewModel : ObservableObject
 
     [ObservableProperty]
     private string _usernameLengthMessage;
+
     [ObservableProperty]
     private ColorScheme? _validationColorScheme;
 
@@ -33,6 +35,13 @@ internal partial class LoginViewModel : ObservableObject
     private string _validationMessage;
     public LoginViewModel ()
     {
+        _loginProgressMessage = string.Empty;
+        _password = string.Empty;
+        _passwordLengthMessage = string.Empty;
+        _username = string.Empty;
+        _usernameLengthMessage = string.Empty;
+        _validationMessage = string.Empty;
+
         Username = string.Empty;
         Password = string.Empty;
 
@@ -81,35 +90,39 @@ internal partial class LoginViewModel : ObservableObject
     {
         Username = string.Empty;
         Password = string.Empty;
-        SendMessage (LoginAction.Validation);
-        SendMessage (LoginAction.LoginProgress, DEFAULT_LOGIN_PROGRESS_MESSAGE);
+        SendMessage (LoginActions.Clear, DEFAULT_LOGIN_PROGRESS_MESSAGE);
     }
 
     private async Task Login ()
     {
-        SendMessage (LoginAction.LoginProgress, LOGGING_IN_PROGRESS_MESSAGE);
+        SendMessage (LoginActions.LoginProgress, LOGGING_IN_PROGRESS_MESSAGE);
         await Task.Delay (TimeSpan.FromSeconds (1));
         Clear ();
     }
 
-    private void SendMessage (LoginAction loginAction, string message = "")
+    private void SendMessage (LoginActions loginAction, string message = "")
     {
         switch (loginAction)
         {
-            case LoginAction.LoginProgress:
+             case LoginActions.Clear:
+                LoginProgressMessage = message;
+                ValidationMessage = INVALID_LOGIN_MESSAGE;
+                ValidationColorScheme = Colors.ColorSchemes ["Error"];
+                break;
+            case LoginActions.LoginProgress:
                 LoginProgressMessage = message;
                 break;
-            case LoginAction.Validation:
+            case LoginActions.Validation:
                 ValidationMessage = CanLogin ? VALID_LOGIN_MESSAGE : INVALID_LOGIN_MESSAGE;
                 ValidationColorScheme = CanLogin ? Colors.ColorSchemes ["Base"] : Colors.ColorSchemes ["Error"];
                 break;
         }
-        WeakReferenceMessenger.Default.Send (new Message<LoginAction> { Value = loginAction });
+        WeakReferenceMessenger.Default.Send (new Message<LoginActions> { Value = loginAction });
     }
 
     private void ValidateLogin ()
     {
         CanLogin = !string.IsNullOrEmpty (Username) && !string.IsNullOrEmpty (Password);
-        SendMessage (LoginAction.Validation);
+        SendMessage (LoginActions.Validation);
     }
 }

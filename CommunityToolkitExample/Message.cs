@@ -2,5 +2,5 @@
 
 internal class Message<T>
 {
-    public T Value { get; set; }
+    public T? Value { get; set; }
 }

@@ -3,7 +3,7 @@ using Terminal.Gui;
 
 namespace CommunityToolkitExample;
 
-internal partial class LoginView : IRecipient<Message<LoginAction>>
+internal partial class LoginView : IRecipient<Message<LoginActions>>
 {
     public LoginView (LoginViewModel viewModel)
     {
@@ -14,12 +14,10 @@ internal partial class LoginView : IRecipient<Message<LoginAction>>
         usernameInput.TextChanged += (_, _) =>
                                      {
                                          ViewModel.Username = usernameInput.Text;
-                                         SetText ();
                                      };
         passwordInput.TextChanged += (_, _) =>
                                      {
                                          ViewModel.Password = passwordInput.Text;
-                                         SetText ();
                                      };
         loginButton.Accept += (_, _) =>
                               {
@@ -30,7 +28,6 @@ internal partial class LoginView : IRecipient<Message<LoginAction>>
         clearButton.Accept += (_, _) =>
                               {
                                   ViewModel.ClearCommand.Execute (null);
-                                  SetText ();
                               };
 
         Initialized += (_, _) => { ViewModel.Initialized (); };
@@ -38,16 +35,23 @@ internal partial class LoginView : IRecipient<Message<LoginAction>>
 
     public LoginViewModel ViewModel { get; set; }
 
-    public void Receive (Message<LoginAction> message)
+    public void Receive (Message<LoginActions> message)
     {
         switch (message.Value)
         {
-            case LoginAction.LoginProgress:
+            case LoginActions.Clear:
+                {
+                    loginProgressLabel.Text = ViewModel.LoginProgressMessage;
+                    validationLabel.Text = ViewModel.ValidationMessage;
+                    validationLabel.ColorScheme = ViewModel.ValidationColorScheme;
+                    break;
+                }
+            case LoginActions.LoginProgress:
                 {
                     loginProgressLabel.Text = ViewModel.LoginProgressMessage;
                     break;
                 }
-            case LoginAction.Validation:
+            case LoginActions.Validation:
                 {
                     validationLabel.Text = ViewModel.ValidationMessage;
                     validationLabel.ColorScheme = ViewModel.ValidationColorScheme;
