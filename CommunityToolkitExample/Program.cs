@@ -12,6 +12,7 @@ public static class Program
         Services = ConfigureServices ();
         Application.Init ();
         Application.Run (Services.GetRequiredService<LoginView> ());
+        Application.Top.Dispose();
         Application.Shutdown ();
     }
 
