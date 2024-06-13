@@ -11,7 +11,7 @@ internal partial class LoginViewModel : ObservableObject
     private const string INVALID_LOGIN_MESSAGE = "Please enter a valid user name and password.";
     private const string LOGGING_IN_PROGRESS_MESSAGE = "Logging in...";
     private const string VALID_LOGIN_MESSAGE = "The input is valid!";
-
+    
     [ObservableProperty]
     private bool _canLogin;
 
@@ -27,7 +27,7 @@ internal partial class LoginViewModel : ObservableObject
 
     [ObservableProperty]
     private string _usernameLengthMessage;
-
+    
     [ObservableProperty]
     private ColorScheme? _validationColorScheme;
 
