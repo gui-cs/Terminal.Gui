@@ -355,7 +355,6 @@ public class Shortcuts : Scenario
             {
                 shortcut.Accept += (o, args) =>
                                    {
-                                       var x = button;
                                        eventSource.Add ($"Accept: {shortcut!.CommandView.Text}");
                                        eventLog.MoveDown ();
                                    };

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
@@ -35,7 +36,7 @@ public class Bars : Scenario
         {
             X = Pos.AnchorEnd (),
             Width = 50,
-            Height = Dim.Fill (),
+            Height = Dim.Fill (3),
             ColorScheme = Colors.ColorSchemes ["Toplevel"],
             Source = new ListWrapper<string> (eventSource)
         };
@@ -46,28 +47,19 @@ public class Bars : Scenario
             Title = "_Zigzag",
             Key = Key.G.WithCtrl,
             Text = "Gonna zig zag",
-            KeyBindingScope = KeyBindingScope.HotKey,
         };
         shortcut1.Accept += (s, e) =>
                             {
                                 eventSource.Add ($"Accept: {s}");
                                 eventLog.MoveDown ();
                             };
-        Application.Top.Add (shortcut1);
-        shortcut1.SetFocus ();
 
-        //var shortcut2 = new Shortcut
-        //{
-        //    Title = "Za_G",
-        //    Text = "Gonna zag",
-        //    Key = Key.G.WithAlt,
-        //    KeyBindingScope = KeyBindingScope.HotKey,
-        //    Command = Command.Accept,
-        //    X = Pos.Left (shortcut1),
-        //    Y = Pos.Bottom (shortcut1),
-        //    //Width = 50,
-        //};
-
+        var shortcut2 = new Shortcut
+        {
+            Title = "Za_G",
+            Text = "Gonna zag",
+            Key = Key.G.WithAlt,
+        };
 
         //var shortcut3 = new Shortcut
         //{
@@ -112,15 +104,14 @@ public class Bars : Scenario
         //                        eventLog.MoveDown ();
         //                    };
 
-        //var bar = new Bar
-        //{
-        //    X = 2,
-        //    Y = Pos.Bottom(shortcut1),
-        //    Orientation = Orientation.Vertical,
-        //    StatusBarStyle = false,
-        //    Width = Dim.Percent(40)
-        //};
-        //bar.Add (shortcut3, shortcut4);
+        var bar = new Bar
+        {
+            X = 2,
+            Y = 2,
+            Orientation = Orientation.Vertical,
+            StatusBarStyle = false,
+        };
+        bar.Add (shortcut1, shortcut2);
 
         ////CheckBox hello = new ()
         ////{
@@ -135,14 +126,27 @@ public class Bars : Scenario
         ////                     eventLog.MoveDown ();
         ////                 };
 
-        //Application.Top.Add (bar);
+
+        Application.Top.Add (bar);
 
         // BUGBUG: This should not be needed
-        //Application.Top.LayoutSubviews ();
+        Application.Top.LayoutSubviews ();
 
         //SetupMenuBar ();
         //SetupContentMenu ();
-       // SetupStatusBar ();
+        SetupStatusBar ();
+
+        foreach (Bar barView in Application.Top.Subviews.Where (b => b is Bar)!)
+        {
+            foreach (Shortcut sh in barView.Subviews.Where (s => s is Shortcut)!)
+            {
+                sh.Accept += (o, args) =>
+                                   {
+                                       eventSource.Add ($"Accept: {sh!.CommandView.Text}");
+                                       eventLog.MoveDown ();
+                                   };
+            }
+        }
     }
 
     private void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
@@ -404,11 +408,10 @@ public class Bars : Scenario
 
         var shortcut = new Shortcut
         {
-            Text = "Quit Application",
+            Text = "Quit",
             Title = "Q_uit",
             Key = Application.QuitKey,
             KeyBindingScope = KeyBindingScope.Application,
-//            Command = Command.QuitToplevel,
             CanFocus = false
         };
 
@@ -443,8 +446,7 @@ public class Bars : Scenario
         {
             Title = "_Show/Hide",
             Key = Key.F10,
-            KeyBindingScope = KeyBindingScope.HotKey,
-            //Command = Command.ToggleExpandCollapse,
+            KeyBindingScope = KeyBindingScope.Application,
             CommandView = new CheckBox
             {
                 Text = "_Show/Hide"
@@ -457,18 +459,23 @@ public class Bars : Scenario
         var button1 = new Button
         {
             Text = "I'll Hide",
-            Visible = false
+            // Visible = false
         };
         button1.Accept += Button_Clicked;
         statusBar.Add (button1);
 
-        ((CheckBox)shortcut.CommandView).Toggled += (s, e) =>
+        shortcut.Accept += (s, e) =>
                                                     {
                                                         button1.Visible = !button1.Visible;
                                                         button1.Enabled = button1.Visible;
                                                     };
 
-        statusBar.Add (new Label { HotKeySpecifier = new Rune ('_'), Text = "Fo_cusLabel", CanFocus = true });
+        statusBar.Add (new Label
+        {
+            HotKeySpecifier = new Rune ('_'),
+            Text = "Fo_cusLabel",
+            CanFocus = true
+        });
 
         var button2 = new Button
         {
@@ -481,7 +488,6 @@ public class Bars : Scenario
         statusBar.Initialized += Menu_Initialized;
 
         Application.Top.Add (statusBar);
-
 
     }
 
