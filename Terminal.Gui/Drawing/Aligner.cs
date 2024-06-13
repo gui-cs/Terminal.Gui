@@ -108,10 +108,11 @@ public class Aligner : INotifyPropertyChanged
             spacesToGive = containerSize - totalItemsSize;
         }
 
+        AlignmentModes mode = alignmentMode & ~AlignmentModes.AddSpaceBetweenItems; // copy to avoid modifying the original
         switch (alignment)
         {
             case Alignment.Start:
-                switch (alignmentMode & ~AlignmentModes.AddSpaceBetweenItems)
+                switch (mode)
                 {
                     case AlignmentModes.StartToEnd:
                         return Start (in sizesCopy, maxSpaceBetweenItems, spacesToGive);
@@ -129,7 +130,7 @@ public class Aligner : INotifyPropertyChanged
                 break;
 
             case Alignment.End:
-                switch (alignmentMode & ~AlignmentModes.AddSpaceBetweenItems)
+                switch (mode)
                 {
                     case AlignmentModes.StartToEnd:
                         return End (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive);
@@ -147,7 +148,8 @@ public class Aligner : INotifyPropertyChanged
                 break;
 
             case Alignment.Center:
-                switch (alignmentMode & ~AlignmentModes.AddSpaceBetweenItems)
+                mode &= ~AlignmentModes.IgnoreFirstOrLast;
+                switch (mode)
                 {
                     case AlignmentModes.StartToEnd:
                         return Center (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive);
@@ -159,7 +161,8 @@ public class Aligner : INotifyPropertyChanged
                 break;
 
             case Alignment.Fill:
-                switch (alignmentMode & ~AlignmentModes.AddSpaceBetweenItems)
+                mode &= ~AlignmentModes.IgnoreFirstOrLast;
+                switch (mode)
                 {
                     case AlignmentModes.StartToEnd:
                         return Fill (in sizesCopy, containerSize, totalItemsSize);
@@ -260,7 +263,8 @@ public class Aligner : INotifyPropertyChanged
             var currentPosition = 0;
             if (totalItemsSize > containerSize)
             {
-                currentPosition = containerSize - totalItemsSize - spacesToGive;
+                // Don't allow negative positions
+                currentPosition = int.Max(0, containerSize - totalItemsSize - spacesToGive);
             }
 
             for (var i = 0; i < sizes.Length; i++)

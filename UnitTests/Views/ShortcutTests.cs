@@ -22,20 +22,20 @@ public class ShortcutTests
     }
 
     [Theory]
-    [InlineData ("", "", KeyCode.Null, 0)]
+    [InlineData ("", "", KeyCode.Null, 2)]
     [InlineData ("C", "", KeyCode.Null, 3)]
-    [InlineData ("", "H", KeyCode.Null, 3)]
-    [InlineData ("", "", KeyCode.K, 3)]
+    [InlineData ("", "H", KeyCode.Null, 5)]
+    [InlineData ("", "", KeyCode.K, 5)]
     [InlineData ("C", "", KeyCode.K, 6)]
     [InlineData ("C", "H", KeyCode.Null, 6)]
-    [InlineData ("", "H", KeyCode.K, 6)]
+    [InlineData ("", "H", KeyCode.K, 8)]
     [InlineData ("C", "H", KeyCode.K, 9)]
     public void NaturalSize (string command, string help, Key key, int expectedWidth)
     {
         Shortcut shortcut = new Shortcut ()
         {
             Title = command,
-            Text = help,
+            HelpText = help,
             Key = key,
         };
 
@@ -79,19 +79,13 @@ public class ShortcutTests
     }
 
     [Fact]
-    public void CommandView_Text_And_Title_Are_The_Same ()
+    public void CommandView_Text_And_Title_Track ()
     {
         Shortcut shortcut = new Shortcut ()
         {
             Title = "T",
         };
 
-        Assert.Equal (shortcut.Title, shortcut.CommandView.Text);
-
-        shortcut = new Shortcut ()
-        {
-        };
-        shortcut.CommandView.Text = "T";
         Assert.Equal (shortcut.Title, shortcut.CommandView.Text);
 
         shortcut = new Shortcut ()
