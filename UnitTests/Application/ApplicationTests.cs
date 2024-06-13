@@ -863,7 +863,7 @@ public class ApplicationTests
 
 #if DEBUG_IDISPOSABLE
         Assert.False (w.WasDisposed);
-        Exception exception = Record.Exception (() => Application.Shutdown ()); // Invalid - w has not been disposed.
+        Exception exception = Record.Exception (Application.Shutdown); // Invalid - w has not been disposed.
         Assert.NotNull (exception);
 
         w.Dispose ();
@@ -902,7 +902,7 @@ public class ApplicationTests
 #if DEBUG_IDISPOSABLE
         Assert.Equal (top, Application.Top);
         Assert.False (top.WasDisposed);
-        Exception exception = Record.Exception (() => Application.Shutdown ());
+        Exception exception = Record.Exception (Application.Shutdown);
         Assert.NotNull (exception);
         Assert.False (top.WasDisposed);
 #endif
@@ -934,7 +934,7 @@ public class ApplicationTests
         Application.Run<Toplevel> (null, driver);
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Top.WasDisposed);
-        Exception exception = Record.Exception (() => Application.Shutdown ());
+        Exception exception = Record.Exception (Application.Shutdown);
         Assert.NotNull (exception);
         Assert.False (Application.Top.WasDisposed);
 
@@ -949,12 +949,22 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Run_t_Creates_Top_Without_Init ()
+    public void Run_t_Does_Not_Creates_Top_Without_Init ()
     {
+        // When a Toplevel is created it must already have all the Application configuration loaded
+        // This is only possible by two ways:
+        // 1 - Using Application.Init first
+        // 2 - Using Application.Run() or Application.Run<T>()
+        // The Application.Run(new(Toplevel)) must always call Application.Init() first because
+        // the new(Toplevel) may be a derived class that is possible using Application static
+        // properties that is only available after the Application.Init was called
         var driver = new FakeDriver ();
 
         Assert.Null (Application.Top);
 
+        Assert.Throws<InvalidOperationException> (() => Application.Run (new (), null, driver));
+
+        Application.Init (driver);
         Application.Iteration += (s, e) =>
                                  {
                                      Assert.NotNull (Application.Top);
@@ -963,7 +973,7 @@ public class ApplicationTests
         Application.Run (new (), null, driver);
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Top.WasDisposed);
-        Exception exception = Record.Exception (() => Application.Shutdown ());
+        Exception exception = Record.Exception (Application.Shutdown);
         Assert.NotNull (exception);
         Assert.False (Application.Top.WasDisposed);
 

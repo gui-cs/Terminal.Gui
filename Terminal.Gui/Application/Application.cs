@@ -679,6 +679,12 @@ public static partial class Application
     public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
         where T : Toplevel, new ()
     {
+        if (!_initialized)
+        {
+            // Init() has NOT been called.
+            InternalInit (driver, null, true);
+        }
+
         var top = new T ();
 
         Run (top, errorHandler, driver);
@@ -708,7 +714,10 @@ public static partial class Application
     ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
     ///         return control immediately.
     ///     </para>
-    ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
+    ///     <para>Calling <see cref="Init"/> first is not needed if only <see cref="Run{T}"/> or
+    ///         <see cref="Run(System.Func{System.Exception,bool},Terminal.Gui.ConsoleDriver)"/>
+    ///         has been used, otherwise it's needed to call <see cref="Init"/> first.
+    ///     </para>
     ///     <para>
     ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
     ///         rethrown. Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
@@ -746,7 +755,9 @@ public static partial class Application
         else
         {
             // Init() has NOT been called.
-            InternalInit (driver, null, true);
+            throw new InvalidOperationException (
+                                                 "Init() has not been called. Only Run() or Run<T>() can be used without calling Init()."
+                                                );
         }
 
         var resume = true;
