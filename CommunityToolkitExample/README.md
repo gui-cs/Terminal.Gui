@@ -2,8 +2,6 @@
 
 This small demo gives an example of using the `CommunityToolkit.MVVM` framework's `ObservableObject`, `ObservableProperty`, and `IRecipient<T>` in conjunction with `Microsoft.Extensions.DependencyInjection`. 
 
-### Startup
-
 Right away we use IoC to load our views and view models.
 
 ``` csharp
@@ -58,10 +56,9 @@ internal partial class LoginView : IRecipient<Message<LoginAction>>
 }
 ```
 
-Momentarily slipping over to the view model, all bindable properties use some form of `ObservableProperty` with the class deriving from `ObservableObject`. Commands are of the `RelayCommand` type.
+Momentarily slipping over to the view model, all bindable properties use some form of `ObservableProperty` with the class deriving from `ObservableObject`. Commands are of the `RelayCommand` type. The use of `ObservableProperty` generates the code for handling `INotifyPropertyChanged` and `INotifyPropertyChanging`.
 
 ``` csharp
-
 internal partial class LoginViewModel : ObservableObject
 {
     ...
@@ -155,5 +152,3 @@ public void Receive (Message<LoginAction> message)
     Application.Refresh ();
 }
 ```
-
-There are other ways of handling cross-thread communication, this gives just one example. 
