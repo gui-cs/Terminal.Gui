@@ -27,8 +27,7 @@ namespace Terminal.Gui;
 ///         right side.
 ///     </para>
 ///     <para>
-///         The command text can be set by setting the <see cref="CommandView"/>'s Text property or by setting
-///         <see cref="View.Title"/>.
+///         The command text can be set by setting the <see cref="CommandView"/>'s Text property.
 ///     </para>
 ///     <para>
 ///         The help text can be set by setting the <see cref="HelpText"/> property or by setting <see cref="View.Text"/>.
@@ -59,26 +58,30 @@ public class Shortcut : View
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
-        CommandView = new ();
+        CommandView = new ()
+        {
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+        };
 
         HelpView.Id = "_helpView";
         HelpView.CanFocus = false;
         SetHelpViewDefaultLayout ();
         Add (HelpView);
-        HelpView.MouseClick += Shortcut_MouseClick;
 
         KeyView.Id = "_keyView";
         KeyView.CanFocus = false;
         SetKeyViewDefaultLayout ();
         Add (KeyView);
 
+        // If the user clicks anywhere on the Shortcut, other than the CommandView, invoke the Command
+        MouseClick += Shortcut_MouseClick;
+        HelpView.MouseClick += Shortcut_MouseClick;
         KeyView.MouseClick += Shortcut_MouseClick;
 
-        MouseClick += Shortcut_MouseClick;
+        LayoutStarted += OnLayoutStarted;
 
         Initialized += OnInitialized;
-
-        LayoutStarted += OnLayoutStarted;
 
         return;
 
@@ -111,9 +114,18 @@ public class Shortcut : View
         // Helper to set Width consistently
         Dim GetWidthDimAuto ()
         {
+            // TODO: PosAlign.CalculateMinDimension is a hack. Need to figure out a better way of doing this.
             return Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)));
         }
     }
+
+
+    /// <summary>
+    ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Shortcut"/>. The default is
+    ///     <see cref="Orientation.Horizontal"/>, which is ideal for status bars and toolbars. If set to <see cref="Orientation.Vertical"/>,
+    ///     the Shortcut will be configured for vertical layout, which is ideal for menus.
+    /// </summary>
+    public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
     // When one of the subviews is "empty" we don't want to show it. So we
     // Use Add/Remove. We need to be careful to add them in the right order
@@ -122,7 +134,7 @@ public class Shortcut : View
     {
         RemoveAll ();
 
-        if (!string.IsNullOrEmpty (CommandView.Text))
+        if (CommandView.Visible)
         {
             Add (CommandView);
         }
@@ -161,7 +173,7 @@ public class Shortcut : View
             if (currentWidth < _minimumDimAutoWidth)
             {
                 int delta = _minimumDimAutoWidth.Value - currentWidth;
-                int maxHelpWidth = int.Max (0, HelpView.Text.GetColumns () + 2 - delta);
+                int maxHelpWidth = int.Max (0, HelpView.Text.GetColumns () + Margin.Thickness.Horizontal - delta);
 
                 switch (maxHelpWidth)
                 {
@@ -180,13 +192,14 @@ public class Shortcut : View
 
                     case 2:
                         // Scrunch just the right margin
-                        HelpView.Margin.Thickness = new (1, 0, 0, 0);
+                        var t = GetMarginThickness ();
+                        HelpView.Margin.Thickness = new (t.Right, t.Top, t.Left - 1, t.Bottom);
 
                         break;
 
                     default:
                         // Default margin
-                        HelpView.Margin.Thickness = new (1, 0, 1, 0);
+                        HelpView.Margin.Thickness = GetMarginThickness ();
 
                         break;
                 }
@@ -205,6 +218,18 @@ public class Shortcut : View
                 // Reset to default
                 SetHelpViewDefaultLayout ();
             }
+        }
+    }
+
+    private Thickness GetMarginThickness ()
+    {
+        if (Orientation == Orientation.Vertical)
+        {
+            return new Thickness (1, 0, 1, 0);
+        }
+        else
+        {
+            return new Thickness (1, 0, 1, 0);
         }
     }
 
@@ -339,18 +364,26 @@ public class Shortcut : View
 
             // TODO: Determine if it makes sense to allow the CommandView to be focusable.
             // Right now, we don't set CanFocus to false here.
-            _commandView.CanFocus = false;
+            //_commandView.CanFocus = true;
 
-            // Bar will set the width of all CommandViews to the width of the widest CommandViews.
-            _commandView.Width = Dim.Auto ();
-            _commandView.Height = Dim.Auto ();
+            //// Bar will set the width of all CommandViews to the width of the widest CommandViews.
+            ////if (_commandView.Width == Dim.Absolute(0))
+            //{
+            //    _commandView.Width = Dim.Auto ();
+            //}
+
+            ////if (_commandView.Height == Dim.Absolute (0))
+            //{
+            //    _commandView.Height = Dim.Auto ();
+            //}
+
             _commandView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
             _commandView.Y = 0; //Pos.Center ();
 
             _commandView.MouseClick += Shortcut_MouseClick;
             _commandView.Accept += CommandViewAccept;
 
-            _commandView.Margin.Thickness = new (1, 0, 1, 0);
+            _commandView.Margin.Thickness = GetMarginThickness ();
 
             _commandView.HotKeyChanged += (s, e) =>
                                           {
@@ -364,7 +397,6 @@ public class Shortcut : View
             _commandView.HotKeySpecifier = new ('_');
 
             Title = _commandView.Text;
-            _commandView.TextChanged += CommandViewTextChanged;
 
             SetHelpViewDefaultLayout ();
             SetKeyViewDefaultLayout ();
@@ -372,8 +404,6 @@ public class Shortcut : View
             UpdateKeyBinding ();
 
             return;
-
-            void CommandViewMouseEvent (object sender, MouseEventEventArgs e) { e.Handled = true; }
 
             void CommandViewTextChanged (object sender, StateEventArgs<string> e)
             {
@@ -417,11 +447,12 @@ public class Shortcut : View
 
     private void SetHelpViewDefaultLayout ()
     {
-        HelpView.Margin.Thickness = new (1, 0, 1, 0);
+        HelpView.Margin.Thickness = GetMarginThickness ();
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
         HelpView.Y = 0; //Pos.Center (),    
         HelpView.Width = Dim.Auto (DimAutoStyle.Text);
-        HelpView.Height = Dim.Height (CommandView);
+        HelpView.Height = CommandView?.IsAdded == true ? Dim.Height (CommandView) : 1;
+
         HelpView.Visible = true;
         HelpView.VerticalTextAlignment = Alignment.Center;
     }
@@ -537,12 +568,12 @@ public class Shortcut : View
 
     private void SetKeyViewDefaultLayout ()
     {
-        KeyView.Margin.Thickness = new (1, 0, 1, 0);
+        KeyView.Margin.Thickness = GetMarginThickness();
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
-
         //KeyView.Y = Pos.Center ();
         KeyView.Width = Dim.Auto (DimAutoStyle.Text, Dim.Func (GetMinimumKeyViewSize));
-        KeyView.Height = Dim.Height (CommandView);
+        KeyView.Height = CommandView?.IsAdded == true ? Dim.Height (CommandView) : 1;
+
         KeyView.Visible = true;
 
         // Right align the text in the keyview
@@ -582,6 +613,7 @@ public class Shortcut : View
         switch (KeyBindingScope)
         {
             case KeyBindingScope.Application:
+                handled = false;
                 break;
 
             case KeyBindingScope.Focused:
@@ -663,17 +695,8 @@ public class Shortcut : View
     /// <inheritdoc/>
     public override bool OnLeave (View view)
     {
+        // Reset the color scheme (to SuperView).
         ColorScheme = null;
-
-        return base.OnLeave (view);
-        if (SuperView is { })
-        {
-            ColorScheme = new (SuperView?.ColorScheme)
-            {
-                Normal = SuperView.ColorScheme.Normal,
-                HotNormal = SuperView.ColorScheme.HotNormal
-            };
-        }
 
         return base.OnLeave (view);
     }
