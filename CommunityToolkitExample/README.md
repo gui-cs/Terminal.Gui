@@ -9,14 +9,10 @@ Right away we use IoC to load our views and view models.
 ``` csharp
 // As a public property for access further in the application if needed. 
 public static IServiceProvider Services { get; private set; }
-
-. . .
-
+...
 // In Main
 Services = ConfigureServices ();
-
-. . .
-
+...
 private static IServiceProvider ConfigureServices ()
 {
     var services = new ServiceCollection ();
@@ -41,13 +37,9 @@ internal partial class LoginView : IRecipient<Message<LoginAction>>
     {
         // Initialize our Receive method
         WeakReferenceMessenger.Default.Register (this);
-        
         ...
-
         ViewModel = viewModel;
-       
         ...
-
         passwordInput.TextChanged += (_, _) =>
                                      {
                                          ViewModel.Password = passwordInput.Text;
@@ -58,14 +50,11 @@ internal partial class LoginView : IRecipient<Message<LoginAction>>
                                   if (!ViewModel.CanLogin) { return; }
                                   ViewModel.LoginCommand.Execute (null);
                               };
-
         ...
-
+        // Let the view model know the view is intialized.
         Initialized += (_, _) => { ViewModel.Initialized (); };
     }
-
     ...
-
 }
 ```
 
@@ -76,22 +65,16 @@ Momentarily slipping over to the view model, all bindable properties use some fo
 internal partial class LoginViewModel : ObservableObject
 {
     ...
-
     [ObservableProperty]
     private bool _canLogin;
 
     private string _password;
-
     ...
-
     public LoginViewModel ()
     {
         ...
-
         Password = string.Empty;
-
-        ...
-        
+        ...   
         LoginCommand = new (Execute);
 
         Clear ();
@@ -100,9 +83,7 @@ internal partial class LoginViewModel : ObservableObject
 
         async void Execute () { await Login (); }
     }
-
     ...
-
     public RelayCommand LoginCommand { get; }
 
     public string Password
@@ -121,7 +102,6 @@ The use of `WeakReferenceMessenger` provides one method of signaling the view fr
 
 ``` csharp
 ...
-
 private async Task Login ()
 {
     SendMessage (LoginAction.LoginProgress, LOGGING_IN_PROGRESS_MESSAGE);
@@ -149,7 +129,6 @@ private void ValidateLogin ()
     CanLogin = !string.IsNullOrEmpty (Username) && !string.IsNullOrEmpty (Password);
     SendMessage (LoginAction.Validation);
 }
-
 ...
 ```
 
