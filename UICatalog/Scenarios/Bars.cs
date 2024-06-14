@@ -110,6 +110,7 @@ public class Bars : Scenario
             Y = 2,
             Orientation = Orientation.Vertical,
             StatusBarStyle = false,
+            BorderStyle = LineStyle.Rounded
         };
         bar.Add (shortcut1, shortcut2);
 
@@ -132,9 +133,9 @@ public class Bars : Scenario
         // BUGBUG: This should not be needed
         Application.Top.LayoutSubviews ();
 
-        //SetupMenuBar ();
+       // SetupMenuBar ();
         //SetupContentMenu ();
-        SetupStatusBar ();
+       // SetupStatusBar ();
 
         foreach (Bar barView in Application.Top.Subviews.Where (b => b is Bar)!)
         {
@@ -298,103 +299,111 @@ public class Bars : Scenario
         ((View)(sender)).LayoutSubviews ();
     }
 
-    //private void SetupMenuBar ()
-    //{
-    //    var menuBar = new Bar
-    //    {
-    //        Id = "menuBar",
+    private void SetupMenuBar ()
+    {
+        var menuBar = new Bar
+        {
+            Id = "menuBar",
+            Width = Dim.Fill (),
+            Height = 1,//Dim.Auto (DimAutoStyle.Content),
+            Orientation = Orientation.Horizontal,
+            StatusBarStyle = false,
+        };
 
-    //        X = 0,
-    //        Y = 0,
-    //        Width = Dim.Fill (),
-    //        Height = Dim.Auto (DimAutoStyle.Content),
-    //        StatusBarStyle = true
-    //    };
+        var fileMenuBarItem = new Shortcut
+        {
+            Title = "_File",
+            KeyBindingScope = KeyBindingScope.Application,
+            Key = Key.F.WithAlt,
+        };
+        fileMenuBarItem.KeyView.Visible = false;
+        
+        var editMenuBarItem = new Shortcut
+        {
+            Title = "_Edit",
 
-    //    var fileMenu = new Shortcut
-    //    {
-    //        Title = "_File",
-    //        Key = Key.F.WithAlt,
-    //        KeyBindingScope = KeyBindingScope.HotKey,
-    //        Command = Command.Accept,
-    //    };
-    //    fileMenu.HelpView.Visible = false;
-    //    fileMenu.KeyView.Visible = false;
+            KeyBindingScope = KeyBindingScope.HotKey,
+        };
 
-    //    fileMenu.Accept += (s, e) =>
-    //                       {
-    //                           fileMenu.SetFocus ();
+        editMenuBarItem.Accept += (s, e) => { };
+        //editMenu.HelpView.Visible = false;
+        //editMenu.KeyView.Visible = false;
 
-    //                           if (s is View view)
-    //                           {
-    //                               var menu = new Bar
-    //                               {
-    //                                   X = view.Frame.X + 1,
-    //                                   Y = view.Frame.Y + 1,
-    //                                   ColorScheme = view.ColorScheme,
-    //                                   Orientation = Orientation.Vertical,
-    //                                   StatusBarStyle = false,
-    //                                   BorderStyle = LineStyle.Dotted,
-    //                                   Width = Dim.Auto (DimAutoStyle.Content),
-    //                                   Height = Dim.Auto (DimAutoStyle.Content),
-    //                               };
+        menuBar.Add (fileMenuBarItem, editMenuBarItem);
+        menuBar.Initialized += Menu_Initialized;
+        Application.Top.Add (menuBar);
 
-    //                               menu.KeyBindings.Add (Key.Esc, Command.QuitToplevel);
+        var fileMenu = new Bar
+        {
+            X = 1,
+            Y = 1,
+            Orientation = Orientation.Vertical,
+            StatusBarStyle = false,
+            Modal = true,
+            Visible = false,
+        };
 
-    //                               var newMenu = new Shortcut
-    //                               {
-    //                                   Title = "_New...",
-    //                                   Text = "Create a new file",
-    //                                   Key = Key.N.WithCtrl
-    //                               };
+        var newShortcut = new Shortcut
+        {
+            Title = "_New...",
+            Text = "Create a new file",
+            Key = Key.N.WithCtrl
+        };
+        newShortcut.Border.Thickness = new Thickness (0, 1, 0, 0);
 
-    //                               var open = new Shortcut
-    //                               {
-    //                                   Title = "_Open...",
-    //                                   Text = "Show the File Open Dialog",
-    //                                   Key = Key.O.WithCtrl
-    //                               };
+        var openShortcut = new Shortcut
+        {
+            Title = "_Open...",
+            Text = "Show the File Open Dialog",
+            Key = Key.O.WithCtrl
+        };
 
-    //                               var save = new Shortcut
-    //                               {
-    //                                   Title = "_Save...",
-    //                                   Text = "Save",
-    //                                   Key = Key.S.WithCtrl
-    //                               };
+        var saveShortcut = new Shortcut
+        {
+            Title = "_Save...",
+            Text = "Save",
+            Key = Key.S.WithCtrl,
+            Enabled = false
+        };
 
-    //                               menu.Add (newMenu, open, save);
+        var exitShortcut = new Shortcut
+        {
+            Title = "E_xit",
+            Text = "Exit",
+            Key = Key.X.WithCtrl,
+        };
+        exitShortcut.Border.Thickness = new Thickness (0, 1, 0, 1);
 
-    //                               // BUGBUG: this is all bad
-    //                               menu.Initialized += Menu_Initialized;
-    //                               open.Initialized += Menu_Initialized;
-    //                               save.Initialized += Menu_Initialized;
-    //                               newMenu.Initialized += Menu_Initialized;
+        fileMenu.Add (newShortcut, openShortcut, saveShortcut, exitShortcut);
 
-    //                               Application.Run (menu);
-    //                               menu.Dispose ();
-    //                               Application.Refresh ();
-    //                           }
-    //                       };
+        View prevFocus = null;
+        fileMenuBarItem.Accept += (s, e) =>
+                              {
+                                  if (fileMenu.Visible)
+                                  {
+                                      fileMenu.RequestStop ();
+                                      prevFocus?.SetFocus ();
+                                      return;
+                                  }
 
-    //    var editMenu = new Shortcut
-    //    {
-    //        Title = "_Edit",
+                                  //fileMenu.Visible = !fileMenu.Visible;
+                                  var sender = s as Shortcut;
+                                  var screen = sender.FrameToScreen ();
+                                  fileMenu.X = screen.X;
+                                  fileMenu.Y = screen.Y + 1;
+                                  fileMenu.Visible = true;
+                                  prevFocus = Application.Top.Focused;
+                                  fileMenuBarItem.SetFocus ();
+                                  Application.Run (fileMenu);
+                                  fileMenu.Visible = false;
+                              };
 
-    //        //Key = Key.E.WithAlt,
-    //        KeyBindingScope = KeyBindingScope.HotKey,
-    //        Command = Command.Accept
-    //    };
+        Application.Top.Closed += (s, e) =>
+        {
+            fileMenu.Dispose ();
+        };
 
-    //    editMenu.Accept += (s, e) => { };
-    //    editMenu.HelpView.Visible = false;
-    //    editMenu.KeyView.Visible = false;
-
-    //    menuBar.Add (fileMenu, editMenu);
-
-    //    menuBar.Initialized += Menu_Initialized;
-
-    //    Application.Top.Add (menuBar);
-    //}
+    }
 
     private void SetupStatusBar ()
     {

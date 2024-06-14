@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Timers;
 using Terminal.Gui;
 
@@ -81,14 +82,14 @@ public class Shortcuts : Scenario
         vShortcut2.Accept += (o, args) =>
                             {
                                 // Cycle to next item. If at end, set 0
-                                if (((RadioGroup)vShortcut2.CommandView).SelectedItem < ((RadioGroup)vShortcut2.CommandView).RadioLabels.Length - 1)
-                                {
-                                    ((RadioGroup)vShortcut2.CommandView).SelectedItem++;
-                                }
-                                else
-                                {
-                                    ((RadioGroup)vShortcut2.CommandView).SelectedItem = 0;
-                                }
+                                //if (((RadioGroup)vShortcut2.CommandView).SelectedItem < ((RadioGroup)vShortcut2.CommandView).RadioLabels.Length - 1)
+                                //{
+                                //    ((RadioGroup)vShortcut2.CommandView).SelectedItem++;
+                                //}
+                                //else
+                                //{
+                                //    ((RadioGroup)vShortcut2.CommandView).SelectedItem = 0;
+                                //}
                             };
         vShortcut2.Border.Thickness = new (1, 1, 1, 1);
         Application.Top.Add (vShortcut2);
@@ -99,7 +100,7 @@ public class Shortcuts : Scenario
             X = 0,
             Y = Pos.Bottom (vShortcut2),
             CommandView = new CheckBox { Text = "_Align" },
-            Key = Key.F3,
+            Key = Key.F5.WithCtrl.WithAlt.WithShift,
             HelpText = "Width is Fill",
             Width = Dim.Fill () - Dim.Width (eventLog),
             KeyBindingScope = KeyBindingScope.HotKey,
@@ -161,7 +162,7 @@ public class Shortcuts : Scenario
             Y = Pos.Bottom (vShortcut4),
             Width = Dim.Width (vShortcut4),
 
-            Key = Key.F5.WithCtrl.WithAlt.WithShift,
+            Key = Key.F4,
             HelpText = "CommandView.CanFocus",
             KeyBindingScope = KeyBindingScope.HotKey,
             BorderStyle = LineStyle.Rounded,
@@ -178,8 +179,11 @@ public class Shortcuts : Scenario
 
                                                              foreach (Shortcut peer in Application.Top.Subviews.Where (v => v is Shortcut)!)
                                                              {
-                                                                 peer.CanFocus = e.NewValue == true;
-                                                                 peer.CommandView.CanFocus = e.NewValue == true;
+                                                                 if (peer.CanFocus)
+                                                                 {
+                                                                     peer.CommandView.CanFocus = e.NewValue == true;
+                                                                     peer.SetColorScheme ();
+                                                                 }
                                                              }
                                                          }
                                                      };
@@ -224,13 +228,14 @@ public class Shortcuts : Scenario
 
             Title = "_No Key",
             HelpText = "Keyless",
-            BorderStyle = LineStyle.Rounded
+            BorderStyle = LineStyle.Rounded,
         };
         vShortcut6.Border.Thickness = new (1, 1, 1, 1);
 
         Application.Top.Add (vShortcut6);
+        vShortcut6.SetFocus ();
 
-        ((CheckBox)vShortcut3.CommandView).OnToggled();
+        ((CheckBox)vShortcut3.CommandView).OnToggled ();
 
         // Horizontal
         var hShortcut1 = new Shortcut
@@ -303,7 +308,7 @@ public class Shortcuts : Scenario
 
         var hShortcutBG = new Shortcut
         {
-            X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1)-1,
+            X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1) - 1,
             Y = Pos.Top (hShortcut2),
             Key = Key.F9,
             HelpText = "BG Color",

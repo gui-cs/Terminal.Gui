@@ -1377,7 +1377,8 @@ public class Slider<T> : View
 
             SetNeedsDisplay ();
 
-            return true;
+            mouseEvent.Handled = true;
+            return OnMouseClick (new (mouseEvent));
         }
 
         return false;

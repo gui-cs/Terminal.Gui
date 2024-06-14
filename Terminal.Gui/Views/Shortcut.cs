@@ -45,8 +45,8 @@ public class Shortcut : View
     public Shortcut ()
     {
         Id = "_shortcut";
-        HighlightStyle = HighlightStyle.Pressed;
-        Highlight += Shortcut_Highlight;
+        //HighlightStyle = HighlightStyle.Pressed;
+        //Highlight += Shortcut_Highlight;
         CanFocus = true;
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
@@ -80,6 +80,7 @@ public class Shortcut : View
         KeyView.MouseClick += Shortcut_MouseClick;
 
         LayoutStarted += OnLayoutStarted;
+        DrawContent += Shortcut_DrawContent;
 
         Initialized += OnInitialized;
 
@@ -98,17 +99,7 @@ public class Shortcut : View
             _minimumDimAutoWidth = Frame.Width;
             Width = savedDim;
 
-            // Set KeyView's colors to show "hot"
-            if (ColorScheme != null)
-            {
-                var cs = new ColorScheme (ColorScheme)
-                {
-                    Normal = ColorScheme.HotNormal,
-                    HotNormal = ColorScheme.Normal
-                };
-
-                KeyView.ColorScheme = cs;
-            }
+            //SetColorScheme ();
         }
 
         // Helper to set Width consistently
@@ -117,6 +108,11 @@ public class Shortcut : View
             // TODO: PosAlign.CalculateMinDimension is a hack. Need to figure out a better way of doing this.
             return Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)));
         }
+    }
+
+    private void Shortcut_DrawContent (object sender, DrawEventArgs e)
+    {
+       //SetColorScheme();
     }
 
 
@@ -139,12 +135,12 @@ public class Shortcut : View
             Add (CommandView);
         }
 
-        if (!string.IsNullOrEmpty (HelpView.Text))
+        if (HelpView.Visible && !string.IsNullOrEmpty (HelpView.Text))
         {
             Add (HelpView);
         }
 
-        if (Key != Key.Empty)
+        if (KeyView.Visible && Key != Key.Empty)
         {
             Add (KeyView);
         }
@@ -273,8 +269,6 @@ public class Shortcut : View
         {
             CommandView.InvokeCommand (Command.Accept);
             e.Handled = true;
-
-            return;
         }
 
         if (!e.Handled)
@@ -568,7 +562,7 @@ public class Shortcut : View
 
     private void SetKeyViewDefaultLayout ()
     {
-        KeyView.Margin.Thickness = GetMarginThickness();
+        KeyView.Margin.Thickness = GetMarginThickness ();
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes.IgnoreFirstOrLast);
         //KeyView.Y = Pos.Center ();
         KeyView.Width = Dim.Auto (DimAutoStyle.Text, Dim.Func (GetMinimumKeyViewSize));
@@ -645,50 +639,69 @@ public class Shortcut : View
     /// <inheritdoc/>
     public override ColorScheme ColorScheme
     {
-        get
-        {
-            if (base.ColorScheme == null)
-            {
-                return SuperView?.ColorScheme ?? base.ColorScheme;
-            }
-
-            return base.ColorScheme;
-        }
+        get => base.ColorScheme;
         set
         {
             base.ColorScheme = value;
-
-            if (CommandView.CanFocus)
-            {
-                CommandView.ColorScheme = SuperView?.ColorScheme ?? ColorScheme;
-            }
-
-            if (ColorScheme != null)
-            {
-                var cs = new ColorScheme (ColorScheme)
-                {
-                    Normal = ColorScheme.HotNormal,
-                    HotNormal = ColorScheme.Normal
-                };
-                KeyView.ColorScheme = cs;
-            }
-
-            Border.ColorScheme = SuperView?.ColorScheme ?? ColorScheme;
+            SetColorScheme ();
         }
+    }
+
+    public void SetColorScheme ()
+    {
+        // Border should match superview.
+        Border.ColorScheme = SuperView?.ColorScheme;
+
+        if (HasFocus)
+        {
+            // When we have focus, we invert the SuperView's colors
+            base.ColorScheme = new (base.ColorScheme)
+            {
+                Normal = base.ColorScheme.Focus,
+                HotNormal = base.ColorScheme.HotFocus,
+                HotFocus = base.ColorScheme.HotNormal,
+                Focus = base.ColorScheme.Normal
+            };
+        }
+        else
+        {
+            base.ColorScheme = SuperView?.ColorScheme;
+        }
+
+        //// If the command view is focusable, invert the focus colors
+        if (CommandView.CanFocus)
+        {
+            ColorScheme commandViewCS = new (base.ColorScheme)
+            {
+                Normal = base.ColorScheme.Focus,
+                HotNormal = base.ColorScheme.HotFocus,
+                HotFocus = base.ColorScheme.HotNormal,
+                Focus = base.ColorScheme.Normal
+            };
+            CommandView.ColorScheme = commandViewCS;
+        }
+        else
+        {
+            CommandView.ColorScheme = base.ColorScheme;
+        }
+
+        //HelpView.ColorScheme = base.ColorScheme;
+
+        //// Set KeyView's colors to show "hot"
+        //var cs = new ColorScheme (ColorScheme)
+        //{
+        //    Normal = base.ColorScheme.HotNormal,
+        //    HotNormal = base.ColorScheme.Normal
+        //};
+
+        //KeyView.ColorScheme = cs;
+
     }
 
     /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
-        if (SuperView is { })
-        {
-            ColorScheme = new (SuperView?.ColorScheme)
-            {
-                Normal = SuperView.ColorScheme.Focus,
-                HotNormal = SuperView.ColorScheme.HotFocus
-            };
-        }
-
+        SetColorScheme ();
         return base.OnEnter (view);
     }
 
@@ -696,8 +709,8 @@ public class Shortcut : View
     public override bool OnLeave (View view)
     {
         // Reset the color scheme (to SuperView).
-        ColorScheme = null;
-
+        //ColorScheme = null;
+        SetColorScheme ();
         return base.OnLeave (view);
     }
 

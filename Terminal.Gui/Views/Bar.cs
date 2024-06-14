@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Microsoft.CodeAnalysis;
 
 namespace Terminal.Gui;
 
@@ -8,12 +9,33 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 /// </remarks>
-public class Bar : View
+public class Bar : Toplevel
 {
     /// <inheritdoc/>
     public Bar ()
     {
-        SetInitialProperties ();
+        CanFocus = true;
+
+        Width = Dim.Auto ();
+        Height = Dim.Auto ();
+
+        LayoutStarted += Bar_LayoutStarted;
+
+        Initialized += Bar_Initialized;
+
+    }
+
+    private void Bar_Initialized (object sender, EventArgs e)
+    {
+        ColorScheme = Colors.ColorSchemes ["Menu"];
+        AdjustSubviewBorders();
+    }
+
+    /// <inheritdoc />
+    public override void SetBorderStyle (LineStyle value)
+    {
+        // The default changes the thickness. We don't want that. We just set the style.
+        Border.LineStyle = value;
     }
 
     /// <summary>
@@ -31,46 +53,59 @@ public class Bar : View
             //view.AutoSize = true;
         }
 
-        //if (StatusBarStyle)
-        //{
-        //    // Light up right border
-        //    view.BorderStyle = LineStyle.Single;
-        //    view.Border.Thickness = new Thickness (0, 0, 1, 0);
-        //}
-
-        //if (view is not Shortcut)
-        //{
-        //    if (StatusBarStyle)
-        //    {
-        //        view.Padding.Thickness = new Thickness (0, 0, 1, 0);
-        //    }
-
-        //    view.Margin.Thickness = new Thickness (1, 0, 0, 0);
-        //}
-
-        //view.ColorScheme = ColorScheme;
-
-        // Add any HotKey keybindings to our bindings
-        //IEnumerable<KeyValuePair<Key, KeyBinding>> bindings = view.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.HotKey);
-
-        //foreach (KeyValuePair<Key, KeyBinding> binding in bindings)
-        //{
-        //    AddCommand (
-        //                binding.Value.Commands [0],
-        //                () =>
-        //                {
-        //                    if (view is Shortcut shortcut)
-        //                    {
-        //                        return shortcut.CommandView.InvokeCommands (binding.Value.Commands);
-        //                    }
-
-        //                    return false;
-        //                });
-        //    KeyBindings.Add (binding.Key, binding.Value);
-        //}
-
-
         base.Add (view);
+        AdjustSubviewBorders ();
+
+    }
+
+    /// <inheritdoc />
+    public override void Remove (View view)
+    {
+        base.Remove (view);
+        AdjustSubviewBorders ();
+    }
+
+    private void AdjustSubviewBorders ()
+    {
+        for (var index = 0; index < Subviews.Count; index++)
+        {
+            View barItem = Subviews [index];
+
+            barItem.Border.LineStyle = BorderStyle;
+            barItem.SuperViewRendersLineCanvas = true;
+            barItem.ColorScheme = ColorScheme;
+
+
+            if (!barItem.Visible)
+            {
+                continue;
+            }
+
+            if (StatusBarStyle)
+            {
+                if (index == 0)
+                {
+                    barItem.Border.Thickness = new Thickness (0, 0, 1, 0);
+                } 
+
+                if (index == Subviews.Count - 1)
+                {
+                    barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
+                }
+            }
+            else
+            {
+                if (index == 0)
+                {
+                    barItem.Border.Thickness = new Thickness (1, 1, 1, 0);
+                }
+
+                if (index == Subviews.Count - 1)
+                {
+                    barItem.Border.Thickness = new Thickness (1, 0, 1, 1);
+                }
+            }
+        }
     }
 
     private void Bar_LayoutStarted (object sender, LayoutEventArgs e)
@@ -89,7 +124,15 @@ public class Bar : View
                         continue;
                     }
 
-                    barItem.BorderStyle = LineStyle.Dashed;
+                    if (StatusBarStyle)
+                    {
+                        barItem.BorderStyle = LineStyle.Dashed;
+                    }
+                    else
+                    {
+                        barItem.BorderStyle = LineStyle.None;
+                    }
+
                     if (index == Subviews.Count - 1)
                     {
                         barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
@@ -99,7 +142,7 @@ public class Bar : View
                         barItem.Border.Thickness = new Thickness (0, 0, 1, 0);
                     }
 
-                    barItem.X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast);
+                    barItem.X = Pos.Align (Alignment.Start, StatusBarStyle ? AlignmentModes.IgnoreFirstOrLast : 0);
                     barItem.Y = Pos.Center ();
                     prevBarItem = barItem;
                 }
@@ -126,6 +169,7 @@ public class Bar : View
 
                 // Set the overall size of the Bar and arrange the views vertically
                 var maxBarItemWidth = 0;
+                var totalHeight = 0;
 
                 for (var index = 0; index < Subviews.Count; index++)
                 {
@@ -148,7 +192,7 @@ public class Bar : View
                     else
                     {
                         // Align the view to the bottom of the previous view
-                        barItem.Y = index;
+                        barItem.Y = Pos.Bottom(prevBarItem);
                     }
 
                     prevBarItem = barItem;
@@ -163,6 +207,7 @@ public class Bar : View
                     }
 
                     barItem.X = 0;
+                    totalHeight += barItem.Frame.Height;
                 }
 
                 foreach (Shortcut shortcut in shortcuts)
@@ -170,20 +215,11 @@ public class Bar : View
                     shortcut.Width = maxBarItemWidth;
                 }
 
-                Height = Subviews.Count;
+                Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: totalHeight);
 
                 break;
         }
     }
 
-    private void SetInitialProperties ()
-    {
-        ColorScheme = Colors.ColorSchemes ["Menu"];
-        CanFocus = true;
 
-        Width = Dim.Auto ();
-        Height = Dim.Auto ();
-
-        LayoutStarted += Bar_LayoutStarted;
-    }
 }
