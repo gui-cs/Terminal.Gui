@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
-using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
@@ -679,9 +678,15 @@ public static partial class Application
     public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
         where T : Toplevel, new ()
     {
+        if (!_initialized)
+        {
+            // Init() has NOT been called.
+            InternalInit (driver, null, true);
+        }
+
         var top = new T ();
 
-        Run (top, errorHandler, driver);
+        Run (top, errorHandler);
 
         return top;
     }
@@ -708,7 +713,10 @@ public static partial class Application
     ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
     ///         return control immediately.
     ///     </para>
-    ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
+    ///     <para>When using <see cref="Run{T}"/> or
+    ///         <see cref="Run(System.Func{System.Exception,bool},Terminal.Gui.ConsoleDriver)"/>
+    ///         <see cref="Init"/> will be called automatically.
+    ///     </para>
     ///     <para>
     ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
     ///         rethrown. Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
@@ -721,12 +729,7 @@ public static partial class Application
     ///     RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true,
     ///     rethrows when null).
     /// </param>
-    /// <param name="driver">
-    ///     The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the platform will
-    ///     be used ( <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
-    ///     <see langword="null"/> if <see cref="Init"/> was called.
-    /// </param>
-    public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
+    public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
     {
         ArgumentNullException.ThrowIfNull (view);
 
@@ -746,7 +749,9 @@ public static partial class Application
         else
         {
             // Init() has NOT been called.
-            InternalInit (driver, null, true);
+            throw new InvalidOperationException (
+                                                 "Init() has not been called. Only Run() or Run<T>() can be used without calling Init()."
+                                                );
         }
 
         var resume = true;
