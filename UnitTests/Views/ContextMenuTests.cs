@@ -133,10 +133,12 @@ public class ContextMenuTests (ITestOutputHelper output)
         var tf = new TextField { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 20, Text = "TextField" };
 
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                        [
                                            new StatusItem (KeyCode.F1, "~F1~ Help", null),
                                            new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
                                        ]
+#endif
                                       );
 
         var top = new Toplevel ();
@@ -200,11 +202,13 @@ public class ContextMenuTests (ITestOutputHelper output)
         win.Add (label, tf);
 
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                        new []
                                        {
                                            new StatusItem (KeyCode.F1, "~F1~ Help", null),
                                            new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
                                        }
+#endif
                                       );
 
         var top = new Toplevel ();

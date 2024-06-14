@@ -22,7 +22,7 @@ public class ConfigurationEditor : Scenario
     };
 
     private static Action _editorColorSchemeChanged;
-    private StatusItem _lenStatusItem;
+    private Shortcut _lenShortcut;
     private TileView _tileView;
 
     [SerializableConfigurationProperty (Scope = typeof (AppScope))]
@@ -48,21 +48,34 @@ public class ConfigurationEditor : Scenario
 
         top.Add (_tileView);
 
-        _lenStatusItem = new StatusItem (KeyCode.CharMask, "Len: ", null);
+        _lenShortcut = new Shortcut ()
+        {
+            Title = "Len: ",
+        };
 
-        var statusBar = new StatusBar (
-                                       new []
-                                       {
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} Quit",
-                                                () => Quit ()
-                                               ),
-                                           new (KeyCode.F5, "~F5~ Reload", () => Reload ()),
-                                           new (KeyCode.CtrlMask | KeyCode.S, "~^S~ Save", () => Save ()),
-                                           _lenStatusItem
-                                       }
-                                      );
+        var quitShortcut = new Shortcut ()
+        {
+            Key = Application.QuitKey,
+            Title = $"{Application.QuitKey} Quit",
+            AcceptAction = Quit
+        };
+
+        var reloadShortcut = new Shortcut ()
+        {
+            Key = KeyCode.F5,
+            Title = "Reload",
+            AcceptAction = Reload
+        };
+        var saveShortcut = new Shortcut ()
+        {
+            Key = Key.S.WithCtrl,
+            Title = "Save",
+            AcceptAction = Save
+        };
+
+
+        var statusBar = new StatusBar ();
+        statusBar.Add (quitShortcut, reloadShortcut, saveShortcut, _lenShortcut);
 
         top.Add (statusBar);
 
@@ -120,7 +133,7 @@ public class ConfigurationEditor : Scenario
 
             textView.Read ();
 
-            textView.Enter += (s, e) => { _lenStatusItem.Title = $"Len:{textView.Text.Length}"; };
+            textView.Enter += (s, e) => { _lenShortcut.Title = $"Len:{textView.Text.Length}"; };
         }
 
         Application.Top.LayoutSubviews ();

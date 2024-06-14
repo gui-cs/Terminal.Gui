@@ -1,7 +1,7 @@
 ﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
-
+#if V2_STATUSBAR
 public class StatusBarTests (ITestOutputHelper output)
 {
     [Fact]
@@ -16,7 +16,7 @@ public class StatusBarTests (ITestOutputHelper output)
                                 }
                                );
 
-        sb.AddItemAt (2, new (KeyCode.CtrlMask | KeyCode.Q, "~^C~ Close", null));
+        sb.AddShortcutAt (2, new (KeyCode.CtrlMask | KeyCode.Q, "~^C~ Close", null));
 
         Assert.Equal ("~^O~ Open", sb.Items [0].Title);
         Assert.Equal ("~^S~ Save", sb.Items [1].Title);
@@ -205,3 +205,4 @@ CTRL-O Open {
         Application.Shutdown ();
     }
 }
+#endif

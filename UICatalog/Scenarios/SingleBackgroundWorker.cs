@@ -62,6 +62,7 @@ public class SingleBackgroundWorker : Scenario
             Add (menu);
 
             var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                            new []
                                            {
                                                new StatusItem (
@@ -75,6 +76,7 @@ public class SingleBackgroundWorker : Scenario
                                                                () => RunWorker ()
                                                               )
                                            }
+#endif
                                           );
             Add (statusBar);
 
@@ -275,6 +277,7 @@ public class SingleBackgroundWorker : Scenario
             _top.Add (menu);
 
             var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                            new []
                                            {
                                                new StatusItem (
@@ -289,6 +292,7 @@ public class SingleBackgroundWorker : Scenario
                                                                }
                                                               )
                                            }
+#endif
                                           );
             _top.Add (statusBar);
 

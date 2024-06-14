@@ -29,8 +29,8 @@ public class InteractiveTree : Scenario
         _treeView.KeyDown += TreeView_KeyPress;
 
         Win.Add (_treeView);
-
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                        new StatusItem []
                                        {
                                            new (
@@ -54,6 +54,7 @@ public class InteractiveTree : Scenario
                                                 RenameNode
                                                )
                                        }
+#endif
                                       );
         Top.Add (statusBar);
     }

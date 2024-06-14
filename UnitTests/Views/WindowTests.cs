@@ -29,6 +29,7 @@ public class WindowTests
         top.Dispose ();
     }
 
+#if V2_STATUSBAR
     [Fact]
     [AutoInitShutdown]
     public void MenuBar_And_StatusBar_Inside_Window ()
@@ -122,6 +123,7 @@ public class WindowTests
                                                      );
         top.Dispose ();
     }
+#endif
 
     [Fact]
     public void New_Initializes ()
@@ -168,9 +170,9 @@ public class WindowTests
         Assert.Equal (0, windowWithFrameRectEmpty.Width);
         Assert.Equal (0, windowWithFrameRectEmpty.Height);
         Assert.False (windowWithFrameRectEmpty.IsCurrentTop);
-    #if DEBUG
+#if DEBUG
         Assert.Equal (windowWithFrameRectEmpty.Title, windowWithFrameRectEmpty.Id);
-    #endif
+#endif
         Assert.False (windowWithFrameRectEmpty.WantContinuousButtonPressed);
         Assert.False (windowWithFrameRectEmpty.WantMousePositionReports);
         Assert.Null (windowWithFrameRectEmpty.SuperView);
@@ -183,11 +185,11 @@ public class WindowTests
         windowWithFrame1234.Title = "title";
         Assert.Equal ("title", windowWithFrame1234.Title);
         Assert.NotNull (windowWithFrame1234);
-    #if DEBUG
+#if DEBUG
         Assert.Equal ($"Window(title){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
-    #else
+#else
         Assert.Equal ($"Window(){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
-    #endif
+#endif
         Assert.True (windowWithFrame1234.CanFocus);
         Assert.False (windowWithFrame1234.HasFocus);
         Assert.Equal (new (0, 0, 1, 2), windowWithFrame1234.Viewport);
@@ -199,9 +201,9 @@ public class WindowTests
         Assert.Equal (3, windowWithFrame1234.Width);
         Assert.Equal (4, windowWithFrame1234.Height);
         Assert.False (windowWithFrame1234.IsCurrentTop);
-    #if DEBUG
+#if DEBUG
         Assert.Equal (windowWithFrame1234.Title, windowWithFrame1234.Id);
-    #endif
+#endif
         Assert.False (windowWithFrame1234.WantContinuousButtonPressed);
         Assert.False (windowWithFrame1234.WantMousePositionReports);
         Assert.Null (windowWithFrame1234.SuperView);

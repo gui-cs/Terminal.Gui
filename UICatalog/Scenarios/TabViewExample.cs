@@ -172,6 +172,7 @@ public class TabViewExample : Scenario
         Win.Add (frameBelow);
 
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                        new StatusItem []
                                        {
                                            new (
@@ -180,6 +181,7 @@ public class TabViewExample : Scenario
                                                 Quit
                                                )
                                        }
+#endif
                                       );
         Top.Add (statusBar);
     }

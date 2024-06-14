@@ -88,7 +88,7 @@ public class BackgroundWorkerCollection : Scenario
             ;
             _menu.MenuOpening += Menu_MenuOpening;
             Add (_menu);
-
+#if V2_STATUSBAR
             var statusBar = new StatusBar (
                                            new []
                                            {
@@ -106,7 +106,7 @@ public class BackgroundWorkerCollection : Scenario
                                            }
                                           );
             Add (statusBar);
-
+#endif
             Ready += OverlappedMain_Ready;
             Activate += OverlappedMain_Activate;
             Deactivate += OverlappedMain_Deactivate;

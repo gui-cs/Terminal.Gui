@@ -63,6 +63,7 @@ public class UnicodeInMenu : Scenario
         Top.Add (menu);
 
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                        new StatusItem []
                                        {
                                            new (
@@ -73,6 +74,7 @@ public class UnicodeInMenu : Scenario
                                            new (KeyCode.Null, "~F2~ Создать", null),
                                            new (KeyCode.Null, "~F3~ Со_хранить", null)
                                        }
+#endif
                                       );
         Top.Add (statusBar);
 

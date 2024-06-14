@@ -1,10 +1,24 @@
 ﻿using System.ComponentModel;
+using System.Reflection.Metadata;
+using Terminal.Gui.Analyzers.Internal.Attributes;
 
 namespace Terminal.Gui;
 
 // TODO: I don't love the name Shortcut, but I can't think of a better one right now. Shortcut is a bit overloaded.
 // TODO: It can mean "Application-scoped key binding" or "A key binding that is displayed in a visual way".
 // TODO: I tried `BarItem` but that's not great either as it implies it can only be used in `Bar`s.
+
+[Flags]
+[GenerateEnumExtensionMethods (FastHasFlags = true)]
+public enum ShortcutStyles
+{
+    None = 0,
+
+    SeparatorBefore = 8,
+
+    SeparatorAfter = 16,
+}
+
 
 /// <summary>
 ///     Displays a command, help text, and a key binding. When the key is pressed, the command will be invoked. Useful for
@@ -80,7 +94,6 @@ public class Shortcut : View
         KeyView.MouseClick += Shortcut_MouseClick;
 
         LayoutStarted += OnLayoutStarted;
-        DrawContent += Shortcut_DrawContent;
 
         Initialized += OnInitialized;
 
@@ -110,18 +123,14 @@ public class Shortcut : View
         }
     }
 
-    private void Shortcut_DrawContent (object sender, DrawEventArgs e)
-    {
-       //SetColorScheme();
-    }
-
-
     /// <summary>
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Shortcut"/>. The default is
     ///     <see cref="Orientation.Horizontal"/>, which is ideal for status bars and toolbars. If set to <see cref="Orientation.Vertical"/>,
     ///     the Shortcut will be configured for vertical layout, which is ideal for menus.
     /// </summary>
     public Orientation Orientation { get; set; } = Orientation.Horizontal;
+
+    public ShortcutStyles ShortcutStyle { get; set; } = ShortcutStyles.None;
 
     // When one of the subviews is "empty" we don't want to show it. So we
     // Use Add/Remove. We need to be careful to add them in the right order
@@ -622,15 +631,25 @@ public class Shortcut : View
                 break;
         }
 
+        if (AcceptAction is null)
+        {
+            AcceptAction = () =>
+                           {
+                               var args = new HandledEventArgs ();
+                               Accept?.Invoke (this, args);
+                           };
+        }
+
         if (handled == false)
         {
-            var args = new HandledEventArgs ();
-            Accept?.Invoke (this, args);
-            handled = args.Handled;
+            AcceptAction.Invoke();
         }
 
         return true;
     }
+
+    [CanBeNull]
+    public Action AcceptAction { get; set; }
 
     #endregion Accept Handling
 

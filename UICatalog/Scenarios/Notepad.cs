@@ -11,7 +11,9 @@ namespace UICatalog.Scenarios;
 public class Notepad : Scenario
 {
     private TabView _focusedTabView;
+#if V2_STATUSBAR
     private StatusItem _lenStatusItem;
+#endif
     private int _numNewTabs = 1;
     private TabView _tabView;
 
@@ -66,7 +68,7 @@ public class Notepad : Scenario
         split.LineStyle = LineStyle.None;
 
         top.Add (split);
-
+#if V2_STATUSBAR
         _lenStatusItem = new (KeyCode.CharMask, "Len: ", null);
 
         var statusBar = new StatusBar (
@@ -87,11 +89,13 @@ public class Notepad : Scenario
                                            _lenStatusItem
                                        }
                                       );
+        top.Add (statusBar);
+#endif
+
         _focusedTabView = _tabView;
         _tabView.SelectedTabChanged += TabView_SelectedTabChanged;
         _tabView.Enter += (s, e) => _focusedTabView = _tabView;
 
-        top.Add (statusBar);
         top.Ready += (s, e) => New ();
 
         Application.Run (top);
@@ -323,7 +327,9 @@ public class Notepad : Scenario
 
     private void TabView_SelectedTabChanged (object sender, TabChangedEventArgs e)
     {
+#if V2_STATUSBAR
         _lenStatusItem.Title = $"Len:{e.NewTab?.View?.Text?.Length ?? 0}";
+#endif
         e.NewTab?.View?.SetFocus ();
     }
 

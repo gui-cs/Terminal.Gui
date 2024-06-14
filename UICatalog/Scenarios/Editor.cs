@@ -237,6 +237,7 @@ public class Editor : Scenario
         };
 
         _appWindow.Add (menu);
+#if V2_STATUSBAR
 
         var siCursorPosition = new StatusItem (KeyCode.Null, "", null);
 
@@ -266,6 +267,7 @@ public class Editor : Scenario
                                              };
 
         _appWindow.Add (statusBar);
+#endif
 
         _scrollBar = new (_textView, true);
 

@@ -375,7 +375,6 @@ internal class UICatalogApp
         public MenuItem? MiIsMenuBorderDisabled;
         public MenuItem? MiIsMouseDisabled;
         public MenuItem? MiUseSubMenusSingleFrame;
-        public new Bar StatusBar;
         public Shortcut? ShForce16Colors;
         //public Shortcut? ShDiagnostics;
         public Shortcut? ShVersion;
@@ -458,10 +457,6 @@ internal class UICatalogApp
             StatusBar = new ()
             {
                 Visible = ShowStatusBar,
-                Orientation = Orientation.Horizontal,
-                Y = Pos.AnchorEnd (),
-                Width = Dim.Fill (),
-                CanFocus = false,
             };
 
             Shortcut statusBarShortcut = new Shortcut ()

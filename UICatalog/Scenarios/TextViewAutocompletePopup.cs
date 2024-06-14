@@ -13,8 +13,10 @@ public class TextViewAutocompletePopup : Scenario
     private int _height = 10;
     private MenuItem _miMultiline;
     private MenuItem _miWrap;
+#if V2_STATUSBAR
     private StatusItem _siMultiline;
     private StatusItem _siWrap;
+#endif
     private TextView _textViewBottomLeft;
     private TextView _textViewBottomRight;
     private TextView _textViewCentered;
@@ -94,6 +96,7 @@ public class TextViewAutocompletePopup : Scenario
         _miWrap.Checked = _textViewTopLeft.WordWrap;
 
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                        new []
                                        {
                                            new (
@@ -104,6 +107,7 @@ public class TextViewAutocompletePopup : Scenario
                                            _siMultiline = new StatusItem (KeyCode.Null, "", null),
                                            _siWrap = new StatusItem (KeyCode.Null, "", null)
                                        }
+#endif
                                       );
         Top.Add (statusBar);
 
@@ -132,8 +136,19 @@ public class TextViewAutocompletePopup : Scenario
                                                                                                 .ToList ();
     }
 
-    private void SetMultilineStatusText () { _siMultiline.Title = $"Multiline: {_miMultiline.Checked}"; }
-    private void SetWrapStatusText () { _siWrap.Title = $"WordWrap: {_miWrap.Checked}"; }
+    private void SetMultilineStatusText ()
+    {
+#if V2_STATUSBAR
+        _siMultiline.Title = $"Multiline: {_miMultiline.Checked}";
+#endif
+    }
+
+    private void SetWrapStatusText ()
+    {
+#if V2_STATUSBAR
+        _siWrap.Title = $"WordWrap: {_miWrap.Checked}";
+#endif
+    }
     private void TextViewBottomLeft_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewBottomLeft); }
     private void TextViewBottomRight_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewBottomRight); }
     private void TextViewCentered_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewCentered); }

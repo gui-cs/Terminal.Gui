@@ -339,7 +339,7 @@ public class Bars : Scenario
             Y = 1,
             Orientation = Orientation.Vertical,
             StatusBarStyle = false,
-            Modal = true,
+           // Modal = true,
             Visible = false,
         };
 
@@ -381,7 +381,7 @@ public class Bars : Scenario
                               {
                                   if (fileMenu.Visible)
                                   {
-                                      fileMenu.RequestStop ();
+                                     // fileMenu.RequestStop ();
                                       prevFocus?.SetFocus ();
                                       return;
                                   }
@@ -394,7 +394,7 @@ public class Bars : Scenario
                                   fileMenu.Visible = true;
                                   prevFocus = Application.Top.Focused;
                                   fileMenuBarItem.SetFocus ();
-                                  Application.Run (fileMenu);
+                                  //Application.Run (fileMenu);
                                   fileMenu.Visible = false;
                               };
 

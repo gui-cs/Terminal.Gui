@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 /// </remarks>
-public class Bar : Toplevel
+public class Bar : View
 {
     /// <inheritdoc/>
     public Bar ()
@@ -44,15 +44,12 @@ public class Bar : Toplevel
     /// </summary>
     public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
+
+
     public bool StatusBarStyle { get; set; } = true;
 
     public override void Add (View view)
     {
-        if (Orientation == Orientation.Horizontal)
-        {
-            //view.AutoSize = true;
-        }
-
         base.Add (view);
         AdjustSubviewBorders ();
 

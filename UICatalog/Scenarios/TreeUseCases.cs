@@ -50,6 +50,7 @@ public class TreeUseCases : Scenario
         Top.Add (menu);
 
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                        new StatusItem []
                                        {
                                            new (
@@ -58,6 +59,7 @@ public class TreeUseCases : Scenario
                                                 () => Quit ()
                                                )
                                        }
+#endif
                                       );
 
         Top.Add (statusBar);

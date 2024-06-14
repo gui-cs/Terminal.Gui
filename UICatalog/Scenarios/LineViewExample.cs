@@ -73,6 +73,7 @@ public class LineViewExample : Scenario
         Win.Add (verticalArrow);
 
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                        new StatusItem []
                                        {
                                            new (
@@ -81,6 +82,7 @@ public class LineViewExample : Scenario
                                                 () => Quit ()
                                                )
                                        }
+#endif
                                       );
         Top.Add (statusBar);
     }

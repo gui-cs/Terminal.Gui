@@ -173,6 +173,7 @@ public class SyntaxHighlighting : Scenario
         Win.Add (_textView);
 
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                        new StatusItem []
                                        {
                                            new (
@@ -181,6 +182,7 @@ public class SyntaxHighlighting : Scenario
                                                 () => Quit ()
                                                )
                                        }
+#endif
                                       );
 
         Top.Add (statusBar);

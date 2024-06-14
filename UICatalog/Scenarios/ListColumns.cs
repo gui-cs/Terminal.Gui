@@ -212,6 +212,7 @@ public class ListColumns : Scenario
         Top.Add (menu);
 
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                        new StatusItem []
                                        {
                                            new (
@@ -235,6 +236,7 @@ public class ListColumns : Scenario
                                                 () => Quit ()
                                                )
                                        }
+#endif
                                       );
         Top.Add (statusBar);
 

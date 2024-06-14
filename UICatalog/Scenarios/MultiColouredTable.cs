@@ -32,6 +32,8 @@ public class MultiColouredTable : Scenario
         Top.Add (menu);
 
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
+
                                        new StatusItem []
                                        {
                                            new (
@@ -40,6 +42,7 @@ public class MultiColouredTable : Scenario
                                                 () => Quit ()
                                                )
                                        }
+#endif
                                       );
         Top.Add (statusBar);
 

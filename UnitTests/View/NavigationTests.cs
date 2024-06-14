@@ -620,6 +620,7 @@ public class NavigationTests (ITestOutputHelper output)
         top1.Dispose ();
     }
 
+#if V2_STATUSBAR
     [Fact]
     [AutoInitShutdown]
     public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
@@ -747,6 +748,7 @@ public class NavigationTests (ITestOutputHelper output)
 #endif
         top.Dispose ();
     }
+#endif
 
     [Fact]
     [SetupFakeDriver]

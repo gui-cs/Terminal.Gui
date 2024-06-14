@@ -165,6 +165,7 @@ public class GraphViewExample : Scenario
         Win.Add (frameRight);
 
         var statusBar = new StatusBar (
+#if V2_STATUSBAR
                                        new StatusItem []
                                        {
                                            new (
@@ -178,6 +179,7 @@ public class GraphViewExample : Scenario
                                                 () => _graphs [_currentGraph++ % _graphs.Length] ()
                                                )
                                        }
+#endif
                                       );
         Top.Add (statusBar);
     }

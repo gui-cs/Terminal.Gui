@@ -16,8 +16,10 @@ public class HexEditor : Scenario
     private HexView _hexView;
     private MenuItem _miAllowEdits;
     private bool _saved = true;
+#if V2_STATUSBAR
     private StatusItem _siPositionChanged;
     private StatusBar _statusBar;
+#endif
 
     public override void Setup ()
     {
@@ -75,7 +77,7 @@ public class HexEditor : Scenario
             ]
         };
         Top.Add (menu);
-
+#if V2_STATUSBAR
         _statusBar = new StatusBar (
                                     new []
                                     {
@@ -102,12 +104,14 @@ public class HexEditor : Scenario
                                     }
                                    );
         Top.Add (_statusBar);
+#endif
     }
 
     private void _hexView_Edited (object sender, HexViewEditEventArgs e) { _saved = false; }
 
     private void _hexView_PositionChanged (object sender, HexViewEventArgs obj)
     {
+#if V2_STATUSBAR
         _siPositionChanged.Title =
             $"Position: {
                 obj.Position
@@ -119,6 +123,7 @@ public class HexEditor : Scenario
                 obj.BytesPerLine
             }";
         _statusBar.SetNeedsDisplay ();
+#endif
     }
 
     private void Copy () { MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok"); }
