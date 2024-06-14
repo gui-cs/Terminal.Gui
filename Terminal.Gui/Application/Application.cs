@@ -686,7 +686,7 @@ public static partial class Application
 
         var top = new T ();
 
-        Run (top, errorHandler, driver);
+        Run (top, errorHandler);
 
         return top;
     }
@@ -729,12 +729,7 @@ public static partial class Application
     ///     RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true,
     ///     rethrows when null).
     /// </param>
-    /// <param name="driver">
-    ///     The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the platform will
-    ///     be used ( <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
-    ///     <see langword="null"/> if <see cref="Init"/> was called.
-    /// </param>
-    public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
+    public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
     {
         ArgumentNullException.ThrowIfNull (view);
 

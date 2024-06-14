@@ -962,7 +962,7 @@ public class ApplicationTests
 
         Assert.Null (Application.Top);
 
-        Assert.Throws<InvalidOperationException> (() => Application.Run (new (), null, driver));
+        Assert.Throws<InvalidOperationException> (() => Application.Run (new Toplevel ()));
 
         Application.Init (driver);
         Application.Iteration += (s, e) =>
@@ -970,7 +970,7 @@ public class ApplicationTests
                                      Assert.NotNull (Application.Top);
                                      Application.RequestStop ();
                                  };
-        Application.Run (new (), null, driver);
+        Application.Run (new Toplevel ());
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Top.WasDisposed);
         Exception exception = Record.Exception (Application.Shutdown);
