@@ -343,7 +343,8 @@ public static class EscSeqUtils
     ///     <see cref="CSI_SendDeviceAttributes2"/>.
     /// </param>
     /// <param name="value">The value.</param>
-    /// <param name="mod">The <see cref="ConsoleModifiers"/> which may changes.</param>
+    /// <param name="mod">The <see cref="ConsoleModifiers"/> which may change.</param>
+    /// <param name="keyChar">Normally is '\0' but on some cases may need other value.</param>
     /// <returns>The <see cref="ConsoleKey"/> and probably the <see cref="ConsoleModifiers"/>.</returns>
     public static ConsoleKey GetConsoleKey (char terminator, string? value, ref ConsoleModifiers mod, ref char keyChar)
     {
