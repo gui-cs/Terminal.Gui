@@ -195,6 +195,7 @@ public static class EscSeqUtils
         buttonState = new List<MouseFlags> { 0 };
         pos = default (Point);
         isResponse = false;
+        char keyChar = '\0';
 
         switch (c1Control)
         {
@@ -242,10 +243,10 @@ public static class EscSeqUtils
 
                 break;
             case "SS3":
-                key = GetConsoleKey (terminator [0], values [0], ref mod);
+                key = GetConsoleKey (terminator [0], values [0], ref mod, ref keyChar);
 
                 newConsoleKeyInfo = new ConsoleKeyInfo (
-                                                        '\0',
+                                                        keyChar,
                                                         key,
                                                         (mod & ConsoleModifiers.Shift) != 0,
                                                         (mod & ConsoleModifiers.Alt) != 0,
@@ -271,7 +272,7 @@ public static class EscSeqUtils
 
                 if (!string.IsNullOrEmpty (terminator))
                 {
-                    key = GetConsoleKey (terminator [0], values [0], ref mod);
+                    key = GetConsoleKey (terminator [0], values [0], ref mod, ref keyChar);
 
                     if (key != 0 && values.Length > 1)
                     {
@@ -279,7 +280,7 @@ public static class EscSeqUtils
                     }
 
                     newConsoleKeyInfo = new ConsoleKeyInfo (
-                                                            '\0',
+                                                            keyChar,
                                                             key,
                                                             (mod & ConsoleModifiers.Shift) != 0,
                                                             (mod & ConsoleModifiers.Alt) != 0,
@@ -344,11 +345,21 @@ public static class EscSeqUtils
     /// <param name="value">The value.</param>
     /// <param name="mod">The <see cref="ConsoleModifiers"/> which may changes.</param>
     /// <returns>The <see cref="ConsoleKey"/> and probably the <see cref="ConsoleModifiers"/>.</returns>
-    public static ConsoleKey GetConsoleKey (char terminator, string? value, ref ConsoleModifiers mod)
+    public static ConsoleKey GetConsoleKey (char terminator, string? value, ref ConsoleModifiers mod, ref char keyChar)
     {
         if (terminator == 'Z')
         {
             mod |= ConsoleModifiers.Shift;
+        }
+
+        if (terminator == 'l')
+        {
+            keyChar = '+';
+        }
+
+        if (terminator == 'm')
+        {
+            keyChar = '-';
         }
 
         return (terminator, value) switch
@@ -376,6 +387,18 @@ public static class EscSeqUtils
                    ('~', "21") => ConsoleKey.F10,
                    ('~', "23") => ConsoleKey.F11,
                    ('~', "24") => ConsoleKey.F12,
+                   ('l', _) => ConsoleKey.Add,
+                   ('m', _) => ConsoleKey.Subtract,
+                   ('p', _) => ConsoleKey.Insert,
+                   ('q', _) => ConsoleKey.End,
+                   ('r', _) => ConsoleKey.DownArrow,
+                   ('s', _) => ConsoleKey.PageDown,
+                   ('t', _) => ConsoleKey.LeftArrow,
+                   ('u', _) => ConsoleKey.Clear,
+                   ('v', _) => ConsoleKey.RightArrow,
+                   ('w', _) => ConsoleKey.Home,
+                   ('x', _) => ConsoleKey.UpArrow,
+                   ('y', _) => ConsoleKey.PageUp,
                    (_, _) => 0
                };
     }

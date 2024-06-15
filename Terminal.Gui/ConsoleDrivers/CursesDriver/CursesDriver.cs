@@ -515,9 +515,10 @@ internal class CursesDriver : ConsoleDriver
             {
                 // The ESC-number handling, debatable.
                 // Simulates the AltMask itself by pressing Alt + Space.
+                // Needed for macOS
                 if (wch2 == (int)KeyCode.Space)
                 {
-                    k = KeyCode.AltMask;
+                    k = KeyCode.AltMask | KeyCode.Space;
                 }
                 else if (wch2 - (int)KeyCode.Space >= (uint)KeyCode.A
                          && wch2 - (int)KeyCode.Space <= (uint)KeyCode.Z)
@@ -532,41 +533,51 @@ internal class CursesDriver : ConsoleDriver
                 {
                     k = (KeyCode)((uint)KeyCode.AltMask + (uint)KeyCode.D0 + (wch2 - (uint)KeyCode.D0));
                 }
-                else if (wch2 == Curses.KeyCSI)
+                else
                 {
                     ConsoleKeyInfo [] cki =
-                    {
-                        new ((char)KeyCode.Esc, 0, false, false, false), new ('[', 0, false, false, false)
-                    };
+                    [
+                        new ((char)KeyCode.Esc, 0, false, false, false), new ((char)wch2, 0, false, false, false)
+                    ];
                     HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
 
                     return;
                 }
-                else
-                {
-                    // Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
-                    if (((KeyCode)wch2 & KeyCode.CtrlMask) != 0)
-                    {
-                        k = (KeyCode)((uint)KeyCode.CtrlMask + (wch2 & ~(int)KeyCode.CtrlMask));
-                    }
+                //else if (wch2 == Curses.KeyCSI)
+                //{
+                //    ConsoleKeyInfo [] cki =
+                //    {
+                //        new ((char)KeyCode.Esc, 0, false, false, false), new ('[', 0, false, false, false)
+                //    };
+                //    HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
 
-                    if (wch2 == 0)
-                    {
-                        k = KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Space;
-                    }
-                    else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z)
-                    {
-                        k = KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.Space;
-                    }
-                    else if (wch2 < 256)
-                    {
-                        k = (KeyCode)wch2; // | KeyCode.AltMask;
-                    }
-                    else
-                    {
-                        k = (KeyCode)((uint)(KeyCode.AltMask | KeyCode.CtrlMask) + wch2);
-                    }
-                }
+                //    return;
+                //}
+                //else
+                //{
+                //    // Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
+                //    if (((KeyCode)wch2 & KeyCode.CtrlMask) != 0)
+                //    {
+                //        k = (KeyCode)((uint)KeyCode.CtrlMask + (wch2 & ~(int)KeyCode.CtrlMask));
+                //    }
+
+                //    if (wch2 == 0)
+                //    {
+                //        k = KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Space;
+                //    }
+                //    //else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z)
+                //    //{
+                //    //    k = KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.Space;
+                //    //}
+                //    else if (wch2 < 256)
+                //    {
+                //        k = (KeyCode)wch2; // | KeyCode.AltMask;
+                //    }
+                //    else
+                //    {
+                //        k = (KeyCode)((uint)(KeyCode.AltMask | KeyCode.CtrlMask) + wch2);
+                //    }
+                //}
 
                 key = new Key (k);
             }
@@ -581,6 +592,13 @@ internal class CursesDriver : ConsoleDriver
         else if (wch == Curses.KeyTab)
         {
             k = MapCursesKey (wch);
+            OnKeyDown (new Key (k));
+            OnKeyUp (new Key (k));
+        }
+        else if (wch == 127)
+        {
+            // Backspace needed for macOS
+            k = KeyCode.Backspace;
             OnKeyDown (new Key (k));
             OnKeyUp (new Key (k));
         }
@@ -611,7 +629,8 @@ internal class CursesDriver : ConsoleDriver
             }
 
             // Strip the KeyCode.Space flag off if it's set
-            if (k != KeyCode.Space && k.HasFlag (KeyCode.Space))
+            //if (k != KeyCode.Space && k.HasFlag (KeyCode.Space))
+            if (Key.GetIsKeyCodeAtoZ (k) && (k & KeyCode.Space) != 0)
             {
                 k &= ~KeyCode.Space;
             }

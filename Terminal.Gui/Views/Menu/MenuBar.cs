@@ -136,6 +136,8 @@ public class MenuBar : View
 
         // TODO: Why do we have two keybindings for opening the menu? Ctrl-Space and Key?
         KeyBindings.Add (Key.Space.WithCtrl, keyBinding);
+        // This is needed for macOS because Key.Space.WithCtrl doesn't work
+        KeyBindings.Add (Key.Space.WithAlt, keyBinding);
 
         // TODO: Figure out how to make Alt work (on Windows)
         //KeyBindings.Add (Key.WithAlt, keyBinding);
