@@ -1,21 +1,22 @@
-using System;
-using System.Linq;
-using System.Reflection;
-using Microsoft.CodeAnalysis;
-
 namespace Terminal.Gui;
 
 /// <summary>
-///     Provides a horizontally or vertically oriented container for other views to be used as a menu, toolbar, or status bar.
+///     Provides a horizontally or vertically oriented container for <see cref="Shortcut"/>s to be used as a menu, toolbar, or status
+///     bar.
 /// </summary>
 /// <remarks>
+///     <para>
+///         Any <see cref="View"/> can be added to a <see cref="Bar"/>. However, the <see cref="Bar"/> is designed to work with
+///         <see cref="Shortcut"/> objects. The <see cref="Shortcut"/> class provides a way to display a command, help, and key and
+///         align them in a specific order.
+///     </para>
 /// </remarks>
 public class Bar : View
 {
     /// <inheritdoc/>
     public Bar () : this ([]) { }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Bar (IEnumerable<Shortcut> shortcuts)
     {
         CanFocus = true;
@@ -37,13 +38,9 @@ public class Bar : View
         }
     }
 
-    private void Bar_Initialized (object sender, EventArgs e)
-    {
-        ColorScheme = Colors.ColorSchemes ["Menu"];
-        AdjustSubviews ();
-    }
+    private void Bar_Initialized (object sender, EventArgs e) { ColorScheme = Colors.ColorSchemes ["Menu"]; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void SetBorderStyle (LineStyle value)
     {
         // The default changes the thickness. We don't want that. We just set the style.
@@ -56,6 +53,12 @@ public class Bar : View
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Bar"/>. The default is
     ///     <see cref="Orientation.Horizontal"/>.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Horizontal orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from right to left
+    ///         Vertical orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from left to right.
+    ///     </para>
+    /// </remarks>
     public Orientation Orientation
     {
         get => _orientation;
@@ -69,7 +72,8 @@ public class Bar : View
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd;
 
     /// <summary>
-    ///      Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Bar"/>. The default is <see cref="AlignmentModes.StartToEnd"/>.
+    ///     Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Bar"/>. The default is
+    ///     <see cref="AlignmentModes.StartToEnd"/>.
     /// </summary>
     public AlignmentModes AlignmentModes
     {
@@ -81,24 +85,6 @@ public class Bar : View
         }
     }
 
-    public override View Add (View view)
-    {
-        base.Add (view);
-        AdjustSubviews ();
-
-        return view;
-    }
-
-    /// <inheritdoc />
-    public override View Remove (View view)
-    {
-        base.Remove (view);
-        AdjustSubviews ();
-
-        return view;
-    }
-
-
     /// <summary>Inserts a <see cref="Shortcut"/> in the specified index of <see cref="Items"/>.</summary>
     /// <param name="index">The zero-based index at which item should be inserted.</param>
     /// <param name="item">The item to insert.</param>
@@ -107,14 +93,17 @@ public class Bar : View
         List<View> savedSubViewList = Subviews.ToList ();
         int count = savedSubViewList.Count;
         RemoveAll ();
-        for (int i = 0; i < count; i++)
+
+        for (var i = 0; i < count; i++)
         {
             if (i == index)
             {
                 Add (item);
             }
+
             Add (savedSubViewList [i]);
         }
+
         SetNeedsDisplay ();
     }
 
@@ -124,7 +113,8 @@ public class Bar : View
     public Shortcut RemoveShortcut (int index)
     {
         View toRemove = null;
-        for (int i = 0; i < Subviews.Count; i++)
+
+        for (var i = 0; i < Subviews.Count; i++)
         {
             if (i == index)
             {
@@ -141,34 +131,6 @@ public class Bar : View
         return toRemove as Shortcut;
     }
 
-    private void AdjustSubviews ()
-    {
-        for (var index = 0; index < Subviews.Count; index++)
-        {
-            View barItem = Subviews [index];
-
-            //barItem.Border.LineStyle = BorderStyle;
-            //barItem.SuperViewRendersLineCanvas = true;
-            //barItem.ColorScheme = ColorScheme;
-
-            //if (!barItem.Visible)
-            //{
-            //    continue;
-            //}
-
-            //barItem.BorderStyle = LineStyle.None;
-            //if (index == 0)
-            //{
-            //    barItem.Border.Thickness = new Thickness (1, 1, 1, 0);
-            //}
-
-            //if (index == Subviews.Count - 1)
-            //{
-            //    barItem.Border.Thickness = new Thickness (1, 0, 1, 1);
-            //}
-        }
-    }
-
     private void Bar_LayoutStarted (object sender, LayoutEventArgs e)
     {
         View prevBarItem = null;
@@ -182,7 +144,7 @@ public class Bar : View
 
                     barItem.ColorScheme = ColorScheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
-                    barItem.Y = 0;//Pos.Center ();
+                    barItem.Y = 0; //Pos.Center ();
 
                     // HACK: This should not be needed
                     barItem.SetRelativeLayout (GetContentSize ());
@@ -195,9 +157,9 @@ public class Bar : View
                 // All CommandView's are the same width, all HelpView's are the same width,
                 // all KeyView's are the same width
 
-                int maxCommandWidth = 0;
-                int maxHelpWidth = 0;
-                int minKeyWidth = 0;
+                var maxCommandWidth = 0;
+                var maxHelpWidth = 0;
+                var minKeyWidth = 0;
 
                 List<Shortcut> shortcuts = Subviews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
 
@@ -256,11 +218,9 @@ public class Bar : View
                     shortcut.Width = maxBarItemWidth;
                 }
 
-                Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: totalHeight);
+                Height = Dim.Auto (DimAutoStyle.Content, totalHeight);
 
                 break;
         }
     }
-
-
 }
