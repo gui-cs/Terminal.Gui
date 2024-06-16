@@ -347,7 +347,6 @@ internal class UICatalogApp
         // 'app' closed cleanly.
         foreach (Responder? inst in Responder.Instances)
         {
-            
             Debug.Assert (inst.WasDisposed);
         }
 
