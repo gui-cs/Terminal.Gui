@@ -261,6 +261,8 @@ public class Shortcuts : Scenario
         hShortcut1.CommandView.Width = 10;
         hShortcut1.CommandView.Height = 1;
         hShortcut1.CommandView.CanFocus = false;
+        hShortcut1.AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
+
         Timer timer = new (10)
         {
             AutoReset = true,
@@ -297,11 +299,12 @@ public class Shortcuts : Scenario
             X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1),
             Y = Pos.Top (hShortcut1),
             Key = Key.F8,
-            HelpText = "Edit",
+            HelpText = "TextField",
             CanFocus = true,
-            BorderStyle = LineStyle.Dashed,
             CommandView = textField,
+            BorderStyle = LineStyle.Dashed,
         };
+        hShortcut2.AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
         hShortcut2.Border.Thickness = new (0, 0, 1, 0);
 
         Application.Top.Add (hShortcut2);
@@ -331,6 +334,7 @@ public class Shortcuts : Scenario
                                 };
         hShortcutBG.CommandView = bgColor;
         hShortcutBG.Border.Thickness = new (1, 0, 1, 0);
+        hShortcutBG.AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
 
         Application.Top.Add (hShortcutBG);
 
@@ -365,6 +369,9 @@ public class Shortcuts : Scenario
                                    };
             }
         }
+
+        ((CheckBox)vShortcut5.CommandView).OnToggled ();
+        ((CheckBox)vShortcut5.CommandView).OnToggled ();
     }
 
     private void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }

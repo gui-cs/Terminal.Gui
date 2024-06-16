@@ -9,60 +9,28 @@ namespace Terminal.Gui;
 /// </summary>
 public class StatusBar : Bar
 {
+    /// <inheritdoc />
+    public StatusBar () : this ([]) { }
 
-    public StatusBar ()
+    /// <inheritdoc />
+    public StatusBar (IEnumerable<Shortcut> shortcuts) : base (shortcuts)
     {
         Orientation = Orientation.Horizontal;
         Y = Pos.AnchorEnd ();
         Width = Dim.Fill ();
+        StatusBarStyle = true;
     }
 
     /// <inheritdoc />
     public override void Add (View view)
     {
         view.CanFocus = false;
+        if (view is Shortcut shortcut)
+        {
+            shortcut.KeyBindingScope = KeyBindingScope.Application;
+            shortcut.AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
+        }
         base.Add (view);
     }
 
-    /// <summary>Inserts a <see cref="Shortcut"/> in the specified index of <see cref="Items"/>.</summary>
-    /// <param name="index">The zero-based index at which item should be inserted.</param>
-    /// <param name="item">The item to insert.</param>
-    public void AddShortcutAt (int index, Shortcut item)
-    {
-        List<View> savedSubViewList = Subviews.ToList ();
-        int count = savedSubViewList.Count;
-        RemoveAll ();
-        for (int i = 0; i < count; i++)
-        {
-            if (i == index)
-            {
-                Add (item);
-            }
-            Add (savedSubViewList [i]);
-        }
-        SetNeedsDisplay ();
-    }
-
-    /// <summary>Removes a <see cref="Shortcut"/> at specified index of <see cref="Items"/>.</summary>
-    /// <param name="index">The zero-based index of the item to remove.</param>
-    /// <returns>The <see cref="Shortcut"/> removed.</returns>
-    public Shortcut RemoveItem (int index)
-    {
-        View toRemove = null;
-        for (int i = 0; i < Subviews.Count; i++)
-        {
-            if (i == index)
-            {
-                toRemove = Subviews [i];
-            }
-        }
-
-        if (toRemove is { })
-        {
-            Remove (toRemove);
-            SetNeedsDisplay ();
-        }
-
-        return toRemove as Shortcut;
-    }
 }

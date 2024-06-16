@@ -347,6 +347,7 @@ internal class UICatalogApp
         // 'app' closed cleanly.
         foreach (Responder? inst in Responder.Instances)
         {
+            
             Debug.Assert (inst.WasDisposed);
         }
 
@@ -457,14 +458,13 @@ internal class UICatalogApp
             StatusBar = new ()
             {
                 Visible = ShowStatusBar,
+                AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast
             };
 
             Shortcut statusBarShortcut = new Shortcut ()
             {
                 Key = Key.F10,
-                KeyBindingScope = KeyBindingScope.Application,
-                Title = "Status Bar",
-                CanFocus = false,
+                Title = "Show/Hide Status Bar",
             };
             statusBarShortcut.Accept += (sender, args) =>
                                         {
@@ -473,15 +473,13 @@ internal class UICatalogApp
 
             ShForce16Colors = new Shortcut ()
             {
-                Key = Key.F6,
-                KeyBindingScope = KeyBindingScope.Application,
-                CommandView = new CheckBox()
+                CommandView = new CheckBox ()
                 {
-                    Title ="16 Colors",
+                    Title = "16 color mode",
                     Checked = Application.Force16Colors,
                     CanFocus = false,
-                },
-                CanFocus = false,
+                }, HelpText = "",
+                Key = Key.F6,
             };
             ShForce16Colors.Accept += (sender, args) =>
                                             {
@@ -508,8 +506,6 @@ internal class UICatalogApp
                 {
                     Title = "Quit",
                     Key = Application.QuitKey,
-                    KeyBindingScope = KeyBindingScope.Application,
-                    CanFocus = false,
                 },
                 statusBarShortcut,
                 ShForce16Colors,
@@ -542,7 +538,7 @@ internal class UICatalogApp
                 X = Pos.Right (CategoryList) - 1,
                 Y = 1,
                 Width = Dim.Fill (),
-                Height = Dim.Height(CategoryList),
+                Height = Dim.Height (CategoryList),
 
                 //AllowsMarking = false,
                 CanFocus = true,

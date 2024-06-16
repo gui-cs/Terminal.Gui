@@ -12,7 +12,10 @@ namespace Terminal.Gui;
 public class Bar : View
 {
     /// <inheritdoc/>
-    public Bar ()
+    public Bar () : this ([]) { }
+
+    /// <inheritdoc />
+    public Bar (IEnumerable<Shortcut> shortcuts)
     {
         CanFocus = true;
 
@@ -23,12 +26,16 @@ public class Bar : View
 
         Initialized += Bar_Initialized;
 
+        foreach (Shortcut shortcut in shortcuts)
+        {
+            Add (shortcut);
+        }
     }
 
     private void Bar_Initialized (object sender, EventArgs e)
     {
         ColorScheme = Colors.ColorSchemes ["Menu"];
-        AdjustSubviewBorders();
+        AdjustSubviewBorders ();
     }
 
     /// <inheritdoc />
@@ -44,7 +51,10 @@ public class Bar : View
     /// </summary>
     public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
-
+    /// <summary>
+    ///      Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Bar"/>. The default is <see cref="AlignmentModes.StartToEnd"/>.
+    /// </summary>
+    public AlignmentModes AlignmentModes { get; set; } = AlignmentModes.StartToEnd;
 
     public bool StatusBarStyle { get; set; } = true;
 
@@ -52,7 +62,6 @@ public class Bar : View
     {
         base.Add (view);
         AdjustSubviewBorders ();
-
     }
 
     /// <inheritdoc />
@@ -60,6 +69,49 @@ public class Bar : View
     {
         base.Remove (view);
         AdjustSubviewBorders ();
+    }
+
+
+    /// <summary>Inserts a <see cref="Shortcut"/> in the specified index of <see cref="Items"/>.</summary>
+    /// <param name="index">The zero-based index at which item should be inserted.</param>
+    /// <param name="item">The item to insert.</param>
+    public void AddShortcutAt (int index, Shortcut item)
+    {
+        List<View> savedSubViewList = Subviews.ToList ();
+        int count = savedSubViewList.Count;
+        RemoveAll ();
+        for (int i = 0; i < count; i++)
+        {
+            if (i == index)
+            {
+                Add (item);
+            }
+            Add (savedSubViewList [i]);
+        }
+        SetNeedsDisplay ();
+    }
+
+    /// <summary>Removes a <see cref="Shortcut"/> at specified index of <see cref="Items"/>.</summary>
+    /// <param name="index">The zero-based index of the item to remove.</param>
+    /// <returns>The <see cref="Shortcut"/> removed.</returns>
+    public Shortcut RemoveShortcut (int index)
+    {
+        View toRemove = null;
+        for (int i = 0; i < Subviews.Count; i++)
+        {
+            if (i == index)
+            {
+                toRemove = Subviews [i];
+            }
+        }
+
+        if (toRemove is { })
+        {
+            Remove (toRemove);
+            SetNeedsDisplay ();
+        }
+
+        return toRemove as Shortcut;
     }
 
     private void AdjustSubviewBorders ()
@@ -72,7 +124,6 @@ public class Bar : View
             barItem.SuperViewRendersLineCanvas = true;
             barItem.ColorScheme = ColorScheme;
 
-
             if (!barItem.Visible)
             {
                 continue;
@@ -80,18 +131,20 @@ public class Bar : View
 
             if (StatusBarStyle)
             {
-                if (index == 0)
-                {
-                    barItem.Border.Thickness = new Thickness (0, 0, 1, 0);
-                } 
+                barItem.BorderStyle = LineStyle.Dashed;
 
                 if (index == Subviews.Count - 1)
                 {
                     barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
                 }
+                else
+                {
+                    barItem.Border.Thickness = new Thickness (0, 0, 1, 0);
+                }
             }
             else
             {
+                barItem.BorderStyle = LineStyle.None;
                 if (index == 0)
                 {
                     barItem.Border.Thickness = new Thickness (1, 1, 1, 0);
@@ -121,25 +174,33 @@ public class Bar : View
                         continue;
                     }
 
-                    if (StatusBarStyle)
+                    //if (StatusBarStyle)
+                    //{
+                    //    barItem.BorderStyle = LineStyle.Dashed;
+                    //}
+                    //else
+                    //{
+                    //    barItem.BorderStyle = LineStyle.None;
+                    //}
+
+                    //if (index == Subviews.Count - 1)
+                    //{
+                    //    barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
+                    //}
+                    //else
+                    //{
+                    //    barItem.Border.Thickness = new Thickness (0, 0, 1, 0);
+                    //}
+
+                    if (barItem is Shortcut shortcut)
                     {
-                        barItem.BorderStyle = LineStyle.Dashed;
+                        shortcut.X = Pos.Align (Alignment.Start, AlignmentModes);
                     }
                     else
                     {
-                        barItem.BorderStyle = LineStyle.None;
+                        barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     }
-
-                    if (index == Subviews.Count - 1)
-                    {
-                        barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
-                    }
-                    else
-                    {
-                        barItem.Border.Thickness = new Thickness (0, 0, 1, 0);
-                    }
-
-                    barItem.X = Pos.Align (Alignment.Start, StatusBarStyle ? AlignmentModes.IgnoreFirstOrLast : 0);
+                        
                     barItem.Y = Pos.Center ();
                     prevBarItem = barItem;
                 }
@@ -189,7 +250,7 @@ public class Bar : View
                     else
                     {
                         // Align the view to the bottom of the previous view
-                        barItem.Y = Pos.Bottom(prevBarItem);
+                        barItem.Y = Pos.Bottom (prevBarItem);
                     }
 
                     prevBarItem = barItem;

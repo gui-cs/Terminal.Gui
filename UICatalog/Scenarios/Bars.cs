@@ -135,7 +135,7 @@ public class Bars : Scenario
 
        // SetupMenuBar ();
         //SetupContentMenu ();
-       // SetupStatusBar ();
+        SetupStatusBar ();
 
         foreach (Bar barView in Application.Top.Subviews.Where (b => b is Bar)!)
         {

@@ -41,6 +41,7 @@ public class ConfigurationEditor : Scenario
         Application.Init ();
 
         Toplevel top = new ();
+
         _tileView = new TileView (0)
         {
             Width = Dim.Fill (), Height = Dim.Fill (1), Orientation = Orientation.Vertical, LineStyle = LineStyle.Single
@@ -57,25 +58,24 @@ public class ConfigurationEditor : Scenario
         {
             Key = Application.QuitKey,
             Title = $"{Application.QuitKey} Quit",
-            AcceptAction = Quit
+            Action = Quit
         };
 
         var reloadShortcut = new Shortcut ()
         {
-            Key = KeyCode.F5,
+            Key = Key.F5.WithShift,
             Title = "Reload",
-            AcceptAction = Reload
         };
+        reloadShortcut.Accept += (s, e) => { Reload (); };
+
         var saveShortcut = new Shortcut ()
         {
-            Key = Key.S.WithCtrl,
+            Key = Key.F4,
             Title = "Save",
-            AcceptAction = Save
+            Action = Save
         };
 
-
-        var statusBar = new StatusBar ();
-        statusBar.Add (quitShortcut, reloadShortcut, saveShortcut, _lenShortcut);
+        var statusBar = new StatusBar ([quitShortcut, reloadShortcut, saveShortcut, _lenShortcut]);
 
         top.Add (statusBar);
 
