@@ -1,3 +1,6 @@
+using System;
+using System.Reflection;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -9,28 +12,61 @@ namespace Terminal.Gui;
 /// </summary>
 public class StatusBar : Bar
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public StatusBar () : this ([]) { }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public StatusBar (IEnumerable<Shortcut> shortcuts) : base (shortcuts)
     {
         Orientation = Orientation.Horizontal;
         Y = Pos.AnchorEnd ();
         Width = Dim.Fill ();
-        StatusBarStyle = true;
+        Height = Dim.Auto (DimAutoStyle.Content, 1);
+        BorderStyle = LineStyle.Dashed;
+        ColorScheme = Colors.ColorSchemes ["Menu"];
+
+        LayoutStarted += StatusBar_LayoutStarted;
     }
 
-    /// <inheritdoc />
+    // StatusBar arranges the items horizontally.
+    // The first item has no left border, the last item has no right border.
+    // The Shortcuts are configured with the command, help, and key views aligned in reverse order (EndToStart).
+    private void StatusBar_LayoutStarted (object sender, LayoutEventArgs e)
+    {
+        for (int index = 0; index < Subviews.Count; index++)
+        {
+            View barItem = Subviews [index];
+
+            barItem.BorderStyle = BorderStyle;
+
+            if (index == Subviews.Count - 1)
+            {
+                barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
+            }
+            else
+            {
+                barItem.Border.Thickness = new Thickness (0, 0, 1, 0);
+            }
+
+            if (barItem is Shortcut shortcut)
+            {
+                shortcut.AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
+                
+            }
+        }
+    }
+
+
+    /// <inheritdoc/>
     public override View Add (View view)
     {
         view.CanFocus = false;
+
         if (view is Shortcut shortcut)
         {
             shortcut.KeyBindingScope = KeyBindingScope.Application;
-            shortcut.AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
         }
+
         return base.Add (view);
     }
-
 }

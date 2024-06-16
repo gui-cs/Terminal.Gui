@@ -458,8 +458,8 @@ internal class UICatalogApp
             StatusBar = new ()
             {
                 Visible = ShowStatusBar,
-                AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast
             };
+            StatusBar.AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
 
             Shortcut statusBarShortcut = new Shortcut ()
             {

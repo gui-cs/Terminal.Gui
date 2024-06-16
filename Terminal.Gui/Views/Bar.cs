@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 
 namespace Terminal.Gui;
@@ -23,8 +24,12 @@ public class Bar : View
         Height = Dim.Auto ();
 
         LayoutStarted += Bar_LayoutStarted;
-
         Initialized += Bar_Initialized;
+
+        if (shortcuts is null)
+        {
+            return;
+        }
 
         foreach (Shortcut shortcut in shortcuts)
         {
@@ -35,7 +40,7 @@ public class Bar : View
     private void Bar_Initialized (object sender, EventArgs e)
     {
         ColorScheme = Colors.ColorSchemes ["Menu"];
-        AdjustSubviewBorders ();
+        AdjustSubviews ();
     }
 
     /// <inheritdoc />
@@ -45,23 +50,41 @@ public class Bar : View
         Border.LineStyle = value;
     }
 
+    private Orientation _orientation = Orientation.Horizontal;
+
     /// <summary>
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Bar"/>. The default is
     ///     <see cref="Orientation.Horizontal"/>.
     /// </summary>
-    public Orientation Orientation { get; set; } = Orientation.Horizontal;
+    public Orientation Orientation
+    {
+        get => _orientation;
+        set
+        {
+            _orientation = value;
+            SetNeedsLayout ();
+        }
+    }
+
+    private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd;
 
     /// <summary>
     ///      Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Bar"/>. The default is <see cref="AlignmentModes.StartToEnd"/>.
     /// </summary>
-    public AlignmentModes AlignmentModes { get; set; } = AlignmentModes.StartToEnd;
-
-    public bool StatusBarStyle { get; set; } = true;
+    public AlignmentModes AlignmentModes
+    {
+        get => _alignmentModes;
+        set
+        {
+            _alignmentModes = value;
+            SetNeedsLayout ();
+        }
+    }
 
     public override View Add (View view)
     {
         base.Add (view);
-        AdjustSubviewBorders ();
+        AdjustSubviews ();
 
         return view;
     }
@@ -70,7 +93,7 @@ public class Bar : View
     public override View Remove (View view)
     {
         base.Remove (view);
-        AdjustSubviewBorders ();
+        AdjustSubviews ();
 
         return view;
     }
@@ -118,47 +141,31 @@ public class Bar : View
         return toRemove as Shortcut;
     }
 
-    private void AdjustSubviewBorders ()
+    private void AdjustSubviews ()
     {
         for (var index = 0; index < Subviews.Count; index++)
         {
             View barItem = Subviews [index];
 
-            barItem.Border.LineStyle = BorderStyle;
-            barItem.SuperViewRendersLineCanvas = true;
-            barItem.ColorScheme = ColorScheme;
+            //barItem.Border.LineStyle = BorderStyle;
+            //barItem.SuperViewRendersLineCanvas = true;
+            //barItem.ColorScheme = ColorScheme;
 
-            if (!barItem.Visible)
-            {
-                continue;
-            }
+            //if (!barItem.Visible)
+            //{
+            //    continue;
+            //}
 
-            if (StatusBarStyle)
-            {
-                barItem.BorderStyle = LineStyle.Dashed;
+            //barItem.BorderStyle = LineStyle.None;
+            //if (index == 0)
+            //{
+            //    barItem.Border.Thickness = new Thickness (1, 1, 1, 0);
+            //}
 
-                if (index == Subviews.Count - 1)
-                {
-                    barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
-                }
-                else
-                {
-                    barItem.Border.Thickness = new Thickness (0, 0, 1, 0);
-                }
-            }
-            else
-            {
-                barItem.BorderStyle = LineStyle.None;
-                if (index == 0)
-                {
-                    barItem.Border.Thickness = new Thickness (1, 1, 1, 0);
-                }
-
-                if (index == Subviews.Count - 1)
-                {
-                    barItem.Border.Thickness = new Thickness (1, 0, 1, 1);
-                }
-            }
+            //if (index == Subviews.Count - 1)
+            //{
+            //    barItem.Border.Thickness = new Thickness (1, 0, 1, 1);
+            //}
         }
     }
 
@@ -173,40 +180,12 @@ public class Bar : View
                 {
                     View barItem = Subviews [index];
 
-                    if (!barItem.Visible)
-                    {
-                        continue;
-                    }
+                    barItem.ColorScheme = ColorScheme;
+                    barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
+                    barItem.Y = 0;//Pos.Center ();
 
-                    //if (StatusBarStyle)
-                    //{
-                    //    barItem.BorderStyle = LineStyle.Dashed;
-                    //}
-                    //else
-                    //{
-                    //    barItem.BorderStyle = LineStyle.None;
-                    //}
-
-                    //if (index == Subviews.Count - 1)
-                    //{
-                    //    barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
-                    //}
-                    //else
-                    //{
-                    //    barItem.Border.Thickness = new Thickness (0, 0, 1, 0);
-                    //}
-
-                    if (barItem is Shortcut shortcut)
-                    {
-                        shortcut.X = Pos.Align (Alignment.Start, AlignmentModes);
-                    }
-                    else
-                    {
-                        barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
-                    }
-                        
-                    barItem.Y = Pos.Center ();
-                    prevBarItem = barItem;
+                    // HACK: This should not be needed
+                    barItem.SetRelativeLayout (GetContentSize ());
                 }
 
                 break;

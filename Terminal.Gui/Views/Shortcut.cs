@@ -98,6 +98,11 @@ public class Shortcut : View
         LayoutStarted += OnLayoutStarted;
         Initialized += OnInitialized;
 
+        if (key is null)
+        {
+            key = Key.Empty;
+        }
+
         Key = key;
         Title = commandText;
         Action = action;
@@ -445,7 +450,7 @@ public class Shortcut : View
     {
         CommandView.Margin.Thickness = GetMarginThickness ();
         CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
-        CommandView.Y = 0; //Pos.Center (),    
+        CommandView.Y = 0;//Pos.Center ();
     }
 
 
@@ -470,9 +475,9 @@ public class Shortcut : View
     {
         HelpView.Margin.Thickness = GetMarginThickness ();
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
-        HelpView.Y = 0; //Pos.Center (),    
+        HelpView.Y = 0;//Pos.Center ();
         HelpView.Width = Dim.Auto (DimAutoStyle.Text);
-        HelpView.Height = CommandView?.IsAdded == true ? Dim.Height (CommandView) : 1;
+        HelpView.Height = CommandView?.Visible == true ? Dim.Height (CommandView) : 1;
 
         HelpView.Visible = true;
         HelpView.VerticalTextAlignment = Alignment.Center;
@@ -592,9 +597,9 @@ public class Shortcut : View
     {
         KeyView.Margin.Thickness = GetMarginThickness ();
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
-        //KeyView.Y = Pos.Center ();
+        KeyView.Y = 0;//Pos.Center ();
         KeyView.Width = Dim.Auto (DimAutoStyle.Text, Dim.Func (GetMinimumKeyViewSize));
-        KeyView.Height = CommandView?.IsAdded == true ? Dim.Height (CommandView) : 1;
+        KeyView.Height = CommandView?.Visible == true ? Dim.Height (CommandView) : 1;
 
         KeyView.Visible = true;
 
@@ -653,7 +658,7 @@ public class Shortcut : View
             }
         }
 
-        return true;
+        return false;
     }
 
     /// <summary>
@@ -702,7 +707,7 @@ public class Shortcut : View
         }
 
         // Set KeyView's colors to show "hot"
-        if (IsInitialized)
+        if (IsInitialized && base.ColorScheme is {})
         {
             var cs = new ColorScheme (base.ColorScheme)
             {

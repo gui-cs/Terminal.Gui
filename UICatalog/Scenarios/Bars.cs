@@ -36,7 +36,7 @@ public class Bars : Scenario
         {
             X = Pos.AnchorEnd (),
             Width = 50,
-            Height = Dim.Fill (3),
+            Height = Dim.Fill (6),
             ColorScheme = Colors.ColorSchemes ["Toplevel"],
             Source = new ListWrapper<string> (eventSource)
         };
@@ -104,15 +104,14 @@ public class Bars : Scenario
         //                        eventLog.MoveDown ();
         //                    };
 
-        var bar = new Bar
+        var vBar = new Bar
         {
             X = 2,
             Y = 2,
             Orientation = Orientation.Vertical,
-            StatusBarStyle = false,
             BorderStyle = LineStyle.Rounded
         };
-        bar.Add (shortcut1, shortcut2);
+        vBar.Add (shortcut1, shortcut2);
 
         ////CheckBox hello = new ()
         ////{
@@ -128,14 +127,48 @@ public class Bars : Scenario
         ////                 };
 
 
-        Application.Top.Add (bar);
+        Application.Top.Add (vBar);
 
         // BUGBUG: This should not be needed
         Application.Top.LayoutSubviews ();
 
-       // SetupMenuBar ();
+        // SetupMenuBar ();
         //SetupContentMenu ();
-        SetupStatusBar ();
+        Label label = new Label ()
+        {
+            Title = "      Bar:",
+            X = 0,
+            Y = Pos.AnchorEnd () - 6
+        };
+        Application.Top.Add (label);
+        var bar = new Bar
+        {
+            Id = "bar",
+            X = Pos.Right (label),
+            Y = Pos.Top (label),
+            Width = Dim.Fill (),
+            Orientation = Orientation.Horizontal,
+        };
+        ConfigStatusBar (bar);
+        Application.Top.Add (bar);
+
+        label = new Label ()
+        {
+            Title = "StatusBar:",
+            X = 0,
+            Y = Pos.AnchorEnd () - 3
+        };
+        Application.Top.Add (label);
+        bar = new StatusBar()
+        {
+            Id = "statusBar",
+            X = Pos.Right (label),
+            Y = Pos.Top (label),
+            Width = Dim.Fill (),
+            Orientation = Orientation.Horizontal,
+        };
+        ConfigStatusBar (bar);
+        Application.Top.Add (bar);
 
         foreach (Bar barView in Application.Top.Subviews.Where (b => b is Bar)!)
         {
@@ -143,14 +176,13 @@ public class Bars : Scenario
             {
                 sh.Accept += (o, args) =>
                                    {
-                                       eventSource.Add ($"Accept: {sh!.CommandView.Text}");
+                                       eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
                                        eventLog.MoveDown ();
                                    };
             }
         }
     }
 
-    private void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
 
     //private void SetupContentMenu ()
     //{
@@ -307,7 +339,6 @@ public class Bars : Scenario
             Width = Dim.Fill (),
             Height = 1,//Dim.Auto (DimAutoStyle.Content),
             Orientation = Orientation.Horizontal,
-            StatusBarStyle = false,
         };
 
         var fileMenuBarItem = new Shortcut
@@ -317,7 +348,7 @@ public class Bars : Scenario
             Key = Key.F.WithAlt,
         };
         fileMenuBarItem.KeyView.Visible = false;
-        
+
         var editMenuBarItem = new Shortcut
         {
             Title = "_Edit",
@@ -338,8 +369,7 @@ public class Bars : Scenario
             X = 1,
             Y = 1,
             Orientation = Orientation.Vertical,
-            StatusBarStyle = false,
-           // Modal = true,
+            // Modal = true,
             Visible = false,
         };
 
@@ -381,7 +411,7 @@ public class Bars : Scenario
                               {
                                   if (fileMenu.Visible)
                                   {
-                                     // fileMenu.RequestStop ();
+                                      // fileMenu.RequestStop ();
                                       prevFocus?.SetFocus ();
                                       return;
                                   }
@@ -405,26 +435,18 @@ public class Bars : Scenario
 
     }
 
-    private void SetupStatusBar ()
+    private void ConfigStatusBar (Bar bar)
     {
-        var statusBar = new Bar
-        {
-            Id = "statusBar",
-            X = 0,
-            Y = Pos.AnchorEnd (),
-            Width = Dim.Fill (),
-        };
-
         var shortcut = new Shortcut
         {
+            Height = Dim.Auto (DimAutoStyle.Content, 3),
             Text = "Quit",
             Title = "Q_uit",
             Key = Application.QuitKey,
             KeyBindingScope = KeyBindingScope.Application,
-            CanFocus = false
         };
 
-        statusBar.Add (shortcut);
+        bar.Add (shortcut);
 
         shortcut = new Shortcut
         {
@@ -432,24 +454,9 @@ public class Bars : Scenario
             Title = "Help",
             Key = Key.F1,
             KeyBindingScope = KeyBindingScope.HotKey,
-            CanFocus = false
         };
 
-        var labelHelp = new Label
-        {
-            X = Pos.Center (),
-            Y = Pos.Top (statusBar) - 1,
-            Text = "Help"
-        };
-        Application.Top.Add (labelHelp);
-
-        shortcut.Accept += (s, e) =>
-                           {
-                               labelHelp.Text = labelHelp.Text + "!";
-                               e.Cancel = true;
-                           };
-
-        statusBar.Add (shortcut);
+        bar.Add (shortcut);
 
         shortcut = new Shortcut
         {
@@ -460,10 +467,9 @@ public class Bars : Scenario
             {
                 Text = "_Show/Hide"
             },
-            CanFocus = false
         };
 
-        statusBar.Add (shortcut);
+        bar.Add (shortcut);
 
         var button1 = new Button
         {
@@ -471,15 +477,16 @@ public class Bars : Scenario
             // Visible = false
         };
         button1.Accept += Button_Clicked;
-        statusBar.Add (button1);
+        bar.Add (button1);
 
         shortcut.Accept += (s, e) =>
                                                     {
                                                         button1.Visible = !button1.Visible;
                                                         button1.Enabled = button1.Visible;
+                                                        e.Cancel = false;
                                                     };
 
-        statusBar.Add (new Label
+        bar.Add (new Label
         {
             HotKeySpecifier = new Rune ('_'),
             Text = "Fo_cusLabel",
@@ -492,11 +499,11 @@ public class Bars : Scenario
         };
         button2.Accept += (s, e) => Application.RequestStop ();
 
-        statusBar.Add (button2);
+        bar.Add (button2);
 
-        statusBar.Initialized += Menu_Initialized;
+        return;
 
-        Application.Top.Add (statusBar);
+        void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
 
     }
 
