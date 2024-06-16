@@ -451,14 +451,14 @@ public partial class Toplevel : View
     public event EventHandler Ready;
 
     /// <inheritdoc/>
-    public override void Remove (View view)
+    public override View Remove (View view)
     {
         if (this is Toplevel { MenuBar: { } })
         {
             RemoveMenuStatusBar (view);
         }
 
-        base.Remove (view);
+        return base.Remove (view);
     }
 
     /// <inheritdoc/>

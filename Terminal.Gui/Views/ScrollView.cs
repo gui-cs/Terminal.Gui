@@ -457,11 +457,11 @@ public class ScrollView : View
 
     /// <summary>Removes the view from the scrollview.</summary>
     /// <param name="view">The view to remove from the scrollview.</param>
-    public override void Remove (View view)
+    public override View Remove (View view)
     {
         if (view is null)
         {
-            return;
+            return view;
         }
 
         SetNeedsDisplay ();
@@ -480,6 +480,8 @@ public class ScrollView : View
         {
             CanFocus = false;
         }
+
+        return view;
     }
 
     /// <summary>Removes all widgets from this container.</summary>

@@ -142,11 +142,11 @@ public class WizardStep : FrameView
 
     /// <summary>Removes a <see cref="View"/> from <see cref="WizardStep"/>.</summary>
     /// <remarks></remarks>
-    public override void Remove (View view)
+    public override View Remove (View view)
     {
         if (view is null)
         {
-            return;
+            return view;
         }
 
         SetNeedsDisplay ();
@@ -167,6 +167,8 @@ public class WizardStep : FrameView
         }
 
         ShowHide ();
+
+        return view;
     }
 
     /// <summary>Removes all <see cref="View"/>s from the <see cref="WizardStep"/>.</summary>

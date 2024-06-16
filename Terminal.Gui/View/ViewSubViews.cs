@@ -209,11 +209,11 @@ public partial class View
     ///         lifecycle to be transferred to the caller; the caller muse call <see cref="Dispose"/>.
     ///     </para>
     /// </remarks>
-    public virtual void Remove (View view)
+    public virtual View Remove (View view)
     {
         if (view is null || _subviews is null)
         {
-            return;
+            return view;
         }
 
         Rectangle touched = view.Frame;
@@ -238,6 +238,8 @@ public partial class View
         {
             Focused = null;
         }
+
+        return view;
     }
 
     /// <summary>

@@ -67,10 +67,12 @@ public class Bar : View
     }
 
     /// <inheritdoc />
-    public override void Remove (View view)
+    public override View Remove (View view)
     {
         base.Remove (view);
         AdjustSubviewBorders ();
+
+        return view;
     }
 
 
