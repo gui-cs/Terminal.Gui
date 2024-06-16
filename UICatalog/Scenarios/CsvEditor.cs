@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CsvHelper;
-using SixLabors.ImageSharp.ColorSpaces;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -114,7 +113,7 @@ public class CsvEditor : Scenario
         {
             Text = "0,0",
             Width = 10,
-            Height = 1,
+            Height = 1
         };
         _selectedCellTextField.TextChanged += SelectedCellLabel_TextChanged;
 

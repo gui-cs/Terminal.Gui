@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
+using static System.Net.Mime.MediaTypeNames;
+using Application = Terminal.Gui.Application;
 
 namespace UICatalog.Scenarios;
 
@@ -18,12 +20,10 @@ public class GraphViewExample : Scenario
     private GraphView _graphView;
     private MenuItem _miDiags;
     private MenuItem _miShowBorder;
-
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
-        Win.Y = 1; // menu
-        Win.Height = Dim.Fill (1); // status bar
+        Application.Init ();
+        Toplevel app = new ();
 
         _graphs = new []
         {
@@ -117,9 +117,9 @@ public class GraphViewExample : Scenario
                                              .Checked
                                      },
                                      _miDiags = new MenuItem (
-                                                              "Dri_ver Diagnostics",
+                                                              "_Diagnostics",
                                                               "",
-                                                              () => EnableDiagnostics ()
+                                                              () => ToggleDiagnostics ()
                                                              )
                                      {
                                          Checked = View.Diagnostics
@@ -133,28 +133,28 @@ public class GraphViewExample : Scenario
                                 )
             ]
         };
-        Top.Add (menu);
+        app.Add (menu);
 
         _graphView = new GraphView
         {
             X = 0,
-            Y = 0,
+            Y = 1,
             Width = Dim.Percent (70),
-            Height = Dim.Fill (),
+            Height = Dim.Fill (1),
             BorderStyle = LineStyle.Single
         };
         _graphView.Border.Thickness = _thickness;
         _graphView.Margin.Thickness = _thickness;
         _graphView.Padding.Thickness = _thickness;
 
-        Win.Add (_graphView);
+        app.Add (_graphView);
 
         var frameRight = new FrameView
         {
-            X = Pos.Right (_graphView) + 1,
-            Y = 0,
+            X = Pos.Right (_graphView),
+            Y = Pos.Top (_graphView),
             Width = Dim.Fill (),
-            Height = Dim.Fill (),
+            Height = Dim.Height (_graphView),
             Title = "About"
         };
 
@@ -162,29 +162,42 @@ public class GraphViewExample : Scenario
                         _about = new TextView { Width = Dim.Fill (), Height = Dim.Fill () }
                        );
 
-        Win.Add (frameRight);
+        app.Add (frameRight);
 
         var statusBar = new StatusBar (
-#if V2_STATUSBAR
-                                       new StatusItem []
+                                       new Shortcut []
                                        {
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
-                                                () => Quit ()
-                                               ),
-                                           new (
-                                                KeyCode.CtrlMask | KeyCode.G,
-                                                "~^G~ Next",
-                                                () => _graphs [_currentGraph++ % _graphs.Length] ()
-                                               )
+                                           new (Key.G.WithCtrl, "Next Graph", () => _graphs [_currentGraph++ % _graphs.Length] ()),
+                                           new (Key.CursorUp, "Zoom In", () => Zoom (0.5f)),
+                                           new (Key.CursorDown, "Zoom Out", () => Zoom (2f)),
                                        }
-#endif
                                       );
-        Top.Add (statusBar);
+        app.Add (statusBar);
+
+        var diagShortcut = new Shortcut ()
+        {
+            Key = Key.F10,
+            CommandView = new CheckBox ()
+            {
+                Title = "Diagnostics",
+                CanFocus = false
+            }
+        };
+        diagShortcut.Accept += DiagShortcut_Accept;
+        statusBar.Add (diagShortcut);
+
+        _graphs [_currentGraph++ % _graphs.Length] ();
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
     }
 
-    private void EnableDiagnostics ()
+    private void DiagShortcut_Accept (object sender, System.ComponentModel.HandledEventArgs e)
+    {
+        ToggleDiagnostics();
+    }
+
+    private void ToggleDiagnostics ()
     {
         _miDiags.Checked = !_miDiags.Checked;
 
