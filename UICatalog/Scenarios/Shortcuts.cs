@@ -82,14 +82,14 @@ public class Shortcuts : Scenario
         vShortcut2.Accept += (o, args) =>
                             {
                                 // Cycle to next item. If at end, set 0
-                                //if (((RadioGroup)vShortcut2.CommandView).SelectedItem < ((RadioGroup)vShortcut2.CommandView).RadioLabels.Length - 1)
-                                //{
-                                //    ((RadioGroup)vShortcut2.CommandView).SelectedItem++;
-                                //}
-                                //else
-                                //{
-                                //    ((RadioGroup)vShortcut2.CommandView).SelectedItem = 0;
-                                //}
+                                if (((RadioGroup)vShortcut2.CommandView).SelectedItem < ((RadioGroup)vShortcut2.CommandView).RadioLabels.Length - 1)
+                                {
+                                    ((RadioGroup)vShortcut2.CommandView).SelectedItem++;
+                                }
+                                else
+                                {
+                                    ((RadioGroup)vShortcut2.CommandView).SelectedItem = 0;
+                                }
                             };
         vShortcut2.Border.Thickness = new (1, 1, 1, 1);
         Application.Top.Add (vShortcut2);

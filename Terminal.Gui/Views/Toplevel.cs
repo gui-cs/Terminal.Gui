@@ -186,11 +186,11 @@ public partial class Toplevel : View
     public event EventHandler<ToplevelEventArgs> Activate;
 
     /// <inheritdoc/>
-    public override void Add (View view)
+    public override View Add (View view)
     {
         CanFocus = true;
         AddMenuStatusBar (view);
-        base.Add (view);
+        return base.Add (view);
     }
 
     /// <summary>

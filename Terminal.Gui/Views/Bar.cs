@@ -58,10 +58,12 @@ public class Bar : View
 
     public bool StatusBarStyle { get; set; } = true;
 
-    public override void Add (View view)
+    public override View Add (View view)
     {
         base.Add (view);
         AdjustSubviewBorders ();
+
+        return view;
     }
 
     /// <inheritdoc />

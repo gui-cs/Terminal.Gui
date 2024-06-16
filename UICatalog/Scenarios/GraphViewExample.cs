@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
@@ -20,6 +21,8 @@ public class GraphViewExample : Scenario
     private GraphView _graphView;
     private MenuItem _miDiags;
     private MenuItem _miShowBorder;
+    private ViewDiagnosticFlags _viewDiagnostics;
+
     public override void Main ()
     {
         Application.Init ();
@@ -183,18 +186,25 @@ public class GraphViewExample : Scenario
                 CanFocus = false
             }
         };
-        diagShortcut.Accept += DiagShortcut_Accept;
-        statusBar.Add (diagShortcut);
+        statusBar.Add (diagShortcut).Accept += DiagShortcut_Accept;
 
         _graphs [_currentGraph++ % _graphs.Length] ();
+
+        _viewDiagnostics = View.Diagnostics;
         Application.Run (app);
+        View.Diagnostics = _viewDiagnostics;
         app.Dispose ();
         Application.Shutdown ();
+
     }
 
-    private void DiagShortcut_Accept (object sender, System.ComponentModel.HandledEventArgs e)
+    private void DiagShortcut_Accept (object sender, CancelEventArgs e)
     {
         ToggleDiagnostics();
+        if (sender is Shortcut shortcut && shortcut.CommandView is CheckBox checkBox)
+        {
+            checkBox.Checked = _miDiags.Checked;
+        }
     }
 
     private void ToggleDiagnostics ()

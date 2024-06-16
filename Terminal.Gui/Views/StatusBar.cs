@@ -22,7 +22,7 @@ public class StatusBar : Bar
     }
 
     /// <inheritdoc />
-    public override void Add (View view)
+    public override View Add (View view)
     {
         view.CanFocus = false;
         if (view is Shortcut shortcut)
@@ -30,7 +30,7 @@ public class StatusBar : Bar
             shortcut.KeyBindingScope = KeyBindingScope.Application;
             shortcut.AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
         }
-        base.Add (view);
+        return base.Add (view);
     }
 
 }

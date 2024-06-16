@@ -40,11 +40,13 @@ public partial class View
     ///         the lifecycle of the subviews to be transferred to this View.
     ///     </para>
     /// </remarks>
-    public virtual void Add (View view)
+    /// <param name="view">The view to add.</param>
+    /// <returns>The view that was added.</returns>
+    public virtual View Add (View view)
     {
         if (view is null)
         {
-            return;
+            return view;
         }
 
         if (_subviews is null)
@@ -94,6 +96,8 @@ public partial class View
         CheckDimAuto ();
         SetNeedsLayout ();
         SetNeedsDisplay ();
+
+        return view;
     }
 
     /// <summary>Adds the specified views (children) to the view.</summary>

@@ -446,7 +446,7 @@ public class Bars : Scenario
         shortcut.Accept += (s, e) =>
                            {
                                labelHelp.Text = labelHelp.Text + "!";
-                               e.Handled = true;
+                               e.Cancel = true;
                            };
 
         statusBar.Add (shortcut);

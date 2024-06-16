@@ -431,12 +431,9 @@ public class Shortcut : View
             {
                 // When the CommandView fires its Accept event, we want to act as though the
                 // Shortcut was clicked.
-                var args = new HandledEventArgs ();
-                Accept?.Invoke (this, args);
-
-                if (args.Handled)
+                if (base.OnAccept() == true)
                 {
-                    e.Cancel = args.Handled;
+                    e.Cancel = true;
                 }
 
                 //e.Cancel = true;
@@ -621,12 +618,6 @@ public class Shortcut : View
     #region Accept Handling
 
     /// <summary>
-    ///     The event fired when the <see cref="Command.Accept"/> command is received. This
-    ///     occurs if the user clicks on the Shortcut or presses <see cref="Key"/>.
-    /// </summary>
-    public new event EventHandler<HandledEventArgs> Accept;
-
-    /// <summary>
     ///     Called when the <see cref="Command.Accept"/> command is received. This
     ///     occurs if the user clicks on the Bar with the mouse or presses the key bound to
     ///     Command.Accept (Space by default).
@@ -656,15 +647,10 @@ public class Shortcut : View
 
         if (handled == false)
         {
-            var args = new HandledEventArgs ();
-            Accept?.Invoke (this, args);
-
-            if (args.Handled is false)
+            if (base.OnAccept () is false)
             {
                 Action?.Invoke ();
             }
-
-            args.Handled = true;
         }
 
         return true;

@@ -346,7 +346,7 @@ public class ScrollView : View
 
     /// <summary>Adds the view to the scrollview.</summary>
     /// <param name="view">The view to add to the scrollview.</param>
-    public override void Add (View view)
+    public override View Add (View view)
     {
         if (view is ScrollBarView.ContentBottomRightCorner)
         {
@@ -365,6 +365,7 @@ public class ScrollView : View
         }
 
         SetNeedsLayout ();
+        return view;
     }
 
     /// <inheritdoc/>

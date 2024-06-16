@@ -126,7 +126,7 @@ public class WizardStep : FrameView
 
     /// <summary>Add the specified <see cref="View"/> to the <see cref="WizardStep"/>.</summary>
     /// <param name="view"><see cref="View"/> to add to this container</param>
-    public override void Add (View view)
+    public override View Add (View view)
     {
         _contentView.Add (view);
 
@@ -136,6 +136,8 @@ public class WizardStep : FrameView
         }
 
         ShowHide ();
+
+        return view;
     }
 
     /// <summary>Removes a <see cref="View"/> from <see cref="WizardStep"/>.</summary>
