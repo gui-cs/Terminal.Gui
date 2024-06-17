@@ -634,7 +634,7 @@ public class Shortcut : View
 
                 break;
             case KeyBindingScope.HotKey:
-                _commandView.InvokeCommand (Command.HotKey);
+                CommandView.InvokeCommand (Command.HotKey);
                 handled = false;
 
                 break;
@@ -648,10 +648,10 @@ public class Shortcut : View
 
                 if (CanFocus)
                 {
-                    SetFocus ();
+                    CommandView.SetFocus ();
                 }
 
-                return false;
+                return true;
             }
         }
 

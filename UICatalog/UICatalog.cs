@@ -447,10 +447,10 @@ internal class UICatalogApp
                 ]
             };
 
-            //StatusBar = new ()
-            //{
-            //    Visible = ShowStatusBar,
-            //};
+            StatusBar = new ()
+            {
+                Visible = ShowStatusBar,
+            };
 
             if (StatusBar is { })
             {

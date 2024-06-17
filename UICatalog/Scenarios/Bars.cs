@@ -151,16 +151,16 @@ public class Bars : Scenario
             Y = Pos.AnchorEnd () - 6
         };
         statusBarLikeExamples.Add (label);
-        //bar = new Bar
-        //{
-        //    Id = "statusBar-like",
-        //    X = Pos.Right (label),
-        //    Y = Pos.Top (label),
-        //    Width = Dim.Fill (),
-        //    Orientation = Orientation.Horizontal,
-        //};
-        //ConfigStatusBar (bar);
-        //statusBarLikeExamples.Add (bar);
+        bar = new Bar
+        {
+            Id = "statusBar-like",
+            X = Pos.Right (label),
+            Y = Pos.Top (label),
+            Width = Dim.Fill (),
+            Orientation = Orientation.Horizontal,
+        };
+        ConfigStatusBar (bar);
+        statusBarLikeExamples.Add (bar);
 
         label = new Label ()
         {
@@ -175,7 +175,6 @@ public class Bars : Scenario
             X = Pos.Right (label),
             Y = Pos.Top (label),
             Width = Dim.Fill (),
-            Orientation = Orientation.Horizontal,
         };
         ConfigStatusBar (bar);
         statusBarLikeExamples.Add (bar);
