@@ -152,4 +152,55 @@ public class StatusBarTests (ITestOutputHelper output)
         Assert.Equal (1, sb.Frame.Height);
     }
 
+    [Fact]
+    public void RemoveAndThenAddStatusBar_ShouldNotChangeWidth ()
+    {
+        StatusBar statusBar;
+        StatusBar statusBar2;
+
+        var w = new Window ();
+        statusBar2 = new StatusBar () { Id = "statusBar2" };
+        statusBar = new StatusBar () { Id = "statusBar" };
+        w.Width = Dim.Fill (0);
+        w.Height = Dim.Fill (0);
+        w.X = 0;
+        w.Y = 0;
+
+        w.Visible = true;
+        w.Modal = false;
+        w.Title = "";
+        statusBar.Width = Dim.Fill (0);
+        statusBar.Height = 1;
+        statusBar.X = 0;
+        statusBar.Y = 0;
+        statusBar.Visible = true;
+        w.Add (statusBar);
+        Assert.Equal (w.StatusBar, statusBar);
+
+        statusBar2.Width = Dim.Fill (0);
+        statusBar2.Height = 1;
+        statusBar2.X = 0;
+        statusBar2.Y = 4;
+        statusBar2.Visible = true;
+        w.Add (statusBar2);
+        Assert.Equal (w.StatusBar, statusBar2);
+
+        var menuBars = w.Subviews.OfType<StatusBar> ().ToArray ();
+        Assert.Equal (2, menuBars.Length);
+
+        Assert.Equal (Dim.Fill (0), menuBars [0].Width);
+        Assert.Equal (Dim.Fill (0), menuBars [1].Width);
+
+        // Goes wrong here
+        w.Remove (statusBar);
+        w.Remove (statusBar2);
+
+        w.Add (statusBar);
+        w.Add (statusBar2);
+
+        // These assertions fail
+        Assert.Equal (Dim.Fill (0), menuBars [0].Width);
+        Assert.Equal (Dim.Fill (0), menuBars [1].Width);
+    }
+
 }
