@@ -43,7 +43,7 @@ The entire library has been reviewed and simplified. As a result, the API is mor
 * *[StatusBar](~/api/Terminal.Gui.StatusBar.yml)* - New implementation based on `Bar`
 * *[MenuBar](~/api/Terminal.Gui.MenuBar.yml)* - COMING SOON! New implementation based on `Bar`
 * *[ContextMenu](~/api/Terminal.Gui.ContextMenu.yml)* - COMING SOON! New implementation based on `Bar`
-* *[FileDialog](~/api/Terminal.Gui.FileDialog.yml)* - The new, modern file dialog includes icons (in TUI!) for files/folders, search, and a `TreeView``. See [FileDialog](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#filedialog) for details.
+* *[FileDialog](~/api/Terminal.Gui.FileDialog.yml)* - The new, modern file dialog includes icons (in TUI!) for files/folders, search, and a `TreeView`. 
 
 ## Configuration Manager
 
