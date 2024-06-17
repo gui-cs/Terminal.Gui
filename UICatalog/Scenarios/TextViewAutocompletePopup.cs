@@ -36,29 +36,29 @@ public class TextViewAutocompletePopup : Scenario
         {
             Menus =
             [
-                new MenuBarItem (
-                                 "_File",
-                                 new []
-                                 {
-                                     _miMultiline =
-                                         new MenuItem (
-                                                       "_Multiline",
-                                                       "",
-                                                       () => Multiline ()
-                                                      ) { CheckType = MenuItemCheckStyle.Checked },
-                                     _miWrap = new MenuItem (
-                                                             "_Word Wrap",
-                                                             "",
-                                                             () => WordWrap ()
-                                                            ) { CheckType = MenuItemCheckStyle.Checked },
-                                     new ("_Quit", "", () => Quit ())
-                                 }
-                                )
+                new (
+                     "_File",
+                     new []
+                     {
+                         _miMultiline =
+                             new (
+                                  "_Multiline",
+                                  "",
+                                  () => Multiline ()
+                                 ) { CheckType = MenuItemCheckStyle.Checked },
+                         _miWrap = new (
+                                        "_Word Wrap",
+                                        "",
+                                        () => WordWrap ()
+                                       ) { CheckType = MenuItemCheckStyle.Checked },
+                         new ("_Quit", "", () => Quit ())
+                     }
+                    )
             ]
         };
         appWindow.Add (menu);
 
-        _textViewTopLeft = new TextView
+        _textViewTopLeft = new()
         {
             Y = 1,
             Width = width, Height = _height, Text = text
@@ -66,22 +66,22 @@ public class TextViewAutocompletePopup : Scenario
         _textViewTopLeft.DrawContent += TextViewTopLeft_DrawContent;
         appWindow.Add (_textViewTopLeft);
 
-        _textViewTopRight = new TextView
+        _textViewTopRight = new()
         {
-            X = Pos.AnchorEnd (width), Y = 1, 
+            X = Pos.AnchorEnd (width), Y = 1,
             Width = width, Height = _height, Text = text
         };
         _textViewTopRight.DrawContent += TextViewTopRight_DrawContent;
         appWindow.Add (_textViewTopRight);
 
-        _textViewBottomLeft = new TextView
+        _textViewBottomLeft = new()
         {
             Y = Pos.AnchorEnd (_height), Width = width, Height = _height, Text = text
         };
         _textViewBottomLeft.DrawContent += TextViewBottomLeft_DrawContent;
         appWindow.Add (_textViewBottomLeft);
 
-        _textViewBottomRight = new TextView
+        _textViewBottomRight = new()
         {
             X = Pos.AnchorEnd (width),
             Y = Pos.AnchorEnd (_height),
@@ -92,7 +92,7 @@ public class TextViewAutocompletePopup : Scenario
         _textViewBottomRight.DrawContent += TextViewBottomRight_DrawContent;
         appWindow.Add (_textViewBottomRight);
 
-        _textViewCentered = new TextView
+        _textViewCentered = new()
         {
             X = Pos.Center (),
             Y = Pos.Center (),
@@ -111,13 +111,12 @@ public class TextViewAutocompletePopup : Scenario
                                        {
                                            new (
                                                 Application.QuitKey,
-                                                $"Quit",
+                                                "Quit",
                                                 () => Quit ()
                                                ),
-                                           _siMultiline = new Shortcut (Key.Empty, "", null),
-                                           _siWrap = new Shortcut (Key.Empty, "", null)
+                                           _siMultiline = new (Key.Empty, "", null),
+                                           _siWrap = new (Key.Empty, "", null)
                                        }
-
                                       );
         appWindow.Add (statusBar);
 
@@ -154,15 +153,9 @@ public class TextViewAutocompletePopup : Scenario
                                                                                                 .ToList ();
     }
 
-    private void SetMultilineStatusText ()
-    {
-        _siMultiline.Title = $"Multiline: {_miMultiline.Checked}";
-    }
+    private void SetMultilineStatusText () { _siMultiline.Title = $"Multiline: {_miMultiline.Checked}"; }
 
-    private void SetWrapStatusText ()
-    {
-        _siWrap.Title = $"WordWrap: {_miWrap.Checked}";
-    }
+    private void SetWrapStatusText () { _siWrap.Title = $"WordWrap: {_miWrap.Checked}"; }
     private void TextViewBottomLeft_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewBottomLeft); }
     private void TextViewBottomRight_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewBottomRight); }
     private void TextViewCentered_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewCentered); }

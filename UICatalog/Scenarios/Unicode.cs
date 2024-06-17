@@ -10,7 +10,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 public class UnicodeInMenu : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
         var unicode =
             "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
@@ -27,6 +27,15 @@ public class UnicodeInMenu : Scenario
             }1 {
                 CM.Glyphs.HorizontalEllipsis
             }";
+
+        // Init
+        Application.Init ();
+
+        // Setup - Create a top-level application window and configure it.
+        Window appWindow = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+        };
 
         var menu = new MenuBar
         {
@@ -60,26 +69,24 @@ public class UnicodeInMenu : Scenario
                     )
             ]
         };
-        Top.Add (menu);
+        appWindow.Add (menu);
 
         var statusBar = new StatusBar (
-#if V2_STATUSBAR
-                                       new StatusItem []
+                                       new Shortcut []
                                        {
                                            new (
                                                 Application.QuitKey,
-                                                $"{Application.QuitKey} Выход",
+                                                $"Выход",
                                                 () => Application.RequestStop ()
                                                ),
-                                           new (KeyCode.Null, "~F2~ Создать", null),
-                                           new (KeyCode.Null, "~F3~ Со_хранить", null)
+                                           new (Key.F2, "Создать", null),
+                                           new (Key.F3, "Со_хранить", null)
                                        }
-#endif
                                       );
-        Top.Add (statusBar);
+        appWindow.Add (statusBar);
 
         var label = new Label { X = 0, Y = 1, Text = "Label:" };
-        Win.Add (label);
+        appWindow.Add (label);
 
         var testlabel = new Label
         {
@@ -89,10 +96,10 @@ public class UnicodeInMenu : Scenario
             Width = Dim.Percent (50),
             Text = gitString
         };
-        Win.Add (testlabel);
+        appWindow.Add (testlabel);
 
         label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Label (CanFocus):" };
-        Win.Add (label);
+        appWindow.Add (label);
         var sb = new StringBuilder ();
         sb.Append ('e');
         sb.Append ('\u0301');
@@ -108,14 +115,14 @@ public class UnicodeInMenu : Scenario
             HotKeySpecifier = new ('&'),
             Text = $"Should be [e with two accents, but isn't due to #2616]: [{sb}]"
         };
-        Win.Add (testlabel);
+        appWindow.Add (testlabel);
         label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Button:" };
-        Win.Add (label);
+        appWindow.Add (label);
         var button = new Button { X = 20, Y = Pos.Y (label), Text = "A123456789♥♦♣♠JQK" };
-        Win.Add (button);
+        appWindow.Add (button);
 
         label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "CheckBox:" };
-        Win.Add (label);
+        appWindow.Add (label);
 
         var checkBox = new CheckBox
         {
@@ -137,27 +144,27 @@ public class UnicodeInMenu : Scenario
             TextAlignment = Alignment.End,
             Text = $"End - {gitString}"
         };
-        Win.Add (checkBox, checkBoxRight);
+        appWindow.Add (checkBox, checkBoxRight);
 
         label = new() { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1, Text = "ComboBox:" };
-        Win.Add (label);
+        appWindow.Add (label);
         var comboBox = new ComboBox { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
         comboBox.SetSource (new ObservableCollection<string> { gitString, "Со_хранить" });
 
-        Win.Add (comboBox);
+        appWindow.Add (comboBox);
         comboBox.Text = gitString;
 
         label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 2, Text = "HexView:" };
-        Win.Add (label);
+        appWindow.Add (label);
 
         var hexView = new HexView (new MemoryStream (Encoding.ASCII.GetBytes (gitString + " Со_хранить")))
         {
             X = 20, Y = Pos.Y (label), Width = Dim.Percent (60), Height = 5
         };
-        Win.Add (hexView);
+        appWindow.Add (hexView);
 
         label = new() { X = Pos.X (label), Y = Pos.Bottom (hexView) + 1, Text = "ListView:" };
-        Win.Add (label);
+        appWindow.Add (label);
 
         var listView = new ListView
         {
@@ -169,10 +176,10 @@ public class UnicodeInMenu : Scenario
                                               ["item #1", gitString, "Со_хранить", unicode]
                                              )
         };
-        Win.Add (listView);
+        appWindow.Add (listView);
 
         label = new() { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "RadioGroup:" };
-        Win.Add (label);
+        appWindow.Add (label);
 
         var radioGroup = new RadioGroup
         {
@@ -181,19 +188,19 @@ public class UnicodeInMenu : Scenario
             Width = Dim.Percent (60),
             RadioLabels = new [] { "item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ" }
         };
-        Win.Add (radioGroup);
+        appWindow.Add (radioGroup);
 
         label = new() { X = Pos.X (label), Y = Pos.Bottom (radioGroup) + 1, Text = "TextField:" };
-        Win.Add (label);
+        appWindow.Add (label);
 
         var textField = new TextField
         {
             X = 20, Y = Pos.Y (label), Width = Dim.Percent (60), Text = gitString + " = Со_хранить"
         };
-        Win.Add (textField);
+        appWindow.Add (textField);
 
         label = new() { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "TextView:" };
-        Win.Add (label);
+        appWindow.Add (label);
 
         var textView = new TextView
         {
@@ -203,6 +210,15 @@ public class UnicodeInMenu : Scenario
             Height = 5,
             Text = unicode
         };
-        Win.Add (textView);
+        appWindow.Add (textView);
+
+
+        // Run - Start the application.
+        Application.Run (appWindow);
+
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
     }
 }
