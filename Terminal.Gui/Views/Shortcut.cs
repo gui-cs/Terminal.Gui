@@ -634,9 +634,8 @@ public class Shortcut : View
 
                 break;
             case KeyBindingScope.HotKey:
-                CommandView.InvokeCommand (Command.HotKey);
-                handled = false;
-
+                    CommandView.InvokeCommand (Command.HotKey);
+                    handled = false;
                 break;
         }
 
@@ -648,7 +647,7 @@ public class Shortcut : View
 
                 if (CanFocus)
                 {
-                    CommandView.SetFocus ();
+                    SetFocus ();
                 }
 
                 return true;
@@ -718,10 +717,12 @@ public class Shortcut : View
         }
     }
 
+    View _lastFocusedView;
     /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
         SetColors ();
+        _lastFocusedView = view;
 
         return base.OnEnter (view);
     }
@@ -730,6 +731,7 @@ public class Shortcut : View
     public override bool OnLeave (View view)
     {
         SetColors ();
+        _lastFocusedView = this;
 
         return base.OnLeave (view);
     }

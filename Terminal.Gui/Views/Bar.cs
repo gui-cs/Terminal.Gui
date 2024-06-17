@@ -159,21 +159,6 @@ public class Bar : View
                 break;
 
             case Orientation.Vertical:
-                // CommandView is aligned left, HelpView is aligned right, KeyView is aligned right
-                // All CommandView's are the same width, all HelpView's are the same width,
-                // all KeyView's are the same width
-
-                var minKeyWidth = 0;
-
-                List<Shortcut> shortcuts = Subviews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
-
-                foreach (Shortcut shortcut in shortcuts)
-                {
-                    // Let AutoSize do its thing to get the minimum width of each CommandView and HelpView
-                    //shortcut.CommandView.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
-                    minKeyWidth = int.Max (minKeyWidth, shortcut.KeyView.Text.GetColumns ());
-                }
-
                 // Set the overall size of the Bar and arrange the views vertically
                 var maxBarItemWidth = 0;
                 var totalHeight = 0;
@@ -182,10 +167,7 @@ public class Bar : View
                 {
                     View barItem = Subviews [index];
 
-                    if (barItem is Shortcut scBarItem)
-                    {
-                        scBarItem.MinimumKeyViewSize = minKeyWidth;
-                    }
+                    barItem.ColorScheme = ColorScheme;
 
                     if (!barItem.Visible)
                     {
@@ -204,23 +186,16 @@ public class Bar : View
 
                     prevBarItem = barItem;
 
-                    if (barItem is Shortcut shortcut)
-                    {
-                        maxBarItemWidth = Math.Max (maxBarItemWidth, shortcut.Frame.Width);
-                    }
-                    else
-                    {
-                        maxBarItemWidth = Math.Max (maxBarItemWidth, barItem.Frame.Width);
-                    }
+                    //maxBarItemWidth = Math.Max (maxBarItemWidth, barItem.Frame.Width);
 
                     barItem.X = 0;
                     totalHeight += barItem.Frame.Height;
                 }
 
-                foreach (Shortcut shortcut in shortcuts)
-                {
-                    shortcut.Width = maxBarItemWidth;
-                }
+                //foreach (Shortcut shortcut in shortcuts)
+                //{
+                //    shortcut.Width = maxBarItemWidth;
+                //}
 
                 Height = Dim.Auto (DimAutoStyle.Content, totalHeight);
 

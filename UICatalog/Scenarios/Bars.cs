@@ -35,7 +35,7 @@ public class Bars : Scenario
         {
             Title = "Event Log",
             X = Pos.AnchorEnd (),
-            Width = Dim.Auto(),
+            Width = Dim.Auto (),
             Height = Dim.Fill (), // Make room for some wide things
             ColorScheme = Colors.ColorSchemes ["Toplevel"],
             Source = new ListWrapper<string> (eventSource)
@@ -49,7 +49,7 @@ public class Bars : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill () - Dim.Width (eventLog),
-            Height = 10,
+            Height = Dim.Percent(33),
         };
         Application.Top.Add (menuBarLikeExamples);
 
@@ -57,7 +57,7 @@ public class Bars : Scenario
         {
             Title = "      Bar:",
             X = 0,
-            Y = Pos.AnchorEnd () - 6
+            Y = 0,
         };
         menuBarLikeExamples.Add (label);
 
@@ -67,8 +67,6 @@ public class Bars : Scenario
             X = Pos.Right (label),
             Y = Pos.Top (label),
             Width = Dim.Fill (),
-            Height = 1,//Dim.Auto (DimAutoStyle.Content),
-            Orientation = Orientation.Horizontal,
         };
 
         ConfigMenuBar (bar);
@@ -78,61 +76,68 @@ public class Bars : Scenario
         {
             Title = "  MenuBar:",
             X = 0,
-            Y = Pos.Bottom(bar)
+            Y = Pos.Bottom (bar) + 1
         };
         menuBarLikeExamples.Add (label);
 
-        //bar = new MenuBarv2
-        //{
-        //    Id = "menuBar",
-        //    Width = Dim.Fill (),
-        //    Height = 1,//Dim.Auto (DimAutoStyle.Content),
-        //    Orientation = Orientation.Horizontal,
-        //};
+        bar = new MenuBarv2
+        {
+            Id = "menuBar",
+            X = Pos.Right (label),
+            Y = Pos.Top (label),
+        };
 
-        //ConfigMenuBar (bar);
-        //menuBarLikeExamples.Add (bar);
+        ConfigMenuBar (bar);
+        menuBarLikeExamples.Add (bar);
 
         FrameView menuLikeExamples = new ()
         {
             Title = "Menu-Like Examples",
             X = 0,
-            Y = Pos.Bottom (menuBarLikeExamples),
+            Y = Pos.Center (),
             Width = Dim.Fill () - Dim.Width (eventLog),
-            Height = 10,
+            Height = Dim.Percent (33),
         };
         Application.Top.Add (menuLikeExamples);
 
-        var shortcut1 = new Shortcut
+        label = new Label ()
         {
-            Title = "_Zigzag",
-            Key = Key.G.WithCtrl,
-            Text = "Gonna zig zag",
+            Title = "Bar:",
+            X = 0,
+            Y = 0,
         };
+        menuLikeExamples.Add (label);
 
-        var shortcut2 = new Shortcut
+        bar = new Bar
         {
-            Title = "Za_G",
-            Text = "Gonna zag",
-            Key = Key.G.WithAlt,
-        };
-
-        var vBar = new Bar
-        {
-            X = 2,
-            Y = 2,
+            Id = "menu-like",
+            X = 0,
+            Y = Pos.Bottom(label),
+            //Width = Dim.Percent (40),
             Orientation = Orientation.Vertical,
-            BorderStyle = LineStyle.Rounded
         };
-        vBar.Add (shortcut1, shortcut2);
+        bar.Border.Thickness = new (1);
+        ConfigureMenu (bar);
 
-        menuLikeExamples.Add (vBar);
+        menuLikeExamples.Add (bar);
 
-        // BUGBUG: This should not be needed
-        menuLikeExamples.LayoutSubviews ();
+        label = new Label ()
+        {
+            Title = "Menu:",
+            X = Pos.Right(bar) + 1,
+            Y = Pos.Top (label),
+        };
+        menuLikeExamples.Add (label);
 
-        // SetupMenuBar ();
-        //SetupContentMenu ();
+        bar = new Menuv2
+        {
+            Id = "menu",
+            X = Pos.Left (label),
+            Y = Pos.Bottom (label),
+        };
+        ConfigureMenu (bar);
+
+        menuLikeExamples.Add (bar);
 
         FrameView statusBarLikeExamples = new ()
         {
@@ -140,7 +145,7 @@ public class Bars : Scenario
             X = 0,
             Y = Pos.AnchorEnd (),
             Width = Dim.Width (menuLikeExamples),
-            Height = 10,
+            Height = Dim.Percent (33),
         };
         Application.Top.Add (statusBarLikeExamples);
 
@@ -148,7 +153,7 @@ public class Bars : Scenario
         {
             Title = "      Bar:",
             X = 0,
-            Y = Pos.AnchorEnd () - 6
+            Y = 0,
         };
         statusBarLikeExamples.Add (label);
         bar = new Bar
@@ -166,7 +171,7 @@ public class Bars : Scenario
         {
             Title = "StatusBar:",
             X = 0,
-            Y = Pos.AnchorEnd () - 3
+            Y = Pos.Bottom (bar) + 1,
         };
         statusBarLikeExamples.Add (label);
         bar = new StatusBar ()
@@ -348,22 +353,58 @@ public class Bars : Scenario
         var fileMenuBarItem = new Shortcut
         {
             Title = "_File",
+            HelpText = "File Menu",
+            Key = Key.D0.WithAlt,
         };
-        fileMenuBarItem.KeyView.Visible = false;
 
         var editMenuBarItem = new Shortcut
         {
             Title = "_Edit",
+            HelpText = "Edit Menu",
+            Key = Key.D1.WithAlt
         };
 
-        bar.Add (fileMenuBarItem, editMenuBarItem);
+        var helpMenuBarItem = new Shortcut
+        {
+            Title = "_Help",
+            HelpText = "Halp Menu",
+            Key = Key.D2.WithAlt
+        };
+
+        bar.Add (fileMenuBarItem, editMenuBarItem, helpMenuBarItem);
+    }
+
+    private void ConfigureMenu (Bar bar)
+    {
+
+        var shortcut1 = new Shortcut
+        {
+            Title = "Z_igzag",
+            Key = Key.I.WithCtrl,
+            Text = "Gonna zig zag",
+        };
+
+        var shortcut2 = new Shortcut
+        {
+            Title = "Za_G",
+            Text = "Gonna zag",
+            Key = Key.G.WithAlt,
+        };
+
+        var shortcut3 = new Shortcut
+        {
+            Title = "_Three",
+            Text = "The 3rd item",
+            Key = Key.D3.WithAlt,
+        };
+
+        bar.Add (shortcut1, shortcut2, shortcut3);
     }
 
     private void ConfigStatusBar (Bar bar)
     {
         var shortcut = new Shortcut
         {
-            Height = Dim.Auto (DimAutoStyle.Content, 3),
             Text = "Quit",
             Title = "Q_uit",
             Key = Key.Z.WithCtrl,
