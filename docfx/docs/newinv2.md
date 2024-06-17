@@ -12,7 +12,7 @@ Apps built with Terminal.Gui now feel modern thanks to these improvements:
 * *Enhanced Borders and Padding* - Terminal.Gui now supports a `Border`, `Margin`, and `Padding` property on all views. This simplifies View development and enables a sophisticated look and feel. See [Adornments](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#adornments) for details.
 * *User Configurable Color Themes* - See [Color Themes](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#color-themes) for details.
 * *Enhanced Unicode/Wide Character support* - Terminal.Gui now supports the full range of Unicode/wide characters. See [Unicode](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#unicode) for details.
-* *Line Canvas* - Terminal.Gui now supports a line canvas enabling high-performance drawing of lines and shapes using box-drawing glyphs. `LineCanvas` provides *auto join*, a smart TUI drawing system that automatically selects the correct line/box drawing glyphs for intersections making drawing complex shapes easy. See [Line Canvas](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#line-canvas) for details.
+* *[LineCanvas](~/api/Terminal.Gui.Line Canvas.yml)* - Terminal.Gui now supports a line canvas enabling high-performance drawing of lines and shapes using box-drawing glyphs. `LineCanvas` provides *auto join*, a smart TUI drawing system that automatically selects the correct line/box drawing glyphs for intersections making drawing complex shapes easy. See [Line Canvas](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#line-canvas) for details.
 
 ## Simplified API
 
@@ -34,15 +34,16 @@ The entire library has been reviewed and simplified. As a result, the API is mor
 
 ## New and Improved Built-in Views
 
-* *DatePicker* - NEW!
-* *ScrollView* - Replaced by built-in scrolling.
-* *ScrollBar* - Replaces *ScrollBarView* with a much simpler view.
-* *Slider* - NEW!
-* *Bars* - NEW!
-* *StatusBar* - New implementation based on `Bar`
-* *MenuBar* - New implementation based on `Bar`
-* *ContextMenu* - New implementation based on `Bar`
-* *File Dialog* - The new, modern file dialog includes icons (in TUI!) for files/folders, search, and a `TreeView``. See [FileDialog](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#filedialog) for details.
+* *[DatePicker](~/api/Terminal.Gui.DatePicker.yml)* - NEW! 
+* *[ScrollView](~/api/Terminal.Gui.ScrollView.yml)* - Replaced by built-in scrolling.
+* *[ScrollBar](~/api/Terminal.Gui.ScrollBar.yml)* - Replaces *ScrollBarView* with a much simpler view.
+* *[Slider](~/api/Terminal.Gui.Slider.yml)* - NEW!
+* *[Shortcut](~/api/Terminal.Gui.Shortcut.yml)* - NEW! An opinionated (visually & API) View for displaying a command, helptext, key.
+* *[Bar](~/api/Terminal.Gui.Bar.yml)* - NEW! Building-block View for containing Shortcuts. Opinionated relative to Orientation but minimially so. The basis for the new StatusBar, MenuBar, and Menu views.
+* *[StatusBar](~/api/Terminal.Gui.StatusBar.yml)* - New implementation based on `Bar`
+* *[MenuBar](~/api/Terminal.Gui.MenuBar.yml)* - COMING SOON! New implementation based on `Bar`
+* *[ContextMenu](~/api/Terminal.Gui.ContextMenu.yml)* - COMING SOON! New implementation based on `Bar`
+* *[FileDialog](~/api/Terminal.Gui.FileDialog.yml)* - The new, modern file dialog includes icons (in TUI!) for files/folders, search, and a `TreeView``. See [FileDialog](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#filedialog) for details.
 
 ## Configuration Manager
 

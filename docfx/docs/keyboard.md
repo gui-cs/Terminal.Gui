@@ -43,17 +43,14 @@ A **HotKey** is a keypress that selects a visible UI item. For selecting items a
 
 By default, the `Text` of a `View` is used to determine the `HotKey` by looking for the first occurrence of the [HotKeySpecifier](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_HotKeySpecifier) (which is underscore (`_`) by default). The character following the underscore is the `HotKey`. If the `HotKeySpecifier` is not found in `Text`, the first character of `Text` is used as the `HotKey`. The `Text` of a `View` can be changed at runtime, and the `HotKey` will be updated accordingly. [HotKey](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_HotKey) is `virtual` enabling this behavior to be customized.
 
-### **[Shortcut](~/api/Terminal.Gui.MenuItem.yml#Terminal_Gui_MenuItem_Shortcut)** 
+### **[Shortcut](~/api/Terminal.Gui.Shortcut.yml) - An opinionated (visually & API) View for displaying a command, helptext, key.
+**
 
-A **Shortcut** is a keypress that invokes a [Command](~/api/Terminal.Gui.Command.yml) or `View`-defined action regardless of whether the `View` that defines them is visible (but the `View` must be enabled). Shortcuts can be any keypress; `Key.A`, `Key.A | Key.Ctrl`, `Key.A | Key.Ctrl | Key.Alt`, `Key.Del`, and `Key.F1`, are all valid. 
+A **Shortcut** is a keypress that invokes a [Command](~/api/Terminal.Gui.Command.yml) or `View`-defined action even if the `View` that defines them is not focused or visible (but the `View` must be enabled). Shortcuts can be any keypress; `Key.A`, `Key.A | Key.Ctrl`, `Key.A | Key.Ctrl | Key.Alt`, `Key.Del`, and `Key.F1`, are all valid. 
 
 `Shortcuts` are used to define application-wide actions (e.g. `Quit`), or actions that are not visible (e.g. `Copy`).
 
-Not all `Views` support `Shortcut`s. [MenuBar](~/api/Terminal.Gui.MenuBar.yml), [ContextMenu](~/api/Terminal.Gui.ContextMenu.yml), and [StatusBar](~/api/Terminal.Gui.StatusBar.yml) support `Shortcut`s. However, the `Button` class does not. 
-
-The `Shortcut` is provided by setting the [Shortcut](~/api/Terminal.Gui.MenuItem.yml#Terminal_Gui_MenuItem_Shortcut) property on either a [MenuItem](~/api/Terminal.Gui.MenuItem.yml) or [StatusItem](~/api/Terminal.Gui.StatusItem.yml). 
-
-The [ShortcutDelimiter](~/api/Terminal.Gui.MenuBar.yml#Terminal_Gui_MenuBar_ShortcutDelimiter) (`+` by default) is used to separate the `Shortcut` from the `Text` of the `MenuItem` or `StatusItem`. For example, the `Shortcut` for `Quit` is `Ctrl+Q` and the `Text` is `Quit`. 
+[MenuBar](~/api/Terminal.Gui.MenuBar.yml), [ContextMenu](~/api/Terminal.Gui.ContextMenu.yml), and [StatusBar](~/api/Terminal.Gui.StatusBar.yml) support `Shortcut`s. 
 
 ### **[Handling Keyboard Events](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_KeyDown)**
 

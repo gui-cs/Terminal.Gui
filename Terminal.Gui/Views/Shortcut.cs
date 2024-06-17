@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Reflection.Metadata;
-using Terminal.Gui.Analyzers.Internal.Attributes;
 
 namespace Terminal.Gui;
 
@@ -21,11 +19,11 @@ namespace Terminal.Gui;
 ///         be invoked regardless of what View has focus, enabling an application-wide keyboard shortcut.
 ///     </para>
 ///     <para>
-///         A Shortcut displays the command text on the left side, the help text in the middle, and the key binding on the
-///         right side.
+///         By default, a Shortcut displays the command text on the left side, the help text in the middle, and the key binding on the
+///         right side. Set <see cref="AlignmentModes"/> to <see cref="AlignmentModes.EndToStart"/> to reverse the order.
 ///     </para>
 ///     <para>
-///         The command text can be set by setting the <see cref="CommandView"/>'s Text property.
+///         The command text can be set by setting the <see cref="CommandView"/>'s Text property or by setting <see cref="View.Title"/>.
 ///     </para>
 ///     <para>
 ///         The help text can be set by setting the <see cref="HelpText"/> property or by setting <see cref="View.Text"/>.
@@ -38,8 +36,13 @@ namespace Terminal.Gui;
 public class Shortcut : View
 {
     /// <summary>
-    ///  Creates a new instance of <see cref="Shortcut"/>;
+    ///     Creates a new instance of <see cref="Shortcut"/>.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a helper API that mimics the V1 API for creating StatusItems.
+    ///     </para>
+    /// </remarks>
     /// <param name="key"></param>
     /// <param name="commandText"></param>
     /// <param name="action"></param>
@@ -63,7 +66,7 @@ public class Shortcut : View
         CommandView = new ()
         {
             Width = Dim.Auto (),
-            Height = Dim.Auto (),
+            Height = Dim.Auto ()
         };
 
         HelpView.Id = "_helpView";
@@ -117,18 +120,22 @@ public class Shortcut : View
         Dim GetWidthDimAuto ()
         {
             // TODO: PosAlign.CalculateMinDimension is a hack. Need to figure out a better way of doing this.
-            return Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)), maximumContentDim: Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)));
+            return Dim.Auto (
+                             DimAutoStyle.Content,
+                             Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)),
+                             Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)));
         }
     }
 
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
     /// </summary>
-    public Shortcut () : this (Gui.Key.Empty, string.Empty, null) { }
+    public Shortcut () : this (Key.Empty, string.Empty, null) { }
 
     /// <summary>
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Shortcut"/>. The default is
-    ///     <see cref="Orientation.Horizontal"/>, which is ideal for status bars and toolbars. If set to <see cref="Orientation.Vertical"/>,
+    ///     <see cref="Orientation.Horizontal"/>, which is ideal for status bars and toolbars. If set to
+    ///     <see cref="Orientation.Vertical"/>,
     ///     the Shortcut will be configured for vertical layout, which is ideal for menus.
     /// </summary>
     public Orientation Orientation { get; set; } = Orientation.Horizontal;
@@ -136,7 +143,8 @@ public class Shortcut : View
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
 
     /// <summary>
-    ///      Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Shortcut"/>. The default is <see cref="AlignmentModes.StartToEnd"/>.
+    ///     Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Shortcut"/>. The default is
+    ///     <see cref="AlignmentModes.StartToEnd"/>.
     /// </summary>
     public AlignmentModes AlignmentModes
     {
@@ -215,7 +223,7 @@ public class Shortcut : View
 
                     case 2:
                         // Scrunch just the right margin
-                        var t = GetMarginThickness ();
+                        Thickness t = GetMarginThickness ();
                         HelpView.Margin.Thickness = new (t.Right, t.Top, t.Left - 1, t.Bottom);
 
                         break;
@@ -241,6 +249,7 @@ public class Shortcut : View
                 // Reset to default
                 //SetCommandViewDefaultLayout();
                 SetHelpViewDefaultLayout ();
+
                 //SetKeyViewDefaultLayout ();
             }
         }
@@ -250,12 +259,10 @@ public class Shortcut : View
     {
         if (Orientation == Orientation.Vertical)
         {
-            return new Thickness (1, 0, 1, 0);
+            return new (1, 0, 1, 0);
         }
-        else
-        {
-            return new Thickness (1, 0, 1, 0);
-        }
+
+        return new (1, 0, 1, 0);
     }
 
     private Color? _savedForeColor;
@@ -304,7 +311,6 @@ public class Shortcut : View
         {
             SetFocus ();
         }
-
     }
 
     #region Command
@@ -374,6 +380,7 @@ public class Shortcut : View
 
             _commandView.MouseClick += Shortcut_MouseClick;
             _commandView.Accept += CommandViewAccept;
+
             _commandView.HotKeyChanged += (s, e) =>
                                           {
                                               if (e.NewKey != Key.Empty)
@@ -411,9 +418,8 @@ public class Shortcut : View
     {
         CommandView.Margin.Thickness = GetMarginThickness ();
         CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
-        CommandView.Y = 0;//Pos.Center ();
+        CommandView.Y = 0; //Pos.Center ();
     }
-
 
     private void Shortcut_TitleChanged (object sender, StateEventArgs<string> e)
     {
@@ -436,7 +442,7 @@ public class Shortcut : View
     {
         HelpView.Margin.Thickness = GetMarginThickness ();
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
-        HelpView.Y = 0;//Pos.Center ();
+        HelpView.Y = 0; //Pos.Center ();
         HelpView.Width = Dim.Auto (DimAutoStyle.Text);
         HelpView.Height = CommandView?.Visible == true ? Dim.Height (CommandView) : 1;
 
@@ -530,7 +536,6 @@ public class Shortcut : View
 
     private int _minimumKeyViewSize;
 
-
     /// <summary>
     /// </summary>
     public int MinimumKeyViewSize
@@ -558,7 +563,7 @@ public class Shortcut : View
     {
         KeyView.Margin.Thickness = GetMarginThickness ();
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
-        KeyView.Y = 0;//Pos.Center ();
+        KeyView.Y = 0; //Pos.Center ();
         KeyView.Width = Dim.Auto (DimAutoStyle.Text, Dim.Func (GetMinimumKeyViewSize));
         KeyView.Height = CommandView?.Visible == true ? Dim.Height (CommandView) : 1;
 
@@ -596,6 +601,7 @@ public class Shortcut : View
         {
             case KeyBindingScope.Application:
                 handled = false;
+
                 break;
 
             case KeyBindingScope.Focused:
@@ -609,7 +615,6 @@ public class Shortcut : View
 
                 break;
         }
-
 
         if (handled == false)
         {
@@ -625,7 +630,8 @@ public class Shortcut : View
     }
 
     /// <summary>
-    ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the mouse. 
+    ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the
+    ///     mouse.
     /// </summary>
     /// <remarks>
     ///     Note, the <see cref="View.Accept"/> event is fired first, and if cancelled, the event will not be invoked.
@@ -649,7 +655,6 @@ public class Shortcut : View
     }
 
     /// <summary>
-    /// 
     /// </summary>
     internal void SetColors ()
     {
@@ -688,6 +693,7 @@ public class Shortcut : View
     public override bool OnEnter (View view)
     {
         SetColors ();
+
         return base.OnEnter (view);
     }
 
@@ -695,12 +701,13 @@ public class Shortcut : View
     public override bool OnLeave (View view)
     {
         SetColors ();
+
         return base.OnLeave (view);
     }
 
     #endregion Focus
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         if (disposing)
@@ -709,16 +716,18 @@ public class Shortcut : View
             {
                 CommandView.Dispose ();
             }
+
             if (HelpView?.IsAdded == false)
             {
                 HelpView.Dispose ();
             }
+
             if (KeyView?.IsAdded == false)
             {
                 KeyView.Dispose ();
             }
         }
-        base.Dispose (disposing);
 
+        base.Dispose (disposing);
     }
 }
