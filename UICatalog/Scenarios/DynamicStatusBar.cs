@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -8,20 +9,14 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-#if V2_STATUSBAR
 [ScenarioMetadata ("Dynamic StatusBar", "Demonstrates how to add and remove a StatusBar and change items dynamically.")]
 [ScenarioCategory ("Top Level Windows")]
 public class DynamicStatusBar : Scenario
 {
-    public override void Init ()
+    public override void Main ()
     {
-        Application.Init ();
 
-        Top = new ();
-
-        Top.Add (
-                 new DynamicStatusBarSample { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" }
-                );
+        Application.Run<DynamicStatusBarSample> ().Dispose();
     }
 
     public class Binding
@@ -214,7 +209,7 @@ public class DynamicStatusBar : Scenario
                                   ? GetTargetAction (statusItem.Action)
                                   : string.Empty;
 
-            TextShortcut.Text = statusItem.Shortcut;
+            TextShortcut.Text = statusItem.CommandView.Text;
         }
 
         public DynamicStatusItem EnterStatusItem ()
@@ -321,6 +316,8 @@ public class DynamicStatusBar : Scenario
         {
             DataContext = new DynamicStatusItemModel ();
 
+            Title = $"{Application.QuitKey} to Quit";
+
             var _frmStatusBar = new FrameView
             {
                 Y = 5, Width = Dim.Percent (50), Height = Dim.Fill (2), Title = "Items:"
@@ -376,7 +373,7 @@ public class DynamicStatusBar : Scenario
 
                                   if (statusItem != null)
                                   {
-                                      Shortcut [] items = _statusBar.Items;
+                                      Shortcut [] items = _statusBar.Subviews.Cast<Shortcut> ().ToArray ();
 
                                       if (i > 0)
                                       {
@@ -399,7 +396,7 @@ public class DynamicStatusBar : Scenario
 
                                     if (statusItem != null)
                                     {
-                                        Shortcut [] items = _statusBar.Items;
+                                        Shortcut [] items = _statusBar.Subviews.Cast<Shortcut> ().ToArray ();
 
                                         if (i < items.Length - 1)
                                         {
@@ -488,7 +485,7 @@ public class DynamicStatusBar : Scenario
 
                                       if (statusItem != null)
                                       {
-                                          _statusBar.RemoveItem (_currentSelectedStatusBar);
+                                          _statusBar.RemoveShortcut (_currentSelectedStatusBar);
                                           DataContext.Items.RemoveAt (_lstItems.SelectedItem);
 
                                           if (_lstItems.Source.Count > 0 && _lstItems.SelectedItem > _lstItems.Source.Count - 1)
@@ -581,7 +578,7 @@ public class DynamicStatusBar : Scenario
 
                 if (statusItem != null)
                 {
-                    foreach (Shortcut si in _statusBar.Items)
+                    foreach (Shortcut si in _statusBar.Subviews.Cast<Shortcut> ())
                     {
                         DataContext.Items.Add (new DynamicStatusItemList (si.Title, si));
                     }
@@ -590,7 +587,7 @@ public class DynamicStatusBar : Scenario
 
             Shortcut CreateNewStatusBar (DynamicStatusItem item)
             {
-                var newStatusItem = new Shortcut (item.Shortcut);
+                var newStatusItem = new Shortcut (Key.Empty, item.Title, null);
 
                 return newStatusItem;
             }
@@ -602,7 +599,7 @@ public class DynamicStatusBar : Scenario
             )
             {
                 _currentEditStatusItem = CreateNewStatusBar (statusItem);
-                _statusBar.Items [index] = _currentEditStatusItem;
+                //_statusBar.Items [index] = _currentEditStatusItem;
 
                 if (DataContext.Items.Count == 0)
                 {
@@ -735,4 +732,3 @@ public class DynamicStatusBar : Scenario
         }
     }
 }
-#endif
