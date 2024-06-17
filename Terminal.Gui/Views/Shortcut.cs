@@ -126,7 +126,7 @@ public class Shortcut : View
             SetHelpViewDefaultLayout ();
             SetKeyViewDefaultLayout ();
 
-            SetColorScheme ();
+            SetColors ();
         }
 
         // Helper to set Width consistently
@@ -312,22 +312,10 @@ public class Shortcut : View
         // When the Shortcut is clicked, we want to invoke the Command and Set focus
         var view = sender as View;
 
-        if (view != CommandView)
-        {
-            CommandView.InvokeCommand (Command.Accept);
-            e.Handled = true;
-        }
-
         if (!e.Handled)
         {
             // If the subview (likely CommandView) didn't handle the mouse click, invoke the command.
-            bool? handled = false;
-            handled = InvokeCommand (Command.Accept);
-
-            if (handled.HasValue)
-            {
-                e.Handled = handled.Value;
-            }
+            e.Handled = InvokeCommand (Command.Accept) == true;
         }
 
         if (CanFocus)
@@ -335,7 +323,6 @@ public class Shortcut : View
             SetFocus ();
         }
 
-        e.Handled = true;
     }
 
     #region Command
@@ -426,12 +413,6 @@ public class Shortcut : View
 
             return;
 
-            void CommandViewTextChanged (object sender, StateEventArgs<string> e)
-            {
-                Title = _commandView.Text;
-                ShowHide ();
-            }
-
             void CommandViewAccept (object sender, CancelEventArgs e)
             {
                 // When the CommandView fires its Accept event, we want to act as though the
@@ -440,8 +421,6 @@ public class Shortcut : View
                 {
                     e.Cancel = true;
                 }
-
-                //e.Cancel = true;
             }
         }
     }
@@ -643,7 +622,7 @@ public class Shortcut : View
 
                 break;
             case KeyBindingScope.HotKey:
-                handled = _commandView.InvokeCommand (Command.HotKey) == true;
+                _commandView.InvokeCommand (Command.HotKey);
                 handled = false;
 
                 break;
@@ -655,6 +634,8 @@ public class Shortcut : View
             if (base.OnAccept () is false)
             {
                 Action?.Invoke ();
+
+                return true;
             }
         }
 
@@ -681,11 +662,14 @@ public class Shortcut : View
         set
         {
             base.ColorScheme = value;
-            SetColorScheme ();
+            SetColors ();
         }
     }
 
-    public void SetColorScheme ()
+    /// <summary>
+    /// 
+    /// </summary>
+    internal void SetColors ()
     {
         // Border should match superview.
         Border.ColorScheme = SuperView?.ColorScheme;
@@ -721,14 +705,14 @@ public class Shortcut : View
     /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
-        SetColorScheme ();
+        SetColors ();
         return base.OnEnter (view);
     }
 
     /// <inheritdoc/>
     public override bool OnLeave (View view)
     {
-        SetColorScheme ();
+        SetColors ();
         return base.OnLeave (view);
     }
 

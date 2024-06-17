@@ -182,7 +182,7 @@ public class Shortcuts : Scenario
                                                                  if (peer.CanFocus)
                                                                  {
                                                                      peer.CommandView.CanFocus = e.NewValue == true;
-                                                                     peer.SetColorScheme ();
+                                                                     //peer.SetColors ();
                                                                  }
                                                              }
                                                          }
