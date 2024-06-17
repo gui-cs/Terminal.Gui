@@ -49,23 +49,20 @@ public class Shortcuts : Scenario
             Width = 35,
             Title = "A_pp Shortcut",
             Key = Key.F1,
-            Text = "Width is 30",
+            Text = "Width is 35",
             KeyBindingScope = KeyBindingScope.Application,
-            BorderStyle = LineStyle.Dotted
         };
-        vShortcut1.Border.Thickness = new (1, 1, 1, 1);
         Application.Top.Add (vShortcut1);
 
         var vShortcut2 = new Shortcut
         {
             Orientation = Orientation.Vertical,
             X = 0,
-            Y = Pos.Bottom (vShortcut1) - 1,
-            Width = Dim.Width (vShortcut1),
+            Y = Pos.Bottom (vShortcut1),
+            Width = 35,
             Key = Key.F2,
-            Text = "Width is ^",
+            Text = "Width is 35",
             KeyBindingScope = KeyBindingScope.HotKey,
-            BorderStyle = LineStyle.Dotted,
             CommandView = new RadioGroup
             {
                 Orientation = Orientation.Vertical,
@@ -91,7 +88,6 @@ public class Shortcuts : Scenario
                                     ((RadioGroup)vShortcut2.CommandView).SelectedItem = 0;
                                 }
                             };
-        vShortcut2.Border.Thickness = new (1, 1, 1, 1);
         Application.Top.Add (vShortcut2);
 
         var vShortcut3 = new Shortcut
@@ -104,34 +100,32 @@ public class Shortcuts : Scenario
             HelpText = "Width is Fill",
             Width = Dim.Fill () - Dim.Width (eventLog),
             KeyBindingScope = KeyBindingScope.HotKey,
-            BorderStyle = LineStyle.Rounded
         };
-        vShortcut3.Border.Thickness = new (1, 1, 1, 0);
 
         ((CheckBox)vShortcut3.CommandView).Toggled += (s, e) =>
-                                                     {
-                                                         if (vShortcut3.CommandView is CheckBox cb)
-                                                         {
-                                                             eventSource.Add ($"Toggled: {cb.Text}");
-                                                             eventLog.MoveDown ();
+                                                      {
+                                                          if (vShortcut3.CommandView is CheckBox cb)
+                                                          {
+                                                              eventSource.Add ($"Toggled: {cb.Text}");
+                                                              eventLog.MoveDown ();
 
-                                                             var max = 0;
-                                                             var toAlign = Application.Top.Subviews.Where (v => v is Shortcut s && s.Orientation == Orientation.Vertical && s.BorderStyle == LineStyle.Rounded);
+                                                              var max = 0;
+                                                              var toAlign = Application.Top.Subviews.Where (v => v is Shortcut { Orientation: Orientation.Vertical, Width: not DimAbsolute });
 
-                                                             if (e.NewValue == true)
-                                                             {
-                                                                 foreach (Shortcut peer in toAlign)
-                                                                 {
-                                                                     max = Math.Max (max, peer.KeyView.Text.GetColumns ());
-                                                                 }
-                                                             }
+                                                              if (e.NewValue == true)
+                                                              {
+                                                                  foreach (Shortcut peer in toAlign)
+                                                                  {
+                                                                      max = Math.Max (max, peer.KeyView.Text.GetColumns ());
+                                                                  }
+                                                              }
 
-                                                             foreach (Shortcut peer in toAlign)
-                                                             {
-                                                                 peer.MinimumKeyViewSize = max;
-                                                             }
-                                                         }
-                                                     };
+                                                              foreach (Shortcut peer in toAlign)
+                                                              {
+                                                                  peer.MinimumKeyViewSize = max;
+                                                              }
+                                                          }
+                                                      };
         Application.Top.Add (vShortcut3);
 
         var vShortcut4 = new Shortcut
@@ -147,11 +141,9 @@ public class Shortcuts : Scenario
             HelpText = "Width is Fill",
             Key = Key.K,
             KeyBindingScope = KeyBindingScope.HotKey,
-            BorderStyle = LineStyle.Rounded
         };
         Button button = (Button)vShortcut4.CommandView;
         vShortcut4.CommandView.Accept += Button_Clicked;
-        vShortcut4.Border.Thickness = new (1, 0, 1, 0);
 
         Application.Top.Add (vShortcut4);
 
@@ -165,10 +157,8 @@ public class Shortcuts : Scenario
             Key = Key.F4,
             HelpText = "CommandView.CanFocus",
             KeyBindingScope = KeyBindingScope.HotKey,
-            BorderStyle = LineStyle.Rounded,
             CommandView = new CheckBox { Text = "_CanFocus" },
         };
-        vShortcut5.Border.Thickness = new (1, 0, 1, 1);
 
         ((CheckBox)vShortcut5.CommandView).Toggled += (s, e) =>
                                                      {
@@ -193,13 +183,12 @@ public class Shortcuts : Scenario
         {
             Orientation = Orientation.Vertical,
             X = 0,
-            Y = Pos.Bottom (vShortcut5) - 1,
+            Y = Pos.Bottom (vShortcut5),
             Key = Key.F5,
             HelpText = "Width is Fill",
             Width = Dim.Width (vShortcut5),
 
             KeyBindingScope = KeyBindingScope.HotKey,
-            BorderStyle = LineStyle.Rounded,
             CommandView = new Slider<string>
             {
                 Orientation = Orientation.Vertical,
@@ -209,7 +198,6 @@ public class Shortcuts : Scenario
 
         ((Slider<string>)vShortcutSlider.CommandView).Options = new () { new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" } };
         ((Slider<string>)vShortcutSlider.CommandView).SetOption (0);
-        vShortcutSlider.Border.Thickness = new (1, 1, 1, 1);
 
         ((Slider<string>)vShortcutSlider.CommandView).OptionsChanged += (o, args) =>
                                                                        {
@@ -223,14 +211,12 @@ public class Shortcuts : Scenario
         {
             Orientation = Orientation.Vertical,
             X = 0,
-            Y = Pos.Bottom (vShortcutSlider) - 1,
+            Y = Pos.Bottom (vShortcutSlider),
             Width = Dim.Width (vShortcutSlider),
 
             Title = "_No Key",
             HelpText = "Keyless",
-            BorderStyle = LineStyle.Rounded,
         };
-        vShortcut6.Border.Thickness = new (1, 1, 1, 1);
 
         Application.Top.Add (vShortcut6);
         vShortcut6.SetFocus ();
@@ -240,14 +226,13 @@ public class Shortcuts : Scenario
         // Horizontal
         var hShortcut1 = new Shortcut
         {
+            Orientation = Orientation.Horizontal,
             X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1),
             Y = Pos.Bottom (eventLog) + 1,
             Key = Key.F7,
             HelpText = "Horizontal",
-            BorderStyle = LineStyle.Dashed,
             CanFocus = false
         };
-        hShortcut1.Border.Thickness = new (0, 0, 1, 0);
 
         hShortcut1.CommandView = new ProgressBar
         {
@@ -261,7 +246,6 @@ public class Shortcuts : Scenario
         hShortcut1.CommandView.Width = 10;
         hShortcut1.CommandView.Height = 1;
         hShortcut1.CommandView.CanFocus = false;
-        hShortcut1.AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
 
         Timer timer = new (10)
         {
@@ -296,26 +280,24 @@ public class Shortcuts : Scenario
 
         var hShortcut2 = new Shortcut
         {
+            Orientation = Orientation.Horizontal,
             X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1),
             Y = Pos.Top (hShortcut1),
             Key = Key.F8,
             HelpText = "TextField",
             CanFocus = true,
             CommandView = textField,
-            BorderStyle = LineStyle.Dashed,
         };
-        hShortcut2.AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
-        hShortcut2.Border.Thickness = new (0, 0, 1, 0);
 
         Application.Top.Add (hShortcut2);
 
         var hShortcutBG = new Shortcut
         {
+            Orientation = Orientation.Horizontal,
             X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1) - 1,
             Y = Pos.Top (hShortcut2),
             Key = Key.F9,
             HelpText = "BG Color",
-            BorderStyle = LineStyle.Dashed,
             CanFocus = false
         };
 
@@ -333,23 +315,20 @@ public class Shortcuts : Scenario
                                     };
                                 };
         hShortcutBG.CommandView = bgColor;
-        hShortcutBG.Border.Thickness = new (1, 0, 1, 0);
-        hShortcutBG.AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
 
         Application.Top.Add (hShortcutBG);
 
         var hShortcut3 = new Shortcut
         {
+            Orientation = Orientation.Horizontal,
             X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1),
             Y = Pos.Top (hShortcut2),
             Key = Key.Esc,
             KeyBindingScope = KeyBindingScope.Application,
             Title = "Quit",
             HelpText = "App Scope",
-            BorderStyle = LineStyle.Dashed,
             CanFocus = false
         };
-        hShortcut3.Border.Thickness = new (0);
         hShortcut3.Accept += (o, args) =>
                             {
                                 Application.RequestStop ();

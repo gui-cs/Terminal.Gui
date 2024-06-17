@@ -132,13 +132,34 @@ public class Shortcut : View
     /// </summary>
     public Shortcut () : this (Key.Empty, string.Empty, null) { }
 
+    private Orientation _orientation = Orientation.Horizontal;
+
     /// <summary>
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Shortcut"/>. The default is
     ///     <see cref="Orientation.Horizontal"/>, which is ideal for status bars and toolbars. If set to
     ///     <see cref="Orientation.Vertical"/>,
     ///     the Shortcut will be configured for vertical layout, which is ideal for menus.
     /// </summary>
-    public Orientation Orientation { get; set; } = Orientation.Horizontal;
+    /// <remarks>
+    ///      When Horizontal, Key is first, then Help, then Command. When Vertical, Command is first, then Help, then Key.
+    /// </remarks>
+    public Orientation Orientation
+    {
+        get => _orientation;
+        set
+        {
+            _orientation = value;
+
+            if (value == Orientation.Vertical)
+            {
+                AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
+            }
+            else
+            {
+                AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
+            }
+        }
+    }
 
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
 
@@ -200,7 +221,13 @@ public class Shortcut : View
 
             int currentWidth = Frame.Width;
 
-            // If our width is smaller than the natural then reduce width of HelpView.
+            // If our width is smaller than the natural width then reduce width of HelpView first.
+            // Then KeyView.
+            // Don't ever reduce CommandView (it should spill).
+            // When Horizontal, Key is first, then Help, then Command.
+            // When Vertical, Command is first, then Help, then Key.
+            // BUGBUG: This does not do what the above says.
+            // TODO: Add Unit tests for this.
             if (currentWidth < _minimumDimAutoWidth)
             {
                 int delta = _minimumDimAutoWidth.Value - currentWidth;
