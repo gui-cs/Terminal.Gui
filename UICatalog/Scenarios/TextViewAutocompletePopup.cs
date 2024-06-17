@@ -13,19 +13,22 @@ public class TextViewAutocompletePopup : Scenario
     private int _height = 10;
     private MenuItem _miMultiline;
     private MenuItem _miWrap;
-#if V2_STATUSBAR
-    private StatusItem _siMultiline;
-    private StatusItem _siWrap;
-#endif
+    private Shortcut _siMultiline;
+    private Shortcut _siWrap;
     private TextView _textViewBottomLeft;
     private TextView _textViewBottomRight;
     private TextView _textViewCentered;
     private TextView _textViewTopLeft;
     private TextView _textViewTopRight;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
+        // Init
+        Application.Init ();
+
+        // Setup - Create a top-level application window and configure it.
+        Toplevel appWindow = new ();
+
         var width = 20;
         var text = " jamp jemp jimp jomp jump";
 
@@ -53,22 +56,30 @@ public class TextViewAutocompletePopup : Scenario
                                 )
             ]
         };
-        Top.Add (menu);
+        appWindow.Add (menu);
 
-        _textViewTopLeft = new TextView { Width = width, Height = _height, Text = text };
+        _textViewTopLeft = new TextView
+        {
+            Y = 1,
+            Width = width, Height = _height, Text = text
+        };
         _textViewTopLeft.DrawContent += TextViewTopLeft_DrawContent;
-        Win.Add (_textViewTopLeft);
+        appWindow.Add (_textViewTopLeft);
 
-        _textViewTopRight = new TextView { X = Pos.AnchorEnd (width), Width = width, Height = _height, Text = text };
+        _textViewTopRight = new TextView
+        {
+            X = Pos.AnchorEnd (width), Y = 1, 
+            Width = width, Height = _height, Text = text
+        };
         _textViewTopRight.DrawContent += TextViewTopRight_DrawContent;
-        Win.Add (_textViewTopRight);
+        appWindow.Add (_textViewTopRight);
 
         _textViewBottomLeft = new TextView
         {
             Y = Pos.AnchorEnd (_height), Width = width, Height = _height, Text = text
         };
         _textViewBottomLeft.DrawContent += TextViewBottomLeft_DrawContent;
-        Win.Add (_textViewBottomLeft);
+        appWindow.Add (_textViewBottomLeft);
 
         _textViewBottomRight = new TextView
         {
@@ -79,7 +90,7 @@ public class TextViewAutocompletePopup : Scenario
             Text = text
         };
         _textViewBottomRight.DrawContent += TextViewBottomRight_DrawContent;
-        Win.Add (_textViewBottomRight);
+        appWindow.Add (_textViewBottomRight);
 
         _textViewCentered = new TextView
         {
@@ -90,28 +101,35 @@ public class TextViewAutocompletePopup : Scenario
             Text = text
         };
         _textViewCentered.DrawContent += TextViewCentered_DrawContent;
-        Win.Add (_textViewCentered);
+        appWindow.Add (_textViewCentered);
 
         _miMultiline.Checked = _textViewTopLeft.Multiline;
         _miWrap.Checked = _textViewTopLeft.WordWrap;
 
         var statusBar = new StatusBar (
-#if V2_STATUSBAR
                                        new []
                                        {
                                            new (
                                                 Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
+                                                $"Quit",
                                                 () => Quit ()
                                                ),
-                                           _siMultiline = new StatusItem (KeyCode.Null, "", null),
-                                           _siWrap = new StatusItem (KeyCode.Null, "", null)
+                                           _siMultiline = new Shortcut (Key.Empty, "", null),
+                                           _siWrap = new Shortcut (Key.Empty, "", null)
                                        }
-#endif
-                                      );
-        Top.Add (statusBar);
 
-        Win.LayoutStarted += Win_LayoutStarted;
+                                      );
+        appWindow.Add (statusBar);
+
+        appWindow.LayoutStarted += Win_LayoutStarted;
+
+        // Run - Start the application.
+        Application.Run (appWindow);
+
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
     }
 
     private void Multiline ()
@@ -138,16 +156,12 @@ public class TextViewAutocompletePopup : Scenario
 
     private void SetMultilineStatusText ()
     {
-#if V2_STATUSBAR
         _siMultiline.Title = $"Multiline: {_miMultiline.Checked}";
-#endif
     }
 
     private void SetWrapStatusText ()
     {
-#if V2_STATUSBAR
         _siWrap.Title = $"WordWrap: {_miWrap.Checked}";
-#endif
     }
     private void TextViewBottomLeft_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewBottomLeft); }
     private void TextViewBottomRight_DrawContent (object sender, DrawEventArgs e) { SetAllSuggestions (_textViewBottomRight); }

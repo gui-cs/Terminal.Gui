@@ -27,51 +27,51 @@ public class TabViewExample : Scenario
         {
             Menus =
             [
-                new MenuBarItem (
-                                 "_File",
-                                 new MenuItem []
-                                 {
-                                     new ("_Add Blank Tab", "", AddBlankTab),
-                                     new (
-                                          "_Clear SelectedTab",
-                                          "",
-                                          () => _tabView.SelectedTab = null
-                                         ),
-                                     new ("_Quit", "", Quit)
-                                 }
-                                ),
-                new MenuBarItem (
-                                 "_View",
-                                 new []
-                                 {
-                                     _miShowTopLine =
-                                         new MenuItem ("_Show Top Line", "", ShowTopLine)
-                                         {
-                                             Checked = true, CheckType = MenuItemCheckStyle.Checked
-                                         },
-                                     _miShowBorder =
-                                         new MenuItem ("_Show Border", "", ShowBorder)
-                                         {
-                                             Checked = true, CheckType = MenuItemCheckStyle.Checked
-                                         },
-                                     _miTabsOnBottom =
-                                         new MenuItem ("_Tabs On Bottom", "", SetTabsOnBottom)
-                                         {
-                                             Checked = false, CheckType = MenuItemCheckStyle.Checked
-                                         },
-                                     _miShowTabViewBorder =
-                                         new MenuItem (
-                                                       "_Show TabView Border",
-                                                       "",
-                                                       ShowTabViewBorder
-                                                      ) { Checked = true, CheckType = MenuItemCheckStyle.Checked }
-                                 }
-                                )
+                new (
+                     "_File",
+                     new MenuItem []
+                     {
+                         new ("_Add Blank Tab", "", AddBlankTab),
+                         new (
+                              "_Clear SelectedTab",
+                              "",
+                              () => _tabView.SelectedTab = null
+                             ),
+                         new ("_Quit", "", Quit)
+                     }
+                    ),
+                new (
+                     "_View",
+                     new []
+                     {
+                         _miShowTopLine =
+                             new ("_Show Top Line", "", ShowTopLine)
+                             {
+                                 Checked = true, CheckType = MenuItemCheckStyle.Checked
+                             },
+                         _miShowBorder =
+                             new ("_Show Border", "", ShowBorder)
+                             {
+                                 Checked = true, CheckType = MenuItemCheckStyle.Checked
+                             },
+                         _miTabsOnBottom =
+                             new ("_Tabs On Bottom", "", SetTabsOnBottom)
+                             {
+                                 Checked = false, CheckType = MenuItemCheckStyle.Checked
+                             },
+                         _miShowTabViewBorder =
+                             new (
+                                  "_Show TabView Border",
+                                  "",
+                                  ShowTabViewBorder
+                                 ) { Checked = true, CheckType = MenuItemCheckStyle.Checked }
+                     }
+                    )
             ]
         };
         appWindow.Add (menu);
 
-        _tabView = new TabView
+        _tabView = new()
         {
             X = 0,
             Y = 1,
@@ -80,13 +80,13 @@ public class TabViewExample : Scenario
             BorderStyle = LineStyle.Single
         };
 
-        _tabView.AddTab (new Tab { DisplayText = "Tab1", View = new Label { Text = "hodor!" } }, false);
-        _tabView.AddTab (new Tab { DisplayText = "Tab2", View = new TextField { Text = "durdur" } }, false);
-        _tabView.AddTab (new Tab { DisplayText = "Interactive Tab", View = GetInteractiveTab () }, false);
-        _tabView.AddTab (new Tab { DisplayText = "Big Text", View = GetBigTextFileTab () }, false);
+        _tabView.AddTab (new() { DisplayText = "Tab1", View = new Label { Text = "hodor!" } }, false);
+        _tabView.AddTab (new() { DisplayText = "Tab2", View = new TextField { Text = "durdur" } }, false);
+        _tabView.AddTab (new() { DisplayText = "Interactive Tab", View = GetInteractiveTab () }, false);
+        _tabView.AddTab (new() { DisplayText = "Big Text", View = GetBigTextFileTab () }, false);
 
         _tabView.AddTab (
-                         new Tab
+                         new()
                          {
                              DisplayText =
                                  "Long name Tab, I mean seriously long.  Like you would not believe how long this tab's name is its just too much really woooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooowwww thats long",
@@ -100,7 +100,7 @@ public class TabViewExample : Scenario
                         );
 
         _tabView.AddTab (
-                         new Tab
+                         new()
                          {
                              DisplayText = "Les Mise" + '\u0301' + "rables", View = new Label { Text = "This tab name is unicode" }
                          },
@@ -108,7 +108,7 @@ public class TabViewExample : Scenario
                         );
 
         _tabView.AddTab (
-                         new Tab
+                         new()
                          {
                              DisplayText = "Les Mise" + '\u0328' + '\u0301' + "rables",
                              View = new Label
@@ -123,7 +123,7 @@ public class TabViewExample : Scenario
         for (var i = 0; i < 100; i++)
         {
             _tabView.AddTab (
-                             new Tab { DisplayText = $"Tab{i}", View = new Label { Text = $"Welcome to tab {i}" } },
+                             new() { DisplayText = $"Tab{i}", View = new Label { Text = $"Welcome to tab {i}" } },
                              false
                             );
         }
@@ -178,13 +178,14 @@ public class TabViewExample : Scenario
 
         // Run - Start the application.
         Application.Run (appWindow);
+
         appWindow.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
     }
 
-    private void AddBlankTab () { _tabView.AddTab (new Tab (), false); }
+    private void AddBlankTab () { _tabView.AddTab (new (), false); }
 
     private View GetBigTextFileTab ()
     {
