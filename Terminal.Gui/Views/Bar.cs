@@ -85,6 +85,7 @@ public class Bar : View
         }
     }
 
+    // TODO: Move this to View
     /// <summary>Inserts a <see cref="Shortcut"/> in the specified index of <see cref="View.Subviews"/>.</summary>
     /// <param name="index">The zero-based index at which item should be inserted.</param>
     /// <param name="item">The item to insert.</param>
@@ -94,18 +95,23 @@ public class Bar : View
         int count = savedSubViewList.Count;
         RemoveAll ();
 
-        for (var i = 0; i < count; i++)
+        for (var i = 0; i <= count; i++)
         {
             if (i == index)
             {
                 Add (item);
             }
 
-            Add (savedSubViewList [i]);
+            if (i < count)
+            {
+                Add (savedSubViewList [i]);
+            }
         }
 
         SetNeedsDisplay ();
     }
+
+    // TODO: Move this to View
 
     /// <summary>Removes a <see cref="Shortcut"/> at specified index of <see cref="View.Subviews"/>.</summary>
     /// <param name="index">The zero-based index of the item to remove.</param>
