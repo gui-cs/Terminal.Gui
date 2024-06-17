@@ -620,135 +620,133 @@ public class NavigationTests (ITestOutputHelper output)
         top1.Dispose ();
     }
 
-#if V2_STATUSBAR
-    [Fact]
-    [AutoInitShutdown]
-    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
-    {
-        var sbQuiting = false;
-        var tfQuiting = false;
-        var topQuiting = false;
+//    [Fact]
+//    [AutoInitShutdown]
+//    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
+//    {
+//        var sbQuiting = false;
+//        var tfQuiting = false;
+//        var topQuiting = false;
 
-        var sb = new StatusBar (
-                                new StatusItem []
-                                {
-                                    new (
-                                         KeyCode.CtrlMask | KeyCode.Q,
-                                         "~^Q~ Quit",
-                                         () => sbQuiting = true
-                                        )
-                                }
-                               );
-        var tf = new TextField ();
-        tf.KeyDown += Tf_KeyPressed;
+//        var sb = new StatusBar (
+//                                new Shortcut []
+//                                {
+//                                    new (
+//                                         KeyCode.CtrlMask | KeyCode.Q,
+//                                         "Quit",
+//                                         () => sbQuiting = true
+//                                        )
+//                                }
+//                               );
+//        var tf = new TextField ();
+//        tf.KeyDown += Tf_KeyPressed;
 
-        void Tf_KeyPressed (object sender, Key obj)
-        {
-            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
-            {
-                obj.Handled = tfQuiting = true;
-            }
-        }
+//        void Tf_KeyPressed (object sender, Key obj)
+//        {
+//            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
+//            {
+//                obj.Handled = tfQuiting = true;
+//            }
+//        }
 
-        var win = new Window ();
-        win.Add (sb, tf);
-        Toplevel top = new ();
-        top.KeyDown += Top_KeyPress;
+//        var win = new Window ();
+//        win.Add (sb, tf);
+//        Toplevel top = new ();
+//        top.KeyDown += Top_KeyPress;
 
-        void Top_KeyPress (object sender, Key obj)
-        {
-            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
-            {
-                obj.Handled = topQuiting = true;
-            }
-        }
+//        void Top_KeyPress (object sender, Key obj)
+//        {
+//            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
+//            {
+//                obj.Handled = topQuiting = true;
+//            }
+//        }
 
-        top.Add (win);
-        Application.Begin (top);
+//        top.Add (win);
+//        Application.Begin (top);
 
-        Assert.False (sbQuiting);
-        Assert.False (tfQuiting);
-        Assert.False (topQuiting);
+//        Assert.False (sbQuiting);
+//        Assert.False (tfQuiting);
+//        Assert.False (topQuiting);
 
-        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
-        Assert.False (sbQuiting);
-        Assert.True (tfQuiting);
-        Assert.False (topQuiting);
+//        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+//        Assert.False (sbQuiting);
+//        Assert.True (tfQuiting);
+//        Assert.False (topQuiting);
 
-#if BROKE_WITH_2927
-        tf.KeyPressed -= Tf_KeyPress;
-        tfQuiting = false;
-        Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
-        Application.MainLoop.RunIteration ();
-        Assert.True (sbQuiting);
-        Assert.False (tfQuiting);
-        Assert.False (topQuiting);
+//#if BROKE_WITH_2927
+//        tf.KeyPressed -= Tf_KeyPress;
+//        tfQuiting = false;
+//        Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+//        Application.MainLoop.RunIteration ();
+//        Assert.True (sbQuiting);
+//        Assert.False (tfQuiting);
+//        Assert.False (topQuiting);
 
-        sb.RemoveItem (0);
-        sbQuiting = false;
-        Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
-        Application.MainLoop.RunIteration ();
-        Assert.False (sbQuiting);
-        Assert.False (tfQuiting);
+//        sb.RemoveItem (0);
+//        sbQuiting = false;
+//        Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+//        Application.MainLoop.RunIteration ();
+//        Assert.False (sbQuiting);
+//        Assert.False (tfQuiting);
 
-// This test is now invalid because `win` is focused, so it will receive the keypress
-        Assert.True (topQuiting);
-#endif
-        top.Dispose ();
-    }
+//// This test is now invalid because `win` is focused, so it will receive the keypress
+//        Assert.True (topQuiting);
+//#endif
+//        top.Dispose ();
+//    }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
-    {
-        var sbQuiting = false;
-        var tfQuiting = false;
+//    [Fact]
+//    [AutoInitShutdown]
+//    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
+//    {
+//        var sbQuiting = false;
+//        var tfQuiting = false;
 
-        var sb = new StatusBar (
-                                new StatusItem []
-                                {
-                                    new (
-                                         KeyCode.CtrlMask | KeyCode.Q,
-                                         "~^Q~ Quit",
-                                         () => sbQuiting = true
-                                        )
-                                }
-                               );
-        var tf = new TextField ();
-        tf.KeyDown += Tf_KeyPressed;
+//        var sb = new StatusBar (
+//                                new Shortcut []
+//                                {
+//                                    new (
+//                                         KeyCode.CtrlMask | KeyCode.Q,
+//                                         "~^Q~ Quit",
+//                                         () => sbQuiting = true
+//                                        )
+//                                }
+//                               );
+//        var tf = new TextField ();
+//        tf.KeyDown += Tf_KeyPressed;
 
-        void Tf_KeyPressed (object sender, Key obj)
-        {
-            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
-            {
-                obj.Handled = tfQuiting = true;
-            }
-        }
+//        void Tf_KeyPressed (object sender, Key obj)
+//        {
+//            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
+//            {
+//                obj.Handled = tfQuiting = true;
+//            }
+//        }
 
-        var win = new Window ();
-        win.Add (sb, tf);
-        Toplevel top = new ();
-        top.Add (win);
-        Application.Begin (top);
+//        var win = new Window ();
+//        win.Add (sb, tf);
+//        Toplevel top = new ();
+//        top.Add (win);
+//        Application.Begin (top);
 
-        Assert.False (sbQuiting);
-        Assert.False (tfQuiting);
+//        Assert.False (sbQuiting);
+//        Assert.False (tfQuiting);
 
-        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
-        Assert.False (sbQuiting);
-        Assert.True (tfQuiting);
+//        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+//        Assert.False (sbQuiting);
+//        Assert.True (tfQuiting);
 
-        tf.KeyDown -= Tf_KeyPressed;
-        tfQuiting = false;
-        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
-        Application.MainLoop.RunIteration ();
-#if BROKE_WITH_2927
-        Assert.True (sbQuiting);
-        Assert.False (tfQuiting);
-#endif
-        top.Dispose ();
-    }
-#endif
+//        tf.KeyDown -= Tf_KeyPressed;
+//        tfQuiting = false;
+//        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+//        Application.MainLoop.RunIteration ();
+//#if BROKE_WITH_2927
+//        Assert.True (sbQuiting);
+//        Assert.False (tfQuiting);
+//#endif
+//        top.Dispose ();
+//    }
 
     [Fact]
     [SetupFakeDriver]

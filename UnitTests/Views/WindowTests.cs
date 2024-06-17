@@ -29,7 +29,6 @@ public class WindowTests
         top.Dispose ();
     }
 
-#if V2_STATUSBAR
     [Fact]
     [AutoInitShutdown]
     public void MenuBar_And_StatusBar_Inside_Window ()
@@ -46,14 +45,7 @@ public class WindowTests
             ]
         };
 
-        var sb = new StatusBar (
-                                new StatusItem []
-                                {
-                                    new ((KeyCode)Key.Q.WithCtrl, "~^Q~ Quit", null),
-                                    new ((KeyCode)Key.O.WithCtrl, "~^O~ Open", null),
-                                    new ((KeyCode)Key.C.WithCtrl, "~^C~ Copy", null)
-                                }
-                               );
+        var sb = new StatusBar ();
 
         var fv = new FrameView { Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1), Title = "Frame View" };
         var win = new Window ();
@@ -73,7 +65,7 @@ public class WindowTests
 ││                ││
 ││                ││
 │└────────────────┘│
-│ ^Q Quit │ ^O Open│
+│                  │
 └──────────────────┘",
                                                       _output
                                                      );
@@ -100,7 +92,7 @@ public class WindowTests
 ││                                    ││
 ││                                    ││
 │└────────────────────────────────────┘│
-│ ^Q Quit │ ^O Open │ ^C Copy          │
+│                                      │
 └──────────────────────────────────────┘",
                                                       _output
                                                      );
@@ -117,13 +109,12 @@ public class WindowTests
 ││                ││
 ││                ││
 │└────────────────┘│
-│ ^Q Quit │ ^O Open│
+│                  │
 └──────────────────┘",
                                                       _output
                                                      );
         top.Dispose ();
     }
-#endif
 
     [Fact]
     public void New_Initializes ()
