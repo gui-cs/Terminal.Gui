@@ -447,70 +447,73 @@ internal class UICatalogApp
                 ]
             };
 
-            ShVersion = new ()
-            {
-                Title = "Version Info",
-                CanFocus = false,
-
-            };
-
-            StatusBar = new ()
-            {
-                Visible = ShowStatusBar,
-            };
-            StatusBar.AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
-
-            Shortcut statusBarShortcut = new Shortcut ()
-            {
-                Key = Key.F10,
-                Title = "Show/Hide Status Bar",
-            };
-            statusBarShortcut.Accept += (sender, args) =>
-                                        {
-                                            StatusBar.Visible = !StatusBar.Visible;
-                                        };
-
-            ShForce16Colors = new Shortcut ()
-            {
-                CommandView = new CheckBox ()
-                {
-                    Title = "16 color mode",
-                    Checked = Application.Force16Colors,
-                    CanFocus = false,
-                }, HelpText = "",
-                Key = Key.F6,
-            };
-            ShForce16Colors.Accept += (sender, args) =>
-                                            {
-                                                ((CheckBox)ShForce16Colors.CommandView).Checked = Application.Force16Colors = (bool)!((CheckBox)ShForce16Colors.CommandView).Checked!;
-                                                MiForce16Colors.Checked = Application.Force16Colors;
-                                                Application.Refresh ();
-
-                                            };
-
-            //ShDiagnostics = new Shortcut ()
+            //StatusBar = new ()
             //{
-            //    HelpText = "Diagnostic flags",
-            //    CommandView = new RadioGroup()
-            //    {
-            //        RadioLabels = ["Off", "Ruler", "Padding", "MouseEnter"],
-
-            //        CanFocus = false,
-            //        Orientation = Orientation.Vertical,
-            //    }
+            //    Visible = ShowStatusBar,
             //};
 
-            StatusBar.Add (
-                new Shortcut ()
+            if (StatusBar is { })
+            {
+                ShVersion = new ()
                 {
-                    Title = "Quit",
-                    Key = Application.QuitKey,
-                },
-                statusBarShortcut,
-                ShForce16Colors,
-                //ShDiagnostics,
-                ShVersion
-            );
+                    Title = "Version Info",
+                    CanFocus = false,
+
+                };
+
+                Shortcut statusBarShortcut = new Shortcut ()
+                {
+                    Key = Key.F10,
+                    Title = "Show/Hide Status Bar",
+                };
+                statusBarShortcut.Accept += (sender, args) => { StatusBar.Visible = !StatusBar.Visible; };
+
+                ShForce16Colors = new Shortcut ()
+                {
+                    CommandView = new CheckBox ()
+                    {
+                        Title = "16 color mode",
+                        Checked = Application.Force16Colors,
+                        CanFocus = false,
+                    },
+                    HelpText = "",
+                    Key = Key.F6,
+                };
+
+                ShForce16Colors.Accept += (sender, args) =>
+                                          {
+                                              ((CheckBox)ShForce16Colors.CommandView).Checked =
+                                                  Application.Force16Colors = (bool)!((CheckBox)ShForce16Colors.CommandView).Checked!;
+                                              MiForce16Colors.Checked = Application.Force16Colors;
+                                              Application.Refresh ();
+
+                                          };
+
+                //ShDiagnostics = new Shortcut ()
+                //{
+                //    HelpText = "Diagnostic flags",
+                //    CommandView = new RadioGroup()
+                //    {
+                //        RadioLabels = ["Off", "Ruler", "Padding", "MouseEnter"],
+
+                //        CanFocus = false,
+                //        Orientation = Orientation.Vertical,
+                //    }
+                //};
+
+                StatusBar.Add (
+                               new Shortcut ()
+                               {
+                                   Title = "Quit",
+                                   Key = Application.QuitKey,
+                               },
+                               statusBarShortcut,
+                               ShForce16Colors,
+
+                               //ShDiagnostics,
+                               ShVersion
+                              );
+            }
 
             // Create the Category list view. This list never changes.
             CategoryList = new ()
@@ -615,7 +618,11 @@ internal class UICatalogApp
             Add (ScenarioList);
 
             Add (MenuBar);
-            Add (StatusBar);
+
+            if (StatusBar is { })
+            {
+                Add (StatusBar);
+            }
 
             Loaded += LoadedHandler;
             Unloaded += UnloadedHandler;
@@ -651,15 +658,13 @@ internal class UICatalogApp
 
             MenuBar.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
 
-            ((Shortcut)StatusBar.Subviews [0]).Key = Application.QuitKey;
+            if (StatusBar is { })
+            {
+                ((Shortcut)StatusBar.Subviews [0]).Key = Application.QuitKey;
+                StatusBar.Visible = ShowStatusBar;
+            }
 
             MiIsMouseDisabled!.Checked = Application.IsMouseDisabled;
-
-            int height = ShowStatusBar ? 1 : 0; // + (MenuBar.Visible ? 1 : 0);
-
-            //ContentPane.Height = Dim.Fill (height);
-
-            StatusBar.Visible = ShowStatusBar;
 
             Application.Top.SetNeedsDisplay ();
         }
@@ -1032,7 +1037,11 @@ internal class UICatalogApp
             ConfigChanged ();
 
             MiIsMouseDisabled!.Checked = Application.IsMouseDisabled;
-            ShVersion.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Driver.GetVersionInfo ()}";
+
+            if (ShVersion is { })
+            {
+                ShVersion.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Driver.GetVersionInfo ()}";
+            }
 
             if (_selectedScenario != null)
             {
@@ -1045,18 +1054,21 @@ internal class UICatalogApp
                 ScenarioList.SetFocus ();
             }
 
-            StatusBar.VisibleChanged += (s, e) =>
-                                        {
-                                            ShowStatusBar = StatusBar.Visible;
+            if (StatusBar is { })
+            {
+                StatusBar.VisibleChanged += (s, e) =>
+                                            {
+                                                ShowStatusBar = StatusBar.Visible;
 
-                                            int height = StatusBar.Visible ? 1 : 0;
-                                            CategoryList.Height = Dim.Fill (height);
-                                            ScenarioList.Height = Dim.Fill (height);
+                                                int height = StatusBar.Visible ? 1 : 0;
+                                                CategoryList.Height = Dim.Fill (height);
+                                                ScenarioList.Height = Dim.Fill (height);
 
-                                            // ContentPane.Height = Dim.Fill (height);
-                                            LayoutSubviews ();
-                                            SetSubViewNeedsDisplay ();
-                                        };
+                                                // ContentPane.Height = Dim.Fill (height);
+                                                LayoutSubviews ();
+                                                SetSubViewNeedsDisplay ();
+                                            };
+            }
 
             Loaded -= LoadedHandler;
             CategoryList.EnsureSelectedItemVisible ();

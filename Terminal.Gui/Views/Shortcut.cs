@@ -138,18 +138,10 @@ public class Shortcut : View
 
     /// <summary>
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Shortcut"/>. The default is
-    ///     <see cref="Orientation.Horizontal"/>, which is ideal for status bars and toolbars. If set to
+    ///     <see cref="Orientation.Horizontal"/>, which is ideal for status bar, menu bar, and tool bar items If set to
     ///     <see cref="Orientation.Vertical"/>,
-    ///     the Shortcut will be configured for vertical layout, which is ideal for menus.
+    ///     the Shortcut will be configured for vertical layout, which is ideal for menu items.
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         When Horizontal, Key is first, then Help, then Command. When Vertical, Command is first, then Help, then Key.
-    ///     </para>
-    ///     <para>
-    ///         Set <see cref="AlignmentModes"/> to override the default layout.
-    ///     </para>
-    /// </remarks>
     public Orientation Orientation
     {
         get => _orientation;
@@ -157,26 +149,19 @@ public class Shortcut : View
         {
             _orientation = value;
 
-            if (value == Orientation.Vertical)
-            {
-                AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
-            }
-            else
-            {
-                AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
-            }
+            // TODO: Determine what, if anything, is opinionated about the orientation.
         }
     }
 
-    // The default Orientation is Horizontal thus set this to EndToStart
-    private AlignmentModes _alignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
+    private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
 
     /// <summary>
     ///     Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Shortcut"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Setting <see cref="Orientation"/> will set the <see cref="AlignmentModes"/> to the appropriate value.
+    ///         The default is <see cref="AlignmentModes.StartToEnd"/>. This means that the CommandView will be on the left,
+    ///         HelpView in the middle, and KeyView on the right.
     ///     </para>
     /// </remarks>
     public AlignmentModes AlignmentModes
@@ -661,7 +646,12 @@ public class Shortcut : View
             {
                 Action?.Invoke ();
 
-                return true;
+                if (CanFocus)
+                {
+                    SetFocus ();
+                }
+
+                return false;
             }
         }
 

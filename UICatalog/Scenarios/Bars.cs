@@ -14,7 +14,7 @@ public class Bars : Scenario
     public override void Main ()
     {
         Application.Init ();
-        Window app = new ();
+        Toplevel app = new ();
 
         app.Loaded += App_Loaded;
 
@@ -28,19 +28,80 @@ public class Bars : Scenario
     // QuitKey and it only sticks if changed after init
     private void App_Loaded (object sender, EventArgs e)
     {
-        Application.QuitKey = Key.Z.WithCtrl;
         Application.Top.Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}";
 
         ObservableCollection<string> eventSource = new ();
         ListView eventLog = new ListView ()
         {
+            Title = "Event Log",
             X = Pos.AnchorEnd (),
-            Width = 50,
-            Height = Dim.Fill (6),
+            Width = Dim.Auto(),
+            Height = Dim.Fill (), // Make room for some wide things
             ColorScheme = Colors.ColorSchemes ["Toplevel"],
             Source = new ListWrapper<string> (eventSource)
         };
+        eventLog.Border.Thickness = new (0, 1, 0, 0);
         Application.Top.Add (eventLog);
+
+        FrameView menuBarLikeExamples = new ()
+        {
+            Title = "MenuBar-Like Examples",
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill () - Dim.Width (eventLog),
+            Height = 10,
+        };
+        Application.Top.Add (menuBarLikeExamples);
+
+        Label label = new Label ()
+        {
+            Title = "      Bar:",
+            X = 0,
+            Y = Pos.AnchorEnd () - 6
+        };
+        menuBarLikeExamples.Add (label);
+
+        Bar bar = new Bar
+        {
+            Id = "menuBar-like",
+            X = Pos.Right (label),
+            Y = Pos.Top (label),
+            Width = Dim.Fill (),
+            Height = 1,//Dim.Auto (DimAutoStyle.Content),
+            Orientation = Orientation.Horizontal,
+        };
+
+        ConfigMenuBar (bar);
+        menuBarLikeExamples.Add (bar);
+
+        label = new Label ()
+        {
+            Title = "  MenuBar:",
+            X = 0,
+            Y = Pos.Bottom(bar)
+        };
+        menuBarLikeExamples.Add (label);
+
+        //bar = new MenuBarv2
+        //{
+        //    Id = "menuBar",
+        //    Width = Dim.Fill (),
+        //    Height = 1,//Dim.Auto (DimAutoStyle.Content),
+        //    Orientation = Orientation.Horizontal,
+        //};
+
+        //ConfigMenuBar (bar);
+        //menuBarLikeExamples.Add (bar);
+
+        FrameView menuLikeExamples = new ()
+        {
+            Title = "Menu-Like Examples",
+            X = 0,
+            Y = Pos.Bottom (menuBarLikeExamples),
+            Width = Dim.Fill () - Dim.Width (eventLog),
+            Height = 10,
+        };
+        Application.Top.Add (menuLikeExamples);
 
         var shortcut1 = new Shortcut
         {
@@ -48,11 +109,6 @@ public class Bars : Scenario
             Key = Key.G.WithCtrl,
             Text = "Gonna zig zag",
         };
-        shortcut1.Accept += (s, e) =>
-                            {
-                                eventSource.Add ($"Accept: {s}");
-                                eventLog.MoveDown ();
-                            };
 
         var shortcut2 = new Shortcut
         {
@@ -60,49 +116,6 @@ public class Bars : Scenario
             Text = "Gonna zag",
             Key = Key.G.WithAlt,
         };
-
-        //var shortcut3 = new Shortcut
-        //{
-        //    Title = "Shortcut3",
-        //    Key = Key.D3.WithCtrl,
-        //    Text = "Number Three",
-        //    KeyBindingScope = KeyBindingScope.Application,
-        //    Command = Command.Accept,
-        //};
-
-        //shortcut3.Accept += (s, e) =>
-        //                    {
-        //                        eventSource.Add ($"Accept: {s}");
-        //                        eventLog.MoveDown ();
-        //                    };
-
-        //var shortcut4 = new Shortcut
-        //{
-        //    Title = "Shortcut4",
-        //    Text = "Number 4",
-        //    Key = Key.F4,
-        //    KeyBindingScope = KeyBindingScope.Application,
-        //    Command = Command.Accept,
-        //};
-
-        //var cb = new CheckBox ()
-        //{
-        //    Title = "Hello",// shortcut4.Text
-        //};
-
-        //cb.Toggled += (s, e) =>
-        //             {
-        //                 eventSource.Add ($"Toggled: {s}");
-        //                 eventLog.MoveDown ();
-        //             };
-
-        //shortcut4.CommandView = cb;
-
-        //shortcut4.Accept += (s, e) =>
-        //                    {
-        //                        eventSource.Add ($"Accept: {s}");
-        //                        eventLog.MoveDown ();
-        //                    };
 
         var vBar = new Bar
         {
@@ -113,44 +126,41 @@ public class Bars : Scenario
         };
         vBar.Add (shortcut1, shortcut2);
 
-        ////CheckBox hello = new ()
-        ////{
-        ////    Title = "Hello",
-        ////    X = 0,
-        ////    Y = 1,
-        ////};
-        ////Application.Top.Add (hello);
-        ////hello.Toggled += (s, e) =>
-        ////                 {
-        ////                     eventSource.Add ($"Toggled: {s}");
-        ////                     eventLog.MoveDown ();
-        ////                 };
-
-
-        Application.Top.Add (vBar);
+        menuLikeExamples.Add (vBar);
 
         // BUGBUG: This should not be needed
-        Application.Top.LayoutSubviews ();
+        menuLikeExamples.LayoutSubviews ();
 
         // SetupMenuBar ();
         //SetupContentMenu ();
-        Label label = new Label ()
+
+        FrameView statusBarLikeExamples = new ()
+        {
+            Title = "StatusBar-Like Examples",
+            X = 0,
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Width (menuLikeExamples),
+            Height = 10,
+        };
+        Application.Top.Add (statusBarLikeExamples);
+
+        label = new Label ()
         {
             Title = "      Bar:",
             X = 0,
             Y = Pos.AnchorEnd () - 6
         };
-        Application.Top.Add (label);
-        var bar = new Bar
-        {
-            Id = "bar",
-            X = Pos.Right (label),
-            Y = Pos.Top (label),
-            Width = Dim.Fill (),
-            Orientation = Orientation.Horizontal,
-        };
-        ConfigStatusBar (bar);
-        Application.Top.Add (bar);
+        statusBarLikeExamples.Add (label);
+        //bar = new Bar
+        //{
+        //    Id = "statusBar-like",
+        //    X = Pos.Right (label),
+        //    Y = Pos.Top (label),
+        //    Width = Dim.Fill (),
+        //    Orientation = Orientation.Horizontal,
+        //};
+        //ConfigStatusBar (bar);
+        //statusBarLikeExamples.Add (bar);
 
         label = new Label ()
         {
@@ -158,8 +168,8 @@ public class Bars : Scenario
             X = 0,
             Y = Pos.AnchorEnd () - 3
         };
-        Application.Top.Add (label);
-        bar = new StatusBar()
+        statusBarLikeExamples.Add (label);
+        bar = new StatusBar ()
         {
             Id = "statusBar",
             X = Pos.Right (label),
@@ -168,17 +178,20 @@ public class Bars : Scenario
             Orientation = Orientation.Horizontal,
         };
         ConfigStatusBar (bar);
-        Application.Top.Add (bar);
+        statusBarLikeExamples.Add (bar);
 
-        foreach (Bar barView in Application.Top.Subviews.Where (b => b is Bar)!)
+        foreach (FrameView frameView in Application.Top.Subviews.Where (f => f is FrameView)!)
         {
-            foreach (Shortcut sh in barView.Subviews.Where (s => s is Shortcut)!)
+            foreach (Bar barView in frameView.Subviews.Where (b => b is Bar)!)
             {
-                sh.Accept += (o, args) =>
-                                   {
-                                       eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
-                                       eventLog.MoveDown ();
-                                   };
+                foreach (Shortcut sh in barView.Subviews.Where (s => s is Shortcut)!)
+                {
+                    sh.Accept += (o, args) =>
+                                 {
+                                     eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
+                                     eventLog.MoveDown ();
+                                 };
+                }
             }
         }
     }
@@ -331,108 +344,20 @@ public class Bars : Scenario
         ((View)(sender)).LayoutSubviews ();
     }
 
-    private void SetupMenuBar ()
+    private void ConfigMenuBar (Bar bar)
     {
-        var menuBar = new Bar
-        {
-            Id = "menuBar",
-            Width = Dim.Fill (),
-            Height = 1,//Dim.Auto (DimAutoStyle.Content),
-            Orientation = Orientation.Horizontal,
-        };
-
         var fileMenuBarItem = new Shortcut
         {
             Title = "_File",
-            KeyBindingScope = KeyBindingScope.Application,
-            Key = Key.F.WithAlt,
         };
         fileMenuBarItem.KeyView.Visible = false;
 
         var editMenuBarItem = new Shortcut
         {
             Title = "_Edit",
-
-            KeyBindingScope = KeyBindingScope.HotKey,
         };
 
-        editMenuBarItem.Accept += (s, e) => { };
-        //editMenu.HelpView.Visible = false;
-        //editMenu.KeyView.Visible = false;
-
-        menuBar.Add (fileMenuBarItem, editMenuBarItem);
-        menuBar.Initialized += Menu_Initialized;
-        Application.Top.Add (menuBar);
-
-        var fileMenu = new Bar
-        {
-            X = 1,
-            Y = 1,
-            Orientation = Orientation.Vertical,
-            // Modal = true,
-            Visible = false,
-        };
-
-        var newShortcut = new Shortcut
-        {
-            Title = "_New...",
-            Text = "Create a new file",
-            Key = Key.N.WithCtrl
-        };
-        newShortcut.Border.Thickness = new Thickness (0, 1, 0, 0);
-
-        var openShortcut = new Shortcut
-        {
-            Title = "_Open...",
-            Text = "Show the File Open Dialog",
-            Key = Key.O.WithCtrl
-        };
-
-        var saveShortcut = new Shortcut
-        {
-            Title = "_Save...",
-            Text = "Save",
-            Key = Key.S.WithCtrl,
-            Enabled = false
-        };
-
-        var exitShortcut = new Shortcut
-        {
-            Title = "E_xit",
-            Text = "Exit",
-            Key = Key.X.WithCtrl,
-        };
-        exitShortcut.Border.Thickness = new Thickness (0, 1, 0, 1);
-
-        fileMenu.Add (newShortcut, openShortcut, saveShortcut, exitShortcut);
-
-        View prevFocus = null;
-        fileMenuBarItem.Accept += (s, e) =>
-                              {
-                                  if (fileMenu.Visible)
-                                  {
-                                      // fileMenu.RequestStop ();
-                                      prevFocus?.SetFocus ();
-                                      return;
-                                  }
-
-                                  //fileMenu.Visible = !fileMenu.Visible;
-                                  var sender = s as Shortcut;
-                                  var screen = sender.FrameToScreen ();
-                                  fileMenu.X = screen.X;
-                                  fileMenu.Y = screen.Y + 1;
-                                  fileMenu.Visible = true;
-                                  prevFocus = Application.Top.Focused;
-                                  fileMenuBarItem.SetFocus ();
-                                  //Application.Run (fileMenu);
-                                  fileMenu.Visible = false;
-                              };
-
-        Application.Top.Closed += (s, e) =>
-        {
-            fileMenu.Dispose ();
-        };
-
+        bar.Add (fileMenuBarItem, editMenuBarItem);
     }
 
     private void ConfigStatusBar (Bar bar)
@@ -442,8 +367,7 @@ public class Bars : Scenario
             Height = Dim.Auto (DimAutoStyle.Content, 3),
             Text = "Quit",
             Title = "Q_uit",
-            Key = Application.QuitKey,
-            KeyBindingScope = KeyBindingScope.Application,
+            Key = Key.Z.WithCtrl,
         };
 
         bar.Add (shortcut);
@@ -453,7 +377,6 @@ public class Bars : Scenario
             Text = "Help Text",
             Title = "Help",
             Key = Key.F1,
-            KeyBindingScope = KeyBindingScope.HotKey,
         };
 
         bar.Add (shortcut);
@@ -462,9 +385,9 @@ public class Bars : Scenario
         {
             Title = "_Show/Hide",
             Key = Key.F10,
-            KeyBindingScope = KeyBindingScope.Application,
             CommandView = new CheckBox
             {
+                CanFocus = false,
                 Text = "_Show/Hide"
             },
         };

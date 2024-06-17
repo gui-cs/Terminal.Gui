@@ -74,6 +74,7 @@ public partial class View
                 SuperView._addingView = false;
             }
 
+            // QUESTION: This automatic behavior of setting CanFocus to true on the SuperView is not documented, and is annoying.
             CanFocus = true;
             view._tabIndex = _tabIndexes.IndexOf (view);
             _addingView = false;
