@@ -34,7 +34,7 @@ public class UnicodeInMenu : Scenario
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
         };
 
         var menu = new MenuBar
@@ -76,7 +76,7 @@ public class UnicodeInMenu : Scenario
                                        {
                                            new (
                                                 Application.QuitKey,
-                                                $"Выход",
+                                                "Выход",
                                                 () => Application.RequestStop ()
                                                ),
                                            new (Key.F2, "Создать", null),
@@ -98,14 +98,14 @@ public class UnicodeInMenu : Scenario
         };
         appWindow.Add (testlabel);
 
-        label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Label (CanFocus):" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Label (CanFocus):" };
         appWindow.Add (label);
         var sb = new StringBuilder ();
         sb.Append ('e');
         sb.Append ('\u0301');
         sb.Append ('\u0301');
 
-        testlabel = new()
+        testlabel = new ()
         {
             X = 20,
             Y = Pos.Y (label),
@@ -116,12 +116,12 @@ public class UnicodeInMenu : Scenario
             Text = $"Should be [e with two accents, but isn't due to #2616]: [{sb}]"
         };
         appWindow.Add (testlabel);
-        label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Button:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Button:" };
         appWindow.Add (label);
         var button = new Button { X = 20, Y = Pos.Y (label), Text = "A123456789♥♦♣♠JQK" };
         appWindow.Add (button);
 
-        label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "CheckBox:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "CheckBox:" };
         appWindow.Add (label);
 
         var checkBox = new CheckBox
@@ -146,7 +146,7 @@ public class UnicodeInMenu : Scenario
         };
         appWindow.Add (checkBox, checkBoxRight);
 
-        label = new() { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1, Text = "ComboBox:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1, Text = "ComboBox:" };
         appWindow.Add (label);
         var comboBox = new ComboBox { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
         comboBox.SetSource (new ObservableCollection<string> { gitString, "Со_хранить" });
@@ -154,7 +154,7 @@ public class UnicodeInMenu : Scenario
         appWindow.Add (comboBox);
         comboBox.Text = gitString;
 
-        label = new() { X = Pos.X (label), Y = Pos.Bottom (label) + 2, Text = "HexView:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 2, Text = "HexView:" };
         appWindow.Add (label);
 
         var hexView = new HexView (new MemoryStream (Encoding.ASCII.GetBytes (gitString + " Со_хранить")))
@@ -163,7 +163,7 @@ public class UnicodeInMenu : Scenario
         };
         appWindow.Add (hexView);
 
-        label = new() { X = Pos.X (label), Y = Pos.Bottom (hexView) + 1, Text = "ListView:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (hexView) + 1, Text = "ListView:" };
         appWindow.Add (label);
 
         var listView = new ListView
@@ -178,7 +178,7 @@ public class UnicodeInMenu : Scenario
         };
         appWindow.Add (listView);
 
-        label = new() { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "RadioGroup:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "RadioGroup:" };
         appWindow.Add (label);
 
         var radioGroup = new RadioGroup
@@ -190,7 +190,7 @@ public class UnicodeInMenu : Scenario
         };
         appWindow.Add (radioGroup);
 
-        label = new() { X = Pos.X (label), Y = Pos.Bottom (radioGroup) + 1, Text = "TextField:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (radioGroup) + 1, Text = "TextField:" };
         appWindow.Add (label);
 
         var textField = new TextField
@@ -199,7 +199,7 @@ public class UnicodeInMenu : Scenario
         };
         appWindow.Add (textField);
 
-        label = new() { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "TextView:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "TextView:" };
         appWindow.Add (label);
 
         var textView = new TextView
@@ -211,7 +211,6 @@ public class UnicodeInMenu : Scenario
             Text = unicode
         };
         appWindow.Add (textView);
-
 
         // Run - Start the application.
         Application.Run (appWindow);

@@ -11,11 +11,13 @@ public class TreeUseCases : Scenario
 {
     private View _currentTree;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
-        Win.Y = 1; // menu
-        Win.Height = Dim.Fill (1); // status bar
+        // Init
+        Application.Init ();
+
+        // Setup - Create a top-level application window and configure it.
+        Toplevel appWindow = new ();
 
         var menu = new MenuBar
         {
@@ -47,25 +49,23 @@ public class TreeUseCases : Scenario
             ]
         };
 
-        Top.Add (menu);
+        appWindow.Add (menu);
 
-        var statusBar = new StatusBar (
-#if V2_STATUSBAR
-                                       new StatusItem []
-                                       {
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
-                                                () => Quit ()
-                                               )
-                                       }
-#endif
-                                      );
+        var statusBar = new StatusBar ([new (Application.QuitKey, "Quit", Quit)]);
 
-        Top.Add (statusBar);
+        appWindow.Add (statusBar);
 
-        // Start with the most basic use case
-        LoadSimpleNodes ();
+        appWindow.Ready += (sender, args) =>
+                                        // Start with the most basic use case
+                                        LoadSimpleNodes ();
+
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
+
     }
 
     private void LoadArmies (bool useDelegate)
@@ -78,11 +78,11 @@ public class TreeUseCases : Scenario
 
         if (_currentTree != null)
         {
-            Win.Remove (_currentTree);
+            Application.Top.Remove (_currentTree);
             _currentTree.Dispose ();
         }
 
-        TreeView<GameObject> tree = new () { X = 0, Y = 0, Width = 40, Height = 20 };
+        TreeView<GameObject> tree = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
         if (useDelegate)
         {
@@ -98,7 +98,7 @@ public class TreeUseCases : Scenario
             tree.TreeBuilder = new GameObjectTreeBuilder ();
         }
 
-        Win.Add (tree);
+        Application.Top.Add (tree);
 
         tree.AddObject (army1);
 
@@ -118,13 +118,13 @@ public class TreeUseCases : Scenario
 
         if (_currentTree != null)
         {
-            Win.Remove (_currentTree);
+            Application.Top.Remove (_currentTree);
             _currentTree.Dispose ();
         }
 
-        var tree = new TreeView { X = 0, Y = 0, Width = 40, Height = 20 };
+        var tree = new TreeView { X = 0, Y = 1, Width = Dim.Fill(), Height = Dim.Fill (1) };
 
-        Win.Add (tree);
+        Application.Top.Add (tree);
 
         tree.AddObject (myHouse);
 
@@ -135,13 +135,13 @@ public class TreeUseCases : Scenario
     {
         if (_currentTree != null)
         {
-            Win.Remove (_currentTree);
+            Application.Top.Remove (_currentTree);
             _currentTree.Dispose ();
         }
 
-        var tree = new TreeView { X = 0, Y = 0, Width = 40, Height = 20 };
+        var tree = new TreeView { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-        Win.Add (tree);
+        Application.Top.Add (tree);
 
         var root1 = new TreeNode ("Root1");
         root1.Children.Add (new TreeNode ("Child1.1"));
