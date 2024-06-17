@@ -4,10 +4,6 @@ using Terminal.Gui.Analyzers.Internal.Attributes;
 
 namespace Terminal.Gui;
 
-// TODO: I don't love the name Shortcut, but I can't think of a better one right now. Shortcut is a bit overloaded.
-// TODO: It can mean "Application-scoped key binding" or "A key binding that is displayed in a visual way".
-// TODO: I tried `BarItem` but that's not great either as it implies it can only be used in `Bar`s.
-
 /// <summary>
 ///     Displays a command, help text, and a key binding. When the key is pressed, the command will be invoked. Useful for
 ///     displaying a command in <see cref="Bar"/> such as a
