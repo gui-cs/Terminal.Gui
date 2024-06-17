@@ -717,6 +717,12 @@ public partial class View
                     return true;
                 }
             }
+
+            bool recurse = subview.ProcessSubViewKeyBindings (keyEvent, ref handled);
+            if (recurse || (handled is { } && (bool)handled))
+            {
+                return true;
+            }
         }
 
         return false;
@@ -871,7 +877,7 @@ public partial class View
     /// <param name="f">The function.</param>
     protected void AddCommand (Command command, Func<bool?> f)
     {
-        CommandImplementations [command] = ctx => f (); ;
+        CommandImplementations [command] = ctx => f ();
     }
 
     /// <summary>Returns all commands that are supported by this <see cref="View"/>.</summary>

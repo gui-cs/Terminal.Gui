@@ -1377,7 +1377,8 @@ public class Slider<T> : View
 
             SetNeedsDisplay ();
 
-            return true;
+            mouseEvent.Handled = true;
+            return OnMouseClick (new (mouseEvent));
         }
 
         return false;
@@ -1650,6 +1651,8 @@ public class Slider<T> : View
             default:
                 throw new ArgumentOutOfRangeException (_config._type.ToString ());
         }
+        OnAccept ();
+
     }
 
     internal bool ExtendPlus ()
@@ -1735,7 +1738,6 @@ public class Slider<T> : View
     internal bool Set ()
     {
         SetFocusedOption ();
-
         return true;
     }
 

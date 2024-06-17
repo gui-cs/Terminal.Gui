@@ -186,11 +186,11 @@ public partial class Toplevel : View
     public event EventHandler<ToplevelEventArgs> Activate;
 
     /// <inheritdoc/>
-    public override void Add (View view)
+    public override View Add (View view)
     {
         CanFocus = true;
         AddMenuStatusBar (view);
-        base.Add (view);
+        return base.Add (view);
     }
 
     /// <summary>
@@ -451,14 +451,14 @@ public partial class Toplevel : View
     public event EventHandler Ready;
 
     /// <inheritdoc/>
-    public override void Remove (View view)
+    public override View Remove (View view)
     {
         if (this is Toplevel { MenuBar: { } })
         {
             RemoveMenuStatusBar (view);
         }
 
-        base.Remove (view);
+        return base.Remove (view);
     }
 
     /// <inheritdoc/>

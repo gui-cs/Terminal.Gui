@@ -12,14 +12,10 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Top Level Windows")]
 public class SingleBackgroundWorker : Scenario
 {
-    public override void Init ()
+    public override void Main ()
     {
-        Application.Run<MainApp> ();
-
-        Application.Top.Dispose ();
+        Application.Run<MainApp> ().Dispose ();
     }
-
-    public override void Run () { }
 
     public class MainApp : Toplevel
     {
@@ -34,57 +30,47 @@ public class SingleBackgroundWorker : Scenario
             {
                 Menus =
                 [
-                    new MenuBarItem (
-                                     "_Options",
-                                     new MenuItem []
-                                     {
-                                         new (
-                                              "_Run Worker",
-                                              "",
-                                              () => RunWorker (),
-                                              null,
-                                              null,
-                                              KeyCode.CtrlMask | KeyCode.R
-                                             ),
-                                         null,
-                                         new (
-                                              "_Quit",
-                                              "",
-                                              () => Application.RequestStop (),
-                                              null,
-                                              null,
-                                              KeyCode.CtrlMask | KeyCode.Q
-                                             )
-                                     }
-                                    )
+                    new (
+                         "_Options",
+                         new MenuItem []
+                         {
+                             new (
+                                  "_Run Worker",
+                                  "",
+                                  () => RunWorker (),
+                                  null,
+                                  null,
+                                  KeyCode.CtrlMask | KeyCode.R
+                                 ),
+                             null,
+                             new (
+                                  "_Quit",
+                                  "",
+                                  () => Application.RequestStop (),
+                                  null,
+                                  null,
+                                  KeyCode.CtrlMask | KeyCode.Q
+                                 )
+                         }
+                        )
                 ]
             };
             Add (menu);
 
             var statusBar = new StatusBar (
-                                           new []
-                                           {
-                                               new StatusItem (
-                                                               Application.QuitKey,
-                                                               $"{Application.QuitKey} to Quit",
-                                                               () => Application.RequestStop ()
-                                                              ),
-                                               new StatusItem (
-                                                               KeyCode.CtrlMask | KeyCode.P,
-                                                               "~^R~ Run Worker",
-                                                               () => RunWorker ()
-                                                              )
-                                           }
-                                          );
+                                           [
+                                               new (Application.QuitKey, "Quit", () => Application.RequestStop ()),
+                                               new (Key.R.WithCtrl, "Run Worker", RunWorker)
+                                           ]);
             Add (statusBar);
 
-            var workerLogTop = new Toplevel () { Title = "Worker Log Top"};
+            var workerLogTop = new Toplevel { Title = "Worker Log Top" };
 
             workerLogTop.Add (
-                     new Label { X = Pos.Center (), Y = 0, Text = "Worker Log" }
-                    );
+                              new Label { X = Pos.Center (), Y = 0, Text = "Worker Log" }
+                             );
 
-            _listLog = new ListView
+            _listLog = new()
             {
                 X = 0,
                 Y = 2,
@@ -99,26 +85,26 @@ public class SingleBackgroundWorker : Scenario
 
         private void RunWorker ()
         {
-            _worker = new BackgroundWorker { WorkerSupportsCancellation = true };
+            _worker = new() { WorkerSupportsCancellation = true };
 
             var cancel = new Button { Text = "Cancel Worker" };
 
             cancel.Accept += (s, e) =>
-                              {
-                                  if (_worker == null)
-                                  {
-                                      _log.Add ($"Worker is not running at {DateTime.Now}!");
-                                      _listLog.SetNeedsDisplay ();
+                             {
+                                 if (_worker == null)
+                                 {
+                                     _log.Add ($"Worker is not running at {DateTime.Now}!");
+                                     _listLog.SetNeedsDisplay ();
 
-                                      return;
-                                  }
+                                     return;
+                                 }
 
-                                  _log.Add (
-                                            $"Worker {_startStaging}.{_startStaging:fff} is canceling at {DateTime.Now}!"
-                                           );
-                                  _listLog.SetNeedsDisplay ();
-                                  _worker.CancelAsync ();
-                              };
+                                 _log.Add (
+                                           $"Worker {_startStaging}.{_startStaging:fff} is canceling at {DateTime.Now}!"
+                                          );
+                                 _listLog.SetNeedsDisplay ();
+                                 _worker.CancelAsync ();
+                             };
 
             _startStaging = DateTime.Now;
             _log.Add ($"Worker is started at {_startStaging}.{_startStaging:fff}");
@@ -164,15 +150,7 @@ public class SingleBackgroundWorker : Scenario
                                               {
                                                   // Failed
                                                   _log.Add (
-                                                            $"Exception occurred {
-                                                                e.Error.Message
-                                                            } on Worker {
-                                                                _startStaging
-                                                            }.{
-                                                                _startStaging
-                                                                :fff} at {
-                                                                DateTime.Now
-                                                            }"
+                                                            $"Exception occurred {e.Error.Message} on Worker {_startStaging}.{_startStaging:fff} at {DateTime.Now}"
                                                            );
                                                   _listLog.SetNeedsDisplay ();
                                               }
@@ -195,7 +173,7 @@ public class SingleBackgroundWorker : Scenario
 
                                                   var builderUI =
                                                       new StagingUIController (_startStaging, e.Result as ObservableCollection<string>);
-                                                  var top = Application.Top;
+                                                  Toplevel top = Application.Top;
                                                   top.Visible = false;
                                                   Application.Current.Visible = false;
                                                   builderUI.Load ();
@@ -217,7 +195,7 @@ public class SingleBackgroundWorker : Scenario
 
         public StagingUIController (DateTime? start, ObservableCollection<string> list)
         {
-            _top = new Toplevel
+            _top = new()
             {
                 Title = "_top", Width = Dim.Fill (), Height = Dim.Fill ()
             };
@@ -250,46 +228,44 @@ public class SingleBackgroundWorker : Scenario
             {
                 Menus =
                 [
-                    new MenuBarItem (
-                                     "_Stage",
-                                     new MenuItem []
-                                     {
-                                         new (
-                                              "_Close",
-                                              "",
-                                              () =>
-                                              {
-                                                  if (Close ())
-                                                  {
-                                                      Application.RequestStop ();
-                                                  }
-                                              },
-                                              null,
-                                              null,
-                                              KeyCode.CtrlMask | KeyCode.C
-                                             )
-                                     }
-                                    )
+                    new (
+                         "_Stage",
+                         new MenuItem []
+                         {
+                             new (
+                                  "_Close",
+                                  "",
+                                  () =>
+                                  {
+                                      if (Close ())
+                                      {
+                                          Application.RequestStop ();
+                                      }
+                                  },
+                                  null,
+                                  null,
+                                  KeyCode.CtrlMask | KeyCode.C
+                                 )
+                         }
+                        )
                 ]
             };
             _top.Add (menu);
 
             var statusBar = new StatusBar (
-                                           new []
-                                           {
-                                               new StatusItem (
-                                                               KeyCode.CtrlMask | KeyCode.C,
-                                                               "~^C~ Close",
-                                                               () =>
-                                                               {
-                                                                   if (Close ())
-                                                                   {
-                                                                       Application.RequestStop ();
-                                                                   }
-                                                               }
-                                                              )
-                                           }
-                                          );
+                                           [
+                                               new (
+                                                    Key.C.WithCtrl,
+                                                    "Close",
+                                                    () =>
+                                                    {
+                                                        if (Close ())
+                                                        {
+                                                            Application.RequestStop ();
+                                                        }
+                                                    }
+                                                   )
+                                           ]);
             _top.Add (statusBar);
 
             Title = $"Worker started at {start}.{start:fff}";
@@ -309,18 +285,11 @@ public class SingleBackgroundWorker : Scenario
             _top.Add (this);
         }
 
-        public void Load () {
+        public void Load ()
+        {
             Application.Run (_top);
             _top.Dispose ();
             _top = null;
         }
-
-        ///// <inheritdoc />
-        //protected override void Dispose (bool disposing)
-        //{
-        //    _top?.Dispose ();
-        //    _top = null;
-        //    base.Dispose (disposing);
-        //}
     }
 }

@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios;
 public class Notepad : Scenario
 {
     private TabView _focusedTabView;
-    private StatusItem _lenStatusItem;
+    public Shortcut LenShortcut { get; private set; } 
     private int _numNewTabs = 1;
     private TabView _tabView;
 
@@ -39,11 +39,11 @@ public class Notepad : Scenario
                               | KeyCode.CtrlMask
                               | KeyCode.AltMask
                              ),
-                         new ("_Open", "", () => Open ()),
-                         new ("_Save", "", () => Save ()),
+                         new ("_Open", "", Open),
+                         new ("_Save", "", Save),
                          new ("Save _As", "", () => SaveAs ()),
-                         new ("_Close", "", () => Close ()),
-                         new ("_Quit", "", () => Quit ())
+                         new ("_Close", "", Close),
+                         new ("_Quit", "", Quit)
                      }
                     ),
                 new (
@@ -66,33 +66,31 @@ public class Notepad : Scenario
         split.LineStyle = LineStyle.None;
 
         top.Add (split);
+        LenShortcut = new (Key.Empty, "Len: ", null);
 
-        _lenStatusItem = new (KeyCode.CharMask, "Len: ", null);
-
-        var statusBar = new StatusBar (
-                                       new []
-                                       {
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
-                                                () => Quit ()
-                                               ),
-
-                                           // These shortcut keys don't seem to work correctly in linux 
-                                           //new StatusItem(Key.CtrlMask | Key.N, "~^O~ Open", () => Open()),
-                                           //new StatusItem(Key.CtrlMask | Key.N, "~^N~ New", () => New()),
-
-                                           new (KeyCode.CtrlMask | KeyCode.S, "~^S~ Save", () => Save ()),
-                                           new (KeyCode.CtrlMask | KeyCode.W, "~^W~ Close", () => Close ()),
-                                           _lenStatusItem
+        var statusBar = new StatusBar (new [] {
+                                           new (Application.QuitKey, $"Quit", Quit),
+                                           new Shortcut(Key.F2, "Open", Open),
+                                           new Shortcut(Key.F1, "New", New),
+                                           new (Key.F3, "Save", Save),
+                                           new (Key.F6, "Close", Close),
+                                           LenShortcut
                                        }
-                                      );
+                                      )
+        {
+            AlignmentModes = AlignmentModes.IgnoreFirstOrLast
+        };
+        top.Add (statusBar);
+
         _focusedTabView = _tabView;
         _tabView.SelectedTabChanged += TabView_SelectedTabChanged;
         _tabView.Enter += (s, e) => _focusedTabView = _tabView;
 
-        top.Add (statusBar);
-        top.Ready += (s, e) => New ();
+        top.Ready += (s, e) =>
+                     {
+                         New ();
+                         LenShortcut.Title = $"Len:{_focusedTabView.Text?.Length ?? 0}";
+                     };
 
         Application.Run (top);
         top.Dispose ();
@@ -279,7 +277,7 @@ public class Notepad : Scenario
     /// <param name="fileInfo">File that was read or null if a new blank document</param>
     private void Open (FileInfo fileInfo, string tabName)
     {
-        var tab = new OpenedFile { DisplayText = tabName, File = fileInfo };
+        var tab = new OpenedFile (this) { DisplayText = tabName, File = fileInfo };
         tab.View = tab.CreateTextView (fileInfo);
         tab.SavedText = tab.View.Text;
         tab.RegisterTextViewEvents (_focusedTabView);
@@ -323,7 +321,8 @@ public class Notepad : Scenario
 
     private void TabView_SelectedTabChanged (object sender, TabChangedEventArgs e)
     {
-        _lenStatusItem.Title = $"Len:{e.NewTab?.View?.Text?.Length ?? 0}";
+        LenShortcut.Title = $"Len:{e.NewTab?.View?.Text?.Length ?? 0}";
+
         e.NewTab?.View?.SetFocus ();
     }
 
@@ -370,11 +369,13 @@ public class Notepad : Scenario
         e.MouseEvent.Handled = true;
     }
 
-    private class OpenedFile : Tab
+    private class OpenedFile (Notepad notepad) : Tab
     {
+        private Notepad _notepad = notepad;
+
         public OpenedFile CloneTo (TabView other)
         {
-            var newTab = new OpenedFile { DisplayText = base.Text, File = File };
+            var newTab = new OpenedFile (_notepad) { DisplayText = base.Text, File = File };
             newTab.View = newTab.CreateTextView (newTab.File);
             newTab.SavedText = newTab.View.Text;
             newTab.RegisterTextViewEvents (other);
@@ -410,28 +411,27 @@ public class Notepad : Scenario
             var textView = (TextView)View;
 
             // when user makes changes rename tab to indicate unsaved
-            textView.KeyUp += (s, k) =>
-                              {
-                                  // if current text doesn't match saved text
-                                  bool areDiff = UnsavedChanges;
+            textView.ContentsChanged += (s, k) =>
+                                        {
+                                            // if current text doesn't match saved text
+                                            bool areDiff = UnsavedChanges;
 
-                                  if (areDiff)
-                                  {
-                                      if (!Text.EndsWith ('*'))
-                                      {
-                                          Text = Text + '*';
-                                          parent.SetNeedsDisplay ();
-                                      }
-                                  }
-                                  else
-                                  {
-                                      if (Text.EndsWith ('*'))
-                                      {
-                                          Text = Text.TrimEnd ('*');
-                                          parent.SetNeedsDisplay ();
-                                      }
-                                  }
-                              };
+                                            if (areDiff)
+                                            {
+                                                if (!DisplayText.EndsWith ('*'))
+                                                {
+                                                    DisplayText = Text + '*';
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (DisplayText.EndsWith ('*'))
+                                                {
+                                                    DisplayText = Text.TrimEnd ('*');
+                                                }
+                                            }
+                                            _notepad.LenShortcut.Title = $"Len:{textView.Text.Length}";
+                                        };
         }
 
         /// <summary>The text of the tab the last time it was saved</summary>
@@ -452,7 +452,7 @@ public class Notepad : Scenario
             System.IO.File.WriteAllText (File.FullName, newText);
             SavedText = newText;
 
-            Text = Text.TrimEnd ('*');
+            DisplayText = DisplayText.TrimEnd ('*');
         }
     }
 }

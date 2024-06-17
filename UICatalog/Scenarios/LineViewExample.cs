@@ -9,60 +9,59 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Borders")]
 public class LineViewExample : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
-        Win.Y = 1; // menu
-        Win.Height = Dim.Fill (1); // status bar
+        // Setup - Create a top-level application window and configure it.
+        Toplevel appWindow = new ();
 
         var menu = new MenuBar
         {
             Menus =
             [
-                new MenuBarItem ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
+                new ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
             ]
         };
-        Top.Add (menu);
+        appWindow.Add (menu);
 
-        Win.Add (new Label { Y = 0, Text = "Regular Line" });
-
-        // creates a horizontal line
-        var line = new LineView { Y = 1 };
-
-        Win.Add (line);
-
-        Win.Add (new Label { Y = 2, Text = "Double Width Line" });
+        appWindow.Add (new Label { Y = 1, Text = "Regular Line" });
 
         // creates a horizontal line
-        var doubleLine = new LineView { Y = 3, LineRune = (Rune)'\u2550' };
+        var line = new LineView { Y = 2 };
 
-        Win.Add (doubleLine);
+        appWindow.Add (line);
 
-        Win.Add (new Label { Y = 4, Text = "Short Line" });
+        appWindow.Add (new Label { Y = 3, Text = "Double Width Line" });
+
+        // creates a horizontal line
+        var doubleLine = new LineView { Y = 4, LineRune = (Rune)'\u2550' };
+
+        appWindow.Add (doubleLine);
+
+        appWindow.Add (new Label { Y = 5, Text = "Short Line" });
 
         // creates a horizontal line
         var shortLine = new LineView { Y = 5, Width = 10 };
 
-        Win.Add (shortLine);
+        appWindow.Add (shortLine);
 
-        Win.Add (new Label { Y = 6, Text = "Arrow Line" });
+        appWindow.Add (new Label { Y = 7, Text = "Arrow Line" });
 
         // creates a horizontal line
         var arrowLine = new LineView
         {
-            Y = 7, Width = 10, StartingAnchor = CM.Glyphs.LeftTee, EndingAnchor = (Rune)'>'
+            Y = 8, Width = 10, StartingAnchor = CM.Glyphs.LeftTee, EndingAnchor = (Rune)'>'
         };
 
-        Win.Add (arrowLine);
+        appWindow.Add (arrowLine);
 
-        Win.Add (new Label { Y = 9, X = 11, Text = "Vertical Line" });
+        appWindow.Add (new Label { Y = 10, X = 11, Text = "Vertical Line" });
 
         // creates a horizontal line
         var verticalLine = new LineView (Orientation.Vertical) { X = 25 };
 
-        Win.Add (verticalLine);
+        appWindow.Add (verticalLine);
 
-        Win.Add (new Label { Y = 11, X = 28, Text = "Vertical Arrow" });
+        appWindow.Add (new Label { Y = 12, X = 28, Text = "Vertical Arrow" });
 
         // creates a horizontal line
         var verticalArrow = new LineView (Orientation.Vertical)
@@ -70,19 +69,22 @@ public class LineViewExample : Scenario
             X = 27, StartingAnchor = CM.Glyphs.TopTee, EndingAnchor = (Rune)'V'
         };
 
-        Win.Add (verticalArrow);
+        appWindow.Add (verticalArrow);
 
         var statusBar = new StatusBar (
-                                       new StatusItem []
+                                       new Shortcut []
                                        {
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
-                                                () => Quit ()
-                                               )
+                                           new (Application.QuitKey, "Quit", Quit)
                                        }
                                       );
-        Top.Add (statusBar);
+        appWindow.Add (statusBar);
+
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
     }
 
     private void Quit () { Application.RequestStop (); }

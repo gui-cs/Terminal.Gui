@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
+using Application = Terminal.Gui.Application;
 
 namespace UICatalog.Scenarios;
 
@@ -18,12 +20,12 @@ public class GraphViewExample : Scenario
     private GraphView _graphView;
     private MenuItem _miDiags;
     private MenuItem _miShowBorder;
+    private ViewDiagnosticFlags _viewDiagnostics;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
-        Win.Y = 1; // menu
-        Win.Height = Dim.Fill (1); // status bar
+        Application.Init ();
+        Toplevel app = new ();
 
         _graphs = new []
         {
@@ -41,155 +43,177 @@ public class GraphViewExample : Scenario
         {
             Menus =
             [
-                new MenuBarItem (
-                                 "_File",
-                                 new MenuItem []
-                                 {
-                                     new (
-                                          "Scatter _Plot",
-                                          "",
-                                          () => _graphs [_currentGraph =
-                                                             0] ()
-                                         ),
-                                     new (
-                                          "_V Bar Graph",
-                                          "",
-                                          () => _graphs [_currentGraph =
-                                                             1] ()
-                                         ),
-                                     new (
-                                          "_H Bar Graph",
-                                          "",
-                                          () => _graphs [_currentGraph =
-                                                             2] ()
-                                         ),
-                                     new (
-                                          "P_opulation Pyramid",
-                                          "",
-                                          () => _graphs [_currentGraph =
-                                                             3] ()
-                                         ),
-                                     new (
-                                          "_Line Graph",
-                                          "",
-                                          () => _graphs [_currentGraph =
-                                                             4] ()
-                                         ),
-                                     new (
-                                          "Sine _Wave",
-                                          "",
-                                          () => _graphs [_currentGraph =
-                                                             5] ()
-                                         ),
-                                     new (
-                                          "Silent _Disco",
-                                          "",
-                                          () => _graphs [_currentGraph =
-                                                             6] ()
-                                         ),
-                                     new (
-                                          "_Multi Bar Graph",
-                                          "",
-                                          () => _graphs [_currentGraph =
-                                                             7] ()
-                                         ),
-                                     new ("_Quit", "", () => Quit ())
-                                 }
-                                ),
-                new MenuBarItem (
-                                 "_View",
-                                 new []
-                                 {
-                                     new ("Zoom _In", "", () => Zoom (0.5f)),
-                                     new ("Zoom _Out", "", () => Zoom (2f)),
-                                     new ("MarginLeft++", "", () => Margin (true, true)),
-                                     new ("MarginLeft--", "", () => Margin (true, false)),
-                                     new ("MarginBottom++", "", () => Margin (false, true)),
-                                     new ("MarginBottom--", "", () => Margin (false, false)),
-                                     _miShowBorder = new MenuItem (
-                                                                   "_Enable Margin, Border, and Padding",
-                                                                   "",
-                                                                   () => ShowBorder ()
-                                                                  )
-                                     {
-                                         Checked = true,
-                                         CheckType = MenuItemCheckStyle
-                                             .Checked
-                                     },
-                                     _miDiags = new MenuItem (
-                                                              "Dri_ver Diagnostics",
-                                                              "",
-                                                              () => EnableDiagnostics ()
-                                                             )
-                                     {
-                                         Checked = View.Diagnostics
-                                                   == (ViewDiagnosticFlags
-                                                                    .Padding
-                                                       | ViewDiagnosticFlags
-                                                                      .Ruler),
-                                         CheckType = MenuItemCheckStyle.Checked
-                                     }
-                                 }
-                                )
+                new (
+                     "_File",
+                     new MenuItem []
+                     {
+                         new (
+                              "Scatter _Plot",
+                              "",
+                              () => _graphs [_currentGraph =
+                                                 0] ()
+                             ),
+                         new (
+                              "_V Bar Graph",
+                              "",
+                              () => _graphs [_currentGraph =
+                                                 1] ()
+                             ),
+                         new (
+                              "_H Bar Graph",
+                              "",
+                              () => _graphs [_currentGraph =
+                                                 2] ()
+                             ),
+                         new (
+                              "P_opulation Pyramid",
+                              "",
+                              () => _graphs [_currentGraph =
+                                                 3] ()
+                             ),
+                         new (
+                              "_Line Graph",
+                              "",
+                              () => _graphs [_currentGraph =
+                                                 4] ()
+                             ),
+                         new (
+                              "Sine _Wave",
+                              "",
+                              () => _graphs [_currentGraph =
+                                                 5] ()
+                             ),
+                         new (
+                              "Silent _Disco",
+                              "",
+                              () => _graphs [_currentGraph =
+                                                 6] ()
+                             ),
+                         new (
+                              "_Multi Bar Graph",
+                              "",
+                              () => _graphs [_currentGraph =
+                                                 7] ()
+                             ),
+                         new ("_Quit", "", () => Quit ())
+                     }
+                    ),
+                new (
+                     "_View",
+                     new []
+                     {
+                         new ("Zoom _In", "", () => Zoom (0.5f)),
+                         new ("Zoom _Out", "", () => Zoom (2f)),
+                         new ("MarginLeft++", "", () => Margin (true, true)),
+                         new ("MarginLeft--", "", () => Margin (true, false)),
+                         new ("MarginBottom++", "", () => Margin (false, true)),
+                         new ("MarginBottom--", "", () => Margin (false, false)),
+                         _miShowBorder = new (
+                                              "_Enable Margin, Border, and Padding",
+                                              "",
+                                              () => ShowBorder ()
+                                             )
+                         {
+                             Checked = true,
+                             CheckType = MenuItemCheckStyle
+                                 .Checked
+                         },
+                         _miDiags = new (
+                                         "_Diagnostics",
+                                         "",
+                                         () => ToggleDiagnostics ()
+                                        )
+                         {
+                             Checked = View.Diagnostics
+                                       == (ViewDiagnosticFlags
+                                               .Padding
+                                           | ViewDiagnosticFlags
+                                               .Ruler),
+                             CheckType = MenuItemCheckStyle.Checked
+                         }
+                     }
+                    )
             ]
         };
-        Top.Add (menu);
+        app.Add (menu);
 
-        _graphView = new GraphView
+        _graphView = new()
         {
             X = 0,
-            Y = 0,
+            Y = 1,
             Width = Dim.Percent (70),
-            Height = Dim.Fill (),
+            Height = Dim.Fill (1),
             BorderStyle = LineStyle.Single
         };
         _graphView.Border.Thickness = _thickness;
         _graphView.Margin.Thickness = _thickness;
         _graphView.Padding.Thickness = _thickness;
 
-        Win.Add (_graphView);
+        app.Add (_graphView);
 
         var frameRight = new FrameView
         {
-            X = Pos.Right (_graphView) + 1,
-            Y = 0,
+            X = Pos.Right (_graphView),
+            Y = Pos.Top (_graphView),
             Width = Dim.Fill (),
-            Height = Dim.Fill (),
+            Height = Dim.Height (_graphView),
             Title = "About"
         };
 
         frameRight.Add (
-                        _about = new TextView { Width = Dim.Fill (), Height = Dim.Fill () }
+                        _about = new() { Width = Dim.Fill (), Height = Dim.Fill () }
                        );
 
-        Win.Add (frameRight);
+        app.Add (frameRight);
 
         var statusBar = new StatusBar (
-                                       new StatusItem []
+                                       new Shortcut []
                                        {
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
-                                                () => Quit ()
-                                               ),
-                                           new (
-                                                KeyCode.CtrlMask | KeyCode.G,
-                                                "~^G~ Next",
-                                                () => _graphs [_currentGraph++ % _graphs.Length] ()
-                                               )
+                                           new (Key.G.WithCtrl, "Next Graph", () => _graphs [_currentGraph++ % _graphs.Length] ()),
+                                           new (Key.CursorUp, "Zoom In", () => Zoom (0.5f)),
+                                           new (Key.CursorDown, "Zoom Out", () => Zoom (2f))
                                        }
                                       );
-        Top.Add (statusBar);
+        app.Add (statusBar);
+
+        var diagShortcut = new Shortcut
+        {
+            Key = Key.F10,
+            CommandView = new CheckBox
+            {
+                Title = "Diagnostics",
+                CanFocus = false
+            }
+        };
+        statusBar.Add (diagShortcut).Accept += DiagShortcut_Accept;
+
+        _graphs [_currentGraph++ % _graphs.Length] ();
+
+        _viewDiagnostics = View.Diagnostics;
+        Application.Run (app);
+        View.Diagnostics = _viewDiagnostics;
+        app.Dispose ();
+        Application.Shutdown ();
     }
 
-    private void EnableDiagnostics ()
+    private void DiagShortcut_Accept (object sender, CancelEventArgs e)
+    {
+        ToggleDiagnostics ();
+
+        if (sender is Shortcut shortcut && shortcut.CommandView is CheckBox checkBox)
+        {
+            checkBox.Checked = _miDiags.Checked;
+        }
+    }
+
+    private void ToggleDiagnostics ()
     {
         _miDiags.Checked = !_miDiags.Checked;
 
         View.Diagnostics = _miDiags.Checked == true
-                                        ? ViewDiagnosticFlags.Padding
-                                          | ViewDiagnosticFlags.Ruler
-                                        : ViewDiagnosticFlags.Off;
+                               ? ViewDiagnosticFlags.Padding
+                                 | ViewDiagnosticFlags.Ruler
+                               : ViewDiagnosticFlags.Off;
         Application.Refresh ();
     }
 
@@ -216,7 +240,7 @@ public class GraphViewExample : Scenario
         _about.Text = "Housing Expenditures by income thirds 1996-2003";
 
         Color fore = _graphView.ColorScheme.Normal.Foreground == new Color (ColorName.Black)
-                         ? new Color (ColorName.White)
+                         ? new (ColorName.White)
                          : _graphView.ColorScheme.Normal.Foreground;
         var black = new Attribute (fore, Color.Black);
         var cyan = new Attribute (Color.BrightCyan, Color.Black);
@@ -238,7 +262,7 @@ public class GraphViewExample : Scenario
         series.AddBars ("'02", stiple, 6600, 11000, 16700);
         series.AddBars ("'03", stiple, 7000, 12000, 17000);
 
-        _graphView.CellSize = new PointF (0.25f, 1000);
+        _graphView.CellSize = new (0.25f, 1000);
         _graphView.Series.Add (series);
         _graphView.SetNeedsDisplay ();
 
@@ -254,20 +278,20 @@ public class GraphViewExample : Scenario
 
         _graphView.AxisY.Minimum = 0;
 
-        var legend = new LegendAnnotation (new Rectangle (_graphView.Viewport.Width - 20, 0, 20, 5));
+        var legend = new LegendAnnotation (new (_graphView.Viewport.Width - 20, 0, 20, 5));
 
         legend.AddEntry (
-                         new GraphCellToRender (stiple, series.SubSeries.ElementAt (0).OverrideBarColor),
+                         new (stiple, series.SubSeries.ElementAt (0).OverrideBarColor),
                          "Lower Third"
                         );
 
         legend.AddEntry (
-                         new GraphCellToRender (stiple, series.SubSeries.ElementAt (1).OverrideBarColor),
+                         new (stiple, series.SubSeries.ElementAt (1).OverrideBarColor),
                          "Middle Third"
                         );
 
         legend.AddEntry (
-                         new GraphCellToRender (stiple, series.SubSeries.ElementAt (2).OverrideBarColor),
+                         new (stiple, series.SubSeries.ElementAt (2).OverrideBarColor),
                          "Upper Third"
                         );
         _graphView.Annotations.Add (legend);
@@ -299,7 +323,7 @@ public class GraphViewExample : Scenario
                                    for (var i = 0; i < 31; i++)
                                    {
                                        bars.Add (
-                                                 new BarSeriesBar (null, stiple, r.Next (0, 100))
+                                                 new (null, stiple, r.Next (0, 100))
                                                  {
                                                      //ColorGetter = colorDelegate
                                                  }
@@ -319,7 +343,7 @@ public class GraphViewExample : Scenario
         _graphView.Series.Add (series);
 
         // How much graph space each cell of the console depicts
-        _graphView.CellSize = new PointF (1, 10);
+        _graphView.CellSize = new (1, 10);
         _graphView.AxisX.Increment = 0; // No graph ticks
         _graphView.AxisX.ShowLabelsEvery = 0; // no labels
 
@@ -374,7 +398,7 @@ public class GraphViewExample : Scenario
 
         var barSeries = new BarSeries
         {
-            Bars = new List<BarSeriesBar>
+            Bars = new()
             {
                 new ("Switzerland", softStiple, 83.4f),
                 new (
@@ -451,7 +475,7 @@ public class GraphViewExample : Scenario
             barSeries.Orientation = Orientation.Vertical;
 
             // How much graph space each cell of the console depicts
-            _graphView.CellSize = new PointF (0.1f, 0.25f);
+            _graphView.CellSize = new (0.1f, 0.25f);
 
             // No axis marks since Bar will add it's own categorical marks
             _graphView.AxisX.Increment = 0f;
@@ -469,14 +493,14 @@ public class GraphViewExample : Scenario
             _graphView.MarginLeft = 6;
 
             // Start the graph at 80 years because that is where most of our data is
-            _graphView.ScrollOffset = new PointF (0, 80);
+            _graphView.ScrollOffset = new (0, 80);
         }
         else
         {
             barSeries.Orientation = Orientation.Horizontal;
 
             // How much graph space each cell of the console depicts
-            _graphView.CellSize = new PointF (0.1f, 1f);
+            _graphView.CellSize = new (0.1f, 1f);
 
             // No axis marks since Bar will add it's own categorical marks
             _graphView.AxisY.Increment = 0f;
@@ -495,7 +519,7 @@ public class GraphViewExample : Scenario
             _graphView.MarginLeft = (uint)barSeries.Bars.Max (b => b.Text.Length) + 2;
 
             // Start the graph at 80 years because that is where most of our data is
-            _graphView.ScrollOffset = new PointF (80, 0);
+            _graphView.ScrollOffset = new (80, 0);
         }
 
         _graphView.SetNeedsDisplay ();
@@ -522,7 +546,7 @@ public class GraphViewExample : Scenario
 
         for (var i = 0; i < 10; i++)
         {
-            randomPoints.Add (new PointF (r.Next (100), r.Next (100)));
+            randomPoints.Add (new (r.Next (100), r.Next (100)));
         }
 
         var points = new ScatterSeries { Points = randomPoints };
@@ -535,14 +559,14 @@ public class GraphViewExample : Scenario
         _graphView.Series.Add (points);
         _graphView.Annotations.Add (line);
 
-        randomPoints = new List<PointF> ();
+        randomPoints = new ();
 
         for (var i = 0; i < 10; i++)
         {
-            randomPoints.Add (new PointF (r.Next (100), r.Next (100)));
+            randomPoints.Add (new (r.Next (100), r.Next (100)));
         }
 
-        var points2 = new ScatterSeries { Points = randomPoints, Fill = new GraphCellToRender ((Rune)'x', red) };
+        var points2 = new ScatterSeries { Points = randomPoints, Fill = new ((Rune)'x', red) };
 
         var line2 = new PathAnnotation
         {
@@ -553,7 +577,7 @@ public class GraphViewExample : Scenario
         _graphView.Annotations.Add (line2);
 
         // How much graph space each cell of the console depicts
-        _graphView.CellSize = new PointF (2, 5);
+        _graphView.CellSize = new (2, 5);
 
         // leave space for axis labels
         _graphView.MarginBottom = 2;
@@ -574,10 +598,10 @@ public class GraphViewExample : Scenario
                                     new TextAnnotation
                                     {
                                         Text = "(Max)",
-                                        GraphPosition = new PointF (
-                                                                    max.X + 2 * _graphView.CellSize.X,
-                                                                    max.Y
-                                                                   )
+                                        GraphPosition = new (
+                                                             max.X + 2 * _graphView.CellSize.X,
+                                                             max.Y
+                                                            )
                                     }
                                    );
 
@@ -597,7 +621,7 @@ public class GraphViewExample : Scenario
         _graphView.Series.Add (
                                new ScatterSeries
                                {
-                                   Points = new List<PointF>
+                                   Points = new()
                                    {
                                        new (1, 1.007f),
                                        new (2, 4.002f),
@@ -719,7 +743,7 @@ public class GraphViewExample : Scenario
                               );
 
         // How much graph space each cell of the console depicts
-        _graphView.CellSize = new PointF (1, 5);
+        _graphView.CellSize = new (1, 5);
 
         // leave space for axis labels
         _graphView.MarginBottom = 2;
@@ -772,10 +796,10 @@ public class GraphViewExample : Scenario
         _graphView.Reset ();
 
         // How much graph space each cell of the console depicts
-        _graphView.CellSize = new PointF (100_000, 1);
+        _graphView.CellSize = new (100_000, 1);
 
         //center the x axis in middle of screen to show both sides
-        _graphView.ScrollOffset = new PointF (-3_000_000, 0);
+        _graphView.ScrollOffset = new (-3_000_000, 0);
 
         _graphView.AxisX.Text = "Number Of People";
         _graphView.AxisX.Increment = 500_000;
@@ -801,7 +825,7 @@ public class GraphViewExample : Scenario
         var malesSeries = new BarSeries
         {
             Orientation = Orientation.Horizontal,
-            Bars = new List<BarSeriesBar>
+            Bars = new()
             {
                 new ("0-4", stiple, -2009363),
                 new ("5-9", stiple, -2108550),
@@ -832,7 +856,7 @@ public class GraphViewExample : Scenario
         var femalesSeries = new BarSeries
         {
             Orientation = Orientation.Horizontal,
-            Bars = new List<BarSeriesBar>
+            Bars = new()
             {
                 new ("0-4", stiple, 1915127),
                 new ("5-9", stiple, 2011016),
@@ -895,15 +919,15 @@ public class GraphViewExample : Scenario
         // Generate line graph with 2,000 points
         for (float x = -500; x < 500; x += 0.5f)
         {
-            points.Points.Add (new PointF (x, (float)Math.Sin (x)));
-            line.Points.Add (new PointF (x, (float)Math.Sin (x)));
+            points.Points.Add (new (x, (float)Math.Sin (x)));
+            line.Points.Add (new (x, (float)Math.Sin (x)));
         }
 
         _graphView.Series.Add (points);
         _graphView.Annotations.Add (line);
 
         // How much graph space each cell of the console depicts
-        _graphView.CellSize = new PointF (0.1f, 0.1f);
+        _graphView.CellSize = new (0.1f, 0.1f);
 
         // leave space for axis labels
         _graphView.MarginBottom = 2;
@@ -920,7 +944,7 @@ public class GraphViewExample : Scenario
         _graphView.AxisY.Text = "↑Y";
         _graphView.AxisY.LabelGetter = v => v.Value.ToString ("N2");
 
-        _graphView.ScrollOffset = new PointF (-2.5f, -1);
+        _graphView.ScrollOffset = new (-2.5f, -1);
 
         _graphView.SetNeedsDisplay ();
     }
@@ -946,10 +970,10 @@ public class GraphViewExample : Scenario
 
     private void Zoom (float factor)
     {
-        _graphView.CellSize = new PointF (
-                                          _graphView.CellSize.X * factor,
-                                          _graphView.CellSize.Y * factor
-                                         );
+        _graphView.CellSize = new (
+                                   _graphView.CellSize.X * factor,
+                                   _graphView.CellSize.Y * factor
+                                  );
 
         _graphView.AxisX.Increment *= factor;
         _graphView.AxisY.Increment *= factor;
@@ -967,11 +991,11 @@ public class GraphViewExample : Scenario
 
         public DiscoBarSeries ()
         {
-            _green = new Attribute (Color.BrightGreen, Color.Black);
-            _brightgreen = new Attribute (Color.Green, Color.Black);
-            _brightyellow = new Attribute (Color.BrightYellow, Color.Black);
-            _red = new Attribute (Color.Red, Color.Black);
-            _brightred = new Attribute (Color.BrightRed, Color.Black);
+            _green = new (Color.BrightGreen, Color.Black);
+            _brightgreen = new (Color.Green, Color.Black);
+            _brightyellow = new (Color.BrightYellow, Color.Black);
+            _red = new (Color.Red, Color.Black);
+            _brightred = new (Color.BrightRed, Color.Black);
         }
 
         protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
