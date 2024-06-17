@@ -161,7 +161,7 @@ public class Shortcut : View
     // When one of the subviews is "empty" we don't want to show it. So we
     // Use Add/Remove. We need to be careful to add them in the right order
     // so Pos.Align works correctly.
-    private void ShowHide ()
+    internal void ShowHide ()
     {
         RemoveAll ();
 
@@ -674,7 +674,7 @@ public class Shortcut : View
         }
         else
         {
-            base.ColorScheme = SuperView?.ColorScheme;
+            base.ColorScheme = SuperView?.ColorScheme ?? base.ColorScheme;
         }
 
         // Set KeyView's colors to show "hot"

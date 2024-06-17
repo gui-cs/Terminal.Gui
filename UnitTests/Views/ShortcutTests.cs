@@ -186,7 +186,100 @@ public class ShortcutTests
 
         shortcut.Key = Key.F1;
 
-       // Assert.Equal (Command.Accept, shortcut.CommandView.Get);
+        // TODO:
+    }
+
+
+    [Theory]
+    [InlineData (Orientation.Horizontal)]
+    [InlineData (Orientation.Vertical)]
+    public void Orientation_SetsCorrectly (Orientation orientation)
+    {
+        var shortcut = new Shortcut
+        {
+            Orientation = orientation
+        };
+
+        Assert.Equal (orientation, shortcut.Orientation);
+    }
+
+    [Theory]
+    [InlineData (AlignmentModes.StartToEnd)]
+    [InlineData (AlignmentModes.EndToStart)]
+    public void AlignmentModes_SetsCorrectly (AlignmentModes alignmentModes)
+    {
+        var shortcut = new Shortcut
+        {
+            AlignmentModes = alignmentModes
+        };
+
+        Assert.Equal (alignmentModes, shortcut.AlignmentModes);
+    }
+
+    [Fact]
+    public void Action_SetsAndGetsCorrectly ()
+    {
+        bool actionInvoked = false;
+        var shortcut = new Shortcut
+        {
+            Action = () => { actionInvoked = true; }
+        };
+
+        shortcut.Action.Invoke ();
+
+        Assert.True (actionInvoked);
+    }
+
+    [Fact]
+    public void ColorScheme_SetsAndGetsCorrectly ()
+    {
+        var colorScheme = new ColorScheme ();
+        var shortcut = new Shortcut
+        {
+            ColorScheme = colorScheme
+        };
+
+        Assert.Same (colorScheme, shortcut.ColorScheme);
+    }
+
+    [Fact]
+    public void Subview_Visibility_Controlled_By_Removal ()
+    {
+        var shortcut = new Shortcut ();
+
+        Assert.True (shortcut.CommandView.Visible);
+        Assert.Contains (shortcut.CommandView, shortcut.Subviews);
+        Assert.True (shortcut.HelpView.Visible);
+        Assert.DoesNotContain (shortcut.HelpView, shortcut.Subviews);
+        Assert.True (shortcut.KeyView.Visible);
+        Assert.DoesNotContain (shortcut.KeyView, shortcut.Subviews);
+
+        shortcut.HelpText = "help";
+        Assert.True (shortcut.HelpView.Visible);
+        Assert.Contains (shortcut.HelpView, shortcut.Subviews);
+        Assert.True (shortcut.KeyView.Visible);
+        Assert.DoesNotContain (shortcut.KeyView, shortcut.Subviews);
+
+        shortcut.Key = Key.A;
+        Assert.True (shortcut.HelpView.Visible);
+        Assert.Contains (shortcut.HelpView, shortcut.Subviews);
+        Assert.True (shortcut.KeyView.Visible);
+        Assert.Contains (shortcut.KeyView, shortcut.Subviews);
+
+        shortcut.HelpView.Visible = false;
+        shortcut.ShowHide();
+        Assert.False (shortcut.HelpView.Visible);
+        Assert.DoesNotContain (shortcut.HelpView, shortcut.Subviews);
+        Assert.True (shortcut.KeyView.Visible);
+        Assert.Contains (shortcut.KeyView, shortcut.Subviews);
+
+        shortcut.KeyView.Visible = false;
+        shortcut.ShowHide ();
+        Assert.False (shortcut.HelpView.Visible);
+        Assert.DoesNotContain (shortcut.HelpView, shortcut.Subviews);
+        Assert.False (shortcut.KeyView.Visible);
+        Assert.DoesNotContain (shortcut.KeyView, shortcut.Subviews);
+
     }
 
 }
