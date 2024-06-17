@@ -1,17 +1,14 @@
-﻿using System.CommandLine;
-using JetBrains.Annotations;
-using UICatalog.Scenarios;
+﻿using JetBrains.Annotations;
 
 namespace Terminal.Gui.ViewsTests;
 
 [TestSubject (typeof (Shortcut))]
 public class ShortcutTests
 {
-
     [Fact]
     public void Constructor_Defaults ()
     {
-        Shortcut shortcut = new Shortcut ();
+        var shortcut = new Shortcut ();
 
         Assert.NotNull (shortcut);
         Assert.True (shortcut.CanFocus);
@@ -32,18 +29,18 @@ public class ShortcutTests
     [InlineData ("C", "H", KeyCode.K, 9)]
     public void NaturalSize (string command, string help, Key key, int expectedWidth)
     {
-        Shortcut shortcut = new Shortcut ()
+        var shortcut = new Shortcut
         {
             Title = command,
             HelpText = help,
-            Key = key,
+            Key = key
         };
 
         Assert.IsType<DimAuto> (shortcut.Width);
         Assert.IsType<DimAuto> (shortcut.Height);
 
         shortcut.LayoutSubviews ();
-        shortcut.SetRelativeLayout (new Size (100, 100));
+        shortcut.SetRelativeLayout (new (100, 100));
 
         // |0123456789
         // | C  H  K |
@@ -60,7 +57,7 @@ public class ShortcutTests
     [InlineData (11, 0, 5, 8)]
     public void Set_Width_Layouts_Correctly (int width, int expectedCmdX, int expectedHelpX, int expectedKeyX)
     {
-        Shortcut shortcut = new Shortcut ()
+        var shortcut = new Shortcut
         {
             Width = width,
             Title = "C",
@@ -69,7 +66,7 @@ public class ShortcutTests
         };
 
         shortcut.LayoutSubviews ();
-        shortcut.SetRelativeLayout (new Size (100, 100));
+        shortcut.SetRelativeLayout (new (100, 100));
 
         // 0123456789
         // -C--H--K- 
@@ -81,17 +78,16 @@ public class ShortcutTests
     [Fact]
     public void CommandView_Text_And_Title_Track ()
     {
-        Shortcut shortcut = new Shortcut ()
+        var shortcut = new Shortcut
         {
-            Title = "T",
+            Title = "T"
         };
 
         Assert.Equal (shortcut.Title, shortcut.CommandView.Text);
 
-        shortcut = new Shortcut ()
-        {
-        };
-        shortcut.CommandView = new View ()
+        shortcut = new ();
+
+        shortcut.CommandView = new()
         {
             Text = "T"
         };
@@ -101,16 +97,16 @@ public class ShortcutTests
     [Fact]
     public void HelpText_And_Text_Are_The_Same ()
     {
-        Shortcut shortcut = new Shortcut ()
+        var shortcut = new Shortcut
         {
-            Text = "H",
+            Text = "H"
         };
 
         Assert.Equal (shortcut.Text, shortcut.HelpText);
 
-        shortcut = new Shortcut ()
+        shortcut = new()
         {
-            HelpText = "H",
+            HelpText = "H"
         };
 
         Assert.Equal (shortcut.Text, shortcut.HelpText);
@@ -121,9 +117,9 @@ public class ShortcutTests
     [InlineData (KeyCode.F1, "F1")]
     public void KeyView_Text_Tracks_Key (Key key, string expected)
     {
-        Shortcut shortcut = new Shortcut ()
+        var shortcut = new Shortcut
         {
-            Key = key,
+            Key = key
         };
 
         Assert.Equal (expected, shortcut.KeyView.Text);
@@ -133,7 +129,7 @@ public class ShortcutTests
     [Fact]
     public void Key_Defaults_To_Empty ()
     {
-        Shortcut shortcut = new Shortcut ();
+        var shortcut = new Shortcut ();
 
         Assert.Equal (Key.Empty, shortcut.Key);
     }
@@ -141,7 +137,7 @@ public class ShortcutTests
     [Fact]
     public void Key_Can_Be_Set ()
     {
-        Shortcut shortcut = new Shortcut ();
+        var shortcut = new Shortcut ();
 
         shortcut.Key = Key.F1;
 
@@ -151,7 +147,7 @@ public class ShortcutTests
     [Fact]
     public void Key_Can_Be_Set_To_Empty ()
     {
-        Shortcut shortcut = new Shortcut ();
+        var shortcut = new Shortcut ();
 
         shortcut.Key = Key.Empty;
 
@@ -164,7 +160,7 @@ public class ShortcutTests
     [Fact]
     public void KeyBindingScope_Defaults_To_HotKey ()
     {
-        Shortcut shortcut = new Shortcut ();
+        var shortcut = new Shortcut ();
 
         Assert.Equal (KeyBindingScope.HotKey, shortcut.KeyBindingScope);
     }
@@ -172,7 +168,7 @@ public class ShortcutTests
     [Fact]
     public void KeyBindingScope_Can_Be_Set ()
     {
-        Shortcut shortcut = new Shortcut ();
+        var shortcut = new Shortcut ();
 
         shortcut.KeyBindingScope = KeyBindingScope.Application;
 
@@ -182,13 +178,12 @@ public class ShortcutTests
     [Fact]
     public void Setting_Key_Binds_Key_To_CommandView_Accept ()
     {
-        Shortcut shortcut = new Shortcut ();
+        var shortcut = new Shortcut ();
 
         shortcut.Key = Key.F1;
 
         // TODO:
     }
-
 
     [Theory]
     [InlineData (Orientation.Horizontal)]
@@ -219,7 +214,8 @@ public class ShortcutTests
     [Fact]
     public void Action_SetsAndGetsCorrectly ()
     {
-        bool actionInvoked = false;
+        var actionInvoked = false;
+
         var shortcut = new Shortcut
         {
             Action = () => { actionInvoked = true; }
@@ -234,6 +230,7 @@ public class ShortcutTests
     public void ColorScheme_SetsAndGetsCorrectly ()
     {
         var colorScheme = new ColorScheme ();
+
         var shortcut = new Shortcut
         {
             ColorScheme = colorScheme
@@ -267,7 +264,7 @@ public class ShortcutTests
         Assert.Contains (shortcut.KeyView, shortcut.Subviews);
 
         shortcut.HelpView.Visible = false;
-        shortcut.ShowHide();
+        shortcut.ShowHide ();
         Assert.False (shortcut.HelpView.Visible);
         Assert.DoesNotContain (shortcut.HelpView, shortcut.Subviews);
         Assert.True (shortcut.KeyView.Visible);
@@ -279,7 +276,5 @@ public class ShortcutTests
         Assert.DoesNotContain (shortcut.HelpView, shortcut.Subviews);
         Assert.False (shortcut.KeyView.Visible);
         Assert.DoesNotContain (shortcut.KeyView, shortcut.Subviews);
-
     }
-
 }
