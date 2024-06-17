@@ -6,15 +6,13 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Top Level Windows")]
 public class RunTExample : Scenario
 {
-    public override void Init ()
+    public override void Main ()
     {
         // No need to call Init if Application.Run<T> is used
         Application.Run<ExampleWindow> ();
 
         Application.Top.Dispose ();
     }
-
-    public override void Run () { }
 
     public class ExampleWindow : Window
     {
