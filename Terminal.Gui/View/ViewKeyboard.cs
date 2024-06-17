@@ -783,10 +783,11 @@ public partial class View
     /// </summary>
     /// <param name="commands"></param>
     /// <param name="key">The key that caused the commands to be invoked, if any.</param>
+    /// <param name="keyBinding"></param>
     /// <returns>
     ///     <see langword="null"/> if no command was found.
-    ///     <see langword="true"/> if the command was invoked and it handled the command.
-    ///     <see langword="false"/> if the command was invoked and it did not handle the command.
+    ///     <see langword="true"/> if the command was invoked the command was handled.
+    ///     <see langword="false"/> if the command was invoked and the command was not handled.
     /// </returns>
     public bool? InvokeCommands (Command [] commands, [CanBeNull] Key key = null, [CanBeNull] KeyBinding? keyBinding = null)
     {

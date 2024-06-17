@@ -336,10 +336,16 @@ public abstract class Pos
     /// <returns></returns>
     internal virtual bool ReferencesOtherViews () { return false; }
 
+    /// <summary>
+    ///     Indicates whether the specified type is in the hierarchy of this Pos object.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="pos"></param>
+    /// <returns></returns>
     public bool Has (Type type, out Pos pos)
     {
         pos = this;
-        if (type == GetType())
+        if (type == GetType ())
         {
             return true;
         }

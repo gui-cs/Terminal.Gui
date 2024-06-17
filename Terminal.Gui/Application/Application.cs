@@ -177,15 +177,15 @@ public static partial class Application
     /// </para>
     /// <para>
     ///     <see cref="Shutdown"/> must be called when the application is closing (typically after
-    ///     <see cref="Run(Func{Exception, bool}, ConsoleDriver)"/> has returned) to ensure resources are cleaned up and
+    ///     <see cref="Run{T}"/> has returned) to ensure resources are cleaned up and
     ///     terminal settings
     ///     restored.
     /// </para>
     /// <para>
-    ///     The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> function combines
+    ///     The <see cref="Run{T}"/> function combines
     ///     <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
     ///     into a single
-    ///     call. An application cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> without explicitly calling
+    ///     call. An application cam use <see cref="Run{T}"/> without explicitly calling
     ///     <see cref="Init(ConsoleDriver, string)"/>.
     /// </para>
     /// <param name="driver">

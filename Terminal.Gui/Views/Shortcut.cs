@@ -8,18 +8,6 @@ namespace Terminal.Gui;
 // TODO: It can mean "Application-scoped key binding" or "A key binding that is displayed in a visual way".
 // TODO: I tried `BarItem` but that's not great either as it implies it can only be used in `Bar`s.
 
-[Flags]
-[GenerateEnumExtensionMethods (FastHasFlags = true)]
-public enum ShortcutStyles
-{
-    None = 0,
-
-    SeparatorBefore = 8,
-
-    SeparatorAfter = 16,
-}
-
-
 /// <summary>
 ///     Displays a command, help text, and a key binding. When the key is pressed, the command will be invoked. Useful for
 ///     displaying a command in <see cref="Bar"/> such as a
@@ -29,7 +17,7 @@ public enum ShortcutStyles
 ///     <para>
 ///         When the user clicks on the <see cref="Shortcut"/> or presses the key
 ///         specified by <see cref="Key"/> the <see cref="Command.Accept"/> command is invoked, causing the
-///         <see cref="Accept"/> event to be fired
+///         <see cref="View.Accept"/> event to be fired
 ///     </para>
 ///     <para>
 ///         If <see cref="KeyBindingScope"/> is <see cref="KeyBindingScope.Application"/>, the <see cref="Command.Accept"/>
@@ -53,13 +41,13 @@ public enum ShortcutStyles
 /// </remarks>
 public class Shortcut : View
 {
-
     /// <summary>
     ///  Creates a new instance of <see cref="Shortcut"/>;
     /// </summary>
     /// <param name="key"></param>
-    /// <param name="command"></param>
+    /// <param name="commandText"></param>
     /// <param name="action"></param>
+    /// <param name="helpText"></param>
     public Shortcut (Key key, string commandText, Action action, string helpText = null)
     {
         Id = "_shortcut";
@@ -165,8 +153,6 @@ public class Shortcut : View
             SetKeyViewDefaultLayout ();
         }
     }
-
-    public ShortcutStyles ShortcutStyle { get; set; } = ShortcutStyles.None;
 
     // When one of the subviews is "empty" we don't want to show it. So we
     // Use Add/Remove. We need to be careful to add them in the right order
@@ -417,7 +403,7 @@ public class Shortcut : View
             {
                 // When the CommandView fires its Accept event, we want to act as though the
                 // Shortcut was clicked.
-                if (base.OnAccept() == true)
+                if (base.OnAccept () == true)
                 {
                     e.Cancel = true;
                 }
@@ -646,7 +632,7 @@ public class Shortcut : View
     ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the mouse. 
     /// </summary>
     /// <remarks>
-    ///     Note, the <see cref="Accept"/> event is fired first, and if cancelled, <see cref="Action"/> will not be invoked.
+    ///     Note, the <see cref="View.Accept"/> event is fired first, and if cancelled, the event will not be invoked.
     /// </remarks>
     [CanBeNull]
     public Action Action { get; set; }
@@ -691,7 +677,7 @@ public class Shortcut : View
         }
 
         // Set KeyView's colors to show "hot"
-        if (IsInitialized && base.ColorScheme is {})
+        if (IsInitialized && base.ColorScheme is { })
         {
             var cs = new ColorScheme (base.ColorScheme)
             {

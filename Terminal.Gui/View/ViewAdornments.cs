@@ -107,7 +107,7 @@ public partial class View
     /// Called when the <see cref="BorderStyle"/> is changing. Invokes <see cref="BorderStyleChanging"/>, which allows the event to be cancelled.
     /// </summary>
     /// <remarks>
-    ///     Override <see cref="SetBorderStyle"/> to prevent the <see cref="BorderStyle"/> from changing. Set <see cref="StateEventArgs{T}.Cancel"/> to `true` to cancel the event.
+    ///     Override <see cref="SetBorderStyle"/> to prevent the <see cref="BorderStyle"/> from changing.
     /// </remarks>
     /// <param name="e"></param>
     protected void OnBorderStyleChanging (StateEventArgs<LineStyle> e)
@@ -163,6 +163,9 @@ public partial class View
         Border.LineStyle = value;
     }
 
+    /// <summary>
+    ///     Fired when the <see cref="BorderStyle"/> is changing. Allows the event to be cancelled.
+    /// </summary>
     public event EventHandler<StateEventArgs<LineStyle>> BorderStyleChanging;
 
     /// <summary>

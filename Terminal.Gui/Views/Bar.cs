@@ -85,7 +85,7 @@ public class Bar : View
         }
     }
 
-    /// <summary>Inserts a <see cref="Shortcut"/> in the specified index of <see cref="Items"/>.</summary>
+    /// <summary>Inserts a <see cref="Shortcut"/> in the specified index of <see cref="View.Subviews"/>.</summary>
     /// <param name="index">The zero-based index at which item should be inserted.</param>
     /// <param name="item">The item to insert.</param>
     public void AddShortcutAt (int index, Shortcut item)
@@ -107,7 +107,7 @@ public class Bar : View
         SetNeedsDisplay ();
     }
 
-    /// <summary>Removes a <see cref="Shortcut"/> at specified index of <see cref="Items"/>.</summary>
+    /// <summary>Removes a <see cref="Shortcut"/> at specified index of <see cref="View.Subviews"/>.</summary>
     /// <param name="index">The zero-based index of the item to remove.</param>
     /// <returns>The <see cref="Shortcut"/> removed.</returns>
     public Shortcut RemoveShortcut (int index)
@@ -157,8 +157,6 @@ public class Bar : View
                 // All CommandView's are the same width, all HelpView's are the same width,
                 // all KeyView's are the same width
 
-                var maxCommandWidth = 0;
-                var maxHelpWidth = 0;
                 var minKeyWidth = 0;
 
                 List<Shortcut> shortcuts = Subviews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();

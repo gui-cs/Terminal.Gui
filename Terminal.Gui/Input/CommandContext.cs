@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 #pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
 /// <summary>
 ///     Provides context for a <see cref="Command"/> that is being invoked.
-/// </summary
+/// </summary>
 /// <remarks>
 ///     <para>
 ///         To define a <see cref="Command"/> that is invoked with context,

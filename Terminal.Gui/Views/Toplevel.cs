@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         Toplevels can run as modal (popup) views, started by calling
-///         <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>. They return control to the caller when
+///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. They return control to the caller when
 ///         <see cref="Application.RequestStop(Toplevel)"/> has been called (which sets the <see cref="Toplevel.Running"/>
 ///         property to <c>false</c>).
 ///     </para>
@@ -15,7 +15,7 @@ namespace Terminal.Gui;
 ///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init"/>.
 ///         The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created
 ///         and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and call
-///         <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>.
+///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
 ///     </para>
 /// </remarks>
 public partial class Toplevel : View
@@ -445,7 +445,7 @@ public partial class Toplevel : View
     ///     perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set. changes.
     ///     <para>
     ///         A Ready event handler is a good place to finalize initialization after calling
-    ///         <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> on this <see cref="Toplevel"/>.
+    ///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
     ///     </para>
     /// </summary>
     public event EventHandler Ready;
