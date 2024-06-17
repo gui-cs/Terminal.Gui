@@ -12,15 +12,13 @@ public class LineViewExample : Scenario
     public override void Main ()
     {
         // Setup - Create a top-level application window and configure it.
-        Toplevel appWindow = new ()
-        {
-        };
+        Toplevel appWindow = new ();
 
         var menu = new MenuBar
         {
             Menus =
             [
-                new MenuBarItem ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
+                new ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
             ]
         };
         appWindow.Add (menu);
