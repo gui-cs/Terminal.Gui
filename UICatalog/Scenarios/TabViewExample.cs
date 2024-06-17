@@ -15,11 +15,13 @@ public class TabViewExample : Scenario
     private MenuItem _miTabsOnBottom;
     private TabView _tabView;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
-        Win.Y = 1; // menu
-        Win.Height = Dim.Fill (1); // status bar
+        // Init
+        Application.Init ();
+
+        // Setup - Create a top-level application window and configure it.
+        Toplevel appWindow = new ();
 
         var menu = new MenuBar
         {
@@ -67,12 +69,12 @@ public class TabViewExample : Scenario
                                 )
             ]
         };
-        Top.Add (menu);
+        appWindow.Add (menu);
 
         _tabView = new TabView
         {
             X = 0,
-            Y = 0,
+            Y = 1,
             Width = 60,
             Height = 20,
             BorderStyle = LineStyle.Single
@@ -128,14 +130,14 @@ public class TabViewExample : Scenario
 
         _tabView.SelectedTab = _tabView.Tabs.First ();
 
-        Win.Add (_tabView);
+        appWindow.Add (_tabView);
 
         var frameRight = new FrameView
         {
             X = Pos.Right (_tabView),
-            Y = 0,
+            Y = 1,
             Width = Dim.Fill (),
-            Height = Dim.Fill (),
+            Height = Dim.Fill (1),
             Title = "About"
         };
 
@@ -148,14 +150,14 @@ public class TabViewExample : Scenario
                         }
                        );
 
-        Win.Add (frameRight);
+        appWindow.Add (frameRight);
 
         var frameBelow = new FrameView
         {
             X = 0,
             Y = Pos.Bottom (_tabView),
             Width = _tabView.Width,
-            Height = Dim.Fill (),
+            Height = Dim.Fill (1),
             Title = "Bottom Frame"
         };
 
@@ -169,21 +171,17 @@ public class TabViewExample : Scenario
                         }
                        );
 
-        Win.Add (frameBelow);
+        appWindow.Add (frameBelow);
 
-        var statusBar = new StatusBar (
-#if V2_STATUSBAR
-                                       new StatusItem []
-                                       {
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
-                                                Quit
-                                               )
-                                       }
-#endif
-                                      );
-        Top.Add (statusBar);
+        var statusBar = new StatusBar ([new (Application.QuitKey, "Quit", Quit)]);
+        appWindow.Add (statusBar);
+
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
     }
 
     private void AddBlankTab () { _tabView.AddTab (new Tab (), false); }

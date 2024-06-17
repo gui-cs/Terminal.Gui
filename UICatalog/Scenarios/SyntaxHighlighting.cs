@@ -181,7 +181,7 @@ public class SyntaxHighlighting : Scenario
 
         appWindow.Add (_textView);
 
-        var statusBar = new StatusBar ([new (Application.QuitKey, "to Quit", Quit)]);
+        var statusBar = new StatusBar ([new (Application.QuitKey, "Quit", Quit)]);
 
         appWindow.Add (statusBar);
 
