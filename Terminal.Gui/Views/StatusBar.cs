@@ -50,8 +50,7 @@ public class StatusBar : Bar
 
             if (barItem is Shortcut shortcut)
             {
-                shortcut.AlignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
-                
+                shortcut.Orientation = Orientation.Horizontal;
             }
         }
     }

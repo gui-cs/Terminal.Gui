@@ -19,11 +19,13 @@ namespace Terminal.Gui;
 ///         be invoked regardless of what View has focus, enabling an application-wide keyboard shortcut.
 ///     </para>
 ///     <para>
-///         By default, a Shortcut displays the command text on the left side, the help text in the middle, and the key binding on the
+///         By default, a Shortcut displays the command text on the left side, the help text in the middle, and the key
+///         binding on the
 ///         right side. Set <see cref="AlignmentModes"/> to <see cref="AlignmentModes.EndToStart"/> to reverse the order.
 ///     </para>
 ///     <para>
-///         The command text can be set by setting the <see cref="CommandView"/>'s Text property or by setting <see cref="View.Title"/>.
+///         The command text can be set by setting the <see cref="CommandView"/>'s Text property or by setting
+///         <see cref="View.Title"/>.
 ///     </para>
 ///     <para>
 ///         The help text can be set by setting the <see cref="HelpText"/> property or by setting <see cref="View.Text"/>.
@@ -141,7 +143,12 @@ public class Shortcut : View
     ///     the Shortcut will be configured for vertical layout, which is ideal for menus.
     /// </summary>
     /// <remarks>
-    ///      When Horizontal, Key is first, then Help, then Command. When Vertical, Command is first, then Help, then Key.
+    ///     <para>
+    ///         When Horizontal, Key is first, then Help, then Command. When Vertical, Command is first, then Help, then Key.
+    ///     </para>
+    ///     <para>
+    ///         Set <see cref="AlignmentModes"/> to override the default layout.
+    ///     </para>
     /// </remarks>
     public Orientation Orientation
     {
@@ -164,9 +171,13 @@ public class Shortcut : View
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
 
     /// <summary>
-    ///     Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Shortcut"/>. The default is
-    ///     <see cref="AlignmentModes.StartToEnd"/>.
+    ///     Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Shortcut"/>.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Setting <see cref="Orientation"/> will set the <see cref="AlignmentModes"/> to the appropriate value.
+    ///     </para>
+    /// </remarks>
     public AlignmentModes AlignmentModes
     {
         get => _alignmentModes;
