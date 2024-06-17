@@ -226,7 +226,6 @@ public class Shortcuts : Scenario
         // Horizontal
         var hShortcut1 = new Shortcut
         {
-            Orientation = Orientation.Horizontal,
             X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1),
             Y = Pos.Bottom (eventLog) + 1,
             Key = Key.F7,

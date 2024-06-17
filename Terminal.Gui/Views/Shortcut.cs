@@ -168,7 +168,8 @@ public class Shortcut : View
         }
     }
 
-    private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
+    // The default Orientation is Horizontal thus set this to EndToStart
+    private AlignmentModes _alignmentModes = AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast;
 
     /// <summary>
     ///     Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Shortcut"/>.
