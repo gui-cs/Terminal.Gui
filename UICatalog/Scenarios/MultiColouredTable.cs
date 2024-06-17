@@ -25,7 +25,7 @@ public class MultiColouredTable : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
         };
 
-        _tableView = new() { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        _tableView = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
         var menu = new MenuBar
         {
@@ -55,7 +55,7 @@ public class MultiColouredTable : Scenario
         dt.Rows.Add (DBNull.Value, DBNull.Value);
         dt.Rows.Add (DBNull.Value, DBNull.Value);
 
-        _tableView.ColorScheme = new()
+        _tableView.ColorScheme = new ()
         {
             Disabled = appWindow.ColorScheme.Disabled,
             HotFocus = appWindow.ColorScheme.HotFocus,
