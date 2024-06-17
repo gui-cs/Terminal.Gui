@@ -427,13 +427,15 @@ public class TableEditor : Scenario
         return dt;
     }
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
-        Win.Y = 1; // menu
-        Win.Height = Dim.Fill (1); // status bar
+        // Init
+        Application.Init ();
 
-        _tableView = new() { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        // Setup - Create a top-level application window and configure it.
+        Toplevel appWindow = new ();
+
+        _tableView = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
         var menu = new MenuBar
         {
@@ -669,50 +671,48 @@ public class TableEditor : Scenario
             ]
         };
 
-        Top.Add (menu);
-
-        var statusBar = new StatusBar (
-#if V2_STATUSBAR
-                                       new StatusItem []
-                                       {
-                                           new (
-                                                KeyCode.F2,
-                                                "~F2~ OpenExample",
-                                                () => OpenExample (true)
-                                               ),
-                                           new (
-                                                KeyCode.F3,
-                                                "~F3~ CloseExample",
-                                                () => CloseExample ()
-                                               ),
-                                           new (
-                                                KeyCode.F4,
-                                                "~F4~ OpenSimple",
-                                                () => OpenSimple (true)
-                                               ),
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
-                                                () => Quit ()
-                                               )
-                                       }
-#endif
-                                      );
-        Top.Add (statusBar);
-
-        Win.Add (_tableView);
+        appWindow.Add (menu);
 
         var selectedCellLabel = new Label
         {
-            X = 0,
-            Y = Pos.Bottom (_tableView),
-            Text = "0,0",
-
-            Width = Dim.Fill (),
-            TextAlignment = Alignment.End
+            Text = "0,0"
         };
 
-        Win.Add (selectedCellLabel);
+        var statusBar = new StatusBar (
+                                       [
+                                           new (
+                                                Application.QuitKey,
+                                                "Quit",
+                                                Quit
+                                               ),
+                                           new (
+                                                Key.F2,
+                                                "OpenExample",
+                                                () => OpenExample (true)
+                                               ),
+                                           new (
+                                                Key.F3,
+                                                "CloseExample",
+                                                CloseExample
+                                               ),
+                                           new (
+                                                Key.F4,
+                                                "OpenSimple",
+                                                () => OpenSimple (true)
+                                               ),
+                                           new ()
+                                           {
+                                               HelpText = "Cell:",
+                                               CommandView = selectedCellLabel
+                                           }
+                                       ]
+                                      )
+        {
+            AlignmentModes = AlignmentModes.IgnoreFirstOrLast
+        };
+        appWindow.Add (statusBar);
+
+        appWindow.Add (_tableView);
 
         _tableView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{_tableView.SelectedRow},{_tableView.SelectedColumn}"; };
         _tableView.CellActivated += EditCurrentCell;
@@ -720,27 +720,27 @@ public class TableEditor : Scenario
 
         SetupScrollBar ();
 
-        _redColorScheme = new()
+        _redColorScheme = new ()
         {
-            Disabled = Win.ColorScheme.Disabled,
-            HotFocus = Win.ColorScheme.HotFocus,
-            Focus = Win.ColorScheme.Focus,
-            Normal = new (Color.Red, Win.ColorScheme.Normal.Background)
+            Disabled = appWindow.ColorScheme.Disabled,
+            HotFocus = appWindow.ColorScheme.HotFocus,
+            Focus = appWindow.ColorScheme.Focus,
+            Normal = new (Color.Red, appWindow.ColorScheme.Normal.Background)
         };
 
-        _alternatingColorScheme = new()
+        _alternatingColorScheme = new ()
         {
-            Disabled = Win.ColorScheme.Disabled,
-            HotFocus = Win.ColorScheme.HotFocus,
-            Focus = Win.ColorScheme.Focus,
+            Disabled = appWindow.ColorScheme.Disabled,
+            HotFocus = appWindow.ColorScheme.HotFocus,
+            Focus = appWindow.ColorScheme.Focus,
             Normal = new (Color.White, Color.BrightBlue)
         };
 
-        _redColorSchemeAlt = new()
+        _redColorSchemeAlt = new ()
         {
-            Disabled = Win.ColorScheme.Disabled,
-            HotFocus = Win.ColorScheme.HotFocus,
-            Focus = Win.ColorScheme.Focus,
+            Disabled = appWindow.ColorScheme.Disabled,
+            HotFocus = appWindow.ColorScheme.HotFocus,
+            Focus = appWindow.ColorScheme.Focus,
             Normal = new (Color.Red, Color.BrightBlue)
         };
 
@@ -770,6 +770,13 @@ public class TableEditor : Scenario
                                  };
 
         _tableView.KeyBindings.Add (Key.Space, Command.Accept);
+
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
     }
 
     protected override void Dispose (bool disposing)
@@ -1019,7 +1026,7 @@ public class TableEditor : Scenario
                                                       _tableView,
                                                       "Name",
                                                       tree,
-                                                      new()
+                                                      new ()
                                                       {
                                                           { "Extension", f => f.Extension },
                                                           { "CreationTime", f => f.CreationTime },
