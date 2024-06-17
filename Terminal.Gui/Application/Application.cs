@@ -183,7 +183,7 @@ public static partial class Application
     /// </para>
     /// <para>
     ///     The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> function combines
-    ///     <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>
+    ///     <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
     ///     into a single
     ///     call. An application cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> without explicitly calling
     ///     <see cref="Init(ConsoleDriver, string)"/>.
@@ -344,7 +344,7 @@ public static partial class Application
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     /// <remarks>
     ///     Shutdown must be called for every call to <see cref="Init"/> or
-    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> to ensure all resources are cleaned
+    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned
     ///     up (Disposed)
     ///     and terminal settings are restored.
     /// </remarks>
@@ -639,7 +639,7 @@ public static partial class Application
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/> object and calling
-    ///     <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>.
+    ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
     /// </summary>
     /// <remarks>
     ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
@@ -656,7 +656,7 @@ public static partial class Application
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
-    ///     <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>.
+    ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
     /// </summary>
     /// <remarks>
     ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
@@ -698,11 +698,11 @@ public static partial class Application
     ///         modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
     ///     </para>
     ///     <para>
-    ///         To make a <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> stop execution, call
+    ///         To make a <see cref="Run(Toplevel, Func{Exception, bool})"/> stop execution, call
     ///         <see cref="Application.RequestStop"/>.
     ///     </para>
     ///     <para>
-    ///         Calling <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> is equivalent to calling
+    ///         Calling <see cref="Run(Toplevel, Func{Exception, bool})"/> is equivalent to calling
     ///         <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState)"/>, and then calling
     ///         <see cref="End(RunState)"/>.
     ///     </para>
@@ -996,7 +996,7 @@ public static partial class Application
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
     /// <param name="top">The <see cref="Toplevel"/> to stop.</param>
     /// <remarks>
-    ///     <para>This will cause <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> to return.</para>
+    ///     <para>This will cause <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to return.</para>
     ///     <para>
     ///         Calling <see cref="Application.RequestStop"/> is equivalent to setting the <see cref="Toplevel.Running"/>
     ///         property on the currently running <see cref="Toplevel"/> to false.
