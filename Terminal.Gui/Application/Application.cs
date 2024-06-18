@@ -530,6 +530,7 @@ public static partial class Application
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
         toplevel.FocusFirst ();
+        BringOverlappedTopToFront ();
 
         if (refreshDriver)
         {

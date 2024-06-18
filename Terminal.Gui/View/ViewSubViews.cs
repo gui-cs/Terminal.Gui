@@ -438,7 +438,7 @@ public partial class View
                 SetHasFocus (false, this);
                 SuperView?.EnsureFocus ();
 
-                if (SuperView is { } && SuperView.Focused is null)
+                if (SuperView is { Focused: null })
                 {
                     SuperView.FocusNext ();
 
@@ -476,6 +476,11 @@ public partial class View
                             view._addingView = false;
                         }
                     }
+                }
+
+                if (this is Toplevel && Application.Current.Focused != this)
+                {
+                    Application.BringOverlappedTopToFront ();
                 }
             }
 

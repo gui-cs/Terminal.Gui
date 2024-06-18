@@ -193,7 +193,7 @@ public class KeyboardTests
         Assert.True (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.False (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
+        Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
 
         win.CanFocus = false;
         Assert.False (win.CanFocus);
@@ -220,7 +220,7 @@ public class KeyboardTests
 
     [Fact]
     [AutoInitShutdown]
-    public void EnsuresTopOnFront_CanFocus_True_By_Keyboard_ ()
+    public void EnsuresTopOnFront_CanFocus_True_By_Keyboard ()
     {
         Toplevel top = new ();
 
@@ -253,7 +253,7 @@ public class KeyboardTests
         Assert.True (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.False (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
+        Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
 
         top.NewKeyDownEvent (Key.Tab.WithCtrl);
         Assert.True (win.CanFocus);
