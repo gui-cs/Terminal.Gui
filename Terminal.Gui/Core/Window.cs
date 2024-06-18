@@ -104,7 +104,7 @@ namespace Terminal.Gui {
 
 			public override void OnCanFocusChanged ()
 			{
-				if (MostFocused == null && CanFocus && Visible) {
+				if (HasFocus && MostFocused == null && CanFocus && Visible) {
 					EnsureFocus ();
 				}
 
