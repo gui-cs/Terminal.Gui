@@ -189,7 +189,7 @@ public class Bar : View
 
                     if (barItem is Shortcut scBarItem)
                     {
-                        scBarItem.MinimumKeyViewSize = minKeyWidth;
+                        scBarItem.MinimumKeyTextSize = minKeyWidth;
                         // HACK: This should not be needed
                         scBarItem.SetRelativeLayout (GetContentSize ());
                         maxBarItemWidth = Math.Max (maxBarItemWidth, scBarItem.Frame.Width);

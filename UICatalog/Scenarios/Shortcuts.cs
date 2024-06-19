@@ -116,13 +116,14 @@ public class Shortcuts : Scenario
                                                               {
                                                                   foreach (Shortcut peer in toAlign)
                                                                   {
-                                                                      max = Math.Max (max, peer.KeyView.Text.GetColumns ());
+                                                                      // DANGER: KeyView is internal so we can't access it. So we assume this is how it works.
+                                                                      max = Math.Max (max, peer.Key.ToString ().GetColumns ());
                                                                   }
                                                               }
 
                                                               foreach (Shortcut peer in toAlign)
                                                               {
-                                                                  peer.MinimumKeyViewSize = max;
+                                                                  peer.MinimumKeyTextSize = max;
                                                               }
                                                           }
                                                       };
@@ -344,6 +345,7 @@ public class Shortcuts : Scenario
                                    {
                                        eventSource.Add ($"Accept: {shortcut!.CommandView.Text}");
                                        eventLog.MoveDown ();
+                                       args.Cancel = true;
                                    };
             }
         }

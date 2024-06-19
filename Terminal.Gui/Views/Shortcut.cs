@@ -3,20 +3,21 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Displays a command, help text, and a key binding. When the key is pressed, the command will be invoked. Useful for
+///     Displays a command, help text, and a key binding. When the key specified by <see cref="Key"/> is pressed, the command will be invoked. Useful for
 ///     displaying a command in <see cref="Bar"/> such as a
 ///     menu, toolbar, or status bar.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         When the user clicks on the <see cref="Shortcut"/> or presses the key
-///         specified by <see cref="Key"/> the <see cref="Command.Accept"/> command is invoked, causing the
-///         <see cref="View.Accept"/> event to be fired
+///         The following user actions will invoke the <see cref="Command.Accept"/>, causing the
+///         <see cref="View.Accept"/> event to be fired:
+/// - Clicking on the <see cref="Shortcut"/>.
+/// - Pressing the key specified by <see cref="Key"/>.
+/// - Pressing the HotKey specified by <see cref="CommandView"/>.
 ///     </para>
 ///     <para>
-///         If <see cref="KeyBindingScope"/> is <see cref="KeyBindingScope.Application"/>, the <see cref="Command.Accept"/>
-///         command
-///         be invoked regardless of what View has focus, enabling an application-wide keyboard shortcut.
+///         If <see cref="KeyBindingScope"/> is <see cref="KeyBindingScope.Application"/>, <see cref="Key"/> will invoked <see cref="Command.Accept"/>
+///         command regardless of what View has focus, enabling an application-wide keyboard shortcut.
 ///     </para>
 ///     <para>
 ///         By default, a Shortcut displays the command text on the left side, the help text in the middle, and the key
@@ -58,8 +59,8 @@ public class Shortcut : View
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
 
-        AddCommand (Command.HotKey, OnAccept);
-        AddCommand (Command.Accept, OnAccept);
+        AddCommand (Command.HotKey, ctx => OnAccept(ctx));
+        AddCommand (Command.Accept, ctx => OnAccept (ctx));
         KeyBindings.Add (KeyCode.Space, Command.Accept);
         KeyBindings.Add (KeyCode.Enter, Command.Accept);
 
@@ -430,10 +431,10 @@ public class Shortcut : View
             {
                 // When the CommandView fires its Accept event, we want to act as though the
                 // Shortcut was clicked.
-                if (base.OnAccept () == true)
-                {
-                    e.Cancel = true;
-                }
+                //if (base.OnAccept () == true)
+                //{
+                //    e.Cancel = true;
+                //}
             }
         }
     }
@@ -551,28 +552,28 @@ public class Shortcut : View
         }
     }
 
-    // TODO: Make internal once Bar is done
     /// <summary>
     ///     Gets the subview that displays the key. Internal for unit testing.
     /// </summary>
 
-    public View KeyView { get; } = new ();
+    internal View KeyView { get; } = new ();
 
-    private int _minimumKeyViewSize;
+    private int _minimumKeyTextSize;
 
     /// <summary>
+    /// Gets or sets the minimum size of the key text. Useful for aligning the key text with other <see cref="Shortcut"/>s.
     /// </summary>
-    public int MinimumKeyViewSize
+    public int MinimumKeyTextSize
     {
-        get => _minimumKeyViewSize;
+        get => _minimumKeyTextSize;
         set
         {
-            if (value == _minimumKeyViewSize)
+            if (value == _minimumKeyTextSize)
             {
                 //return;
             }
 
-            _minimumKeyViewSize = value;
+            _minimumKeyTextSize = value;
             SetKeyViewDefaultLayout ();
             CommandView.SetNeedsLayout ();
             HelpView.SetNeedsLayout ();
@@ -581,7 +582,7 @@ public class Shortcut : View
         }
     }
 
-    private int GetMinimumKeyViewSize () { return MinimumKeyViewSize; }
+    private int GetMinimumKeyViewSize () { return MinimumKeyTextSize; }
 
     private void SetKeyViewDefaultLayout ()
     {
@@ -603,6 +604,9 @@ public class Shortcut : View
     {
         if (Key != null)
         {
+            // Disable the command view key bindings
+            CommandView.KeyBindings.Remove (Key);
+            CommandView.KeyBindings.Remove (CommandView.HotKey);
             KeyBindings.Remove (Key);
             KeyBindings.Add (Key, KeyBindingScope, Command.Accept);
         }
@@ -614,47 +618,52 @@ public class Shortcut : View
 
     /// <summary>
     ///     Called when the <see cref="Command.Accept"/> command is received. This
-    ///     occurs if the user clicks on the Bar with the mouse or presses the key bound to
-    ///     Command.Accept (Space by default).
+    ///     occurs
+    ///     - if the user clicks anywhere on the shortcut with the mouse
+    ///     - if the user presses Key
+    ///     - if the user presses the HotKey specified by CommandView
+    ///     - if HasFocus and the user presses Space or Enter (or any other key bound to Command.Accept).
     /// </summary>
-    protected new bool? OnAccept ()
+    protected new bool? OnAccept (CommandContext ctx)
     {
-        var handled = true;
+        var cancel = false;
 
-        switch (KeyBindingScope)
+        switch (ctx.KeyBinding?.Scope)
         {
             case KeyBindingScope.Application:
-                handled = false;
+                cancel = base.OnAccept () == true;
 
                 break;
 
             case KeyBindingScope.Focused:
                 // TODO: Figure this out
-                handled = false;
+                cancel = false;
 
                 break;
+
             case KeyBindingScope.HotKey:
-                    CommandView.InvokeCommand (Command.HotKey);
-                    handled = false;
-                break;
-        }
-
-        if (handled == false)
-        {
-            if (base.OnAccept () is false)
-            {
-                Action?.Invoke ();
+                cancel = base.OnAccept () == true;
 
                 if (CanFocus)
                 {
                     SetFocus ();
                 }
 
-                return true;
-            }
+                break;
+
+            default:
+                cancel = base.OnAccept () == true;
+                break;
         }
 
-        return false;
+        CommandView.InvokeCommand (Command.Accept);
+
+        if (!cancel)
+        {
+            Action?.Invoke ();
+        }
+
+        return cancel;
     }
 
     /// <summary>
