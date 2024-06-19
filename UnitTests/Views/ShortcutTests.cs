@@ -277,4 +277,41 @@ public class ShortcutTests
         Assert.False (shortcut.KeyView.Visible);
         Assert.DoesNotContain (shortcut.KeyView, shortcut.Subviews);
     }
+
+    [Fact]
+    public void Focus_CanFocus_Default_Is_True ()
+    {
+        Shortcut shortcut = new ();
+        shortcut.Key = Key.A;
+        shortcut.Text = "Help";
+        shortcut.Title = "Command";
+        Assert.True (shortcut.CanFocus);
+        Assert.False (shortcut.CommandView.CanFocus);
+    }
+
+    [Fact]
+    public void Focus_CanFocus_CommandView_Add_Tracks ()
+    {
+        Shortcut shortcut = new ();
+        Assert.True (shortcut.CanFocus);
+        Assert.False (shortcut.CommandView.CanFocus);
+
+        shortcut.CommandView = new () { CanFocus = true };
+        Assert.False (shortcut.CommandView.CanFocus);
+
+        shortcut.CommandView.CanFocus = true;
+        Assert.True (shortcut.CommandView.CanFocus);
+
+        shortcut.CanFocus = false;
+        Assert.False (shortcut.CanFocus);
+        Assert.True (shortcut.CommandView.CanFocus);
+
+        shortcut.CommandView.CanFocus = false;
+        Assert.False (shortcut.CanFocus);
+        Assert.False (shortcut.CommandView.CanFocus);
+
+        shortcut.CommandView.CanFocus = true;
+        Assert.False (shortcut.CanFocus);
+        Assert.True (shortcut.CommandView.CanFocus);
+    }
 }

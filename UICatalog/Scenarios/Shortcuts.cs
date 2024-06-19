@@ -66,7 +66,7 @@ public class Shortcuts : Scenario
             CommandView = new RadioGroup
             {
                 Orientation = Orientation.Vertical,
-                RadioLabels = ["One", "Two", "Three", "Four"]
+                RadioLabels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"]
             }
         };
 
@@ -173,7 +173,6 @@ public class Shortcuts : Scenario
                                                                  if (peer.CanFocus)
                                                                  {
                                                                      peer.CommandView.CanFocus = e.NewValue == true;
-                                                                     //peer.SetColors ();
                                                                  }
                                                              }
                                                          }
@@ -185,7 +184,6 @@ public class Shortcuts : Scenario
             Orientation = Orientation.Vertical,
             X = 0,
             Y = Pos.Bottom (vShortcut5),
-            Key = Key.F5,
             HelpText = "Width is Fill",
             Width = Dim.Width (vShortcut5),
 
@@ -193,8 +191,9 @@ public class Shortcuts : Scenario
             CommandView = new Slider<string>
             {
                 Orientation = Orientation.Vertical,
-                AllowEmpty = false
-            }
+                AllowEmpty = true
+            },
+            Key = Key.F5,
         };
 
         ((Slider<string>)vShortcutSlider.CommandView).Options = new () { new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" } };
@@ -202,7 +201,7 @@ public class Shortcuts : Scenario
 
         ((Slider<string>)vShortcutSlider.CommandView).OptionsChanged += (o, args) =>
                                                                        {
-                                                                           eventSource.Add ($"OptionsChanged: {o.GetType ().Name} - {args.Options}");
+                                                                           eventSource.Add ($"OptionsChanged: {o.GetType ().Name} - {string.Join (",", ((Slider<string>)o).GetSetOptions ())}");
                                                                            eventLog.MoveDown ();
                                                                        };
 
@@ -220,9 +219,22 @@ public class Shortcuts : Scenario
         };
 
         Application.Top.Add (vShortcut6);
-        vShortcut6.SetFocus ();
 
-        ((CheckBox)vShortcut3.CommandView).OnToggled ();
+
+        var vShortcut7 = new Shortcut
+        {
+            Orientation = Orientation.Vertical,
+            X = 0,
+            Y = Pos.Bottom (vShortcut6),
+            Width = Dim.Width (vShortcutSlider),
+            Key = Key.F6,
+            Title = "No _Help",
+            HelpText = "",
+        };
+
+        Application.Top.Add (vShortcut7);
+        vShortcut7.SetFocus ();
+
 
         // Horizontal
         var hShortcut1 = new Shortcut
@@ -350,8 +362,7 @@ public class Shortcuts : Scenario
             }
         }
 
-        ((CheckBox)vShortcut5.CommandView).OnToggled ();
-        ((CheckBox)vShortcut5.CommandView).OnToggled ();
+        //((CheckBox)vShortcut5.CommandView).OnToggled ();
     }
 
     private void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }

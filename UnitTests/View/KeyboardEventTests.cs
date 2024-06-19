@@ -421,7 +421,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         var view = new KeyBindingsTestView ();
         view.CommandReturns = toReturn;
 
-        bool? result = view.OnInvokingKeyBindings (Key.A);
+        bool? result = view.OnInvokingKeyBindings (Key.A, KeyBindingScope.HotKey | KeyBindingScope.Focused);
         Assert.Equal (expected, result);
     }
 
@@ -449,9 +449,9 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         public bool OnKeyUpContinued { get; set; }
         public override string Text { get; set; }
 
-        public override bool? OnInvokingKeyBindings (Key keyEvent)
+        public override bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
         {
-            bool? handled = base.OnInvokingKeyBindings (keyEvent);
+            bool? handled = base.OnInvokingKeyBindings (keyEvent, scope);
 
             if (handled != null && (bool)handled)
             {

@@ -59,10 +59,11 @@ public class Shortcut : View
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
 
-        AddCommand (Command.HotKey, ctx => OnAccept(ctx));
+        AddCommand (Command.HotKey, ctx => OnAccept (ctx));
         AddCommand (Command.Accept, ctx => OnAccept (ctx));
-        KeyBindings.Add (KeyCode.Space, Command.Accept);
+        AddCommand (Command.Select, ctx => OnSelect (ctx));
         KeyBindings.Add (KeyCode.Enter, Command.Accept);
+        KeyBindings.Add (KeyCode.Space, Command.Select);
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
@@ -129,6 +130,7 @@ public class Shortcut : View
                              Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)));
         }
     }
+
 
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
@@ -403,6 +405,10 @@ public class Shortcut : View
             _commandView = value;
             _commandView.Id = "_commandView";
 
+            // The default behavior is for CommandView to not get focus. I
+            // If you want it to get focus, you need to set it.
+            _commandView.CanFocus = false;
+
             _commandView.MouseClick += Shortcut_MouseClick;
             _commandView.Accept += CommandViewAccept;
 
@@ -608,7 +614,8 @@ public class Shortcut : View
             CommandView.KeyBindings.Remove (Key);
             CommandView.KeyBindings.Remove (CommandView.HotKey);
             KeyBindings.Remove (Key);
-            KeyBindings.Add (Key, KeyBindingScope, Command.Accept);
+            KeyBindings.Add (Key, KeyBindingScope | KeyBindingScope.HotKey, Command.Accept);
+            //KeyBindings.Add (Key, KeyBindingScope.HotKey, Command.Accept);
         }
     }
 
@@ -637,7 +644,7 @@ public class Shortcut : View
 
             case KeyBindingScope.Focused:
                 // TODO: Figure this out
-                cancel = false;
+                cancel = base.OnAccept () == true;
 
                 break;
 
@@ -677,6 +684,17 @@ public class Shortcut : View
     public Action Action { get; set; }
 
     #endregion Accept Handling
+
+    private bool? OnSelect (CommandContext ctx)
+    {
+        if (CommandView.GetSupportedCommands ().Contains (Command.Select))
+        {
+           return CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
+        }
+        return false;
+
+    }
+
 
     #region Focus
 

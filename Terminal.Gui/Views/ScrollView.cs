@@ -392,7 +392,7 @@ public class ScrollView : View
             return true;
         }
 
-        bool? result = InvokeKeyBindings (a);
+        bool? result = InvokeKeyBindings (a, KeyBindingScope.HotKey);
 
         if (result is { })
         {

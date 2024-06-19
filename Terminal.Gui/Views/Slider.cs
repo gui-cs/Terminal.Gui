@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using System.Transactions;
+
+namespace Terminal.Gui;
 
 /// <summary>Slider control.</summary>
 public class Slider : Slider<object>
@@ -1418,7 +1420,8 @@ public class Slider<T> : View
         AddCommand (Command.RightEnd, () => MoveEnd ());
         AddCommand (Command.RightExtend, () => ExtendPlus ());
         AddCommand (Command.LeftExtend, () => ExtendMinus ());
-        AddCommand (Command.Accept, () => Set ());
+        AddCommand (Command.Select, () => Select ());
+        AddCommand (Command.Accept, () => Accept ());
 
         SetKeyBindings ();
     }
@@ -1454,7 +1457,7 @@ public class Slider<T> : View
         KeyBindings.Add (Key.Home, Command.LeftHome);
         KeyBindings.Add (Key.End, Command.RightEnd);
         KeyBindings.Add (Key.Enter, Command.Accept);
-        KeyBindings.Add (Key.Space, Command.Accept);
+        KeyBindings.Add (Key.Space, Command.Select);
     }
 
     private Dictionary<int, SliderOption<T>> GetSetOptionDictionary () { return _setOptions.ToDictionary (e => e, e => _options [e]); }
@@ -1651,8 +1654,6 @@ public class Slider<T> : View
             default:
                 throw new ArgumentOutOfRangeException (_config._type.ToString ());
         }
-        OnAccept ();
-
     }
 
     internal bool ExtendPlus ()
@@ -1735,10 +1736,18 @@ public class Slider<T> : View
         return true;
     }
 
-    internal bool Set ()
+    internal bool Select ()
+    {
+        SetFocusedOption();
+
+        return true;
+    }
+
+    internal bool Accept ()
     {
         SetFocusedOption ();
-        return true;
+
+        return OnAccept () == true;
     }
 
     internal bool MovePlus ()

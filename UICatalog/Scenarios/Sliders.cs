@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
@@ -242,7 +244,7 @@ public class Sliders : Scenario
                                       }
                                   };
         configView.Add (dimAutoUsesMin);
-    
+
         #region Slider Orientation Slider
 
         Slider<string> orientationSlider = new (new List<string> { "Horizontal", "Vertical" })
@@ -393,7 +395,7 @@ public class Sliders : Scenario
         FrameView spacingOptions = new ()
         {
             Title = "Spacing Options",
-            X = Pos.Right(orientationSlider),
+            X = Pos.Right (orientationSlider),
             Y = Pos.Top (orientationSlider),
             Width = Dim.Fill (),
             Height = Dim.Auto (),
@@ -407,7 +409,7 @@ public class Sliders : Scenario
 
         Buttons.NumericUpDown<int> innerSpacingUpDown = new ()
         {
-           X = Pos.Right(label) + 1
+            X = Pos.Right (label) + 1
         };
 
         innerSpacingUpDown.Value = app.Subviews.OfType<Slider> ().First ().MinimumInnerSpacing;
@@ -429,8 +431,8 @@ public class Sliders : Scenario
 
 
 
-        spacingOptions.Add(label, innerSpacingUpDown);
-        configView.Add(spacingOptions);
+        spacingOptions.Add (label, innerSpacingUpDown);
+        configView.Add (spacingOptions);
 
         #endregion
 
@@ -563,6 +565,35 @@ public class Sliders : Scenario
         #endregion Color Slider
 
         #endregion Config Slider
+
+        ObservableCollection<string> eventSource = new ();
+        var eventLog = new ListView
+        {
+            X = Pos.Right (sliderBGColor),
+            Y = Pos.Bottom (spacingOptions),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            Source = new ListWrapper<string> (eventSource)
+        };
+        configView.Add (eventLog);
+
+
+        foreach (Slider slider in app.Subviews.Where (v => v is Slider)!)
+        {
+            slider.Accept += (o, args) =>
+                             {
+                                 eventSource.Add ($"Accept: {string.Join(",", slider.GetSetOptions ())}");
+                                 eventLog.MoveDown ();
+                                 args.Cancel = true;
+                             };
+            slider.OptionsChanged += (o, args) =>
+                             {
+                                 eventSource.Add ($"OptionsChanged: {string.Join (",", slider.GetSetOptions ())}");
+                                 eventLog.MoveDown ();
+                                 args.Cancel = true;
+                             };
+        }
 
         app.FocusFirst ();
 
