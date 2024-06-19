@@ -143,18 +143,15 @@ partial class Application
             {
                 if (view is {} && view.KeyBindings.TryGet (binding.Key, (KeyBindingScope)0xFFFF, out KeyBinding kb))
                 {
-                    bool? handled = view.InvokeCommands (kb.Commands, binding.Key, kb);
+                    //bool? handled = view.InvokeCommands (kb.Commands, binding.Key, kb);
+                    bool? handled = view?.OnInvokingKeyBindings (keyEvent, kb.Scope);
+
                     if (handled != null && (bool)handled)
                     {
                         return true;
                     }
-                }
-                //bool? handled = view?.OnInvokingKeyBindings (keyEvent, KeyBindingScope.Application);
 
-                //if (handled != null && (bool)handled)
-                //{
-                //    return true;
-                //}
+                }
             }
         }
 

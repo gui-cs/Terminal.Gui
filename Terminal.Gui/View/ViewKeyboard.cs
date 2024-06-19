@@ -639,7 +639,7 @@ public partial class View
     public virtual bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
     {
         // fire event only if there's an hotkey binding for the key
-        if (KeyBindings.TryGet (keyEvent, scope, out KeyBinding _))
+        if (KeyBindings.TryGet (keyEvent, scope, out KeyBinding kb))
         {
             InvokingKeyBindings?.Invoke (this, keyEvent);
             if (keyEvent.Handled)
@@ -709,7 +709,10 @@ public partial class View
         {
             if (subview.KeyBindings.TryGet (keyEvent, scope, out KeyBinding binding))
             {
-                //keyEvent.Scope = KeyBindingScope.HotKey;
+                if (binding.Scope == KeyBindingScope.Focused && !subview.HasFocus)
+                {
+                    continue;
+                }
                 handled = subview.OnInvokingKeyBindings (keyEvent, scope);
 
                 if (handled is { } && (bool)handled)
