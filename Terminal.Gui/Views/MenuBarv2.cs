@@ -30,57 +30,7 @@ public class MenuBarv2 : Bar
     // The Shortcuts are configured with the command, help, and key views aligned in reverse order (EndToStart).
     private void MenuBarv2_LayoutStarted (object sender, LayoutEventArgs e)
     {
-        var minKeyWidth = 0;
-
-        List<Shortcut> shortcuts = Subviews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
-
-        foreach (Shortcut shortcut in shortcuts)
-        {
-            // Let AutoSize do its thing to get the minimum width of each CommandView and HelpView
-            //shortcut.CommandView.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
-            minKeyWidth = int.Max (minKeyWidth, shortcut.KeyView.Text.GetColumns ());
-        }
-
-        View prevBarItem = null;
-        var maxBarItemWidth = 0;
-
-        for (int index = 0; index < Subviews.Count; index++)
-        {
-            View barItem = Subviews [index];
-
-            if (!barItem.Visible)
-            {
-                continue;
-            }
-
-            if (barItem is Shortcut scBarItem)
-            {
-                scBarItem.MinimumKeyViewSize = minKeyWidth;
-            }
-
-            if (index == Subviews.Count - 1)
-            {
-                barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
-            }
-            else
-            {
-                barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
-            }
-
-            if (barItem is Shortcut shortcut)
-            {
-                //                shortcut.Min
-                // shortcut.Orientation = Orientation.Vertical;
-            }
-
-            maxBarItemWidth = Math.Max (maxBarItemWidth, barItem.Frame.Width);
-
-        }
-
-        foreach (Shortcut shortcut in shortcuts)
-        {
-            shortcut.Width = maxBarItemWidth;
-        }
+       
     }
 
     /// <inheritdoc/>

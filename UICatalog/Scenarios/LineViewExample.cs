@@ -11,6 +11,7 @@ public class LineViewExample : Scenario
 {
     public override void Main ()
     {
+        Application.Init ();
         // Setup - Create a top-level application window and configure it.
         Toplevel appWindow = new ();
 

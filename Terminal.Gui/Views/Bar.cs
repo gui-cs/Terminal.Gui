@@ -24,7 +24,6 @@ public class Bar : View
         Width = Dim.Auto ();
         Height = Dim.Auto ();
 
-        LayoutStarted += Bar_LayoutStarted;
         Initialized += Bar_Initialized;
 
         if (shortcuts is null)
@@ -137,8 +136,11 @@ public class Bar : View
         return toRemove as Shortcut;
     }
 
-    private void Bar_LayoutStarted (object sender, LayoutEventArgs e)
+    /// <inheritdoc />
+    internal override void OnLayoutStarted (LayoutEventArgs args)
     {
+        base.OnLayoutStarted (args);
+
         View prevBarItem = null;
 
         switch (Orientation)
@@ -160,6 +162,17 @@ public class Bar : View
 
             case Orientation.Vertical:
                 // Set the overall size of the Bar and arrange the views vertically
+
+                var minKeyWidth = 0;
+
+                List<Shortcut> shortcuts = Subviews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
+                foreach (Shortcut shortcut in shortcuts)
+                {
+                    // Let AutoSize do its thing to get the minimum width of each CommandView and HelpView
+                    //shortcut.CommandView.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
+                    minKeyWidth = int.Max (minKeyWidth, shortcut.KeyView.Text.GetColumns ());
+                }
+
                 var maxBarItemWidth = 0;
                 var totalHeight = 0;
 
@@ -174,6 +187,14 @@ public class Bar : View
                         continue;
                     }
 
+                    if (barItem is Shortcut scBarItem)
+                    {
+                        scBarItem.MinimumKeyViewSize = minKeyWidth;
+                        // HACK: This should not be needed
+                        scBarItem.SetRelativeLayout (GetContentSize ());
+                        maxBarItemWidth = Math.Max (maxBarItemWidth, scBarItem.Frame.Width);
+                    }
+
                     if (prevBarItem == null)
                     {
                         barItem.Y = 0;
@@ -186,16 +207,19 @@ public class Bar : View
 
                     prevBarItem = barItem;
 
-                    //maxBarItemWidth = Math.Max (maxBarItemWidth, barItem.Frame.Width);
-
                     barItem.X = 0;
                     totalHeight += barItem.Frame.Height;
                 }
 
-                //foreach (Shortcut shortcut in shortcuts)
-                //{
-                //    shortcut.Width = maxBarItemWidth;
-                //}
+
+                foreach (View barItem in Subviews)
+                {
+                    barItem.Width = maxBarItemWidth;
+
+                    if (barItem is Line line)
+                    {
+                    }
+                }
 
                 Height = Dim.Auto (DimAutoStyle.Content, totalHeight);
 

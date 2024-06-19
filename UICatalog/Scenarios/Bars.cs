@@ -116,8 +116,7 @@ public class Bars : Scenario
             //Width = Dim.Percent (40),
             Orientation = Orientation.Vertical,
         };
-        bar.Border.Thickness = new (1);
-        ConfigureMenu (bar);
+            ConfigureMenu (bar);
 
         menuLikeExamples.Add (bar);
 
@@ -391,6 +390,13 @@ public class Bars : Scenario
             Key = Key.G.WithAlt,
         };
 
+        var line = new Line ()
+        {
+            BorderStyle = LineStyle.Dotted,
+            Orientation = Orientation.Horizontal,
+            CanFocus = false,
+        };
+
         var shortcut3 = new Shortcut
         {
             Title = "_Three",
@@ -398,7 +404,7 @@ public class Bars : Scenario
             Key = Key.D3.WithAlt,
         };
 
-        bar.Add (shortcut1, shortcut2, shortcut3);
+        bar.Add (shortcut1, shortcut2, line, shortcut3);
     }
 
     private void ConfigStatusBar (Bar bar)

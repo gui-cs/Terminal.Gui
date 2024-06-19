@@ -36,6 +36,9 @@ public class ScenarioTests : TestsAllViews
 
         Scenario scenario = (Scenario)Activator.CreateInstance (scenarioType);
 
+        // BUGBUG: Scenario.Main is supposed to call Init. This is a workaround for now.
+        // BUGBUG: To be able to test Scenarios we need Application to have an event like "Application.Started"
+        // BUGBUG: That tests like this could subscribe to.
         Application.Init (new FakeDriver ());
 
         // Press QuitKey 
