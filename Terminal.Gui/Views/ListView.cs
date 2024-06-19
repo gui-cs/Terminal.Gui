@@ -19,6 +19,12 @@ public interface IListDataSource: IDisposable
     /// <summary>Returns the maximum length of elements to display</summary>
     int Length { get; }
 
+    /// <summary>
+    /// Allow suspending the <see cref="CollectionChanged"/> event from being invoked,
+    /// if <see langword="true"/>, otherwise is <see langword="false"/>.
+    /// </summary>
+    bool SuspendCollectionChangedEvent { get; set; }
+
     /// <summary>Should return whether the specified item is currently marked.</summary>
     /// <returns><see langword="true"/>, if marked, <see langword="false"/> otherwise.</returns>
     /// <param name="item">Item index.</param>
@@ -893,6 +899,28 @@ public class ListView : View
 
         base.Dispose (disposing);
     }
+
+    /// <summary>
+    /// Allow suspending the <see cref="CollectionChanged"/> event from being invoked,
+    /// </summary>
+    public void SuspendCollectionChangedEvent ()
+    {
+        if (Source is { })
+        {
+            Source.SuspendCollectionChangedEvent = true;
+        }
+    }
+
+    /// <summary>
+    /// Allow resume the <see cref="CollectionChanged"/> event from being invoked,
+    /// </summary>
+    public void ResumeSuspendCollectionChangedEvent ()
+    {
+        if (Source is { })
+        {
+            Source.SuspendCollectionChangedEvent = false;
+        }
+    }
 }
 
 /// <summary>
@@ -920,8 +948,11 @@ public class ListWrapper<T> : IListDataSource, IDisposable
 
     private void Source_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
     {
-        CheckAndResizeMarksIfRequired ();
-        CollectionChanged?.Invoke (sender, e);
+        if (!SuspendCollectionChangedEvent)
+        {
+            CheckAndResizeMarksIfRequired ();
+            CollectionChanged?.Invoke (sender, e);
+        }
     }
 
     /// <inheritdoc />
@@ -933,7 +964,24 @@ public class ListWrapper<T> : IListDataSource, IDisposable
     /// <inheritdoc/>
     public int Length { get; private set; }
 
-    void CheckAndResizeMarksIfRequired ()
+    private bool _suspendCollectionChangedEvent;
+
+    /// <inheritdoc />
+    public bool SuspendCollectionChangedEvent
+    {
+        get => _suspendCollectionChangedEvent;
+        set
+        {
+            _suspendCollectionChangedEvent = value;
+
+            if (!_suspendCollectionChangedEvent)
+            {
+                CheckAndResizeMarksIfRequired ();
+            }
+        }
+    }
+
+    private void CheckAndResizeMarksIfRequired ()
     {
         if (_source != null && _count != _source.Count)
         {

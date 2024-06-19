@@ -679,6 +679,9 @@ Item 6",
 
         public int Count => 0;
         public int Length => 0;
+
+        public bool SuspendCollectionChangedEvent { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+
         public bool IsMarked (int item) { throw new NotImplementedException (); }
 
         public void Render (
@@ -1072,6 +1075,84 @@ Item 6",
             else
             {
                 otherActions++;
+            }
+        }
+    }
+
+    [Fact]
+    public void ListWrapper_SuspendCollectionChangedEvent_ResumeSuspendCollectionChangedEvent_Tests ()
+    {
+        var added = 0;
+        ObservableCollection<string> source = [];
+        ListWrapper<string> lw = new (source);
+
+        lw.CollectionChanged += Lw_CollectionChanged;
+
+        lw.SuspendCollectionChangedEvent = true;
+
+        for (int i = 0; i < 3; i++)
+        {
+            source.Add ($"Item{i}");
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, lw.Count);
+        Assert.Equal (3, source.Count);
+
+        lw.SuspendCollectionChangedEvent = false;
+
+        for (int i = 3; i < 6; i++)
+        {
+            source.Add ($"Item{i}");
+        }
+        Assert.Equal (3, added);
+        Assert.Equal (6, lw.Count);
+        Assert.Equal (6, source.Count);
+
+
+        void Lw_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+        }
+    }
+
+    [Fact]
+    public void ListView_SuspendCollectionChangedEvent_ResumeSuspendCollectionChangedEvent_Tests ()
+    {
+        var added = 0;
+        ObservableCollection<string> source = [];
+        ListView lv = new ListView { Source = new ListWrapper<string> (source) };
+
+        lv.CollectionChanged += Lw_CollectionChanged;
+
+        lv.SuspendCollectionChangedEvent ();
+
+        for (int i = 0; i < 3; i++)
+        {
+            source.Add ($"Item{i}");
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, lv.Source.Count);
+        Assert.Equal (3, source.Count);
+
+        lv.ResumeSuspendCollectionChangedEvent ();
+
+        for (int i = 3; i < 6; i++)
+        {
+            source.Add ($"Item{i}");
+        }
+        Assert.Equal (3, added);
+        Assert.Equal (6, lv.Source.Count);
+        Assert.Equal (6, source.Count);
+
+
+        void Lw_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
             }
         }
     }
