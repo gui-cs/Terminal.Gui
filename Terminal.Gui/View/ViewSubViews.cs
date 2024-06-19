@@ -528,7 +528,7 @@ public partial class View
     // BUGBUG: This API is poorly defined and implemented. It does not specify what it means if THIS view is focused and has no subviews.
     /// <summary>Returns the currently focused Subview inside this view, or null if nothing is focused.</summary>
     /// <value>The focused.</value>
-    public View Focused { get;  set; }
+    public View Focused { get; private set; }
 
     // BUGBUG: This API is poorly defined and implemented. It does not specify what it means if THIS view is focused and has no subviews.
     /// <summary>Returns the most focused Subview in the chain of subviews (the leaf view that has the focus).</summary>

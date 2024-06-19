@@ -16,7 +16,8 @@ public class DynamicStatusBar : Scenario
     public override void Main ()
     {
 
-        Application.Run<DynamicStatusBarSample> ().Dispose();
+        Application.Run<DynamicStatusBarSample> ().Dispose ();
+        Application.Shutdown ();
     }
 
     public class Binding
@@ -165,7 +166,7 @@ public class DynamicStatusBar : Scenario
                     return true;
                 }
 
-                TextShortcut.Text = k.ToString();
+                TextShortcut.Text = k.ToString ();
                 return true;
             }
 

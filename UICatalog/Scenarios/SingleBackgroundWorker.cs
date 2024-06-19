@@ -15,6 +15,7 @@ public class SingleBackgroundWorker : Scenario
     public override void Main ()
     {
         Application.Run<MainApp> ().Dispose ();
+        Application.Shutdown ();
     }
 
     public class MainApp : Toplevel

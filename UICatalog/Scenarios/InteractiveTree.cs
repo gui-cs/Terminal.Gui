@@ -12,6 +12,7 @@ public class InteractiveTree : Scenario
 
     public override void Main ()
     {
+        Application.Init ();
         var appWindow = new Toplevel ()
         {
             Title = GetName (),

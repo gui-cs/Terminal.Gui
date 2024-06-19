@@ -180,6 +180,7 @@ public class CharacterMap : Scenario
 
         Application.Run (top);
         top.Dispose ();
+        Application.Shutdown ();
     }
 
     private void _categoryList_Initialized (object sender, EventArgs e) { _charMap.Width = Dim.Fill () - _categoryList.Width; }

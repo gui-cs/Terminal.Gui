@@ -139,5 +139,6 @@ public class LineCanvasExperiment : Scenario
 
         Application.Run (app);
         app.Dispose ();
+        Application.Shutdown ();
     }
 }

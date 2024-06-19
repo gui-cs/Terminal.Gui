@@ -9,9 +9,8 @@ public class RunTExample : Scenario
     public override void Main ()
     {
         // No need to call Init if Application.Run<T> is used
-        Application.Run<ExampleWindow> ();
-
-        Application.Top.Dispose ();
+        Application.Run<ExampleWindow> ().Dispose ();
+        Application.Shutdown ();
     }
 
     public class ExampleWindow : Window

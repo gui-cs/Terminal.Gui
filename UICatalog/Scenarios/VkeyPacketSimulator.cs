@@ -260,6 +260,10 @@ public class VkeyPacketSimulator : Scenario
 
         void Win_LayoutComplete (object sender, LayoutEventArgs obj)
         {
+            if (inputHorizontalRuler.Viewport.Width == 0 || inputVerticalRuler.Viewport.Height == 0)
+            {
+                return;
+            }
             inputHorizontalRuler.Text = outputHorizontalRuler.Text =
                                             ruler.Repeat (
                                                           (int)Math.Ceiling (

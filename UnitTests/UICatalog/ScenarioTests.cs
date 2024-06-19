@@ -30,63 +30,75 @@ public class ScenarioTests : TestsAllViews
     /// </summary>
     [Theory]
     [MemberData (nameof (AllScenarioTypes))]
-    public void Run_All_Scenarios (Type scenarioType)
+    public void All_Scenarios_Quit_And_Init_Shutdown_Properly (Type scenarioType)
     {
+        Application.ResetState (true);
+
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
 
         Scenario scenario = (Scenario)Activator.CreateInstance (scenarioType);
 
-        // BUGBUG: Scenario.Main is supposed to call Init. This is a workaround for now.
-        // BUGBUG: To be able to test Scenarios we need Application to have an event like "Application.Started"
-        // BUGBUG: That tests like this could subscribe to.
-        Application.Init (new FakeDriver ());
-
-        // Press QuitKey 
-        Assert.Empty (FakeConsole.MockKeyPresses);
-
-        FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
-
         uint abortTime = 500;
 
-        // If the scenario doesn't close within 500ms, this will force it to quit
-        bool ForceCloseCallback ()
-        {
-            if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
-            {
-                Application.RequestStop ();
+        bool initialized = false;
+        bool shutdown = false;
 
-                // See #2474 for why this is commented out
-                Assert.Fail (
-                             $"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
-            }
+        object timeout = null;
 
-            return false;
-        }
+        Application.InitializedChanged += (s, a) =>
+                                          {
+                                              if (a.NewValue)
+                                              {
+                                                  //output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
+                                                  timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
 
-        //output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
-        _ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
-
-        Application.Iteration += (s, a) =>
-                                 {
-                                     // Press QuitKey 
-                                     Assert.Empty (FakeConsole.MockKeyPresses);
-                                     FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
-
-                                     //output.WriteLine ($"  iteration {++iterations}");
-                                     if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
-                                     {
-                                         Application.RequestStop ();
-                                         Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey}. Force quit.");
-                                     }
-                                 };
+                                                  Application.Iteration += OnApplicationOnIteration;
+                                                  initialized = true;
+                                              }
+                                              else
+                                              {
+                                                  if (timeout is { })
+                                                  {
+                                                      Application.RemoveTimeout (timeout);
+                                                      timeout = null;
+                                                  }
+                                                  Application.Iteration -= OnApplicationOnIteration;
+                                                  shutdown = true;
+                                              }
+                                          };
 
         scenario.Main ();
         scenario.Dispose ();
 
-        Application.Shutdown ();
+        Assert.True (initialized);
+        Assert.True (shutdown);
+
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
 #endif
+
+        return;
+
+        // If the scenario doesn't close within 500ms, this will force it to quit
+        bool ForceCloseCallback ()
+        {
+            if (timeout is { })
+            {
+                Application.RemoveTimeout (timeout);
+                timeout = null;
+            }
+            Application.ResetState (true);
+            Assert.Fail (
+                         $"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
+
+            return false;
+        }
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            // Press QuitKey 
+            Application.OnKeyDown (Application.QuitKey);
+        }
     }
 
     [Fact]

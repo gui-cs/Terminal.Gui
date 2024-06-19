@@ -21,6 +21,7 @@ public class HexEditor : Scenario
 
     public override void Main ()
     {
+        Application.Init ();
         Toplevel app = new Toplevel ()
         {
             ColorScheme = Colors.ColorSchemes ["Base"]

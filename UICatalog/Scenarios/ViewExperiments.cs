@@ -248,5 +248,6 @@ public class ViewExperiments : Scenario
 
         Application.Run (app);
         app.Dispose ();
+        Application.Shutdown ();
     }
 }
