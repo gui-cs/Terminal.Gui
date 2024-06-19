@@ -620,9 +620,9 @@ public class MainLoopTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public async Task InvokeLeakTest ()
     {
+        Application.Init ();
         Random r = new ();
         TextField tf = new ();
         var top = new Toplevel ();
@@ -641,10 +641,10 @@ public class MainLoopTests
 
         Assert.Equal (numIncrements * numPasses, tbCounter);
         top.Dispose ();
+        Application.Shutdown ();
     }
 
     [Theory]
-    [AutoInitShutdown]
     [MemberData (nameof (TestAddIdle))]
     public void Mainloop_Invoke_Or_AddIdle_Can_Be_Used_For_Events_Or_Actions (
         Action action,
@@ -658,6 +658,8 @@ public class MainLoopTests
         int pfour
     )
     {
+        Application.Init ();
+
         total = 0;
         btn = null;
         clickMe = pclickMe;
@@ -720,6 +722,8 @@ public class MainLoopTests
         Assert.True (taskCompleted);
         Assert.Equal (clickMe, btn.Text);
         Assert.Equal (four, total);
+
+        Application.Shutdown ();
     }
 
     [Fact]

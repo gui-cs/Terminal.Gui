@@ -5,9 +5,9 @@ namespace Terminal.Gui.ApplicationTests;
 public class SyncrhonizationContextTests
 {
     [Fact]
-    [AutoInitShutdown]
     public void SynchronizationContext_CreateCopy ()
     {
+        Application.Init ();
         SynchronizationContext context = SynchronizationContext.Current;
         Assert.NotNull (context);
 
@@ -15,12 +15,13 @@ public class SyncrhonizationContextTests
         Assert.NotNull (contextCopy);
 
         Assert.NotEqual (context, contextCopy);
+        Application.Shutdown ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void SynchronizationContext_Post ()
     {
+        Application.Init ();
         SynchronizationContext context = SynchronizationContext.Current;
 
         var success = false;
@@ -48,12 +49,14 @@ public class SyncrhonizationContextTests
         // blocks here until the RequestStop is processed at the end of the test
         Application.Run ().Dispose ();
         Assert.True (success);
+        Application.Shutdown ();
     }
 
     [Fact]
     [AutoInitShutdown]
     public void SynchronizationContext_Send ()
     {
+        Application.Init ();
         SynchronizationContext context = SynchronizationContext.Current;
 
         var success = false;
@@ -81,5 +84,6 @@ public class SyncrhonizationContextTests
         // blocks here until the RequestStop is processed at the end of the test
         Application.Run ().Dispose ();
         Assert.True (success);
+        Application.Shutdown ();
     }
 }
