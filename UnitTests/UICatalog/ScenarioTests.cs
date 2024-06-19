@@ -69,6 +69,7 @@ public class ScenarioTests : TestsAllViews
 
         scenario.Main ();
         scenario.Dispose ();
+        scenario = null;
 
         Assert.True (initialized);
         Assert.True (shutdown);
@@ -76,7 +77,7 @@ public class ScenarioTests : TestsAllViews
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
 #endif
-
+        Application.Shutdown ();
         return;
 
         // If the scenario doesn't close within 500ms, this will force it to quit
@@ -96,8 +97,11 @@ public class ScenarioTests : TestsAllViews
 
         void OnApplicationOnIteration (object s, IterationEventArgs a)
         {
-            // Press QuitKey 
-            Application.OnKeyDown (Application.QuitKey);
+            if (scenario is { })
+            {
+                // Press QuitKey 
+                Application.OnKeyDown (Application.QuitKey);
+            }
         }
     }
 
