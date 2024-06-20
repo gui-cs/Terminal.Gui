@@ -744,6 +744,7 @@ public class ComboBox : View
             return;
         }
 
+        // PERF: At the request of @dodexahedron in the comment https://github.com/gui-cs/Terminal.Gui/pull/3552#discussion_r1648112410.
         _listview.SuspendCollectionChangedEvent ();
 
         // force deep copy
