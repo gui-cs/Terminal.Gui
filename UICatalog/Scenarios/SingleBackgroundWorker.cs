@@ -203,7 +203,7 @@ public class SingleBackgroundWorker : Scenario
 
             _top.KeyDown += (s, e) =>
                             {
-                                // Prevents Ctrl+Q from closing this.
+                                // Prevents App.QuitKey from closing this.
                                 // Only Ctrl+C is allowed.
                                 if (e == Application.QuitKey)
                                 {
