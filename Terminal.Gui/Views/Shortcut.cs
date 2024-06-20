@@ -631,7 +631,7 @@ public class Shortcut : View
     ///     - if the user presses the HotKey specified by CommandView
     ///     - if HasFocus and the user presses Space or Enter (or any other key bound to Command.Accept).
     /// </summary>
-    protected new bool? OnAccept (CommandContext ctx)
+    protected bool? OnAccept (CommandContext ctx)
     {
         var cancel = false;
 

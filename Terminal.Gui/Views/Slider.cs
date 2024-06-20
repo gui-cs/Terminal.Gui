@@ -1743,7 +1743,7 @@ public class Slider<T> : View
         return true;
     }
 
-    internal bool Accept ()
+    internal new bool Accept ()
     {
         SetFocusedOption ();
 
