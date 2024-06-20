@@ -640,16 +640,16 @@ public partial class View
     {
         SubViewNeedsDisplay = true;
 
+        if (this is Adornment adornment)
+        {
+            adornment.Parent?.SetSubViewNeedsDisplay ();
+        }
+
         if (SuperView is { SubViewNeedsDisplay: false })
         {
             SuperView.SetSubViewNeedsDisplay ();
 
             return;
-        }
-
-        if (this is Adornment adornment)
-        {
-            adornment.Parent?.SetSubViewNeedsDisplay ();
         }
     }
 

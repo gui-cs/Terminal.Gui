@@ -73,6 +73,7 @@ public class RadioGroupTests (ITestOutputHelper output)
     public void KeyBindings_Command ()
     {
         var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
+        rg.SetFocus();
 
         Assert.True (rg.NewKeyDownEvent (Key.CursorUp));
         Assert.True (rg.NewKeyDownEvent (Key.CursorDown));

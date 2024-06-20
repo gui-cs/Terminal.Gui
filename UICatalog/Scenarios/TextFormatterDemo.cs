@@ -144,5 +144,6 @@ public class TextFormatterDemo : Scenario
 
         Application.Run (app);
         app.Dispose ();
+        Application.Shutdown ();
     }
 }

@@ -188,6 +188,8 @@ public class Scenario : IDisposable
     {
         // Must explicitly call Application.Shutdown method to shutdown.
         Application.Run (Top);
+        Top.Dispose ();
+        Application.Shutdown ();
     }
 
     /// <summary>Override this to implement the <see cref="Scenario"/> setup logic (create controls, etc...).</summary>

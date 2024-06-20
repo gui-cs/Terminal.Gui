@@ -59,6 +59,8 @@ public class ASCIICustomButtonTest : Scenario
         Application.Run (top);
         top.Dispose ();
 
+        Application.Shutdown ();
+
         return;
 
         void ChangeWindowSize ()
