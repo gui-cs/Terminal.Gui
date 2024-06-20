@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>

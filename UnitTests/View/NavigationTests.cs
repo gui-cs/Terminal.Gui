@@ -1535,7 +1535,6 @@ public class NavigationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void WindowDispose_CanFocusProblem ()
     {
         // Arrange

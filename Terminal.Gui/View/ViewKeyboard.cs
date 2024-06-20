@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -702,7 +703,7 @@ public partial class View
         return false;
     }
 
-    private bool ProcessSubViewKeyBindings (Key keyEvent, KeyBindingScope scope, ref bool? handled)
+    private bool ProcessSubViewKeyBindings (Key keyEvent, KeyBindingScope scope, ref bool? handled, bool invoke = true)
     {
         // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
         foreach (View subview in Subviews)
@@ -713,6 +714,12 @@ public partial class View
                 {
                     continue;
                 }
+
+                if (!invoke)
+                {
+                    return true;
+                }
+
                 handled = subview.OnInvokingKeyBindings (keyEvent, scope);
 
                 if (handled is { } && (bool)handled)
@@ -721,13 +728,43 @@ public partial class View
                 }
             }
 
-            bool recurse = subview.ProcessSubViewKeyBindings (keyEvent, scope, ref handled);
+            bool recurse = subview.ProcessSubViewKeyBindings (keyEvent, scope, ref handled, invoke);
             if (recurse || (handled is { } && (bool)handled))
             {
                 return true;
             }
         }
 
+        return false;
+    }
+
+    // TODO: This is a "prototype" debug check. It may be too annyoing vs. useful.
+    // TODO: A better approach would be have Application hold a list of bound Hotkeys, similar to
+    // TODO: how Application holds a list of Application Scoped key bindings and then check that list.
+    /// <summary>
+    /// Returns true if Key is bound in this view heirarchy. For debugging
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public bool IsHotKeyKeyBound (Key key, out View boundView)
+    {
+        // recurse through the subviews to find the views that has the key bound
+        boundView = null;
+
+        foreach (View subview in Subviews)
+        {
+            if (subview.KeyBindings.TryGet (key, KeyBindingScope.HotKey, out _))
+            {
+                boundView = subview;
+                return true;
+            }
+
+            if (subview.IsHotKeyKeyBound (key, out boundView))
+            {
+                return true;
+            }
+
+        }
         return false;
     }
 
@@ -755,6 +792,27 @@ public partial class View
         {
             return null;
         }
+
+#if DEBUG
+
+        // TODO: Determine if App scope bindings should be fired first or last (currently last).
+        if (Application.TryGetKeyBindings (key, out List<View> views))
+        {
+            var boundView = views [0];
+            var commandBinding = boundView.KeyBindings.Get (key);
+            Debug.WriteLine ($"WARNING: InvokeKeyBindings ({key}) - An Application scope binding exists for this key. The registered view will not invoke Command.{commandBinding.Commands [0]}: {boundView}.");
+        }
+
+        // TODO: This is a "prototype" debug check. It may be too annyoing vs. useful.
+        // Scour the bindings up our View heirarchy
+        // to ensure that the key is not already bound to a different set of commands.
+        if (SuperView?.IsHotKeyKeyBound (key, out View previouslyBoundView) ?? false)
+        {
+            Debug.WriteLine ($"WARNING: InvokeKeyBindings ({key}) - A subview or peer has bound this Key and will not see it: {previouslyBoundView}.");
+        }
+
+#endif
+
 
         foreach (Command command in binding.Commands)
         {

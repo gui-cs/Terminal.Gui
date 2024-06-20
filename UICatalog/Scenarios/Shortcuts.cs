@@ -1,6 +1,8 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using Terminal.Gui;
@@ -38,7 +40,9 @@ public class Shortcuts : Scenario
             Width = 40,
             Height = Dim.Fill (4),
             ColorScheme = Colors.ColorSchemes ["Toplevel"],
-            Source = new ListWrapper<string> (eventSource)
+            Source = new ListWrapper<string> (eventSource),
+            BorderStyle = LineStyle.Double,
+            Title = "E_vents"
         };
         Application.Top.Add (eventLog);
 
@@ -228,7 +232,7 @@ public class Shortcuts : Scenario
             Y = Pos.Bottom (vShortcut6),
             Width = Dim.Width (vShortcutSlider),
             Key = Key.F6,
-            Title = "No _Help",
+            Title = "Not _very much help",
             HelpText = "",
         };
 
@@ -347,7 +351,6 @@ public class Shortcuts : Scenario
                             };
 
         Application.Top.Add (hShortcut3);
-
 
         foreach (View sh in Application.Top.Subviews.Where (v => v is Shortcut)!)
         {
