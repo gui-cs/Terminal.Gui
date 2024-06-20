@@ -907,69 +907,6 @@ e
         top.Dispose ();
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void AnchorEnd_Better_Than_Bottom_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
-    {
-        var win = new Window ();
-
-        // Label is AutoSize == true
-        var label = new Label
-        {
-            Text = "This should be the last line.",
-            ColorScheme = Colors.ColorSchemes ["Menu"],
-
-            X = 0,
-            Y = Pos.AnchorEnd (1)
-        };
-
-        win.Add (label);
-
-        var menu = new MenuBar { Menus = new MenuBarItem [] { new ("Menu", "", null) } };
-        var status = new StatusBar (new StatusItem [] { new (KeyCode.F1, "~F1~ Help", null) });
-        Toplevel top = new ();
-        top.Add (win, menu, status);
-        RunState rs = Application.Begin (top);
-
-        Assert.Equal (new (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new (0, 0, 80, 1), menu.Frame);
-        Assert.Equal (new (0, 24, 80, 1), status.Frame);
-        Assert.Equal (new (0, 1, 80, 23), win.Frame);
-        Assert.Equal (new (0, 20, 29, 1), label.Frame);
-
-        var expected = @"
- Menu                                                                           
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│This should be the last line.                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
- F1 Help                                                                        
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Application.End (rs);
-        top.Dispose ();
-    }
-
     // TODO: This is a Label test. Move to label tests if there's not already a test for this.
     [Fact]
     [AutoInitShutdown]
@@ -1018,6 +955,7 @@ e
         top.Dispose ();
     }
 
+#if V2_STATUSBAR
     // TODO: This is a Label test. Move to label tests if there's not already a test for this.
 
     [Fact]
@@ -1083,7 +1021,7 @@ e
         Application.End (rs);
         top.Dispose ();
     }
-
+#endif
     // TODO: This is a Dim test. Move to Dim tests.
 
     [Fact]

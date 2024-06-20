@@ -81,7 +81,7 @@ public class HotKeyTests
     [InlineData (KeyCode.ShiftMask | KeyCode.AltMask, true)]
     [InlineData (KeyCode.CtrlMask, false)]
     [InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask, false)]
-    public void KeyPress_Runs_Default_HotKey_Command (KeyCode mask, bool expected)
+    public void NewKeyDownEvent_Runs_Default_HotKey_Command (KeyCode mask, bool expected)
     {
         var view = new View { HotKeySpecifier = (Rune)'^', Title = "^Test" };
         view.CanFocus = true;
@@ -91,10 +91,10 @@ public class HotKeyTests
     }
 
     [Fact]
-    public void ProcessKeyDown_Ignores_KeyBindings_Out_Of_Scope_SuperView ()
+    public void NewKeyDownEvent_Ignores_Focus_KeyBindings_SuperView ()
     {
         var view = new View ();
-        view.KeyBindings.Add (Key.A, Command.HotKey);
+        view.KeyBindings.Add (Key.A, Command.HotKey); // implies KeyBindingScope.Focused - so this should not be invoked
         view.InvokingKeyBindings += (s, e) => { Assert.Fail (); };
 
         var superView = new View ();
@@ -105,7 +105,25 @@ public class HotKeyTests
     }
 
     [Fact]
-    public void ProcessKeyDown_Invokes_HotKey_Command_With_SuperView ()
+    public void NewKeyDownEvent_Honors_HotKey_KeyBindings_SuperView ()
+    {
+        var view = new View ();
+        view.KeyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.HotKey); 
+        bool invoked = false;
+        view.InvokingKeyBindings += (s, e) => { invoked = true; };
+
+        var superView = new View ();
+        superView.Add (view);
+
+        var ke = Key.A;
+        superView.NewKeyDownEvent (ke);
+
+        Assert.True (invoked);
+    }
+
+
+    [Fact]
+    public void NewKeyDownEvent_InNewKeyDownEventvokes_HotKey_Command_With_SuperView ()
     {
         var view = new View { HotKeySpecifier = (Rune)'^', Title = "^Test" };
 

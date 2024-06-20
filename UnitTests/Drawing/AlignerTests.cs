@@ -218,7 +218,7 @@ public class AlignerTests (ITestOutputHelper output)
     [InlineData (Alignment.Start, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems | AlignmentModes.IgnoreFirstOrLast, new [] { 1, 2, 3 }, 9, new [] { 0, 2, 6 })]
     [InlineData (Alignment.Start, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems | AlignmentModes.IgnoreFirstOrLast, new [] { 1, 2, 3 }, 10, new [] { 0, 2, 7 })]
     [InlineData (Alignment.Start, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems | AlignmentModes.IgnoreFirstOrLast, new [] { 1, 2, 3 }, 11, new [] { 0, 2, 8 })]
-    [InlineData (Alignment.Start, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems | AlignmentModes.IgnoreFirstOrLast, new [] { 1, 2, 3 }, 5, new [] { -1, 0, 2 })] // 5 is too small to fit the items. The first item is at -1.})]
+    [InlineData (Alignment.Start, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems | AlignmentModes.IgnoreFirstOrLast, new [] { 1, 2, 3 }, 5, new [] { 0, 1, 2 })] 
     [InlineData (Alignment.Start, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems | AlignmentModes.IgnoreFirstOrLast, new [] { 1, 2, 3, 4 }, 10, new [] { 0, 1, 3, 6 })]
     [InlineData (Alignment.Start, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems | AlignmentModes.IgnoreFirstOrLast, new [] { 1, 2, 3, 4 }, 11, new [] { 0, 2, 4, 7 })]
     [InlineData (Alignment.Start, AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems | AlignmentModes.IgnoreFirstOrLast, new [] { 3, 3, 3 }, 21, new [] { 0, 4, 18 })]

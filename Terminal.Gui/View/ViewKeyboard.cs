@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -414,7 +415,7 @@ public partial class View
             return true;
         }
 
-        bool? handled = OnInvokingKeyBindings (keyEvent);
+        bool? handled = OnInvokingKeyBindings (keyEvent, KeyBindingScope.HotKey | KeyBindingScope.Focused);
 
         if (handled is { } && (bool)handled)
         {
@@ -636,10 +637,10 @@ public partial class View
     ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled
     ///     and no other view should see it.
     /// </returns>
-    public virtual bool? OnInvokingKeyBindings (Key keyEvent)
+    public virtual bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
     {
-        // fire event only if there's an app or hotkey binding for the key
-        if (KeyBindings.TryGet (keyEvent, KeyBindingScope.Application | KeyBindingScope.HotKey, out KeyBinding _))
+        // fire event only if there's an hotkey binding for the key
+        if (KeyBindings.TryGet (keyEvent, scope, out KeyBinding kb))
         {
             InvokingKeyBindings?.Invoke (this, keyEvent);
             if (keyEvent.Handled)
@@ -655,7 +656,7 @@ public partial class View
         //   `InvokeKeyBindings` returns `false`. Continue passing the event (return `false` from `OnInvokeKeyBindings`)..
         // * If key bindings were found, and any handled the key (at least one `Command` returned `true`),
         //   `InvokeKeyBindings` returns `true`. Continue passing the event (return `false` from `OnInvokeKeyBindings`).
-        bool? handled = InvokeKeyBindings (keyEvent);
+        bool? handled = InvokeKeyBindings (keyEvent, scope);
 
         if (handled is { } && (bool)handled)
         {
@@ -664,22 +665,22 @@ public partial class View
             return true;
         }
 
-        if (Margin is { } && ProcessAdornmentKeyBindings (Margin, keyEvent, ref handled))
+        if (Margin is { } && ProcessAdornmentKeyBindings (Margin, keyEvent, scope, ref handled))
         {
             return true;
         }
 
-        if (Padding is { } && ProcessAdornmentKeyBindings (Padding, keyEvent, ref handled))
+        if (Padding is { } && ProcessAdornmentKeyBindings (Padding, keyEvent, scope, ref handled))
         {
             return true;
         }
 
-        if (Border is { } && ProcessAdornmentKeyBindings (Border, keyEvent, ref handled))
+        if (Border is { } && ProcessAdornmentKeyBindings (Border, keyEvent, scope, ref handled))
         {
             return true;
         }
 
-        if (ProcessSubViewKeyBindings (keyEvent, ref handled))
+        if (ProcessSubViewKeyBindings (keyEvent, scope, ref handled))
         {
             return true;
         }
@@ -687,11 +688,11 @@ public partial class View
         return handled;
     }
 
-    private bool ProcessAdornmentKeyBindings (Adornment adornment, Key keyEvent, ref bool? handled)
+    private bool ProcessAdornmentKeyBindings (Adornment adornment, Key keyEvent, KeyBindingScope scope, ref bool? handled)
     {
         foreach (View subview in adornment?.Subviews)
         {
-            handled = subview.OnInvokingKeyBindings (keyEvent);
+            handled = subview.OnInvokingKeyBindings (keyEvent, scope);
 
             if (handled is { } && (bool)handled)
             {
@@ -702,23 +703,68 @@ public partial class View
         return false;
     }
 
-    private bool ProcessSubViewKeyBindings (Key keyEvent, ref bool? handled)
+    private bool ProcessSubViewKeyBindings (Key keyEvent, KeyBindingScope scope, ref bool? handled, bool invoke = true)
     {
         // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
         foreach (View subview in Subviews)
         {
-            if (subview.KeyBindings.TryGet (keyEvent, KeyBindingScope.HotKey, out KeyBinding binding))
+            if (subview.KeyBindings.TryGet (keyEvent, scope, out KeyBinding binding))
             {
-                //keyEvent.Scope = KeyBindingScope.HotKey;
-                handled = subview.OnInvokingKeyBindings (keyEvent);
+                if (binding.Scope == KeyBindingScope.Focused && !subview.HasFocus)
+                {
+                    continue;
+                }
+
+                if (!invoke)
+                {
+                    return true;
+                }
+
+                handled = subview.OnInvokingKeyBindings (keyEvent, scope);
 
                 if (handled is { } && (bool)handled)
                 {
                     return true;
                 }
             }
+
+            bool recurse = subview.ProcessSubViewKeyBindings (keyEvent, scope, ref handled, invoke);
+            if (recurse || (handled is { } && (bool)handled))
+            {
+                return true;
+            }
         }
 
+        return false;
+    }
+
+    // TODO: This is a "prototype" debug check. It may be too annyoing vs. useful.
+    // TODO: A better approach would be have Application hold a list of bound Hotkeys, similar to
+    // TODO: how Application holds a list of Application Scoped key bindings and then check that list.
+    /// <summary>
+    /// Returns true if Key is bound in this view heirarchy. For debugging
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public bool IsHotKeyKeyBound (Key key, out View boundView)
+    {
+        // recurse through the subviews to find the views that has the key bound
+        boundView = null;
+
+        foreach (View subview in Subviews)
+        {
+            if (subview.KeyBindings.TryGet (key, KeyBindingScope.HotKey, out _))
+            {
+                boundView = subview;
+                return true;
+            }
+
+            if (subview.IsHotKeyKeyBound (key, out boundView))
+            {
+                return true;
+            }
+
+        }
         return false;
     }
 
@@ -738,14 +784,35 @@ public partial class View
     ///     commands were invoked and at least one handled the command. <see langword="false"/> if commands were invoked and at
     ///     none handled the command.
     /// </returns>
-    protected bool? InvokeKeyBindings (Key key)
+    protected bool? InvokeKeyBindings (Key key, KeyBindingScope scope)
     {
         bool? toReturn = null;
 
-        if (!KeyBindings.TryGet (key, out KeyBinding binding))
+        if (!KeyBindings.TryGet (key, scope, out KeyBinding binding))
         {
             return null;
         }
+
+#if DEBUG
+
+        // TODO: Determine if App scope bindings should be fired first or last (currently last).
+        if (Application.TryGetKeyBindings (key, out List<View> views))
+        {
+            var boundView = views [0];
+            var commandBinding = boundView.KeyBindings.Get (key);
+            Debug.WriteLine ($"WARNING: InvokeKeyBindings ({key}) - An Application scope binding exists for this key. The registered view will not invoke Command.{commandBinding.Commands [0]}: {boundView}.");
+        }
+
+        // TODO: This is a "prototype" debug check. It may be too annyoing vs. useful.
+        // Scour the bindings up our View heirarchy
+        // to ensure that the key is not already bound to a different set of commands.
+        if (SuperView?.IsHotKeyKeyBound (key, out View previouslyBoundView) ?? false)
+        {
+            Debug.WriteLine ($"WARNING: InvokeKeyBindings ({key}) - A subview or peer has bound this Key and will not see it: {previouslyBoundView}.");
+        }
+
+#endif
+
 
         foreach (Command command in binding.Commands)
         {
@@ -777,10 +844,11 @@ public partial class View
     /// </summary>
     /// <param name="commands"></param>
     /// <param name="key">The key that caused the commands to be invoked, if any.</param>
+    /// <param name="keyBinding"></param>
     /// <returns>
     ///     <see langword="null"/> if no command was found.
-    ///     <see langword="true"/> if the command was invoked and it handled the command.
-    ///     <see langword="false"/> if the command was invoked and it did not handle the command.
+    ///     <see langword="true"/> if the command was invoked the command was handled.
+    ///     <see langword="false"/> if the command was invoked and the command was not handled.
     /// </returns>
     public bool? InvokeCommands (Command [] commands, [CanBeNull] Key key = null, [CanBeNull] KeyBinding? keyBinding = null)
     {
@@ -871,7 +939,7 @@ public partial class View
     /// <param name="f">The function.</param>
     protected void AddCommand (Command command, Func<bool?> f)
     {
-        CommandImplementations [command] = ctx => f (); ;
+        CommandImplementations [command] = ctx => f ();
     }
 
     /// <summary>Returns all commands that are supported by this <see cref="View"/>.</summary>

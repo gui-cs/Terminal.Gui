@@ -396,6 +396,7 @@ public class Buttons : Scenario
         main.Ready += (s, e) => radioGroup.Refresh ();
         Application.Run (main);
         main.Dispose ();
+        Application.Shutdown ();
     }
 
     /// <summary>

@@ -123,5 +123,6 @@ public class HotKeys : Scenario
 
         Application.Run (app);
         app.Dispose ();
+        Application.Shutdown ();
     }
 }

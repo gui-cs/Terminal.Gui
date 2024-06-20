@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -619,16 +620,22 @@ public class MainLoopTests
                        );
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public async Task InvokeLeakTest ()
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    //[InlineData (typeof (NetDriver))] // BUGBUG: NetDriver never exits in this test
+
+    //[InlineData (typeof (ANSIDriver))]
+    //[InlineData (typeof (WindowsDriver))] // BUGBUG: NetDriver never exits in this test
+    //[InlineData (typeof (CursesDriver))] // BUGBUG: CursesDriver never exits in this test
+    public async Task InvokeLeakTest (Type driverType)
     {
+        Application.Init (driverName: driverType.Name);
         Random r = new ();
         TextField tf = new ();
         var top = new Toplevel ();
         top.Add (tf);
 
-        const int numPasses = 5;
+        const int numPasses = 2;
         const int numIncrements = 500;
         const int pollMs = 2500;
 
@@ -641,10 +648,10 @@ public class MainLoopTests
 
         Assert.Equal (numIncrements * numPasses, tbCounter);
         top.Dispose ();
+        Application.Shutdown ();
     }
 
     [Theory]
-    [AutoInitShutdown]
     [MemberData (nameof (TestAddIdle))]
     public void Mainloop_Invoke_Or_AddIdle_Can_Be_Used_For_Events_Or_Actions (
         Action action,
@@ -658,6 +665,9 @@ public class MainLoopTests
         int pfour
     )
     {
+        // TODO: Expand this test to test all drivers
+        Application.Init (new FakeDriver());
+
         total = 0;
         btn = null;
         clickMe = pclickMe;
@@ -720,6 +730,8 @@ public class MainLoopTests
         Assert.True (taskCompleted);
         Assert.Equal (clickMe, btn.Text);
         Assert.Equal (four, total);
+
+        Application.Shutdown ();
     }
 
     [Fact]

@@ -247,6 +247,7 @@ public class Scrolling : Scenario
         app.Loaded -= App_Loaded;
         app.Unloaded -= app_Unloaded;
         app.Dispose ();
+        Application.Shutdown ();
 
         return;
 

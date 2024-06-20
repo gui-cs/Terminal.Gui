@@ -76,7 +76,7 @@ public static partial class Application
     // this in a function like this ensures we don't make mistakes in
     // guaranteeing that the state of this singleton is deterministic when Init
     // starts running and after Shutdown returns.
-    internal static void ResetState ()
+    internal static void ResetState (bool ignoreDisposed = false)
     {
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
@@ -84,11 +84,6 @@ public static partial class Application
         foreach (Toplevel t in _topLevels)
         {
             t.Running = false;
-#if DEBUG_IDISPOSABLE
-
-            // Don't dispose the toplevels. It's up to caller dispose them
-            //Debug.Assert (t.WasDisposed);
-#endif
         }
 
         _topLevels.Clear ();
@@ -96,7 +91,7 @@ public static partial class Application
 #if DEBUG_IDISPOSABLE
 
         // Don't dispose the Top. It's up to caller dispose it
-        if (Top is { })
+        if (!ignoreDisposed && Top is { })
         {
             Debug.Assert (Top.WasDisposed);
 
@@ -177,15 +172,15 @@ public static partial class Application
     /// </para>
     /// <para>
     ///     <see cref="Shutdown"/> must be called when the application is closing (typically after
-    ///     <see cref="Run(Func{Exception, bool}, ConsoleDriver)"/> has returned) to ensure resources are cleaned up and
+    ///     <see cref="Run{T}"/> has returned) to ensure resources are cleaned up and
     ///     terminal settings
     ///     restored.
     /// </para>
     /// <para>
-    ///     The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> function combines
+    ///     The <see cref="Run{T}"/> function combines
     ///     <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
     ///     into a single
-    ///     call. An application cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> without explicitly calling
+    ///     call. An application cam use <see cref="Run{T}"/> without explicitly calling
     ///     <see cref="Init(ConsoleDriver, string)"/>.
     /// </para>
     /// <param name="driver">
@@ -313,6 +308,7 @@ public static partial class Application
         SupportedCultures = GetSupportedCultures ();
         _mainThreadId = Thread.CurrentThread.ManagedThreadId;
         _initialized = true;
+        InitializedChanged?.Invoke (null, new (false, _initialized));
     }
 
     private static void Driver_SizeChanged (object sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
@@ -353,7 +349,16 @@ public static partial class Application
         // TODO: Throw an exception if Init hasn't been called.
         ResetState ();
         PrintJsonErrors ();
+        InitializedChanged?.Invoke (null, new (true, _initialized));
     }
+
+    /// <summary>
+    ///     This event is fired after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
+    /// </summary>
+    /// <remarks>
+    ///     Intended to support unit tests that need to know when the application has been initialized.
+    /// </remarks>
+    public static event EventHandler<StateEventArgs<bool>> InitializedChanged;
 
     #endregion Initialization (Init/Shutdown)
 
@@ -677,7 +682,7 @@ public static partial class Application
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
-        where T : Toplevel, new ()
+        where T : Toplevel, new()
     {
         if (!_initialized)
         {

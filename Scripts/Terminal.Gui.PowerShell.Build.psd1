@@ -36,7 +36,7 @@ PowerShellHostVersion = '7.4.0'
 # Processor architecture (None, MSIL, X86, IA64, Amd64, Arm, or an empty string) required by this module. One value only.
 # Set to AMD64 here because development on Terminal.Gui isn't really supported on anything else.
 # Has nothing to do with runtime use of Terminal.Gui.
-ProcessorArchitecture = 'Amd64'
+ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
