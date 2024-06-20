@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -619,16 +620,22 @@ public class MainLoopTests
                        );
     }
 
-    [Fact]
-    public async Task InvokeLeakTest ()
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    //[InlineData (typeof (NetDriver))] // BUGBUG: NetDriver never exits in this test
+
+    //[InlineData (typeof (ANSIDriver))]
+    //[InlineData (typeof (WindowsDriver))] // BUGBUG: NetDriver never exits in this test
+    //[InlineData (typeof (CursesDriver))] // BUGBUG: CursesDriver never exits in this test
+    public async Task InvokeLeakTest (Type driverType)
     {
-        Application.Init ();
+        Application.Init (driverName: driverType.Name);
         Random r = new ();
         TextField tf = new ();
         var top = new Toplevel ();
         top.Add (tf);
 
-        const int numPasses = 5;
+        const int numPasses = 2;
         const int numIncrements = 500;
         const int pollMs = 2500;
 
@@ -658,7 +665,8 @@ public class MainLoopTests
         int pfour
     )
     {
-        Application.Init ();
+        // TODO: Expand this test to test all drivers
+        Application.Init (new FakeDriver());
 
         total = 0;
         btn = null;

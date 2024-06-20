@@ -18,10 +18,14 @@ public class SyncrhonizationContextTests
         Application.Shutdown ();
     }
 
-    [Fact]
-    public void SynchronizationContext_Post ()
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    //[InlineData (typeof (NetDriver))]
+    [InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (CursesDriver))]
+    public void SynchronizationContext_Post (Type driverType)
     {
-        Application.Init ();
+        Application.Init (driverName: driverType.Name);
         SynchronizationContext context = SynchronizationContext.Current;
 
         var success = false;

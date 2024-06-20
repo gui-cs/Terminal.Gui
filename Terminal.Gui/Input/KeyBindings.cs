@@ -38,7 +38,7 @@ public class KeyBindings
         else
         {
             Bindings.Add (key, binding);
-            if (binding.Scope.FastHasFlags (KeyBindingScope.Application))
+            if (binding.Scope.HasFlag (KeyBindingScope.Application))
             {
                 Application.AddKeyBinding (key, BoundView);
             }

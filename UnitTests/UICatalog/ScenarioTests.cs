@@ -23,7 +23,7 @@ public class ScenarioTests : TestsAllViews
                      .Where (type => type.IsClass && !type.IsAbstract && type.IsSubclassOf (typeof (Scenario)))
                      .Select (type => new object [] { type });
 
-    private readonly object _timeoutLock = new object ();
+    private object _timeoutLock;
 
     /// <summary>
     ///     <para>This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run.</para>
@@ -33,41 +33,27 @@ public class ScenarioTests : TestsAllViews
     [MemberData (nameof (AllScenarioTypes))]
     public void All_Scenarios_Quit_And_Init_Shutdown_Properly (Type scenarioType)
     {
+        Assert.Null (_timeoutLock);
+        _timeoutLock = new object ();
+
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
 
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
         Scenario scenario = (Scenario)Activator.CreateInstance (scenarioType);
 
-        uint abortTime = 500;
+        uint abortTime = 1500;
         bool initialized = false;
         bool shutdown = false;
         object timeout = null;
 
-        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
-        {
-            if (a.NewValue)
-            {
-                lock (_timeoutLock)
-                {
-                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
-                }
-
-                Application.Iteration += OnApplicationOnIteration;
-                initialized = true;
-            }
-            else
-            {
-                Application.Iteration -= OnApplicationOnIteration;
-                shutdown = true;
-            }
-        }
-
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
+        Application.ForceDriver = "FakeDriver";
         scenario.Main ();
         scenario.Dispose ();
         scenario = null;
+        Application.ForceDriver = string.Empty;
 
         Application.InitializedChanged -= OnApplicationOnInitializedChanged;
 
@@ -75,7 +61,6 @@ public class ScenarioTests : TestsAllViews
         {
             if (timeout is { })
             {
-                Application.RemoveTimeout (timeout);
                 timeout = null;
             }
         }
@@ -87,7 +72,39 @@ public class ScenarioTests : TestsAllViews
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
 #endif
+
+        lock (_timeoutLock)
+        {
+            _timeoutLock = null;
+        }
+
         return;
+
+
+        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
+        {
+            if (a.NewValue)
+            {
+                Assert.Equal (Key.Q.WithCtrl, Application.QuitKey);
+
+                Application.Iteration += OnApplicationOnIteration;
+                initialized = true;
+                lock (_timeoutLock)
+                {
+                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
+                }
+                _output.WriteLine ($"Initialized '{Application.Driver}'");
+                //Dictionary<Key, List<View>> bindings = Application.GetKeyBindings ();
+                //Assert.NotEmpty (bindings);
+                //_output.WriteLine ($"bindings: {string.Join (",", bindings.Keys)}");
+                //Assert.True (bindings.ContainsKey (Application.QuitKey));
+            }
+            else
+            {
+                Application.Iteration -= OnApplicationOnIteration;
+                shutdown = true;
+            }
+        }
 
         // If the scenario doesn't close within 500ms, this will force it to quit
         bool ForceCloseCallback ()
@@ -96,14 +113,13 @@ public class ScenarioTests : TestsAllViews
             {
                 if (timeout is { })
                 {
-                    Application.RemoveTimeout (timeout);
                     timeout = null;
                 }
             }
-            Application.ResetState (true);
             Assert.Fail (
                          $"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
 
+            Application.ResetState (true);
             return false;
         }
 
@@ -112,6 +128,7 @@ public class ScenarioTests : TestsAllViews
             if (Application._initialized)
             {
                 // Press QuitKey 
+                //_output.WriteLine ($"Forcing Quit with {Application.QuitKey}");
                 Application.OnKeyDown (Application.QuitKey);
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text.Json;
+using Xunit.Abstractions;
 using static Terminal.Gui.ConfigurationManager;
 #pragma warning disable IDE1006
 
@@ -7,6 +8,13 @@ namespace Terminal.Gui.ConfigurationTests;
 
 public class ConfigurationManagerTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public ConfigurationManagerTests (ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
     public static readonly JsonSerializerOptions _jsonOptions = new ()
     {
         Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
@@ -402,6 +410,7 @@ public class ConfigurationManagerTests
         // Application is a static class
         PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");
         Assert.Equal (pi, Settings ["Application.QuitKey"].PropertyInfo);
+        
 
         // FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
         pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
