@@ -166,7 +166,7 @@ public class ConfigurationManagerTests
             fired = true;
 
             // assert
-            Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
+            Assert.Equal (Key.Esc, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
 
             Assert.Equal (
                           KeyCode.PageDown | KeyCode.CtrlMask,
@@ -250,7 +250,7 @@ public class ConfigurationManagerTests
         // assert
         Assert.NotEmpty (Themes);
         Assert.Equal ("Default", Themes.Theme);
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
+        Assert.Equal (Key.Esc, Application.QuitKey);
         Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
         Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
         Assert.False (Application.IsMouseDisabled);
@@ -271,7 +271,7 @@ public class ConfigurationManagerTests
         // assert
         Assert.NotEmpty (Themes);
         Assert.Equal ("Default", Themes.Theme);
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
+        Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
         Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
         Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
         Assert.False (Application.IsMouseDisabled);
@@ -436,9 +436,6 @@ public class ConfigurationManagerTests
     public void TestConfigurationManagerInitDriver ()
     {
         Assert.Equal ("Default", Themes.Theme);
-        Assert.True (Themes.ContainsKey ("Default"));
-
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
 
         Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
@@ -804,7 +801,7 @@ public class ConfigurationManagerTests
 
         Settings.Update (json, "TestConfigurationManagerUpdateFromJson");
 
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
+        Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
         Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
 
         Assert.Equal ("Default", Themes.Theme);

@@ -9,7 +9,7 @@ public class SettingsScopeTests
     public void Apply_ShouldApplyProperties ()
     {
         // arrange
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
+        Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
 
         Assert.Equal (
                       KeyCode.PageDown | KeyCode.CtrlMask,
