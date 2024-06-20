@@ -592,6 +592,7 @@ public class TextAlignmentAndDirection : Scenario
 
         Application.Run (app);
         app.Dispose ();
+        Application.Shutdown ();
 
         void ToggleJustify (bool oldValue, bool wasJustOptions = false)
         {

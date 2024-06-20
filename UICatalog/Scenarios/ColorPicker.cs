@@ -86,6 +86,7 @@ public class ColorPickers : Scenario
 
         Application.Run (app);
         app.Dispose ();
+        Application.Shutdown ();
     }
 
     /// <summary>Fired when background color is changed.</summary>

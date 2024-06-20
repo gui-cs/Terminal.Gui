@@ -6,15 +6,12 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Top Level Windows")]
 public class RunTExample : Scenario
 {
-    public override void Init ()
+    public override void Main ()
     {
         // No need to call Init if Application.Run<T> is used
-        Application.Run<ExampleWindow> ();
-
-        Application.Top.Dispose ();
+        Application.Run<ExampleWindow> ().Dispose ();
+        Application.Shutdown ();
     }
-
-    public override void Run () { }
 
     public class ExampleWindow : Window
     {
@@ -27,7 +24,7 @@ public class RunTExample : Scenario
             // Create input components and labels
             var usernameLabel = new Label { Text = "Username:" };
 
-            _usernameText = new TextField
+            _usernameText = new()
             {
                 // Position text field adjacent to the label
                 X = Pos.Right (usernameLabel) + 1,
@@ -64,21 +61,21 @@ public class RunTExample : Scenario
 
             // When login button is clicked display a message popup
             btnLogin.Accept += (s, e) =>
-                                {
-                                    if (_usernameText.Text == "admin" && passwordText.Text == "password")
-                                    {
-                                        MessageBox.Query ("Login Successful", $"Username: {_usernameText.Text}", "Ok");
-                                        Application.RequestStop ();
-                                    }
-                                    else
-                                    {
-                                        MessageBox.ErrorQuery (
-                                                               "Error Logging In",
-                                                               "Incorrect username or password (hint: admin/password)",
-                                                               "Ok"
-                                                              );
-                                    }
-                                };
+                               {
+                                   if (_usernameText.Text == "admin" && passwordText.Text == "password")
+                                   {
+                                       MessageBox.Query ("Login Successful", $"Username: {_usernameText.Text}", "Ok");
+                                       Application.RequestStop ();
+                                   }
+                                   else
+                                   {
+                                       MessageBox.ErrorQuery (
+                                                              "Error Logging In",
+                                                              "Incorrect username or password (hint: admin/password)",
+                                                              "Ok"
+                                                             );
+                                   }
+                               };
 
             // Add the views to the Window
             Add (usernameLabel, _usernameText, passwordLabel, passwordText, btnLogin);

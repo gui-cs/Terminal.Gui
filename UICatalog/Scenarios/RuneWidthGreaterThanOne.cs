@@ -17,11 +17,11 @@ public class RuneWidthGreaterThanOne : Scenario
     private TextField _text;
     private Window _win;
 
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
 
-        Top = new ();
+        Toplevel topLevel = new ();
 
         var menu = new MenuBar
         {
@@ -87,16 +87,17 @@ public class RuneWidthGreaterThanOne : Scenario
         };
         _win = new Window { X = 5, Y = 5, Width = Dim.Fill (22), Height = Dim.Fill (5) };
         _win.Add (_label, _text, _button, _labelR, _labelV);
-        Top.Add (menu, _win);
+        topLevel.Add (menu, _win);
 
         WideRunes ();
 
         //NarrowRunes ();
         //MixedRunes ();
-        Application.Run (Top);
+        Application.Run (topLevel);
+        topLevel.Dispose ();
+        Application.Shutdown ();
     }
 
-    public override void Run () { }
     private void MixedMessage (object sender, EventArgs e) { MessageBox.Query ("Say Hello 你", $"Hello {_text.Text}", "Ok"); }
 
     private void MixedRunes ()

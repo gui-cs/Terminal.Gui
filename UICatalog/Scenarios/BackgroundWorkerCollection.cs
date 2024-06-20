@@ -88,25 +88,23 @@ public class BackgroundWorkerCollection : Scenario
             ;
             _menu.MenuOpening += Menu_MenuOpening;
             Add (_menu);
-
             var statusBar = new StatusBar (
                                            new []
                                            {
-                                               new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit ()),
-                                               new StatusItem (
-                                                               KeyCode.CtrlMask | KeyCode.R,
-                                                               "~^R~ Run Worker",
-                                                               () => _workerApp.RunWorker ()
-                                                              ),
-                                               new StatusItem (
-                                                               KeyCode.CtrlMask | KeyCode.C,
-                                                               "~^C~ Cancel Worker",
-                                                               () => _workerApp.CancelWorker ()
-                                                              )
+                                               new Shortcut (Application.QuitKey, $"Quit", Quit),
+                                               new Shortcut (
+                                                             Key.R.WithCtrl,
+                                                             "Run Worker",
+                                                             () => _workerApp.RunWorker ()
+                                                            ),
+                                               new Shortcut (
+                                                             Key.C.WithCtrl,
+                                                             "Cancel Worker",
+                                                             () => _workerApp.CancelWorker ()
+                                                            )
                                            }
                                           );
             Add (statusBar);
-
             Ready += OverlappedMain_Ready;
             Activate += OverlappedMain_Activate;
             Deactivate += OverlappedMain_Deactivate;

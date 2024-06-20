@@ -141,11 +141,16 @@ partial class Application
         {
             foreach (View view in binding.Value)
             {
-                bool? handled = view?.OnInvokingKeyBindings (keyEvent);
-
-                if (handled != null && (bool)handled)
+                if (view is {} && view.KeyBindings.TryGet (binding.Key, (KeyBindingScope)0xFFFF, out KeyBinding kb))
                 {
-                    return true;
+                    //bool? handled = view.InvokeCommands (kb.Commands, binding.Key, kb);
+                    bool? handled = view?.OnInvokingKeyBindings (keyEvent, kb.Scope);
+
+                    if (handled != null && (bool)handled)
+                    {
+                        return true;
+                    }
+
                 }
             }
         }

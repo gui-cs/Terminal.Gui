@@ -1,14 +1,17 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
+
+#pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
 /// <summary>
 ///     Provides context for a <see cref="Command"/> that is being invoked.
-/// </summary
+/// </summary>
 /// <remarks>
 ///     <para>
 ///         To define a <see cref="Command"/> that is invoked with context,
-///         use <see cref="View.AddCommand(Command,Func{CommandContext,Nullable{bool}})"/>
+///         use <see cref="View.AddCommand(Command,Func{CommandContext,System.Nullable{bool}})"/>.
 ///     </para>
 /// </remarks>
+#pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 public record struct CommandContext
 {
     /// <summary>
