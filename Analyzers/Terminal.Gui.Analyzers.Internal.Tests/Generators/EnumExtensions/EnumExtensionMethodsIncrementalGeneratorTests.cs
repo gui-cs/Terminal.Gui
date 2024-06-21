@@ -61,9 +61,6 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
         return attr.EnumType.IsDefined (typeof (GenerateEnumExtensionMethodsAttribute));
     }
 
-    private const string AssemblyExtendedEnumTypeAttributeEnumPropertyName =
-        $"{nameof (AssemblyExtendedEnumTypeAttribute)}.{nameof (AssemblyExtendedEnumTypeAttribute.EnumType)}";
-
     [Test]
     [Category("Attributes")]
     public void AssemblyExtendedEnumTypeAttribute_ExtensionClassHasExpectedReverseMappingAttribute ([ValueSource(nameof(GetAssemblyExtendedEnumTypeAttributes))]AssemblyExtendedEnumTypeAttribute attr)
@@ -113,7 +110,6 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
     {
         Assume.That (enumType.IsEnum);
         Assume.That (enumType, Has.Attribute<GenerateEnumExtensionMethodsAttribute> ());
-        ITypeInfo enumTypeInfo = new TypeWrapper (enumType);
         Assume.That (enumType, Has.Attribute<GenerateEnumExtensionMethodsAttribute> ());
     }
 
@@ -134,7 +130,7 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
 
         Assert.That (fastIsDefinedMethod, Is.Not.Null);
         Assert.That (fastIsDefinedMethod, Has.Attribute<ExtensionAttribute> ());
-        IMethodInfo[] extensionMethods = extensionClassTypeInfo.GetMethodsWithAttribute<ExtensionAttribute> (false);
+        extensionClassTypeInfo.GetMethodsWithAttribute<ExtensionAttribute> (false);
 
 
     }
@@ -236,9 +232,7 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
                                        .GetExecutingAssembly ()
                                        .GetTypes ();
 
-            IEnumerable<Type> allEnumTypes = allAssemblyTypes.Where (IsDefinedEnum);
-
-            foreach (Type type in allEnumTypes)
+            foreach (Type type in allAssemblyTypes.Where (IsDefinedEnum))
             {
                 _allEnumTypes.Add (type);
             }
