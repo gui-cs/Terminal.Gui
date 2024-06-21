@@ -155,25 +155,6 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
         }
     }
 
-    private static IEnumerable<Type> GetBoringEnumTypes ()
-    {
-        _initializationLock.EnterUpgradeableReadLock ();
-
-        try
-        {
-            if (!_isInitialized)
-            {
-                Initialize ();
-            }
-
-            return _boringEnumTypes;
-        }
-        finally
-        {
-            _initializationLock.ExitUpgradeableReadLock ();
-        }
-    }
-
     private static IEnumerable<EnumData> GetExtendedEnumTypes_FastIsDefinedFalse ()
     {
         _initializationLock.EnterUpgradeableReadLock ();
