@@ -13,22 +13,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "Example\Example.csproj", "{B0A602CD-E176-449D-8663-64238D54F857}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E143FB1F-0B88-48CB-9086-72CDCECFCD22}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-		.gitignore = .gitignore
-		.github\workflows\api-docs.yml = .github\workflows\api-docs.yml
-		.github\CODEOWNERS = .github\CODEOWNERS
-		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
-		CONTRIBUTING.md = CONTRIBUTING.md
-		.github\workflows\dotnet-core.yml = .github\workflows\dotnet-core.yml
-		GitVersion.yml = GitVersion.yml
-		global.json = global.json
-		nuget.config = nuget.config
-		.github\workflows\publish.yml = .github\workflows\publish.yml
-		README.md = README.md
-		Terminal.sln.DotSettings = Terminal.sln.DotSettings
-		testenvironments.json = testenvironments.json
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{CCADA0BC-61CF-4B4B-96BA-A3B0C0A7F54D}"
 EndProject
@@ -40,12 +24,34 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal.Gui.Analyzers.Inte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkitExample", "CommunityToolkitExample\CommunityToolkitExample.csproj", "{58FDCA8F-08F7-4D80-9DA3-6A9AED01E163}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{B8F48EE8-34A6-43B7-B00E-CD91CDD93962}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.filenesting.json = .filenesting.json
+		.gitignore = .gitignore
+		global.json = global.json
+		nuget.config = nuget.config
+		Terminal.sln.DotSettings = Terminal.sln.DotSettings
+		testenvironments.json = testenvironments.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C46-B324-4B9C-92EB-CE6184D4736E}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\api-docs.yml = .github\workflows\api-docs.yml
+		.github\workflows\dotnet-core.yml = .github\workflows\dotnet-core.yml
+		GitVersion.yml = GitVersion.yml
+		.github\workflows\publish.yml = .github\workflows\publish.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5E0F-4986-AB37-A6BF89966C12}"
+	ProjectSection(SolutionItems) = preProject
+		.github\CODEOWNERS = .github\CODEOWNERS
+		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
+		CONTRIBUTING.md = CONTRIBUTING.md
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
-	GlobalSection(NestedProjects) = preSolution
-		{5DE91722-8765-4E2B-97E4-2A18010B5CED} = {CCADA0BC-61CF-4B4B-96BA-A3B0C0A7F54D}
-		{715DB4BA-F989-4DF6-B46F-5ED26A32B2DD} = {CCADA0BC-61CF-4B4B-96BA-A3B0C0A7F54D}
-		{C2AD09BD-D579-45A7-ACA3-E4EF3BC027D2} = {CCADA0BC-61CF-4B4B-96BA-A3B0C0A7F54D}
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -90,6 +96,14 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5DE91722-8765-4E2B-97E4-2A18010B5CED} = {CCADA0BC-61CF-4B4B-96BA-A3B0C0A7F54D}
+		{715DB4BA-F989-4DF6-B46F-5ED26A32B2DD} = {CCADA0BC-61CF-4B4B-96BA-A3B0C0A7F54D}
+		{C2AD09BD-D579-45A7-ACA3-E4EF3BC027D2} = {CCADA0BC-61CF-4B4B-96BA-A3B0C0A7F54D}
+		{B8F48EE8-34A6-43B7-B00E-CD91CDD93962} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
+		{13BB2C46-B324-4B9C-92EB-CE6184D4736E} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
+		{C7A51224-5E0F-4986-AB37-A6BF89966C12} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F8F8A4D-7B8D-4C2A-AC5E-CD7117F74C03}
