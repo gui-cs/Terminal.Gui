@@ -1,8 +1,6 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 using Terminal.Gui.Analyzers.Internal.Attributes;
@@ -19,20 +17,20 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
     private static bool _isInitialized;
 
     /// <summary>All enum types declared in the test assembly.</summary>
-    private static readonly ObservableCollection<Type> AllEnumTypes = [];
+    private static readonly ObservableCollection<Type> _allEnumTypes = [];
 
     /// <summary>
-    ///     All enum types without a <see cref="GenerateEnumExtensionMethodsAttribute"/>, <see cref="AllEnumTypes"/>
+    ///     All enum types without a <see cref="GenerateEnumExtensionMethodsAttribute"/>, <see cref="_allEnumTypes"/>
     /// </summary>
-    private static readonly HashSet<Type> BoringEnumTypes = [];
+    private static readonly HashSet<Type> _boringEnumTypes = [];
 
     /// <summary>All extension classes generated for enums with our attribute.</summary>
-    private static readonly ObservableCollection<Type> EnumExtensionClasses = [];
+    private static readonly ObservableCollection<Type> _enumExtensionClasses = [];
 
-    private static readonly ConcurrentDictionary<Type, EnumData> ExtendedEnumTypeMappings = [];
-    private static IEnumerable<Type> ExtendedEnumTypes => ExtendedEnumTypeMappings.Keys;
+    private static readonly ConcurrentDictionary<Type, EnumData> _extendedEnumTypeMappings = [];
+    private static IEnumerable<Type> ExtendedEnumTypes => _extendedEnumTypeMappings.Keys;
 
-    private static readonly ReaderWriterLockSlim InitializationLock = new ();
+    private static readonly ReaderWriterLockSlim _initializationLock = new ();
 
     private static IEnumerable<AssemblyExtendedEnumTypeAttribute> GetAssemblyExtendedEnumTypeAttributes () =>
         Assembly.GetExecutingAssembly ()
@@ -89,7 +87,7 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
     }
 
     [Test]
-    public void BoringEnum_DoesNotHaveExtensions ([ValueSource (nameof (BoringEnumTypes))] Type enumType)
+    public void BoringEnum_DoesNotHaveExtensions ([ValueSource (nameof (_boringEnumTypes))] Type enumType)
     {
         Assume.That (enumType.IsEnum);
 
@@ -142,7 +140,7 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
 
     private static IEnumerable<EnumData> GetExtendedEnum_EnumData ()
     {
-        InitializationLock.EnterUpgradeableReadLock ();
+        _initializationLock.EnterUpgradeableReadLock ();
 
         try
         {
@@ -151,17 +149,17 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
                 Initialize ();
             }
 
-            return ExtendedEnumTypeMappings.Values;
+            return _extendedEnumTypeMappings.Values;
         }
         finally
         {
-            InitializationLock.ExitUpgradeableReadLock ();
+            _initializationLock.ExitUpgradeableReadLock ();
         }
     }
 
     private static IEnumerable<Type> GetBoringEnumTypes ()
     {
-        InitializationLock.EnterUpgradeableReadLock ();
+        _initializationLock.EnterUpgradeableReadLock ();
 
         try
         {
@@ -170,17 +168,17 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
                 Initialize ();
             }
 
-            return BoringEnumTypes;
+            return _boringEnumTypes;
         }
         finally
         {
-            InitializationLock.ExitUpgradeableReadLock ();
+            _initializationLock.ExitUpgradeableReadLock ();
         }
     }
 
     private static IEnumerable<EnumData> GetExtendedEnumTypes_FastIsDefinedFalse ()
     {
-        InitializationLock.EnterUpgradeableReadLock ();
+        _initializationLock.EnterUpgradeableReadLock ();
 
         try
         {
@@ -189,17 +187,17 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
                 Initialize ();
             }
 
-            return ExtendedEnumTypeMappings.Values.Where (static t => t.GeneratorAttribute?.FastIsDefined is false);
+            return _extendedEnumTypeMappings.Values.Where (static t => t.GeneratorAttribute?.FastIsDefined is false);
         }
         finally
         {
-            InitializationLock.ExitUpgradeableReadLock ();
+            _initializationLock.ExitUpgradeableReadLock ();
         }
     }
 
     private static IEnumerable<EnumData> GetExtendedEnumTypes_FastIsDefinedTrue ()
     {
-        InitializationLock.EnterUpgradeableReadLock ();
+        _initializationLock.EnterUpgradeableReadLock ();
 
         try
         {
@@ -208,17 +206,17 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
                 Initialize ();
             }
 
-            return ExtendedEnumTypeMappings.Values.Where (static t => t.GeneratorAttribute?.FastIsDefined is true);
+            return _extendedEnumTypeMappings.Values.Where (static t => t.GeneratorAttribute?.FastIsDefined is true);
         }
         finally
         {
-            InitializationLock.ExitUpgradeableReadLock ();
+            _initializationLock.ExitUpgradeableReadLock ();
         }
     }
 
     private static void Initialize ()
     {
-        if (!InitializationLock.IsUpgradeableReadLockHeld || !InitializationLock.TryEnterWriteLock (5000))
+        if (!_initializationLock.IsUpgradeableReadLockHeld || !_initializationLock.TryEnterWriteLock (5000))
         {
             return;
         }
@@ -230,8 +228,8 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
                 return;
             }
 
-            AllEnumTypes.CollectionChanged += AllEnumTypes_CollectionChanged;
-            EnumExtensionClasses.CollectionChanged += EnumExtensionClasses_OnCollectionChanged;
+            _allEnumTypes.CollectionChanged += AllEnumTypes_CollectionChanged;
+            _enumExtensionClasses.CollectionChanged += EnumExtensionClasses_OnCollectionChanged;
 
             Type [] allAssemblyTypes = Assembly
                                        .GetExecutingAssembly ()
@@ -241,19 +239,19 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
 
             foreach (Type type in allEnumTypes)
             {
-                AllEnumTypes.Add (type);
+                _allEnumTypes.Add (type);
             }
 
             foreach (Type type in allAssemblyTypes.Where (static t => t.IsClass && t.IsDefined (typeof (ExtensionsForEnumTypeAttribute<>))))
             {
-                EnumExtensionClasses.Add (type);
+                _enumExtensionClasses.Add (type);
             }
 
             _isInitialized = true;
         }
         finally
         {
-            InitializationLock.ExitWriteLock ();
+            _initializationLock.ExitWriteLock ();
         }
 
         return;
@@ -271,12 +269,12 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
             {
                 if (enumType.GetCustomAttribute<GenerateEnumExtensionMethodsAttribute> () is not { } generatorAttribute)
                 {
-                    BoringEnumTypes.Add (enumType);
+                    _boringEnumTypes.Add (enumType);
 
                     continue;
                 }
 
-                ExtendedEnumTypeMappings.AddOrUpdate (
+                _extendedEnumTypeMappings.AddOrUpdate (
                                                enumType,
                                                CreateNewEnumData,
                                                UpdateGeneratorAttributeProperty,
@@ -310,7 +308,7 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
                     continue;
                 }
 
-                ExtendedEnumTypeMappings [extensionForAttribute.EnumType].ExtensionClass ??= extensionClassType;
+                _extendedEnumTypeMappings [extensionForAttribute.EnumType].ExtensionClass ??= extensionClassType;
             }
         }
     }
