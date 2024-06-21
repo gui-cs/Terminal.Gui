@@ -3,6 +3,8 @@
 /// <summary>
 ///     Basic enum without explicitly-defined backing type and no attributes on the enum or any of its members.
 /// </summary>
+[SuppressMessage ("Naming", "CA1707:Identifiers should not contain underscores", Justification = "Naming is intentional.")]
+[SuppressMessage ("Roslynator", "RCS1154:Sort enum members", Justification = "Order is intentional.")]
 public enum BasicEnum
 {
     Bit31 = -0b_10000000_00000000_00000000_00000000,
