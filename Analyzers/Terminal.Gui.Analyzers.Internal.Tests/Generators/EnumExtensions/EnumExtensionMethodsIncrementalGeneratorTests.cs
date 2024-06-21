@@ -55,7 +55,7 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
     {
         Assume.That (attr, Is.Not.Null);
         Assume.That (attr.EnumType, Is.Not.Null);
-        Assume.That (attr.EnumType!.IsEnum);
+        Assume.That (attr.EnumType.IsEnum);
 
         return attr.EnumType.IsDefined (typeof (GenerateEnumExtensionMethodsAttribute));
     }
@@ -69,8 +69,8 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
     {
         Assume.That (attr, Is.Not.Null);
         Assume.That (attr.ExtensionClass, Is.Not.Null);
-        Assume.That (attr.ExtensionClass!.IsClass);
-        Assume.That (attr.ExtensionClass!.IsSealed);
+        Assume.That (attr.ExtensionClass.IsClass);
+        Assume.That (attr.ExtensionClass.IsSealed);
 
         Assert.That (attr.ExtensionClass.IsDefined (typeof (ExtensionsForEnumTypeAttribute<>)));
     }
@@ -81,7 +81,7 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
     {
         Assume.That (enumData, Is.Not.Null);
         Assume.That (enumData.EnumType, Is.Not.Null);
-        Assume.That (enumData.EnumType!.IsEnum);
+        Assume.That (enumData.EnumType.IsEnum);
 
         Assert.That (enumData.EnumType, Has.Attribute<GenerateEnumExtensionMethodsAttribute> ());
     }
