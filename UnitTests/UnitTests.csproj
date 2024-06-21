@@ -75,7 +75,5 @@
     <IncludeTestAssembly>
       False
     </IncludeTestAssembly>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 </Project>
