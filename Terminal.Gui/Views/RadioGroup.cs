@@ -25,6 +25,11 @@ public class RadioGroup : View
                     Command.LineUp,
                     () =>
                     {
+                        if (!HasFocus)
+                        {
+                            return false;
+                        }
+
                         MoveUpLeft ();
 
                         return true;
@@ -35,6 +40,10 @@ public class RadioGroup : View
                     Command.LineDown,
                     () =>
                     {
+                        if (!HasFocus)
+                        {
+                            return false;
+                        }
                         MoveDownRight ();
 
                         return true;
@@ -45,6 +54,10 @@ public class RadioGroup : View
                     Command.TopHome,
                     () =>
                     {
+                        if (!HasFocus)
+                        {
+                            return false;
+                        }
                         MoveHome ();
 
                         return true;
@@ -55,6 +68,10 @@ public class RadioGroup : View
                     Command.BottomEnd,
                     () =>
                     {
+                        if (!HasFocus)
+                        {
+                            return false;
+                        }
                         MoveEnd ();
 
                         return true;
@@ -355,7 +372,11 @@ public class RadioGroup : View
     /// <param name="selectedItem"></param>
     /// <param name="previousSelectedItem"></param>
     public virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem)
-    {
+    { 
+        if (_selected == selectedItem)
+        {
+            return;
+        }
         _selected = selectedItem;
         SelectedItemChanged?.Invoke (this, new (selectedItem, previousSelectedItem));
     }

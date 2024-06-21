@@ -111,5 +111,6 @@ public class BasicColors : Scenario
 
         Application.Run (app);
         app.Dispose ();
+        Application.Shutdown ();
     }
 }

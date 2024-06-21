@@ -1961,7 +1961,6 @@ public class TextView : View
     private readonly HistoryText _historyText = new ();
     private bool _allowsReturn = true;
     private bool _allowsTab = true;
-    private int _bottomOffset, _rightOffset;
     private bool _clickWithSelecting;
 
     // The column we are tracking, or -1 if we are not tracking any column
@@ -3635,7 +3634,7 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key a)
+    public override bool? OnInvokingKeyBindings (Key a, KeyBindingScope scope)
     {
         if (!a.IsValid)
         {
@@ -3648,7 +3647,7 @@ public class TextView : View
             return true;
         }
 
-        return base.OnInvokingKeyBindings (a);
+        return base.OnInvokingKeyBindings (a, scope);
     }
 
     /// <inheritdoc/>

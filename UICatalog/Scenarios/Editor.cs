@@ -238,27 +238,22 @@ public class Editor : Scenario
 
         _appWindow.Add (menu);
 
-        var siCursorPosition = new StatusItem (KeyCode.Null, "", null);
+        var siCursorPosition = new Shortcut(KeyCode.Null, "", null);
 
         var statusBar = new StatusBar (
                                        new []
                                        {
+                                           new (Application.QuitKey, $"Quit", Quit),
+                                           new (Key.F2, "Open", Open),
+                                           new (Key.F3, "Save", () => Save ()),
+                                           new (Key.F4, "Save As", () => SaveAs ()),
+                                           new (Key.Empty, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null),
                                            siCursorPosition,
-                                           new (KeyCode.F2, "~F2~ Open", () => Open ()),
-                                           new (KeyCode.F3, "~F3~ Save", () => Save ()),
-                                           new (KeyCode.F4, "~F4~ Save As", () => SaveAs ()),
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
-                                                () => Quit ()
-                                               ),
-                                           new (
-                                                KeyCode.Null,
-                                                $"OS Clipboard IsSupported : {Clipboard.IsSupported}",
-                                                null
-                                               )
                                        }
-                                      );
+                                      )
+        {
+            AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast
+        };
 
         _textView.UnwrappedCursorPosition += (s, e) =>
                                              {

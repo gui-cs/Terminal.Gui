@@ -48,7 +48,7 @@ public class ColorPicker : View
 
     private void ColorPicker_MouseClick (object sender, MouseEventEventArgs me)
     {
-        if (CanFocus)
+       // if (CanFocus)
         {
             Cursor = new Point (me.MouseEvent.Position.X / _boxWidth, me.MouseEvent.Position.Y / _boxHeight);
             SetFocus ();

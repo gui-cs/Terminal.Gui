@@ -310,7 +310,7 @@ public class SliderTests
 
         // Act
         slider.FocusedOption = 2;
-        bool result = slider.Set ();
+        bool result = slider.Select ();
 
         // Assert
         Assert.True (result);

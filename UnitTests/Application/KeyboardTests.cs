@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using UICatalog;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ApplicationTests;
 
@@ -56,6 +57,123 @@ public class KeyboardTests
         // Reset the QuitKey to avoid throws errors on another tests
         Application.QuitKey = Key.Q.WithCtrl;
         top.Dispose ();
+    }
+
+    [Fact]
+    public void QuitKey_Default_Is_CtrlQ ()
+    {
+        Application.ResetState (true);
+        // Before Init
+        Assert.Equal (Key.Empty, Application.QuitKey);
+
+        Application.Init (new FakeDriver ());
+        // After Init
+        Assert.Equal (Key.Q.WithCtrl, Application.QuitKey);
+
+        Application.Shutdown();
+    }
+
+    private object _timeoutLock;
+
+    [Fact]
+    public void QuitKey_Quits ()
+    {
+        Assert.Null (_timeoutLock);
+        _timeoutLock = new object ();
+
+        uint abortTime = 500;
+        bool initialized = false;
+        int iteration = 0;
+        bool shutdown = false;
+        object timeout = null;
+
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+
+        Application.Init (new FakeDriver ());
+        Assert.True (initialized);
+        Assert.False (shutdown);
+
+        _output.WriteLine ("Application.Run<Toplevel> ().Dispose ()..");
+        Application.Run<Toplevel> ().Dispose ();
+        _output.WriteLine ("Back from Application.Run<Toplevel> ().Dispose ()");
+
+        Assert.True (initialized);
+        Assert.False (shutdown);
+
+        Assert.Equal (1, iteration);
+
+        Application.Shutdown ();
+
+        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+
+        lock (_timeoutLock)
+        {
+            if (timeout is { })
+            {
+                Application.RemoveTimeout (timeout);
+                timeout = null;
+            }
+        }
+
+        Assert.True (initialized);
+        Assert.True (shutdown);
+
+#if DEBUG_IDISPOSABLE
+        Assert.Empty (Responder.Instances);
+#endif
+        lock (_timeoutLock)
+        {
+            _timeoutLock = null;
+        }
+
+        return;
+
+        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
+        {
+            _output.WriteLine ("OnApplicationOnInitializedChanged: {0}", a.NewValue);
+            if (a.NewValue)
+            {
+                Application.Iteration += OnApplicationOnIteration;
+                initialized = true;
+                lock (_timeoutLock)
+                {
+                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
+                }
+            }
+            else
+            {
+                Application.Iteration -= OnApplicationOnIteration;
+                shutdown = true;
+            }
+        }
+
+        bool ForceCloseCallback ()
+        {
+            lock (_timeoutLock)
+            {
+                _output.WriteLine ($"ForceCloseCallback. iteration: {iteration}");
+                if (timeout is { })
+                {
+                    timeout = null;
+                }
+            }
+            Application.ResetState (true);
+            Assert.Fail ($"Failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
+
+            return false;
+        }
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            _output.WriteLine ("Iteration: {0}", iteration);
+            iteration++;
+            Assert.True (iteration < 2, "Too many iterations, something is wrong.");
+            if (Application._initialized)
+            {
+                _output.WriteLine ("  Pressing QuitKey");
+                Application.OnKeyDown (Application.QuitKey);
+            }
+        }
     }
 
     [Fact]
@@ -193,7 +311,7 @@ public class KeyboardTests
         Assert.True (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.False (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
+        Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
 
         win.CanFocus = false;
         Assert.False (win.CanFocus);
@@ -220,7 +338,7 @@ public class KeyboardTests
 
     [Fact]
     [AutoInitShutdown]
-    public void EnsuresTopOnFront_CanFocus_True_By_Keyboard_ ()
+    public void EnsuresTopOnFront_CanFocus_True_By_Keyboard ()
     {
         Toplevel top = new ();
 
@@ -253,7 +371,7 @@ public class KeyboardTests
         Assert.True (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.False (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
+        Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
 
         top.NewKeyDownEvent (Key.Tab.WithCtrl);
         Assert.True (win.CanFocus);

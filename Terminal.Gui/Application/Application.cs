@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
-using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
@@ -77,7 +76,7 @@ public static partial class Application
     // this in a function like this ensures we don't make mistakes in
     // guaranteeing that the state of this singleton is deterministic when Init
     // starts running and after Shutdown returns.
-    internal static void ResetState ()
+    internal static void ResetState (bool ignoreDisposed = false)
     {
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
@@ -85,11 +84,6 @@ public static partial class Application
         foreach (Toplevel t in _topLevels)
         {
             t.Running = false;
-#if DEBUG_IDISPOSABLE
-
-            // Don't dispose the toplevels. It's up to caller dispose them
-            //Debug.Assert (t.WasDisposed);
-#endif
         }
 
         _topLevels.Clear ();
@@ -97,7 +91,7 @@ public static partial class Application
 #if DEBUG_IDISPOSABLE
 
         // Don't dispose the Top. It's up to caller dispose it
-        if (Top is { })
+        if (!ignoreDisposed && Top is { })
         {
             Debug.Assert (Top.WasDisposed);
 
@@ -181,15 +175,15 @@ public static partial class Application
     /// </para>
     /// <para>
     ///     <see cref="Shutdown"/> must be called when the application is closing (typically after
-    ///     <see cref="Run(Func{Exception, bool}, ConsoleDriver)"/> has returned) to ensure resources are cleaned up and
+    ///     <see cref="Run{T}"/> has returned) to ensure resources are cleaned up and
     ///     terminal settings
     ///     restored.
     /// </para>
     /// <para>
-    ///     The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> function combines
-    ///     <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>
+    ///     The <see cref="Run{T}"/> function combines
+    ///     <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
     ///     into a single
-    ///     call. An application cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> without explicitly calling
+    ///     call. An application cam use <see cref="Run{T}"/> without explicitly calling
     ///     <see cref="Init(ConsoleDriver, string)"/>.
     /// </para>
     /// <param name="driver">
@@ -317,6 +311,7 @@ public static partial class Application
         SupportedCultures = GetSupportedCultures ();
         _mainThreadId = Thread.CurrentThread.ManagedThreadId;
         _initialized = true;
+        InitializedChanged?.Invoke (null, new (false, _initialized));
     }
 
     private static void Driver_SizeChanged (object sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
@@ -348,7 +343,7 @@ public static partial class Application
     /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
     /// <remarks>
     ///     Shutdown must be called for every call to <see cref="Init"/> or
-    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> to ensure all resources are cleaned
+    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned
     ///     up (Disposed)
     ///     and terminal settings are restored.
     /// </remarks>
@@ -357,7 +352,16 @@ public static partial class Application
         // TODO: Throw an exception if Init hasn't been called.
         ResetState ();
         PrintJsonErrors ();
+        InitializedChanged?.Invoke (null, new (true, _initialized));
     }
+
+    /// <summary>
+    ///     This event is fired after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
+    /// </summary>
+    /// <remarks>
+    ///     Intended to support unit tests that need to know when the application has been initialized.
+    /// </remarks>
+    public static event EventHandler<StateEventArgs<bool>> InitializedChanged;
 
     #endregion Initialization (Init/Shutdown)
 
@@ -534,6 +538,7 @@ public static partial class Application
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
         toplevel.FocusFirst ();
+        BringOverlappedTopToFront ();
 
         if (refreshDriver)
         {
@@ -643,7 +648,7 @@ public static partial class Application
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/> object and calling
-    ///     <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>.
+    ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
     /// </summary>
     /// <remarks>
     ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
@@ -660,7 +665,7 @@ public static partial class Application
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
-    ///     <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>.
+    ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
     /// </summary>
     /// <remarks>
     ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
@@ -680,11 +685,17 @@ public static partial class Application
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
-        where T : Toplevel, new ()
+        where T : Toplevel, new()
     {
+        if (!_initialized)
+        {
+            // Init() has NOT been called.
+            InternalInit (driver, null, true);
+        }
+
         var top = new T ();
 
-        Run (top, errorHandler, driver);
+        Run (top, errorHandler);
 
         return top;
     }
@@ -696,11 +707,11 @@ public static partial class Application
     ///         modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
     ///     </para>
     ///     <para>
-    ///         To make a <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> stop execution, call
+    ///         To make a <see cref="Run(Toplevel, Func{Exception, bool})"/> stop execution, call
     ///         <see cref="Application.RequestStop"/>.
     ///     </para>
     ///     <para>
-    ///         Calling <see cref="Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> is equivalent to calling
+    ///         Calling <see cref="Run(Toplevel, Func{Exception, bool})"/> is equivalent to calling
     ///         <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState)"/>, and then calling
     ///         <see cref="End(RunState)"/>.
     ///     </para>
@@ -711,7 +722,10 @@ public static partial class Application
     ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
     ///         return control immediately.
     ///     </para>
-    ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
+    ///     <para>When using <see cref="Run{T}"/> or
+    ///         <see cref="Run(System.Func{System.Exception,bool},Terminal.Gui.ConsoleDriver)"/>
+    ///         <see cref="Init"/> will be called automatically.
+    ///     </para>
     ///     <para>
     ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
     ///         rethrown. Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
@@ -724,12 +738,7 @@ public static partial class Application
     ///     RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true,
     ///     rethrows when null).
     /// </param>
-    /// <param name="driver">
-    ///     The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the platform will
-    ///     be used ( <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
-    ///     <see langword="null"/> if <see cref="Init"/> was called.
-    /// </param>
-    public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
+    public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
     {
         ArgumentNullException.ThrowIfNull (view);
 
@@ -749,7 +758,9 @@ public static partial class Application
         else
         {
             // Init() has NOT been called.
-            InternalInit (driver, null, true);
+            throw new InvalidOperationException (
+                                                 "Init() has not been called. Only Run() or Run<T>() can be used without calling Init()."
+                                                );
         }
 
         var resume = true;
@@ -994,7 +1005,7 @@ public static partial class Application
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
     /// <param name="top">The <see cref="Toplevel"/> to stop.</param>
     /// <remarks>
-    ///     <para>This will cause <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> to return.</para>
+    ///     <para>This will cause <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to return.</para>
     ///     <para>
     ///         Calling <see cref="Application.RequestStop"/> is equivalent to setting the <see cref="Toplevel.Running"/>
     ///         property on the currently running <see cref="Toplevel"/> to false.

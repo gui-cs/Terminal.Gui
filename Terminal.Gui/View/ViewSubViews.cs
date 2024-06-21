@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 public partial class View
@@ -40,11 +42,13 @@ public partial class View
     ///         the lifecycle of the subviews to be transferred to this View.
     ///     </para>
     /// </remarks>
-    public virtual void Add (View view)
+    /// <param name="view">The view to add.</param>
+    /// <returns>The view that was added.</returns>
+    public virtual View Add (View view)
     {
         if (view is null)
         {
-            return;
+            return view;
         }
 
         if (_subviews is null)
@@ -72,6 +76,7 @@ public partial class View
                 SuperView._addingView = false;
             }
 
+            // QUESTION: This automatic behavior of setting CanFocus to true on the SuperView is not documented, and is annoying.
             CanFocus = true;
             view._tabIndex = _tabIndexes.IndexOf (view);
             _addingView = false;
@@ -94,6 +99,8 @@ public partial class View
         CheckDimAuto ();
         SetNeedsLayout ();
         SetNeedsDisplay ();
+
+        return view;
     }
 
     /// <summary>Adds the specified views (children) to the view.</summary>
@@ -205,11 +212,11 @@ public partial class View
     ///         lifecycle to be transferred to the caller; the caller muse call <see cref="Dispose"/>.
     ///     </para>
     /// </remarks>
-    public virtual void Remove (View view)
+    public virtual View Remove (View view)
     {
         if (view is null || _subviews is null)
         {
-            return;
+            return view;
         }
 
         Rectangle touched = view.Frame;
@@ -234,6 +241,8 @@ public partial class View
         {
             Focused = null;
         }
+
+        return view;
     }
 
     /// <summary>
@@ -438,7 +447,7 @@ public partial class View
                 SetHasFocus (false, this);
                 SuperView?.EnsureFocus ();
 
-                if (SuperView is { } && SuperView.Focused is null)
+                if (SuperView is { Focused: null })
                 {
                     SuperView.FocusNext ();
 
@@ -476,6 +485,11 @@ public partial class View
                             view._addingView = false;
                         }
                     }
+                }
+
+                if (this is Toplevel && Application.Current.Focused != this)
+                {
+                    Application.BringOverlappedTopToFront ();
                 }
             }
 

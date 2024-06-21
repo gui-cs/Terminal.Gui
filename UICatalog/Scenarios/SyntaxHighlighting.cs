@@ -120,70 +120,77 @@ public class SyntaxHighlighting : Scenario
         }
     }
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
+        // Init
+        Application.Init ();
+
+        // Setup - Create a top-level application window and configure it.
+        Toplevel appWindow = new ();
 
         var menu = new MenuBar
         {
             Menus =
             [
-                new MenuBarItem (
-                                 "_TextView",
-                                 new []
-                                 {
-                                     _miWrap = new MenuItem (
-                                                             "_Word Wrap",
-                                                             "",
-                                                             () => WordWrap ()
-                                                            )
-                                     {
-                                         CheckType = MenuItemCheckStyle
-                                             .Checked
-                                     },
-                                     null,
-                                     new (
-                                          "_Syntax Highlighting",
-                                          "",
-                                          () => ApplySyntaxHighlighting ()
-                                         ),
-                                     null,
-                                     new (
-                                          "_Load Rune Cells",
-                                          "",
-                                          () => ApplyLoadRuneCells ()
-                                         ),
-                                     new (
-                                          "_Save Rune Cells",
-                                          "",
-                                          () => SaveRuneCells ()
-                                         ),
-                                     null,
-                                     new ("_Quit", "", () => Quit ())
-                                 }
-                                )
+                new (
+                     "_TextView",
+                     new []
+                     {
+                         _miWrap = new (
+                                        "_Word Wrap",
+                                        "",
+                                        () => WordWrap ()
+                                       )
+                         {
+                             CheckType = MenuItemCheckStyle
+                                 .Checked
+                         },
+                         null,
+                         new (
+                              "_Syntax Highlighting",
+                              "",
+                              () => ApplySyntaxHighlighting ()
+                             ),
+                         null,
+                         new (
+                              "_Load Rune Cells",
+                              "",
+                              () => ApplyLoadRuneCells ()
+                             ),
+                         new (
+                              "_Save Rune Cells",
+                              "",
+                              () => SaveRuneCells ()
+                             ),
+                         null,
+                         new ("_Quit", "", () => Quit ())
+                     }
+                    )
             ]
         };
-        Top.Add (menu);
+        appWindow.Add (menu);
 
-        _textView = new TextView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+        _textView = new()
+        {
+            Y = 1,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1)
+        };
 
         ApplySyntaxHighlighting ();
 
-        Win.Add (_textView);
+        appWindow.Add (_textView);
 
-        var statusBar = new StatusBar (
-                                       new StatusItem []
-                                       {
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
-                                                () => Quit ()
-                                               )
-                                       }
-                                      );
+        var statusBar = new StatusBar ([new (Application.QuitKey, "Quit", Quit)]);
 
-        Top.Add (statusBar);
+        appWindow.Add (statusBar);
+
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
     }
 
     /// <summary>
@@ -236,10 +243,10 @@ public class SyntaxHighlighting : Scenario
 
             foreach (Rune rune in csName.EnumerateRunes ())
             {
-                runeCells.Add (new RuneCell { Rune = rune, ColorScheme = color.Value });
+                runeCells.Add (new() { Rune = rune, ColorScheme = color.Value });
             }
 
-            runeCells.Add (new RuneCell { Rune = (Rune)'\n', ColorScheme = color.Value });
+            runeCells.Add (new() { Rune = (Rune)'\n', ColorScheme = color.Value });
         }
 
         if (File.Exists (_path))
@@ -260,10 +267,10 @@ public class SyntaxHighlighting : Scenario
     {
         ClearAllEvents ();
 
-        _green = new ColorScheme (new Attribute (Color.Green, Color.Black));
-        _blue = new ColorScheme (new Attribute (Color.Blue, Color.Black));
-        _magenta = new ColorScheme (new Attribute (Color.Magenta, Color.Black));
-        _white = new ColorScheme (new Attribute (Color.White, Color.Black));
+        _green = new (new Attribute (Color.Green, Color.Black));
+        _blue = new (new Attribute (Color.Blue, Color.Black));
+        _magenta = new (new Attribute (Color.Magenta, Color.Black));
+        _white = new (new Attribute (Color.White, Color.Black));
         _textView.ColorScheme = _white;
 
         _textView.Text =
@@ -342,7 +349,7 @@ public class SyntaxHighlighting : Scenario
     private string IdxToWord (List<Rune> line, int idx)
     {
         string [] words = Regex.Split (
-                                       new string (line.Select (r => (char)r.Value).ToArray ()),
+                                       new (line.Select (r => (char)r.Value).ToArray ()),
                                        "\\b"
                                       );
 

@@ -8,26 +8,81 @@ public class Line : View
     {
         BorderStyle = LineStyle.Single;
         Border.Thickness = new Thickness (0);
+        SuperViewRendersLineCanvas = true;
     }
+
+    public Dim Length { get; set; } = Dim.Fill ();
+
+    private Orientation _orientation;
 
     /// <summary>
     ///     The direction of the line.  If you change this you will need to manually update the Width/Height of the
     ///     control to cover a relevant area based on the new direction.
     /// </summary>
-    public Orientation Orientation { get; set; }
+    public Orientation Orientation
+    {
+        get => _orientation;
+        set
+        {
+            _orientation = value;
+
+            switch (Orientation)
+            {
+                case Orientation.Horizontal:
+                    Height = 1;
+                    // Width = Length;
+                    //Border.Thickness = new Thickness (1, 0, 1, 0);
+
+                    break;
+                case Orientation.Vertical:
+                    Height = Length;
+                    Width = 1;
+
+                    break;
+
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    public override void SetBorderStyle (LineStyle value)
+    {
+        // The default changes the thickness. We don't want that. We just set the style.
+        Border.LineStyle = value;
+    }
 
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
         LineCanvas lc = LineCanvas;
 
+        if (SuperViewRendersLineCanvas)
+        {
+            lc = SuperView.LineCanvas;
+        }
+
         if (SuperView is Adornment adornment)
         {
             lc = adornment.Parent.LineCanvas;
         }
+
+        Point pos = ViewportToScreen (viewport).Location;
+        int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
+
+        if (SuperViewRendersLineCanvas && Orientation == Orientation.Horizontal)
+        {
+            pos.Offset (-SuperView.Border.Thickness.Left, 0);
+            length += SuperView.Border.Thickness.Horizontal;
+        }
+
+        if (SuperViewRendersLineCanvas && Orientation == Orientation.Vertical)
+        {
+            pos.Offset (0, -SuperView.Border.Thickness.Top);
+            length += SuperView.Border.Thickness.Vertical;
+        }
         lc.AddLine (
-                    ViewportToScreen (viewport).Location,
-                    Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height,
+                    pos,
+                    length,
                     Orientation,
                     BorderStyle
                    );

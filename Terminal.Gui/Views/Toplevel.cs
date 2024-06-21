@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         Toplevels can run as modal (popup) views, started by calling
-///         <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>. They return control to the caller when
+///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. They return control to the caller when
 ///         <see cref="Application.RequestStop(Toplevel)"/> has been called (which sets the <see cref="Toplevel.Running"/>
 ///         property to <c>false</c>).
 ///     </para>
@@ -15,7 +15,7 @@ namespace Terminal.Gui;
 ///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init"/>.
 ///         The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created
 ///         and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and call
-///         <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>.
+///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
 ///     </para>
 /// </remarks>
 public partial class Toplevel : View
@@ -106,7 +106,7 @@ public partial class Toplevel : View
                    );
 
         // Default keybindings for this view
-        KeyBindings.Add (Application.QuitKey, KeyBindingScope.Application, Command.QuitToplevel);
+        KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
 
         KeyBindings.Add (Key.CursorRight, Command.NextView);
         KeyBindings.Add (Key.CursorDown, Command.NextView);
@@ -186,11 +186,11 @@ public partial class Toplevel : View
     public event EventHandler<ToplevelEventArgs> Activate;
 
     /// <inheritdoc/>
-    public override void Add (View view)
+    public override View Add (View view)
     {
         CanFocus = true;
         AddMenuStatusBar (view);
-        base.Add (view);
+        return base.Add (view);
     }
 
     /// <summary>
@@ -445,20 +445,20 @@ public partial class Toplevel : View
     ///     perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set. changes.
     ///     <para>
     ///         A Ready event handler is a good place to finalize initialization after calling
-    ///         <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> on this <see cref="Toplevel"/>.
+    ///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
     ///     </para>
     /// </summary>
     public event EventHandler Ready;
 
     /// <inheritdoc/>
-    public override void Remove (View view)
+    public override View Remove (View view)
     {
         if (this is Toplevel { MenuBar: { } })
         {
             RemoveMenuStatusBar (view);
         }
 
-        base.Remove (view);
+        return base.Remove (view);
     }
 
     /// <inheritdoc/>

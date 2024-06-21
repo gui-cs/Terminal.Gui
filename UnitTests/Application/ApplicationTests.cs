@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using Microsoft.VisualBasic;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -147,8 +148,12 @@ public class ApplicationTests
         Shutdown ();
     }
 
-    [Fact]
-    public void Init_ResetState_Resets_Properties ()
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (NetDriver))]
+    [InlineData (typeof (WindowsDriver))]
+    [InlineData (typeof (CursesDriver))]
+    public void Init_ResetState_Resets_Properties (Type driverType)
     {
         ConfigurationManager.ThrowOnJsonErrors = true;
 
@@ -156,7 +161,7 @@ public class ApplicationTests
 
         // Set some values
 
-        Application.Init ();
+        Application.Init (driverName: driverType.Name);
         Application._initialized = true;
 
         // Reset
@@ -228,7 +233,7 @@ public class ApplicationTests
         Application.AlternateBackwardKey = Key.A;
         Application.AlternateForwardKey = Key.B;
         Application.QuitKey = Key.C;
-        Application.AddKeyBinding(Key.A, new View ());
+        Application.AddKeyBinding (Key.A, new View ());
 
         //Application.OverlappedChildren = new List<View> ();
         //Application.OverlappedTop = 
@@ -265,6 +270,71 @@ public class ApplicationTests
         Assert.Empty (Responder.Instances);
 #endif
     }
+
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (NetDriver))]
+    [InlineData (typeof (WindowsDriver))]
+    [InlineData (typeof (CursesDriver))]
+    public void Init_Shutdown_Fire_InitializedChanged (Type driverType)
+    {
+        bool initialized = false;
+        bool shutdown = false;
+
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+
+        Application.Init (driverName: driverType.Name);
+        Assert.True (initialized);
+        Assert.False (shutdown);
+
+        Application.Shutdown ();
+        Assert.True (initialized);
+        Assert.True (shutdown);
+
+        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+
+        return;
+
+        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
+        {
+            if (a.NewValue)
+            {
+                initialized = true;
+            }
+            else
+            {
+                shutdown = true;
+            }
+        }
+    }
+
+
+    [Fact]
+    public void Run_Iteration_Fires ()
+    {
+        int iteration = 0;
+
+        Application.Init (new FakeDriver ());
+
+        Application.Iteration += Application_Iteration;
+        Application.Run<Toplevel> ().Dispose ();
+
+        Assert.Equal (1, iteration);
+        Application.Shutdown ();
+
+        return;
+
+        void Application_Iteration (object sender, IterationEventArgs e)
+        {
+            if (iteration > 0)
+            {
+                Assert.Fail ();
+            }
+            iteration++;
+            Application.RequestStop ();
+        }
+    }
+
 
     [Fact]
     public void Init_Unbalanced_Throws ()
@@ -826,10 +896,10 @@ public class ApplicationTests
 
         Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
         Assert.Equal (w.Border, Application.MouseGrabView);
-        Assert.Equal (new Point (0,0), w.Frame.Location);
+        Assert.Equal (new Point (0, 0), w.Frame.Location);
 
         // Move down and to the right.
-        Application.OnMouseEvent (new () { Position = new (1,1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         Assert.Equal (new Point (1, 1), w.Frame.Location);
 
         Application.End (rs);
@@ -863,7 +933,7 @@ public class ApplicationTests
 
 #if DEBUG_IDISPOSABLE
         Assert.False (w.WasDisposed);
-        Exception exception = Record.Exception (() => Application.Shutdown ()); // Invalid - w has not been disposed.
+        Exception exception = Record.Exception (Application.Shutdown); // Invalid - w has not been disposed.
         Assert.NotNull (exception);
 
         w.Dispose ();
@@ -902,7 +972,7 @@ public class ApplicationTests
 #if DEBUG_IDISPOSABLE
         Assert.Equal (top, Application.Top);
         Assert.False (top.WasDisposed);
-        Exception exception = Record.Exception (() => Application.Shutdown ());
+        Exception exception = Record.Exception (Application.Shutdown);
         Assert.NotNull (exception);
         Assert.False (top.WasDisposed);
 #endif
@@ -934,7 +1004,7 @@ public class ApplicationTests
         Application.Run<Toplevel> (null, driver);
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Top.WasDisposed);
-        Exception exception = Record.Exception (() => Application.Shutdown ());
+        Exception exception = Record.Exception (Application.Shutdown);
         Assert.NotNull (exception);
         Assert.False (Application.Top.WasDisposed);
 
@@ -949,21 +1019,31 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Run_t_Creates_Top_Without_Init ()
+    public void Run_t_Does_Not_Creates_Top_Without_Init ()
     {
+        // When a Toplevel is created it must already have all the Application configuration loaded
+        // This is only possible by two ways:
+        // 1 - Using Application.Init first
+        // 2 - Using Application.Run() or Application.Run<T>()
+        // The Application.Run(new(Toplevel)) must always call Application.Init() first because
+        // the new(Toplevel) may be a derived class that is possible using Application static
+        // properties that is only available after the Application.Init was called
         var driver = new FakeDriver ();
 
         Assert.Null (Application.Top);
 
+        Assert.Throws<InvalidOperationException> (() => Application.Run (new Toplevel ()));
+
+        Application.Init (driver);
         Application.Iteration += (s, e) =>
                                  {
                                      Assert.NotNull (Application.Top);
                                      Application.RequestStop ();
                                  };
-        Application.Run (new (), null, driver);
+        Application.Run (new Toplevel ());
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Top.WasDisposed);
-        Exception exception = Record.Exception (() => Application.Shutdown ());
+        Exception exception = Record.Exception (Application.Shutdown);
         Assert.NotNull (exception);
         Assert.False (Application.Top.WasDisposed);
 
@@ -1014,4 +1094,123 @@ public class ApplicationTests
     }
 
     #endregion
+
+
+    private object _timeoutLock;
+
+    [Fact]
+    public void AddTimeout_Fires ()
+    {
+        Assert.Null (_timeoutLock);
+        _timeoutLock = new object ();
+
+        uint timeoutTime = 250;
+        bool initialized = false;
+        int iteration = 0;
+        bool shutdown = false;
+        object timeout = null;
+        int timeoutCount = 0;
+
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+
+        Application.Init (new FakeDriver ());
+        Assert.True (initialized);
+        Assert.False (shutdown);
+
+        _output.WriteLine ("Application.Run<Toplevel> ().Dispose ()..");
+        Application.Run<Toplevel> ().Dispose ();
+        _output.WriteLine ("Back from Application.Run<Toplevel> ().Dispose ()");
+
+        Assert.True (initialized);
+        Assert.False (shutdown);
+
+        Assert.Equal (1, timeoutCount);
+        Application.Shutdown ();
+
+        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+
+        lock (_timeoutLock)
+        {
+            if (timeout is { })
+            {
+                Application.RemoveTimeout (timeout);
+                timeout = null;
+            }
+        }
+
+        Assert.True (initialized);
+        Assert.True (shutdown);
+
+#if DEBUG_IDISPOSABLE
+        Assert.Empty (Responder.Instances);
+#endif
+        lock (_timeoutLock)
+        {
+            _timeoutLock = null;
+        }
+
+        return;
+
+        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
+        {
+            if (a.NewValue)
+            {
+                Application.Iteration += OnApplicationOnIteration;
+                initialized = true;
+
+                lock (_timeoutLock)
+                {
+                    _output.WriteLine ($"Setting timeout for {timeoutTime}ms");
+                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (timeoutTime), TimeoutCallback);
+                }
+
+            }
+            else
+            {
+                Application.Iteration -= OnApplicationOnIteration;
+                shutdown = true;
+            }
+        }
+
+        bool TimeoutCallback ()
+        {
+            lock (_timeoutLock)
+            {
+                _output.WriteLine ($"TimeoutCallback. Count: {++timeoutCount}. Application Iteration: {iteration}");
+                if (timeout is { })
+                {
+                    _output.WriteLine ($"  Nulling timeout.");
+                    timeout = null;
+                }
+            }
+
+            // False means "don't re-do timer and remove it"
+            return false;
+        }
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            lock (_timeoutLock)
+            {
+                if (timeoutCount > 0)
+                {
+                    _output.WriteLine ($"Iteration #{iteration} - Timeout fired. Calling Application.RequestStop.");
+                    Application.RequestStop ();
+
+                    return;
+                }
+            }
+            iteration++;
+
+            // Simulate a delay
+            Thread.Sleep ((int)timeoutTime / 10);
+
+            // Worst case scenario - something went wrong
+            if (Application._initialized && iteration > 25)
+            {
+                _output.WriteLine ($"Too many iterations ({iteration}): Calling Application.RequestStop.");
+                Application.RequestStop ();
+            }
+        }
+    }
 }

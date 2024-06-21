@@ -164,6 +164,7 @@ In v1, scrolling was enabled by using `ScrollView` or `ScrollBarView`. In v2, th
 The API for handling keyboard input is significantly improved. See [Keyboard API](keyboard.md).
 
 * The [Key](~/api/Terminal.Gui.Key.yml) class replaces the `KeyEvent` struct and provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level [KeyCode](~/api/Terminal.Gui.KeyCode.yml) enum when possible. See [Key](~/api/Terminal.Gui.Key.yml) for more details.
+* The preferred way to enable Application-wide or View-heirarchy-dependent keystrokes is to use the [Shortcut](~/api/Terminal.Gui.Shortcut.yml) View or the built-in View's that utilize it, such as the [Bar](~/api/Terminal.Gui.Bar.yml)-based views.
 * The preferred way to handle single keystrokes is to use **Key Bindings**. Key Bindings map a key press to a [Command](~/api/Terminal.Gui.Command.yml). A view can declare which commands it supports, and provide a lambda that implements the functionality of the command, using `View.AddCommand()`. Use the [View.Keybindings](~/api/Terminal.Gui.View.Keybindings.yml) to configure the key bindings.
 
 ### How to Fix
@@ -200,7 +201,6 @@ The cursor and focus system has been redesigned in v2 to be more consistent and 
 * Use [View.CursorPosition](~/api/Terminal.Gui.View.CursorPosition.yml) to set the cursor position in a view. Set [View.CursorPosition](~/api/Terminal.Gui.View.CursorPosition.yml) to `null` to hide the cursor.
 * Set [View.CursorVisibility](~/api/Terminal.Gui.View.CursorVisibility.yml) to the cursor style you want to use.
 * Remove any overrides of `OnEnter` and `OnLeave` that explicitly change the cursor.
-
 
 ## Events now use `object sender, EventArgs args` signature
 
@@ -274,3 +274,23 @@ The [Aligner](~/api/Terminal.Gui.Aligner.yml) class makes it easy to align eleme
 ### How to Fix
 
 * Replace `VerticalAlignment.Middle` is now [Alignment.Center](~/api/Terminal.Gui.Alignment.Center.yml). 
+
+## `StatusBar`- `StatusItem` is replaced by `Shortcut`
+
+[StatusBar](~/api/Terminal.Gui.StatusBar.yml) has been upgraded to utilize [Shortcut](~/api/Terminal.Gui.Shortcut.yml).
+
+### How to Fix
+
+```diff
+-  var statusBar = new StatusBar (
+-                                       new StatusItem []
+-                                       {
+-                                           new (
+-                                                Application.QuitKey,
+-                                                $"{Application.QuitKey} to Quit",
+-                                                () => Quit ()
+-                                               )
+-                                       }
+-                                      );
++ var statusBar = new StatusBar (new Shortcut [] { new (Application.QuitKey, "Quit", Quit) });
+```

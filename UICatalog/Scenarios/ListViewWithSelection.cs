@@ -207,6 +207,7 @@ public class ListViewWithSelection : Scenario
         public event NotifyCollectionChangedEventHandler CollectionChanged;
         public int Count => Scenarios != null ? Scenarios.Count : 0;
         public int Length { get; private set; }
+        public bool SuspendCollectionChangedEvent { get => throw new System.NotImplementedException (); set => throw new System.NotImplementedException (); }
 
         public void Render (
             ListView container,

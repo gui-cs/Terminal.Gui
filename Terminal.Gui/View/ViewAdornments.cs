@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using System.ComponentModel;
+
+namespace Terminal.Gui;
 
 public partial class View
 {
@@ -95,28 +97,76 @@ public partial class View
         get => Border?.LineStyle ?? LineStyle.Single;
         set
         {
-            if (Border is null)
-            {
-                return;
-            }
+            StateEventArgs<LineStyle> e = new (Border?.LineStyle ?? LineStyle.None, value);
+            OnBorderStyleChanging (e);
 
-            if (value != LineStyle.None)
-            {
-                if (Border.Thickness == Thickness.Empty)
-                {
-                    Border.Thickness = new (1);
-                }
-            }
-            else
-            {
-                Border.Thickness = new (0);
-            }
-
-            Border.LineStyle = value;
-            LayoutAdornments ();
-            SetNeedsLayout ();
         }
     }
+
+    /// <summary>
+    /// Called when the <see cref="BorderStyle"/> is changing. Invokes <see cref="BorderStyleChanging"/>, which allows the event to be cancelled.
+    /// </summary>
+    /// <remarks>
+    ///     Override <see cref="SetBorderStyle"/> to prevent the <see cref="BorderStyle"/> from changing.
+    /// </remarks>
+    /// <param name="e"></param>
+    protected void OnBorderStyleChanging (StateEventArgs<LineStyle> e)
+    {
+        if (Border is null)
+        {
+            return;
+        }
+
+        BorderStyleChanging?.Invoke (this, e);
+        if (e.Cancel)
+        {
+            return;
+        }
+
+        SetBorderStyle (e.NewValue);
+        LayoutAdornments ();
+        SetNeedsLayout ();
+
+        return;
+    }
+
+    /// <summary>
+    ///     Sets the <see cref="BorderStyle"/> of the view to the specified value.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///          <see cref="BorderStyle"/> is a helper for manipulating the view's <see cref="Border"/>. Setting this property to any value other
+    ///         than <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
+    ///         <see cref="Adornment.Thickness"/> to `1` and <see cref="BorderStyle"/> to the value.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
+    ///         <see cref="Adornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
+    ///     </para>
+    ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
+    /// </remarks>
+    /// <param name="value"></param>
+    public virtual void SetBorderStyle (LineStyle value)
+    {
+        if (value != LineStyle.None)
+        {
+            if (Border.Thickness == Thickness.Empty)
+            {
+                Border.Thickness = new (1);
+            }
+        }
+        else
+        {
+            Border.Thickness = new (0);
+        }
+
+        Border.LineStyle = value;
+    }
+
+    /// <summary>
+    ///     Fired when the <see cref="BorderStyle"/> is changing. Allows the event to be cancelled.
+    /// </summary>
+    public event EventHandler<StateEventArgs<LineStyle>> BorderStyleChanging;
 
     /// <summary>
     ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="Viewport"/>

@@ -258,6 +258,93 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (clicked);
     }
 
+    [Theory]
+    [InlineData (false, 0)]
+    [InlineData (true, 1)]
+    public void Space_Fires_Accept (bool focused, int expected)
+    {
+        View superView = new View ()
+        {
+            CanFocus = true,
+        };
+
+        Button button = new ();
+
+        button.CanFocus = focused;
+
+        int acceptInvoked = 0;
+        button.Accept += (s, e) => acceptInvoked++;
+
+        superView.Add (button);
+        button.SetFocus ();
+        Assert.Equal (focused, button.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (expected, acceptInvoked);
+
+        superView.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (false, 0)]
+    [InlineData (true, 1)]
+    public void Enter_Fires_Accept (bool focused, int expected)
+    {
+        View superView = new View ()
+        {
+            CanFocus = true,
+        };
+
+        Button button = new ();
+
+        button.CanFocus = focused;
+
+        int acceptInvoked = 0;
+        button.Accept += (s, e) => acceptInvoked++;
+
+        superView.Add (button);
+        button.SetFocus ();
+        Assert.Equal (focused, button.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (expected, acceptInvoked);
+
+        superView.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (false, 1)]
+    [InlineData (true, 1)]
+    public void HotKey_Fires_Accept (bool focused, int expected)
+    {
+        View superView = new View ()
+        {
+            CanFocus = true,
+        };
+
+        Button button = new ()
+        {
+            HotKey = Key.A
+        };
+
+        button.CanFocus = focused;
+
+        int acceptInvoked = 0;
+        button.Accept += (s, e) => acceptInvoked++;
+
+        superView.Add (button);
+        button.SetFocus ();
+        Assert.Equal (focused, button.HasFocus);
+
+        superView.NewKeyDownEvent (Key.A);
+
+        Assert.Equal (expected, acceptInvoked);
+
+        superView.Dispose ();
+    }
+
     /// <summary>
     ///     This test demonstrates how to change the activation key for Button as described in the README.md keyboard
     ///     handling section
@@ -279,7 +366,9 @@ public class ButtonTests (ITestOutputHelper output)
         top.Add (btn);
         Application.Begin (top);
 
-        // default keybinding is Space which results in keypress
+        Assert.True (btn.HasFocus);
+
+        // default keybinding is Space which results in Command.Accept (when focused)
         Application.OnKeyDown (new ((KeyCode)' '));
         Assert.Equal (1, pressed);
 
@@ -292,8 +381,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal (1, pressed);
 
         // Set a new binding of b for the click (Accept) event
-        btn.KeyBindings.Add (Key.B, Command.HotKey);
-        btn.KeyBindings.Add (Key.B, Command.Accept);
+        btn.KeyBindings.Add (Key.B, Command.HotKey); // b will now trigger the Accept command (when focused or not)
 
         // now pressing B should call the button click event
         Application.OnKeyDown (Key.B);
