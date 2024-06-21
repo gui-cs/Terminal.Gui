@@ -441,5 +441,6 @@
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=B0C2F2A1AF61DA42BBF270980E3DCEF7/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;CONCURRENCY:)(\W|$)(.*)</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=B0C2F2A1AF61DA42BBF270980E3DCEF7/TodoIconStyle/@EntryValue">Warning</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Justifier/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=langword/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=unsynchronized/@EntryIndexedValue">True</s:Boolean>
 </wpf:ResourceDictionary>
