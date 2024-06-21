@@ -18,7 +18,7 @@ public class Mouse : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
         };
 
-        Slider<MouseFlags> filterSlider = new()
+        Slider<MouseFlags> filterSlider = new ()
         {
             Title = "_Filter",
             X = 0,
@@ -57,7 +57,7 @@ public class Mouse : Scenario
         win.Add (clearButton);
         Label ml;
         var count = 0;
-        ml = new() { X = Pos.Right (filterSlider), Y = 0, Text = "Mouse: " };
+        ml = new () { X = Pos.Right (filterSlider), Y = 0, Text = "Mouse: " };
 
         win.Add (ml);
 
@@ -138,7 +138,7 @@ public class Mouse : Scenario
                                       }
                                   };
 
-        label = new()
+        label = new ()
         {
             Text = "_Window Events:",
             X = Pos.Right (appLog) + 1,
@@ -184,6 +184,7 @@ public class Mouse : Scenario
 
         Application.Run (win);
         win.Dispose ();
+        Application.Shutdown ();
     }
 
     public class MouseDemo : View

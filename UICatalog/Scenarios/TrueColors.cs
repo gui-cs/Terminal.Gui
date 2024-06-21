@@ -125,6 +125,8 @@ public class TrueColors : Scenario
         Application.Run (app);
         app.Dispose ();
 
+        Application.Shutdown ();
+
         return;
 
         void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc)

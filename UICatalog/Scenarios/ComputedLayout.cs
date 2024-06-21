@@ -53,6 +53,10 @@ public class ComputedLayout : Scenario
 
         app.LayoutComplete += (s, a) =>
                                           {
+                                              if (horizontalRuler.Viewport.Width == 0 || horizontalRuler.Viewport.Height == 0)
+                                              {
+                                                  return;
+                                              }
                                               horizontalRuler.Text =
                                                   rule.Repeat ((int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length)) [
                                                    ..horizontalRuler.Viewport.Width];
@@ -409,5 +413,6 @@ public class ComputedLayout : Scenario
 
         Application.Run (app);
         app.Dispose ();
+        Application.Shutdown ();
     }
 }

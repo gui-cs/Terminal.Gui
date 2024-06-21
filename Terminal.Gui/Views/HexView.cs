@@ -249,8 +249,6 @@ public class HexView : View
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent  (MouseEvent me)
     {
-        // BUGBUG: Test this with a border! Assumes Frame == Viewport!
-
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
             && !me.Flags.HasFlag (MouseFlags.WheeledDown)
@@ -343,20 +341,17 @@ public class HexView : View
         Driver.SetAttribute (current);
         Move (0, 0);
 
-        // BUGBUG: Viewport!!!!
-        Rectangle frame = Frame;
-
         int nblocks = bytesPerLine / bsize;
-        var data = new byte [nblocks * bsize * frame.Height];
+        var data = new byte [nblocks * bsize * viewport.Height];
         Source.Position = displayStart;
         int n = source.Read (data, 0, data.Length);
 
         Attribute activeColor = ColorScheme.HotNormal;
         Attribute trackingColor = ColorScheme.HotFocus;
 
-        for (var line = 0; line < frame.Height; line++)
+        for (var line = 0; line < viewport.Height; line++)
         {
-            Rectangle lineRect = new (0, line, frame.Width, 1);
+            Rectangle lineRect = new (0, line, viewport.Width, 1);
 
             if (!Viewport.Contains (lineRect))
             {
@@ -597,16 +592,15 @@ public class HexView : View
 
     private bool MoveDown (int bytes)
     {
-        // BUGBUG: Viewport!
         RedisplayLine (position);
 
         if (position + bytes < source.Length)
         {
             position += bytes;
         }
-        else if ((bytes == bytesPerLine * Frame.Height && source.Length >= DisplayStart + bytesPerLine * Frame.Height)
-                 || (bytes <= bytesPerLine * Frame.Height - bytesPerLine
-                     && source.Length <= DisplayStart + bytesPerLine * Frame.Height))
+        else if ((bytes == bytesPerLine * Viewport.Height && source.Length >= DisplayStart + bytesPerLine * Viewport.Height)
+                 || (bytes <= bytesPerLine * Viewport.Height - bytesPerLine
+                     && source.Length <= DisplayStart + bytesPerLine * Viewport.Height))
         {
             long p = position;
 
@@ -618,7 +612,7 @@ public class HexView : View
             position = p;
         }
 
-        if (position >= DisplayStart + bytesPerLine * Frame.Height)
+        if (position >= DisplayStart + bytesPerLine * Viewport.Height)
         {
             SetDisplayStart (DisplayStart + bytes);
             SetNeedsDisplay ();
@@ -635,8 +629,7 @@ public class HexView : View
     {
         position = source.Length;
 
-        // BUGBUG: Viewport!
-        if (position >= DisplayStart + bytesPerLine * Frame.Height)
+        if (position >= DisplayStart + bytesPerLine * Viewport.Height)
         {
             SetDisplayStart (position);
             SetNeedsDisplay ();
@@ -722,8 +715,7 @@ public class HexView : View
             position++;
         }
 
-        // BUGBUG: Viewport!
-        if (position >= DisplayStart + bytesPerLine * Frame.Height)
+        if (position >= DisplayStart + bytesPerLine * Viewport.Height)
         {
             SetDisplayStart (DisplayStart + bytesPerLine);
             SetNeedsDisplay ();
@@ -771,8 +763,7 @@ public class HexView : View
         var delta = (int)(pos - DisplayStart);
         int line = delta / bytesPerLine;
 
-        // BUGBUG: Viewport!
-        SetNeedsDisplay (new (0, line, Frame.Width, 1));
+        SetNeedsDisplay (new (0, line, Viewport.Width, 1));
     }
 
     private bool ToggleSide ()

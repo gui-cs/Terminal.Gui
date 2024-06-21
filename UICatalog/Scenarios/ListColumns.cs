@@ -47,19 +47,24 @@ public class ListColumns : Scenario
         return list;
     }
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
-        Win.Y = 1; // menu
-        Win.Height = Dim.Fill (1); // status bar
+        // Init
+        Application.Init ();
 
-        _listColView = new()
+        // Setup - Create a top-level application window and configure it.
+        Toplevel appWindow = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
+
+        _listColView = new ()
         {
             X = 0,
-            Y = 0,
+            Y = 1,
             Width = Dim.Fill (),
             Height = Dim.Fill (1),
-            Style = new()
+            Style = new ()
             {
                 ShowHeaders = false,
                 ShowHorizontalHeaderOverline = false,
@@ -209,36 +214,20 @@ public class ListColumns : Scenario
             ]
         };
 
-        Top.Add (menu);
+        appWindow.Add (menu);
 
         var statusBar = new StatusBar (
-                                       new StatusItem []
+                                       new Shortcut []
                                        {
-                                           new (
-                                                KeyCode.F2,
-                                                "~F2~ OpenBigListEx",
-                                                () => OpenSimpleList (true)
-                                               ),
-                                           new (
-                                                KeyCode.F3,
-                                                "~F3~ CloseExample",
-                                                () => CloseExample ()
-                                               ),
-                                           new (
-                                                KeyCode.F4,
-                                                "~F4~ OpenSmListEx",
-                                                () => OpenSimpleList (false)
-                                               ),
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
-                                                () => Quit ()
-                                               )
+                                           new (Key.F2, "OpenBigListEx", () => OpenSimpleList (true)),
+                                           new (Key.F3, "CloseExample", CloseExample),
+                                           new (Key.F4, "OpenSmListEx", () => OpenSimpleList (false)),
+                                           new (Application.QuitKey, "Quit", Quit)
                                        }
                                       );
-        Top.Add (statusBar);
+        appWindow.Add (statusBar);
 
-        Win.Add (_listColView);
+        appWindow.Add (_listColView);
 
         var selectedCellLabel = new Label
         {
@@ -250,18 +239,18 @@ public class ListColumns : Scenario
             TextAlignment = Alignment.End
         };
 
-        Win.Add (selectedCellLabel);
+        appWindow.Add (selectedCellLabel);
 
         _listColView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{_listColView.SelectedRow},{_listColView.SelectedColumn}"; };
         _listColView.KeyDown += TableViewKeyPress;
 
         SetupScrollBar ();
 
-        _alternatingColorScheme = new()
+        _alternatingColorScheme = new ()
         {
-            Disabled = Win.ColorScheme.Disabled,
-            HotFocus = Win.ColorScheme.HotFocus,
-            Focus = Win.ColorScheme.Focus,
+            Disabled = appWindow.ColorScheme.Disabled,
+            HotFocus = appWindow.ColorScheme.HotFocus,
+            Focus = appWindow.ColorScheme.Focus,
             Normal = new (Color.White, Color.BrightBlue)
         };
 
@@ -269,6 +258,13 @@ public class ListColumns : Scenario
         _listColView.MouseClick += (s, e) => { _listColView.ScreenToCell (e.MouseEvent.Position, out int? clickedCol); };
 
         _listColView.KeyBindings.Add (Key.Space, Command.Accept);
+
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
     }
 
     private void CloseExample () { _listColView.Table = null; }
@@ -370,7 +366,7 @@ public class ListColumns : Scenario
 
     private void TableViewKeyPress (object sender, Key e)
     {
-        if (e.KeyCode == KeyCode.Delete)
+        if (e.KeyCode == Key.Delete)
         {
             // set all selected cells to null
             foreach (Point pt in _listColView.GetAllSelectedCells ())

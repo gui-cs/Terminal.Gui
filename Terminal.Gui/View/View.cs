@@ -230,6 +230,7 @@ public partial class View : Responder, ISupportInitializeNotification
         }
 
         Initialized?.Invoke (this, EventArgs.Empty);
+
     }
 
     #endregion Constructors and Initialization

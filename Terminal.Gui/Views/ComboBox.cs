@@ -187,7 +187,7 @@ public class ComboBox : View
             {
                 SelectedItem = -1;
                 _search.Text = string.Empty;
-                Search_Changed (this, new StateEventArgs<string> (string.Empty, _search.Text)); 
+                Search_Changed (this, new StateEventArgs<string> (string.Empty, _search.Text));
                 SetNeedsDisplay ();
             }
         }
@@ -645,7 +645,9 @@ public class ComboBox : View
 
     private void ResetSearchSet (bool noCopy = false)
     {
+        _listview.SuspendCollectionChangedEvent ();
         _searchSet.Clear ();
+        _listview.ResumeSuspendCollectionChangedEvent ();
 
         if (_autoHide || noCopy)
         {
@@ -682,6 +684,8 @@ public class ComboBox : View
 
             if (!string.IsNullOrEmpty (_search.Text))
             {
+                _listview.SuspendCollectionChangedEvent ();
+
                 foreach (object item in _source.ToList ())
                 {
                     // Iterate to preserver object type and force deep copy
@@ -694,6 +698,8 @@ public class ComboBox : View
                         _searchSet.Add (item);
                     }
                 }
+
+                _listview.ResumeSuspendCollectionChangedEvent ();
             }
         }
 
@@ -738,11 +744,16 @@ public class ComboBox : View
             return;
         }
 
+        // PERF: At the request of @dodexahedron in the comment https://github.com/gui-cs/Terminal.Gui/pull/3552#discussion_r1648112410.
+        _listview.SuspendCollectionChangedEvent ();
+
         // force deep copy
         foreach (object item in Source.ToList ())
         {
             _searchSet.Add (item);
         }
+
+        _listview.ResumeSuspendCollectionChangedEvent ();
     }
 
     private void SetSearchText (string value) { _search.Text = _text = value; }
@@ -765,8 +776,11 @@ public class ComboBox : View
     /// Consider making public
     private void ShowList ()
     {
+        _listview.SuspendCollectionChangedEvent ();
         _listview.SetSource (_searchSet);
-        _listview.Clear (); 
+        _listview.ResumeSuspendCollectionChangedEvent ();
+
+        _listview.Clear ();
         _listview.Height = CalculatetHeight ();
         SuperView?.BringSubviewToFront (this);
     }

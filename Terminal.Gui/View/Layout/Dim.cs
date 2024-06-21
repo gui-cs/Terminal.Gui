@@ -110,14 +110,9 @@ public abstract class Dim
     ///     Specifies how <see cref="Dim.Auto"/> will compute the dimension. The default is <see cref="DimAutoStyle.Auto"/>.
     /// </param>
     /// <param name="minimumContentDim">The minimum dimension the View's ContentSize will be constrained to.</param>
-    /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.</param>
+    /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to.</param>
     public static Dim? Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim? minimumContentDim = null, Dim? maximumContentDim = null)
     {
-        if (maximumContentDim is { })
-        {
-            Debug.WriteLine (@"WARNING: maximumContentDim is not fully implemented.");
-        }
-
         return new DimAuto ()
         {
             MinimumContentDim = minimumContentDim,

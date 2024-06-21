@@ -14,6 +14,8 @@ public class Buttons : Scenario
 {
     public override void Main ()
     {
+        Application.Init ();
+
         Window main = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
@@ -394,6 +396,7 @@ public class Buttons : Scenario
         main.Ready += (s, e) => radioGroup.Refresh ();
         Application.Run (main);
         main.Dispose ();
+        Application.Shutdown ();
     }
 
     /// <summary>

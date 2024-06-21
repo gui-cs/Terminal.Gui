@@ -42,7 +42,7 @@ PowerShellHostName = 'ConsoleHost'
 # PowerShellHostVersion = ''
 
 # Processor architecture (None, X86, Amd64) required by this module
-ProcessorArchitecture = 'Amd64'
+ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @('Microsoft.PowerShell.Management','Microsoft.PowerShell.Utility','./Terminal.Gui.PowerShell.Core.psd1')

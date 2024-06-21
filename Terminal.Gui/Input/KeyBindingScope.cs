@@ -13,6 +13,9 @@ namespace Terminal.Gui;
 [GenerateEnumExtensionMethods (FastHasFlags = true)]
 public enum KeyBindingScope
 {
+    /// <summary>The key binding is disabled.</summary>
+    Disabled = 0,
+
     /// <summary>The key binding is scoped to just the view that has focus.</summary>
     Focused = 1,
 

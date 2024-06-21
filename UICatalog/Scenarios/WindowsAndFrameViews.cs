@@ -207,5 +207,6 @@ public class WindowsAndFrameViews : Scenario
 
         Application.Run (app);
         app.Dispose ();
+        Application.Shutdown ();
     }
 }
