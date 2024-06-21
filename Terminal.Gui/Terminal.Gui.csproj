@@ -77,7 +77,7 @@
     <Using Include="System.Text" />
   </ItemGroup>
   <!-- =================================================================== -->
-  <!-- Namespaces for which internal items are visible -->
+  <!-- Assembliy names for which internal items are visible -->
   <!-- =================================================================== -->
   <ItemGroup>
     <InternalsVisibleTo Include="UnitTests" />
@@ -138,11 +138,10 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <!-- Embed source files that are not tracked by the source control manager in the PDB -->
     <GitRepositoryRemoteName>upstream</GitRepositoryRemoteName>
+    <!-- Embed source files that are not tracked by the source control manager in the PDB -->
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <EnableSourceLink>true</EnableSourceLink>
     <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 </Project>
