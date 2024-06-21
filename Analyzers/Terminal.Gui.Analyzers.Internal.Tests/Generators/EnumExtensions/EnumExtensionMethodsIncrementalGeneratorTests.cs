@@ -238,7 +238,7 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
                 _allEnumTypes.Add (type);
             }
 
-            foreach (Type type in allAssemblyTypes.Where (static t => t.IsClass && t.IsDefined (typeof (ExtensionsForEnumTypeAttribute<>))))
+            foreach (Type type in allAssemblyTypes.Where (HasExtensionForEnumTypeAttribute))
             {
                 _enumExtensionClasses.Add (type);
             }
@@ -308,6 +308,8 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
             }
         }
     }
+
+    private static bool HasExtensionForEnumTypeAttribute (Type t) => t.IsClass && t.IsDefined (typeof (ExtensionsForEnumTypeAttribute<>));
 
     public sealed record EnumData (
         Type EnumType,
