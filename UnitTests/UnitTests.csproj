@@ -14,11 +14,11 @@
     <IsPackable>false</IsPackable>
     <UseDataCollector />
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineTrace>True</DefineTrace>
+    <DefineTrace>true</DefineTrace>
     <DebugType>portable</DebugType>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
     <ImplicitUsings>enable</ImplicitUsings>
-    <NoLogo>True</NoLogo>
+    <NoLogo>true</NoLogo>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

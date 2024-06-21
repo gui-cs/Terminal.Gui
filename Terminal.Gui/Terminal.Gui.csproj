@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- =================================================================== -->
   <!-- Version numbers -->
   <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
@@ -23,19 +23,19 @@
     <LangVersion>12</LangVersion>
     <RootNamespace>$(AssemblyName)</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineTrace>True</DefineTrace>
+    <DefineTrace>true</DefineTrace>
     <DebugType>portable</DebugType>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
     <ImplicitUsings>enable</ImplicitUsings>
-    <NoLogo>True</NoLogo>
+    <NoLogo>true</NoLogo>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DefineDebug>True</DefineDebug>
+    <DefineDebug>true</DefineDebug>
     <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Optimize>True</Optimize>
+    <Optimize>true</Optimize>
     <VersionSuffix></VersionSuffix>
   </PropertyGroup>
   <!-- =================================================================== -->
@@ -50,12 +50,12 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <PackageReference Include="ColorHelper" Version="1.8.1" />
-    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.9.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
     <!-- Enable Nuget Source Link for github -->
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
     <PackageReference Include="System.IO.Abstractions" Version="21.0.2" />
     <PackageReference Include="System.Text.Json" Version="8.0.3" />
     <PackageReference Include="Wcwidth" Version="2.0.0" />
@@ -86,11 +86,11 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <None Include="..\docfx\images\logo.png">
-      <Pack>True</Pack>
+      <Pack>true</Pack>
       <PackagePath>\</PackagePath>
     </None>
     <None Include="..\README.md">
-      <Pack>True</Pack>
+      <Pack>true</Pack>
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
@@ -99,8 +99,8 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <Compile Update="Resources\Strings.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
+      <DesignTime>true</DesignTime>
+      <AutoGen>true</AutoGen>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
   </ItemGroup>
