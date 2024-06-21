@@ -13,6 +13,8 @@ public class ThreeD : Scenario
 {
     public override void Main ()
     {
+        Application.Init ();
+
         Window app = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"

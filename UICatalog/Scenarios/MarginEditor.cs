@@ -16,7 +16,9 @@ public class MarginEditor : AdornmentEditor
         var ckbShadow = new CheckBox
         {
             X = 0,
-            Y = Pos.AnchorEnd (),
+            //Y = Pos.AnchorEnd(),
+            // BUGBUG: Hack until dimauto is working properly
+            Y = Pos.Bottom (Subviews [^1]),
 
             SuperViewRendersLineCanvas = true,
             Title = "_Shadow",

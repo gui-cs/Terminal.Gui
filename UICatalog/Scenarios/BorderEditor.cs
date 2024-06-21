@@ -32,6 +32,7 @@ public class BorderEditor : AdornmentEditor
         _rbBorderStyle = new RadioGroup
         {
             X = 0,
+            // BUGBUG: Hack until dimauto is working properly
             Y = Pos.Bottom (Subviews [^1]),
             Width = Dim.Width (Subviews [^2]) + Dim.Width (Subviews [^1]) - 1,
             SelectedItem = (int)(((Border)AdornmentToEdit)?.LineStyle ?? LineStyle.None),
