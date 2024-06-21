@@ -121,7 +121,7 @@ public class EnumExtensionMethodsIncrementalGeneratorTests
         Assume.That (enumData.EnumType.IsEnum);
         Assume.That (enumData.EnumType, Has.Attribute<GenerateEnumExtensionMethodsAttribute> ());
         Assume.That (enumData.ExtensionClass, Is.Not.Null);
-        ITypeInfo extensionClassTypeInfo = new TypeWrapper (enumData.ExtensionClass!);
+        TypeWrapper extensionClassTypeInfo = new(enumData.ExtensionClass!);
         Assume.That (extensionClassTypeInfo.IsStaticClass);
         Assume.That (enumData.GeneratorAttribute, Is.Not.Null);
         Assume.That (enumData.GeneratorAttribute, Is.EqualTo (enumData.EnumType.GetCustomAttribute<GenerateEnumExtensionMethodsAttribute> ()));
