@@ -5,6 +5,7 @@ using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 using Terminal.Gui.Analyzers.Internal.Attributes;
 using Terminal.Gui.Analyzers.Internal.Generators.EnumExtensions;
+// ReSharper disable InconsistentNaming
 
 namespace Terminal.Gui.Analyzers.Internal.Tests.Generators.EnumExtensions;
 
