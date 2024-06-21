@@ -21,7 +21,7 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
     <LangVersion>12</LangVersion>
-    <RootNamespace>Terminal.Gui</RootNamespace>
+    <RootNamespace>$(AssemblyName)</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineTrace>True</DefineTrace>
     <DebugType>portable</DebugType>
@@ -116,23 +116,23 @@
   <!-- Nuget  -->
   <!-- =================================================================== -->
   <PropertyGroup>
-    <PackageId>Terminal.Gui</PackageId>
+    <PackageId>$(AssemblyName)</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/gui-cs/Terminal.Gui/</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/gui-cs/$(AssemblyName)</PackageProjectUrl>
     <PackageIcon>logo.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console, tui</PackageTags>
     <Description>Cross platform Terminal UI toolkit for .NET</Description>
     <Owners>Miguel de Icaza, Tig Kindel</Owners>
     <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
-    <Title>Terminal.Gui - Cross platform Terminal User Interface (TUI) toolkit for .NET</Title>
+    <Title>$(AssemblyName) - Cross-platform Terminal User Interface (TUI) toolkit for .NET</Title>
     <PackageReleaseNotes>
-      See: https://github.com/gui-cs/Terminal.Gui/releases
+      See: $(PackageProjectUrl)/releases
     </PackageReleaseNotes>
-    <DocumentationFile>bin\$(Configuration)\Terminal.Gui.xml</DocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <RepositoryUrl>https://github.com/gui-cs/Terminal.Gui.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/gui-cs/$(AssemblyName).git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
