@@ -33,6 +33,12 @@ public class Button : View
     private readonly Rune _rightDefault;
     private bool _isDefault;
 
+    /// <summary>
+    /// Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public new static bool DefaultShadow { get; set; } = false;
+
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
     {
@@ -44,14 +50,15 @@ public class Button : View
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
+        Height = Dim.Auto (DimAutoStyle.Text);
         Width = Dim.Auto (DimAutoStyle.Text);
-        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
         CanFocus = true;
         HighlightStyle |= HighlightStyle.Pressed;
 #if HOVER
         HighlightStyle |= HighlightStyle.Hover;
 #endif
+
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>
         {
@@ -64,6 +71,8 @@ public class Button : View
 
         TitleChanged += Button_TitleChanged;
         MouseClick += Button_MouseClick;
+
+        Shadow = DefaultShadow;
     }
 
     private bool _wantContinuousButtonPressed;

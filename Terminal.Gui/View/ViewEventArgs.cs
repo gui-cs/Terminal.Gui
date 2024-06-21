@@ -58,8 +58,11 @@ public class DrawEventArgs : EventArgs
 public class FocusEventArgs : EventArgs
 {
     /// <summary>Constructs.</summary>
-    /// <param name="view">The view that gets or loses focus.</param>
-    public FocusEventArgs (View view) { View = view; }
+    /// <param name="leaving">The view that gets or loses focus.</param>
+    public FocusEventArgs (View leaving, View entering) {
+        Leaving = leaving;
+        Entering = entering;
+    }
 
     /// <summary>
     ///     Indicates if the current focus event has already been processed and the driver should stop notifying any other
@@ -68,6 +71,10 @@ public class FocusEventArgs : EventArgs
     /// </summary>
     public bool Handled { get; set; }
 
-    /// <summary>Indicates the current view that gets or loses focus.</summary>
-    public View View { get; set; }
+    /// <summary>Indicates the view that is losing focus.</summary>
+    public View Leaving { get; set; }
+
+    /// <summary>Indicates the view that is gaining focus.</summary>
+    public View Entering { get; set; }
+
 }

@@ -330,7 +330,6 @@ internal class UICatalogApp
             // made by Scenario.Init() above
             // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
-
             VerifyObjectsWereDisposed ();
         }
 
@@ -388,6 +387,8 @@ internal class UICatalogApp
 
         public UICatalogTopLevel ()
         {
+            _diagnosticFlags = View.Diagnostics;
+
             _themeMenuItems = CreateThemeMenuItems ();
             _themeMenuBarItem = new ("_Themes", _themeMenuItems);
 

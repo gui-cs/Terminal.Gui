@@ -59,6 +59,36 @@ public partial class View
     /// </remarks>
     public Margin Margin { get; private set; }
 
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static bool DefaultShadow { get; set; } = false;
+
+
+    private bool _shadow;
+    /// <summary>
+    ///     Gets or sets whether the View is shown with a shadow effect. The shadow is drawn on the right and bottom sides of the
+    ///     Margin.
+    /// </summary>
+    /// <remarks>
+    ///     Setting this property to <see langword="true"/> will add a shadow to the right and bottom sides of the Margin.
+    ///     The View 's <see cref="Frame"/> will be expanded to include the shadow.
+    /// </remarks>
+    public bool Shadow
+    {
+        get => _shadow;
+        set
+        {
+            if (_shadow == value)
+            {
+                return;
+            }
+            _shadow = value;
+            if (Margin is { })
+            {
+                _shadow = Margin.EnableShadow (value);
+            }
+        }
+    }
+
     /// <summary>
     ///     The <see cref="Adornment"/> that offsets the <see cref="Viewport"/> from the <see cref="Margin"/>.
     ///     The Border provides the space for a visual border (drawn using

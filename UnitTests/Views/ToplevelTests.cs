@@ -1165,12 +1165,12 @@ public class ToplevelTests (ITestOutputHelper output)
                         if (iterations == 1)
                         {
                             steps [0] = iterations;
-                            Assert.Null (e.View);
+                            Assert.Null (e.Leaving);
                         }
                         else
                         {
                             steps [3] = iterations;
-                            Assert.Equal (diag, e.View);
+                            Assert.Equal (diag, e.Leaving);
                         }
                     };
 
@@ -1179,7 +1179,7 @@ public class ToplevelTests (ITestOutputHelper output)
                         // This will never be raised
                         iterations++;
                         isLeaveTop = true;
-                        Assert.Equal (diag, e.View);
+                        Assert.Equal (diag, e.Leaving);
                     };
         top.Add (vt);
 
@@ -1205,7 +1205,7 @@ public class ToplevelTests (ITestOutputHelper output)
                         iterations++;
                         steps [1] = iterations;
                         isEnterDiag = true;
-                        Assert.Null (e.View);
+                        Assert.Null (e.Leaving);
                     };
 
         vd.Leave += (s, e) =>
@@ -1213,7 +1213,7 @@ public class ToplevelTests (ITestOutputHelper output)
                         iterations++;
                         steps [2] = iterations;
                         isLeaveDiag = true;
-                        Assert.Equal (top, e.View);
+                        Assert.Equal (top, e.Entering);
                     };
         diag.Add (vd);
 

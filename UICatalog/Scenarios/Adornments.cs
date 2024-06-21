@@ -21,10 +21,9 @@ public class Adornments : Scenario
             AutoSelectViewToEdit = true,
             // This is for giggles, to show that the editor can be moved around.
             Arrangement = ViewArrangement.Movable,
-            X = Pos.AnchorEnd()
-
+            X = Pos.AnchorEnd(),
         };
-        editor.Border.Thickness = new Thickness (1, 3, 1, 1);
+        editor.Border.Thickness = new Thickness (1, 2, 1, 1);
 
         app.Add (editor);
 
@@ -104,7 +103,7 @@ public class Adornments : Scenario
                                   window.Padding.Add (labelInPadding);
 
                                   var textFieldInPadding = new TextField
-                                  { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
+                                      { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
                                   textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
                                   window.Padding.Add (textFieldInPadding);
 
