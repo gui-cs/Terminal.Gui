@@ -13,6 +13,7 @@ namespace Terminal.Gui.Analyzers.Internal.Tests.Generators.EnumExtensions;
 [Category ("Source Generators")]
 [TestOf (typeof (EnumExtensionMethodsIncrementalGenerator))]
 [Parallelizable (ParallelScope.Children)]
+[SuppressMessage ("ReSharper", "ExceptionNotDocumented")]
 public class EnumExtensionMethodsIncrementalGeneratorTests
 {
     private static bool _isInitialized;
