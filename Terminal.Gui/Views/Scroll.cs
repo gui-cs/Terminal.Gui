@@ -18,17 +18,18 @@ public class Scroll : View
         {
             Id = "slider",
             Width = Dim.Auto (DimAutoStyle.Content),
-            Height = Dim.Auto (DimAutoStyle.Content)
+            Height = Dim.Auto (DimAutoStyle.Content),
+            WantMousePositionReports = true
         };
         Add (_slider);
 
         Added += Scroll_Added;
         Removed += Scroll_Removed;
         Initialized += Scroll_Initialized;
-        DrawContent += Scroll_DrawContent;
         MouseEvent += Scroll_MouseEvent;
-        _slider.DrawContent += Scroll_DrawContent;
         _slider.MouseEvent += Slider_MouseEvent;
+        _slider.MouseEnter += Slider_MouseEnter;
+        _slider.MouseLeave += Slider_MouseLeave;
     }
 
     private readonly View _slider;
@@ -210,10 +211,11 @@ public class Scroll : View
         // QUESTION: Can we figure out a way to do this without tracking the parent's mouse events?
         parent.MouseEnter += SuperView_MouseEnter;
         parent.MouseLeave += SuperView_MouseLeave;
+
+        _slider.ColorScheme = new () { Normal = new (parent.ColorScheme.HotNormal.Foreground, parent.ColorScheme.HotNormal.Foreground) };
     }
 
     // TODO: Just override GetNormalColor instead of having this method (make Slider a View sub-class that overrides GetNormalColor)
-    private void Scroll_DrawContent (object sender, DrawEventArgs e) { SetColorSchemeWithSuperview (sender as View); }
 
     private void Scroll_Initialized (object sender, EventArgs e)
     {
@@ -250,6 +252,13 @@ public class Scroll : View
         {
             Position = Math.Max (Position - 1, 0);
         }
+        else if (me.Flags == MouseFlags.Button1Clicked)
+        {
+            if (_slider.Frame.Contains (me.Position))
+            {
+                Slider_MouseEnter (_slider, e);
+            }
+        }
     }
 
     private void Scroll_Removed (object sender, SuperViewChangedEventArgs e)
@@ -261,24 +270,6 @@ public class Scroll : View
             parent.LayoutComplete -= SuperView_LayoutComplete;
             parent.MouseEnter -= SuperView_MouseEnter;
             parent.MouseLeave -= SuperView_MouseLeave;
-        }
-    }
-
-    // TODO: Just override GetNormalColor instead of having this method
-    private static void SetColorSchemeWithSuperview (View view)
-    {
-        if (view.SuperView is { })
-        {
-            View parent = view.SuperView is Adornment adornment ? adornment.Parent : view.SuperView;
-
-            if (view.Id == "slider")
-            {
-                view.ColorScheme = new () { Normal = new (parent.ColorScheme.Normal.Foreground, parent.ColorScheme.Normal.Foreground) };
-            }
-            else
-            {
-                view.ColorScheme = parent.ColorScheme;
-            }
         }
     }
 
@@ -375,7 +366,7 @@ public class Scroll : View
         {
             Position = Math.Max (Position - 1, 0);
         }
-        else
+        else if (me.Flags != MouseFlags.ReportMousePosition)
         {
             return;
         }
@@ -383,15 +374,33 @@ public class Scroll : View
         e.Handled = true;
     }
 
+    [CanBeNull]
+    private ColorScheme _savedColorScheme;
+
+    private void Slider_MouseEnter (object sender, MouseEventEventArgs e)
+    {
+        _savedColorScheme ??= _slider.ColorScheme;
+        _slider.ColorScheme = new () { Normal = new (_savedColorScheme.HotNormal.Foreground, _savedColorScheme.HotNormal.Foreground) };
+    }
+
+    private void Slider_MouseLeave (object sender, MouseEventEventArgs e)
+    {
+        if (_savedColorScheme is { } && !e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        {
+            _slider.ColorScheme = _savedColorScheme;
+            _savedColorScheme = null;
+        }
+    }
+
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         Added -= Scroll_Added;
         Initialized -= Scroll_Initialized;
-        DrawContent -= Scroll_DrawContent;
         MouseEvent -= Scroll_MouseEvent;
-        _slider.DrawContent -= Scroll_DrawContent;
         _slider.MouseEvent -= Slider_MouseEvent;
+        _slider.MouseEnter -= Slider_MouseEnter;
+        _slider.MouseLeave -= Slider_MouseLeave;
 
         base.Dispose (disposing);
     }
