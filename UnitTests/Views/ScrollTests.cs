@@ -843,4 +843,75 @@ public class ScrollTests
 
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
     }
+
+    [Fact]
+    public void PositionChanging_PositionChanged_Events_Only_Raises_Once_If_Position_Was_Really_Changed ()
+    {
+        var changing = 0;
+        var cancel = false;
+        var changed = 0;
+        var scroll = new Scroll { Height = 10, Size = 20 };
+        scroll.PositionChanging += Scroll_PositionChanging;
+        scroll.PositionChanged += Scroll_PositionChanged;
+
+        Assert.Equal (Orientation.Vertical, scroll.Orientation);
+        Assert.Equal (new (0, 0, 1, 10), scroll.Viewport);
+        Assert.Equal (0, scroll.Position);
+        Assert.Equal (0, changing);
+        Assert.Equal (0, changed);
+
+        scroll.Position = 0;
+        Assert.Equal (0, scroll.Position);
+        Assert.Equal (0, changing);
+        Assert.Equal (0, changed);
+
+        scroll.Position = 1;
+        Assert.Equal (1, scroll.Position);
+        Assert.Equal (1, changing);
+        Assert.Equal (1, changed);
+
+        Reset ();
+        cancel = true;
+        scroll.Position = 2;
+        Assert.Equal (1, scroll.Position);
+        Assert.Equal (1, changing);
+        Assert.Equal (0, changed);
+
+        Reset ();
+        scroll.Position = 10;
+        Assert.Equal (10, scroll.Position);
+        Assert.Equal (1, changing);
+        Assert.Equal (1, changed);
+
+        Reset ();
+        scroll.Position = 11;
+        Assert.Equal (10, scroll.Position);
+        Assert.Equal (0, changing);
+        Assert.Equal (0, changed);
+
+        Reset ();
+        scroll.Position = 0;
+        Assert.Equal (0, scroll.Position);
+        Assert.Equal (1, changing);
+        Assert.Equal (1, changed);
+
+        scroll.PositionChanging -= Scroll_PositionChanging;
+        scroll.PositionChanged -= Scroll_PositionChanged;
+
+
+        void Scroll_PositionChanging (object sender, StateEventArgs<int> e)
+        {
+            changing++;
+            e.Cancel = cancel;
+        }
+
+        void Scroll_PositionChanged (object sender, StateEventArgs<int> e) => changed++;
+
+        void Reset ()
+        {
+            changing = 0;
+            cancel = false;
+            changed = 0;
+        }
+    }
 }

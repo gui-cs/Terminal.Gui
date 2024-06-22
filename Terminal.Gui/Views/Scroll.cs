@@ -62,7 +62,7 @@ public class Scroll : View
         get => _position;
         set
         {
-            if (value < 0 || (value > 0 && value + _barSize > Size))
+            if (value == _position || value < 0 || value + _barSize > Size)
             {
                 return;
             }
