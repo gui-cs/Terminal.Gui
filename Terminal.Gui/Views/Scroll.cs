@@ -37,6 +37,8 @@ public class Scroll : View
 
     private bool _wasSliderMouse;
 
+    private int _barSize => Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
+
     private Orientation _orientation;
     /// <summary>
     ///     Gets or sets if the Scroll is oriented vertically or horizontally.
@@ -60,9 +62,7 @@ public class Scroll : View
         get => _position;
         set
         {
-            int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
-
-            if (value < 0 || (value > 0 && value + barSize > Size))
+            if (value < 0 || (value > 0 && value + _barSize > Size))
             {
                 return;
             }
@@ -73,7 +73,6 @@ public class Scroll : View
             {
                 return;
             }
-
 
             if (!_wasSliderMouse)
             {
@@ -228,7 +227,6 @@ public class Scroll : View
     {
         MouseEvent me = e.MouseEvent;
         int location = Orientation == Orientation.Vertical ? me.Position.Y : me.Position.X;
-        int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
 
         (int topLeft, int bottomRight) sliderPos = _orientation == Orientation.Vertical
                                                        ? new (_slider.Frame.Y, _slider.Frame.Bottom - 1)
@@ -236,16 +234,16 @@ public class Scroll : View
 
         if (me.Flags == MouseFlags.Button1Pressed && location < sliderPos.topLeft)
         {
-            Position = Math.Max (Position - barSize, 0);
+            Position = Math.Max (Position - _barSize, 0);
         }
         else if (me.Flags == MouseFlags.Button1Pressed && location > sliderPos.bottomRight)
         {
-            Position = Math.Min (Position + barSize, Size - barSize);
+            Position = Math.Min (Position + _barSize, Size - _barSize);
         }
         else if ((me.Flags == MouseFlags.WheeledDown && Orientation == Orientation.Vertical)
                  || (me.Flags == MouseFlags.WheeledRight && Orientation == Orientation.Horizontal))
         {
-            Position = Math.Min (Position + 1, Size - barSize);
+            Position = Math.Min (Position + 1, Size - _barSize);
         }
         else if ((me.Flags == MouseFlags.WheeledUp && Orientation == Orientation.Vertical)
                  || (me.Flags == MouseFlags.WheeledLeft && Orientation == Orientation.Horizontal))
@@ -327,7 +325,6 @@ public class Scroll : View
     {
         MouseEvent me = e.MouseEvent;
         int location = Orientation == Orientation.Vertical ? me.Position.Y : me.Position.X;
-        int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
         int offset = _lastLocation > -1 ? location - _lastLocation : 0;
 
         if (me.Flags == MouseFlags.Button1Pressed)
@@ -342,7 +339,7 @@ public class Scroll : View
         {
             if (Orientation == Orientation.Vertical)
             {
-                if (_slider.Frame.Y + offset >= 0 && _slider.Frame.Y + offset + _slider.Frame.Height <= barSize)
+                if (_slider.Frame.Y + offset >= 0 && _slider.Frame.Y + offset + _slider.Frame.Height <= _barSize)
                 {
                     _wasSliderMouse = true;
                     _slider.Y = _slider.Frame.Y + offset;
@@ -351,7 +348,7 @@ public class Scroll : View
             }
             else
             {
-                if (_slider.Frame.X + offset >= 0 && _slider.Frame.X + offset + _slider.Frame.Width <= barSize)
+                if (_slider.Frame.X + offset >= 0 && _slider.Frame.X + offset + _slider.Frame.Width <= _barSize)
                 {
                     _wasSliderMouse = true;
                     _slider.X = _slider.Frame.X + offset;
@@ -371,7 +368,7 @@ public class Scroll : View
         else if ((me.Flags == MouseFlags.WheeledDown && Orientation == Orientation.Vertical)
                  || (me.Flags == MouseFlags.WheeledRight && Orientation == Orientation.Horizontal))
         {
-            Position = Math.Min (Position + 1, Size - barSize);
+            Position = Math.Min (Position + 1, Size - _barSize);
         }
         else if ((me.Flags == MouseFlags.WheeledUp && Orientation == Orientation.Vertical)
                  || (me.Flags == MouseFlags.WheeledLeft && Orientation == Orientation.Horizontal))
