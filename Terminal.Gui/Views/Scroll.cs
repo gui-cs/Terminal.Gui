@@ -202,25 +202,30 @@ public class Scroll : View
         }
     }
 
-    private void SuperView_MouseEnter (object sender, MouseEventEventArgs e) { OnMouseEnter (e.MouseEvent); }
 
-    private void SuperView_MouseLeave (object sender, MouseEventEventArgs e) { OnMouseLeave (e.MouseEvent); }
 
     private void Scroll_Added (object sender, SuperViewChangedEventArgs e)
     {
         View parent = e.SuperView is Adornment adornment ? adornment.Parent : e.SuperView;
 
         parent.LayoutComplete += SuperView_LayoutComplete;
-
-        // QUESTION: I really don't like this. It feels like a hack that a subview needs to track its parent's mouse events.
-        // QUESTION: Can we figure out a way to do this without tracking the parent's mouse events?
-        parent.MouseEnter += SuperView_MouseEnter;
-        parent.MouseLeave += SuperView_MouseLeave;
-
-        _slider.ColorScheme = new () { Normal = new (parent.ColorScheme.HotNormal.Foreground, parent.ColorScheme.HotNormal.Foreground) };
     }
 
-    // TODO: Just override GetNormalColor instead of having this method (make Slider a View sub-class that overrides GetNormalColor)
+
+    /// <inheritdoc />
+    public override Attribute GetNormalColor ()
+    {
+        if (_savedColorScheme is null)
+        {
+            _slider.ColorScheme = new () { Normal = new (ColorScheme.HotNormal.Foreground, ColorScheme.HotNormal.Foreground) };
+        }
+        else
+        {
+            _slider.ColorScheme = new () { Normal = new (ColorScheme.Normal.Foreground, ColorScheme.Normal.Foreground) };
+        }
+
+        return base.GetNormalColor ();
+    }
 
     private void Scroll_Initialized (object sender, EventArgs e)
     {
@@ -274,8 +279,6 @@ public class Scroll : View
             View parent = e.SuperView is Adornment adornment ? adornment.Parent : e.SuperView;
 
             parent.LayoutComplete -= SuperView_LayoutComplete;
-            parent.MouseEnter -= SuperView_MouseEnter;
-            parent.MouseLeave -= SuperView_MouseLeave;
         }
     }
 
@@ -411,5 +414,4 @@ public class Scroll : View
 
         base.Dispose (disposing);
     }
-
 }
