@@ -107,6 +107,10 @@ public class ColorPicker : View
         get => (ColorName)_selectColorIndex;
         set
         {
+            if (value == (ColorName)_selectColorIndex)
+            {
+                return;
+            }
             var prev = (ColorName)_selectColorIndex;
             _selectColorIndex = (int)value;
 

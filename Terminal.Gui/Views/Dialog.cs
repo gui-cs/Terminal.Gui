@@ -60,7 +60,8 @@ public class Dialog : Window
     /// <remarks>
     ///     By default, <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> are
     ///     set
-    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of the screen dimensions.
+    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of <see cref="Application.Top"/>, if there is one. Otherwise,
+    ///     it will be bound by the screen dimensions.
     /// </remarks>
     public Dialog ()
     {
