@@ -390,7 +390,14 @@ public class Scroll : View
     private void Slider_MouseEnter (object sender, MouseEventEventArgs e)
     {
         _savedColorScheme ??= _slider.ColorScheme;
-        _slider.ColorScheme = new () { Normal = new (_savedColorScheme.HotNormal.Foreground, _savedColorScheme.HotNormal.Foreground) };
+        _slider.ColorScheme = new ()
+        {
+            Normal = new (_savedColorScheme.HotNormal.Foreground, _savedColorScheme.HotNormal.Foreground),
+            Focus = new (_savedColorScheme.Focus.Foreground, _savedColorScheme.Focus.Foreground),
+            HotNormal = new (_savedColorScheme.Normal.Foreground, _savedColorScheme.Normal.Foreground),
+            HotFocus = new (_savedColorScheme.HotFocus.Foreground, _savedColorScheme.HotFocus.Foreground),
+            Disabled = new (_savedColorScheme.Disabled.Foreground, _savedColorScheme.Disabled.Foreground)
+        };
     }
 
     private void Slider_MouseLeave (object sender, MouseEventEventArgs e)
