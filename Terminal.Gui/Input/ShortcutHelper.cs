@@ -2,6 +2,7 @@
 
 namespace Terminal.Gui;
 
+// TODO: Nuke when #2975 is completed
 /// <summary>Represents a helper to manipulate shortcut keys used on views.</summary>
 public class ShortcutHelper
 {
@@ -114,8 +115,6 @@ public class ShortcutHelper
         {
             return true;
         }
-
-        Debug.WriteLine ($"WARNING: {Key.ToString (key)} is not a valid shortcut key.");
 
         return false;
     }

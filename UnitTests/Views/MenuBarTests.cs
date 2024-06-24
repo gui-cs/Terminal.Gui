@@ -1290,7 +1290,7 @@ wo
     [Theory]
     [AutoInitShutdown]
     [InlineData ("New", KeyCode.CtrlMask | KeyCode.N)]
-    [InlineData ("Quit", KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.Q)]
+    [InlineData ("Quit", KeyCode.CtrlMask | KeyCode.Q)]
     [InlineData ("Copy", KeyCode.CtrlMask | KeyCode.C)]
     [InlineData ("Replace", KeyCode.CtrlMask | KeyCode.H)]
     [InlineData ("1", KeyCode.F1)]

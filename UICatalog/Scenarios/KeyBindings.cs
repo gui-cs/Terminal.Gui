@@ -54,11 +54,13 @@ public sealed class KeyBindings : Scenario
             Height = Dim.Auto (DimAutoStyle.Text),
             HotKeySpecifier = (Rune)'_',
             Title = "_KeyBindingsDemo",
-            Text = @"These keys will cause this view to show a message box:
-- Hotkey: k, K, Alt-K, Alt-Shift-K
-- Focused: F3
-- Application: F4
-Pressing Ctrl-Q will cause it to quit the app.",
+            Text = $"""
+                    These keys will cause this view to show a message box:
+                    - Hotkey: k, K, Alt-K, Alt-Shift-K
+                    - Focused: F3
+                    - Application: F4
+                    Pressing Esc or {Application.QuitKey} will cause it to quit the app.
+                    """,
             BorderStyle = LineStyle.Dashed
         };
         appWindow.Add (keyBindingsDemo);

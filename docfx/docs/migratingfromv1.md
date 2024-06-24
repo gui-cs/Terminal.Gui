@@ -166,6 +166,7 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 * The [Key](~/api/Terminal.Gui.Key.yml) class replaces the `KeyEvent` struct and provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level [KeyCode](~/api/Terminal.Gui.KeyCode.yml) enum when possible. See [Key](~/api/Terminal.Gui.Key.yml) for more details.
 * The preferred way to enable Application-wide or View-heirarchy-dependent keystrokes is to use the [Shortcut](~/api/Terminal.Gui.Shortcut.yml) View or the built-in View's that utilize it, such as the [Bar](~/api/Terminal.Gui.Bar.yml)-based views.
 * The preferred way to handle single keystrokes is to use **Key Bindings**. Key Bindings map a key press to a [Command](~/api/Terminal.Gui.Command.yml). A view can declare which commands it supports, and provide a lambda that implements the functionality of the command, using `View.AddCommand()`. Use the [View.Keybindings](~/api/Terminal.Gui.View.Keybindings.yml) to configure the key bindings.
+* For better consistency and user experience, the default key for closing an app or `Toplevel` is now `Esc` (it was previously `Ctrl+Q`).
 
 ### How to Fix
 
@@ -173,6 +174,7 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 * Use [View.AddCommand](~/api/Terminal.Gui.View.AddCommand.yml) to define commands your view supports.
 * Use [View.Keybindings](~/api/Terminal.Gui.View.Keybindings.yml) to configure key bindings to `Command`s.
 * It should be very uncommon for v2 code to override `OnKeyPressed` etc... 
+* Anywhere `Ctrl+Q` was hard-coded as the "quit key", replace with `Application.QuitKey`.
 
 ## Updated Mouse API
 
