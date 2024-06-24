@@ -484,7 +484,7 @@ internal class UICatalogApp
                                           {
                                               ((CheckBox)ShForce16Colors.CommandView).Checked =
                                                   Application.Force16Colors = (bool)!((CheckBox)ShForce16Colors.CommandView).Checked!;
-                                              MiForce16Colors.Checked = Application.Force16Colors;
+                                              MiForce16Colors!.Checked = Application.Force16Colors;
                                               Application.Refresh ();
 
                                           };
