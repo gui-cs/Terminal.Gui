@@ -745,8 +745,8 @@ public partial class View
     /// <summary>
     /// Returns true if Key is bound in this view heirarchy. For debugging
     /// </summary>
-    /// <param name="key"></param>
-    /// <param name="boundView"></param>
+    /// <param name="key">The key to test.</param>
+    /// <param name="boundView">Returns the view the key is bound to.</param>
     /// <returns></returns>
     public bool IsHotKeyKeyBound (Key key, out View boundView)
     {

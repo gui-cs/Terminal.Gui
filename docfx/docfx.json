@@ -29,14 +29,13 @@
     "template": [
       "default",
       "templates/modern"
-      // ,
-      // "templates/singulinkfx"
     ],
     "output": "_site",
     "content": [
       {
         "files": [
-          "**/*.{md,yml}"
+          "**/*.{md,yml}",
+          "schemas/**.json"
         ],
         "exclude": [
           "_site/**"
