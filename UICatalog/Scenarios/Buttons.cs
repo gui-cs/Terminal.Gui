@@ -440,7 +440,7 @@ public class Buttons : Scenario
                 Text = Value.ToString (),
                 X = Pos.Right (_down),
                 Y = Pos.Top (_down),
-                Width = Dim.Func (() => Digits),
+                Width = Dim.Func (() => _number is null ? Digits : Math.Max (Digits, _number.Text.Length)),
                 Height = 1,
                 TextAlignment = Alignment.Center,
                 CanFocus = true
