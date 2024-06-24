@@ -451,6 +451,7 @@ internal class UICatalogApp
             StatusBar = new ()
             {
                 Visible = ShowStatusBar,
+                AlignmentModes = AlignmentModes.IgnoreFirstOrLast
             };
 
             if (StatusBar is { })
