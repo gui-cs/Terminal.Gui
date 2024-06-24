@@ -35,13 +35,14 @@ public class ThreeD : Scenario
             Height = Dim.Percent (30),
             Title = "Shadow Window",
             Arrangement = ViewArrangement.Movable,
+            Shadow = true
         };
 
         var buttonInWin = new Button
         {
             X = Pos.Center (),
             Y = Pos.Center (), Text = "Button in Window",
-            //Shadow = true
+            Shadow = true
         };
         win.Add (buttonInWin);
         app.Add (win);
@@ -50,9 +51,9 @@ public class ThreeD : Scenario
         {
             X = Pos.Right (editor) + 10,
             Y = Pos.Center (), Text = "Button",
+            Shadow = true
         };
         app.Add (button);
-
 
         Application.Run (app);
         app.Dispose ();

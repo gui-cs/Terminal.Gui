@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using static Unix.Terminal.Curses;
+
 namespace Terminal.Gui;
 
 /// <summary>The Margin for a <see cref="View"/>.</summary>
@@ -25,10 +27,10 @@ public class Margin : Adornment
     private void Margin_LayoutStarted (object? sender, LayoutEventArgs e)
     {
         // Adjust the shadow such that it is drawn aligned with the Border
-        if (_shadow && _rightShadow is {} && _bottomShadow is {})
+        if (_shadow && _rightShadow is { } && _bottomShadow is { })
         {
-            _rightShadow.Y = Parent.Border.Thickness.Top - (Parent.Border.Thickness.Top > 2 && Parent.Border.ShowTitle ? 1 : 0);
-            _bottomShadow.X = Parent.Border.Thickness.Left;
+            _rightShadow.Y = Parent.Border.Thickness.Top > 0 ? Parent.Border.Thickness.Top - (Parent.Border.Thickness.Top > 2 && Parent.Border.ShowTitle ? 1 : 0) : 1;
+            _bottomShadow.X = Parent.Border.Thickness.Left > 0 ? Parent.Border.Thickness.Left : 1;
         }
     }
 
@@ -73,6 +75,40 @@ public class Margin : Adornment
 
     }
 
+    public override void OnDrawContent (Rectangle viewport)
+    {
+        Rectangle screen = ViewportToScreen (viewport);
+        Attribute normalAttr = GetNormalColor ();
+        Driver.SetAttribute (normalAttr);
+
+        // This just draws/clears the thickness, not the insides.
+        if (Parent?.Shadow == true)
+        {
+            screen = Rectangle.Inflate (screen, -1, -1);
+        }
+        Thickness.Draw (screen, ToString ());
+
+        if (Subviews.Count > 0)
+        {
+            // Draw subviews
+            // TODO: Implement OnDrawSubviews (cancelable);
+            if (Subviews is { } && SubViewNeedsDisplay)
+            {
+                IEnumerable<View> subviewsNeedingDraw = Subviews.Where (
+                                                                        view => view.Visible
+                                                                                && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
+                                                                       );
+                foreach (View view in subviewsNeedingDraw)
+                {
+                    if (view.LayoutNeeded)
+                    {
+                        view.LayoutSubviews ();
+                    }
+                    view.Draw ();
+                }
+            }
+        }
+    }
 
     /// <summary>
     ///     The color scheme for the Margin. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>'s
@@ -177,9 +213,9 @@ public class Margin : Adornment
 internal class ShadowView : View
 {
     // TODO: Add these to CM.Glyphs
-    private readonly char VERTICAL_START_GLYPH = '\u2596';
+    private readonly char VERTICAL_START_GLYPH = '\u258C'; // Half: '\u2596';
     private readonly char VERTICAL_GLYPH = '\u258C';
-    private readonly char HORIZONTAL_START_GLYPH = '\u259d';
+    private readonly char HORIZONTAL_START_GLYPH = '\u2580'; // Half: '\u259d';
     private readonly char HORIZONTAL_GLYPH = '\u2580';
     private readonly char HORIZONTAL_END_GLYPH = '\u2598';
 
