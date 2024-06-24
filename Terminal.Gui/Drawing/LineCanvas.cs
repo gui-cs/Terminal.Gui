@@ -165,9 +165,9 @@ public class LineCanvas : IDisposable
     ///     intersection symbols.
     /// </summary>
     /// <returns>A map of all the points within the canvas.</returns>
-    public Dictionary<Point, Cell> GetCellMap ()
+    public Dictionary<Point, Cell?> GetCellMap ()
     {
-        Dictionary<Point, Cell> map = new ();
+        Dictionary<Point, Cell?> map = new ();
 
         // walk through each pixel of the bitmap
         for (int y = Viewport.Y; y < Viewport.Y + Viewport.Height; y++)
