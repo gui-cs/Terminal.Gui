@@ -433,11 +433,10 @@
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=90214AE24C7BA34FA45434C0B221453E/TodoIconStyle/@EntryValue">Question</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=961894CCC510410ABE2B99132B253C80/Pattern/@EntryValue">(/{2}|/\*|\* ?)[\w\s\d:]*?\W(?&lt;TAG&gt;TODOTODO|TODO|TASK): *(?&lt;Message&gt;[\S].*?)(?: ?\*/)?$</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=AAF58D8E48F4F648BB088E649A89FF54/@KeyIndexDefined">True</s:Boolean>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=AAF58D8E48F4F648BB088E649A89FF54/CaseSensitive/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=AAF58D8E48F4F648BB088E649A89FF54/Color/@EntryValue">#FFCF9D32</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=AAF58D8E48F4F648BB088E649A89FF54/MatchComments/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=AAF58D8E48F4F648BB088E649A89FF54/Name/@EntryValue">Unclear Intent</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=AAF58D8E48F4F648BB088E649A89FF54/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;UNCLEAR:|INTENT:)(\W|$)(.*)</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=AAF58D8E48F4F648BB088E649A89FF54/Pattern/@EntryValue">(/{2}|/\*|\* ?)[\w\s\d:]*?\W(?&lt;TAG&gt;UNCLEAR|INTENT|CLARITY|SPECIFY): *(?&lt;Message&gt;[\S].*?)(?: ?\*/)?$</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=AAF58D8E48F4F648BB088E649A89FF54/TodoIconStyle/@EntryValue">Warning</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=B0C2F2A1AF61DA42BBF270980E3DCEF7/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=B0C2F2A1AF61DA42BBF270980E3DCEF7/Color/@EntryValue">#FFCF9D32</s:String>
