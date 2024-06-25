@@ -77,7 +77,7 @@ public class HotKeys : Scenario
         {
             Title = "B_utton with Frame (focusable)",
             CanFocus = true,
-            X = Pos.Right (buttonWithFrameLabel) + 1, Y = Pos.Top (buttonWithFrameLabel), Width = 40, Height = 3,
+            X = Pos.Right (buttonWithFrameLabel) + 1, Y = Pos.Top (buttonWithFrameLabel), Width = 40,
             BorderStyle = LineStyle.Dashed
         };
         app.Add (buttonWithFrameFocusable);
@@ -88,7 +88,7 @@ public class HotKeys : Scenario
         var buttonWithFrame = new Button
         {
             Title = "Button with Frame (not focusab_le)",
-            X = Pos.Right (buttonWithFrameLabel) + 1, Y = Pos.Top (buttonWithFrameLabel), Width = 40, Height = 3,
+            X = Pos.Right (buttonWithFrameLabel) + 1, Y = Pos.Top (buttonWithFrameLabel), Width = 40,
             CanFocus = false,
             BorderStyle = LineStyle.Dashed
         };
