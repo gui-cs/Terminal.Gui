@@ -107,11 +107,6 @@ public class Button : View
 
     private void Button_MouseClick (object sender, MouseEventEventArgs e)
     {
-        if (!CanFocus)
-        {
-            return;
-        }
-
         e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 

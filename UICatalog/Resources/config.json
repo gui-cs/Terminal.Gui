@@ -31,6 +31,7 @@
   "Themes": [
     {
       "UI Catalog Theme": {
+        "Button.DefaultShadow": "Opaque",
         "Dialog.DefaultButtonAlignment": "Fill",
         "ColorSchemes": [
           {
