@@ -402,7 +402,7 @@
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=1BE867097E5CBD4A911FDC0FC0E0BAAC/Color/@EntryValue">#FFCF9D32</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=1BE867097E5CBD4A911FDC0FC0E0BAAC/MatchComments/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=1BE867097E5CBD4A911FDC0FC0E0BAAC/Name/@EntryValue">Suggestion</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=1BE867097E5CBD4A911FDC0FC0E0BAAC/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;SUGGESTION:)(\W|$)(.*)</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=1BE867097E5CBD4A911FDC0FC0E0BAAC/Pattern/@EntryValue">(/{2}|/\*|\* ?)[\w\s\d:]*?\W(?&lt;TAG&gt;SUGGESTION): *(?&lt;Message&gt;[\S].*?)(?: ?\*/)?$</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=1BE867097E5CBD4A911FDC0FC0E0BAAC/TodoIconStyle/@EntryValue">Question</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=4386F01B791C56499C7EA059B55FFB54/CaseSensitive/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=4386F01B791C56499C7EA059B55FFB54/Pattern/@EntryValue">(/{2}|/\*|\* ?)[\w\s\d:]*?\W(?&lt;TAG&gt;BUGBUG|BUG|PROBLEM): *(?&lt;Message&gt;[\S].*?)(?: ?\*/)?$</s:String>
