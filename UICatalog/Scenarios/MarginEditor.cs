@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -9,11 +10,22 @@ public class MarginEditor : AdornmentEditor
     {
         Title = "_Margin";
         Initialized += MarginEditor_Initialized;
+        AdornmentChanged += MarginEditor_AdornmentChanged;
+    }
+
+    RadioGroup _rgShadow;
+
+    private void MarginEditor_AdornmentChanged (object sender, EventArgs e)
+    {
+        if (AdornmentToEdit is { })
+        {
+            _rgShadow.SelectedItem = (int)((Margin)AdornmentToEdit).ShadowStyle;
+        }
     }
 
     private void MarginEditor_Initialized (object sender, EventArgs e)
     {
-        var ckbShadow = new CheckBox
+        _rgShadow = new RadioGroup
         {
             X = 0,
             //Y = Pos.AnchorEnd(),
@@ -22,13 +34,21 @@ public class MarginEditor : AdornmentEditor
 
             SuperViewRendersLineCanvas = true,
             Title = "_Shadow",
+            BorderStyle = LineStyle.Dashed,
             Enabled = AdornmentToEdit is { },
+            RadioLabels = Enum.GetNames (typeof (ShadowStyle)),
         };
 
-        ckbShadow.Toggled += (sender, args) =>
-                             {
-                                 ((Margin)AdornmentToEdit).EnableShadow (args.NewValue!.Value);
-                             };
-        Add (ckbShadow);
+        if (AdornmentToEdit is { })
+        {
+            _rgShadow.SelectedItem = (int)((Margin)AdornmentToEdit).ShadowStyle;
+        }
+
+        _rgShadow.SelectedItemChanged += (sender, args) =>
+                                        {
+                                            ((Margin)AdornmentToEdit).ShadowStyle = (ShadowStyle)args.SelectedItem;
+                                        };
+
+        Add (_rgShadow);
     }
 }

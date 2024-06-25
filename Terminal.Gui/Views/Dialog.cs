@@ -42,16 +42,23 @@ public class Dialog : Window
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     public static int DefaultMinimumHeight { get; set; } = 25;
 
-    // TODO: Reenable once border/borderframe design is settled
+
+    /// <summary>
+    /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
+
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
 
-    //[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    //public static Border DefaultBorder { get; set; } = new Border () {
-    //	LineStyle = LineStyle.Single,
-    //};
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Rounded;
+
     private readonly List<Button> _buttons = new ();
 
     /// <summary>
@@ -66,6 +73,9 @@ public class Dialog : Window
     public Dialog ()
     {
         Arrangement = ViewArrangement.Movable;
+        ShadowStyle = DefaultShadow;
+        BorderStyle = DefaultBorderStyle;
+
         X = Pos.Center ();
         Y = Pos.Center ();
 

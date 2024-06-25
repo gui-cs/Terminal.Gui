@@ -27,8 +27,10 @@
       "Default": {
         "Dialog.DefaultButtonAlignment": "End",
         "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
-        "FrameView.DefaultBorderStyle": "Single",
+        "FrameView.DefaultBorderStyle": "Rounded",
         "Window.DefaultBorderStyle": "Single",
+        "Dialog.DefaultBorderStyle": "Double",
+        "MessageBox.DefaultBorderStyle": "Double",
         "ColorSchemes": [
           {
             "TopLevel": {

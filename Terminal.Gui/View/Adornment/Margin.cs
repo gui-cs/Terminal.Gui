@@ -1,5 +1,6 @@
 ﻿#nullable enable
-using static Unix.Terminal.Curses;
+
+using System.Drawing;
 
 namespace Terminal.Gui;
 
@@ -27,7 +28,7 @@ public class Margin : Adornment
     private void Margin_LayoutStarted (object? sender, LayoutEventArgs e)
     {
         // Adjust the shadow such that it is drawn aligned with the Border
-        if (_shadow && _rightShadow is { } && _bottomShadow is { })
+        if (ShadowStyle != Gui.ShadowStyle.None && _rightShadow is { } && _bottomShadow is { })
         {
             _rightShadow.Y = Parent.Border.Thickness.Top > 0 ? Parent.Border.Thickness.Top - (Parent.Border.Thickness.Top > 2 && Parent.Border.ShowTitle ? 1 : 0) : 1;
             _bottomShadow.X = Parent.Border.Thickness.Left > 0 ? Parent.Border.Thickness.Left : 1;
@@ -37,7 +38,7 @@ public class Margin : Adornment
     private bool _pressed;
     private void Margin_Highlight (object? sender, HighlightEventArgs e)
     {
-        if (_shadow)
+        if (ShadowStyle != Gui.ShadowStyle.None)
         {
             if (_pressed && e.HighlightStyle == HighlightStyle.None)
             {
@@ -75,6 +76,7 @@ public class Margin : Adornment
 
     }
 
+    /// <inheritdoc />
     public override void OnDrawContent (Rectangle viewport)
     {
         Rectangle screen = ViewportToScreen (viewport);
@@ -82,7 +84,7 @@ public class Margin : Adornment
         Driver.SetAttribute (normalAttr);
 
         // This just draws/clears the thickness, not the insides.
-        if (Parent?.Shadow == true)
+        if (ShadowStyle != ShadowStyle.None)
         {
             screen = Rectangle.Inflate (screen, -1, -1);
         }
@@ -132,45 +134,53 @@ public class Margin : Adornment
         }
     }
 
-    private bool _shadow;
+    /// <inheritdoc />
+    public override ShadowStyle ShadowStyle
+    {
+        get => base.ShadowStyle;
+        set
+        {
+            base.ShadowStyle = SetShadow (value);
+        }
+    }
 
     /// <summary>
-    ///     Gets or sets whether the Margin includes a shadow effect. The shadow is drawn on the right and bottom sides of the
+    ///    Sets whether the Margin includes a shadow effect. The shadow is drawn on the right and bottom sides of the
     ///     Margin.
     /// </summary>
-    public bool EnableShadow (bool enable)
+    public ShadowStyle SetShadow (ShadowStyle style)
     {
-        if (_shadow == enable)
+        if (ShadowStyle == style)
         {
-            return _shadow;
+           // return style;
         }
 
-        if (_shadow)
+        if (ShadowStyle != ShadowStyle.None)
         {
+            // Turn off shadow
             Thickness = new (Thickness.Left, Thickness.Top, Thickness.Right - 1, Thickness.Bottom - 1);
         }
 
-        _shadow = enable;
-
-        if (_shadow)
+        if (style != ShadowStyle.None)
         {
+            // Turn on shadow
             Thickness = new (Thickness.Left, Thickness.Top, Thickness.Right + 1, Thickness.Bottom + 1);
         }
 
         if (_rightShadow is { })
         {
-            _rightShadow.Visible = _shadow;
+            _rightShadow.ShadowStyle = style;
         }
 
         if (_bottomShadow is { })
         {
-            _bottomShadow.Visible = _shadow;
+            _bottomShadow.ShadowStyle = style;
         }
-        return _shadow;
+        return style;
     }
 
-    private View? _bottomShadow;
-    private View? _rightShadow;
+    private ShadowView? _bottomShadow;
+    private ShadowView? _rightShadow;
 
     /// <inheritdoc/>
     public override void BeginInit ()
@@ -182,8 +192,7 @@ public class Margin : Adornment
             return;
         }
 
-        Attribute attr = Parent.GetNormalColor ();
-
+        ShadowStyle = base.ShadowStyle;
         Add (
              _rightShadow = new ShadowView
              {
@@ -191,7 +200,7 @@ public class Margin : Adornment
                  Y = 0,
                  Width = 1,
                  Height = Dim.Fill (),
-                 Visible = _shadow,
+                 ShadowStyle = ShadowStyle,
                  Orientation = Orientation.Vertical
              },
              _bottomShadow = new ShadowView
@@ -200,88 +209,9 @@ public class Margin : Adornment
                  Y = Pos.AnchorEnd (1),
                  Width = Dim.Fill (),
                  Height = 1,
-                 Visible = _shadow,
+                 ShadowStyle = ShadowStyle,
                  Orientation = Orientation.Horizontal
              }
             );
-    }
-}
-
-/// <summary>
-///     Draws a shadow on the right or bottom of the view.
-/// </summary>
-internal class ShadowView : View
-{
-    // TODO: Add these to CM.Glyphs
-    private readonly char VERTICAL_START_GLYPH = '\u258C'; // Half: '\u2596';
-    private readonly char VERTICAL_GLYPH = '\u258C';
-    private readonly char HORIZONTAL_START_GLYPH = '\u2580'; // Half: '\u259d';
-    private readonly char HORIZONTAL_GLYPH = '\u2580';
-    private readonly char HORIZONTAL_END_GLYPH = '\u2598';
-
-    /// <summary>
-    ///     Gets or sets the orientation of the shadow.
-    /// </summary>
-    public Orientation Orientation { get; set; }
-
-    /// <inheritdoc />
-    public override Attribute GetNormalColor ()
-    {
-        if (SuperView is Adornment adornment)
-        {
-            if (adornment.Parent.SuperView is { })
-            {
-                Attribute attr = adornment.Parent.SuperView.GetNormalColor ();
-                return new (new Attribute (attr.Foreground.GetDarkerColor (), attr.Background));
-            }
-            else
-            {
-                Attribute attr = Application.Top.GetNormalColor ();
-                return new (new Attribute (attr.Foreground.GetDarkerColor (), attr.Background));
-            }
-        }
-        return base.GetNormalColor ();
-    }
-
-    /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
-    {
-        //base.OnDrawContent (viewport);
-
-        if (Orientation == Orientation.Vertical)
-        {
-            DrawVerticalShadow (viewport);
-        }
-        else
-        {
-            DrawHorizontalShadow (viewport);
-        }
-    }
-
-    private void DrawHorizontalShadow (Rectangle rectangle)
-    {
-        // Draw the start glyph
-        AddRune (0, 0, (Rune)HORIZONTAL_START_GLYPH);
-
-        // Fill the rest of the rectangle with the glyph
-        for (var i = 1; i < rectangle.Width - 1; i++)
-        {
-            AddRune (i, 0, (Rune)HORIZONTAL_GLYPH);
-        }
-
-        // Last is special
-        AddRune (rectangle.Width - 1, 0, (Rune)HORIZONTAL_END_GLYPH);
-    }
-
-    private void DrawVerticalShadow (Rectangle viewport)
-    {
-        // Draw the start glyph
-        AddRune (0, 0, (Rune)VERTICAL_START_GLYPH);
-
-        // Fill the rest of the rectangle with the glyph
-        for (var i = 1; i < viewport.Height; i++)
-        {
-            AddRune (0, i, (Rune)VERTICAL_GLYPH);
-        }
     }
 }

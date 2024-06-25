@@ -527,7 +527,7 @@ internal class UICatalogApp
                 AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Categories",
-                BorderStyle = LineStyle.Single,
+                BorderStyle = LineStyle.Rounded,
                 SuperViewRendersLineCanvas = true,
                 Source = new ListWrapper<string> (_categories)
             };
@@ -547,7 +547,7 @@ internal class UICatalogApp
                 //AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Scenarios",
-                BorderStyle = LineStyle.Single,
+                BorderStyle = CategoryList.BorderStyle,
                 SuperViewRendersLineCanvas = true
             };
 

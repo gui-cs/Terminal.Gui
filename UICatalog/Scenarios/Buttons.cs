@@ -433,7 +433,7 @@ public class Buttons : Scenario
                 Title = $"{CM.Glyphs.DownArrow}",
                 WantContinuousButtonPressed = true,
                 CanFocus = false,
-                Shadow = false,
+                ShadowStyle = ShadowStyle.None,
             };
 
             _number = new ()
@@ -458,7 +458,7 @@ public class Buttons : Scenario
                 Title = $"{CM.Glyphs.UpArrow}",
                 WantContinuousButtonPressed = true,
                 CanFocus = false,
-                Shadow = false,
+                ShadowStyle = ShadowStyle.None,
             };
 
             CanFocus = true;

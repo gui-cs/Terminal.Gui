@@ -5,6 +5,8 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
+using System.Text.Json.Serialization;
+
 namespace Terminal.Gui;
 
 /// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="View.Accept"/> event.</summary>
@@ -37,7 +39,9 @@ public class Button : View
     /// Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static bool DefaultShadow { get; set; } = false;
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Opaque;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
@@ -72,7 +76,7 @@ public class Button : View
         TitleChanged += Button_TitleChanged;
         MouseClick += Button_MouseClick;
 
-        Shadow = DefaultShadow;
+        ShadowStyle = DefaultShadow;
     }
 
     private bool _wantContinuousButtonPressed;

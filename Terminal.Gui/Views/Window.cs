@@ -19,7 +19,7 @@ public class Window : Toplevel
     /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static bool DefaultShadow { get; set; } = false;
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 
 
     /// <summary>
@@ -30,7 +30,7 @@ public class Window : Toplevel
         CanFocus = true;
         ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
         BorderStyle = DefaultBorderStyle;
-        Shadow = DefaultShadow;
+        ShadowStyle = DefaultShadow;
 
         // This enables the default button to be activated by the Enter key.
         AddCommand (

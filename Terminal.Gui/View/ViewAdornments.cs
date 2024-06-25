@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
@@ -59,11 +60,7 @@ public partial class View
     /// </remarks>
     public Margin Margin { get; private set; }
 
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static bool DefaultShadow { get; set; } = false;
-
-
-    private bool _shadow;
+    private ShadowStyle _shadowStyle;
     /// <summary>
     ///     Gets or sets whether the View is shown with a shadow effect. The shadow is drawn on the right and bottom sides of the
     ///     Margin.
@@ -72,19 +69,19 @@ public partial class View
     ///     Setting this property to <see langword="true"/> will add a shadow to the right and bottom sides of the Margin.
     ///     The View 's <see cref="Frame"/> will be expanded to include the shadow.
     /// </remarks>
-    public bool Shadow
+    public virtual ShadowStyle ShadowStyle
     {
-        get => _shadow;
+        get => _shadowStyle;
         set
         {
-            if (_shadow == value)
+            if (_shadowStyle == value)
             {
                 return;
             }
-            _shadow = value;
+            _shadowStyle = value;
             if (Margin is { })
             {
-                _shadow = Margin.EnableShadow (value);
+                Margin.ShadowStyle = value;
             }
         }
     }
