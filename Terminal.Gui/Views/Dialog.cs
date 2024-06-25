@@ -48,7 +48,7 @@ public class Dialog : Window
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter))]
-    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
+    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
@@ -57,7 +57,7 @@ public class Dialog : Window
 
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter))]
-    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Rounded;
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
     private readonly List<Button> _buttons = new ();
 

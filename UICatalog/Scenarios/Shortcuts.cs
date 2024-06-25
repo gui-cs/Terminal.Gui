@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -141,7 +142,7 @@ public class Shortcuts : Scenario
             Width = Dim.Width (vShortcut3),
             CommandView = new Button
             {
-                Title = "B_utton",
+                Title = "_Button",
             },
             HelpText = "Width is Fill",
             Key = Key.K,
@@ -362,11 +363,21 @@ public class Shortcuts : Scenario
                                        eventLog.MoveDown ();
                                        args.Cancel = true;
                                    };
+
+                shortcut.CommandView.Accept += (o, args) =>
+                                               {
+                                                   eventSource.Add ($"CommandView.Accept: {shortcut!.CommandView.Text}");
+                                                   eventLog.MoveDown ();
+                                               };
             }
         }
 
         //((CheckBox)vShortcut5.CommandView).OnToggled ();
     }
 
-    private void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
+    private void Button_Clicked (object sender, CancelEventArgs e)
+    {
+        //e.Cancel = true;
+        MessageBox.Query ("Hi", $"You clicked {sender}"); 
+    }
 }

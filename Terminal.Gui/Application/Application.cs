@@ -1239,7 +1239,7 @@ public static partial class Application
     ///     Only relevant in scenarios where <see cref="Toplevel.IsOverlappedContainer"/> is <see langword="true"/>.
     /// </remarks>
     /// <value>The current.</value>
-    public static Toplevel Current { get; private set; }
+    public static Toplevel Current { get; internal set; }
 
     private static void EnsureModalOrVisibleAlwaysOnTop (Toplevel topLevel)
     {

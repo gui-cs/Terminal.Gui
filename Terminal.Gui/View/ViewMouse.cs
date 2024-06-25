@@ -324,7 +324,7 @@ public partial class View
             {
                 Application.GrabMouse (this);
 
-                if (CanFocus)
+                if (!HasFocus && CanFocus)
                 {
                     // Set the focus, but don't invoke Accept
                     SetFocus ();

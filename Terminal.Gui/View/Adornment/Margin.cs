@@ -23,6 +23,9 @@ public class Margin : Adornment
         HighlightStyle |= HighlightStyle.Pressed;
         Highlight += Margin_Highlight;
         LayoutStarted += Margin_LayoutStarted;
+
+        // Margin should not be focusable
+        CanFocus = false;
     }
 
     private void Margin_LayoutStarted (object? sender, LayoutEventArgs e)
@@ -81,7 +84,9 @@ public class Margin : Adornment
     {
         Rectangle screen = ViewportToScreen (viewport);
         Attribute normalAttr = GetNormalColor ();
-        Driver.SetAttribute (normalAttr);
+
+        Driver?.SetAttribute (normalAttr);
+
 
         // This just draws/clears the thickness, not the insides.
         if (ShadowStyle != ShadowStyle.None)
@@ -152,7 +157,7 @@ public class Margin : Adornment
     {
         if (ShadowStyle == style)
         {
-           // return style;
+            // return style;
         }
 
         if (ShadowStyle != ShadowStyle.None)
