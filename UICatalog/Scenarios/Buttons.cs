@@ -129,7 +129,7 @@ public class Buttons : Scenario
             X = 0,
             Y = Pos.Bottom (removeButton) + 1,
             Width = Dim.Percent (50),
-            Height = 5,
+            Height = 6,
             Title = "Computed Layout"
         };
         main.Add (computedFrame);
@@ -140,7 +140,6 @@ public class Buttons : Scenario
             X = 0,
             Y = Pos.Center () - 1,
             Width = 30,
-            Height = 1,
             ColorScheme = Colors.ColorSchemes ["Error"],
             Text = "Move This \u263b Button v_ia Pos"
         };
@@ -157,7 +156,6 @@ public class Buttons : Scenario
             Y = Pos.Center () + 1,
             X = 0,
             Width = 30,
-            Height = 1,
             Text = "Grow This \u263a Button _via Pos",
             ColorScheme = Colors.ColorSchemes ["Error"],
         };
@@ -173,7 +171,7 @@ public class Buttons : Scenario
             X = Pos.Right (computedFrame),
             Y = Pos.Bottom (removeButton) + 1,
             Width = Dim.Fill (),
-            Height = 5,
+            Height = 6,
             Title = "Absolute Layout"
         };
         main.Add (absoluteFrame);
@@ -211,7 +209,8 @@ public class Buttons : Scenario
 
         var label = new Label
         {
-            X = 2, Y = Pos.Bottom (computedFrame) + 1, Text = "Text Alignment (changes the four buttons above): "
+            X = 2, Y = Pos.Bottom (computedFrame) + 1, 
+            Text = "Text Alignment (changes the four buttons above): "
         };
         main.Add (label);
 
@@ -262,7 +261,6 @@ public class Buttons : Scenario
         {
             X = 2,
             Y = Pos.Bottom (radioGroup) + 1,
-            Height = 1,
             Width = Dim.Width (computedFrame) - 2,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = mhkb
@@ -276,7 +274,6 @@ public class Buttons : Scenario
         {
             X = Pos.Left (absoluteFrame) + 1,
             Y = Pos.Bottom (radioGroup) + 1,
-            Height = 1,
             Width = Dim.Width (absoluteFrame) - 2,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = muhkb
