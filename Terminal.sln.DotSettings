@@ -426,11 +426,10 @@
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=712534BA80FF50429CC407A77A052F63/Pattern/@EntryValue">(/{2}|/\*|\* ?)[\w\s\d:]*?\W(?&lt;TAG&gt;NOTE): *(?&lt;Message&gt;[\S].*?)(?: ?\*/)?$</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=712534BA80FF50429CC407A77A052F63/TodoIconStyle/@EntryValue">Normal</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=90214AE24C7BA34FA45434C0B221453E/@KeyIndexDefined">True</s:Boolean>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=90214AE24C7BA34FA45434C0B221453E/CaseSensitive/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=90214AE24C7BA34FA45434C0B221453E/Color/@EntryValue">#FFCF9D32</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=90214AE24C7BA34FA45434C0B221453E/MatchComments/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=90214AE24C7BA34FA45434C0B221453E/Name/@EntryValue">Question</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=90214AE24C7BA34FA45434C0B221453E/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;QUESTION:)(\W|$)(.*)</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=90214AE24C7BA34FA45434C0B221453E/Pattern/@EntryValue">(/{2}|/\*|\* ?)[\w\s\d:]*?\W(?&lt;TAG&gt;QUESTION|Q): *(?&lt;Message&gt;[\S].*?)(?: ?\*/)?$</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=90214AE24C7BA34FA45434C0B221453E/TodoIconStyle/@EntryValue">Question</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=961894CCC510410ABE2B99132B253C80/CaseSensitive/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=961894CCC510410ABE2B99132B253C80/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;TODO:)(\W|$)(.*)</s:String>
