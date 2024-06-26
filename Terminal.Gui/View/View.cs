@@ -67,7 +67,8 @@ namespace Terminal.Gui;
 ///         a View can be accessed with the <see cref="SuperView"/> property.
 ///     </para>
 ///     <para>
-///         To flag a region of the View's <see cref="Viewport"/> to be redrawn call <see cref="SetNeedsDisplay(Rectangle)"/>
+///         To flag a region of the View's <see cref="Viewport"/> to be redrawn call
+///         <see cref="SetNeedsDisplay(Rectangle)"/>
 ///         .
 ///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 ///     </para>
@@ -106,6 +107,61 @@ namespace Terminal.Gui;
 
 public partial class View : Responder, ISupportInitializeNotification
 {
+    /// <summary>
+    ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
+    ///     <see cref="CancelEventArgs.Cancel"/>
+    ///     to cancel the event.
+    /// </summary>
+    public event EventHandler<CancelEventArgs> Accept;
+
+    /// <summary>Gets or sets arbitrary data for the view.</summary>
+    /// <remarks>This property is not used internally.</remarks>
+    public object Data { get; set; }
+
+    /// <summary>Gets or sets an identifier for the view;</summary>
+    /// <value>The identifier.</value>
+    /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
+    public string Id { get; set; } = "";
+
+    /// <summary>Pretty prints the View</summary>
+    /// <returns></returns>
+    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        LineCanvas.Dispose ();
+
+        DisposeKeyboard ();
+        DisposeAdornments ();
+
+        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
+        {
+            View subview = InternalSubviews [i];
+            Remove (subview);
+            subview.Dispose ();
+        }
+
+        base.Dispose (disposing);
+        Debug.Assert (InternalSubviews.Count == 0);
+    }
+
+    /// <summary>
+    ///     Called when the <see cref="Command.Accept"/> command is invoked. Fires the <see cref="Accept"/>
+    ///     event.
+    /// </summary>
+    /// <returns>
+    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was fired but not canceled.
+    ///     If <see langword="null"/> no event was fired.
+    /// </returns>
+    protected bool? OnAccept ()
+    {
+        var args = new CancelEventArgs ();
+        Accept?.Invoke (this, args);
+
+        return Accept is null ? null : args.Cancel;
+    }
+
     #region Constructors and Initialization
 
     /// <summary>
@@ -125,6 +181,7 @@ public partial class View : Responder, ISupportInitializeNotification
     {
         SetupAdornments ();
         SetupKeyboard ();
+
         //SetupMouse ();
         SetupText ();
 
@@ -230,39 +287,9 @@ public partial class View : Responder, ISupportInitializeNotification
         }
 
         Initialized?.Invoke (this, EventArgs.Empty);
-
     }
 
     #endregion Constructors and Initialization
-
-    /// <summary>Gets or sets an identifier for the view;</summary>
-    /// <value>The identifier.</value>
-    /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
-    public string Id { get; set; } = "";
-
-    /// <summary>Gets or sets arbitrary data for the view.</summary>
-    /// <remarks>This property is not used internally.</remarks>
-    public object Data { get; set; }
-
-    /// <summary>
-    ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
-    ///     <see cref="CancelEventArgs.Cancel"/>
-    ///     to cancel the event.
-    /// </summary>
-    public event EventHandler<CancelEventArgs> Accept;
-
-    /// <summary>
-    ///     Called when the <see cref="Command.Accept"/> command is invoked. Fires the <see cref="Accept"/>
-    ///     event.
-    /// </summary>
-    /// <returns>If <see langword="true"/> the event was canceled.</returns>
-    protected bool? OnAccept ()
-    {
-        var args = new CancelEventArgs ();
-        Accept?.Invoke (this, args);
-
-        return Accept is null ? null : args.Cancel;
-    }
 
     #region Visibility
 
@@ -318,6 +345,7 @@ public partial class View : Responder, ISupportInitializeNotification
     public virtual void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
 
     private bool _visible = true;
+
     /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> and all its child controls are displayed.</summary>
     public virtual bool Visible
     {
@@ -348,7 +376,6 @@ public partial class View : Responder, ISupportInitializeNotification
             SetNeedsDisplay ();
         }
     }
-
 
     /// <summary>Method invoked when the <see cref="Visible"/> property from a view is changed.</summary>
     public virtual void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
@@ -494,27 +521,4 @@ public partial class View : Responder, ISupportInitializeNotification
     public event EventHandler<StateEventArgs<string>> TitleChanging;
 
     #endregion
-
-    /// <summary>Pretty prints the View</summary>
-    /// <returns></returns>
-    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        LineCanvas.Dispose ();
-
-        DisposeKeyboard ();
-        DisposeAdornments ();
-
-        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
-        {
-            View subview = InternalSubviews [i];
-            Remove (subview);
-            subview.Dispose ();
-        }
-
-        base.Dispose (disposing);
-        Debug.Assert (InternalSubviews.Count == 0);
-    }
 }
