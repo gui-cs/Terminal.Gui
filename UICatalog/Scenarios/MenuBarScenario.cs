@@ -57,16 +57,14 @@ public class MenuBarScenario : Scenario
                                          ),
                                      null,
 
-                                     // Don't use Ctrl-Q so we can disambiguate between quitting and closing the toplevel
+                                     // Don't use Application.Quit so we can disambiguate between quitting and closing the toplevel
                                      new (
                                           "_Quit",
                                           "",
                                           () => actionFn ("Quit"),
                                           null,
                                           null,
-                                          KeyCode.AltMask
-                                          | KeyCode.CtrlMask
-                                          | KeyCode.Q
+                                          KeyCode.CtrlMask | KeyCode.Q
                                          )
                                  }
                                 ),

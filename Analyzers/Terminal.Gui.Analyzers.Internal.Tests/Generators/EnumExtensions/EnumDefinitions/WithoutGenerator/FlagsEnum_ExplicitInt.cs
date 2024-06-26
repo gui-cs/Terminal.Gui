@@ -4,6 +4,8 @@
 ///     Flags enum with explicitly-defined backing type of int and only a <see cref="FlagsAttribute"/> on the enum declaration No other attributes on the enum or its members..
 /// </summary>
 [Flags]
+[SuppressMessage ("Naming", "CA1707:Identifiers should not contain underscores", Justification = "Naming is intentional.")]
+[SuppressMessage ("Roslynator", "RCS1154:Sort enum members", Justification = "Order is intentional.")]
 public enum FlagsEnum_ExplicitInt : int
 {
     Bit31 = -0b_10000000_00000000_00000000_00000000,

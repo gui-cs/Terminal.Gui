@@ -7,6 +7,8 @@ namespace Terminal.Gui.Analyzers.Internal.Tests.Generators.EnumExtensions.EnumDe
 ///     Same as <see cref="BetterEnum_ExplicitInt"/>, but with <see cref="GenerateEnumExtensionMethodsAttribute.FastIsDefined"/> = <see langword="false" />.
 /// </summary>
 [GenerateEnumExtensionMethods (FastIsDefined = false)]
+[SuppressMessage ("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "Naming is intentional.")]
+[SuppressMessage ("Roslynator", "RCS1154:Sort enum members", Justification = "Order is intentional.")]
 public enum BetterEnum_ExplicitInt_NoFastIsDefined : int
 {
     Bit31 = -0b_10000000_00000000_00000000_00000000,

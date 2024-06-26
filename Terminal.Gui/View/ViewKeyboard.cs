@@ -633,6 +633,7 @@ public partial class View
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
     /// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+    /// <param name="scope">The scope.</param>
     /// <returns>
     ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled
     ///     and no other view should see it.
@@ -744,7 +745,8 @@ public partial class View
     /// <summary>
     /// Returns true if Key is bound in this view heirarchy. For debugging
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="key">The key to test.</param>
+    /// <param name="boundView">Returns the view the key is bound to.</param>
     /// <returns></returns>
     public bool IsHotKeyKeyBound (Key key, out View boundView)
     {
@@ -779,6 +781,7 @@ public partial class View
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </summary>
     /// <param name="key">The key event passed.</param>
+    /// <param name="scope">The scope.</param>
     /// <returns>
     ///     <see langword="null"/> if no command was bound the <paramref name="key"/>. <see langword="true"/> if
     ///     commands were invoked and at least one handled the command. <see langword="false"/> if commands were invoked and at

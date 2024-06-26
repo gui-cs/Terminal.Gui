@@ -5,6 +5,8 @@ namespace Terminal.Gui.Analyzers.Internal.Tests.Generators.EnumExtensions.EnumDe
 /// <summary>
 ///     Basic enum with explicitly-defined backing type of int and no attributes on the enum or any of its members.
 /// </summary>
+[SuppressMessage ("Naming", "CA1707:Identifiers should not contain underscores", Justification = "Naming is intentional.")]
+[SuppressMessage ("Roslynator", "RCS1154:Sort enum members", Justification = "Order is intentional.")]
 public enum BasicEnum_ExplicitInt : int
 {
     Bit31 = -0b_10000000_00000000_00000000_00000000,

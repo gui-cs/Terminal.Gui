@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
-    <WarningLevel>7</WarningLevel>
+    <WarningLevel>8</WarningLevel>
     <CharacterSet>UTF-8</CharacterSet>
     <Deterministic>true</Deterministic>
     <UTF8OutPut>true</UTF8OutPut>
@@ -12,7 +12,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
-    <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.147" />
+    <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.149" />
   </ItemGroup>
   <ItemGroup>
       <Using Include="System.Buffers" />

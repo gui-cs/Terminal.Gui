@@ -797,6 +797,8 @@ public class ToplevelTests (ITestOutputHelper output)
         Key alternateBackwardKey = KeyCode.Null;
         Key quitKey = KeyCode.Null;
 
+        Key previousQuitKey = Application.QuitKey;
+
         Toplevel top = new ();
         var view = new View ();
         view.Initialized += View_Initialized;
@@ -819,7 +821,7 @@ public class ToplevelTests (ITestOutputHelper output)
 
         Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey);
         Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey);
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey);
+        Assert.Equal (Key.Esc, Application.QuitKey);
 
         Application.AlternateForwardKey = KeyCode.A;
         Application.AlternateBackwardKey = KeyCode.B;
@@ -827,7 +829,7 @@ public class ToplevelTests (ITestOutputHelper output)
 
         Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, alternateForwardKey);
         Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, alternateBackwardKey);
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, quitKey);
+        Assert.Equal (previousQuitKey, quitKey);
 
         Assert.Equal (KeyCode.A, Application.AlternateForwardKey);
         Assert.Equal (KeyCode.B, Application.AlternateBackwardKey);
@@ -836,11 +838,11 @@ public class ToplevelTests (ITestOutputHelper output)
         // Replacing the defaults keys to avoid errors on others unit tests that are using it.
         Application.AlternateForwardKey = Key.PageDown.WithCtrl;
         Application.AlternateBackwardKey = Key.PageUp.WithCtrl;
-        Application.QuitKey = Key.Q.WithCtrl;
+        Application.QuitKey = previousQuitKey;
 
         Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey);
         Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey);
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey);
+        Assert.Equal (previousQuitKey, Application.QuitKey);
         top.Dispose ();
     }
 

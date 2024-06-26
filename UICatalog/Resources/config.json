@@ -1,6 +1,5 @@
 {
   "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-  "Application.QuitKey": "Esc",
   "FileDialog.MaxSearchResults": 10000,
   "FileDialogStyle.DefaultUseColors": false,
   "FileDialogStyle.DefaultUseUnicodeCharacters": false,
