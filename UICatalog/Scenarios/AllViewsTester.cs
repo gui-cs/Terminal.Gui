@@ -348,47 +348,56 @@ public class AllViewsTester : Scenario
             view.ColorScheme = Colors.ColorSchemes ["Base"];
         }
 
-        // If the view supports a Text property, set it so we have something to look at
-        if (view.GetType ().GetProperty ("Text") != null)
+        if (view.GetType().GetInterface ("ISupportsDesignMode") is { } iface)
         {
-            try
-            {
-                view.GetType ()
-                    .GetProperty ("Text")
-                    ?.GetSetMethod ()
-                    ?.Invoke (view, new [] { _demoText });
-            }
-            catch (TargetInvocationException e)
-            {
-                MessageBox.ErrorQuery ("Exception", e.InnerException.Message, "Ok");
-                view = null;
-            }
+            iface.GetMethod ("LoadDemoData")?.Invoke (view, null);
         }
-
-        // If the view supports a Title property, set it so we have something to look at
-        if (view != null && view.GetType ().GetProperty ("Title") != null)
+        else
         {
-            if (view.GetType ().GetProperty ("Title")!.PropertyType == typeof (string))
+            // If the view supports a Text property, set it so we have something to look at
+            if (view.GetType ().GetProperty ("Text") != null)
             {
-                view?.GetType ()
-                    .GetProperty ("Title")
-                    ?.GetSetMethod ()
-                    ?.Invoke (view, new [] { "Test Title" });
+                try
+                {
+                    view.GetType ()
+                        .GetProperty ("Text")
+                        ?.GetSetMethod ()
+                        ?.Invoke (view, new [] { _demoText });
+                }
+                catch (TargetInvocationException e)
+                {
+                    MessageBox.ErrorQuery ("Exception", e.InnerException.Message, "Ok");
+                    view = null;
+                }
             }
-            else
-            {
-                view?.GetType ()
-                    .GetProperty ("Title")
-                    ?.GetSetMethod ()
-                    ?.Invoke (view, new [] { "Test Title" });
-            }
-        }
 
-        // If the view supports a Source property, set it so we have something to look at
-        if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource))
-        {
-            var source = new ListWrapper<string> (["Test Text #1", "Test Text #2", "Test Text #3"]);
-            view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, [source]);
+            // If the view supports a Title property, set it so we have something to look at
+            if (view != null && view.GetType ().GetProperty ("Title") != null)
+            {
+                if (view.GetType ().GetProperty ("Title")!.PropertyType == typeof (string))
+                {
+                    view?.GetType ()
+                        .GetProperty ("Title")
+                        ?.GetSetMethod ()
+                        ?.Invoke (view, new [] { "Test Title" });
+                }
+                else
+                {
+                    view?.GetType ()
+                        .GetProperty ("Title")
+                        ?.GetSetMethod ()
+                        ?.Invoke (view, new [] { "Test Title" });
+                }
+            }
+
+            // If the view supports a Source property, set it so we have something to look at
+            if (view != null
+                && view.GetType ().GetProperty ("Source") != null
+                && view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource))
+            {
+                var source = new ListWrapper<string> (["Test Text #1", "Test Text #2", "Test Text #3"]);
+                view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, [source]);
+            }
         }
 
         // If the view supports a Title property, set it so we have something to look at

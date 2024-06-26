@@ -101,7 +101,7 @@ public interface IListDataSource: IDisposable
 ///         first item that starts with what the user types will be selected.
 ///     </para>
 /// </remarks>
-public class ListView : View
+public class ListView : View, ISupportsDesignMode
 {
     private bool _allowsMarking;
     private bool _allowsMultipleSelection = true;
@@ -920,6 +920,15 @@ public class ListView : View
         {
             Source.SuspendCollectionChangedEvent = false;
         }
+    }
+
+    /// <inheritdoc />
+    public bool LoadDemoData ()
+    {
+        var source = new ListWrapper<string> (["List Item 1", "List Item two", "List Item Quattro", "Last List Item"]);
+        Source = source;
+
+        return true;
     }
 }
 

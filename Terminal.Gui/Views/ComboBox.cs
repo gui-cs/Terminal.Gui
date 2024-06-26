@@ -11,7 +11,7 @@ using System.ComponentModel;
 namespace Terminal.Gui;
 
 /// <summary>Provides a drop-down list of items the user can select from.</summary>
-public class ComboBox : View
+public class ComboBox : View, ISupportsDesignMode
 {
     private readonly ComboListView _listview;
     private readonly int _minimumHeight = 2;
@@ -243,7 +243,7 @@ public class ComboBox : View
     public event EventHandler Expanded;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (me.Position.X == Viewport.Right - 1
             && me.Position.Y == Viewport.Top
@@ -813,7 +813,7 @@ public class ComboBox : View
             set => _hideDropdownListOnClick = WantContinuousButtonPressed = value;
         }
 
-        protected internal override bool OnMouseEvent  (MouseEvent me)
+        protected internal override bool OnMouseEvent (MouseEvent me)
         {
             var res = false;
             bool isMousePositionValid = IsMousePositionValid (me);
@@ -982,5 +982,15 @@ public class ComboBox : View
             HideDropdownListOnClick = hideDropdownListOnClick;
             AddCommand (Command.LineUp, () => _container.MoveUpList ());
         }
+    }
+
+    /// <inheritdoc />
+    public bool LoadDemoData ()
+    {
+        var source = new ObservableCollection<string> (["Combo Item 1", "Combo Item two", "Combo Item Quattro", "Last Combo Item"]);
+        SetSource (source);
+        Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: source.Count + 1);
+
+        return true;
     }
 }
