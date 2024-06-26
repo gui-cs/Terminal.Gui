@@ -35,7 +35,7 @@ public enum ProgressBarFormat
 ///         <see cref="Pulse"/> method is called. Call <see cref="Pulse"/> repeatedly as progress is made.
 ///     </para>
 /// </remarks>
-public class ProgressBar : View, ISupportsDesignMode
+public class ProgressBar : View, IDisignable
 {
     private int [] _activityPos;
     private bool _bidirectionalMarquee = true;

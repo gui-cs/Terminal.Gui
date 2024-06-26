@@ -101,7 +101,7 @@ public interface IListDataSource: IDisposable
 ///         first item that starts with what the user types will be selected.
 ///     </para>
 /// </remarks>
-public class ListView : View, ISupportsDesignMode
+public class ListView : View, IDisignable
 {
     private bool _allowsMarking;
     private bool _allowsMultipleSelection = true;
