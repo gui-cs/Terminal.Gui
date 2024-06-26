@@ -36,6 +36,7 @@ public class ExpanderButton : Button
         Height = 1;
         NoDecorations = true;
         NoPadding = true;
+        ShadowStyle = ShadowStyle.None;
 
         AddCommand (Command.HotKey, Toggle);
         AddCommand (Command.ToggleExpandCollapse, Toggle);
