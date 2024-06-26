@@ -336,7 +336,7 @@ public class TextField : View
 
         // OnAccept returns true if the event is canceled.
         // By Default pressing ENTER should be ignored (Invoke(Command.Accept) should return false).
-        AddCommand (Command.Accept, () => OnAccept () != true);
+        AddCommand (Command.Accept, () => OnAccept () == false);
 
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts

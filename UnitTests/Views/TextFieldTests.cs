@@ -789,6 +789,85 @@ public class TextFieldTests (ITestOutputHelper output)
         void Accept (object sender, CancelEventArgs e) { accepted = true; }
     }
 
+    [Theory]
+    [InlineData (false, 0)]
+    [InlineData (true, 1)]
+    public void Accept_Handler_Cancel_Prevents_Default_Button_Accept (bool cancelAccept, int expectedButtonAccepts)
+    {
+        var superView = new Window ();
+        var tf = new TextField ();
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tf, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        var textFieldAccept = 0;
+        tf.Accept += TextFieldAccept;
+
+        tf.SetFocus ();
+        Assert.True (tf.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, textFieldAccept);
+        Assert.Equal (expectedButtonAccepts, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, textFieldAccept);
+        Assert.Equal (expectedButtonAccepts + 1, buttonAccept);
+
+        return;
+
+        void TextFieldAccept (object sender, CancelEventArgs e)
+        {
+            textFieldAccept++;
+            e.Cancel = cancelAccept;
+        }
+
+        void ButtonAccept (object sender, CancelEventArgs e)
+        {
+            buttonAccept++;
+        }
+    }
+
+    [Fact]
+    public void Accept_No_Handler_Enables_Default_Button_Accept ()
+    {
+        var superView = new Window ();
+        var tf = new TextField ();
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tf, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        tf.SetFocus ();
+        Assert.True (tf.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (2, buttonAccept);
+
+        return;
+
+        void ButtonAccept (object sender, CancelEventArgs e)
+        {
+            buttonAccept++;
+        }
+    }
+
     [Fact]
     public void Accept_Cancel_Event_HandlesCommand ()
     {
@@ -1823,8 +1902,8 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
     {
         var tf = new TextField { Width = 30, Text = "Les Misérables" };
-        tf.SetRelativeLayout(new Size(100,100));
-        tf.Draw();
+        tf.SetRelativeLayout (new Size (100, 100));
+        tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"

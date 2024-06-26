@@ -261,7 +261,7 @@ public partial class View : Responder, ISupportInitializeNotification
         var args = new CancelEventArgs ();
         Accept?.Invoke (this, args);
 
-        return args.Cancel;
+        return Accept is null ? null : args.Cancel;
     }
 
     #region Visibility
