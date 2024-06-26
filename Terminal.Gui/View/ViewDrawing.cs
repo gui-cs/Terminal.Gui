@@ -542,17 +542,14 @@ public partial class View
         // If we have a SuperView, it'll render our frames.
         if (!SuperViewRendersLineCanvas && LineCanvas.Viewport != Rectangle.Empty)
         {
-            foreach (KeyValuePair<Point, Cell?> p in LineCanvas.GetCellMap ())
+            foreach (KeyValuePair<Point, Cell> p in LineCanvas.GetCellMap ())
             {
                 // Get the entire map
-                if (p.Value is { })
-                {
-                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme.Normal);
-                    Driver.Move (p.Key.X, p.Key.Y);
+                Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
+                Driver.Move (p.Key.X, p.Key.Y);
 
-                    // TODO: #2616 - Support combining sequences that don't normalize
-                    Driver.AddRune (p.Value.Value.Rune);
-                }
+                // TODO: #2616 - Support combining sequences that don't normalize
+                Driver.AddRune (p.Value.Rune);
             }
 
             LineCanvas.Clear ();
@@ -567,17 +564,14 @@ public partial class View
                 subview.LineCanvas.Clear ();
             }
 
-            foreach (KeyValuePair<Point, Cell?> p in LineCanvas.GetCellMap ())
+            foreach (KeyValuePair<Point, Cell> p in LineCanvas.GetCellMap ())
             {
                 // Get the entire map
-                if (p.Value is { })
-                {
-                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme.Normal);
-                    Driver.Move (p.Key.X, p.Key.Y);
+                Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
+                Driver.Move (p.Key.X, p.Key.Y);
 
-                    // TODO: #2616 - Support combining sequences that don't normalize
-                    Driver.AddRune (p.Value.Value.Rune);
-                }
+                // TODO: #2616 - Support combining sequences that don't normalize
+                Driver.AddRune (p.Value.Rune);
             }
 
             LineCanvas.Clear ();

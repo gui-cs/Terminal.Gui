@@ -4,7 +4,6 @@ using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.Versioning;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -50,7 +49,6 @@ namespace Terminal.Gui;
 ///         Lowest Precedence.
 ///     </para>
 /// </summary>
-[ComponentGuarantees (ComponentGuaranteesOptions.None)]
 public static class ConfigurationManager
 {
     /// <summary>

@@ -14,14 +14,6 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Window : Toplevel
 {
-
-    /// <summary>
-    /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
-    /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
-
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Window"/> class.
     /// </summary>
@@ -30,7 +22,6 @@ public class Window : Toplevel
         CanFocus = true;
         ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
         BorderStyle = DefaultBorderStyle;
-        ShadowStyle = DefaultShadow;
 
         // This enables the default button to be activated by the Enter key.
         AddCommand (

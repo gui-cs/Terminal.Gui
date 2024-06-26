@@ -973,7 +973,6 @@ public static partial class Application
 
         if (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || OverlappedChildNeedsDisplay ())
         {
-            state.Toplevel.SetNeedsDisplay();
             state.Toplevel.Draw ();
             Driver.UpdateScreen ();
 

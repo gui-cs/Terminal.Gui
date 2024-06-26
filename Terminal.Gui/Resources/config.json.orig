@@ -20,7 +20,10 @@
   "Application.AlternateBackwardKey": "Ctrl+PageUp",
   "Application.AlternateForwardKey": "Ctrl+PageDown",
   "Application.QuitKey": "Esc",
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of 3f973a25 (Merge branch 'v2_2144-3D-effect' of tig:tig/Terminal.Gui into v2_2144-3D-effect)
   "Theme": "Default",
   "Themes": [
     {

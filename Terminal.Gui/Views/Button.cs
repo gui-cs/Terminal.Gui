@@ -5,8 +5,6 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
-using System.Text.Json.Serialization;
-
 namespace Terminal.Gui;
 
 /// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="View.Accept"/> event.</summary>
@@ -27,21 +25,13 @@ namespace Terminal.Gui;
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
 /// </remarks>
-public class Button : View, ISupportsDesignMode
+public class Button : View, IDisignable
 {
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
     private readonly Rune _rightBracket;
     private readonly Rune _rightDefault;
     private bool _isDefault;
-
-    /// <summary>
-    /// Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
-    /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
@@ -54,15 +44,14 @@ public class Button : View, ISupportsDesignMode
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
-        Height = Dim.Auto (DimAutoStyle.Text);
         Width = Dim.Auto (DimAutoStyle.Text);
+        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
         CanFocus = true;
         HighlightStyle |= HighlightStyle.Pressed;
 #if HOVER
         HighlightStyle |= HighlightStyle.Hover;
 #endif
-
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>
         {
@@ -75,8 +64,6 @@ public class Button : View, ISupportsDesignMode
 
         TitleChanged += Button_TitleChanged;
         MouseClick += Button_MouseClick;
-
-        ShadowStyle = DefaultShadow;
     }
 
     private bool _wantContinuousButtonPressed;
@@ -107,7 +94,7 @@ public class Button : View, ISupportsDesignMode
 
     private void Button_MouseClick (object sender, MouseEventEventArgs e)
     {
-        e.Handled = InvokeCommand (Command.HotKey) == true;
+       e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
     private void Button_TitleChanged (object sender, StateEventArgs<string> e)

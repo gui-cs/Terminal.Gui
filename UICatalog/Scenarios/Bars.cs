@@ -193,7 +193,6 @@ public class Bars : Scenario
                                  {
                                      eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
                                      eventLog.MoveDown ();
-                                     args.Cancel = true;
                                  };
                 }
             }

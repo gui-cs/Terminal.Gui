@@ -4,19 +4,18 @@
 ///     Represents a single row/column in a Terminal.Gui rendering surface (e.g. <see cref="LineCanvas"/> and
 ///     <see cref="ConsoleDriver"/>).
 /// </summary>
-public record struct Cell ()
+public class Cell
 {
+    private Rune _rune;
 
     /// <summary>The attributes to use when drawing the Glyph.</summary>
-    public Attribute? Attribute { get; set; } = null;
+    public Attribute? Attribute { get; set; }
 
     /// <summary>
     ///     Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Cell"/> has been modified since the
     ///     last time it was drawn.
     /// </summary>
-    public bool IsDirty { get; set; } = false;
-
-    private Rune _rune = default;
+    public bool IsDirty { get; set; }
 
     /// <summary>The character to display. If <see cref="Rune"/> is <see langword="null"/>, then <see cref="Rune"/> is ignored.</summary>
     public Rune Rune

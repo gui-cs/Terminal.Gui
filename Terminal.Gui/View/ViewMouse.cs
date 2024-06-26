@@ -324,7 +324,7 @@ public partial class View
             {
                 Application.GrabMouse (this);
 
-                if (!HasFocus && CanFocus)
+                if (CanFocus)
                 {
                     // Set the focus, but don't invoke Accept
                     SetFocus ();
@@ -335,14 +335,14 @@ public partial class View
 
             if (Viewport.Contains (mouseEvent.Position))
             {
-                if (this is not Adornment && SetHighlight (HighlightStyle.HasFlag (HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None) == true)
+                if (SetHighlight (HighlightStyle.HasFlag (HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None) == true)
                 {
                     return true;
                 }
             }
             else
             {
-                if (this is not Adornment && SetHighlight (HighlightStyle.HasFlag (HighlightStyle.PressedOutside) ? HighlightStyle.PressedOutside : HighlightStyle.None) == true)
+                if (SetHighlight (HighlightStyle.HasFlag (HighlightStyle.PressedOutside) ? HighlightStyle.PressedOutside : HighlightStyle.None) == true)
 
                 {
                     return true;
@@ -532,20 +532,6 @@ public partial class View
     {
         HighlightEventArgs args = new (highlight);
         Highlight?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return true;
-        }
-
-        args = new (highlight);
-        Margin?.Highlight?.Invoke (this, args);
-
-        //args = new (highlight);
-        //Border?.Highlight?.Invoke (this, args);
-
-        //args = new (highlight);
-        //Padding?.Highlight?.Invoke (this, args);
 
         return args.Cancel;
     }

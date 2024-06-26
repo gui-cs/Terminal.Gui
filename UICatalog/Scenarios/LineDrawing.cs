@@ -42,15 +42,12 @@ public class LineDrawing : Scenario
 
             foreach (LineCanvas canvas in _layers)
             {
-                foreach (KeyValuePair<Point, Cell?> c in canvas.GetCellMap ())
+                foreach (KeyValuePair<Point, Cell> c in canvas.GetCellMap ())
                 {
-                    if (c.Value is { })
-                    {
-                        Driver.SetAttribute (c.Value.Value.Attribute ?? ColorScheme.Normal);
+                    Driver.SetAttribute (c.Value.Attribute ?? ColorScheme.Normal);
 
-                        // TODO: #2616 - Support combining sequences that don't normalize
-                        AddRune (c.Key.X, c.Key.Y, c.Value.Value.Rune);
-                    }
+                    // TODO: #2616 - Support combining sequences that don't normalize
+                    AddRune (c.Key.X, c.Key.Y, c.Value.Rune);
                 }
             }
         }

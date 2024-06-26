@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     MessageBox displays a modal message to the user, with a title, a message and a series of options that the user
@@ -31,7 +29,6 @@ public static class MessageBox
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
     /// <summary>
@@ -367,7 +364,7 @@ public static class MessageBox
             Buttons = buttonList.ToArray (),
             ButtonAlignment = Alignment.Center,
             ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems,
-            BorderStyle = MessageBox.DefaultBorderStyle,
+            BorderStyle = DefaultBorderStyle,
             Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1, Dim.Percent (90)),
             Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1, Dim.Percent (90)),
         };

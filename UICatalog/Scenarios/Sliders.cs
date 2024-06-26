@@ -174,7 +174,7 @@ public class Sliders : Scenario
             BorderStyle = LineStyle.Single
         };
 
-        optionsSlider.Style.SetChar = optionsSlider.Style.SetChar with { Attribute = new Attribute (Color.BrightGreen, Color.Black) };
+        optionsSlider.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
         optionsSlider.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Black);
 
         optionsSlider.Options = new List<SliderOption<string>>
@@ -440,10 +440,10 @@ public class Sliders : Scenario
 
         foreach (Slider s in app.Subviews.OfType<Slider> ())
         {
-            s.Style.OptionChar = s.Style.OptionChar with { Attribute = app.GetNormalColor () };
-            s.Style.SetChar = s.Style.SetChar with { Attribute = app.GetNormalColor () };
+            s.Style.OptionChar.Attribute = app.GetNormalColor ();
+            s.Style.SetChar.Attribute = app.GetNormalColor ();
             s.Style.LegendAttributes.SetAttribute = app.GetNormalColor ();
-            s.Style.RangeChar = s.Style.RangeChar with { Attribute = app.GetNormalColor () };
+            s.Style.RangeChar.Attribute = app.GetNormalColor ();
         }
 
         Slider<(Color, Color)> sliderFGColor = new ()
@@ -463,7 +463,7 @@ public class Sliders : Scenario
             UseMinimumSize = true
         };
 
-        sliderFGColor.Style.SetChar = sliderFGColor.Style.SetChar with { Attribute = new Attribute (Color.BrightGreen, Color.Black) };
+        sliderFGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
         sliderFGColor.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Blue);
 
         List<SliderOption<(Color, Color)>> colorOptions = new ();
@@ -505,30 +505,16 @@ public class Sliders : Scenario
                                                                                )
                                                     };
 
-                                                    s.Style.OptionChar = s.Style.OptionChar with
-                                                    {
-                                                        Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background)
-                                                    };
+                                                    s.Style.OptionChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
 
-                                                    s.Style.SetChar = s.Style.SetChar with
-                                                    {
-                                                        Attribute = new Attribute (
-                                                                                   data.Item1,
-                                                                                   s.Style.SetChar.Attribute?.Background
-                                                                                   ?? s.ColorScheme.Normal.Background
-                                                                                  )
-                                                    };
+                                                    s.Style.SetChar.Attribute = new Attribute (
+                                                                                               data.Item1,
+                                                                                               s.Style.SetChar.Attribute?.Background
+                                                                                               ?? s.ColorScheme.Normal.Background
+                                                                                              );
                                                     s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
-
-                                                    s.Style.RangeChar = s.Style.RangeChar with
-                                                    {
-                                                        Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background)
-                                                    };
-
-                                                    s.Style.SpaceChar = s.Style.SpaceChar with
-                                                    {
-                                                        Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background)
-                                                    };
+                                                    s.Style.RangeChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+                                                    s.Style.SpaceChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
 
                                                     s.Style.LegendAttributes.NormalAttribute =
                                                         new Attribute (data.Item1, s.ColorScheme.Normal.Background);
@@ -550,7 +536,7 @@ public class Sliders : Scenario
             UseMinimumSize = true
         };
 
-        sliderBGColor.Style.SetChar = sliderBGColor.Style.SetChar with { Attribute = new Attribute (Color.BrightGreen, Color.Black) };
+        sliderBGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
         sliderBGColor.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Blue);
 
         sliderBGColor.Options = colorOptions;

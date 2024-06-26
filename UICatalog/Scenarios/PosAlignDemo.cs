@@ -326,7 +326,7 @@ public sealed class PosAlignDemo : Scenario
                                         aligner.Alignment,
                                         aligner.AlignmentModes,
                                         posAlign!.GroupId);
-                    view.Margin.Thickness = new (_leftMargin, view.Margin.Thickness.Top, view.Margin.Thickness.Right, view.Margin.Thickness.Bottom);
+                    view.Margin.Thickness = new (_leftMargin, 0, 0, 0);
                 }
                 else
                 {
@@ -337,7 +337,7 @@ public sealed class PosAlignDemo : Scenario
                                         aligner.AlignmentModes,
                                         posAlign!.GroupId);
 
-                    view.Margin.Thickness = new (view.Margin.Thickness.Left, _topMargin, view.Margin.Thickness.Right, view.Margin.Thickness.Bottom);
+                    view.Margin.Thickness = new (0, _topMargin, 0, 0);
                 }
             }
         }

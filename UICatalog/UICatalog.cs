@@ -330,6 +330,7 @@ internal class UICatalogApp
             // made by Scenario.Init() above
             // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
+
             VerifyObjectsWereDisposed ();
         }
 
@@ -387,8 +388,6 @@ internal class UICatalogApp
 
         public UICatalogTopLevel ()
         {
-            _diagnosticFlags = View.Diagnostics;
-
             _themeMenuItems = CreateThemeMenuItems ();
             _themeMenuBarItem = new ("_Themes", _themeMenuItems);
 
@@ -451,7 +450,6 @@ internal class UICatalogApp
             StatusBar = new ()
             {
                 Visible = ShowStatusBar,
-                AlignmentModes = AlignmentModes.IgnoreFirstOrLast
             };
 
             if (StatusBar is { })
@@ -527,7 +525,7 @@ internal class UICatalogApp
                 AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Categories",
-                BorderStyle = LineStyle.Rounded,
+                BorderStyle = LineStyle.Single,
                 SuperViewRendersLineCanvas = true,
                 Source = new ListWrapper<string> (_categories)
             };
@@ -547,7 +545,7 @@ internal class UICatalogApp
                 //AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Scenarios",
-                BorderStyle = CategoryList.BorderStyle,
+                BorderStyle = LineStyle.Single,
                 SuperViewRendersLineCanvas = true
             };
 
