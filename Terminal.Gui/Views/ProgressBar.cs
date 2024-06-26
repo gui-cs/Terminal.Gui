@@ -35,7 +35,7 @@ public enum ProgressBarFormat
 ///         <see cref="Pulse"/> method is called. Call <see cref="Pulse"/> repeatedly as progress is made.
 ///     </para>
 /// </remarks>
-public class ProgressBar : View
+public class ProgressBar : View, ISupportsDesignMode
 {
     private int [] _activityPos;
     private bool _bidirectionalMarquee = true;
@@ -276,5 +276,14 @@ public class ProgressBar : View
         CanFocus = false;
         _fraction = 0;
         Initialized += ProgressBar_Initialized;
+    }
+
+    /// <inheritdoc />
+    public bool LoadDemoData (object ctx = null)
+    {
+        Width = Dim.Fill ();
+        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
+        Fraction = 0.75f;
+        return true;
     }
 }

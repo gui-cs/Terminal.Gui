@@ -3,7 +3,7 @@
 namespace Terminal.Gui;
 
 /// <summary>Slider control.</summary>
-public class Slider : Slider<object>
+public class Slider : Slider<object>, ISupportsDesignMode
 {
     /// <summary>Initializes a new instance of the <see cref="Slider"/> class.</summary>
     public Slider () { }
@@ -14,6 +14,14 @@ public class Slider : Slider<object>
     public Slider (List<object> options, Orientation orientation = Orientation.Horizontal) :
         base (options, orientation)
     { }
+
+    /// <inheritdoc />
+    public bool LoadDemoData ()
+    {
+        string [] list = { "Option 1", "Option 2", "Option 3", "Option 4", "Option 5" };
+        Options = list.Select (x => new SliderOption<object> { Legend = x }).ToList ();
+        return true;
+    }
 }
 
 /// <summary>
@@ -21,7 +29,7 @@ public class Slider : Slider<object>
 ///     keyboard or mouse.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class Slider<T> : View
+public class Slider<T> : View, ISupportsDesignMode
 {
     private readonly SliderConfiguration _config = new ();
 
@@ -151,35 +159,6 @@ public class Slider<T> : View
     #endregion
 
     #region Properties
-
-    /// <summary>
-    ///     Setting the Text of a slider is a shortcut to setting options. The text is a CSV string of the options.
-    /// </summary>
-    public override string Text
-    {
-        get
-        {
-            if (_options.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            // Return labels as a CSV string
-            return string.Join (",", _options);
-        }
-        set
-        {
-            if (string.IsNullOrEmpty (value))
-            {
-                Options = [];
-            }
-            else
-            {
-                IEnumerable<string> list = value.Split (',').Select (x => x.Trim ());
-                Options = list.Select (x => new SliderOption<T> { Legend = x }).ToList ();
-            }
-        }
-    }
 
     /// <summary>Allow no selection.</summary>
     public bool AllowEmpty
@@ -1821,4 +1800,12 @@ public class Slider<T> : View
     }
 
     #endregion
+
+    /// <inheritdoc />
+    public bool LoadDemoData (object ctx = null)
+    {
+        string [] list = { "Option 1", "Option 2", "Option 3", "Option 4", "Option 5" };
+        Options = list.Select (x => new SliderOption<T> { Legend = x }).ToList ();
+        return true;
+    }
 }
