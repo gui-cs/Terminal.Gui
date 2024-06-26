@@ -437,4 +437,24 @@ public class GlyphDefinitions
     public Rune CrossHv { get; set; } = (Rune)'╋';
 
     #endregion
+
+    #region ----------------- ShadowStyle -----------------
+
+
+    /// <summary>Shadow - Vertical Start - Left Half Block - ▌ U+0258c</summary>
+    public Rune ShadowVerticalStart { get; set; } =  (Rune)'▌'; // Half: '\u2596'  ▖;
+
+    /// <summary>Shadow - Vertical - Left Half Block - ▌ U+0258c</summary>
+    public Rune ShadowVertical { get; set; } = (Rune)'▌';
+
+    /// <summary>Shadow - Horizontal Start - Upper Half Block - ▀ U+02580</summary>
+    public Rune ShadowHorizontalStart { get; set; } = (Rune)'▀'; // Half: ▝ U+0259d;
+
+    /// <summary>Shadow - Horizontal - Upper Half Block - ▀ U+02580</summary>
+    public Rune ShadowHorizontal { get; set; } = (Rune)'▀';
+
+    /// <summary>Shadow - Horizontal End - Quadrant Upper Left - ▘ U+02598</summary>
+    public Rune ShadowHorizontalEnd { get; set; } = (Rune)'▘';
+
+    #endregion
 }

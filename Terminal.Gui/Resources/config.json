@@ -20,6 +20,7 @@
   "Application.AlternateBackwardKey": "Ctrl+PageUp",
   "Application.AlternateForwardKey": "Ctrl+PageDown",
   "Application.QuitKey": "Esc",
+  "Application.IsMouseDisabled": false,
   "Theme": "Default",
   "Themes": [
     {
@@ -28,6 +29,9 @@
         "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
         "FrameView.DefaultBorderStyle": "Single",
         "Window.DefaultBorderStyle": "Single",
+        "Dialog.DefaultBorderStyle": "Single",
+        "MessageBox.DefaultBorderStyle": "Double",
+        "Button.DefaultShadow": "None",
         "ColorSchemes": [
           {
             "TopLevel": {
