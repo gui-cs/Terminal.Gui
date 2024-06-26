@@ -6,6 +6,8 @@ namespace Terminal.Gui.Analyzers.Internal.Tests.Generators.EnumExtensions.EnumDe
 ///     Same as <see cref="BasicEnum"/>, but with <see cref="GenerateEnumExtensionMethodsAttribute"/> applied.
 /// </summary>
 [GenerateEnumExtensionMethods]
+[SuppressMessage ("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "Naming is intentional.")]
+[SuppressMessage ("Roslynator", "RCS1154:Sort enum members", Justification = "Order is intentional.")]
 public enum BetterEnum
 {
     Bit31 = -0b_10000000_00000000_00000000_00000000,

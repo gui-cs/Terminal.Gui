@@ -42,6 +42,7 @@
     <Using Include="Terminal.Gui" />
     <Using Include="Terminal.Gui.Analyzers" />
     <Using Include="Terminal.Gui.Analyzers.Internal" />
+    <Using Include="System.Diagnostics.CodeAnalysis" />
   </ItemGroup>
 
 </Project>

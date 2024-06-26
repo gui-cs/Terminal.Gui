@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Terminal.Gui.Analyzers.Internal.Tests.Generators.EnumExtensions.EnumDefinitions;
-internal class SignedEnumMemberValues
+﻿namespace Terminal.Gui.Analyzers.Internal.Tests.Generators.EnumExtensions.EnumDefinitions;
+internal sealed class SignedEnumMemberValues
 {
     internal const int Bit31 = ~0b_01111111_11111111_11111111_11111111;
     internal const int Bit30 =  0b_01000000_00000000_00000000_00000000;
