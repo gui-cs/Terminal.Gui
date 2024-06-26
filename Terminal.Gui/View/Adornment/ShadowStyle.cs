@@ -1,18 +1,17 @@
-﻿#nullable enable
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Defines the style of shadow to be drawn on the right and bottom sides of the <see cref="View"/>. 
+///     Defines the style of shadow to be drawn on the right and bottom sides of the <see cref="View"/>.
 /// </summary>
 public enum ShadowStyle
 {
     /// <summary>
-    /// No shadow.
+    ///     No shadow.
     /// </summary>
     None,
 
     /// <summary>
-    ///    A shadow that is drawn using block elements. Ideal for smaller views such as buttons.
+    ///     A shadow that is drawn using block elements. Ideal for smaller views such as buttons.
     /// </summary>
     Opaque,
 

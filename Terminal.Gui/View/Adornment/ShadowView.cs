@@ -6,19 +6,15 @@ namespace Terminal.Gui;
 /// </summary>
 internal class ShadowView : View
 {
-    // TODO: Add these to CM.Glyphs
-    private readonly char VERTICAL_START_GLYPH = '\u258C'; // Half: '\u2596';
-    private readonly char VERTICAL_GLYPH = '\u258C';
-    private readonly char HORIZONTAL_START_GLYPH = '\u2580'; // Half: '\u259d';
-    private readonly char HORIZONTAL_GLYPH = '\u2580';
-    private readonly char HORIZONTAL_END_GLYPH = '\u2598';
+    private ShadowStyle _shadowStyle;
 
     /// <inheritdoc/>
     public override Attribute GetNormalColor ()
     {
         if (SuperView is Adornment adornment)
         {
-            Attribute attr = Attribute.Default;
+            var attr = Attribute.Default;
+
             if (adornment.Parent.SuperView is { })
             {
                 attr = adornment.Parent.SuperView.GetNormalColor ();
@@ -27,8 +23,11 @@ internal class ShadowView : View
             {
                 attr = Application.Top.GetNormalColor ();
             }
-            return new (new Attribute (ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
-                                       ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor()));
+
+            return new (
+                        new Attribute (
+                                       ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
+                                       ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor ()));
         }
 
         return base.GetNormalColor ();
@@ -77,7 +76,6 @@ internal class ShadowView : View
     /// </summary>
     public Orientation Orientation { get; set; }
 
-    private ShadowStyle _shadowStyle;
     public override ShadowStyle ShadowStyle
     {
         get => _shadowStyle;
@@ -91,22 +89,23 @@ internal class ShadowView : View
     private void DrawHorizontalShadowOpaque (Rectangle rectangle)
     {
         // Draw the start glyph
-        AddRune (0, 0, (Rune)HORIZONTAL_START_GLYPH);
+        AddRune (0, 0, Glyphs.ShadowHorizontalStart);
 
-        // Fill the rest of the rectangle with the glyph
+        // Fill the rest of the rectangle with the glyph - note we skip the last since vertical will draw it
         for (var i = 1; i < rectangle.Width - 1; i++)
         {
-            AddRune (i, 0, (Rune)HORIZONTAL_GLYPH);
+            AddRune (i, 0, Glyphs.ShadowHorizontal);
         }
 
         // Last is special
-        AddRune (rectangle.Width - 1, 0, (Rune)HORIZONTAL_END_GLYPH);
+        AddRune (rectangle.Width - 1, 0, Glyphs.ShadowHorizontalEnd);
     }
 
     private void DrawHorizontalShadowTransparent (Rectangle viewport)
     {
         Rectangle screen = ViewportToScreen (viewport);
 
+        // Fill the rest of the rectangle - note we skip the last since vertical will draw it
         for (int i = screen.X; i < screen.X + screen.Width - 1; i++)
         {
             Driver.Move (i, screen.Y);
@@ -117,12 +116,12 @@ internal class ShadowView : View
     private void DrawVerticalShadowOpaque (Rectangle viewport)
     {
         // Draw the start glyph
-        AddRune (0, 0, (Rune)VERTICAL_START_GLYPH);
+        AddRune (0, 0, Glyphs.ShadowVerticalStart);
 
         // Fill the rest of the rectangle with the glyph
         for (var i = 1; i < viewport.Height; i++)
         {
-            AddRune (0, i, (Rune)VERTICAL_GLYPH);
+            AddRune (0, i, Glyphs.ShadowVertical);
         }
     }
 
@@ -130,7 +129,7 @@ internal class ShadowView : View
     {
         Rectangle screen = ViewportToScreen (viewport);
 
-        // Fill the rest of the rectangle with the glyph
+        // Fill the rest of the rectangle
         for (int i = screen.Y; i < screen.Y + viewport.Height; i++)
         {
             Driver.Move (screen.X, i);
