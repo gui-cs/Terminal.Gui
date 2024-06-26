@@ -923,7 +923,7 @@ public class ListView : View, ISupportsDesignMode
     }
 
     /// <inheritdoc />
-    public bool LoadDemoData ()
+    public bool LoadDemoData (object ctx = null)
     {
         var source = new ListWrapper<string> (["List Item 1", "List Item two", "List Item Quattro", "Last List Item"]);
         Source = source;

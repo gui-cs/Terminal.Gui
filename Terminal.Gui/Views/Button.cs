@@ -179,7 +179,7 @@ public class Button : View, ISupportsDesignMode
     }
 
     /// <inheritdoc />
-    public bool LoadDemoData ()
+    public bool LoadDemoData (object ctx = null)
     {
         Title = "_Button";
 

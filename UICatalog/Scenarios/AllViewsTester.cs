@@ -350,7 +350,7 @@ public class AllViewsTester : Scenario
 
         if (view.GetType().GetInterface ("ISupportsDesignMode") is { } iface)
         {
-            iface.GetMethod ("LoadDemoData")?.Invoke (view, null);
+            iface.GetMethod ("LoadDemoData")?.Invoke (view, [null]);
         }
         else
         {

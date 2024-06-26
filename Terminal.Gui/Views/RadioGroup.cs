@@ -463,7 +463,7 @@ public class RadioGroup : View, ISupportsDesignMode
     }
 
     /// <inheritdoc />
-    public bool LoadDemoData ()
+    public bool LoadDemoData (object ctx = null)
     {
         RadioLabels = new [] { "Option _1", "Option _2", "Option _3" };
         return true;

@@ -1802,7 +1802,7 @@ public class Slider<T> : View, ISupportsDesignMode
     #endregion
 
     /// <inheritdoc />
-    public bool LoadDemoData ()
+    public bool LoadDemoData (object ctx = null)
     {
         string [] list = { "Option 1", "Option 2", "Option 3", "Option 4", "Option 5" };
         Options = list.Select (x => new SliderOption<T> { Legend = x }).ToList ();
