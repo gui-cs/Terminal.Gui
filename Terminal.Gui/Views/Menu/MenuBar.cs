@@ -1594,11 +1594,9 @@ public class MenuBar : View, IDesignable
 
 
     /// <inheritdoc />
-    public bool LoadDemoData (object ctx = null)
+    public bool LoadDemoData<T> (T context)
     {
-        Func<string, bool> actionFn = (Func<string, bool>)ctx;
-
-        if (actionFn is null)
+        if (context is not Func<string, bool> actionFn)
         {
             actionFn = (s) => true;
         }
