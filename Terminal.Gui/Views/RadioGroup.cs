@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.</summary>
-public class RadioGroup : View, IDisignable
+public class RadioGroup : View, IDesignable
 {
     private int _cursor;
     private List<(int pos, int length)> _horizontal;

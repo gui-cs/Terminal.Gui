@@ -348,7 +348,7 @@ public class AllViewsTester : Scenario
             view.ColorScheme = Colors.ColorSchemes ["Base"];
         }
 
-        if (view.GetType().GetInterface ("IDisignable") is { } iface)
+        if (view.GetType().GetInterface ("IDesignable") is { } iface)
         {
             iface.GetMethod ("LoadDemoData")?.Invoke (view, [null]);
         }

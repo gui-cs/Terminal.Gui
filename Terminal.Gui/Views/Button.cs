@@ -25,7 +25,7 @@ namespace Terminal.Gui;
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
 /// </remarks>
-public class Button : View, IDisignable
+public class Button : View, IDesignable
 {
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;

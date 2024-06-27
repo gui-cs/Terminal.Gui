@@ -3,7 +3,7 @@
 /// <summary>
 ///     Indicates that the view supports design mode.
 /// </summary>
-public interface IDisignable
+public interface IDesignable
 {
     /// <summary>
     ///     Causes the View to load demo data.

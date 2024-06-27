@@ -34,7 +34,7 @@ namespace Terminal.Gui;
 ///         duplicates a shortcut (e.g. _File and Alt-F), the hot key wins.
 ///     </para>
 /// </remarks>
-public class MenuBar : View, IDisignable
+public class MenuBar : View, IDesignable
 {
     // Spaces before the Title
     private static readonly int _leftPadding = 1;

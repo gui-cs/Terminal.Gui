@@ -11,7 +11,7 @@ using System.ComponentModel;
 namespace Terminal.Gui;
 
 /// <summary>Provides a drop-down list of items the user can select from.</summary>
-public class ComboBox : View, IDisignable
+public class ComboBox : View, IDesignable
 {
     private readonly ComboListView _listview;
     private readonly int _minimumHeight = 2;

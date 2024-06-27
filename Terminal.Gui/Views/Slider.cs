@@ -3,7 +3,7 @@
 namespace Terminal.Gui;
 
 /// <summary>Slider control.</summary>
-public class Slider : Slider<object>, IDisignable
+public class Slider : Slider<object>, IDesignable
 {
     /// <summary>Initializes a new instance of the <see cref="Slider"/> class.</summary>
     public Slider () { }
@@ -29,7 +29,7 @@ public class Slider : Slider<object>, IDisignable
 ///     keyboard or mouse.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class Slider<T> : View, IDisignable
+public class Slider<T> : View, IDesignable
 {
     private readonly SliderConfiguration _config = new ();
 
