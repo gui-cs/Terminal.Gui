@@ -985,7 +985,7 @@ public class ComboBox : View, IDesignable
     }
 
     /// <inheritdoc />
-    public bool LoadDemoData ()
+    public bool Enable ()
     {
         var source = new ObservableCollection<string> (["Combo Item 1", "Combo Item two", "Combo Item Quattro", "Last Combo Item"]);
         SetSource (source);

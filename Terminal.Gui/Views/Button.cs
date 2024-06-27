@@ -179,7 +179,7 @@ public class Button : View, IDesignable
     }
 
     /// <inheritdoc />
-    public bool LoadDemoData ()
+    public bool Enable ()
     {
         Title = "_Button";
 

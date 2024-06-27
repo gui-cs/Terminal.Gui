@@ -350,7 +350,7 @@ public class AllViewsTester : Scenario
 
         if (view is IDesignable iface)
         {
-            iface.LoadDemoData ();
+            iface.Enable (_demoText);
         }
         else
         {

@@ -1254,14 +1254,14 @@ wo
         MenuItem miCurrent = null;
 
         MenuBar menu = new MenuBar ();
-        menu.LoadDemoData (
-                           new Func<object, bool> (s =>
-                                                   {
-                                                       miAction = s as string;
+        menu.Enable (
+                               new Func<object, bool> (s =>
+                                                       {
+                                                           miAction = s as string;
 
-                                                       return true;
-                                                   })
-                          );
+                                                           return true;
+                                                       })
+                              );
 
         menu.Key = KeyCode.F9;
         menu.MenuOpening += (s, e) => mbiCurrent = e.CurrentMenu;
@@ -1304,14 +1304,14 @@ wo
         MenuItem miCurrent = null;
 
         MenuBar menu = new MenuBar ();
-        menu.LoadDemoData (
-                           new Func<object, bool> (s =>
-                                                   {
-                                                       miAction = s as string;
+        menu.Enable (
+                               new Func<object, bool> (s =>
+                                                       {
+                                                           miAction = s as string;
 
-                                                       return true;
-                                                   })
-                          );
+                                                           return true;
+                                                       })
+                              );
 
         menu.Key = KeyCode.F9;
         menu.MenuOpening += (s, e) => mbiCurrent = e.CurrentMenu;
