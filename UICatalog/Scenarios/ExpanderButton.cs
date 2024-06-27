@@ -136,7 +136,7 @@ public class ExpanderButton : Button
     /// <returns>True of the event was cancelled.</returns>
     protected virtual bool OnCollapsedChanging (bool newValue)
     {
-        StateEventArgs<bool> args = new (Collapsed, newValue);
+        CancelEventArgs<bool> args = new (Collapsed, newValue);
         CollapsedChanging?.Invoke (this, args);
 
         if (!args.Cancel)
@@ -168,7 +168,7 @@ public class ExpanderButton : Button
     ///     Fired when the orientation has changed. Can be cancelled by setting
     ///     <see cref="OrientationEventArgs.Cancel"/> to true.
     /// </summary>
-    public event EventHandler<StateEventArgs<bool>> CollapsedChanging;
+    public event EventHandler<CancelEventArgs<bool>> CollapsedChanging;
 
     /// <summary>
     ///     Collapses or Expands the view.

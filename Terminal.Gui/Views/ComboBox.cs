@@ -68,7 +68,7 @@ public class ComboBox : View
 
                      SetNeedsLayout ();
                      SetNeedsDisplay ();
-                     Search_Changed (this, new StateEventArgs<string> (string.Empty, Text));
+                     Search_Changed (this, new CancelEventArgs<string> (string.Empty, Text));
                  };
 
         // Things this view knows how to do
@@ -187,7 +187,7 @@ public class ComboBox : View
             {
                 SelectedItem = -1;
                 _search.Text = string.Empty;
-                Search_Changed (this, new StateEventArgs<string> (string.Empty, _search.Text));
+                Search_Changed (this, new CancelEventArgs<string> (string.Empty, _search.Text));
                 SetNeedsDisplay ();
             }
         }
@@ -660,7 +660,7 @@ public class ComboBox : View
     // Tell TextField to handle Accept Command (Enter)
     void Search_Accept (object sender, HandledEventArgs e) { e.Handled = true; }
 
-    private void Search_Changed (object sender, StateEventArgs<string> e)
+    private void Search_Changed (object sender, CancelEventArgs<string> e)
     {
         if (_source is null)
         {
@@ -730,7 +730,7 @@ public class ComboBox : View
 
         SetValue (_listview.SelectedItem > -1 ? _searchSet [_listview.SelectedItem] : _text);
         _search.CursorPosition = _search.Text.GetColumns ();
-        Search_Changed (this, new StateEventArgs<string> (_search.Text, _search.Text));
+        Search_Changed (this, new CancelEventArgs<string> (_search.Text, _search.Text));
         OnOpenSelectedItem ();
         Reset (true);
         HideList ();

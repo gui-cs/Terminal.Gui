@@ -341,7 +341,7 @@ public class Buttons : Scenario
         };
         numericUpDown.ValueChanged += NumericUpDown_ValueChanged;
 
-        void NumericUpDown_ValueChanged (object sender, StateEventArgs<int> e) { }
+        void NumericUpDown_ValueChanged (object sender, CancelEventArgs<int> e) { }
 
         main.Add (label, numericUpDown);
 
@@ -518,7 +518,7 @@ public class Buttons : Scenario
                 }
 
                 T oldValue = value;
-                StateEventArgs<T> args = new StateEventArgs<T> (_value, value);
+                CancelEventArgs<T> args = new CancelEventArgs<T> (_value, value);
                 ValueChanging?.Invoke (this, args);
 
                 if (args.Cancel)
@@ -533,16 +533,16 @@ public class Buttons : Scenario
         }
 
         /// <summary>
-        /// Fired when the value is about to change. Set <see cref="StateEventArgs{T}.Cancel"/> to true to prevent the change.
+        /// Fired when the value is about to change. Set <see cref="CancelEventArgs{T}.Cancel"/> to true to prevent the change.
         /// </summary>
         [CanBeNull]
-        public event EventHandler<StateEventArgs<T>> ValueChanging;
+        public event EventHandler<CancelEventArgs<T>> ValueChanging;
 
         /// <summary>
         /// Fired when the value has changed.
         /// </summary>
         [CanBeNull]
-        public event EventHandler<StateEventArgs<T>> ValueChanged;
+        public event EventHandler<CancelEventArgs<T>> ValueChanged;
 
         /// <summary>
         /// The number of digits to display. The <see cref="View.Viewport"/> will be resized to fit this number of characters plus the buttons. The default is 3.

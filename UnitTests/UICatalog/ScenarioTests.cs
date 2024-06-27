@@ -73,7 +73,7 @@ public class ScenarioTests : TestsAllViews
 
         return;
 
-        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object s, CancelEventArgs<bool> a)
         {
             if (a.NewValue)
             {

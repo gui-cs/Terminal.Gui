@@ -42,7 +42,7 @@ public class CheckBox : View
         e.Handled = OnToggled () == true;
     }
 
-    private void Checkbox_TitleChanged (object? sender, StateEventArgs<string> e)
+    private void Checkbox_TitleChanged (object? sender, CancelEventArgs<string> e)
     {
         base.Text = e.NewValue;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
@@ -99,7 +99,7 @@ public class CheckBox : View
     /// <returns>If <see langword="true"/> the <see cref="Toggled"/> event was canceled.</returns>
     public bool? OnToggled ()
     {
-        StateEventArgs<bool?> e = new (Checked, false);
+        CancelEventArgs<bool?> e = new (Checked, false);
 
         if (AllowNullChecked)
         {
@@ -147,7 +147,7 @@ public class CheckBox : View
     ///    This event can be cancelled. If cancelled, the <see cref="CheckBox"/> will not change its state.
     /// </para>
     /// </remarks>
-    public event EventHandler<StateEventArgs<bool?>>? Toggled;
+    public event EventHandler<CancelEventArgs<bool?>>? Toggled;
 
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()

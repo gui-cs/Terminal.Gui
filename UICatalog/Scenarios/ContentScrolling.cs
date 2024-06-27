@@ -138,7 +138,7 @@ public class ContentScrolling : Scenario
         cbAllowNegativeX.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowNegativeX);
         cbAllowNegativeX.Toggled += AllowNegativeX_Toggled;
 
-        void AllowNegativeX_Toggled (object sender, StateEventArgs<bool?> e)
+        void AllowNegativeX_Toggled (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
@@ -162,7 +162,7 @@ public class ContentScrolling : Scenario
         cbAllowNegativeY.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowNegativeY);
         cbAllowNegativeY.Toggled += AllowNegativeY_Toggled;
 
-        void AllowNegativeY_Toggled (object sender, StateEventArgs<bool?> e)
+        void AllowNegativeY_Toggled (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
@@ -185,7 +185,7 @@ public class ContentScrolling : Scenario
         cbAllowXGreaterThanContentWidth.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth);
         cbAllowXGreaterThanContentWidth.Toggled += AllowXGreaterThanContentWidth_Toggled;
 
-        void AllowXGreaterThanContentWidth_Toggled (object sender, StateEventArgs<bool?> e)
+        void AllowXGreaterThanContentWidth_Toggled (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
@@ -209,7 +209,7 @@ public class ContentScrolling : Scenario
         cbAllowYGreaterThanContentHeight.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight);
         cbAllowYGreaterThanContentHeight.Toggled += AllowYGreaterThanContentHeight_Toggled;
 
-        void AllowYGreaterThanContentHeight_Toggled (object sender, StateEventArgs<bool?> e)
+        void AllowYGreaterThanContentHeight_Toggled (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
@@ -237,7 +237,7 @@ public class ContentScrolling : Scenario
         };
         contentSizeWidth.ValueChanging += ContentSizeWidth_ValueChanged;
 
-        void ContentSizeWidth_ValueChanged (object sender, StateEventArgs<int> e)
+        void ContentSizeWidth_ValueChanged (object sender, CancelEventArgs<int> e)
         {
             if (e.NewValue < 0)
             {
@@ -265,7 +265,7 @@ public class ContentScrolling : Scenario
         };
         contentSizeHeight.ValueChanging += ContentSizeHeight_ValueChanged;
 
-        void ContentSizeHeight_ValueChanged (object sender, StateEventArgs<int> e)
+        void ContentSizeHeight_ValueChanged (object sender, CancelEventArgs<int> e)
         {
             if (e.NewValue < 0)
             {
@@ -287,7 +287,7 @@ public class ContentScrolling : Scenario
         cbClearOnlyVisible.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClearContentOnly);
         cbClearOnlyVisible.Toggled += ClearVisibleContentOnly_Toggled;
 
-        void ClearVisibleContentOnly_Toggled (object sender, StateEventArgs<bool?> e)
+        void ClearVisibleContentOnly_Toggled (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
@@ -309,7 +309,7 @@ public class ContentScrolling : Scenario
         cbDoNotClipContent.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly);
         cbDoNotClipContent.Toggled += ClipVisibleContentOnly_Toggled;
 
-        void ClipVisibleContentOnly_Toggled (object sender, StateEventArgs<bool?> e)
+        void ClipVisibleContentOnly_Toggled (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {

@@ -358,7 +358,7 @@ public static partial class Application
     /// <remarks>
     ///     Intended to support unit tests that need to know when the application has been initialized.
     /// </remarks>
-    public static event EventHandler<StateEventArgs<bool>> InitializedChanged;
+    public static event EventHandler<CancelEventArgs<bool>> InitializedChanged;
 
     #endregion Initialization (Init/Shutdown)
 

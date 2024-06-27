@@ -3,25 +3,26 @@ using System.ComponentModel;
 
 namespace Terminal.Gui;
 
-/// <summary><see cref="EventArgs"/> for events that convey state changes to a <see cref="View"/> class.</summary>
+/// <summary>
+/// <see cref="EventArgs"/> for events that convey changes to a property of type `T`.</summary>
 /// <remarks>
-/// Events that use this class can be cancellable. The <see cref="CancelEventArgs.Cancel"/> property should be set to
+/// Events that use this class can be cancellable. Where applicable, the <see cref="CancelEventArgs.Cancel"/> property should be set to
 /// <see langword="true"/> to prevent the state change from occurring.
 /// </remarks>
-public class StateEventArgs<T> : CancelEventArgs
+public class CancelEventArgs<T> : CancelEventArgs
 {
-    /// <summary>Creates a new instance of the <see cref="StateEventArgs{T}"/> class.</summary>
-    /// <param name="oldValue"></param>
-    /// <param name="newValue"></param>
-    public StateEventArgs (T oldValue, T newValue)
+    /// <summary>Initializes a new instance of the <see cref="CancelEventArgs{T}"/> class.</summary>
+    /// <param name="currentValue">The current (old) value of the property.</param>
+    /// <param name="newValue">The value the property will be set to if the event is not cancelled.</param>
+    public CancelEventArgs (T currentValue, T newValue)
     {
-        OldValue = oldValue;
+        CurrentValue = currentValue;
         NewValue = newValue;
     }
 
-    /// <summary>The new state</summary>
+    /// <summary>The value the property will be set to if the event is not cancelled.</summary>
     public T NewValue { get; set; }
 
-    /// <summary>The previous state</summary>
-    public T OldValue { get; }
+    /// <summary>The current value of the property.</summary>
+    public T CurrentValue { get; }
 }

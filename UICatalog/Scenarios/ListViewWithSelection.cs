@@ -118,7 +118,7 @@ public class ListViewWithSelection : Scenario
         Application.Shutdown ();
     }
 
-    private void _customRenderCB_Toggled (object sender, StateEventArgs<bool?> stateEventArgs)
+    private void _customRenderCB_Toggled (object sender, CancelEventArgs<bool?> stateEventArgs)
     {
         if (stateEventArgs.OldValue == true)
         {
@@ -132,14 +132,14 @@ public class ListViewWithSelection : Scenario
         _appWindow.SetNeedsDisplay ();
     }
 
-    private void AllowMarkingCB_Toggled (object sender, [NotNull] StateEventArgs<bool?> stateEventArgs)
+    private void AllowMarkingCB_Toggled (object sender, [NotNull] CancelEventArgs<bool?> stateEventArgs)
     {
         _listView.AllowsMarking = (bool)!stateEventArgs.OldValue;
         _allowMultipleCB.Visible = _listView.AllowsMarking;
         _appWindow.SetNeedsDisplay ();
     }
 
-    private void AllowMultipleCB_Toggled (object sender, [NotNull] StateEventArgs<bool?> stateEventArgs)
+    private void AllowMultipleCB_Toggled (object sender, [NotNull] CancelEventArgs<bool?> stateEventArgs)
     {
         _listView.AllowsMultipleSelection = (bool)!stateEventArgs.OldValue;
         _appWindow.SetNeedsDisplay ();

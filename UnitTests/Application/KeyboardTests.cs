@@ -129,7 +129,7 @@ public class KeyboardTests
 
         return;
 
-        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object s, CancelEventArgs<bool> a)
         {
             _output.WriteLine ("OnApplicationOnInitializedChanged: {0}", a.NewValue);
             if (a.NewValue)

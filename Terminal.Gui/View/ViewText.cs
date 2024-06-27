@@ -80,13 +80,13 @@ public partial class View
     /// <param name="newValue"></param>
     public void OnTextChanged (string oldValue, string newValue)
     {
-        TextChanged?.Invoke (this, new StateEventArgs<string> (oldValue, newValue));
+        TextChanged?.Invoke (this, new CancelEventArgs<string> (oldValue, newValue));
     }
 
     /// <summary>
     ///     Text changed event, raised when the text has changed.
     /// </summary>
-    public event EventHandler<StateEventArgs<string>> TextChanged;
+    public event EventHandler<CancelEventArgs<string>> TextChanged;
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will

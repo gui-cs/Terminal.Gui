@@ -31,7 +31,7 @@ public class Label : View
         e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
-    private void Label_TitleChanged (object sender, StateEventArgs<string> e)
+    private void Label_TitleChanged (object sender, CancelEventArgs<string> e)
     {
         base.Text = e.NewValue;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;

@@ -492,7 +492,7 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
     public virtual void OnTitleChanged (string oldTitle, string newTitle)
     {
-        StateEventArgs<string> args = new (oldTitle, newTitle);
+        CancelEventArgs<string> args = new (oldTitle, newTitle);
         TitleChanged?.Invoke (this, args);
     }
 
@@ -505,20 +505,20 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <returns>`true` if an event handler canceled the Title change.</returns>
     public virtual bool OnTitleChanging (string oldTitle, string newTitle)
     {
-        StateEventArgs<string> args = new (oldTitle, newTitle);
+        CancelEventArgs<string> args = new (oldTitle, newTitle);
         TitleChanging?.Invoke (this, args);
 
         return args.Cancel;
     }
 
     /// <summary>Event fired after the <see cref="View.Title"/> has been changed.</summary>
-    public event EventHandler<StateEventArgs<string>> TitleChanged;
+    public event EventHandler<CancelEventArgs<string>> TitleChanged;
 
     /// <summary>
     ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to `true`
     ///     to cancel the Title change.
     /// </summary>
-    public event EventHandler<StateEventArgs<string>> TitleChanging;
+    public event EventHandler<CancelEventArgs<string>> TitleChanging;
 
     #endregion
 }

@@ -240,7 +240,7 @@ public class CharacterMap : Scenario
         return item;
     }
 
-    private void JumpEdit_TextChanged (object sender, StateEventArgs<string> e)
+    private void JumpEdit_TextChanged (object sender, CancelEventArgs<string> e)
     {
         var jumpEdit = sender as TextField;
 

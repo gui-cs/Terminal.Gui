@@ -363,7 +363,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         _textField.TextChanging += _textField_TextChanging;
 
-        void _textField_TextChanging (object sender, StateEventArgs<string> e)
+        void _textField_TextChanging (object sender, CancelEventArgs<string> e)
         {
             if (e.NewValue.GetRuneCount () > 11)
             {
