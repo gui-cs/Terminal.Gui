@@ -82,12 +82,12 @@ public class CharacterMap : Scenario
 #else
         jumpEdit.Accept += JumpEditOnAccept;
 
-        void JumpEditOnAccept (object sender, CancelEventArgs e)
+        void JumpEditOnAccept (object sender, HandledEventArgs e)
         {
             JumpEdit_TextChanged (sender, new (jumpEdit.Text, jumpEdit.Text));
 
             // Cancel the event to prevent ENTER from being handled elsewhere
-            e.Cancel = true;
+            e.Handled = true;
         }
 #endif
         _categoryList = new () { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
@@ -483,7 +483,7 @@ internal class CharMap : View
             WantContinuousButtonPressed = true,
             CanFocus = false
         };
-        up.Accept += (sender, args) => { args.Cancel = ScrollVertical (-1) == true; };
+        up.Accept += (sender, args) => { args.Handled = ScrollVertical (-1) == true; };
 
         var down = new Button
         {

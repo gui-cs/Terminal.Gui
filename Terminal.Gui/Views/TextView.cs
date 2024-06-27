@@ -2523,10 +2523,21 @@ public class TextView : View
         KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
     }
 
+    // BUGBUG: AllowsReturn is mis-named. It should be EnterKeyAccepts.
     /// <summary>
-    ///     Gets or sets a value indicating whether pressing ENTER in a <see cref="TextView"/> creates a new line of text
-    ///     in the view or activates the default button for the Toplevel.
+    ///     Gets or sets whether pressing ENTER in a <see cref="TextView"/> creates a new line of text
+    ///     in the view or invokes the <see cref="View.Accept"/> event.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Setting this property alters <see cref="Multiline"/>.
+    ///         If <see cref="AllowsReturn"/> is set to <see langword="true"/>, then <see cref="Multiline"/> is also set to `true` and
+    ///         vice-versa.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="AllowsReturn"/> is set to <see langword="false"/>, then <see cref="AllowsTab"/> gets set to <see langword="false"/>.
+    ///     </para>
+    /// </remarks>
     public bool AllowsReturn
     {
         get => _allowsReturn;
@@ -2536,12 +2547,14 @@ public class TextView : View
 
             if (_allowsReturn && !_multiline)
             {
+                // BUGBUG: Seting properties should not have side-effects like this. Multiline and AllowsReturn should be independent.
                 Multiline = true;
             }
 
             if (!_allowsReturn && _multiline)
             {
                 Multiline = false;
+                // BUGBUG: Seting properties should not have side-effects like this. Multiline and AlowsTab should be independent.
                 AllowsTab = false;
             }
 
@@ -6050,13 +6063,13 @@ public class TextView : View
         Paste ();
     }
 
-    private bool ProcessReturn ()
+    private bool? ProcessReturn ()
     {
         ResetColumnTrack ();
 
         if (!AllowsReturn || _isReadOnly)
         {
-            return false;
+            return OnAccept ();
         }
 
         SetWrapModel ();

@@ -658,7 +658,7 @@ public class ComboBox : View
     }
 
     // Tell TextField to handle Accept Command (Enter)
-    void Search_Accept (object sender, CancelEventArgs e) { e.Cancel = true; }
+    void Search_Accept (object sender, HandledEventArgs e) { e.Handled = true; }
 
     private void Search_Changed (object sender, StateEventArgs<string> e)
     {

@@ -109,10 +109,10 @@ public partial class View : Responder, ISupportInitializeNotification
 {
     /// <summary>
     ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
-    ///     <see cref="CancelEventArgs.Cancel"/>
+    ///     <see cref="HandledEventArgs.Cancel"/>
     ///     to cancel the event.
     /// </summary>
-    public event EventHandler<CancelEventArgs> Accept;
+    public event EventHandler<HandledEventArgs> Accept;
 
     /// <summary>Gets or sets arbitrary data for the view.</summary>
     /// <remarks>This property is not used internally.</remarks>
@@ -156,10 +156,10 @@ public partial class View : Responder, ISupportInitializeNotification
     /// </returns>
     protected bool? OnAccept ()
     {
-        var args = new CancelEventArgs ();
+        var args = new HandledEventArgs ();
         Accept?.Invoke (this, args);
 
-        return Accept is null ? null : args.Cancel;
+        return Accept is null ? null : args.Handled;
     }
 
     #region Constructors and Initialization

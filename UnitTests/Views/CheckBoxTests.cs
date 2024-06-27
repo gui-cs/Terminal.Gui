@@ -229,10 +229,10 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         return;
 
-        void ViewOnAccept (object sender, CancelEventArgs e)
+        void ViewOnAccept (object sender, HandledEventArgs e)
         {
             acceptInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -469,7 +469,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         return;
 
-        void CheckBoxOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void CheckBoxOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Theory]

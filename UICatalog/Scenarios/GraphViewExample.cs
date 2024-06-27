@@ -196,7 +196,7 @@ public class GraphViewExample : Scenario
         Application.Shutdown ();
     }
 
-    private void DiagShortcut_Accept (object sender, CancelEventArgs e)
+    private void DiagShortcut_Accept (object sender, HandledEventArgs e)
     {
         ToggleDiagnostics ();
 

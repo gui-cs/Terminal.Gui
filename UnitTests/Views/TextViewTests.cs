@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9130,4 +9131,153 @@ line.
             _textView.Text = Encoding.Unicode.GetString (ms);
         }
     }
+
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new TextView ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var view = new TextView ();
+        var accepted = false;
+        view.Accept += OnAccept;
+        view.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Command_Fires_Accept ()
+    {
+        var view = new TextView ();
+
+        var accepted = false;
+        view.Accept += Accept;
+        view.InvokeCommand (Command.Accept);
+        Assert.True (accepted);
+
+        return;
+
+        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+
+    [Theory]
+    [InlineData(false, 1)]
+    [InlineData (true, 0)]
+    public void Enter_Key_Fires_Accept (bool multiline, int expectedAccepts)
+    {
+        var view = new TextView ()
+        {
+            Multiline = multiline,
+        };
+
+        int accepted = 0;
+        view.Accept += Accept;
+        view.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedAccepts, accepted);
+
+        return;
+
+        void Accept (object sender, HandledEventArgs e) { accepted++;}
+    }
+
+    [Theory, InlineData (false, false, 0), InlineData (false, true, 1), InlineData (true, false, 0), InlineData (true, true, 0)]
+    public void Accept_Handler_Handled_Prevents_Default_Button_Accept (bool multiline, bool handleAccept, int expectedButtonAccepts)
+    {
+        var superView = new Window ();
+        var tv = new TextView ()
+        {
+            Multiline = multiline
+        };
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tv, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        var textViewAccept = 0;
+        tv.Accept += TextViewAccept;
+
+        tv.SetFocus ();
+        Assert.True (tv.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, textViewAccept);
+        Assert.Equal (expectedButtonAccepts, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, textViewAccept);
+        Assert.Equal (expectedButtonAccepts + 1, buttonAccept);
+
+        return;
+
+        void TextViewAccept (object sender, HandledEventArgs e)
+        {
+            textViewAccept++;
+            e.Handled = handleAccept;
+        }
+
+        void ButtonAccept (object sender, HandledEventArgs e)
+        {
+            buttonAccept++;
+        }
+    }
+    
+    [Theory]
+    [InlineData (true, 0)]
+    [InlineData (false, 1)]
+    public void Accept_No_Handler_Enables_Default_Button_Accept (bool multiline, int expectedButtonAccept)
+    {
+        var superView = new Window ();
+        var tv = new TextView ()
+        {
+            Multiline = multiline
+        };
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tv, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        tv.SetFocus ();
+        Assert.True (tv.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedButtonAccept, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedButtonAccept + 1, buttonAccept);
+
+        return;
+
+        void ButtonAccept (object sender, HandledEventArgs e)
+        {
+            buttonAccept++;
+        }
+    }
+
 }

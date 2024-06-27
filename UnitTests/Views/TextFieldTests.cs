@@ -771,7 +771,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -786,13 +786,13 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void Accept (object sender, CancelEventArgs e) { accepted = true; }
+        void Accept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Theory]
     [InlineData (false, 0)]
     [InlineData (true, 1)]
-    public void Accept_Handler_Cancel_Prevents_Default_Button_Accept (bool cancelAccept, int expectedButtonAccepts)
+    public void Accept_Handler_Handled_Prevents_Default_Button_Accept (bool handleAccept, int expectedButtonAccepts)
     {
         var superView = new Window ();
         var tf = new TextField ();
@@ -823,13 +823,13 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void TextFieldAccept (object sender, CancelEventArgs e)
+        void TextFieldAccept (object sender, HandledEventArgs e)
         {
             textFieldAccept++;
-            e.Cancel = cancelAccept;
+            e.Handled = handleAccept;
         }
 
-        void ButtonAccept (object sender, CancelEventArgs e)
+        void ButtonAccept (object sender, HandledEventArgs e)
         {
             buttonAccept++;
         }
@@ -862,7 +862,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void ButtonAccept (object sender, CancelEventArgs e)
+        void ButtonAccept (object sender, HandledEventArgs e)
         {
             buttonAccept++;
         }
@@ -879,23 +879,23 @@ public class TextFieldTests (ITestOutputHelper output)
         //var superAcceptedInvoked = false;
 
         var tfAcceptedInvoked = false;
-        var cancel = false;
+        var handle = false;
         view.Accept += TextViewAccept;
         Assert.True (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 
         tfAcceptedInvoked = false;
-        cancel = true;
+        handle = true;
         view.Accept += TextViewAccept;
         Assert.False (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 
         return;
 
-        void TextViewAccept (object sender, CancelEventArgs e)
+        void TextViewAccept (object sender, HandledEventArgs e)
         {
             tfAcceptedInvoked = true;
-            e.Cancel = cancel;
+            e.Handled = handle;
         }
     }
 

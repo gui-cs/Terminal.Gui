@@ -361,7 +361,7 @@ public class Shortcuts : Scenario
                                    {
                                        eventSource.Add ($"Accept: {shortcut!.CommandView.Text}");
                                        eventLog.MoveDown ();
-                                       args.Cancel = true;
+                                       args.Handled = true;
                                    };
 
                 shortcut.CommandView.Accept += (o, args) =>
@@ -375,7 +375,7 @@ public class Shortcuts : Scenario
         //((CheckBox)vShortcut5.CommandView).OnToggled ();
     }
 
-    private void Button_Clicked (object sender, CancelEventArgs e)
+    private void Button_Clicked (object sender, HandledEventArgs e)
     {
         //e.Cancel = true;
         MessageBox.Query ("Hi", $"You clicked {sender}"); 

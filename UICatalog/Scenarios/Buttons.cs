@@ -486,12 +486,12 @@ public class Buttons : Scenario
 
             return;
 
-            void OnDownButtonOnAccept (object s, CancelEventArgs e)
+            void OnDownButtonOnAccept (object s, HandledEventArgs e)
             {
                 InvokeCommand (Command.ScrollDown);
             }
 
-            void OnUpButtonOnAccept (object s, CancelEventArgs e)
+            void OnUpButtonOnAccept (object s, HandledEventArgs e)
             {
                 InvokeCommand (Command.ScrollUp);
             }
