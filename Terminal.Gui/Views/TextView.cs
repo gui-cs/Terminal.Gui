@@ -6067,7 +6067,12 @@ public class TextView : View
     {
         ResetColumnTrack ();
 
-        if (!AllowsReturn || _isReadOnly)
+        if (_isReadOnly)
+        {
+            return false;
+        }
+
+        if (!AllowsReturn)
         {
             // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
             // event was fired and set Cancel = true.
