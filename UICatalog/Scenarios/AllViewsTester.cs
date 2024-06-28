@@ -354,52 +354,11 @@ public class AllViewsTester : Scenario
         }
         else
         {
-            // If the view supports a Text property, set it so we have something to look at
-            if (view.GetType ().GetProperty ("Text") != null)
-            {
-                try
-                {
-                    view.GetType ()
-                        .GetProperty ("Text")
-                        ?.GetSetMethod ()
-                        ?.Invoke (view, new [] { _demoText });
-                }
-                catch (TargetInvocationException e)
-                {
-                    MessageBox.ErrorQuery ("Exception", e.InnerException.Message, "Ok");
-                    view = null;
-                }
-            }
-
-            // If the view supports a Title property, set it so we have something to look at
-            if (view != null && view.GetType ().GetProperty ("Title") != null)
-            {
-                if (view.GetType ().GetProperty ("Title")!.PropertyType == typeof (string))
-                {
-                    view?.GetType ()
-                        .GetProperty ("Title")
-                        ?.GetSetMethod ()
-                        ?.Invoke (view, new [] { "Test Title" });
-                }
-                else
-                {
-                    view?.GetType ()
-                        .GetProperty ("Title")
-                        ?.GetSetMethod ()
-                        ?.Invoke (view, new [] { "Test Title" });
-                }
-            }
-
-            // If the view supports a Source property, set it so we have something to look at
-            if (view != null
-                && view.GetType ().GetProperty ("Source") != null
-                && view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource))
-            {
-                var source = new ListWrapper<string> (["Test Text #1", "Test Text #2", "Test Text #3"]);
-                view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, [source]);
-            }
+            view.Text = _demoText;
+            view.Title = "_Test Title";
         }
 
+        // TODO: Add IOrientation so this doesn't require reflection
         // If the view supports a Title property, set it so we have something to look at
         if (view?.GetType ().GetProperty ("Orientation") is { } prop)
         {
