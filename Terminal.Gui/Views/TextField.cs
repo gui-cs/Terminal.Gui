@@ -532,9 +532,11 @@ public class TextField : View
                 return;
             }
 
-            CancelEventArgs<string> newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
+            string newText = value.Replace ("\t", "").Split ("\n") [0];
+            CancelEventArgs<string> args = new (oldText, newText);
+            OnTextChanging (args);
 
-            if (newText.Cancel)
+            if (args.Cancel)
             {
                 if (_cursorPosition > _text.Count)
                 {
@@ -545,7 +547,7 @@ public class TextField : View
             }
 
             ClearAllSelection ();
-            _text = newText.NewValue.EnumerateRunes ().ToList ();
+            _text = args.NewValue.EnumerateRunes ().ToList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {
@@ -1102,13 +1104,12 @@ public class TextField : View
 
     /// <summary>Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.</summary>
     /// <param name="newText">The new text to be replaced.</param>
-    /// <returns>Returns the <see cref="StringEventArgs"/></returns>
-    public virtual CancelEventArgs<string> OnTextChanging (string newText)
+    /// <returns>The event arguments.</returns>
+    public bool OnTextChanging (CancelEventArgs<string> args)
     {
-        CancelEventArgs<string> ev = new (string.Empty, newText);
-        TextChanging?.Invoke (this, ev);
+        TextChanging?.Invoke (this, args);
 
-        return ev;
+        return args.Cancel;
     }
 
     /// <summary>Paste the selected text from the clipboard.</summary>
