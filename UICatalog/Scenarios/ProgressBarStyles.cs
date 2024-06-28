@@ -289,7 +289,7 @@ public class ProgressBarStyles : Scenario
         ckbBidirectional.Toggled += (s, e) =>
                                     {
                                         ckbBidirectional.Checked = marqueesBlocksPB.BidirectionalMarquee =
-                                                                       marqueesContinuousPB.BidirectionalMarquee = (bool)!e.OldValue;
+                                                                       marqueesContinuousPB.BidirectionalMarquee = (bool)!e.CurrentValue;
                                     };
 
 

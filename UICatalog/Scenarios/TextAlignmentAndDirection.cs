@@ -484,7 +484,7 @@ public class TextAlignmentAndDirection : Scenario
             Enabled = false
         };
 
-        justifyCheckbox.Toggled += (s, e) => ToggleJustify (e.OldValue is { } && (bool)e.OldValue);
+        justifyCheckbox.Toggled += (s, e) => ToggleJustify (e.CurrentValue is { } && (bool)e.CurrentValue);
 
         justifyOptions.SelectedItemChanged += (s, e) => { ToggleJustify (false, true); };
 
@@ -504,7 +504,7 @@ public class TextAlignmentAndDirection : Scenario
 
         wrapCheckbox.Toggled += (s, e) =>
                                 {
-                                    if (e.OldValue == true)
+                                    if (e.CurrentValue == true)
                                     {
                                         foreach (Label t in multiLineLabels)
                                         {
@@ -536,7 +536,7 @@ public class TextAlignmentAndDirection : Scenario
 
         autoSizeCheckbox.Toggled += (s, e) =>
                                     {
-                                        if (e.OldValue == true)
+                                        if (e.CurrentValue == true)
                                         {
                                             foreach (Label t in multiLineLabels)
                                             {

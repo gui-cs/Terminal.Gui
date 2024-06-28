@@ -274,10 +274,10 @@ public sealed class PosAlignDemo : Scenario
                                               }
 
                                               // Add or remove buttons
-                                              if (e.NewValue < e.OldValue)
+                                              if (e.NewValue < e.CurrentValue)
                                               {
                                                   // Remove buttons
-                                                  for (int i = e.OldValue - 1; i >= e.NewValue; i--)
+                                                  for (int i = e.CurrentValue - 1; i >= e.NewValue; i--)
                                                   {
                                                       Button button = addedViews [i];
                                                       appWindow.Remove (button);
@@ -286,10 +286,10 @@ public sealed class PosAlignDemo : Scenario
                                                   }
                                               }
 
-                                              if (e.NewValue > e.OldValue)
+                                              if (e.NewValue > e.CurrentValue)
                                               {
                                                   // Add buttons
-                                                  for (int i = e.OldValue; i < e.NewValue; i++)
+                                                  for (int i = e.CurrentValue; i < e.NewValue; i++)
                                                   {
                                                       var button = new Button
                                                       {

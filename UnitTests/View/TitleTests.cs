@@ -16,7 +16,7 @@ public class TitleTests (ITestOutputHelper output)
 
         r.TitleChanged += (s, args) =>
                           {
-                              Assert.Equal (expectedOld, args.OldValue);
+                              Assert.Equal (expectedOld, args.CurrentValue);
                               Assert.Equal (r.Title, args.NewValue);
                           };
 
@@ -40,7 +40,7 @@ public class TitleTests (ITestOutputHelper output)
 
         r.TitleChanging += (s, args) =>
                            {
-                               Assert.Equal (expectedOld, args.OldValue);
+                               Assert.Equal (expectedOld, args.CurrentValue);
                                Assert.Equal (expectedDuring, args.NewValue);
                                args.Cancel = cancel;
                            };

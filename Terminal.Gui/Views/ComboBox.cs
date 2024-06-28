@@ -668,13 +668,13 @@ public class ComboBox : View
             return;
         }
 
-        if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.OldValue))
+        if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.CurrentValue))
         {
             ResetSearchSet ();
         }
-        else if (_search.Text != e.OldValue)
+        else if (_search.Text != e.CurrentValue)
         {
-            if (_search.Text.Length < e.OldValue.Length)
+            if (_search.Text.Length < e.CurrentValue.Length)
             {
                 _selectedItem = -1;
             }

@@ -109,7 +109,7 @@ public partial class View : Responder, ISupportInitializeNotification
 {
     /// <summary>
     ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
-    ///     <see cref="HandledEventArgs.Cancel"/>
+    ///     <see cref="HandledEventArgs.Handled"/>
     ///     to cancel the event.
     /// </summary>
     public event EventHandler<HandledEventArgs> Accept;

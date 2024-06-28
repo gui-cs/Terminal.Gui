@@ -137,8 +137,8 @@ public class TextFormatterDemo : Scenario
                                    {
                                        for (int i = 0; i < alignments.Count; i++)
                                        {
-                                           singleLines [i].Text = e.OldValue == true ? text : unicode;
-                                           multipleLines [i].Text = e.OldValue == true ? text : unicode;
+                                           singleLines [i].Text = e.CurrentValue == true ? text : unicode;
+                                           multipleLines [i].Text = e.CurrentValue == true ? text : unicode;
                                        }
                                    };
 

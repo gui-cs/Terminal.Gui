@@ -228,7 +228,7 @@ public class Border : Adornment
             return;
         }
 
-        if (e.HighlightStyle.HasFlag (HighlightStyle.Pressed))
+        if (e.NewValue.HasFlag (HighlightStyle.Pressed))
         {
             if (!_savedForeColor.HasValue)
             {
@@ -252,7 +252,7 @@ public class Border : Adornment
         }
 #endif
 
-        if (e.HighlightStyle == HighlightStyle.None && _savedForeColor.HasValue)
+        if (e.NewValue == HighlightStyle.None && _savedForeColor.HasValue)
         {
             ColorScheme cs = new ColorScheme (ColorScheme)
             {
@@ -299,7 +299,7 @@ public class Border : Adornment
                 _startGrabPoint = new (mouseEvent.Position.X + Frame.X, mouseEvent.Position.Y + Frame.Y);
                 _dragPosition = mouseEvent.Position;
                 Application.GrabMouse (this);
-                SetHighlight (HighlightStyle);
+                SetHighlight (new (HighlightStyle, HighlightStyle));
             }
 
             return true;
@@ -343,7 +343,7 @@ public class Border : Adornment
         {
             _dragPosition = null;
             Application.UngrabMouse ();
-            SetHighlight (HighlightStyle.None);
+            SetHighlight (new (HighlightStyle, HighlightStyle.None));
 
             return true;
         }

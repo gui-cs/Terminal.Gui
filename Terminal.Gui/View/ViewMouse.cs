@@ -34,21 +34,10 @@ public enum HighlightStyle
 /// <summary>
 /// Event arguments for the <see cref="View.Highlight"/> event.
 /// </summary>
-public class HighlightEventArgs : CancelEventArgs
+public class HighlightEventArgs : CancelEventArgs<HighlightStyle>
 {
-    /// <summary>
-    /// Constructs a new instance of <see cref="HighlightEventArgs"/>.
-    /// </summary>
-    /// <param name="style"></param>
-    public HighlightEventArgs (HighlightStyle style)
-    {
-        HighlightStyle = style;
-    }
-
-    /// <summary>
-    /// The highlight style.
-    /// </summary>
-    public HighlightStyle HighlightStyle { get; }
+    /// <inheritdoc />
+    public HighlightEventArgs (HighlightStyle currentValue, HighlightStyle newValue) : base (currentValue, newValue) { }
 }
 
 public partial class View
@@ -170,7 +159,7 @@ public partial class View
             return false;
         }
 
-        if (OnMouseLeave (mouseEvent) == true)      
+        if (OnMouseLeave (mouseEvent) == true)
         {
             return true;
         }
@@ -335,14 +324,15 @@ public partial class View
 
             if (Viewport.Contains (mouseEvent.Position))
             {
-                if (this is not Adornment && SetHighlight (HighlightStyle.HasFlag (HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None) == true)
+                if (this is not Adornment && SetHighlight (new (HighlightStyle,
+                                                                HighlightStyle.HasFlag (HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None)) == true)
                 {
                     return true;
                 }
             }
             else
             {
-                if (this is not Adornment && SetHighlight (HighlightStyle.HasFlag (HighlightStyle.PressedOutside) ? HighlightStyle.PressedOutside : HighlightStyle.None) == true)
+                if (this is not Adornment && SetHighlight (new (HighlightStyle, HighlightStyle.HasFlag (HighlightStyle.PressedOutside) ? HighlightStyle.PressedOutside : HighlightStyle.None)) == true)
 
                 {
                     return true;
@@ -379,7 +369,7 @@ public partial class View
         {
             if (Application.MouseGrabView == this)
             {
-                SetHighlight (HighlightStyle.None);
+                SetHighlight (new (HighlightStyle, HighlightStyle.None));
             }
 
             return mouseEvent.Handled = true;
@@ -408,7 +398,7 @@ public partial class View
             // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
             Application.UngrabMouse ();
 
-            if (SetHighlight (HighlightStyle.None))
+            if (SetHighlight (new (HighlightStyle, HighlightStyle.None)))
             {
                 return true;
             }
@@ -444,7 +434,7 @@ public partial class View
     /// </remarks>
     /// <returns><see langword="true"/>, if the Highlight event was handled, <see langword="false"/> otherwise.</returns>
 
-    internal bool SetHighlight (HighlightStyle style)
+    internal bool SetHighlight (HighlightEventArgs args)
     {
         // TODO: Make the highlight colors configurable
         if (!CanFocus)
@@ -453,7 +443,7 @@ public partial class View
         }
 
         // Enable override via virtual method and/or event
-        if (OnHighlight (style) == true)
+        if (OnHighlight (args) == true)
         {
             return true;
         }
@@ -475,7 +465,7 @@ public partial class View
             return true;
         }
 #endif 
-        if (style.HasFlag (HighlightStyle.Pressed) || style.HasFlag (HighlightStyle.PressedOutside))
+        if (args.NewValue.HasFlag (HighlightStyle.Pressed) || args.NewValue.HasFlag (HighlightStyle.PressedOutside))
         {
             if (_savedHighlightColorScheme is null && ColorScheme is { })
             {
@@ -505,7 +495,7 @@ public partial class View
         }
 
 
-        if (style == HighlightStyle.None)
+        if (args.NewValue == HighlightStyle.None)
         {
             // Unhighlight
             if (_savedHighlightColorScheme is { })
@@ -528,9 +518,8 @@ public partial class View
     ///     Called when the view is to be highlighted.
     /// </summary>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected virtual bool? OnHighlight (HighlightStyle highlight)
+    protected virtual bool? OnHighlight (HighlightEventArgs args)
     {
-        HighlightEventArgs args = new (highlight);
         Highlight?.Invoke (this, args);
 
         if (args.Cancel)
@@ -538,7 +527,6 @@ public partial class View
             return true;
         }
 
-        args = new (highlight);
         Margin?.Highlight?.Invoke (this, args);
 
         //args = new (highlight);

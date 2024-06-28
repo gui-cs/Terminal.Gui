@@ -297,7 +297,7 @@ public class Shortcut : View
 
     private void Shortcut_Highlight (object sender, HighlightEventArgs e)
     {
-        if (e.HighlightStyle.HasFlag (HighlightStyle.Pressed))
+        if (e.CurrentValue.HasFlag (HighlightStyle.Pressed))
         {
             if (!_savedForeColor.HasValue)
             {
@@ -311,7 +311,7 @@ public class Shortcut : View
             base.ColorScheme = cs;
         }
 
-        if (e.HighlightStyle == HighlightStyle.None && _savedForeColor.HasValue)
+        if (e.CurrentValue == HighlightStyle.None && _savedForeColor.HasValue)
         {
             var cs = new ColorScheme (base.ColorScheme)
             {
