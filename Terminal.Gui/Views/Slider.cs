@@ -3,7 +3,7 @@
 namespace Terminal.Gui;
 
 /// <summary>Slider control.</summary>
-public class Slider : Slider<object>, IDesignable
+public class Slider : Slider<object>
 {
     /// <summary>Initializes a new instance of the <see cref="Slider"/> class.</summary>
     public Slider () { }
@@ -14,14 +14,6 @@ public class Slider : Slider<object>, IDesignable
     public Slider (List<object> options, Orientation orientation = Orientation.Horizontal) :
         base (options, orientation)
     { }
-
-    /// <inheritdoc />
-    public bool Enable ()
-    {
-        string [] list = { "Option 1", "Option 2", "Option 3", "Option 4", "Option 5" };
-        Options = list.Select (x => new SliderOption<object> { Legend = x }).ToList ();
-        return true;
-    }
 }
 
 /// <summary>
@@ -1802,7 +1794,7 @@ public class Slider<T> : View, IDesignable
     #endregion
 
     /// <inheritdoc />
-    public bool Enable ()
+    public bool EnableForDesign ()
     {
         string [] list = { "Option 1", "Option 2", "Option 3", "Option 4", "Option 5" };
         Options = list.Select (x => new SliderOption<T> { Legend = x }).ToList ();

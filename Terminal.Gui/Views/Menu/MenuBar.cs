@@ -1594,7 +1594,7 @@ public class MenuBar : View, IDesignable
 
 
     /// <inheritdoc />
-    public bool Enable<TContext> (in TContext context) where TContext : notnull
+    public bool EnableForDesign<TContext> (in TContext context) where TContext : notnull
     {
         if (context is not Func<string, bool> actionFn)
         {

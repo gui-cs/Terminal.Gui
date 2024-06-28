@@ -1254,7 +1254,7 @@ wo
         MenuItem miCurrent = null;
 
         MenuBar menu = new MenuBar ();
-        menu.Enable (
+        menu.EnableForDesign (
                                new Func<object, bool> (s =>
                                                        {
                                                            miAction = s as string;
@@ -1304,7 +1304,7 @@ wo
         MenuItem miCurrent = null;
 
         MenuBar menu = new MenuBar ();
-        menu.Enable (
+        menu.EnableForDesign (
                                new Func<object, bool> (s =>
                                                        {
                                                            miAction = s as string;

@@ -71,7 +71,7 @@ public class MenuBarScenario : Scenario
             return true;
         }
 
-        menuBar.Enable ((Func<string, bool>)fnAction);
+        menuBar.EnableForDesign ((Func<string, bool>)fnAction);
 
         menuBar.MenuOpening += (s, e) =>
                                {

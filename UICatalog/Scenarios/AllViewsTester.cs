@@ -350,7 +350,7 @@ public class AllViewsTester : Scenario
 
         if (view is IDesignable designable)
         {
-            designable.Enable (_demoText);
+            designable.EnableForDesign (_demoText);
         }
         else
         {

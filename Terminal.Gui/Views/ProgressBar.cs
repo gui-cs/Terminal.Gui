@@ -279,7 +279,7 @@ public class ProgressBar : View, IDesignable
     }
 
     /// <inheritdoc />
-    public bool Enable ()
+    public bool EnableForDesign ()
     {
         Width = Dim.Fill ();
         Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
