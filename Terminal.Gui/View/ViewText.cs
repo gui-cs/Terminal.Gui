@@ -69,18 +69,17 @@ public partial class View
                 Id = _text;
             }
 #endif
-            OnTextChanged (old, Text);
+            OnTextChanged (new CancelEventArgs<string> (old, Text));
         }
     }
 
     /// <summary>
     /// Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
     /// </summary>
-    /// <param name="oldValue"></param>
-    /// <param name="newValue"></param>
-    public void OnTextChanged (string oldValue, string newValue)
+    /// <param name="args">The event arguments</param>
+    public void OnTextChanged (CancelEventArgs<string> args)
     {
-        TextChanged?.Invoke (this, new CancelEventArgs<string> (oldValue, newValue));
+        TextChanged?.Invoke (this, args);
     }
 
     /// <summary>

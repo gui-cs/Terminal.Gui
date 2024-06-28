@@ -12,7 +12,7 @@ namespace Terminal.Gui;
 ///     should be set to
 ///     <see langword="true"/> to prevent the state change from occurring.
 /// </remarks>
-public class CancelEventArgs<T> : CancelEventArgs where T : notnull
+public class CancelEventArgs<T> : CancelEventArgs
 {
     /// <summary>Initializes a new instance of the <see cref="CancelEventArgs{T}"/> class.</summary>
     /// <param name="currentValue">The current (old) value of the property.</param>

@@ -2830,7 +2830,7 @@ public class TextView : View
                 _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
             }
 
-            OnTextChanged (old, Text);
+            OnTextChanged (new (old, Text));
             SetNeedsDisplay ();
 
             _historyText.Clear (Text);

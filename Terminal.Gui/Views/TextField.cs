@@ -563,7 +563,7 @@ public class TextField : View
                                  );
             }
 
-            OnTextChanged (oldText, StringExtensions.ToString (_text));
+            OnTextChanged (new (oldText, StringExtensions.ToString (_text)));
 
             ProcessAutocomplete ();
 
