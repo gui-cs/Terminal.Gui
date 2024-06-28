@@ -348,9 +348,9 @@ public class AllViewsTester : Scenario
             view.ColorScheme = Colors.ColorSchemes ["Base"];
         }
 
-        if (view is IDesignable iface)
+        if (view is IDesignable designable)
         {
-            iface.Enable (_demoText);
+            designable.Enable (_demoText);
         }
         else
         {
