@@ -45,10 +45,10 @@ public class Adornment : View
         get => _thickness;
         set
         {
-            Thickness prev = _thickness;
+            Thickness current = _thickness;
             _thickness = value;
 
-            if (prev != _thickness)
+            if (current != _thickness)
             {
                 if (Parent?.IsInitialized == false)
                 {
@@ -61,21 +61,18 @@ public class Adornment : View
                     Parent?.LayoutSubviews ();
                 }
 
-                OnThicknessChanged (prev);
+                OnThicknessChanged (new (current, Thickness));
             }
         }
     }
 
     /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
-    public event EventHandler<ThicknessEventArgs> ThicknessChanged;
+    public event EventHandler<CancelEventArgs<Thickness>> ThicknessChanged;
 
     /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
-    public void OnThicknessChanged (Thickness previousThickness)
+    public void OnThicknessChanged (CancelEventArgs<Thickness> args)
     {
-        ThicknessChanged?.Invoke (
-                                  this,
-                                  new () { Thickness = Thickness, PreviousThickness = previousThickness }
-                                 );
+        ThicknessChanged?.Invoke (this, args);
     }
 
     #endregion Thickness
