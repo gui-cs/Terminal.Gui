@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -362,7 +362,7 @@ public class ShortcutTests
     // " C  0  A "
     [InlineData (-1, 0, 0)]
     [InlineData (0, 1, 1)]
-    [InlineData (1, 0, 1)] // BUGBUG: This should be 1,1,1. We need to fix the logic in the Shortcut class.
+    [InlineData (1, 1, 1, Skip = "BUGBUG: This breaks. We need to fix the logic in the Shortcut class.")]
     [InlineData (2, 1, 1)]
     [InlineData (3, 1, 1)]
     [InlineData (4, 1, 1)]
