@@ -1253,14 +1253,16 @@ wo
         MenuItem mbiCurrent = null;
         MenuItem miCurrent = null;
 
-        MenuBar menu = MenuBarScenario.CreateTestMenu (
-                                                       s =>
+        MenuBar menu = new MenuBar ();
+        menu.EnableForDesign (
+                               new Func<object, bool> (s =>
                                                        {
-                                                           miAction = s;
+                                                           miAction = s as string;
 
                                                            return true;
-                                                       }
-                                                      );
+                                                       })
+                              );
+
         menu.Key = KeyCode.F9;
         menu.MenuOpening += (s, e) => mbiCurrent = e.CurrentMenu;
         menu.MenuOpened += (s, e) => { miCurrent = e.MenuItem; };
@@ -1301,14 +1303,16 @@ wo
         MenuItem mbiCurrent = null;
         MenuItem miCurrent = null;
 
-        MenuBar menu = MenuBarScenario.CreateTestMenu (
-                                                       s =>
+        MenuBar menu = new MenuBar ();
+        menu.EnableForDesign (
+                               new Func<object, bool> (s =>
                                                        {
-                                                           miAction = s;
+                                                           miAction = s as string;
 
                                                            return true;
-                                                       }
-                                                      );
+                                                       })
+                              );
+
         menu.Key = KeyCode.F9;
         menu.MenuOpening += (s, e) => mbiCurrent = e.CurrentMenu;
         menu.MenuOpened += (s, e) => { miCurrent = e.MenuItem; };

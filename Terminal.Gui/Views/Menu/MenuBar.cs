@@ -34,7 +34,7 @@ namespace Terminal.Gui;
 ///         duplicates a shortcut (e.g. _File and Alt-F), the hot key wins.
 ///     </para>
 /// </remarks>
-public class MenuBar : View
+public class MenuBar : View, IDesignable
 {
     // Spaces before the Title
     private static readonly int _leftPadding = 1;
@@ -1591,4 +1591,177 @@ public class MenuBar : View
     }
 
     #endregion Mouse Handling
+
+
+    /// <inheritdoc />
+    public bool EnableForDesign<TContext> (in TContext context) where TContext : notnull
+    {
+        if (context is not Func<string, bool> actionFn)
+        {
+            actionFn = (s) => true;
+        }
+
+        Menus =
+        [
+            new MenuBarItem (
+                             "_File",
+                             new MenuItem []
+                             {
+                                 new (
+                                      "_New",
+                                      "",
+                                      () => actionFn ("New"),
+                                      null,
+                                      null,
+                                      KeyCode.CtrlMask | KeyCode.N
+                                     ),
+                                 new (
+                                      "_Open",
+                                      "",
+                                      () => actionFn ("Open"),
+                                      null,
+                                      null,
+                                      KeyCode.CtrlMask | KeyCode.O
+                                     ),
+                                 new (
+                                      "_Save",
+                                      "",
+                                      () => actionFn ("Save"),
+                                      null,
+                                      null,
+                                      KeyCode.CtrlMask | KeyCode.S
+                                     ),
+                                 null,
+
+                                 // Don't use Application.Quit so we can disambiguate between quitting and closing the toplevel
+                                 new (
+                                      "_Quit",
+                                      "",
+                                      () => actionFn ("Quit"),
+                                      null,
+                                      null,
+                                      KeyCode.CtrlMask | KeyCode.Q
+                                     )
+                             }
+                            ),
+            new MenuBarItem (
+                             "_Edit",
+                             new MenuItem []
+                             {
+                                 new (
+                                      "_Copy",
+                                      "",
+                                      () => actionFn ("Copy"),
+                                      null,
+                                      null,
+                                      KeyCode.CtrlMask | KeyCode.C
+                                     ),
+                                 new (
+                                      "C_ut",
+                                      "",
+                                      () => actionFn ("Cut"),
+                                      null,
+                                      null,
+                                      KeyCode.CtrlMask | KeyCode.X
+                                     ),
+                                 new (
+                                      "_Paste",
+                                      "",
+                                      () => actionFn ("Paste"),
+                                      null,
+                                      null,
+                                      KeyCode.CtrlMask | KeyCode.V
+                                     ),
+                                 new MenuBarItem (
+                                                  "_Find and Replace",
+                                                  new MenuItem []
+                                                  {
+                                                      new (
+                                                           "F_ind",
+                                                           "",
+                                                           () => actionFn ("Find"),
+                                                           null,
+                                                           null,
+                                                           KeyCode.CtrlMask | KeyCode.F
+                                                          ),
+                                                      new (
+                                                           "_Replace",
+                                                           "",
+                                                           () => actionFn ("Replace"),
+                                                           null,
+                                                           null,
+                                                           KeyCode.CtrlMask | KeyCode.H
+                                                          ),
+                                                      new MenuBarItem (
+                                                                       "_3rd Level",
+                                                                       new MenuItem []
+                                                                       {
+                                                                           new (
+                                                                                "_1st",
+                                                                                "",
+                                                                                () => actionFn (
+                                                                                                "1"
+                                                                                               ),
+                                                                                null,
+                                                                                null,
+                                                                                KeyCode.F1
+                                                                               ),
+                                                                           new (
+                                                                                "_2nd",
+                                                                                "",
+                                                                                () => actionFn (
+                                                                                                "2"
+                                                                                               ),
+                                                                                null,
+                                                                                null,
+                                                                                KeyCode.F2
+                                                                               )
+                                                                       }
+                                                                      ),
+                                                      new MenuBarItem (
+                                                                       "_4th Level",
+                                                                       new MenuItem []
+                                                                       {
+                                                                           new (
+                                                                                "_5th",
+                                                                                "",
+                                                                                () => actionFn (
+                                                                                                "5"
+                                                                                               ),
+                                                                                null,
+                                                                                null,
+                                                                                KeyCode.CtrlMask
+                                                                                | KeyCode.D5
+                                                                               ),
+                                                                           new (
+                                                                                "_6th",
+                                                                                "",
+                                                                                () => actionFn (
+                                                                                                "6"
+                                                                                               ),
+                                                                                null,
+                                                                                null,
+                                                                                KeyCode.CtrlMask
+                                                                                | KeyCode.D6
+                                                                               )
+                                                                       }
+                                                                      )
+                                                  }
+                                                 ),
+                                 new (
+                                      "_Select All",
+                                      "",
+                                      () => actionFn ("Select All"),
+                                      null,
+                                      null,
+                                      KeyCode.CtrlMask
+                                      | KeyCode.ShiftMask
+                                      | KeyCode.S
+                                     )
+                             }
+                            ),
+            new MenuBarItem ("_About", "Top-Level", () => actionFn ("About"))
+        ];
+        return true;
+    }
 }
