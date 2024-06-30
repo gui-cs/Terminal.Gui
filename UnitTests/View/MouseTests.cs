@@ -566,7 +566,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         return;
 
-        void View_Highlight (object sender, HighlightEventArgs e)
+        void View_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
         {
             if (e.NewValue == HighlightStyle.None)
             {
@@ -635,7 +635,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         return;
 
-        void View_Highlight (object sender, HighlightEventArgs e)
+        void View_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
         {
             if (e.NewValue == HighlightStyle.None)
             {

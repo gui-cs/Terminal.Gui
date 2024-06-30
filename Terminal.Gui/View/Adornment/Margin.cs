@@ -39,7 +39,7 @@ public class Margin : Adornment
     }
 
     private bool _pressed;
-    private void Margin_Highlight (object? sender, HighlightEventArgs e)
+    private void Margin_Highlight (object? sender, CancelEventArgs<HighlightStyle> e)
     {
         if (ShadowStyle != Gui.ShadowStyle.None)
         {

@@ -220,7 +220,7 @@ public class Border : Adornment
 
     private Color? _savedForeColor;
 
-    private void Border_Highlight (object sender, HighlightEventArgs e)
+    private void Border_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
     {
         if (!Parent.Arrangement.HasFlag (ViewArrangement.Movable))
         {

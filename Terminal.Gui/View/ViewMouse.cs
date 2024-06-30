@@ -11,7 +11,7 @@ public partial class View
     ///     Fired when the view is highlighted. Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/>
     ///     to implement a custom highlight scheme or prevent the view from being highlighted.
     /// </summary>
-    public event EventHandler<HighlightEventArgs> Highlight;
+    public event EventHandler<CancelEventArgs<HighlightStyle>> Highlight;
 
     /// <summary>
     ///     Gets or sets whether the <see cref="View"/> will be highlighted visually while the mouse button is
@@ -211,7 +211,7 @@ public partial class View
     ///     Called when the view is to be highlighted.
     /// </summary>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected virtual bool? OnHighlight (HighlightEventArgs args)
+    protected virtual bool? OnHighlight (CancelEventArgs<HighlightStyle> args)
     {
         Highlight?.Invoke (this, args);
 
@@ -442,7 +442,7 @@ public partial class View
 
         // Enable override via virtual method and/or event
         HighlightStyle copy = HighlightStyle;
-        var args = new HighlightEventArgs (ref copy, ref newHighlightStyle);
+        var args = new CancelEventArgs<HighlightStyle> (ref copy, ref newHighlightStyle);
 
         if (OnHighlight (args) == true)
         {

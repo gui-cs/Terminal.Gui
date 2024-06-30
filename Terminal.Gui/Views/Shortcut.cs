@@ -295,7 +295,7 @@ public class Shortcut : View
 
     private Color? _savedForeColor;
 
-    private void Shortcut_Highlight (object sender, HighlightEventArgs e)
+    private void Shortcut_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
     {
         if (e.CurrentValue.HasFlag (HighlightStyle.Pressed))
         {
