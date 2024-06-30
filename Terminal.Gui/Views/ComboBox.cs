@@ -7,6 +7,7 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -186,12 +187,6 @@ public class ComboBox : View
             if (SuperView is { } && SuperView.Subviews.Contains (this))
             {
                 Text = string.Empty;
-//                SelectedItem = -1;
-//                _search.Text = string.Empty;
-//                ResetSearchSet ();
-
-//                HideList ();
-////                ShowHideList (string.Empty);
                 SetNeedsDisplay ();
             }
         }
@@ -768,14 +763,15 @@ public class ComboBox : View
     // Sets the search text field Text as well as our own Text property
     private void SetSearchText (string value)
     {
-//        _text = value;
         _search.Text = value;
         _text = value;
     }
 
     private void SetValue (object text, bool isFromSelectedItem = false)
     {
+        // TOOD: THe fact we have to suspend events to change the text makes this feel very hacky.
         _search.TextChanged -= Search_Changed;
+        // Note we set _text, to avoid set_Text from setting _search.Text again
         _text = _search.Text = text.ToString ();
         _search.CursorPosition = 0;
         _search.TextChanged += Search_Changed;
