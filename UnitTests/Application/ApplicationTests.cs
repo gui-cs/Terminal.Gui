@@ -295,9 +295,9 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnInitializedChanged (object s, CancelEventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
         {
-            if (a.NewValue)
+            if (a.CurrentValue)
             {
                 initialized = true;
             }
@@ -1151,9 +1151,9 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnInitializedChanged (object s, CancelEventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
         {
-            if (a.NewValue)
+            if (a.CurrentValue)
             {
                 Application.Iteration += OnApplicationOnIteration;
                 initialized = true;

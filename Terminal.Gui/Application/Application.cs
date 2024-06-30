@@ -308,7 +308,7 @@ public static partial class Application
         SupportedCultures = GetSupportedCultures ();
         _mainThreadId = Thread.CurrentThread.ManagedThreadId;
         _initialized = true;
-        InitializedChanged?.Invoke (null, new (false, _initialized));
+        InitializedChanged?.Invoke (null, new (in _initialized));
     }
 
     private static void Driver_SizeChanged (object sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
@@ -349,7 +349,7 @@ public static partial class Application
         // TODO: Throw an exception if Init hasn't been called.
         ResetState ();
         PrintJsonErrors ();
-        InitializedChanged?.Invoke (null, new (true, _initialized));
+        InitializedChanged?.Invoke (null, new (in _initialized));
     }
 
     /// <summary>
@@ -358,7 +358,7 @@ public static partial class Application
     /// <remarks>
     ///     Intended to support unit tests that need to know when the application has been initialized.
     /// </remarks>
-    public static event EventHandler<CancelEventArgs<bool>> InitializedChanged;
+    public static event EventHandler<EventArgs<bool>> InitializedChanged;
 
     #endregion Initialization (Init/Shutdown)
 

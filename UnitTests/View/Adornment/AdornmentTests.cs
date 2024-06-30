@@ -326,8 +326,7 @@ public class AdornmentTests (ITestOutputHelper output)
         adornment.ThicknessChanged += (s, e) =>
                                       {
                                           raised = true;
-                                          Assert.Equal (Thickness.Empty, e.CurrentValue);
-                                          Assert.Equal (new Thickness (1, 2, 3, 4), e.NewValue);
+                                          Assert.Equal (new Thickness (1, 2, 3, 4), e.CurrentValue);
                                           Assert.Equal (new Thickness (1, 2, 3, 4), adornment.Thickness);
                                       };
         adornment.Thickness = new Thickness (1, 2, 3, 4);

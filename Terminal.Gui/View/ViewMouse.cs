@@ -283,7 +283,7 @@ public partial class View
             // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
             Application.UngrabMouse ();
 
-            if (SetHighlight (new (HighlightStyle, HighlightStyle.None)))
+            if (SetHighlight (HighlightStyle.None))
             {
                 return true;
             }
@@ -318,7 +318,7 @@ public partial class View
         {
             if (Application.MouseGrabView == this)
             {
-                SetHighlight (new (HighlightStyle, HighlightStyle.None));
+                SetHighlight (HighlightStyle.None);
             }
 
             return mouseEvent.Handled = true;
@@ -432,7 +432,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <returns><see langword="true"/>, if the Highlight event was handled, <see langword="false"/> otherwise.</returns>
-    internal bool SetHighlight (HighlightEventArgs args)
+    internal bool SetHighlight (HighlightStyle newHighlightStyle)
     {
         // TODO: Make the highlight colors configurable
         if (!CanFocus)
@@ -441,6 +441,9 @@ public partial class View
         }
 
         // Enable override via virtual method and/or event
+        HighlightStyle copy = HighlightStyle;
+        var args = new HighlightEventArgs (ref copy, ref newHighlightStyle);
+
         if (OnHighlight (args) == true)
         {
             return true;
@@ -541,10 +544,7 @@ public partial class View
             if (Viewport.Contains (mouseEvent.Position))
             {
                 if (this is not Adornment
-                    && SetHighlight (
-                                     new (
-                                          HighlightStyle,
-                                          HighlightStyle.HasFlag (HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None)))
+                    && SetHighlight (HighlightStyle.HasFlag (HighlightStyle.Pressed) ? HighlightStyle.Pressed : HighlightStyle.None))
                 {
                     return true;
                 }
@@ -552,10 +552,7 @@ public partial class View
             else
             {
                 if (this is not Adornment
-                    && SetHighlight (
-                                     new (
-                                          HighlightStyle,
-                                          HighlightStyle.HasFlag (HighlightStyle.PressedOutside) ? HighlightStyle.PressedOutside : HighlightStyle.None)))
+                    && SetHighlight (HighlightStyle.HasFlag (HighlightStyle.PressedOutside) ? HighlightStyle.PressedOutside : HighlightStyle.None))
 
                 {
                     return true;

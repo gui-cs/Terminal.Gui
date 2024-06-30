@@ -42,9 +42,9 @@ public class CheckBox : View
         e.Handled = OnToggled () == true;
     }
 
-    private void Checkbox_TitleChanged (object? sender, CancelEventArgs<string> e)
+    private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
     {
-        base.Text = e.NewValue;
+        base.Text = e.CurrentValue;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
@@ -63,7 +63,7 @@ public class CheckBox : View
     }
 
     /// <summary>
-    ///     If <see langword="true"/> allows <see cref="Checked"/> to be null, true or false. If <see langword="false"/>
+    ///     If <see langword="true"/> allows <see cref="Checked"/> to be null, true, or false. If <see langword="false"/>
     ///     only allows <see cref="Checked"/> to be true or false.
     /// </summary>
     public bool AllowNullChecked
@@ -76,7 +76,23 @@ public class CheckBox : View
         }
     }
 
-    /// <summary>The state of the <see cref="CheckBox"/></summary>
+    /// <summary>
+    ///     The state of the <see cref="CheckBox"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///        If <see langword="null"/> and <see cref="AllowNullChecked"/> is <see langword="true"/>, the <see cref="CheckBox"/>
+    ///        will display the <c>ConfigurationManager.Glyphs.NullChecked</c> character (☒).
+    ///     </para>
+    ///     <para>
+    ///        If <see langword="false"/>, the <see cref="CheckBox"/>
+    ///        will display the <c>ConfigurationManager.Glyphs.UnChecked</c> character (☐).
+    ///     </para>
+    ///     <para>
+    ///        If <see langword="false"/>, the <see cref="CheckBox"/>
+    ///        will display the <c>ConfigurationManager.Glyphs.Checked</c> character (☑).
+    ///     </para>
+    /// </remarks>
     public bool? Checked
     {
         get => _checked;
@@ -99,7 +115,8 @@ public class CheckBox : View
     /// <returns>If <see langword="true"/> the <see cref="Toggled"/> event was canceled.</returns>
     public bool? OnToggled ()
     {
-        CancelEventArgs<bool?> e = new (Checked, false);
+        bool ? oldValue = Checked;
+        CancelEventArgs<bool?> e = new (ref _checked, ref oldValue);
 
         if (AllowNullChecked)
         {

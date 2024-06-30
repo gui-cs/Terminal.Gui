@@ -533,7 +533,7 @@ public class TextField : View
             }
 
             string newText = value.Replace ("\t", "").Split ("\n") [0];
-            CancelEventArgs<string> args = new (oldText, newText);
+            CancelEventArgs<string> args = new (ref oldText, ref newText);
             OnTextChanging (args);
 
             if (args.Cancel)
@@ -547,6 +547,8 @@ public class TextField : View
             }
 
             ClearAllSelection ();
+
+            // Note we use NewValue here; TextChanging subscribers may have changed it
             _text = args.NewValue.EnumerateRunes ().ToList ();
 
             if (!Secret && !_historyText.IsFromHistory)
@@ -563,7 +565,7 @@ public class TextField : View
                                  );
             }
 
-            OnTextChanged (new (oldText, StringExtensions.ToString (_text)));
+            OnTextChanged ();
 
             ProcessAutocomplete ();
 

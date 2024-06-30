@@ -61,16 +61,16 @@ public class Adornment : View
                     Parent?.LayoutSubviews ();
                 }
 
-                OnThicknessChanged (new (current, Thickness));
+                OnThicknessChanged (new (Thickness));
             }
         }
     }
 
     /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
-    public event EventHandler<CancelEventArgs<Thickness>> ThicknessChanged;
+    public event EventHandler<EventArgs<Thickness>> ThicknessChanged;
 
     /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
-    public void OnThicknessChanged (CancelEventArgs<Thickness> args)
+    public void OnThicknessChanged (EventArgs<Thickness> args)
     {
         ThicknessChanged?.Invoke (this, args);
     }

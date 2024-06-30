@@ -6,5 +6,5 @@
 public class HighlightEventArgs : CancelEventArgs<HighlightStyle>
 {
     /// <inheritdoc />
-    public HighlightEventArgs (HighlightStyle currentValue, HighlightStyle newValue) : base (currentValue, newValue) { }
+    public HighlightEventArgs (ref HighlightStyle currentValue, ref HighlightStyle newValue) : base (ref currentValue, ref newValue) { }
 }

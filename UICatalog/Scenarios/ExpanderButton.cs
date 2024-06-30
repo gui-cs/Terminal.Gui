@@ -133,15 +133,16 @@ public class ExpanderButton : Button
 
     /// <summary>Called when the orientation is changing. Invokes the <see cref="OrientationChanging"/> event.</summary>
     /// <param name="newOrientation"></param>
+    /// <param name="newValue"></param>
     /// <returns>True of the event was cancelled.</returns>
     protected virtual bool OnCollapsedChanging (bool newValue)
     {
-        CancelEventArgs<bool> args = new (Collapsed, newValue);
+        CancelEventArgs<bool> args = new (ref _collapsed, ref newValue);
         CollapsedChanging?.Invoke (this, args);
 
         if (!args.Cancel)
         {
-            _collapsed = newValue;
+            _collapsed = args.NewValue;
 
             ExpandOrCollapse (_collapsed);
 

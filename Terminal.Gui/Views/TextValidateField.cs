@@ -64,8 +64,8 @@ namespace Terminal.Gui
 
             /// <summary>Method that invoke the <see cref="TextChanged"/> event if it's defined.</summary>
             /// <param name="oldValue">The previous text before replaced.</param>
-            /// <returns>Returns the <see cref="CancelEventArgs{T}"/></returns>
-            void OnTextChanged (CancelEventArgs<string> oldValue);
+            /// <returns>Returns the <see cref="EventArgs{T}"/></returns>
+            void OnTextChanged (EventArgs<string> oldValue);
 
             /// <summary>
             ///     Changed event, raised when the text has changed.
@@ -74,7 +74,7 @@ namespace Terminal.Gui
             ///         <see cref="string"/> containing the old value.
             ///     </remarks>
             /// </summary>
-            event EventHandler<CancelEventArgs<string>> TextChanged;
+            event EventHandler<EventArgs<string>> TextChanged;
         }
 
         //////////////////////////////////////////////////////////////////////////////
@@ -125,7 +125,7 @@ namespace Terminal.Gui
             }
 
             /// <inheritdoc/>
-            public event EventHandler<CancelEventArgs<string>> TextChanged;
+            public event EventHandler<EventArgs<string>> TextChanged;
 
             /// <inheritdoc/>
             public string Text
@@ -206,7 +206,7 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new CancelEventArgs<string> (oldValue, Text));
+                    OnTextChanged (new EventArgs<string> (ref oldValue));
                 }
 
                 return result;
@@ -220,14 +220,14 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new CancelEventArgs<string> (oldValue, Text));
+                    OnTextChanged (new EventArgs<string> (ref oldValue));
                 }
 
                 return result;
             }
 
             /// <inheritdoc/>
-            public void OnTextChanged (CancelEventArgs<string> args) { TextChanged?.Invoke (this, args); }
+            public void OnTextChanged (EventArgs<string> args) { TextChanged?.Invoke (this, args); }
         }
 
         #endregion
@@ -260,7 +260,7 @@ namespace Terminal.Gui
             public bool ValidateOnInput { get; set; } = true;
 
             /// <inheritdoc/>
-            public event EventHandler<CancelEventArgs<string>> TextChanged;
+            public event EventHandler<EventArgs<string>> TextChanged;
 
             /// <inheritdoc/>
             public string Text
@@ -333,7 +333,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.RemoveAt (pos);
-                    OnTextChanged (new CancelEventArgs<string> (oldValue, Text));
+                    OnTextChanged (new EventArgs<string> (oldValue));
                 }
 
                 return true;
@@ -349,7 +349,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.Insert (pos, (Rune)ch);
-                    OnTextChanged (new CancelEventArgs<string> (oldValue, Text));
+                    OnTextChanged (new EventArgs<string> (ref oldValue));
 
                     return true;
                 }
@@ -358,7 +358,7 @@ namespace Terminal.Gui
             }
 
             /// <inheritdoc/>
-            public void OnTextChanged (CancelEventArgs<string> args) { TextChanged?.Invoke (this, args); }
+            public void OnTextChanged (EventArgs<string> args) { TextChanged?.Invoke (this, args); }
 
             /// <summary>Compiles the regex pattern for validation./></summary>
             private void CompileMask () { _regex = new Regex (StringExtensions.ToString (_pattern), RegexOptions.Compiled); }

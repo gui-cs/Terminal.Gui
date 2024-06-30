@@ -2820,7 +2820,6 @@ public class TextView : View
         }
         set
         {
-            string old = Text;
             ResetPosition ();
             _model.LoadString (value);
 
@@ -2830,7 +2829,7 @@ public class TextView : View
                 _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
             }
 
-            OnTextChanged (new (old, Text));
+            OnTextChanged ();
             SetNeedsDisplay ();
 
             _historyText.Clear (Text);

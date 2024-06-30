@@ -124,7 +124,8 @@ public partial class View
         get => Border?.LineStyle ?? LineStyle.Single;
         set
         {
-            CancelEventArgs<LineStyle> e = new (Border?.LineStyle ?? LineStyle.None, value);
+            var old = Border?.LineStyle ?? LineStyle.None;
+            CancelEventArgs<LineStyle> e = new (ref old, ref value);
             OnBorderStyleChanging (e);
 
         }

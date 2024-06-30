@@ -77,19 +77,8 @@ public class CharacterMap : Scenario
         };
         top.Add (_errorLabel);
 
-#if TEXT_CHANGED_TO_JUMP
-        jumpEdit.TextChanged += JumpEdit_TextChanged;
-#else
         jumpEdit.Accept += JumpEditOnAccept;
 
-        void JumpEditOnAccept (object sender, HandledEventArgs e)
-        {
-            JumpEdit_TextChanged (sender, new (jumpEdit.Text, jumpEdit.Text));
-
-            // Cancel the event to prevent ENTER from being handled elsewhere
-            e.Handled = true;
-        }
-#endif
         _categoryList = new () { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
         _categoryList.FullRowSelect = true;
 
@@ -181,6 +170,83 @@ public class CharacterMap : Scenario
         Application.Run (top);
         top.Dispose ();
         Application.Shutdown ();
+
+        return;
+
+        void JumpEditOnAccept (object sender, HandledEventArgs e)
+        {
+            if (jumpEdit.Text.Length == 0)
+            {
+                return;
+            }
+
+            uint result = 0;
+
+            if (jumpEdit.Text.StartsWith ("U+", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u"))
+            {
+                try
+                {
+                    result = uint.Parse (jumpEdit.Text [2..], NumberStyles.HexNumber);
+                }
+                catch (FormatException)
+                {
+                    _errorLabel.Text = "Invalid hex value";
+
+                    return;
+                }
+            }
+            else if (jumpEdit.Text.StartsWith ("0", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u"))
+            {
+                try
+                {
+                    result = uint.Parse (jumpEdit.Text, NumberStyles.HexNumber);
+                }
+                catch (FormatException)
+                {
+                    _errorLabel.Text = "Invalid hex value";
+
+                    return;
+                }
+            }
+            else
+            {
+                try
+                {
+                    result = uint.Parse (jumpEdit.Text, NumberStyles.Integer);
+                }
+                catch (FormatException)
+                {
+                    _errorLabel.Text = "Invalid value";
+
+                    return;
+                }
+            }
+
+            if (result > RuneExtensions.MaxUnicodeCodePoint)
+            {
+                _errorLabel.Text = "Beyond maximum codepoint";
+
+                return;
+            }
+
+            _errorLabel.Text = $"U+{result:x5}";
+
+            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+
+            _categoryList.SelectedRow = table.Data
+                                             .Select ((item, index) => new { item, index })
+                                             .FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)
+                                             ?.index
+                                        ?? -1;
+            _categoryList.EnsureSelectedCellIsVisible ();
+
+            // Ensure the typed glyph is selected 
+            _charMap.SelectedCodePoint = (int)result;
+
+
+            // Cancel the event to prevent ENTER from being handled elsewhere
+            e.Handled = true;
+        }
     }
 
     private void _categoryList_Initialized (object sender, EventArgs e) { _charMap.Width = Dim.Fill () - _categoryList.Width; }
@@ -240,78 +306,6 @@ public class CharacterMap : Scenario
         return item;
     }
 
-    private void JumpEdit_TextChanged (object sender, CancelEventArgs<string> e)
-    {
-        var jumpEdit = sender as TextField;
-
-        if (jumpEdit.Text.Length == 0)
-        {
-            return;
-        }
-
-        uint result = 0;
-
-        if (jumpEdit.Text.StartsWith ("U+", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u"))
-        {
-            try
-            {
-                result = uint.Parse (jumpEdit.Text [2..], NumberStyles.HexNumber);
-            }
-            catch (FormatException)
-            {
-                _errorLabel.Text = "Invalid hex value";
-
-                return;
-            }
-        }
-        else if (jumpEdit.Text.StartsWith ("0", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u"))
-        {
-            try
-            {
-                result = uint.Parse (jumpEdit.Text, NumberStyles.HexNumber);
-            }
-            catch (FormatException)
-            {
-                _errorLabel.Text = "Invalid hex value";
-
-                return;
-            }
-        }
-        else
-        {
-            try
-            {
-                result = uint.Parse (jumpEdit.Text, NumberStyles.Integer);
-            }
-            catch (FormatException)
-            {
-                _errorLabel.Text = "Invalid value";
-
-                return;
-            }
-        }
-
-        if (result > RuneExtensions.MaxUnicodeCodePoint)
-        {
-            _errorLabel.Text = "Beyond maximum codepoint";
-
-            return;
-        }
-
-        _errorLabel.Text = $"U+{result:x5}";
-
-        EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-
-        _categoryList.SelectedRow = table.Data
-                                         .Select ((item, index) => new { item, index })
-                                         .FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)
-                                         ?.index
-                                    ?? -1;
-        _categoryList.EnsureSelectedCellIsVisible ();
-
-        // Ensure the typed glyph is selected 
-        _charMap.SelectedCodePoint = (int)result;
-    }
 }
 
 internal class CharMap : View
@@ -1005,7 +999,7 @@ internal class CharMap : View
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                            { WriteIndented = true }
+                                                        { WriteIndented = true }
                                                        );
             }
 

@@ -446,7 +446,7 @@ public class Shortcut : View
     CommandView.Y = 0; //Pos.Center ();
 }
 
-private void Shortcut_TitleChanged (object sender, CancelEventArgs<string> e)
+private void Shortcut_TitleChanged (object sender, EventArgs<string> e)
 {
     // If the Title changes, update the CommandView text.
     // This is a helper to make it easier to set the CommandView text.

@@ -110,9 +110,9 @@ public class Button : View
         e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
-    private void Button_TitleChanged (object sender, CancelEventArgs<string> e)
+    private void Button_TitleChanged (object sender, EventArgs<string> e)
     {
-        base.Text = e.NewValue;
+        base.Text = e.CurrentValue;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 

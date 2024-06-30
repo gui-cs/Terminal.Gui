@@ -69,23 +69,22 @@ public partial class View
                 Id = _text;
             }
 #endif
-            OnTextChanged (new CancelEventArgs<string> (old, Text));
+            OnTextChanged ();
         }
     }
 
     /// <summary>
     /// Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
     /// </summary>
-    /// <param name="args">The event arguments</param>
-    public void OnTextChanged (CancelEventArgs<string> args)
+    public void OnTextChanged ()
     {
-        TextChanged?.Invoke (this, args);
+        TextChanged?.Invoke (this, EventArgs.Empty);
     }
 
     /// <summary>
     ///     Text changed event, raised when the text has changed.
     /// </summary>
-    public event EventHandler<CancelEventArgs<string>> TextChanged;
+    public event EventHandler<EventArgs> TextChanged;
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will
