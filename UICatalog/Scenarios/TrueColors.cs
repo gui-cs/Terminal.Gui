@@ -34,6 +34,7 @@ public class TrueColors : Scenario
             Y = y++,
             State = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
             CanFocus = false,
+            Enabled = false,
             Text = "Driver supports true color "
         };
         app.Add (cbSupportsTrueColor);

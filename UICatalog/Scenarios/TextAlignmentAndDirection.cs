@@ -484,7 +484,7 @@ public class TextAlignmentAndDirection : Scenario
             Enabled = false
         };
 
-        justifyCheckbox.Toggle += (s, e) => ToggleJustify (e.NewValue == CheckState.Checked);
+        justifyCheckbox.Toggle += (s, e) => ToggleJustify (e.NewValue != CheckState.Checked);
 
         justifyOptions.SelectedItemChanged += (s, e) => { ToggleJustify (false, true); };
 
