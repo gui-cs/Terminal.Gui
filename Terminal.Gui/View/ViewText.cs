@@ -1,4 +1,4 @@
-using static Terminal.Gui.SpinnerStyle;
+#nullable enable
 
 namespace Terminal.Gui;
 
@@ -84,7 +84,7 @@ public partial class View
     /// <summary>
     ///     Text changed event, raised when the text has changed.
     /// </summary>
-    public event EventHandler<EventArgs> TextChanged;
+    public event EventHandler? TextChanged;
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will
@@ -191,8 +191,8 @@ public partial class View
 
         // TODO: This is a hack. Figure out how to move this into DimDimAuto
         // Use _width & _height instead of Width & Height to avoid debug spew
-        DimAuto widthAuto = _width as DimAuto;
-        DimAuto heightAuto = _height as DimAuto;
+        DimAuto? widthAuto = _width as DimAuto;
+        DimAuto? heightAuto = _height as DimAuto;
         if ((widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
             || (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text)))
         {

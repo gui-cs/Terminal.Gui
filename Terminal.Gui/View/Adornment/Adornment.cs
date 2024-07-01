@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+using Terminal.Gui;
+using Attribute = Terminal.Gui.Attribute;
 
 /// <summary>
 ///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Viewport"/>:
@@ -33,7 +35,7 @@ public class Adornment : View
     ///     Adornments are distinguished from typical View classes in that they are not sub-views, but have a parent/child
     ///     relationship with their containing View.
     /// </remarks>
-    public View Parent { get; set; }
+    public View? Parent { get; set; }
 
     #region Thickness
 
@@ -61,18 +63,19 @@ public class Adornment : View
                     Parent?.LayoutSubviews ();
                 }
 
-                OnThicknessChanged (new (Thickness));
+                OnThicknessChanged ();
             }
         }
     }
 
     /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
-    public event EventHandler<EventArgs<Thickness>> ThicknessChanged;
+    [CanBeNull]
+    public event EventHandler? ThicknessChanged;
 
     /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
-    public void OnThicknessChanged (EventArgs<Thickness> args)
+    public void OnThicknessChanged ()
     {
-        ThicknessChanged?.Invoke (this, args);
+        ThicknessChanged?.Invoke (this, EventArgs.Empty);
     }
 
     #endregion Thickness
@@ -85,7 +88,7 @@ public class Adornment : View
     /// </summary>
     public override View SuperView
     {
-        get => null;
+        get => null!;
         set => throw new InvalidOperationException (@"Adornments can not be Subviews or have SuperViews. Use Parent instead.");
     }
 
@@ -134,7 +137,7 @@ public class Adornment : View
     /// <inheritdoc/>
     public override Point ScreenToFrame (in Point location)
     {
-        return Parent.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
+        return Parent!.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
     }
 
     /// <summary>Does nothing for Adornment</summary>

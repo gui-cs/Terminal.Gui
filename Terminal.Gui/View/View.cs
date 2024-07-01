@@ -497,7 +497,6 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
     ///     be cancelled.
     /// </summary>
-    /// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
     /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
     /// <returns>`true` if an event handler canceled the Title change.</returns>
     protected bool OnTitleChanging (ref string newTitle)

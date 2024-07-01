@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿#nullable enable
+using System.ComponentModel;
 
 namespace Terminal.Gui;
 
@@ -61,7 +62,7 @@ public class Tile
     /// <param name="newTitle">The new <see cref="Title"/> to be replaced.</param>
     public virtual void OnTitleChanged (string oldTitle, string newTitle)
     {
-        var args = new EventArgs<string> (newTitle);
+        var args = new EventArgs<string> (ref newTitle);
         TitleChanged?.Invoke (this, args);
     }
 
@@ -81,11 +82,11 @@ public class Tile
     }
 
     /// <summary>Event fired after the <see cref="Title"/> has been changed.</summary>
-    public event EventHandler<EventArgs<string>> TitleChanged;
+    public event EventHandler? TitleChanged;
 
     /// <summary>
     ///     Event fired when the <see cref="Title"/> is changing.
     ///     <see cref="CancelEventArgs.Cancel"/> can be set to <c>true</c> to cancel the change.
     /// </summary>
-    public event EventHandler<CancelEventArgs<string>> TitleChanging;
+    public event EventHandler<CancelEventArgs<string>>? TitleChanging;
 }

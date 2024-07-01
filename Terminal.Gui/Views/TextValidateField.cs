@@ -333,7 +333,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.RemoveAt (pos);
-                    OnTextChanged (new EventArgs<string> (oldValue));
+                    OnTextChanged (new EventArgs<string> (ref oldValue));
                 }
 
                 return true;

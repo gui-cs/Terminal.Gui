@@ -322,11 +322,9 @@ public class AdornmentTests (ITestOutputHelper output)
         var adornment = new Adornment (null);
         var super = new View ();
         var raised = false;
-
         adornment.ThicknessChanged += (s, e) =>
                                       {
                                           raised = true;
-                                          Assert.Equal (new Thickness (1, 2, 3, 4), e.CurrentValue);
                                           Assert.Equal (new Thickness (1, 2, 3, 4), adornment.Thickness);
                                       };
         adornment.Thickness = new Thickness (1, 2, 3, 4);
