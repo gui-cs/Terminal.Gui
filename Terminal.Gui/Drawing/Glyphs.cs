@@ -32,13 +32,13 @@ public class GlyphDefinitions
     #region ----------------- Single Glyphs -----------------
 
     /// <summary>Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
-    public Rune Checked { get; set; } = (Rune)'☑';
+    public Rune CheckStateChecked { get; set; } = (Rune)'☑';
 
     /// <summary>Not Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
-    public Rune UnChecked { get; set; } = (Rune)'☐';
+    public Rune CheckStateUnChecked { get; set; } = (Rune)'☐';
 
     /// <summary>Null Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
-    public Rune NullChecked { get; set; } = (Rune)'☒';
+    public Rune CheckStateNone { get; set; } = (Rune)'☒';
 
     /// <summary>Selected indicator  (e.g. for <see cref="ListView"/> and <see cref="RadioGroup"/>).</summary>
     public Rune Selected { get; set; } = (Rune)'◉';

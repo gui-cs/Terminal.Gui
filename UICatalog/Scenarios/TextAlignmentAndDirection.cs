@@ -484,7 +484,7 @@ public class TextAlignmentAndDirection : Scenario
             Enabled = false
         };
 
-        justifyCheckbox.Toggle += (s, e) => ToggleJustify (e.CurrentValue is { } && (bool)e.CurrentValue);
+        justifyCheckbox.Toggle += (s, e) => ToggleJustify (e.NewValue == CheckState.Checked);
 
         justifyOptions.SelectedItemChanged += (s, e) => { ToggleJustify (false, true); };
 
@@ -500,11 +500,11 @@ public class TextAlignmentAndDirection : Scenario
             Height = 1,
             Text = "Word Wrap"
         };
-        wrapCheckbox.Checked = wrapCheckbox.TextFormatter.WordWrap;
+        wrapCheckbox.State = wrapCheckbox.TextFormatter.WordWrap ? CheckState.Checked : CheckState.UnChecked;
 
         wrapCheckbox.Toggle += (s, e) =>
                                 {
-                                    if (e.CurrentValue == true)
+                                    if (e.CurrentValue == CheckState.Checked)
                                     {
                                         foreach (Label t in multiLineLabels)
                                         {
@@ -532,11 +532,11 @@ public class TextAlignmentAndDirection : Scenario
             Height = 1,
             Text = "AutoSize"
         };
-        autoSizeCheckbox.Checked = autoSizeCheckbox.TextFormatter.AutoSize;
+        autoSizeCheckbox.State = autoSizeCheckbox.TextFormatter.AutoSize ? CheckState.Checked : CheckState.UnChecked;
 
         autoSizeCheckbox.Toggle += (s, e) =>
                                     {
-                                        if (e.CurrentValue == true)
+                                        if (e.CurrentValue == CheckState.Checked)
                                         {
                                             foreach (Label t in multiLineLabels)
                                             {
@@ -570,7 +570,7 @@ public class TextAlignmentAndDirection : Scenario
 
         directionOptions.SelectedItemChanged += (s, ev) =>
                                                 {
-                                                    bool justChecked = justifyCheckbox.Checked is { } && (bool)justifyCheckbox.Checked;
+                                                    bool justChecked = justifyCheckbox.State == CheckState.Checked;
 
                                                     if (justChecked)
                                                     {

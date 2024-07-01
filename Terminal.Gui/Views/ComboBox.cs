@@ -929,8 +929,8 @@ public class ComboBox : View
                     if (AllowsMarking)
                     {
                         Driver.AddRune (
-                                        Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected :
-                                        AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected
+                                        Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                        AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected
                                        );
                         Driver.AddRune ((Rune)' ');
                     }

@@ -447,14 +447,14 @@ internal sealed class Menu : View
             }
 
             string textToDraw = null;
-            Rune nullCheckedChar = Glyphs.NullChecked;
+            Rune nullCheckedChar = Glyphs.CheckStateNone;
             Rune checkChar = Glyphs.Selected;
             Rune uncheckedChar = Glyphs.UnSelected;
 
             if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked))
             {
-                checkChar = Glyphs.Checked;
-                uncheckedChar = Glyphs.UnChecked;
+                checkChar = Glyphs.CheckStateChecked;
+                uncheckedChar = Glyphs.CheckStateUnChecked;
             }
 
             // Support Checked even though CheckType wasn't set

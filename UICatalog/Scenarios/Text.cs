@@ -105,7 +105,7 @@ public class Text : Scenario
         // single-line mode.
         var chxMultiline = new CheckBox
         {
-            X = Pos.Left (textView), Y = Pos.Bottom (textView), Checked = textView.Multiline, Text = "_Multiline"
+            X = Pos.Left (textView), Y = Pos.Bottom (textView), State = textView.Multiline ? CheckState.Checked : CheckState.UnChecked, Text = "_Multiline"
         };
         Win.Add (chxMultiline);
 
@@ -113,10 +113,10 @@ public class Text : Scenario
         {
             X = Pos.Right (chxMultiline) + 2,
             Y = Pos.Top (chxMultiline),
-            Checked = textView.WordWrap,
+            State = textView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Word Wrap"
         };
-        chxWordWrap.Toggle += (s, e) => textView.WordWrap = (bool)e.NewValue;
+        chxWordWrap.Toggle += (s, e) => textView.WordWrap = e.NewValue == CheckState.Checked;
         Win.Add (chxWordWrap);
 
         // TextView captures Tabs (so users can enter /t into text) by default;
@@ -126,22 +126,22 @@ public class Text : Scenario
         {
             X = Pos.Right (chxWordWrap) + 2,
             Y = Pos.Top (chxWordWrap),
-            Checked = textView.AllowsTab,
+            State = textView.AllowsTab ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Capture Tabs"
         };
 
         chxMultiline.Toggle += (s, e) =>
                                 {
-                                    textView.Multiline = (bool)e.NewValue;
+                                    textView.Multiline = e.NewValue == CheckState.Checked;
 
-                                    if (!textView.Multiline && (bool)chxWordWrap.Checked)
+                                    if (!textView.Multiline && chxWordWrap.State == CheckState.Checked)
                                     {
-                                        chxWordWrap.Checked = false;
+                                        chxWordWrap.State = CheckState.UnChecked;
                                     }
 
-                                    if (!textView.Multiline && (bool)chxCaptureTabs.Checked)
+                                    if (!textView.Multiline && chxCaptureTabs.State == CheckState.Checked)
                                     {
-                                        chxCaptureTabs.Checked = false;
+                                        chxCaptureTabs.State = CheckState.UnChecked;
                                     }
                                 };
 
@@ -150,7 +150,7 @@ public class Text : Scenario
 
         chxCaptureTabs.Toggle += (s, e) =>
                                   {
-                                      if (e.NewValue == true)
+                                      if (e.NewValue == CheckState.Checked)
                                       {
                                           textView.KeyBindings.Add (keyTab, Command.Tab);
                                           textView.KeyBindings.Add (keyBackTab, Command.BackTab);
@@ -161,7 +161,7 @@ public class Text : Scenario
                                           textView.KeyBindings.Remove (keyBackTab);
                                       }
 
-                                      textView.AllowsTab = (bool)e.NewValue;
+                                      textView.AllowsTab = e.NewValue == CheckState.Checked;
                                   };
         Win.Add (chxCaptureTabs);
 

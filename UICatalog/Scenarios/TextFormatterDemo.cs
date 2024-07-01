@@ -58,7 +58,7 @@ public class TextFormatterDemo : Scenario
             X = 0,
             Y = Pos.Bottom (blockText) + 1,
             Text = "Unicode",
-            Checked = app.HotKeySpecifier == (Rune)' '
+            State = app.HotKeySpecifier == (Rune)' ' ? CheckState.Checked : CheckState.UnChecked
         };
 
         app.Add (unicodeCheckBox);
@@ -137,8 +137,8 @@ public class TextFormatterDemo : Scenario
                                    {
                                        for (int i = 0; i < alignments.Count; i++)
                                        {
-                                           singleLines [i].Text = e.CurrentValue == true ? text : unicode;
-                                           multipleLines [i].Text = e.CurrentValue == true ? text : unicode;
+                                           singleLines [i].Text = e.CurrentValue == CheckState.Checked ? text : unicode;
+                                           multipleLines [i].Text = e.CurrentValue == CheckState.Checked ? text : unicode;
                                        }
                                    };
 

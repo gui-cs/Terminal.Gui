@@ -38,7 +38,7 @@ public class ListViewWithSelection : Scenario
 
         _allowMarkingCB = new CheckBox
         {
-            X = Pos.Right (_customRenderCB) + 1, Y = 0, Text = "Allow Marking", AllowNullChecked = false
+            X = Pos.Right (_customRenderCB) + 1, Y = 0, Text = "Allow Marking", AllowCheckStateNone = false
         };
         _appWindow.Add (_allowMarkingCB);
         _allowMarkingCB.Toggle += AllowMarkingCB_Toggle;
@@ -47,7 +47,7 @@ public class ListViewWithSelection : Scenario
         {
             X = Pos.Right (_allowMarkingCB) + 1,
             Y = 0,
-            Visible = (bool)_allowMarkingCB.Checked,
+            Visible = _allowMarkingCB.State == CheckState.Checked,
             Text = "Allow Multi-Select"
         };
         _appWindow.Add (_allowMultipleCB);
@@ -108,9 +108,9 @@ public class ListViewWithSelection : Scenario
 
         var keepCheckBox = new CheckBox
         {
-            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, Checked = scrollBar.AutoHideScrollBars
+            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, State = scrollBar.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
-        keepCheckBox.Toggle += (s, e) => scrollBar.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
+        keepCheckBox.Toggle += (s, e) => scrollBar.KeepContentAlwaysInViewport = e.NewValue == CheckState.Checked;
         _appWindow.Add (keepCheckBox);
 
         Application.Run (_appWindow);
@@ -118,9 +118,9 @@ public class ListViewWithSelection : Scenario
         Application.Shutdown ();
     }
 
-    private void _customRenderCB_Toggle (object sender, CancelEventArgs<bool?> stateEventArgs)
+    private void _customRenderCB_Toggle (object sender, CancelEventArgs<CheckState> stateEventArgs)
     {
-        if (stateEventArgs.CurrentValue == true)
+        if (stateEventArgs.CurrentValue == CheckState.Checked)
         {
             _listView.SetSource (_scenarios);
         }
@@ -132,16 +132,16 @@ public class ListViewWithSelection : Scenario
         _appWindow.SetNeedsDisplay ();
     }
 
-    private void AllowMarkingCB_Toggle (object sender, [NotNull] CancelEventArgs<bool?> stateEventArgs)
+    private void AllowMarkingCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMarking = (bool)!stateEventArgs.CurrentValue;
+        _listView.AllowsMarking = stateEventArgs.NewValue == CheckState.Checked;
         _allowMultipleCB.Visible = _listView.AllowsMarking;
         _appWindow.SetNeedsDisplay ();
     }
 
-    private void AllowMultipleCB_Toggle (object sender, [NotNull] CancelEventArgs<bool?> stateEventArgs)
+    private void AllowMultipleCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMultipleSelection = (bool)!stateEventArgs.CurrentValue;
+        _listView.AllowsMultipleSelection = stateEventArgs.NewValue == CheckState.Checked;
         _appWindow.SetNeedsDisplay ();
     }
 

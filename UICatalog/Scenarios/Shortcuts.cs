@@ -117,7 +117,7 @@ public class Shortcuts : Scenario
                                                               var max = 0;
                                                               var toAlign = Application.Top.Subviews.Where (v => v is Shortcut { Orientation: Orientation.Vertical, Width: not DimAbsolute });
 
-                                                              if (e.NewValue == true)
+                                                              if (e.NewValue == CheckState.Checked)
                                                               {
                                                                   foreach (Shortcut peer in toAlign)
                                                                   {
@@ -177,7 +177,7 @@ public class Shortcuts : Scenario
                                                              {
                                                                  if (peer.CanFocus)
                                                                  {
-                                                                     peer.CommandView.CanFocus = e.NewValue == true;
+                                                                     peer.CommandView.CanFocus = e.NewValue == CheckState.Checked;
                                                                  }
                                                              }
                                                          }
