@@ -136,9 +136,9 @@ public class ContentScrolling : Scenario
             CanFocus = false
         };
         cbAllowNegativeX.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowNegativeX);
-        cbAllowNegativeX.Toggled += AllowNegativeX_Toggled;
+        cbAllowNegativeX.Toggle += AllowNegativeX_Toggle;
 
-        void AllowNegativeX_Toggled (object sender, CancelEventArgs<bool?> e)
+        void AllowNegativeX_Toggle (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
@@ -160,9 +160,9 @@ public class ContentScrolling : Scenario
             CanFocus = false
         };
         cbAllowNegativeY.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowNegativeY);
-        cbAllowNegativeY.Toggled += AllowNegativeY_Toggled;
+        cbAllowNegativeY.Toggle += AllowNegativeY_Toggle;
 
-        void AllowNegativeY_Toggled (object sender, CancelEventArgs<bool?> e)
+        void AllowNegativeY_Toggle (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
@@ -183,9 +183,9 @@ public class ContentScrolling : Scenario
             CanFocus = false
         };
         cbAllowXGreaterThanContentWidth.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth);
-        cbAllowXGreaterThanContentWidth.Toggled += AllowXGreaterThanContentWidth_Toggled;
+        cbAllowXGreaterThanContentWidth.Toggle += AllowXGreaterThanContentWidth_Toggle;
 
-        void AllowXGreaterThanContentWidth_Toggled (object sender, CancelEventArgs<bool?> e)
+        void AllowXGreaterThanContentWidth_Toggle (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
@@ -207,9 +207,9 @@ public class ContentScrolling : Scenario
             CanFocus = false
         };
         cbAllowYGreaterThanContentHeight.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight);
-        cbAllowYGreaterThanContentHeight.Toggled += AllowYGreaterThanContentHeight_Toggled;
+        cbAllowYGreaterThanContentHeight.Toggle += AllowYGreaterThanContentHeight_Toggle;
 
-        void AllowYGreaterThanContentHeight_Toggled (object sender, CancelEventArgs<bool?> e)
+        void AllowYGreaterThanContentHeight_Toggle (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
@@ -285,9 +285,9 @@ public class ContentScrolling : Scenario
             CanFocus = false
         };
         cbClearOnlyVisible.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClearContentOnly);
-        cbClearOnlyVisible.Toggled += ClearVisibleContentOnly_Toggled;
+        cbClearOnlyVisible.Toggle += ClearVisibleContentOnly_Toggle;
 
-        void ClearVisibleContentOnly_Toggled (object sender, CancelEventArgs<bool?> e)
+        void ClearVisibleContentOnly_Toggle (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {
@@ -307,9 +307,9 @@ public class ContentScrolling : Scenario
             CanFocus = false
         };
         cbDoNotClipContent.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly);
-        cbDoNotClipContent.Toggled += ClipVisibleContentOnly_Toggled;
+        cbDoNotClipContent.Toggle += ClipVisibleContentOnly_Toggle;
 
-        void ClipVisibleContentOnly_Toggled (object sender, CancelEventArgs<bool?> e)
+        void ClipVisibleContentOnly_Toggle (object sender, CancelEventArgs<bool?> e)
         {
             if (e.NewValue == true)
             {

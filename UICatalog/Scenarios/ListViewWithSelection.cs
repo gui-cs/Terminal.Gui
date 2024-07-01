@@ -34,14 +34,14 @@ public class ListViewWithSelection : Scenario
 
         _customRenderCB = new CheckBox { X = 0, Y = 0, Text = "Use custom rendering" };
         _appWindow.Add (_customRenderCB);
-        _customRenderCB.Toggled += _customRenderCB_Toggled;
+        _customRenderCB.Toggle += _customRenderCB_Toggle;
 
         _allowMarkingCB = new CheckBox
         {
             X = Pos.Right (_customRenderCB) + 1, Y = 0, Text = "Allow Marking", AllowNullChecked = false
         };
         _appWindow.Add (_allowMarkingCB);
-        _allowMarkingCB.Toggled += AllowMarkingCB_Toggled;
+        _allowMarkingCB.Toggle += AllowMarkingCB_Toggle;
 
         _allowMultipleCB = new CheckBox
         {
@@ -51,7 +51,7 @@ public class ListViewWithSelection : Scenario
             Text = "Allow Multi-Select"
         };
         _appWindow.Add (_allowMultipleCB);
-        _allowMultipleCB.Toggled += AllowMultipleCB_Toggled;
+        _allowMultipleCB.Toggle += AllowMultipleCB_Toggle;
 
         _listView = new ListView
         {
@@ -110,7 +110,7 @@ public class ListViewWithSelection : Scenario
         {
             X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, Checked = scrollBar.AutoHideScrollBars
         };
-        keepCheckBox.Toggled += (s, e) => scrollBar.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
+        keepCheckBox.Toggle += (s, e) => scrollBar.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
         _appWindow.Add (keepCheckBox);
 
         Application.Run (_appWindow);
@@ -118,7 +118,7 @@ public class ListViewWithSelection : Scenario
         Application.Shutdown ();
     }
 
-    private void _customRenderCB_Toggled (object sender, CancelEventArgs<bool?> stateEventArgs)
+    private void _customRenderCB_Toggle (object sender, CancelEventArgs<bool?> stateEventArgs)
     {
         if (stateEventArgs.CurrentValue == true)
         {
@@ -132,14 +132,14 @@ public class ListViewWithSelection : Scenario
         _appWindow.SetNeedsDisplay ();
     }
 
-    private void AllowMarkingCB_Toggled (object sender, [NotNull] CancelEventArgs<bool?> stateEventArgs)
+    private void AllowMarkingCB_Toggle (object sender, [NotNull] CancelEventArgs<bool?> stateEventArgs)
     {
         _listView.AllowsMarking = (bool)!stateEventArgs.CurrentValue;
         _allowMultipleCB.Visible = _listView.AllowsMarking;
         _appWindow.SetNeedsDisplay ();
     }
 
-    private void AllowMultipleCB_Toggled (object sender, [NotNull] CancelEventArgs<bool?> stateEventArgs)
+    private void AllowMultipleCB_Toggle (object sender, [NotNull] CancelEventArgs<bool?> stateEventArgs)
     {
         _listView.AllowsMultipleSelection = (bool)!stateEventArgs.CurrentValue;
         _appWindow.SetNeedsDisplay ();

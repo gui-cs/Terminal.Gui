@@ -42,7 +42,7 @@ public class Images : Scenario
             Enabled = canTrueColor,
             Text = "Use true color"
         };
-        cbUseTrueColor.Toggled += (_, evt) => Application.Force16Colors = !evt.NewValue ?? false;
+        cbUseTrueColor.Toggle += (_, evt) => Application.Force16Colors = !evt.NewValue ?? false;
         Win.Add (cbUseTrueColor);
 
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };

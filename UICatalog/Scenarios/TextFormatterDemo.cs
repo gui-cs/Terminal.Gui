@@ -133,7 +133,7 @@ public class TextFormatterDemo : Scenario
             label = multipleLines [i];
         }
 
-        unicodeCheckBox.Toggled += (s, e) =>
+        unicodeCheckBox.Toggle += (s, e) =>
                                    {
                                        for (int i = 0; i < alignments.Count; i++)
                                        {

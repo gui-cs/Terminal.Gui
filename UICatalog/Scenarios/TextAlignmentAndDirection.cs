@@ -484,7 +484,7 @@ public class TextAlignmentAndDirection : Scenario
             Enabled = false
         };
 
-        justifyCheckbox.Toggled += (s, e) => ToggleJustify (e.CurrentValue is { } && (bool)e.CurrentValue);
+        justifyCheckbox.Toggle += (s, e) => ToggleJustify (e.CurrentValue is { } && (bool)e.CurrentValue);
 
         justifyOptions.SelectedItemChanged += (s, e) => { ToggleJustify (false, true); };
 
@@ -502,7 +502,7 @@ public class TextAlignmentAndDirection : Scenario
         };
         wrapCheckbox.Checked = wrapCheckbox.TextFormatter.WordWrap;
 
-        wrapCheckbox.Toggled += (s, e) =>
+        wrapCheckbox.Toggle += (s, e) =>
                                 {
                                     if (e.CurrentValue == true)
                                     {
@@ -534,7 +534,7 @@ public class TextAlignmentAndDirection : Scenario
         };
         autoSizeCheckbox.Checked = autoSizeCheckbox.TextFormatter.AutoSize;
 
-        autoSizeCheckbox.Toggled += (s, e) =>
+        autoSizeCheckbox.Toggle += (s, e) =>
                                     {
                                         if (e.CurrentValue == true)
                                         {

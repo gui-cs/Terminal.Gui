@@ -58,7 +58,7 @@ public class BorderEditor : AdornmentEditor
         };
 
 
-        _ckbTitle.Toggled += OnCkbTitleOnToggled;
+        _ckbTitle.Toggle += OnCkbTitleOnToggle;
         Add (_ckbTitle);
 
         return;
@@ -81,6 +81,6 @@ public class BorderEditor : AdornmentEditor
             LayoutSubviews ();
         }
 
-        void OnCkbTitleOnToggled (object sender, CancelEventArgs<bool?> args) { ((Border)AdornmentToEdit).ShowTitle = args.NewValue!.Value; }
+        void OnCkbTitleOnToggle (object sender, CancelEventArgs<bool?> args) { ((Border)AdornmentToEdit).ShowTitle = args.NewValue!.Value; }
     }
 }

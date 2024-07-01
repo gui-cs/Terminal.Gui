@@ -31,16 +31,16 @@ public class TileViewNesting : Scenario
         _textField.TextChanged += (s, e) => SetupTileView ();
 
         _cbHorizontal = new() { X = Pos.Right (_textField) + 1, Text = "Horizontal" };
-        _cbHorizontal.Toggled += (s, e) => SetupTileView ();
+        _cbHorizontal.Toggle += (s, e) => SetupTileView ();
 
         _cbBorder = new() { X = Pos.Right (_cbHorizontal) + 1, Text = "Border" };
-        _cbBorder.Toggled += (s, e) => SetupTileView ();
+        _cbBorder.Toggle += (s, e) => SetupTileView ();
 
         _cbTitles = new() { X = Pos.Right (_cbBorder) + 1, Text = "Titles" };
-        _cbTitles.Toggled += (s, e) => SetupTileView ();
+        _cbTitles.Toggle += (s, e) => SetupTileView ();
 
         _cbUseLabels = new() { X = Pos.Right (_cbTitles) + 1, Text = "Use Labels" };
-        _cbUseLabels.Toggled += (s, e) => SetupTileView ();
+        _cbUseLabels.Toggle += (s, e) => SetupTileView ();
 
         _workArea = new() { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill () };
 

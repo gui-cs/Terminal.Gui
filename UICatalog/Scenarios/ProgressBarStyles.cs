@@ -286,7 +286,7 @@ public class ProgressBarStyles : Scenario
                                               marqueesContinuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
                                           };
 
-        ckbBidirectional.Toggled += (s, e) =>
+        ckbBidirectional.Toggle += (s, e) =>
                                     {
                                         ckbBidirectional.Checked = marqueesBlocksPB.BidirectionalMarquee =
                                                                        marqueesContinuousPB.BidirectionalMarquee = (bool)!e.CurrentValue;

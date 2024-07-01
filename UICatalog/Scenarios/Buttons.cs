@@ -387,7 +387,7 @@ public class Buttons : Scenario
             Title = "Enabled",
             Checked = true
         };
-        enableCB.Toggled += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
+        enableCB.Toggle += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
         main.Add (label, repeatButton, enableCB);
 
         main.Ready += (s, e) => radioGroup.Refresh ();

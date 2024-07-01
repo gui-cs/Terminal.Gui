@@ -174,7 +174,7 @@ public class CheckBoxTests (ITestOutputHelper output)
     {
         var toggled = false;
         var ckb = new CheckBox ();
-        ckb.Toggled += (s, e) => toggled = true;
+        ckb.Toggle += (s, e) => toggled = true;
 
         Assert.False (ckb.Checked);
         Assert.False (toggled);
@@ -481,18 +481,18 @@ public class CheckBoxTests (ITestOutputHelper output)
         var ckb = new CheckBox { AllowNullChecked = true };
         var checkedInvoked = false;
 
-        ckb.Toggled += CheckBoxToggled;
+        ckb.Toggle += CheckBoxToggle;
 
         ckb.Checked = initialState;
         Assert.Equal (initialState, ckb.Checked);
-        bool? ret = ckb.OnToggled ();
+        bool? ret = ckb.OnToggle ();
         Assert.True (ret);
         Assert.True (checkedInvoked);
         Assert.Equal (initialState, ckb.Checked);
 
         return;
 
-        void CheckBoxToggled (object sender, CancelEventArgs e)
+        void CheckBoxToggle (object sender, CancelEventArgs e)
         {
             checkedInvoked = true;
             e.Cancel = true;

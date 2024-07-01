@@ -174,7 +174,7 @@ public class Scrolling : Scenario
             X = Pos.Left (scrollView), Y = Pos.Bottom (ahCheckBox), Text = k, Checked = scrollView.AutoHideScrollBars
         };
 
-        hCheckBox.Toggled += (s, e) =>
+        hCheckBox.Toggle += (s, e) =>
                              {
                                  if (ahCheckBox.Checked == false)
                                  {
@@ -187,7 +187,7 @@ public class Scrolling : Scenario
                                  }
                              };
 
-        vCheckBox.Toggled += (s, e) =>
+        vCheckBox.Toggle += (s, e) =>
                              {
                                  if (ahCheckBox.Checked == false)
                                  {
@@ -200,7 +200,7 @@ public class Scrolling : Scenario
                                  }
                              };
 
-        ahCheckBox.Toggled += (s, e) =>
+        ahCheckBox.Toggle += (s, e) =>
                               {
                                   scrollView.AutoHideScrollBars = (bool)ahCheckBox.Checked;
                                   hCheckBox.Checked = true;
@@ -208,7 +208,7 @@ public class Scrolling : Scenario
                               };
         app.Add (ahCheckBox);
 
-        keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
+        keepCheckBox.Toggle += (s, e) => scrollView.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
         app.Add (keepCheckBox);
 
         var count = 0;

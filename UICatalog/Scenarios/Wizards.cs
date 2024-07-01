@@ -243,7 +243,7 @@ public class Wizards : Scenario
                                            };
                                            thirdStep.Add (progLbl, progressBar);
                                            thirdStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked;
-                                           thirdStepEnabledCeckBox.Toggled += (s, e) => { thirdStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked; };
+                                           thirdStepEnabledCeckBox.Toggle += (s, e) => { thirdStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked; };
 
                                            // Add 4th step
                                            var fourthStep = new WizardStep { Title = "Step Four" };
@@ -331,7 +331,7 @@ public class Wizards : Scenario
                                                "This step only shows if it was enabled on the other last step.";
                                            finalFinalStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked;
 
-                                           finalFinalStepEnabledCeckBox.Toggled += (s, e) =>
+                                           finalFinalStepEnabledCeckBox.Toggle += (s, e) =>
                                                                                    {
                                                                                        finalFinalStep.Enabled = (bool)finalFinalStepEnabledCeckBox.Checked;
                                                                                    };

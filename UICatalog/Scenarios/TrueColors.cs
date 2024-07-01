@@ -46,7 +46,7 @@ public class TrueColors : Scenario
             Enabled = canTrueColor,
             Text = "Force 16 colors"
         };
-        cbUseTrueColor.Toggled += (_, evt) => { Application.Force16Colors = evt.NewValue ?? false; };
+        cbUseTrueColor.Toggle += (_, evt) => { Application.Force16Colors = evt.NewValue ?? false; };
         app.Add (cbUseTrueColor);
 
         y += 2;

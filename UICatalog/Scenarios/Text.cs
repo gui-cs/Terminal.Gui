@@ -116,7 +116,7 @@ public class Text : Scenario
             Checked = textView.WordWrap,
             Text = "_Word Wrap"
         };
-        chxWordWrap.Toggled += (s, e) => textView.WordWrap = (bool)e.NewValue;
+        chxWordWrap.Toggle += (s, e) => textView.WordWrap = (bool)e.NewValue;
         Win.Add (chxWordWrap);
 
         // TextView captures Tabs (so users can enter /t into text) by default;
@@ -130,7 +130,7 @@ public class Text : Scenario
             Text = "_Capture Tabs"
         };
 
-        chxMultiline.Toggled += (s, e) =>
+        chxMultiline.Toggle += (s, e) =>
                                 {
                                     textView.Multiline = (bool)e.NewValue;
 
@@ -148,7 +148,7 @@ public class Text : Scenario
         Key keyTab = textView.KeyBindings.GetKeyFromCommands (Command.Tab);
         Key keyBackTab = textView.KeyBindings.GetKeyFromCommands (Command.BackTab);
 
-        chxCaptureTabs.Toggled += (s, e) =>
+        chxCaptureTabs.Toggle += (s, e) =>
                                   {
                                       if (e.NewValue == true)
                                       {

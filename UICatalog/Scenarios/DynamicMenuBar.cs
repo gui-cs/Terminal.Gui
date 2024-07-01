@@ -249,7 +249,7 @@ public class DynamicMenuBar : Scenario
             _btnShortcut.Accept += (s, e) => { TextShortcut.Text = ""; };
             Add (_btnShortcut);
 
-            CkbIsTopLevel.Toggled += (s, e) =>
+            CkbIsTopLevel.Toggle += (s, e) =>
                                      {
                                          if ((_menuItem != null && _menuItem.Parent != null && (bool)CkbIsTopLevel.Checked)
                                              || (_menuItem == null && _hasParent && (bool)CkbIsTopLevel.Checked))
@@ -290,7 +290,7 @@ public class DynamicMenuBar : Scenario
                                          }
                                      };
 
-            CkbSubMenu.Toggled += (s, e) =>
+            CkbSubMenu.Toggle += (s, e) =>
                                   {
                                       if ((bool)CkbSubMenu.Checked)
                                       {
@@ -320,7 +320,7 @@ public class DynamicMenuBar : Scenario
                                       }
                                   };
 
-            CkbNullCheck.Toggled += (s, e) =>
+            CkbNullCheck.Toggle += (s, e) =>
                                     {
                                         if (_menuItem != null)
                                         {

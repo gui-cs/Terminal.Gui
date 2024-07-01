@@ -897,14 +897,14 @@ public class Editor : Scenario
         {
             X = 0, Y = Pos.Top (txtToFind) + 2, Checked = _matchCase, Text = "Match c_ase"
         };
-        ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
+        ckbMatchCase.Toggle += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
         d.Add (ckbMatchCase);
 
         var ckbMatchWholeWord = new CheckBox
         {
             X = 0, Y = Pos.Top (ckbMatchCase) + 1, Checked = _matchWholeWord, Text = "Match _whole word"
         };
-        ckbMatchWholeWord.Toggled += (s, e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
+        ckbMatchWholeWord.Toggle += (s, e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
         d.Add (ckbMatchWholeWord);
         return d;
     }
@@ -1155,14 +1155,14 @@ public class Editor : Scenario
         {
             X = 0, Y = Pos.Top (txtToFind) + 2, Checked = _matchCase, Text = "Match c_ase"
         };
-        ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
+        ckbMatchCase.Toggle += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
         d.Add (ckbMatchCase);
 
         var ckbMatchWholeWord = new CheckBox
         {
             X = 0, Y = Pos.Top (ckbMatchCase) + 1, Checked = _matchWholeWord, Text = "Match _whole word"
         };
-        ckbMatchWholeWord.Toggled += (s, e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
+        ckbMatchWholeWord.Toggle += (s, e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
         d.Add (ckbMatchWholeWord);
 
         return d;

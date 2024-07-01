@@ -98,7 +98,7 @@ public sealed class PosAlignDemo : Scenario
             endToStartCheckBox.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        endToStartCheckBox.Toggled += (s, e) =>
+        endToStartCheckBox.Toggle += (s, e) =>
                                       {
                                           if (dimension == Dimension.Width)
                                           {
@@ -138,7 +138,7 @@ public sealed class PosAlignDemo : Scenario
             ignoreFirstOrLast.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        ignoreFirstOrLast.Toggled += (s, e) =>
+        ignoreFirstOrLast.Toggle += (s, e) =>
                                      {
                                          if (dimension == Dimension.Width)
                                          {
@@ -178,7 +178,7 @@ public sealed class PosAlignDemo : Scenario
             addSpacesBetweenItems.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        addSpacesBetweenItems.Toggled += (s, e) =>
+        addSpacesBetweenItems.Toggle += (s, e) =>
                                          {
                                              if (dimension == Dimension.Width)
                                              {
@@ -217,7 +217,7 @@ public sealed class PosAlignDemo : Scenario
             margin.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        margin.Toggled += (s, e) =>
+        margin.Toggle += (s, e) =>
                           {
                               if (dimension == Dimension.Width)
                               {

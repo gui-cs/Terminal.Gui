@@ -25,8 +25,8 @@ public class CheckBox : View
         CanFocus = true;
 
         // Things this view knows how to do
-        AddCommand (Command.Accept, OnToggled);
-        AddCommand (Command.HotKey, OnToggled);
+        AddCommand (Command.Accept, OnToggle);
+        AddCommand (Command.HotKey, OnToggle);
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.Accept);
@@ -39,7 +39,7 @@ public class CheckBox : View
 
     private void CheckBox_MouseClick (object? sender, MouseEventEventArgs e)
     {
-        e.Handled = OnToggled () == true;
+        e.Handled = OnToggle () == true;
     }
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
@@ -109,11 +109,11 @@ public class CheckBox : View
         }
     }
 
-    /// <summary>Called when the <see cref="Checked"/> property changes. Invokes the <see cref="Toggled"/> event.</summary>
+    /// <summary>Called when the <see cref="Checked"/> property changes. Invokes the cancelable <see cref="Toggle"/> event.</summary>
     /// <remarks>
     /// </remarks>
-    /// <returns>If <see langword="true"/> the <see cref="Toggled"/> event was canceled.</returns>
-    public bool? OnToggled ()
+    /// <returns>If <see langword="true"/> the <see cref="Toggle"/> event was canceled.</returns>
+    public bool? OnToggle ()
     {
         bool ? oldValue = Checked;
         CancelEventArgs<bool?> e = new (ref _checked, ref oldValue);
@@ -141,7 +141,7 @@ public class CheckBox : View
             e.NewValue = !Checked;
         }
 
-        Toggled?.Invoke (this, e);
+        Toggle?.Invoke (this, e);
         if (e.Cancel)
         {
             return e.Cancel;
@@ -158,13 +158,13 @@ public class CheckBox : View
         return true;
     }
 
-    /// <summary>Toggled event, raised when the <see cref="CheckBox"/> is toggled.</summary>
+    /// <summary>Toggle event, raised when the <see cref="CheckBox"/> is toggled.</summary>
     /// <remarks>
     /// <para>
     ///    This event can be cancelled. If cancelled, the <see cref="CheckBox"/> will not change its state.
     /// </para>
     /// </remarks>
-    public event EventHandler<CancelEventArgs<bool?>>? Toggled;
+    public event EventHandler<CancelEventArgs<bool?>>? Toggle;
 
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()

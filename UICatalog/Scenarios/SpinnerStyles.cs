@@ -164,9 +164,9 @@ public class SpinnerViewStyles : Scenario
                                           }
                                       };
 
-        ckbReverse.Toggled += (s, e) => { spinner.SpinReverse = (bool)!e.CurrentValue; };
+        ckbReverse.Toggle += (s, e) => { spinner.SpinReverse = (bool)!e.CurrentValue; };
 
-        ckbBounce.Toggled += (s, e) => { spinner.SpinBounce = (bool)!e.CurrentValue; };
+        ckbBounce.Toggle += (s, e) => { spinner.SpinBounce = (bool)!e.CurrentValue; };
 
         app.Unloaded += App_Unloaded;
 
