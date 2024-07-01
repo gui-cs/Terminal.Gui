@@ -233,7 +233,10 @@ public class ProgressBarStyles : Scenario
 
         var ckbBidirectional = new CheckBox
         {
-            X = Pos.Center (), Y = Pos.Bottom (continuousPB) + 1, Text = "BidirectionalMarquee", State = CheckState.Checked
+            X = Pos.Center (),
+            Y = Pos.Bottom (continuousPB),
+            Text = "BidirectionalMarquee", 
+            State = CheckState.Checked
         };
         container.Add (ckbBidirectional);
 
@@ -288,9 +291,9 @@ public class ProgressBarStyles : Scenario
 
         ckbBidirectional.Toggle += (s, e) =>
                                    {
-                                       ckbBidirectional.State = e.CurrentValue;
+                                       ckbBidirectional.State = e.NewValue;
                                        marqueesBlocksPB.BidirectionalMarquee =
-                                                                  marqueesContinuousPB.BidirectionalMarquee = e.CurrentValue == CheckState.Checked;
+                                                                  marqueesContinuousPB.BidirectionalMarquee = e.NewValue == CheckState.Checked;
                                    };
 
 
