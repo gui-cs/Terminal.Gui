@@ -14,9 +14,6 @@ public enum CheckState
 /// <summary>Shows a check box that can be toggled.</summary>
 public class CheckBox : View
 {
-    private readonly Rune _charChecked;
-    private readonly Rune _charNone;
-    private readonly Rune _charUnChecked;
     private bool _allowNone;
     private CheckState _checked = CheckState.UnChecked;
 
@@ -25,10 +22,6 @@ public class CheckBox : View
     /// </summary>
     public CheckBox ()
     {
-        _charNone = Glyphs.CheckStateNone;
-        _charChecked = Glyphs.CheckStateChecked;
-        _charUnChecked = Glyphs.CheckStateUnChecked;
-
         Width = Dim.Auto (DimAutoStyle.Text);
         Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
@@ -194,23 +187,23 @@ public class CheckBox : View
             case Alignment.Start:
             case Alignment.Center:
             case Alignment.Fill:
-                TextFormatter.Text = $"{GetCheckedState ()} {Text}";
+                TextFormatter.Text = $"{GetCheckedGlyph ()} {Text}";
 
                 break;
             case Alignment.End:
-                TextFormatter.Text = $"{Text} {GetCheckedState ()}";
+                TextFormatter.Text = $"{Text} {GetCheckedGlyph ()}";
 
                 break;
         }
     }
 
-    private Rune GetCheckedState ()
+    private Rune GetCheckedGlyph ()
     {
         return State switch
         {
-            CheckState.Checked => _charChecked,
-            CheckState.UnChecked => _charUnChecked,
-            CheckState.None => _charNone,
+            CheckState.Checked => Glyphs.CheckStateChecked,
+            CheckState.UnChecked => Glyphs.CheckStateUnChecked,
+            CheckState.None => Glyphs.CheckStateNone,
             _ => throw new ArgumentOutOfRangeException ()
         };
     }
