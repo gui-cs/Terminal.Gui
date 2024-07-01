@@ -67,7 +67,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (ml),
             Title = "_Want Continuous Button Pressed"
         };
-        cbWantContinuousPresses.Toggled += (s, e) => { win.WantContinuousButtonPressed = !win.WantContinuousButtonPressed; };
+        cbWantContinuousPresses.Toggle += (s, e) => { win.WantContinuousButtonPressed = !win.WantContinuousButtonPressed; };
 
         win.Add (cbWantContinuousPresses);
 
@@ -77,11 +77,11 @@ public class Mouse : Scenario
             Y = Pos.Bottom (cbWantContinuousPresses),
             Title = "_Highlight on Press"
         };
-        cbHighlightOnPress.Checked = win.HighlightStyle == (HighlightStyle.Pressed | HighlightStyle.PressedOutside);
+        cbHighlightOnPress.State = win.HighlightStyle == (HighlightStyle.Pressed | HighlightStyle.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
 
-        cbHighlightOnPress.Toggled += (s, e) =>
+        cbHighlightOnPress.Toggle += (s, e) =>
                                       {
-                                          if (e.NewValue == true)
+                                          if (e.NewValue == CheckState.Checked)
                                           {
                                               win.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
                                           }

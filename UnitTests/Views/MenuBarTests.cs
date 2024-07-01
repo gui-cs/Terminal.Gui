@@ -64,7 +64,7 @@ public class MenuBarTests (ITestOutputHelper output)
  Nullable Checked       
 ┌──────────────────────┐
 │ {
-    CM.Glyphs.NullChecked
+    CM.Glyphs.CheckStateNone
 } Check this out 你  │
 └──────────────────────┘",
                                                       output

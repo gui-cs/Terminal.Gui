@@ -193,7 +193,7 @@ public class Bars : Scenario
                                  {
                                      eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
                                      eventLog.MoveDown ();
-                                     args.Cancel = true;
+                                     args.Handled = true;
                                  };
                 }
             }
@@ -453,7 +453,7 @@ public class Bars : Scenario
                                                     {
                                                         button1.Visible = !button1.Visible;
                                                         button1.Enabled = button1.Visible;
-                                                        e.Cancel = false;
+                                                        e.Handled = false;
                                                     };
 
         bar.Add (new Label

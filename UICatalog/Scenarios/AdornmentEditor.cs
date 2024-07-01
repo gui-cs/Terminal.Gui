@@ -186,7 +186,7 @@ public class AdornmentEditor : View
                };
     }
 
-    private void Top_ValueChanging (object sender, StateEventArgs<int> e)
+    private void Top_ValueChanging (object sender, CancelEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {
@@ -198,7 +198,7 @@ public class AdornmentEditor : View
         AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, e.NewValue, AdornmentToEdit.Thickness.Right, AdornmentToEdit.Thickness.Bottom);
     }
 
-    private void Left_ValueChanging (object sender, StateEventArgs<int> e)
+    private void Left_ValueChanging (object sender, CancelEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {
@@ -210,7 +210,7 @@ public class AdornmentEditor : View
         AdornmentToEdit.Thickness = new (e.NewValue, AdornmentToEdit.Thickness.Top, AdornmentToEdit.Thickness.Right, AdornmentToEdit.Thickness.Bottom);
     }
 
-    private void Right_ValueChanging (object sender, StateEventArgs<int> e)
+    private void Right_ValueChanging (object sender, CancelEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {
@@ -222,7 +222,7 @@ public class AdornmentEditor : View
         AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, AdornmentToEdit.Thickness.Top, e.NewValue, AdornmentToEdit.Thickness.Bottom);
     }
 
-    private void Bottom_ValueChanging (object sender, StateEventArgs<int> e)
+    private void Bottom_ValueChanging (object sender, CancelEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {

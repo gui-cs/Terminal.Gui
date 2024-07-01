@@ -131,7 +131,7 @@ public class Dialogs : Scenario
             Y = Pos.Bottom (numButtonsLabel),
             TextAlignment = Alignment.End,
             Text = $"_Add {char.ConvertFromUtf32 (CODE_POINT)} to button text to stress wide char support",
-            Checked = false
+            State = CheckState.UnChecked
         };
         frame.Add (glyphsNotWords);
 
@@ -230,7 +230,7 @@ public class Dialogs : Scenario
                 int buttonId = i;
                 Button button = null;
 
-                if (glyphsNotWords.Checked == true)
+                if (glyphsNotWords.State == CheckState.Checked)
                 {
                     buttonId = i;
 
@@ -281,7 +281,7 @@ public class Dialogs : Scenario
                               int buttonId = buttons.Count;
                               Button button;
 
-                              if (glyphsNotWords.Checked == true)
+                              if (glyphsNotWords.State == CheckState.Checked)
                               {
                                   button = new ()
                                   {

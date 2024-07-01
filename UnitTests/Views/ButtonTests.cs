@@ -484,7 +484,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         return;
 
-        void ButtonOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void ButtonOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -503,10 +503,10 @@ public class ButtonTests (ITestOutputHelper output)
 
         return;
 
-        void ButtonAccept (object sender, CancelEventArgs e)
+        void ButtonAccept (object sender, HandledEventArgs e)
         {
             acceptInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 

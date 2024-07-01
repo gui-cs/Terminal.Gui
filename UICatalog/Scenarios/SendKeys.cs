@@ -87,9 +87,9 @@ public class SendKeys : Scenario
                 Application.Driver.SendKeys (
                                              r,
                                              ck,
-                                             (bool)ckbShift.Checked,
-                                             (bool)ckbAlt.Checked,
-                                             (bool)ckbControl.Checked
+                                             ckbShift.State == CheckState.Checked,
+                                             ckbAlt.State == CheckState.Checked,
+                                             ckbControl.State == CheckState.Checked
                                             );
             }
 

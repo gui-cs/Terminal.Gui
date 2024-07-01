@@ -142,7 +142,7 @@ public class DynamicMenuBar : Scenario
             {
                 X = Pos.Left (_lblTitle),
                 Y = Pos.Bottom (CkbIsTopLevel),
-                Checked = _menuItem == null ? !_hasParent : HasSubMenus (_menuItem),
+                State = (_menuItem == null ? !_hasParent : HasSubMenus (_menuItem)) ? CheckState.Checked : CheckState.UnChecked,
                 Text = "Has sub-menus"
             };
             Add (CkbSubMenu);
@@ -249,36 +249,36 @@ public class DynamicMenuBar : Scenario
             _btnShortcut.Accept += (s, e) => { TextShortcut.Text = ""; };
             Add (_btnShortcut);
 
-            CkbIsTopLevel.Toggled += (s, e) =>
+            CkbIsTopLevel.Toggle += (s, e) =>
                                      {
-                                         if ((_menuItem != null && _menuItem.Parent != null && (bool)CkbIsTopLevel.Checked)
-                                             || (_menuItem == null && _hasParent && (bool)CkbIsTopLevel.Checked))
+                                         if ((_menuItem != null && _menuItem.Parent != null && CkbIsTopLevel.State == CheckState.Checked)
+                                             || (_menuItem == null && _hasParent && CkbIsTopLevel.State == CheckState.Checked))
                                          {
                                              MessageBox.ErrorQuery (
                                                                     "Invalid IsTopLevel",
                                                                     "Only menu bar can have top level menu item!",
                                                                     "Ok"
                                                                    );
-                                             CkbIsTopLevel.Checked = false;
+                                             CkbIsTopLevel.State = CheckState.UnChecked;
 
                                              return;
                                          }
 
-                                         if (CkbIsTopLevel.Checked == true)
+                                         if (CkbIsTopLevel.State == CheckState.Checked)
                                          {
-                                             CkbSubMenu.Checked = false;
+                                             CkbSubMenu.State = CheckState.UnChecked;
                                              CkbSubMenu.SetNeedsDisplay ();
                                              TextHelp.Enabled = true;
                                              TextAction.Enabled = true;
 
                                              TextShortcut.Enabled =
-                                                 CkbIsTopLevel.Checked == false && CkbSubMenu.Checked == false;
+                                                 CkbIsTopLevel.State == CheckState.UnChecked && CkbSubMenu.State == CheckState.UnChecked;
                                          }
                                          else
                                          {
                                              if ((_menuItem == null && !_hasParent) || _menuItem.Parent == null)
                                              {
-                                                 CkbSubMenu.Checked = true;
+                                                 CkbSubMenu.State = CheckState.Checked;
                                                  CkbSubMenu.SetNeedsDisplay ();
                                                  TextShortcut.Enabled = false;
                                              }
@@ -290,11 +290,11 @@ public class DynamicMenuBar : Scenario
                                          }
                                      };
 
-            CkbSubMenu.Toggled += (s, e) =>
+            CkbSubMenu.Toggle += (s, e) =>
                                   {
-                                      if ((bool)CkbSubMenu.Checked)
+                                      if (e.NewValue == CheckState.Checked)
                                       {
-                                          CkbIsTopLevel.Checked = false;
+                                          CkbIsTopLevel.State = CheckState.UnChecked;
                                           CkbIsTopLevel.SetNeedsDisplay ();
                                           TextHelp.Text = "";
                                           TextHelp.Enabled = false;
@@ -307,7 +307,7 @@ public class DynamicMenuBar : Scenario
                                       {
                                           if (!_hasParent)
                                           {
-                                              CkbIsTopLevel.Checked = true;
+                                              CkbIsTopLevel.State = CheckState.Checked;
                                               CkbIsTopLevel.SetNeedsDisplay ();
                                               TextShortcut.Enabled = false;
                                           }
@@ -316,15 +316,15 @@ public class DynamicMenuBar : Scenario
                                           TextAction.Enabled = true;
 
                                           TextShortcut.Enabled =
-                                              CkbIsTopLevel.Checked == false && CkbSubMenu.Checked == false;
+                                              CkbIsTopLevel.State == CheckState.UnChecked && CkbSubMenu.State == CheckState.UnChecked;
                                       }
                                   };
 
-            CkbNullCheck.Toggled += (s, e) =>
+            CkbNullCheck.Toggle += (s, e) =>
                                     {
                                         if (_menuItem != null)
                                         {
-                                            _menuItem.AllowNullChecked = (bool)CkbNullCheck.Checked;
+                                            _menuItem.AllowNullChecked = e.NewValue == CheckState.Checked;
                                         }
                                     };
 
@@ -394,14 +394,14 @@ public class DynamicMenuBar : Scenario
             TextAction.Text = menuItem != null && menuItem.Action != null
                                   ? GetTargetAction (menuItem.Action)
                                   : string.Empty;
-            CkbIsTopLevel.Checked = IsTopLevel (menuItem);
-            CkbSubMenu.Checked = HasSubMenus (menuItem);
-            CkbNullCheck.Checked = menuItem.AllowNullChecked;
-            TextHelp.Enabled = (bool)!CkbSubMenu.Checked;
-            TextAction.Enabled = (bool)!CkbSubMenu.Checked;
+            CkbIsTopLevel.State = IsTopLevel (menuItem) ? CheckState.Checked : CheckState.UnChecked;
+            CkbSubMenu.State = HasSubMenus (menuItem) ? CheckState.Checked : CheckState.UnChecked;
+            CkbNullCheck.State = menuItem.AllowNullChecked ? CheckState.Checked : CheckState.UnChecked;
+            TextHelp.Enabled = CkbSubMenu.State == CheckState.Checked;
+            TextAction.Enabled = CkbSubMenu.State == CheckState.Checked;
             RbChkStyle.SelectedItem = (int)(menuItem?.CheckType ?? MenuItemCheckStyle.NoCheck);
             TextShortcut.Text = menuItem?.ShortcutTag ?? "";
-            TextShortcut.Enabled = CkbIsTopLevel.Checked == false && CkbSubMenu.Checked == false;
+            TextShortcut.Enabled = CkbIsTopLevel.State == CheckState.UnChecked && CkbSubMenu.State == CheckState.UnChecked;
         }
 
         public DynamicMenuItem EnterMenuItem ()
@@ -414,9 +414,9 @@ public class DynamicMenuBar : Scenario
                 TextTitle.Text = m.Title;
                 TextHelp.Text = m.Help;
                 TextAction.Text = m.Action;
-                CkbIsTopLevel.Checked = false;
-                CkbSubMenu.Checked = !_hasParent;
-                CkbNullCheck.Checked = false;
+                CkbIsTopLevel.State = CheckState.UnChecked;
+                CkbSubMenu.State = !_hasParent ? CheckState.Checked : CheckState.UnChecked;
+                CkbNullCheck.State = CheckState.UnChecked;
                 TextHelp.Enabled = _hasParent;
                 TextAction.Enabled = _hasParent;
                 TextShortcut.Enabled = _hasParent;
@@ -466,13 +466,13 @@ public class DynamicMenuBar : Scenario
                     Title = TextTitle.Text,
                     Help = TextHelp.Text,
                     Action = TextAction.Text,
-                    IsTopLevel = CkbIsTopLevel?.Checked ?? false,
-                    HasSubMenu = CkbSubMenu?.Checked ?? false,
+                    IsTopLevel = CkbIsTopLevel?.State == CheckState.Checked,
+                    HasSubMenu = CkbSubMenu?.State == CheckState.UnChecked,
                     CheckStyle = RbChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck :
                                  RbChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked :
                                  MenuItemCheckStyle.Radio,
                     Shortcut = TextShortcut.Text,
-                    AllowNullChecked = CkbNullCheck.Checked != null && (bool)CkbNullCheck.Checked
+                    AllowNullChecked = CkbNullCheck?.State == CheckState.Checked,
                 };
             }
 
@@ -515,8 +515,8 @@ public class DynamicMenuBar : Scenario
             TextTitle.Text = "";
             TextHelp.Text = "";
             TextAction.Text = "";
-            CkbIsTopLevel.Checked = false;
-            CkbSubMenu.Checked = false;
+            CkbIsTopLevel.State = CheckState.UnChecked;
+            CkbSubMenu.State = CheckState.UnChecked;
             RbChkStyle.SelectedItem = (int)MenuItemCheckStyle.NoCheck;
             TextShortcut.Text = "";
         }
@@ -835,8 +835,8 @@ public class DynamicMenuBar : Scenario
                                          Title = _frmMenuDetails.TextTitle.Text,
                                          Help = _frmMenuDetails.TextHelp.Text,
                                          Action = _frmMenuDetails.TextAction.Text,
-                                         IsTopLevel = _frmMenuDetails.CkbIsTopLevel?.Checked ?? false,
-                                         HasSubMenu = _frmMenuDetails.CkbSubMenu?.Checked ?? false,
+                                         IsTopLevel = _frmMenuDetails.CkbIsTopLevel?.State == CheckState.UnChecked,
+                                         HasSubMenu = _frmMenuDetails.CkbSubMenu?.State == CheckState.UnChecked,
                                          CheckStyle = _frmMenuDetails.RbChkStyle.SelectedItem == 0
                                                           ? MenuItemCheckStyle.NoCheck
                                                           : _frmMenuDetails.RbChkStyle.SelectedItem == 1

@@ -124,7 +124,8 @@ public partial class View
         get => Border?.LineStyle ?? LineStyle.Single;
         set
         {
-            StateEventArgs<LineStyle> e = new (Border?.LineStyle ?? LineStyle.None, value);
+            var old = Border?.LineStyle ?? LineStyle.None;
+            CancelEventArgs<LineStyle> e = new (ref old, ref value);
             OnBorderStyleChanging (e);
 
         }
@@ -137,7 +138,7 @@ public partial class View
     ///     Override <see cref="SetBorderStyle"/> to prevent the <see cref="BorderStyle"/> from changing.
     /// </remarks>
     /// <param name="e"></param>
-    protected void OnBorderStyleChanging (StateEventArgs<LineStyle> e)
+    protected void OnBorderStyleChanging (CancelEventArgs<LineStyle> e)
     {
         if (Border is null)
         {
@@ -193,7 +194,7 @@ public partial class View
     /// <summary>
     ///     Fired when the <see cref="BorderStyle"/> is changing. Allows the event to be cancelled.
     /// </summary>
-    public event EventHandler<StateEventArgs<LineStyle>> BorderStyleChanging;
+    public event EventHandler<CancelEventArgs<LineStyle>> BorderStyleChanging;
 
     /// <summary>
     ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="Viewport"/>

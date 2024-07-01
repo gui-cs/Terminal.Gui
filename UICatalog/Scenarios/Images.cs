@@ -28,7 +28,7 @@ public class Images : Scenario
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 0,
-            Checked = canTrueColor,
+            State = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
             CanFocus = false,
             Text = "supports true color "
         };
@@ -38,11 +38,11 @@ public class Images : Scenario
         {
             X = Pos.Right (cbSupportsTrueColor) + 2,
             Y = 0,
-            Checked = !Application.Force16Colors,
+            State = !Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Use true color"
         };
-        cbUseTrueColor.Toggled += (_, evt) => Application.Force16Colors = !evt.NewValue ?? false;
+        cbUseTrueColor.Toggle += (_, evt) => Application.Force16Colors = evt.NewValue == CheckState.UnChecked;
         Win.Add (cbUseTrueColor);
 
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };

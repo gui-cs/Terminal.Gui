@@ -295,9 +295,9 @@ public class Shortcut : View
 
     private Color? _savedForeColor;
 
-    private void Shortcut_Highlight (object sender, HighlightEventArgs e)
+    private void Shortcut_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
     {
-        if (e.HighlightStyle.HasFlag (HighlightStyle.Pressed))
+        if (e.CurrentValue.HasFlag (HighlightStyle.Pressed))
         {
             if (!_savedForeColor.HasValue)
             {
@@ -311,7 +311,7 @@ public class Shortcut : View
             base.ColorScheme = cs;
         }
 
-        if (e.HighlightStyle == HighlightStyle.None && _savedForeColor.HasValue)
+        if (e.CurrentValue == HighlightStyle.None && _savedForeColor.HasValue)
         {
             var cs = new ColorScheme (base.ColorScheme)
             {
@@ -446,7 +446,7 @@ public class Shortcut : View
     CommandView.Y = 0; //Pos.Center ();
 }
 
-private void Shortcut_TitleChanged (object sender, StateEventArgs<string> e)
+private void Shortcut_TitleChanged (object sender, EventArgs<string> e)
 {
     // If the Title changes, update the CommandView text.
     // This is a helper to make it easier to set the CommandView text.

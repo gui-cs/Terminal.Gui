@@ -73,9 +73,9 @@ public class ScenarioTests : TestsAllViews
 
         return;
 
-        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
         {
-            if (a.NewValue)
+            if (a.CurrentValue)
             {
                 Application.Iteration += OnApplicationOnIteration;
                 initialized = true;

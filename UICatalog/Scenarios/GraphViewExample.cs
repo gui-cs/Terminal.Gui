@@ -196,13 +196,13 @@ public class GraphViewExample : Scenario
         Application.Shutdown ();
     }
 
-    private void DiagShortcut_Accept (object sender, CancelEventArgs e)
+    private void DiagShortcut_Accept (object sender, HandledEventArgs e)
     {
         ToggleDiagnostics ();
 
         if (sender is Shortcut shortcut && shortcut.CommandView is CheckBox checkBox)
         {
-            checkBox.Checked = _miDiags.Checked;
+            checkBox.State = _miDiags.Checked ?? false ? CheckState.Checked : CheckState.UnChecked;
         }
     }
 

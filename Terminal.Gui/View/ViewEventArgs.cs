@@ -58,7 +58,8 @@ public class DrawEventArgs : EventArgs
 public class FocusEventArgs : EventArgs
 {
     /// <summary>Constructs.</summary>
-    /// <param name="leaving">The view that gets or loses focus.</param>
+    /// <param name="leaving">The view that is losing focus.</param>
+    /// <param name="entering">The view that is gaining focus.</param>
     public FocusEventArgs (View leaving, View entering) {
         Leaving = leaving;
         Entering = entering;

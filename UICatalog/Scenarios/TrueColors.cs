@@ -32,8 +32,9 @@ public class TrueColors : Scenario
         {
             X = x,
             Y = y++,
-            Checked = canTrueColor,
+            State = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
             CanFocus = false,
+            Enabled = false,
             Text = "Driver supports true color "
         };
         app.Add (cbSupportsTrueColor);
@@ -42,11 +43,11 @@ public class TrueColors : Scenario
         {
             X = x,
             Y = y++,
-            Checked = Application.Force16Colors,
+            State = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Force 16 colors"
         };
-        cbUseTrueColor.Toggled += (_, evt) => { Application.Force16Colors = evt.NewValue ?? false; };
+        cbUseTrueColor.Toggle += (_, evt) => { Application.Force16Colors = evt.NewValue == CheckState.Checked; };
         app.Add (cbUseTrueColor);
 
         y += 2;

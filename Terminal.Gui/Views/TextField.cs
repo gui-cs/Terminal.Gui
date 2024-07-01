@@ -334,9 +334,9 @@ public class TextField : View
                     }
                    );
 
-        // OnAccept returns true if the event is canceled.
-        // By Default pressing ENTER should be ignored (Invoke(Command.Accept) should return false).
-        AddCommand (Command.Accept, () => OnAccept () != true);
+        // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
+        // event was fired and set Cancel = true.
+        AddCommand (Command.Accept, () => OnAccept () == false);
 
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
@@ -532,9 +532,11 @@ public class TextField : View
                 return;
             }
 
-            StateEventArgs<string> newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
+            string newText = value.Replace ("\t", "").Split ("\n") [0];
+            CancelEventArgs<string> args = new (ref oldText, ref newText);
+            OnTextChanging (args);
 
-            if (newText.Cancel)
+            if (args.Cancel)
             {
                 if (_cursorPosition > _text.Count)
                 {
@@ -545,7 +547,9 @@ public class TextField : View
             }
 
             ClearAllSelection ();
-            _text = newText.NewValue.EnumerateRunes ().ToList ();
+
+            // Note we use NewValue here; TextChanging subscribers may have changed it
+            _text = args.NewValue.EnumerateRunes ().ToList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {
@@ -561,7 +565,7 @@ public class TextField : View
                                  );
             }
 
-            OnTextChanged (oldText, StringExtensions.ToString (_text));
+            OnTextChanged ();
 
             ProcessAutocomplete ();
 
@@ -1101,14 +1105,13 @@ public class TextField : View
     }
 
     /// <summary>Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.</summary>
-    /// <param name="newText">The new text to be replaced.</param>
-    /// <returns>Returns the <see cref="StringEventArgs"/></returns>
-    public virtual StateEventArgs<string> OnTextChanging (string newText)
+    /// <param name="args">The event arguments..</param>
+    /// <returns><see langword="true"/> if the event was cancelled.</returns>
+    public bool OnTextChanging (CancelEventArgs<string> args)
     {
-        StateEventArgs<string> ev = new (string.Empty, newText);
-        TextChanging?.Invoke (this, ev);
+        TextChanging?.Invoke (this, args);
 
-        return ev;
+        return args.Cancel;
     }
 
     /// <summary>Paste the selected text from the clipboard.</summary>
@@ -1195,7 +1198,7 @@ public class TextField : View
     //public event EventHandler<StateEventArgs<string>> TextChanged;
 
     /// <summary>Changing event, raised before the <see cref="Text"/> changes and can be canceled or changing the new text.</summary>
-    public event EventHandler<StateEventArgs<string>> TextChanging;
+    public event EventHandler<CancelEventArgs<string>> TextChanging;
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()

@@ -90,11 +90,11 @@ public class AdornmentsEditor : View
         Add (_paddingEditor);
 
         _diagPaddingCheckBox = new () { Text = "_Diagnostic Padding" };
-        _diagPaddingCheckBox.Checked = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Padding);
+        _diagPaddingCheckBox.State = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Padding) ? CheckState.Checked : CheckState.UnChecked;
 
-        _diagPaddingCheckBox.Toggled += (s, e) =>
+        _diagPaddingCheckBox.Toggle += (s, e) =>
                                         {
-                                            if (e.NewValue == true)
+                                            if (e.NewValue == CheckState.Checked)
                                             {
                                                 Diagnostics |= ViewDiagnosticFlags.Padding;
                                             }
@@ -108,11 +108,11 @@ public class AdornmentsEditor : View
         _diagPaddingCheckBox.Y = Pos.Bottom (_paddingEditor);
 
         _diagRulerCheckBox = new () { Text = "_Diagnostic Ruler" };
-        _diagRulerCheckBox.Checked = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Ruler);
+        _diagRulerCheckBox.State = Diagnostics.FastHasFlags(ViewDiagnosticFlags.Ruler) ? CheckState.Checked : CheckState.UnChecked;
 
-        _diagRulerCheckBox.Toggled += (s, e) =>
+        _diagRulerCheckBox.Toggle += (s, e) =>
                                       {
-                                          if (e.NewValue == true)
+                                          if (e.NewValue == CheckState.Checked)
                                           {
                                               Diagnostics |= ViewDiagnosticFlags.Ruler;
                                           }

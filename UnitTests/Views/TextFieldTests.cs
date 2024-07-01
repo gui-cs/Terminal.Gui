@@ -363,7 +363,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         _textField.TextChanging += _textField_TextChanging;
 
-        void _textField_TextChanging (object sender, StateEventArgs<string> e)
+        void _textField_TextChanging (object sender, CancelEventArgs<string> e)
         {
             if (e.NewValue.GetRuneCount () > 11)
             {
@@ -429,8 +429,11 @@ public class TextFieldTests (ITestOutputHelper output)
         var oldText = "";
         var tf = new TextField { Width = 10, Text = "-1" };
 
-        tf.TextChanging += (s, e) => newText = e.NewValue;
-        tf.TextChanged += (s, e) => oldText = e.OldValue;
+        tf.TextChanging += (s, e) =>
+                           {
+                               newText = e.NewValue;
+                               oldText = e.CurrentValue;
+                           };
 
         var top = new Toplevel ();
         top.Add (tf);
@@ -771,7 +774,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -786,7 +789,86 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void Accept (object sender, CancelEventArgs e) { accepted = true; }
+        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Theory]
+    [InlineData (false, 0)]
+    [InlineData (true, 1)]
+    public void Accept_Handler_Handled_Prevents_Default_Button_Accept (bool handleAccept, int expectedButtonAccepts)
+    {
+        var superView = new Window ();
+        var tf = new TextField ();
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tf, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        var textFieldAccept = 0;
+        tf.Accept += TextFieldAccept;
+
+        tf.SetFocus ();
+        Assert.True (tf.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, textFieldAccept);
+        Assert.Equal (expectedButtonAccepts, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, textFieldAccept);
+        Assert.Equal (expectedButtonAccepts + 1, buttonAccept);
+
+        return;
+
+        void TextFieldAccept (object sender, HandledEventArgs e)
+        {
+            textFieldAccept++;
+            e.Handled = handleAccept;
+        }
+
+        void ButtonAccept (object sender, HandledEventArgs e)
+        {
+            buttonAccept++;
+        }
+    }
+
+    [Fact]
+    public void Accept_No_Handler_Enables_Default_Button_Accept ()
+    {
+        var superView = new Window ();
+        var tf = new TextField ();
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tf, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        tf.SetFocus ();
+        Assert.True (tf.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (2, buttonAccept);
+
+        return;
+
+        void ButtonAccept (object sender, HandledEventArgs e)
+        {
+            buttonAccept++;
+        }
     }
 
     [Fact]
@@ -800,23 +882,23 @@ public class TextFieldTests (ITestOutputHelper output)
         //var superAcceptedInvoked = false;
 
         var tfAcceptedInvoked = false;
-        var cancel = false;
+        var handle = false;
         view.Accept += TextViewAccept;
         Assert.True (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 
         tfAcceptedInvoked = false;
-        cancel = true;
+        handle = true;
         view.Accept += TextViewAccept;
         Assert.False (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 
         return;
 
-        void TextViewAccept (object sender, CancelEventArgs e)
+        void TextViewAccept (object sender, HandledEventArgs e)
         {
             tfAcceptedInvoked = true;
-            e.Cancel = cancel;
+            e.Handled = handle;
         }
     }
 
@@ -1112,10 +1194,13 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void TextChanged_Event ()
     {
-        _textField.TextChanged += (s, e) => { Assert.Equal ("TAB to jump between text fields.", e.OldValue); };
+        bool eventFired = false;
+        _textField.TextChanged += (s, e) => eventFired = true;
 
         _textField.Text = "changed";
+        Assert.True (eventFired);
         Assert.Equal ("changed", _textField.Text);
+
     }
 
     [Fact]
@@ -1823,8 +1908,8 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
     {
         var tf = new TextField { Width = 30, Text = "Les Misérables" };
-        tf.SetRelativeLayout(new Size(100,100));
-        tf.Draw();
+        tf.SetRelativeLayout (new Size (100, 100));
+        tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
