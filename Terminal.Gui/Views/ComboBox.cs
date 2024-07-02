@@ -422,7 +422,7 @@ public class ComboBox : View
 
             if (SelectedItem > -1 && _listview.Source?.Count > 0)
             {
-                Text = _listview.Source.ToList () [SelectedItem].ToString ();
+                Text = _listview.Source.ToList () [SelectedItem]?.ToString ();
             }
         }
         else if (!ReadOnly)

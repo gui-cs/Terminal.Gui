@@ -147,12 +147,12 @@ public partial class View : Responder, ISupportInitializeNotification
     }
 
     /// <summary>
-    ///     Called when the <see cref="Command.Accept"/> command is invoked. Fires the <see cref="Accept"/>
+    ///     Called when the <see cref="Command.Accept"/> command is invoked. Raises <see cref="Accept"/>
     ///     event.
     /// </summary>
     /// <returns>
-    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was fired but not canceled.
-    ///     If <see langword="null"/> no event was fired.
+    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
+    ///     If <see langword="null"/> no event was raised.
     /// </returns>
     protected bool? OnAccept ()
     {

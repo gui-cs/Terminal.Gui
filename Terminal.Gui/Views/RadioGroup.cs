@@ -84,7 +84,7 @@ public class RadioGroup : View
                     {
                         SelectedItem = _cursor;
 
-                        return OnAccept () != false;
+                        return OnAccept () is true or null;
                     }
                    );
 
@@ -97,7 +97,7 @@ public class RadioGroup : View
                         {
                             SelectedItem = (int)ctx.KeyBinding?.Context!;
 
-                            return OnAccept () != false;
+                            return OnAccept () is true or null;
                         }
 
                         return true;

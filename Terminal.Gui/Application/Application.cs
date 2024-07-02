@@ -352,13 +352,15 @@ public static partial class Application
         InitializedChanged?.Invoke (null, new (in _initialized));
     }
 
+#nullable enable
     /// <summary>
-    ///     This event is fired after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
+    ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
     /// </summary>
     /// <remarks>
     ///     Intended to support unit tests that need to know when the application has been initialized.
     /// </remarks>
-    public static event EventHandler<EventArgs<bool>> InitializedChanged;
+    public static event EventHandler<EventArgs<bool>>? InitializedChanged;
+#nullable restore
 
     #endregion Initialization (Init/Shutdown)
 
