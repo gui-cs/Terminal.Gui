@@ -189,7 +189,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         return;
 
-        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         return;
 
-        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]

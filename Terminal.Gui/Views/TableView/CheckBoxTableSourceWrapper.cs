@@ -33,9 +33,9 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     }
 
     /// <summary>
-    ///     Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.Checked"/>
+    ///     Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.CheckStateChecked"/>
     /// </summary>
-    public Rune CheckedRune { get; set; } = Glyphs.Checked;
+    public Rune CheckedRune { get; set; } = Glyphs.CheckStateChecked;
 
     /// <summary>
     ///     Gets or sets the character to use for checked entry when <see cref="UseRadioButtons"/> is true. Defaults to
@@ -50,9 +50,9 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     public Rune RadioUnCheckedRune { get; set; } = Glyphs.UnSelected;
 
     /// <summary>
-    ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.UnChecked"/>
+    ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.CheckStateUnChecked"/>
     /// </summary>
-    public Rune UnCheckedRune { get; set; } = Glyphs.UnChecked;
+    public Rune UnCheckedRune { get; set; } = Glyphs.CheckStateUnChecked;
 
     /// <summary>Gets or sets whether to only allow a single row to be toggled at once (Radio button).</summary>
     public bool UseRadioButtons { get; set; }

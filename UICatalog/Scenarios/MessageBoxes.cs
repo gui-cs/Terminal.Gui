@@ -186,7 +186,7 @@ public class MessageBoxes : Scenario
 
         var ckbWrapMessage = new CheckBox
         {
-            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", Checked = true
+            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", State = CheckState.Checked
         };
         frame.Add (ckbWrapMessage);
 
@@ -237,7 +237,7 @@ public class MessageBoxes : Scenario
                                                                              titleEdit.Text,
                                                                              messageEdit.Text,
                                                                              defaultButton,
-                                                                             (bool)ckbWrapMessage.Checked,
+                                                                             ckbWrapMessage.State == CheckState.Checked,
                                                                              btns.ToArray ()
                                                                             )}";
                                                }
@@ -250,7 +250,7 @@ public class MessageBoxes : Scenario
                                                                                   titleEdit.Text,
                                                                                   messageEdit.Text,
                                                                                   defaultButton,
-                                                                                  (bool)ckbWrapMessage.Checked,
+                                                                                  ckbWrapMessage.State == CheckState.Checked,
                                                                                   btns.ToArray ()
                                                                                  )}";
                                                }

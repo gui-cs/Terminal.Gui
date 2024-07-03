@@ -220,7 +220,7 @@ public class Border : Adornment
 
     private Color? _savedForeColor;
 
-    private void Border_Highlight (object sender, HighlightEventArgs e)
+    private void Border_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
     {
         if (!Parent.Arrangement.HasFlag (ViewArrangement.Movable))
         {
@@ -228,7 +228,7 @@ public class Border : Adornment
             return;
         }
 
-        if (e.HighlightStyle.HasFlag (HighlightStyle.Pressed))
+        if (e.NewValue.HasFlag (HighlightStyle.Pressed))
         {
             if (!_savedForeColor.HasValue)
             {
@@ -252,7 +252,7 @@ public class Border : Adornment
         }
 #endif
 
-        if (e.HighlightStyle == HighlightStyle.None && _savedForeColor.HasValue)
+        if (e.NewValue == HighlightStyle.None && _savedForeColor.HasValue)
         {
             ColorScheme cs = new ColorScheme (ColorScheme)
             {
@@ -299,6 +299,7 @@ public class Border : Adornment
                 _startGrabPoint = new (mouseEvent.Position.X + Frame.X, mouseEvent.Position.Y + Frame.Y);
                 _dragPosition = mouseEvent.Position;
                 Application.GrabMouse (this);
+
                 SetHighlight (HighlightStyle);
             }
 

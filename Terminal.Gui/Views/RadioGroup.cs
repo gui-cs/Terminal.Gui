@@ -84,7 +84,7 @@ public class RadioGroup : View, IDesignable
                     {
                         SelectedItem = _cursor;
 
-                        return !OnAccept ();
+                        return OnAccept () is true or null;
                     }
                    );
 
@@ -97,7 +97,7 @@ public class RadioGroup : View, IDesignable
                         {
                             SelectedItem = (int)ctx.KeyBinding?.Context!;
 
-                            return !OnAccept();
+                            return OnAccept () is true or null;
                         }
 
                         return true;

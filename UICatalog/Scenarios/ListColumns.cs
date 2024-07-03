@@ -120,8 +120,7 @@ public class ListColumns : Scenario
                          {
                              Checked = _listColView.Style
                                                    .ShowHorizontalBottomline,
-                             CheckType = MenuItemCheckStyle
-                                 .Checked
+                             CheckType = MenuItemCheckStyle.Checked
                          },
                          _miCellLines = new (
                                              "_CellLines",
@@ -131,8 +130,7 @@ public class ListColumns : Scenario
                          {
                              Checked = _listColView.Style
                                                    .ShowVerticalCellLines,
-                             CheckType = MenuItemCheckStyle
-                                 .Checked
+                             CheckType = MenuItemCheckStyle.Checked
                          },
                          _miExpandLastColumn = new (
                                                     "_ExpandLastColumn",
