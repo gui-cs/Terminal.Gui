@@ -27,7 +27,7 @@ namespace Terminal.Gui;
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
 /// </remarks>
-public class Button : View
+public class Button : View, IDesignable
 {
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
@@ -189,5 +189,13 @@ public class Button : View
                 TextFormatter.Text = $"{_leftBracket} {Text} {_rightBracket}";
             }
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        Title = "_Button";
+
+        return true;
     }
 }

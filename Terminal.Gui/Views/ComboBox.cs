@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace Terminal.Gui;
 
 /// <summary>Provides a drop-down list of items the user can select from.</summary>
-public class ComboBox : View
+public class ComboBox : View, IDesignable
 {
     private readonly ComboListView _listview;
     private readonly int _minimumHeight = 2;
@@ -993,5 +993,15 @@ public class ComboBox : View
             HideDropdownListOnClick = hideDropdownListOnClick;
             AddCommand (Command.LineUp, () => _container.MoveUpList ());
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        var source = new ObservableCollection<string> (["Combo Item 1", "Combo Item two", "Combo Item Quattro", "Last Combo Item"]);
+        SetSource (source);
+        Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: source.Count + 1);
+
+        return true;
     }
 }
