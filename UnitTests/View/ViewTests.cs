@@ -1198,7 +1198,7 @@ At 0,0
 
         return;
 
-        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void ViewOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -1215,10 +1215,10 @@ At 0,0
 
         return;
 
-        void ViewOnAccept (object sender, CancelEventArgs e)
+        void ViewOnAccept (object sender, HandledEventArgs e)
         {
             acceptInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -1235,7 +1235,7 @@ At 0,0
 
         return;
 
-        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void ViewOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]

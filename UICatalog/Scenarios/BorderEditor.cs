@@ -20,7 +20,7 @@ public class BorderEditor : AdornmentEditor
 
     private void BorderEditor_AdornmentChanged (object sender, EventArgs e)
     {
-        _ckbTitle.Checked = ((Border)AdornmentToEdit).ShowTitle;
+        _ckbTitle.State = ((Border)AdornmentToEdit).ShowTitle ? CheckState.Checked : CheckState.UnChecked;
         _rbBorderStyle.SelectedItem = (int)((Border)AdornmentToEdit).LineStyle;
     }
 
@@ -51,14 +51,14 @@ public class BorderEditor : AdornmentEditor
             X = 0,
             Y = Pos.Bottom (_rbBorderStyle),
 
-            Checked = true,
+            State = CheckState.Checked,
             SuperViewRendersLineCanvas = true,
             Text = "Show Title",
             Enabled = AdornmentToEdit is { }
         };
 
 
-        _ckbTitle.Toggled += OnCkbTitleOnToggled;
+        _ckbTitle.Toggle += OnCkbTitleOnToggle;
         Add (_ckbTitle);
 
         return;
@@ -81,6 +81,6 @@ public class BorderEditor : AdornmentEditor
             LayoutSubviews ();
         }
 
-        void OnCkbTitleOnToggled (object sender, StateEventArgs<bool?> args) { ((Border)AdornmentToEdit).ShowTitle = args.NewValue!.Value; }
+        void OnCkbTitleOnToggle (object sender, CancelEventArgs<CheckState> args) { ((Border)AdornmentToEdit).ShowTitle = args.NewValue == CheckState.Checked; }
     }
 }

@@ -81,7 +81,7 @@ public class LabelTests (ITestOutputHelper output)
 
         return;
 
-        void LabelOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void LabelOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]

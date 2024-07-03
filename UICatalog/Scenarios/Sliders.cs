@@ -236,7 +236,7 @@ public class Sliders : Scenario
             Y = Pos.Bottom (optionsSlider)
         };
 
-        dimAutoUsesMin.Toggled += (sender, e) =>
+        dimAutoUsesMin.Toggle += (sender, e) =>
                                   {
                                       foreach (Slider s in app.Subviews.OfType<Slider> ())
                                       {
@@ -599,7 +599,7 @@ public class Sliders : Scenario
                              {
                                  eventSource.Add ($"Accept: {string.Join(",", slider.GetSetOptions ())}");
                                  eventLog.MoveDown ();
-                                 args.Cancel = true;
+                                 args.Handled = true;
                              };
             slider.OptionsChanged += (o, args) =>
                              {

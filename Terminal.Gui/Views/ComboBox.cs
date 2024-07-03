@@ -7,6 +7,7 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -68,7 +69,7 @@ public class ComboBox : View
 
                      SetNeedsLayout ();
                      SetNeedsDisplay ();
-                     Search_Changed (this, new StateEventArgs<string> (string.Empty, Text));
+                     ShowHideList (Text);
                  };
 
         // Things this view knows how to do
@@ -185,15 +186,13 @@ public class ComboBox : View
             // Only need to refresh list if its been added to a container view
             if (SuperView is { } && SuperView.Subviews.Contains (this))
             {
-                SelectedItem = -1;
-                _search.Text = string.Empty;
-                Search_Changed (this, new StateEventArgs<string> (string.Empty, _search.Text));
+                Text = string.Empty;
                 SetNeedsDisplay ();
             }
         }
     }
 
-    /// <summary>The currently selected list item</summary>
+    /// <summary>The text of the currently selected list item</summary>
     public new string Text
     {
         get => _text;
@@ -243,7 +242,7 @@ public class ComboBox : View
     public event EventHandler Expanded;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (me.Position.X == Viewport.Right - 1
             && me.Position.Y == Viewport.Top
@@ -423,12 +422,12 @@ public class ComboBox : View
 
             if (SelectedItem > -1 && _listview.Source?.Count > 0)
             {
-                _search.Text = _text = _listview.Source.ToList () [SelectedItem].ToString ();
+                Text = _listview.Source.ToList () [SelectedItem]?.ToString ();
             }
         }
         else if (!ReadOnly)
         {
-            _search.Text = _text = "";
+            Text = string.Empty;
             _selectedItem = _lastSelectedItem;
             OnSelectedChanged ();
         }
@@ -658,9 +657,9 @@ public class ComboBox : View
     }
 
     // Tell TextField to handle Accept Command (Enter)
-    void Search_Accept (object sender, CancelEventArgs e) { e.Cancel = true; }
+    void Search_Accept (object sender, HandledEventArgs e) { e.Handled = true; }
 
-    private void Search_Changed (object sender, StateEventArgs<string> e)
+    private void Search_Changed (object sender, EventArgs e)
     {
         if (_source is null)
         {
@@ -668,13 +667,18 @@ public class ComboBox : View
             return;
         }
 
-        if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.OldValue))
+        ShowHideList (Text);
+    }
+
+    private void ShowHideList (string oldText)
+    {
+        if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (oldText))
         {
             ResetSearchSet ();
         }
-        else if (_search.Text != e.OldValue)
+        else if (_search.Text != oldText)
         {
-            if (_search.Text.Length < e.OldValue.Length)
+            if (_search.Text.Length < oldText.Length)
             {
                 _selectedItem = -1;
             }
@@ -730,7 +734,7 @@ public class ComboBox : View
 
         SetValue (_listview.SelectedItem > -1 ? _searchSet [_listview.SelectedItem] : _text);
         _search.CursorPosition = _search.Text.GetColumns ();
-        Search_Changed (this, new StateEventArgs<string> (_search.Text, _search.Text));
+        ShowHideList (Text);
         OnOpenSelectedItem ();
         Reset (true);
         HideList ();
@@ -756,11 +760,18 @@ public class ComboBox : View
         _listview.ResumeSuspendCollectionChangedEvent ();
     }
 
-    private void SetSearchText (string value) { _search.Text = _text = value; }
+    // Sets the search text field Text as well as our own Text property
+    private void SetSearchText (string value)
+    {
+        _search.Text = value;
+        _text = value;
+    }
 
     private void SetValue (object text, bool isFromSelectedItem = false)
     {
+        // TOOD: THe fact we have to suspend events to change the text makes this feel very hacky.
         _search.TextChanged -= Search_Changed;
+        // Note we set _text, to avoid set_Text from setting _search.Text again
         _text = _search.Text = text.ToString ();
         _search.CursorPosition = 0;
         _search.TextChanged += Search_Changed;
@@ -813,7 +824,7 @@ public class ComboBox : View
             set => _hideDropdownListOnClick = WantContinuousButtonPressed = value;
         }
 
-        protected internal override bool OnMouseEvent  (MouseEvent me)
+        protected internal override bool OnMouseEvent (MouseEvent me)
         {
             var res = false;
             bool isMousePositionValid = IsMousePositionValid (me);
@@ -918,8 +929,8 @@ public class ComboBox : View
                     if (AllowsMarking)
                     {
                         Driver.AddRune (
-                                        Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected :
-                                        AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected
+                                        Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                        AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected
                                        );
                         Driver.AddRune ((Rune)' ');
                     }

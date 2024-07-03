@@ -724,8 +724,8 @@ public class ListView : View
                 if (_allowsMarking)
                 {
                     Driver.AddRune (
-                                    _source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected :
-                                    AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected
+                                    _source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                    AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected
                                    );
                     Driver.AddRune ((Rune)' ');
                 }

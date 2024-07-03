@@ -39,11 +39,11 @@ public class Margin : Adornment
     }
 
     private bool _pressed;
-    private void Margin_Highlight (object? sender, HighlightEventArgs e)
+    private void Margin_Highlight (object? sender, CancelEventArgs<HighlightStyle> e)
     {
         if (ShadowStyle != Gui.ShadowStyle.None)
         {
-            if (_pressed && e.HighlightStyle == HighlightStyle.None)
+            if (_pressed && e.CurrentValue == HighlightStyle.None)
             {
                 Thickness = new (Thickness.Left - 1, Thickness.Top, Thickness.Right + 1, Thickness.Bottom);
 
@@ -61,7 +61,7 @@ public class Margin : Adornment
                 return;
             }
 
-            if (!_pressed && (e.HighlightStyle.HasFlag (HighlightStyle.Pressed) /*|| e.HighlightStyle.HasFlag (HighlightStyle.PressedOutside)*/))
+            if (!_pressed && (e.CurrentValue.HasFlag (HighlightStyle.Pressed) /*|| e.HighlightStyle.HasFlag (HighlightStyle.PressedOutside)*/))
             {
                 Thickness = new (Thickness.Left + 1, Thickness.Top, Thickness.Right - 1, Thickness.Bottom);
                 _pressed = true;
