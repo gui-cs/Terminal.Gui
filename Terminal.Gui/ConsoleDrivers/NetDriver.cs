@@ -113,7 +113,9 @@ namespace Terminal.Gui {
 		ConsoleDriver consoleDriver;
 		volatile ConsoleKeyInfo [] cki = null;
 		static volatile bool isEscSeq;
-		bool stopTasks;
+
+		internal CancellationTokenSource TokenSource = new CancellationTokenSource ();
+
 #if PROCESS_REQUEST
 		bool neededProcessRequest;
 #endif
@@ -125,21 +127,13 @@ namespace Terminal.Gui {
 				throw new ArgumentNullException ("Console driver instance must be provided.");
 			}
 			this.consoleDriver = consoleDriver;
-			Task.Run (ProcessInputResultQueue);
-			Task.Run (CheckWinChange);
-		}
-
-		internal void StopTasks ()
-		{
-			stopTasks = true;
+			Task.Run (ProcessInputResultQueue, TokenSource.Token);
+			Task.Run (CheckWinChange, TokenSource.Token);
 		}
 
 		public InputResult? ReadConsoleInput ()
 		{
-			while (true) {
-				if (stopTasks) {
-					return null;
-				}
+			while (!TokenSource.IsCancellationRequested) {
 				waitForStart.Set ();
 				winChange.Set ();
 
@@ -154,11 +148,13 @@ namespace Terminal.Gui {
 					return inputResultQueue.Dequeue ();
 				}
 			}
+
+			return null;
 		}
 
 		void ProcessInputResultQueue ()
 		{
-			while (true) {
+			while (!TokenSource.IsCancellationRequested) {
 				waitForStart.Wait ();
 				waitForStart.Reset ();
 
@@ -176,8 +172,23 @@ namespace Terminal.Gui {
 			ConsoleModifiers mod = 0;
 			ConsoleKeyInfo newConsoleKeyInfo = default;
 
-			while (true) {
-				ConsoleKeyInfo consoleKeyInfo = Console.ReadKey (true);
+			while (!TokenSource.IsCancellationRequested) {
+				ConsoleKeyInfo consoleKeyInfo = default;
+
+				try {
+					if (Console.KeyAvailable) {
+						consoleKeyInfo = Console.ReadKey (true);
+					} else {
+						Task.Delay (100, TokenSource.Token).Wait (TokenSource.Token);
+						if (Console.KeyAvailable) {
+							consoleKeyInfo = Console.ReadKey (true);
+						}
+					}
+				} catch (OperationCanceledException) {
+
+					return;
+				}
+
 				if ((consoleKeyInfo.KeyChar == (char)Key.Esc && !isEscSeq)
 					|| (consoleKeyInfo.KeyChar != (char)Key.Esc && isEscSeq)) {
 					if (cki == null && consoleKeyInfo.KeyChar != (char)Key.Esc && isEscSeq) {
@@ -201,18 +212,19 @@ namespace Terminal.Gui {
 					}
 					break;
 				} else {
-					GetConsoleInputType (consoleKeyInfo);
-					break;
+					if (consoleKeyInfo != default) {
+						GetConsoleInputType (consoleKeyInfo);
+						break;
+					}
 				}
+
+				TokenSource.Token.ThrowIfCancellationRequested ();
 			}
 		}
 
 		void CheckWinChange ()
 		{
-			while (true) {
-				if (stopTasks) {
-					return;
-				}
+			while (!TokenSource.IsCancellationRequested) {
 				winChange.Wait ();
 				winChange.Reset ();
 				WaitWinChange ();
@@ -222,13 +234,16 @@ namespace Terminal.Gui {
 
 		void WaitWinChange ()
 		{
-			while (true) {
-				// Wait for a while then check if screen has changed sizes
-				Task.Delay (500).Wait ();
+			while (!TokenSource.IsCancellationRequested) {
+				try {
+					// Wait for a while then check if screen has changed sizes
+					Task.Delay (500, TokenSource.Token).Wait (TokenSource.Token);
 
-				if (stopTasks) {
+				} catch (OperationCanceledException) {
+
 					return;
 				}
+
 				int buffHeight, buffWidth;
 				if (((NetDriver)consoleDriver).IsWinPlatform) {
 					buffHeight = Math.Max (Console.BufferHeight, 0);
@@ -691,7 +706,7 @@ namespace Terminal.Gui {
 
 		public override void End ()
 		{
-			mainLoop.netEvents.StopTasks ();
+			mainLoop.Dispose ();
 
 			if (IsWinPlatform) {
 				NetWinConsole.Cleanup ();
@@ -1019,8 +1034,28 @@ namespace Terminal.Gui {
 
 		public override void Suspend ()
 		{
-		}
+			if (Environment.OSVersion.Platform != PlatformID.Unix) {
+				return;
+			}
 
+			StopReportingMouseMoves ();
+			Console.ResetColor ();
+			Console.Clear ();
+
+			//Disable alternative screen buffer.
+			Console.Out.Write ("\x1b[?1049l");
+
+			//Set cursor key to cursor.
+			Console.Out.Write ("\x1b[?25h");
+
+			Platform.Suspend ();
+
+			//Enable alternative screen buffer.
+			Console.Out.Write ("\x1b[?1049h");
+
+			Application.Refresh ();
+			StartReportingMouseMoves ();
+		}
 
 		public override void SetAttribute (Attribute c)
 		{
@@ -1343,7 +1378,11 @@ namespace Terminal.Gui {
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
 			savedCursorVisibility = visibility;
-			return Console.CursorVisible = visibility == CursorVisibility.Default;
+			Console.Out.Write (visibility == CursorVisibility.Default
+				? "\x1b[?25h"
+				: "\x1b[?25l");
+
+			return visibility == CursorVisibility.Default;
 		}
 
 		/// <inheritdoc/>
@@ -1423,7 +1462,7 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// This implementation is used for NetDriver.
 	/// </remarks>
-	internal class NetMainLoop : IMainLoopDriver {
+	internal class NetMainLoop : IMainLoopDriver, IDisposable {
 		ManualResetEventSlim keyReady = new ManualResetEventSlim (false);
 		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
 		Queue<NetEvents.InputResult?> inputResult = new Queue<NetEvents.InputResult?> ();
@@ -1453,27 +1492,25 @@ namespace Terminal.Gui {
 
 		void NetInputHandler ()
 		{
-			while (true) {
+			while (!tokenSource.IsCancellationRequested) {
 				waitForProbe.Wait ();
 				waitForProbe.Reset ();
 				if (inputResult.Count == 0) {
 					inputResult.Enqueue (netEvents.ReadConsoleInput ());
 				}
-				try {
-					while (inputResult.Peek () == null) {
-						inputResult.Dequeue ();
-					}
-					if (inputResult.Count > 0) {
-						keyReady.Set ();
-					}
-				} catch (InvalidOperationException) { }
+				while (inputResult.Count > 0 && inputResult.Peek () == null) {
+					inputResult.Dequeue ();
+				}
+				if (inputResult.Count > 0) {
+					keyReady.Set ();
+				}
 			}
 		}
 
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
 		{
 			this.mainLoop = mainLoop;
-			Task.Run (NetInputHandler);
+			Task.Run (NetInputHandler, tokenSource.Token);
 		}
 
 		void IMainLoopDriver.Wakeup ()
@@ -1503,8 +1540,7 @@ namespace Terminal.Gui {
 				return inputResult.Count > 0 || CheckTimers (wait, out _);
 			}
 
-			tokenSource.Dispose ();
-			tokenSource = new CancellationTokenSource ();
+			tokenSource.Token.ThrowIfCancellationRequested ();
 			return true;
 		}
 
@@ -1536,6 +1572,12 @@ namespace Terminal.Gui {
 			while (inputResult.Count > 0) {
 				ProcessInput?.Invoke (inputResult.Dequeue ().Value);
 			}
+		}
+
+		public void Dispose ()
+		{
+			tokenSource.Cancel ();
+			netEvents.TokenSource.Cancel ();
 		}
 	}
 }

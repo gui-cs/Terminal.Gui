@@ -1037,6 +1037,7 @@ namespace Terminal.Gui {
 			toplevel.LayoutSubviews ();
 			toplevel.PositionToplevels ();
 			toplevel.WillPresent ();
+			EnsuresTopOnFront ();
 			if (refreshDriver) {
 				MdiTop?.OnChildLoaded (toplevel);
 				toplevel.OnLoaded ();
@@ -1133,9 +1134,9 @@ namespace Terminal.Gui {
 
 			// BUGBUG: MdiTop is not cleared here, but it should be?
 
-			MainLoop = null;
 			Driver?.End ();
 			Driver = null;
+			MainLoop = null;
 			Iteration = null;
 			RootMouseEvent = null;
 			RootKeyEvent = null;
