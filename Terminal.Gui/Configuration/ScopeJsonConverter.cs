@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,9 +12,12 @@ namespace Terminal.Gui;
 ///     data to/from <see cref="ConfigurationManager"/> JSON documents.
 /// </summary>
 /// <typeparam name="scopeT"></typeparam>
-internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT>
+internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT>
 {
+    [RequiresDynamicCode ("Calls System.Type.MakeGenericType(params Type[])")]
+#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
     public override scopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
     {
         if (reader.TokenType != JsonTokenType.StartObject)
         {
@@ -223,6 +227,8 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
     internal class ReadHelper<converterT> : ReadHelper
     {
         private readonly ReadDelegate _readDelegate;
+
+        [RequiresUnreferencedCode ("Calls System.Delegate.CreateDelegate(Type, Object, String)")]
         public ReadHelper (object converter) { _readDelegate = (ReadDelegate)Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read"); }
 
         public override object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)

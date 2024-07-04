@@ -153,6 +153,8 @@ public static class ConfigurationManager
     /// </summary>
     public static SettingsScope? Settings
     {
+        [RequiresUnreferencedCode ("AOT")]
+        [RequiresDynamicCode ("AOT")]
         get
         {
             if (_settings is null)
@@ -184,6 +186,8 @@ public static class ConfigurationManager
     public static event EventHandler<ConfigurationManagerEventArgs>? Applied;
 
     /// <summary>Applies the configuration settings to the running <see cref="Application"/> instance.</summary>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public static void Apply ()
     {
         var settings = false;
@@ -238,6 +242,8 @@ public static class ConfigurationManager
     ///     If <see langword="true"/> the state of <see cref="ConfigurationManager"/> will be reset to the
     ///     defaults.
     /// </param>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public static void Load (bool reset = false)
     {
         Debug.WriteLine ("ConfigurationManager.Load()");
@@ -325,6 +331,8 @@ public static class ConfigurationManager
     ///     <see langword="true"/>.
     /// </summary>
     /// <remarks></remarks>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public static void Reset ()
     {
         Debug.WriteLine (@"ConfigurationManager.Reset()");
@@ -478,6 +486,8 @@ public static class ConfigurationManager
     ///         make sure you copy the Theme definitions from the existing <c>Terminal.Gui.Resources.config.json</c> file.
     ///     </para>
     /// </remarks>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     internal static void GetHardCodedDefaults ()
     {
         if (_allConfigProperties is null)
@@ -499,6 +509,7 @@ public static class ConfigurationManager
     ///     Initializes the internal state of ConfigurationManager. Nominally called once as part of application startup
     ///     to initialize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).
     /// </summary>
+    [RequiresUnreferencedCode ("AOT")]
     internal static void Initialize ()
     {
         _allConfigProperties = new ();
@@ -588,6 +599,8 @@ public static class ConfigurationManager
 
     /// <summary>Creates a JSON document with the configuration specified.</summary>
     /// <returns></returns>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     internal static string ToJson ()
     {
         //Debug.WriteLine ("ConfigurationManager.ToJson()");
@@ -595,6 +608,8 @@ public static class ConfigurationManager
         return JsonSerializer.Serialize (Settings!, typeof (SettingsScope), _serializerContext);
     }
 
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     internal static Stream ToStream ()
     {
         string json = JsonSerializer.Serialize (Settings!, typeof (SettingsScope), _serializerContext);
