@@ -65,32 +65,34 @@ This example includes a menu bar at the top of the screen and a button that show
 ```csharp
 using Terminal.Gui;
 
-Application.Init ();
-var menu = new MenuBar (new MenuBarItem [] {
+Application.Init();
+
+var menu = new MenuBar();
+menu.Menus = [ 
     new MenuBarItem ("_File", new MenuItem [] {
-        new MenuItem ("_Quit", "", () => { 
-            Application.RequestStop (); 
+        new MenuItem ("_Quit", "", () => {
+            Application.RequestStop ();
         })
-    }),
-});
+    })];
 
-var button = new Button () {
-    Title = "_Hello",
+var button = new Button()
+{
+    Title = "H_ello",
     X = 0,
-    Y = Pos.Bottom (menu),
-    Width = Dim.Fill (),
-    Height = Dim.Fill () - 1
+    Y = Pos.Bottom(menu),
+    Width = Dim.Fill(),
+    Height = Dim.Fill() - 1
 };
-button.Clicked += () => {
-    MessageBox.Query (50, 5, "Hi", "Hello World! This is a message box", "Ok");
+button.Accept += (s, e) => {
+    MessageBox.Query(50, 5, "Hi", "Hello World! This is a message box", "Ok");
 };
 
-var app = new Toplevel ();
+var app = new Toplevel();
 // Add both menu and win in a single call
-top.Add (menu, button);
-Application.Run (top);
-top.Dispose ();
-Application.Shutdown ();
+app.Add(menu, button);
+Application.Run(app);
+app.Dispose();
+Application.Shutdown();
 ```
 
 ## Views
@@ -104,27 +106,37 @@ Every view can contain an arbitrary number of child views, called `SubViews`. Ca
 [View.Add](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_Add_Terminal_Gui_View_) method to add a couple of buttons to a UI:
 
 ```csharp
-void SetupMyView (View myView)
+using Terminal.Gui;
+
+Application.Init();
+void SetupMyView(View myView)
 {
-    var label = new Label () {
-        Title = "_Username:"
+    var label = new Label()
+    {
+        Title = "_Username:",
         X = 1,
         Y = 1,
         Width = 20,
         Height = 1
     };
-    myView.Add (label);
+    myView.Add(label);
 
-    var username = new TextField () {
-        X = Pos.Right (label) + 1,
+    var username = new TextField()
+    {
+        X = Pos.Right(label) + 1,
         Y = 2,
         Width = 30,
         Height = 1
     };
-    myView.Add (username);
+    myView.Add(username);
 }
-```
 
+var app = new Toplevel();
+SetupMyView(app);
+Application.Run(app);
+app.Dispose();
+Application.Shutdown();
+```
 The container of a given view is called the `SuperView` and it is a property of every View.
 
 ## Modal Views
@@ -134,26 +146,43 @@ Views can either be Modal or Non-modal. Modal views take over all user input unt
 To run any View (but especially Dialogs, Windows, or Toplevels) modally, invoke the `Application.Run` method on a Toplevel. Use the `Application.RequestStop()` method to terminate the modal execution.
 
 ```csharp
-bool okpressed = false;
-var ok = new Button(3, 14, "Ok") { 
-    Clicked = () => { Application.RequestStop (); okpressed = true; }
-};
-var cancel = new Button(10, 14, "Cancel") {
-    Clicked = () => Application.RequestStop () 
-};
-var dialog = new Dialog ("Login", 60, 18, ok, cancel);
+using Terminal.Gui;
 
-var entry = new TextField () {
-    X = 1, 
+Application.Init();
+bool okpressed = false;
+Button ok= new()
+{
+    Text = "Ok"
+};
+ok.Accept += (s, e) => { Application.RequestStop(); okpressed = true; };
+
+Button cancel = new()
+{
+    Text = "Cancel"
+};
+cancel.Accept += (s, e) => Application.RequestStop();
+
+var dialog = new Dialog()
+{
+    Title = "Login",
+    Width = 60,
+    Height = 18,
+    Buttons = [ok, cancel]
+};
+
+var entry = new TextField()
+{
+    X = 1,
     Y = 1,
-    Width = Dim.Fill (),
+    Width = Dim.Fill(),
     Height = 1
 };
-dialog.Add (entry);
-Application.Run (dialog);
+
+dialog.Add(entry);
+Application.Run(dialog);
 if (okpressed)
-    Console.WriteLine ("The user entered: " + entry.Text);
-dialog.Dispose ();
+    Console.WriteLine("The user entered: " + entry.Text);
+dialog.Dispose();
 ```
 
 There is no return value from running modally, so the modal view must have a mechanism to indicate the reason the modal was closed. In the case above, the `okpressed` value is set to true if the user pressed or selected the `Ok` button.
@@ -170,10 +199,9 @@ Dialogs expose an API for adding buttons and managing the layout such that butto
 
 Example:
 ```csharp
-bool okpressed = false;
 var ok = new Button() { Title = "Ok" };
 var cancel = new Button() { Title = "Cancel" };
-var dialog = new Dialog () { Text = "Are you sure you want to quit?", Title = "Quit", Buttons = { ok, cancel } };
+var dialog = new Dialog() { Text = "Are you sure you want to quit?", Title = "Quit", Buttons = [ ok, cancel] };
 ```
 
 Which will show something like this:
