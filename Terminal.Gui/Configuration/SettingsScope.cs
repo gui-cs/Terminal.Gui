@@ -42,7 +42,7 @@ public class SettingsScope : Scope<SettingsScope>
         // Update the existing settings with the new settings.
         try
         {
-            Update (JsonSerializer.Deserialize<SettingsScope> (stream, _serializerOptions)!);
+            Update ((SettingsScope)JsonSerializer.Deserialize (stream, typeof (SettingsScope), _serializerOptions)!);
             OnUpdated ();
             Debug.WriteLine ($"ConfigurationManager: Read configuration from \"{source}\"");
             if (!Sources.Contains (source))

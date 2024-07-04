@@ -85,7 +85,7 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
                     try
                     {
                         scope! [propertyName].PropertyValue =
-                            JsonSerializer.Deserialize (ref reader, propertyType!, options);
+                            JsonSerializer.Deserialize (ref reader, propertyType!, _serializerContext);
                     }
                     catch (Exception ex)
                     {
@@ -133,7 +133,7 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
                 if (property is { })
                 {
                     PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
-                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, options));
+                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, _serializerContext));
                 }
                 else
                 {
@@ -160,7 +160,8 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
         foreach (PropertyInfo p in properties)
         {
             writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
-            JsonSerializer.Serialize (writer, scope.GetType ().GetProperty (p.Name)?.GetValue (scope), options);
+            object? prop = scope.GetType ().GetProperty (p.Name)?.GetValue (scope);
+            JsonSerializer.Serialize (writer, prop, prop!.GetType (), _serializerContext);
         }
 
         foreach (KeyValuePair<string, ConfigProperty> p in from p in scope
@@ -205,7 +206,8 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
             }
             else
             {
-                JsonSerializer.Serialize (writer, p.Value.PropertyValue, options);
+                object? prop = p.Value.PropertyValue;
+                JsonSerializer.Serialize (writer, prop, prop!.GetType (), _serializerContext);
             }
         }
 

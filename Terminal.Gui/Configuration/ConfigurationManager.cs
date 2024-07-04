@@ -106,8 +106,11 @@ public static class ConfigurationManager
         },
 
         // Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        TypeInfoResolver = SourceGenerationContext.Default
     };
+
+    internal static readonly SourceGenerationContext _serializerContext = new (_serializerOptions);
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static StringBuilder _jsonErrors = new ();
@@ -222,7 +225,7 @@ public static class ConfigurationManager
         var emptyScope = new SettingsScope ();
         emptyScope.Clear ();
 
-        return JsonSerializer.Serialize (emptyScope, _serializerOptions);
+        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), _serializerContext);
     }
 
     /// <summary>
@@ -589,12 +592,12 @@ public static class ConfigurationManager
     {
         //Debug.WriteLine ("ConfigurationManager.ToJson()");
 
-        return JsonSerializer.Serialize (Settings!, _serializerOptions);
+        return JsonSerializer.Serialize (Settings!, typeof (SettingsScope), _serializerContext);
     }
 
     internal static Stream ToStream ()
     {
-        string json = JsonSerializer.Serialize (Settings!, _serializerOptions);
+        string json = JsonSerializer.Serialize (Settings!, typeof (SettingsScope), _serializerContext);
 
         // turn it into a stream
         var stream = new MemoryStream ();
