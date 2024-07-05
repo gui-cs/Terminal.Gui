@@ -15,6 +15,8 @@ public static class Program
         // Before the application exits, reset Terminal.Gui for clean shutdown
         Application.Shutdown ();
 
+        // To see this output on the screen it must be done after shutdown,
+        // which restores the previous screen.
         Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
     }
 }
@@ -31,7 +33,7 @@ public class ExampleWindow : Window
         // Create input components and labels
         var usernameLabel = new Label { Text = "Username:" };
 
-        var usernameText = new TextField
+        var userNameText = new TextField
         {
             // Position text field adjacent to the label
             X = Pos.Right (usernameLabel) + 1,
@@ -50,7 +52,7 @@ public class ExampleWindow : Window
             Secret = true,
 
             // align with the text box above
-            X = Pos.Left (usernameText),
+            X = Pos.Left (userNameText),
             Y = Pos.Top (passwordLabel),
             Width = Dim.Fill ()
         };
@@ -68,20 +70,20 @@ public class ExampleWindow : Window
 
         // When login button is clicked display a message popup
         btnLogin.Accept += (s, e) =>
-        {
-            if (usernameText.Text == "admin" && passwordText.Text == "password")
-            {
-                MessageBox.Query ("Logging In", "Login Successful", "Ok");
-                UserName = usernameText.Text;
-                Application.RequestStop ();
-            }
-            else
-            {
-                MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
-            }
-        };
+                           {
+                               if (userNameText.Text == "admin" && passwordText.Text == "password")
+                               {
+                                   MessageBox.Query ("Logging In", "Login Successful", "Ok");
+                                   UserName = userNameText.Text;
+                                   Application.RequestStop ();
+                               }
+                               else
+                               {
+                                   MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
+                               }
+                           };
 
         // Add the views to the Window
-        Add (usernameLabel, usernameText, passwordLabel, passwordText, btnLogin);
+        Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin);
     }
 }
