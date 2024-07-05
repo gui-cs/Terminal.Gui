@@ -109,6 +109,8 @@ public class Scene
         Ease = ease;
         NoColor = noColor;
         UseXtermColors = useXtermColors;
+        EasingTotalSteps = 0;
+        EasingCurrentStep = 0;
     }
 
     public void AddFrame (string symbol, int duration, Color color = null, bool bold = false, bool dim = false, bool italic = false, bool underline = false, bool blink = false, bool reverse = false, bool hidden = false, bool strike = false)
@@ -120,23 +122,13 @@ public class Scene
             {
                 charVisColor = null;
             }
-            else if (UseXtermColors)
+            else if (UseXtermColors && color.XtermColor.HasValue)
             {
-                if (color.XtermColor != null)
-                {
-                    charVisColor = color.XtermColor;
-                }
-                else if (XtermColorMap.ContainsKey (color.RgbColor))
-                {
-                    // Build error says  Error CS0029  Cannot implicitly convert type 'int' to 'string'    Terminal.Gui (net8.0)   D:\Repos\TerminalGuiDesigner\gui.cs\Terminal.Gui\TextEffects\Animation.cs   120 Active
-                    charVisColor = XtermColorMap [color.RgbColor].ToString ();
-                }
-                else
-                {
-                    var xtermColor = Hexterm.HexToXterm (color.RgbColor);
-                    XtermColorMap [color.RgbColor] = int.Parse (xtermColor);
-                    charVisColor = xtermColor;
-                }
+                charVisColor = color.XtermColor.Value.ToString ();
+            }
+            else if (color.RgbColor != null && XtermColorMap.ContainsKey (color.RgbColor))
+            {
+                charVisColor = XtermColorMap [color.RgbColor].ToString ();
             }
             else
             {
@@ -145,12 +137,10 @@ public class Scene
         }
 
         if (duration < 1)
-        {
-            throw new ArgumentException ("duration must be greater than 0");
-        }
+            throw new ArgumentException ("Duration must be greater than 0.");
 
-        var charVis = new CharacterVisual (symbol, bold, dim, italic, underline, blink, reverse, hidden, strike, color, charVisColor);
-        var frame = new Frame (charVis, duration);
+        var characterVisual = new CharacterVisual (symbol, bold, dim, italic, underline, blink, reverse, hidden, strike, color, charVisColor);
+        var frame = new Frame (characterVisual, duration);
         Frames.Add (frame);
         for (int i = 0; i < frame.Duration; i++)
         {
@@ -161,33 +151,32 @@ public class Scene
 
     public CharacterVisual Activate ()
     {
-        if (Frames.Count > 0)
-        {
-            return Frames [0].CharacterVisual;
-        }
-        else
-        {
+        if (Frames.Count == 0)
             throw new InvalidOperationException ("Scene has no frames.");
-        }
+        EasingCurrentStep = 0;
+        return Frames [0].CharacterVisual;
     }
 
     public CharacterVisual GetNextVisual ()
     {
-        var currentFrame = Frames [0];
-        var nextVisual = currentFrame.CharacterVisual;
-        currentFrame.IncrementTicks ();
-        if (currentFrame.TicksElapsed == currentFrame.Duration)
+        if (Frames.Count == 0)
+            return null;
+
+        var frame = Frames [0];
+        if (++EasingCurrentStep >= frame.Duration)
         {
-            currentFrame.TicksElapsed = 0;
-            PlayedFrames.Add (Frames [0]);
+            EasingCurrentStep = 0;
+            PlayedFrames.Add (frame);
             Frames.RemoveAt (0);
             if (IsLooping && Frames.Count == 0)
             {
                 Frames.AddRange (PlayedFrames);
                 PlayedFrames.Clear ();
             }
+            if (Frames.Count > 0)
+                return Frames [0].CharacterVisual;
         }
-        return nextVisual;
+        return frame.CharacterVisual;
     }
 
     public void ApplyGradientToSymbols (Gradient gradient, IList<string> symbols, int duration)
@@ -208,11 +197,7 @@ public class Scene
 
     public void ResetScene ()
     {
-        foreach (var sequence in Frames)
-        {
-            sequence.TicksElapsed = 0;
-            PlayedFrames.Add (sequence);
-        }
+        EasingCurrentStep = 0;
         Frames.Clear ();
         Frames.AddRange (PlayedFrames);
         PlayedFrames.Clear ();
@@ -220,11 +205,7 @@ public class Scene
 
     public override bool Equals (object obj)
     {
-        if (obj is Scene other)
-        {
-            return SceneId == other.SceneId;
-        }
-        return false;
+        return obj is Scene other && SceneId == other.SceneId;
     }
 
     public override int GetHashCode ()
@@ -306,14 +287,14 @@ public class Animation
             }
             else if (UseXtermColors)
             {
-                charVisColor = color.XtermColor;
+                charVisColor = color.XtermColor.ToString();
             }
             else
             {
                 charVisColor = color.RgbColor;
             }
         }
-        CurrentCharacterVisual = new CharacterVisual (symbol, color: color, _colorCode: charVisColor);
+        CurrentCharacterVisual = new CharacterVisual (symbol, color: color, colorCode: charVisColor);
     }
 
     public static Color RandomColor ()
@@ -489,54 +470,12 @@ public class Animation
     }
 }
 
-public class EffectCharacter
+// Dummy Enum for Event handling
+public enum Event
 {
-    public string InputSymbol { get; }
-    public CharacterVisual CharacterVisual { get; set; }
-    public Animation Animation { get; set; }
-
-    public EffectCharacter (string inputSymbol)
-    {
-        InputSymbol = inputSymbol;
-        CharacterVisual = new CharacterVisual (inputSymbol);
-        Animation = new Animation (this);
-    }
-
-    public void Animate (string sceneId)
-    {
-        Animation.ActivateScene (sceneId);
-        Animation.IncrementScene ();
-        CharacterVisual = Animation.CurrentCharacterVisual;
-    }
-
-    public void ResetEffects ()
-    {
-        CharacterVisual.DisableModes ();
-    }
+    SceneComplete,
+    SceneActivated
 }
-
-public class Color
-{
-    public string RgbColor { get; }
-    public string XtermColor { get; }
-
-    public Color (string rgbColor, string xtermColor)
-    {
-        RgbColor = rgbColor;
-        XtermColor = xtermColor;
-    }
-}
-
-public class Gradient
-{
-    public List<Color> Spectrum { get; }
-
-    public Gradient (List<Color> spectrum)
-    {
-        Spectrum = spectrum;
-    }
-}
-
 
 // Dummy classes for Ansitools, Colorterm, and Hexterm as placeholders
 public static class Ansitools
