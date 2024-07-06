@@ -178,7 +178,7 @@ public class Margin : Adornment
             {
                 // If the view is pressed and the highlight is being removed, move the shadow back.
                 // Note, for visual effects reasons, we only move horizontally.
-                // TODO: Add a setting or flag that lets the shadow move vertically as well.
+                // TODO: Add a setting or flag that lets the view move vertically as well.
                 Thickness = new (Thickness.Left - 1, Thickness.Top, Thickness.Right + 1, Thickness.Bottom);
 
                 if (_rightShadow is { })
@@ -200,7 +200,7 @@ public class Margin : Adornment
             {
                 // If the view is not pressed and we want highlight move the shadow
                 // Note, for visual effects reasons, we only move horizontally.
-                // TODO: Add a setting or flag that lets the shadow move vertically as well.
+                // TODO: Add a setting or flag that lets the view move vertically as well.
                 Thickness = new (Thickness.Left + 1, Thickness.Top, Thickness.Right - 1, Thickness.Bottom);
                 _pressed = true;
 
