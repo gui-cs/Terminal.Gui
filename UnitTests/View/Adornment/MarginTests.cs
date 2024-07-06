@@ -10,13 +10,13 @@ public class MarginTests (ITestOutputHelper output)
     {
         ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
         var view = new View { Height = 3, Width = 3 };
-        view.Margin.Thickness = new Thickness (1);
+        view.Margin.Thickness = new (1);
 
         var superView = new View ();
 
-        superView.ColorScheme = new ColorScheme
+        superView.ColorScheme = new()
         {
-            Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red)
+            Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         };
 
         superView.Add (view);
@@ -40,5 +40,4 @@ MMM",
                                             );
         TestHelpers.AssertDriverAttributesAre ("0", null, superView.GetNormalColor ());
     }
-
 }
