@@ -84,6 +84,53 @@ internal class TextEffectsExampleView : View
             resized = false;
         }
 
+        DrawTopLineGradient (viewport);
+        DrawRadialGradient (viewport);
+
+        _ball?.Draw ();
+    }
+
+    private void DrawRadialGradient (Rectangle viewport)
+    {
+        // Define the colors of the gradient stops
+        var stops = new List<Color>
+        {
+            Color.FromRgb(255, 0, 0),    // Red
+            Color.FromRgb(0, 255, 0),    // Green
+            Color.FromRgb(238, 130, 238)  // Violet
+        };
+
+        // Define the number of steps between each color
+        var steps = new List<int> { 10, 10 }; // 10 steps between Red -> Green, and Green -> Blue
+
+        // Create the gradient
+        var radialGradient = new Gradient (stops, steps, loop: false);
+
+        // Define the size of the rectangle
+        int maxRow = 20;
+        int maxColumn = 40;
+
+        // Build the coordinate-color mapping for a radial gradient
+        var gradientMapping = radialGradient.BuildCoordinateColorMapping (maxRow, maxColumn, Gradient.Direction.Radial);
+
+        // Print the gradient
+        for (int row = 0; row <= maxRow; row++)
+        {
+            for (int col = 0; col <= maxColumn; col++)
+            {
+                var coord = new Coord (col, row);
+                var color = gradientMapping [coord];
+                
+                SetColor (color);
+
+                AddRune (col+2, row+3, new Rune ('█'));
+            }
+        }
+    }
+
+    private void DrawTopLineGradient (Rectangle viewport)
+    {
+
         // Define the colors of the rainbow
         var stops = new List<Color>
         {
@@ -115,17 +162,21 @@ internal class TextEffectsExampleView : View
             double fraction = (double)x / (viewport.Width - 1);
             Color color = rainbowGradient.GetColorAtFraction (fraction);
 
-            // Assuming AddRune is a method you have for drawing at specific positions
-            Application.Driver.SetAttribute (
-                new Attribute (
-                    new Terminal.Gui.Color (color.R, color.G, color.B),
-                    new Terminal.Gui.Color (color.R, color.G, color.B)
-                )); // Setting color based on RGB
+            SetColor (color);
 
             AddRune (x, 0, new Rune ('█'));
         }
+    }
 
-        _ball?.Draw ();
+    private void SetColor (Color color)
+    {
+        // Assuming AddRune is a method you have for drawing at specific positions
+        Application.Driver.SetAttribute (
+            new Attribute (
+                new Terminal.Gui.Color (color.R, color.G, color.B),
+                new Terminal.Gui.Color (color.R, color.G, color.B)
+            )); // Setting color based on RGB
+
     }
 
     public class Ball

@@ -1,5 +1,4 @@
 ﻿namespace Terminal.Gui.TextEffects;
-
 public class Coord
 {
     public int Column { get; set; }
@@ -12,6 +11,34 @@ public class Coord
     }
 
     public override string ToString () => $"({Column}, {Row})";
+
+    public override bool Equals (object obj)
+    {
+        if (obj is Coord other)
+        {
+            return Column == other.Column && Row == other.Row;
+        }
+        return false;
+    }
+
+    public override int GetHashCode ()
+    {
+        return HashCode.Combine (Column, Row);
+    }
+
+    public static bool operator == (Coord left, Coord right)
+    {
+        if (left is null)
+        {
+            return right is null;
+        }
+        return left.Equals (right);
+    }
+
+    public static bool operator != (Coord left, Coord right)
+    {
+        return !(left == right);
+    }
 }
 
 public class Waypoint

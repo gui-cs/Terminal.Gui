@@ -6,10 +6,16 @@ public abstract class BaseEffectIterator<T>  where T : EffectConfig, new()
     protected Terminal Terminal { get; set; }
     protected List<EffectCharacter> ActiveCharacters { get; set; } = new List<EffectCharacter> ();
 
+    protected BaseEffect<T> Effect { get; }
+
+
+
     public BaseEffectIterator (BaseEffect<T> effect)
     {
+        Effect = effect;
         Config = effect.EffectConfig;
         Terminal = new Terminal (effect.InputData, effect.TerminalConfig);
+
     }
 
     public void Update ()
