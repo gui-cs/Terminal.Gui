@@ -18,84 +18,83 @@ public class TextEffectsScenario : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var top = Application.Top;
+        var w = new Window
+        {
+            Width = Dim.Fill(),
+            Height = Dim.Fill (),
+        };
 
         // Creates a window that occupies the entire terminal with a title.
-        var window = new Window ()
+        var tabView = new TabView ()
         {
-            X = 0,
-            Y = 1, // Leaves one row for the toplevel menu
-
-            // By using Dim.Fill(), it will automatically resize without manual intervention
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            Title = "Text Effects Scenario"
-        };
-
-        // Create a large empty view.
-        var emptyView = new TextEffectsExampleView ()
-        {
-            X = 0,
-            Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
         };
 
-        window.Add (emptyView);
-
-        // Create a label in the center of the window.
-        var label = new Label ()
+        var t1 = new Tab ()
         {
-            X = Pos.Center (),
-            Y = Pos.Center (),
-            Width = 10,
-            Height = 1,
-            Text = "Hello"
+            View = new GradientsView ()
+            {
+                Width = Dim.Fill (),
+                Height = Dim.Fill (),
+            },
+            DisplayText = "Gradients"
         };
-        window.Add (label);
+        var t2 = new Tab ()
+        {
+            View = new BallsView ()
+            {
+                Width = Dim.Fill (),
+                Height = Dim.Fill (),
+            },
+            DisplayText = "Ball"
+        };
 
-        Application.Run (window);
+        tabView.AddTab (t1,false);
+        tabView.AddTab (t2,false);
+
+        w.Add (tabView);
+
+        Application.Run (w);
+        w.Dispose ();
+
         Application.Shutdown ();
+        this.Dispose ();
     }
 }
 
-internal class TextEffectsExampleView : View
+
+internal class GradientsView : View
 {
-    Ball? _ball;
-    private bool resized;
-
-    protected override void OnViewportChanged (DrawEventArgs e)
-    {
-        base.OnViewportChanged (e);
-        resized = true;
-    }
-
     public override void OnDrawContent (Rectangle viewport)
     {
         base.OnDrawContent (viewport);
 
-        if (
-            // First time
-            (_ball == null && viewport.Width > 0 && viewport.Height > 0)
-            || resized)
-        {
-            _ball = new Ball (this);
-            _ball.Start ();
-            resized = false;
-        }
-
         DrawTopLineGradient (viewport);
 
         int x = 2;
-        DrawGradientArea (Gradient.Direction.Horizontal,x);
-        DrawGradientArea (Gradient.Direction.Vertical, x += 41);
-        DrawGradientArea (Gradient.Direction.Radial, x += 41);
-        DrawGradientArea (Gradient.Direction.Diagonal, x += 41);
+        int y = 3;
 
-        _ball?.Draw ();
+        if (viewport.Height < 25) // Not enough space, render in a single line
+        {
+            DrawGradientArea (Gradient.Direction.Horizontal, x, y);
+            DrawGradientArea (Gradient.Direction.Vertical, x + 32, y);
+            DrawGradientArea (Gradient.Direction.Radial, x + 64, y);
+            DrawGradientArea (Gradient.Direction.Diagonal, x + 96, y);
+        }
+        else // Enough space, render in two lines
+        {
+            DrawGradientArea (Gradient.Direction.Horizontal, x, y);
+            DrawGradientArea (Gradient.Direction.Vertical, x + 32, y);
+            DrawGradientArea (Gradient.Direction.Radial, x, y + 17);
+            DrawGradientArea (Gradient.Direction.Diagonal, x + 32, y + 17);
+        }
     }
 
-    private void DrawGradientArea (Gradient.Direction direction, int xOffset)
+
+
+
+    private void DrawGradientArea (Gradient.Direction direction, int xOffset, int yOffset)
     {
         // Define the colors of the gradient stops
         var stops = new List<Color>
@@ -112,8 +111,8 @@ internal class TextEffectsExampleView : View
         var radialGradient = new Gradient (stops, steps, loop: false);
 
         // Define the size of the rectangle
-        int maxRow = 20;
-        int maxColumn = 40;
+        int maxRow = 15; // Adjusted to keep aspect ratio
+        int maxColumn = 30;
 
         // Build the coordinate-color mapping for a radial gradient
         var gradientMapping = radialGradient.BuildCoordinateColorMapping (maxRow, maxColumn, direction);
@@ -125,17 +124,16 @@ internal class TextEffectsExampleView : View
             {
                 var coord = new Coord (col, row);
                 var color = gradientMapping [coord];
-                
+
                 SetColor (color);
 
-                AddRune (col+ xOffset, row+3, new Rune ('█'));
+                AddRune (col + xOffset, row + yOffset, new Rune ('█'));
             }
         }
     }
 
     private void DrawTopLineGradient (Rectangle viewport)
     {
-
         // Define the colors of the rainbow
         var stops = new List<Color>
         {
@@ -181,7 +179,32 @@ internal class TextEffectsExampleView : View
                 new Terminal.Gui.Color (color.R, color.G, color.B),
                 new Terminal.Gui.Color (color.R, color.G, color.B)
             )); // Setting color based on RGB
+    }
+}
 
+internal class BallsView : View
+{
+    private Ball? _ball;
+    private bool _resized;
+
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        base.OnViewportChanged (e);
+        _resized = true;
+    }
+
+    public override void OnDrawContent (Rectangle viewport)
+    {
+        base.OnDrawContent (viewport);
+
+        if ((_ball == null && viewport.Width > 0 && viewport.Height > 0) || _resized)
+        {
+            _ball = new Ball (this);
+            _ball.Start ();
+            _resized = false;
+        }
+
+        _ball?.Draw ();
     }
 
     public class Ball
@@ -209,13 +232,13 @@ internal class TextEffectsExampleView : View
 
             for (int x = 0; x < width; x++)
             {
-                int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
+                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x) * 0.8)); // Decrease amplitude
                 BouncingScene.AddFrame ("O", 1);
             }
 
             for (int x = width - 1; x >= 0; x--)
             {
-                int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
+                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x) * 0.8)); // Decrease amplitude
                 BouncingScene.AddFrame ("O", 1);
             }
         }
@@ -230,13 +253,13 @@ internal class TextEffectsExampleView : View
 
             for (int x = 0; x < width; x++)
             {
-                int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
+                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x) * 0.8)); // Decrease amplitude
                 path.AddWaypoint (new Waypoint ($"waypoint_{x}", new Coord (x, y)));
             }
 
             for (int x = width - 1; x >= 0; x--)
             {
-                int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
+                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x) * 0.8)); // Decrease amplitude
                 path.AddWaypoint (new Waypoint ($"waypoint_{x}", new Coord (x, y)));
             }
 
@@ -266,3 +289,87 @@ internal class TextEffectsExampleView : View
         }
     }
 }
+
+
+public class Ball
+{
+    public Animation Animation { get; private set; }
+    public Scene BouncingScene { get; private set; }
+    public View Viewport { get; private set; }
+    public EffectCharacter Character { get; private set; }
+
+    public Ball (View viewport)
+    {
+        Viewport = viewport;
+        Character = new EffectCharacter (1, "O", 0, 0);
+        Animation = Character.Animation;
+        CreateBouncingScene ();
+        CreateMotionPath ();
+    }
+
+    private void CreateBouncingScene ()
+    {
+        BouncingScene = Animation.NewScene (isLooping: true);
+        int width = Viewport.Frame.Width;
+        int height = Viewport.Frame.Height;
+        double frequency = 4 * Math.PI / width; // Double the frequency
+
+        for (int x = 0; x < width; x++)
+        {
+            int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
+            BouncingScene.AddFrame ("O", 1);
+        }
+
+        for (int x = width - 1; x >= 0; x--)
+        {
+            int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
+            BouncingScene.AddFrame ("O", 1);
+        }
+    }
+
+    private void CreateMotionPath ()
+    {
+        int width = Viewport.Frame.Width;
+        int height = Viewport.Frame.Height;
+        double frequency = 4 * Math.PI / width; // Double the frequency
+
+        var path = Character.Motion.CreatePath ("sineWavePath", speed: 1, loop: true);
+
+        for (int x = 0; x < width; x++)
+        {
+            int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
+            path.AddWaypoint (new Waypoint ($"waypoint_{x}", new Coord (x, y)));
+        }
+
+        for (int x = width - 1; x >= 0; x--)
+        {
+            int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
+            path.AddWaypoint (new Waypoint ($"waypoint_{x}", new Coord (x, y)));
+        }
+
+        Character.Motion.ActivatePath (path);
+    }
+
+    public void Start ()
+    {
+        Animation.ActivateScene (BouncingScene);
+        new Thread (() =>
+        {
+            while (true)
+            {
+                Thread.Sleep (10); // Adjust the speed of animation
+                Character.Tick ();
+
+                Application.Invoke (() => Viewport.SetNeedsDisplay ());
+            }
+        })
+        { IsBackground = true }.Start ();
+    }
+
+    public void Draw ()
+    {
+        Application.Driver.SetAttribute (Viewport.ColorScheme.Normal);
+        Viewport.AddRune (Character.Motion.CurrentCoord.Column, Character.Motion.CurrentCoord.Row, new Rune ('O'));
+    }
+}
+
