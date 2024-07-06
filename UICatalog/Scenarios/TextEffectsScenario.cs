@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using Terminal.Gui;
 using Terminal.Gui.TextEffects;
 using static UICatalog.Scenario;
 
 
 using Color = Terminal.Gui.TextEffects.Color;
+using Animation = Terminal.Gui.TextEffects.Animation;
 
 namespace UICatalog.Scenarios;
 
@@ -108,6 +110,70 @@ internal class TextEffectsExampleView : View
 
 
             AddRune (x, 0, new Rune ('█'));
+        }
+    }
+    public class Ball
+    {
+        public Animation Animation { get; private set; }
+        public Scene BouncingScene { get; private set; }
+        public View Viewport { get; private set; }
+        public EffectCharacter Character { get; private set; }
+
+        public Ball (View viewport)
+        {
+            Viewport = viewport;
+            Character = new EffectCharacter (1, "O", 0, 0);
+            Animation = Character.Animation;
+            CreateBouncingScene ();
+        }
+
+        private void CreateBouncingScene ()
+        {
+            BouncingScene = Animation.NewScene (isLooping: true);
+            int width = Viewport.Frame.Width;
+            int height = Viewport.Frame.Height;
+            double frequency = 2 * Math.PI / width;
+
+            for (int x = 0; x < width; x++)
+            {
+                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x)));
+                BouncingScene.AddFrame ("O", 1);
+                BouncingScene.Frames [BouncingScene.Frames.Count - 1].CharacterVisual.Position = new Coord (x, y);
+            }
+
+            for (int x = width - 1; x >= 0; x--)
+            {
+                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x)));
+                BouncingScene.AddFrame ("O", 1);
+                BouncingScene.Frames [BouncingScene.Frames.Count - 1].CharacterVisual.Position = new Coord (x, y);
+            }
+        }
+
+        public void Start ()
+        {
+            Animation.ActivateScene (BouncingScene);
+            new Thread (() =>
+            {
+                while (true)
+                {
+                    Draw ();
+                    Thread.Sleep (100); // Adjust the speed of animation
+                    Animation.StepAnimation ();
+                }
+            })
+            { IsBackground = true }.Start ();
+        }
+
+        private void Draw ()
+        {
+            var characterVisual = Animation.CurrentCharacterVisual;
+            var coord = characterVisual.Position;
+            Application.MainLoop.Invoke (() =>
+            {
+                Viewport.Clear ();
+                Viewport.AddRune (coord.X, coord.Y, new Rune ('O'));
+                Application.Refresh ();
+            });
         }
     }
 }
