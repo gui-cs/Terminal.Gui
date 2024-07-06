@@ -52,9 +52,9 @@ dotnet run
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/gui-cs/Terminal.GuiV2Docs/blob/master/CONTRIBUTING.md).
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-Debates on architecture and design can be found in Issues tagged with [design](https://github.com/gui-cs/Terminal.GuiV2Docs/issues?q=is%3Aopen+is%3Aissue+label%3Adesign).
+Debates on architecture and design can be found in Issues tagged with [design](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Av2+label%3Adesign).
 
 ## History
 
