@@ -56,7 +56,6 @@ public class Segment
         return new Coord (column, row);
     }
 }
-
 public class Path
 {
     public string PathId { get; private set; }
@@ -69,6 +68,7 @@ public class Path
     public int CurrentStep { get; set; }
     public double TotalDistance { get; set; }
     public double LastDistanceReached { get; set; }
+    public int MaxSteps => (int)Math.Ceiling (TotalDistance / Speed); // Calculates max steps based on total distance and speed
 
     public Path (string pathId, double speed, Func<double, double> easeFunction = null, int layer = 0, int holdTime = 0, bool loop = false)
     {
@@ -100,9 +100,9 @@ public class Path
 
     public Coord Step ()
     {
-        if (EaseFunction != null && CurrentStep <= TotalDistance)
+        if (CurrentStep <= MaxSteps)
         {
-            double progress = EaseFunction ((double)CurrentStep / TotalDistance);
+            double progress = EaseFunction?.Invoke ((double)CurrentStep / TotalDistance) ?? (double)CurrentStep / TotalDistance;
             double distanceTravelled = TotalDistance * progress;
             LastDistanceReached = distanceTravelled;
 
@@ -174,9 +174,19 @@ public class Motion
         ActivePath.CurrentStep = 0;  // Reset the path's progress
     }
 
+    /// <summary>
+    /// Set the active path to None if the active path is the given path.    
+    /// </summary>
+    public void DeactivatePath (Path p)
+    {
+        if (p == ActivePath)
+        {
+            ActivePath = null;
+        }
+    }
     public void DeactivatePath ()
     {
-        ActivePath = null;
+       ActivePath = null;        
     }
 
     public void Move ()

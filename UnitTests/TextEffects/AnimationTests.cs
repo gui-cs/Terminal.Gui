@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using Terminal.Gui.TextEffects;
-using Xunit;
+﻿using Terminal.Gui.TextEffects;
 
 namespace Terminal.Gui.TextEffectsTests;
+using Color = Terminal.Gui.TextEffects.Color;
 
 public class AnimationTests
 {
@@ -100,7 +97,8 @@ public class AnimationTests
     public void TestSceneApplyGradientToSymbolsEqualColorsAndSymbols ()
     {
         var scene = new Scene (sceneId: "test_scene");
-        var gradient = new Gradient (new Color ("000000"), new Color ("ffffff"), steps: 2);
+        var gradient = new Gradient (new [] { new Color ("000000"), new Color ("ffffff") }, 
+            steps: new [] { 2 });
         var symbols = new List<string> { "a", "b", "c" };
         scene.ApplyGradientToSymbols (gradient, symbols, duration: 1);
         Assert.Equal (3, scene.Frames.Count);
@@ -115,7 +113,9 @@ public class AnimationTests
     public void TestSceneApplyGradientToSymbolsUnequalColorsAndSymbols ()
     {
         var scene = new Scene (sceneId: "test_scene");
-        var gradient = new Gradient (new Color ("000000"), new Color ("ffffff"), steps: 4);
+        var gradient = new Gradient (
+            new [] { new Color ("000000"), new Color ("ffffff") },
+            steps: new [] { 4 });
         var symbols = new List<string> { "q", "z" };
         scene.ApplyGradientToSymbols (gradient, symbols, duration: 1);
         Assert.Equal (5, scene.Frames.Count);
@@ -142,7 +142,7 @@ public class AnimationTests
     public void TestAnimationNewScene ()
     {
         var animation = character.Animation;
-        var scene = animation.NewScene ("test_scene", isLooping: true);
+        var scene = animation.NewScene (id:"test_scene", isLooping: true);
         Assert.IsType<Scene> (scene);
         Assert.Equal ("test_scene", scene.SceneId);
         Assert.True (scene.IsLooping);
@@ -163,7 +163,7 @@ public class AnimationTests
     public void TestAnimationQueryScene ()
     {
         var animation = character.Animation;
-        var scene = animation.NewScene ("test_scene", isLooping: true);
+        var scene = animation.NewScene (id:"test_scene", isLooping: true);
         Assert.Equal (scene, animation.QueryScene ("test_scene"));
     }
 
@@ -171,7 +171,7 @@ public class AnimationTests
     public void TestAnimationLoopingActiveSceneIsComplete ()
     {
         var animation = character.Animation;
-        var scene = animation.NewScene ("test_scene", isLooping: true);
+        var scene = animation.NewScene (id: "test_scene", isLooping: true);
         scene.AddFrame (symbol: "a", duration: 2);
         animation.ActivateScene (scene);
         Assert.True (animation.ActiveSceneIsComplete ());
@@ -181,7 +181,7 @@ public class AnimationTests
     public void TestAnimationNonLoopingActiveSceneIsComplete ()
     {
         var animation = character.Animation;
-        var scene = animation.NewScene ("test_scene");
+        var scene = animation.NewScene (id: "test_scene");
         scene.AddFrame (symbol: "a", duration: 1);
         animation.ActivateScene (scene);
         Assert.False (animation.ActiveSceneIsComplete ());

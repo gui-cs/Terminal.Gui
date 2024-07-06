@@ -77,7 +77,9 @@ public class EventHandler
                     Character.Motion.CurrentCoord = (Coord)target;
                     break;
                 case Action.Callback:
-                    (target as Action)?.Invoke ();
+
+                    // TODO:
+                    throw new NotImplementedException ("TODO, port (target as Action)?.Invoke ()");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException (nameof (action), "Unhandled action.");

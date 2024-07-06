@@ -1,4 +1,5 @@
-﻿using static Unix.Terminal.Curses;
+﻿
+using static Terminal.Gui.TextEffects.EventHandler;
 
 namespace Terminal.Gui.TextEffects;
 
@@ -7,7 +8,6 @@ public enum SyncMetric
     Distance,
     Step
 }
-
 public class CharacterVisual
 {
     public string Symbol { get; set; }
@@ -21,7 +21,9 @@ public class CharacterVisual
     public bool Strike { get; set; }
     public Color Color { get; set; }
     public string FormattedSymbol { get; private set; }
-    private string _colorCode;
+    private string _colorCode;  // Holds the ANSI color code or similar string directly
+
+    public string ColorCode => _colorCode;
 
     public CharacterVisual (string symbol, bool bold = false, bool dim = false, bool italic = false, bool underline = false, bool blink = false, bool reverse = false, bool hidden = false, bool strike = false, Color color = null, string colorCode = null)
     {
@@ -35,7 +37,7 @@ public class CharacterVisual
         Hidden = hidden;
         Strike = strike;
         Color = color;
-        _colorCode = colorCode;
+        _colorCode = colorCode;  // Initialize _colorCode from the constructor argument
         FormattedSymbol = FormatSymbol ();
     }
 
@@ -49,7 +51,7 @@ public class CharacterVisual
         if (Reverse) formattingString += Ansitools.ApplyReverse ();
         if (Hidden) formattingString += Ansitools.ApplyHidden ();
         if (Strike) formattingString += Ansitools.ApplyStrikethrough ();
-        if (_colorCode != null) formattingString += Colorterm.Fg (_colorCode);
+        if (_colorCode != null) formattingString += Colorterm.Fg (_colorCode);  // Use the direct color code
 
         return $"{formattingString}{Symbol}{(formattingString != "" ? Ansitools.ResetAll () : "")}";
     }
@@ -66,6 +68,7 @@ public class CharacterVisual
         Strike = false;
     }
 }
+
 
 public class Frame
 {
@@ -97,8 +100,8 @@ public class Scene
     public List<Frame> Frames { get; } = new List<Frame> ();
     public List<Frame> PlayedFrames { get; } = new List<Frame> ();
     public Dictionary<int, Frame> FrameIndexMap { get; } = new Dictionary<int, Frame> ();
-    public int EasingTotalSteps { get; private set; }
-    public int EasingCurrentStep { get; private set; }
+    public int EasingTotalSteps { get; set; }
+    public int EasingCurrentStep { get; set; }
     public static Dictionary<string, int> XtermColorMap { get; } = new Dictionary<string, int> ();
 
     public Scene (string sceneId, bool isLooping = false, SyncMetric? sync = null, EasingFunction ease = null, bool noColor = false, bool useXtermColors = false)
@@ -470,12 +473,6 @@ public class Animation
     }
 }
 
-// Dummy Enum for Event handling
-public enum Event
-{
-    SceneComplete,
-    SceneActivated
-}
 
 // Dummy classes for Ansitools, Colorterm, and Hexterm as placeholders
 public static class Ansitools

@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui.TextEffects;
 
-public abstract class BaseEffectIterator<T> : IEnumerable<string> where T : EffectConfig
+public abstract class BaseEffectIterator<T>  where T : EffectConfig, new()
 {
     protected T Config { get; set; }
     protected Terminal Terminal { get; set; }
@@ -12,8 +12,6 @@ public abstract class BaseEffectIterator<T> : IEnumerable<string> where T : Effe
         Terminal = new Terminal (effect.InputData, effect.TerminalConfig);
     }
 
-    public string Frame => Terminal.GetFormattedOutputString ();
-
     public void Update ()
     {
         foreach (var character in ActiveCharacters)
@@ -23,17 +21,6 @@ public abstract class BaseEffectIterator<T> : IEnumerable<string> where T : Effe
         ActiveCharacters.RemoveAll (character => !character.IsActive);
     }
 
-    public IEnumerator<string> GetEnumerator ()
-    {
-        return this;
-    }
-
-    IEnumerator IEnumerable.GetEnumerator ()
-    {
-        return GetEnumerator ();
-    }
-
-    public abstract string Next ();
 }
 
 public abstract class BaseEffect<T> where T : EffectConfig, new()
@@ -49,14 +36,7 @@ public abstract class BaseEffect<T> where T : EffectConfig, new()
         TerminalConfig = new TerminalConfig ();
     }
 
-    public abstract Type IteratorClass { get; }
-
-    public IEnumerator<string> GetEnumerator ()
-    {
-        var iterator = (BaseEffectIterator<T>)Activator.CreateInstance (IteratorClass, this);
-        return iterator;
-    }
-
+    /*
     public IDisposable TerminalOutput (string endSymbol = "\n")
     {
         var terminal = new Terminal (InputData, TerminalConfig);
@@ -69,6 +49,6 @@ public abstract class BaseEffect<T> where T : EffectConfig, new()
         {
             terminal.RestoreCursor (endSymbol);
         }
-    }
+    }*/
 }
 
