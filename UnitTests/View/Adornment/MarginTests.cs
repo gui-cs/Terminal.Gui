@@ -40,4 +40,5 @@ MMM",
                                             );
         TestHelpers.AssertDriverAttributesAre ("0", null, superView.GetNormalColor ());
     }
+
 }
