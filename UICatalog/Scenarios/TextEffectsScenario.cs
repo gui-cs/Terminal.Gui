@@ -6,13 +6,10 @@ using Terminal.Gui;
 using Terminal.Gui.TextEffects;
 using static UICatalog.Scenario;
 
-
 using Color = Terminal.Gui.TextEffects.Color;
 using Animation = Terminal.Gui.TextEffects.Animation;
 
 namespace UICatalog.Scenarios;
-
-
 
 [ScenarioMetadata ("Text Effects", "Text Effects.")]
 [ScenarioCategory ("Colors")]
@@ -41,7 +38,7 @@ public class TextEffectsScenario : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Fill () ,
+            Height = Dim.Fill (),
         };
 
         window.Add (emptyView);
@@ -53,7 +50,7 @@ public class TextEffectsScenario : Scenario
             Y = Pos.Center (),
             Width = 10,
             Height = 1,
-            Title = "Hello"            
+            Text = "Hello"
         };
         window.Add (label);
 
@@ -64,9 +61,28 @@ public class TextEffectsScenario : Scenario
 
 internal class TextEffectsExampleView : View
 {
+    Ball? _ball;
+    private bool resized;
+
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        base.OnViewportChanged (e);
+        resized = true;
+    }
+
     public override void OnDrawContent (Rectangle viewport)
     {
         base.OnDrawContent (viewport);
+
+        if (
+            // First time
+            (_ball == null && viewport.Width > 0 && viewport.Height > 0)
+            || resized)
+        {
+            _ball = new Ball (this);
+            _ball.Start ();
+            resized = false;
+        }
 
         // Define the colors of the rainbow
         var stops = new List<Color>
@@ -94,24 +110,24 @@ internal class TextEffectsExampleView : View
         // Create the gradient
         var rainbowGradient = new Gradient (stops, steps, loop: true);
 
-
-        for (int x = 0 ; x < viewport.Width; x++)
+        for (int x = 0; x < viewport.Width; x++)
         {
             double fraction = (double)x / (viewport.Width - 1);
             Color color = rainbowGradient.GetColorAtFraction (fraction);
 
             // Assuming AddRune is a method you have for drawing at specific positions
             Application.Driver.SetAttribute (
-                
                 new Attribute (
-                    new Terminal.Gui.Color(color.R, color.G, color.B),
+                    new Terminal.Gui.Color (color.R, color.G, color.B),
                     new Terminal.Gui.Color (color.R, color.G, color.B)
-                    )); // Setting color based on RGB
-
+                )); // Setting color based on RGB
 
             AddRune (x, 0, new Rune ('█'));
         }
+
+        _ball?.Draw ();
     }
+
     public class Ball
     {
         public Animation Animation { get; private set; }
@@ -125,6 +141,7 @@ internal class TextEffectsExampleView : View
             Character = new EffectCharacter (1, "O", 0, 0);
             Animation = Character.Animation;
             CreateBouncingScene ();
+            CreateMotionPath ();
         }
 
         private void CreateBouncingScene ()
@@ -132,21 +149,42 @@ internal class TextEffectsExampleView : View
             BouncingScene = Animation.NewScene (isLooping: true);
             int width = Viewport.Frame.Width;
             int height = Viewport.Frame.Height;
-            double frequency = 2 * Math.PI / width;
+            double frequency = 4 * Math.PI / width; // Double the frequency
 
             for (int x = 0; x < width; x++)
             {
-                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x)));
+                int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
                 BouncingScene.AddFrame ("O", 1);
-                BouncingScene.Frames [BouncingScene.Frames.Count - 1].CharacterVisual.Position = new Coord (x, y);
             }
 
             for (int x = width - 1; x >= 0; x--)
             {
-                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x)));
+                int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
                 BouncingScene.AddFrame ("O", 1);
-                BouncingScene.Frames [BouncingScene.Frames.Count - 1].CharacterVisual.Position = new Coord (x, y);
             }
+        }
+
+        private void CreateMotionPath ()
+        {
+            int width = Viewport.Frame.Width;
+            int height = Viewport.Frame.Height;
+            double frequency = 4 * Math.PI / width; // Double the frequency
+
+            var path = Character.Motion.CreatePath ("sineWavePath", speed: 1, loop: true);
+
+            for (int x = 0; x < width; x++)
+            {
+                int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
+                path.AddWaypoint (new Waypoint ($"waypoint_{x}", new Coord (x, y)));
+            }
+
+            for (int x = width - 1; x >= 0; x--)
+            {
+                int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
+                path.AddWaypoint (new Waypoint ($"waypoint_{x}", new Coord (x, y)));
+            }
+
+            Character.Motion.ActivatePath (path);
         }
 
         public void Start ()
@@ -156,24 +194,19 @@ internal class TextEffectsExampleView : View
             {
                 while (true)
                 {
-                    Draw ();
-                    Thread.Sleep (100); // Adjust the speed of animation
-                    Animation.StepAnimation ();
+                    Thread.Sleep (10); // Adjust the speed of animation
+                    Character.Tick ();
+
+                    Application.Invoke (() => Viewport.SetNeedsDisplay ());
                 }
             })
             { IsBackground = true }.Start ();
         }
 
-        private void Draw ()
+        public void Draw ()
         {
-            var characterVisual = Animation.CurrentCharacterVisual;
-            var coord = characterVisual.Position;
-            Application.MainLoop.Invoke (() =>
-            {
-                Viewport.Clear ();
-                Viewport.AddRune (coord.X, coord.Y, new Rune ('O'));
-                Application.Refresh ();
-            });
+            Driver.SetAttribute (Viewport.ColorScheme.Normal);
+            Viewport.AddRune (Character.Motion.CurrentCoord.Column, Character.Motion.CurrentCoord.Row, new Rune ('O'));
         }
     }
 }

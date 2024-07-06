@@ -13,7 +13,7 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Animation", "Demonstration of how to render animated images with threading.")]
 [ScenarioCategory ("Threading")]
 [ScenarioCategory ("Drawing")]
-public class Animation : Scenario
+public class AnimationScenario : Scenario
 {
     private bool _isDisposed;
 
