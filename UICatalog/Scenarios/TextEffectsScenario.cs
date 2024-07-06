@@ -85,12 +85,17 @@ internal class TextEffectsExampleView : View
         }
 
         DrawTopLineGradient (viewport);
-        DrawRadialGradient (viewport);
+
+        int x = 2;
+        DrawGradientArea (Gradient.Direction.Horizontal,x);
+        DrawGradientArea (Gradient.Direction.Vertical, x += 41);
+        DrawGradientArea (Gradient.Direction.Radial, x += 41);
+        DrawGradientArea (Gradient.Direction.Diagonal, x += 41);
 
         _ball?.Draw ();
     }
 
-    private void DrawRadialGradient (Rectangle viewport)
+    private void DrawGradientArea (Gradient.Direction direction, int xOffset)
     {
         // Define the colors of the gradient stops
         var stops = new List<Color>
@@ -111,7 +116,7 @@ internal class TextEffectsExampleView : View
         int maxColumn = 40;
 
         // Build the coordinate-color mapping for a radial gradient
-        var gradientMapping = radialGradient.BuildCoordinateColorMapping (maxRow, maxColumn, Gradient.Direction.Radial);
+        var gradientMapping = radialGradient.BuildCoordinateColorMapping (maxRow, maxColumn, direction);
 
         // Print the gradient
         for (int row = 0; row <= maxRow; row++)
@@ -123,7 +128,7 @@ internal class TextEffectsExampleView : View
                 
                 SetColor (color);
 
-                AddRune (col+2, row+3, new Rune ('█'));
+                AddRune (col+ xOffset, row+3, new Rune ('█'));
             }
         }
     }
