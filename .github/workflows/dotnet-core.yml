@@ -2,11 +2,11 @@ name: Build & Test Terminal.Gui with .NET Core
 
 on:
   push:
-    branches: [ v2, v2_develop ]
+    branches: [ v2_release, v2_develop ]
     paths-ignore:
       - '**.md'
   pull_request:
-    branches: [ v2, v2_develop ]
+    branches: [ v2_release, v2_develop ]
     paths-ignore:
       - '**.md'
       
