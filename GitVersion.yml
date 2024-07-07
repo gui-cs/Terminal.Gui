@@ -19,11 +19,10 @@ branches:
     #is-source-branch-for: ['v2']
     source-branches: []
 
-  v2:
+  v2_release:
     mode: ContinuousDeployment
     is-release-branch: true
     tag: prealpha
-    increment: Patch
     regex: ^v2_release?[/-]
     source-branches: ['v2_develop']
 
