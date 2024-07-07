@@ -16,7 +16,7 @@ public class FillPair
     /// </summary>
     /// <param name="fore"></param>
     /// <param name="back"></param>
-    public FillPair (GradientFill fore, SolidFill back)
+    public FillPair (IFill fore, IFill back)
     {
         Foreground = fore;
         Background = back;
