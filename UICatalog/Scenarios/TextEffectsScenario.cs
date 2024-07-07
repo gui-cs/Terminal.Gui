@@ -128,6 +128,11 @@ public class TextEffectsScenario : Scenario
 
 internal class GradientsView : View
 {
+    private const int GradientWidth = 30;
+    private const int GradientHeight = 15;
+    private const int LabelHeight = 1;
+    private const int GradientWithLabelHeight = GradientHeight + LabelHeight + 1; // +1 for spacing
+
     public override void OnDrawContent (Rectangle viewport)
     {
         base.OnDrawContent (viewport);
@@ -137,25 +142,47 @@ internal class GradientsView : View
         int x = 2;
         int y = 3;
 
-        if (viewport.Height < 25) // Not enough space, render in a single line
+        var gradients = new List<(string Label, GradientDirection Direction)>
         {
-            DrawGradientArea (GradientDirection.Horizontal, x, y);
-            DrawGradientArea (GradientDirection.Horizontal, x, y);
-            DrawGradientArea (GradientDirection.Vertical, x + 32, y);
-            DrawGradientArea (GradientDirection.Radial, x + 64, y);
-            DrawGradientArea (GradientDirection.Diagonal, x + 96, y);
-        }
-        else // Enough space, render in two lines
+            ("Horizontal", GradientDirection.Horizontal),
+            ("Vertical", GradientDirection.Vertical),
+            ("Radial", GradientDirection.Radial),
+            ("Diagonal", GradientDirection.Diagonal)
+        };
+
+        foreach (var (label, direction) in gradients)
         {
-            DrawGradientArea (GradientDirection.Horizontal, x, y);
-            DrawGradientArea (GradientDirection.Vertical, x + 32, y);
-            DrawGradientArea (GradientDirection.Radial, x, y + 17);
-            DrawGradientArea (GradientDirection.Diagonal, x + 32, y + 17);
+            if (x + GradientWidth > viewport.Width)
+            {
+                x = 2; // Reset to left margin
+                y += GradientWithLabelHeight; // Move down to next row
+            }
+
+            DrawLabeledGradientArea (label, direction, x, y);
+            x += GradientWidth + 2; // Move right for next gradient, +2 for spacing
         }
     }
 
+    private void DrawLabeledGradientArea (string label, GradientDirection direction, int xOffset, int yOffset)
+    {
+        DrawGradientArea (direction, xOffset, yOffset);
+        CenterText (label, xOffset, yOffset + GradientHeight); // Adjusted for text below the gradient
+    }
 
+    private void CenterText (string text, int xOffset, int yOffset)
+    {
+        if(yOffset+1 >= Viewport.Height)
+        {
+            // Not enough space for label
+            return;
+        }
 
+        var width = text.Length;
+        var x = xOffset + (GradientWidth - width) / 2; // Center the text within the gradient area width
+        Driver.SetAttribute (GetNormalColor ());
+        Move (x, yOffset+1);
+        Driver.AddStr (text);
+    }
 
     private void DrawGradientArea (GradientDirection direction, int xOffset, int yOffset)
     {
@@ -174,8 +201,8 @@ internal class GradientsView : View
         var radialGradient = new Gradient (stops, steps, loop: TextEffectsScenario.LoopingGradient);
 
         // Define the size of the rectangle
-        int maxRow = 15; // Adjusted to keep aspect ratio
-        int maxColumn = 30;
+        int maxRow = GradientHeight; // Adjusted to keep aspect ratio
+        int maxColumn = GradientWidth;
 
         // Build the coordinate-color mapping for a radial gradient
         var gradientMapping = radialGradient.BuildCoordinateColorMapping (maxRow, maxColumn, direction);
@@ -236,11 +263,6 @@ internal class GradientsView : View
 
     private void SetColor (Color color)
     {
-        // Assuming AddRune is a method you have for drawing at specific positions
-        Application.Driver.SetAttribute (
-            new Attribute (
-                new Terminal.Gui.Color (color.R, color.G, color.B),
-                new Terminal.Gui.Color (color.R, color.G, color.B)
-            )); // Setting color based on RGB
+        Application.Driver.SetAttribute (new Attribute (color, color));
     }
 }
