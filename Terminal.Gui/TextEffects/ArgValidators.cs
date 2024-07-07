@@ -114,24 +114,17 @@ public static class Ratio
     }
 }
 
-public enum GradientDirection
-{
-    Horizontal,
-    Vertical,
-    Diagonal,
-    Radial
-}
 
 public static class GradientDirectionParser
 {
-    public static GradientDirection Parse (string arg)
+    public static Gradient.Direction Parse (string arg)
     {
         return arg.ToLower () switch
         {
-            "horizontal" => GradientDirection.Horizontal,
-            "vertical" => GradientDirection.Vertical,
-            "diagonal" => GradientDirection.Diagonal,
-            "radial" => GradientDirection.Radial,
+            "horizontal" => Gradient.Direction.Horizontal,
+            "vertical" => Gradient.Direction.Vertical,
+            "diagonal" => Gradient.Direction.Diagonal,
+            "radial" => Gradient.Direction.Radial,
             _ => throw new ArgumentException ($"invalid gradient direction: '{arg}' is not a valid gradient direction. Choices are diagonal, horizontal, vertical, or radial."),
         };
     }

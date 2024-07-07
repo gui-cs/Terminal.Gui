@@ -3,7 +3,7 @@
 public abstract class BaseEffectIterator<T>  where T : EffectConfig, new()
 {
     protected T Config { get; set; }
-    protected Terminal Terminal { get; set; }
+    protected TerminalA Terminal { get; set; }
     protected List<EffectCharacter> ActiveCharacters { get; set; } = new List<EffectCharacter> ();
 
     protected BaseEffect<T> Effect { get; }
@@ -14,7 +14,7 @@ public abstract class BaseEffectIterator<T>  where T : EffectConfig, new()
     {
         Effect = effect;
         Config = effect.EffectConfig;
-        Terminal = new Terminal (effect.InputData, effect.TerminalConfig);
+        Terminal = new TerminalA (effect.InputData, effect.TerminalConfig);
 
     }
 

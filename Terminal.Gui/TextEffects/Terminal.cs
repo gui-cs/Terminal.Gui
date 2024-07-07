@@ -57,13 +57,13 @@ public class Canvas
     }
 }
 
-public class Terminal
+public class TerminalA
 {
     public TerminalConfig Config { get; }
     public Canvas Canvas { get; private set; }
     private Dictionary<Coord, EffectCharacter> CharacterByInputCoord = new Dictionary<Coord, EffectCharacter> ();
 
-    public Terminal (string input, TerminalConfig config = null)
+    public TerminalA (string input, TerminalConfig config = null)
     {
         Config = config ?? new TerminalConfig ();
         var dimensions = GetTerminalDimensions ();

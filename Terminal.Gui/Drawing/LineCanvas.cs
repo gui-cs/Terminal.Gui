@@ -4,6 +4,7 @@ namespace Terminal.Gui;
 /// <summary>Facilitates box drawing and line intersection detection and rendering.  Does not support diagonal lines.</summary>
 public class LineCanvas : IDisposable
 {
+    public FillPair? Fill { get; set; }
     private readonly List<StraightLine> _lines = [];
 
     private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> _runeResolvers = new ()
@@ -324,7 +325,9 @@ public class LineCanvas : IDisposable
     /// <returns></returns>
     private bool Exactly (HashSet<IntersectionType> intersects, params IntersectionType [] types) { return intersects.SetEquals (types); }
 
-    private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects) { return intersects [0]!.Line.Attribute; }
+    private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects) { 
+        return Fill != null ? Fill.GetAttribute(intersects [0]!.Point):
+            intersects [0]!.Line.Attribute; }
 
     private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
     {

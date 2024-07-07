@@ -15,6 +15,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Colors")]
 public class TextEffectsScenario : Scenario
 {
+    private TabView tabView;
+
     public override void Main ()
     {
         Application.Init ();
@@ -24,8 +26,30 @@ public class TextEffectsScenario : Scenario
             Height = Dim.Fill (),
         };
 
+        w.Loaded += (s, e) =>
+        {
+            SetupGradientLineCanvas (w, w.Frame.Size);
+            // TODO: Does not work
+            //  SetupGradientLineCanvas (tabView, tabView.Frame.Size);
+        };
+        w.SizeChanging += (s,e)=>
+        {
+            SetupGradientLineCanvas (w, e.Size);
+            // TODO: Does not work
+            //SetupGradientLineCanvas (tabView, tabView.Frame.Size);
+        };
+
+        w.ColorScheme = new ColorScheme
+        {
+            Normal = new Terminal.Gui.Attribute (ColorName.White, ColorName.Black),
+            Focus = new Terminal.Gui.Attribute (ColorName.Black,ColorName.White),
+            HotNormal = new Terminal.Gui.Attribute (ColorName.White, ColorName.Black),
+            HotFocus = new Terminal.Gui.Attribute (ColorName.White, ColorName.Black),
+            Disabled = new Terminal.Gui.Attribute (ColorName.Gray, ColorName.Black)
+        };
+
         // Creates a window that occupies the entire terminal with a title.
-        var tabView = new TabView ()
+        tabView = new TabView ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
@@ -60,6 +84,38 @@ public class TextEffectsScenario : Scenario
 
         Application.Shutdown ();
         this.Dispose ();
+    }
+
+
+    private void SetupGradientLineCanvas (View w, Size? size)
+    {
+        GetAppealingGradientColors (out var stops, out var steps);
+
+        var g = new Gradient (stops, steps);
+
+        var fore = new GradientFill (
+            new Rectangle (0, 0, size.Value.Width, size.Value.Height), g, Gradient.Direction.Diagonal);
+        var back = new SolidFill (new Terminal.Gui.Color (ColorName.Black));
+
+        w.LineCanvas.Fill = new FillPair (
+            fore,
+            back);
+    }
+
+    private void GetAppealingGradientColors (out List<Color> stops, out List<int> steps)
+    {
+        // Define the colors of the gradient stops with more appealing colors
+        stops = new List<Color>
+        {
+            Color.FromRgb(0, 128, 255),    // Bright Blue
+            Color.FromRgb(0, 255, 128),    // Bright Green
+            Color.FromRgb(255, 255, 0),    // Bright Yellow
+            Color.FromRgb(255, 128, 0),    // Bright Orange
+            Color.FromRgb(255, 0, 128)     // Bright Pink
+        };
+
+        // Define the number of steps between each color for smoother transitions
+        steps = new List<int> { 15, 15, 15, 15 }; // 15 steps between each color
     }
 }
 
