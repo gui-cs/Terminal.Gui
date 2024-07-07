@@ -2,35 +2,36 @@ mode: ContinuousDeployment
 tag-prefix: '[vV]'
 continuous-delivery-fallback-tag: pre
 branches:
-  develop:
-    mode: ContinuousDeployment
-    tag: pre
-    regex: develop
-    source-branches:
-    - main
-    pre-release-weight: 100
+  # develop:
+    # mode: ContinuousDeployment
+    # tag: pre
+    # regex: develop
+    # source-branches:
+    # - main
+    # pre-release-weight: 100
 
-  v2_develop:
-    mode: ContinuousDeployment
-    tag: pre
-    regex: ^v2_develop?[/-]
-    is-release-branch: true
-    tracks-release-branches: true
-    #is-source-branch-for: ['v2']
-    source-branches: []
+  # v2_develop:
+  #   mode: ContinuousDeployment
+  #   tag: pre
+  #   regex: ^v2_develop?[/-]
+  #   is-release-branch: true
+  #   tracks-release-branches: true
+  #   #is-source-branch-for: ['v2']
+  #   source-branches: []
 
-  v2_release:
-    mode: ContinuousDeployment
-    is-release-branch: true
-    tag: prealpha
-    regex: ^v2_release?[/-]
-    source-branches: ['v2_develop']
+  # v2_release:
+  #   mode: ContinuousDeployment
+  #   tag: prealpha
+  #   regex: ^v2_release?[/-]
+  #   is-release-branch: true
+  #   source-branches: []
 
-  feature:
-    tag: useBranchName
-    regex: ^features?[/-]
-    source-branches:
-    - v2_develop
+  # feature:
+  #   tag: useBranchName
+  #   regex: ^features?[/-]
+  #   source-branches:
+  #   - v2_develop
+
   pull-request:
     tag: PullRequest.{BranchName}
     increment: Inherit
