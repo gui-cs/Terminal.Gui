@@ -985,7 +985,7 @@ public static partial class Application
 
         if (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || OverlappedChildNeedsDisplay ())
         {
-            state.Toplevel.SetNeedsDisplay();
+            state.Toplevel.SetNeedsDisplay ();
             state.Toplevel.Draw ();
             Driver.UpdateScreen ();
 
@@ -1449,4 +1449,62 @@ public static partial class Application
     }
 
     #endregion Toplevel handling
+
+    /// <summary>
+    ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
+    /// </summary>
+    /// <returns>A string representation of the Application </returns>
+    public new static string ToString ()
+    {
+        ConsoleDriver driver = Driver;
+
+        if (driver is null)
+        {
+            return string.Empty;
+        }
+
+        return ToString (driver);
+    }
+
+    /// <summary>
+    ///     Gets a string representation of the Application rendered by the provided <see cref="ConsoleDriver"/>.
+    /// </summary>
+    /// <param name="driver">The driver to use to render the contents.</param>
+    /// <returns>A string representation of the Application </returns>
+    public static string ToString (ConsoleDriver driver)
+    {
+        var sb = new StringBuilder ();
+
+        Cell [,] contents = driver.Contents;
+
+        for (var r = 0; r < driver.Rows; r++)
+        {
+            for (var c = 0; c < driver.Cols; c++)
+            {
+                Rune rune = contents [r, c].Rune;
+
+                if (rune.DecodeSurrogatePair (out char [] sp))
+                {
+                    sb.Append (sp);
+                }
+                else
+                {
+                    sb.Append ((char)rune.Value);
+                }
+
+                if (rune.GetColumns () > 1)
+                {
+                    c++;
+                }
+
+                // See Issue #2616
+                //foreach (var combMark in contents [r, c].CombiningMarks) {
+                //	sb.Append ((char)combMark.Value);
+                //}
+            }
+
+            sb.AppendLine ();
+        }
+        return sb.ToString ();
+    }
 }
