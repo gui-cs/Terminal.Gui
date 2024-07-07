@@ -45,7 +45,7 @@ public class GradientTests
 
         var g = new Gradient (stops, steps, loop: false);
 
-        // Note that
+        // Note that maxRow and maxCol are inclusive so this results in 1x1 area i.e. a single cell. 
         var c = Assert.Single (g.BuildCoordinateColorMapping (0, 0, direction));
         Assert.Equal (c.Key, new Point(0,0));
         Assert.Equal (c.Value, new Color (0, 0, 255));
