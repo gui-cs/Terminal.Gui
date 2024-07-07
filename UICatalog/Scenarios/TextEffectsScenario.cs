@@ -24,6 +24,7 @@ public class TextEffectsScenario : Scenario
         {
             Width = Dim.Fill(),
             Height = Dim.Fill (),
+            Title = "Text Effects Scenario"
         };
 
         w.Loaded += (s, e) =>
@@ -34,7 +35,11 @@ public class TextEffectsScenario : Scenario
         };
         w.SizeChanging += (s,e)=>
         {
-            SetupGradientLineCanvas (w, e.Size);
+            if(e.Size.HasValue)
+            {
+                SetupGradientLineCanvas (w, e.Size.Value);
+            }
+            
             // TODO: Does not work
             //SetupGradientLineCanvas (tabView, tabView.Frame.Size);
         };
@@ -87,14 +92,14 @@ public class TextEffectsScenario : Scenario
     }
 
 
-    private void SetupGradientLineCanvas (View w, Size? size)
+    private void SetupGradientLineCanvas (View w, Size size)
     {
-        GetAppealingGradientColors (out var stops, out var steps);
+        GetAppealingGradientColors (size, out var stops, out var steps);
 
         var g = new Gradient (stops, steps);
 
         var fore = new GradientFill (
-            new Rectangle (0, 0, size.Value.Width, size.Value.Height), g, Gradient.Direction.Diagonal);
+            new Rectangle (0, 0, size.Width, size.Height), g, Gradient.Direction.Diagonal);
         var back = new SolidFill (new Terminal.Gui.Color (ColorName.Black));
 
         w.LineCanvas.Fill = new FillPair (
@@ -102,7 +107,7 @@ public class TextEffectsScenario : Scenario
             back);
     }
 
-    private void GetAppealingGradientColors (out List<Color> stops, out List<int> steps)
+    private void GetAppealingGradientColors (Size size, out List<Color> stops, out List<int> steps)
     {
         // Define the colors of the gradient stops with more appealing colors
         stops = new List<Color>
@@ -114,8 +119,11 @@ public class TextEffectsScenario : Scenario
             Color.FromRgb(255, 0, 128)     // Bright Pink
         };
 
-        // Define the number of steps between each color for smoother transitions
-        steps = new List<int> { 15, 15, 15, 15 }; // 15 steps between each color
+            // Calculate the number of steps based on the size
+            int maxSteps = Math.Max (size.Width, size.Height);
+
+            // Define the number of steps between each color for smoother transitions
+            steps = new List<int> { maxSteps / 4, maxSteps / 4, maxSteps / 4, maxSteps / 4 };
     }
 }
 

@@ -17,15 +17,19 @@ public class GradientFill : IFill
 
     public GradientFill (Rectangle area, Gradient gradient, Gradient.Direction direction)
     {
-        _map = 
+        _map =
             gradient.BuildCoordinateColorMapping (area.Height, area.Width, direction)
-            .ToDictionary(
-                (k)=> new Point(k.Key.Column,k.Key.Row),
-                (v)=> new Terminal.Gui.Color (v.Value.R, v.Value.G, v.Value.B));
+            .ToDictionary (
+                (k) => new Point (k.Key.Column, k.Key.Row),
+                (v) => new Terminal.Gui.Color (v.Value.R, v.Value.G, v.Value.B));
     }
 
     public Terminal.Gui.Color GetColor (Point point)
     {
-        return _map [point];
+        if (_map.TryGetValue (point, out var color))
+        {
+            return color;
+        }
+        return new Terminal.Gui.Color (0, 0, 0); // Default to black if point not found
     }
 }
