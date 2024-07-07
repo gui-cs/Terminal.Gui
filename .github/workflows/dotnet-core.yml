@@ -2,19 +2,24 @@ name: Build & Test Terminal.Gui with .NET Core
 
 on:
   push:
-    branches: [ main, develop, v2_develop ]
+    branches: [ v2, v2_develop ]
+    paths-ignore:
+      - '**.md'
   pull_request:
-    branches: [ main, develop, v2_develop ]
-
+    branches: [ v2, v2_develop ]
+    paths-ignore:
+      - '**.md'
+      
 jobs:
   build_and_test:
 
-    runs-on: windows-latest
-
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-    - uses: actions/checkout@v4
     
-    - name: Setup dotnet
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.x
@@ -34,19 +39,19 @@ jobs:
         mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
     # Note: this step is currently not writing to the gist for some reason
-    - name: Create Test Coverage Badge
-      uses: simon-k/dotnet-code-coverage-badge@v1.0.0
-      id: create_coverage_badge
-      with:
-        label: Unit Test Coverage
-        color: brightgreen
-        path: UnitTests/TestResults/coverage.opencover.xml
-        gist-filename: code-coverage.json
-        # https://gist.github.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27
-        gist-id: 90ef67a684cb71db1817921a970f8d27
-        gist-auth-token: ${{ secrets.GIST_AUTH_TOKEN }}   
+    # - name: Create Test Coverage Badge
+    #   uses: simon-k/dotnet-code-coverage-badge@v1.0.0
+    #   id: create_coverage_badge
+    #   with:
+    #     label: Unit Test Coverage
+    #     color: brightgreen
+    #     path: UnitTests/TestResults/coverage.opencover.xml
+    #     gist-filename: code-coverage.json
+    #     # https://gist.github.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27
+    #     gist-id: 90ef67a684cb71db1817921a970f8d27
+    #     gist-auth-token: ${{ secrets.GIST_AUTH_TOKEN }}   
 
-    - name: Print Code Coverage
-      run: |
-        echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
-        echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
+    # - name: Print Code Coverage
+    #   run: |
+    #     echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
+    #     echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
