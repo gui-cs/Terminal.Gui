@@ -15,7 +15,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>Use the helper API (<see cref="Draw(Rectangle, string)"/> to draw the frame with the specified thickness.</para>
 /// </remarks>
-public class Thickness : IEquatable<Thickness>
+public record struct Thickness 
 {
     /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
     [JsonInclude]
@@ -240,32 +240,6 @@ public class Thickness : IEquatable<Thickness>
         return GetInside (rect);
     }
 
-    /// <summary>Determines whether the specified object is equal to the current object.</summary>
-    /// <param name="obj">The object to compare with the current object.</param>
-    /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-    public override bool Equals (object obj)
-    {
-        //Check for null and compare run-time types.
-        if (obj is null || !GetType ().Equals (obj.GetType ()))
-        {
-            return false;
-        }
-
-        return Equals ((Thickness)obj);
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode ()
-    {
-        var hashCode = 1380952125;
-        hashCode = hashCode * -1521134295 + Left.GetHashCode ();
-        hashCode = hashCode * -1521134295 + Right.GetHashCode ();
-        hashCode = hashCode * -1521134295 + Top.GetHashCode ();
-        hashCode = hashCode * -1521134295 + Bottom.GetHashCode ();
-
-        return hashCode;
-    }
-
     /// <summary>
     ///     Returns a rectangle describing the location and size of the inside area of <paramref name="rect"/> with the
     ///     thickness widths subtracted. The height and width of the returned rectangle will never be less than 0.
@@ -289,23 +263,7 @@ public class Thickness : IEquatable<Thickness>
         return new (x, y, width, height);
     }
 
-    /// <inheritdoc/>
-    public static bool operator == (Thickness left, Thickness right) { return EqualityComparer<Thickness>.Default.Equals (left, right); }
-
-    /// <inheritdoc/>
-    public static bool operator != (Thickness left, Thickness right) { return !(left == right); }
-
     /// <summary>Returns the thickness widths of the Thickness formatted as a string.</summary>
     /// <returns>The thickness widths as a string.</returns>
     public override string ToString () { return $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})"; }
-
-    private int validate (int width)
-    {
-        if (width < 0)
-        {
-            throw new ArgumentException ("Thickness widths cannot be negative.");
-        }
-
-        return width;
-    }
 }
