@@ -2,17 +2,17 @@ mode: ContinuousDeployment
 tag-prefix: '[vV]'
 continuous-delivery-fallback-tag: pre
 branches:
-  # develop:
-    # mode: ContinuousDeployment
-    # tag: pre
-    # regex: develop
-    # source-branches:
-    # - main
-    # pre-release-weight: 100
+  develop:
+    mode: ContinuousDeployment
+    tag: pre
+    regex: develop
+    source-branches:
+    - main
+    pre-release-weight: 100
 
   v2_develop:
     mode: ContinuousDeployment
-    tag: pre
+    tag: dev
     regex: ^v2_develop?[/-]
     #is-release-branch: true
     tracks-release-branches: true
