@@ -10,31 +10,39 @@ branches:
     # - main
     # pre-release-weight: 100
 
-  # v2_develop:
-  #   mode: ContinuousDeployment
-  #   tag: pre
-  #   regex: ^v2_develop?[/-]
-  #   is-release-branch: true
-  #   tracks-release-branches: true
-  #   #is-source-branch-for: ['v2']
-  #   source-branches: []
+  v2_develop:
+    mode: ContinuousDeployment
+    tag: pre
+    regex: ^v2_develop?[/-]
+    #is-release-branch: true
+    tracks-release-branches: true
+    is-source-branch-for: ['v2_release']
+    source-branches: []
 
-  # v2_release:
-  #   mode: ContinuousDeployment
-  #   tag: prealpha
-  #   regex: ^v2_release?[/-]
-  #   is-release-branch: true
-  #   source-branches: []
-
-  # feature:
-  #   tag: useBranchName
-  #   regex: ^features?[/-]
-  #   source-branches:
-  #   - v2_develop
+  v2_release:
+    mode: ContinuousDeployment
+    tag: prealpha
+    regex: ^v2_release?[/-]
+    #is-release-branch: true
+    source-branches: ['v2_develop']
 
   pull-request:
+    mode: ContinuousDeployment
     tag: PullRequest.{BranchName}
     increment: Inherit
+    tag-number-pattern: '[/-](?<number>\d+)'
+    regex: ^(pull|pull\-requests|pr)[/-]
+    source-branches:
+    - develop
+    - main
+    - release
+    - v2_develop
+    - v2_release
+    - feature
+    - support
+    - hotfix
+    pre-release-weight: 30000
+
 ignore:
   sha: []
 
