@@ -40,7 +40,9 @@ jobs:
         dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings  --blame --diag:logs/logs.txt --blame-hang --blame-hang-timeout 60s
         mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
-    - uses: actions/upload-artifact@v4
+    - name: Upload Test Logs
+      if: always()
+      uses: actions/upload-artifact@v4
       with:
         name: test-logs
         path: logs/    
