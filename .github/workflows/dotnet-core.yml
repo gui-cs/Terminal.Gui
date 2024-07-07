@@ -62,7 +62,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: test-logs
+        name: test-logs-for-blame-debugging
         path: |
           logs/    
           UnitTests/TestResults/
