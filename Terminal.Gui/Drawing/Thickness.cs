@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
@@ -17,8 +18,19 @@ namespace Terminal.Gui;
 /// </remarks>
 public record struct Thickness
 {
+    private Vector4 _sides;
+
+    /// <summary>Initializes a new instance of the <see cref="Thickness"/> class.</summary>
+    public Thickness (float left, float top, float right, float bottom)
+    {
+        _sides = new  (left, top, right, bottom);
+    }
+
     /// <summary>Initializes a new instance of the <see cref="Thickness"/> class with all widths set to 0.</summary>
-    public Thickness () { }
+    public Thickness ()
+    {
+        _sides = new  (0, 0, 0, 0);
+    }
 
     /// <summary>Initializes a new instance of the <see cref="Thickness"/> class with a uniform width to each side.</summary>
     /// <param name="width"></param>
@@ -40,21 +52,37 @@ public record struct Thickness
         Bottom = bottom;
     }
 
-    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
-    [JsonInclude]
-    public int Bottom { get; set; }
 
     /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
     [JsonInclude]
-    public int Left { get; set; }
+    public int Left
+    {
+        get => (int)_sides.X;
+        set => _sides.X = value;
+    }
+    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
+    [JsonInclude]
+    public int Top
+    {
+        get => (int)_sides.Y;
+        set => _sides.Y = value;
+    }
 
     /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
     [JsonInclude]
-    public int Right { get; set; }
+    public int Right
+    {
+        get => (int)_sides.Z;
+        set => _sides.Z = value;
+    }
 
-    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
+    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
     [JsonInclude]
-    public int Top { get; set; }
+    public int Bottom
+    {
+        get => (int)_sides.W;
+        set => _sides.W = value;
+    }
 
     /// <summary>
     ///     Adds the thickness widths of another <see cref="Thickness"/> to the current <see cref="Thickness"/>, returning a
@@ -248,7 +276,7 @@ public record struct Thickness
 
     /// <summary>Returns the thickness widths of the Thickness formatted as a string.</summary>
     /// <returns>The thickness widths as a string.</returns>
-    public readonly override string ToString () { return $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})"; }
+    public override string ToString () { return $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})"; }
 
     /// <summary>
     ///     Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom
