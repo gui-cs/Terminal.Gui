@@ -19,18 +19,19 @@ branches:
     #is-source-branch-for: ['v2']
     source-branches: []
 
-  main:
-    tag: rc
+  v2:
+    mode: ContinuousDeployment
+    is-release-branch: true
+    tag: prealpha
     increment: Patch
-    source-branches:
-    - develop
-    - main
+    regex: ^v2?[/-]
+    source-branches: ['v2_develop']
+
   feature:
     tag: useBranchName
     regex: ^features?[/-]
     source-branches:
-    - develop
-    - main
+    - v2_develop
   pull-request:
     tag: PullRequest.{BranchName}
     increment: Inherit
