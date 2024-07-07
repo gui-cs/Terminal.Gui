@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -186,6 +187,12 @@ public class DateFieldTests
             if (separator.Length > 1 && separator.Contains ('\u200f'))
             {
                 separator = separator.Replace ("\u200f", "");
+            }
+
+            // BUGBUG: This is a workaround for the issue with the date separator in macOS. See https://github.com/gui-cs/Terminal.Gui/issues/3592
+            if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
+            {
+                separator = " ";
             }
 
             string format = culture.DateTimeFormat.ShortDatePattern;
