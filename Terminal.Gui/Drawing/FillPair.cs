@@ -1,5 +1,5 @@
 ﻿
-using Terminal.Gui.TextEffects;
+using Terminal.Gui.Drawing;
 
 namespace Terminal.Gui;
 

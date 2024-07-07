@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.TextEffects;
+﻿namespace Terminal.Gui.Drawing;
 
 
 /// <summary>
@@ -6,13 +6,13 @@
 /// </summary>
 public class SolidFill : IFill
 {
-    readonly Terminal.Gui.Color _color;
+    readonly Color _color;
 
-    public SolidFill (Terminal.Gui.Color color)
+    public SolidFill (Color color)
     {
         _color = color;
     }
-    public Gui.Color GetColor (Point point)
+    public Color GetColor (Point point)
     {
         return _color;
     }

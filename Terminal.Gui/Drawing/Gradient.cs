@@ -1,58 +1,7 @@
-﻿namespace Terminal.Gui.TextEffects;
+﻿namespace Terminal.Gui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-public class Color
-{
-    public string RgbColor { get; private set; }
-    public int? XtermColor { get; private set; }
-
-    public Color (string rgbColor)
-    {
-        if (!ColorUtils.IsValidHexColor (rgbColor))
-            throw new ArgumentException ("Invalid RGB hex color format.");
-
-        RgbColor = rgbColor.StartsWith ("#") ? rgbColor.Substring (1).ToUpper () : rgbColor.ToUpper ();
-        XtermColor = ColorUtils.HexToXterm (RgbColor);  // Convert RGB to XTerm-256
-    }
-
-    public Color (int xtermColor)
-    {
-        if (!ColorUtils.IsValidXtermColor (xtermColor))
-            throw new ArgumentException ("Invalid XTerm-256 color code.");
-
-        XtermColor = xtermColor;
-        RgbColor = ColorUtils.XtermToHex (xtermColor); // Perform the actual conversion
-    }
-    public int R => Convert.ToInt32 (RgbColor.Substring (0, 2), 16);
-    public int G => Convert.ToInt32 (RgbColor.Substring (2, 2), 16);
-    public int B => Convert.ToInt32 (RgbColor.Substring (4, 2), 16);
-
-    public (int R, int G, int B) GetRgbInts ()
-    {
-        return (
-            Convert.ToInt32 (RgbColor.Substring (0, 2), 16),
-            Convert.ToInt32 (RgbColor.Substring (2, 2), 16),
-            Convert.ToInt32 (RgbColor.Substring (4, 2), 16)
-        );
-    }
-
-    public override string ToString () => $"#{RgbColor}";
-
-    public static Color FromRgb (int r, int g, int b)
-    {
-        // Validate the RGB values to ensure they are within the 0-255 range
-        if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
-            throw new ArgumentOutOfRangeException ("RGB values must be between 0 and 255.");
-
-        // Convert RGB values to a hexadecimal string
-        string rgbColor = $"#{r:X2}{g:X2}{b:X2}";
-
-        // Create and return a new Color instance using the hexadecimal string
-        return new Color (rgbColor);
-    }
-}
 
 public class Gradient
 {
@@ -127,13 +76,13 @@ public class Gradient
             int r = (int)(start.R + fraction * (end.R - start.R));
             int g = (int)(start.G + fraction * (end.G - start.G));
             int b = (int)(start.B + fraction * (end.B - start.B));
-            yield return Color.FromRgb (r, g, b);
+            yield return new Color (r, g, b);
         }
     }
 
-    public Dictionary<Coord, Color> BuildCoordinateColorMapping (int maxRow, int maxColumn, Direction direction)
+    public Dictionary<Point, Color> BuildCoordinateColorMapping (int maxRow, int maxColumn, Direction direction)
     {
-        var gradientMapping = new Dictionary<Coord, Color> ();
+        var gradientMapping = new Dictionary<Point, Color> ();
 
         switch (direction)
         {
@@ -144,7 +93,7 @@ public class Gradient
                     Color color = GetColorAtFraction (fraction);
                     for (int col = 0; col <= maxColumn; col++)
                     {
-                        gradientMapping [new Coord (col, row)] = color;
+                        gradientMapping [new Point (col, row)] = color;
                     }
                 }
                 break;
@@ -156,7 +105,7 @@ public class Gradient
                     Color color = GetColorAtFraction (fraction);
                     for (int row = 0; row <= maxRow; row++)
                     {
-                        gradientMapping [new Coord (col, row)] = color;
+                        gradientMapping [new Point (col, row)] = color;
                     }
                 }
                 break;
@@ -166,9 +115,9 @@ public class Gradient
                 {
                     for (int col = 0; col <= maxColumn; col++)
                     {
-                        double distanceFromCenter = FindNormalizedDistanceFromCenter (maxRow, maxColumn, new Coord (col, row));
+                        double distanceFromCenter = FindNormalizedDistanceFromCenter (maxRow, maxColumn, new Point (col, row));
                         Color color = GetColorAtFraction (distanceFromCenter);
-                        gradientMapping [new Coord (col, row)] = color;
+                        gradientMapping [new Point (col, row)] = color;
                     }
                 }
                 break;
@@ -178,9 +127,9 @@ public class Gradient
                 {
                     for (int col = 0; col <= maxColumn; col++)
                     {
-                        double fraction = ((double)row * 2 + col) / ((maxRow * 2) + maxColumn);
+                        double fraction = ((double)row * 2 + col) / (maxRow * 2 + maxColumn);
                         Color color = GetColorAtFraction (fraction);
-                        gradientMapping [new Coord (col, row)] = color;
+                        gradientMapping [new Point (col, row)] = color;
                     }
                 }
                 break;
@@ -189,12 +138,12 @@ public class Gradient
         return gradientMapping;
     }
 
-    private double FindNormalizedDistanceFromCenter (int maxRow, int maxColumn, Coord coord)
+    private double FindNormalizedDistanceFromCenter (int maxRow, int maxColumn, Point coord)
     {
         double centerX = maxColumn / 2.0;
         double centerY = maxRow / 2.0;
-        double dx = coord.Column - centerX;
-        double dy = coord.Row - centerY;
+        double dx = coord.X - centerX;
+        double dy = coord.Y - centerY;
         double distance = Math.Sqrt (dx * dx + dy * dy);
         double maxDistance = Math.Sqrt (centerX * centerX + centerY * centerY);
         return distance / maxDistance;

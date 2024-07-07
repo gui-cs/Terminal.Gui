@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using Terminal.Gui;
-using Terminal.Gui.TextEffects;
 
-using Color = Terminal.Gui.TextEffects.Color;
-using Animation = Terminal.Gui.TextEffects.Animation;
+using Terminal.Gui.Drawing;
 
 namespace UICatalog.Scenarios;
 
@@ -68,18 +66,8 @@ public class TextEffectsScenario : Scenario
             },
             DisplayText = "Gradients"
         };
-        var t2 = new Tab ()
-        {
-            View = new BallsView ()
-            {
-                Width = Dim.Fill (),
-                Height = Dim.Fill (),
-            },
-            DisplayText = "Ball"
-        };
 
         tabView.AddTab (t1,false);
-        tabView.AddTab (t2,false);
 
         w.Add (tabView);
 
@@ -111,11 +99,11 @@ public class TextEffectsScenario : Scenario
         // Define the colors of the gradient stops with more appealing colors
         stops = new List<Color>
         {
-            Color.FromRgb(0, 128, 255),    // Bright Blue
-            Color.FromRgb(0, 255, 128),    // Bright Green
-            Color.FromRgb(255, 255, 0),    // Bright Yellow
-            Color.FromRgb(255, 128, 0),    // Bright Orange
-            Color.FromRgb(255, 0, 128)     // Bright Pink
+            new Color(0, 128, 255),    // Bright Blue
+            new Color(0, 255, 128),    // Bright Green
+            new Color(255, 255, 0),    // Bright Yellow
+            new Color(255, 128, 0),    // Bright Orange
+            new Color(255, 0, 128)     // Bright Pink
         };
 
         // Define the number of steps between each color for smoother transitions
@@ -159,9 +147,9 @@ internal class GradientsView : View
         // Define the colors of the gradient stops
         var stops = new List<Color>
         {
-            Color.FromRgb(255, 0, 0),    // Red
-            Color.FromRgb(0, 255, 0),    // Green
-            Color.FromRgb(238, 130, 238)  // Violet
+            new Color(255, 0, 0),    // Red
+            new Color(0, 255, 0),    // Green
+            new Color(238, 130, 238)  // Violet
         };
 
         // Define the number of steps between each color
@@ -182,7 +170,7 @@ internal class GradientsView : View
         {
             for (int col = 0; col <= maxColumn; col++)
             {
-                var coord = new Coord (col, row);
+                var coord = new Point (col, row);
                 var color = gradientMapping [coord];
 
                 SetColor (color);
@@ -197,13 +185,13 @@ internal class GradientsView : View
         // Define the colors of the rainbow
         var stops = new List<Color>
         {
-            Color.FromRgb(255, 0, 0),     // Red
-            Color.FromRgb(255, 165, 0),   // Orange
-            Color.FromRgb(255, 255, 0),   // Yellow
-            Color.FromRgb(0, 128, 0),     // Green
-            Color.FromRgb(0, 0, 255),     // Blue
-            Color.FromRgb(75, 0, 130),    // Indigo
-            Color.FromRgb(238, 130, 238)  // Violet
+            new Color(255, 0, 0),     // Red
+            new Color(255, 165, 0),   // Orange
+            new Color(255, 255, 0),   // Yellow
+            new Color(0, 128, 0),     // Green
+            new Color(0, 0, 255),     // Blue
+            new Color(75, 0, 130),    // Indigo
+            new Color(238, 130, 238)  // Violet
         };
 
         // Define the number of steps between each color
@@ -241,244 +229,3 @@ internal class GradientsView : View
             )); // Setting color based on RGB
     }
 }
-
-internal class BallsView : View
-{
-    private Ball? _ball;
-    private bool _resized;
-    private LineCanvas lc;
-    private Gradient gradient;
-
-    protected override void OnViewportChanged (DrawEventArgs e)
-    {
-        base.OnViewportChanged (e);
-        _resized = true;
-
-        lc = new LineCanvas (new []{
-            new StraightLine(new System.Drawing.Point(0,0),10,Orientation.Horizontal,LineStyle.Single),
-
-        });
-        TextEffectsScenario.GetAppealingGradientColors (out var stops, out var steps);
-        gradient = new Gradient (stops, steps);
-        var fill = new FillPair (
-            new GradientFill (new System.Drawing.Rectangle (0, 0, 10, 0), gradient , Gradient.Direction.Horizontal),
-            new SolidFill(Terminal.Gui.Color.Black)
-            );
-        lc.Fill = fill;
-
-    }
-
-    public override void OnDrawContent (Rectangle viewport)
-    {
-        base.OnDrawContent (viewport);
-
-        if ((_ball == null && viewport.Width > 0 && viewport.Height > 0) || _resized)
-        {
-            _ball = new Ball (this);
-            _ball.Start ();
-            _resized = false;
-        }
-
-        _ball?.Draw ();
-
-        foreach(var map in lc.GetCellMap())
-        {
-            Driver.SetAttribute (map.Value.Value.Attribute.Value);
-            AddRune (map.Key.X, map.Key.Y, map.Value.Value.Rune);
-        }
-
-        for (int x = 0; x < 10; x++)
-        {
-            double fraction = (double)x / 10;
-            Color color = gradient.GetColorAtFraction (fraction);
-
-            SetColor (color);
-
-            AddRune (x, 2, new Rune ('█'));
-        }
-
-        var map2 = gradient.BuildCoordinateColorMapping (0,10,Gradient.Direction.Horizontal);
-
-        for (int x = 0; x < map2.Count; x++)
-        {
-            SetColor (map2[new Coord(x,0)]);
-
-            AddRune (x, 3, new Rune ('█'));
-        }
-    }
-
-    private void SetColor (Color color)
-    {
-        // Assuming AddRune is a method you have for drawing at specific positions
-        Application.Driver.SetAttribute (
-            new Attribute (
-                new Terminal.Gui.Color (color.R, color.G, color.B),
-                new Terminal.Gui.Color (color.R, color.G, color.B)
-            )); // Setting color based on RGB
-    }
-    public class Ball
-    {
-        public Animation Animation { get; private set; }
-        public Scene BouncingScene { get; private set; }
-        public View Viewport { get; private set; }
-        public EffectCharacter Character { get; private set; }
-
-        public Ball (View viewport)
-        {
-            Viewport = viewport;
-            Character = new EffectCharacter (1, "O", 0, 0);
-            Animation = Character.Animation;
-            CreateBouncingScene ();
-            CreateMotionPath ();
-        }
-
-        private void CreateBouncingScene ()
-        {
-            BouncingScene = Animation.NewScene (isLooping: true);
-            int width = Viewport.Frame.Width;
-            int height = Viewport.Frame.Height;
-            double frequency = 4 * Math.PI / width; // Double the frequency
-
-            for (int x = 0; x < width; x++)
-            {
-                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x) * 0.8)); // Decrease amplitude
-                BouncingScene.AddFrame ("O", 1);
-            }
-
-            for (int x = width - 1; x >= 0; x--)
-            {
-                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x) * 0.8)); // Decrease amplitude
-                BouncingScene.AddFrame ("O", 1);
-            }
-        }
-
-        private void CreateMotionPath ()
-        {
-            int width = Viewport.Frame.Width;
-            int height = Viewport.Frame.Height;
-            double frequency = 4 * Math.PI / width; // Double the frequency
-
-            var path = Character.Motion.CreatePath ("sineWavePath", speed: 1, loop: true);
-
-            for (int x = 0; x < width; x++)
-            {
-                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x) * 0.8)); // Decrease amplitude
-                path.AddWaypoint (new Waypoint ($"waypoint_{x}", new Coord (x, y)));
-            }
-
-            for (int x = width - 1; x >= 0; x--)
-            {
-                int y = (int)((height - 1) / 2 * (1 + Math.Sin (frequency * x) * 0.8)); // Decrease amplitude
-                path.AddWaypoint (new Waypoint ($"waypoint_{x}", new Coord (x, y)));
-            }
-
-            Character.Motion.ActivatePath (path);
-        }
-
-        public void Start ()
-        {
-            Animation.ActivateScene (BouncingScene);
-            new Thread (() =>
-            {
-                while (true)
-                {
-                    Thread.Sleep (10); // Adjust the speed of animation
-                    Character.Tick ();
-
-                    Application.Invoke (() => Viewport.SetNeedsDisplay ());
-                }
-            })
-            { IsBackground = true }.Start ();
-        }
-
-        public void Draw ()
-        {
-            Driver.SetAttribute (Viewport.ColorScheme.Normal);
-            Viewport.AddRune (Character.Motion.CurrentCoord.Column, Character.Motion.CurrentCoord.Row, new Rune ('O'));
-        }
-    }
-}
-
-
-public class Ball
-{
-    public Animation Animation { get; private set; }
-    public Scene BouncingScene { get; private set; }
-    public View Viewport { get; private set; }
-    public EffectCharacter Character { get; private set; }
-
-    public Ball (View viewport)
-    {
-        Viewport = viewport;
-        Character = new EffectCharacter (1, "O", 0, 0);
-        Animation = Character.Animation;
-        CreateBouncingScene ();
-        CreateMotionPath ();
-    }
-
-    private void CreateBouncingScene ()
-    {
-        BouncingScene = Animation.NewScene (isLooping: true);
-        int width = Viewport.Frame.Width;
-        int height = Viewport.Frame.Height;
-        double frequency = 4 * Math.PI / width; // Double the frequency
-
-        for (int x = 0; x < width; x++)
-        {
-            int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
-            BouncingScene.AddFrame ("O", 1);
-        }
-
-        for (int x = width - 1; x >= 0; x--)
-        {
-            int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
-            BouncingScene.AddFrame ("O", 1);
-        }
-    }
-
-    private void CreateMotionPath ()
-    {
-        int width = Viewport.Frame.Width;
-        int height = Viewport.Frame.Height;
-        double frequency = 4 * Math.PI / width; // Double the frequency
-
-        var path = Character.Motion.CreatePath ("sineWavePath", speed: 1, loop: true);
-
-        for (int x = 0; x < width; x++)
-        {
-            int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
-            path.AddWaypoint (new Waypoint ($"waypoint_{x}", new Coord (x, y)));
-        }
-
-        for (int x = width - 1; x >= 0; x--)
-        {
-            int y = (int)((height) / 2 * (1 + Math.Sin (frequency * x))); // Decrease amplitude
-            path.AddWaypoint (new Waypoint ($"waypoint_{x}", new Coord (x, y)));
-        }
-
-        Character.Motion.ActivatePath (path);
-    }
-
-    public void Start ()
-    {
-        Animation.ActivateScene (BouncingScene);
-        new Thread (() =>
-        {
-            while (true)
-            {
-                Thread.Sleep (10); // Adjust the speed of animation
-                Character.Tick ();
-
-                Application.Invoke (() => Viewport.SetNeedsDisplay ());
-            }
-        })
-        { IsBackground = true }.Start ();
-    }
-
-    public void Draw ()
-    {
-        Application.Driver.SetAttribute (Viewport.ColorScheme.Normal);
-        Viewport.AddRune (Character.Motion.CurrentCoord.Column, Character.Motion.CurrentCoord.Row, new Rune ('O'));
-    }
-}
-

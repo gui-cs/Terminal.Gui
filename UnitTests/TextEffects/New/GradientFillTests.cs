@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.TextEffects.Tests;
+﻿using Terminal.Gui.Drawing;
+
+namespace Terminal.Gui.TextEffects.Tests;
 
 public class GradientFillTests
 {
@@ -9,8 +11,8 @@ public class GradientFillTests
         // Define the colors of the gradient stops
         var stops = new List<Color>
         {
-            Color.FromRgb(255, 0, 0),    // Red
-            Color.FromRgb(0, 0, 255)     // Blue
+            new Color(255, 0, 0),    // Red
+            new Color(0, 0, 255)     // Blue
         };
 
         // Define the number of steps between each color
