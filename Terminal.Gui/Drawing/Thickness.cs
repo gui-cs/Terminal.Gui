@@ -15,24 +15,8 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>Use the helper API (<see cref="Draw(Rectangle, string)"/> to draw the frame with the specified thickness.</para>
 /// </remarks>
-public record struct Thickness 
+public record struct Thickness
 {
-    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
-    [JsonInclude]
-    public int Bottom;
-
-    /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
-    [JsonInclude]
-    public int Left;
-
-    /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
-    [JsonInclude]
-    public int Right;
-
-    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
-    [JsonInclude]
-    public int Top;
-
     /// <summary>Initializes a new instance of the <see cref="Thickness"/> class with all widths set to 0.</summary>
     public Thickness () { }
 
@@ -56,35 +40,29 @@ public record struct Thickness
         Bottom = bottom;
     }
 
-    // TODO: add operator overloads
-    /// <summary>Gets an empty thickness.</summary>
-    public static Thickness Empty => new (0);
+    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
+    [JsonInclude]
+    public int Bottom { get; set; }
+
+    /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
+    [JsonInclude]
+    public int Left { get; set; }
+
+    /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
+    [JsonInclude]
+    public int Right { get; set; }
+
+    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
+    [JsonInclude]
+    public int Top { get; set; }
 
     /// <summary>
-    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides
-    ///     of the rectangle to half the specified value.
+    ///     Adds the thickness widths of another <see cref="Thickness"/> to the current <see cref="Thickness"/>, returning a
+    ///     new <see cref="Thickness"/>.
     /// </summary>
-    public int Horizontal
-    {
-        get => Left + Right;
-        set => Left = Right = value / 2;
-    }
-
-    /// <summary>
-    ///     Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom
-    ///     sides of the rectangle to half the specified value.
-    /// </summary>
-    public int Vertical
-    {
-        get => Top + Bottom;
-        set => Top = Bottom = value / 2;
-    }
-
-    // IEquitable
-    /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
     /// <param name="other"></param>
-    /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-    public bool Equals (Thickness other) { return other is { } && Left == other.Left && Right == other.Right && Top == other.Top && Bottom == other.Bottom; }
+    /// <returns></returns>
+    public readonly Thickness Add (Thickness other) { return new (Left + other.Left, Top + other.Top, Right + other.Right, Bottom + other.Bottom); }
 
     /// <summary>
     ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside
@@ -99,22 +77,6 @@ public record struct Thickness
 
         return outside.Contains (location) && !inside.Contains (location);
     }
-
-    /// <summary>
-    ///     Adds the thickness widths of another <see cref="Thickness"/> to the current <see cref="Thickness"/>, returning a
-    ///     new <see cref="Thickness"/>.
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    public Thickness Add (Thickness other) { return new (Left + other.Left, Top + other.Top, Right + other.Right, Bottom + other.Bottom); }
-
-    /// <summary>
-    ///     Adds the thickness widths of another <see cref="Thickness"/> to another <see cref="Thickness"/>.
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
-    public static Thickness operator + (Thickness a, Thickness b) { return a.Add (b); }
 
     /// <summary>Draws the <see cref="Thickness"/> rectangle with an optional diagnostics label.</summary>
     /// <remarks>
@@ -240,6 +202,9 @@ public record struct Thickness
         return GetInside (rect);
     }
 
+    /// <summary>Gets an empty thickness.</summary>
+    public static Thickness Empty => new (0);
+
     /// <summary>
     ///     Returns a rectangle describing the location and size of the inside area of <paramref name="rect"/> with the
     ///     thickness widths subtracted. The height and width of the returned rectangle will never be less than 0.
@@ -263,7 +228,35 @@ public record struct Thickness
         return new (x, y, width, height);
     }
 
+    /// <summary>
+    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides
+    ///     of the rectangle to half the specified value.
+    /// </summary>
+    public int Horizontal
+    {
+        get => Left + Right;
+        set => Left = Right = value / 2;
+    }
+
+    /// <summary>
+    ///     Adds the thickness widths of another <see cref="Thickness"/> to another <see cref="Thickness"/>.
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static Thickness operator + (Thickness a, Thickness b) { return a.Add (b); }
+
     /// <summary>Returns the thickness widths of the Thickness formatted as a string.</summary>
     /// <returns>The thickness widths as a string.</returns>
-    public override string ToString () { return $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})"; }
+    public readonly override string ToString () { return $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})"; }
+
+    /// <summary>
+    ///     Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom
+    ///     sides of the rectangle to half the specified value.
+    /// </summary>
+    public int Vertical
+    {
+        get => Top + Bottom;
+        set => Top = Bottom = value / 2;
+    }
 }
