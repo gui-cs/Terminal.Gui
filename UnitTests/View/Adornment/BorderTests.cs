@@ -18,7 +18,7 @@ public class BorderTests (ITestOutputHelper output)
         view.Border.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.ColorScheme = new()
+        view.ColorScheme = new ()
         {
             Normal = new (Color.Red, Color.Green),
             Focus = new (Color.Green, Color.Red)
@@ -53,7 +53,7 @@ public class BorderTests (ITestOutputHelper output)
         view.Border.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.ColorScheme = new()
+        view.ColorScheme = new ()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         };
@@ -90,7 +90,7 @@ public class BorderTests (ITestOutputHelper output)
         {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
-        win.Border.Thickness.Top = 4;
+        win.Border.Thickness = win.Border.Thickness with { Top = 4 };
 
         RunState rs = Application.Begin (win);
         var firstIteration = false;
@@ -224,7 +224,7 @@ public class BorderTests (ITestOutputHelper output)
         {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
-        win.Border.Thickness.Top = 3;
+        win.Border.Thickness = win.Border.Thickness with { Top = 3 };
 
         RunState rs = Application.Begin (win);
         var firstIteration = false;
@@ -358,7 +358,7 @@ public class BorderTests (ITestOutputHelper output)
         {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
-        win.Border.Thickness.Top = 2;
+        win.Border.Thickness = win.Border.Thickness with { Top = 2 };
 
         RunState rs = Application.Begin (win);
         var firstIteration = false;
