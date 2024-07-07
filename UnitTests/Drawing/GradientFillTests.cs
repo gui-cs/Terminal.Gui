@@ -37,12 +37,6 @@ public class GradientFillTests
         var bottomLeftColor = gradientFill.GetColor (bottomLeft);
         var bottomRightColor = gradientFill.GetColor (bottomRight);
 
-        // Validate the colors at the corners
-        Assert.NotNull (topLeftColor);
-        Assert.NotNull (topRightColor);
-        Assert.NotNull (bottomLeftColor);
-        Assert.NotNull (bottomRightColor);
-
         // Expected colors
         var expectedTopLeftColor = new Terminal.Gui.Color (255, 0, 0); // Red
         var expectedBottomRightColor = new Terminal.Gui.Color (0, 0, 255); // Blue
@@ -73,9 +67,6 @@ public class GradientFillTests
                 var point = new Point (col, row);
                 var color = gradientFill.GetColor (point);
 
-                // Ensure color is not null
-                Assert.NotNull (color);
-
                 // Check if the current color is 'more blue' and 'less red' as it goes right and down
                 Assert.True (color.R <= previousRed, $"Failed at ({col}, {row}): {color.R} > {previousRed}");
                 Assert.True (color.B >= previousBlue, $"Failed at ({col}, {row}): {color.B} < {previousBlue}");
@@ -95,9 +86,6 @@ public class GradientFillTests
             {
                 var point = new Point (col, row);
                 var color = gradientFill.GetColor (point);
-
-                // Ensure color is not null
-                Assert.NotNull (color);
 
                 // Check if the current color is 'more blue' and 'less red' as it goes right and down
                 Assert.True (color.R <= previousRed, $"Failed at ({col}, {row}): {color.R} > {previousRed}");

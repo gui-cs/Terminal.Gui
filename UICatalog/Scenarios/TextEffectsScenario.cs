@@ -12,7 +12,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Colors")]
 public class TextEffectsScenario : Scenario
 {
-    private TabView tabView;
+    private TabView _tabView;
 
     public static bool LoopingGradient = false;
 
@@ -48,7 +48,7 @@ public class TextEffectsScenario : Scenario
         };
 
         // Creates a window that occupies the entire terminal with a title.
-        tabView = new TabView ()
+        _tabView = new TabView ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
@@ -75,14 +75,14 @@ public class TextEffectsScenario : Scenario
         {
             LoopingGradient = e.NewValue == CheckState.Checked;
             SetupGradientLineCanvas (w, w.Frame.Size);
-            tabView.SetNeedsDisplay ();
+            _tabView.SetNeedsDisplay ();
         };
 
         gradientsView.Add (cbLooping);
 
-        tabView.AddTab (t1, false);
+        _tabView.AddTab (t1, false);
 
-        w.Add (tabView);
+        w.Add (_tabView);
 
         Application.Run (w);
         w.Dispose ();
