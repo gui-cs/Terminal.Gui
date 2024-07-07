@@ -36,6 +36,10 @@ jobs:
     - name: Build Debug
       run: dotnet build --configuration Debug --no-restore
 
+    - name: Install sed on macOS
+      if: runner.os == 'macOS'
+      run: brew install gnu-sed
+
       # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
       # Without it, the test runner crashes on ubuntu (but not Windows)/
     - name: Test
