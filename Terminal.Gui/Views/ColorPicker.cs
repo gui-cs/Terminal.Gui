@@ -1,283 +1,279 @@
-﻿using System;
-using System.Text;
+﻿namespace Terminal.Gui;
 
-namespace Terminal.Gui {
+/// <summary>Event arguments for the <see cref="Color"/> events.</summary>
+public class ColorEventArgs : EventArgs
+{
+    /// <summary>Initializes a new instance of <see cref="ColorEventArgs"/></summary>
+    public ColorEventArgs () { }
 
-	/// <summary>
-	/// Event arguments for the <see cref="Color"/> events.
-	/// </summary>
-	public class ColorEventArgs : EventArgs {
+    /// <summary>The new Thickness.</summary>
+    public Color Color { get; set; }
 
-		/// <summary>
-		/// Initializes a new instance of <see cref="ColorEventArgs"/>
-		/// </summary>
-		public ColorEventArgs ()
-		{
-		}
+    /// <summary>The previous Thickness.</summary>
+    public Color PreviousColor { get; set; }
+}
 
-		/// <summary>
-		/// The new Thickness.
-		/// </summary>
-		public Color Color { get; set; }
+/// <summary>The <see cref="ColorPicker"/> <see cref="View"/> Color picker.</summary>
+public class ColorPicker : View
+{
+    /// <summary>Columns of color boxes</summary>
+    private readonly int _cols = 8;
 
-		/// <summary>
-		/// The previous Thickness.
-		/// </summary>
-		public Color PreviousColor { get; set; }
-	}
+    /// <summary>Rows of color boxes</summary>
+    private readonly int _rows = 2;
 
-	/// <summary>
-	/// The <see cref="ColorPicker"/> <see cref="View"/> Color picker.
-	/// </summary>
-	public class ColorPicker : View {
-		private int _selectColorIndex = (int)Color.Black;
+    private int _boxHeight = 2;
+    private int _boxWidth = 4;
+    private int _selectColorIndex = (int)Color.Black;
 
-		/// <summary>
-		/// Columns of color boxes
-		/// </summary>
-		private int _cols = 8;
+    /// <summary>Initializes a new instance of <see cref="ColorPicker"/>.</summary>
+    public ColorPicker () { SetInitialProperties (); }
 
-		/// <summary>
-		/// Rows of color boxes
-		/// </summary>
-		private int _rows = 2;
+    private void SetInitialProperties ()
+    {
+        HighlightStyle = Gui.HighlightStyle.PressedOutside | Gui.HighlightStyle.Pressed;
 
-		/// <summary>
-		/// Width of a color box
-		/// </summary>
-		public int BoxWidth {
-			get => _boxWidth;
-			set {
-				if (_boxWidth != value) {
-					_boxWidth = value;
-					SetNeedsLayout ();
-				}
-			}
-		}
-		private int _boxWidth = 4;
+        CanFocus = true;
+        AddCommands ();
+        AddKeyBindings ();
 
-		/// <summary>
-		/// Height of a color box
-		/// </summary>
-		public int BoxHeight {
-			get => _boxHeight;
-			set {
-				if (_boxHeight != value) {
-					_boxHeight = value;
-					SetNeedsLayout ();
-				}
-			}
-		}
-		int _boxHeight = 2;
+        Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
+        Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
+        SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
 
-		/// <summary>
-		/// Cursor for the selected color.
-		/// </summary>
-		public Point Cursor {
-			get {
-				return new Point (_selectColorIndex % _cols, _selectColorIndex / _cols);
-			}
+        MouseClick += ColorPicker_MouseClick;
+    }
 
-			set {
-				var colorIndex = value.Y * _cols + value.X;
-				SelectedColor = (Color)colorIndex;
-			}
-		}
+    // TODO: Decouple Cursor from SelectedColor so that mouse press-and-hold can show the color under the cursor.
 
-		/// <summary>
-		/// Fired when a color is picked.
-		/// </summary>
-		public event EventHandler<ColorEventArgs> ColorChanged;
+    private void ColorPicker_MouseClick (object sender, MouseEventEventArgs me)
+    {
+       // if (CanFocus)
+        {
+            Cursor = new Point (me.MouseEvent.Position.X / _boxWidth, me.MouseEvent.Position.Y / _boxHeight);
+            SetFocus ();
+            me.Handled = true;
+        }
+    }
 
-		/// <summary>
-		/// Selected color.
-		/// </summary>
-		public Color SelectedColor {
-			get {
-				return (Color)_selectColorIndex;
-			}
+    /// <summary>Height of a color box</summary>
+    public int BoxHeight
+    {
+        get => _boxHeight;
+        set
+        {
+            if (_boxHeight != value)
+            {
+                _boxHeight = value;
+                Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
+                Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
+                SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
+                SetNeedsLayout ();
+            }
+        }
+    }
 
-			set {
-				Color prev = (Color)_selectColorIndex;
-				_selectColorIndex = (int)value;
-				ColorChanged?.Invoke (this, new ColorEventArgs () {
-					PreviousColor = prev,
-					Color = value,
-				});
-				SetNeedsDisplay ();
-			}
-		}
+    /// <summary>Width of a color box</summary>
+    public int BoxWidth
+    {
+        get => _boxWidth;
+        set
+        {
+            if (_boxWidth != value)
+            {
+                _boxWidth = value;
+                Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
+                Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
+                SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
+                SetNeedsLayout ();
+            }
+        }
+    }
 
-		/// <summary>
-		/// Initializes a new instance of <see cref="ColorPicker"/>.
-		/// </summary>
-		public ColorPicker ()
-		{
-			SetInitialProperties ();
-		}
+    /// <summary>Cursor for the selected color.</summary>
+    public Point Cursor
+    {
+        get => new (_selectColorIndex % _cols, _selectColorIndex / _cols);
+        set
+        {
+            int colorIndex = value.Y * _cols + value.X;
+            SelectedColor = (ColorName)colorIndex;
+        }
+    }
 
-		private void SetInitialProperties ()
-		{
-			CanFocus = true;
-			AddCommands ();
-			AddKeyBindings ();
-			LayoutStarted += (o, a) => {
-				Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
-			};
-		}
+    /// <summary>Selected color.</summary>
+    public ColorName SelectedColor
+    {
+        get => (ColorName)_selectColorIndex;
+        set
+        {
+            if (value == (ColorName)_selectColorIndex)
+            {
+                return;
+            }
+            var prev = (ColorName)_selectColorIndex;
+            _selectColorIndex = (int)value;
 
-		/// <summary>
-		/// Add the commands.
-		/// </summary>
-		private void AddCommands ()
-		{
-			AddCommand (Command.Left, () => MoveLeft ());
-			AddCommand (Command.Right, () => MoveRight ());
-			AddCommand (Command.LineUp, () => MoveUp ());
-			AddCommand (Command.LineDown, () => MoveDown ());
-		}
+            ColorChanged?.Invoke (
+                                  this,
+                                  new ColorEventArgs { PreviousColor = new Color (prev), Color = new Color (value) }
+                                 );
+            SetNeedsDisplay ();
+        }
+    }
 
-		/// <summary>
-		/// Add the KeyBindinds.
-		/// </summary>
-		private void AddKeyBindings ()
-		{
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			AddKeyBinding (Key.CursorRight, Command.Right);
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-		}
+    /// <summary>Fired when a color is picked.</summary>
+    public event EventHandler<ColorEventArgs> ColorChanged;
 
-		///<inheritdoc/>
-		public override void OnDrawContent (Rect contentArea)
-		{
-			base.OnDrawContent (contentArea);
 
-			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
-			var colorIndex = 0;
+    /// <summary>Moves the selected item index to the previous column.</summary>
+    /// <returns></returns>
+    public virtual bool MoveLeft ()
+    {
+        if (Cursor.X > 0)
+        {
+            SelectedColor--;
+        }
 
-			for (var y = 0; y < (Bounds.Height / BoxHeight); y++) {
-				for (var x = 0; x < (Bounds.Width / BoxWidth); x++) {
-					var foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
-					Driver.SetAttribute (Driver.MakeAttribute ((Color)foregroundColorIndex, (Color)colorIndex));
-					var selected = x == Cursor.X && y == Cursor.Y;
-					DrawColorBox (x, y, selected);
-					colorIndex++;
-				}
-			}
-		}
+        return true;
+    }
 
-		/// <summary>
-		/// Draw a box for one color.
-		/// </summary>
-		/// <param name="x">X location.</param>
-		/// <param name="y">Y location</param>
-		/// <param name="selected"></param>
-		private void DrawColorBox (int x, int y, bool selected)
-		{
-			var index = 0;
+    /// <summary>Moves the selected item index to the next column.</summary>
+    /// <returns></returns>
+    public virtual bool MoveRight ()
+    {
+        if (Cursor.X < _cols - 1)
+        {
+            SelectedColor++;
+        }
 
-			for (var zoomedY = 0; zoomedY < BoxHeight; zoomedY++) {
-				for (var zoomedX = 0; zoomedX < BoxWidth; zoomedX++) {
-					Move (x * BoxWidth + zoomedX, y * BoxHeight + zoomedY);
-					Driver.AddRune ((Rune)' ');
-					index++;
-				}
-			}
+        return true;
+    }
 
-			if (selected) {
-				DrawFocusRect (new Rect (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
-			}
-		}
+    /// <summary>Moves the selected item index to the previous row.</summary>
+    /// <returns></returns>
+    public virtual bool MoveUp ()
+    {
+        if (Cursor.Y > 0)
+        {
+            SelectedColor -= _cols;
+        }
 
-		private void DrawFocusRect (Rect rect)
-		{
-			var lc = new LineCanvas ();
-			if (rect.Width == 1) {
-				lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
-			} else if (rect.Height == 1) {
-				lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
-			} else {
-				lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
-				lc.AddLine (new Point (rect.Location.X, rect.Location.Y + rect.Height - 1), rect.Width, Orientation.Horizontal, LineStyle.Dotted);
+        return true;
+    }
 
-				lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
-				lc.AddLine (new Point (rect.Location.X + rect.Width - 1, rect.Location.Y), rect.Height, Orientation.Vertical, LineStyle.Dotted);
-			}
-			foreach (var p in lc.GetMap ()) {
-				AddRune (p.Key.X, p.Key.Y, p.Value);
-			}
-		}
+    /// <summary>Moves the selected item index to the next row.</summary>
+    /// <returns></returns>
+    public virtual bool MoveDown ()
+    {
+        if (Cursor.Y < _rows - 1)
+        {
+            SelectedColor += _cols;
+        }
 
-		/// <summary>
-		/// Moves the selected item index to the previous column.
-		/// </summary>
-		/// <returns></returns>
-		public virtual bool MoveLeft ()
-		{
-			if (Cursor.X > 0) SelectedColor--;
-			return true;
-		}
+        return true;
+    }
 
-		/// <summary>
-		/// Moves the selected item index to the next column.
-		/// </summary>
-		/// <returns></returns>
-		public virtual bool MoveRight ()
-		{
-			if (Cursor.X < _cols - 1) SelectedColor++;
-			return true;
-		}
+    ///<inheritdoc/>
+    public override void OnDrawContent (Rectangle viewport)
+    {
+        base.OnDrawContent (viewport);
 
-		/// <summary>
-		/// Moves the selected item index to the previous row.
-		/// </summary>
-		/// <returns></returns>
-		public virtual bool MoveUp ()
-		{
-			if (Cursor.Y > 0) SelectedColor -= _cols;
-			return true;
-		}
+        Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
+        var colorIndex = 0;
 
-		/// <summary>
-		/// Moves the selected item index to the next row.
-		/// </summary>
-		/// <returns></returns>
-		public virtual bool MoveDown ()
-		{
-			if (Cursor.Y < _rows - 1) SelectedColor += _cols;
-			return true;
-		}
+        for (var y = 0; y < Math.Max (2, viewport.Height / BoxHeight); y++)
+        {
+            for (var x = 0; x < Math.Max (8, viewport.Width / BoxWidth); x++)
+            {
+                int foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
+                Driver.SetAttribute (new Attribute ((ColorName)foregroundColorIndex, (ColorName)colorIndex));
+                bool selected = x == Cursor.X && y == Cursor.Y;
+                DrawColorBox (x, y, selected);
+                colorIndex++;
+            }
+        }
+    }
 
-		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
-		{
-			var result = InvokeKeybindings (kb);
-			if (result != null)
-				return (bool)result;
 
-			return false;
-		}
+    /// <summary>Add the commands.</summary>
+    private void AddCommands ()
+    {
+        AddCommand (Command.Left, () => MoveLeft ());
+        AddCommand (Command.Right, () => MoveRight ());
+        AddCommand (Command.LineUp, () => MoveUp ());
+        AddCommand (Command.LineDown, () => MoveDown ());
+    }
 
-		///<inheritdoc/>
-		public override bool MouseEvent (MouseEvent me)
-		{
-			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) || !CanFocus) {
-				return false;
-			}
+    /// <summary>Add the KeyBindinds.</summary>
+    private void AddKeyBindings ()
+    {
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+    }
 
-			SetFocus ();
-			Cursor = new Point ((me.X - GetFramesThickness ().Left) / _boxWidth, (me.Y - GetFramesThickness ().Top) / _boxHeight);
+    /// <summary>Draw a box for one color.</summary>
+    /// <param name="x">X location.</param>
+    /// <param name="y">Y location</param>
+    /// <param name="selected"></param>
+    private void DrawColorBox (int x, int y, bool selected)
+    {
+        var index = 0;
 
-			return true;
-		}
+        for (var zoomedY = 0; zoomedY < BoxHeight; zoomedY++)
+        {
+            for (var zoomedX = 0; zoomedX < BoxWidth; zoomedX++)
+            {
+                Move (x * BoxWidth + zoomedX, y * BoxHeight + zoomedY);
+                Driver.AddRune ((Rune)' ');
+                index++;
+            }
+        }
 
-		///<inheritdoc/>
-		public override bool OnEnter (View view)
-		{
-			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+        if (selected)
+        {
+            DrawFocusRect (new (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
+        }
+    }
 
-			return base.OnEnter (view);
-		}
-	}
+    private void DrawFocusRect (Rectangle rect)
+    {
+        var lc = new LineCanvas ();
+
+        if (rect.Width == 1)
+        {
+            lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
+        }
+        else if (rect.Height == 1)
+        {
+            lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
+        }
+        else
+        {
+            lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
+
+            lc.AddLine (
+                        rect.Location with { Y = rect.Location.Y + rect.Height - 1 },
+                        rect.Width,
+                        Orientation.Horizontal,
+                        LineStyle.Dotted
+                       );
+
+            lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
+
+            lc.AddLine (
+                        rect.Location with { X = rect.Location.X + rect.Width - 1 },
+                        rect.Height,
+                        Orientation.Vertical,
+                        LineStyle.Dotted
+                       );
+        }
+
+        foreach (KeyValuePair<Point, Rune> p in lc.GetMap ())
+        {
+            AddRune (p.Key.X, p.Key.Y, p.Value);
+        }
+    }
 }

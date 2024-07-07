@@ -2,199 +2,230 @@
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
-namespace UICatalog.Scenarios {
+namespace UICatalog.Scenarios;
 
-	[ScenarioMetadata (Name: "Line Drawing", Description: "Demonstrates LineCanvas.")]
-	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Layout")]
-	public class LineDrawing : Scenario {
+[ScenarioMetadata ("Line Drawing", "Demonstrates LineCanvas.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Drawing")]
+public class LineDrawing : Scenario
+{
+    public override void Setup ()
+    {
+        var canvas = new DrawingArea { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
-		public override void Setup ()
-		{
-			var canvas = new DrawingArea {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
+        var tools = new ToolsView { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
 
-			var tools = new ToolsView () {
-				Title = "Tools",
-				X = Pos.Right (canvas) - 20,
-				Y = 2
-			};
+        tools.ColorChanged += c => canvas.SetColor (c);
+        tools.SetStyle += b => canvas.LineStyle = b;
+        tools.AddLayer += () => canvas.AddLayer ();
 
-			tools.ColorChanged += (c) => canvas.SetColor (c);
-			tools.SetStyle += (b) => canvas.LineStyle = b;
-			tools.AddLayer += () => canvas.AddLayer ();
+        Win.Add (canvas);
+        Win.Add (tools);
 
-			Win.Add (canvas);
-			Win.Add (tools);
+        Win.KeyDown += (s, e) => { e.Handled = canvas.OnKeyDown (e); };
+    }
 
-			Win.KeyPress += (s,e) => { e.Handled = canvas.ProcessKey (e.KeyEvent); };
-		}
+    private class DrawingArea : View
+    {
+        private readonly List<LineCanvas> _layers = new ();
+        private readonly Stack<StraightLine> _undoHistory = new ();
+        private Color _currentColor = new (Color.White);
+        private LineCanvas _currentLayer;
+        private StraightLine _currentLine;
+        public DrawingArea () { AddLayer (); }
+        public LineStyle LineStyle { get; set; }
 
-		class ToolsView : Window {
-			public event Action<Color> ColorChanged;
-			public event Action<LineStyle> SetStyle;
-			public event Action AddLayer;
+        public override void OnDrawContentComplete (Rectangle viewport)
+        {
+            base.OnDrawContentComplete (viewport);
 
-			private RadioGroup _stylePicker;
-			private ColorPicker _colorPicker;
-			private Button _addLayerBtn;
+            foreach (LineCanvas canvas in _layers)
+            {
+                foreach (KeyValuePair<Point, Cell?> c in canvas.GetCellMap ())
+                {
+                    if (c.Value is { })
+                    {
+                        Driver.SetAttribute (c.Value.Value.Attribute ?? ColorScheme.Normal);
 
-			public ToolsView ()
-			{
-				BorderStyle = LineStyle.Dotted;
-				Border.Thickness = new Thickness (1, 2, 1, 1);
-				Initialized += ToolsView_Initialized;
-			}
+                        // TODO: #2616 - Support combining sequences that don't normalize
+                        AddRune (c.Key.X, c.Key.Y, c.Value.Value.Rune);
+                    }
+                }
+            }
+        }
 
-			private void ToolsView_Initialized (object sender, EventArgs e)
-			{
-				LayoutSubviews ();
-				Width = Math.Max (_colorPicker.Frame.Width, _stylePicker.Frame.Width) + GetFramesThickness ().Horizontal;
-				Height = _colorPicker.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height + GetFramesThickness ().Vertical;
-				SuperView.LayoutSubviews ();
-			}
+        //// BUGBUG: Why is this not handled by a key binding???
+        public override bool OnKeyDown (Key e)
+        {
+            // BUGBUG: These should be implemented with key bindings
+            if (e.KeyCode == (KeyCode.Z | KeyCode.CtrlMask))
+            {
+                StraightLine pop = _currentLayer.RemoveLastLine ();
 
-			public override void BeginInit ()
-			{
-				base.BeginInit ();
+                if (pop != null)
+                {
+                    _undoHistory.Push (pop);
+                    SetNeedsDisplay ();
 
-				_colorPicker = new ColorPicker () {
-					X = 0,
-					Y = 0,
-					BoxHeight = 1,
-					BoxWidth = 2
-				};
+                    return true;
+                }
+            }
 
-				_colorPicker.ColorChanged += (s, a) => ColorChanged?.Invoke (a.Color);
+            if (e.KeyCode == (KeyCode.Y | KeyCode.CtrlMask))
+            {
+                if (_undoHistory.Any ())
+                {
+                    StraightLine pop = _undoHistory.Pop ();
+                    _currentLayer.AddLine (pop);
+                    SetNeedsDisplay ();
 
-				_stylePicker = new RadioGroup (Enum.GetNames (typeof (LineStyle)).ToArray ()) {
-					X = 0,
-					Y = Pos.Bottom (_colorPicker)
-				};
+                    return true;
+                }
+            }
 
-				_stylePicker.SelectedItemChanged += (s, a) => {
-					SetStyle?.Invoke ((LineStyle)a.SelectedItem);
-				};
+            return false;
+        }
 
-				_addLayerBtn = new Button () {
-					Text = "New Layer",
-					X = Pos.Center (),
-					Y = Pos.Bottom (_stylePicker),
-				};
+        protected override bool OnMouseEvent (MouseEvent mouseEvent)
+        {
+            if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+            {
+                if (_currentLine == null)
+                {
+                    // Mouse pressed down
+                    _currentLine = new StraightLine (
+                                                     mouseEvent.Position,
+                                                     0,
+                                                     Orientation.Vertical,
+                                                     LineStyle,
+                                                     new Attribute (_currentColor, GetNormalColor ().Background)
+                                                    );
 
-				_addLayerBtn.Clicked += (s, a) => AddLayer?.Invoke ();
-				Add (_colorPicker, _stylePicker, _addLayerBtn);
-			}
-		}
+                    _currentLayer.AddLine (_currentLine);
+                }
+                else
+                {
+                    // Mouse dragged
+                    Point start = _currentLine.Start;
+                    var end = mouseEvent.Position;
+                    var orientation = Orientation.Vertical;
+                    int length = end.Y - start.Y;
 
-		class DrawingArea : View {
-			List<LineCanvas> _layers = new List<LineCanvas> ();
-			LineCanvas _currentLayer;
-			Color _currentColor = Color.White;
-			StraightLine _currentLine = null;
+                    // if line is wider than it is tall switch to horizontal
+                    if (Math.Abs (start.X - end.X) > Math.Abs (start.Y - end.Y))
+                    {
+                        orientation = Orientation.Horizontal;
+                        length = end.X - start.X;
+                    }
 
-			public LineStyle LineStyle { get; set; }
+                    if (length > 0)
+                    {
+                        length++;
+                    }
+                    else
+                    {
+                        length--;
+                    }
 
-			public DrawingArea ()
-			{
-				AddLayer ();
-			}
+                    _currentLine.Length = length;
+                    _currentLine.Orientation = orientation;
+                    _currentLayer.ClearCache ();
+                    SetNeedsDisplay ();
+                }
+            }
+            else
+            {
+                // Mouse released
+                if (_currentLine != null)
+                {
+                    if (_currentLine.Length == 0)
+                    {
+                        _currentLine.Length = 1;
+                    }
 
-			Stack<StraightLine> undoHistory = new ();
+                    if (_currentLine.Style == LineStyle.None)
+                    {
+                        // Treat none as eraser
+                        int idx = _layers.IndexOf (_currentLayer);
+                        _layers.Remove (_currentLayer);
 
-			public override bool ProcessKey (KeyEvent e)
-			{
-				if (e.Key == (Key.Z | Key.CtrlMask)) {
-					var pop = _currentLayer.RemoveLastLine ();
-					if(pop != null) {
-						undoHistory.Push (pop);
-						SetNeedsDisplay ();
-						return true;
-					}
-				}
+                        _currentLayer = new LineCanvas (
+                                                        _currentLayer.Lines.Exclude (
+                                                                                     _currentLine.Start,
+                                                                                     _currentLine.Length,
+                                                                                     _currentLine.Orientation
+                                                                                    )
+                                                       );
 
-				if (e.Key == (Key.Y | Key.CtrlMask)) {
-					if (undoHistory.Any()) {
-						var pop = undoHistory.Pop ();
-						_currentLayer.AddLine(pop);
-						SetNeedsDisplay ();
-						return true;
-					}
-				}
+                        _layers.Insert (idx, _currentLayer);
+                    }
 
-				return base.ProcessKey (e);
-			}
-			internal void AddLayer ()
-			{
-				_currentLayer = new LineCanvas ();
-				_layers.Add (_currentLayer);
-			}
+                    _currentLine = null;
+                    _undoHistory.Clear ();
+                    SetNeedsDisplay ();
+                }
+            }
 
-			public override void OnDrawContentComplete (Rect contentArea)
-			{
-				base.OnDrawContentComplete (contentArea);
-				foreach (var canvas in _layers) {
+            return base.OnMouseEvent (mouseEvent);
+        }
 
-					foreach (var c in canvas.GetCellMap ()) {
-						Driver.SetAttribute (c.Value.Attribute ?? ColorScheme.Normal);
-						// TODO: #2616 - Support combining sequences that don't normalize
-						this.AddRune (c.Key.X, c.Key.Y, c.Value.Runes [0]);
-					}
-				}
-			}
+        internal void AddLayer ()
+        {
+            _currentLayer = new LineCanvas ();
+            _layers.Add (_currentLayer);
+        }
 
-			public override bool OnMouseEvent (MouseEvent mouseEvent)
-			{
-				if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
-					if (_currentLine == null) {
+        internal void SetColor (Color c) { _currentColor = c; }
+    }
 
-						_currentLine = new StraightLine (
-							new Point (mouseEvent.X - GetBoundsOffset ().X, mouseEvent.Y - GetBoundsOffset ().X),
-							0, Orientation.Vertical, LineStyle, new Attribute (_currentColor, GetNormalColor ().Background));
-						_currentLayer.AddLine (_currentLine);
-					} else {
-						var start = _currentLine.Start;
-						var end = new Point (mouseEvent.X - GetBoundsOffset ().X, mouseEvent.Y - GetBoundsOffset ().Y);
-						var orientation = Orientation.Vertical;
-						var length = end.Y - start.Y;
+    private class ToolsView : Window
+    {
+        private Button _addLayerBtn;
+        private ColorPicker _colorPicker;
+        private RadioGroup _stylePicker;
 
-						// if line is wider than it is tall switch to horizontal
-						if (Math.Abs (start.X - end.X) > Math.Abs (start.Y - end.Y)) {
-							orientation = Orientation.Horizontal;
-							length = end.X - start.X;
-						}
+        public ToolsView ()
+        {
+            BorderStyle = LineStyle.Dotted;
+            Border.Thickness = new Thickness (1, 2, 1, 1);
+            Initialized += ToolsView_Initialized;
+        }
 
-						if (length > 0) {
-							length++;
-						} else {
-							length--;
-						}
-						_currentLine.Length = length;
-						_currentLine.Orientation = orientation;
-						_currentLayer.ClearCache ();
-						SetNeedsDisplay ();
-					}
-				} else {
-					if (_currentLine != null) {
-						_currentLine = null;
-						undoHistory.Clear ();
-						SetNeedsDisplay ();
-					}
-				}
+        public event Action AddLayer;
 
-				return base.OnMouseEvent (mouseEvent);
-			}
+        public override void BeginInit ()
+        {
+            base.BeginInit ();
 
-			internal void SetColor (Color c)
-			{
-				_currentColor = c;
-			}
-		}
-	}
+            _colorPicker = new ColorPicker { X = 0, Y = 0, BoxHeight = 1, BoxWidth = 2 };
+
+            _colorPicker.ColorChanged += (s, a) => ColorChanged?.Invoke (a.Color);
+
+            _stylePicker = new RadioGroup
+            {
+                X = 0, Y = Pos.Bottom (_colorPicker), RadioLabels = Enum.GetNames (typeof (LineStyle)).ToArray ()
+            };
+            _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem); };
+            _stylePicker.SelectedItem = 1;
+
+            _addLayerBtn = new Button { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
+
+            _addLayerBtn.Accept += (s, a) => AddLayer?.Invoke ();
+            Add (_colorPicker, _stylePicker, _addLayerBtn);
+        }
+
+        public event Action<Color> ColorChanged;
+        public event Action<LineStyle> SetStyle;
+
+        private void ToolsView_Initialized (object sender, EventArgs e)
+        {
+            LayoutSubviews ();
+
+            Width = Math.Max (_colorPicker.Frame.Width, _stylePicker.Frame.Width) + GetAdornmentsThickness ().Horizontal;
+
+            Height = _colorPicker.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height + GetAdornmentsThickness ().Vertical;
+            SuperView.LayoutSubviews ();
+        }
+    }
 }

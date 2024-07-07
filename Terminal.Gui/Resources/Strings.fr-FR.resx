@@ -142,16 +142,16 @@
     <value>_Dossier</value>
   </data>
   <data name="fdFile" xml:space="preserve">
-    <value>_Ficher</value>
+    <value>Ficher</value>
   </data>
   <data name="fdSave" xml:space="preserve">
-    <value>_Enregistrer</value>
+    <value>Enregistrer</value>
   </data>
   <data name="fdSaveAs" xml:space="preserve">
-    <value>E_nregistrer sous</value>
+    <value>Enregistrer sous</value>
   </data>
   <data name="fdOpen" xml:space="preserve">
-    <value>_Ouvrir</value>
+    <value>Ouvrir</value>
   </data>
   <data name="fdSelectFolder" xml:space="preserve">
     <value>Sélection de _dossier</value>
@@ -167,5 +167,17 @@
   </data>
   <data name="wzNext" xml:space="preserve">
     <value>Prochai_n...</value>
+  </data>
+  <data name="btnSave" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="btnSaveAs" xml:space="preserve">
+    <value>E_nregistrer sous</value>
+  </data>
+  <data name="btnOpen" xml:space="preserve">
+    <value>Ouvrir</value>
+  </data>
+  <data name="dpTitle" xml:space="preserve">
+    <value>Sélecteur de Date</value>
   </data>
 </root>

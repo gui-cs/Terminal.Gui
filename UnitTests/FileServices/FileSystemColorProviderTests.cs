@@ -1,14 +1,11 @@
-using Xunit;
+namespace Terminal.Gui.FileServicesTests;
 
-namespace Terminal.Gui.FileServicesTests {
-	public class FileSystemColorProviderTests
+public class FileSystemColorProviderTests
+{
+    [Fact]
+    public void CanConstruct ()
     {
-        [Fact]
-        public void CanConstruct()
-        {
-            var prov = new FileSystemColorProvider();
-            Assert.NotNull(prov);
-        }
+        var prov = new FileSystemColorProvider ();
+        Assert.NotNull (prov);
     }
-
 }

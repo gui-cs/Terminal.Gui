@@ -1,130 +1,127 @@
-﻿using Terminal.Gui;
-using System;
+﻿using System;
+using Terminal.Gui;
 
-namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Color Picker", Description: "Color Picker.")]
-	[ScenarioCategory ("Colors")]
-	[ScenarioCategory ("Controls")]
-	public class ColorPickers : Scenario {
-		/// <summary>
-		/// Foreground ColorPicker.
-		/// </summary>
-		private ColorPicker foregroundColorPicker;
+namespace UICatalog.Scenarios;
 
-		/// <summary>
-		/// Background ColorPicker.
-		/// </summary>
-		private ColorPicker backgroundColorPicker;
+[ScenarioMetadata ("Color Picker", "Color Picker.")]
+[ScenarioCategory ("Colors")]
+[ScenarioCategory ("Controls")]
+public class ColorPickers : Scenario
+{
+    /// <summary>Background color Label.</summary>
+    private Label _backgroundColorLabel;
 
-		/// <summary>
-		/// Foreground color label.
-		/// </summary>
-		private Label _foregroundColorLabel;
+    /// <summary>Demo label.</summary>
+    private View _demoView;
 
-		/// <summary>
-		/// Background color Label.
-		/// </summary>
-		private Label _backgroundColorLabel;
+    /// <summary>Foreground color label.</summary>
+    private Label _foregroundColorLabel;
 
-		/// <summary>
-		/// Demo label.
-		/// </summary>
-		private View _demoView;
+    /// <summary>Background ColorPicker.</summary>
+    private ColorPicker backgroundColorPicker;
 
-		/// <summary>
-		/// Setup the scenario.
-		/// </summary>
-		public override void Setup ()
-		{
-			// Scenario Window's.
-			Win.Title = this.GetName ();
+    /// <summary>Foreground ColorPicker.</summary>
+    private ColorPicker foregroundColorPicker;
 
-			// Foreground ColorPicker.
-			foregroundColorPicker = new ColorPicker () {
-				Title = "Foreground Color",
-				X = 0,
-				Y = 0,
-				BoxHeight = 3,
-				BoxWidth = 6,
-				BorderStyle = LineStyle.Single
-			};
-			foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
-			Win.Add (foregroundColorPicker);
+    /// <summary>Setup the scenario.</summary>
+    public override void Main ()
+    {
+        Application.Init ();
 
-			_foregroundColorLabel = new Label {
-				X = Pos.Left (foregroundColorPicker),
-				Y = Pos.Bottom (foregroundColorPicker) + 1
-			};
-			Win.Add (_foregroundColorLabel);
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+        };
 
-			// Background ColorPicker.
-			backgroundColorPicker = new ColorPicker () { 
-				Title = "Background Color",
-				Y = 0,
-				BoxHeight = 1,
-				BoxWidth = 4,
-				BorderStyle = LineStyle.Single
-			};
-			backgroundColorPicker.X = Pos.AnchorEnd () - (Pos.Right (backgroundColorPicker) - Pos.Left (backgroundColorPicker));
-			backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
-			Win.Add (backgroundColorPicker);
+        // Foreground ColorPicker.
+        foregroundColorPicker = new ColorPicker { Title = "Foreground Color", BorderStyle = LineStyle.Single };
+        foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
+        app.Add (foregroundColorPicker);
 
-			_backgroundColorLabel = new Label ();
-			_backgroundColorLabel.X = Pos.AnchorEnd () - (Pos.Right (_backgroundColorLabel) - Pos.Left (_backgroundColorLabel));
-			_backgroundColorLabel.Y = Pos.Bottom (backgroundColorPicker) + 1;
-			Win.Add (_backgroundColorLabel);
+        _foregroundColorLabel = new Label
+        {
+            X = Pos.Left (foregroundColorPicker), Y = Pos.Bottom (foregroundColorPicker) + 1
+        };
+        app.Add (_foregroundColorLabel);
 
-			// Demo Label.
-			_demoView = new View () {
-				Title = "Color Sample",
-				Text = "Lorem Ipsum",
-				TextAlignment = TextAlignment.Centered,
-				VerticalTextAlignment = VerticalTextAlignment.Middle,
-				BorderStyle = LineStyle.Heavy,
-				X = Pos.Center (),
-				Y = Pos.Center (),
-				Height = 5,
-				Width = 20
-			};
-			Win.Add (_demoView);
+        // Background ColorPicker.
+        backgroundColorPicker = new ColorPicker
+        {
+            Title = "Background Color",
+            X = Pos.AnchorEnd (),
+            BoxHeight = 1,
+            BoxWidth = 4,
+            BorderStyle = LineStyle.Single,
+        };
 
-			// Set default colors.
-			backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background;
-			foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground;
-		}
+        backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
+        app.Add (backgroundColorPicker);
+        _backgroundColorLabel = new Label ()
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.Bottom (backgroundColorPicker) + 1
+        };
 
-		/// <summary>
-		/// Fired when foreground color is changed.
-		/// </summary>
-		private void ForegroundColor_ColorChanged (object sender, EventArgs e)
-		{
-			UpdateColorLabel (_foregroundColorLabel, foregroundColorPicker);
-			UpdateDemoLabel ();
-		}
+        app.Add (_backgroundColorLabel);
 
-		/// <summary>
-		/// Fired when background color is changed.
-		/// </summary>
-		private void BackgroundColor_ColorChanged (object sender, EventArgs e)
-		{
-			UpdateColorLabel (_backgroundColorLabel, backgroundColorPicker);
-			UpdateDemoLabel ();
-		}
+        // Demo Label.
+        _demoView = new View
+        {
+            Title = "Color Sample",
+            Text = "Lorem Ipsum",
+            TextAlignment = Alignment.Center,
+            VerticalTextAlignment = Alignment.Center,
+            BorderStyle = LineStyle.Heavy,
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Height = 5,
+            Width = 20
+        };
+        app.Add (_demoView);
 
-		/// <summary>
-		/// Update a color label from his ColorPicker.
-		/// </summary>
-		private void UpdateColorLabel (Label label, ColorPicker colorPicker)
-		{
-			label.Clear ();
-			label.Text = $"{colorPicker.SelectedColor} - {(int)colorPicker.SelectedColor}";
-		}
+        // Set default colors.
+        foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground.GetClosestNamedColor ();
+        backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background.GetClosestNamedColor ();
+        app.Initialized += (s, e) => app.LayoutSubviews ();
 
-		/// <summary>
-		/// Update Demo Label.
-		/// </summary>
-		private void UpdateDemoLabel () => _demoView.ColorScheme = new ColorScheme () {
-			Normal = new Terminal.Gui.Attribute (foregroundColorPicker.SelectedColor, backgroundColorPicker.SelectedColor)
-		};
-	}
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
+    }
+
+    /// <summary>Fired when background color is changed.</summary>
+    private void BackgroundColor_ColorChanged (object sender, EventArgs e)
+    {
+        UpdateColorLabel (_backgroundColorLabel, backgroundColorPicker);
+        UpdateDemoLabel ();
+    }
+
+    /// <summary>Fired when foreground color is changed.</summary>
+    private void ForegroundColor_ColorChanged (object sender, EventArgs e)
+    {
+        UpdateColorLabel (_foregroundColorLabel, foregroundColorPicker);
+        UpdateDemoLabel ();
+    }
+
+    /// <summary>Update a color label from his ColorPicker.</summary>
+    private void UpdateColorLabel (Label label, ColorPicker colorPicker)
+    {
+        label.Clear ();
+        var color = new Color (colorPicker.SelectedColor);
+
+        label.Text =
+            $"{colorPicker.SelectedColor} ({(int)colorPicker.SelectedColor}) #{color.R:X2}{color.G:X2}{color.B:X2}";
+    }
+
+    /// <summary>Update Demo Label.</summary>
+    private void UpdateDemoLabel ()
+    {
+        _demoView.ColorScheme = new ColorScheme
+        {
+            Normal = new Attribute (
+                                    foregroundColorPicker.SelectedColor,
+                                    backgroundColorPicker.SelectedColor
+                                   )
+        };
+    }
 }

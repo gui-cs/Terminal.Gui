@@ -3,10 +3,6 @@
   "description": "The JSON schema for the Terminal.Gui Configuration Manager (https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json).",
   "type": "object",
   "properties": {
-    "Application.HeightAsBuffer": {
-      "description": "See HeightAsBuffer API documentation.",
-      "type": "boolean"
-    },
     "Application.AlternateForwardKey": {
       "description": "Alternative key for navigating forwards through views. SCtrl+Tab is the primary key.",
       "$ref": "#/definitions/Key"
@@ -16,7 +12,7 @@
       "$ref": "#/definitions/Key"
     },
     "Application.QuitKey": {
-      "description": "The key to quit the application. Ctrl+Q is the default.",
+      "description": "The key to quit the application. Esc is the default.",
       "$ref": "#/definitions/Key"
     },
     "Application.IsMouseDisabled": {

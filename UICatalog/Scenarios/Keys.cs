@@ -1,177 +1,127 @@
-﻿using System.Text;
-using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Keys", Description: "Shows how to handle keyboard input")]
-	[ScenarioCategory ("Mouse and Keyboard")]
-	public class Keys : Scenario {
+namespace UICatalog.Scenarios;
 
-		class TestWindow : Window {
-			public List<string> _processKeyList = new List<string> ();
-			public List<string> _processHotKeyList = new List<string> ();
-			public List<string> _processColdKeyList = new List<string> ();
+[ScenarioMetadata ("Keys", "Shows keyboard input handling.")]
+[ScenarioCategory ("Mouse and Keyboard")]
+public class Keys : Scenario
+{
+    public override void Setup ()
+    {
+        ObservableCollection<string> keyPressedList = [];
+        ObservableCollection<string> invokingKeyBindingsList = new ();
 
-			public override bool ProcessKey (KeyEvent keyEvent)
-			{
-				_processKeyList.Add (keyEvent.ToString ());
-				return base.ProcessKey (keyEvent);
-			}
+        var editLabel = new Label { X = 0, Y = 0, Text = "Type text here:" };
+        Win.Add (editLabel);
 
-			public override bool ProcessHotKey (KeyEvent keyEvent)
-			{
-				_processHotKeyList.Add (keyEvent.ToString ());
-				return base.ProcessHotKey (keyEvent);
-			}
+        var edit = new TextField { X = Pos.Right (editLabel) + 1, Y = Pos.Top (editLabel), Width = Dim.Fill (2) };
+        Win.Add (edit);
 
-			public override bool ProcessColdKey (KeyEvent keyEvent)
-			{
-				_processColdKeyList.Add (keyEvent.ToString ());
+        edit.KeyDown += (s, a) => { keyPressedList.Add (a.ToString ()); };
 
-				return base.ProcessColdKey (keyEvent);
-			}
-		}
+        edit.InvokingKeyBindings += (s, a) =>
+                                    {
+                                        if (edit.KeyBindings.TryGet (a, out KeyBinding binding))
+                                        {
+                                            invokingKeyBindingsList.Add ($"{a}: {string.Join (",", binding.Commands)}");
+                                        }
+                                    };
 
-		public override void Init ()
-		{
-			Application.Init ();
-			ConfigurationManager.Themes.Theme = Theme;
-			ConfigurationManager.Apply ();
-			
-			Win = new TestWindow () {
-				Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				ColorScheme = Colors.ColorSchemes [TopLevelColorScheme],
-			};
-			Application.Top.Add (Win);
-		}
+        // Last KeyPress: ______
+        var keyPressedLabel = new Label
+        {
+            X = Pos.Left (editLabel), Y = Pos.Top (editLabel) + 1, Text = "Last TextView.KeyPressed:"
+        };
+        Win.Add (keyPressedLabel);
+        var labelTextViewKeypress = new Label { X = Pos.Right (keyPressedLabel) + 1, Y = Pos.Top (keyPressedLabel) };
+        Win.Add (labelTextViewKeypress);
 
-		public override void Setup ()
-		{
-			// Type text here: ______
-			var editLabel = new Label ("Type text here:") {
-				X = 0,
-				Y = 0,
-			};
-			Win.Add (editLabel);
-			var edit = new TextField ("") {
-				X = Pos.Right (editLabel) + 1,
-				Y = Pos.Top (editLabel),
-				Width = Dim.Fill (2),
-			};
-			Win.Add (edit);
+        edit.KeyDown += (s, e) => labelTextViewKeypress.Text = e.ToString ();
 
-			// Last KeyPress: ______
-			var keyPressedLabel = new Label ("Last KeyPress:") {
-				X = Pos.Left (editLabel),
-				Y = Pos.Top (editLabel) + 2,
-			};
-			Win.Add (keyPressedLabel);
-			var labelKeypress = new Label ("") {
-				X = Pos.Left (edit),
-				Y = Pos.Top (keyPressedLabel),
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
-				ColorScheme = Colors.Error,
-				AutoSize = true
-			};
-			Win.Add (labelKeypress);
+        keyPressedLabel = new Label
+        {
+            X = Pos.Left (keyPressedLabel), Y = Pos.Bottom (keyPressedLabel), Text = "Last Application.KeyDown:"
+        };
+        Win.Add (keyPressedLabel);
+        var labelAppKeypress = new Label { X = Pos.Right (keyPressedLabel) + 1, Y = Pos.Top (keyPressedLabel) };
+        Win.Add (labelAppKeypress);
 
-			Win.KeyPress += (s,e) => labelKeypress.Text = e.KeyEvent.ToString ();
+        Application.KeyDown += (s, e) => labelAppKeypress.Text = e.ToString ();
 
-			// Key stroke log:
-			var keyLogLabel = new Label ("Key stroke log:") {
-				X = Pos.Left (editLabel),
-				Y = Pos.Top (editLabel) + 4,
-			};
-			Win.Add (keyLogLabel);
-			var fakeKeyPress = new KeyEvent (Key.CtrlMask | Key.A, new KeyModifiers () {
-				Alt = true,
-				Ctrl = true,
-				Shift = true
-			});
-			var maxLogEntry = $"Key{"",-5}: {fakeKeyPress}".Length;
-			var yOffset = (Application.Top == Application.Top ? 1 : 6);
-			var keyStrokelist = new List<string> ();
-			var keyStrokeListView = new ListView (keyStrokelist) {
-				X = 0,
-				Y = Pos.Top (keyLogLabel) + yOffset,
-				Width = Dim.Percent (30),
-				Height = Dim.Fill (),
-			};
-			keyStrokeListView.ColorScheme = Colors.TopLevel;
-			Win.Add (keyStrokeListView);
+        // Key stroke log:
+        var keyLogLabel = new Label
+        {
+            X = Pos.Left (editLabel), Y = Pos.Top (editLabel) + 4, Text = "Application Key Events:"
+        };
+        Win.Add (keyLogLabel);
+        int maxKeyString = Key.CursorRight.WithAlt.WithCtrl.WithShift.ToString ().Length;
+        var yOffset = 1;
+        ObservableCollection<string> keyEventlist = new ();
 
-			// ProcessKey log:
-			var processKeyLogLabel = new Label ("ProcessKey log:") {
-				X = Pos.Right (keyStrokeListView) + 1,
-				Y = Pos.Top (editLabel) + 4,
-			};
-			Win.Add (processKeyLogLabel);
+        var keyEventListView = new ListView
+        {
+            X = 0,
+            Y = Pos.Top (keyLogLabel) + yOffset,
+            Width = "Key Down:".Length + maxKeyString,
+            Height = Dim.Fill (),
+            Source = new ListWrapper<string> (keyEventlist)
+        };
+        keyEventListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        Win.Add (keyEventListView);
 
-			maxLogEntry = $"{fakeKeyPress}".Length;
-			yOffset = (Application.Top == Application.Top ? 1 : 6);
-			var processKeyListView = new ListView (((TestWindow)Win)._processKeyList) {
-				X = Pos.Left (processKeyLogLabel),
-				Y = Pos.Top (processKeyLogLabel) + yOffset,
-				Width = Dim.Percent(30),
-				Height = Dim.Fill (),
-			};
-			processKeyListView.ColorScheme = Colors.TopLevel;
-			Win.Add (processKeyListView);
+        // OnKeyPressed
+        var onKeyPressedLabel = new Label
+        {
+            X = Pos.Right (keyEventListView) + 1, Y = Pos.Top (editLabel) + 4, Text = "TextView KeyDown:"
+        };
+        Win.Add (onKeyPressedLabel);
 
-			// ProcessHotKey log:
-			// BUGBUG: Label is not positioning right with Pos, so using TextField instead
-			var processHotKeyLogLabel = new Label ("ProcessHotKey log:") {
-				X = Pos.Right (processKeyListView) + 1,
-				Y = Pos.Top (editLabel) + 4,
-			};
-			Win.Add (processHotKeyLogLabel);
+        yOffset = 1;
 
-			yOffset = (Application.Top == Application.Top ? 1 : 6);
-			var processHotKeyListView = new ListView (((TestWindow)Win)._processHotKeyList) {
-				X = Pos.Left (processHotKeyLogLabel),
-				Y = Pos.Top (processHotKeyLogLabel) + yOffset,
-				Width = Dim.Percent (20),
-				Height = Dim.Fill (),
-			};
-			processHotKeyListView.ColorScheme = Colors.TopLevel;
-			Win.Add (processHotKeyListView);
+        var onKeyPressedListView = new ListView
+        {
+            X = Pos.Left (onKeyPressedLabel),
+            Y = Pos.Top (onKeyPressedLabel) + yOffset,
+            Width = maxKeyString,
+            Height = Dim.Fill (),
+            Source = new ListWrapper<string> (keyPressedList)
+        };
+        onKeyPressedListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        Win.Add (onKeyPressedListView);
 
-			// ProcessColdKey log:
-			// BUGBUG: Label is not positioning right with Pos, so using TextField instead
-			var processColdKeyLogLabel = new Label ("ProcessColdKey log:") {
-				X = Pos.Right (processHotKeyListView) + 1,
-				Y = Pos.Top (editLabel) + 4,
-			};
-			Win.Add (processColdKeyLogLabel);
+        // OnInvokeKeyBindings
+        var onInvokingKeyBindingsLabel = new Label
+        {
+            X = Pos.Right (onKeyPressedListView) + 1,
+            Y = Pos.Top (editLabel) + 4,
+            Text = "TextView InvokingKeyBindings:"
+        };
+        Win.Add (onInvokingKeyBindingsLabel);
 
-			yOffset = (Application.Top == Application.Top ? 1 : 6);
-			var processColdKeyListView = new ListView (((TestWindow)Win)._processColdKeyList) {
-				X = Pos.Left (processColdKeyLogLabel),
-				Y = Pos.Top (processColdKeyLogLabel) + yOffset,
-				Width = Dim.Percent (20),
-				Height = Dim.Fill (),
-			};
+        var onInvokingKeyBindingsListView = new ListView
+        {
+            X = Pos.Left (onInvokingKeyBindingsLabel),
+            Y = Pos.Top (onInvokingKeyBindingsLabel) + yOffset,
+            Width = Dim.Fill (1),
+            Height = Dim.Fill (),
+            Source = new ListWrapper<string> (invokingKeyBindingsList)
+        };
+        onInvokingKeyBindingsListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        Win.Add (onInvokingKeyBindingsListView);
 
-			Win.KeyDown += (s,a) => KeyDownPressUp (a.KeyEvent, "Down");
-			Win.KeyPress += (s, a) => KeyDownPressUp (a.KeyEvent, "Press");
-			Win.KeyUp += (s, a) => KeyDownPressUp (a.KeyEvent, "Up");
+        //Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
+        Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
+        Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
 
-			void KeyDownPressUp (KeyEvent keyEvent, string updown)
-			{
-				var msg = $"Key{updown,-5}: {keyEvent}";
-				keyStrokelist.Add (msg);
-				keyStrokeListView.MoveDown ();
-				processKeyListView.MoveDown ();
-				processColdKeyListView.MoveDown ();
-				processHotKeyListView.MoveDown ();
-			}
-
-			processColdKeyListView.ColorScheme = Colors.TopLevel;
-			Win.Add (processColdKeyListView);
-		}
-	}
+        void KeyDownPressUp (Key args, string updown)
+        {
+            // BUGBUG: KeyEvent.ToString is badly broken
+            var msg = $"Key{updown,-7}: {args}";
+            keyEventlist.Add (msg);
+            keyEventListView.MoveDown ();
+            onKeyPressedListView.MoveDown ();
+            onInvokingKeyBindingsListView.MoveDown ();
+        }
+    }
 }

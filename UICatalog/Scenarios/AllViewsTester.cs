@@ -1,438 +1,554 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "All Views Tester", Description: "Provides a test UI for all classes derived from View.")]
-	[ScenarioCategory ("Layout")]
-	[ScenarioCategory ("Tests")]
-	[ScenarioCategory ("Top Level Windows")]
-	public class AllViewsTester : Scenario {
-		FrameView _leftPane;
-		ListView _classListView;
-		FrameView _hostPane;
+namespace UICatalog.Scenarios;
 
-		Dictionary<string, Type> _viewClasses;
-		View _curView = null;
+[ScenarioMetadata ("All Views Tester", "Provides a test UI for all classes derived from View.")]
+[ScenarioCategory ("Layout")]
+[ScenarioCategory ("Tests")]
+[ScenarioCategory ("Top Level Windows")]
+public class AllViewsTester : Scenario
+{
+    private readonly List<string> _dimNames = new () { "Auto", "Percent", "Fill", "Absolute" };
 
-		// Settings
-		FrameView _settingsPane;
-		CheckBox _computedCheckBox;
-		FrameView _locationFrame;
-		RadioGroup _xRadioGroup;
-		TextField _xText;
-		int _xVal = 0;
-		RadioGroup _yRadioGroup;
-		TextField _yText;
-		int _yVal = 0;
+    // TODO: This is missing some
+    private readonly List<string> _posNames = new () { "Percent", "AnchorEnd", "Center", "Absolute" };
+    private ListView _classListView;
+    private View _curView;
+    private FrameView _hostPane;
+    private AdornmentsEditor _adornmentsEditor;
+    private RadioGroup _hRadioGroup;
+    private TextField _hText;
+    private int _hVal;
+    private FrameView _leftPane;
+    private FrameView _locationFrame;
 
-		FrameView _sizeFrame;
-		RadioGroup _wRadioGroup;
-		TextField _wText;
-		int _wVal = 0;
-		RadioGroup _hRadioGroup;
-		TextField _hText;
-		int _hVal = 0;
+    // Settings
+    private FrameView _settingsPane;
+    private FrameView _sizeFrame;
+    private Dictionary<string, Type> _viewClasses;
+    private RadioGroup _wRadioGroup;
+    private TextField _wText;
+    private int _wVal;
+    private RadioGroup _xRadioGroup;
+    private TextField _xText;
+    private int _xVal;
+    private RadioGroup _yRadioGroup;
+    private TextField _yText;
+    private int _yVal;
+    private RadioGroup _orientation;
+    private string _demoText = "This, that, and the other thing.";
+    private TextView _demoTextView;
 
-		public override void Init ()
-		{
-			// Don't create a sub-win (Scenario.Win); just use Application.Top
-			Application.Init ();
-			ConfigurationManager.Themes.Theme = Theme;
-			ConfigurationManager.Apply ();
-			Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
-		}
+    public override void Main ()
+    {
+        // Don't create a sub-win (Scenario.Win); just use Application.Top
+        Application.Init ();
+        ConfigurationManager.Apply ();
 
-		public override void Setup ()
-		{
-			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-				new StatusItem(Key.F2, "~F2~ Toggle Frame Ruler", () => {
-					ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
-					Application.Top.SetNeedsDisplay ();
-				}),
-				new StatusItem(Key.F3, "~F3~ Toggle Frame Padding", () => {
-					ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
-					Application.Top.SetNeedsDisplay ();
-				}),
-			});
-			Application.Top.Add (statusBar);
+        var app = new Window
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            ColorScheme = Colors.ColorSchemes ["TopLevel"]
+        };
 
-			_viewClasses = GetAllViewClassesCollection ()
-				.OrderBy (t => t.Name)
-				.Select (t => new KeyValuePair<string, Type> (t.Name, t))
-				.ToDictionary (t => t.Key, t => t.Value);
+        _viewClasses = GetAllViewClassesCollection ()
+                       .OrderBy (t => t.Name)
+                       .Select (t => new KeyValuePair<string, Type> (t.Name, t))
+                       .ToDictionary (t => t.Key, t => t.Value);
 
-			_leftPane = new FrameView ("Classes") {
-				X = 0,
-				Y = 0,
-				Width = 15,
-				Height = Dim.Fill (1), // for status bar
-				CanFocus = false,
-				ColorScheme = Colors.TopLevel,
-			};
+        _leftPane = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Auto (DimAutoStyle.Content),
+            Height = Dim.Fill (),
+            CanFocus = false,
+            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            Title = "Classes"
+        };
 
-			_classListView = new ListView (_viewClasses.Keys.ToList ()) {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (0),
-				Height = Dim.Fill (0),
-				AllowsMarking = false,
-				ColorScheme = Colors.TopLevel,
-				SelectedItem = 0
-			};
-			_classListView.OpenSelectedItem += (s, a) => {
-				_settingsPane.SetFocus ();
-			};
-			_classListView.SelectedItemChanged += (s,args) => {
-				// Remove existing class, if any
-				if (_curView != null) {
-					_curView.LayoutComplete -= LayoutCompleteHandler;
-					_hostPane.Remove (_curView);
-					_curView.Dispose ();
-					_curView = null;
-					_hostPane.Clear ();
-				}
-				_curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
-			};
-			_leftPane.Add (_classListView);
+        _classListView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Auto (),
+            Height = Dim.Fill (),
+            AllowsMarking = false,
+            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            SelectedItem = 0,
+            Source = new ListWrapper<string> (new (_viewClasses.Keys.ToList ()))
+        };
+        _classListView.OpenSelectedItem += (s, a) => { _settingsPane.SetFocus (); };
 
-			_settingsPane = new FrameView ("Settings") {
-				X = Pos.Right (_leftPane),
-				Y = 0, // for menu
-				Width = Dim.Fill (),
-				Height = 10,
-				CanFocus = false,
-				ColorScheme = Colors.TopLevel,
-			};
-			_computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
-			_computedCheckBox.Toggled += (s,e) => {
-				if (_curView != null) {
-					_curView.LayoutStyle = e.OldValue == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
-					_hostPane.LayoutSubviews ();
-				}
-			};
-			_settingsPane.Add (_computedCheckBox);
+        _classListView.SelectedItemChanged += (s, args) =>
+                                              {
+                                                  // Remove existing class, if any
+                                                  if (_curView != null)
+                                                  {
+                                                      _curView.LayoutComplete -= LayoutCompleteHandler;
+                                                      _hostPane.Remove (_curView);
+                                                      _curView.Dispose ();
+                                                      _curView = null;
+                                                      _hostPane.Clear ();
+                                                  }
 
-			var radioItems = new string [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
-			_locationFrame = new FrameView ("Location (Pos)") {
-				X = Pos.Left (_computedCheckBox),
-				Y = Pos.Bottom (_computedCheckBox),
-				Height = 3 + radioItems.Length,
-				Width = 36,
-			};
-			_settingsPane.Add (_locationFrame);
+                                                  _curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
+                                              };
+        _leftPane.Add (_classListView);
 
-			var label = new Label ("x:") { X = 0, Y = 0 };
-			_locationFrame.Add (label);
-			_xRadioGroup = new RadioGroup (radioItems) {
-				X = 0,
-				Y = Pos.Bottom (label),
-			};
-			_xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
-			_xText = new TextField ($"{_xVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_xText.TextChanged += (s, args) => {
-				try {
-					_xVal = int.Parse (_xText.Text);
-					DimPosChanged (_curView);
-				} catch {
+        _adornmentsEditor = new ()
+        {
+            X = Pos.Right (_leftPane),
+            Y = 0,
+            Width = Dim.Auto (),
+            Height = Dim.Fill (),
+            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            BorderStyle = LineStyle.Single
+        };
 
-				}
-			};
-			_locationFrame.Add (_xText);
+        var expandButton = new ExpanderButton
+        {
+            CanFocus = false,
+            Orientation = Orientation.Horizontal
+        };
+        _adornmentsEditor.Border.Add (expandButton);
 
-			_locationFrame.Add (_xRadioGroup);
+        _settingsPane = new ()
+        {
+            X = Pos.Right (_adornmentsEditor),
+            Y = 0, // for menu
+            Width = Dim.Fill (),
+            Height = Dim.Auto (),
+            CanFocus = false,
+            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            Title = "Settings"
+        };
 
-			radioItems = new string [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
-			label = new Label ("y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
-			_locationFrame.Add (label);
-			_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_yText.TextChanged += (s,args) => {
-				try {
-					_yVal = int.Parse (_yText.Text);
-					DimPosChanged (_curView);
-				} catch {
+        string [] radioItems = { "_Percent(x)", "_AnchorEnd", "_Center", "A_bsolute(x)" };
 
-				}
-			};
-			_locationFrame.Add (_yText);
-			_yRadioGroup = new RadioGroup (radioItems) {
-				X = Pos.X (label),
-				Y = Pos.Bottom (label),
-			};
-			_yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
-			_locationFrame.Add (_yRadioGroup);
+        _locationFrame = new ()
+        {
+            X = 0,
+            Y = 0,
+            Height = Dim.Auto (),
+            Width = Dim.Auto (),
+            Title = "Location (Pos)"
+        };
+        _settingsPane.Add (_locationFrame);
 
-			_sizeFrame = new FrameView ("Size (Dim)") {
-				X = Pos.Right (_locationFrame),
-				Y = Pos.Y (_locationFrame),
-				Height = 3 + radioItems.Length,
-				Width = 40,
-			};
+        var label = new Label { X = 0, Y = 0, Text = "X:" };
+        _locationFrame.Add (label);
+        _xRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _xText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
 
-			radioItems = new string [] { "Percent(width)", "Fill(width)", "Sized(width)" };
-			label = new Label ("width:") { X = 0, Y = 0 };
-			_sizeFrame.Add (label);
-			_wRadioGroup = new RadioGroup (radioItems) {
-				X = 0,
-				Y = Pos.Bottom (label),
-			};
-			_wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
-			_wText = new TextField ($"{_wVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_wText.TextChanged += (s,args) => {
-				try {
-					switch (_wRadioGroup.SelectedItem) {
-					case 0:
-						_wVal = Math.Min (int.Parse (_wText.Text), 100);
-						break;
-					case 1:
-					case 2:
-						_wVal = int.Parse (_wText.Text);
-						break;
-					}
-					DimPosChanged (_curView);
-				} catch {
+        _xText.Accept += (s, args) =>
+                         {
+                             try
+                             {
+                                 _xVal = int.Parse (_xText.Text);
+                                 DimPosChanged (_curView);
+                             }
+                             catch
+                             { }
+                         };
+        _locationFrame.Add (_xText);
 
-				}
-			};
-			_sizeFrame.Add (_wText);
-			_sizeFrame.Add (_wRadioGroup);
+        _locationFrame.Add (_xRadioGroup);
 
-			radioItems = new string [] { "Percent(height)", "Fill(height)", "Sized(height)" };
-			label = new Label ("height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
-			_sizeFrame.Add (label);
-			_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_hText.TextChanged += (s, args) => {
-				try {
-					switch (_hRadioGroup.SelectedItem) {
-					case 0:
-						_hVal = Math.Min (int.Parse (_hText.Text), 100);
-						break;
-					case 1:
-					case 2:
-						_hVal = int.Parse (_hText.Text);
-						break;
-					}
-					DimPosChanged (_curView);
-				} catch {
+        radioItems = new [] { "P_ercent(y)", "A_nchorEnd", "C_enter", "Absolute(_y)" };
+        label = new () { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "Y:" };
+        _locationFrame.Add (label);
+        _yText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
 
-				}
-			};
-			_sizeFrame.Add (_hText);
+        _yText.Accept += (s, args) =>
+                         {
+                             try
+                             {
+                                 _yVal = int.Parse (_yText.Text);
+                                 DimPosChanged (_curView);
+                             }
+                             catch
+                             { }
+                         };
+        _locationFrame.Add (_yText);
+        _yRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _locationFrame.Add (_yRadioGroup);
 
-			_hRadioGroup = new RadioGroup (radioItems) {
-				X = Pos.X (label),
-				Y = Pos.Bottom (label),
-			};
-			_hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
-			_sizeFrame.Add (_hRadioGroup);
+        _sizeFrame = new ()
+        {
+            X = Pos.Right (_locationFrame),
+            Y = Pos.Y (_locationFrame),
+            Height = Dim.Auto (),
+            Width = Dim.Auto (),
+            Title = "Size (Dim)"
+        };
 
-			_settingsPane.Add (_sizeFrame);
+        radioItems = new [] { "Auto", "_Percent(width)", "_Fill(width)", "A_bsolute(width)" };
+        label = new () { X = 0, Y = 0, Text = "Width:" };
+        _sizeFrame.Add (label);
+        _wRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
 
-			_hostPane = new FrameView ("") {
-				X = Pos.Right (_leftPane),
-				Y = Pos.Bottom (_settingsPane),
-				Width = Dim.Fill (),
-				Height = Dim.Fill (1), // + 1 for status bar
-				ColorScheme = Colors.Dialog,
-			};
+        _wText.Accept += (s, args) =>
+                         {
+                             try
+                             {
+                                 switch (_wRadioGroup.SelectedItem)
+                                 {
+                                     case 1:
+                                         _wVal = Math.Min (int.Parse (_wText.Text), 100);
 
-			Application.Top.Add (_leftPane, _settingsPane, _hostPane);
+                                         break;
+                                     case 0:
+                                     case 2:
+                                     case 3:
+                                         _wVal = int.Parse (_wText.Text);
 
-			_curView = CreateClass (_viewClasses.First ().Value);
-		}
+                                         break;
+                                 }
 
-		void DimPosChanged (View view)
-		{
-			if (view == null) {
-				return;
-			}
+                                 DimPosChanged (_curView);
+                             }
+                             catch
+                             { }
+                         };
+        _sizeFrame.Add (_wText);
+        _sizeFrame.Add (_wRadioGroup);
 
-			var layout = view.LayoutStyle;
+        radioItems = new [] { "_Auto", "P_ercent(height)", "F_ill(height)", "Ab_solute(height)" };
+        label = new () { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "Height:" };
+        _sizeFrame.Add (label);
+        _hText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
 
-			try {
-				view.LayoutStyle = LayoutStyle.Absolute;
+        _hText.Accept += (s, args) =>
+                         {
+                             try
+                             {
+                                 switch (_hRadioGroup.SelectedItem)
+                                 {
+                                     case 1:
+                                         _hVal = Math.Min (int.Parse (_hText.Text), 100);
 
-				switch (_xRadioGroup.SelectedItem) {
-				case 0:
-					view.X = Pos.Percent (_xVal);
-					break;
-				case 1:
-					view.X = Pos.AnchorEnd (_xVal);
-					break;
-				case 2:
-					view.X = Pos.Center ();
-					break;
-				case 3:
-					view.X = Pos.At (_xVal);
-					break;
-				}
+                                         break;
+                                     case 0:
+                                     case 2:
+                                     case 3:
+                                         _hVal = int.Parse (_hText.Text);
 
-				switch (_yRadioGroup.SelectedItem) {
-				case 0:
-					view.Y = Pos.Percent (_yVal);
-					break;
-				case 1:
-					view.Y = Pos.AnchorEnd (_yVal);
-					break;
-				case 2:
-					view.Y = Pos.Center ();
-					break;
-				case 3:
-					view.Y = Pos.At (_yVal);
-					break;
-				}
+                                         break;
+                                 }
 
-				switch (_wRadioGroup.SelectedItem) {
-				case 0:
-					view.Width = Dim.Percent (_wVal);
-					break;
-				case 1:
-					view.Width = Dim.Fill (_wVal);
-					break;
-				case 2:
-					view.Width = Dim.Sized (_wVal);
-					break;
-				}
+                                 DimPosChanged (_curView);
+                             }
+                             catch
+                             { }
+                         };
+        _sizeFrame.Add (_hText);
 
-				switch (_hRadioGroup.SelectedItem) {
-				case 0:
-					view.Height = Dim.Percent (_hVal);
-					break;
-				case 1:
-					view.Height = Dim.Fill (_hVal);
-					break;
-				case 2:
-					view.Height = Dim.Sized (_hVal);
-					break;
-				}
-			} catch (Exception e) {
-				MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
-			} finally {
-				view.LayoutStyle = layout;
-			}
-			UpdateTitle (view);
-		}
+        _hRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _sizeFrame.Add (_hRadioGroup);
 
-		List<string> posNames = new List<String> { "Factor", "AnchorEnd", "Center", "Absolute" };
-		List<string> dimNames = new List<String> { "Factor", "Fill", "Absolute" };
+        _settingsPane.Add (_sizeFrame);
 
-		void UpdateSettings (View view)
-		{
-			var x = view.X.ToString ();
-			var y = view.Y.ToString ();
-			_xRadioGroup.SelectedItem = posNames.IndexOf (posNames.Where (s => x.Contains (s)).First ());
-			_yRadioGroup.SelectedItem = posNames.IndexOf (posNames.Where (s => y.Contains (s)).First ());
-			_xText.Text = $"{view.Frame.X}";
-			_yText.Text = $"{view.Frame.Y}";
+        label = new () { X = 0, Y = Pos.Bottom (_sizeFrame), Text = "_Orientation:" };
 
-			var w = view.Width.ToString ();
-			var h = view.Height.ToString ();
-			_wRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.Where (s => w.Contains (s)).First ());
-			_hRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.Where (s => h.Contains (s)).First ());
-			_wText.Text = $"{view.Frame.Width}";
-			_hText.Text = $"{view.Frame.Height}";
-		}
+        _orientation = new ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            RadioLabels = new [] { "Horizontal", "Vertical" },
+            Orientation = Orientation.Horizontal
+        };
 
-		void UpdateTitle (View view)
-		{
-			_hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}";
-		}
+        _orientation.SelectedItemChanged += (s, selected) =>
+                                            {
+                                                if (_curView?.GetType ().GetProperty ("Orientation") is { } prop)
+                                                {
+                                                    prop.GetSetMethod ()?.Invoke (_curView, new object [] { _orientation.SelectedItem });
+                                                }
+                                            };
+        _settingsPane.Add (label, _orientation);
 
-		List<Type> GetAllViewClassesCollection ()
-		{
-			List<Type> types = new List<Type> ();
-			foreach (Type type in typeof (View).Assembly.GetTypes ()
-			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))) {
-				types.Add (type);
-			}
-			types.Add (typeof (View));
-			return types;
-		}
-		
+        label = new () { X = 0, Y = Pos.Bottom (_orientation), Text = "_Text:" };
 
-		View CreateClass (Type type)
-		{
-			// If we are to create a generic Type
-			if (type.IsGenericType) {
+        _demoTextView = new ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Width = Dim.Fill (),
+            Height = Dim.Auto (minimumContentDim: 2),
+            Text = _demoText
+        };
 
-				// For each of the <T> arguments
-				List<Type> typeArguments = new List<Type> ();
+        _demoTextView.ContentsChanged += (s, e) =>
+                                         {
+                                             _demoText = _demoTextView.Text;
 
-				// use <object>
-				foreach (var arg in type.GetGenericArguments ()) {
-					typeArguments.Add (typeof (object));
-				}
+                                             if (_curView is { })
+                                             {
+                                                 _curView.Text = _demoText;
+                                             }
+                                         };
 
-				// And change what type we are instantiating from MyClass<T> to MyClass<object>
-				type = type.MakeGenericType (typeArguments.ToArray ());
-			}
-			// Instantiate view
-			var view = (View)Activator.CreateInstance (type);
+        _settingsPane.Add (label, _demoTextView);
 
-			//_curView.X = Pos.Center ();
-			//_curView.Y = Pos.Center ();
-			view.Width = Dim.Percent (75);
-			view.Height = Dim.Percent (75);
+        _hostPane = new ()
+        {
+            X = Pos.Right (_adornmentsEditor),
+            Y = Pos.Bottom (_settingsPane),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (), // + 1 for status bar
+            ColorScheme = Colors.ColorSchemes ["Dialog"]
+        };
 
-			// Set the colorscheme to make it stand out if is null by default
-			if (view.ColorScheme == null) {
-				view.ColorScheme = Colors.Base;
-			}
+        app.Add (_leftPane, _adornmentsEditor, _settingsPane, _hostPane);
 
-			// If the view supports a Text property, set it so we have something to look at
-			if (view.GetType ().GetProperty ("Text") != null) {
-				try {
-					view.GetType ().GetProperty ("Text")?.GetSetMethod ()?.Invoke (view, new [] { "Test Text" });
-				} catch (TargetInvocationException e) {
-					MessageBox.ErrorQuery ("Exception", e.InnerException.Message, "Ok");
-					view = null;
-				}
-			}
+        _classListView.SelectedItem = 0;
 
-			// If the view supports a Title property, set it so we have something to look at
-			if (view != null && view.GetType ().GetProperty ("Title") != null) {
-				if (view.GetType ().GetProperty ("Title").PropertyType == typeof (string)) {
-					view?.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (view, new [] { "Test Title" });
-				} else {
-					view?.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (view, new [] { "Test Title" });
-				}
-			}
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
+    }
 
-			// If the view supports a Source property, set it so we have something to look at
-			if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType ().GetProperty ("Source").PropertyType == typeof (Terminal.Gui.IListDataSource)) {
-				var source = new ListWrapper (new List<string> () { "Test Text #1", "Test Text #2", "Test Text #3" });
-				view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
-			}
+    // TODO: Add Command.HotKey handler (pop a message box?)
+    private View CreateClass (Type type)
+    {
+        // If we are to create a generic Type
+        if (type.IsGenericType)
+        {
+            // For each of the <T> arguments
+            List<Type> typeArguments = new ();
 
-			// Set Settings
-			_computedCheckBox.Checked = view.LayoutStyle == LayoutStyle.Computed;
+            // use <object>
+            foreach (Type arg in type.GetGenericArguments ())
+            {
+                typeArguments.Add (typeof (object));
+            }
 
-			// Add
-			_hostPane.Add (view);
-			_hostPane.Clear ();
-			_hostPane.SetNeedsDisplay ();
-			UpdateSettings (view);
-			UpdateTitle (view);
+            // And change what type we are instantiating from MyClass<T> to MyClass<object>
+            type = type.MakeGenericType (typeArguments.ToArray ());
+        }
 
-			view.LayoutComplete += LayoutCompleteHandler;
+        // Instantiate view
+        var view = (View)Activator.CreateInstance (type);
 
-			return view;
-		}
+        // Set the colorscheme to make it stand out if is null by default
+        if (view.ColorScheme == null)
+        {
+            view.ColorScheme = Colors.ColorSchemes ["Base"];
+        }
 
-		void LayoutCompleteHandler (object sender, LayoutEventArgs args)
-		{
-			UpdateTitle (_curView);
-		}
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign (ref _demoText);
+        }
+        else
+        {
+            view.Text = _demoText;
+            view.Title = "_Test Title";
+        }
 
-		private void Quit ()
-		{
-			Application.RequestStop ();
-		}
-	}
+        // TODO: Add IOrientation so this doesn't require reflection
+        // If the view supports a Title property, set it so we have something to look at
+        if (view?.GetType ().GetProperty ("Orientation") is { } prop)
+        {
+            _orientation.SelectedItem = (int)prop.GetGetMethod ()!.Invoke (view, null)!;
+            _orientation.Enabled = true;
+        }
+        else
+        {
+            _orientation.Enabled = false;
+        }
+
+        view.Initialized += View_Initialized;
+
+        // Add
+        _hostPane.Add (view);
+        _hostPane.SetNeedsDisplay ();
+
+        return view;
+    }
+
+    private void DimPosChanged (View view)
+    {
+        if (view == null)
+        {
+            return;
+        }
+
+        try
+        {
+            view.X = _xRadioGroup.SelectedItem switch
+                     {
+                         0 => Pos.Percent (_xVal),
+                         1 => Pos.AnchorEnd (),
+                         2 => Pos.Center (),
+                         3 => Pos.Absolute (_xVal),
+                         _ => view.X
+                     };
+
+            view.Y = _yRadioGroup.SelectedItem switch
+                     {
+                         0 => Pos.Percent (_yVal),
+                         1 => Pos.AnchorEnd (),
+                         2 => Pos.Center (),
+                         3 => Pos.Absolute (_yVal),
+                         _ => view.Y
+                     };
+
+            view.Width = _wRadioGroup.SelectedItem switch
+                         {
+                             0 => Dim.Auto (),
+                             1 => Dim.Percent (_wVal),
+                             2 => Dim.Fill (_wVal),
+                             3 => Dim.Absolute (_wVal),
+                             _ => view.Width
+                         };
+
+            view.Height = _hRadioGroup.SelectedItem switch
+                          {
+                              0 => Dim.Auto (),
+                              1 => Dim.Percent (_hVal),
+                              2 => Dim.Fill (_hVal),
+                              3 => Dim.Absolute (_hVal),
+                              _ => view.Height
+                          };
+        }
+        catch (Exception e)
+        {
+            MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
+        }
+
+        if (view.Width is DimAuto)
+        {
+            _wText.Text = "Auto";
+            _wText.Enabled = false;
+        }
+        else
+        {
+            _wText.Text = $"{_wVal}";
+            _wText.Enabled = true;
+        }
+
+        if (view.Height is DimAuto)
+        {
+            _hText.Text = "Auto";
+            _hText.Enabled = false;
+        }
+        else
+        {
+            _hText.Text = $"{_hVal}";
+            _hText.Enabled = true;
+        }
+
+        UpdateTitle (view);
+    }
+
+    private List<Type> GetAllViewClassesCollection ()
+    {
+        List<Type> types = new ();
+
+        foreach (Type type in typeof (View).Assembly.GetTypes ()
+                                           .Where (
+                                                   myType =>
+                                                       myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View))
+                                                  ))
+        {
+            types.Add (type);
+        }
+
+        types.Add (typeof (View));
+
+        return types;
+    }
+
+    private void LayoutCompleteHandler (object sender, LayoutEventArgs args)
+    {
+        UpdateSettings (_curView);
+        UpdateTitle (_curView);
+    }
+
+    private void Quit () { Application.RequestStop (); }
+
+    private void UpdateSettings (View view)
+    {
+        _adornmentsEditor.ViewToEdit = view;
+
+        var x = view.X.ToString ();
+        var y = view.Y.ToString ();
+
+        try
+        {
+            _xRadioGroup.SelectedItem = _posNames.IndexOf (_posNames.First (s => x.Contains (s)));
+            _yRadioGroup.SelectedItem = _posNames.IndexOf (_posNames.First (s => y.Contains (s)));
+        }
+        catch (InvalidOperationException e)
+        {
+            // This is a hack to work around the fact that the Pos enum doesn't have an "Align" value yet
+            Debug.WriteLine($"{e}");
+        }
+
+        _xText.Text = $"{view.Frame.X}";
+        _yText.Text = $"{view.Frame.Y}";
+
+        var w = view.Width.ToString ();
+        var h = view.Height.ToString ();
+        _wRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => w.Contains (s)));
+        _hRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => h.Contains (s)));
+
+        if (view.Width is DimAuto)
+        {
+            _wText.Text = "Auto";
+            _wText.Enabled = false;
+        }
+        else
+        {
+            _wText.Text = "100";
+            _wText.Enabled = true;
+        }
+
+        if (view.Height is DimAuto)
+        {
+            _hText.Text = "Auto";
+            _hText.Enabled = false;
+        }
+        else
+        {
+            _hText.Text = "100";
+            _hText.Enabled = true;
+        }
+    }
+
+    private void UpdateTitle (View view) { _hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}"; }
+
+    private void View_Initialized (object sender, EventArgs e)
+    {
+        if (sender is not View view)
+        {
+            return;
+        }
+
+        if (view.Width is not DimAuto && (view.Width is null || view.Frame.Width == 0))
+        {
+            view.Width = Dim.Fill ();
+        }
+
+        if (view.Height is not DimAuto && (view.Height is null || view.Frame.Height == 0))
+        {
+            view.Height = Dim.Fill ();
+        }
+
+        UpdateSettings (view);
+        UpdateTitle (view);
+    }
 }

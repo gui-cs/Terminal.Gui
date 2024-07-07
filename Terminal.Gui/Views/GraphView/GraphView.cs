@@ -1,333 +1,348 @@
-﻿using System.Text;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿#nullable enable
+namespace Terminal.Gui;
 
-namespace Terminal.Gui {
+/// <summary>View for rendering graphs (bar, scatter, etc...).</summary>
+public class GraphView : View
+{
+    /// <summary>Creates a new graph with a 1 to 1 graph space with absolute layout.</summary>
+    public GraphView ()
+    {
+        CanFocus = true;
 
-	/// <summary>
-	/// Control for rendering graphs (bar, scatter etc)
-	/// </summary>
-	public class GraphView : View {
+        AxisX = new HorizontalAxis ();
+        AxisY = new VerticalAxis ();
 
-		/// <summary>
-		/// Horizontal axis
-		/// </summary>
-		/// <value></value>
-		public HorizontalAxis AxisX { get; set; }
+        // Things this view knows how to do
+        AddCommand (
+                    Command.ScrollUp,
+                    () =>
+                    {
+                        Scroll (0, CellSize.Y);
 
-		/// <summary>
-		/// Vertical axis
-		/// </summary>
-		/// <value></value>
-		public VerticalAxis AxisY { get; set; }
+                        return true;
+                    }
+                   );
 
-		/// <summary>
-		/// Collection of data series that are rendered in the graph
-		/// </summary>
-		public List<ISeries> Series { get; } = new List<ISeries> ();
+        AddCommand (
+                    Command.ScrollDown,
+                    () =>
+                    {
+                        Scroll (0, -CellSize.Y);
 
-		/// <summary>
-		/// Elements drawn into graph after series have been drawn e.g. Legends etc
-		/// </summary>
-		public List<IAnnotation> Annotations { get; } = new List<IAnnotation> ();
+                        return true;
+                    }
+                   );
 
-		/// <summary>
-		/// Amount of space to leave on left of control.  Graph content (<see cref="Series"/>)
-		/// will not be rendered in margins but axis labels may be
-		/// </summary>
-		public uint MarginLeft { get; set; }
+        AddCommand (
+                    Command.ScrollRight,
+                    () =>
+                    {
+                        Scroll (CellSize.X, 0);
 
-		/// <summary>
-		/// Amount of space to leave on bottom of control.  Graph content (<see cref="Series"/>)
-		/// will not be rendered in margins but axis labels may be
-		/// </summary>
-		public uint MarginBottom { get; set; }
+                        return true;
+                    }
+                   );
 
-		/// <summary>
-		/// The graph space position of the bottom left of the control.
-		/// Changing this scrolls the viewport around in the graph
-		/// </summary>
-		/// <value></value>
-		public PointF ScrollOffset { get; set; } = new PointF (0, 0);
+        AddCommand (
+                    Command.ScrollLeft,
+                    () =>
+                    {
+                        Scroll (-CellSize.X, 0);
 
-		/// <summary>
-		/// Translates console width/height into graph space. Defaults
-		/// to 1 row/col of console space being 1 unit of graph space. 
-		/// </summary>
-		/// <returns></returns>
-		public PointF CellSize { get; set; } = new PointF (1, 1);
+                        return true;
+                    }
+                   );
 
-		/// <summary>
-		/// The color of the background of the graph and axis/labels
-		/// </summary>
-		public Attribute? GraphColor { get; set; }
+        AddCommand (
+                    Command.PageUp,
+                    () =>
+                    {
+                        PageUp ();
 
-		/// <summary>
-		/// Creates a new graph with a 1 to 1 graph space with absolute layout
-		/// </summary>
-		public GraphView ()
-		{
-			CanFocus = true;
+                        return true;
+                    }
+                   );
 
-			AxisX = new HorizontalAxis ();
-			AxisY = new VerticalAxis ();
+        AddCommand (
+                    Command.PageDown,
+                    () =>
+                    {
+                        PageDown ();
 
-			// Things this view knows how to do
-			AddCommand (Command.ScrollUp, () => { Scroll (0, CellSize.Y); return true; });
-			AddCommand (Command.ScrollDown, () => { Scroll (0, -CellSize.Y); return true; });
-			AddCommand (Command.ScrollRight, () => { Scroll (CellSize.X, 0); return true; });
-			AddCommand (Command.ScrollLeft, () => { Scroll (-CellSize.X, 0); return true; });
-			AddCommand (Command.PageUp, () => { PageUp (); return true; });
-			AddCommand (Command.PageDown, () => { PageDown (); return true; });
+                        return true;
+                    }
+                   );
 
-			AddKeyBinding (Key.CursorRight, Command.ScrollRight);
-			AddKeyBinding (Key.CursorLeft, Command.ScrollLeft);
-			AddKeyBinding (Key.CursorUp, Command.ScrollUp);
-			AddKeyBinding (Key.CursorDown, Command.ScrollDown);
+        KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
+        KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
+        KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
+        KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
 
-			// Not bound by default (preserves backwards compatibility)
-			//AddKeyBinding (Key.PageUp, Command.PageUp);
-			//AddKeyBinding (Key.PageDown, Command.PageDown);
-		}
+        // Not bound by default (preserves backwards compatibility)
+        //KeyBindings.Add (Key.PageUp, Command.PageUp);
+        //KeyBindings.Add (Key.PageDown, Command.PageDown);
+    }
 
-		/// <summary>
-		/// Clears all settings configured on the graph and resets all properties
-		/// to default values (<see cref="CellSize"/>, <see cref="ScrollOffset"/> etc) 
-		/// </summary>
-		public void Reset ()
-		{
-			ScrollOffset = new PointF (0, 0);
-			CellSize = new PointF (1, 1);
-			AxisX.Reset ();
-			AxisY.Reset ();
-			Series.Clear ();
-			Annotations.Clear ();
-			GraphColor = null;
-			SetNeedsDisplay ();
-		}
+    /// <summary>Elements drawn into graph after series have been drawn e.g. Legends etc.</summary>
+    public List<IAnnotation> Annotations { get; } = new ();
 
-		///<inheritdoc/>
-		public override void OnDrawContent (Rect contentArea)
-		{
-			if (CellSize.X == 0 || CellSize.Y == 0) {
-				throw new Exception ($"{nameof (CellSize)} cannot be 0");
-			}
+    /// <summary>Horizontal axis.</summary>
+    /// <value></value>
+    public HorizontalAxis AxisX { get; set; }
 
-			SetDriverColorToGraphColor ();
+    /// <summary>Vertical axis.</summary>
+    /// <value></value>
+    public VerticalAxis AxisY { get; set; }
 
-			Move (0, 0);
+    /// <summary>
+    ///     Translates console width/height into graph space. Defaults to 1 row/col of console space being 1 unit of graph
+    ///     space.
+    /// </summary>
+    /// <returns></returns>
+    public PointF CellSize { get; set; } = new (1, 1);
 
-			// clear all old content
-			for (int i = 0; i < Bounds.Height; i++) {
-				Move (0, i);
-				Driver.AddStr (new string (' ', Bounds.Width));
-			}
+    /// <summary>The color of the background of the graph and axis/labels.</summary>
+    public Attribute? GraphColor { get; set; }
 
-			// If there is no data do not display a graph
-			if (!Series.Any () && !Annotations.Any ()) {
-				return;
-			}
+    /// <summary>
+    ///     Amount of space to leave on bottom of the graph. Graph content (<see cref="Series"/>) will not be rendered in
+    ///     margins but axis labels may be. Use <see cref="Padding"/> to add a margin outside of the GraphView.
+    /// </summary>
+    public uint MarginBottom { get; set; }
 
-			// The drawable area of the graph (anything that isn't in the margins)
-			var graphScreenWidth = Bounds.Width - ((int)MarginLeft);
-			var graphScreenHeight = Bounds.Height - (int)MarginBottom;
+    /// <summary>
+    ///     Amount of space to leave on left of the graph. Graph content (<see cref="Series"/>) will not be rendered in
+    ///     margins but axis labels may be. Use <see cref="Padding"/> to add a margin outside of the GraphView.
+    /// </summary>
+    public uint MarginLeft { get; set; }
 
-			// if the margins take up the full draw bounds don't render
-			if (graphScreenWidth < 0 || graphScreenHeight < 0) {
-				return;
-			}
+    /// <summary>
+    ///     The graph space position of the bottom left of the graph. Changing this scrolls the viewport around in the
+    ///     graph.
+    /// </summary>
+    /// <value></value>
+    public PointF ScrollOffset { get; set; } = new (0, 0);
 
-			// Draw 'before' annotations
-			foreach (var a in Annotations.ToArray ().Where (a => a.BeforeSeries)) {
-				a.Render (this);
-			}
+    /// <summary>Collection of data series that are rendered in the graph.</summary>
+    public List<ISeries> Series { get; } = new ();
 
-			SetDriverColorToGraphColor ();
+    #region Bresenham's line algorithm
 
-			AxisY.DrawAxisLine (this);
-			AxisX.DrawAxisLine (this);
+    // https://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C.23
 
-			AxisY.DrawAxisLabels (this);
-			AxisX.DrawAxisLabels (this);
+    /// <summary>Draws a line between two points in screen space. Can be diagonals.</summary>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <param name="symbol">The symbol to use for the line</param>
+    public void DrawLine (Point start, Point end, Rune symbol)
+    {
+        if (Equals (start, end))
+        {
+            return;
+        }
 
-			// Draw a cross where the two axis cross
-			var axisIntersection = new Point (AxisY.GetAxisXPosition (this), AxisX.GetAxisYPosition (this));
+        int x0 = start.X;
+        int y0 = start.Y;
+        int x1 = end.X;
+        int y1 = end.Y;
 
-			if (AxisX.Visible && AxisY.Visible) {
-				Move (axisIntersection.X, axisIntersection.Y);
-				AddRune (axisIntersection.X, axisIntersection.Y, (Rune)'\u253C');
-			}
+        int dx = Math.Abs (x1 - x0), sx = x0 < x1 ? 1 : -1;
+        int dy = Math.Abs (y1 - y0), sy = y0 < y1 ? 1 : -1;
+        int err = (dx > dy ? dx : -dy) / 2, e2;
 
-			SetDriverColorToGraphColor ();
+        while (true)
+        {
+            AddRune (x0, y0, symbol);
 
-			Rect drawBounds = new Rect ((int)MarginLeft, 0, graphScreenWidth, graphScreenHeight);
+            if (x0 == x1 && y0 == y1)
+            {
+                break;
+            }
 
-			RectangleF graphSpace = ScreenToGraphSpace (drawBounds);
+            e2 = err;
 
-			foreach (var s in Series.ToArray ()) {
+            if (e2 > -dx)
+            {
+                err -= dy;
+                x0 += sx;
+            }
 
-				s.DrawSeries (this, drawBounds, graphSpace);
+            if (e2 < dy)
+            {
+                err += dx;
+                y0 += sy;
+            }
+        }
+    }
 
-				// If a series changes the graph color reset it
-				SetDriverColorToGraphColor ();
-			}
+    #endregion
 
-			SetDriverColorToGraphColor ();
+    /// <summary>Calculates the screen location for a given point in graph space. Bear in mind these may be off screen.</summary>
+    /// <param name="location">
+    ///     Point in graph space that may or may not be represented in the visible area of graph currently
+    ///     presented.  E.g. 0,0 for origin.
+    /// </param>
+    /// <returns>
+    ///     Screen position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note that
+    ///     this can be outside the current content area of the view.
+    /// </returns>
+    public Point GraphSpaceToScreen (PointF location)
+    {
+        return new Point (
+                          (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
 
-			// Draw 'after' annotations
-			foreach (var a in Annotations.ToArray ().Where (a => !a.BeforeSeries)) {
-				a.Render (this);
-			}
-		}
+                          // screen coordinates are top down while graph coordinates are bottom up
+                          Viewport.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
+                         );
+    }
 
-		/// <summary>
-		/// Sets the color attribute of <see cref="Application.Driver"/> to the <see cref="GraphColor"/>
-		/// (if defined) or <see cref="ColorScheme"/> otherwise.
-		/// </summary>
-		public void SetDriverColorToGraphColor ()
-		{
-			Driver.SetAttribute (GraphColor ?? (GetNormalColor ()));
-		}
+    ///<inheritdoc/>
+    public override void OnDrawContent (Rectangle viewport)
+    {
+        if (CellSize.X == 0 || CellSize.Y == 0)
+        {
+            throw new Exception ($"{nameof (CellSize)} cannot be 0");
+        }
 
-		/// <summary>
-		/// Returns the section of the graph that is represented by the given
-		/// screen position
-		/// </summary>
-		/// <param name="col"></param>
-		/// <param name="row"></param>
-		/// <returns></returns>
-		public RectangleF ScreenToGraphSpace (int col, int row)
-		{
-			return new RectangleF (
-				ScrollOffset.X + ((col - MarginLeft) * CellSize.X),
-				ScrollOffset.Y + ((Bounds.Height - (row + MarginBottom + 1)) * CellSize.Y),
-				CellSize.X, CellSize.Y);
-		}
+        SetDriverColorToGraphColor ();
 
-		/// <summary>
-		/// Returns the section of the graph that is represented by the screen area
-		/// </summary>
-		/// <param name="screenArea"></param>
-		/// <returns></returns>
-		public RectangleF ScreenToGraphSpace (Rect screenArea)
-		{
-			// get position of the bottom left
-			var pos = ScreenToGraphSpace (screenArea.Left, screenArea.Bottom - 1);
+        Move (0, 0);
 
-			return new RectangleF (pos.X, pos.Y, screenArea.Width * CellSize.X, screenArea.Height * CellSize.Y);
-		}
-		/// <summary>
-		/// Calculates the screen location for a given point in graph space.
-		/// Bear in mind these be off screen
-		/// </summary>
-		/// <param name="location">Point in graph space that may or may not be represented in the
-		/// visible area of graph currently presented.  E.g. 0,0 for origin</param>
-		/// <returns>Screen position (Column/Row) which would be used to render the graph <paramref name="location"/>.
-		/// Note that this can be outside the current client area of the control</returns>
-		public Point GraphSpaceToScreen (PointF location)
-		{
-			return new Point (
+        // clear all old content
+        for (var i = 0; i < Viewport.Height; i++)
+        {
+            Move (0, i);
+            Driver.AddStr (new string (' ', Viewport.Width));
+        }
 
-				(int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
-				 // screen coordinates are top down while graph coordinates are bottom up
-				 (Bounds.Height - 1) - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
-				);
-		}
+        // If there is no data do not display a graph
+        if (!Series.Any () && !Annotations.Any ())
+        {
+            return;
+        }
 
-		/// <inheritdoc/>
-		/// <remarks>Also ensures that cursor is invisible after entering the <see cref="GraphView"/>.</remarks>
-		public override bool OnEnter (View view)
-		{
-			Driver.SetCursorVisibility (CursorVisibility.Invisible);
-			return base.OnEnter (view);
-		}
+        // The drawable area of the graph (anything that isn't in the margins)
+        int graphScreenWidth = Viewport.Width - (int)MarginLeft;
+        int graphScreenHeight = Viewport.Height - (int)MarginBottom;
 
-		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEvent keyEvent)
-		{
-			if (HasFocus && CanFocus) {
-				var result = InvokeKeybindings (keyEvent);
-				if (result != null)
-					return (bool)result;
-			}
+        // if the margins take up the full draw bounds don't render
+        if (graphScreenWidth < 0 || graphScreenHeight < 0)
+        {
+            return;
+        }
 
-			return base.ProcessKey (keyEvent);
-		}
+        // Draw 'before' annotations
+        foreach (IAnnotation a in Annotations.ToArray ().Where (a => a.BeforeSeries))
+        {
+            a.Render (this);
+        }
 
-		/// <summary>
-		/// Scrolls the graph up 1 page
-		/// </summary>
-		public void PageUp ()
-		{
-			Scroll (0, CellSize.Y * Bounds.Height);
-		}
+        SetDriverColorToGraphColor ();
 
-		/// <summary>
-		/// Scrolls the graph down 1 page
-		/// </summary>
-		public void PageDown ()
-		{
-			Scroll (0, -1 * CellSize.Y * Bounds.Height);
-		}
-		/// <summary>
-		/// Scrolls the view by a given number of units in graph space.
-		/// See <see cref="CellSize"/> to translate this into rows/cols
-		/// </summary>
-		/// <param name="offsetX"></param>
-		/// <param name="offsetY"></param>
-		public void Scroll (float offsetX, float offsetY)
-		{
-			ScrollOffset = new PointF (
-				ScrollOffset.X + offsetX,
-				ScrollOffset.Y + offsetY);
+        AxisY.DrawAxisLine (this);
+        AxisX.DrawAxisLine (this);
 
-			SetNeedsDisplay ();
-		}
+        AxisY.DrawAxisLabels (this);
+        AxisX.DrawAxisLabels (this);
 
-		#region Bresenham's line algorithm
-		// https://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C.23
+        // Draw a cross where the two axis cross
+        var axisIntersection = new Point (AxisY.GetAxisXPosition (this), AxisX.GetAxisYPosition (this));
 
-		int ipart (decimal x) { return (int)x; }
+        if (AxisX.Visible && AxisY.Visible)
+        {
+            Move (axisIntersection.X, axisIntersection.Y);
+            AddRune (axisIntersection.X, axisIntersection.Y, (Rune)'\u253C');
+        }
 
-		decimal fpart (decimal x)
-		{
-			if (x < 0) return (1 - (x - Math.Floor (x)));
-			return (x - Math.Floor (x));
-		}
+        SetDriverColorToGraphColor ();
 
-		/// <summary>
-		/// Draws a line between two points in screen space.  Can be diagonals.
-		/// </summary>
-		/// <param name="start"></param>
-		/// <param name="end"></param>
-		/// <param name="symbol">The symbol to use for the line</param>
-		public void DrawLine (Point start, Point end, Rune symbol)
-		{
-			if (Equals (start, end)) {
-				return;
-			}
+        var drawBounds = new Rectangle ((int)MarginLeft, 0, graphScreenWidth, graphScreenHeight);
 
-			int x0 = start.X;
-			int y0 = start.Y;
-			int x1 = end.X;
-			int y1 = end.Y;
+        RectangleF graphSpace = ScreenToGraphSpace (drawBounds);
 
-			int dx = Math.Abs (x1 - x0), sx = x0 < x1 ? 1 : -1;
-			int dy = Math.Abs (y1 - y0), sy = y0 < y1 ? 1 : -1;
-			int err = (dx > dy ? dx : -dy) / 2, e2;
+        foreach (ISeries s in Series.ToArray ())
+        {
+            s.DrawSeries (this, drawBounds, graphSpace);
 
-			while (true) {
+            // If a series changes the graph color reset it
+            SetDriverColorToGraphColor ();
+        }
 
-				AddRune (x0, y0, symbol);
+        SetDriverColorToGraphColor ();
 
-				if (x0 == x1 && y0 == y1) break;
-				e2 = err;
-				if (e2 > -dx) { err -= dy; x0 += sx; }
-				if (e2 < dy) { err += dx; y0 += sy; }
-			}
-		}
+        // Draw 'after' annotations
+        foreach (IAnnotation a in Annotations.ToArray ().Where (a => !a.BeforeSeries))
+        {
+            a.Render (this);
+        }
+    }
 
-		#endregion
-	}
+    /// <summary>Scrolls the graph down 1 page.</summary>
+    public void PageDown () { Scroll (0, -1 * CellSize.Y * Viewport.Height); }
+
+    /// <summary>Scrolls the graph up 1 page.</summary>
+    public void PageUp () { Scroll (0, CellSize.Y * Viewport.Height); }
+
+    /// <summary>
+    ///     Clears all settings configured on the graph and resets all properties to default values (
+    ///     <see cref="CellSize"/>, <see cref="ScrollOffset"/> etc) .
+    /// </summary>
+    public void Reset ()
+    {
+        ScrollOffset = new PointF (0, 0);
+        CellSize = new PointF (1, 1);
+        AxisX.Reset ();
+        AxisY.Reset ();
+        Series.Clear ();
+        Annotations.Clear ();
+        GraphColor = null;
+        SetNeedsDisplay ();
+    }
+
+    /// <summary>Returns the section of the graph that is represented by the given screen position.</summary>
+    /// <param name="col"></param>
+    /// <param name="row"></param>
+    /// <returns></returns>
+    public RectangleF ScreenToGraphSpace (int col, int row)
+    {
+        return new (
+                    ScrollOffset.X + (col - MarginLeft) * CellSize.X,
+                    ScrollOffset.Y + (Viewport.Height - (row + MarginBottom + 1)) * CellSize.Y,
+                    CellSize.X,
+                    CellSize.Y
+                   );
+    }
+
+    /// <summary>Returns the section of the graph that is represented by the screen area.</summary>
+    /// <param name="screenArea"></param>
+    /// <returns></returns>
+    public RectangleF ScreenToGraphSpace (Rectangle screenArea)
+    {
+        // get position of the bottom left
+        RectangleF pos = ScreenToGraphSpace (screenArea.Left, screenArea.Bottom - 1);
+
+        return pos with { Width = screenArea.Width * CellSize.X, Height = screenArea.Height * CellSize.Y };
+    }
+
+    /// <summary>
+    ///     Scrolls the view by a given number of units in graph space. See <see cref="CellSize"/> to translate this into
+    ///     rows/cols.
+    /// </summary>
+    /// <param name="offsetX"></param>
+    /// <param name="offsetY"></param>
+    public void Scroll (float offsetX, float offsetY)
+    {
+        ScrollOffset = new (
+                            ScrollOffset.X + offsetX,
+                            ScrollOffset.Y + offsetY
+                           );
+
+        SetNeedsDisplay ();
+    }
+
+    /// <summary>
+    ///     Sets the color attribute of <see cref="Application.Driver"/> to the <see cref="GraphColor"/> (if defined) or
+    ///     <see cref="ColorScheme"/> otherwise.
+    /// </summary>
+    public void SetDriverColorToGraphColor () { Driver.SetAttribute (GraphColor ?? GetNormalColor ()); }
 }

@@ -1,0 +1,3 @@
+﻿N:System.Runtime.CompilerServices
+N:System.Diagnostics.CodeAnalysis
+N:System.Numerics

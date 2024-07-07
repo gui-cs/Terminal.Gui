@@ -1,180 +1,196 @@
-﻿using Xunit;
-using Terminal.Gui;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 using static Terminal.Gui.ConfigurationManager;
-using Attribute = Terminal.Gui.Attribute;
 
-namespace Terminal.Gui.ConfigurationTests {
-	public class ThemeTests {
-		public static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions () {
-			Converters = {
-				new AttributeJsonConverter (),
-				new ColorJsonConverter ()
-				}
-		};
+namespace Terminal.Gui.ConfigurationTests;
 
-		[Fact]
-		public void TestApply_UpdatesColors ()
-		{
-			// Arrange
-			ConfigurationManager.Reset ();
+public class ThemeTests
+{
+    public static readonly JsonSerializerOptions _jsonOptions = new ()
+    {
+        Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
+    };
 
-			Assert.False (Colors.ColorSchemes.ContainsKey ("test"));
+    [Fact]
+    public void TestApply ()
+    {
+        Reset ();
 
-			var theme = new ThemeScope ();
-			Assert.NotEmpty (theme);
+        var theme = new ThemeScope ();
+        Assert.NotEmpty (theme);
 
-			Themes.Add ("testTheme", theme);
+        Themes.Add ("testTheme", theme);
 
-			var colorScheme = new ColorScheme { Normal = new Attribute (Color.Red, Color.Green) };
+        Assert.Equal (LineStyle.Single, FrameView.DefaultBorderStyle);
+        theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double; // default is Single
 
-			theme ["ColorSchemes"].PropertyValue = new Dictionary<string, ColorScheme> () {
-				{ "test",  colorScheme }
-			};
+        Themes.Theme = "testTheme";
+        Themes! [ThemeManager.SelectedTheme]!.Apply ();
 
-			Assert.Equal (Color.Red, ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Foreground);
-			Assert.Equal (Color.Green, ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Background);
+        Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
 
-			// Act
-			Themes.Theme = "testTheme";
-			Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        Reset ();
+    }
 
-			// Assert
-			var updatedScheme = Colors.ColorSchemes ["test"];
-			Assert.Equal (Color.Red, updatedScheme.Normal.Foreground);
-			Assert.Equal (Color.Green, updatedScheme.Normal.Background);
+    [Fact]
+    public void TestApply_UpdatesColors ()
+    {
+        // Arrange
+        Reset ();
 
-			// remove test ColorScheme from Colors to avoid failures on others unit tests with ColorScheme
-			Colors.ColorSchemes.Remove ("test");
-			Assert.Equal (5, Colors.ColorSchemes.Count);
-		}
+        Assert.False (Colors.ColorSchemes.ContainsKey ("test"));
 
-		[Fact]
-		public void TestApply ()
-		{
-			ConfigurationManager.Reset ();
+        var theme = new ThemeScope ();
+        Assert.NotEmpty (theme);
 
-			var theme = new ThemeScope ();
-			Assert.NotEmpty (theme);
+        Themes.Add ("testTheme", theme);
 
-			Themes.Add ("testTheme", theme);
+        var colorScheme = new ColorScheme { Normal = new Attribute (Color.Red, Color.Green) };
 
-			Assert.Equal (LineStyle.Single, FrameView.DefaultBorderStyle);
-			theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double; // default is Single
+        theme ["ColorSchemes"].PropertyValue = new Dictionary<string, ColorScheme> { { "test", colorScheme } };
 
-			Themes.Theme = "testTheme";
-			Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        Assert.Equal (
+                      new Color (Color.Red),
+                      ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Foreground
+                     );
 
-			Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
-		}
+        Assert.Equal (
+                      new Color (Color.Green),
+                      ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Background
+                     );
 
-		[Fact]
-		public void TestUpdatFrom_Change ()
-		{
-			// arrange
-			ConfigurationManager.Reset ();
+        // Act
+        Themes.Theme = "testTheme";
+        Themes! [ThemeManager.SelectedTheme]!.Apply ();
 
-			var theme = new ThemeScope ();
-			Assert.NotEmpty (theme);
+        // Assert
+        ColorScheme updatedScheme = Colors.ColorSchemes ["test"];
+        Assert.Equal (new Color (Color.Red), updatedScheme.Normal.Foreground);
+        Assert.Equal (new Color (Color.Green), updatedScheme.Normal.Background);
 
-			var colorScheme = new ColorScheme {
-				// note: ColorScheme's can't be partial; default for each attribute
-				// is always White/Black
-				Normal = new Attribute (Color.Red, Color.Green),
-				Focus = new Attribute (Color.Cyan, Color.BrightCyan),
-				HotNormal = new Attribute (Color.Brown, Color.BrightYellow),
-				HotFocus = new Attribute (Color.Green, Color.BrightGreen),
-				Disabled = new Attribute (Color.Gray, Color.DarkGray),
-			};
-			theme ["ColorSchemes"].PropertyValue = Colors.Create ();
-			((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"] = colorScheme;
+        // remove test ColorScheme from Colors to avoid failures on others unit tests with ColorScheme
+        Colors.ColorSchemes.Remove ("test");
+        Assert.Equal (5, Colors.ColorSchemes.Count);
+        Reset ();
+    }
 
-			var colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
-			Assert.Equal (colorScheme.Normal, colorSchemes ["Test"].Normal);
-			Assert.Equal (colorScheme.Focus, colorSchemes ["Test"].Focus);
+    [Fact]
+    public void TestSerialize_RoundTrip ()
+    {
+        var theme = new ThemeScope ();
+        theme ["Dialog.DefaultButtonAlignment"].PropertyValue = Alignment.End;
 
-			// Change just Normal
-			var newTheme = new ThemeScope ();
-			var newColorScheme = new ColorScheme {
-				Normal = new Attribute (Color.Blue, Color.BrightBlue),
+        string json = JsonSerializer.Serialize (theme, _jsonOptions);
 
-				Focus = colorScheme.Focus,
-				HotNormal = colorScheme.HotNormal,
-				HotFocus = colorScheme.HotFocus,
-				Disabled = colorScheme.Disabled,
-			};
-			newTheme ["ColorSchemes"].PropertyValue = Colors.Create ();
-			((Dictionary<string, ColorScheme>)newTheme ["ColorSchemes"].PropertyValue) ["test"] = newColorScheme;
+        var deserialized = JsonSerializer.Deserialize<ThemeScope> (json, _jsonOptions);
 
-			// Act
-			theme.Update (newTheme);
+        Assert.Equal (
+                      Alignment.End,
+                      (Alignment)deserialized ["Dialog.DefaultButtonAlignment"].PropertyValue
+                     );
+        Reset ();
+    }
 
-			// Assert
-			colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
-			// Normal should have changed
-			Assert.Equal (Color.Blue, colorSchemes ["Test"].Normal.Foreground);
-			Assert.Equal (Color.BrightBlue, colorSchemes ["Test"].Normal.Background);
-			Assert.Equal (Color.Cyan, colorSchemes ["Test"].Focus.Foreground);
-			Assert.Equal (Color.BrightCyan, colorSchemes ["Test"].Focus.Background);
-		}
+    [Fact]
+    public void TestUpdatFrom_Add ()
+    {
+        // arrange
+        Reset ();
 
-		[Fact]
-		public void TestUpdatFrom_Add ()
-		{
-			// arrange
-			ConfigurationManager.Reset ();
+        var theme = new ThemeScope ();
+        Assert.NotEmpty (theme);
 
-			var theme = new ThemeScope ();
-			Assert.NotEmpty (theme);
+        Assert.Equal (5, Colors.ColorSchemes.Count);
 
-			theme ["ColorSchemes"].PropertyValue = Colors.Create ();
-			var colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
-			Assert.Equal (Colors.ColorSchemes.Count, colorSchemes.Count);
+        theme ["ColorSchemes"].PropertyValue = Colors.ColorSchemes;
 
-			var newTheme = new ThemeScope ();
-			var colorScheme = new ColorScheme {
-				// note: ColorScheme's can't be partial; default for each attribute
-				// is always White/Black
-				Normal = new Attribute (Color.Red, Color.Green),
-				Focus = new Attribute (Color.Cyan, Color.BrightCyan),
-				HotNormal = new Attribute (Color.Brown, Color.BrightYellow),
-				HotFocus = new Attribute (Color.Green, Color.BrightGreen),
-				Disabled = new Attribute (Color.Gray, Color.DarkGray),
-			};
+        Dictionary<string, ColorScheme> colorSchemes =
+            (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
+        Assert.Equal (Colors.ColorSchemes.Count, colorSchemes.Count);
 
-			newTheme ["ColorSchemes"].PropertyValue = Colors.Create ();
-			// add a new ColorScheme to the newTheme
-			((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"] = colorScheme;
+        var newTheme = new ThemeScope ();
 
-			colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
-			Assert.Equal (Colors.ColorSchemes.Count + 1, colorSchemes.Count);
+        var colorScheme = new ColorScheme
+        {
+            // note: ColorScheme's can't be partial; default for each attribute
+            // is always White/Black
+            Normal = new Attribute (Color.Red, Color.Green),
+            Focus = new Attribute (Color.Cyan, Color.BrightCyan),
+            HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
+            HotFocus = new Attribute (Color.Green, Color.BrightGreen),
+            Disabled = new Attribute (Color.Gray, Color.DarkGray)
+        };
 
-			// Act
-			theme.Update (newTheme);
+        newTheme ["ColorSchemes"].PropertyValue = Colors.Reset ();
+        Assert.Equal (5, Colors.ColorSchemes.Count);
 
-			// Assert
-			colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
-			Assert.Equal (colorSchemes ["Test"].Normal, colorScheme.Normal);
-			Assert.Equal (colorSchemes ["Test"].Focus, colorScheme.Focus);
-		}
+        // add a new ColorScheme to the newTheme
+        ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"] = colorScheme;
 
-		[Fact]
-		public void TestSerialize_RoundTrip ()
-		{
-			var theme = new ThemeScope ();
-			theme ["Dialog.DefaultButtonAlignment"].PropertyValue = Dialog.ButtonAlignments.Right;
+        colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
+        Assert.Equal (Colors.ColorSchemes.Count, colorSchemes.Count);
 
-			var json = JsonSerializer.Serialize (theme, _jsonOptions);
+        // Act
+        theme.Update (newTheme);
 
-			var deserialized = JsonSerializer.Deserialize<ThemeScope> (json, _jsonOptions);
+        // Assert
+        colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
+        Assert.Equal (colorSchemes ["Test"].Normal, colorScheme.Normal);
+        Assert.Equal (colorSchemes ["Test"].Focus, colorScheme.Focus);
+        Reset ();
+    }
 
-			Assert.Equal (Dialog.ButtonAlignments.Right, (Dialog.ButtonAlignments)deserialized ["Dialog.DefaultButtonAlignment"].PropertyValue);
-		}
-	}
+    [Fact]
+    public void TestUpdatFrom_Change ()
+    {
+        // arrange
+        Reset ();
+
+        var theme = new ThemeScope ();
+        Assert.NotEmpty (theme);
+
+        var colorScheme = new ColorScheme
+        {
+            // note: ColorScheme's can't be partial; default for each attribute
+            // is always White/Black
+            Normal = new Attribute (Color.Red, Color.Green),
+            Focus = new Attribute (Color.Cyan, Color.BrightCyan),
+            HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
+            HotFocus = new Attribute (Color.Green, Color.BrightGreen),
+            Disabled = new Attribute (Color.Gray, Color.DarkGray)
+        };
+        theme ["ColorSchemes"].PropertyValue = Colors.Reset ();
+        ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"] = colorScheme;
+
+        Dictionary<string, ColorScheme> colorSchemes =
+            (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
+        Assert.Equal (colorScheme.Normal, colorSchemes ["Test"].Normal);
+        Assert.Equal (colorScheme.Focus, colorSchemes ["Test"].Focus);
+
+        // Change just Normal
+        var newTheme = new ThemeScope ();
+
+        var newColorScheme = new ColorScheme
+        {
+            Normal = new Attribute (Color.Blue, Color.BrightBlue),
+            Focus = colorScheme.Focus,
+            HotNormal = colorScheme.HotNormal,
+            HotFocus = colorScheme.HotFocus,
+            Disabled = colorScheme.Disabled
+        };
+        newTheme ["ColorSchemes"].PropertyValue = Colors.Reset ();
+        ((Dictionary<string, ColorScheme>)newTheme ["ColorSchemes"].PropertyValue) ["test"] = newColorScheme;
+
+        // Act
+        theme.Update (newTheme);
+
+        // Assert
+        colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
+
+        // Normal should have changed
+        Assert.Equal (new Color (Color.Blue), colorSchemes ["Test"].Normal.Foreground);
+        Assert.Equal (new Color (Color.BrightBlue), colorSchemes ["Test"].Normal.Background);
+        Assert.Equal (new Color (Color.Cyan), colorSchemes ["Test"].Focus.Foreground);
+        Assert.Equal (new Color (Color.BrightCyan), colorSchemes ["Test"].Focus.Background);
+        Reset ();
+    }
 }

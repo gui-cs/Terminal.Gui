@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-    <LangVersion>10.0</LangVersion>
+    <TargetFramework>net8.0</TargetFramework>
     <StartupObject>UICatalog.UICatalogApp</StartupObject>
+    <LangVersion>12</LangVersion>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- In the source tree the version will always be 2.0 for all projects. -->
     <!-- Do not modify these. -->
@@ -11,11 +11,12 @@
     <FileVersion>2.0</FileVersion>
     <Version>2.0</Version>
     <InformationalVersion>2.0</InformationalVersion>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
@@ -28,11 +29,21 @@
   <None Update="./Scenarios/Spinning_globe_dark_small.gif" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
-    <PackageReference Include="CsvHelper" Version="30.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
+    <PackageReference Include="CsvHelper" Version="32.0.2" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="System.Drawing.Rectangle" Alias="Rectangle" />
+    <Using Include="System.Drawing.RectangleF" Alias="RectangleF" />
+    <Using Include="System.Drawing.Point" Alias="Point" />
+    <Using Include="System.Drawing.PointF" Alias="PointF" />
+    <Using Include="System.Drawing.Size" Alias="Size" />
+    <Using Include="System.Drawing.SizeF" Alias="SizeF" />
   </ItemGroup>
 </Project>

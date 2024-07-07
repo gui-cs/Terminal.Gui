@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -9,392 +8,499 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
-namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Syntax Highlighting", Description: "Text editor with keyword highlighting using the TextView control.")]
-	[ScenarioCategory ("Text and Formatting")]
-	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("TextView")]
-	public class SyntaxHighlighting : Scenario {
+namespace UICatalog.Scenarios;
 
-		TextView textView;
-		MenuItem miWrap;
-		string path = "RuneCells.rce";
-		private HashSet<string> keywords = new HashSet<string> (StringComparer.CurrentCultureIgnoreCase){
+[ScenarioMetadata ("Syntax Highlighting", "Text editor with keyword highlighting using the TextView control.")]
+[ScenarioCategory ("Text and Formatting")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("TextView")]
+public class SyntaxHighlighting : Scenario
+{
+    private readonly HashSet<string> _keywords = new (StringComparer.CurrentCultureIgnoreCase)
+    {
+        "select",
+        "distinct",
+        "top",
+        "from",
+        "create",
+        "CIPHER",
+        "CLASS_ORIGIN",
+        "CLIENT",
+        "CLOSE",
+        "COALESCE",
+        "CODE",
+        "COLUMNS",
+        "COLUMN_FORMAT",
+        "COLUMN_NAME",
+        "COMMENT",
+        "COMMIT",
+        "COMPACT",
+        "COMPLETION",
+        "COMPRESSED",
+        "COMPRESSION",
+        "CONCURRENT",
+        "CONNECT",
+        "CONNECTION",
+        "CONSISTENT",
+        "CONSTRAINT_CATALOG",
+        "CONSTRAINT_SCHEMA",
+        "CONSTRAINT_NAME",
+        "CONTAINS",
+        "CONTEXT",
+        "CONTRIBUTORS",
+        "COPY",
+        "CPU",
+        "CURSOR_NAME",
+        "primary",
+        "key",
+        "insert",
+        "alter",
+        "add",
+        "update",
+        "set",
+        "delete",
+        "truncate",
+        "as",
+        "order",
+        "by",
+        "asc",
+        "desc",
+        "between",
+        "where",
+        "and",
+        "or",
+        "not",
+        "limit",
+        "null",
+        "is",
+        "drop",
+        "database",
+        "table",
+        "having",
+        "in",
+        "join",
+        "on",
+        "union",
+        "exists"
+    };
 
-			"select",
-			"distinct",
-			"top",
-			"from",
-			"create",
-			"CIPHER",
-			"CLASS_ORIGIN",
-			"CLIENT",
-			"CLOSE",
-			"COALESCE",
-			"CODE",
-			"COLUMNS",
-			"COLUMN_FORMAT",
-			"COLUMN_NAME",
-			"COMMENT",
-			"COMMIT",
-			"COMPACT",
-			"COMPLETION",
-			"COMPRESSED",
-			"COMPRESSION",
-			"CONCURRENT",
-			"CONNECT",
-			"CONNECTION",
-			"CONSISTENT",
-			"CONSTRAINT_CATALOG",
-			"CONSTRAINT_SCHEMA",
-			"CONSTRAINT_NAME",
-			"CONTAINS",
-			"CONTEXT",
-			"CONTRIBUTORS",
-			"COPY",
-			"CPU",
-			"CURSOR_NAME",
-			"primary",
-			"key",
-			"insert",
-			"alter",
-			"add",
-			"update",
-			"set",
-			"delete",
-			"truncate",
-			"as",
-			"order",
-			"by",
-			"asc",
-			"desc",
-			"between",
-			"where",
-			"and",
-			"or",
-			"not",
-			"limit",
-			"null",
-			"is",
-			"drop",
-			"database",
-			"table",
-			"having",
-			"in",
-			"join",
-			"on",
-			"union",
-			"exists",
-		};
-		private ColorScheme blue;
-		private ColorScheme magenta;
-		private ColorScheme white;
-		private ColorScheme green;
+    private readonly string _path = "RuneCells.rce";
+    private ColorScheme _blue;
+    private ColorScheme _green;
+    private ColorScheme _magenta;
+    private MenuItem _miWrap;
+    private TextView _textView;
+    private ColorScheme _white;
 
-		public override void Setup ()
-		{
-			Win.Title = this.GetName ();
+    /// <summary>
+    ///     Reads an object instance from an Json file.
+    ///     <para>Object type must have a parameterless constructor.</para>
+    /// </summary>
+    /// <typeparam name="T">The type of object to read from the file.</typeparam>
+    /// <param name="filePath">The file path to read the object instance from.</param>
+    /// <returns>Returns a new instance of the object read from the Json file.</returns>
+    public static T ReadFromJsonFile<T> (string filePath) where T : new ()
+    {
+        TextReader reader = null;
 
-			var menu = new MenuBar (new MenuBarItem [] {
-			new MenuBarItem ("_TextView", new MenuItem [] {
-				miWrap =  new MenuItem ("_Word Wrap", "", () => WordWrap()){CheckType = MenuItemCheckStyle.Checked},
-				null,
-				new MenuItem ("_Syntax Highlighting", "", () => ApplySyntaxHighlighting()),
-				null,
-				new MenuItem ("_Load Rune Cells", "", () => ApplyLoadRuneCells()),
-				new MenuItem ("_Save Rune Cells", "", () => SaveRuneCells()),
-				null,
-				new MenuItem ("_Quit", "", () => Quit()),
-			})
-			});
-			Application.Top.Add (menu);
+        try
+        {
+            reader = new StreamReader (filePath);
+            string fileContents = reader.ReadToEnd ();
 
-			textView = new TextView () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
+            return (T)JsonSerializer.Deserialize (fileContents, typeof (T));
+        }
+        finally
+        {
+            if (reader != null)
+            {
+                reader.Close ();
+            }
+        }
+    }
 
-			ApplySyntaxHighlighting ();
+    public override void Main ()
+    {
+        // Init
+        Application.Init ();
 
-			Win.Add (textView);
+        // Setup - Create a top-level application window and configure it.
+        Toplevel appWindow = new ();
 
-			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-			});
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new (
+                     "_TextView",
+                     new []
+                     {
+                         _miWrap = new (
+                                        "_Word Wrap",
+                                        "",
+                                        () => WordWrap ()
+                                       )
+                         {
+                             CheckType = MenuItemCheckStyle
+                                 .Checked
+                         },
+                         null,
+                         new (
+                              "_Syntax Highlighting",
+                              "",
+                              () => ApplySyntaxHighlighting ()
+                             ),
+                         null,
+                         new (
+                              "_Load Rune Cells",
+                              "",
+                              () => ApplyLoadRuneCells ()
+                             ),
+                         new (
+                              "_Save Rune Cells",
+                              "",
+                              () => SaveRuneCells ()
+                             ),
+                         null,
+                         new ("_Quit", "", () => Quit ())
+                     }
+                    )
+            ]
+        };
+        appWindow.Add (menu);
 
-			Application.Top.Add (statusBar);
-		}
+        _textView = new()
+        {
+            Y = 1,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1)
+        };
 
-		private void ApplySyntaxHighlighting ()
-		{
-			ClearAllEvents ();
+        ApplySyntaxHighlighting ();
 
-			green = new ColorScheme (new Attribute (Color.Green, Color.Black));
-			blue = new ColorScheme (new Attribute (Color.Blue, Color.Black));
-			magenta = new ColorScheme (new Attribute (Color.Magenta, Color.Black));
-			white = new ColorScheme (new Attribute (Color.White, Color.Black));
-			textView.ColorScheme = white;
+        appWindow.Add (_textView);
 
-			textView.Text = "/*Query to select:\nLots of data*/\nSELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry where TestCode = 'blah';";
+        var statusBar = new StatusBar ([new (Application.QuitKey, "Quit", Quit)]);
 
-			textView.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator () {
-				AllSuggestions = keywords.ToList ()
-			};
+        appWindow.Add (statusBar);
 
-			textView.TextChanged += (s, e) => HighlightTextBasedOnKeywords ();
-			textView.DrawContent += (s, e) => HighlightTextBasedOnKeywords ();
-			textView.DrawContentComplete += (s, e) => HighlightTextBasedOnKeywords ();
-		}
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
 
-		private void ApplyLoadRuneCells ()
-		{
-			ClearAllEvents ();
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
+    }
 
-			List<RuneCell> runeCells = new List<RuneCell> ();
-			foreach (var color in Colors.ColorSchemes) {
-				string csName = color.Key;
-				foreach (var rune in csName.EnumerateRunes ()) {
-					runeCells.Add (new RuneCell { Rune = rune, ColorScheme = color.Value });
-				}
-				runeCells.Add (new RuneCell { Rune = (Rune)'\n', ColorScheme = color.Value });
-			}
+    /// <summary>
+    ///     Writes the given object instance to a Json file.
+    ///     <para>Object type must have a parameterless constructor.</para>
+    ///     <para>
+    ///         Only Public properties and variables will be written to the file. These can be any type though, even other
+    ///         classes.
+    ///     </para>
+    ///     <para>
+    ///         If there are public properties/variables that you do not want written to the file, decorate them with the
+    ///         [JsonIgnore] attribute.
+    ///     </para>
+    /// </summary>
+    /// <typeparam name="T">The type of object being written to the file.</typeparam>
+    /// <param name="filePath">The file path to write the object instance to.</param>
+    /// <param name="objectToWrite">The object instance to write to the file.</param>
+    /// <param name="append">
+    ///     If false the file will be overwritten if it already exists. If true the contents will be appended
+    ///     to the file.
+    /// </param>
+    public static void WriteToJsonFile<T> (string filePath, T objectToWrite, bool append = false) where T : new ()
+    {
+        TextWriter writer = null;
 
-			if (File.Exists (path)) {
-				//Reading the file  
-				var cells = ReadFromJsonFile<List<List<RuneCell>>> (path);
-				textView.Load (cells);
-			} else {
-				textView.Load (runeCells);
-			}
-			textView.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator ();
-		}
+        try
+        {
+            string contentsToWriteToFile = JsonSerializer.Serialize (objectToWrite);
+            writer = new StreamWriter (filePath, append);
+            writer.Write (contentsToWriteToFile);
+        }
+        finally
+        {
+            if (writer != null)
+            {
+                writer.Close ();
+            }
+        }
+    }
 
-		private void SaveRuneCells ()
-		{
-			//Writing to file  
-			var cells = textView.GetAllLines ();
-			WriteToJsonFile (path, cells);
-		}
+    private void ApplyLoadRuneCells ()
+    {
+        ClearAllEvents ();
 
-		private void ClearAllEvents ()
-		{
-			textView.ClearEventHandlers ("TextChanged");
-			textView.ClearEventHandlers ("DrawContent");
-			textView.ClearEventHandlers ("DrawContentComplete");
+        List<RuneCell> runeCells = new ();
 
-			textView.InheritsPreviousColorScheme = false;
-		}
+        foreach (KeyValuePair<string, ColorScheme> color in Colors.ColorSchemes)
+        {
+            string csName = color.Key;
 
-		private void HighlightTextBasedOnKeywords ()
-		{
-			// Comment blocks, quote blocks etc
-			Dictionary<Rune, ColorScheme> blocks = new Dictionary<Rune, ColorScheme> ();
+            foreach (Rune rune in csName.EnumerateRunes ())
+            {
+                runeCells.Add (new() { Rune = rune, ColorScheme = color.Value });
+            }
 
-			var comments = new Regex (@"/\*.*?\*/", RegexOptions.Singleline);
-			var commentMatches = comments.Matches (textView.Text);
+            runeCells.Add (new() { Rune = (Rune)'\n', ColorScheme = color.Value });
+        }
 
-			var singleQuote = new Regex (@"'.*?'", RegexOptions.Singleline);
-			var singleQuoteMatches = singleQuote.Matches (textView.Text);
+        if (File.Exists (_path))
+        {
+            //Reading the file  
+            List<List<RuneCell>> cells = ReadFromJsonFile<List<List<RuneCell>>> (_path);
+            _textView.Load (cells);
+        }
+        else
+        {
+            _textView.Load (runeCells);
+        }
 
-			// Find all keywords (ignoring for now if they are in comments, quotes etc)
-			Regex [] keywordRegexes = keywords.Select (k => new Regex ($@"\b{k}\b", RegexOptions.IgnoreCase)).ToArray ();
-			Match [] keywordMatches = keywordRegexes.SelectMany (r => r.Matches (textView.Text)).ToArray ();
+        _textView.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator ();
+    }
 
-			int pos = 0;
+    private void ApplySyntaxHighlighting ()
+    {
+        ClearAllEvents ();
 
-			for (int y = 0; y < textView.Lines; y++) {
+        _green = new (new Attribute (Color.Green, Color.Black));
+        _blue = new (new Attribute (Color.Blue, Color.Black));
+        _magenta = new (new Attribute (Color.Magenta, Color.Black));
+        _white = new (new Attribute (Color.White, Color.Black));
+        _textView.ColorScheme = _white;
 
-				var line = textView.GetLine (y);
+        _textView.Text =
+            "/*Query to select:\nLots of data*/\nSELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry where TestCode = 'blah';";
 
-				for (int x = 0; x < line.Count; x++) {
-					if (commentMatches.Any (m => ContainsPosition (m, pos))) {
-						line [x].ColorScheme = green;
-					} else if (singleQuoteMatches.Any (m => ContainsPosition (m, pos))) {
-						line [x].ColorScheme = magenta;
-					} else if (keywordMatches.Any (m => ContainsPosition (m, pos))) {
-						line [x].ColorScheme = blue;
-					} else {
-						line [x].ColorScheme = white;
-					}
+        _textView.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator
+        {
+            AllSuggestions = _keywords.ToList ()
+        };
 
-					pos++;
-				}
+        _textView.TextChanged += (s, e) => HighlightTextBasedOnKeywords ();
+        _textView.DrawContent += (s, e) => HighlightTextBasedOnKeywords ();
+        _textView.DrawContentComplete += (s, e) => HighlightTextBasedOnKeywords ();
+    }
 
-				// for the \n or \r\n that exists in Text but not the returned lines
-				pos += Environment.NewLine.Length;
-			}
-		}
+    private void ClearAllEvents ()
+    {
+        _textView.ClearEventHandlers ("TextChanged");
+        _textView.ClearEventHandlers ("DrawContent");
+        _textView.ClearEventHandlers ("DrawContentComplete");
 
-		private bool ContainsPosition (Match m, int pos)
-		{
-			return pos >= m.Index && pos < m.Index + m.Length;
-		}
+        _textView.InheritsPreviousColorScheme = false;
+    }
 
-		private void WordWrap ()
-		{
-			miWrap.Checked = !miWrap.Checked;
-			textView.WordWrap = (bool)miWrap.Checked;
-		}
+    private bool ContainsPosition (Match m, int pos) { return pos >= m.Index && pos < m.Index + m.Length; }
 
-		private void Quit ()
-		{
-			Application.RequestStop ();
-		}
+    private void HighlightTextBasedOnKeywords ()
+    {
+        // Comment blocks, quote blocks etc
+        Dictionary<Rune, ColorScheme> blocks = new ();
 
-		private bool IsKeyword (List<Rune> line, int idx)
-		{
-			var word = IdxToWord (line, idx);
+        var comments = new Regex (@"/\*.*?\*/", RegexOptions.Singleline);
+        MatchCollection commentMatches = comments.Matches (_textView.Text);
 
-			if (string.IsNullOrWhiteSpace (word)) {
-				return false;
-			}
+        var singleQuote = new Regex (@"'.*?'", RegexOptions.Singleline);
+        MatchCollection singleQuoteMatches = singleQuote.Matches (_textView.Text);
 
-			return keywords.Contains (word, StringComparer.CurrentCultureIgnoreCase);
-		}
+        // Find all keywords (ignoring for now if they are in comments, quotes etc)
+        Regex [] keywordRegexes =
+            _keywords.Select (k => new Regex ($@"\b{k}\b", RegexOptions.IgnoreCase)).ToArray ();
+        Match [] keywordMatches = keywordRegexes.SelectMany (r => r.Matches (_textView.Text)).ToArray ();
 
-		private string IdxToWord (List<Rune> line, int idx)
-		{
-			var words = Regex.Split (
-				new string (line.Select (r => (char)r.Value).ToArray ()),
-				"\\b");
+        var pos = 0;
 
-			int count = 0;
-			string current = null;
+        for (var y = 0; y < _textView.Lines; y++)
+        {
+            List<RuneCell> line = _textView.GetLine (y);
 
-			foreach (var word in words) {
-				current = word;
-				count += word.Length;
-				if (count > idx) {
-					break;
-				}
-			}
+            for (var x = 0; x < line.Count; x++)
+            {
+                if (commentMatches.Any (m => ContainsPosition (m, pos)))
+                {
+                    line [x].ColorScheme = _green;
+                }
+                else if (singleQuoteMatches.Any (m => ContainsPosition (m, pos)))
+                {
+                    line [x].ColorScheme = _magenta;
+                }
+                else if (keywordMatches.Any (m => ContainsPosition (m, pos)))
+                {
+                    line [x].ColorScheme = _blue;
+                }
+                else
+                {
+                    line [x].ColorScheme = _white;
+                }
 
-			return current?.Trim ();
-		}
+                pos++;
+            }
 
-		/// <summary>
-		/// Writes the given object instance to a Json file.
-		/// <para>Object type must have a parameterless constructor.</para>
-		/// <para>Only Public properties and variables will be written to the file. These can be any type though, even other classes.</para>
-		/// <para>If there are public properties/variables that you do not want written to the file, decorate them with the [JsonIgnore] attribute.</para>
-		/// </summary>
-		/// <typeparam name="T">The type of object being written to the file.</typeparam>
-		/// <param name="filePath">The file path to write the object instance to.</param>
-		/// <param name="objectToWrite">The object instance to write to the file.</param>
-		/// <param name="append">If false the file will be overwritten if it already exists. If true the contents will be appended to the file.</param>
-		public static void WriteToJsonFile<T> (string filePath, T objectToWrite, bool append = false) where T : new()
-		{
-			TextWriter writer = null;
-			try {
-				var contentsToWriteToFile = JsonSerializer.Serialize (objectToWrite);
-				writer = new StreamWriter (filePath, append);
-				writer.Write (contentsToWriteToFile);
-			} finally {
-				if (writer != null) {
-					writer.Close ();
-				}
-			}
-		}
+            // for the \n or \r\n that exists in Text but not the returned lines
+            pos += Environment.NewLine.Length;
+        }
+    }
 
-		/// <summary>
-		/// Reads an object instance from an Json file.
-		/// <para>Object type must have a parameterless constructor.</para>
-		/// </summary>
-		/// <typeparam name="T">The type of object to read from the file.</typeparam>
-		/// <param name="filePath">The file path to read the object instance from.</param>
-		/// <returns>Returns a new instance of the object read from the Json file.</returns>
-		public static T ReadFromJsonFile<T> (string filePath) where T : new()
-		{
-			TextReader reader = null;
-			try {
-				reader = new StreamReader (filePath);
-				var fileContents = reader.ReadToEnd ();
-				return (T)JsonSerializer.Deserialize (fileContents, typeof (T));
-			} finally {
-				if (reader != null) {
-					reader.Close ();
-				}
-			}
-		}
-	}
+    private string IdxToWord (List<Rune> line, int idx)
+    {
+        string [] words = Regex.Split (
+                                       new (line.Select (r => (char)r.Value).ToArray ()),
+                                       "\\b"
+                                      );
 
-	public static class EventExtensions {
-		public static void ClearEventHandlers (this object obj, string eventName)
-		{
-			if (obj == null) {
-				return;
-			}
+        var count = 0;
+        string current = null;
 
-			var objType = obj.GetType ();
-			var eventInfo = objType.GetEvent (eventName);
-			if (eventInfo == null) {
-				return;
-			}
+        foreach (string word in words)
+        {
+            current = word;
+            count += word.Length;
 
-			var isEventProperty = false;
-			var type = objType;
-			FieldInfo eventFieldInfo = null;
-			while (type != null) {
-				/* Find events defined as field */
-				eventFieldInfo = type.GetField (eventName, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-				if (eventFieldInfo != null && (eventFieldInfo.FieldType == typeof (MulticastDelegate) || eventFieldInfo.FieldType.IsSubclassOf (typeof (MulticastDelegate)))) {
-					break;
-				}
+            if (count > idx)
+            {
+                break;
+            }
+        }
 
-				/* Find events defined as property { add; remove; } */
-				eventFieldInfo = type.GetField ("EVENT_" + eventName.ToUpper (), BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic);
-				if (eventFieldInfo != null) {
-					isEventProperty = true;
-					break;
-				}
+        return current?.Trim ();
+    }
 
-				type = type.BaseType;
-			}
+    private bool IsKeyword (List<Rune> line, int idx)
+    {
+        string word = IdxToWord (line, idx);
 
-			if (eventFieldInfo == null) {
-				return;
-			}
+        if (string.IsNullOrWhiteSpace (word))
+        {
+            return false;
+        }
 
-			if (isEventProperty) {
-				// Default Events Collection Type
-				RemoveHandler<EventHandlerList> (obj, eventFieldInfo);
-				return;
-			}
+        return _keywords.Contains (word, StringComparer.CurrentCultureIgnoreCase);
+    }
 
-			if (!(eventFieldInfo.GetValue (obj) is Delegate eventDelegate)) {
-				return;
-			}
+    private void Quit () { Application.RequestStop (); }
 
-			// Remove Field based event handlers
-			foreach (var d in eventDelegate.GetInvocationList ()) {
-				eventInfo.RemoveEventHandler (obj, d);
-			}
-		}
+    private void SaveRuneCells ()
+    {
+        //Writing to file  
+        List<List<RuneCell>> cells = _textView.GetAllLines ();
+        WriteToJsonFile (_path, cells);
+    }
 
-		private static void RemoveHandler<T> (object obj, FieldInfo eventFieldInfo)
-		{
-			var objType = obj.GetType ();
-			var eventPropertyValue = eventFieldInfo.GetValue (obj);
+    private void WordWrap ()
+    {
+        _miWrap.Checked = !_miWrap.Checked;
+        _textView.WordWrap = (bool)_miWrap.Checked;
+    }
+}
 
-			if (eventPropertyValue == null) {
-				return;
-			}
+public static class EventExtensions
+{
+    public static void ClearEventHandlers (this object obj, string eventName)
+    {
+        if (obj == null)
+        {
+            return;
+        }
 
-			var propertyInfo = objType.GetProperties (BindingFlags.NonPublic | BindingFlags.Instance)
-						  .FirstOrDefault (p => p.Name == "Events" && p.PropertyType == typeof (T));
-			if (propertyInfo == null) {
-				return;
-			}
+        Type objType = obj.GetType ();
+        EventInfo eventInfo = objType.GetEvent (eventName);
 
-			var eventList = propertyInfo?.GetValue (obj, null);
-			switch (eventList) {
-			case null:
-				return;
-			}
-		}
-	}
+        if (eventInfo == null)
+        {
+            return;
+        }
+
+        var isEventProperty = false;
+        Type type = objType;
+        FieldInfo eventFieldInfo = null;
+
+        while (type != null)
+        {
+            /* Find events defined as field */
+            eventFieldInfo = type.GetField (
+                                            eventName,
+                                            BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                                           );
+
+            if (eventFieldInfo != null
+                && (eventFieldInfo.FieldType == typeof (MulticastDelegate)
+                    || eventFieldInfo.FieldType.IsSubclassOf (
+                                                              typeof (MulticastDelegate)
+                                                             )))
+            {
+                break;
+            }
+
+            /* Find events defined as property { add; remove; } */
+            eventFieldInfo = type.GetField (
+                                            "EVENT_" + eventName.ToUpper (),
+                                            BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic
+                                           );
+
+            if (eventFieldInfo != null)
+            {
+                isEventProperty = true;
+
+                break;
+            }
+
+            type = type.BaseType;
+        }
+
+        if (eventFieldInfo == null)
+        {
+            return;
+        }
+
+        if (isEventProperty)
+        {
+            // Default Events Collection Type
+            RemoveHandler<EventHandlerList> (obj, eventFieldInfo);
+
+            return;
+        }
+
+        if (!(eventFieldInfo.GetValue (obj) is Delegate eventDelegate))
+        {
+            return;
+        }
+
+        // Remove Field based event handlers
+        foreach (Delegate d in eventDelegate.GetInvocationList ())
+        {
+            eventInfo.RemoveEventHandler (obj, d);
+        }
+    }
+
+    private static void RemoveHandler<T> (object obj, FieldInfo eventFieldInfo)
+    {
+        Type objType = obj.GetType ();
+        object eventPropertyValue = eventFieldInfo.GetValue (obj);
+
+        if (eventPropertyValue == null)
+        {
+            return;
+        }
+
+        PropertyInfo propertyInfo = objType.GetProperties (BindingFlags.NonPublic | BindingFlags.Instance)
+                                           .FirstOrDefault (p => p.Name == "Events" && p.PropertyType == typeof (T));
+
+        if (propertyInfo == null)
+        {
+            return;
+        }
+
+        object eventList = propertyInfo?.GetValue (obj, null);
+
+        switch (eventList)
+        {
+            case null:
+                return;
+        }
+    }
 }

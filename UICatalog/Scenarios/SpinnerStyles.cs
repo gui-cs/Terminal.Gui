@@ -1,183 +1,221 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "SpinnerView Styles", Description: "Shows the SpinnerView Styles.")]
-	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Progress")]
+namespace UICatalog.Scenarios;
 
-	public class SpinnerViewStyles : Scenario {
-		class Property {
-			public string Name { get; set; }
-		}
+[ScenarioMetadata ("SpinnerView Styles", "Shows the SpinnerView Styles.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Progress")]
+public class SpinnerViewStyles : Scenario
+{
+    public override void Main ()
+    {
+    
+        Application.Init ();
 
-		public override void Setup ()
-		{
-			const int DEFAULT_DELAY = 130;
-			const string DEFAULT_CUSTOM = @"-\|/";
-			var styleDict = new Dictionary<int, KeyValuePair<string, Type>> ();
-			int i = 0;
-			foreach (var style in typeof (SpinnerStyle).GetNestedTypes ()) {
-				styleDict.Add (i, new KeyValuePair<string, Type> (style.Name, style));
-				i++;
-			}
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
 
-			var preview = new View () {
-				X = Pos.Center (),
-				Y = 0,
-				Width = 22,
-				Height = 3,
-				//Title = "Preview",
-				BorderStyle = LineStyle.Single
-			};
-			Win.Add (preview);
+        const int DEFAULT_DELAY = 130;
+        const string DEFAULT_CUSTOM = @"-\|/";
+        Dictionary<int, KeyValuePair<string, Type>> styleDict = new ();
+        var i = 0;
 
-			var spinner = new SpinnerView () {
-				X = Pos.Center (),
-				Y = 0
-			};
-			preview.Add (spinner);
-			spinner.AutoSpin = true;
+        foreach (Type style in typeof (SpinnerStyle).GetNestedTypes ())
+        {
+            styleDict.Add (i, new KeyValuePair<string, Type> (style.Name, style));
+            i++;
+        }
 
-			var ckbAscii = new CheckBox ("Ascii Only", false) {
-				X = Pos.Center () - 7,
-				Y = Pos.Bottom (preview),
-				Enabled = false,
-				Checked = true
-			};
-			Win.Add (ckbAscii);
+        var preview = new View
+        {
+            X = Pos.Center (),
+            Y = 0,
+            Width = 22,
+            Height = 3,
 
-			var ckbNoSpecial = new CheckBox ("No Special", false) {
-				X = Pos.Center () + 7,
-				Y = Pos.Bottom (preview),
-				Enabled = false,
-				Checked = true
-			};
-			Win.Add (ckbNoSpecial);
+            //Title = "Preview",
+            BorderStyle = LineStyle.Single
+        };
+        app.Add (preview);
 
-			var ckbReverse = new CheckBox ("Reverse", false) {
-				X = Pos.Center () - 22,
-				Y = Pos.Bottom (preview) + 1,
-				Checked = false
-			};
-			Win.Add (ckbReverse);
+        var spinner = new SpinnerView { X = Pos.Center (), Y = 0 };
+        preview.Add (spinner);
+        spinner.AutoSpin = true;
 
-			var ckbBounce = new CheckBox ("Bounce", false) {
-				X = Pos.Right (ckbReverse) + 2,
-				Y = Pos.Bottom (preview) + 1,
-				Checked = false
-			};
-			Win.Add (ckbBounce);
+        var ckbAscii = new CheckBox
+        {
+            X = Pos.Center () - 7,
+            Y = Pos.Bottom (preview),
+            Enabled = false,
+            State = CheckState.Checked,
+            Text = "Ascii Only"
+        };
+        app.Add (ckbAscii);
 
-			var delayLabel = new Label ("Delay:") {
-				X = Pos.Right (ckbBounce) + 2,
-				Y = Pos.Bottom (preview) + 1
-			};
-			Win.Add (delayLabel);
-			var delayField = new TextField (DEFAULT_DELAY.ToString ()) {
-				X = Pos.Right (delayLabel),
-				Y = Pos.Bottom (preview) + 1,
-				Width = 5
-			};
-			Win.Add (delayField);
-			delayField.TextChanged += (s, e) => {
-				if (ushort.TryParse (delayField.Text, out var i))
-					spinner.SpinDelay = i;
-			};
+        var ckbNoSpecial = new CheckBox
+        {
+            X = Pos.Center () + 7,
+            Y = Pos.Bottom (preview),
+            Enabled = false,
+            State = CheckState.Checked,
+            Text = "No Special"
+        };
+        app.Add (ckbNoSpecial);
 
-			var customLabel = new Label ("Custom:") {
-				X = Pos.Right (delayField) + 2,
-				Y = Pos.Bottom (preview) + 1
-			};
-			Win.Add (customLabel);
-			var customField = new TextField (DEFAULT_CUSTOM) {
-				X = Pos.Right (customLabel),
-				Y = Pos.Bottom (preview) + 1,
-				Width = 12
-			};
-			Win.Add (customField);
+        var ckbReverse = new CheckBox
+        {
+            X = Pos.Center () - 22, Y = Pos.Bottom (preview) + 1, State = CheckState.UnChecked, Text = "Reverse"
+        };
+        app.Add (ckbReverse);
 
-			var styleArray = styleDict.Select (e => e.Value.Key).ToArray ();
-			if (styleArray.Length < 1)
-				return;
+        var ckbBounce = new CheckBox
+        {
+            X = Pos.Right (ckbReverse) + 2, Y = Pos.Bottom (preview) + 1, State = CheckState.UnChecked, Text = "Bounce"
+        };
+        app.Add (ckbBounce);
 
-			var styles = new ListView () {
-				X = Pos.Center (),
-				Y = Pos.Bottom (preview) + 2,
-				Height = Dim.Fill (),
-				Width = Dim.Fill (1)
-			};
-			styles.SetSource (styleArray);
-			styles.SelectedItem = 0; // SpinnerStyle.Custom;
-			Win.Add (styles);
-			SetCustom ();
+        var delayLabel = new Label { X = Pos.Right (ckbBounce) + 2, Y = Pos.Bottom (preview) + 1, Text = "Delay:" };
+        app.Add (delayLabel);
 
-			customField.TextChanged += (s, e) => {
-				if (customField.Text.Length > 0) {
-					if (styles.SelectedItem != 0)
-						styles.SelectedItem = 0; // SpinnerStyle.Custom
-					SetCustom ();
-				}
-			};
+        var delayField = new TextField
+        {
+            X = Pos.Right (delayLabel), Y = Pos.Bottom (preview) + 1, Width = 5, Text = DEFAULT_DELAY.ToString ()
+        };
+        app.Add (delayField);
 
-			styles.SelectedItemChanged += (s, e) => {
-				if (e.Item == 0) { // SpinnerStyle.Custom
-					if (customField.Text.Length < 1)
-						customField.Text = DEFAULT_CUSTOM;
-					if (delayField.Text.Length < 1)
-						delayField.Text = DEFAULT_DELAY.ToString ();
-					SetCustom ();
-				} else {
-					spinner.Visible = true;
-					spinner.Style = (SpinnerStyle)Activator.CreateInstance(styleDict [e.Item].Value);
-					delayField.Text = spinner.SpinDelay.ToString ();
-					ckbBounce.Checked = spinner.SpinBounce;
-					ckbNoSpecial.Checked = !spinner.HasSpecialCharacters;
-					ckbAscii.Checked = spinner.IsAsciiOnly;
-					ckbReverse.Checked = false;
-				}
-			};
+        delayField.TextChanged += (s, e) =>
+                                  {
+                                      if (ushort.TryParse (delayField.Text, out ushort i))
+                                      {
+                                          spinner.SpinDelay = i;
+                                      }
+                                  };
 
-			ckbReverse.Toggled += (s, e) => {
-				spinner.SpinReverse = (bool)!e.OldValue;
-			};
+        var customLabel = new Label { X = Pos.Right (delayField) + 2, Y = Pos.Bottom (preview) + 1, Text = "Custom:" };
+        app.Add (customLabel);
 
-			ckbBounce.Toggled += (s, e) => {
-				spinner.SpinBounce = (bool)!e.OldValue;
-			};
+        var customField = new TextField
+        {
+            X = Pos.Right (customLabel), Y = Pos.Bottom (preview) + 1, Width = 12, Text = DEFAULT_CUSTOM
+        };
+        app.Add (customField);
 
-			Application.Top.Unloaded += Top_Unloaded;
+        string [] styleArray = styleDict.Select (e => e.Value.Key).ToArray ();
 
-			void SetCustom ()
-			{
-				if (customField.Text.Length > 0) {
-					spinner.Visible = true;
-					if (ushort.TryParse (delayField.Text, out var d))
-						spinner.SpinDelay = d;
-					else {
-						delayField.Text = DEFAULT_DELAY.ToString ();
-						spinner.SpinDelay = DEFAULT_DELAY;
-					}
-					var str = new List<string> ();
-					foreach (var c in customField.Text.ToCharArray ()) {
-						str.Add (c.ToString ());
-					}
-					spinner.Sequence = str.ToArray ();
-				} else {
-					spinner.Visible = false;
-				}
-			}
+        if (styleArray.Length < 1)
+        {
+            return;
+        }
 
-			void Top_Unloaded (object sender, EventArgs args)
-			{
-				if (spinner != null) {
-					spinner.Dispose ();
-					spinner = null;
-				}
-				Application.Top.Unloaded -= Top_Unloaded;
-			}
-		}
-	}
+        var styles = new ListView
+        {
+            X = Pos.Center (), Y = Pos.Bottom (preview) + 2, Height = Dim.Fill (), Width = Dim.Fill (1)
+        };
+        styles.SetSource (new ObservableCollection<string> (styleArray));
+        styles.SelectedItem = 0; // SpinnerStyle.Custom;
+        app.Add (styles);
+        SetCustom ();
+
+        customField.TextChanged += (s, e) =>
+                                   {
+                                       if (customField.Text.Length > 0)
+                                       {
+                                           if (styles.SelectedItem != 0)
+                                           {
+                                               styles.SelectedItem = 0; // SpinnerStyle.Custom
+                                           }
+
+                                           SetCustom ();
+                                       }
+                                   };
+
+        styles.SelectedItemChanged += (s, e) =>
+                                      {
+                                          if (e.Item == 0)
+                                          {
+                                              // SpinnerStyle.Custom
+                                              if (customField.Text.Length < 1)
+                                              {
+                                                  customField.Text = DEFAULT_CUSTOM;
+                                              }
+
+                                              if (delayField.Text.Length < 1)
+                                              {
+                                                  delayField.Text = DEFAULT_DELAY.ToString ();
+                                              }
+
+                                              SetCustom ();
+                                          }
+                                          else
+                                          {
+                                              spinner.Visible = true;
+                                              spinner.Style = (SpinnerStyle)Activator.CreateInstance (styleDict [e.Item].Value);
+                                              delayField.Text = spinner.SpinDelay.ToString ();
+                                              ckbBounce.State = spinner.SpinBounce ? CheckState.Checked : CheckState.UnChecked;
+                                              ckbNoSpecial.State = !spinner.HasSpecialCharacters ? CheckState.Checked : CheckState.UnChecked;
+                                              ckbAscii.State = spinner.IsAsciiOnly ? CheckState.Checked : CheckState.UnChecked;
+                                              ckbReverse.State = CheckState.UnChecked;
+                                          }
+                                      };
+
+        ckbReverse.Toggle += (s, e) => { spinner.SpinReverse = e.NewValue == CheckState.Checked; };
+
+        ckbBounce.Toggle += (s, e) => { spinner.SpinBounce = e.NewValue == CheckState.Checked; };
+
+        app.Unloaded += App_Unloaded;
+
+        void SetCustom ()
+        {
+            if (customField.Text.Length > 0)
+            {
+                spinner.Visible = true;
+
+                if (ushort.TryParse (delayField.Text, out ushort d))
+                {
+                    spinner.SpinDelay = d;
+                }
+                else
+                {
+                    delayField.Text = DEFAULT_DELAY.ToString ();
+                    spinner.SpinDelay = DEFAULT_DELAY;
+                }
+
+                List<string> str = new ();
+
+                foreach (char c in customField.Text)
+                {
+                    str.Add (c.ToString ());
+                }
+
+                spinner.Sequence = str.ToArray ();
+            }
+            else
+            {
+                spinner.Visible = false;
+            }
+        }
+
+        void App_Unloaded (object sender, EventArgs args)
+        {
+            if (spinner != null)
+            {
+                spinner.Dispose ();
+                spinner = null;
+            }
+
+            app.Unloaded -= App_Unloaded;
+        }
+
+
+        Application.Run (app);
+        app.Dispose ();
+
+        Application.Shutdown ();
+    }
 }

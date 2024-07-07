@@ -1,96 +1,234 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
+﻿using System.ComponentModel;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests {
-	public class RadioGroupTests {
-		readonly ITestOutputHelper output;
+namespace Terminal.Gui.ViewsTests;
 
-		public RadioGroupTests (ITestOutputHelper output)
-		{
-			this.output = output;
-		}
+public class RadioGroupTests (ITestOutputHelper output)
+{
+    [Fact]
+    public void Constructors_Defaults ()
+    {
+        var rg = new RadioGroup ();
+        Assert.True (rg.CanFocus);
+        Assert.Empty (rg.RadioLabels);
+        Assert.Equal (Rectangle.Empty, rg.Frame);
+        Assert.Equal (0, rg.SelectedItem);
 
-		[Fact]
-		public void Constructors_Defaults ()
-		{
-			var rg = new RadioGroup ();
-			Assert.True (rg.CanFocus);
-			Assert.Empty (rg.RadioLabels);
-			Assert.Null (rg.X);
-			Assert.Null (rg.Y);
-			Assert.Null (rg.Width);
-			Assert.Null (rg.Height);
-			Assert.Equal (Rect.Empty, rg.Frame);
-			Assert.Equal (0, rg.SelectedItem);
+        rg = new () { RadioLabels = new [] { "Test" } };
+        Assert.True (rg.CanFocus);
+        Assert.Single (rg.RadioLabels);
+        Assert.Equal (0, rg.SelectedItem);
 
-			rg = new RadioGroup (new string [] { "Test" });
-			Assert.True (rg.CanFocus);
-			Assert.Single (rg.RadioLabels);
-			Assert.Null (rg.X);
-			Assert.Null (rg.Y);
-			Assert.Null (rg.Width);
-			Assert.Null (rg.Height);
-			Assert.Equal (new Rect (0, 0, 0, 0), rg.Frame);
-			Assert.Equal (0, rg.SelectedItem);
+        rg = new ()
+        {
+            X = 1,
+            Y = 2,
+            Width = 20,
+            Height = 5,
+            RadioLabels = new [] { "Test" }
+        };
+        Assert.True (rg.CanFocus);
+        Assert.Single (rg.RadioLabels);
+        Assert.Equal (new (1, 2, 20, 5), rg.Frame);
+        Assert.Equal (0, rg.SelectedItem);
 
-			rg = new RadioGroup (new Rect (1, 2, 20, 5), new string [] { "Test" });
-			Assert.True (rg.CanFocus);
-			Assert.Single (rg.RadioLabels);
-			Assert.Equal (LayoutStyle.Absolute, rg.LayoutStyle);
-			Assert.Null (rg.X);
-			Assert.Null (rg.Y);
-			Assert.Null (rg.Width);
-			Assert.Null (rg.Height);
-			Assert.Equal (new Rect (1, 2, 20, 5), rg.Frame);
-			Assert.Equal (0, rg.SelectedItem);
+        rg = new () { X = 1, Y = 2, RadioLabels = new [] { "Test" } };
 
-			rg = new RadioGroup (1, 2, new string [] { "Test" });
-			Assert.True (rg.CanFocus);
-			Assert.Single (rg.RadioLabels);
-			Assert.Equal (LayoutStyle.Absolute, rg.LayoutStyle);
-			Assert.Null (rg.X);
-			Assert.Null (rg.Y);
-			Assert.Null (rg.Width);
-			Assert.Null (rg.Height);
-			Assert.Equal (new Rect (1, 2, 6, 1), rg.Frame);
-			Assert.Equal (0, rg.SelectedItem);
-		}
+        var view = new View { Width = 30, Height = 40 };
+        view.Add (rg);
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubviews ();
 
-		[Fact]
-		public void Initialize_SelectedItem_With_Minus_One ()
-		{
-			var rg = new RadioGroup (new string [] { "Test" }, -1);
-			Assert.Equal (-1, rg.SelectedItem);
-			Assert.True (rg.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
-			Assert.Equal (0, rg.SelectedItem);
-		}
+        Assert.True (rg.CanFocus);
+        Assert.Single (rg.RadioLabels);
+        Assert.Equal (new (1, 2, 6, 1), rg.Frame);
+        Assert.Equal (0, rg.SelectedItem);
+    }
 
-		[Fact, AutoInitShutdown]
-		public void DisplayMode_Width_Height_Vertical_Horizontal_Space ()
-		{
-			var rg = new RadioGroup (new string [] { "Test", "New Test 你" });
-			var win = new Window () {
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
-			win.Add (rg);
-			Application.Top.Add (win);
+    [Fact]
+    public void Initialize_SelectedItem_With_Minus_One ()
+    {
+        var rg = new RadioGroup { RadioLabels = new [] { "Test" }, SelectedItem = -1 };
+        Assert.Equal (-1, rg.SelectedItem);
+        Assert.True (rg.NewKeyDownEvent (Key.Space));
+        Assert.Equal (0, rg.SelectedItem);
+    }
 
-			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+    [Fact]
+    public void KeyBindings_Are_Added_Correctly ()
+    {
+        var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right" } };
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L));
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R));
 
-			Assert.Equal (DisplayModeLayout.Vertical, rg.DisplayMode);
-			Assert.Equal (2, rg.RadioLabels.Length);
-			Assert.Equal (0, rg.X);
-			Assert.Equal (0, rg.Y);
-			Assert.Equal (13, rg.Frame.Width);
-			Assert.Equal (2, rg.Frame.Height);
-			var expected = @$"
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L.WithShift));
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L.WithAlt));
+
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R.WithShift));
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R.WithAlt));
+    }
+
+    [Fact]
+    public void KeyBindings_Command ()
+    {
+        var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
+        rg.SetFocus();
+
+        Assert.True (rg.NewKeyDownEvent (Key.CursorUp));
+        Assert.True (rg.NewKeyDownEvent (Key.CursorDown));
+        Assert.True (rg.NewKeyDownEvent (Key.Home));
+        Assert.True (rg.NewKeyDownEvent (Key.End));
+        Assert.True (rg.NewKeyDownEvent (Key.Space));
+        Assert.Equal (1, rg.SelectedItem);
+    }
+
+    [Fact]
+    public void HotKeys_Select_RadioLabels ()
+    {
+        var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
+        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));
+
+        // BUGBUG: These tests only test that RG works on it's own, not if it's a subview
+        Assert.True (rg.NewKeyDownEvent (Key.T));
+        Assert.Equal (2, rg.SelectedItem);
+        Assert.True (rg.NewKeyDownEvent (Key.L));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.True (rg.NewKeyDownEvent (Key.J));
+        Assert.Equal (3, rg.SelectedItem);
+        Assert.True (rg.NewKeyDownEvent (Key.R));
+        Assert.Equal (1, rg.SelectedItem);
+
+        Assert.True (rg.NewKeyDownEvent (Key.T.WithAlt));
+        Assert.Equal (2, rg.SelectedItem);
+        Assert.True (rg.NewKeyDownEvent (Key.L.WithAlt));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.True (rg.NewKeyDownEvent (Key.J.WithAlt));
+        Assert.Equal (3, rg.SelectedItem);
+        Assert.True (rg.NewKeyDownEvent (Key.R.WithAlt));
+        Assert.Equal (1, rg.SelectedItem);
+
+        var superView = new View ();
+        superView.Add (rg);
+        Assert.True (superView.NewKeyDownEvent (Key.T));
+        Assert.Equal (2, rg.SelectedItem);
+        Assert.True (superView.NewKeyDownEvent (Key.L));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.True (superView.NewKeyDownEvent (Key.J));
+        Assert.Equal (3, rg.SelectedItem);
+        Assert.True (superView.NewKeyDownEvent (Key.R));
+        Assert.Equal (1, rg.SelectedItem);
+
+        Assert.True (superView.NewKeyDownEvent (Key.T.WithAlt));
+        Assert.Equal (2, rg.SelectedItem);
+        Assert.True (superView.NewKeyDownEvent (Key.L.WithAlt));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.True (superView.NewKeyDownEvent (Key.J.WithAlt));
+        Assert.Equal (3, rg.SelectedItem);
+        Assert.True (superView.NewKeyDownEvent (Key.R.WithAlt));
+        Assert.Equal (1, rg.SelectedItem);
+    }
+
+    [Fact]
+    public void HotKey_For_View_SetsFocus ()
+    {
+        var superView = new View
+        {
+            CanFocus = true
+        };
+        superView.Add (new View { CanFocus = true });
+
+        var group = new RadioGroup
+        {
+            Title = "Radio_Group",
+            RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" }
+        };
+        superView.Add (group);
+
+        Assert.False (group.HasFocus);
+        Assert.Equal (0, group.SelectedItem);
+
+        group.NewKeyDownEvent (Key.G.WithAlt);
+
+        Assert.Equal (0, group.SelectedItem);
+        Assert.True (group.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_For_Item_SetsFocus ()
+    {
+        var superView = new View
+        {
+            CanFocus = true
+        };
+        superView.Add (new View { CanFocus = true });
+        var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+        superView.Add (group);
+
+        Assert.False (group.HasFocus);
+        Assert.Equal (0, group.SelectedItem);
+
+        group.NewKeyDownEvent (Key.R);
+
+        Assert.Equal (1, group.SelectedItem);
+        Assert.True (group.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+        var accepted = false;
+
+        group.Accept += OnAccept;
+        group.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Command_Fires_Accept ()
+    {
+        var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+        var accepted = false;
+
+        group.Accept += OnAccept;
+        group.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+
+        return;
+
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Orientation_Width_Height_Vertical_Horizontal_Space ()
+    {
+        var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test 你" } };
+        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
+        win.Add (rg);
+        var top = new Toplevel ();
+        top.Add (win);
+
+        Application.Begin (top);
+        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+
+        Assert.Equal (Orientation.Vertical, rg.Orientation);
+        Assert.Equal (2, rg.RadioLabels.Length);
+        Assert.Equal (0, rg.X);
+        Assert.Equal (0, rg.Y);
+        Assert.Equal (13, rg.Frame.Width);
+        Assert.Equal (2, rg.Frame.Height);
+
+        var expected = @$"
 ┌────────────────────────────┐
 │{CM.Glyphs.Selected} Test                      │
 │{CM.Glyphs.UnSelected} New Test 你               │
@@ -98,20 +236,20 @@ namespace Terminal.Gui.ViewsTests {
 └────────────────────────────┘
 ";
 
-			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
 
-			rg.DisplayMode = DisplayModeLayout.Horizontal;
-			Application.Refresh ();
+        rg.Orientation = Orientation.Horizontal;
+        Application.Refresh ();
 
-			Assert.Equal (DisplayModeLayout.Horizontal, rg.DisplayMode);
-			Assert.Equal (2, rg.HorizontalSpace);
-			Assert.Equal (0, rg.X);
-			Assert.Equal (0, rg.Y);
-			Assert.Equal (21, rg.Width);
-			Assert.Equal (1, rg.Height);
+        Assert.Equal (Orientation.Horizontal, rg.Orientation);
+        Assert.Equal (2, rg.HorizontalSpace);
+        Assert.Equal (0, rg.X);
+        Assert.Equal (0, rg.Y);
+        Assert.Equal (21, rg.Frame.Width);
+        Assert.Equal (1, rg.Frame.Height);
 
-			expected = @$"
+        expected = @$"
 ┌────────────────────────────┐
 │{CM.Glyphs.Selected} Test  {CM.Glyphs.UnSelected} New Test 你       │
 │                            │
@@ -119,19 +257,20 @@ namespace Terminal.Gui.ViewsTests {
 └────────────────────────────┘
 ";
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
 
-			rg.HorizontalSpace = 4;
-			Application.Refresh ();
+        rg.HorizontalSpace = 4;
+        Application.Refresh ();
 
-			Assert.Equal (DisplayModeLayout.Horizontal, rg.DisplayMode);
-			Assert.Equal (4, rg.HorizontalSpace);
-			Assert.Equal (0, rg.X);
-			Assert.Equal (0, rg.Y);
-			Assert.Equal (23, rg.Width);
-			Assert.Equal (1, rg.Height);
-			expected = @$"
+        Assert.Equal (Orientation.Horizontal, rg.Orientation);
+        Assert.Equal (4, rg.HorizontalSpace);
+        Assert.Equal (0, rg.X);
+        Assert.Equal (0, rg.Y);
+        Assert.Equal (23, rg.Frame.Width);
+        Assert.Equal (1, rg.Frame.Height);
+
+        expected = @$"
 ┌────────────────────────────┐
 │{CM.Glyphs.Selected} Test    {CM.Glyphs.UnSelected} New Test 你     │
 │                            │
@@ -139,52 +278,26 @@ namespace Terminal.Gui.ViewsTests {
 └────────────────────────────┘
 ";
 
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 30, 5), pos);
-		}
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
+        top.Dispose ();
+    }
 
-		[Fact]
-		public void SelectedItemChanged_Event ()
-		{
-			var previousSelectedItem = -1;
-			var selectedItem = -1;
-			var rg = new RadioGroup (new string [] { "Test", "New Test" });
-			rg.SelectedItemChanged += (s,e) => {
-				previousSelectedItem = e.PreviousSelectedItem;
-				selectedItem = e.SelectedItem;
-			};
+    [Fact]
+    public void SelectedItemChanged_Event ()
+    {
+        int previousSelectedItem = -1;
+        int selectedItem = -1;
+        var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
 
-			rg.SelectedItem = 1;
-			Assert.Equal (0, previousSelectedItem);
-			Assert.Equal (selectedItem, rg.SelectedItem);
-		}
+        rg.SelectedItemChanged += (s, e) =>
+                                  {
+                                      previousSelectedItem = e.PreviousSelectedItem;
+                                      selectedItem = e.SelectedItem;
+                                  };
 
-		[Fact]
-		public void KeyBindings_Command ()
-		{
-			var rg = new RadioGroup (new string [] { "Test", "New Test" });
-
-			Assert.True (rg.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
-			Assert.True (rg.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
-			Assert.True (rg.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
-			Assert.True (rg.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
-			Assert.True (rg.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
-			Assert.Equal (1, rg.SelectedItem);
-		}
-
-		[Fact]
-		public void ProcessColdKey_HotKey ()
-		{
-			var rg = new RadioGroup (new string [] { "Left", "Right", "Cen_tered", "Justified" });
-
-			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.t, new KeyModifiers ())));
-			Assert.Equal (2, rg.SelectedItem);
-			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.L, new KeyModifiers ())));
-			Assert.Equal (0, rg.SelectedItem);
-			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.J, new KeyModifiers ())));
-			Assert.Equal (3, rg.SelectedItem);
-			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.R, new KeyModifiers ())));
-			Assert.Equal (1, rg.SelectedItem);
-		}
-	}
+        rg.SelectedItem = 1;
+        Assert.Equal (0, previousSelectedItem);
+        Assert.Equal (selectedItem, rg.SelectedItem);
+    }
 }

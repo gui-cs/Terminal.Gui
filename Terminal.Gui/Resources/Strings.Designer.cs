@@ -61,6 +61,69 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Cancel.
+        /// </summary>
+        internal static string btnCancel {
+            get {
+                return ResourceManager.GetString("btnCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _No.
+        /// </summary>
+        internal static string btnNo {
+            get {
+                return ResourceManager.GetString("btnNo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _OK.
+        /// </summary>
+        internal static string btnOk {
+            get {
+                return ResourceManager.GetString("btnOk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to O_pen.
+        /// </summary>
+        internal static string btnOpen {
+            get {
+                return ResourceManager.GetString("btnOpen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Save.
+        /// </summary>
+        internal static string btnSave {
+            get {
+                return ResourceManager.GetString("btnSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save _as.
+        /// </summary>
+        internal static string btnSaveAs {
+            get {
+                return ResourceManager.GetString("btnSaveAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Yes.
+        /// </summary>
+        internal static string btnYes {
+            get {
+                return ResourceManager.GetString("btnYes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Copy.
         /// </summary>
         internal static string ctxCopy {
@@ -124,11 +187,74 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Date Picker.
+        /// </summary>
+        internal static string dpTitle {
+            get {
+                return ResourceManager.GetString("dpTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Any Files.
         /// </summary>
         internal static string fdAnyFiles {
             get {
                 return ResourceManager.GetString("fdAnyFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Delete.
+        /// </summary>
+        internal static string fdCtxDelete {
+            get {
+                return ResourceManager.GetString("fdCtxDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Hide {0}.
+        /// </summary>
+        internal static string fdCtxHide {
+            get {
+                return ResourceManager.GetString("fdCtxHide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _New.
+        /// </summary>
+        internal static string fdCtxNew {
+            get {
+                return ResourceManager.GetString("fdCtxNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Rename.
+        /// </summary>
+        internal static string fdCtxRename {
+            get {
+                return ResourceManager.GetString("fdCtxRename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Sort {0} ASC.
+        /// </summary>
+        internal static string fdCtxSortAsc {
+            get {
+                return ResourceManager.GetString("fdCtxSortAsc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Sort {0} DESC.
+        /// </summary>
+        internal static string fdCtxSortDesc {
+            get {
+                return ResourceManager.GetString("fdCtxSortDesc", resourceCulture);
             }
         }
         
@@ -268,15 +394,6 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No.
-        /// </summary>
-        internal static string fdNo {
-            get {
-                return ResourceManager.GetString("fdNo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open.
         /// </summary>
         internal static string fdOpen {
@@ -390,15 +507,6 @@ namespace Terminal.Gui.Resources {
         internal static string fdWrongFileTypeFeedback {
             get {
                 return ResourceManager.GetString("fdWrongFileTypeFeedback", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Yes.
-        /// </summary>
-        internal static string fdYes {
-            get {
-                return ResourceManager.GetString("fdYes", resourceCulture);
             }
         }
         

@@ -3,168 +3,216 @@ using System.Data;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios {
+namespace UICatalog.Scenarios;
 
-	[ScenarioMetadata (Name: "MultiColouredTable", Description: "Demonstrates how to multi color cell contents.")]
-	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Colors")]
-	[ScenarioCategory ("TableView")]
-	public class MultiColouredTable : Scenario {
-		TableViewColors tableView;
-		private DataTable table;
+[ScenarioMetadata ("MultiColouredTable", "Demonstrates how to multi color cell contents.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Colors")]
+[ScenarioCategory ("TableView")]
+public class MultiColouredTable : Scenario
+{
+    private DataTable _table;
+    private TableViewColors _tableView;
 
-		public override void Setup ()
-		{
-			Win.Title = this.GetName ();
-			Win.Y = 1; // menu
-			Win.Height = Dim.Fill (1); // status bar
-			Application.Top.LayoutSubviews ();
+    public override void Main ()
+    {
+        // Init
+        Application.Init ();
 
-			this.tableView = new TableViewColors () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (1),
-			};
+        // Setup - Create a top-level application window and configure it.
+        Toplevel appWindow = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
 
-			var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Quit()),
-				}),
-			});
-			Application.Top.Add (menu);
+        _tableView = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-			});
-			Application.Top.Add (statusBar);
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new ("_File", new MenuItem [] { new ("_Quit", "", Quit) })
+            ]
+        };
+        appWindow.Add (menu);
 
-			Win.Add (tableView);
+        var statusBar = new StatusBar (new Shortcut [] { new (Application.QuitKey, "Quit", Quit) });
 
-			tableView.CellActivated += EditCurrentCell;
+        appWindow.Add (statusBar);
 
-			var dt = new DataTable ();
-			dt.Columns.Add ("Col1");
-			dt.Columns.Add ("Col2");
+        appWindow.Add (_tableView);
 
-			dt.Rows.Add ("some text", "Rainbows and Unicorns are so fun!");
-			dt.Rows.Add ("some text", "When it rains you get rainbows");
-			dt.Rows.Add (DBNull.Value, DBNull.Value);
-			dt.Rows.Add (DBNull.Value, DBNull.Value);
-			dt.Rows.Add (DBNull.Value, DBNull.Value);
-			dt.Rows.Add (DBNull.Value, DBNull.Value);
+        _tableView.CellActivated += EditCurrentCell;
 
-			tableView.ColorScheme = new ColorScheme () {
+        var dt = new DataTable ();
+        dt.Columns.Add ("Col1");
+        dt.Columns.Add ("Col2");
 
-				Disabled = Win.ColorScheme.Disabled,
-				HotFocus = Win.ColorScheme.HotFocus,
-				Focus = Win.ColorScheme.Focus,
-				Normal = Application.Driver.MakeAttribute (Color.DarkGray, Color.Black)
-			};
+        dt.Rows.Add ("some text", "Rainbows and Unicorns are so fun!");
+        dt.Rows.Add ("some text", "When it rains you get rainbows");
+        dt.Rows.Add (DBNull.Value, DBNull.Value);
+        dt.Rows.Add (DBNull.Value, DBNull.Value);
+        dt.Rows.Add (DBNull.Value, DBNull.Value);
+        dt.Rows.Add (DBNull.Value, DBNull.Value);
 
-			tableView.Table = new DataTableSource (this.table = dt);
-		}
+        _tableView.ColorScheme = new ()
+        {
+            Disabled = appWindow.ColorScheme.Disabled,
+            HotFocus = appWindow.ColorScheme.HotFocus,
+            Focus = appWindow.ColorScheme.Focus,
+            Normal = new (Color.DarkGray, Color.Black)
+        };
 
-		private void Quit ()
-		{
-			Application.RequestStop ();
-		}
-		private bool GetText (string title, string label, string initialText, out string enteredText)
-		{
-			bool okPressed = false;
+        _tableView.Table = new DataTableSource (_table = dt);
 
-			var ok = new Button ("Ok", is_default: true);
-			ok.Clicked += (s, e) => { okPressed = true; Application.RequestStop (); };
-			var cancel = new Button ("Cancel");
-			cancel.Clicked += (s, e) => { Application.RequestStop (); };
-			var d = new Dialog (ok, cancel) { Title = title };
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
 
-			var lbl = new Label () {
-				X = 0,
-				Y = 1,
-				Text = label
-			};
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
+    }
 
-			var tf = new TextField () {
-				Text = initialText,
-				X = 0,
-				Y = 2,
-				Width = Dim.Fill ()
-			};
+    private void EditCurrentCell (object sender, CellActivatedEventArgs e)
+    {
+        if (e.Table == null)
+        {
+            return;
+        }
 
-			d.Add (lbl, tf);
-			tf.SetFocus ();
+        var oldValue = e.Table [e.Row, e.Col].ToString ();
 
-			Application.Run (d);
+        if (GetText ("Enter new value", e.Table.ColumnNames [e.Col], oldValue, out string newText))
+        {
+            try
+            {
+                _table.Rows [e.Row] [e.Col] =
+                    string.IsNullOrWhiteSpace (newText) ? DBNull.Value : newText;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
+            }
 
-			enteredText = okPressed ? tf.Text : null;
-			return okPressed;
-		}
-		private void EditCurrentCell (object sender, CellActivatedEventArgs e)
-		{
-			if (e.Table == null)
-				return;
+            _tableView.Update ();
+        }
+    }
 
-			var oldValue = e.Table [e.Row, e.Col].ToString ();
+    private bool GetText (string title, string label, string initialText, out string enteredText)
+    {
+        var okPressed = false;
 
-			if (GetText ("Enter new value", e.Table.ColumnNames [e.Col], oldValue, out string newText)) {
-				try {
-					table.Rows [e.Row] [e.Col] = string.IsNullOrWhiteSpace (newText) ? DBNull.Value : (object)newText;
-				} catch (Exception ex) {
-					MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
-				}
+        var ok = new Button { Text = "Ok", IsDefault = true };
 
-				tableView.Update ();
-			}
-		}
+        ok.Accept += (s, e) =>
+                     {
+                         okPressed = true;
+                         Application.RequestStop ();
+                     };
+        var cancel = new Button { Text = "Cancel" };
+        cancel.Accept += (s, e) => { Application.RequestStop (); };
+        var d = new Dialog { Title = title, Buttons = [ok, cancel] };
 
-		class TableViewColors : TableView {
-			protected override void RenderCell (Terminal.Gui.Attribute cellColor, string render, bool isPrimaryCell)
-			{
-				int unicorns = render.IndexOf ("unicorns", StringComparison.CurrentCultureIgnoreCase);
-				int rainbows = render.IndexOf ("rainbows", StringComparison.CurrentCultureIgnoreCase);
+        var lbl = new Label { X = 0, Y = 1, Text = label };
 
-				for (int i = 0; i < render.Length; i++) {
+        var tf = new TextField { Text = initialText, X = 0, Y = 2, Width = Dim.Fill () };
 
-					if (unicorns != -1 && i >= unicorns && i <= unicorns + 8) {
-						Driver.SetAttribute (Driver.MakeAttribute (Color.White, cellColor.Background));
-					}
+        d.Add (lbl, tf);
+        tf.SetFocus ();
 
-					if (rainbows != -1 && i >= rainbows && i <= rainbows + 8) {
+        Application.Run (d);
+        d.Dispose ();
 
-						var letterOfWord = i - rainbows;
-						switch (letterOfWord) {
-						case 0:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.Red, cellColor.Background));
-							break;
-						case 1:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.BrightRed, cellColor.Background));
-							break;
-						case 2:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.BrightYellow, cellColor.Background));
-							break;
-						case 3:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.Green, cellColor.Background));
-							break;
-						case 4:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.BrightGreen, cellColor.Background));
-							break;
-						case 5:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.BrightBlue, cellColor.Background));
-							break;
-						case 6:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.BrightCyan, cellColor.Background));
-							break;
-						case 7:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.Cyan, cellColor.Background));
-							break;
-						}
-					}
+        enteredText = okPressed ? tf.Text : null;
 
-					Driver.AddRune ((Rune)render [i]);
-					Driver.SetAttribute (cellColor);
-				}
-			}
-		}
-	}
+        return okPressed;
+    }
+
+    private void Quit () { Application.RequestStop (); }
+
+    private class TableViewColors : TableView
+    {
+        protected override void RenderCell (Attribute cellColor, string render, bool isPrimaryCell)
+        {
+            int unicorns = render.IndexOf ("unicorns", StringComparison.CurrentCultureIgnoreCase);
+            int rainbows = render.IndexOf ("rainbows", StringComparison.CurrentCultureIgnoreCase);
+
+            for (var i = 0; i < render.Length; i++)
+            {
+                if (unicorns != -1 && i >= unicorns && i <= unicorns + 8)
+                {
+                    Driver.SetAttribute (new (Color.White, cellColor.Background));
+                }
+
+                if (rainbows != -1 && i >= rainbows && i <= rainbows + 8)
+                {
+                    int letterOfWord = i - rainbows;
+
+                    switch (letterOfWord)
+                    {
+                        case 0:
+                            Driver.SetAttribute (new (Color.Red, cellColor.Background));
+
+                            break;
+                        case 1:
+                            Driver.SetAttribute (
+                                                 new (
+                                                      Color.BrightRed,
+                                                      cellColor.Background
+                                                     )
+                                                );
+
+                            break;
+                        case 2:
+                            Driver.SetAttribute (
+                                                 new (
+                                                      Color.BrightYellow,
+                                                      cellColor.Background
+                                                     )
+                                                );
+
+                            break;
+                        case 3:
+                            Driver.SetAttribute (new (Color.Green, cellColor.Background));
+
+                            break;
+                        case 4:
+                            Driver.SetAttribute (
+                                                 new (
+                                                      Color.BrightGreen,
+                                                      cellColor.Background
+                                                     )
+                                                );
+
+                            break;
+                        case 5:
+                            Driver.SetAttribute (
+                                                 new (
+                                                      Color.BrightBlue,
+                                                      cellColor.Background
+                                                     )
+                                                );
+
+                            break;
+                        case 6:
+                            Driver.SetAttribute (
+                                                 new (
+                                                      Color.BrightCyan,
+                                                      cellColor.Background
+                                                     )
+                                                );
+
+                            break;
+                        case 7:
+                            Driver.SetAttribute (new (Color.Cyan, cellColor.Background));
+
+                            break;
+                    }
+                }
+
+                Driver.AddRune ((Rune)render [i]);
+                Driver.SetAttribute (cellColor);
+            }
+        }
+    }
 }

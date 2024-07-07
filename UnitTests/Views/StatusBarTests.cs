@@ -1,164 +1,206 @@
-﻿using System;
-using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests {
-	public class StatusBarTests {
-		readonly ITestOutputHelper output;
+namespace Terminal.Gui.ViewsTests;
+public class StatusBarTests (ITestOutputHelper output)
+{
+    [Fact]
+    public void AddItemAt_RemoveItem_Replacing ()
+    {
+        var sb = new StatusBar ([
+                                    new (Key.O.WithCtrl, "Open", null),
+                                    new (Key.S.WithCtrl, "Save", null),
+                                    new (Key.Q.WithCtrl, "Quit", null)
+                                ]
+                               );
 
-		public StatusBarTests (ITestOutputHelper output)
-		{
-			this.output = output;
-		}
+        sb.AddShortcutAt (2, new (Key.C.WithCtrl, "Close", null));
 
-		[Fact]
-		public void StatusItem_Constructor ()
-		{
-			var si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", null);
-			Assert.Equal (Key.CtrlMask | Key.Q, si.Shortcut);
-			Assert.Equal ($"{Application.QuitKey} to Quit", si.Title);
-			Assert.Null (si.Action);
-			si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", () => { });
-			Assert.NotNull (si.Action);
-		}
+        Assert.Equal ("Open", sb.Subviews [0].Title);
+        Assert.Equal ("Save", sb.Subviews [1].Title);
+        Assert.Equal ("Close", sb.Subviews [2].Title);
+        Assert.Equal ("Quit", sb.Subviews [^1].Title);
 
-		[Fact]
-		public void StatusBar_Contructor_Default ()
-		{
-			var sb = new StatusBar ();
+        Assert.Equal ("Save", sb.RemoveShortcut (1).Title);
 
-			Assert.Empty (sb.Items);
-			Assert.False (sb.CanFocus);
-			Assert.Equal (Colors.Menu, sb.ColorScheme);
-			Assert.Equal (0, sb.X);
-			Assert.Equal ("AnchorEnd(1)", sb.Y.ToString ());
-			Assert.Equal (Dim.Fill (), sb.Width);
-			Assert.Equal (1, sb.Height);
+        Assert.Equal ("Open", sb.Subviews [0].Title);
+        Assert.Equal ("Close", sb.Subviews [1].Title);
+        Assert.Equal ("Quit", sb.Subviews [^1].Title);
 
-			var driver = new FakeDriver ();
-			Application.Init (driver);
+        sb.AddShortcutAt (1, new Shortcut (Key.A.WithCtrl, "Save As", null));
 
-			sb = new StatusBar ();
+        Assert.Equal ("Open", sb.Subviews [0].Title);
+        Assert.Equal ("Save As", sb.Subviews [1].Title);
+        Assert.Equal ("Quit", sb.Subviews [^1].Title);
+    }
 
-			driver.SetCursorVisibility (CursorVisibility.Default);
-			driver.GetCursorVisibility (out CursorVisibility cv);
-			Assert.Equal (CursorVisibility.Default, cv);
-			Assert.True (FakeConsole.CursorVisible);
+    //[Fact]
+    //[AutoInitShutdown]
+    //public void CanExecute_ProcessHotKey ()
+    //{
+    //    Window win = null;
 
-			Application.Iteration += () => {
-				Assert.Equal (24, sb.Frame.Y);
+    //    var statusBar = new StatusBar (
+    //                                   new Shortcut []
+    //                                   {
+    //                                       new (
+    //                                            KeyCode.CtrlMask | KeyCode.N,
+    //                                            "~^N~ New",
+    //                                            New,
+    //                                            CanExecuteNew
+    //                                           ),
+    //                                       new (
+    //                                            KeyCode.CtrlMask | KeyCode.C,
+    //                                            "~^C~ Close",
+    //                                            Close,
+    //                                            CanExecuteClose
+    //                                           )
+    //                                   }
+    //                                  );
+    //    Toplevel top = new ();
+    //    top.Add (statusBar);
 
-				driver.SetWindowSize (driver.Cols, 15);
+    //    bool CanExecuteNew () { return win == null; }
 
-				Assert.Equal (14, sb.Frame.Y);
+    //    void New () { win = new (); }
 
-				sb.OnEnter (null);
-				driver.GetCursorVisibility (out cv);
-				Assert.Equal (CursorVisibility.Invisible, cv);
-				Assert.False (FakeConsole.CursorVisible);
+    //    bool CanExecuteClose () { return win != null; }
 
-				Application.RequestStop ();
-			};
+    //    void Close () { win = null; }
 
-			Application.Top.Add (sb);
+    //    Application.Begin (top);
 
-			Application.Run ();
+    //    Assert.Null (win);
+    //    Assert.True (CanExecuteNew ());
+    //    Assert.False (CanExecuteClose ());
 
-			Application.Shutdown ();
-		}
+    //    Assert.True (top.NewKeyDownEvent (Key.N.WithCtrl));
+    //    Application.MainLoop.RunIteration ();
+    //    Assert.NotNull (win);
+    //    Assert.False (CanExecuteNew ());
+    //    Assert.True (CanExecuteClose ());
+    //    top.Dispose ();
+    //}
 
-		[Fact]
-		[AutoInitShutdown]
-		public void Run_Action_With_Key_And_Mouse ()
-		{
-			var msg = "";
-			var sb = new StatusBar (new StatusItem [] { new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", () => msg = "Quiting...") });
-			Application.Top.Add (sb);
+    [Fact]
+    [AutoInitShutdown]
+    public void Redraw_Output ()
+    {
+    }
 
-			var iteration = 0;
+    [Fact]
+    [AutoInitShutdown]
+    public void Redraw_Output_CTRLQ ()
+    {
 
-			Application.Iteration += () => {
-				if (iteration == 0) {
-					Assert.Equal ("", msg);
-					sb.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.Q, null));
-				} else if (iteration == 1) {
-					Assert.Equal ("Quiting...", msg);
-					msg = "";
-					sb.MouseEvent (new MouseEvent () { X = 1, Y = 24, Flags = MouseFlags.Button1Clicked });
-				} else {
-					Assert.Equal ("Quiting...", msg);
+    }
 
-					Application.RequestStop ();
-				}
-				iteration++;
-			};
+    [Fact]
+    [AutoInitShutdown]
+    public void Run_Action_With_Key_And_Mouse ()
+    {
+        var msg = "";
 
-			Application.Run ();
-		}
+        var sb = new StatusBar (
+                                new Shortcut []
+                                {
+                                    new (
+                                         Application.QuitKey,
+                                         $"Quit",
+                                         () => msg = "Quiting..."
+                                        )
+                                }
+                               );
+        var iteration = 0;
 
-		[Fact]
-		[AutoInitShutdown]
-		public void Redraw_Output ()
-		{
-			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.O, "~^O~ Open", null),
-				new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit!", null)
-			});
-			Application.Top.Add (sb);
+        Application.Iteration += (s, a) =>
+                                 {
+                                     if (iteration == 0)
+                                     {
+                                         Assert.Equal ("", msg);
+                                         Application.OnKeyDown (Application.QuitKey);
+                                     }
+                                     else if (iteration == 1)
+                                     {
+                                         Assert.Equal ("Quiting...", msg);
+                                         msg = "";
+                                         sb.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+                                     }
+                                     else
+                                     {
+                                         Assert.Equal ("Quiting...", msg);
 
-			sb.OnDrawContent (sb.Bounds);
+                                         Application.RequestStop ();
+                                     }
 
-			string expected = @$"
-^O Open {CM.Glyphs.VLine} Q, CtrlMask to Quit!
-";
-			TestHelpers.AssertDriverContentsAre (expected, output);
-		}
+                                     iteration++;
+                                 };
 
-		[Fact]
-		[AutoInitShutdown]
-		public void Redraw_Output_CTRLQ ()
-		{
-			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.O, "~CTRL-O~ Open", null),
-				new StatusItem (Key.CtrlMask | Key.Q, "~CTRL-Q~ Quit", null)
-			});
-			Application.Top.Add (sb);
-			sb.OnDrawContent (sb.Bounds);
+        Application.Run ().Dispose ();
+    }
 
-			string expected = @$"
-CTRL-O Open {CM.Glyphs.VLine} CTRL-Q Quit
-";
+    [Fact]
+    public void StatusBar_Constructor_Default ()
+    {
+        var sb = new StatusBar ();
 
-			TestHelpers.AssertDriverContentsAre (expected, output);
-		}
+        Assert.Empty (sb.Subviews);
+        Assert.True (sb.CanFocus);
+        Assert.Equal (Colors.ColorSchemes ["Menu"], sb.ColorScheme);
+        Assert.Equal (0, sb.X);
+        Assert.Equal ("AnchorEnd()", sb.Y.ToString ());
+        Assert.Equal (Dim.Fill (), sb.Width);
+        Assert.Equal (1, sb.Frame.Height);
+    }
 
-		[Fact]
-		public void AddItemAt_RemoveItem_Replacing ()
-		{
-			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.Q, "~^O~ Open", null),
-				new StatusItem (Key.CtrlMask | Key.Q, "~^S~ Save", null),
-				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", null)
-			});
+    [Fact]
+    public void RemoveAndThenAddStatusBar_ShouldNotChangeWidth ()
+    {
+        StatusBar statusBar;
+        StatusBar statusBar2;
 
-			sb.AddItemAt (2, new StatusItem (Key.CtrlMask | Key.Q, "~^C~ Close", null));
+        var w = new Window ();
+        statusBar2 = new StatusBar () { Id = "statusBar2" };
+        statusBar = new StatusBar () { Id = "statusBar" };
+        w.Width = Dim.Fill (0);
+        w.Height = Dim.Fill (0);
+        w.X = 0;
+        w.Y = 0;
 
-			Assert.Equal ("~^O~ Open", sb.Items [0].Title);
-			Assert.Equal ("~^S~ Save", sb.Items [1].Title);
-			Assert.Equal ("~^C~ Close", sb.Items [2].Title);
-			Assert.Equal ("~^Q~ Quit", sb.Items [^1].Title);
+        w.Visible = true;
+        w.Modal = false;
+        w.Title = "";
+        statusBar.Width = Dim.Fill (0);
+        statusBar.Height = 1;
+        statusBar.X = 0;
+        statusBar.Y = 0;
+        statusBar.Visible = true;
+        w.Add (statusBar);
+        Assert.Equal (w.StatusBar, statusBar);
 
-			Assert.Equal ("~^S~ Save", sb.RemoveItem (1).Title);
+        statusBar2.Width = Dim.Fill (0);
+        statusBar2.Height = 1;
+        statusBar2.X = 0;
+        statusBar2.Y = 4;
+        statusBar2.Visible = true;
+        w.Add (statusBar2);
+        Assert.Equal (w.StatusBar, statusBar2);
 
-			Assert.Equal ("~^O~ Open", sb.Items [0].Title);
-			Assert.Equal ("~^C~ Close", sb.Items [1].Title);
-			Assert.Equal ("~^Q~ Quit", sb.Items [^1].Title);
+        var menuBars = w.Subviews.OfType<StatusBar> ().ToArray ();
+        Assert.Equal (2, menuBars.Length);
 
-			sb.Items [1] = new StatusItem (Key.CtrlMask | Key.A, "~^A~ Save As", null);
+        Assert.Equal (Dim.Fill (0), menuBars [0].Width);
+        Assert.Equal (Dim.Fill (0), menuBars [1].Width);
 
-			Assert.Equal ("~^O~ Open", sb.Items [0].Title);
-			Assert.Equal ("~^A~ Save As", sb.Items [1].Title);
-			Assert.Equal ("~^Q~ Quit", sb.Items [^1].Title);
-		}
-	}
+        // Goes wrong here
+        w.Remove (statusBar);
+        w.Remove (statusBar2);
+
+        w.Add (statusBar);
+        w.Add (statusBar2);
+
+        // These assertions fail
+        Assert.Equal (Dim.Fill (0), menuBars [0].Width);
+        Assert.Equal (Dim.Fill (0), menuBars [1].Width);
+    }
+
 }

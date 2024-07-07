@@ -1,230 +1,303 @@
-﻿using System.Text;
-using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Nodes;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Text;
+using JetBrains.Annotations;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
-namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "List View With Selection", Description: "ListView with columns and selection")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("ListView")]
-	public class ListViewWithSelection : Scenario {
+namespace UICatalog.Scenarios;
 
-		public CheckBox _customRenderCB;
-		public CheckBox _allowMarkingCB;
-		public CheckBox _allowMultipleCB;
-		public ListView _listView;
+[ScenarioMetadata ("List View With Selection", "ListView with columns and selection")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("ListView")]
+public class ListViewWithSelection : Scenario
+{
+    private CheckBox _allowMarkingCB;
+    private CheckBox _allowMultipleCB;
+    private CheckBox _customRenderCB;
+    private ListView _listView;
+    private ObservableCollection<Scenario> _scenarios;
+    private Window _appWindow;
 
-		public List<Scenario> _scenarios;
+    /// <inheritdoc />
+    public override void Main ()
+    {
+        Application.Init ();
 
-		public override void Setup ()
-		{
-			_scenarios = Scenario.GetScenarios ();
+        _appWindow = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+        };
 
-			_customRenderCB = new CheckBox ("Use custom rendering") {
-				X = 0,
-				Y = 0,
-				Height = 1,
-			};
-			Win.Add (_customRenderCB);
-			_customRenderCB.Toggled += _customRenderCB_Toggled;
+        _scenarios = GetScenarios ();
 
-			_allowMarkingCB = new CheckBox ("Allow Marking") {
-				X = Pos.Right (_customRenderCB) + 1,
-				Y = 0,
-				Height = 1,
-			};
-			Win.Add (_allowMarkingCB);
-			_allowMarkingCB.Toggled += AllowMarkingCB_Toggled;
+        _customRenderCB = new CheckBox { X = 0, Y = 0, Text = "Use custom rendering" };
+        _appWindow.Add (_customRenderCB);
+        _customRenderCB.Toggle += _customRenderCB_Toggle;
 
-			_allowMultipleCB = new CheckBox ("Allow Multi-Select") {
-				X = Pos.Right (_allowMarkingCB) + 1,
-				Y = 0,
-				Height = 1,
-				Visible = (bool)_allowMarkingCB.Checked
-			};
-			Win.Add (_allowMultipleCB);
-			_allowMultipleCB.Toggled += AllowMultipleCB_Toggled;
+        _allowMarkingCB = new CheckBox
+        {
+            X = Pos.Right (_customRenderCB) + 1, Y = 0, Text = "Allow Marking", AllowCheckStateNone = false
+        };
+        _appWindow.Add (_allowMarkingCB);
+        _allowMarkingCB.Toggle += AllowMarkingCB_Toggle;
 
-			_listView = new ListView () {
-				X = 1,
-				Y = 2,
-				Height = Dim.Fill (),
-				Width = Dim.Fill (1),
-				//ColorScheme = Colors.TopLevel,
-				AllowsMarking = false,
-				AllowsMultipleSelection = false
-			};
-			_listView.RowRender += ListView_RowRender;
-			Win.Add (_listView);
+        _allowMultipleCB = new CheckBox
+        {
+            X = Pos.Right (_allowMarkingCB) + 1,
+            Y = 0,
+            Visible = _allowMarkingCB.State == CheckState.Checked,
+            Text = "Allow Multi-Select"
+        };
+        _appWindow.Add (_allowMultipleCB);
+        _allowMultipleCB.Toggle += AllowMultipleCB_Toggle;
 
-			var scrollBar = new ScrollBarView (_listView, true);
+        _listView = new ListView
+        {
+            X = 1,
+            Y = 2,
+            Height = Dim.Fill (),
+            Width = Dim.Fill (1),
 
-			scrollBar.ChangedPosition += (s,e) => {
-				_listView.TopItem = scrollBar.Position;
-				if (_listView.TopItem != scrollBar.Position) {
-					scrollBar.Position = _listView.TopItem;
-				}
-				_listView.SetNeedsDisplay ();
-			};
+            //ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            AllowsMarking = false,
+            AllowsMultipleSelection = false
+        };
+        _listView.RowRender += ListView_RowRender;
+        _appWindow.Add (_listView);
 
-			scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
-				_listView.LeftItem = scrollBar.OtherScrollBarView.Position;
-				if (_listView.LeftItem != scrollBar.OtherScrollBarView.Position) {
-					scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
-				}
-				_listView.SetNeedsDisplay ();
-			};
+        var scrollBar = new ScrollBarView (_listView, true);
 
-			_listView.DrawContent += (s,e) => {
-				scrollBar.Size = _listView.Source.Count - 1;
-				scrollBar.Position = _listView.TopItem;
-				scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
-				scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
-				scrollBar.Refresh ();
-			};
+        scrollBar.ChangedPosition += (s, e) =>
+        {
+            _listView.TopItem = scrollBar.Position;
 
-			_listView.SetSource (_scenarios);
+            if (_listView.TopItem != scrollBar.Position)
+            {
+                scrollBar.Position = _listView.TopItem;
+            }
 
-			var k = "Keep Content Always In Viewport";
-			var keepCheckBox = new CheckBox (k, scrollBar.AutoHideScrollBars) {
-				X = Pos.AnchorEnd (k.Length + 3),
-				Y = 0,
-			};
-			keepCheckBox.Toggled += (s,e) => scrollBar.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
-			Win.Add (keepCheckBox);
-		}
+            _listView.SetNeedsDisplay ();
+        };
 
-		private void ListView_RowRender (object sender, ListViewRowEventArgs obj)
-		{
-			if (obj.Row == _listView.SelectedItem) {
-				return;
-			}
-			if (_listView.AllowsMarking && _listView.Source.IsMarked (obj.Row)) {
-				obj.RowAttribute = new Attribute (Color.BrightRed, Color.BrightYellow);
-				return;
-			}
-			if (obj.Row % 2 == 0) {
-				obj.RowAttribute = new Attribute (Color.BrightGreen, Color.Magenta);
-			} else {
-				obj.RowAttribute = new Attribute (Color.BrightMagenta, Color.Green);
-			}
-		}
+        scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
+        {
+            _listView.LeftItem = scrollBar.OtherScrollBarView.Position;
 
-		private void _customRenderCB_Toggled (object sender, ToggleEventArgs e)
-		{
-			if (e.OldValue == true) {
-				_listView.SetSource (_scenarios);
-			} else {
-				_listView.Source = new ScenarioListDataSource (_scenarios);
-			}
+            if (_listView.LeftItem != scrollBar.OtherScrollBarView.Position)
+            {
+                scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+            }
 
-			Win.SetNeedsDisplay ();
-		}
+            _listView.SetNeedsDisplay ();
+        };
 
-		private void AllowMarkingCB_Toggled (object sender, ToggleEventArgs e)
-		{
-			_listView.AllowsMarking = (bool)!e.OldValue;
-			_allowMultipleCB.Visible = _listView.AllowsMarking;
-			Win.SetNeedsDisplay ();
-		}
+        _listView.DrawContent += (s, e) =>
+        {
+            scrollBar.Size = _listView.Source.Count;
+            scrollBar.Position = _listView.TopItem;
+            scrollBar.OtherScrollBarView.Size = _listView.MaxLength;
+            scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+            scrollBar.Refresh ();
+        };
 
-		private void AllowMultipleCB_Toggled (object sender, ToggleEventArgs e)
-		{
-			_listView.AllowsMultipleSelection = (bool)!e.OldValue;
-			Win.SetNeedsDisplay ();
-		}
+        _listView.SetSource (_scenarios);
 
-		// This is basically the same implementation used by the UICatalog main window
-		internal class ScenarioListDataSource : IListDataSource {
-			int _nameColumnWidth = 30;
-			private List<Scenario> scenarios;
-			BitArray marks;
-			int count, len;
+        var k = "Keep Content Always In Viewport";
 
-			public List<Scenario> Scenarios {
-				get => scenarios;
-				set {
-					if (value != null) {
-						count = value.Count;
-						marks = new BitArray (count);
-						scenarios = value;
-						len = GetMaxLengthItem ();
-					}
-				}
-			}
-			public bool IsMarked (int item)
-			{
-				if (item >= 0 && item < count)
-					return marks [item];
-				return false;
-			}
+        var keepCheckBox = new CheckBox
+        {
+            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, State = scrollBar.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
+        };
+        keepCheckBox.Toggle += (s, e) => scrollBar.KeepContentAlwaysInViewport = e.NewValue == CheckState.Checked;
+        _appWindow.Add (keepCheckBox);
 
-			public int Count => Scenarios != null ? Scenarios.Count : 0;
+        Application.Run (_appWindow);
+        _appWindow.Dispose ();
+        Application.Shutdown ();
+    }
 
-			public int Length => len;
+    private void _customRenderCB_Toggle (object sender, CancelEventArgs<CheckState> stateEventArgs)
+    {
+        if (stateEventArgs.CurrentValue == CheckState.Checked)
+        {
+            _listView.SetSource (_scenarios);
+        }
+        else
+        {
+            _listView.Source = new ScenarioListDataSource (_scenarios);
+        }
 
-			public ScenarioListDataSource (List<Scenario> itemList) => Scenarios = itemList;
+        _appWindow.SetNeedsDisplay ();
+    }
 
-			public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start = 0)
-			{
-				container.Move (col, line);
-				// Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
-				var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenarios [item].GetName ());
-				RenderUstr (driver, $"{s} ({Scenarios [item].GetDescription ()})", col, line, width, start);
-			}
+    private void AllowMarkingCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
+    {
+        _listView.AllowsMarking = stateEventArgs.NewValue == CheckState.Checked;
+        _allowMultipleCB.Visible = _listView.AllowsMarking;
+        _appWindow.SetNeedsDisplay ();
+    }
 
-			public void SetMark (int item, bool value)
-			{
-				if (item >= 0 && item < count)
-					marks [item] = value;
-			}
+    private void AllowMultipleCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
+    {
+        _listView.AllowsMultipleSelection = stateEventArgs.NewValue == CheckState.Checked;
+        _appWindow.SetNeedsDisplay ();
+    }
 
-			int GetMaxLengthItem ()
-			{
-				if (scenarios?.Count == 0) {
-					return 0;
-				}
+    private void ListView_RowRender (object sender, ListViewRowEventArgs obj)
+    {
+        if (obj.Row == _listView.SelectedItem)
+        {
+            return;
+        }
 
-				int maxLength = 0;
-				for (int i = 0; i < scenarios.Count; i++) {
-					var s = String.Format (String.Format ("{{0,{0}}}", -_nameColumnWidth), Scenarios [i].GetName ());
-					var sc = $"{s}  {Scenarios [i].GetDescription ()}";
-					var l = sc.Length;
-					if (l > maxLength) {
-						maxLength = l;
-					}
-				}
+        if (_listView.AllowsMarking && _listView.Source.IsMarked (obj.Row))
+        {
+            obj.RowAttribute = new Attribute (Color.BrightRed, Color.BrightYellow);
 
-				return maxLength;
-			}
+            return;
+        }
 
-			// A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-			private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
-			{
-				int used = 0;
-				int index = start;
-				while (index < ustr.Length) {
-					(var rune, var size) = ustr.DecodeRune (index, index - ustr.Length);
-					var count = rune.GetColumns ();
-					if (used + count >= width) break;
-					driver.AddRune (rune);
-					used += count;
-					index += size;
-				}
+        if (obj.Row % 2 == 0)
+        {
+            obj.RowAttribute = new Attribute (Color.BrightGreen, Color.Magenta);
+        }
+        else
+        {
+            obj.RowAttribute = new Attribute (Color.BrightMagenta, Color.Green);
+        }
+    }
 
-				while (used < width) {
-					driver.AddRune ((Rune)' ');
-					used++;
-				}
-			}
+    // This is basically the same implementation used by the UICatalog main window
+    internal class ScenarioListDataSource : IListDataSource
+    {
+        private readonly int _nameColumnWidth = 30;
+        private int _count;
+        private BitArray _marks;
+        private ObservableCollection<Scenario> _scenarios;
+        public ScenarioListDataSource (ObservableCollection<Scenario> itemList) { Scenarios = itemList; }
 
-			public IList ToList ()
-			{
-				return Scenarios;
-			}
-		}
-	}
+        public ObservableCollection<Scenario> Scenarios
+        {
+            get => _scenarios;
+            set
+            {
+                if (value != null)
+                {
+                    _count = value.Count;
+                    _marks = new BitArray (_count);
+                    _scenarios = value;
+                    Length = GetMaxLengthItem ();
+                }
+            }
+        }
+
+        public bool IsMarked (int item)
+        {
+            if (item >= 0 && item < _count)
+            {
+                return _marks [item];
+            }
+
+            return false;
+        }
+
+        /// <inheritdoc />
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public int Count => Scenarios != null ? Scenarios.Count : 0;
+        public int Length { get; private set; }
+        public bool SuspendCollectionChangedEvent { get => throw new System.NotImplementedException (); set => throw new System.NotImplementedException (); }
+
+        public void Render (
+            ListView container,
+            ConsoleDriver driver,
+            bool selected,
+            int item,
+            int col,
+            int line,
+            int width,
+            int start = 0
+        )
+        {
+            container.Move (col, line);
+
+            // Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
+            string s = string.Format (
+                                      string.Format ("{{0,{0}}}", -_nameColumnWidth),
+                                      Scenarios [item].GetName ()
+                                     );
+            RenderUstr (driver, $"{s} ({Scenarios [item].GetDescription ()})", col, line, width, start);
+        }
+
+        public void SetMark (int item, bool value)
+        {
+            if (item >= 0 && item < _count)
+            {
+                _marks [item] = value;
+            }
+        }
+
+        public IList ToList () { return Scenarios; }
+
+        private int GetMaxLengthItem ()
+        {
+            if (_scenarios?.Count == 0)
+            {
+                return 0;
+            }
+
+            var maxLength = 0;
+
+            for (var i = 0; i < _scenarios.Count; i++)
+            {
+                string s = string.Format (
+                                          $"{{0,{-_nameColumnWidth}}}",
+                                          Scenarios [i].GetName ()
+                                         );
+                var sc = $"{s}  {Scenarios [i].GetDescription ()}";
+                int l = sc.Length;
+
+                if (l > maxLength)
+                {
+                    maxLength = l;
+                }
+            }
+
+            return maxLength;
+        }
+
+        // A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+        private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
+        {
+            var used = 0;
+            int index = start;
+
+            while (index < ustr.Length)
+            {
+                (Rune rune, int size) = ustr.DecodeRune (index, index - ustr.Length);
+                int count = rune.GetColumns ();
+
+                if (used + count >= width)
+                {
+                    break;
+                }
+
+                driver.AddRune (rune);
+                used += count;
+                index += size;
+            }
+
+            while (used < width)
+            {
+                driver.AddRune ((Rune)' ');
+                used++;
+            }
+        }
+
+        public void Dispose ()
+        {
+            _scenarios = null;
+        }
+    }
 }

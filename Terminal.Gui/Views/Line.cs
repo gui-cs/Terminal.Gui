@@ -1,49 +1,85 @@
-﻿using System;
+﻿namespace Terminal.Gui;
 
-namespace Terminal.Gui {
+/// <summary>Draws a single line using the <see cref="LineStyle"/> specified by <see cref="View.BorderStyle"/>.</summary>
+public class Line : View
+{
+    /// <summary>Constructs a Line object.</summary>
+    public Line ()
+    {
+        BorderStyle = LineStyle.Single;
+        Border.Thickness = new Thickness (0);
+        SuperViewRendersLineCanvas = true;
+    }
 
-	/// <summary>
-	/// Draws a single line using the <see cref="LineStyle"/> specified by <see cref="View.BorderStyle"/>.
-	/// </summary>
-	public class Line : View {
-		private Orientation _orientation;
+    private Orientation _orientation;
 
-		/// <summary>
-		/// The direction of the line.  If you change this you will need to manually update the Width/Height
-		/// of the control to cover a relevant area based on the new direction.
-		/// </summary>
-		public Orientation Orientation { get => _orientation; set => _orientation = value; }
+    /// <summary>
+    ///     The direction of the line.  If you change this you will need to manually update the Width/Height of the
+    ///     control to cover a relevant area based on the new direction.
+    /// </summary>
+    public Orientation Orientation
+    {
+        get => _orientation;
+        set
+        {
+            _orientation = value;
 
-		/// <summary>
-		/// Constructs a Line object.
-		/// </summary>
-		public Line ()
-		{
+            switch (Orientation)
+            {
+                case Orientation.Horizontal:
+                    Height = 1;
 
-		}
+                    break;
+                case Orientation.Vertical:
+                    Width = 1;
 
-		/// <inheritdoc/>
-		public override bool OnDrawFrames ()
-		{
-			var screenBounds = ViewToScreen (Bounds);
-			LineCanvas lc;
+                    break;
 
-			lc = SuperView?.LineCanvas;
-			lc.AddLine (screenBounds.Location, Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height, Orientation, BorderStyle);
+            }
+        }
+    }
 
-			return true;
-		}
+    /// <inheritdoc/>
+    public override void SetBorderStyle (LineStyle value)
+    {
+        // The default changes the thickness. We don't want that. We just set the style.
+        Border.LineStyle = value;
+    }
 
-		//public override void OnDrawContentComplete (Rect contentArea)
-		//{
-		//	var screenBounds = ViewToScreen (Frame);
+    /// <inheritdoc/>
+    public override void OnDrawContent (Rectangle viewport)
+    {
+        LineCanvas lc = LineCanvas;
 
-		//}
+        if (SuperViewRendersLineCanvas)
+        {
+            lc = SuperView.LineCanvas;
+        }
 
-		/// <inheritdoc/>
-		public override void OnDrawContent (Rect contentArea)
-		{
-			OnDrawFrames ();
-		}
-	}
+        if (SuperView is Adornment adornment)
+        {
+            lc = adornment.Parent.LineCanvas;
+        }
+
+        Point pos = ViewportToScreen (viewport).Location;
+        int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
+
+        if (SuperViewRendersLineCanvas && Orientation == Orientation.Horizontal)
+        {
+            pos.Offset (-SuperView.Border.Thickness.Left, 0);
+            length += SuperView.Border.Thickness.Horizontal;
+        }
+
+        if (SuperViewRendersLineCanvas && Orientation == Orientation.Vertical)
+        {
+            pos.Offset (0, -SuperView.Border.Thickness.Top);
+            length += SuperView.Border.Thickness.Vertical;
+        }
+        lc.AddLine (
+                    pos,
+                    length,
+                    Orientation,
+                    BorderStyle
+                   );
+    }
 }

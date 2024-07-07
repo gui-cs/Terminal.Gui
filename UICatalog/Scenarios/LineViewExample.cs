@@ -1,102 +1,92 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Terminal.Gui;
-using static UICatalog.Scenario;
 
-namespace UICatalog.Scenarios {
+namespace UICatalog.Scenarios;
 
-	[ScenarioMetadata (Name: "Line View", Description: "Demonstrates drawing lines using the LineView control.")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("LineView")]
-	public class LineViewExample : Scenario {
+[ScenarioMetadata ("Line View", "Demonstrates drawing lines using the LineView control.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("LineView")]
+[ScenarioCategory ("Borders")]
+public class LineViewExample : Scenario
+{
+    public override void Main ()
+    {
+        Application.Init ();
+        // Setup - Create a top-level application window and configure it.
+        Toplevel appWindow = new ();
 
-		public override void Setup ()
-		{
-			Win.Title = this.GetName ();
-			Win.Y = 1; // menu
-			Win.Height = Dim.Fill (1); // status bar
-			Application.Top.LayoutSubviews ();
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
+            ]
+        };
+        appWindow.Add (menu);
 
-			var menu = new MenuBar (new MenuBarItem [] {
-			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Quit", "", () => Quit()),
-			})
-			});
-			Application.Top.Add (menu);
+        appWindow.Add (new Label { Y = 1, Text = "Regular Line" });
 
-			Win.Add (new Label ("Regular Line") { Y = 0 });
+        // creates a horizontal line
+        var line = new LineView { Y = 2 };
 
-			// creates a horizontal line
-			var line = new LineView () {
-				Y = 1,
-			};
+        appWindow.Add (line);
 
-			Win.Add (line);
+        appWindow.Add (new Label { Y = 3, Text = "Double Width Line" });
 
-			Win.Add (new Label ("Double Width Line") { Y = 2 });
+        // creates a horizontal line
+        var doubleLine = new LineView { Y = 4, LineRune = (Rune)'\u2550' };
 
-			// creates a horizontal line
-			var doubleLine = new LineView () {
-				Y = 3,
-				LineRune = (Rune)'\u2550'
-			};
+        appWindow.Add (doubleLine);
 
-			Win.Add (doubleLine);
+        appWindow.Add (new Label { Y = 5, Text = "Short Line" });
 
-			Win.Add (new Label ("Short Line") { Y = 4 });
+        // creates a horizontal line
+        var shortLine = new LineView { Y = 5, Width = 10 };
 
-			// creates a horizontal line
-			var shortLine = new LineView () {
-				Y = 5,
-				Width = 10
-			};
+        appWindow.Add (shortLine);
 
-			Win.Add (shortLine);
+        appWindow.Add (new Label { Y = 7, Text = "Arrow Line" });
 
-			Win.Add (new Label ("Arrow Line") { Y = 6 });
+        // creates a horizontal line
+        var arrowLine = new LineView
+        {
+            Y = 8, Width = 10, StartingAnchor = CM.Glyphs.LeftTee, EndingAnchor = (Rune)'>'
+        };
 
-			// creates a horizontal line
-			var arrowLine = new LineView () {
-				Y = 7,
-				Width = 10,
-				StartingAnchor = CM.Glyphs.LeftTee,
-				EndingAnchor = (Rune)'>'
-			};
+        appWindow.Add (arrowLine);
 
-			Win.Add (arrowLine);
+        appWindow.Add (new Label { Y = 10, X = 11, Text = "Vertical Line" });
 
-			Win.Add (new Label ("Vertical Line") { Y = 9,X=11 });
+        // creates a horizontal line
+        var verticalLine = new LineView (Orientation.Vertical) { X = 25 };
 
-			// creates a horizontal line
-			var verticalLine = new LineView (Orientation.Vertical) {
-				X = 25,
-			};
+        appWindow.Add (verticalLine);
 
-			Win.Add (verticalLine);
+        appWindow.Add (new Label { Y = 12, X = 28, Text = "Vertical Arrow" });
 
-			Win.Add (new Label ("Vertical Arrow") { Y = 11, X = 28 });
+        // creates a horizontal line
+        var verticalArrow = new LineView (Orientation.Vertical)
+        {
+            X = 27, StartingAnchor = CM.Glyphs.TopTee, EndingAnchor = (Rune)'V'
+        };
 
-			// creates a horizontal line
-			var verticalArrow = new LineView (Orientation.Vertical) {
-				X = 27,
-				StartingAnchor = CM.Glyphs.TopTee,
-				EndingAnchor = (Rune)'V'
-			};
+        appWindow.Add (verticalArrow);
 
-			Win.Add (verticalArrow);
+        var statusBar = new StatusBar (
+                                       new Shortcut []
+                                       {
+                                           new (Application.QuitKey, "Quit", Quit)
+                                       }
+                                      );
+        appWindow.Add (statusBar);
 
-			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-			});
-			Application.Top.Add (statusBar);
+        // Run - Start the application.
+        Application.Run (appWindow);
+        appWindow.Dispose ();
 
-		}
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
+    }
 
-		private void Quit ()
-		{
-			Application.RequestStop ();
-		}
-	}
+    private void Quit () { Application.RequestStop (); }
 }

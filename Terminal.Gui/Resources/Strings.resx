@@ -226,8 +226,8 @@
   <data name="fdNewTitle" xml:space="preserve">
     <value>New Folder</value>
   </data>
-  <data name="fdNo" xml:space="preserve">
-    <value>No</value>
+  <data name="btnNo" xml:space="preserve">
+    <value>_No</value>
   </data>
   <data name="fdRenameFailedTitle" xml:space="preserve">
     <value>Rename Failed</value>
@@ -238,10 +238,46 @@
   <data name="fdRenameTitle" xml:space="preserve">
     <value>Rename</value>
   </data>
-  <data name="fdYes" xml:space="preserve">
-    <value>Yes</value>
+  <data name="btnYes" xml:space="preserve">
+    <value>_Yes</value>
   </data>
   <data name="fdExisting" xml:space="preserve">
     <value>Existing</value>
+  </data>
+  <data name="btnOpen" xml:space="preserve">
+    <value>O_pen</value>
+  </data>
+  <data name="btnSave" xml:space="preserve">
+    <value>_Save</value>
+  </data>
+  <data name="btnSaveAs" xml:space="preserve">
+    <value>Save _as</value>
+  </data>
+  <data name="btnOk" xml:space="preserve">
+    <value>_OK</value>
+  </data>
+  <data name="btnCancel" xml:space="preserve">
+    <value>_Cancel</value>
+  </data>
+  <data name="fdCtxDelete" xml:space="preserve">
+    <value>_Delete</value>
+  </data>
+  <data name="fdCtxHide" xml:space="preserve">
+    <value>_Hide {0}</value>
+  </data>
+  <data name="fdCtxNew" xml:space="preserve">
+    <value>_New</value>
+  </data>
+  <data name="fdCtxRename" xml:space="preserve">
+    <value>_Rename</value>
+  </data>
+  <data name="fdCtxSortAsc" xml:space="preserve">
+    <value>_Sort {0} ASC</value>
+  </data>
+  <data name="fdCtxSortDesc" xml:space="preserve">
+    <value>_Sort {0} DESC</value>
+  </data>
+  <data name="dpTitle" xml:space="preserve">
+    <value>Date Picker</value>
   </data>
 </root>

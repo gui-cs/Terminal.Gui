@@ -1,408 +1,341 @@
-﻿using System;
-using System.Threading;
-using Terminal.Gui;
-using Xunit;
+﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.TextTests {
-	public class CollectionNavigatorTests {
-		static string [] simpleStrings = new string []{
-		    "appricot", // 0
-		    "arm",      // 1
-		    "bat",      // 2
-		    "batman",   // 3
-		    "candle"    // 4
-		  };
+namespace Terminal.Gui.TextTests;
 
-		[Fact]
-		public void ShouldAcceptNegativeOne ()
-		{
-			var n = new CollectionNavigator (simpleStrings);
+public class CollectionNavigatorTests
+{
+    private static readonly string [] simpleStrings =
+    {
+        "appricot", // 0
+        "arm", // 1
+        "bat", // 2
+        "batman", // 3
+        "candle" // 4
+    };
 
-			// Expect that index of -1 (i.e. no selection) should work correctly
-			// and select the first entry of the letter 'b'
-			Assert.Equal (2, n.GetNextMatchingItem (-1, 'b'));
-		}
-		[Fact]
-		public void OutOfBoundsShouldBeIgnored ()
-		{
-			var n = new CollectionNavigator (simpleStrings);
+    private readonly ITestOutputHelper _output;
 
-			// Expect saying that index 500 is the current selection should not cause
-			// error and just be ignored (treated as no selection)
-			Assert.Equal (2, n.GetNextMatchingItem (500, 'b'));
-		}
+    public CollectionNavigatorTests (ITestOutputHelper output) { _output = output; }
 
-		[Fact]
-		public void Cycling ()
-		{
-			// cycling with 'b'
-			var n = new CollectionNavigator (simpleStrings);
-			Assert.Equal (2, n.GetNextMatchingItem (0, 'b'));
-			Assert.Equal (3, n.GetNextMatchingItem (2, 'b'));
+    [Fact]
+    public void AtSymbol ()
+    {
+        var strings = new [] { "appricot", "arm", "ta", "@bob", "@bb", "text", "egg", "candle" };
 
-			// if 4 (candle) is selected it should loop back to bat
-			Assert.Equal (2, n.GetNextMatchingItem (4, 'b'));
+        var n = new CollectionNavigator (strings);
+        Assert.Equal (3, n.GetNextMatchingItem (0, '@'));
+        Assert.Equal (3, n.GetNextMatchingItem (3, 'b'));
+        Assert.Equal (4, n.GetNextMatchingItem (3, 'b'));
+    }
 
-			// cycling with 'a'
-			n = new CollectionNavigator (simpleStrings);
-			Assert.Equal (0, n.GetNextMatchingItem (-1, 'a'));
-			Assert.Equal (1, n.GetNextMatchingItem (0, 'a'));
+    [Fact]
+    public void Cycling ()
+    {
+        // cycling with 'b'
+        var n = new CollectionNavigator (simpleStrings);
+        Assert.Equal (2, n.GetNextMatchingItem (0, 'b'));
+        Assert.Equal (3, n.GetNextMatchingItem (2, 'b'));
 
-			// if 4 (candle) is selected it should loop back to appricot
-			Assert.Equal (0, n.GetNextMatchingItem (4, 'a'));
-		}
+        // if 4 (candle) is selected it should loop back to bat
+        Assert.Equal (2, n.GetNextMatchingItem (4, 'b'));
 
-		[Fact]
-		public void FullText ()
-		{
-			var strings = new string []{
-			    "appricot",
-			    "arm",
-			    "ta",
-			    "target",
-			    "text",
-			    "egg",
-			    "candle"
-			  };
+        // cycling with 'a'
+        n = new CollectionNavigator (simpleStrings);
+        Assert.Equal (0, n.GetNextMatchingItem (-1, 'a'));
+        Assert.Equal (1, n.GetNextMatchingItem (0, 'a'));
 
-			var n = new CollectionNavigator (strings);
-			int current = 0;
-			Assert.Equal (strings.IndexOf ("ta"), current = n.GetNextMatchingItem (current, 't'));
+        // if 4 (candle) is selected it should loop back to appricot
+        Assert.Equal (0, n.GetNextMatchingItem (4, 'a'));
+    }
 
-			// should match "te" in "text"
-			Assert.Equal (strings.IndexOf ("text"), current = n.GetNextMatchingItem (current, 'e'));
+    [Fact]
+    public void Delay ()
+    {
+        var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot" };
+        var current = 0;
+        var n = new CollectionNavigator (strings);
 
-			// still matches text
-			Assert.Equal (strings.IndexOf ("text"), current = n.GetNextMatchingItem (current, 'x'));
+        // No delay
+        Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
+        Assert.Equal ("a", n.SearchString);
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
+        Assert.Equal ("$", n.SearchString);
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
+        Assert.Equal ("$$", n.SearchString);
 
-			// nothing starts texa so it should NOT jump to appricot
-			Assert.Equal (strings.IndexOf ("text"), current = n.GetNextMatchingItem (current, 'a'));
+        // Delay 
+        Thread.Sleep (n.TypingDelay + 10);
+        Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
+        Assert.Equal ("a", n.SearchString);
 
-			Thread.Sleep (n.TypingDelay + 100);
-			// nothing starts "texa". Since were past timedelay we DO jump to appricot
-			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
-		}
+        Thread.Sleep (n.TypingDelay + 10);
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
+        Assert.Equal ("$", n.SearchString);
 
-		[Fact]
-		public void Unicode ()
-		{
-			var strings = new string []{
-			    "appricot",
-			    "arm",
-			    "ta",
-			    "丗丙业丞",
-			    "丗丙丛",
-			    "text",
-			    "egg",
-			    "candle"
-			  };
+        Thread.Sleep (n.TypingDelay + 10);
+        Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, '$'));
+        Assert.Equal ("$", n.SearchString);
 
-			var n = new CollectionNavigator (strings);
-			int current = 0;
-			Assert.Equal (strings.IndexOf ("丗丙业丞"), current = n.GetNextMatchingItem (current, '丗'));
+        Thread.Sleep (n.TypingDelay + 10);
+        Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, '$'));
+        Assert.Equal ("$", n.SearchString);
 
-			// 丗丙业丞 is as good a match as 丗丙丛
-			// so when doing multi character searches we should
-			// prefer to stay on the same index unless we invalidate
-			// our typed text
-			Assert.Equal (strings.IndexOf ("丗丙业丞"), current = n.GetNextMatchingItem (current, '丙'));
+        Thread.Sleep (n.TypingDelay + 10);
+        Assert.Equal (strings.IndexOf ("$101.10"), current = n.GetNextMatchingItem (current, '$'));
+        Assert.Equal ("$", n.SearchString);
 
-			// No longer matches 丗丙业丞 and now only matches 丗丙丛
-			// so we should move to the new match
-			Assert.Equal (strings.IndexOf ("丗丙丛"), current = n.GetNextMatchingItem (current, '丛'));
+        Thread.Sleep (n.TypingDelay + 10);
+        Assert.Equal (strings.IndexOf ("$101.10"), current = n.GetNextMatchingItem (current, '2')); // Shouldn't move
+        Assert.Equal ("2", n.SearchString);
+    }
 
-			// nothing starts "丗丙丛a". Since were still in the timedelay we do not jump to appricot
-			Assert.Equal (strings.IndexOf ("丗丙丛"), current = n.GetNextMatchingItem (current, 'a'));
+    [Fact]
+    public void FullText ()
+    {
+        var strings = new [] { "appricot", "arm", "ta", "target", "text", "egg", "candle" };
 
-			Thread.Sleep (n.TypingDelay + 100);
-			// nothing starts "丗丙丛a". Since were past timedelay we DO jump to appricot
-			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
-		}
+        var n = new CollectionNavigator (strings);
+        var current = 0;
+        Assert.Equal (strings.IndexOf ("ta"), current = n.GetNextMatchingItem (current, 't'));
 
-		[Fact]
-		public void AtSymbol ()
-		{
-			var strings = new string []{
-			    "appricot",
-			    "arm",
-			    "ta",
-			    "@bob",
-			    "@bb",
-			    "text",
-			    "egg",
-			    "candle"
-			  };
+        // should match "te" in "text"
+        Assert.Equal (strings.IndexOf ("text"), current = n.GetNextMatchingItem (current, 'e'));
 
-			var n = new CollectionNavigator (strings);
-			Assert.Equal (3, n.GetNextMatchingItem (0, '@'));
-			Assert.Equal (3, n.GetNextMatchingItem (3, 'b'));
-			Assert.Equal (4, n.GetNextMatchingItem (3, 'b'));
-		}
+        // still matches text
+        Assert.Equal (strings.IndexOf ("text"), current = n.GetNextMatchingItem (current, 'x'));
 
-		[Fact]
-		public void Word ()
-		{
-			var strings = new string []{
-			    "appricot",
-			    "arm",
-			    "bat",
-			    "batman",
-			    "bates hotel",
-			    "candle"
-			  };
-			int current = 0;
-			var n = new CollectionNavigator (strings);
-			Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'b')); // match bat
-			Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'a')); // match bat
-			Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 't')); // match bat
-			Assert.Equal (strings.IndexOf ("bates hotel"), current = n.GetNextMatchingItem (current, 'e')); // match bates hotel
-			Assert.Equal (strings.IndexOf ("bates hotel"), current = n.GetNextMatchingItem (current, 's')); // match bates hotel
-			Assert.Equal (strings.IndexOf ("bates hotel"), current = n.GetNextMatchingItem (current, ' ')); // match bates hotel
-		}
+        // nothing starts texa so it should NOT jump to appricot
+        Assert.Equal (strings.IndexOf ("text"), current = n.GetNextMatchingItem (current, 'a'));
 
-		[Fact]
-		public void Symbols ()
-		{
-			var strings = new string []{
-			    "$$",
-			    "$100.00",
-			    "$101.00",
-			    "$101.10",
-			    "$200.00",
-			    "appricot"
-			  };
-			int current = 0;
-			var n = new CollectionNavigator (strings);
-			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
-			Assert.Equal ("a", n.SearchString);
+        Thread.Sleep (n.TypingDelay + 100);
 
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
-			Assert.Equal ("$", n.SearchString);
+        // nothing starts "texa". Since were past timedelay we DO jump to appricot
+        Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
+    }
 
-			Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, '1'));
-			Assert.Equal ("$1", n.SearchString);
+    [Theory]
+    [InlineData (KeyCode.A, true)]
+    [InlineData (KeyCode.Z, true)]
+    [InlineData (KeyCode.D0, true)]
+    [InlineData (KeyCode.A | KeyCode.ShiftMask, true)]
+    [InlineData (KeyCode.Z | KeyCode.ShiftMask, true)]
+    [InlineData (KeyCode.Space, true)]
+    [InlineData (KeyCode.Z | KeyCode.CtrlMask, false)]
+    [InlineData (KeyCode.Z | KeyCode.AltMask, false)]
+    [InlineData (KeyCode.F1, false)]
+    [InlineData (KeyCode.Delete, false)]
+    [InlineData (KeyCode.Esc, false)]
+    [InlineData (KeyCode.ShiftMask, false)]
+    public void IsCompatibleKey_Does_Not_Allow_Alt_And_Ctrl_Keys (KeyCode keyCode, bool compatible)
+    {
+        Assert.Equal (compatible, CollectionNavigatorBase.IsCompatibleKey (keyCode));
+    }
 
-			Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, '0'));
-			Assert.Equal ("$10", n.SearchString);
+    [Fact]
+    public void MinimizeMovement_False_ShouldMoveIfMultipleMatches ()
+    {
+        var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot", "c", "car", "cart" };
+        var current = 0;
+        var n = new CollectionNavigator (strings);
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$"));
+        Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$"));
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$")); // back to top
+        Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$"));
+        Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, "$"));
+        Assert.Equal (strings.IndexOf ("$101.10"), current = n.GetNextMatchingItem (current, "$"));
+        Assert.Equal (strings.IndexOf ("$200.00"), current = n.GetNextMatchingItem (current, "$"));
 
-			Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, '1'));
-			Assert.Equal ("$101", n.SearchString);
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$")); // back to top
+        Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, "a"));
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$")); // back to top
 
-			Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, '.'));
-			Assert.Equal ("$101.", n.SearchString);
+        Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$100.00"));
+        Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, "$"));
+        Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, "$101.00"));
+        Assert.Equal (strings.IndexOf ("$200.00"), current = n.GetNextMatchingItem (current, "$2"));
 
-			// stay on the same item becuase still in timedelay
-			Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, 'a'));
-			Assert.Equal ("$101.", n.SearchString);
+        Assert.Equal (strings.IndexOf ("$200.00"), current = n.GetNextMatchingItem (current, "$200.00"));
+        Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, "$101.00"));
+        Assert.Equal (strings.IndexOf ("$200.00"), current = n.GetNextMatchingItem (current, "$2"));
 
-			Thread.Sleep (n.TypingDelay + 100);
-			// another '$' means searching for "$" again
-			Assert.Equal (strings.IndexOf ("$101.10"), current = n.GetNextMatchingItem (current, '$'));
-			Assert.Equal ("$", n.SearchString);
+        Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, "$101.00"));
+        Assert.Equal (strings.IndexOf ("$200.00"), current = n.GetNextMatchingItem (current, "$2"));
 
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
-			Assert.Equal ("$$", n.SearchString);
+        Assert.Equal (strings.IndexOf ("car"), current = n.GetNextMatchingItem (current, "car"));
+        Assert.Equal (strings.IndexOf ("cart"), current = n.GetNextMatchingItem (current, "car"));
 
-		}
+        Assert.Equal (-1, current = n.GetNextMatchingItem (current, "x"));
+    }
 
-		[Fact]
-		public void Delay ()
-		{
-			var strings = new string []{
-			    "$$",
-			    "$100.00",
-			    "$101.00",
-			    "$101.10",
-			    "$200.00",
-			    "appricot"
-			  };
-			int current = 0;
-			var n = new CollectionNavigator (strings);
+    [Fact]
+    public void MinimizeMovement_True_ShouldStayOnCurrentIfMultipleMatches ()
+    {
+        var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot", "c", "car", "cart" };
+        var current = 0;
+        var n = new CollectionNavigator (strings);
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", true));
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$", true));
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", true)); // back to top
+        Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$1", true));
+        Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$", true));
+        Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$", true));
 
-			// No delay
-			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
-			Assert.Equal ("a", n.SearchString);
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
-			Assert.Equal ("$", n.SearchString);
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
-			Assert.Equal ("$$", n.SearchString);
+        Assert.Equal (strings.IndexOf ("car"), current = n.GetNextMatchingItem (current, "car", true));
+        Assert.Equal (strings.IndexOf ("car"), current = n.GetNextMatchingItem (current, "car", true));
 
-			// Delay 
-			Thread.Sleep (n.TypingDelay + 10);
-			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
-			Assert.Equal ("a", n.SearchString);
+        Assert.Equal (-1, current = n.GetNextMatchingItem (current, "x", true));
+    }
 
-			Thread.Sleep (n.TypingDelay + 10);
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
-			Assert.Equal ("$", n.SearchString);
+    [Fact]
+    public void MutliKeySearchPlusWrongKeyStays ()
+    {
+        var strings = new [] { "a", "c", "can", "candle", "candy", "yellow", "zebra" };
+        var current = 0;
+        var n = new CollectionNavigator (strings);
 
-			Thread.Sleep (n.TypingDelay + 10);
-			Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, '$'));
-			Assert.Equal ("$", n.SearchString);
+        // https://github.com/gui-cs/Terminal.Gui/pull/2132#issuecomment-1298425573
+        // One thing that it currently does that is different from Explorer is that as soon as you hit a wrong key then it jumps to that index.
+        // So if you type cand then z it jumps you to something beginning with z. In the same situation Windows Explorer beeps (not the best!)
+        // but remains on candle.
+        // We might be able to update the behaviour so that a 'wrong' keypress (z) within 500ms of a 'right' keypress ("can" + 'd') is
+        // simply ignored (possibly ending the search process though). That would give a short delay for user to realise the thing
+        // they typed doesn't exist and then start a new search (which would be possible 500ms after the last 'good' keypress).
+        // This would only apply for 2+ character searches where theres been a successful 2+ character match right before.
 
-			Thread.Sleep (n.TypingDelay + 10);
-			Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, '$'));
-			Assert.Equal ("$", n.SearchString);
+        Assert.Equal (strings.IndexOf ("a"), current = n.GetNextMatchingItem (current, 'a'));
+        Assert.Equal ("a", n.SearchString);
+        Assert.Equal (strings.IndexOf ("c"), current = n.GetNextMatchingItem (current, 'c'));
+        Assert.Equal ("c", n.SearchString);
+        Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'a'));
+        Assert.Equal ("ca", n.SearchString);
+        Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'n'));
+        Assert.Equal ("can", n.SearchString);
+        Assert.Equal (strings.IndexOf ("candle"), current = n.GetNextMatchingItem (current, 'd'));
+        Assert.Equal ("cand", n.SearchString);
 
-			Thread.Sleep (n.TypingDelay + 10);
-			Assert.Equal (strings.IndexOf ("$101.10"), current = n.GetNextMatchingItem (current, '$'));
-			Assert.Equal ("$", n.SearchString);
+        // Same as above, but with a 'wrong' key (z)
+        Thread.Sleep (n.TypingDelay + 10);
+        Assert.Equal (strings.IndexOf ("a"), current = n.GetNextMatchingItem (current, 'a'));
+        Assert.Equal ("a", n.SearchString);
+        Assert.Equal (strings.IndexOf ("c"), current = n.GetNextMatchingItem (current, 'c'));
+        Assert.Equal ("c", n.SearchString);
+        Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'a'));
+        Assert.Equal ("ca", n.SearchString);
+        Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'n'));
+        Assert.Equal ("can", n.SearchString);
+        Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'z')); // Shouldn't move
+        Assert.Equal ("can", n.SearchString); // Shouldn't change
+    }
 
-			Thread.Sleep (n.TypingDelay + 10);
-			Assert.Equal (strings.IndexOf ("$101.10"), current = n.GetNextMatchingItem (current, '2')); // Shouldn't move
-			Assert.Equal ("2", n.SearchString);
-		}
+    [Fact]
+    public void OutOfBoundsShouldBeIgnored ()
+    {
+        var n = new CollectionNavigator (simpleStrings);
 
-		[Fact]
-		public void MutliKeySearchPlusWrongKeyStays ()
-		{
-			var strings = new string []{
-				"a",
-			    "c",
-			    "can",
-			    "candle",
-			    "candy",
-			    "yellow",
-				"zebra"
-			  };
-			int current = 0;
-			var n = new CollectionNavigator (strings);
+        // Expect saying that index 500 is the current selection should not cause
+        // error and just be ignored (treated as no selection)
+        Assert.Equal (2, n.GetNextMatchingItem (500, 'b'));
+    }
 
-			// https://github.com/gui-cs/Terminal.Gui/pull/2132#issuecomment-1298425573
-			// One thing that it currently does that is different from Explorer is that as soon as you hit a wrong key then it jumps to that index.
-			// So if you type cand then z it jumps you to something beginning with z. In the same situation Windows Explorer beeps (not the best!)
-			// but remains on candle.
-			// We might be able to update the behaviour so that a 'wrong' keypress (z) within 500ms of a 'right' keypress ("can" + 'd') is
-			// simply ignored (possibly ending the search process though). That would give a short delay for user to realise the thing
-			// they typed doesn't exist and then start a new search (which would be possible 500ms after the last 'good' keypress).
-			// This would only apply for 2+ character searches where theres been a successful 2+ character match right before.
+    [Fact]
+    public void ShouldAcceptNegativeOne ()
+    {
+        var n = new CollectionNavigator (simpleStrings);
 
-			Assert.Equal (strings.IndexOf ("a"), current = n.GetNextMatchingItem (current, 'a'));
-			Assert.Equal ("a", n.SearchString);
-			Assert.Equal (strings.IndexOf ("c"), current = n.GetNextMatchingItem (current, 'c'));
-			Assert.Equal ("c", n.SearchString);
-			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'a'));
-			Assert.Equal ("ca", n.SearchString);
-			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'n'));
-			Assert.Equal ("can", n.SearchString);
-			Assert.Equal (strings.IndexOf ("candle"), current = n.GetNextMatchingItem (current, 'd'));
-			Assert.Equal ("cand", n.SearchString);
+        // Expect that index of -1 (i.e. no selection) should work correctly
+        // and select the first entry of the letter 'b'
+        Assert.Equal (2, n.GetNextMatchingItem (-1, 'b'));
+    }
 
-			// Same as above, but with a 'wrong' key (z)
-			Thread.Sleep (n.TypingDelay + 10);
-			Assert.Equal (strings.IndexOf ("a"), current = n.GetNextMatchingItem (current, 'a'));
-			Assert.Equal ("a", n.SearchString);
-			Assert.Equal (strings.IndexOf ("c"), current = n.GetNextMatchingItem (current, 'c'));
-			Assert.Equal ("c", n.SearchString);
-			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'a'));
-			Assert.Equal ("ca", n.SearchString);
-			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'n'));
-			Assert.Equal ("can", n.SearchString);
-			Assert.Equal (strings.IndexOf ("can"), current = n.GetNextMatchingItem (current, 'z')); // Shouldn't move
-			Assert.Equal ("can", n.SearchString); // Shouldn't change
-		}
+    [Fact]
+    public void Symbols ()
+    {
+        var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "appricot" };
+        var current = 0;
+        var n = new CollectionNavigator (strings);
+        Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
+        Assert.Equal ("a", n.SearchString);
 
-		[Fact]
-		public void MinimizeMovement_False_ShouldMoveIfMultipleMatches ()
-		{
-			var strings = new string [] {
-				"$$",
-				"$100.00",
-				"$101.00",
-				"$101.10",
-				"$200.00",
-				"appricot",
-				"c",
-				"car",
-				"cart",
-			};
-			int current = 0;
-			var n = new CollectionNavigator (strings);
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", false));
-			Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$", false));
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", false)); // back to top
-			Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$", false));
-			Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, "$", false));
-			Assert.Equal (strings.IndexOf ("$101.10"), current = n.GetNextMatchingItem (current, "$", false));
-			Assert.Equal (strings.IndexOf ("$200.00"), current = n.GetNextMatchingItem (current, "$", false));
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
+        Assert.Equal ("$", n.SearchString);
 
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$", false)); // back to top
-			Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, "a", false));
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$", false)); // back to top
+        Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, '1'));
+        Assert.Equal ("$1", n.SearchString);
 
-			Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$100.00", false));
-			Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, "$", false));
-			Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, "$101.00", false));
-			Assert.Equal (strings.IndexOf ("$200.00"), current = n.GetNextMatchingItem (current, "$2", false));
+        Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, '0'));
+        Assert.Equal ("$10", n.SearchString);
 
-			Assert.Equal (strings.IndexOf ("$200.00"), current = n.GetNextMatchingItem (current, "$200.00", false));
-			Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, "$101.00", false));
-			Assert.Equal (strings.IndexOf ("$200.00"), current = n.GetNextMatchingItem (current, "$2", false));
+        Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, '1'));
+        Assert.Equal ("$101", n.SearchString);
 
-			Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, "$101.00", false));
-			Assert.Equal (strings.IndexOf ("$200.00"), current = n.GetNextMatchingItem (current, "$2", false));
+        Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, '.'));
+        Assert.Equal ("$101.", n.SearchString);
 
-			Assert.Equal (strings.IndexOf ("car"), current = n.GetNextMatchingItem (current, "car", false));
-			Assert.Equal (strings.IndexOf ("cart"), current = n.GetNextMatchingItem (current, "car", false));
+        // stay on the same item becuase still in timedelay
+        Assert.Equal (strings.IndexOf ("$101.00"), current = n.GetNextMatchingItem (current, 'a'));
+        Assert.Equal ("$101.", n.SearchString);
 
-			Assert.Equal (-1, current = n.GetNextMatchingItem (current, "x", false));
-		}
+        Thread.Sleep (n.TypingDelay + 100);
 
-		[Fact]
-		public void MinimizeMovement_True_ShouldStayOnCurrentIfMultipleMatches ()
-		{
-			var strings = new string [] {
-				"$$",
-				"$100.00",
-				"$101.00",
-				"$101.10",
-				"$200.00",
-				"appricot",
-				"c",
-				"car",
-				"cart",
-			};
-			int current = 0;
-			var n = new CollectionNavigator (strings);
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", true));
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$", true));
-			Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", true)); // back to top
-			Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$1", true));
-			Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$", true));
-			Assert.Equal (strings.IndexOf ("$100.00"), current = n.GetNextMatchingItem (current, "$", true));
+        // another '$' means searching for "$" again
+        Assert.Equal (strings.IndexOf ("$101.10"), current = n.GetNextMatchingItem (current, '$'));
+        Assert.Equal ("$", n.SearchString);
 
-			Assert.Equal (strings.IndexOf ("car"), current = n.GetNextMatchingItem (current, "car", true));
-			Assert.Equal (strings.IndexOf ("car"), current = n.GetNextMatchingItem (current, "car", true));
+        Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
+        Assert.Equal ("$$", n.SearchString);
+    }
 
-			Assert.Equal (-1, current = n.GetNextMatchingItem (current, "x", true));
-		}
+    [Fact]
+    public void Unicode ()
+    {
+        var strings = new [] { "appricot", "arm", "ta", "丗丙业丞", "丗丙丛", "text", "egg", "candle" };
 
-		[Fact]
-		public void IsCompatibleKey_Does_Not_Allow_Alt_And_Ctrl_Keys ()
-		{
-			// test all Keys
-			foreach (Key key in Enum.GetValues (typeof (Key))) {
-				var ke = new KeyEvent (key, new KeyModifiers () {
-					Alt = key == Key.AltMask,
-					Ctrl = key == Key.CtrlMask,
-					Shift = key == Key.ShiftMask
-				});
-				if (key == Key.AltMask || key == Key.CtrlMask) {
-					Assert.False (CollectionNavigator.IsCompatibleKey (ke));
-				} else {
-					Assert.True (CollectionNavigator.IsCompatibleKey (ke));
-				}
-			}
+        var n = new CollectionNavigator (strings);
+        var current = 0;
+        Assert.Equal (strings.IndexOf ("丗丙业丞"), current = n.GetNextMatchingItem (current, '丗'));
 
-			// test Capslock, Numlock and Scrolllock
-			Assert.True (CollectionNavigator.IsCompatibleKey (new KeyEvent (Key.Null, new KeyModifiers () {
-				Alt = false,
-				Ctrl = false,
-				Shift = false,
-				Capslock = true,
-				Numlock = true,
-				Scrolllock = true,
-			})));
-		}
-	}
+        // 丗丙业丞 is as good a match as 丗丙丛
+        // so when doing multi character searches we should
+        // prefer to stay on the same index unless we invalidate
+        // our typed text
+        Assert.Equal (strings.IndexOf ("丗丙业丞"), current = n.GetNextMatchingItem (current, '丙'));
+
+        // No longer matches 丗丙业丞 and now only matches 丗丙丛
+        // so we should move to the new match
+        Assert.Equal (strings.IndexOf ("丗丙丛"), current = n.GetNextMatchingItem (current, '丛'));
+
+        // nothing starts "丗丙丛a". Since were still in the timedelay we do not jump to appricot
+        Assert.Equal (strings.IndexOf ("丗丙丛"), current = n.GetNextMatchingItem (current, 'a'));
+
+        Thread.Sleep (n.TypingDelay + 100);
+
+        // nothing starts "丗丙丛a". Since were past timedelay we DO jump to appricot
+        Assert.Equal (strings.IndexOf ("appricot"), current = n.GetNextMatchingItem (current, 'a'));
+    }
+
+    [Fact]
+    public void Word ()
+    {
+        var strings = new [] { "appricot", "arm", "bat", "batman", "bates hotel", "candle" };
+        var current = 0;
+        var n = new CollectionNavigator (strings);
+        Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'b')); // match bat
+        Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'a')); // match bat
+        Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 't')); // match bat
+
+        Assert.Equal (
+                      strings.IndexOf ("bates hotel"),
+                      current = n.GetNextMatchingItem (current, 'e')
+                     ); // match bates hotel
+
+        Assert.Equal (
+                      strings.IndexOf ("bates hotel"),
+                      current = n.GetNextMatchingItem (current, 's')
+                     ); // match bates hotel
+
+        Assert.Equal (
+                      strings.IndexOf ("bates hotel"),
+                      current = n.GetNextMatchingItem (current, ' ')
+                     ); // match bates hotel
+    }
 }

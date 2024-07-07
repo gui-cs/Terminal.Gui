@@ -1,18 +1,17 @@
-﻿using System.Text.Json.Serialization;
-
-#nullable enable
+﻿#nullable enable
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
 /// <summary>
-/// The root object for a Theme. A Theme is a set of settings that are applied to the running <see cref="Application"/>
-/// as a group.
+///     The root object for a Theme. A Theme is a set of settings that are applied to the running
+///     <see cref="Application"/> as a group.
 /// </summary>
 /// <remarks>
-/// <para>
-/// </para>
+///     <para></para>
 /// </remarks>
-/// <example><code>
+/// <example>
+///     <code>
 /// 	"Default": {
 /// 		"ColorSchemes": [
 /// 		{
@@ -27,7 +26,7 @@ namespace Terminal.Gui;
 /// 
 /// 		},
 /// 		"HotNormal": {
-/// 			"Foreground": "Brown",
+/// 			"Foreground": "Yellow",
 /// 			"Background": "Black"
 /// 
 /// 		},
@@ -41,15 +40,8 @@ namespace Terminal.Gui;
 /// 
 /// 		}
 /// 	}
-/// </code></example> 
+/// </code>
+/// </example>
 [JsonConverter (typeof (ScopeJsonConverter<ThemeScope>))]
-public class ThemeScope : Scope<ThemeScope> {
-
-	/// <inheritdoc/>
-	internal override bool Apply ()
-	{
-		var ret = base.Apply ();
-		Application.Driver?.InitializeColorSchemes ();
-		return ret;
-	}
-}
+public class ThemeScope : Scope<ThemeScope>
+{ }

@@ -3,63 +3,41 @@
     {
       "src": [
         {
+          "src": "../Terminal.Gui",
           "files": [
-            "Terminal.Gui.csproj"
-          ],
-          "exclude": [
-            "**/obj/**",
-            "_site/**"
-          ],
-          "src": "../Terminal.Gui"
+            "**/*.csproj"
+          ]
         }
       ],
-      "dest": "api/Terminal.Gui",
-      "shouldSkipMarkup": true,
-      "properties": {
-          "TargetFramework": "net7.0"
-      }
+      "dest": "api",
+      "memberLayout": "separatePages"
     },
     {
       "src": [
         {
+          "src": "../UICatalog",
           "files": [
-            "UICatalog.csproj"
-          ],
-          "exclude": [
-            "**/obj/**",
-            "_site/**"
-          ],
-          "src": "../UICatalog"
+            "**/*.csproj"
+          ]
         }
       ],
       "dest": "api/UICatalog",
-      "shouldSkipMarkup": false,
-      "properties": {
-          "TargetFramework": "net7.0"
-      }
+      "memberLayout": "separatePages"
     }
   ],
   "build": {
     "template": [
       "default",
-      "./templates/default"
+      "templates/modern"
     ],
+    "output": "_site",
     "content": [
       {
         "files": [
-          "api/**.yml",
-          "api/index.md"
-        ]
-      },
-      {
-        "files": [
-          "articles/**.md",
-          "articles/**/toc.yml",
-          "toc.yml",
-          "*.md"
+          "**/*.{md,yml}",
+          "schemas/**.json"
         ],
         "exclude": [
-          "obj/**",
           "_site/**"
         ]
       }
@@ -67,41 +45,35 @@
     "resource": [
       {
         "files": [
-          "images/**",
-          "schemas/**"
-        ],
-        "exclude": [
-          "obj/**",
-          "_site/**"
+          "images/**"
         ]
       }
     ],
-    "overwrite": [
-      {
-        "files": [
-          "apidoc/**.md"
-        ],
-        "exclude": [
-          "obj/**",
-          "_site/**"
-        ]
-      }
-    ],
-    "dest": "../docs",
     "globalMetadata": {
-      "_enableSearch": "true",
+      "_appName": "Terminal.Gui v2",
+      "_appTitle": "Terminal.Gui v2",
+      "pdf": false,
+      "_appFaviconPath": "images/icon48.png",
       "_appLogoPath": "images/logo48.png",
+      "_appFooter": "Terminal.Gui - Part of the <a href=https://github.com/gui-cs>gui-cs Organization</a>",
+      "_enableSearch": true,
+      "_disableSideFilter": false,
+      "_enableNewTab": true,
       "_disableContribution": false,
+      "_disableBreadcrumb": false,
       "_gitContribute": {
         "repo": "https://github.com/gui-cs/Terminal.Gui",
-        "branch": "develop",
+        "branch": "v2_develop",
         "apiSpecFolder": "docfx/overrides"
       },
       "_gitUrlPattern": "github"
     },
+    "markdownEngineName": "markdig",
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
-    "postProcessors": ["ExtractSearchIndex"],
+    "postProcessors": [
+      "ExtractSearchIndex"
+    ],
     "noLangKeyword": false,
     "keepFileLink": false
   }

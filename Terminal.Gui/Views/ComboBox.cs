@@ -5,880 +5,1003 @@
 //   Ross Ferguson (ross.c.ferguson@btinternet.com)
 //
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Terminal.Gui {
-	/// <summary>
-	/// Provides a drop-down list of items the user can select from.
-	/// </summary>
-	public class ComboBox : View {
-
-		private class ComboListView : ListView {
-			private int highlighted = -1;
-			private bool isFocusing;
-			private ComboBox container;
-			private bool hideDropdownListOnClick;
-
-			public ComboListView (ComboBox container, bool hideDropdownListOnClick)
-			{
-				Initialize (container, hideDropdownListOnClick);
-			}
-
-			public ComboListView (ComboBox container, Rect rect, IList source, bool hideDropdownListOnClick) : base (rect, source)
-			{
-				Initialize (container, hideDropdownListOnClick);
-			}
-
-			public ComboListView (ComboBox container, IList source, bool hideDropdownListOnClick) : base (source)
-			{
-				Initialize (container, hideDropdownListOnClick);
-			}
-
-			private void Initialize (ComboBox container, bool hideDropdownListOnClick)
-			{
-				if (container == null)
-					throw new ArgumentNullException ("ComboBox container cannot be null.", nameof (container));
-
-				this.container = container;
-				HideDropdownListOnClick = hideDropdownListOnClick;
-			}
-
-			public bool HideDropdownListOnClick {
-				get => hideDropdownListOnClick;
-				set => hideDropdownListOnClick = WantContinuousButtonPressed = value;
-			}
-
-			public override bool MouseEvent (MouseEvent me)
-			{
-				var res = false;
-				var isMousePositionValid = IsMousePositionValid (me);
-
-				if (isMousePositionValid) {
-					res = base.MouseEvent (me);
-				}
-
-				if (HideDropdownListOnClick && me.Flags == MouseFlags.Button1Clicked) {
-					if (!isMousePositionValid && !isFocusing) {
-						container.isShow = false;
-						container.HideList ();
-					} else if (isMousePositionValid) {
-						OnOpenSelectedItem ();
-					} else {
-						isFocusing = false;
-					}
-					return true;
-				} else if (me.Flags == MouseFlags.ReportMousePosition && HideDropdownListOnClick) {
-					if (isMousePositionValid) {
-						highlighted = Math.Min (TopItem + me.Y, Source.Count);
-						SetNeedsDisplay ();
-					}
-					isFocusing = false;
-					return true;
-				}
-
-				return res;
-			}
-
-			private bool IsMousePositionValid (MouseEvent me)
-			{
-				if (me.X >= 0 && me.X < Frame.Width && me.Y >= 0 && me.Y < Frame.Height) {
-					return true;
-				}
-				return false;
-			}
-
-			public override void OnDrawContent (Rect contentArea)
-			{
-				var current = ColorScheme.Focus;
-				Driver.SetAttribute (current);
-				Move (0, 0);
-				var f = Frame;
-				var item = TopItem;
-				bool focused = HasFocus;
-				int col = AllowsMarking ? 2 : 0;
-				int start = LeftItem;
-
-				for (int row = 0; row < f.Height; row++, item++) {
-					bool isSelected = item == container.SelectedItem;
-					bool isHighlighted = hideDropdownListOnClick && item == highlighted;
-
-					Attribute newcolor;
-					if (isHighlighted || (isSelected && !hideDropdownListOnClick)) {
-						newcolor = focused ? ColorScheme.Focus : ColorScheme.HotNormal;
-					} else if (isSelected && hideDropdownListOnClick) {
-						newcolor = focused ? ColorScheme.HotFocus : ColorScheme.HotNormal;
-					} else {
-						newcolor = focused ? GetNormalColor () : GetNormalColor ();
-					}
-
-					if (newcolor != current) {
-						Driver.SetAttribute (newcolor);
-						current = newcolor;
-					}
-
-					Move (0, row);
-					if (Source == null || item >= Source.Count) {
-						for (int c = 0; c < f.Width; c++)
-							Driver.AddRune ((Rune)' ');
-					} else {
-						var rowEventArgs = new ListViewRowEventArgs (item);
-						OnRowRender (rowEventArgs);
-						if (rowEventArgs.RowAttribute != null && current != rowEventArgs.RowAttribute) {
-							current = (Attribute)rowEventArgs.RowAttribute;
-							Driver.SetAttribute (current);
-						}
-						if (AllowsMarking) {
-							Driver.AddRune (Source.IsMarked (item) ? (AllowsMultipleSelection ? CM.Glyphs.Checked : CM.Glyphs.Selected) : (AllowsMultipleSelection ? CM.Glyphs.UnChecked : CM.Glyphs.UnSelected));
-							Driver.AddRune ((Rune)' ');
-						}
-						Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
-					}
-				}
-			}
-
-			public override bool OnEnter (View view)
-			{
-				if (hideDropdownListOnClick) {
-					isFocusing = true;
-					highlighted = container.SelectedItem;
-					Application.GrabMouse (this);
-				}
-
-				return base.OnEnter (view);
-			}
-
-			public override bool OnLeave (View view)
-			{
-				if (hideDropdownListOnClick) {
-					isFocusing = false;
-					highlighted = container.SelectedItem;
-					Application.UngrabMouse ();
-				}
-
-				return base.OnLeave (view);
-			}
-
-			public override bool OnSelectedChanged ()
-			{
-				var res = base.OnSelectedChanged ();
-
-				highlighted = SelectedItem;
-
-				return res;
-			}
-		}
-
-		IListDataSource source;
-		/// <summary>
-		/// Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ComboBox"/>, enabling custom rendering.
-		/// </summary>
-		/// <value>The source.</value>
-		/// <remarks>
-		///  Use <see cref="SetSource"/> to set a new <see cref="IList"/> source.
-		/// </remarks>
-		public IListDataSource Source {
-			get => source;
-			set {
-				source = value;
-
-				// Only need to refresh list if its been added to a container view
-				if (SuperView != null && SuperView.Subviews.Contains (this)) {
-					SelectedItem = -1;
-					search.Text = "";
-					Search_Changed (this, new TextChangedEventArgs (""));
-					SetNeedsDisplay ();
-				}
-			}
-		}
-
-		/// <summary>
-		/// Sets the source of the <see cref="ComboBox"/> to an <see cref="IList"/>.
-		/// </summary>
-		/// <value>An object implementing the IList interface.</value>
-		/// <remarks>
-		///  Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome rendering.
-		/// </remarks>
-		public void SetSource (IList source)
-		{
-			if (source == null) {
-				Source = null;
-			} else {
-				listview.SetSource (source);
-				Source = listview.Source;
-			}
-		}
-
-		/// <summary>
-		/// This event is raised when the selected item in the <see cref="ComboBox"/> has changed.
-		/// </summary>
-		public event EventHandler<ListViewItemEventArgs> SelectedItemChanged;
-
-		/// <summary>
-		/// This event is raised when the drop-down list is expanded.
-		/// </summary>
-		public event EventHandler Expanded;
-
-		/// <summary>
-		/// This event is raised when the drop-down list is collapsed.
-		/// </summary>
-		public event EventHandler Collapsed;
-
-		/// <summary>
-		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
-		/// </summary>
-		public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
-
-		readonly IList searchset = new List<object> ();
-		string text = "";
-		readonly TextField search;
-		readonly ComboListView listview;
-		bool autoHide = true;
-		int minimumHeight = 2;
-
-		/// <summary>
-		/// Public constructor
-		/// </summary>
-		public ComboBox () : this (string.Empty)
-		{
-		}
-
-		/// <summary>
-		/// Public constructor
-		/// </summary>
-		/// <param name="text"></param>
-		public ComboBox (string text) : base ()
-		{
-			search = new TextField ("");
-			listview = new ComboListView (this, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, CanFocus = true, TabStop = false };
-
-			Initialize ();
-			Text = text;
-		}
-
-		/// <summary>
-		/// Public constructor
-		/// </summary>
-		/// <param name="rect"></param>
-		/// <param name="source"></param>
-		public ComboBox (Rect rect, IList source) : base (rect)
-		{
-			search = new TextField ("") { Width = rect.Width };
-			listview = new ComboListView (this, rect, source, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
-
-			Initialize ();
-			SetSource (source);
-		}
-
-		/// <summary>
-		/// Initialize with the source.
-		/// </summary>
-		/// <param name="source">The source.</param>
-		public ComboBox (IList source) : this (string.Empty)
-		{
-			search = new TextField ("");
-			listview = new ComboListView (this, source, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
-
-			Initialize ();
-			SetSource (source);
-		}
-
-		private void Initialize ()
-		{
-			if (Bounds.Height < minimumHeight && (Height == null || Height is Dim.DimAbsolute)) {
-				Height = minimumHeight;
-			}
-
-			search.TextChanged += Search_Changed;
-
-			listview.Y = Pos.Bottom (search);
-			listview.OpenSelectedItem += (object sender, ListViewItemEventArgs a) => Selected ();
-
-			this.Add (search, listview);
-
-			// On resize
-			LayoutComplete += (object sender, LayoutEventArgs a) => {
-				if ((!autoHide && Bounds.Width > 0 && search.Frame.Width != Bounds.Width) ||
-					(autoHide && Bounds.Width > 0 && search.Frame.Width != Bounds.Width - 1)) {
-					search.Width = listview.Width = autoHide ? Bounds.Width - 1 : Bounds.Width;
-					listview.Height = CalculatetHeight ();
-					search.SetRelativeLayout (Bounds);
-					listview.SetRelativeLayout (Bounds);
-				}
-			};
-
-			listview.SelectedItemChanged += (object sender, ListViewItemEventArgs e) => {
-
-				if (!HideDropdownListOnClick && searchset.Count > 0) {
-					SetValue (searchset [listview.SelectedItem]);
-				}
-			};
-
-			Added += (s, e) => {
-
-				// Determine if this view is hosted inside a dialog and is the only control
-				for (View view = this.SuperView; view != null; view = view.SuperView) {
-					if (view is Dialog && SuperView != null && SuperView.Subviews.Count == 1 && SuperView.Subviews [0] == this) {
-						autoHide = false;
-						break;
-					}
-				}
-
-				SetNeedsLayout ();
-				SetNeedsDisplay ();
-				Search_Changed (this, new TextChangedEventArgs (Text));
-			};
-
-			// Things this view knows how to do
-			AddCommand (Command.Accept, () => ActivateSelected ());
-			AddCommand (Command.ToggleExpandCollapse, () => ExpandCollapse ());
-			AddCommand (Command.Expand, () => Expand ());
-			AddCommand (Command.Collapse, () => Collapse ());
-			AddCommand (Command.LineDown, () => MoveDown ());
-			AddCommand (Command.LineUp, () => MoveUp ());
-			AddCommand (Command.PageDown, () => PageDown ());
-			AddCommand (Command.PageUp, () => PageUp ());
-			AddCommand (Command.TopHome, () => MoveHome ());
-			AddCommand (Command.BottomEnd, () => MoveEnd ());
-			AddCommand (Command.Cancel, () => CancelSelected ());
-			AddCommand (Command.UnixEmulation, () => UnixEmulation ());
-
-			// Default keybindings for this view
-			AddKeyBinding (Key.Enter, Command.Accept);
-			AddKeyBinding (Key.F4, Command.ToggleExpandCollapse);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.PageDown, Command.PageDown);
-			AddKeyBinding (Key.PageUp, Command.PageUp);
-			AddKeyBinding (Key.Home, Command.TopHome);
-			AddKeyBinding (Key.End, Command.BottomEnd);
-			AddKeyBinding (Key.Esc, Command.Cancel);
-			AddKeyBinding (Key.U | Key.CtrlMask, Command.UnixEmulation);
-		}
-
-		private bool isShow = false;
-		private int selectedItem = -1;
-		private int lastSelectedItem = -1;
-		private bool hideDropdownListOnClick;
-
-		/// <summary>
-		/// Gets the index of the currently selected item in the <see cref="Source"/>
-		/// </summary>
-		/// <value>The selected item or -1 none selected.</value>
-		public int SelectedItem {
-			get => selectedItem;
-			set {
-				if (selectedItem != value && (value == -1
-					|| (source != null && value > -1 && value < source.Count))) {
-
-					selectedItem = lastSelectedItem = value;
-					if (selectedItem != -1) {
-						SetValue (source.ToList () [selectedItem].ToString (), true);
-					} else {
-						SetValue ("", true);
-					}
-					OnSelectedChanged ();
-				}
-			}
-		}
-
-		/// <summary>
-		/// Gets the drop down list state, expanded or collapsed.
-		/// </summary>
-		public bool IsShow => isShow;
-
-		///<inheritdoc/>
-		public new ColorScheme ColorScheme {
-			get {
-				return base.ColorScheme;
-			}
-			set {
-				listview.ColorScheme = value;
-				base.ColorScheme = value;
-				SetNeedsDisplay ();
-			}
-		}
-
-		/// <summary>
-		///If set to true its not allow any changes in the text.
-		/// </summary>
-		public bool ReadOnly {
-			get => search.ReadOnly;
-			set {
-				search.ReadOnly = value;
-				if (search.ReadOnly) {
-					if (search.ColorScheme != null) {
-						search.ColorScheme.Normal = search.ColorScheme.Focus;
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets if the drop-down list can be hide with a button click event.
-		/// </summary>
-		public bool HideDropdownListOnClick {
-			get => hideDropdownListOnClick;
-			set => hideDropdownListOnClick = listview.HideDropdownListOnClick = value;
-		}
-
-		///<inheritdoc/>
-		public override bool MouseEvent (MouseEvent me)
-		{
-			if (me.X == Bounds.Right - 1 && me.Y == Bounds.Top && me.Flags == MouseFlags.Button1Pressed
-				&& autoHide) {
-
-				if (isShow) {
-					isShow = false;
-					HideList ();
-				} else {
-					SetSearchSet ();
-
-					isShow = true;
-					ShowList ();
-					FocusSelectedItem ();
-				}
-
-				return true;
-			} else if (me.Flags == MouseFlags.Button1Pressed) {
-				if (!search.HasFocus) {
-					search.SetFocus ();
-				}
-
-				return true;
-			}
-
-			return false;
-		}
-
-		private void FocusSelectedItem ()
-		{
-			listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
-			listview.TabStop = true;
-			listview.SetFocus ();
-			OnExpanded ();
-		}
-
-		/// <summary>
-		/// Virtual method which invokes the <see cref="Expanded"/> event.
-		/// </summary>
-		public virtual void OnExpanded ()
-		{
-			Expanded?.Invoke (this, EventArgs.Empty);
-		}
-
-		/// <summary>
-		/// Virtual method which invokes the <see cref="Collapsed"/> event.
-		/// </summary>
-		public virtual void OnCollapsed ()
-		{
-			Collapsed?.Invoke (this, EventArgs.Empty);
-		}
-
-		///<inheritdoc/>
-		public override bool OnEnter (View view)
-		{
-			if (!search.HasFocus && !listview.HasFocus) {
-				search.SetFocus ();
-			}
-
-			search.CursorPosition = search.Text.GetRuneCount ();
-
-			return base.OnEnter (view);
-		}
-
-		///<inheritdoc/>
-		public override bool OnLeave (View view)
-		{
-			if (source?.Count > 0 && selectedItem > -1 && selectedItem < source.Count - 1
-				&& text != source.ToList () [selectedItem].ToString ()) {
-
-				SetValue (source.ToList () [selectedItem].ToString ());
-			}
-			if (autoHide && isShow && view != this && view != search && view != listview) {
-				isShow = false;
-				HideList ();
-			} else if (listview.TabStop) {
-				listview.TabStop = false;
-			}
-
-			return base.OnLeave (view);
-		}
-
-		/// <summary>
-		/// Invokes the SelectedChanged event if it is defined.
-		/// </summary>
-		/// <returns></returns>
-		public virtual bool OnSelectedChanged ()
-		{
-			// Note: Cannot rely on "listview.SelectedItem != lastSelectedItem" because the list is dynamic. 
-			// So we cannot optimize. Ie: Don't call if not changed
-			SelectedItemChanged?.Invoke (this, new ListViewItemEventArgs (SelectedItem, search.Text));
-
-			return true;
-		}
-
-		/// <summary>
-		/// Invokes the OnOpenSelectedItem event if it is defined.
-		/// </summary>
-		/// <returns></returns>
-		public virtual bool OnOpenSelectedItem ()
-		{
-			var value = search.Text;
-			lastSelectedItem = SelectedItem;
-			OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (SelectedItem, value));
-
-			return true;
-		}
-
-		///<inheritdoc/>
-		public override void OnDrawContent (Rect contentArea)
-		{
-			base.OnDrawContent (contentArea);
-
-			if (!autoHide) {
-				return;
-			}
-
-			Driver.SetAttribute (ColorScheme.Focus);
-			Move (Bounds.Right - 1, 0);
-			Driver.AddRune (CM.Glyphs.DownArrow);
-		}
-
-		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent e)
-		{
-			var result = InvokeKeybindings (e);
-			if (result != null)
-				return (bool)result;
-
-			return base.ProcessKey (e);
-		}
-
-		bool UnixEmulation ()
-		{
-			// Unix emulation
-			Reset ();
-			return true;
-		}
-
-		bool CancelSelected ()
-		{
-			search.SetFocus ();
-			if (ReadOnly || HideDropdownListOnClick) {
-				SelectedItem = lastSelectedItem;
-				if (SelectedItem > -1 && listview.Source?.Count > 0) {
-					search.Text = text = listview.Source.ToList () [SelectedItem].ToString ();
-				}
-			} else if (!ReadOnly) {
-				search.Text = text = "";
-				selectedItem = lastSelectedItem;
-				OnSelectedChanged ();
-			}
-			Collapse ();
-			return true;
-		}
-
-		bool? MoveEnd ()
-		{
-			if (!isShow && search.HasFocus) {
-				return null;
-			}
-			if (HasItems ()) {
-				listview.MoveEnd ();
-			}
-			return true;
-		}
-
-		bool? MoveHome ()
-		{
-			if (!isShow && search.HasFocus) {
-				return null;
-			}
-			if (HasItems ()) {
-				listview.MoveHome ();
-			}
-			return true;
-		}
-
-		bool PageUp ()
-		{
-			if (HasItems ()) {
-				listview.MovePageUp ();
-			}
-			return true;
-		}
-
-		bool PageDown ()
-		{
-			if (HasItems ()) {
-				listview.MovePageDown ();
-			}
-			return true;
-		}
-
-		bool? MoveUp ()
-		{
-			if (search.HasFocus) { // stop odd behavior on KeyUp when search has focus
-				return true;
-			}
-
-			if (listview.HasFocus && listview.SelectedItem == 0 && searchset?.Count > 0) // jump back to search
-			{
-				search.CursorPosition = search.Text.GetRuneCount ();
-				search.SetFocus ();
-				return true;
-			}
-			return null;
-		}
-
-		bool? MoveDown ()
-		{
-			if (search.HasFocus) { // jump to list
-				if (searchset?.Count > 0) {
-					listview.TabStop = true;
-					listview.SetFocus ();
-					if (listview.SelectedItem > -1) {
-						SetValue (searchset [listview.SelectedItem]);
-					}
-				} else {
-					listview.TabStop = false;
-					SuperView?.FocusNext ();
-				}
-				return true;
-			}
-			return null;
-		}
-
-		/// <summary>
-		/// Toggles the expand/collapse state of the sublist in the combo box
-		/// </summary>
-		/// <returns></returns>
-		bool ExpandCollapse ()
-		{
-			if (search.HasFocus || listview.HasFocus) {
-				if (!isShow) {
-					return Expand ();
-				} else {
-					return Collapse ();
-				}
-			}
-			return false;
-		}
-
-		bool ActivateSelected ()
-		{
-			if (HasItems ()) {
-				Selected ();
-				return true;
-			}
-			return false;
-		}
-
-		bool HasItems ()
-		{
-			return Source?.Count > 0;
-		}
-
-		/// <summary>
-		/// Collapses the drop down list.  Returns true if the state chagned or false
-		/// if it was already collapsed and no action was taken
-		/// </summary>
-		public virtual bool Collapse ()
-		{
-			if (!isShow) {
-				return false;
-			}
-
-			isShow = false;
-			HideList ();
-			return true;
-		}
-
-		/// <summary>
-		/// Expands the drop down list.  Returns true if the state chagned or false
-		/// if it was already expanded and no action was taken
-		/// </summary>
-		public virtual bool Expand ()
-		{
-			if (isShow) {
-				return false;
-			}
-
-			SetSearchSet ();
-			isShow = true;
-			ShowList ();
-			FocusSelectedItem ();
-
-			return true;
-		}
-
-		/// <summary>
-		/// The currently selected list item
-		/// </summary>
-		public new string Text {
-			get {
-				return text;
-			}
-			set {
-				search.Text = text = value;
-			}
-		}
-
-		private void SetValue (object text, bool isFromSelectedItem = false)
-		{
-			search.TextChanged -= Search_Changed;
-			this.text = search.Text = text.ToString ();
-			search.CursorPosition = 0;
-			search.TextChanged += Search_Changed;
-			if (!isFromSelectedItem) {
-				selectedItem = GetSelectedItemFromSource (this.text);
-				OnSelectedChanged ();
-			}
-		}
-
-		private void Selected ()
-		{
-			isShow = false;
-			listview.TabStop = false;
-
-			if (listview.Source.Count == 0 || (searchset?.Count ?? 0) == 0) {
-				text = "";
-				HideList ();
-				isShow = false;
-				return;
-			}
-
-			SetValue (listview.SelectedItem > -1 ? searchset [listview.SelectedItem] : text);
-			search.CursorPosition = search.Text.GetColumns ();
-			Search_Changed (this, new TextChangedEventArgs (search.Text));
-			OnOpenSelectedItem ();
-			Reset (keepSearchText: true);
-			HideList ();
-			isShow = false;
-		}
-
-		private int GetSelectedItemFromSource (string value)
-		{
-			if (source == null) {
-				return -1;
-			}
-			for (int i = 0; i < source.Count; i++) {
-				if (source.ToList () [i].ToString () == value) {
-					return i;
-				}
-			}
-			return -1;
-		}
-
-		/// <summary>
-		/// Reset to full original list
-		/// </summary>
-		private void Reset (bool keepSearchText = false)
-		{
-			if (!keepSearchText) {
-				search.Text = text = "";
-			}
-
-			ResetSearchSet ();
-
-			listview.SetSource (searchset);
-			listview.Height = CalculatetHeight ();
-
-			if (Subviews.Count > 0) {
-				search.SetFocus ();
-			}
-		}
-
-		private void ResetSearchSet (bool noCopy = false)
-		{
-			searchset.Clear ();
-
-			if (autoHide || noCopy)
-				return;
-			SetSearchSet ();
-		}
-
-		private void SetSearchSet ()
-		{
-			if (Source == null) { return; }
-			// force deep copy
-			foreach (var item in Source.ToList ()) {
-				searchset.Add (item);
-			}
-		}
-
-		private void Search_Changed (object sender, TextChangedEventArgs e)
-		{
-			if (source == null) { // Object initialization		
-				return;
-			}
-
-			if (string.IsNullOrEmpty (search.Text) && string.IsNullOrEmpty (e.OldValue)) {
-				ResetSearchSet ();
-			} else if (search.Text != e.OldValue) {
-				isShow = true;
-				ResetSearchSet (noCopy: true);
-
-				foreach (var item in source.ToList ()) { // Iterate to preserver object type and force deep copy
-					if (item.ToString ().StartsWith (search.Text, StringComparison.CurrentCultureIgnoreCase)) {
-						searchset.Add (item);
-					}
-				}
-			}
-
-			if (HasFocus) {
-				ShowList ();
-			} else if (autoHide) {
-				isShow = false;
-				HideList ();
-			}
-		}
-
-		/// <summary>
-		/// Show the search list
-		/// </summary>
-		/// 
-		/// Consider making public
-		private void ShowList ()
-		{
-			listview.SetSource (searchset);
-			listview.Clear (); // Ensure list shrinks in Dialog as you type
-			listview.Height = CalculatetHeight ();
-			this.SuperView?.BringSubviewToFront (this);
-		}
-
-		/// <summary>
-		/// Hide the search list
-		/// </summary>
-		/// 
-		/// Consider making public
-		private void HideList ()
-		{
-			if (lastSelectedItem != selectedItem) {
-				OnOpenSelectedItem ();
-			}
-			var rect = listview.ViewToScreen (listview.Bounds);
-			Reset (SelectedItem > -1);
-			listview.Clear (rect);
-			listview.TabStop = false;
-			SuperView?.SendSubviewToBack (this);
-			SuperView?.SetNeedsDisplay (rect);
-			OnCollapsed ();
-		}
-
-		/// <summary>
-		/// Internal height of dynamic search list
-		/// </summary>
-		/// <returns></returns>
-		private int CalculatetHeight ()
-		{
-			if (Bounds.Height == 0)
-				return 0;
-
-			return Math.Min (Math.Max (Bounds.Height - 1, minimumHeight - 1), searchset?.Count > 0 ? searchset.Count : isShow ? Math.Max (Bounds.Height - 1, minimumHeight - 1) : 0);
-		}
-	}
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+
+namespace Terminal.Gui;
+
+/// <summary>Provides a drop-down list of items the user can select from.</summary>
+public class ComboBox : View, IDesignable
+{
+    private readonly ComboListView _listview;
+    private readonly int _minimumHeight = 2;
+    private readonly TextField _search;
+    private readonly ObservableCollection<object> _searchSet = [];
+    private bool _autoHide = true;
+    private bool _hideDropdownListOnClick;
+    private int _lastSelectedItem = -1;
+    private int _selectedItem = -1;
+    private IListDataSource _source;
+    private string _text = "";
+
+    /// <summary>Public constructor</summary>
+    public ComboBox ()
+    {
+        _search = new TextField ();
+        _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = false };
+
+        _search.TextChanged += Search_Changed;
+        _search.Accept += Search_Accept;
+
+        _listview.Y = Pos.Bottom (_search);
+        _listview.OpenSelectedItem += (sender, a) => Selected ();
+
+        Add (_search, _listview);
+
+        // BUGBUG: This should not be needed; LayoutComplete will handle
+        Initialized += (s, e) => ProcessLayout ();
+
+        // On resize
+        LayoutComplete += (sender, a) => ProcessLayout ();
+        ;
+
+        _listview.SelectedItemChanged += (sender, e) =>
+                                         {
+                                             if (!HideDropdownListOnClick && _searchSet.Count > 0)
+                                             {
+                                                 SetValue (_searchSet [_listview.SelectedItem]);
+                                             }
+                                         };
+
+        Added += (s, e) =>
+                 {
+                     // Determine if this view is hosted inside a dialog and is the only control
+                     for (View view = SuperView; view != null; view = view.SuperView)
+                     {
+                         if (view is Dialog && SuperView is { } && SuperView.Subviews.Count == 1 && SuperView.Subviews [0] == this)
+                         {
+                             _autoHide = false;
+
+                             break;
+                         }
+                     }
+
+                     SetNeedsLayout ();
+                     SetNeedsDisplay ();
+                     ShowHideList (Text);
+                 };
+
+        // Things this view knows how to do
+        AddCommand (Command.Accept, () => ActivateSelected ());
+        AddCommand (Command.ToggleExpandCollapse, () => ExpandCollapse ());
+        AddCommand (Command.Expand, () => Expand ());
+        AddCommand (Command.Collapse, () => Collapse ());
+        AddCommand (Command.LineDown, () => MoveDown ());
+        AddCommand (Command.LineUp, () => MoveUp ());
+        AddCommand (Command.PageDown, () => PageDown ());
+        AddCommand (Command.PageUp, () => PageUp ());
+        AddCommand (Command.TopHome, () => MoveHome ());
+        AddCommand (Command.BottomEnd, () => MoveEnd ());
+        AddCommand (Command.Cancel, () => CancelSelected ());
+        AddCommand (Command.UnixEmulation, () => UnixEmulation ());
+
+        // Default keybindings for this view
+        KeyBindings.Add (Key.Enter, Command.Accept);
+        KeyBindings.Add (Key.F4, Command.ToggleExpandCollapse);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.Home, Command.TopHome);
+        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Esc, Command.Cancel);
+        KeyBindings.Add (Key.U.WithCtrl, Command.UnixEmulation);
+    }
+
+    /// <inheritdoc/>
+    public new ColorScheme ColorScheme
+    {
+        get => base.ColorScheme;
+        set
+        {
+            _listview.ColorScheme = value;
+            base.ColorScheme = value;
+            SetNeedsDisplay ();
+        }
+    }
+
+    /// <summary>Gets or sets if the drop-down list can be hide with a button click event.</summary>
+    public bool HideDropdownListOnClick
+    {
+        get => _hideDropdownListOnClick;
+        set => _hideDropdownListOnClick = _listview.HideDropdownListOnClick = value;
+    }
+
+    /// <summary>Gets the drop down list state, expanded or collapsed.</summary>
+    public bool IsShow { get; private set; }
+
+    /// <summary>If set to true its not allow any changes in the text.</summary>
+    public bool ReadOnly
+    {
+        get => _search.ReadOnly;
+        set
+        {
+            _search.ReadOnly = value;
+
+            if (_search.ReadOnly)
+            {
+                if (_search.ColorScheme is { })
+                {
+                    _search.ColorScheme = new ColorScheme (_search.ColorScheme) { Normal = _search.ColorScheme.Focus };
+                }
+            }
+        }
+    }
+
+    /// <summary>Current search text</summary>
+    public string SearchText
+    {
+        get => _search.Text;
+        set => SetSearchText (value);
+    }
+
+    /// <summary>Gets the index of the currently selected item in the <see cref="Source"/></summary>
+    /// <value>The selected item or -1 none selected.</value>
+    public int SelectedItem
+    {
+        get => _selectedItem;
+        set
+        {
+            if (_selectedItem != value
+                && (value == -1
+                    || (_source is { } && value > -1 && value < _source.Count)))
+            {
+                _selectedItem = _lastSelectedItem = value;
+
+                if (_selectedItem != -1)
+                {
+                    SetValue (_source.ToList () [_selectedItem].ToString (), true);
+                }
+                else
+                {
+                    SetValue ("", true);
+                }
+
+                OnSelectedChanged ();
+            }
+        }
+    }
+
+    /// <summary>Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ComboBox"/>, enabling custom rendering.</summary>
+    /// <value>The source.</value>
+    /// <remarks>Use <see cref="SetSource{T}"/> to set a new <see cref="ObservableCollection{T}"/> source.</remarks>
+    public IListDataSource Source
+    {
+        get => _source;
+        set
+        {
+            _source = value;
+
+            // Only need to refresh list if its been added to a container view
+            if (SuperView is { } && SuperView.Subviews.Contains (this))
+            {
+                Text = string.Empty;
+                SetNeedsDisplay ();
+            }
+        }
+    }
+
+    /// <summary>The text of the currently selected list item</summary>
+    public new string Text
+    {
+        get => _text;
+        set => SetSearchText (value);
+    }
+
+    /// <summary>
+    ///     Collapses the drop down list.  Returns true if the state chagned or false if it was already collapsed and no
+    ///     action was taken
+    /// </summary>
+    public virtual bool Collapse ()
+    {
+        if (!IsShow)
+        {
+            return false;
+        }
+
+        IsShow = false;
+        HideList ();
+
+        return true;
+    }
+
+    /// <summary>This event is raised when the drop-down list is collapsed.</summary>
+    public event EventHandler Collapsed;
+
+    /// <summary>
+    ///     Expands the drop down list.  Returns true if the state chagned or false if it was already expanded and no
+    ///     action was taken
+    /// </summary>
+    public virtual bool Expand ()
+    {
+        if (IsShow)
+        {
+            return false;
+        }
+
+        SetSearchSet ();
+        IsShow = true;
+        ShowList ();
+        FocusSelectedItem ();
+
+        return true;
+    }
+
+    /// <summary>This event is raised when the drop-down list is expanded.</summary>
+    public event EventHandler Expanded;
+
+    /// <inheritdoc/>
+    protected internal override bool OnMouseEvent (MouseEvent me)
+    {
+        if (me.Position.X == Viewport.Right - 1
+            && me.Position.Y == Viewport.Top
+            && me.Flags == MouseFlags.Button1Pressed
+            && _autoHide)
+        {
+            if (IsShow)
+            {
+                IsShow = false;
+                HideList ();
+            }
+            else
+            {
+                SetSearchSet ();
+
+                IsShow = true;
+                ShowList ();
+                FocusSelectedItem ();
+            }
+
+            return me.Handled = true;
+        }
+
+        if (me.Flags == MouseFlags.Button1Pressed)
+        {
+            if (!_search.HasFocus)
+            {
+                _search.SetFocus ();
+            }
+
+            return me.Handled = true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Virtual method which invokes the <see cref="Collapsed"/> event.</summary>
+    public virtual void OnCollapsed () { Collapsed?.Invoke (this, EventArgs.Empty); }
+
+    /// <inheritdoc/>
+    public override void OnDrawContent (Rectangle viewport)
+    {
+        base.OnDrawContent (viewport);
+
+        if (!_autoHide)
+        {
+            return;
+        }
+
+        Driver.SetAttribute (ColorScheme.Focus);
+        Move (Viewport.Right - 1, 0);
+        Driver.AddRune (Glyphs.DownArrow);
+    }
+
+    /// <inheritdoc/>
+    public override bool OnEnter (View view)
+    {
+        if (!_search.HasFocus && !_listview.HasFocus)
+        {
+            _search.SetFocus ();
+        }
+
+        _search.CursorPosition = _search.Text.GetRuneCount ();
+
+        return base.OnEnter (view);
+    }
+
+    /// <summary>Virtual method which invokes the <see cref="Expanded"/> event.</summary>
+    public virtual void OnExpanded () { Expanded?.Invoke (this, EventArgs.Empty); }
+
+    /// <inheritdoc/>
+    public override bool OnLeave (View view)
+    {
+        if (_source?.Count > 0
+            && _selectedItem > -1
+            && _selectedItem < _source.Count - 1
+            && _text != _source.ToList () [_selectedItem].ToString ())
+        {
+            SetValue (_source.ToList () [_selectedItem].ToString ());
+        }
+
+        if (_autoHide && IsShow && view != this && view != _search && view != _listview)
+        {
+            IsShow = false;
+            HideList ();
+        }
+        else if (_listview.TabStop)
+        {
+            _listview.TabStop = false;
+        }
+
+        return base.OnLeave (view);
+    }
+
+    /// <summary>Invokes the OnOpenSelectedItem event if it is defined.</summary>
+    /// <returns></returns>
+    public virtual bool OnOpenSelectedItem ()
+    {
+        string value = _search.Text;
+        _lastSelectedItem = SelectedItem;
+        OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (SelectedItem, value));
+
+        return true;
+    }
+
+    /// <summary>Invokes the SelectedChanged event if it is defined.</summary>
+    /// <returns></returns>
+    public virtual bool OnSelectedChanged ()
+    {
+        // Note: Cannot rely on "listview.SelectedItem != lastSelectedItem" because the list is dynamic. 
+        // So we cannot optimize. Ie: Don't call if not changed
+        SelectedItemChanged?.Invoke (this, new ListViewItemEventArgs (SelectedItem, _search.Text));
+
+        return true;
+    }
+
+    /// <summary>This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.</summary>
+    public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
+
+    /// <summary>This event is raised when the selected item in the <see cref="ComboBox"/> has changed.</summary>
+    public event EventHandler<ListViewItemEventArgs> SelectedItemChanged;
+
+    /// <summary>Sets the source of the <see cref="ComboBox"/> to an <see cref="ObservableCollection{T}"/>.</summary>
+    /// <value>An object implementing the INotifyCollectionChanged and INotifyPropertyChanged interface.</value>
+    /// <remarks>
+    ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custom
+    ///     rendering.
+    /// </remarks>
+    public void SetSource<T> (ObservableCollection<T> source)
+    {
+        if (source is null)
+        {
+            Source = null;
+        }
+        else
+        {
+            _listview.SetSource<T> (source);
+            Source = _listview.Source;
+        }
+    }
+
+    private bool ActivateSelected ()
+    {
+        if (HasItems ())
+        {
+            Selected ();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Internal height of dynamic search list</summary>
+    /// <returns></returns>
+    private int CalculatetHeight ()
+    {
+        if (!IsInitialized || Viewport.Height == 0)
+        {
+            return 0;
+        }
+
+        return Math.Min (
+                         Math.Max (Viewport.Height - 1, _minimumHeight - 1),
+                         _searchSet?.Count > 0 ? _searchSet.Count :
+                         IsShow ? Math.Max (Viewport.Height - 1, _minimumHeight - 1) : 0
+                        );
+    }
+
+    private bool CancelSelected ()
+    {
+        _search.SetFocus ();
+
+        if (ReadOnly || HideDropdownListOnClick)
+        {
+            SelectedItem = _lastSelectedItem;
+
+            if (SelectedItem > -1 && _listview.Source?.Count > 0)
+            {
+                Text = _listview.Source.ToList () [SelectedItem]?.ToString ();
+            }
+        }
+        else if (!ReadOnly)
+        {
+            Text = string.Empty;
+            _selectedItem = _lastSelectedItem;
+            OnSelectedChanged ();
+        }
+
+        return Collapse ();
+    }
+
+    /// <summary>Toggles the expand/collapse state of the sublist in the combo box</summary>
+    /// <returns></returns>
+    private bool ExpandCollapse ()
+    {
+        if (_search.HasFocus || _listview.HasFocus)
+        {
+            if (!IsShow)
+            {
+                return Expand ();
+            }
+
+            return Collapse ();
+        }
+
+        return false;
+    }
+
+    private void FocusSelectedItem ()
+    {
+        _listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
+        _listview.TabStop = true;
+        _listview.SetFocus ();
+        OnExpanded ();
+    }
+
+    private int GetSelectedItemFromSource (string searchText)
+    {
+        if (_source is null)
+        {
+            return -1;
+        }
+
+        for (var i = 0; i < _searchSet.Count; i++)
+        {
+            if (_searchSet [i].ToString () == searchText)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private bool HasItems () { return Source?.Count > 0; }
+
+    /// <summary>Hide the search list</summary>
+    /// Consider making public
+    private void HideList ()
+    {
+        if (_lastSelectedItem != _selectedItem)
+        {
+            OnOpenSelectedItem ();
+        }
+
+        Reset (true);
+        _listview.Clear ();
+        _listview.TabStop = false;
+        SuperView?.SendSubviewToBack (this);
+        Rectangle rect = _listview.ViewportToScreen (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
+        SuperView?.SetNeedsDisplay (rect);
+        OnCollapsed ();
+    }
+
+    private bool? MoveDown ()
+    {
+        if (_search.HasFocus)
+        {
+            // jump to list
+            if (_searchSet?.Count > 0)
+            {
+                _listview.TabStop = true;
+                _listview.SetFocus ();
+
+                if (_listview.SelectedItem > -1)
+                {
+                    SetValue (_searchSet [_listview.SelectedItem]);
+                }
+                else
+                {
+                    _listview.SelectedItem = 0;
+                }
+            }
+            else
+            {
+                _listview.TabStop = false;
+                SuperView?.FocusNext ();
+            }
+
+            return true;
+        }
+
+        return null;
+    }
+
+    private bool? MoveEnd ()
+    {
+        if (!IsShow && _search.HasFocus)
+        {
+            return null;
+        }
+
+        if (HasItems ())
+        {
+            _listview.MoveEnd ();
+        }
+
+        return true;
+    }
+
+    private bool? MoveHome ()
+    {
+        if (!IsShow && _search.HasFocus)
+        {
+            return null;
+        }
+
+        if (HasItems ())
+        {
+            _listview.MoveHome ();
+        }
+
+        return true;
+    }
+
+    private bool? MoveUp ()
+    {
+        if (HasItems ())
+        {
+            _listview.MoveUp ();
+        }
+
+        return true;
+    }
+
+    private bool? MoveUpList ()
+    {
+        if (_listview.HasFocus && _listview.SelectedItem == 0 && _searchSet?.Count > 0) // jump back to search
+        {
+            _search.CursorPosition = _search.Text.GetRuneCount ();
+            _search.SetFocus ();
+        }
+        else
+        {
+            MoveUp ();
+        }
+
+        return true;
+    }
+
+    private bool PageDown ()
+    {
+        if (HasItems ())
+        {
+            _listview.MovePageDown ();
+        }
+
+        return true;
+    }
+
+    private bool PageUp ()
+    {
+        if (HasItems ())
+        {
+            _listview.MovePageUp ();
+        }
+
+        return true;
+    }
+
+    // TODO: Upgrade Combobox to use Dim.Auto instead of all this stuff.
+    private void ProcessLayout ()
+    {
+        if (Viewport.Height < _minimumHeight && (Height is null || Height is DimAbsolute))
+        {
+            Height = _minimumHeight;
+        }
+
+        // BUGBUG: This uses Viewport. Should use ContentSize
+        if ((!_autoHide && Viewport.Width > 0 && _search.Frame.Width != Viewport.Width)
+            || (_autoHide && Viewport.Width > 0 && _search.Frame.Width != Viewport.Width - 1))
+        {
+            _search.Width = _listview.Width = _autoHide ? Viewport.Width - 1 : Viewport.Width;
+            _listview.Height = CalculatetHeight ();
+            _search.SetRelativeLayout (GetContentSize ());
+            _listview.SetRelativeLayout (GetContentSize ());
+        }
+    }
+
+    /// <summary>Reset to full original list</summary>
+    private void Reset (bool keepSearchText = false)
+    {
+        if (!keepSearchText)
+        {
+            SetSearchText (string.Empty);
+        }
+
+        ResetSearchSet ();
+
+        _listview.SetSource (_searchSet);
+        _listview.Height = CalculatetHeight ();
+
+        if (Subviews.Count > 0 && HasFocus)
+        {
+            _search.SetFocus ();
+        }
+    }
+
+    private void ResetSearchSet (bool noCopy = false)
+    {
+        _listview.SuspendCollectionChangedEvent ();
+        _searchSet.Clear ();
+        _listview.ResumeSuspendCollectionChangedEvent ();
+
+        if (_autoHide || noCopy)
+        {
+            return;
+        }
+
+        SetSearchSet ();
+    }
+
+    // Tell TextField to handle Accept Command (Enter)
+    void Search_Accept (object sender, HandledEventArgs e) { e.Handled = true; }
+
+    private void Search_Changed (object sender, EventArgs e)
+    {
+        if (_source is null)
+        {
+            // Object initialization
+            return;
+        }
+
+        ShowHideList (Text);
+    }
+
+    private void ShowHideList (string oldText)
+    {
+        if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (oldText))
+        {
+            ResetSearchSet ();
+        }
+        else if (_search.Text != oldText)
+        {
+            if (_search.Text.Length < oldText.Length)
+            {
+                _selectedItem = -1;
+            }
+
+            IsShow = true;
+            ResetSearchSet (true);
+
+            if (!string.IsNullOrEmpty (_search.Text))
+            {
+                _listview.SuspendCollectionChangedEvent ();
+
+                foreach (object item in _source.ToList ())
+                {
+                    // Iterate to preserver object type and force deep copy
+                    if (item.ToString ()
+                            .StartsWith (
+                                         _search.Text,
+                                         StringComparison.CurrentCultureIgnoreCase
+                                        ))
+                    {
+                        _searchSet.Add (item);
+                    }
+                }
+
+                _listview.ResumeSuspendCollectionChangedEvent ();
+            }
+        }
+
+        if (HasFocus)
+        {
+            ShowList ();
+        }
+        else if (_autoHide)
+        {
+            IsShow = false;
+            HideList ();
+        }
+    }
+
+    private void Selected ()
+    {
+        IsShow = false;
+        _listview.TabStop = false;
+
+        if (_listview.Source.Count == 0 || (_searchSet?.Count ?? 0) == 0)
+        {
+            _text = "";
+            HideList ();
+            IsShow = false;
+
+            return;
+        }
+
+        SetValue (_listview.SelectedItem > -1 ? _searchSet [_listview.SelectedItem] : _text);
+        _search.CursorPosition = _search.Text.GetColumns ();
+        ShowHideList (Text);
+        OnOpenSelectedItem ();
+        Reset (true);
+        HideList ();
+        IsShow = false;
+    }
+
+    private void SetSearchSet ()
+    {
+        if (Source is null)
+        {
+            return;
+        }
+
+        // PERF: At the request of @dodexahedron in the comment https://github.com/gui-cs/Terminal.Gui/pull/3552#discussion_r1648112410.
+        _listview.SuspendCollectionChangedEvent ();
+
+        // force deep copy
+        foreach (object item in Source.ToList ())
+        {
+            _searchSet.Add (item);
+        }
+
+        _listview.ResumeSuspendCollectionChangedEvent ();
+    }
+
+    // Sets the search text field Text as well as our own Text property
+    private void SetSearchText (string value)
+    {
+        _search.Text = value;
+        _text = value;
+    }
+
+    private void SetValue (object text, bool isFromSelectedItem = false)
+    {
+        // TOOD: THe fact we have to suspend events to change the text makes this feel very hacky.
+        _search.TextChanged -= Search_Changed;
+        // Note we set _text, to avoid set_Text from setting _search.Text again
+        _text = _search.Text = text.ToString ();
+        _search.CursorPosition = 0;
+        _search.TextChanged += Search_Changed;
+
+        if (!isFromSelectedItem)
+        {
+            _selectedItem = GetSelectedItemFromSource (_text);
+            OnSelectedChanged ();
+        }
+    }
+
+    /// <summary>Show the search list</summary>
+    /// Consider making public
+    private void ShowList ()
+    {
+        _listview.SuspendCollectionChangedEvent ();
+        _listview.SetSource (_searchSet);
+        _listview.ResumeSuspendCollectionChangedEvent ();
+
+        _listview.Clear ();
+        _listview.Height = CalculatetHeight ();
+        SuperView?.BringSubviewToFront (this);
+    }
+
+    private bool UnixEmulation ()
+    {
+        // Unix emulation
+        Reset ();
+
+        return true;
+    }
+
+    private class ComboListView : ListView
+    {
+        private ComboBox _container;
+        private bool _hideDropdownListOnClick;
+        private int _highlighted = -1;
+        private bool _isFocusing;
+        public ComboListView (ComboBox container, bool hideDropdownListOnClick) { SetInitialProperties (container, hideDropdownListOnClick); }
+
+        public ComboListView (ComboBox container, ObservableCollection<string> source, bool hideDropdownListOnClick)
+        {
+            Source = new ListWrapper<string> (source);
+            SetInitialProperties (container, hideDropdownListOnClick);
+        }
+
+        public bool HideDropdownListOnClick
+        {
+            get => _hideDropdownListOnClick;
+            set => _hideDropdownListOnClick = WantContinuousButtonPressed = value;
+        }
+
+        protected internal override bool OnMouseEvent (MouseEvent me)
+        {
+            var res = false;
+            bool isMousePositionValid = IsMousePositionValid (me);
+
+            if (isMousePositionValid)
+            {
+                res = base.OnMouseEvent (me);
+            }
+
+            if (HideDropdownListOnClick && me.Flags == MouseFlags.Button1Clicked)
+            {
+                if (!isMousePositionValid && !_isFocusing)
+                {
+                    _container.IsShow = false;
+                    _container.HideList ();
+                }
+                else if (isMousePositionValid)
+                {
+                    OnOpenSelectedItem ();
+                }
+                else
+                {
+                    _isFocusing = false;
+                }
+
+                return true;
+            }
+
+            if (me.Flags == MouseFlags.ReportMousePosition && HideDropdownListOnClick)
+            {
+                if (isMousePositionValid)
+                {
+                    _highlighted = Math.Min (TopItem + me.Position.Y, Source.Count);
+                    SetNeedsDisplay ();
+                }
+
+                _isFocusing = false;
+
+                return true;
+            }
+
+            return res;
+        }
+
+        public override void OnDrawContent (Rectangle viewport)
+        {
+            Attribute current = ColorScheme.Focus;
+            Driver.SetAttribute (current);
+            Move (0, 0);
+            Rectangle f = Frame;
+            int item = TopItem;
+            bool focused = HasFocus;
+            int col = AllowsMarking ? 2 : 0;
+            int start = LeftItem;
+
+            for (var row = 0; row < f.Height; row++, item++)
+            {
+                bool isSelected = item == _container.SelectedItem;
+                bool isHighlighted = _hideDropdownListOnClick && item == _highlighted;
+
+                Attribute newcolor;
+
+                if (isHighlighted || (isSelected && !_hideDropdownListOnClick))
+                {
+                    newcolor = focused ? ColorScheme.Focus : ColorScheme.HotNormal;
+                }
+                else if (isSelected && _hideDropdownListOnClick)
+                {
+                    newcolor = focused ? ColorScheme.HotFocus : ColorScheme.HotNormal;
+                }
+                else
+                {
+                    newcolor = focused ? GetNormalColor () : GetNormalColor ();
+                }
+
+                if (newcolor != current)
+                {
+                    Driver.SetAttribute (newcolor);
+                    current = newcolor;
+                }
+
+                Move (0, row);
+
+                if (Source is null || item >= Source.Count)
+                {
+                    for (var c = 0; c < f.Width; c++)
+                    {
+                        Driver.AddRune ((Rune)' ');
+                    }
+                }
+                else
+                {
+                    var rowEventArgs = new ListViewRowEventArgs (item);
+                    OnRowRender (rowEventArgs);
+
+                    if (rowEventArgs.RowAttribute is { } && current != rowEventArgs.RowAttribute)
+                    {
+                        current = (Attribute)rowEventArgs.RowAttribute;
+                        Driver.SetAttribute (current);
+                    }
+
+                    if (AllowsMarking)
+                    {
+                        Driver.AddRune (
+                                        Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                        AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected
+                                       );
+                        Driver.AddRune ((Rune)' ');
+                    }
+
+                    Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
+                }
+            }
+        }
+
+        public override bool OnEnter (View view)
+        {
+            if (_hideDropdownListOnClick)
+            {
+                _isFocusing = true;
+                _highlighted = _container.SelectedItem;
+                Application.GrabMouse (this);
+            }
+
+            return base.OnEnter (view);
+        }
+
+        public override bool OnLeave (View view)
+        {
+            if (_hideDropdownListOnClick)
+            {
+                _isFocusing = false;
+                _highlighted = _container.SelectedItem;
+                Application.UngrabMouse ();
+            }
+
+            return base.OnLeave (view);
+        }
+
+        public override bool OnSelectedChanged ()
+        {
+            bool res = base.OnSelectedChanged ();
+
+            _highlighted = SelectedItem;
+
+            return res;
+        }
+
+        private bool IsMousePositionValid (MouseEvent me)
+        {
+            if (me.Position.X >= 0 && me.Position.X < Frame.Width && me.Position.Y >= 0 && me.Position.Y < Frame.Height)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void SetInitialProperties (ComboBox container, bool hideDropdownListOnClick)
+        {
+            _container = container
+                         ?? throw new ArgumentNullException (
+                                                             nameof (container),
+                                                             "ComboBox container cannot be null."
+                                                            );
+            HideDropdownListOnClick = hideDropdownListOnClick;
+            AddCommand (Command.LineUp, () => _container.MoveUpList ());
+        }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        var source = new ObservableCollection<string> (["Combo Item 1", "Combo Item two", "Combo Item Quattro", "Last Combo Item"]);
+        SetSource (source);
+        Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: source.Count + 1);
+
+        return true;
+    }
 }

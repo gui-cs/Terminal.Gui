@@ -1,1286 +1,1413 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Xunit;
+﻿using System.ComponentModel;
+using System.Text;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests {
-
-	public class TreeViewTests {
-
-		readonly ITestOutputHelper output;
-
-		public TreeViewTests (ITestOutputHelper output)
-		{
-			this.output = output;
-		}
-
-		#region Test Setup Methods
-		class Factory {
-			public Car [] Cars { get; set; }
-			public override string ToString ()
-			{
-				return "Factory";
-			}
-		};
-		class Car {
-			public string Name { get; set; }
-			public override string ToString ()
-			{
-				return Name;
-			}
-		};
-
-		private TreeView<object> CreateTree ()
-		{
-			return CreateTree (out _, out _, out _);
-		}
-
-		private TreeView<object> CreateTree (out Factory factory1, out Car car1, out Car car2)
-		{
-			car1 = new Car ();
-			car2 = new Car ();
-
-			factory1 = new Factory () {
-				Cars = new [] { car1, car2 }
-			};
-
-			var tree = new TreeView<object> (new DelegateTreeBuilder<object> ((s) => s is Factory f ? f.Cars : null));
-			tree.AddObject (factory1);
-
-			return tree;
-		}
-		#endregion
-
-		/// <summary>
-		/// Tests that <see cref="TreeView.Expand(object)"/> and <see cref="TreeView.IsExpanded(object)"/> are consistent
-		/// </summary>
-		[Fact]
-		public void IsExpanded_TrueAfterExpand ()
-		{
-			var tree = CreateTree (out Factory f, out _, out _);
-			Assert.False (tree.IsExpanded (f));
-
-			tree.Expand (f);
-			Assert.True (tree.IsExpanded (f));
-
-			tree.Collapse (f);
-			Assert.False (tree.IsExpanded (f));
-		}
-
-		[Fact]
-		public void EmptyTreeView_ContentSizes ()
-		{
-			var emptyTree = new TreeView ();
-			Assert.Equal (0, emptyTree.ContentHeight);
-			Assert.Equal (0, emptyTree.GetContentWidth (true));
-			Assert.Equal (0, emptyTree.GetContentWidth (false));
-		}
-		[Fact]
-		public void EmptyTreeViewGeneric_ContentSizes ()
-		{
-			var emptyTree = new TreeView<string> ();
-			Assert.Equal (0, emptyTree.ContentHeight);
-			Assert.Equal (0, emptyTree.GetContentWidth (true));
-			Assert.Equal (0, emptyTree.GetContentWidth (false));
-		}
-
-		/// <summary>
-		/// Tests that <see cref="TreeView.Expand(object)"/> results in a correct content height
-		/// </summary>
-		[Fact]
-		public void ContentHeight_BiggerAfterExpand ()
-		{
-			var tree = CreateTree (out Factory f, out _, out _);
-			Assert.Equal (1, tree.ContentHeight);
-
-			tree.Expand (f);
-			Assert.Equal (3, tree.ContentHeight);
-
-			tree.Collapse (f);
-			Assert.Equal (1, tree.ContentHeight);
-		}
-
-		[Fact]
-		public void ContentWidth_BiggerAfterExpand ()
-		{
-			var tree = CreateTree (out Factory f, out Car car1, out _);
-			tree.BeginInit (); tree.EndInit ();
+namespace Terminal.Gui.ViewsTests;
 
-			tree.Bounds = new Rect (0, 0, 10, 10);
+public class TreeViewTests
+{
+    private readonly ITestOutputHelper _output;
+    public TreeViewTests (ITestOutputHelper output) { _output = output; }
 
-			InitFakeDriver ();
+    /// <summary>Tests that <see cref="TreeView.Expand(object)"/> results in a correct content height</summary>
+    [Fact]
+    public void ContentHeight_BiggerAfterExpand ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
+        Assert.Equal (1, tree.ContentHeight);
+
+        tree.Expand (f);
+        Assert.Equal (3, tree.ContentHeight);
+
+        tree.Collapse (f);
+        Assert.Equal (1, tree.ContentHeight);
+    }
+
+    [Fact]
+    public void ContentWidth_BiggerAfterExpand ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        tree.BeginInit ();
+        tree.EndInit ();
+
+        tree.Viewport = new Rectangle (0, 0, 10, 10);
+
+        //-+Factory
+        Assert.Equal (9, tree.GetContentWidth (true));
+
+        car1.Name = "123456789";
+
+        tree.Expand (f);
+
+        //..├-123456789
+        Assert.Equal (13, tree.GetContentWidth (true));
+
+        tree.Collapse (f);
+
+        //-+Factory
+        Assert.Equal (9, tree.GetContentWidth (true));
+
+    }
+
+    [Fact]
+    public void ContentWidth_VisibleVsAll ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out Car car2);
+        tree.BeginInit ();
+        tree.EndInit ();
+
+        // control only allows 1 row to be viewed at once
+        tree.Viewport = new Rectangle (0, 0, 20, 1);
+
+        //-+Factory
+        Assert.Equal (9, tree.GetContentWidth (true));
+        Assert.Equal (9, tree.GetContentWidth (false));
+
+        car1.Name = "123456789";
+        car2.Name = "12345678";
+
+        tree.Expand (f);
+
+        // Although expanded the bigger (longer) child node is not in the rendered area of the control
+        Assert.Equal (9, tree.GetContentWidth (true));
+
+        Assert.Equal (
+                      13,
+                      tree.GetContentWidth (false)
+                     ); // If you ask for the global max width it includes the longer child
+
+        // Now that we have scrolled down 1 row we should see the big child
+        tree.ScrollOffsetVertical = 1;
+        Assert.Equal (13, tree.GetContentWidth (true));
+        Assert.Equal (13, tree.GetContentWidth (false));
+
+        // Scroll down so only car2 is visible
+        tree.ScrollOffsetVertical = 2;
+        Assert.Equal (12, tree.GetContentWidth (true));
+        Assert.Equal (13, tree.GetContentWidth (false));
+
+        // Scroll way down (off bottom of control even)
+        tree.ScrollOffsetVertical = 5;
+        Assert.Equal (0, tree.GetContentWidth (true));
+        Assert.Equal (13, tree.GetContentWidth (false));
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void CursorVisibility_MultiSelect ()
+    {
+        var tv = new TreeView { Width = 20, Height = 10 };
+
+        var n1 = new TreeNode ("normal");
+        var n2 = new TreeNode ("pink");
+        tv.AddObject (n1);
+        tv.AddObject (n2);
+
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
+
+        Assert.True (tv.MultiSelect);
+        Assert.True (tv.HasFocus);
+        Assert.Equal (CursorVisibility.Invisible, tv.CursorVisibility);
+
+        tv.SelectAll ();
+        tv.CursorVisibility = CursorVisibility.Default;
+        Application.PositionCursor (top);
+        Application.Driver.GetCursorVisibility (out CursorVisibility visibility);
+        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
+        Assert.Equal (CursorVisibility.Default, visibility);
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void EmptyTreeView_ContentSizes ()
+    {
+        var emptyTree = new TreeView ();
+        Assert.Equal (0, emptyTree.ContentHeight);
+        Assert.Equal (0, emptyTree.GetContentWidth (true));
+        Assert.Equal (0, emptyTree.GetContentWidth (false));
+    }
+
+    [Fact]
+    public void EmptyTreeViewGeneric_ContentSizes ()
+    {
+        TreeView<string> emptyTree = new ();
+        Assert.Equal (0, emptyTree.ContentHeight);
+        Assert.Equal (0, emptyTree.GetContentWidth (true));
+        Assert.Equal (0, emptyTree.GetContentWidth (false));
+    }
+
+    /// <summary>
+    ///     Tests that <see cref="TreeView.GetChildren(object)"/> returns the child objects for the factory.  Note that
+    ///     the method only works once the parent branch (Factory) is expanded to expose the child (Car)
+    /// </summary>
+    [Fact]
+    public void GetChildren_ReturnsChildrenOnlyWhenExpanded ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+
+        Assert.Empty (tree.GetChildren (f));
+        Assert.Empty (tree.GetChildren (c1));
+        Assert.Empty (tree.GetChildren (c2));
+
+        // now when we expand the factory we discover the cars
+        tree.Expand (f);
+
+        Assert.Contains (c1, tree.GetChildren (f));
+        Assert.Contains (c2, tree.GetChildren (f));
+        Assert.Empty (tree.GetChildren (c1));
+        Assert.Empty (tree.GetChildren (c2));
+
+        tree.Collapse (f);
+
+        Assert.Empty (tree.GetChildren (f));
+        Assert.Empty (tree.GetChildren (c1));
+        Assert.Empty (tree.GetChildren (c2));
+    }
+
+    /// <summary>
+    ///     Tests that <see cref="TreeView.GetParent(object)"/> returns the parent object for Cars (Factories).  Note that
+    ///     the method only works once the parent branch (Factory) is expanded to expose the child (Car)
+    /// </summary>
+    [Fact]
+    public void GetParent_ReturnsParentOnlyWhenExpanded ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+
+        Assert.Null (tree.GetParent (f));
+        Assert.Null (tree.GetParent (c1));
+        Assert.Null (tree.GetParent (c2));
+
+        // now when we expand the factory we discover the cars
+        tree.Expand (f);
+
+        Assert.Null (tree.GetParent (f));
+        Assert.Equal (f, tree.GetParent (c1));
+        Assert.Equal (f, tree.GetParent (c2));
+
+        tree.Collapse (f);
+
+        Assert.Null (tree.GetParent (f));
+        Assert.Null (tree.GetParent (c1));
+        Assert.Null (tree.GetParent (c2));
+    }
+
+    /// <summary>Tests <see cref="TreeView.GetScrollOffsetOf(object)"/> for objects that are as yet undiscovered by the tree</summary>
+    [Fact]
+    public void GetScrollOffsetOf_MinusOneForUnRevealed ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+
+        // to start with the tree is collapsed and only knows about the root object
+        Assert.Equal (0, tree.GetScrollOffsetOf (f));
+        Assert.Equal (-1, tree.GetScrollOffsetOf (c1));
+        Assert.Equal (-1, tree.GetScrollOffsetOf (c2));
+
+        // reveal it by expanding the root object
+        tree.Expand (f);
+
+        // tree now knows about children
+        Assert.Equal (0, tree.GetScrollOffsetOf (f));
+        Assert.Equal (1, tree.GetScrollOffsetOf (c1));
+        Assert.Equal (2, tree.GetScrollOffsetOf (c2));
+
+        // after collapsing the root node again
+        tree.Collapse (f);
+
+        // tree no longer knows about the locations of these objects
+        Assert.Equal (0, tree.GetScrollOffsetOf (f));
+        Assert.Equal (-1, tree.GetScrollOffsetOf (c1));
+        Assert.Equal (-1, tree.GetScrollOffsetOf (c2));
+    }
+
+    [Fact]
+    public void GoTo_OnlyAppliesToExposedObjects ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        tree.BeginInit ();
+        tree.EndInit ();
+
+        // Make tree bounds 1 in height so that EnsureVisible always requires updating scroll offset
+        tree.Viewport = new Rectangle (0, 0, 50, 1);
+
+        Assert.Null (tree.SelectedObject);
+        Assert.Equal (0, tree.ScrollOffsetVertical);
+
+        // car 1 is not yet exposed
+        tree.GoTo (car1);
+
+        Assert.Null (tree.SelectedObject);
+        Assert.Equal (0, tree.ScrollOffsetVertical);
+
+        tree.Expand (f);
+
+        // Car1 is now exposed by expanding the factory
+        tree.GoTo (car1);
+
+        Assert.Equal (car1, tree.SelectedObject);
+        Assert.Equal (1, tree.ScrollOffsetVertical);
+    }
+
+    [Fact]
+    public void GoToEnd_ShouldNotFailOnEmptyTreeView ()
+    {
+        var tree = new TreeView ();
+
+        Exception exception = Record.Exception (() => tree.GoToEnd ());
+
+        Assert.Null (exception);
+    }
+
+    /// <summary>
+    ///     Tests that <see cref="TreeView.IsExpanded(object)"/> and <see cref="TreeView.Expand(object)"/> behaves
+    ///     correctly when an object cannot be expanded (because it has no children)
+    /// </summary>
+    [Fact]
+    public void IsExpanded_FalseIfCannotExpand ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car c, out _);
+
+        // expose the car by expanding the factory
+        tree.Expand (f);
+
+        // car is not expanded
+        Assert.False (tree.IsExpanded (c));
+
+        //try to expand the car (should have no effect because cars have no children)
+        tree.Expand (c);
+
+        Assert.False (tree.IsExpanded (c));
+
+        // should also be ignored
+        tree.Collapse (c);
+
+        Assert.False (tree.IsExpanded (c));
+
+    }
+
+    /// <summary>Tests that <see cref="TreeView.Expand(object)"/> and <see cref="TreeView.IsExpanded(object)"/> are consistent</summary>
+    [Fact]
+    public void IsExpanded_TrueAfterExpand ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
+        Assert.False (tree.IsExpanded (f));
+
+        tree.Expand (f);
+        Assert.True (tree.IsExpanded (f));
+
+        tree.Collapse (f);
+        Assert.False (tree.IsExpanded (f));
+    }
+
+    [Fact]
+    public void MultiSelect_GetAllSelectedObjects ()
+    {
+        var tree = new TreeView ();
+
+        TreeNode l1;
+        TreeNode l2;
+        TreeNode l3;
+        TreeNode l4;
 
-			//-+Factory
-			Assert.Equal (9, tree.GetContentWidth (true));
+        var root = new TreeNode ("Root");
+        root.Children.Add (l1 = new TreeNode ("Leaf1"));
+        root.Children.Add (l2 = new TreeNode ("Leaf2"));
+        root.Children.Add (l3 = new TreeNode ("Leaf3"));
+        root.Children.Add (l4 = new TreeNode ("Leaf4"));
 
-			car1.Name = "123456789";
+        tree.AddObject (root);
+        tree.MultiSelect = true;
 
-			tree.Expand (f);
+        tree.Expand (root);
+        Assert.Empty (tree.GetAllSelectedObjects ());
 
-			//..├-123456789
-			Assert.Equal (13, tree.GetContentWidth (true));
+        tree.SelectedObject = root;
 
-			tree.Collapse (f);
-			//-+Factory
-			Assert.Equal (9, tree.GetContentWidth (true));
+        Assert.Single (tree.GetAllSelectedObjects (), root);
 
-			Application.Shutdown ();
-		}
+        // move selection down 1
+        tree.AdjustSelection (1);
 
-		[Fact]
-		public void ContentWidth_VisibleVsAll ()
-		{
-			var tree = CreateTree (out Factory f, out Car car1, out Car car2);
-			tree.BeginInit (); tree.EndInit ();
+        Assert.Single (tree.GetAllSelectedObjects (), l1);
 
-			// control only allows 1 row to be viewed at once
-			tree.Bounds = new Rect (0, 0, 20, 1);
+        // expand selection down 2 (e.g. shift down twice)
+        tree.AdjustSelection (1, true);
+        tree.AdjustSelection (1, true);
 
-			InitFakeDriver ();
+        Assert.Equal (3, tree.GetAllSelectedObjects ().Count ());
+        Assert.Contains (l1, tree.GetAllSelectedObjects ());
+        Assert.Contains (l2, tree.GetAllSelectedObjects ());
+        Assert.Contains (l3, tree.GetAllSelectedObjects ());
 
-			//-+Factory
-			Assert.Equal (9, tree.GetContentWidth (true));
-			Assert.Equal (9, tree.GetContentWidth (false));
+        tree.Collapse (root);
 
-			car1.Name = "123456789";
-			car2.Name = "12345678";
+        // No selected objects since the root was collapsed
+        Assert.Empty (tree.GetAllSelectedObjects ());
+    }
 
-			tree.Expand (f);
+    [Fact]
+    public void ObjectActivated_Called ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
-			// Although expanded the bigger (longer) child node is not in the rendered area of the control
-			Assert.Equal (9, tree.GetContentWidth (true));
-			Assert.Equal (13, tree.GetContentWidth (false)); // If you ask for the global max width it includes the longer child
+        object activated = null;
+        var called = false;
 
-			// Now that we have scrolled down 1 row we should see the big child
-			tree.ScrollOffsetVertical = 1;
-			Assert.Equal (13, tree.GetContentWidth (true));
-			Assert.Equal (13, tree.GetContentWidth (false));
+        // register for the event
+        tree.ObjectActivated += (s, e) =>
+                                {
+                                    activated = e.ActivatedObject;
+                                    called = true;
+                                };
 
-			// Scroll down so only car2 is visible
-			tree.ScrollOffsetVertical = 2;
-			Assert.Equal (12, tree.GetContentWidth (true));
-			Assert.Equal (13, tree.GetContentWidth (false));
+        Assert.False (called);
 
-			// Scroll way down (off bottom of control even)
-			tree.ScrollOffsetVertical = 5;
-			Assert.Equal (0, tree.GetContentWidth (true));
-			Assert.Equal (13, tree.GetContentWidth (false));
+        // no object is selected yet so no event should happen
+        tree.NewKeyDownEvent (Key.Enter);
 
-			Application.Shutdown ();
-		}
-		/// <summary>
-		/// Tests that <see cref="TreeView.IsExpanded(object)"/> and <see cref="TreeView.Expand(object)"/> behaves correctly when an object cannot be expanded (because it has no children)
-		/// </summary>
-		[Fact]
-		public void IsExpanded_FalseIfCannotExpand ()
-		{
-			var tree = CreateTree (out Factory f, out Car c, out _);
+        Assert.Null (activated);
+        Assert.False (called);
 
-			// expose the car by expanding the factory
-			tree.Expand (f);
+        // down to select factory
+        tree.NewKeyDownEvent (Key.CursorDown);
 
-			// car is not expanded
-			Assert.False (tree.IsExpanded (c));
+        tree.NewKeyDownEvent (Key.Enter);
 
-			//try to expand the car (should have no effect because cars have no children)
-			tree.Expand (c);
+        Assert.True (called);
+        Assert.Same (f, activated);
+    }
 
-			Assert.False (tree.IsExpanded (c));
+    [Fact]
 
-			// should also be ignored
-			tree.Collapse (c);
-
-			Assert.False (tree.IsExpanded (c));
+    public void ObjectActivated_CustomKey ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
-			Application.Shutdown ();
-		}
+        tree.ObjectActivationKey = KeyCode.Delete;
+        object activated = null;
+        var called = false;
 
-		/// <summary>
-		/// Tests illegal ranges for <see cref="TreeView.ScrollOffset"/>
-		/// </summary>
-		[Fact]
-		public void ScrollOffset_CannotBeNegative ()
-		{
-			var tree = CreateTree ();
+        // register for the event
+        tree.ObjectActivated += (s, e) =>
+                                {
+                                    activated = e.ActivatedObject;
+                                    called = true;
+                                };
 
-			Assert.Equal (0, tree.ScrollOffsetVertical);
+        Assert.False (called);
 
-			tree.ScrollOffsetVertical = -100;
-			Assert.Equal (0, tree.ScrollOffsetVertical);
+        // no object is selected yet so no event should happen
+        tree.NewKeyDownEvent (Key.Enter);
 
-			tree.ScrollOffsetVertical = 10;
-			Assert.Equal (10, tree.ScrollOffsetVertical);
-		}
+        Assert.Null (activated);
+        Assert.False (called);
 
-		/// <summary>
-		/// Tests <see cref="TreeView.GetScrollOffsetOf(object)"/> for objects that are as yet undiscovered by the tree
-		/// </summary>
-		[Fact]
-		public void GetScrollOffsetOf_MinusOneForUnRevealed ()
-		{
-			var tree = CreateTree (out Factory f, out Car c1, out Car c2);
-
-			// to start with the tree is collapsed and only knows about the root object
-			Assert.Equal (0, tree.GetScrollOffsetOf (f));
-			Assert.Equal (-1, tree.GetScrollOffsetOf (c1));
-			Assert.Equal (-1, tree.GetScrollOffsetOf (c2));
-
-			// reveal it by expanding the root object
-			tree.Expand (f);
+        // down to select factory
+        tree.NewKeyDownEvent (Key.CursorDown);
 
-			// tree now knows about children
-			Assert.Equal (0, tree.GetScrollOffsetOf (f));
-			Assert.Equal (1, tree.GetScrollOffsetOf (c1));
-			Assert.Equal (2, tree.GetScrollOffsetOf (c2));
-
-			// after collapsing the root node again
-			tree.Collapse (f);
-
-			// tree no longer knows about the locations of these objects
-			Assert.Equal (0, tree.GetScrollOffsetOf (f));
-			Assert.Equal (-1, tree.GetScrollOffsetOf (c1));
-			Assert.Equal (-1, tree.GetScrollOffsetOf (c2));
-		}
-
-		/// <summary>
-		/// Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree using <see cref="TreeView.RefreshObject(object, bool)"/>
-		/// </summary>
-		[Fact]
-		public void RefreshObject_ChildRemoved ()
-		{
-			var tree = CreateTree (out Factory f, out Car c1, out Car c2);
-
-			//reveal it by expanding the root object
-			tree.Expand (f);
-
-			Assert.Equal (0, tree.GetScrollOffsetOf (f));
-			Assert.Equal (1, tree.GetScrollOffsetOf (c1));
-			Assert.Equal (2, tree.GetScrollOffsetOf (c2));
-
-			// Factory now no longer makes Car c1 (only c2)
-			f.Cars = new Car [] { c2 };
-
-			// Tree does not know this yet
-			Assert.Equal (0, tree.GetScrollOffsetOf (f));
-			Assert.Equal (1, tree.GetScrollOffsetOf (c1));
-			Assert.Equal (2, tree.GetScrollOffsetOf (c2));
-
-			// If the user has selected the node c1
-			tree.SelectedObject = c1;
-
-			// When we refresh the tree
-			tree.RefreshObject (f);
-
-			// Now tree knows that factory has only one child node c2
-			Assert.Equal (0, tree.GetScrollOffsetOf (f));
-			Assert.Equal (-1, tree.GetScrollOffsetOf (c1));
-			Assert.Equal (1, tree.GetScrollOffsetOf (c2));
-
-			// The old selection was c1 which is now gone so selection should default to the parent of that branch (the factory)
-			Assert.Equal (f, tree.SelectedObject);
-		}
-
-		/// <summary>
-		/// Tests that <see cref="TreeView.GetParent(object)"/> returns the parent object for
-		/// Cars (Factories).  Note that the method only works once the parent branch (Factory)
-		/// is expanded to expose the child (Car)
-		/// </summary>
-		[Fact]
-		public void GetParent_ReturnsParentOnlyWhenExpanded ()
-		{
-			var tree = CreateTree (out Factory f, out Car c1, out Car c2);
-
-			Assert.Null (tree.GetParent (f));
-			Assert.Null (tree.GetParent (c1));
-			Assert.Null (tree.GetParent (c2));
-
-			// now when we expand the factory we discover the cars
-			tree.Expand (f);
-
-			Assert.Null (tree.GetParent (f));
-			Assert.Equal (f, tree.GetParent (c1));
-			Assert.Equal (f, tree.GetParent (c2));
-
-			tree.Collapse (f);
-
-			Assert.Null (tree.GetParent (f));
-			Assert.Null (tree.GetParent (c1));
-			Assert.Null (tree.GetParent (c2));
-		}
-
-		/// <summary>
-		/// Tests how the tree adapts to changes in the ChildrenGetter delegate during runtime
-		/// when some branches are expanded and the new delegate returns children for a node that
-		/// previously didn't have any children
-		/// </summary>
-		[Fact]
-		public void RefreshObject_AfterChangingChildrenGetterDuringRuntime ()
-		{
-			var tree = CreateTree (out Factory f, out Car c1, out Car c2);
-
-			string wheel = "Shiny Wheel";
-
-			// Expand the Factory
-			tree.Expand (f);
-
-			// c1 cannot have children
-			Assert.Equal (f, tree.GetParent (c1));
-
-			// expanding it does nothing
-			tree.Expand (c1);
-			Assert.False (tree.IsExpanded (c1));
-
-			// change the children getter so that now cars can have wheels
-			tree.TreeBuilder = new DelegateTreeBuilder<object> ((o) =>
-				 // factories have cars
-				 o is Factory ? new object [] { c1, c2 }
-				 // cars have wheels
-				 : new object [] { wheel });
-
-			// still cannot expand
-			tree.Expand (c1);
-			Assert.False (tree.IsExpanded (c1));
-
-			tree.RefreshObject (c1);
-			tree.Expand (c1);
-			Assert.True (tree.IsExpanded (c1));
-			Assert.Equal (wheel, tree.GetChildren (c1).FirstOrDefault ());
-		}
-		/// <summary>
-		/// Same as <see cref="RefreshObject_AfterChangingChildrenGetterDuringRuntime"/> but
-		/// uses <see cref="TreeView.RebuildTree()"/> instead of <see cref="TreeView.RefreshObject(object, bool)"/>
-		/// </summary>
-		[Fact]
-		public void RebuildTree_AfterChangingChildrenGetterDuringRuntime ()
-		{
-			var tree = CreateTree (out Factory f, out Car c1, out Car c2);
-
-			string wheel = "Shiny Wheel";
-
-			// Expand the Factory
-			tree.Expand (f);
-
-			// c1 cannot have children
-			Assert.Equal (f, tree.GetParent (c1));
-
-			// expanding it does nothing
-			tree.Expand (c1);
-			Assert.False (tree.IsExpanded (c1));
-
-			// change the children getter so that now cars can have wheels
-			tree.TreeBuilder = new DelegateTreeBuilder<object> ((o) =>
-				 // factories have cars
-				 o is Factory ? new object [] { c1, c2 }
-				 // cars have wheels
-				 : new object [] { wheel });
-
-			// still cannot expand
-			tree.Expand (c1);
-			Assert.False (tree.IsExpanded (c1));
-
-			// Rebuild the tree
-			tree.RebuildTree ();
-
-			// Rebuild should not have collapsed any branches or done anything wierd
-			Assert.True (tree.IsExpanded (f));
-
-			tree.Expand (c1);
-			Assert.True (tree.IsExpanded (c1));
-			Assert.Equal (wheel, tree.GetChildren (c1).FirstOrDefault ());
-		}
-		/// <summary>
-		/// Tests that <see cref="TreeView.GetChildren(object)"/> returns the child objects for
-		/// the factory.  Note that the method only works once the parent branch (Factory)
-		/// is expanded to expose the child (Car)
-		/// </summary>
-		[Fact]
-		public void GetChildren_ReturnsChildrenOnlyWhenExpanded ()
-		{
-			var tree = CreateTree (out Factory f, out Car c1, out Car c2);
-
-			Assert.Empty (tree.GetChildren (f));
-			Assert.Empty (tree.GetChildren (c1));
-			Assert.Empty (tree.GetChildren (c2));
-
-			// now when we expand the factory we discover the cars
-			tree.Expand (f);
-
-			Assert.Contains (c1, tree.GetChildren (f));
-			Assert.Contains (c2, tree.GetChildren (f));
-			Assert.Empty (tree.GetChildren (c1));
-			Assert.Empty (tree.GetChildren (c2));
-
-			tree.Collapse (f);
-
-			Assert.Empty (tree.GetChildren (f));
-			Assert.Empty (tree.GetChildren (c1));
-			Assert.Empty (tree.GetChildren (c2));
-		}
-
-		[Fact]
-		public void TreeNode_WorksWithoutDelegate ()
-		{
-			var tree = new TreeView ();
-
-			var root = new TreeNode ("Root");
-			root.Children.Add (new TreeNode ("Leaf1"));
-			root.Children.Add (new TreeNode ("Leaf2"));
-
-			tree.AddObject (root);
-
-			tree.Expand (root);
-			Assert.Equal (2, tree.GetChildren (root).Count ());
-		}
+        tree.NewKeyDownEvent (Key.Enter);
 
-		[Fact]
-		public void MultiSelect_GetAllSelectedObjects ()
-		{
-			var tree = new TreeView ();
+        // Enter is not the activation key in this unit test
+        Assert.Null (activated);
+        Assert.False (called);
 
-			TreeNode l1;
-			TreeNode l2;
-			TreeNode l3;
-			TreeNode l4;
+        // Delete is the activation key in this test so should result in activation occurring
+        tree.NewKeyDownEvent (Key.Delete);
 
-			var root = new TreeNode ("Root");
-			root.Children.Add (l1 = new TreeNode ("Leaf1"));
-			root.Children.Add (l2 = new TreeNode ("Leaf2"));
-			root.Children.Add (l3 = new TreeNode ("Leaf3"));
-			root.Children.Add (l4 = new TreeNode ("Leaf4"));
+        Assert.True (called);
+        Assert.Same (f, activated);
 
-			tree.AddObject (root);
-			tree.MultiSelect = true;
+    }
 
-			tree.Expand (root);
-			Assert.Empty (tree.GetAllSelectedObjects ());
+    [Fact]
+    public void ObjectActivationButton_DoubleClick ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
-			tree.SelectedObject = root;
+        object activated = null;
+        var called = false;
 
-			Assert.Single (tree.GetAllSelectedObjects (), root);
+        // register for the event
+        tree.ObjectActivated += (s, e) =>
+                                {
+                                    activated = e.ActivatedObject;
+                                    called = true;
+                                };
 
-			// move selection down 1
-			tree.AdjustSelection (1, false);
+        Assert.False (called);
 
-			Assert.Single (tree.GetAllSelectedObjects (), l1);
+        // double click triggers activation
+        tree.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1DoubleClicked });
 
-			// expand selection down 2 (e.g. shift down twice)
-			tree.AdjustSelection (1, true);
-			tree.AdjustSelection (1, true);
+        Assert.True (called);
+        Assert.Same (f, activated);
+        Assert.Same (f, tree.SelectedObject);
 
-			Assert.Equal (3, tree.GetAllSelectedObjects ().Count ());
-			Assert.Contains (l1, tree.GetAllSelectedObjects ());
-			Assert.Contains (l2, tree.GetAllSelectedObjects ());
-			Assert.Contains (l3, tree.GetAllSelectedObjects ());
+    }
 
-			tree.Collapse (root);
+    [Fact]
+    public void ObjectActivationButton_RightClick ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
-			// No selected objects since the root was collapsed
-			Assert.Empty (tree.GetAllSelectedObjects ());
-		}
+        tree.ObjectActivationButton = MouseFlags.Button2Clicked;
+        tree.ExpandAll ();
 
-		[Fact]
-		public void ObjectActivated_Called ()
-		{
-			var tree = CreateTree (out Factory f, out Car car1, out _);
+        object activated = null;
+        var called = false;
 
-			InitFakeDriver ();
+        // register for the event
+        tree.ObjectActivated += (s, e) =>
+                                {
+                                    activated = e.ActivatedObject;
+                                    called = true;
+                                };
 
-			object activated = null;
-			bool called = false;
+        Assert.False (called);
 
-			// register for the event
-			tree.ObjectActivated += (s, e) => {
-				activated = e.ActivatedObject;
-				called = true;
-			};
+        // double click does nothing because we changed button binding to right click
+        tree.NewMouseEvent (new MouseEvent { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked });
 
-			Assert.False (called);
+        Assert.Null (activated);
+        Assert.False (called);
 
-			// no object is selected yet so no event should happen
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+        tree.NewMouseEvent (new MouseEvent { Position = new (0, 1), Flags = MouseFlags.Button2Clicked });
 
-			Assert.Null (activated);
-			Assert.False (called);
+        Assert.True (called);
+        Assert.Same (car1, activated);
+        Assert.Same (car1, tree.SelectedObject);
+    }
 
-			// down to select factory
-			tree.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+    [Fact]
+    public void ObjectActivationButton_SetToNull ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
 
-			Assert.True (called);
-			Assert.Same (f, activated);
+        // disable activation
+        tree.ObjectActivationButton = null;
 
-			Application.Shutdown ();
-		}
+        object activated = null;
+        var called = false;
 
-		[Fact]
-		public void GoTo_OnlyAppliesToExposedObjects ()
-		{
-			var tree = CreateTree (out Factory f, out Car car1, out _);
-			tree.BeginInit (); tree.EndInit ();
+        // register for the event
+        tree.ObjectActivated += (s, e) =>
+                                {
+                                    activated = e.ActivatedObject;
+                                    called = true;
+                                };
 
-			// Make tree bounds 1 in height so that EnsureVisible always requires updating scroll offset
-			tree.Bounds = new Rect (0, 0, 50, 1);
+        Assert.False (called);
 
-			Assert.Null (tree.SelectedObject);
-			Assert.Equal (0, tree.ScrollOffsetVertical);
+        // double click does nothing because we changed button to null
+        tree.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1DoubleClicked });
 
-			// car 1 is not yet exposed
-			tree.GoTo (car1);
+        Assert.False (called);
+        Assert.Null (activated);
+        Assert.Null (tree.SelectedObject);
+    }
 
-			Assert.Null (tree.SelectedObject);
-			Assert.Equal (0, tree.ScrollOffsetVertical);
+    /// <summary>
+    ///     Same as <see cref="RefreshObject_AfterChangingChildrenGetterDuringRuntime"/> but uses
+    ///     <see cref="TreeView.RebuildTree()"/> instead of <see cref="TreeView.RefreshObject(object, bool)"/>
+    /// </summary>
+    [Fact]
+    public void RebuildTree_AfterChangingChildrenGetterDuringRuntime ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
-			tree.Expand (f);
+        var wheel = "Shiny Wheel";
 
-			// Car1 is now exposed by expanding the factory
-			tree.GoTo (car1);
+        // Expand the Factory
+        tree.Expand (f);
 
-			Assert.Equal (car1, tree.SelectedObject);
-			Assert.Equal (1, tree.ScrollOffsetVertical);
-		}
+        // c1 cannot have children
+        Assert.Equal (f, tree.GetParent (c1));
 
-		[Fact]
-		public void GoToEnd_ShouldNotFailOnEmptyTreeView ()
-		{
-			var tree = new TreeView ();
+        // expanding it does nothing
+        tree.Expand (c1);
+        Assert.False (tree.IsExpanded (c1));
 
-			var exception = Record.Exception (() => tree.GoToEnd ());
+        // change the children getter so that now cars can have wheels
+        tree.TreeBuilder = new DelegateTreeBuilder<object> (
+                                                            o =>
 
-			Assert.Null (exception);
-		}
+                                                                // factories have cars
+                                                                o is Factory
+                                                                    ? new object [] { c1, c2 }
 
-		[Fact]
-		public void ObjectActivated_CustomKey ()
-		{
-			var tree = CreateTree (out Factory f, out Car car1, out _);
+                                                                    // cars have wheels
+                                                                    : new object [] { wheel }
+                                                           );
 
-			InitFakeDriver ();
+        // still cannot expand
+        tree.Expand (c1);
+        Assert.False (tree.IsExpanded (c1));
 
-			tree.ObjectActivationKey = Key.Delete;
-			object activated = null;
-			bool called = false;
+        // Rebuild the tree
+        tree.RebuildTree ();
+
+        // Rebuild should not have collapsed any branches or done anything wierd
+        Assert.True (tree.IsExpanded (f));
 
-			// register for the event
-			tree.ObjectActivated += (s, e) => {
-				activated = e.ActivatedObject;
-				called = true;
-			};
+        tree.Expand (c1);
+        Assert.True (tree.IsExpanded (c1));
+        Assert.Equal (wheel, tree.GetChildren (c1).FirstOrDefault ());
+    }
 
-			Assert.False (called);
+    /// <summary>
+    ///     Tests how the tree adapts to changes in the ChildrenGetter delegate during runtime when some branches are
+    ///     expanded and the new delegate returns children for a node that previously didn't have any children
+    /// </summary>
+    [Fact]
+    public void RefreshObject_AfterChangingChildrenGetterDuringRuntime ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
-			// no object is selected yet so no event should happen
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+        var wheel = "Shiny Wheel";
 
-			Assert.Null (activated);
-			Assert.False (called);
+        // Expand the Factory
+        tree.Expand (f);
 
-			// down to select factory
-			tree.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+        // c1 cannot have children
+        Assert.Equal (f, tree.GetParent (c1));
 
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+        // expanding it does nothing
+        tree.Expand (c1);
+        Assert.False (tree.IsExpanded (c1));
 
-			// Enter is not the activation key in this unit test
-			Assert.Null (activated);
-			Assert.False (called);
+        // change the children getter so that now cars can have wheels
+        tree.TreeBuilder = new DelegateTreeBuilder<object> (
+                                                            o =>
 
-			// Delete is the activation key in this test so should result in activation occurring
-			tree.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers ()));
+                                                                // factories have cars
+                                                                o is Factory
+                                                                    ? new object [] { c1, c2 }
 
-			Assert.True (called);
-			Assert.Same (f, activated);
+                                                                    // cars have wheels
+                                                                    : new object [] { wheel }
+                                                           );
 
-			Application.Shutdown ();
-		}
+        // still cannot expand
+        tree.Expand (c1);
+        Assert.False (tree.IsExpanded (c1));
 
-		[Fact]
-		public void ObjectActivationButton_DoubleClick ()
-		{
-			var tree = CreateTree (out Factory f, out Car car1, out _);
+        tree.RefreshObject (c1);
+        tree.Expand (c1);
+        Assert.True (tree.IsExpanded (c1));
+        Assert.Equal (wheel, tree.GetChildren (c1).FirstOrDefault ());
+    }
 
-			InitFakeDriver ();
+    /// <summary>
+    ///     Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree
+    ///     using <see cref="TreeView.RefreshObject(object, bool)"/>
+    /// </summary>
+    [Fact]
+    public void RefreshObject_ChildRemoved ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
-			object activated = null;
-			bool called = false;
+        //reveal it by expanding the root object
+        tree.Expand (f);
 
-			// register for the event
-			tree.ObjectActivated += (s, e) => {
-				activated = e.ActivatedObject;
-				called = true;
-			};
+        Assert.Equal (0, tree.GetScrollOffsetOf (f));
+        Assert.Equal (1, tree.GetScrollOffsetOf (c1));
+        Assert.Equal (2, tree.GetScrollOffsetOf (c2));
 
-			Assert.False (called);
+        // Factory now no longer makes Car c1 (only c2)
+        f.Cars = new [] { c2 };
 
-			// double click triggers activation
-			tree.MouseEvent (new MouseEvent () { Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        // Tree does not know this yet
+        Assert.Equal (0, tree.GetScrollOffsetOf (f));
+        Assert.Equal (1, tree.GetScrollOffsetOf (c1));
+        Assert.Equal (2, tree.GetScrollOffsetOf (c2));
 
-			Assert.True (called);
-			Assert.Same (f, activated);
-			Assert.Same (f, tree.SelectedObject);
+        // If the user has selected the node c1
+        tree.SelectedObject = c1;
 
-			Application.Shutdown ();
-		}
+        // When we refresh the tree
+        tree.RefreshObject (f);
 
-		[Fact]
-		public void ObjectActivationButton_SetToNull ()
-		{
-			var tree = CreateTree (out Factory f, out Car car1, out _);
+        // Now tree knows that factory has only one child node c2
+        Assert.Equal (0, tree.GetScrollOffsetOf (f));
+        Assert.Equal (-1, tree.GetScrollOffsetOf (c1));
+        Assert.Equal (1, tree.GetScrollOffsetOf (c2));
 
-			InitFakeDriver ();
+        // The old selection was c1 which is now gone so selection should default to the parent of that branch (the factory)
+        Assert.Equal (f, tree.SelectedObject);
+    }
 
-			// disable activation
-			tree.ObjectActivationButton = null;
+    /// <summary>
+    ///     Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree
+    ///     using <see cref="TreeView.RefreshObject(object, bool)"/>
+    /// </summary>
+    [Fact]
+    public void RefreshObject_EqualityTest ()
+    {
+        var obj1 = new EqualityTestObject { Name = "Bob", Age = 1 };
+        var obj2 = new EqualityTestObject { Name = "Bob", Age = 2 };
+        ;
 
-			object activated = null;
-			bool called = false;
+        var root = "root";
 
-			// register for the event
-			tree.ObjectActivated += (s, e) => {
-				activated = e.ActivatedObject;
-				called = true;
-			};
+        TreeView<object> tree = new ();
 
-			Assert.False (called);
+        tree.TreeBuilder =
+            new DelegateTreeBuilder<object> (s => ReferenceEquals (s, root) ? new object [] { obj1 } : null);
+        tree.AddObject (root);
 
-			// double click does nothing because we changed button to null
-			tree.MouseEvent (new MouseEvent () { Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        // Tree is not expanded so the root has no children yet
+        Assert.Empty (tree.GetChildren (root));
 
-			Assert.False (called);
-			Assert.Null (activated);
-			Assert.Null (tree.SelectedObject);
+        tree.Expand (root);
 
-			Application.Shutdown ();
-		}
+        // now that the tree is expanded we should get our child returned
+        Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj1, child)));
 
-		[Fact]
-		public void ObjectActivationButton_RightClick ()
-		{
-			var tree = CreateTree (out Factory f, out Car car1, out _);
+        // change the getter to return an Equal object (but not the same reference - obj2)
+        tree.TreeBuilder =
+            new DelegateTreeBuilder<object> (s => ReferenceEquals (s, root) ? new object [] { obj2 } : null);
 
-			InitFakeDriver ();
+        // tree has cached the knowledge of what children the root has so won't know about the change (we still get obj1)
+        Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj1, child)));
 
-			tree.ObjectActivationButton = MouseFlags.Button2Clicked;
-			tree.ExpandAll ();
+        // now that we refresh the root we should get the new child reference (obj2)
+        tree.RefreshObject (root);
+        Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj2, child)));
+    }
 
-			object activated = null;
-			bool called = false;
+    /// <summary>Tests illegal ranges for <see cref="TreeView.ScrollOffset"/></summary>
+    [Fact]
+    public void ScrollOffset_CannotBeNegative ()
+    {
+        TreeView<object> tree = CreateTree ();
 
-			// register for the event
-			tree.ObjectActivated += (s, e) => {
-				activated = e.ActivatedObject;
-				called = true;
-			};
+        Assert.Equal (0, tree.ScrollOffsetVertical);
 
-			Assert.False (called);
+        tree.ScrollOffsetVertical = -100;
+        Assert.Equal (0, tree.ScrollOffsetVertical);
 
-			// double click does nothing because we changed button binding to right click
-			tree.MouseEvent (new MouseEvent () { Y = 1, Flags = MouseFlags.Button1DoubleClicked });
+        tree.ScrollOffsetVertical = 10;
+        Assert.Equal (10, tree.ScrollOffsetVertical);
+    }
 
-			Assert.Null (activated);
-			Assert.False (called);
+    [Fact]
+    [SetupFakeDriver]
+    public void TestBottomlessTreeView_MaxDepth_3 ()
+    {
+        TreeView<string> tv = new () { Width = 20, Height = 10 };
 
-			tree.MouseEvent (new MouseEvent () { Y = 1, Flags = MouseFlags.Button2Clicked });
+        tv.TreeBuilder = new DelegateTreeBuilder<string> (
+                                                          s => new [] { (int.Parse (s) + 1).ToString () }
+                                                         );
 
-			Assert.True (called);
-			Assert.Same (car1, activated);
-			Assert.Same (car1, tree.SelectedObject);
+        tv.AddObject ("1");
+        tv.ColorScheme = new ColorScheme ();
 
-			Application.Shutdown ();
-		}
+        tv.LayoutSubviews ();
+        tv.Draw ();
 
-
-		/// <summary>
-		/// Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree using <see cref="TreeView.RefreshObject(object, bool)"/>
-		/// </summary>
-		[Fact]
-		public void RefreshObject_EqualityTest ()
-		{
-			var obj1 = new EqualityTestObject () { Name = "Bob", Age = 1 };
-			var obj2 = new EqualityTestObject () { Name = "Bob", Age = 2 }; ;
-
-			string root = "root";
-
-			var tree = new TreeView<object> ();
-			tree.TreeBuilder = new DelegateTreeBuilder<object> ((s) => ReferenceEquals (s, root) ? new object [] { obj1 } : null);
-			tree.AddObject (root);
-
-			// Tree is not expanded so the root has no children yet
-			Assert.Empty (tree.GetChildren (root));
-
-			tree.Expand (root);
-
-			// now that the tree is expanded we should get our child returned
-			Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj1, child)));
-
-			// change the getter to return an Equal object (but not the same reference - obj2)
-			tree.TreeBuilder = new DelegateTreeBuilder<object> ((s) => ReferenceEquals (s, root) ? new object [] { obj2 } : null);
-
-			// tree has cached the knowledge of what children the root has so won't know about the change (we still get obj1)
-			Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj1, child)));
-
-			// now that we refresh the root we should get the new child reference (obj2)
-			tree.RefreshObject (root);
-			Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj2, child)));
-
-		}
-		[Fact, AutoInitShutdown]
-		public void TestGetObjectOnRow ()
-		{
-			var tv = new TreeView { Width = 20, Height = 10 };
-			tv.BeginInit (); tv.EndInit ();
-			var n1 = new TreeNode ("normal");
-			var n1_1 = new TreeNode ("pink");
-			var n1_2 = new TreeNode ("normal");
-			n1.Children.Add (n1_1);
-			n1.Children.Add (n1_2);
-
-			var n2 = new TreeNode ("pink");
-			tv.AddObject (n1);
-			tv.AddObject (n2);
-			tv.Expand (n1);
-
-			tv.ColorScheme = new ColorScheme ();
-			tv.LayoutSubviews ();
-			tv.Draw ();
-
-			TestHelpers.AssertDriverContentsAre (
-@"├-normal
-│ ├─pink
-│ └─normal
-└─pink
-", output);
-
-			Assert.Same (n1, tv.GetObjectOnRow (0));
-			Assert.Same (n1_1, tv.GetObjectOnRow (1));
-			Assert.Same (n1_2, tv.GetObjectOnRow (2));
-			Assert.Same (n2, tv.GetObjectOnRow (3));
-			Assert.Null (tv.GetObjectOnRow (4));
-
-			tv.Collapse (n1);
-
-			tv.Draw ();
-
-			TestHelpers.AssertDriverContentsAre (
-@"├+normal
-└─pink
-", output);
-
-			Assert.Same (n1, tv.GetObjectOnRow (0));
-			Assert.Same (n2, tv.GetObjectOnRow (1));
-			Assert.Null (tv.GetObjectOnRow (2));
-			Assert.Null (tv.GetObjectOnRow (3));
-			Assert.Null (tv.GetObjectOnRow (4));
-		}
-
-		[Fact, AutoInitShutdown]
-		public void TestGetObjectRow ()
-		{
-			var tv = new TreeView { Width = 20, Height = 10 };
-
-			var n1 = new TreeNode ("normal");
-			var n1_1 = new TreeNode ("pink");
-			var n1_2 = new TreeNode ("normal");
-			n1.Children.Add (n1_1);
-			n1.Children.Add (n1_2);
-
-			var n2 = new TreeNode ("pink");
-			tv.AddObject (n1);
-			tv.AddObject (n2);
-			tv.Expand (n1);
-
-			tv.ColorScheme = new ColorScheme ();
-			tv.LayoutSubviews ();
-			tv.Draw ();
-
-			TestHelpers.AssertDriverContentsAre (
-@"├-normal
-│ ├─pink
-│ └─normal
-└─pink
-", output);
-
-			Assert.Equal (0, tv.GetObjectRow (n1));
-			Assert.Equal (1, tv.GetObjectRow (n1_1));
-			Assert.Equal (2, tv.GetObjectRow (n1_2));
-			Assert.Equal (3, tv.GetObjectRow (n2));
-
-			tv.Collapse (n1);
-
-			tv.LayoutSubviews ();
-			tv.Draw ();
-
-			TestHelpers.AssertDriverContentsAre (
-@"├+normal
-└─pink
-", output);
-			Assert.Equal (0, tv.GetObjectRow (n1));
-			Assert.Null (tv.GetObjectRow (n1_1));
-			Assert.Null (tv.GetObjectRow (n1_2));
-			Assert.Equal (1, tv.GetObjectRow (n2));
-
-			// scroll down 1
-			tv.ScrollOffsetVertical = 1;
-
-			tv.LayoutSubviews ();
-			tv.Draw ();
-
-			TestHelpers.AssertDriverContentsAre (
-@"└─pink
-", output);
-			Assert.Equal (-1, tv.GetObjectRow (n1));
-			Assert.Null (tv.GetObjectRow (n1_1));
-			Assert.Null (tv.GetObjectRow (n1_2));
-			Assert.Equal (0, tv.GetObjectRow (n2));
-		}
-		[Fact, AutoInitShutdown]
-		public void TestTreeViewColor ()
-		{
-			var tv = new TreeView { Width = 20, Height = 10 };
-
-			var n1 = new TreeNode ("normal");
-			var n1_1 = new TreeNode ("pink");
-			var n1_2 = new TreeNode ("normal");
-			n1.Children.Add (n1_1);
-			n1.Children.Add (n1_2);
-
-			var n2 = new TreeNode ("pink");
-			tv.AddObject (n1);
-			tv.AddObject (n2);
-			tv.Expand (n1);
-
-			tv.ColorScheme = new ColorScheme ();
-			tv.LayoutSubviews ();
-			tv.Draw ();
-
-			// create a new color scheme
-			var pink = new Attribute (Color.Magenta, Color.Black);
-			var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
-
-
-			// Normal drawing of the tree view
-			TestHelpers.AssertDriverContentsAre (
-@"├-normal
-│ ├─pink
-│ └─normal
-└─pink
-", output);
-			// Should all be the same color
-			TestHelpers.AssertDriverColorsAre (
-@"00000000
-00000000
-0000000000
-000000
+        // Nothing expanded
+        TestHelpers.AssertDriverContentsAre (
+                                             @"└+1
 ",
-				new [] { tv.ColorScheme.Normal, pink });
+                                             _output
+                                            );
+        tv.MaxDepth = 3;
+        tv.ExpandAll ();
+        tv.Draw ();
 
-			var pinkScheme = new ColorScheme {
-				Normal = pink,
-				Focus = hotpink
-			};
-
-			// and a delegate that uses the pink color scheme 
-			// for nodes "pink"
-			tv.ColorGetter = (n) => n.Text.Equals ("pink") ? pinkScheme : null;
-
-			// redraw now that the custom color
-			// delegate is registered
-			tv.Draw ();
-
-			// Same text
-			TestHelpers.AssertDriverContentsAre (
-@"├-normal
-│ ├─pink
-│ └─normal
-└─pink
-", output);
-			// but now the item (only not lines) appear
-			// in pink when they are the word "pink"
-			TestHelpers.AssertDriverColorsAre (
-@"00000000
-00001111
-0000000000
-001111
+        // Normal drawing of the tree view
+        TestHelpers.AssertDriverContentsAre (
+                                             @"    
+└-1
+  └-2
+    └-3
+      └─4
 ",
-				new [] { tv.ColorScheme.Normal, pink });
-		}
+                                             _output
+                                            );
+    }
 
-		[Fact, AutoInitShutdown]
-		public void TestBottomlessTreeView_MaxDepth_5 ()
-		{
-			var tv = new TreeView<string> () { Width = 20, Height = 10 };
+    [Fact]
+    [SetupFakeDriver]
+    public void TestBottomlessTreeView_MaxDepth_5 ()
+    {
+        TreeView<string> tv = new () { Width = 20, Height = 10 };
 
-			tv.TreeBuilder = new DelegateTreeBuilder<string> (
-				(s) => new [] { (int.Parse (s) + 1).ToString () }
-				);
+        tv.TreeBuilder = new DelegateTreeBuilder<string> (
+                                                          s => new [] { (int.Parse (s) + 1).ToString () }
+                                                         );
 
-			tv.AddObject ("1");
-			tv.ColorScheme = new ColorScheme ();
+        tv.AddObject ("1");
+        tv.ColorScheme = new ColorScheme ();
 
-			tv.LayoutSubviews ();
-			tv.Draw ();
+        tv.LayoutSubviews ();
+        tv.Draw ();
 
-			// Nothing expanded
-			TestHelpers.AssertDriverContentsAre (
-@"└+1
-", output);
-			tv.MaxDepth = 5;
-			tv.ExpandAll ();
+        // Nothing expanded
+        TestHelpers.AssertDriverContentsAre (
+                                             @"└+1
+",
+                                             _output
+                                            );
+        tv.MaxDepth = 5;
+        tv.ExpandAll ();
 
-			tv.Draw ();
+        tv.Draw ();
 
-			// Normal drawing of the tree view
-			TestHelpers.AssertDriverContentsAre (
-@"    
+        // Normal drawing of the tree view
+        TestHelpers.AssertDriverContentsAre (
+                                             @"    
 └-1
   └-2
     └-3
       └-4
         └-5
           └─6
-", output);
-			Assert.False (tv.CanExpand ("6"));
-			Assert.False (tv.IsExpanded ("6"));
+",
+                                             _output
+                                            );
+        Assert.False (tv.CanExpand ("6"));
+        Assert.False (tv.IsExpanded ("6"));
 
-			tv.Collapse ("6");
+        tv.Collapse ("6");
 
-			Assert.False (tv.CanExpand ("6"));
-			Assert.False (tv.IsExpanded ("6"));
+        Assert.False (tv.CanExpand ("6"));
+        Assert.False (tv.IsExpanded ("6"));
 
-			tv.Collapse ("5");
+        tv.Collapse ("5");
 
-			Assert.True (tv.CanExpand ("5"));
-			Assert.False (tv.IsExpanded ("5"));
+        Assert.True (tv.CanExpand ("5"));
+        Assert.False (tv.IsExpanded ("5"));
 
-			tv.Draw ();
+        tv.Draw ();
 
-			// Normal drawing of the tree view
-			TestHelpers.AssertDriverContentsAre (
-@"    
+        // Normal drawing of the tree view
+        TestHelpers.AssertDriverContentsAre (
+                                             @"    
 └-1
   └-2
     └-3
       └-4
         └+5
-", output);
-		}
+",
+                                             _output
+                                            );
+    }
 
-		[Fact, AutoInitShutdown]
-		public void TestBottomlessTreeView_MaxDepth_3 ()
-		{
-			var tv = new TreeView<string> () { Width = 20, Height = 10 };
+    [Fact]
+    [SetupFakeDriver]
+    public void TestGetObjectOnRow ()
+    {
+        var tv = new TreeView { Width = 20, Height = 10 };
+        tv.BeginInit ();
+        tv.EndInit ();
+        var n1 = new TreeNode ("normal");
+        var n1_1 = new TreeNode ("pink");
+        var n1_2 = new TreeNode ("normal");
+        n1.Children.Add (n1_1);
+        n1.Children.Add (n1_2);
 
-			tv.TreeBuilder = new DelegateTreeBuilder<string> (
-				(s) => new [] { (int.Parse (s) + 1).ToString () }
-				);
+        var n2 = new TreeNode ("pink");
+        tv.AddObject (n1);
+        tv.AddObject (n2);
+        tv.Expand (n1);
 
-			tv.AddObject ("1");
-			tv.ColorScheme = new ColorScheme ();
+        tv.ColorScheme = new ColorScheme ();
+        tv.LayoutSubviews ();
+        tv.Draw ();
 
-			tv.LayoutSubviews ();
-			tv.Draw ();
+        TestHelpers.AssertDriverContentsAre (
+                                             @"├-normal
+│ ├─pink
+│ └─normal
+└─pink
+",
+                                             _output
+                                            );
 
-			// Nothing expanded
-			TestHelpers.AssertDriverContentsAre (
-@"└+1
-", output);
-			tv.MaxDepth = 3;
-			tv.ExpandAll ();
-			tv.Draw ();
+        Assert.Same (n1, tv.GetObjectOnRow (0));
+        Assert.Same (n1_1, tv.GetObjectOnRow (1));
+        Assert.Same (n1_2, tv.GetObjectOnRow (2));
+        Assert.Same (n2, tv.GetObjectOnRow (3));
+        Assert.Null (tv.GetObjectOnRow (4));
 
-			// Normal drawing of the tree view
-			TestHelpers.AssertDriverContentsAre (
-@"    
-└-1
-  └-2
-    └-3
-      └─4
-", output);
-		}
-		[Fact, AutoInitShutdown]
-		public void TestTreeView_DrawLineEvent ()
-		{
-			var tv = new TreeView { Width = 20, Height = 10 };
+        tv.Collapse (n1);
 
-			var eventArgs = new List<DrawTreeViewLineEventArgs<ITreeNode>> ();
+        tv.Draw ();
 
-			tv.DrawLine += (s, e) => {
-				eventArgs.Add (e);
-			};
+        TestHelpers.AssertDriverContentsAre (
+                                             @"├+normal
+└─pink
+",
+                                             _output
+                                            );
 
-			var n1 = new TreeNode ("root one");
-			var n1_1 = new TreeNode ("leaf 1");
-			var n1_2 = new TreeNode ("leaf 2");
-			n1.Children.Add (n1_1);
-			n1.Children.Add (n1_2);
+        Assert.Same (n1, tv.GetObjectOnRow (0));
+        Assert.Same (n2, tv.GetObjectOnRow (1));
+        Assert.Null (tv.GetObjectOnRow (2));
+        Assert.Null (tv.GetObjectOnRow (3));
+        Assert.Null (tv.GetObjectOnRow (4));
+    }
 
-			var n2 = new TreeNode ("root two");
-			tv.AddObject (n1);
-			tv.AddObject (n2);
-			tv.Expand (n1);
+    [Fact]
+    [SetupFakeDriver]
+    public void TestGetObjectRow ()
+    {
+        var tv = new TreeView { Width = 20, Height = 10 };
 
-			tv.ColorScheme = new ColorScheme ();
-			tv.LayoutSubviews ();
-			tv.Draw ();
+        var n1 = new TreeNode ("normal");
+        var n1_1 = new TreeNode ("pink");
+        var n1_2 = new TreeNode ("normal");
+        n1.Children.Add (n1_1);
+        n1.Children.Add (n1_2);
 
-			// Normal drawing of the tree view
-			TestHelpers.AssertDriverContentsAre (
-@"
+        var n2 = new TreeNode ("pink");
+        tv.AddObject (n1);
+        tv.AddObject (n2);
+        tv.Expand (n1);
+
+        tv.ColorScheme = new ColorScheme ();
+        tv.LayoutSubviews ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"├-normal
+│ ├─pink
+│ └─normal
+└─pink
+",
+                                             _output
+                                            );
+
+        Assert.Equal (0, tv.GetObjectRow (n1));
+        Assert.Equal (1, tv.GetObjectRow (n1_1));
+        Assert.Equal (2, tv.GetObjectRow (n1_2));
+        Assert.Equal (3, tv.GetObjectRow (n2));
+
+        tv.Collapse (n1);
+
+        tv.LayoutSubviews ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"├+normal
+└─pink
+",
+                                             _output
+                                            );
+        Assert.Equal (0, tv.GetObjectRow (n1));
+        Assert.Null (tv.GetObjectRow (n1_1));
+        Assert.Null (tv.GetObjectRow (n1_2));
+        Assert.Equal (1, tv.GetObjectRow (n2));
+
+        // scroll down 1
+        tv.ScrollOffsetVertical = 1;
+
+        tv.LayoutSubviews ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"└─pink
+",
+                                             _output
+                                            );
+        Assert.Equal (-1, tv.GetObjectRow (n1));
+        Assert.Null (tv.GetObjectRow (n1_1));
+        Assert.Null (tv.GetObjectRow (n1_2));
+        Assert.Equal (0, tv.GetObjectRow (n2));
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void TestTreeView_DrawLineEvent ()
+    {
+        var tv = new TreeView { Width = 20, Height = 10 };
+
+        List<DrawTreeViewLineEventArgs<ITreeNode>> eventArgs = new ();
+
+        tv.DrawLine += (s, e) => { eventArgs.Add (e); };
+
+        var n1 = new TreeNode ("root one");
+        var n1_1 = new TreeNode ("leaf 1");
+        var n1_2 = new TreeNode ("leaf 2");
+        n1.Children.Add (n1_1);
+        n1.Children.Add (n1_2);
+
+        var n2 = new TreeNode ("root two");
+        tv.AddObject (n1);
+        tv.AddObject (n2);
+        tv.Expand (n1);
+
+        tv.ColorScheme = new ColorScheme ();
+        tv.LayoutSubviews ();
+        tv.Draw ();
+
+        // Normal drawing of the tree view
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
 └─root two
-", output);
-			Assert.Equal (4, eventArgs.Count ());
+",
+                                             _output
+                                            );
+        Assert.Equal (4, eventArgs.Count ());
 
-			Assert.Equal (0, eventArgs [0].Y);
-			Assert.Equal (1, eventArgs [1].Y);
-			Assert.Equal (2, eventArgs [2].Y);
-			Assert.Equal (3, eventArgs [3].Y);
+        Assert.Equal (0, eventArgs [0].Y);
+        Assert.Equal (1, eventArgs [1].Y);
+        Assert.Equal (2, eventArgs [2].Y);
+        Assert.Equal (3, eventArgs [3].Y);
 
-			Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
-			Assert.All (eventArgs, ea => Assert.False (ea.Handled));
+        Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
+        Assert.All (eventArgs, ea => Assert.False (ea.Handled));
 
-			Assert.Equal ("├-root one", eventArgs [0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-			Assert.Equal ("│ ├─leaf 1", eventArgs [1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-			Assert.Equal ("│ └─leaf 2", eventArgs [2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-			Assert.Equal ("└─root two", eventArgs [3].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("├-root one", eventArgs [0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("│ ├─leaf 1", eventArgs [1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("│ └─leaf 2", eventArgs [2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("└─root two", eventArgs [3].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
 
-			Assert.Equal (1, eventArgs [0].IndexOfExpandCollapseSymbol);
-			Assert.Equal (3, eventArgs [1].IndexOfExpandCollapseSymbol);
-			Assert.Equal (3, eventArgs [2].IndexOfExpandCollapseSymbol);
-			Assert.Equal (1, eventArgs [3].IndexOfExpandCollapseSymbol);
+        Assert.Equal (1, eventArgs [0].IndexOfExpandCollapseSymbol);
+        Assert.Equal (3, eventArgs [1].IndexOfExpandCollapseSymbol);
+        Assert.Equal (3, eventArgs [2].IndexOfExpandCollapseSymbol);
+        Assert.Equal (1, eventArgs [3].IndexOfExpandCollapseSymbol);
 
-			Assert.Equal (2, eventArgs [0].IndexOfModelText);
-			Assert.Equal (4, eventArgs [1].IndexOfModelText);
-			Assert.Equal (4, eventArgs [2].IndexOfModelText);
-			Assert.Equal (2, eventArgs [3].IndexOfModelText);
+        Assert.Equal (2, eventArgs [0].IndexOfModelText);
+        Assert.Equal (4, eventArgs [1].IndexOfModelText);
+        Assert.Equal (4, eventArgs [2].IndexOfModelText);
+        Assert.Equal (2, eventArgs [3].IndexOfModelText);
 
+        Assert.Equal ("root one", eventArgs [0].Model.Text);
+        Assert.Equal ("leaf 1", eventArgs [1].Model.Text);
+        Assert.Equal ("leaf 2", eventArgs [2].Model.Text);
+        Assert.Equal ("root two", eventArgs [3].Model.Text);
+    }
 
-			Assert.Equal ("root one", eventArgs [0].Model.Text);
-			Assert.Equal ("leaf 1", eventArgs [1].Model.Text);
-			Assert.Equal ("leaf 2", eventArgs [2].Model.Text);
-			Assert.Equal ("root two", eventArgs [3].Model.Text);
-		}
+    [Fact]
+    [SetupFakeDriver]
+    public void TestTreeView_DrawLineEvent_Handled ()
+    {
+        var tv = new TreeView { Width = 20, Height = 10 };
 
-		[Fact, AutoInitShutdown]
-		public void TestTreeView_DrawLineEvent_WithScrolling ()
-		{
-			var tv = new TreeView { Width = 20, Height = 10 };
+        tv.DrawLine += (s, e) =>
+                       {
+                           if (e.Model.Text.Equals ("leaf 1"))
+                           {
+                               e.Handled = true;
 
-			var eventArgs = new List<DrawTreeViewLineEventArgs<ITreeNode>> ();
+                               for (var i = 0; i < 10; i++)
+                               {
+                                   e.Tree.AddRune (i, e.Y, new Rune ('F'));
+                               }
+                           }
+                       };
 
-			tv.DrawLine += (s, e) => {
-				eventArgs.Add (e);
-			};
+        var n1 = new TreeNode ("root one");
+        var n1_1 = new TreeNode ("leaf 1");
+        var n1_2 = new TreeNode ("leaf 2");
+        n1.Children.Add (n1_1);
+        n1.Children.Add (n1_2);
 
-			tv.ScrollOffsetHorizontal = 3;
-			tv.ScrollOffsetVertical = 1;
+        var n2 = new TreeNode ("root two");
+        tv.AddObject (n1);
+        tv.AddObject (n2);
+        tv.Expand (n1);
 
-			var n1 = new TreeNode ("root one");
-			var n1_1 = new TreeNode ("leaf 1");
-			var n1_2 = new TreeNode ("leaf 2");
-			n1.Children.Add (n1_1);
-			n1.Children.Add (n1_2);
+        tv.ColorScheme = new ColorScheme ();
+        tv.LayoutSubviews ();
+        tv.Draw ();
 
-			var n2 = new TreeNode ("root two");
-			tv.AddObject (n1);
-			tv.AddObject (n2);
-			tv.Expand (n1);
-
-			tv.ColorScheme = new ColorScheme ();
-			tv.LayoutSubviews ();
-			tv.Draw ();
-
-			// Normal drawing of the tree view
-			TestHelpers.AssertDriverContentsAre (
-@"
-─leaf 1
-─leaf 2
-oot two
-", output);
-			Assert.Equal (3, eventArgs.Count ());
-
-			Assert.Equal (0, eventArgs [0].Y);
-			Assert.Equal (1, eventArgs [1].Y);
-			Assert.Equal (2, eventArgs [2].Y);
-
-			Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
-			Assert.All (eventArgs, ea => Assert.False (ea.Handled));
-
-			Assert.Equal ("─leaf 1", eventArgs [0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-			Assert.Equal ("─leaf 2", eventArgs [1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-			Assert.Equal ("oot two", eventArgs [2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-
-			Assert.Equal (0, eventArgs [0].IndexOfExpandCollapseSymbol);
-			Assert.Equal (0, eventArgs [1].IndexOfExpandCollapseSymbol);
-			Assert.Null (eventArgs [2].IndexOfExpandCollapseSymbol);
-
-			Assert.Equal (1, eventArgs [0].IndexOfModelText);
-			Assert.Equal (1, eventArgs [1].IndexOfModelText);
-			Assert.Equal (-1, eventArgs [2].IndexOfModelText);
-
-			Assert.Equal ("leaf 1", eventArgs [0].Model.Text);
-			Assert.Equal ("leaf 2", eventArgs [1].Model.Text);
-			Assert.Equal ("root two", eventArgs [2].Model.Text);
-		}
-
-		[Fact, AutoInitShutdown]
-		public void TestTreeView_DrawLineEvent_Handled ()
-		{
-			var tv = new TreeView { Width = 20, Height = 10 };
-
-			tv.DrawLine += (s, e) => {
-				if(e.Model.Text.Equals("leaf 1")) {
-					e.Handled = true;
-
-					for (int i = 0; i < 10; i++) {
-
-						e.Tree.AddRune (i,e.Y,new System.Text.Rune('F'));
-					}
-				}
-			};
-
-			var n1 = new TreeNode ("root one");
-			var n1_1 = new TreeNode ("leaf 1");
-			var n1_2 = new TreeNode ("leaf 2");
-			n1.Children.Add (n1_1);
-			n1.Children.Add (n1_2);
-
-			var n2 = new TreeNode ("root two");
-			tv.AddObject (n1);
-			tv.AddObject (n2);
-			tv.Expand (n1);
-
-			tv.ColorScheme = new ColorScheme ();
-			tv.LayoutSubviews ();
-			tv.Draw ();
-
-			// Normal drawing of the tree view
-			TestHelpers.AssertDriverContentsAre (
-@"
+        // Normal drawing of the tree view
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
 ├-root one
 FFFFFFFFFF
 │ └─leaf 2
 └─root two
-", output);
-		}
+",
+                                             _output
+                                            );
+    }
 
-		[Fact, AutoInitShutdown]
-		public void TestTreeView_Filter ()
-		{
-			var tv = new TreeView { Width = 20, Height = 10 };
+    [Fact]
+    [SetupFakeDriver]
+    public void TestTreeView_DrawLineEvent_WithScrolling ()
+    {
+        var tv = new TreeView { Width = 20, Height = 10 };
 
-			var n1 = new TreeNode ("root one");
-			var n1_1 = new TreeNode ("leaf 1");
-			var n1_2 = new TreeNode ("leaf 2");
-			n1.Children.Add (n1_1);
-			n1.Children.Add (n1_2);
+        List<DrawTreeViewLineEventArgs<ITreeNode>> eventArgs = new ();
 
-			var n2 = new TreeNode ("root two");
-			tv.AddObject (n1);
-			tv.AddObject (n2);
-			tv.Expand (n1);
+        tv.DrawLine += (s, e) => { eventArgs.Add (e); };
 
-			tv.ColorScheme = new ColorScheme ();
-			tv.LayoutSubviews ();
-			tv.Draw ();
+        tv.ScrollOffsetHorizontal = 3;
+        tv.ScrollOffsetVertical = 1;
 
-			// Normal drawing of the tree view
-			TestHelpers.AssertDriverContentsAre (
-@"
+        var n1 = new TreeNode ("root one");
+        var n1_1 = new TreeNode ("leaf 1");
+        var n1_2 = new TreeNode ("leaf 2");
+        n1.Children.Add (n1_1);
+        n1.Children.Add (n1_2);
+
+        var n2 = new TreeNode ("root two");
+        tv.AddObject (n1);
+        tv.AddObject (n2);
+        tv.Expand (n1);
+
+        tv.ColorScheme = new ColorScheme ();
+        tv.LayoutSubviews ();
+        tv.Draw ();
+
+        // Normal drawing of the tree view
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+─leaf 1
+─leaf 2
+oot two
+",
+                                             _output
+                                            );
+        Assert.Equal (3, eventArgs.Count ());
+
+        Assert.Equal (0, eventArgs [0].Y);
+        Assert.Equal (1, eventArgs [1].Y);
+        Assert.Equal (2, eventArgs [2].Y);
+
+        Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
+        Assert.All (eventArgs, ea => Assert.False (ea.Handled));
+
+        Assert.Equal ("─leaf 1", eventArgs [0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("─leaf 2", eventArgs [1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("oot two", eventArgs [2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+
+        Assert.Equal (0, eventArgs [0].IndexOfExpandCollapseSymbol);
+        Assert.Equal (0, eventArgs [1].IndexOfExpandCollapseSymbol);
+        Assert.Null (eventArgs [2].IndexOfExpandCollapseSymbol);
+
+        Assert.Equal (1, eventArgs [0].IndexOfModelText);
+        Assert.Equal (1, eventArgs [1].IndexOfModelText);
+        Assert.Equal (-1, eventArgs [2].IndexOfModelText);
+
+        Assert.Equal ("leaf 1", eventArgs [0].Model.Text);
+        Assert.Equal ("leaf 2", eventArgs [1].Model.Text);
+        Assert.Equal ("root two", eventArgs [2].Model.Text);
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void TestTreeView_Filter ()
+    {
+        var tv = new TreeView { Width = 20, Height = 10 };
+
+        var n1 = new TreeNode ("root one");
+        var n1_1 = new TreeNode ("leaf 1");
+        var n1_2 = new TreeNode ("leaf 2");
+        n1.Children.Add (n1_1);
+        n1.Children.Add (n1_2);
+
+        var n2 = new TreeNode ("root two");
+        tv.AddObject (n1);
+        tv.AddObject (n2);
+        tv.Expand (n1);
+
+        tv.ColorScheme = new ColorScheme ();
+        tv.LayoutSubviews ();
+        tv.Draw ();
+
+        // Normal drawing of the tree view
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
 └─root two
-", output);
-			var filter = new TreeViewTextFilter<ITreeNode> (tv);
-			tv.Filter = filter;
+",
+                                             _output
+                                            );
+        TreeViewTextFilter<ITreeNode> filter = new (tv);
+        tv.Filter = filter;
 
-			// matches nothing
-			filter.Text = "asdfjhasdf";
-			tv.Draw ();
-			// Normal drawing of the tree view
-			TestHelpers.AssertDriverContentsAre (
-@"", output);
+        // matches nothing
+        filter.Text = "asdfjhasdf";
+        tv.Draw ();
 
+        // Normal drawing of the tree view
+        TestHelpers.AssertDriverContentsAre (
+                                             @"",
+                                             _output
+                                            );
 
-			// Matches everything
-			filter.Text = "root";
-			tv.Draw ();
-			TestHelpers.AssertDriverContentsAre (
-@"
+        // Matches everything
+        filter.Text = "root";
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
 └─root two
-", output);
-			// Matches 2 leaf nodes
-			filter.Text = "leaf";
-			tv.Draw ();
-			TestHelpers.AssertDriverContentsAre (
-@"
+",
+                                             _output
+                                            );
+
+        // Matches 2 leaf nodes
+        filter.Text = "leaf";
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
 ├-root one
 │ ├─leaf 1
 │ └─leaf 2
-", output);
+",
+                                             _output
+                                            );
 
-			// Matches 1 leaf nodes
-			filter.Text = "leaf 1";
-			tv.Draw ();
-			TestHelpers.AssertDriverContentsAre (
-@"
+        // Matches 1 leaf nodes
+        filter.Text = "leaf 1";
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
 ├-root one
 │ ├─leaf 1
-", output);
-		}
+",
+                                             _output
+                                            );
+    }
 
-		[Fact, AutoInitShutdown]
-		public void DesiredCursorVisibility_MultiSelect ()
-		{
-			var tv = new TreeView { Width = 20, Height = 10 };
+    [Fact]
+    [SetupFakeDriver]
+    public void TestTreeViewColor ()
+    {
+        var tv = new TreeView { Width = 20, Height = 10 };
+        tv.BeginInit ();
+        tv.EndInit ();
+        var n1 = new TreeNode ("normal");
+        var n1_1 = new TreeNode ("pink");
+        var n1_2 = new TreeNode ("normal");
+        n1.Children.Add (n1_1);
+        n1.Children.Add (n1_2);
 
-			var n1 = new TreeNode ("normal");
-			var n2 = new TreeNode ("pink");
-			tv.AddObject (n1);
-			tv.AddObject (n2);
+        var n2 = new TreeNode ("pink");
+        tv.AddObject (n1);
+        tv.AddObject (n2);
+        tv.Expand (n1);
 
-			Application.Top.Add (tv);
-			Application.Begin (Application.Top);
+        tv.ColorScheme = new ColorScheme ();
+        tv.LayoutSubviews ();
+        tv.Draw ();
 
-			Assert.True (tv.MultiSelect);
-			Assert.True (tv.HasFocus);
-			Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+        // create a new color scheme
+        var pink = new Attribute (Color.Magenta, Color.Black);
+        var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
 
-			tv.SelectAll ();
-			tv.DesiredCursorVisibility = CursorVisibility.Default;
-			Application.Refresh ();
-			Application.Driver.GetCursorVisibility (out CursorVisibility visibility);
-			Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
-			Assert.Equal (CursorVisibility.Default, visibility);
-		}
+        // Normal drawing of the tree view
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+├-normal
+│ ├─pink
+│ └─normal
+└─pink
+",
+                                             _output
+                                            );
 
-		/// <summary>
-		/// Test object which considers for equality only <see cref="Name"/>
-		/// </summary>
-		private class EqualityTestObject {
-			public string Name { get; set; }
-			public int Age { get; set; }
+        // Should all be the same color
+        TestHelpers.AssertDriverAttributesAre (
+                                               @"
+0000000000
+0000000000
+0000000000
+0000000000
+",
+                                               Application.Driver,
+                                               tv.ColorScheme.Normal,
+                                               pink
+                                              );
 
-			public override int GetHashCode ()
-			{
-				return Name?.GetHashCode () ?? base.GetHashCode ();
-			}
-			public override bool Equals (object obj)
-			{
-				return obj is EqualityTestObject eto && Equals (Name, eto.Name);
-			}
-		}
+        var pinkScheme = new ColorScheme { Normal = pink, Focus = hotpink };
 
-		private void InitFakeDriver ()
-		{
-			var driver = new FakeDriver ();
-			Application.Init (driver);
-			driver.Init (() => { });
-		}
-	}
+        // and a delegate that uses the pink color scheme 
+        // for nodes "pink"
+        tv.ColorGetter = n => n.Text.Equals ("pink") ? pinkScheme : null;
+
+        // redraw now that the custom color
+        // delegate is registered
+        tv.Draw ();
+
+        // Same text
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+├-normal
+│ ├─pink
+│ └─normal
+└─pink
+",
+                                             _output
+                                            );
+
+        // but now the item (only not lines) appear
+        // in pink when they are the word "pink"
+        TestHelpers.AssertDriverAttributesAre (
+                                               @"
+00000000
+00001111
+0000000000
+001111
+",
+                                               Application.Driver,
+                                               tv.ColorScheme.Normal,
+                                               pink
+                                              );
+    }
+
+    [Fact]
+    public void TreeNode_WorksWithoutDelegate ()
+    {
+        var tree = new TreeView ();
+
+        var root = new TreeNode ("Root");
+        root.Children.Add (new TreeNode ("Leaf1"));
+        root.Children.Add (new TreeNode ("Leaf2"));
+
+        tree.AddObject (root);
+
+        tree.Expand (root);
+        Assert.Equal (2, tree.GetChildren (root).Count ());
+    }
+
+    /// <summary>Test object which considers for equality only <see cref="Name"/></summary>
+    private class EqualityTestObject
+    {
+        public int Age { get; set; }
+        public string Name { get; set; }
+        public override bool Equals (object obj) { return obj is EqualityTestObject eto && Equals (Name, eto.Name); }
+        public override int GetHashCode () { return Name?.GetHashCode () ?? base.GetHashCode (); }
+    }
+
+    #region Test Setup Methods
+
+    private class Factory
+    {
+        public Car [] Cars { get; set; }
+        public override string ToString () { return "Factory"; }
+    }
+
+    private class Car
+    {
+        public string Name { get; set; }
+        public override string ToString () { return Name; }
+    }
+
+    private TreeView<object> CreateTree () { return CreateTree (out _, out _, out _); }
+
+    private TreeView<object> CreateTree (out Factory factory1, out Car car1, out Car car2)
+    {
+        car1 = new Car ();
+        car2 = new Car ();
+
+        factory1 = new Factory { Cars = new [] { car1, car2 } };
+
+        TreeView<object> tree = new (new DelegateTreeBuilder<object> (s => s is Factory f ? f.Cars : null));
+        tree.AddObject (factory1);
+
+        return tree;
+    }
+
+    #endregion
+
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new TreeView ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var treeView = new TreeView ();
+        var accepted = false;
+
+treeView.Accept += OnAccept;
+treeView.InvokeCommand (Command.HotKey);
+
+Assert.False (accepted);
+
+return;
+void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+
+    [Fact]
+    public void Accept_Command_Accepts_and_ActivatesObject ()
+    {
+        var treeView = CreateTree (out Factory f, out Car car1, out _);
+        Assert.NotNull (car1);
+        treeView.SelectedObject = car1;
+
+        var accepted = false;
+        var activated = false;
+        object selectedObject = null;
+
+        treeView.Accept += Accept;
+        treeView.ObjectActivated += ObjectActivated;
+
+        treeView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.True (activated);
+        Assert.Equal (car1, selectedObject);
+
+        return;
+
+        void ObjectActivated (object sender, ObjectActivatedEventArgs<object> e)
+        {
+            activated = true;
+            selectedObject = e.ActivatedObject;
+        }
+        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Cancel_Event_Prevents_ObjectActivated ()
+    {
+        var treeView = CreateTree (out Factory f, out Car car1, out _);
+        treeView.SelectedObject = car1;
+        var accepted = false;
+        var activated = false;
+        object selectedObject = null;
+
+        treeView.Accept += Accept;
+        treeView.ObjectActivated += ObjectActivated;
+
+        treeView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.False (activated);
+        Assert.Null (selectedObject);
+
+        return;
+
+        void ObjectActivated (object sender, ObjectActivatedEventArgs<object> e)
+        {
+            activated = true;
+            selectedObject = e.ActivatedObject;
+        }
+
+        void Accept (object sender, HandledEventArgs e)
+        {
+            accepted = true;
+            e.Handled = true;
+        }
+    }
 }

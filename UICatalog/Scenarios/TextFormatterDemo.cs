@@ -4,88 +4,134 @@ using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
+namespace UICatalog.Scenarios;
 
-namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "TextFormatter Demo", Description: "Demos and tests the TextFormatter class.")]
-	[ScenarioCategory ("Text and Formatting")]
-	public class TextFormatterDemo : Scenario {
-		public override void Setup ()
-		{
-			// TODO: Move this to another Scenario that specifically tests `Views` that have no subviews.
-			//Top.Text = "Press CTRL-Q to Quit. This is the Text for the TopLevel View. TextAlignment.Centered was specified. It is intentionally very long to illustrate word wrap.\n" +
-			//	"<-- There is a new line here to show a hard line break. You should see this text bleed underneath the subviews, which start at Y = 3.";
-			//Top.TextAlignment = TextAlignment.Centered;
-			//Top.ColorScheme = Colors.Base;
+[ScenarioMetadata ("TextFormatter Demo", "Demos and tests the TextFormatter class.")]
+[ScenarioCategory ("Text and Formatting")]
+public class TextFormatterDemo : Scenario
+{
+    public override void Main ()
+    {
+        Application.Init ();
 
-			// Make Win smaller so sizing the window horizontally will make the
-			// labels shrink to zero-width
-			Win.X = 10;
-			Win.Width = Dim.Fill (10);
+        var app = new Window
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
 
-			string text = "Hello world, how are you today? Pretty neat!\nSecond line\n\nFourth Line.";
-			string unicode = "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
+        // Make Win smaller so sizing the window horizontally will make the
+        // labels shrink to zero-width
+        app.X = 10;
+        app.Width = Dim.Fill (10);
 
-			Label blockText = new Label () { ColorScheme = Colors.TopLevel, X = 0, Y = 0, Height = 10, Width = Dim.Fill (0), AutoSize = false };
+        var text = "Hello world, how are you today? Pretty neat!\nSecond line\n\nFourth Line.";
 
-			var block = new StringBuilder ();
-			block.AppendLine ("  ▄████  █    ██  ██▓      ▄████▄    ██████ ");
-			block.AppendLine (" ██▒ ▀█▒ ██  ▓██▒▓██▒     ▒██▀ ▀█  ▒██    ▒ ");
-			block.AppendLine ("▒██░▄▄▄░▓██  ▒██░▒██▒     ▒▓█    ▄ ░ ▓██▄   ");
-			block.AppendLine ("░▓█  ██▓▓▓█  ░██░░██░     ▒▓▓▄ ▄██▒  ▒   ██▒");
-			block.AppendLine ("░▒▓███▀▒▒▒█████▓ ░██░ ██▓ ▒ ▓███▀ ░▒██████▒▒");
-			block.AppendLine (" ░▒   ▒ ░▒▓▒ ▒ ▒ ░▓   ▒▓▒ ░ ░▒ ▒  ░▒ ▒▓▒ ▒ ░");
-			block.AppendLine ("  ░   ░ ░░▒░ ░ ░  ▒ ░ ░▒    ░  ▒   ░ ░▒  ░ ░");
-			block.AppendLine ("░ ░   ░  ░░░ ░ ░  ▒ ░ ░   ░        ░  ░  ░  ");
-			block.AppendLine ("      ░    ░      ░    ░  ░ ░            ░  ");
-			block.AppendLine ("                       ░  ░                 ");
-			blockText.Text = block.ToString (); // .Replace(" ", "\u00A0"); // \u00A0 is 'non-breaking space
-			Win.Add (blockText);
+        var unicode =
+            "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
-			var unicodeCheckBox = new CheckBox ("Unicode", Application.Top.HotKeySpecifier == (Rune)' ') {
-				X = 0,
-				Y = Pos.Bottom (blockText) + 1,
-			};
+        var blockText = new Label
+        {
+            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            X = 0,
+            Y = 0,
 
-			Win.Add (unicodeCheckBox);
+            Height = 10,
+            Width = Dim.Fill ()
+        };
 
-			var alignments = Enum.GetValues (typeof (Terminal.Gui.TextAlignment)).Cast<Terminal.Gui.TextAlignment> ().ToList ();
-			var singleLines = new Label [alignments.Count];
-			var multipleLines = new Label [alignments.Count];
+        var block = new StringBuilder ();
+        block.AppendLine ("  ▄████  █    ██  ██▓      ▄████▄    ██████ ");
+        block.AppendLine (" ██▒ ▀█▒ ██  ▓██▒▓██▒     ▒██▀ ▀█  ▒██    ▒ ");
+        block.AppendLine ("▒██░▄▄▄░▓██  ▒██░▒██▒     ▒▓█    ▄ ░ ▓██▄   ");
+        block.AppendLine ("░▓█  ██▓▓▓█  ░██░░██░     ▒▓▓▄ ▄██▒  ▒   ██▒");
+        block.AppendLine ("░▒▓███▀▒▒▒█████▓ ░██░ ██▓ ▒ ▓███▀ ░▒██████▒▒");
+        block.AppendLine (" ░▒   ▒ ░▒▓▒ ▒ ▒ ░▓   ▒▓▒ ░ ░▒ ▒  ░▒ ▒▓▒ ▒ ░");
+        block.AppendLine ("  ░   ░ ░░▒░ ░ ░  ▒ ░ ░▒    ░  ▒   ░ ░▒  ░ ░");
+        block.AppendLine ("░ ░   ░  ░░░ ░ ░  ▒ ░ ░   ░        ░  ░  ░  ");
+        block.AppendLine ("      ░    ░      ░    ░  ░ ░            ░  ");
+        block.AppendLine ("                       ░  ░                 ");
+        blockText.Text = block.ToString (); // .Replace(" ", "\u00A0"); // \u00A0 is 'non-breaking space
+        app.Add (blockText);
 
-			var multiLineHeight = 5;
+        var unicodeCheckBox = new CheckBox
+        {
+            X = 0,
+            Y = Pos.Bottom (blockText) + 1,
+            Text = "Unicode",
+            State = app.HotKeySpecifier == (Rune)' ' ? CheckState.Checked : CheckState.UnChecked
+        };
 
-			foreach (var alignment in alignments) {
-				singleLines [(int)alignment] = new Label (text) { TextAlignment = alignment, X = 0, Width = Dim.Fill (), Height = 1, ColorScheme = Colors.Dialog, AutoSize = false };
-				multipleLines [(int)alignment] = new Label (text) { TextAlignment = alignment, X = 0, Width = Dim.Fill (), Height = multiLineHeight, ColorScheme = Colors.Dialog, AutoSize = false };
-			}
+        app.Add (unicodeCheckBox);
+        
+        List<Alignment> alignments = new () { Alignment.Start, Alignment.End, Alignment.Center, Alignment.Fill };
+        Label [] singleLines = new Label [alignments.Count];
+        Label [] multipleLines = new Label [alignments.Count];
 
-			var label = new Label ($"Demonstrating single-line (should clip):") { Y = Pos.Bottom (unicodeCheckBox) + 1 };
-			Win.Add (label);
-			foreach (var alignment in alignments) {
-				label = new Label ($"{alignment}:") { Y = Pos.Bottom (label) };
-				Win.Add (label);
-				singleLines [(int)alignment].Y = Pos.Bottom (label);
-				Win.Add (singleLines [(int)alignment]);
-				label = singleLines [(int)alignment];
-			}
+        var multiLineHeight = 5;
 
-			label = new Label ($"Demonstrating multi-line and word wrap:") { Y = Pos.Bottom (label) };
-			Win.Add (label);
-			foreach (var alignment in alignments) {
-				label = new Label ($"{alignment}:") { Y = Pos.Bottom (label) };
-				Win.Add (label);
-				multipleLines [(int)alignment].Y = Pos.Bottom (label);
-				Win.Add (multipleLines [(int)alignment]);
-				label = multipleLines [(int)alignment];
-			}
+        for (int i = 0; i < alignments.Count; i++)
+        {
+            singleLines [i] = new ()
+            {
+                TextAlignment = alignments [i],
+                X = 0,
 
-			unicodeCheckBox.Toggled += (s,e) => {
-				foreach (var alignment in alignments) {
-					singleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;
-					multipleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;
-				}
-			};
-		}
-	}
+                Width = Dim.Fill (),
+                Height = 1,
+                ColorScheme = Colors.ColorSchemes ["Dialog"],
+                Text = text
+            };
+
+            multipleLines [i] = new ()
+            {
+                TextAlignment = alignments [i],
+                X = 0,
+
+                Width = Dim.Fill (),
+                Height = multiLineHeight,
+                ColorScheme = Colors.ColorSchemes ["Dialog"],
+                Text = text
+            };
+        }
+
+        var label = new Label
+        {
+            Y = Pos.Bottom (unicodeCheckBox) + 1, Text = "Demonstrating multi-line and word wrap:"
+        };
+        app.Add (label);
+
+        for (int i = 0; i < alignments.Count; i++)
+        {
+            label = new () { Y = Pos.Bottom (label), Text = $"{alignments [i]}:" };
+            app.Add (label);
+            singleLines [i].Y = Pos.Bottom (label);
+            app.Add (singleLines [i]);
+            label = singleLines [i];
+        }
+
+        label = new () { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
+        app.Add (label);
+
+        for (int i = 0; i < alignments.Count; i++)
+        {
+            label = new () { Y = Pos.Bottom (label), Text = $"{alignments [i]}:" };
+            app.Add (label);
+            multipleLines [i].Y = Pos.Bottom (label);
+            app.Add (multipleLines [i]);
+            label = multipleLines [i];
+        }
+
+        unicodeCheckBox.Toggle += (s, e) =>
+                                   {
+                                       for (int i = 0; i < alignments.Count; i++)
+                                       {
+                                           singleLines [i].Text = e.CurrentValue == CheckState.Checked ? text : unicode;
+                                           multipleLines [i].Text = e.CurrentValue == CheckState.Checked ? text : unicode;
+                                       }
+                                   };
+
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
+    }
 }
-

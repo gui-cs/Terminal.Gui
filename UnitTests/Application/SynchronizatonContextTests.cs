@@ -1,83 +1,93 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Threading;
-using System.Threading.Tasks;
-using Terminal.Gui;
-using Xunit;
-using Xunit.Sdk;
-
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.ApplicationTests {
-	public class SyncrhonizationContextTests {
+namespace Terminal.Gui.ApplicationTests;
 
-		[Fact, AutoInitShutdown]
-		public void SynchronizationContext_Post ()
-		{
-			var context = SynchronizationContext.Current;
+public class SyncrhonizationContextTests
+{
+    [Fact]
+    public void SynchronizationContext_CreateCopy ()
+    {
+        Application.Init ();
+        SynchronizationContext context = SynchronizationContext.Current;
+        Assert.NotNull (context);
 
-			var success = false;
-			Task.Run (() => {
-				Thread.Sleep (1_000);
+        SynchronizationContext contextCopy = context.CreateCopy ();
+        Assert.NotNull (contextCopy);
 
-				// non blocking
-				context.Post (
-					delegate (object o) {
-						success = true;
+        Assert.NotEqual (context, contextCopy);
+        Application.Shutdown ();
+    }
 
-						// then tell the application to quit
-						Application.MainLoop.Invoke (() => Application.RequestStop ());
-					}, null);
-				Assert.False (success);
-			});
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    //[InlineData (typeof (NetDriver))]
+    [InlineData (typeof (WindowsDriver))]
+    //[InlineData (typeof (CursesDriver))]
+    public void SynchronizationContext_Post (Type driverType)
+    {
+        Application.Init (driverName: driverType.Name);
+        SynchronizationContext context = SynchronizationContext.Current;
 
-			// blocks here until the RequestStop is processed at the end of the test
-			Application.Run ();
-			Assert.True (success);
-		}
+        var success = false;
 
-		[Fact, AutoInitShutdown]
-		public void SynchronizationContext_Send ()
-		{
-			var context = SynchronizationContext.Current;
+        Task.Run (
+                  () =>
+                  {
+                      Thread.Sleep (1_000);
 
-			var success = false;
-			Task.Run (() => {
-				Thread.Sleep (1_000);
+                      // non blocking
+                      context.Post (
+                                    delegate
+                                    {
+                                        success = true;
 
-				// blocking
-				context.Send (
-					delegate (object o) {
-						success = true;
+                                        // then tell the application to quit
+                                        Application.Invoke (() => Application.RequestStop ());
+                                    },
+                                    null
+                                   );
+                      Assert.False (success);
+                  }
+                 );
 
-						// then tell the application to quit
-						Application.MainLoop.Invoke (() => Application.RequestStop ());
-					}, null);
-				Assert.True (success);
-			});
+        // blocks here until the RequestStop is processed at the end of the test
+        Application.Run ().Dispose ();
+        Assert.True (success);
+        Application.Shutdown ();
+    }
 
-			// blocks here until the RequestStop is processed at the end of the test
-			Application.Run ();
-			Assert.True (success);
+    [Fact]
+    [AutoInitShutdown]
+    public void SynchronizationContext_Send ()
+    {
+        Application.Init ();
+        SynchronizationContext context = SynchronizationContext.Current;
 
-		}
+        var success = false;
 
-		[Fact, AutoInitShutdown]
-		public void SynchronizationContext_CreateCopy ()
-		{
-			var context = SynchronizationContext.Current;
-			Assert.NotNull (context);
+        Task.Run (
+                  () =>
+                  {
+                      Thread.Sleep (1_000);
 
-			var contextCopy = context.CreateCopy ();
-			Assert.NotNull (contextCopy);
+                      // blocking
+                      context.Send (
+                                    delegate
+                                    {
+                                        success = true;
 
-			Assert.NotEqual (context, contextCopy);
-		}
+                                        // then tell the application to quit
+                                        Application.Invoke (() => Application.RequestStop ());
+                                    },
+                                    null
+                                   );
+                      Assert.True (success);
+                  }
+                 );
 
-	}
+        // blocks here until the RequestStop is processed at the end of the test
+        Application.Run ().Dispose ();
+        Assert.True (success);
+        Application.Shutdown ();
+    }
 }

@@ -33,7 +33,7 @@ You now have your own fork and a local repo that references it as `origin`. Your
 
 ### Starting to Make a Change
 
-Ensure your local `develop` branch is up-to-date with `upstream` (`github.com/gui-cs/Terminal.Gui`):
+Ensure your local `develop` (for v1) or `v2_develop` (for v2) branch is up-to-date with `upstream` (`github.com/gui-cs/Terminal.Gui`):
 ```powershell
 cd ./Terminal.Gui
 git checkout develop
@@ -45,12 +45,12 @@ Create a new local branch:
 git checkout -b my_new_branch
 ```
 
-#### Making Changes
+### Making Changes
 Follow all the guidelines below.
 
-* Coding Style
-* Unit Tests
-* Sample Code
+* [Coding Style](#TerminalGui-Coding-Style)
+* [Unit Tests](#Unit-Tests)
+* [Sample Code](#Sample-Code)
 * API Documentation
 * etc...
 
@@ -92,7 +92,13 @@ Follow the template instructions found on Github.
 
 ## Terminal.Gui Coding Style
 
-**Terminal.Gui** follows the [Mono Coding Guidelines](https://www.mono-project.com/community/contributing/coding-guidelines/). [`/.editorconfig`](https://github.com/gui-cs/Terminal.Gui/blob/b0a43ba338adf5ec069066e5a7dff8fea39b41db/.editorconfig) enforces this style in Visual Studio. Use `Ctrl-K-D` in Visual Studio to have it reformat code.
+**Terminal.Gui** uses a derivative of the [Microsoft C# Coding Conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions), with any deviations from those (somewhat older) conventions codified in the .editorconfig for the solution, as well as even more specific definitions in team-shared dotsettings files, used by ReSharper and Rider.\
+Before you commit code, please run the formatting rules on **only the code file(s) you have modified**, in one of the following ways, in order of most preferred to least preferred:
+
+ 1. `Ctrl-E-C` if using ReSharper or Rider
+ 2. Running the free [CleanupCode](https://www.jetbrains.com/help/resharper/CleanupCode.html) tool from JetBrains (this applies the same formatting rules as if you had used ReSharper or Rider, but is free for all users, if you don't have a license for those products)
+     - Run at the command line, from the solution root directory, as: `cleanupcode.exe relative/path/to/your/file.cs`
+ 3. If you are unable to use either of those options, the last resort is to use `Ctrl-K-D` in Visual Studio (with default C# developer key bindings), to apply the subset of the formatting rules that Visual Studio can apply.
 
 ## User Experience Tenets
 
@@ -118,13 +124,13 @@ Follow the template instructions found on Github.
 
 ### Include API Documentation
 
-Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html). Contributors have the responsibility of continuously improving the API Documentation.
+Great care has been provided thus far in ensuring **Terminal.Gui** has great [API Documentation](https://gui-cs.github.io/Terminal.Gui). Contributors have the responsibility of continuously improving the API Documentation.
 
 - All public APIs must have clear, concise, and complete documentation in the form of [XML Documentation](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/).
 - Keep the `<summary></summary>` terse.
 - Use `<see cref=""/>` liberally to cross-link topics.
 - Use `<remarks></remarks>` to add more context and explanation.
-- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html).
+- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/docs/index.html).
 - Use proper English and good grammar.
 
 ### Defining Events
@@ -148,15 +154,15 @@ The [Microsoft .NET Framework Design Guidelines](https://docs.microsoft.com/en-u
 > ✔️ DO name event argument classes with the "EventArgs" suffix.
 
 1. We follow the naming guidelines provided in https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-type-members?redirectedfrom=MSDN
-2. We use the `event Action<T>` idiom.
+2. We use the `event EventHandler<T>` idiom.
 3. For public APIs, the class that can raise the event will implement:
    - A `virtual` event raising function, named as `OnEventToRaise`. Typical implementations will simply do a `EventToRaise?.Invoke(this, eventArgs)`.
-   - An `event` as in `public event Action<EventArgs> EventToRaise`
-   - Consumers of the event can do `theobject.EventToRaise += (args) => {};`
+   - An `event` as in `public event EventHandler<EventArgs> EventToRaise`
+   - Consumers of the event can do `theobject.EventToRaise += (sender, args) => {};`
    - Sub-classes of the class implementing `EventToRaise` can override `OnEventToRaise` as needed.
 4. Where possible, a subclass of `EventArgs` should be provided and the old and new state should be included. By doing this, event handler methods do not have to query the sender for state.
 
-See also: https://www.codeproject.com/Articles/20550/C-Event-Implementation-Fundamentals-Best-Practices
+See also: https://www.codeproject.com../docs/20550/C-Event-Implementation-Fundamentals-Best-Practices
 
 ### Defining new `View` classes
 
@@ -167,7 +173,7 @@ See also: https://www.codeproject.com/Articles/20550/C-Event-Implementation-Fund
 ## Breaking Changes to User Behavior or the Public API
 
 - Tag all pull requests that cause breaking changes to user behavior or the public API with the [breaking-change](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Abreaking-change) tag. This will help project maintainers track and document these.
-- Add a `<remark></remark>` to the XML Documentation to the code describing the breaking change. These will get picked up in the [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.html).
+- Add a `<remark></remark>` to the XML Documentation to the code describing the breaking change. These will get picked up in the [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.html).
 
 ## Unit Tests
 

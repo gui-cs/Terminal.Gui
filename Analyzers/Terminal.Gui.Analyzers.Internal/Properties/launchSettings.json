@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "InternalAnalyzers Debug": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\Terminal.Gui.Analyzers.Internal.Debugging\\Terminal.Gui.Analyzers.Internal.Debugging.csproj"
+    }
+  }
+}
