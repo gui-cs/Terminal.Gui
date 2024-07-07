@@ -25,7 +25,7 @@ jobs:
           includePrerelease: true
 
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0
+      uses: gittools/actions/gitversion/execute@v1
       with:
         useConfigFile: true
         #additionalArguments: /b develop
