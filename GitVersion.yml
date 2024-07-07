@@ -24,7 +24,7 @@ branches:
     is-release-branch: true
     tag: prealpha
     increment: Patch
-    regex: ^v2?[/-]
+    regex: ^v2_release?[/-]
     source-branches: ['v2_develop']
 
   feature:
