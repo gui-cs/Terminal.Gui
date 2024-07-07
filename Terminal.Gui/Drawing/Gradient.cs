@@ -38,6 +38,9 @@ public enum GradientDirection
 /// </summary>
 public class Gradient
 {
+    /// <summary>
+    /// The discrete colors that will make up the <see cref="Gradient"/>.
+    /// </summary>
     public List<Color> Spectrum { get; private set; }
     private readonly bool _loop;
     private readonly List<Color> _stops;
