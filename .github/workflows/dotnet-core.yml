@@ -35,7 +35,7 @@ jobs:
     - name: Test
       run: |
         sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
-        dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings --blame
+        dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings  --blame --diag:logs/logs.txt --blame-hang --blame-hang-timeout 60s
         mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
     # Note: this step is currently not writing to the gist for some reason
