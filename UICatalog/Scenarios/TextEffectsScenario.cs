@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading;
 using Terminal.Gui;
 using Terminal.Gui.TextEffects;
-using static UICatalog.Scenario;
 
 using Color = Terminal.Gui.TextEffects.Color;
 using Animation = Terminal.Gui.TextEffects.Animation;
@@ -94,7 +93,7 @@ public class TextEffectsScenario : Scenario
 
     private void SetupGradientLineCanvas (View w, Size size)
     {
-        GetAppealingGradientColors (size, out var stops, out var steps);
+        GetAppealingGradientColors (out var stops, out var steps);
 
         var g = new Gradient (stops, steps);
 
@@ -107,7 +106,7 @@ public class TextEffectsScenario : Scenario
             back);
     }
 
-    private void GetAppealingGradientColors (Size size, out List<Color> stops, out List<int> steps)
+    public static void GetAppealingGradientColors (out List<Color> stops, out List<int> steps)
     {
         // Define the colors of the gradient stops with more appealing colors
         stops = new List<Color>
@@ -119,11 +118,8 @@ public class TextEffectsScenario : Scenario
             Color.FromRgb(255, 0, 128)     // Bright Pink
         };
 
-            // Calculate the number of steps based on the size
-            int maxSteps = Math.Max (size.Width, size.Height);
-
-            // Define the number of steps between each color for smoother transitions
-            steps = new List<int> { maxSteps / 4, maxSteps / 4, maxSteps / 4, maxSteps / 4 };
+        // Define the number of steps between each color for smoother transitions
+        steps = new List<int> { 15,15, 15, 15 };
     }
 }
 
@@ -144,14 +140,14 @@ internal class GradientsView : View
             DrawGradientArea (Gradient.Direction.Horizontal, x, y);
             DrawGradientArea (Gradient.Direction.Vertical, x + 32, y);
             DrawGradientArea (Gradient.Direction.Radial, x + 64, y);
-            DrawGradientArea (Gradient.Direction.Diagonal, x + 96, y);
+            //DrawGradientArea (Gradient.Direction.Diagonal, x + 96, y);
         }
         else // Enough space, render in two lines
         {
             DrawGradientArea (Gradient.Direction.Horizontal, x, y);
             DrawGradientArea (Gradient.Direction.Vertical, x + 32, y);
             DrawGradientArea (Gradient.Direction.Radial, x, y + 17);
-            DrawGradientArea (Gradient.Direction.Diagonal, x + 32, y + 17);
+            //DrawGradientArea (Gradient.Direction.Diagonal, x + 32, y + 17);
         }
     }
 
@@ -250,11 +246,26 @@ internal class BallsView : View
 {
     private Ball? _ball;
     private bool _resized;
+    private LineCanvas lc;
+    private Gradient gradient;
 
     protected override void OnViewportChanged (DrawEventArgs e)
     {
         base.OnViewportChanged (e);
         _resized = true;
+
+        lc = new LineCanvas (new []{
+            new StraightLine(new System.Drawing.Point(0,0),10,Orientation.Horizontal,LineStyle.Single),
+
+        });
+        TextEffectsScenario.GetAppealingGradientColors (out var stops, out var steps);
+        gradient = new Gradient (stops, steps);
+        var fill = new FillPair (
+            new GradientFill (new System.Drawing.Rectangle (0, 0, 10, 0), gradient , Gradient.Direction.Horizontal),
+            new SolidFill(Terminal.Gui.Color.Black)
+            );
+        lc.Fill = fill;
+
     }
 
     public override void OnDrawContent (Rectangle viewport)
@@ -269,8 +280,42 @@ internal class BallsView : View
         }
 
         _ball?.Draw ();
+
+        foreach(var map in lc.GetCellMap())
+        {
+            Driver.SetAttribute (map.Value.Value.Attribute.Value);
+            AddRune (map.Key.X, map.Key.Y, map.Value.Value.Rune);
+        }
+
+        for (int x = 0; x < 10; x++)
+        {
+            double fraction = (double)x / 10;
+            Color color = gradient.GetColorAtFraction (fraction);
+
+            SetColor (color);
+
+            AddRune (x, 2, new Rune ('█'));
+        }
+
+        var map2 = gradient.BuildCoordinateColorMapping (0,10,Gradient.Direction.Horizontal);
+
+        for (int x = 0; x < map2.Count; x++)
+        {
+            SetColor (map2[new Coord(x,0)]);
+
+            AddRune (x, 3, new Rune ('█'));
+        }
     }
 
+    private void SetColor (Color color)
+    {
+        // Assuming AddRune is a method you have for drawing at specific positions
+        Application.Driver.SetAttribute (
+            new Attribute (
+                new Terminal.Gui.Color (color.R, color.G, color.B),
+                new Terminal.Gui.Color (color.R, color.G, color.B)
+            )); // Setting color based on RGB
+    }
     public class Ball
     {
         public Animation Animation { get; private set; }
