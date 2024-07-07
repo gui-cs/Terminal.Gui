@@ -1,5 +1,4 @@
-﻿
-namespace Terminal.Gui.DrawingTests;
+﻿namespace Terminal.Gui.DrawingTests;
 
 public class GradientFillTests
 {
@@ -21,7 +20,7 @@ public class GradientFillTests
     }
 
     [Fact]
-    public void TestGradientFillCorners ()
+    public void TestGradientFillCorners_AtOrigin ()
     {
         var area = new Rectangle (0, 0, 10, 10);
         var gradientFill = new GradientFill (area, _gradient, GradientDirection.Diagonal);
@@ -38,17 +37,36 @@ public class GradientFillTests
         var bottomRightColor = gradientFill.GetColor (bottomRight);
 
         // Expected colors
-        var expectedTopLeftColor = new Terminal.Gui.Color (255, 0, 0); // Red
-        var expectedBottomRightColor = new Terminal.Gui.Color (0, 0, 255); // Blue
+        var expectedTopLeftColor = new Color (255, 0, 0); // Red
+        var expectedBottomRightColor = new Color (0, 0, 255); // Blue
 
         Assert.Equal (expectedTopLeftColor, topLeftColor);
         Assert.Equal (expectedBottomRightColor, bottomRightColor);
+    }
 
-        // Additional checks can be added to verify the exact expected colors if known
-        Console.WriteLine ($"Top-left: {topLeftColor}");
-        Console.WriteLine ($"Top-right: {topRightColor}");
-        Console.WriteLine ($"Bottom-left: {bottomLeftColor}");
-        Console.WriteLine ($"Bottom-right: {bottomRightColor}");
+    [Fact]
+    public void TestGradientFillCorners_NotAtOrigin ()
+    {
+        var area = new Rectangle (5, 5, 10, 10);
+        var gradientFill = new GradientFill (area, _gradient, GradientDirection.Diagonal);
+
+        // Test the corners
+        var topLeft = new Point (5, 5);
+        var topRight = new Point (area.Right - 1, 5);
+        var bottomLeft = new Point (5, area.Bottom - 1);
+        var bottomRight = new Point (area.Right - 1, area.Bottom - 1);
+
+        var topLeftColor = gradientFill.GetColor (topLeft);
+        var topRightColor = gradientFill.GetColor (topRight);
+        var bottomLeftColor = gradientFill.GetColor (bottomLeft);
+        var bottomRightColor = gradientFill.GetColor (bottomRight);
+
+        // Expected colors
+        var expectedTopLeftColor = new Color (255, 0, 0); // Red
+        var expectedBottomRightColor = new Color (0, 0, 255); // Blue
+
+        Assert.Equal (expectedTopLeftColor, topLeftColor);
+        Assert.Equal (expectedBottomRightColor, bottomRightColor);
     }
 
     [Fact]

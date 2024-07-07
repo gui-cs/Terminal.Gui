@@ -18,7 +18,10 @@ public class GradientFill : IFill
     /// <param name="direction"></param>
     public GradientFill (Rectangle area, Gradient gradient, GradientDirection direction)
     {
-        _map = gradient.BuildCoordinateColorMapping (area.Height-1, area.Width-1, direction);
+        _map = gradient.BuildCoordinateColorMapping (area.Height - 1, area.Width - 1, direction)
+            .ToDictionary (
+                kvp => new Point (kvp.Key.X + area.X, kvp.Key.Y + area.Y),
+                kvp => kvp.Value);
     }
 
     /// <summary>
