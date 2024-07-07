@@ -25,13 +25,13 @@ public class GradientFillTests
     public void TestGradientFillCorners ()
     {
         var area = new Rectangle (0, 0, 10, 10);
-        var gradientFill = new GradientFill (area, _gradient, Gradient.Direction.Diagonal);
+        var gradientFill = new GradientFill (area, _gradient, GradientDirection.Diagonal);
 
         // Test the corners
         var topLeft = new Point (0, 0);
-        var topRight = new Point (area.Width - 1, 0);
-        var bottomLeft = new Point (0, area.Height - 1);
-        var bottomRight = new Point (area.Width - 1, area.Height - 1);
+        var topRight = new Point (area.Width, 0);
+        var bottomLeft = new Point (0, area.Height );
+        var bottomRight = new Point (area.Width, area.Height);
 
         var topLeftColor = gradientFill.GetColor (topLeft);
         var topRightColor = gradientFill.GetColor (topRight);
@@ -62,7 +62,7 @@ public class GradientFillTests
     public void TestGradientFillColorTransition ()
     {
         var area = new Rectangle (0, 0, 10, 10);
-        var gradientFill = new GradientFill (area, _gradient, Gradient.Direction.Diagonal);
+        var gradientFill = new GradientFill (area, _gradient, GradientDirection.Diagonal);
 
         for (int row = 0; row < area.Height; row++)
         {

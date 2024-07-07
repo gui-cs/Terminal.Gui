@@ -6,6 +6,36 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// Describes the pattern that a <see cref="Gradient"/> results in e.g. <see cref="Vertical"/>, <see cref="Horizontal"/> etc
+/// </summary>
+public enum GradientDirection
+{
+    /// <summary>
+    /// Color varies along Y axis but is constant on X axis.
+    /// </summary>
+    Vertical,
+
+    /// <summary>
+    /// Color varies along X axis but is constant on Y axis.
+    /// </summary>
+    Horizontal,
+
+
+    /// <summary>
+    /// Color varies by distance from center (i.e. in circular ripples)
+    /// </summary>
+    Radial,
+
+    /// <summary>
+    /// Color varies by X and Y axis (i.e. a slanted gradient)
+    /// </summary>
+    Diagonal
+}
+
+/// <summary>
+/// Describes
+/// </summary>
 public class Gradient
 {
     public List<Color> Spectrum { get; private set; }
@@ -13,13 +43,6 @@ public class Gradient
     private readonly List<Color> _stops;
     private readonly List<int> _steps;
 
-    public enum Direction
-    {
-        Vertical,
-        Horizontal,
-        Radial,
-        Diagonal
-    }
 
     public Gradient (IEnumerable<Color> stops, IEnumerable<int> steps, bool loop = false)
     {
@@ -83,13 +106,13 @@ public class Gradient
         }
     }
 
-    public Dictionary<Point, Color> BuildCoordinateColorMapping (int maxRow, int maxColumn, Direction direction)
+    public Dictionary<Point, Color> BuildCoordinateColorMapping (int maxRow, int maxColumn, GradientDirection direction)
     {
         var gradientMapping = new Dictionary<Point, Color> ();
 
         switch (direction)
         {
-            case Direction.Vertical:
+            case GradientDirection.Vertical:
                 for (int row = 0; row <= maxRow; row++)
                 {
                     double fraction = maxRow == 0 ? 1.0 : (double)row / maxRow;
@@ -101,7 +124,7 @@ public class Gradient
                 }
                 break;
 
-            case Direction.Horizontal:
+            case GradientDirection.Horizontal:
                 for (int col = 0; col <= maxColumn; col++)
                 {
                     double fraction = maxColumn == 0 ? 1.0 : (double)col / maxColumn;
@@ -113,7 +136,7 @@ public class Gradient
                 }
                 break;
 
-            case Direction.Radial:
+            case GradientDirection.Radial:
                 for (int row = 0; row <= maxRow; row++)
                 {
                     for (int col = 0; col <= maxColumn; col++)
@@ -125,7 +148,7 @@ public class Gradient
                 }
                 break;
 
-            case Direction.Diagonal:
+            case GradientDirection.Diagonal:
                 for (int row = 0; row <= maxRow; row++)
                 {
                     for (int col = 0; col <= maxColumn; col++)

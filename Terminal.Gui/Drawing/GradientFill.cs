@@ -8,11 +8,25 @@ public class GradientFill : IFill
 {
     private Dictionary<Point, Color> _map;
 
-    public GradientFill (Rectangle area, Gradient gradient, Gradient.Direction direction)
+    /// <summary>
+    /// Creates a new instance of the <see cref="GradientFill"/> class that can return
+    /// color for any point in the given <paramref name="area"/> using the provided
+    /// <paramref name="gradient"/> and <paramref name="direction"/>.
+    /// </summary>
+    /// <param name="area"></param>
+    /// <param name="gradient"></param>
+    /// <param name="direction"></param>
+    public GradientFill (Rectangle area, Gradient gradient, GradientDirection direction)
     {
         _map = gradient.BuildCoordinateColorMapping (area.Height, area.Width, direction);
     }
 
+    /// <summary>
+    /// Returns the color to use for the given <paramref name="point"/> or Black if it
+    /// lies outside of the prepared gradient area (see constructor).
+    /// </summary>
+    /// <param name="point"></param>
+    /// <returns></returns>
     public Color GetColor (Point point)
     {
         if (_map.TryGetValue (point, out var color))

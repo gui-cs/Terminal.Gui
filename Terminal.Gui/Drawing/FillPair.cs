@@ -10,16 +10,35 @@ namespace Terminal.Gui;
 /// </summary>
 public class FillPair
 {
+    /// <summary>
+    /// Creates a new instance using the provided fills for foreground and background
+    /// color when assembling <see cref="Attribute"/>.
+    /// </summary>
+    /// <param name="fore"></param>
+    /// <param name="back"></param>
     public FillPair (GradientFill fore, SolidFill back)
     {
         Foreground = fore;
         Background = back;
     }
 
-    IFill Foreground { get; set; }
-    IFill Background { get; set; }
+    /// <summary>
+    /// The fill which provides point based foreground color.
+    /// </summary>
+    public IFill Foreground { get; init; }
 
-    internal Attribute? GetAttribute (Point point)
+    /// <summary>
+    /// The fill which provides point based background color.
+    /// </summary>
+    public IFill Background { get; init; }
+
+    /// <summary>
+    /// Returns the color pair (foreground+background) to use when rendering
+    /// a rune at the given <paramref name="point"/>.
+    /// </summary>
+    /// <param name="point"></param>
+    /// <returns></returns>
+    public Attribute GetAttribute (Point point)
     {
         return new Attribute (
             Foreground.GetColor (point),

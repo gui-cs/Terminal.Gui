@@ -4,7 +4,13 @@ namespace Terminal.Gui;
 /// <summary>Facilitates box drawing and line intersection detection and rendering.  Does not support diagonal lines.</summary>
 public class LineCanvas : IDisposable
 {
+    /// <summary>
+    /// Optional <see cref="FillPair"/> which when present overrides the <see cref="StraightLine.Attribute"/>
+    /// (colors) of lines in the canvas.  This can be used e.g. to apply a global <see cref="GradientFill"/> 
+    /// across all lines.
+    /// </summary>
     public FillPair? Fill { get; set; }
+
     private readonly List<StraightLine> _lines = [];
 
     private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> _runeResolvers = new ()
@@ -86,7 +92,7 @@ public class LineCanvas : IDisposable
                     viewport = Rectangle.Union (viewport, _lines [i].Viewport);
                 }
 
-                if (viewport is {Width: 0} or {Height: 0})
+                if (viewport is { Width: 0 } or { Height: 0 })
                 {
                     viewport = viewport with
                     {
@@ -325,9 +331,11 @@ public class LineCanvas : IDisposable
     /// <returns></returns>
     private bool Exactly (HashSet<IntersectionType> intersects, params IntersectionType [] types) { return intersects.SetEquals (types); }
 
-    private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects) { 
-        return Fill != null ? Fill.GetAttribute(intersects [0]!.Point):
-            intersects [0]!.Line.Attribute; }
+    private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects)
+    {
+        return Fill != null ? Fill.GetAttribute (intersects [0]!.Point) :
+            intersects [0]!.Line.Attribute;
+    }
 
     private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
     {

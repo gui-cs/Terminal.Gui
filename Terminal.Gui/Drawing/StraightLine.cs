@@ -111,10 +111,11 @@ public class StraightLine
             return null;
         }
 
+        var p = new Point (x, y);
+
         if (StartsAt (x, y))
         {
-            return new IntersectionDefinition (
-                                               new Point (x, y),
+            return new IntersectionDefinition (p,
                                                GetTypeByLength (
                                                                 IntersectionType.StartLeft,
                                                                 IntersectionType.PassOverHorizontal,
@@ -126,8 +127,7 @@ public class StraightLine
 
         if (EndsAt (x, y))
         {
-            return new IntersectionDefinition (
-                                               new Point (x, y),
+            return new IntersectionDefinition (p,
                                                Length < 0 ? IntersectionType.StartRight : IntersectionType.StartLeft,
                                                this
                                               );
@@ -138,8 +138,7 @@ public class StraightLine
 
         if (xmin < x && xmax > x)
         {
-            return new IntersectionDefinition (
-                                               new Point (x, y),
+            return new IntersectionDefinition (p,
                                                IntersectionType.PassOverHorizontal,
                                                this
                                               );
@@ -155,10 +154,11 @@ public class StraightLine
             return null;
         }
 
+        var p = new Point (x, y);
+
         if (StartsAt (x, y))
         {
-            return new IntersectionDefinition (
-                                               new Point (x, y),
+            return new IntersectionDefinition (p,
                                                GetTypeByLength (
                                                                 IntersectionType.StartUp,
                                                                 IntersectionType.PassOverVertical,
@@ -170,8 +170,7 @@ public class StraightLine
 
         if (EndsAt (x, y))
         {
-            return new IntersectionDefinition (
-                                               new Point (x, y),
+            return new IntersectionDefinition (p,
                                                Length < 0 ? IntersectionType.StartDown : IntersectionType.StartUp,
                                                this
                                               );
@@ -182,8 +181,7 @@ public class StraightLine
 
         if (ymin < y && ymax > y)
         {
-            return new IntersectionDefinition (
-                                               new Point (x, y),
+            return new IntersectionDefinition (p,
                                                IntersectionType.PassOverVertical,
                                                this
                                               );

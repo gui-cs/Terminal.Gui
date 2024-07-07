@@ -19,7 +19,7 @@ public class TextEffectsScenario : Scenario
         Application.Init ();
         var w = new Window
         {
-            Width = Dim.Fill(),
+            Width = Dim.Fill (),
             Height = Dim.Fill (),
             Title = "Text Effects Scenario"
         };
@@ -30,13 +30,13 @@ public class TextEffectsScenario : Scenario
             // TODO: Does not work
             //  SetupGradientLineCanvas (tabView, tabView.Frame.Size);
         };
-        w.SizeChanging += (s,e)=>
+        w.SizeChanging += (s, e) =>
         {
-            if(e.Size.HasValue)
+            if (e.Size.HasValue)
             {
                 SetupGradientLineCanvas (w, e.Size.Value);
             }
-            
+
             // TODO: Does not work
             //SetupGradientLineCanvas (tabView, tabView.Frame.Size);
         };
@@ -44,7 +44,7 @@ public class TextEffectsScenario : Scenario
         w.ColorScheme = new ColorScheme
         {
             Normal = new Terminal.Gui.Attribute (ColorName.White, ColorName.Black),
-            Focus = new Terminal.Gui.Attribute (ColorName.Black,ColorName.White),
+            Focus = new Terminal.Gui.Attribute (ColorName.Black, ColorName.White),
             HotNormal = new Terminal.Gui.Attribute (ColorName.White, ColorName.Black),
             HotFocus = new Terminal.Gui.Attribute (ColorName.White, ColorName.Black),
             Disabled = new Terminal.Gui.Attribute (ColorName.Gray, ColorName.Black)
@@ -67,7 +67,7 @@ public class TextEffectsScenario : Scenario
             DisplayText = "Gradients"
         };
 
-        tabView.AddTab (t1,false);
+        tabView.AddTab (t1, false);
 
         w.Add (tabView);
 
@@ -86,7 +86,7 @@ public class TextEffectsScenario : Scenario
         var g = new Gradient (stops, steps);
 
         var fore = new GradientFill (
-            new Rectangle (0, 0, size.Width, size.Height), g, Gradient.Direction.Diagonal);
+            new Rectangle (0, 0, size.Width, size.Height), g, GradientDirection.Diagonal);
         var back = new SolidFill (new Terminal.Gui.Color (ColorName.Black));
 
         w.LineCanvas.Fill = new FillPair (
@@ -107,7 +107,7 @@ public class TextEffectsScenario : Scenario
         };
 
         // Define the number of steps between each color for smoother transitions
-        steps = new List<int> { 15,15, 15, 15 };
+        steps = new List<int> { 15, 15, 15, 15 };
     }
 }
 
@@ -125,24 +125,25 @@ internal class GradientsView : View
 
         if (viewport.Height < 25) // Not enough space, render in a single line
         {
-            DrawGradientArea (Gradient.Direction.Horizontal, x, y);
-            DrawGradientArea (Gradient.Direction.Vertical, x + 32, y);
-            DrawGradientArea (Gradient.Direction.Radial, x + 64, y);
-            DrawGradientArea (Gradient.Direction.Diagonal, x + 96, y);
+            DrawGradientArea (GradientDirection.Horizontal, x, y);
+            DrawGradientArea (GradientDirection.Horizontal, x, y);
+            DrawGradientArea (GradientDirection.Vertical, x + 32, y);
+            DrawGradientArea (GradientDirection.Radial, x + 64, y);
+            DrawGradientArea (GradientDirection.Diagonal, x + 96, y);
         }
         else // Enough space, render in two lines
         {
-            DrawGradientArea (Gradient.Direction.Horizontal, x, y);
-            DrawGradientArea (Gradient.Direction.Vertical, x + 32, y);
-            DrawGradientArea (Gradient.Direction.Radial, x, y + 17);
-            DrawGradientArea (Gradient.Direction.Diagonal, x + 32, y + 17);
+            DrawGradientArea (GradientDirection.Horizontal, x, y);
+            DrawGradientArea (GradientDirection.Vertical, x + 32, y);
+            DrawGradientArea (GradientDirection.Radial, x, y + 17);
+            DrawGradientArea (GradientDirection.Diagonal, x + 32, y + 17);
         }
     }
 
 
 
 
-    private void DrawGradientArea (Gradient.Direction direction, int xOffset, int yOffset)
+    private void DrawGradientArea (GradientDirection direction, int xOffset, int yOffset)
     {
         // Define the colors of the gradient stops
         var stops = new List<Color>
