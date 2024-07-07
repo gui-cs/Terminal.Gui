@@ -14,23 +14,18 @@ namespace Terminal.Gui;
 ///         frame,
 ///         with the thickness widths subtracted.
 ///     </para>
-///     <para>Use the helper API (<see cref="Draw(Rectangle, string)"/> to draw the frame with the specified thickness.</para>
+///     <para>
+///         Use the helper API (<see cref="Draw(Rectangle, string)"/> to draw the frame with the specified thickness.
+///     </para>
+///     <para>
+///         Thickness uses <see langword="float"/> intenrally. As a result, there is a potential precision loss for very
+///         large numbers. This is typically not an issue for UI dimensions but could be relevant in other contexts.
+///     </para>
 /// </remarks>
 public record struct Thickness
 {
-    private Vector4 _sides;
-
-    /// <summary>Initializes a new instance of the <see cref="Thickness"/> class.</summary>
-    public Thickness (float left, float top, float right, float bottom)
-    {
-        _sides = new  (left, top, right, bottom);
-    }
-
     /// <summary>Initializes a new instance of the <see cref="Thickness"/> class with all widths set to 0.</summary>
-    public Thickness ()
-    {
-        _sides = new  (0, 0, 0, 0);
-    }
+    public Thickness () { _sides = Vector4.Zero; }
 
     /// <summary>Initializes a new instance of the <see cref="Thickness"/> class with a uniform width to each side.</summary>
     /// <param name="width"></param>
@@ -52,37 +47,7 @@ public record struct Thickness
         Bottom = bottom;
     }
 
-
-    /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
-    [JsonInclude]
-    public int Left
-    {
-        get => (int)_sides.X;
-        set => _sides.X = value;
-    }
-    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
-    [JsonInclude]
-    public int Top
-    {
-        get => (int)_sides.Y;
-        set => _sides.Y = value;
-    }
-
-    /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
-    [JsonInclude]
-    public int Right
-    {
-        get => (int)_sides.Z;
-        set => _sides.Z = value;
-    }
-
-    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
-    [JsonInclude]
-    public int Bottom
-    {
-        get => (int)_sides.W;
-        set => _sides.W = value;
-    }
+    private Vector4 _sides;
 
     /// <summary>
     ///     Adds the thickness widths of another <see cref="Thickness"/> to the current <see cref="Thickness"/>, returning a
@@ -91,6 +56,14 @@ public record struct Thickness
     /// <param name="other"></param>
     /// <returns></returns>
     public readonly Thickness Add (Thickness other) { return new (Left + other.Left, Top + other.Top, Right + other.Right, Bottom + other.Bottom); }
+
+    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
+    [JsonInclude]
+    public int Bottom
+    {
+        get => (int)_sides.W;
+        set => _sides.W = value;
+    }
 
     /// <summary>
     ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside
@@ -266,6 +239,14 @@ public record struct Thickness
         set => Left = Right = value / 2;
     }
 
+    /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
+    [JsonInclude]
+    public int Left
+    {
+        get => (int)_sides.X;
+        set => _sides.X = value;
+    }
+
     /// <summary>
     ///     Adds the thickness widths of another <see cref="Thickness"/> to another <see cref="Thickness"/>.
     /// </summary>
@@ -273,6 +254,22 @@ public record struct Thickness
     /// <param name="b"></param>
     /// <returns></returns>
     public static Thickness operator + (Thickness a, Thickness b) { return a.Add (b); }
+
+    /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
+    [JsonInclude]
+    public int Right
+    {
+        get => (int)_sides.Z;
+        set => _sides.Z = value;
+    }
+
+    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
+    [JsonInclude]
+    public int Top
+    {
+        get => (int)_sides.Y;
+        set => _sides.Y = value;
+    }
 
     /// <summary>Returns the thickness widths of the Thickness formatted as a string.</summary>
     /// <returns>The thickness widths as a string.</returns>
