@@ -280,7 +280,7 @@ internal partial class TestHelpers
     )
     {
 #pragma warning restore xUnit1013 // Public method should be marked as test
-        var actualLook = Application.ToString (driver);
+        var actualLook = Application.ToString (driver ?? Application.Driver);
 
         if (string.Equals (expectedLook, actualLook))
         {
