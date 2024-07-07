@@ -58,10 +58,26 @@ public class Gradient
         Spectrum = GenerateGradient (_steps);
     }
 
+    /// <summary>
+    /// Returns the color to use at the given part of the spectrum
+    /// </summary>
+    /// <param name="fraction">Proportion of the way through the spectrum, must be between 
+    /// 0 and 1 (inclusive).  Returns the last color if <paramref name="fraction"/> is
+    /// <see cref="double.NaN"/>.</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Color GetColorAtFraction (double fraction)
     {
+        if (double.IsNaN (fraction))
+        {
+            return Spectrum.Last ();
+        }
+
         if (fraction < 0 || fraction > 1)
+        {
             throw new ArgumentOutOfRangeException (nameof (fraction), "Fraction must be between 0 and 1.");
+        }
+
         int index = (int)(fraction * (Spectrum.Count - 1));
         return Spectrum [index];
     }
@@ -106,6 +122,19 @@ public class Gradient
         }
     }
 
+    /// <summary>
+    /// <para>
+    /// Creates a mapping starting at 0,0 and going to <paramref name="maxRow"/> and <paramref name="maxColumn"/>
+    /// (inclusively) using the supplied <paramref name="direction"/>.
+    /// </para>
+    /// <para>
+    /// Note that this method is inclusive i.e. passing 1/1 results in 4 mapped coordinates.
+    /// </para>
+    /// </summary>
+    /// <param name="maxRow"></param>
+    /// <param name="maxColumn"></param>
+    /// <param name="direction"></param>
+    /// <returns></returns>
     public Dictionary<Point, Color> BuildCoordinateColorMapping (int maxRow, int maxColumn, GradientDirection direction)
     {
         var gradientMapping = new Dictionary<Point, Color> ();

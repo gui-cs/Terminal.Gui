@@ -1,6 +1,5 @@
-﻿using Terminal.Gui.Drawing;
-
-namespace Terminal.Gui.TextEffects.Tests;
+﻿
+namespace Terminal.Gui.DrawingTests;
 
 public class GradientFillTests
 {
@@ -29,9 +28,9 @@ public class GradientFillTests
 
         // Test the corners
         var topLeft = new Point (0, 0);
-        var topRight = new Point (area.Width, 0);
-        var bottomLeft = new Point (0, area.Height );
-        var bottomRight = new Point (area.Width, area.Height);
+        var topRight = new Point (area.Width - 1, 0);
+        var bottomLeft = new Point (0, area.Height - 1);
+        var bottomRight = new Point (area.Width - 1, area.Height - 1);
 
         var topLeftColor = gradientFill.GetColor (topLeft);
         var topRightColor = gradientFill.GetColor (topRight);
