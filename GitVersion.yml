@@ -22,8 +22,8 @@ branches:
   v2_release:
     mode: ContinuousDeployment
     tag: prealpha
-    regex: ^v2_release?[/-]
-    #is-release-branch: true
+    regex: v2_release
+    is-release-branch: true
     source-branches: ['v2_develop']
 
   pull-request:
