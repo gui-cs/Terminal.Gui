@@ -647,5 +647,4 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             }
         }
     }
-
 }
