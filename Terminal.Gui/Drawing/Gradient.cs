@@ -44,15 +44,42 @@ public class Gradient
     private readonly List<int> _steps;
 
 
+    /// <summary>
+    /// Creates a new instance of the <see cref="Gradient"/> class which hosts a <see cref="Spectrum"/>
+    /// of colors including all <paramref name="stops"/> and <paramref name="steps"/> interpolated colors
+    /// between each corresponding pair.
+    /// </summary>
+    /// <param name="stops">The colors to use in the spectrum (N)</param>
+    /// <param name="steps">The number of colors to generate between each pair (must be N-1 numbers).
+    /// If only one step is passed then it is assumed to be the same distance for all pairs.</param>
+    /// <param name="loop">True to duplicate the first stop and step so that the gradient repeats itself</param>
+    /// <exception cref="ArgumentException"></exception>
     public Gradient (IEnumerable<Color> stops, IEnumerable<int> steps, bool loop = false)
     {
         _stops = stops.ToList ();
+
         if (_stops.Count < 1)
+        {
             throw new ArgumentException ("At least one color stop must be provided.");
+        }
 
         _steps = steps.ToList ();
+
+        // If multiple colors and only 1 step assume same distance applies to all steps
+        if (_stops.Count > 2 && _steps.Count == 1)
+        {
+            _steps = Enumerable.Repeat (_steps.Single (),_stops.Count() - 1).ToList();
+        }
+
         if (_steps.Any (step => step < 1))
+        {
             throw new ArgumentException ("Steps must be greater than 0.");
+        }   
+
+        if (_steps.Count != _stops.Count - 1)
+        {
+            throw new ArgumentException ("Number of steps must be N-1");
+        }
 
         _loop = loop;
         Spectrum = GenerateGradient (_steps);
@@ -85,6 +112,7 @@ public class Gradient
     private List<Color> GenerateGradient (IEnumerable<int> steps)
     {
         List<Color> gradient = new List<Color> ();
+
         if (_stops.Count == 1)
         {
             for (int i = 0; i < steps.Sum (); i++)
@@ -94,13 +122,17 @@ public class Gradient
             return gradient;
         }
 
+        var stopsToUse = _stops.ToList ();
+        var stepsToUse = _steps.ToList ();
+
         if (_loop)
         {
-            _stops.Add (_stops [0]);
+            stopsToUse.Add (_stops [0]);
+            stepsToUse.Add (_steps.First ());
         }
 
-        var colorPairs = _stops.Zip (_stops.Skip (1), (start, end) => new { start, end });
-        var stepsList = _steps.ToList ();
+        var colorPairs = stopsToUse.Zip (stopsToUse.Skip (1), (start, end) => new { start, end });
+        var stepsList = stepsToUse;
 
         foreach (var (colorPair, thesteps) in colorPairs.Zip (stepsList, (pair, step) => (pair, step)))
         {
@@ -112,7 +144,7 @@ public class Gradient
 
     private IEnumerable<Color> InterpolateColors (Color start, Color end, int steps)
     {
-        for (int step = 0; step <= steps; step++)
+        for (int step = 0; step < steps; step++)
         {
             double fraction = (double)step / steps;
             int r = (int)(start.R + fraction * (end.R - start.R));
@@ -120,7 +152,9 @@ public class Gradient
             int b = (int)(start.B + fraction * (end.B - start.B));
             yield return new Color (r, g, b);
         }
+        yield return end; // Ensure the last color is included
     }
+
 
     /// <summary>
     /// <para>
