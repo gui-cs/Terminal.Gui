@@ -47,6 +47,13 @@ jobs:
         name: test-logs
         path: logs/    
 
+    - name: Upload Crash Dumps
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: crash-dumps
+        path: uploads/
+  
     # Note: this step is currently not writing to the gist for some reason
     # - name: Create Test Coverage Badge
     #   uses: simon-k/dotnet-code-coverage-badge@v1.0.0
