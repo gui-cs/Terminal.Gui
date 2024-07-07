@@ -49,6 +49,7 @@ jobs:
       # Without it, the test runner crashes on ubuntu (but not Windows)/
     - name: Test
       run: |
+        PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
         sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
         dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
        
