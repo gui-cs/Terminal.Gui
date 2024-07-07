@@ -32,11 +32,20 @@ jobs:
     - name: Build Debug
       run: dotnet build --configuration Debug --no-restore
 
+      # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
+      # Without it, the test runner crashes on ubuntu (but not Windows)/
     - name: Test
       run: |
         sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
-        dotnet test --verbosity normal --blame 
+        dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings  --blame --diag:logs/logs.txt --blame-hang --blame-hang-timeout 60s
         mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
+
+    - name: Upload Test Logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-logs
+        path: logs/    
 
     # Note: this step is currently not writing to the gist for some reason
     # - name: Create Test Coverage Badge
