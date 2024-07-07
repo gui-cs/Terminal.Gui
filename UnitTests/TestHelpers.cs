@@ -8,12 +8,13 @@ using Xunit.Sdk;
 
 namespace Terminal.Gui;
 
-// This class enables test functions annotated with the [AutoInitShutdown] attribute to 
-// automatically call Application.Init at start of the test and Application.Shutdown after the
-// test exits. 
-// 
-// This is necessary because a) Application is a singleton and Init/Shutdown must be called
-// as a pair, and b) all unit test functions should be atomic..
+/// <summary>
+///     This class enables test functions annotated with the [AutoInitShutdown] attribute to
+///     automatically call Application.Init at start of the test and Application.Shutdown after the
+///     test exits.
+///     This is necessary because a) Application is a singleton and Init/Shutdown must be called
+///     as a pair, and b) all unit test functions should be atomic..
+/// </summary>
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 {
@@ -312,8 +313,7 @@ internal partial class TestHelpers
     }
 
     /// <summary>
-    ///     Asserts that the driver contents are equal to the expected look, and that the cursor is at the expected
-    ///     position.
+    ///     Asserts that the driver contents are equal to the provided string.
     /// </summary>
     /// <param name="expectedLook"></param>
     /// <param name="output"></param>
