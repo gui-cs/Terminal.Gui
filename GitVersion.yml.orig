@@ -14,6 +14,10 @@ branches:
     mode: ContinuousDeployment
     tag: dev
     regex: ^v2_develop?[/-]
+<<<<<<< HEAD
+    #is-release-branch: true
+=======
+>>>>>>> v2_develop
     tracks-release-branches: true
     is-source-branch-for: ['v2_release']
     source-branches: []
