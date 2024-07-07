@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Terminal.Gui.Drawing;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests;
@@ -1301,6 +1302,92 @@ public class LineCanvasTests (ITestOutputHelper output)
 ╔╡╞══╗
 ║    ║";
         TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{lc}");
+    }
+
+    [Fact]
+    public void LineCanvas_UsesFillCorrectly ()
+    {
+        // Arrange
+        var foregroundColor = new Color (255, 0, 0); // Red
+        var backgroundColor = new Color (0, 0, 0);   // Black
+        var foregroundFill = new SolidFill (foregroundColor);
+        var backgroundFill = new SolidFill (backgroundColor);
+        var fillPair = new FillPair (foregroundFill, backgroundFill);
+
+        var lineCanvas = new LineCanvas
+        {
+            Fill = fillPair
+        };
+
+        // Act
+        lineCanvas.AddLine (new Point (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
+        var cellMap = lineCanvas.GetCellMap ();
+
+        // Assert
+        foreach (var cell in cellMap.Values)
+        {
+            Assert.NotNull (cell);
+            Assert.Equal (foregroundColor, cell.Value.Attribute.Value.Foreground);
+            Assert.Equal (backgroundColor, cell.Value.Attribute.Value.Background);
+        }
+    }
+
+    [Fact]
+    public void LineCanvas_LineColorIgnoredBecauseOfFill ()
+    {
+        // Arrange
+        var foregroundColor = new Color (255, 0, 0); // Red
+        var backgroundColor = new Color (0, 0, 0);   // Black
+        var lineColor = new Attribute (new Color (0, 255, 0), new Color (255, 255, 255)); // Green on White
+        var foregroundFill = new SolidFill (foregroundColor);
+        var backgroundFill = new SolidFill (backgroundColor);
+        var fillPair = new FillPair (foregroundFill, backgroundFill);
+
+        var lineCanvas = new LineCanvas
+        {
+            Fill = fillPair
+        };
+
+        // Act
+        lineCanvas.AddLine (new Point (0, 0), 5, Orientation.Horizontal, LineStyle.Single, lineColor);
+        var cellMap = lineCanvas.GetCellMap ();
+
+        // Assert
+        foreach (var cell in cellMap.Values)
+        {
+            Assert.NotNull (cell);
+            Assert.Equal (foregroundColor, cell.Value.Attribute.Value.Foreground);
+            Assert.Equal (backgroundColor, cell.Value.Attribute.Value.Background);
+        }
+    }
+
+    [Fact]
+    public void LineCanvas_IntersectingLinesUseFillCorrectly ()
+    {
+        // Arrange
+        var foregroundColor = new Color (255, 0, 0); // Red
+        var backgroundColor = new Color (0, 0, 0);   // Black
+        var foregroundFill = new SolidFill (foregroundColor);
+        var backgroundFill = new SolidFill (backgroundColor);
+        var fillPair = new FillPair (foregroundFill, backgroundFill);
+
+        var lineCanvas = new LineCanvas
+        {
+            Fill = fillPair
+        };
+
+        // Act
+        lineCanvas.AddLine (new Point (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
+        lineCanvas.AddLine (new Point (2, -2), 5, Orientation.Vertical, LineStyle.Single);
+        var cellMap = lineCanvas.GetCellMap ();
+
+        // Assert
+        foreach (var cell in cellMap.Values)
+        {
+            Assert.NotNull (cell);
+            Assert.Equal (foregroundColor, cell.Value.Attribute.Value.Foreground);
+            Assert.Equal (backgroundColor, cell.Value.Attribute.Value.Background);
+        }
     }
 
     // TODO: Remove this and make all LineCanvas tests independent of View
