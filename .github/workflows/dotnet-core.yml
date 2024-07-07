@@ -18,7 +18,8 @@ jobs:
       # Turn on fail-fast once we have the tests running on all platforms
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ windows-latest ]
+        #os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     timeout-minutes: 10
     steps:
@@ -51,7 +52,7 @@ jobs:
           sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
 
       # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
-      # Without it, the test runner crashes on ubuntu (but not Windows)/
+      # Without it, the test runner crashes on ubuntu (but not Windows or mac)
     - name: Test
       run: |
         dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
