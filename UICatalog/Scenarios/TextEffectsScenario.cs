@@ -140,14 +140,14 @@ internal class GradientsView : View
             DrawGradientArea (Gradient.Direction.Horizontal, x, y);
             DrawGradientArea (Gradient.Direction.Vertical, x + 32, y);
             DrawGradientArea (Gradient.Direction.Radial, x + 64, y);
-            //DrawGradientArea (Gradient.Direction.Diagonal, x + 96, y);
+            DrawGradientArea (Gradient.Direction.Diagonal, x + 96, y);
         }
         else // Enough space, render in two lines
         {
             DrawGradientArea (Gradient.Direction.Horizontal, x, y);
             DrawGradientArea (Gradient.Direction.Vertical, x + 32, y);
             DrawGradientArea (Gradient.Direction.Radial, x, y + 17);
-            //DrawGradientArea (Gradient.Direction.Diagonal, x + 32, y + 17);
+            DrawGradientArea (Gradient.Direction.Diagonal, x + 32, y + 17);
         }
     }
 
