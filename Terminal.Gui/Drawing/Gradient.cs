@@ -1,4 +1,7 @@
-﻿namespace Terminal.Gui;
+﻿// This code is a C# port from python library Terminal Text Effects  https://github.com/ChrisBuilds/terminaltexteffects/
+
+namespace Terminal.Gui;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
