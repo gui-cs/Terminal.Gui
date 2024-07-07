@@ -40,7 +40,9 @@ jobs:
 
     - name: Install sed on macOS
       if: runner.os == 'macOS'
-      run: brew install gnu-sed
+      run: |
+          brew install gnu-sed
+          PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
 
       # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
       # Without it, the test runner crashes on ubuntu (but not Windows)/
