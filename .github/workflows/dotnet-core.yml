@@ -55,7 +55,7 @@ jobs:
       # Without it, the test runner crashes on ubuntu (but not Windows or mac)
     - name: Test
       run: |
-        VSTEST_DUMP_PATH="logs/""
+        VSTEST_DUMP_PATH="logs/"
         dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
      
         # mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
