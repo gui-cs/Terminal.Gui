@@ -29,9 +29,8 @@ jobs:
       run: |
         brew install gnu-sed
         echo "{/opt/homebrew/opt/gnu-sed/libexec/gnubin}" >> $GITHUB_PATH
-        sed -version
-        sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
-    
+        sed --version
+
     - uses: actions/checkout@v4
 
     - name: Setup .NET Core
