@@ -29,7 +29,8 @@ jobs:
       run: |
         brew install gnu-sed
         echo "{/opt/homebrew/opt/gnu-sed/libexec/gnubin}" >> $GITHUB_PATH
-        sed -i 's/"stopOnFail": false/"stopOnFail": true/g' 'UnitTests/xunit.runner.json'
+        sed
+        sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
     
     - uses: actions/checkout@v4
 
