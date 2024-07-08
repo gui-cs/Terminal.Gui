@@ -23,6 +23,13 @@ jobs:
 
     timeout-minutes: 10
     steps:
+
+    - name: Install sed on macOS
+      if: runner.os == 'macOS'
+      run: |
+        brew install gnu-sed
+        echo "{/opt/homebrew/opt/gnu-sed/libexec/gnubin}" >> $GITHUB_PATH
+        sed -i 's/"stopOnFail": false/"stopOnFail": true/g' 'UnitTests/xunit.runner.json'
     
     - uses: actions/checkout@v4
 
@@ -39,10 +46,6 @@ jobs:
     - name: Build Debug
       run: dotnet build --configuration Debug --no-restore
 
-    - name: Install sed on macOS
-      if: runner.os == 'macOS'
-      run: |
-          brew install gnu-sed
 
     - name: Set VSTEST_DUMP_PATH
       shell: bash
@@ -52,9 +55,8 @@ jobs:
       # Without it, the test runner crashes on ubuntu (but not Windows or mac)
     - name: Test
       run: |
-        echo "{/opt/homebrew/opt/gnu-sed/libexec/gnubin}" >> $GITHUB_PATH
-        sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
-        dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
+       sed -i 's/"stopOnFail": false/"stopOnFail": true/g' 'UnitTests/xunit.runner.json'
+       dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
      
         # mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
