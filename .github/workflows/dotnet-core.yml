@@ -55,19 +55,19 @@ jobs:
       # Without it, the test runner crashes on ubuntu (but not Windows or mac)
     - name: Test
       run: |
-        VSTEST_DUMP_PATH="logs/"
-        dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
+        VSTEST_DUMP_PATH="logs/${{ runner.os }}/"
+        dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
      
         # mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
-    # - name: Upload Test Logs
-    #   if: always()
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: test-logs-for-blame-debugging
-    #     path: |
-    #       logs/    
-    #       UnitTests/TestResults/
+    - name: Upload Test Logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-logs-${{ runner.os }}
+        path: |
+          logs/    
+          UnitTests/TestResults/
   
     # Note: this step is currently not writing to the gist for some reason
     # - name: Create Test Coverage Badge
