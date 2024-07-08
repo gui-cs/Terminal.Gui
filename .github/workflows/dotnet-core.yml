@@ -16,10 +16,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       # Turn on fail-fast once we have the tests running on all platforms
-      fail-fast: false
+      fail-fast: true
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
-        #os: [ ubuntu-latest, windows-latest, macos-latest ]
+        #os: [ ubuntu-latest, macos-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     timeout-minutes: 10
     steps:
@@ -60,14 +60,14 @@ jobs:
      
         # mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
-    - name: Upload Test Logs
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-logs-for-blame-debugging
-        path: |
-          logs/    
-          UnitTests/TestResults/
+    # - name: Upload Test Logs
+    #   if: always()
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: test-logs-for-blame-debugging
+    #     path: |
+    #       logs/    
+    #       UnitTests/TestResults/
   
     # Note: this step is currently not writing to the gist for some reason
     # - name: Create Test Coverage Badge
