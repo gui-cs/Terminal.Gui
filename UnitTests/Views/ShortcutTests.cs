@@ -487,46 +487,46 @@ public class ShortcutTests
     }
 
 
-    //[Theory]
-    //[InlineData (true, KeyCode.A, 1)]
-    //[InlineData (true, KeyCode.C, 1)]
-    //[InlineData (true, KeyCode.C | KeyCode.AltMask, 1)]
-    //[InlineData (true, KeyCode.Enter, 1)]
-    //[InlineData (true, KeyCode.Space, 0)]
-    //[InlineData (true, KeyCode.F1, 0)]
+    [Theory]
+    [InlineData (true, KeyCode.A, 1)]
+    [InlineData (true, KeyCode.C, 1)]
+    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (true, KeyCode.Enter, 1)]
+    [InlineData (true, KeyCode.Space, 0)]
+    [InlineData (true, KeyCode.F1, 0)]
 
-    //[InlineData (false, KeyCode.A, 1)]
-    //[InlineData (false, KeyCode.C, 1)]
-    //[InlineData (false, KeyCode.C | KeyCode.AltMask, 1)]
-    //[InlineData (false, KeyCode.Enter, 0)]
-    //[InlineData (false, KeyCode.Space, 0)]
-    //[InlineData (false, KeyCode.F1, 0)]
-    //[AutoInitShutdown]
-    //public void KeyDown_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
-    //{
-    //    Toplevel current = new Toplevel ();
-    //    var shortcut = new Shortcut
-    //    {
-    //        Key = Key.A,
-    //        Text = "0",
-    //        Title = "_C",
-    //        CanFocus = canFocus
-    //    };
-    //    current.Add (shortcut);
+    [InlineData (false, KeyCode.A, 1)]
+    [InlineData (false, KeyCode.C, 1)]
+    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (false, KeyCode.Enter, 0)]
+    [InlineData (false, KeyCode.Space, 0)]
+    [InlineData (false, KeyCode.F1, 0)]
+    [AutoInitShutdown]
+    public void KeyDown_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
+    {
+        Toplevel current = new Toplevel ();
+        var shortcut = new Shortcut
+        {
+            Key = Key.A,
+            Text = "0",
+            Title = "_C",
+            CanFocus = canFocus
+        };
+        current.Add (shortcut);
 
-    //    Application.Begin (current);
-    //    Assert.Equal (canFocus, shortcut.HasFocus);
+        Application.Begin (current);
+        Assert.Equal (canFocus, shortcut.HasFocus);
 
-    //    int action = 0;
-    //    shortcut.Action += () => action++;
+        int action = 0;
+        shortcut.Action += () => action++;
 
-    //    Application.OnKeyDown (key);
+        Application.OnKeyDown (key);
 
-    //    Assert.Equal (expectedAction, action);
+        Assert.Equal (expectedAction, action);
 
-    //    current.Dispose ();
+        current.Dispose ();
 
-    //}
+    }
 
     [Theory]
     [InlineData (true, KeyCode.A, 1)]
