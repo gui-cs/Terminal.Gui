@@ -43,9 +43,11 @@ jobs:
       if: runner.os == 'macOS'
       run: |
           brew install gnu-sed
-          echo "{"/opt/homebrew/opt/gnu-sed/libexec/gnubin}" >> $GITHUB_PATH
+          echo "{/opt/homebrew/opt/gnu-sed/libexec/gnubin}" >> $GITHUB_PATH
+          sed --version
 
     - name: Set VSTEST_DUMP_PATH
+      shell: bash
       run: echo "{VSTEST_DUMP_PATH}={logs/${{ runner.os }}/}" >> $GITHUB_ENV
 
       # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
