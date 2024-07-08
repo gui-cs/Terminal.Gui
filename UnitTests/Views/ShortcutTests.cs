@@ -27,7 +27,7 @@ public class ShortcutTests
     [InlineData ("C", "H", KeyCode.Null, 6)]
     [InlineData ("", "H", KeyCode.K, 8)]
     [InlineData ("C", "H", KeyCode.K, 9)]
-    public void NaturalSize (string command, string help, Key key, int expectedWidth)
+    public void NaturalSize (string command, string help, KeyCode key, int expectedWidth)
     {
         var shortcut = new Shortcut
         {
@@ -115,7 +115,7 @@ public class ShortcutTests
     [Theory]
     [InlineData (KeyCode.Null, "")]
     [InlineData (KeyCode.F1, "F1")]
-    public void KeyView_Text_Tracks_Key (Key key, string expected)
+    public void KeyView_Text_Tracks_Key (KeyCode key, string expected)
     {
         var shortcut = new Shortcut
         {
@@ -316,6 +316,7 @@ public class ShortcutTests
     }
 
     [Theory]
+
     //  0123456789
     // " C  0  A "
     [InlineData (-1, 0)]
@@ -332,7 +333,8 @@ public class ShortcutTests
     [AutoInitShutdown]
     public void MouseClick_Fires_Accept (int x, int expectedAccept)
     {
-        Toplevel current = new Toplevel ();
+        var current = new Toplevel ();
+
         var shortcut = new Shortcut
         {
             Key = Key.A,
@@ -343,14 +345,15 @@ public class ShortcutTests
 
         Application.Begin (current);
 
-        int accepted = 0;
+        var accepted = 0;
         shortcut.Accept += (s, e) => accepted++;
 
-        Application.OnMouseEvent (new MouseEvent ()
-        {
-            Position = new Point (x, 0),
-            Flags = MouseFlags.Button1Clicked,
-        });
+        Application.OnMouseEvent (
+                                  new()
+                                  {
+                                      Position = new (x, 0),
+                                      Flags = MouseFlags.Button1Clicked
+                                  });
 
         Assert.Equal (expectedAccept, accepted);
 
@@ -358,6 +361,7 @@ public class ShortcutTests
     }
 
     [Theory]
+
     //  0123456789
     // " C  0  A "
     [InlineData (-1, 0, 0)]
@@ -374,37 +378,37 @@ public class ShortcutTests
     [AutoInitShutdown]
     public void MouseClick_Button_CommandView_Fires_Accept (int x, int expectedAccept, int expectedButtonAccept)
     {
-        Toplevel current = new Toplevel ();
+        var current = new Toplevel ();
+
         var shortcut = new Shortcut
         {
             Key = Key.A,
-            Text = "0",
+            Text = "0"
         };
-        shortcut.CommandView = new Button ()
+
+        shortcut.CommandView = new Button
         {
             Title = "C",
             NoDecorations = true,
-            NoPadding = true,
+            NoPadding = true
         };
-        int buttonAccepted = 0;
-        shortcut.CommandView.Accept += (s, e) =>
-                                       {
-                                           buttonAccepted++;
-                                       };
+        var buttonAccepted = 0;
+        shortcut.CommandView.Accept += (s, e) => { buttonAccepted++; };
         current.Add (shortcut);
 
         Application.Begin (current);
 
-        int accepted = 0;
+        var accepted = 0;
         shortcut.Accept += (s, e) => accepted++;
 
         //Assert.True (shortcut.HasFocus);
 
-        Application.OnMouseEvent (new MouseEvent ()
-        {
-            Position = new Point (x, 0),
-            Flags = MouseFlags.Button1Clicked,
-        });
+        Application.OnMouseEvent (
+                                  new()
+                                  {
+                                      Position = new (x, 0),
+                                      Flags = MouseFlags.Button1Clicked
+                                  });
 
         Assert.Equal (expectedAccept, accepted);
         Assert.Equal (expectedButtonAccept, buttonAccepted);
@@ -419,7 +423,6 @@ public class ShortcutTests
     [InlineData (true, KeyCode.Enter, 1)]
     [InlineData (true, KeyCode.Space, 0)]
     [InlineData (true, KeyCode.F1, 0)]
-
     [InlineData (false, KeyCode.A, 1)]
     [InlineData (false, KeyCode.C, 1)]
     [InlineData (false, KeyCode.C | KeyCode.AltMask, 1)]
@@ -429,7 +432,8 @@ public class ShortcutTests
     [AutoInitShutdown]
     public void KeyDown_Invokes_Accept (bool canFocus, KeyCode key, int expectedAccept)
     {
-        Toplevel current = new Toplevel ();
+        var current = new Toplevel ();
+
         var shortcut = new Shortcut
         {
             Key = Key.A,
@@ -442,7 +446,7 @@ public class ShortcutTests
         Application.Begin (current);
         Assert.Equal (canFocus, shortcut.HasFocus);
 
-        int accepted = 0;
+        var accepted = 0;
         shortcut.Accept += (s, e) => accepted++;
 
         Application.OnKeyDown (key);
@@ -450,9 +454,7 @@ public class ShortcutTests
         Assert.Equal (expectedAccept, accepted);
 
         current.Dispose ();
-
     }
-
 
     [Theory]
     [InlineData (KeyCode.A, 1)]
@@ -464,19 +466,20 @@ public class ShortcutTests
     [AutoInitShutdown]
     public void KeyDown_App_Scope_Invokes_Accept (KeyCode key, int expectedAccept)
     {
-        Toplevel current = new Toplevel ();
+        var current = new Toplevel ();
+
         var shortcut = new Shortcut
         {
             Key = Key.A,
             KeyBindingScope = KeyBindingScope.Application,
             Text = "0",
-            Title = "_C",
+            Title = "_C"
         };
         current.Add (shortcut);
 
         Application.Begin (current);
 
-        int accepted = 0;
+        var accepted = 0;
         shortcut.Accept += (s, e) => accepted++;
 
         Application.OnKeyDown (key);
@@ -486,7 +489,6 @@ public class ShortcutTests
         current.Dispose ();
     }
 
-
     [Theory]
     [InlineData (true, KeyCode.A, 1)]
     [InlineData (true, KeyCode.C, 1)]
@@ -494,7 +496,6 @@ public class ShortcutTests
     [InlineData (true, KeyCode.Enter, 1)]
     [InlineData (true, KeyCode.Space, 0)]
     [InlineData (true, KeyCode.F1, 0)]
-
     [InlineData (false, KeyCode.A, 1)]
     [InlineData (false, KeyCode.C, 1)]
     [InlineData (false, KeyCode.C | KeyCode.AltMask, 1)]
@@ -504,7 +505,8 @@ public class ShortcutTests
     [AutoInitShutdown]
     public void KeyDown_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
     {
-        Toplevel current = new Toplevel ();
+        var current = new Toplevel ();
+
         var shortcut = new Shortcut
         {
             Key = Key.A,
@@ -517,7 +519,7 @@ public class ShortcutTests
         Application.Begin (current);
         Assert.Equal (canFocus, shortcut.HasFocus);
 
-        int action = 0;
+        var action = 0;
         shortcut.Action += () => action++;
 
         Application.OnKeyDown (key);
@@ -525,7 +527,6 @@ public class ShortcutTests
         Assert.Equal (expectedAction, action);
 
         current.Dispose ();
-
     }
 
     [Theory]
@@ -535,7 +536,6 @@ public class ShortcutTests
     [InlineData (true, KeyCode.Enter, 1)]
     [InlineData (true, KeyCode.Space, 0)]
     [InlineData (true, KeyCode.F1, 0)]
-
     [InlineData (false, KeyCode.A, 1)]
     [InlineData (false, KeyCode.C, 1)]
     [InlineData (false, KeyCode.C | KeyCode.AltMask, 1)]
@@ -545,7 +545,8 @@ public class ShortcutTests
     [AutoInitShutdown]
     public void KeyDown_App_Scope_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
     {
-        Toplevel current = new Toplevel ();
+        var current = new Toplevel ();
+
         var shortcut = new Shortcut
         {
             Key = Key.A,
@@ -559,7 +560,7 @@ public class ShortcutTests
         Application.Begin (current);
         Assert.Equal (canFocus, shortcut.HasFocus);
 
-        int action = 0;
+        var action = 0;
         shortcut.Action += () => action++;
 
         Application.OnKeyDown (key);
@@ -567,7 +568,5 @@ public class ShortcutTests
         Assert.Equal (expectedAction, action);
 
         current.Dispose ();
-
     }
-
 }

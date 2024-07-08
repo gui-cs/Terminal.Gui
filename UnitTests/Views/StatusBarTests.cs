@@ -83,19 +83,6 @@ public class StatusBarTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Redraw_Output ()
-    {
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Redraw_Output_CTRLQ ()
-    {
-
-    }
-
-    [Fact]
-    [AutoInitShutdown]
     public void Run_Action_With_Key_And_Mouse ()
     {
         var msg = "";
