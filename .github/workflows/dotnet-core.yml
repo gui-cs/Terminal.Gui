@@ -44,6 +44,7 @@ jobs:
       run: |
           brew install gnu-sed
           echo "{/opt/homebrew/opt/gnu-sed/libexec/gnubin}" >> $GITHUB_PATH
+          sed -version
 
     - name: Set VSTEST_DUMP_PATH
       shell: bash
