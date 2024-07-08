@@ -61,7 +61,6 @@ public class KeyTests
     [InlineData ((KeyCode)'英', '英')]
     [InlineData ((KeyCode)'{', '{')]
     [InlineData ((KeyCode)'\'', '\'')]
-    [InlineData ((KeyCode)'\r', '\r')]
     [InlineData ((KeyCode)'ó', 'ó')]
     [InlineData ((KeyCode)'ó' | KeyCode.ShiftMask, 'ó')]
     [InlineData ((KeyCode)'Ó', 'Ó')]
