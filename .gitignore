@@ -50,9 +50,9 @@ UnitTests/TestResults
 TestResults
 
 # git merge files
-.orig
-.theirs
-.ours
+*.orig
+*.theirs
+*.ours
 
 demo.*
 

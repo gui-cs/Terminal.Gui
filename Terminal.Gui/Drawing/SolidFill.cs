@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drawing;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     <see cref="IFill"/> implementation that uses a solid color for all points

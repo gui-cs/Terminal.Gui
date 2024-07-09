@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui;
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Describes a pair of <see cref="IFill"/> which cooperate in creating

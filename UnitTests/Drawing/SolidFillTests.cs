@@ -1,5 +1,3 @@
-﻿using Terminal.Gui.Drawing;
-
 namespace Terminal.Gui.DrawingTests;
 
 public class SolidFillTests
