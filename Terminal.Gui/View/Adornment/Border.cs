@@ -1,5 +1,3 @@
-using Terminal.Gui.Drawing;
-
 namespace Terminal.Gui;
 
 /// <summary>The Border for a <see cref="View"/>.</summary>
