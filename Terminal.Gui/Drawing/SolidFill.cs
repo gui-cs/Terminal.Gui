@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drawing;
+﻿namespace Terminal.Gui;
 
 
 /// <summary>

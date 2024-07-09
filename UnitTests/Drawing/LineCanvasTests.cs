@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Terminal.Gui.Drawing;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests;

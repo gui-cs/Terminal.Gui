@@ -4,8 +4,6 @@ using System.Text;
 using System.Threading;
 using Terminal.Gui;
 
-using Terminal.Gui.Drawing;
-
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Text Effects", "Text Effects.")]
