@@ -32,8 +32,7 @@ jobs:
 
     - name: Set sed on Windows/Linux
       if: runner.os != 'macOS'
-      run: |
-        echo "{sed}={sed}" >> $GITHUB_ENV
+      run: echo "{sed}={sed}" >> $GITHUB_ENV
 
     - name: Checkout code
       uses: actions/checkout@v4
@@ -59,7 +58,7 @@ jobs:
       # Without it, the test runner crashes on ubuntu (but not Windows or mac)
     - name: Test
       run: |
-       ${{sed}} -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
+       ${{ env.sed }} -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
        dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
      
         # mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
