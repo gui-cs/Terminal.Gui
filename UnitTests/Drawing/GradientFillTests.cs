@@ -2,21 +2,21 @@
 
 public class GradientFillTests
 {
-    private Gradient _gradient;
+    private readonly Gradient _gradient;
 
     public GradientFillTests ()
     {
         // Define the colors of the gradient stops
-        var stops = new List<Color>
+        List<Color> stops = new List<Color>
         {
-            new Color(255, 0, 0),    // Red
-            new Color(0, 0, 255)     // Blue
+            new (255, 0), // Red
+            new (0, 0, 255) // Blue
         };
 
         // Define the number of steps between each color
-        var steps = new List<int> { 10 }; // 10 steps between Red -> Blue
+        List<int> steps = new() { 10 }; // 10 steps between Red -> Blue
 
-        _gradient = new Gradient (stops, steps, loop: false);
+        _gradient = new (stops, steps);
     }
 
     [Fact]
@@ -31,13 +31,13 @@ public class GradientFillTests
         var bottomLeft = new Point (0, area.Height - 1);
         var bottomRight = new Point (area.Width - 1, area.Height - 1);
 
-        var topLeftColor = gradientFill.GetColor (topLeft);
-        var topRightColor = gradientFill.GetColor (topRight);
-        var bottomLeftColor = gradientFill.GetColor (bottomLeft);
-        var bottomRightColor = gradientFill.GetColor (bottomRight);
+        Color topLeftColor = gradientFill.GetColor (topLeft);
+        Color topRightColor = gradientFill.GetColor (topRight);
+        Color bottomLeftColor = gradientFill.GetColor (bottomLeft);
+        Color bottomRightColor = gradientFill.GetColor (bottomRight);
 
         // Expected colors
-        var expectedTopLeftColor = new Color (255, 0, 0); // Red
+        var expectedTopLeftColor = new Color (255, 0); // Red
         var expectedBottomRightColor = new Color (0, 0, 255); // Blue
 
         Assert.Equal (expectedTopLeftColor, topLeftColor);
@@ -56,13 +56,13 @@ public class GradientFillTests
         var bottomLeft = new Point (5, area.Bottom - 1);
         var bottomRight = new Point (area.Right - 1, area.Bottom - 1);
 
-        var topLeftColor = gradientFill.GetColor (topLeft);
-        var topRightColor = gradientFill.GetColor (topRight);
-        var bottomLeftColor = gradientFill.GetColor (bottomLeft);
-        var bottomRightColor = gradientFill.GetColor (bottomRight);
+        Color topLeftColor = gradientFill.GetColor (topLeft);
+        Color topRightColor = gradientFill.GetColor (topRight);
+        Color bottomLeftColor = gradientFill.GetColor (bottomLeft);
+        Color bottomRightColor = gradientFill.GetColor (bottomRight);
 
         // Expected colors
-        var expectedTopLeftColor = new Color (255, 0, 0); // Red
+        var expectedTopLeftColor = new Color (255, 0); // Red
         var expectedBottomRightColor = new Color (0, 0, 255); // Blue
 
         Assert.Equal (expectedTopLeftColor, topLeftColor);
@@ -75,15 +75,15 @@ public class GradientFillTests
         var area = new Rectangle (0, 0, 10, 10);
         var gradientFill = new GradientFill (area, _gradient, GradientDirection.Diagonal);
 
-        for (int row = 0; row < area.Height; row++)
+        for (var row = 0; row < area.Height; row++)
         {
-            int previousRed = 255;
-            int previousBlue = 0;
+            var previousRed = 255;
+            var previousBlue = 0;
 
-            for (int col = 0; col < area.Width; col++)
+            for (var col = 0; col < area.Width; col++)
             {
                 var point = new Point (col, row);
-                var color = gradientFill.GetColor (point);
+                Color color = gradientFill.GetColor (point);
 
                 // Check if the current color is 'more blue' and 'less red' as it goes right and down
                 Assert.True (color.R <= previousRed, $"Failed at ({col}, {row}): {color.R} > {previousRed}");
@@ -95,15 +95,15 @@ public class GradientFillTests
             }
         }
 
-        for (int col = 0; col < area.Width; col++)
+        for (var col = 0; col < area.Width; col++)
         {
-            int previousRed = 255;
-            int previousBlue = 0;
+            var previousRed = 255;
+            var previousBlue = 0;
 
-            for (int row = 0; row < area.Height; row++)
+            for (var row = 0; row < area.Height; row++)
             {
                 var point = new Point (col, row);
-                var color = gradientFill.GetColor (point);
+                Color color = gradientFill.GetColor (point);
 
                 // Check if the current color is 'more blue' and 'less red' as it goes right and down
                 Assert.True (color.R <= previousRed, $"Failed at ({col}, {row}): {color.R} > {previousRed}");

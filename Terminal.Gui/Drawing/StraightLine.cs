@@ -45,6 +45,7 @@ public class StraightLine
     ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
     ///     furthest left/top and Size is defined by the line that extends the furthest right/bottom.
     /// </summary>
+
     // PERF: Probably better to store the rectangle rather than make a new one on every single access to Viewport.
     internal Rectangle Viewport
     {
@@ -115,22 +116,24 @@ public class StraightLine
 
         if (StartsAt (x, y))
         {
-            return new IntersectionDefinition (p,
-                                               GetTypeByLength (
-                                                                IntersectionType.StartLeft,
-                                                                IntersectionType.PassOverHorizontal,
-                                                                IntersectionType.StartRight
-                                                               ),
-                                               this
-                                              );
+            return new (
+                        p,
+                        GetTypeByLength (
+                                         IntersectionType.StartLeft,
+                                         IntersectionType.PassOverHorizontal,
+                                         IntersectionType.StartRight
+                                        ),
+                        this
+                       );
         }
 
         if (EndsAt (x, y))
         {
-            return new IntersectionDefinition (p,
-                                               Length < 0 ? IntersectionType.StartRight : IntersectionType.StartLeft,
-                                               this
-                                              );
+            return new (
+                        p,
+                        Length < 0 ? IntersectionType.StartRight : IntersectionType.StartLeft,
+                        this
+                       );
         }
 
         int xmin = Math.Min (Start.X, Start.X + Length);
@@ -138,10 +141,11 @@ public class StraightLine
 
         if (xmin < x && xmax > x)
         {
-            return new IntersectionDefinition (p,
-                                               IntersectionType.PassOverHorizontal,
-                                               this
-                                              );
+            return new (
+                        p,
+                        IntersectionType.PassOverHorizontal,
+                        this
+                       );
         }
 
         return null;
@@ -158,22 +162,24 @@ public class StraightLine
 
         if (StartsAt (x, y))
         {
-            return new IntersectionDefinition (p,
-                                               GetTypeByLength (
-                                                                IntersectionType.StartUp,
-                                                                IntersectionType.PassOverVertical,
-                                                                IntersectionType.StartDown
-                                                               ),
-                                               this
-                                              );
+            return new (
+                        p,
+                        GetTypeByLength (
+                                         IntersectionType.StartUp,
+                                         IntersectionType.PassOverVertical,
+                                         IntersectionType.StartDown
+                                        ),
+                        this
+                       );
         }
 
         if (EndsAt (x, y))
         {
-            return new IntersectionDefinition (p,
-                                               Length < 0 ? IntersectionType.StartDown : IntersectionType.StartUp,
-                                               this
-                                              );
+            return new (
+                        p,
+                        Length < 0 ? IntersectionType.StartDown : IntersectionType.StartUp,
+                        this
+                       );
         }
 
         int ymin = Math.Min (Start.Y, Start.Y + Length);
@@ -181,10 +187,11 @@ public class StraightLine
 
         if (ymin < y && ymax > y)
         {
-            return new IntersectionDefinition (p,
-                                               IntersectionType.PassOverVertical,
-                                               this
-                                              );
+            return new (
+                        p,
+                        IntersectionType.PassOverVertical,
+                        this
+                       );
         }
 
         return null;
