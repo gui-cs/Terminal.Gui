@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.ViewsTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
