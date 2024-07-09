@@ -1,12 +1,12 @@
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection;
 using Xunit.Abstractions;
 
 namespace UICatalog.Tests;
 
-public class ScenarioTests
+public class ScenarioTests : TestsAllViews
 {
-    private readonly ITestOutputHelper _output;
-
     public ScenarioTests (ITestOutputHelper output)
     {
 #if DEBUG_IDISPOSABLE
@@ -15,92 +15,120 @@ public class ScenarioTests
         _output = output;
     }
 
+    private readonly ITestOutputHelper _output;
+
+    private object _timeoutLock;
+
     /// <summary>
     ///     <para>This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run.</para>
     ///     <para>Should find any Scenarios which crash on load or do not respond to <see cref="Application.RequestStop()"/>.</para>
     /// </summary>
-    [Fact]
-    public void Run_All_Scenarios ()
+    [Theory]
+    [MemberData (nameof (AllScenarioTypes))]
+    public void All_Scenarios_Quit_And_Init_Shutdown_Properly (Type scenarioType)
     {
-        List<Scenario> scenarios = Scenario.GetScenarios ();
-        Assert.NotEmpty (scenarios);
+        Assert.Null (_timeoutLock);
+        _timeoutLock = new ();
 
-        foreach (Scenario scenario in scenarios)
+        // If a previous test failed, this will ensure that the Application is in a clean state
+        Application.ResetState (true);
+
+        _output.WriteLine ($"Running Scenario '{scenarioType}'");
+        var scenario = (Scenario)Activator.CreateInstance (scenarioType);
+
+        uint abortTime = 1500;
+        var initialized = false;
+        var shutdown = false;
+        object timeout = null;
+
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+
+        Application.ForceDriver = "FakeDriver";
+        scenario.Main ();
+        scenario.Dispose ();
+        scenario = null;
+        Application.ForceDriver = string.Empty;
+
+        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+
+        lock (_timeoutLock)
         {
-            _output.WriteLine ($"Running Scenario '{scenario.GetName ()}'");
-
-            Application.Init (new FakeDriver ());
-
-            // Press QuitKey 
-            Assert.Empty (FakeConsole.MockKeyPresses);
-
-            // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-            // by adding this Space it seems to work.
-            //FakeConsole.PushMockKeyPress (Key.Space);
-            FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
-
-            // The only key we care about is the QuitKey
-            Application.Top.KeyDown += (sender, args) =>
-                                       {
-                                           _output.WriteLine ($"  Keypress: {args.KeyCode}");
-
-                                           // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-                                           // by adding this Space it seems to work.
-                                           // See #2474 for why this is commented out
-                                           Assert.Equal (Application.QuitKey.KeyCode, args.KeyCode);
-                                       };
-
-            uint abortTime = 500;
-
-            // If the scenario doesn't close within 500ms, this will force it to quit
-            Func<bool> forceCloseCallback = () =>
-                                            {
-                                                if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
-                                                {
-                                                    Application.RequestStop ();
-
-                                                    // See #2474 for why this is commented out
-                                                    Assert.Fail (
-                                                                 $"'{
-                                                                     scenario.GetName ()
-                                                                 }' failed to Quit with {
-                                                                     Application.QuitKey
-                                                                 } after {
-                                                                     abortTime
-                                                                 }ms. Force quit."
-                                                                );
-                                                }
-
-                                                return false;
-                                            };
-
-            //output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
-            _ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
-
-            Application.Iteration += (s, a) =>
-                                     {
-                                         //output.WriteLine ($"  iteration {++iterations}");
-                                         if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0)
-                                         {
-                                             Application.RequestStop ();
-                                             Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey}. Force quit.");
-                                         }
-                                     };
-
-            scenario.Init ();
-            scenario.Setup ();
-            scenario.Run ();
-            scenario.Dispose ();
-
-            Application.Shutdown ();
-#if DEBUG_IDISPOSABLE
-            Assert.Empty (Responder.Instances);
-#endif
+            if (timeout is { })
+            {
+                timeout = null;
+            }
         }
+
+        Assert.True (initialized);
+        Assert.True (shutdown);
+
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
 #endif
+
+        lock (_timeoutLock)
+        {
+            _timeoutLock = null;
+        }
+
+        return;
+
+        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
+        {
+            if (a.CurrentValue)
+            {
+                Application.Iteration += OnApplicationOnIteration;
+                initialized = true;
+
+                lock (_timeoutLock)
+                {
+                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
+                }
+
+                _output.WriteLine ($"Initialized '{Application.Driver}'");
+            }
+            else
+            {
+                Application.Iteration -= OnApplicationOnIteration;
+                shutdown = true;
+            }
+        }
+
+        // If the scenario doesn't close within 500ms, this will force it to quit
+        bool ForceCloseCallback ()
+        {
+            lock (_timeoutLock)
+            {
+                if (timeout is { })
+                {
+                    timeout = null;
+                }
+            }
+
+            Assert.Fail (
+                         $"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
+
+            Application.ResetState (true);
+
+            return false;
+        }
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            if (Application._initialized)
+            {
+                // Press QuitKey 
+                //_output.WriteLine ($"Forcing Quit with {Application.QuitKey}");
+                Application.OnKeyDown (Application.QuitKey);
+            }
+        }
     }
+
+    public static IEnumerable<object []> AllScenarioTypes =>
+        typeof (Scenario).Assembly
+                         .GetTypes ()
+                         .Where (type => type.IsClass && !type.IsAbstract && type.IsSubclassOf (typeof (Scenario)))
+                         .Select (type => new object [] { type });
 
     [Fact]
     public void Run_All_Views_Tester_Scenario ()
@@ -114,7 +142,6 @@ public class ScenarioTests
 
         // Settings
         FrameView _settingsPane;
-        CheckBox _computedCheckBox;
         FrameView _locationFrame;
         RadioGroup _xRadioGroup;
         TextField _xText;
@@ -130,19 +157,16 @@ public class ScenarioTests
         RadioGroup _hRadioGroup;
         TextField _hText;
         var _hVal = 0;
-        List<string> posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
-        List<string> dimNames = new () { "Factor", "Fill", "Absolute" };
+        List<string> posNames = new () { "Percent", "AnchorEnd", "Center", "Absolute" };
+        List<string> dimNames = new () { "Auto", "Percent", "Fill", "Absolute" };
 
         Application.Init (new FakeDriver ());
 
-        Toplevel Top = Application.Top;
+        var top = new Toplevel ();
 
-        _viewClasses = GetAllViewClassesCollection ()
-                       .OrderBy (t => t.Name)
-                       .Select (t => new KeyValuePair<string, Type> (t.Name, t))
-                       .ToDictionary (t => t.Key, t => t.Value);
+        _viewClasses = TestHelpers.GetAllViewClasses ().ToDictionary (t => t.Name);
 
-        _leftPane = new Window
+        _leftPane = new ()
         {
             Title = "Classes",
             X = 0,
@@ -153,7 +177,7 @@ public class ScenarioTests
             ColorScheme = Colors.ColorSchemes ["TopLevel"]
         };
 
-        _classListView = new ListView
+        _classListView = new ()
         {
             X = 0,
             Y = 0,
@@ -161,11 +185,11 @@ public class ScenarioTests
             Height = Dim.Fill (),
             AllowsMarking = false,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            Source = new ListWrapper (_viewClasses.Keys.ToList ())
+            Source = new ListWrapper<string> (new (_viewClasses.Keys.ToList ()))
         };
         _leftPane.Add (_classListView);
 
-        _settingsPane = new FrameView
+        _settingsPane = new ()
         {
             X = Pos.Right (_leftPane),
             Y = 0, // for menu
@@ -175,15 +199,13 @@ public class ScenarioTests
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Title = "Settings"
         };
-        _computedCheckBox = new CheckBox { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
-        _settingsPane.Add (_computedCheckBox);
 
-        var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
+        var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "Absolute(x)" };
 
-        _locationFrame = new FrameView
+        _locationFrame = new ()
         {
-            X = Pos.Left (_computedCheckBox),
-            Y = Pos.Bottom (_computedCheckBox),
+            X = 0,
+            Y = 0,
             Height = 3 + radioItems.Length,
             Width = 36,
             Title = "Location (Pos)"
@@ -192,21 +214,21 @@ public class ScenarioTests
 
         var label = new Label { X = 0, Y = 0, Text = "x:" };
         _locationFrame.Add (label);
-        _xRadioGroup = new RadioGroup { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _xText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
+        _xRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _xText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
         _locationFrame.Add (_xText);
 
         _locationFrame.Add (_xRadioGroup);
 
-        radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
-        label = new Label { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "y:" };
+        radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "Absolute(y)" };
+        label = new () { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "y:" };
         _locationFrame.Add (label);
-        _yText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
+        _yText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
         _locationFrame.Add (_yText);
-        _yRadioGroup = new RadioGroup { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _yRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
         _locationFrame.Add (_yRadioGroup);
 
-        _sizeFrame = new FrameView
+        _sizeFrame = new ()
         {
             X = Pos.Right (_locationFrame),
             Y = Pos.Y (_locationFrame),
@@ -215,26 +237,26 @@ public class ScenarioTests
             Title = "Size (Dim)"
         };
 
-        radioItems = new [] { "Percent(width)", "Fill(width)", "Sized(width)" };
-        label = new Label { X = 0, Y = 0, Text = "width:" };
+        radioItems = new [] { "Auto()", "Percent(width)", "Fill(width)", "Absolute(width)" };
+        label = new () { X = 0, Y = 0, Text = "width:" };
         _sizeFrame.Add (label);
-        _wRadioGroup = new RadioGroup { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _wText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
+        _wRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
         _sizeFrame.Add (_wText);
         _sizeFrame.Add (_wRadioGroup);
 
-        radioItems = new [] { "Percent(height)", "Fill(height)", "Sized(height)" };
-        label = new Label { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "height:" };
+        radioItems = new [] { "Auto()", "Percent(height)", "Fill(height)", "Absolute(height)" };
+        label = new () { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "height:" };
         _sizeFrame.Add (label);
-        _hText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
+        _hText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
         _sizeFrame.Add (_hText);
 
-        _hRadioGroup = new RadioGroup { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
+        _hRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
         _sizeFrame.Add (_hRadioGroup);
 
         _settingsPane.Add (_sizeFrame);
 
-        _hostPane = new FrameView
+        _hostPane = new ()
         {
             X = Pos.Right (_leftPane),
             Y = Pos.Bottom (_settingsPane),
@@ -254,20 +276,11 @@ public class ScenarioTests
                                                       _hostPane.Remove (_curView);
                                                       _curView.Dispose ();
                                                       _curView = null;
-                                                      _hostPane.Clear ();
+                                                      _hostPane.FillRect (_hostPane.Viewport);
                                                   }
 
                                                   _curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
                                               };
-
-        _computedCheckBox.Toggled += (s, e) =>
-                                     {
-                                         if (_curView != null)
-                                         {
-                                             //_curView.LayoutStyle = e.OldValue == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
-                                             _hostPane.LayoutSubviews ();
-                                         }
-                                     };
 
         _xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
@@ -321,9 +334,9 @@ public class ScenarioTests
 
         _hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
-        Top.Add (_leftPane, _settingsPane, _hostPane);
+        top.Add (_leftPane, _settingsPane, _hostPane);
 
-        Top.LayoutSubviews ();
+        top.LayoutSubviews ();
 
         _curView = CreateClass (_viewClasses.First ().Value);
 
@@ -348,10 +361,11 @@ public class ScenarioTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.Equal (_viewClasses.Count, iterations);
 
+        top.Dispose ();
         Application.Shutdown ();
 
         void DimPosChanged (View view)
@@ -361,12 +375,8 @@ public class ScenarioTests
                 return;
             }
 
-            LayoutStyle layout = view.LayoutStyle;
-
             try
             {
-                //view.LayoutStyle = LayoutStyle.Absolute;
-
                 switch (_xRadioGroup.SelectedItem)
                 {
                     case 0:
@@ -382,7 +392,7 @@ public class ScenarioTests
 
                         break;
                     case 3:
-                        view.X = Pos.At (_xVal);
+                        view.X = Pos.Absolute (_xVal);
 
                         break;
                 }
@@ -402,7 +412,7 @@ public class ScenarioTests
 
                         break;
                     case 3:
-                        view.Y = Pos.At (_yVal);
+                        view.Y = Pos.Absolute (_yVal);
 
                         break;
                 }
@@ -418,7 +428,7 @@ public class ScenarioTests
 
                         break;
                     case 2:
-                        view.Width = Dim.Sized (_wVal);
+                        view.Width = Dim.Absolute (_wVal);
 
                         break;
                 }
@@ -434,7 +444,7 @@ public class ScenarioTests
 
                         break;
                     case 2:
-                        view.Height = Dim.Sized (_hVal);
+                        view.Height = Dim.Absolute (_hVal);
 
                         break;
                 }
@@ -451,36 +461,32 @@ public class ScenarioTests
         {
             var x = view.X.ToString ();
             var y = view.Y.ToString ();
-            _xRadioGroup.SelectedItem = posNames.IndexOf (posNames.Where (s => x.Contains (s)).First ());
-            _yRadioGroup.SelectedItem = posNames.IndexOf (posNames.Where (s => y.Contains (s)).First ());
+
+            try
+            {
+                _xRadioGroup.SelectedItem = posNames.IndexOf (posNames.First (s => x.Contains (s)));
+                _yRadioGroup.SelectedItem = posNames.IndexOf (posNames.First (s => y.Contains (s)));
+            }
+            catch (InvalidOperationException e)
+            {
+                // This is a hack to work around the fact that the Pos enum doesn't have an "Align" value yet
+                Debug.WriteLine ($"{e}");
+            }
+
             _xText.Text = $"{view.Frame.X}";
             _yText.Text = $"{view.Frame.Y}";
 
             var w = view.Width.ToString ();
             var h = view.Height.ToString ();
-            _wRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.Where (s => w.Contains (s)).First ());
-            _hRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.Where (s => h.Contains (s)).First ());
+
+            _wRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.First (s => w.Contains (s)));
+            _hRadioGroup.SelectedItem = dimNames.IndexOf (dimNames.First (s => h.Contains (s)));
+
             _wText.Text = $"{view.Frame.Width}";
             _hText.Text = $"{view.Frame.Height}";
         }
 
         void UpdateTitle (View view) { _hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}"; }
-
-        List<Type> GetAllViewClassesCollection ()
-        {
-            List<Type> types = new ();
-
-            foreach (Type type in typeof (View).Assembly.GetTypes ()
-                                               .Where (
-                                                       myType =>
-                                                           myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View))
-                                                      ))
-            {
-                types.Add (type);
-            }
-
-            return types;
-        }
 
         View CreateClass (Type type)
         {
@@ -503,19 +509,23 @@ public class ScenarioTests
             // Instantiate view
             var view = (View)Activator.CreateInstance (type);
 
-            //_curView.X = Pos.Center ();
-            //_curView.Y = Pos.Center ();
-            if (!view.AutoSize)
+            if (view is null)
+            {
+                return null;
+            }
+
+            if (view.Width is not DimAuto)
             {
                 view.Width = Dim.Percent (75);
+            }
+
+            if (view.Height is not DimAuto)
+            {
                 view.Height = Dim.Percent (75);
             }
 
             // Set the colorscheme to make it stand out if is null by default
-            if (view.ColorScheme == null)
-            {
-                view.ColorScheme = Colors.ColorSchemes ["Base"];
-            }
+            view.ColorScheme ??= Colors.ColorSchemes ["Base"];
 
             // If the view supports a Text property, set it so we have something to look at
             if (view.GetType ().GetProperty ("Text") != null)
@@ -549,12 +559,9 @@ public class ScenarioTests
                 && view.GetType ().GetProperty ("Source") != null
                 && view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource))
             {
-                var source = new ListWrapper (new List<string> { "Test Text #1", "Test Text #2", "Test Text #3" });
+                ListWrapper<string> source = new (["Test Text #1", "Test Text #2", "Test Text #3"]);
                 view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
             }
-
-            // Set Settings
-            _computedCheckBox.Checked = view.LayoutStyle == LayoutStyle.Computed;
 
             // Add
             _hostPane.Add (view);
@@ -577,10 +584,10 @@ public class ScenarioTests
     [Fact]
     public void Run_Generic ()
     {
-        List<Scenario> scenarios = Scenario.GetScenarios ();
+        ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
         Assert.NotEmpty (scenarios);
 
-        int item = scenarios.FindIndex (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
+        int item = scenarios.IndexOf (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
         Scenario generic = scenarios [item];
 
         Application.Init (new FakeDriver ());
@@ -624,15 +631,12 @@ public class ScenarioTests
                                      }
                                  };
 
-        Application.Top.KeyDown += (sender, args) =>
-                                   {
-                                       // See #2474 for why this is commented out
-                                       Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.KeyCode);
-                                   };
+        Application.KeyDown += (sender, args) =>
+                               {
+                                   Assert.Equal (Application.QuitKey, args.KeyCode);
+                               };
 
-        generic.Init ();
-        generic.Setup ();
-        generic.Run ();
+        generic.Main ();
 
         Assert.Equal (0, abortCount);
 

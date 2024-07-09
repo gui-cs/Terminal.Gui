@@ -5,23 +5,29 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
+using System.Text.Json.Serialization;
+
 namespace Terminal.Gui;
 
-/// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="Clicked"/> event.</summary>
+/// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="View.Accept"/> event.</summary>
 /// <remarks>
 ///     <para>
-///         Provides a button showing text that raises the <see cref="Clicked"/> event when clicked on with a mouse or
+///         Provides a button showing text that raises the <see cref="View.Accept"/> event when clicked on with a mouse or
 ///         when the user presses SPACE, ENTER, or the <see cref="View.HotKey"/>. The hot key is the first letter or digit
 ///         following the first underscore ('_') in the button text.
 ///     </para>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
 ///     <para>
 ///         When the button is configured as the default (<see cref="IsDefault"/>) and the user presses the ENTER key, if
-///         no other <see cref="View"/> processes the key, the <see cref="Button"/>'s <see cref="Clicked"/> event will will
+///         no other <see cref="View"/> processes the key, the <see cref="Button"/>'s <see cref="View.Accept"/> event will
 ///         be fired.
 ///     </para>
+///     <para>
+///         Set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/> to have the <see cref="View.Accept"/> event
+///         invoked repeatedly while the button is pressed.
+///     </para>
 /// </remarks>
-public class Button : View
+public class Button : View, IDesignable
 {
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
@@ -29,39 +35,99 @@ public class Button : View
     private readonly Rune _rightDefault;
     private bool _isDefault;
 
-    /// <summary>Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
-    /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
+    /// <summary>
+    /// Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+
+    /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
     {
-        TextAlignment = TextAlignment.Centered;
-        VerticalTextAlignment = VerticalTextAlignment.Middle;
-
-        HotKeySpecifier = new Rune ('_');
+        TextAlignment = Alignment.Center;
+        VerticalTextAlignment = Alignment.Center;
 
         _leftBracket = Glyphs.LeftBracket;
         _rightBracket = Glyphs.RightBracket;
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
-        // Ensures a height of 1 if AutoSize is set to false
-        Height = 1;
+        Height = Dim.Auto (DimAutoStyle.Text);
+        Width = Dim.Auto (DimAutoStyle.Text);
 
         CanFocus = true;
-        AutoSize = true;
+        HighlightStyle |= HighlightStyle.Pressed;
+#if HOVER
+        HighlightStyle |= HighlightStyle.Hover;
+#endif
 
         // Override default behavior of View
-        // Command.Default sets focus
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        OnClicked ();
+        AddCommand (Command.HotKey, () =>
+        {
+            SetFocus ();
+            return !OnAccept ();
+        });
 
-                        return true;
-                    }
-                   );
-        KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
-        KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
+        KeyBindings.Add (Key.Space, Command.HotKey);
+        KeyBindings.Add (Key.Enter, Command.HotKey);
+
+        TitleChanged += Button_TitleChanged;
+        MouseClick += Button_MouseClick;
+
+        ShadowStyle = DefaultShadow;
+    }
+
+    private bool _wantContinuousButtonPressed;
+
+    /// <inheritdoc />
+    public override bool WantContinuousButtonPressed
+    {
+        get => _wantContinuousButtonPressed;
+        set
+        {
+            if (value == _wantContinuousButtonPressed)
+            {
+                return;
+            }
+
+            _wantContinuousButtonPressed = value;
+
+            if (_wantContinuousButtonPressed)
+            {
+                HighlightStyle |= HighlightStyle.PressedOutside;
+            }
+            else
+            {
+                HighlightStyle &= ~HighlightStyle.PressedOutside;
+            }
+        }
+    }
+
+    private void Button_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        e.Handled = InvokeCommand (Command.HotKey) == true;
+    }
+
+    private void Button_TitleChanged (object sender, EventArgs<string> e)
+    {
+        base.Text = e.CurrentValue;
+        TextFormatter.HotKeySpecifier = HotKeySpecifier;
+    }
+
+    /// <inheritdoc />
+    public override string Text
+    {
+        get => base.Title;
+        set => base.Text = base.Title = value;
+    }
+
+    /// <inheritdoc />
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
     }
 
     /// <summary>Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.</summary>
@@ -83,52 +149,8 @@ public class Button : View
     /// <summary></summary>
     public bool NoPadding { get; set; }
 
-    /// <summary>
-    ///     The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View"/> or
-    ///     if the user presses the action key while this view is focused. (TODO: IsDefault)
-    /// </summary>
-    /// <remarks>
-    ///     Client code can hook up to this event, it is raised when the button is activated either with the mouse or the
-    ///     keyboard.
-    /// </remarks>
-    public event EventHandler Clicked;
-
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
-    {
-        if (me.Flags == MouseFlags.Button1Clicked)
-        {
-            if (CanFocus && Enabled)
-            {
-                if (!HasFocus)
-                {
-                    SetFocus ();
-                    SetNeedsDisplay ();
-                    Draw ();
-                }
-
-                OnClicked ();
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>Virtual method to invoke the <see cref="Clicked"/> event.</summary>
-    public virtual void OnClicked () { Clicked?.Invoke (this, EventArgs.Empty); }
-
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (HotKey.IsValid && Text != "")
         {
@@ -137,13 +159,12 @@ public class Button : View
                 if (TextFormatter.Text [i] == Text [0])
                 {
                     Move (i, 0);
-
-                    return;
+                    return null; // Don't show the cursor
                 }
             }
         }
 
-        base.PositionCursor ();
+        return base.PositionCursor ();
     }
 
     /// <inheritdoc/>
@@ -168,5 +189,13 @@ public class Button : View
                 TextFormatter.Text = $"{_leftBracket} {Text} {_rightBracket}";
             }
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        Title = "_Button";
+
+        return true;
     }
 }

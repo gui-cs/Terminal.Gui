@@ -64,8 +64,8 @@ namespace Terminal.Gui
 
             /// <summary>Method that invoke the <see cref="TextChanged"/> event if it's defined.</summary>
             /// <param name="oldValue">The previous text before replaced.</param>
-            /// <returns>Returns the <see cref="TextChangedEventArgs"/></returns>
-            void OnTextChanged (TextChangedEventArgs oldValue);
+            /// <returns>Returns the <see cref="EventArgs{T}"/></returns>
+            void OnTextChanged (EventArgs<string> oldValue);
 
             /// <summary>
             ///     Changed event, raised when the text has changed.
@@ -74,7 +74,7 @@ namespace Terminal.Gui
             ///         <see cref="string"/> containing the old value.
             ///     </remarks>
             /// </summary>
-            event EventHandler<TextChangedEventArgs> TextChanged;
+            event EventHandler<EventArgs<string>> TextChanged;
         }
 
         //////////////////////////////////////////////////////////////////////////////
@@ -125,7 +125,7 @@ namespace Terminal.Gui
             }
 
             /// <inheritdoc/>
-            public event EventHandler<TextChangedEventArgs> TextChanged;
+            public event EventHandler<EventArgs<string>> TextChanged;
 
             /// <inheritdoc/>
             public string Text
@@ -206,7 +206,7 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new TextChangedEventArgs (oldValue));
+                    OnTextChanged (new EventArgs<string> (ref oldValue));
                 }
 
                 return result;
@@ -220,14 +220,14 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new TextChangedEventArgs (oldValue));
+                    OnTextChanged (new EventArgs<string> (ref oldValue));
                 }
 
                 return result;
             }
 
             /// <inheritdoc/>
-            public void OnTextChanged (TextChangedEventArgs oldValue) { TextChanged?.Invoke (this, oldValue); }
+            public void OnTextChanged (EventArgs<string> args) { TextChanged?.Invoke (this, args); }
         }
 
         #endregion
@@ -260,7 +260,7 @@ namespace Terminal.Gui
             public bool ValidateOnInput { get; set; } = true;
 
             /// <inheritdoc/>
-            public event EventHandler<TextChangedEventArgs> TextChanged;
+            public event EventHandler<EventArgs<string>> TextChanged;
 
             /// <inheritdoc/>
             public string Text
@@ -333,7 +333,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.RemoveAt (pos);
-                    OnTextChanged (new TextChangedEventArgs (oldValue));
+                    OnTextChanged (new EventArgs<string> (ref oldValue));
                 }
 
                 return true;
@@ -349,7 +349,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.Insert (pos, (Rune)ch);
-                    OnTextChanged (new TextChangedEventArgs (oldValue));
+                    OnTextChanged (new EventArgs<string> (ref oldValue));
 
                     return true;
                 }
@@ -358,14 +358,14 @@ namespace Terminal.Gui
             }
 
             /// <inheritdoc/>
-            public void OnTextChanged (TextChangedEventArgs oldValue) { TextChanged?.Invoke (this, oldValue); }
+            public void OnTextChanged (EventArgs<string> args) { TextChanged?.Invoke (this, args); }
 
             /// <summary>Compiles the regex pattern for validation./></summary>
             private void CompileMask () { _regex = new Regex (StringExtensions.ToString (_pattern), RegexOptions.Compiled); }
 
             private void SetupText ()
             {
-                if (_text != null && IsValid)
+                if (_text is { } && IsValid)
                 {
                     return;
                 }
@@ -392,12 +392,11 @@ namespace Terminal.Gui
         private ITextValidateProvider _provider;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="TextValidateField"/> class using
-        ///     <see cref="LayoutStyle.Computed"/> positioning.
+        ///     Initializes a new instance of the <see cref="TextValidateField"/> class.
         /// </summary>
         public TextValidateField ()
         {
-            Height = 1;
+            Height = Dim.Auto (minimumContentDim: 1);
             CanFocus = true;
 
             // Things this view knows how to do
@@ -462,15 +461,15 @@ namespace Terminal.Gui
                        );
 
             // Default keybindings for this view
-            KeyBindings.Add (KeyCode.Home, Command.LeftHome);
-            KeyBindings.Add (KeyCode.End, Command.RightEnd);
+            KeyBindings.Add (Key.Home, Command.LeftHome);
+            KeyBindings.Add (Key.End, Command.RightEnd);
 
-            KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
-            KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
+            KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
+            KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
 
-            KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
-            KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-            KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+            KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
+            KeyBindings.Add (Key.CursorLeft, Command.Left);
+            KeyBindings.Add (Key.CursorRight, Command.Right);
         }
 
         /// <summary>This property returns true if the input is valid.</summary>
@@ -478,7 +477,7 @@ namespace Terminal.Gui
         {
             get
             {
-                if (_provider == null)
+                if (_provider is null)
                 {
                     return false;
                 }
@@ -512,7 +511,7 @@ namespace Terminal.Gui
         {
             get
             {
-                if (_provider == null)
+                if (_provider is null)
                 {
                     return string.Empty;
                 }
@@ -521,7 +520,7 @@ namespace Terminal.Gui
             }
             set
             {
-                if (_provider == null)
+                if (_provider is null)
                 {
                     return;
                 }
@@ -533,13 +532,13 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override bool MouseEvent (MouseEvent mouseEvent)
+        protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {
-                int c = _provider.Cursor (mouseEvent.X - GetMargins (Bounds.Width).left);
+                int c = _provider.Cursor (mouseEvent.Position.X - GetMargins (Viewport.Width).left);
 
-                if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && Text.Length > 0)
+                if (_provider.Fixed == false && TextAlignment == Alignment.End && Text.Length > 0)
                 {
                     c++;
                 }
@@ -555,9 +554,9 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
-            if (_provider == null)
+            if (_provider is null)
             {
                 Move (0, 0);
                 Driver.AddStr ("Error: ITextValidateProvider not set!");
@@ -568,7 +567,7 @@ namespace Terminal.Gui
             Color bgcolor = !IsValid ? new Color (Color.BrightRed) : ColorScheme.Focus.Background;
             var textColor = new Attribute (ColorScheme.Focus.Foreground, bgcolor);
 
-            (int margin_left, int margin_right) = GetMargins (Bounds.Width);
+            (int margin_left, int margin_right) = GetMargins (Viewport.Width);
 
             Move (0, 0);
 
@@ -599,25 +598,9 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override bool OnEnter (View view)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-
-            return base.OnEnter (view);
-        }
-
-        /// <inheritdoc/>
-        public override bool OnLeave (View view)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-            return base.OnLeave (view);
-        }
-
-        /// <inheritdoc/>
         public override bool OnProcessKeyDown (Key a)
         {
-            if (_provider == null)
+            if (_provider is null)
             {
                 return false;
             }
@@ -640,41 +623,33 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override void PositionCursor ()
+        public override Point? PositionCursor ()
         {
-            (int left, _) = GetMargins (Bounds.Width);
+            (int left, _) = GetMargins (Viewport.Width);
 
             // Fixed = true, is for inputs that have fixed width, like masked ones.
             // Fixed = false, is for normal input.
             // When it's right-aligned and it's a normal input, the cursor behaves differently.
             int curPos;
 
-            if (_provider?.Fixed == false && TextAlignment == TextAlignment.Right)
+            if (_provider?.Fixed == false && TextAlignment == Alignment.End)
             {
                 curPos = _cursorPosition + left - 1;
-                Move (curPos, 0);
             }
             else
             {
                 curPos = _cursorPosition + left;
-                Move (curPos, 0);
             }
+            Move (curPos, 0);
 
-            if (curPos < 0 || curPos >= Bounds.Width)
-            {
-                Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-            }
-            else
-            {
-                Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-            }
+            return new (curPos, 0);
         }
 
         /// <summary>Delete char at cursor position - 1, moving the cursor.</summary>
         /// <returns></returns>
         private bool BackspaceKeyHandler ()
         {
-            if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && _cursorPosition <= 1)
+            if (_provider.Fixed == false && TextAlignment == Alignment.End && _cursorPosition <= 1)
             {
                 return false;
             }
@@ -712,7 +687,7 @@ namespace Terminal.Gui
         /// <returns></returns>
         private bool DeleteKeyHandler ()
         {
-            if (_provider.Fixed == false && TextAlignment == TextAlignment.Right)
+            if (_provider.Fixed == false && TextAlignment == Alignment.End)
             {
                 _cursorPosition = _provider.CursorLeft (_cursorPosition);
             }
@@ -743,11 +718,11 @@ namespace Terminal.Gui
 
             switch (TextAlignment)
             {
-                case TextAlignment.Left:
+                case Alignment.Start:
                     return (0, total);
-                case TextAlignment.Centered:
+                case Alignment.Center:
                     return (total / 2, total / 2 + total % 2);
-                case TextAlignment.Right:
+                case Alignment.End:
                     return (total, 0);
                 default:
                     return (0, total);

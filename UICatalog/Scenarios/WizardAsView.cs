@@ -6,7 +6,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Wizards")]
 public class WizardAsView : Scenario
 {
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
 
@@ -52,7 +52,9 @@ public class WizardAsView : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+
+        Toplevel topLevel = new ();
+        topLevel.Add (menu);
 
         // No need for a Title because the border is disabled
         var wizard = new Wizard { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
@@ -113,7 +115,7 @@ public class WizardAsView : Scenario
             Text = "Press Me to Rename Step", X = Pos.Right (buttonLbl), Y = Pos.Top (buttonLbl)
         };
 
-        button.Clicked += (s, e) =>
+        button.Accept += (s, e) =>
                           {
                               secondStep.Title = "2nd Step";
 
@@ -138,13 +140,9 @@ public class WizardAsView : Scenario
         lastStep.HelpText =
             "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing Esc will cancel.";
 
-        Application.Top.Add (wizard);
-        Application.Run (Application.Top);
-    }
-
-    public override void Run ()
-    {
-        // Do nothing in the override because we call Application.Run above
-        // (just to make it clear how the Top is being run and not the Wizard).
+        topLevel.Add (wizard);
+        Application.Run (topLevel);
+        topLevel.Dispose ();
+        Application.Shutdown ();
     }
 }

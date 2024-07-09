@@ -26,16 +26,16 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
         Wrapping = toWrap;
         this.tableView = tableView;
 
-        tableView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
+        tableView.KeyBindings.Add (Key.Space, Command.Select);
 
         tableView.MouseClick += TableView_MouseClick;
         tableView.CellToggled += TableView_CellToggled;
     }
 
     /// <summary>
-    ///     Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.Checked"/>
+    ///     Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.CheckStateChecked"/>
     /// </summary>
-    public Rune CheckedRune { get; set; } = Glyphs.Checked;
+    public Rune CheckedRune { get; set; } = Glyphs.CheckStateChecked;
 
     /// <summary>
     ///     Gets or sets the character to use for checked entry when <see cref="UseRadioButtons"/> is true. Defaults to
@@ -50,9 +50,9 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     public Rune RadioUnCheckedRune { get; set; } = Glyphs.UnSelected;
 
     /// <summary>
-    ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.UnChecked"/>
+    ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.CheckStateUnChecked"/>
     /// </summary>
-    public Rune UnCheckedRune { get; set; } = Glyphs.UnChecked;
+    public Rune UnCheckedRune { get; set; } = Glyphs.CheckStateUnChecked;
 
     /// <summary>Gets or sets whether to only allow a single row to be toggled at once (Radio button).</summary>
     public bool UseRadioButtons { get; set; }
@@ -158,7 +158,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             return;
         }
 
-        Point? hit = tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? headerIfAny);
+        Point? hit = tableView.ScreenToCell (e.MouseEvent.Position.X, e.MouseEvent.Position.Y, out int? headerIfAny);
 
         if (headerIfAny.HasValue && headerIfAny.Value == 0)
         {

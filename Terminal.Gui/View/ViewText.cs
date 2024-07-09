@@ -1,13 +1,25 @@
-﻿namespace Terminal.Gui;
+#nullable enable
+
+namespace Terminal.Gui;
 
 public partial class View
 {
+    /// <summary>
+    ///    Initializes the Text of the View. Called by the constructor.
+    /// </summary>
+    private void SetupText ()
+    {
+        Text = string.Empty;
+        TextDirection = TextDirection.LeftRight_TopBottom;
+    }
+
     private string _text;
 
     /// <summary>
-    ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved or not when
-    ///     <see cref="TextFormatter.WordWrap"/> is enabled. If <see langword="true"/> trailing spaces at the end of wrapped
-    ///     lines will be removed when <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
+    ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
+    ///     or not when <see cref="TextFormatter.WordWrap"/> is enabled.
+    ///     If <see langword="true"/> trailing spaces at the end of wrapped lines will be removed when
+    ///     <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
     /// </summary>
     public virtual bool PreserveTrailingSpaces
     {
@@ -22,51 +34,67 @@ public partial class View
         }
     }
 
-    /// <summary>The text displayed by the <see cref="View"/>.</summary>
+    /// <summary>
+    ///     The text displayed by the <see cref="View"/>.
+    /// </summary>
     /// <remarks>
-    ///     <para>The text will be drawn before any subviews are drawn.</para>
     ///     <para>
-    ///         The text will be drawn starting at the view origin (0, 0) and will be formatted according to
-    ///         <see cref="TextAlignment"/> and <see cref="TextDirection"/>.
+    ///         The text will be drawn before any subviews are drawn.
     ///     </para>
     ///     <para>
-    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="Bounds"/>'s height
+    ///         The text will be drawn starting at the view origin (0, 0) and will be formatted according
+    ///         to <see cref="TextAlignment"/> and <see cref="TextDirection"/>.
+    ///     </para>
+    ///     <para>
+    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="GetContentSize ()"/>'s height
     ///         is 1, the text will be clipped.
     ///     </para>
-    ///     <para>
-    ///         Set the <see cref="HotKeySpecifier"/> to enable hotkey support. To disable hotkey support set
-    ///         <see cref="HotKeySpecifier"/> to <c>(Rune)0xffff</c>.
-    ///     </para>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para>If <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>,
+    ///     the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
+    ///     <para>When the text changes, the <see cref="TextChanged"/> is fired.</para>
     /// </remarks>
     public virtual string Text
     {
         get => _text;
         set
         {
+            string old = _text;
             _text = value;
-            SetHotKey ();
+
             UpdateTextFormatterText ();
             OnResizeNeeded ();
-
 #if DEBUG
-            if (_text != null && string.IsNullOrEmpty (Id))
+            if (_text is { } && string.IsNullOrEmpty (Id))
             {
                 Id = _text;
             }
 #endif
+            OnTextChanged ();
         }
     }
+
+    /// <summary>
+    /// Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
+    /// </summary>
+    public void OnTextChanged ()
+    {
+        TextChanged?.Invoke (this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    ///     Text changed event, raised when the text has changed.
+    /// </summary>
+    public event EventHandler? TextChanged;
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will
     ///     redisplay the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
     /// </remarks>
     /// <value>The text alignment.</value>
-    public virtual TextAlignment TextAlignment
+    public virtual Alignment TextAlignment
     {
         get => TextFormatter.Alignment;
         set
@@ -82,9 +110,9 @@ public partial class View
     ///     <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
     /// </remarks>
-    /// <value>The text alignment.</value>
+    /// <value>The text direction.</value>
     public virtual TextDirection TextDirection
     {
         get => TextFormatter.Direction;
@@ -95,18 +123,21 @@ public partial class View
         }
     }
 
-    /// <summary>Gets the <see cref="Gui.TextFormatter"/> used to format <see cref="Text"/>.</summary>
-    public TextFormatter TextFormatter { get; init; } = new ();
+    /// <summary>
+    ///     Gets or sets the <see cref="Gui.TextFormatter"/> used to format <see cref="Text"/>.
+    /// </summary>
+    public TextFormatter TextFormatter { get; init; } = new () { };
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned vertically when drawn. Changing this property will
-    ///     redisplay the <see cref="View"/>.
+    ///     redisplay
+    ///     the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.</para>
+    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
     /// </remarks>
-    /// <value>The text alignment.</value>
-    public virtual VerticalTextAlignment VerticalTextAlignment
+    /// <value>The vertical text alignment.</value>
+    public virtual Alignment VerticalTextAlignment
     {
         get => TextFormatter.VerticalAlignment;
         set
@@ -117,257 +148,80 @@ public partial class View
     }
 
     /// <summary>
-    ///     Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Bounds"/> using the text
-    ///     <see cref="NavigationDirection"/> specified by the <see cref="TextFormatter"/> property and accounting for any
-    ///     <see cref="HotKeySpecifier"/> characters.
+    ///     Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has
+    ///     different format than the default.
     /// </summary>
-    /// <returns>The <see cref="Size"/> the <see cref="Frame"/> needs to be set to fit the text.</returns>
-    public Size GetAutoSize ()
-    {
-        var x = 0;
-        var y = 0;
-
-        if (IsInitialized)
-        {
-            x = Bounds.X;
-            y = Bounds.Y;
-        }
-
-        Rect rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
-
-        int newWidth = rect.Size.Width
-                       - GetHotKeySpecifierLength ()
-                       + (Margin == null
-                              ? 0
-                              : Margin.Thickness.Horizontal
-                                + Border.Thickness.Horizontal
-                                + Padding.Thickness.Horizontal);
-
-        int newHeight = rect.Size.Height
-                        - GetHotKeySpecifierLength (false)
-                        + (Margin == null
-                               ? 0
-                               : Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical);
-
-        return new Size (newWidth, newHeight);
-    }
-
-    /// <summary>
-    ///     Gets the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> characters in the
-    ///     <see cref="Text"/> property.
-    /// </summary>
-    /// <remarks>Only the first HotKey specifier found in <see cref="Text"/> is supported.</remarks>
-    /// <param name="isWidth">
-    ///     If <see langword="true"/> (the default) the width required for the HotKey specifier is returned.
-    ///     Otherwise the height is returned.
-    /// </param>
-    /// <returns>
-    ///     The number of characters required for the <see cref="TextFormatter.HotKeySpecifier"/>. If the text direction
-    ///     specified by <see cref="TextDirection"/> does not match the <paramref name="isWidth"/> parameter, <c>0</c> is
-    ///     returned.
-    /// </returns>
-    public int GetHotKeySpecifierLength (bool isWidth = true)
-    {
-        if (isWidth)
-        {
-            return TextFormatter.IsHorizontalDirection (TextDirection) && TextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                       ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                       : 0;
-        }
-
-        return TextFormatter.IsVerticalDirection (TextDirection) && TextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                   ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                   : 0;
-    }
-
-    /// <summary>Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has different format than the default.</summary>
     protected virtual void UpdateTextFormatterText ()
     {
-        if (TextFormatter != null)
+        if (TextFormatter is { })
         {
             TextFormatter.Text = _text;
         }
     }
 
-    /// <summary>Gets the dimensions required for <see cref="Text"/> ignoring a <see cref="TextFormatter.HotKeySpecifier"/>.</summary>
+    /// <summary>
+    ///     Gets the dimensions required for <see cref="Text"/> ignoring a <see cref="TextFormatter.HotKeySpecifier"/>.
+    /// </summary>
     /// <returns></returns>
     internal Size GetSizeNeededForTextWithoutHotKey ()
     {
         return new Size (
-                         TextFormatter.Size.Width - GetHotKeySpecifierLength (),
-                         TextFormatter.Size.Height - GetHotKeySpecifierLength (false)
-                        );
+                         TextFormatter.Size.Width - TextFormatter.GetHotKeySpecifierLength (),
+                         TextFormatter.Size.Height - TextFormatter.GetHotKeySpecifierLength (false));
     }
 
     /// <summary>
-    ///     Internal API. Sets <see cref="TextFormatter"/>.Size to the current <see cref="Bounds"/> size, adjusted for
+    ///     Internal API. Sets <see cref="TextFormatter"/>.Size to the current <see cref="Viewport"/> size, adjusted for
     ///     <see cref="TextFormatter.HotKeySpecifier"/>.
     /// </summary>
     /// <remarks>
-    ///     Use this API to set <see cref="TextFormatter.Size"/> when the view has changed such that the size required to
-    ///     fit the text has changed. changes.
+    ///     Use this API to set <see cref="TextFormatter.Size"/> when the view has changed such that the
+    ///     size required to fit the text has changed.
+    ///     changes.
     /// </remarks>
     /// <returns></returns>
     internal void SetTextFormatterSize ()
     {
-        if (!IsInitialized)
+        // View subclasses can override UpdateTextFormatterText to modify the Text it holds (e.g. Checkbox and Button).
+        // We need to ensure TextFormatter is accurate by calling it here.
+        UpdateTextFormatterText ();
+
+        // Default is to use GetContentSize ().
+        var size = GetContentSize ();
+
+        // TODO: This is a hack. Figure out how to move this into DimDimAuto
+        // Use _width & _height instead of Width & Height to avoid debug spew
+        DimAuto? widthAuto = _width as DimAuto;
+        DimAuto? heightAuto = _height as DimAuto;
+        if ((widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
+            || (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text)))
         {
-            TextFormatter.Size = Size.Empty;
+            size = TextFormatter.GetAutoSize ();
 
-            return;
-        }
-
-        if (string.IsNullOrEmpty (TextFormatter.Text))
-        {
-            TextFormatter.Size = Bounds.Size;
-
-            return;
-        }
-
-        TextFormatter.Size = new Size (
-                                       Bounds.Size.Width + GetHotKeySpecifierLength (),
-                                       Bounds.Size.Height + GetHotKeySpecifierLength (false)
-                                      );
-    }
-
-    private bool IsValidAutoSize (out Size autoSize)
-    {
-        Rect rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
-
-        autoSize = new Size (
-                             rect.Size.Width - GetHotKeySpecifierLength (),
-                             rect.Size.Height - GetHotKeySpecifierLength (false)
-                            );
-
-        return !((ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)))
-                 || _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
-                 || _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
-    }
-
-    private bool IsValidAutoSizeHeight (Dim height)
-    {
-        Rect rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
-        int dimValue = height.Anchor (0);
-
-        return !((ValidatePosDim && !(height is Dim.DimAbsolute))
-                 || dimValue != rect.Size.Height - GetHotKeySpecifierLength (false));
-    }
-
-    private bool IsValidAutoSizeWidth (Dim width)
-    {
-        Rect rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
-        int dimValue = width.Anchor (0);
-
-        return !((ValidatePosDim && !(width is Dim.DimAbsolute))
-                 || dimValue != rect.Size.Width - GetHotKeySpecifierLength ());
-    }
-
-    /// <summary>Sets the size of the View to the minimum width or height required to fit <see cref="Text"/>.</summary>
-    /// <returns>
-    ///     <see langword="true"/> if the size was changed; <see langword="false"/> if <see cref="AutoSize"/> ==
-    ///     <see langword="true"/> or <see cref="Text"/> will not fit.
-    /// </returns>
-    /// <remarks>
-    ///     Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or if
-    ///     <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero. Does not take into
-    ///     account word wrapping.
-    /// </remarks>
-    private bool SetFrameToFitText ()
-    {
-        if (AutoSize == false)
-        {
-            throw new InvalidOperationException ("SetFrameToFitText can only be called when AutoSize is true");
-        }
-
-        // BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
-        // <summary>
-        // Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
-        // </summary>
-        // <param name="sizeRequired">The minimum dimensions required.</param>
-        // <returns><see langword="true"/> if the dimensions fit within the View's <see cref="Bounds"/>, <see langword="false"/> otherwise.</returns>
-        // <remarks>
-        // Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
-        // if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
-        // Does not take into account word wrapping.
-        // </remarks>
-        bool GetMinimumSizeOfText (out Size sizeRequired)
-        {
-            if (!IsInitialized)
+            if (widthAuto is null || !widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
             {
-                sizeRequired = new Size (0, 0);
-
-                return false;
+                size.Width = GetContentSize ().Width;
             }
 
-            sizeRequired = Bounds.Size;
-
-            if (AutoSize || string.IsNullOrEmpty (TextFormatter.Text))
+            if (heightAuto is null || !heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
             {
-                return false;
+                size.Height = GetContentSize ().Height;
             }
-
-            switch (TextFormatter.IsVerticalDirection (TextDirection))
-            {
-                case true:
-                    int colWidth = TextFormatter.GetWidestLineLength (new List<string> { TextFormatter.Text }, 0, 1);
-
-                    // TODO: v2 - This uses frame.Width; it should only use Bounds
-                    if (_frame.Width < colWidth
-                        && (Width == null || (Bounds.Width >= 0 && Width is Dim.DimAbsolute && Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth)))
-                    {
-                        sizeRequired = new Size (colWidth, Bounds.Height);
-
-                        return true;
-                    }
-
-                    break;
-                default:
-                    if (_frame.Height < 1 && (Height == null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0)))
-                    {
-                        sizeRequired = new Size (Bounds.Width, 1);
-
-                        return true;
-                    }
-
-                    break;
-            }
-
-            return false;
         }
 
-        if (GetMinimumSizeOfText (out Size size))
-        {
-            // TODO: This is a hack.
-            //_width  = size.Width;
-            //_height = size.Height;
-            _frame = new Rect (_frame.Location, size);
-
-            //throw new InvalidOperationException ("This is a hack.");
-            return true;
-        }
-
-        return false;
+        TextFormatter.Size = size;
     }
 
-    // only called from EndInit
     private void UpdateTextDirection (TextDirection newDirection)
     {
-        bool directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction)
-                                != TextFormatter.IsHorizontalDirection (newDirection);
+        bool directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction) != TextFormatter.IsHorizontalDirection (newDirection);
         TextFormatter.Direction = newDirection;
-
-        bool isValidOldAutoSize = AutoSize && IsValidAutoSize (out Size _);
 
         UpdateTextFormatterText ();
 
-        if ((!ValidatePosDim && directionChanged && AutoSize)
-            || (ValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize))
+        if (directionChanged)
         {
             OnResizeNeeded ();
-        }
-        else if (AutoSize && directionChanged && IsAdded)
-        {
-            ResizeBoundsToFit (Bounds.Size);
         }
 
         SetTextFormatterSize ();

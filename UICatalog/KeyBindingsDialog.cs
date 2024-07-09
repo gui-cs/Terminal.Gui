@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Terminal.Gui;
 
@@ -10,7 +11,7 @@ internal class KeyBindingsDialog : Dialog
     // TODO: Update to use Key instead of KeyCode
     private static readonly Dictionary<Command, KeyCode> CurrentBindings = new ();
 
-    private readonly Command [] _commands;
+    private readonly ObservableCollection<Command> _commands;
     private readonly ListView _commandsListView;
     private readonly Label _keyLabel;
 
@@ -26,13 +27,13 @@ internal class KeyBindingsDialog : Dialog
         }
 
         // known commands that views can support
-        _commands = Enum.GetValues (typeof (Command)).Cast<Command> ().ToArray ();
+        _commands = new (Enum.GetValues (typeof (Command)).Cast<Command> ().ToArray ());
 
         _commandsListView = new ListView
         {
             Width = Dim.Percent (50),
             Height = Dim.Percent (100) - 1,
-            Source = new ListWrapper (_commands),
+            Source = new ListWrapper<Command> (_commands),
             SelectedItem = 0
         };
 
@@ -43,11 +44,11 @@ internal class KeyBindingsDialog : Dialog
 
         var btnChange = new Button { X = Pos.Percent (50), Y = 1, Text = "Ch_ange" };
         Add (btnChange);
-        btnChange.Clicked += RemapKey;
+        btnChange.Accept += RemapKey;
 
         var close = new Button { Text = "Ok" };
 
-        close.Clicked += (s, e) =>
+        close.Accept += (s, e) =>
                          {
                              Application.RequestStop ();
                              ViewTracker.Instance.StartUsingNewKeyMap (CurrentBindings);
@@ -55,7 +56,7 @@ internal class KeyBindingsDialog : Dialog
         AddButton (close);
 
         var cancel = new Button { Text = "Cancel" };
-        cancel.Clicked += (s, e) => Application.RequestStop ();
+        cancel.Accept += (s, e) => Application.RequestStop ();
         AddButton (cancel);
 
         // Register event handler as the last thing in constructor to prevent early calls
@@ -82,6 +83,7 @@ internal class KeyBindingsDialog : Dialog
                            Application.RequestStop ();
                        };
         Application.Run (dlg);
+        dlg.Dispose ();
 
         if (key.HasValue)
         {

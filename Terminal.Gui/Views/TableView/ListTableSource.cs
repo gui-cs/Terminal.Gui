@@ -16,7 +16,7 @@ public class ListTableSource : ITableSource
     public ListColumnStyle Style;
 
     private readonly TableView _tableView;
-    private Rect _lastBounds;
+    private Rectangle _lastBounds;
     private IList _lastList;
     private int _lastMaxCellWidth;
     private int _lastMinCellWidth;
@@ -109,12 +109,12 @@ public class ListTableSource : ITableSource
 
         if (Style.Orientation == Orientation.Vertical != Style.ScrollParallel)
         {
-            float f = (float)_tableView.Bounds.Height - _tableView.GetHeaderHeight ();
+            float f = (float)_tableView.Viewport.Height - _tableView.GetHeaderHeight ();
             cols = (int)Math.Ceiling (Count / f);
         }
         else
         {
-            cols = (int)Math.Ceiling (((float)_tableView.Bounds.Width - 1) / colWidth) - 2;
+            cols = (int)Math.Ceiling (((float)_tableView.Viewport.Width - 1) / colWidth) - 2;
         }
 
         return cols > 1 ? cols : 1;
@@ -124,7 +124,7 @@ public class ListTableSource : ITableSource
     /// <returns></returns>
     private int CalculateMaxLength ()
     {
-        if (List == null || Count == 0)
+        if (List is null || Count == 0)
         {
             return 0;
         }
@@ -179,7 +179,7 @@ public class ListTableSource : ITableSource
 
     private void TableView_DrawContent (object sender, DrawEventArgs e)
     {
-        if (!_tableView.Bounds.Equals (_lastBounds)
+        if (!_tableView.Viewport.Equals (_lastBounds)
             || _tableView.MaxCellWidth != _lastMaxCellWidth
             || _tableView.MinCellWidth != _lastMinCellWidth
             || Style != _lastStyle
@@ -188,7 +188,7 @@ public class ListTableSource : ITableSource
             DataTable = CreateTable (CalculateColumns ());
         }
 
-        _lastBounds = _tableView.Bounds;
+        _lastBounds = _tableView.Viewport;
         _lastMinCellWidth = _tableView.MaxCellWidth;
         _lastMaxCellWidth = _tableView.MaxCellWidth;
         _lastStyle = Style;

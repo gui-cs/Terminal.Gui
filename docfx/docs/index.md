@@ -8,16 +8,17 @@
 * **[Templates](getting-started.md)** - The `dotnet new` command can be used to create a new Terminal.Gui app.
 * **[Keyboard](keyboard.md) and [Mouse](mouse.md) Input** - The library handles all the details of input processing and provides a simple event-based API for applications to consume.
 * **[Extensible Widgets](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views. Dozens of [Built-in Views](views.md) are provided.
-* **[Flexible Layout](layout.md)** - *Computed Layout* makes it easy to lay out controls relative to each other and enables dynamic terminal UIs. *Absolute Layout* allows for precise control over the position and size of controls.
+* **[Powerful Layout Engine](layout.md)** - The layout engine makes it easy to lay out controls relative to each other and enables dynamic terminal UIs. 
 * **[Clipboard support](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.Clipboard.html)** - Cut, Copy, and Paste is provided through the [`Clipboard`] class.
-* **Advanced App Features** - The [Mainloop](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.MainLoop.html) supports processing events, idle handlers, and timers. Most classes are safe for threading.
+* **Multi-tasking** - The [Mainloop](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.MainLoop.html) supports processing events, idle handlers, and timers. Most classes are safe for threading.
 * **[Reactive Extensions](https://github.com/dotnet/reactive)** - Use reactive extensions and benefit from increased code readability, and the ability to apply the MVVM pattern and [ReactiveUI](https://www.reactiveui.net/) data bindings. See the [source code](https://github.com/gui-cs/Terminal.GuiV2Docs/tree/master/ReactiveExample) of a sample app.
 
 ## Conceptual Documentation
 
 * [List of Views](views.md)
-* [Keyboard Event Processing](keyboard.md)
-* [Event Processing and the Application Main Loop](mainloop.md)
+* [Keyboard API](keyboard.md)
+* [Mouse API](mouse.md)
+* [Multi-tasking and the Application Main Loop](mainloop.md)
 * [Cross-platform Driver Model](drivers.md)
 * [Configuration and Theme Manager](config.md)
 * [TableView Deep Dive](tableview.md)
@@ -45,14 +46,17 @@ The [Application](~/api/Terminal.Gui.Application.yml) class additionally creates
 using Terminal.Gui;
 Application.Init ();
 
-var label = new Label ("Hello World") {
+var label = new Label () {
+    Title = "Hello World",
     X = Pos.Center (),
     Y = Pos.Center (),
     Height = 1,
 };
 
-Application.Top.Add (label);
-Application.Run ();
+var app = new Toplevel ();
+app.Add (label);
+Application.Run (app);
+app.Dispose ();
 Application.Shutdown ();
 ```
 
@@ -70,7 +74,8 @@ var menu = new MenuBar (new MenuBarItem [] {
     }),
 });
 
-var button = new Button ("_Hello") {
+var button = new Button () {
+    Title = "_Hello",
     X = 0,
     Y = Pos.Bottom (menu),
     Width = Dim.Fill (),
@@ -80,9 +85,11 @@ button.Clicked += () => {
     MessageBox.Query (50, 5, "Hi", "Hello World! This is a message box", "Ok");
 };
 
+var app = new Toplevel ();
 // Add both menu and win in a single call
-Application.Top.Add (menu, button);
-Application.Run ();
+top.Add (menu, button);
+Application.Run (top);
+top.Dispose ();
 Application.Shutdown ();
 ```
 
@@ -99,7 +106,8 @@ Every view can contain an arbitrary number of child views, called `SubViews`. Ca
 ```csharp
 void SetupMyView (View myView)
 {
-    var label = new Label ("Username: ") {
+    var label = new Label () {
+        Title = "_Username:"
         X = 1,
         Y = 1,
         Width = 20,
@@ -107,8 +115,8 @@ void SetupMyView (View myView)
     };
     myView.Add (label);
 
-    var username = new TextField ("") {
-        X = 1,
+    var username = new TextField () {
+        X = Pos.Right (label) + 1,
         Y = 2,
         Width = 30,
         Height = 1
@@ -117,19 +125,7 @@ void SetupMyView (View myView)
 }
 ```
 
-The container of a given view is called the `SuperView` and it is a property of every
-View.
-
-## Layout
-
-Terminal.Gui v2 supports the following View layout systems (controlled by the [View.LayoutStyle](~/api/Terminal.Gui.LayoutStyle.yml)):
-
-* **Absolute** - Used to have the View positioned exactly in a location, with a fixed size. Absolute layout is accomplished by constructing a View with an argument of type [Rect](~/api/Terminal.Gui.Rect.yml) or directly changing the `Frame` property on the View.
-* **Computed** - The Computed Layout system provides automatic aligning of Views with other Views, automatic centering, and automatic sizing. To use Computed layout set the 
- `X`, `Y`, `Width` and `Height` properties after the object has been created. Views laid out using the Computed Layout system can be resized with the mouse or keyboard, enabling tiled window managers and dynamic terminal UIs.
-* **Overlapped** - New in V2 (But not yet) - Overlapped layout enables views to be positioned on top of each other. Overlapped Views are movable and sizable with both the keyboard and the mouse.
-
-See the full [Layout documentation here](layout.md).
+The container of a given view is called the `SuperView` and it is a property of every View.
 
 ## Modal Views
 
@@ -157,6 +153,7 @@ dialog.Add (entry);
 Application.Run (dialog);
 if (okpressed)
     Console.WriteLine ("The user entered: " + entry.Text);
+dialog.Dispose ();
 ```
 
 There is no return value from running modally, so the modal view must have a mechanism to indicate the reason the modal was closed. In the case above, the `okpressed` value is set to true if the user pressed or selected the `Ok` button.
@@ -174,9 +171,9 @@ Dialogs expose an API for adding buttons and managing the layout such that butto
 Example:
 ```csharp
 bool okpressed = false;
-var ok = new Button("Ok");
-var cancel = new Button("Cancel");
-var dialog = new Dialog ("Quit", ok, cancel) { Text = "Are you sure you want to quit?" };
+var ok = new Button() { Title = "Ok" };
+var cancel = new Button() { Title = "Cancel" };
+var dialog = new Dialog () { Text = "Are you sure you want to quit?", Title = "Quit", Buttons = { ok, cancel } };
 ```
 
 Which will show something like this:
@@ -208,61 +205,3 @@ Which will show something like this:
 ║⟦ Back ⟧                                         ⟦► Finish ◄⟧║
 ╚═════════════════════════════════════════════════════════════╝
 ```
-
-## Input Handling
-
-Every view has a focused view, and if that view has nested SubViews, one of those is 
-the focused view. This is called the focus chain, and at any given time, only one
-View has the [Focus](). 
-
-The library provides a default focus mechanism that can be used to navigate the focus chain. The default focus mechanism is based on the Tab key, and the Shift-Tab key combination
-
-Keyboard processing details are available on the [Keyboard Event Processing](keyboard.md) document.
-
-## Colors and Color Schemes
-
-All views have been configured with a color scheme that will work both in color
-terminals as well as the more limited black and white terminals. 
-
-The various styles are captured in the [Colors](~/api/Terminal.Gui.Colors.yml) class which defines color schemes for Toplevel, the normal views (Base), the menu bar, dialog boxes, and error UI::
-
-* `Colors.Toplevel`
-* `Colors.Base`
-* `Colors.Menu`
-* `Colors.Dialog`
-* `Colors.Error`
-
-You can use them for example like this to set the colors for a new Window:
-
-```
-var w = new Window ("Hello");
-w.ColorScheme = Colors.Error
-```
-
-ColorSchemes can be configured with the [Configuration and Theme Manager](config.md). 
-
-The [ColorScheme](~/api/Terminal.Gui.ColorScheme.yml) represents
-four values, the color used for Normal text, the color used for normal text when
-a view is focused an the colors for the hot-keys both in focused and unfocused modes.
-
-By using `ColorSchemes` you ensure that your application will work correctbly both
-in color and black and white terminals.
-
-Some views support setting individual color attributes, you create an
-attribute for a particular pair of Foreground/Background like this:
-
-```
-var myColor = Application.Driver.MakeAttribute (Color.Blue, Color.Red);
-var label = new Label (...);
-label.TextColor = myColor
-```
-
-Learn more about colors in the [Drawing](drawing.md) overview.
-
-## MainLoop, Threads and Input Handling
-
-The Main Loop, threading, and timers are described on the [Event Processing and the Application Main Loop](~/docs/mainloop.md) document.
-
-## Cross-Platform Drivers
-
-See [Cross-platform Driver Model](drivers.md).

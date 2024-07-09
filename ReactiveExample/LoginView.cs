@@ -12,11 +12,11 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
     public LoginView (LoginViewModel viewModel)
     {
-        Title = "Reactive Extensions Example";
+        Title = $"Reactive Extensions Example - {Application.QuitKey} to Exit";
         ViewModel = viewModel;
         Label usernameLengthLabel = UsernameLengthLabel (TitleLabel ());
         TextField usernameInput = UsernameInput (usernameLengthLabel);
-        Label passwordLengthLabel = PasswordLengthLabel (usernameInput);
+        Label passwordLengthLabel = PasswordLengthLabel (usernameLengthLabel);
         TextField passwordInput = PasswordInput (passwordLengthLabel);
         Label validationLabel = ValidationLabel (passwordInput);
         Button loginButton = LoginButton (validationLabel);
@@ -42,12 +42,12 @@ public class LoginView : Window, IViewFor<LoginViewModel>
     {
         var clearButton = new Button
         {
-            X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Width = 40, Text = "Clear"
+            X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Text = "_Clear"
         };
 
         clearButton
             .Events ()
-            .Clicked
+            .Accept
             .InvokeCommand (ViewModel, x => x.Clear)
             .DisposeWith (_disposable);
         Add (clearButton);
@@ -59,12 +59,12 @@ public class LoginView : Window, IViewFor<LoginViewModel>
     {
         var loginButton = new Button
         {
-            X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Width = 40, Text = "Login"
+            X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Text = "_Login"
         };
 
         loginButton
             .Events ()
-            .Clicked
+            .Accept
             .InvokeCommand (ViewModel, x => x.Login)
             .DisposeWith (_disposable);
         Add (loginButton);
@@ -79,7 +79,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
         var loginProgressLabel = new Label
         {
-            X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Width = 40, Text = idle
+            X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Width = 40, Height = 1, Text = idle
         };
 
         ViewModel
@@ -97,7 +97,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
     {
         var passwordInput = new TextField
         {
-            X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Width = 40, Text = ViewModel.Password
+            X = Pos.Right (previous) + 1, Y = Pos.Top (previous), Width = 40, Text = ViewModel.Password
         };
 
         ViewModel
@@ -119,11 +119,11 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
     private Label PasswordLengthLabel (View previous)
     {
-        var passwordLengthLabel = new Label { X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Width = 40 };
+        var passwordLengthLabel = new Label { X = Pos.Left (previous), Y = Pos.Top (previous) + 1, };
 
         ViewModel
             .WhenAnyValue (x => x.PasswordLength)
-            .Select (length => $"Password ({length} characters)")
+            .Select (length => $"_Password ({length} characters):")
             .BindTo (passwordLengthLabel, x => x.Text)
             .DisposeWith (_disposable);
         Add (passwordLengthLabel);
@@ -143,7 +143,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
     {
         var usernameInput = new TextField
         {
-            X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Width = 40, Text = ViewModel.Username
+            X = Pos.Right (previous) + 1, Y = Pos.Top (previous), Width = 40, Text = ViewModel.Username
         };
 
         ViewModel
@@ -165,11 +165,11 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
     private Label UsernameLengthLabel (View previous)
     {
-        var usernameLengthLabel = new Label { X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Width = 40 };
+        var usernameLengthLabel = new Label { X = Pos.Left (previous), Y = Pos.Top (previous) + 1 };
 
         ViewModel
             .WhenAnyValue (x => x.UsernameLength)
-            .Select (length => $"Username ({length} characters)")
+            .Select (length => $"_Username ({length} characters):")
             .BindTo (usernameLengthLabel, x => x.Text)
             .DisposeWith (_disposable);
         Add (usernameLengthLabel);
@@ -179,12 +179,12 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
     private Label ValidationLabel (View previous)
     {
-        var error = "Please, enter user name and password.";
+        var error = "Please enter a valid user name and password.";
         var success = "The input is valid!";
 
         var validationLabel = new Label
         {
-            X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Width = 40, Text = error
+           X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Text = error
         };
 
         ViewModel

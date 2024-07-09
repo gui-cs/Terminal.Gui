@@ -53,7 +53,7 @@ public class DefaultFileOperations : IFileOperations
     public IFileSystemInfo Rename (IFileSystem fileSystem, IFileSystemInfo toRename)
     {
         // Don't allow renaming C: or D: or / (on linux) etc
-        if (toRename is IDirectoryInfo dir && dir.Parent == null)
+        if (toRename is IDirectoryInfo dir && dir.Parent is null)
         {
             return null;
         }
@@ -135,14 +135,14 @@ public class DefaultFileOperations : IFileOperations
         var confirm = false;
         var btnOk = new Button { IsDefault = true, Text = Strings.btnOk };
 
-        btnOk.Clicked += (s, e) =>
+        btnOk.Accept += (s, e) =>
                          {
                              confirm = true;
                              Application.RequestStop ();
                          };
         var btnCancel = new Button { Text = Strings.btnCancel };
 
-        btnCancel.Clicked += (s, e) =>
+        btnCancel.Accept += (s, e) =>
                              {
                                  confirm = false;
                                  Application.RequestStop ();
@@ -162,6 +162,7 @@ public class DefaultFileOperations : IFileOperations
         dlg.AddButton (btnCancel);
 
         Application.Run (dlg);
+        dlg.Dispose ();
 
         result = tf.Text;
 

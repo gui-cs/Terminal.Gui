@@ -10,18 +10,19 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class TextFormatterDemo : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
-        // TODO: Move this to another Scenario that specifically tests `Views` that have no subviews.
-        //Top.Text = "Press CTRL-Q to Quit. This is the Text for the TopLevel View. TextAlignment.Centered was specified. It is intentionally very long to illustrate word wrap.\n" +
-        //	"<-- There is a new line here to show a hard line break. You should see this text bleed underneath the subviews, which start at Y = 3.";
-        //Top.TextAlignment = TextAlignment.Centered;
-        //Top.ColorScheme = Colors.ColorSchemes ["Base"];
+        Application.Init ();
+
+        var app = new Window
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
 
         // Make Win smaller so sizing the window horizontally will make the
         // labels shrink to zero-width
-        Win.X = 10;
-        Win.Width = Dim.Fill (10);
+        app.X = 10;
+        app.Width = Dim.Fill (10);
 
         var text = "Hello world, how are you today? Pretty neat!\nSecond line\n\nFourth Line.";
 
@@ -33,7 +34,7 @@ public class TextFormatterDemo : Scenario
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             X = 0,
             Y = 0,
-            AutoSize = false,
+
             Height = 10,
             Width = Dim.Fill ()
         };
@@ -50,42 +51,42 @@ public class TextFormatterDemo : Scenario
         block.AppendLine ("      ░    ░      ░    ░  ░ ░            ░  ");
         block.AppendLine ("                       ░  ░                 ");
         blockText.Text = block.ToString (); // .Replace(" ", "\u00A0"); // \u00A0 is 'non-breaking space
-        Win.Add (blockText);
+        app.Add (blockText);
 
         var unicodeCheckBox = new CheckBox
         {
             X = 0,
             Y = Pos.Bottom (blockText) + 1,
             Text = "Unicode",
-            Checked = Application.Top.HotKeySpecifier == (Rune)' '
+            State = app.HotKeySpecifier == (Rune)' ' ? CheckState.Checked : CheckState.UnChecked
         };
 
-        Win.Add (unicodeCheckBox);
-
-        List<TextAlignment> alignments = Enum.GetValues (typeof (TextAlignment)).Cast<TextAlignment> ().ToList ();
+        app.Add (unicodeCheckBox);
+        
+        List<Alignment> alignments = new () { Alignment.Start, Alignment.End, Alignment.Center, Alignment.Fill };
         Label [] singleLines = new Label [alignments.Count];
         Label [] multipleLines = new Label [alignments.Count];
 
         var multiLineHeight = 5;
 
-        foreach (TextAlignment alignment in alignments)
+        for (int i = 0; i < alignments.Count; i++)
         {
-            singleLines [(int)alignment] = new Label
+            singleLines [i] = new ()
             {
-                TextAlignment = alignment,
+                TextAlignment = alignments [i],
                 X = 0,
-                AutoSize = false,
+
                 Width = Dim.Fill (),
                 Height = 1,
                 ColorScheme = Colors.ColorSchemes ["Dialog"],
                 Text = text
             };
 
-            multipleLines [(int)alignment] = new Label
+            multipleLines [i] = new ()
             {
-                TextAlignment = alignment,
+                TextAlignment = alignments [i],
                 X = 0,
-                AutoSize = false,
+
                 Width = Dim.Fill (),
                 Height = multiLineHeight,
                 ColorScheme = Colors.ColorSchemes ["Dialog"],
@@ -97,36 +98,40 @@ public class TextFormatterDemo : Scenario
         {
             Y = Pos.Bottom (unicodeCheckBox) + 1, Text = "Demonstrating multi-line and word wrap:"
         };
-        Win.Add (label);
+        app.Add (label);
 
-        foreach (TextAlignment alignment in alignments)
+        for (int i = 0; i < alignments.Count; i++)
         {
-            label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };
-            Win.Add (label);
-            singleLines [(int)alignment].Y = Pos.Bottom (label);
-            Win.Add (singleLines [(int)alignment]);
-            label = singleLines [(int)alignment];
+            label = new () { Y = Pos.Bottom (label), Text = $"{alignments [i]}:" };
+            app.Add (label);
+            singleLines [i].Y = Pos.Bottom (label);
+            app.Add (singleLines [i]);
+            label = singleLines [i];
         }
 
-        label = new Label { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
-        Win.Add (label);
+        label = new () { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
+        app.Add (label);
 
-        foreach (TextAlignment alignment in alignments)
+        for (int i = 0; i < alignments.Count; i++)
         {
-            label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };
-            Win.Add (label);
-            multipleLines [(int)alignment].Y = Pos.Bottom (label);
-            Win.Add (multipleLines [(int)alignment]);
-            label = multipleLines [(int)alignment];
+            label = new () { Y = Pos.Bottom (label), Text = $"{alignments [i]}:" };
+            app.Add (label);
+            multipleLines [i].Y = Pos.Bottom (label);
+            app.Add (multipleLines [i]);
+            label = multipleLines [i];
         }
 
-        unicodeCheckBox.Toggled += (s, e) =>
+        unicodeCheckBox.Toggle += (s, e) =>
                                    {
-                                       foreach (TextAlignment alignment in alignments)
+                                       for (int i = 0; i < alignments.Count; i++)
                                        {
-                                           singleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;
-                                           multipleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;
+                                           singleLines [i].Text = e.CurrentValue == CheckState.Checked ? text : unicode;
+                                           multipleLines [i].Text = e.CurrentValue == CheckState.Checked ? text : unicode;
                                        }
                                    };
+
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
     }
 }

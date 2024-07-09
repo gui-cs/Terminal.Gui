@@ -793,7 +793,6 @@ public class TileViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringInsertTile ()
     {
         TileView tv = GetTileView (20, 10);
@@ -822,7 +821,6 @@ public class TileViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRebuildForTileCount ()
     {
         TileView tv = GetTileView (20, 10);
@@ -850,7 +848,6 @@ public class TileViewTests
     }
 
     [Theory]
-    [AutoInitShutdown]
     [InlineData (0)]
     [InlineData (1)]
     public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRemoveTile (int idx)
@@ -1575,7 +1572,8 @@ public class TileViewTests
 
         Assert.True (tv.IsRootTileView ());
 
-        Application.Top.Add (tv);
+        var top = new Toplevel ();
+        top.Add (tv);
         tv.BeginInit ();
         tv.EndInit ();
         tv.LayoutSubviews ();
@@ -1624,7 +1622,8 @@ public class TileViewTests
         Assert.True (tv.IsRootTileView ());
         tv.Tiles.ElementAt (1).ContentView.Add (tv2);
 
-        Application.Top.Add (tv);
+        var top = new Toplevel ();
+        top.Add (tv);
         tv.BeginInit ();
         tv.EndInit ();
         tv.LayoutSubviews ();
@@ -1661,7 +1660,7 @@ public class TileViewTests
         var ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Right (tileView)));
         Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosView", ex.Message);
 
-        ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Function (() => 1)));
+        ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Func (() => 1)));
         Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosFunc", ex.Message);
 
         // Also not allowed because this results in a PosCombine
@@ -1689,7 +1688,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Keyboard movement on splitter should have no effect if it is not focused
-        bool handled = tileView.NewKeyDownEvent (new Key (KeyCode.CursorDown));
+        bool handled = tileView.NewKeyDownEvent (Key.CursorDown);
         Assert.False (handled);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
@@ -1717,7 +1716,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Now move splitter line down
-        tileView.NewKeyDownEvent (new Key (KeyCode.CursorDown));
+        tileView.NewKeyDownEvent (Key.CursorDown);
 
         tileView.Draw ();
 
@@ -1729,8 +1728,8 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // And 2 up
-        line.NewKeyDownEvent (new Key (KeyCode.CursorUp));
-        line.NewKeyDownEvent (new Key (KeyCode.CursorUp));
+        line.NewKeyDownEvent (Key.CursorUp);
+        line.NewKeyDownEvent (Key.CursorUp);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
 
@@ -1756,7 +1755,7 @@ public class TileViewTests
         Assert.False (tileView.SetSplitterPos (0, 0));
 
         // position should remain where it was, at 50%
-        Assert.Equal (Pos.Percent (50f), tileView.SplitterDistances.ElementAt (0));
+        Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
 
         tileView.Draw ();
 
@@ -1768,7 +1767,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Now move splitter line down (allowed
-        line.NewKeyDownEvent (new Key (KeyCode.CursorDown));
+        line.NewKeyDownEvent (Key.CursorDown);
         tileView.Draw ();
 
         looksLike =
@@ -1779,8 +1778,8 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // And up 2 (only 1 is allowed because of minimum size of 1 on view1)
-        line.NewKeyDownEvent (new Key (KeyCode.CursorUp));
-        line.NewKeyDownEvent (new Key (KeyCode.CursorUp));
+        line.NewKeyDownEvent (Key.CursorUp);
+        line.NewKeyDownEvent (Key.CursorUp);
 
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
@@ -1905,7 +1904,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Keyboard movement on splitter should have no effect if it is not focused
-        tileView.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        tileView.NewKeyDownEvent (Key.CursorRight);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
@@ -1928,7 +1927,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Now while focused move the splitter 1 unit right
-        line.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        line.NewKeyDownEvent (Key.CursorRight);
         tileView.Draw ();
 
         looksLike =
@@ -1939,8 +1938,8 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // and 2 to the left
-        line.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
-        line.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+        line.NewKeyDownEvent (Key.CursorLeft);
+        line.NewKeyDownEvent (Key.CursorLeft);
         tileView.Draw ();
 
         looksLike =
@@ -1957,7 +1956,7 @@ public class TileViewTests
     {
         TileView tileView = Get11By3TileView (out LineView line);
         tileView.SetSplitterPos (0, Pos.Percent (50));
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
         tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
 
         tileView.Draw ();
@@ -1970,7 +1969,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Now while focused move the splitter 1 unit right
-        line.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        line.NewKeyDownEvent (Key.CursorRight);
         tileView.Draw ();
 
         looksLike =
@@ -1981,11 +1980,11 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Even when moving the splitter location it should stay a Percentage based one
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
 
         // and 2 to the left
-        line.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
-        line.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+        line.NewKeyDownEvent (Key.CursorLeft);
+        line.NewKeyDownEvent (Key.CursorLeft);
         tileView.Draw ();
 
         looksLike =
@@ -1996,7 +1995,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Even when moving the splitter location it should stay a Percentage based one
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
     }
 
     [Fact]
@@ -2016,7 +2015,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Now while focused move the splitter 1 unit right
-        line.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        line.NewKeyDownEvent (Key.CursorRight);
         tileView.Draw ();
 
         looksLike =
@@ -2027,8 +2026,8 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // and 2 to the left
-        line.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
-        line.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+        line.NewKeyDownEvent (Key.CursorLeft);
+        line.NewKeyDownEvent (Key.CursorLeft);
         tileView.Draw ();
 
         looksLike =
@@ -2065,13 +2064,13 @@ public class TileViewTests
 
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
-        line.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+        line.NewKeyDownEvent (Key.CursorLeft);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // but we can continue to move the splitter right if we want
-        line.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        line.NewKeyDownEvent (Key.CursorRight);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
 
@@ -2110,13 +2109,13 @@ public class TileViewTests
 
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
-        line.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+        line.NewKeyDownEvent (Key.CursorLeft);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // but we can continue to move the splitter right if we want
-        line.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        line.NewKeyDownEvent (Key.CursorRight);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
 
@@ -2155,13 +2154,13 @@ public class TileViewTests
 
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
-        line.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        line.NewKeyDownEvent (Key.CursorRight);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // but we can continue to move the splitter left if we want
-        line.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+        line.NewKeyDownEvent (Key.CursorLeft);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
 
@@ -2200,13 +2199,13 @@ public class TileViewTests
 
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
-        line.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        line.NewKeyDownEvent (Key.CursorRight);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // but we can continue to move the splitter left if we want
-        line.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+        line.NewKeyDownEvent (Key.CursorLeft);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
 
@@ -2235,7 +2234,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Keyboard movement on splitter should have no effect if it is not focused
-        tileView.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        tileView.NewKeyDownEvent (Key.CursorRight);
         tileView.SetNeedsDisplay ();
         tileView.Draw ();
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
@@ -2280,30 +2279,31 @@ public class TileViewTests
 
         tv.Tiles.ElementAt (0)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
                            );
 
         tv.Tiles.ElementAt (1)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
                            );
 
         tv.Tiles.ElementAt (2)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('3', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('3', 100) }
                            );
 
         tv.Tiles.ElementAt (3)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('4', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('4', 100) }
                            );
 
         tv.Tiles.ElementAt (4)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('5', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('5', 100) }
                            );
 
-        Application.Top.Add (tv);
+        var top = new Toplevel ();
+        top.Add (tv);
         tv.BeginInit ();
         tv.EndInit ();
         tv.LayoutSubviews ();
@@ -2394,14 +2394,13 @@ public class TileViewTests
 
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
-                                   new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
+                                   new Label { Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
                                   );
 
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
                                    new Label
                                    {
-                                       AutoSize = false,
                                        Width = Dim.Fill (),
                                        Height = 1,
                                        Y = 1,
@@ -2411,14 +2410,13 @@ public class TileViewTests
 
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
-                                   new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
+                                   new Label { Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
                                   );
 
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
                                    new Label
                                    {
-                                       AutoSize = false,
                                        Width = Dim.Fill (),
                                        Height = 1,
                                        Y = 1,
@@ -2429,7 +2427,8 @@ public class TileViewTests
         container.Tiles.ElementAt (0).MinSize = 0;
         container.Tiles.ElementAt (1).MinSize = 0;
 
-        Application.Top.Add (container);
+        var top = new Toplevel ();
+        top.Add (container);
         container.ColorScheme = new ColorScheme ();
         container.BeginInit ();
         container.EndInit ();

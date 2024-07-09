@@ -10,7 +10,7 @@ public class LineViewTests
 
         Assert.Equal (Orientation.Horizontal, horizontal.Orientation);
         Assert.Equal (Dim.Fill (), horizontal.Width);
-        Assert.Equal (1, horizontal.Height);
+        Assert.Equal (1, horizontal.Frame.Height);
     }
 
     [Fact]
@@ -21,7 +21,7 @@ public class LineViewTests
 
         Assert.Equal (Orientation.Horizontal, horizontal.Orientation);
         Assert.Equal (Dim.Fill (), horizontal.Width);
-        Assert.Equal (1, horizontal.Height);
+        Assert.Equal (1, horizontal.Frame.Height);
     }
 
     [Fact]
@@ -32,6 +32,6 @@ public class LineViewTests
 
         Assert.Equal (Orientation.Vertical, vert.Orientation);
         Assert.Equal (Dim.Fill (), vert.Height);
-        Assert.Equal (1, vert.Width);
+        Assert.Equal (1, vert.Frame.Width);
     }
 }

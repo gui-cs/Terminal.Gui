@@ -60,14 +60,17 @@ public class FileDialog : Dialog
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem fileSystem)
     {
+        // Assume canceled
+        Canceled = true;
+
         _fileSystem = fileSystem;
         Style = new FileDialogStyle (fileSystem);
 
         _btnOk = new Button
         {
-            Y = Pos.AnchorEnd (1), X = Pos.Function (CalculateOkButtonPosX), IsDefault = true, Text = Style.OkButtonText
+            Y = Pos.AnchorEnd (1), X = Pos.Func (CalculateOkButtonPosX), IsDefault = true, Text = Style.OkButtonText
         };
-        _btnOk.Clicked += (s, e) => Accept (true);
+        _btnOk.Accept += (s, e) => Accept (true);
 
         _btnOk.KeyDown += (s, k) =>
                           {
@@ -83,19 +86,22 @@ public class FileDialog : Dialog
                                   NavigateIf (k, KeyCode.CursorUp, _tableView);
                                   NavigateIf (k, KeyCode.CursorRight, _btnOk);
                               };
-        _btnCancel.Clicked += (s, e) => { Application.RequestStop (); };
+        _btnCancel.Accept += (s, e) => {
+                                 Canceled = true;
+                                 Application.RequestStop ();
+                             };
 
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
-        _btnUp.Clicked += (s, e) => _history.Up ();
+        _btnUp.Accept += (s, e) => _history.Up ();
 
         _btnBack = new Button { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
         _btnBack.Text = GetBackButtonText ();
-        _btnBack.Clicked += (s, e) => _history.Back ();
+        _btnBack.Accept += (s, e) => _history.Back ();
 
         _btnForward = new Button { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
         _btnForward.Text = GetForwardButtonText ();
-        _btnForward.Clicked += (s, e) => _history.Forward ();
+        _btnForward.Accept += (s, e) => _history.Forward ();
 
         _tbPath = new TextField { Width = Dim.Fill (), CaptionColor = new Color (Color.Black) };
 
@@ -128,7 +134,7 @@ public class FileDialog : Dialog
             FullRowSelect = true,
             CollectionNavigator = new FileDialogCollectionNavigator (this)
         };
-        _tableView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
+        _tableView.KeyBindings.Add (Key.Space, Command.Select);
         _tableView.MouseClick += OnTableViewMouseClick;
         _tableView.Style.InvertSelectedCellFirstCharacter = true;
         Style.TableStyle = _tableView.Style;
@@ -184,7 +190,7 @@ public class FileDialog : Dialog
 
         _btnToggleSplitterCollapse = new Button { Y = Pos.AnchorEnd (1), Text = GetToggleSplitterText (false) };
 
-        _btnToggleSplitterCollapse.Clicked += (s, e) =>
+        _btnToggleSplitterCollapse.Accept += (s, e) =>
                                               {
                                                   Tile tile = _splitContainer.Tiles.ElementAt (0);
 
@@ -200,7 +206,7 @@ public class FileDialog : Dialog
             CaptionColor = new Color (Color.Black),
             Width = 30,
             Y = Pos.AnchorEnd (1),
-            HotKey = KeyCode.F | KeyCode.AltMask
+            HotKey = Key.F.WithAlt
         };
         _spinnerView = new SpinnerView { X = Pos.Right (_tbFind) + 1, Y = Pos.AnchorEnd (1), Visible = false };
 
@@ -248,16 +254,16 @@ public class FileDialog : Dialog
         _tableView.KeyUp += (s, k) => k.Handled = TableView_KeyUp (k);
         _tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 
-        _tableView.KeyBindings.Add (KeyCode.Home, Command.TopHome);
-        _tableView.KeyBindings.Add (KeyCode.End, Command.BottomEnd);
-        _tableView.KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.TopHomeExtend);
-        _tableView.KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.BottomEndExtend);
+        _tableView.KeyBindings.Add (Key.Home, Command.TopHome);
+        _tableView.KeyBindings.Add (Key.End, Command.BottomEnd);
+        _tableView.KeyBindings.Add (Key.Home.WithShift, Command.TopHomeExtend);
+        _tableView.KeyBindings.Add (Key.End.WithShift, Command.BottomEndExtend);
 
         _treeView.KeyDown += (s, k) =>
                              {
                                  IFileSystemInfo selected = _treeView.SelectedObject;
 
-                                 if (selected != null)
+                                 if (selected is { })
                                  {
                                      if (!_treeView.CanExpand (selected) || _treeView.IsExpanded (selected))
                                      {
@@ -314,9 +320,6 @@ public class FileDialog : Dialog
         set => _tableView.MultiSelect = value;
     }
 
-    /// <summary>Gets a value indicating whether the <see cref="FileDialog"/> was closed without confirming a selection.</summary>
-    public bool Canceled { get; private set; } = true;
-
     /// <summary>The UI selected <see cref="IAllowedType"/> from combo box. May be null.</summary>
     public IAllowedType CurrentFilter { get; private set; }
 
@@ -336,7 +339,7 @@ public class FileDialog : Dialog
 
     /// <summary>
     ///     Gets all files/directories selected or an empty collection <see cref="AllowsMultipleSelection"/> is
-    ///     <see langword="false"/> or <see cref="Canceled"/>.
+    ///     <see langword="false"/> or <see cref="CancelSearch"/>.
     /// </summary>
     /// <remarks>If selecting only a single file/directory then you should use <see cref="Path"/> instead.</remarks>
     public IReadOnlyList<string> MultiSelected { get; private set; }
@@ -356,7 +359,7 @@ public class FileDialog : Dialog
 
     /// <summary>
     ///     Gets or Sets the selected path in the dialog. This is the result that should be used if
-    ///     <see cref="AllowsMultipleSelection"/> is off and <see cref="Canceled"/> is true.
+    ///     <see cref="AllowsMultipleSelection"/> is off and <see cref="CancelSearch"/> is true.
     /// </summary>
     public string Path
     {
@@ -407,23 +410,23 @@ public class FileDialog : Dialog
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         if (!string.IsNullOrWhiteSpace (_feedback))
         {
             int feedbackWidth = _feedback.EnumerateRunes ().Sum (c => c.GetColumns ());
-            int feedbackPadLeft = (Bounds.Width - feedbackWidth) / 2 - 1;
+            int feedbackPadLeft = (Viewport.Width - feedbackWidth) / 2 - 1;
 
-            feedbackPadLeft = Math.Min (Bounds.Width, feedbackPadLeft);
+            feedbackPadLeft = Math.Min (Viewport.Width, feedbackPadLeft);
             feedbackPadLeft = Math.Max (0, feedbackPadLeft);
 
-            int feedbackPadRight = Bounds.Width - (feedbackPadLeft + feedbackWidth + 2);
-            feedbackPadRight = Math.Min (Bounds.Width, feedbackPadRight);
+            int feedbackPadRight = Viewport.Width - (feedbackPadLeft + feedbackWidth + 2);
+            feedbackPadRight = Math.Min (Viewport.Width, feedbackPadRight);
             feedbackPadRight = Math.Max (0, feedbackPadRight);
 
-            Move (0, Bounds.Height / 2);
+            Move (0, Viewport.Height / 2);
 
             Driver.SetAttribute (new Attribute (Color.Red, ColorScheme.Normal.Background));
             Driver.AddStr (new string (' ', feedbackPadLeft));
@@ -454,7 +457,7 @@ public class FileDialog : Dialog
 
         if (Style.FlipOkCancelButtonLayoutOrder)
         {
-            _btnCancel.X = Pos.Function (CalculateOkButtonPosX);
+            _btnCancel.X = Pos.Func (CalculateOkButtonPosX);
             _btnOk.X = Pos.Right (_btnCancel) + 1;
 
             // Flip tab order too for consistency
@@ -516,7 +519,7 @@ public class FileDialog : Dialog
 
             _allowedTypeMenuBar.DrawContentComplete += (s, e) =>
                                                        {
-                                                           _allowedTypeMenuBar.Move (e.Rect.Width - 1, 0);
+                                                           _allowedTypeMenuBar.Move (e.NewViewport.Width - 1, 0);
                                                            Driver.AddRune (Glyphs.DownArrow);
                                                        };
 
@@ -657,7 +660,7 @@ public class FileDialog : Dialog
         ApplySort ();
     }
 
-    private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
+    private new void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
     {
         if (!AllowsMultipleSelection)
         {
@@ -676,7 +679,7 @@ public class FileDialog : Dialog
         FinishAccept ();
     }
 
-    private void Accept (IFileInfo f)
+    private new void Accept (IFileInfo f)
     {
         if (!IsCompatibleWithOpenMode (f.FullName, out string reason))
         {
@@ -696,7 +699,7 @@ public class FileDialog : Dialog
         FinishAccept ();
     }
 
-    private void Accept (bool allowMulti)
+    private new void Accept (bool allowMulti)
     {
         if (allowMulti && TryAcceptMulti ())
         {
@@ -705,7 +708,7 @@ public class FileDialog : Dialog
 
         if (!IsCompatibleWithOpenMode (_tbPath.Text, out string reason))
         {
-            if (reason != null)
+            if (reason is { })
             {
                 _feedback = reason;
                 SetNeedsDisplay ();
@@ -746,7 +749,7 @@ public class FileDialog : Dialog
         _tbPath.ClearAllSelection ();
         _tbPath.Autocomplete.ClearSuggestions ();
 
-        if (State != null)
+        if (State is { })
         {
             State.RefreshChildren ();
             WriteStateToTableView ();
@@ -773,12 +776,12 @@ public class FileDialog : Dialog
             return 0;
         }
 
-        return Bounds.Width
-               - _btnOk.Bounds.Width
-               - _btnCancel.Bounds.Width
+        return Viewport.Width
+               - _btnOk.Viewport.Width
+               - _btnCancel.Viewport.Width
                - 1
 
-               // TODO: Fiddle factor, seems the Bounds are wrong for someone
+               // TODO: Fiddle factor, seems the Viewport are wrong for someone
                - 2;
     }
 
@@ -842,7 +845,7 @@ public class FileDialog : Dialog
     {
         IFileSystemInfo [] toDelete = GetFocusedFiles ();
 
-        if (toDelete != null && FileOperationsHandler.Delete (toDelete))
+        if (toDelete is { } && FileOperationsHandler.Delete (toDelete))
         {
             RefreshState ();
         }
@@ -876,7 +879,7 @@ public class FileDialog : Dialog
 
     private IFileSystemInfo [] GetFocusedFiles ()
     {
-        if (!_tableView.HasFocus || !_tableView.CanFocus || FileOperationsHandler == null)
+        if (!_tableView.HasFocus || !_tableView.CanFocus || FileOperationsHandler is null)
         {
             return null;
         }
@@ -1025,7 +1028,7 @@ public class FileDialog : Dialog
             {
                 FileSystemInfoStats add = State?.Children [p.Y];
 
-                if (add != null)
+                if (add is { })
                 {
                     toReturn.Add (add);
                 }
@@ -1054,11 +1057,11 @@ public class FileDialog : Dialog
 
     private void New ()
     {
-        if (State != null)
+        if (State is { })
         {
             IFileSystemInfo created = FileOperationsHandler.New (_fileSystem, State.Directory);
 
-            if (created != null)
+            if (created is { })
             {
                 RefreshState ();
                 RestoreSelection (created);
@@ -1068,9 +1071,9 @@ public class FileDialog : Dialog
 
     private void OnTableViewMouseClick (object sender, MouseEventEventArgs e)
     {
-        Point? clickedCell = _tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
+        Point? clickedCell = _tableView.ScreenToCell (e.MouseEvent.Position.X, e.MouseEvent.Position.Y, out int? clickedCol);
 
-        if (clickedCol != null)
+        if (clickedCol is { })
         {
             if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
             {
@@ -1085,7 +1088,7 @@ public class FileDialog : Dialog
         }
         else
         {
-            if (clickedCell != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (clickedCell is { } && e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 // right click in rest of table
                 ShowCellContextMenu (clickedCell, e);
@@ -1149,7 +1152,7 @@ public class FileDialog : Dialog
 
             _tbPath.Autocomplete.ClearSuggestions ();
 
-            if (pathText != null)
+            if (pathText is { })
             {
                 Path = pathText;
             }
@@ -1199,7 +1202,7 @@ public class FileDialog : Dialog
         {
             IFileSystemInfo newNamed = FileOperationsHandler.Rename (_fileSystem, toRename.Single ());
 
-            if (newNamed != null)
+            if (newNamed is { })
             {
                 RefreshState ();
                 RestoreSelection (newNamed);
@@ -1219,7 +1222,7 @@ public class FileDialog : Dialog
 
     //			ClearFeedback ();
 
-    //			if (allowedTypeMenuBar != null &&
+    //			if (allowedTypeMenuBar is { } &&
     //				keyEvent.ConsoleDriverKey == Key.Tab &&
     //				allowedTypeMenuBar.IsMenuOpen) {
     //				allowedTypeMenuBar.CloseMenu (false, false, false);
@@ -1229,7 +1232,7 @@ public class FileDialog : Dialog
     //		}
     private void RestartSearch ()
     {
-        if (_disposed || State?.Directory == null)
+        if (_disposed || State?.Directory is null)
         {
             return;
         }
@@ -1240,7 +1243,7 @@ public class FileDialog : Dialog
         }
 
         // user is clearing search terms
-        if (_tbFind.Text == null || _tbFind.Text.Length == 0)
+        if (_tbFind.Text is null || _tbFind.Text.Length == 0)
         {
             // Wait for search cancellation (if any) to finish
             // then push the current dir state
@@ -1259,14 +1262,14 @@ public class FileDialog : Dialog
 
     private void ShowCellContextMenu (Point? clickedCell, MouseEventEventArgs e)
     {
-        if (clickedCell == null)
+        if (clickedCell is null)
         {
             return;
         }
 
         var contextMenu = new ContextMenu
         {
-            Position = new Point (e.MouseEvent.X + 1, e.MouseEvent.Y + 1),
+            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
             MenuItems = new MenuBarItem (
                                          [
                                              new MenuItem (Strings.fdCtxNew, string.Empty, New),
@@ -1287,7 +1290,7 @@ public class FileDialog : Dialog
 
         var contextMenu = new ContextMenu
         {
-            Position = new Point (e.MouseEvent.X + 1, e.MouseEvent.Y + 1),
+            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
             MenuItems = new MenuBarItem (
                                          [
                                              new MenuItem (
@@ -1394,7 +1397,7 @@ public class FileDialog : Dialog
 
         FileSystemInfoStats stats = RowToStats (obj.NewRow);
 
-        if (stats == null)
+        if (stats is null)
         {
             return;
         }
@@ -1439,7 +1442,7 @@ public class FileDialog : Dialog
 
     private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e)
     {
-        if (e.NewValue == null)
+        if (e.NewValue is null)
         {
             return;
         }
@@ -1469,7 +1472,7 @@ public class FileDialog : Dialog
             return true;
         }
 
-        if (reason != null)
+        if (reason is { })
         {
             _feedback = reason;
             SetNeedsDisplay ();
@@ -1487,7 +1490,7 @@ public class FileDialog : Dialog
 
     private void WriteStateToTableView ()
     {
-        if (State == null)
+        if (State is null)
         {
             return;
         }
@@ -1511,7 +1514,7 @@ public class FileDialog : Dialog
                                                                   _fileDialog.State?.Children [idx]
                                                                  );
 
-            if (val == null)
+            if (val is null)
             {
                 return string.Empty;
             }

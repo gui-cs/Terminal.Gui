@@ -35,19 +35,19 @@ public class ConfigProperty
     /// <returns></returns>
     public bool Apply ()
     {
-        if (PropertyValue != null)
+        if (PropertyValue is { })
         {
             try
             {
-                if (PropertyInfo?.GetValue (null) != null)
+                if (PropertyInfo?.GetValue (null) is { })
                 {
-                    PropertyInfo?.SetValue (null, DeepMemberwiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
+                    PropertyInfo?.SetValue (null, DeepMemberWiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
                 }
             }
             catch (TargetInvocationException tie)
             {
                 // Check if there is an inner exception
-                if (tie.InnerException != null)
+                if (tie.InnerException is { })
                 {
                     // Handle the inner exception separately without catching the outer exception
                     Exception? innerException = tie.InnerException;
@@ -82,9 +82,9 @@ public class ConfigProperty
     /// <returns></returns>
     public static string GetJsonPropertyName (PropertyInfo pi)
     {
-        var jpna = pi.GetCustomAttribute (typeof (JsonPropertyNameAttribute)) as JsonPropertyNameAttribute;
+        var attr = pi.GetCustomAttribute (typeof (JsonPropertyNameAttribute)) as JsonPropertyNameAttribute;
 
-        return jpna?.Name ?? pi.Name;
+        return attr?.Name ?? pi.Name;
     }
 
     /// <summary>
@@ -96,14 +96,14 @@ public class ConfigProperty
 
     internal object? UpdateValueFrom (object source)
     {
-        if (source == null)
+        if (source is null)
         {
             return PropertyValue;
         }
 
         Type? ut = Nullable.GetUnderlyingType (PropertyInfo!.PropertyType);
 
-        if (source.GetType () != PropertyInfo!.PropertyType && ut != null && source.GetType () != ut)
+        if (source.GetType () != PropertyInfo!.PropertyType && ut is { } && source.GetType () != ut)
         {
             throw new ArgumentException (
                                          $"The source object ({
@@ -116,9 +116,9 @@ public class ConfigProperty
                                         );
         }
 
-        if (PropertyValue != null)
+        if (PropertyValue is { })
         {
-            PropertyValue = DeepMemberwiseCopy (source, PropertyValue);
+            PropertyValue = DeepMemberWiseCopy (source, PropertyValue);
         }
         else
         {

@@ -12,61 +12,47 @@ public class KeyTests
     public static TheoryData<string, Key> ValidStrings =>
         new ()
         {
-            { "a", new Key (KeyCode.A) },
-            { "Ctrl+A", new Key (KeyCode.A | KeyCode.CtrlMask) },
-            { "Alt+A", new Key (KeyCode.A | KeyCode.AltMask) },
-            { "Shift+A", new Key (KeyCode.A | KeyCode.ShiftMask) },
-            { "A", new Key (KeyCode.A | KeyCode.ShiftMask) },
+            { "a", Key.A },
+            { "Ctrl+A", Key.A.WithCtrl },
+            { "Alt+A", Key.A.WithAlt },
+            { "Shift+A", Key.A.WithShift },
+            { "A", Key.A.WithShift },
             { "â", new Key ((KeyCode)'â') },
             { "Shift+â", new Key ((KeyCode)'â' | KeyCode.ShiftMask) },
             { "Shift+Â", new Key ((KeyCode)'Â' | KeyCode.ShiftMask) },
-            { "Ctrl+Shift+CursorUp", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.CursorUp) },
-            {
-                "Ctrl+Alt+Shift+CursorUp",
-                new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)
-            },
-            {
-                "ctrl+alt+shift+cursorup",
-                new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)
-            },
-            {
-                "CTRL+ALT+SHIFT+CURSORUP",
-                new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)
-            },
-            {
-                "Ctrl+Alt+Shift+Delete",
-                new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Delete)
-            },
-            {
-                "Ctrl+Alt+Shift+Enter", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Enter)
-            },
-            { "Tab", new Key (KeyCode.Tab) },
-            { "Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask) },
-            { "Ctrl+Tab", new Key (KeyCode.Tab | KeyCode.CtrlMask) },
-            { "Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask) },
-            { "Ctrl+Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask) },
-            { "Ctrl+Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask | KeyCode.CtrlMask) },
-            { "", new Key (KeyCode.Null) },
-            { " ", new Key (KeyCode.Space) },
-            { "Space", new Key (KeyCode.Space) },
-            { "Shift+Space", new Key (KeyCode.Space | KeyCode.ShiftMask) },
-            { "Ctrl+Space", new Key (KeyCode.Space | KeyCode.CtrlMask) },
-            { "Alt+Space", new Key (KeyCode.Space | KeyCode.AltMask) },
-            { "Shift+ ", new Key (KeyCode.Space | KeyCode.ShiftMask) },
-            { "Ctrl+ ", new Key (KeyCode.Space | KeyCode.CtrlMask) },
-            { "Alt+ ", new Key (KeyCode.Space | KeyCode.AltMask) },
-            { "F1", new Key (KeyCode.F1) },
-            { "0", new Key (KeyCode.D0) },
-            { "9", new Key (KeyCode.D9) },
-            { "D0", new Key (KeyCode.D0) },
-            { "65", new Key (KeyCode.A | KeyCode.ShiftMask) },
-            { "97", new Key (KeyCode.A) },
-            { "Shift", new Key (KeyCode.ShiftMask) },
-            { "Ctrl", new Key (KeyCode.CtrlMask) },
-            { "Ctrl-A", new Key (KeyCode.A | KeyCode.CtrlMask) },
-            { "Alt-A", new Key (KeyCode.A | KeyCode.AltMask) },
-            { "A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask) },
-            { "Alt-A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask) }
+            { "Ctrl+Shift+CursorUp", Key.CursorUp.WithShift.WithCtrl },
+            { "Ctrl+Alt+Shift+CursorUp", Key.CursorUp.WithShift.WithCtrl.WithAlt },
+            { "ctrl+alt+shift+cursorup", Key.CursorUp.WithShift.WithCtrl.WithAlt },
+            { "CTRL+ALT+SHIFT+CURSORUP", Key.CursorUp.WithShift.WithCtrl.WithAlt },
+            { "Ctrl+Alt+Shift+Delete", Key.Delete.WithCtrl.WithAlt.WithShift },
+            { "Ctrl+Alt+Shift+Enter", Key.Enter.WithCtrl.WithAlt.WithShift },
+            { "Tab", Key.Tab },
+            { "Shift+Tab", Key.Tab.WithShift },
+            { "Ctrl+Tab", Key.Tab.WithCtrl },
+            { "Alt+Tab", Key.Tab.WithAlt },
+            { "Ctrl+Shift+Tab", Key.Tab.WithShift.WithCtrl },
+            { "Ctrl+Alt+Tab", Key.Tab.WithAlt.WithCtrl },
+            { "", Key.Empty },
+            { " ", Key.Space },
+            { "Space", Key.Space },
+            { "Shift+Space", Key.Space.WithShift },
+            { "Ctrl+Space", Key.Space.WithCtrl },
+            { "Alt+Space", Key.Space.WithAlt },
+            { "Shift+ ", Key.Space.WithShift },
+            { "Ctrl+ ", Key.Space.WithCtrl },
+            { "Alt+ ", Key.Space.WithAlt },
+            { "F1", Key.F1 },
+            { "0", Key.D0 },
+            { "9", Key.D9 },
+            { "D0", Key.D0 },
+            { "65", Key.A.WithShift },
+            { "97", Key.A },
+            { "Shift", KeyCode.ShiftMask },
+            { "Ctrl", KeyCode.CtrlMask },
+            { "Ctrl-A", Key.A.WithCtrl },
+            { "Alt-A", Key.A.WithAlt },
+            { "A-Ctrl", Key.A.WithCtrl },
+            { "Alt-A-Ctrl", Key.A.WithCtrl.WithAlt }
         };
 
     [Theory]
@@ -75,13 +61,11 @@ public class KeyTests
     [InlineData ((KeyCode)'英', '英')]
     [InlineData ((KeyCode)'{', '{')]
     [InlineData ((KeyCode)'\'', '\'')]
-    [InlineData ((KeyCode)'\r', '\r')]
     [InlineData ((KeyCode)'ó', 'ó')]
     [InlineData ((KeyCode)'ó' | KeyCode.ShiftMask, 'ó')]
     [InlineData ((KeyCode)'Ó', 'Ó')]
     [InlineData ((KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, '\0')]
-    [InlineData ((KeyCode)'a', 97)] // 97 or Key.Space | Key.A
-    [InlineData ((KeyCode)'A', 97)] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
+    [InlineData (KeyCode.A, 97)] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
     //[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
     [InlineData (KeyCode.ShiftMask | KeyCode.A, 65)]
     [InlineData (KeyCode.CtrlMask | KeyCode.A, '\0')]
@@ -90,8 +74,7 @@ public class KeyTests
     [InlineData (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.A, '\0')]
     [InlineData (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.A, '\0')]
     [InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.A, '\0')]
-    [InlineData ((KeyCode)'z', 'z')]
-    [InlineData ((KeyCode)'Z', 'z')]
+    [InlineData (KeyCode.Z, 'z')]
     [InlineData (KeyCode.ShiftMask | KeyCode.Z, 'Z')]
     [InlineData ((KeyCode)'1', '1')]
     [InlineData (KeyCode.ShiftMask | KeyCode.D1, '1')]
@@ -127,9 +110,6 @@ public class KeyTests
     [InlineData ('!', (KeyCode)'!')]
     [InlineData ('\r', KeyCode.Enter)]
     [InlineData ('\t', KeyCode.Tab)]
-#pragma warning disable xUnit1025 // InlineData should be unique within the Theory it belongs to
-    [InlineData ('\r', (KeyCode)13)]
-#pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
     [InlineData ('\n', (KeyCode)10)]
     [InlineData ('ó', (KeyCode)'ó')]
     [InlineData ('Ó', (KeyCode)'Ó')]
@@ -156,9 +136,9 @@ public class KeyTests
     [Theory]
     [InlineData (KeyCode.Enter, KeyCode.Enter)]
     [InlineData (KeyCode.Esc, KeyCode.Esc)]
-    [InlineData (KeyCode.A, (KeyCode)'a')]
+    [InlineData (KeyCode.A, KeyCode.A)]
     [InlineData (KeyCode.A | KeyCode.ShiftMask, KeyCode.A | KeyCode.ShiftMask)]
-    [InlineData (KeyCode.Z, (KeyCode)'z')]
+    [InlineData (KeyCode.Z, KeyCode.Z)]
     [InlineData (KeyCode.Space, KeyCode.Space)]
     public void Cast_KeyCode_To_Key (KeyCode cdk, KeyCode expected)
     {
@@ -265,8 +245,6 @@ public class KeyTests
     }
 
     [Theory]
-    [InlineData ((KeyCode)'a', true)]
-    [InlineData ((KeyCode)'a' | KeyCode.ShiftMask, true)]
     [InlineData (KeyCode.A, true)]
     [InlineData (KeyCode.A | KeyCode.ShiftMask, true)]
     [InlineData (KeyCode.F, true)]
@@ -319,14 +297,14 @@ public class KeyTests
 
         Assert.Equal (KeyCode.Delete | KeyCode.AltMask, CAD.NoCtrl);
 
-        Key a = new Key (KeyCode.A).WithCtrl.WithAlt.WithShift;
+        Key a = Key.A.WithCtrl.WithAlt.WithShift;
         Assert.Equal (KeyCode.A, a.NoCtrl.NoShift.NoAlt);
         Assert.Equal (KeyCode.A, a.NoAlt.NoShift.NoCtrl);
         Assert.Equal (KeyCode.A, a.NoAlt.NoShift.NoCtrl.NoCtrl.NoAlt.NoShift);
 
         Assert.Equal (Key.Delete, Key.Delete.WithCtrl.NoCtrl);
 
-        Assert.Equal ((KeyCode)Key.Delete | KeyCode.CtrlMask, Key.Delete.NoCtrl.WithCtrl);
+        Assert.Equal ((KeyCode)Key.Delete.WithCtrl, Key.Delete.NoCtrl.WithCtrl);
     }
 
     [Fact]
@@ -461,7 +439,7 @@ public class KeyTests
     [Fact]
     public void ToString_ShouldReturnReadableString ()
     {
-        var eventArgs = new Key (KeyCode.CtrlMask | KeyCode.A);
+        var eventArgs = Key.A.WithCtrl;
         Assert.Equal ("Ctrl+A", eventArgs.ToString ());
     }
 
@@ -540,10 +518,38 @@ public class KeyTests
     [Fact]
     public void WithShift_ShouldReturnCorrectValue ()
     {
-        var a = new Key (KeyCode.A);
+        var a = Key.A;
         Assert.Equal (KeyCode.A | KeyCode.ShiftMask, a.WithShift);
 
         Key CAD = Key.Delete.WithCtrl.WithAlt;
         Assert.Equal (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.AltMask, CAD);
+    }
+
+    // Test Equals
+    [Fact]
+    public void Equals_ShouldReturnTrue_WhenEqual ()
+    {
+        var a = Key.A;
+        var b = Key.A;
+        Assert.True (a.Equals (b));
+    }
+    
+    [Fact]
+    public void Equals_Handled_Changed_ShouldReturnTrue_WhenEqual ()
+    {
+        var a = Key.A;
+        a.Handled = true;
+        var b = Key.A;
+        b.Handled = true;
+        Assert.True (a.Equals (b));
+    }
+
+    [Fact]
+    public void Equals_Handled_Changed_ShouldReturnFalse_WhenNotEqual ()
+    {
+        var a = Key.A;
+        a.Handled = true;
+        var b = Key.A;
+        Assert.False (a.Equals (b));
     }
 }

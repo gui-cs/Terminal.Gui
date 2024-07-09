@@ -73,10 +73,10 @@ public class GraphView : View
                     }
                    );
 
-        KeyBindings.Add (KeyCode.CursorRight, Command.ScrollRight);
-        KeyBindings.Add (KeyCode.CursorLeft, Command.ScrollLeft);
-        KeyBindings.Add (KeyCode.CursorUp, Command.ScrollUp);
-        KeyBindings.Add (KeyCode.CursorDown, Command.ScrollDown);
+        KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
+        KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
+        KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
+        KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
 
         // Not bound by default (preserves backwards compatibility)
         //KeyBindings.Add (Key.PageUp, Command.PageUp);
@@ -192,12 +192,12 @@ public class GraphView : View
                           (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
 
                           // screen coordinates are top down while graph coordinates are bottom up
-                          Bounds.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
+                          Viewport.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
                          );
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         if (CellSize.X == 0 || CellSize.Y == 0)
         {
@@ -209,10 +209,10 @@ public class GraphView : View
         Move (0, 0);
 
         // clear all old content
-        for (var i = 0; i < Bounds.Height; i++)
+        for (var i = 0; i < Viewport.Height; i++)
         {
             Move (0, i);
-            Driver.AddStr (new string (' ', Bounds.Width));
+            Driver.AddStr (new string (' ', Viewport.Width));
         }
 
         // If there is no data do not display a graph
@@ -222,8 +222,8 @@ public class GraphView : View
         }
 
         // The drawable area of the graph (anything that isn't in the margins)
-        int graphScreenWidth = Bounds.Width - (int)MarginLeft;
-        int graphScreenHeight = Bounds.Height - (int)MarginBottom;
+        int graphScreenWidth = Viewport.Width - (int)MarginLeft;
+        int graphScreenHeight = Viewport.Height - (int)MarginBottom;
 
         // if the margins take up the full draw bounds don't render
         if (graphScreenWidth < 0 || graphScreenHeight < 0)
@@ -256,7 +256,7 @@ public class GraphView : View
 
         SetDriverColorToGraphColor ();
 
-        var drawBounds = new Rect ((int)MarginLeft, 0, graphScreenWidth, graphScreenHeight);
+        var drawBounds = new Rectangle ((int)MarginLeft, 0, graphScreenWidth, graphScreenHeight);
 
         RectangleF graphSpace = ScreenToGraphSpace (drawBounds);
 
@@ -277,20 +277,11 @@ public class GraphView : View
         }
     }
 
-    /// <inheritdoc/>
-    /// <remarks>Also ensures that cursor is invisible after entering the <see cref="GraphView"/>.</remarks>
-    public override bool OnEnter (View view)
-    {
-        Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
     /// <summary>Scrolls the graph down 1 page.</summary>
-    public void PageDown () { Scroll (0, -1 * CellSize.Y * Bounds.Height); }
+    public void PageDown () { Scroll (0, -1 * CellSize.Y * Viewport.Height); }
 
     /// <summary>Scrolls the graph up 1 page.</summary>
-    public void PageUp () { Scroll (0, CellSize.Y * Bounds.Height); }
+    public void PageUp () { Scroll (0, CellSize.Y * Viewport.Height); }
 
     /// <summary>
     ///     Clears all settings configured on the graph and resets all properties to default values (
@@ -314,23 +305,23 @@ public class GraphView : View
     /// <returns></returns>
     public RectangleF ScreenToGraphSpace (int col, int row)
     {
-        return new RectangleF (
-                               ScrollOffset.X + (col - MarginLeft) * CellSize.X,
-                               ScrollOffset.Y + (Bounds.Height - (row + MarginBottom + 1)) * CellSize.Y,
-                               CellSize.X,
-                               CellSize.Y
-                              );
+        return new (
+                    ScrollOffset.X + (col - MarginLeft) * CellSize.X,
+                    ScrollOffset.Y + (Viewport.Height - (row + MarginBottom + 1)) * CellSize.Y,
+                    CellSize.X,
+                    CellSize.Y
+                   );
     }
 
     /// <summary>Returns the section of the graph that is represented by the screen area.</summary>
     /// <param name="screenArea"></param>
     /// <returns></returns>
-    public RectangleF ScreenToGraphSpace (Rect screenArea)
+    public RectangleF ScreenToGraphSpace (Rectangle screenArea)
     {
         // get position of the bottom left
         RectangleF pos = ScreenToGraphSpace (screenArea.Left, screenArea.Bottom - 1);
 
-        return new RectangleF (pos.X, pos.Y, screenArea.Width * CellSize.X, screenArea.Height * CellSize.Y);
+        return pos with { Width = screenArea.Width * CellSize.X, Height = screenArea.Height * CellSize.Y };
     }
 
     /// <summary>
@@ -341,10 +332,10 @@ public class GraphView : View
     /// <param name="offsetY"></param>
     public void Scroll (float offsetX, float offsetY)
     {
-        ScrollOffset = new PointF (
-                                   ScrollOffset.X + offsetX,
-                                   ScrollOffset.Y + offsetY
-                                  );
+        ScrollOffset = new (
+                            ScrollOffset.X + offsetX,
+                            ScrollOffset.Y + offsetY
+                           );
 
         SetNeedsDisplay ();
     }

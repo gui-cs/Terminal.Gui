@@ -1,9 +1,5 @@
 ﻿using Xunit.Abstractions;
 
-//using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
-
-// Alias Console to MockConsole so we don't accidentally use Console
-
 namespace Terminal.Gui.DrawingTests;
 
 public class RulerTests
@@ -36,7 +32,7 @@ public class RulerTests
         ((FakeDriver)Application.Driver).SetBufferSize (25, 25);
 
         var r = new Ruler ();
-        r.Draw (new Point (0, 0));
+        r.Draw (Point.Empty);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
     }
 
@@ -48,16 +44,17 @@ public class RulerTests
 
         // Add a frame so we can see the ruler
         var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
-        Application.Top.Add (f);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (f);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
-        Assert.Equal (new Rect (0, 0, len + 5, 5), f.Frame);
+        Assert.Equal (new (0, 0, len + 5, 5), f.Frame);
 
         var r = new Ruler ();
         Assert.Equal (Orientation.Horizontal, r.Orientation);
 
         r.Length = len;
-        r.Draw (new Point (0, 0));
+        r.Draw (Point.Empty);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -71,7 +68,7 @@ public class RulerTests
 
         // Postive offset
         Application.Refresh ();
-        r.Draw (new Point (1, 1));
+        r.Draw (new (1, 1));
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -85,7 +82,7 @@ public class RulerTests
 
         // Negative offset
         Application.Refresh ();
-        r.Draw (new Point (-1, 1));
+        r.Draw (new (-1, 1));
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -99,7 +96,7 @@ public class RulerTests
 
         // Clip
         Application.Refresh ();
-        r.Draw (new Point (10, 1));
+        r.Draw (new (10, 1));
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -110,6 +107,7 @@ public class RulerTests
 └──────────────────┘",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -120,16 +118,17 @@ public class RulerTests
 
         // Add a frame so we can see the ruler
         var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
-        Application.Top.Add (f);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (f);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
-        Assert.Equal (new Rect (0, 0, len + 5, 5), f.Frame);
+        Assert.Equal (new (0, 0, len + 5, 5), f.Frame);
 
         var r = new Ruler ();
         Assert.Equal (Orientation.Horizontal, r.Orientation);
 
         r.Length = len;
-        r.Draw (new Point (0, 0), 1);
+        r.Draw (Point.Empty, 1);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -143,7 +142,7 @@ public class RulerTests
 
         Application.Refresh ();
         r.Length = len;
-        r.Draw (new Point (1, 0), 1);
+        r.Draw (new (1, 0), 1);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -154,6 +153,7 @@ public class RulerTests
 └──────────────────┘",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -165,15 +165,16 @@ public class RulerTests
         // Add a frame so we can see the ruler
         var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        Application.Top.Add (f);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (f);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
-        Assert.Equal (new Rect (0, 0, 5, len + 5), f.Frame);
+        Assert.Equal (new (0, 0, 5, len + 5), f.Frame);
 
         var r = new Ruler ();
         r.Orientation = Orientation.Vertical;
         r.Length = len;
-        r.Draw (new Point (0, 0));
+        r.Draw (Point.Empty);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -202,7 +203,7 @@ public class RulerTests
 
         // Postive offset
         Application.Refresh ();
-        r.Draw (new Point (1, 1));
+        r.Draw (new (1, 1));
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -231,7 +232,7 @@ public class RulerTests
 
         // Negative offset
         Application.Refresh ();
-        r.Draw (new Point (1, -1));
+        r.Draw (new (1, -1));
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -260,7 +261,7 @@ public class RulerTests
 
         // Clip
         Application.Refresh ();
-        r.Draw (new Point (1, 10));
+        r.Draw (new (1, 10));
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -286,6 +287,7 @@ public class RulerTests
 └9──┘",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -297,15 +299,16 @@ public class RulerTests
         // Add a frame so we can see the ruler
         var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        Application.Top.Add (f);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (f);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
-        Assert.Equal (new Rect (0, 0, 5, len + 5), f.Frame);
+        Assert.Equal (new (0, 0, 5, len + 5), f.Frame);
 
         var r = new Ruler ();
         r.Orientation = Orientation.Vertical;
         r.Length = len;
-        r.Draw (new Point (0, 0), 1);
+        r.Draw (Point.Empty, 1);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -334,7 +337,7 @@ public class RulerTests
 
         Application.Refresh ();
         r.Length = len;
-        r.Draw (new Point (0, 1), 1);
+        r.Draw (new (0, 1), 1);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -360,6 +363,7 @@ public class RulerTests
 └───┘",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]

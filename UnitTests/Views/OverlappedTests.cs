@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.Threading;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -98,6 +99,9 @@ public class OverlappedTests
         Application.Run (overlapped);
 
         Assert.Empty (Application.OverlappedChildren);
+        Assert.NotNull (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -180,6 +184,7 @@ public class OverlappedTests
         Application.Run (top1);
 
         Assert.Null (Application.OverlappedChildren);
+        top1.Dispose ();
     }
 
     [Fact]
@@ -190,11 +195,9 @@ public class OverlappedTests
 
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
-#if DEBUG_IDISPOSABLE
-        Assert.Equal (4, Responder.Instances.Count);
-#endif
 
         Application.End (rs);
+        top.Dispose ();
         Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
@@ -211,7 +214,7 @@ public class OverlappedTests
         var overlapped = new Toplevel { IsOverlappedContainer = true };
         RunState rs = Application.Begin (overlapped);
         Application.End (rs);
-
+        overlapped.Dispose ();
         Application.Shutdown ();
     }
 
@@ -237,6 +240,7 @@ public class OverlappedTests
                                  };
 
         Application.Run (overlapped);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -336,6 +340,9 @@ public class OverlappedTests
         Application.Run (overlapped);
 
         Assert.Empty (Application.OverlappedChildren);
+        Assert.NotNull (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -425,6 +432,9 @@ public class OverlappedTests
         Application.Run (overlapped);
 
         Assert.Empty (Application.OverlappedChildren);
+        Assert.NotNull (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -508,6 +518,9 @@ public class OverlappedTests
         Application.Run (overlapped);
 
         Assert.Empty (Application.OverlappedChildren);
+        Assert.NotNull (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -601,6 +614,9 @@ public class OverlappedTests
         Application.Run (overlapped);
 
         Assert.Empty (Application.OverlappedChildren);
+        Assert.NotNull (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -617,6 +633,7 @@ public class OverlappedTests
                             };
 
         Application.Run (overlapped);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -693,6 +710,9 @@ public class OverlappedTests
         Application.Run (overlapped);
 
         Assert.Empty (Application.OverlappedChildren);
+        Assert.NotNull (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -770,6 +790,9 @@ public class OverlappedTests
         Application.Run (overlapped);
 
         Assert.Empty (Application.OverlappedChildren);
+        Assert.NotNull (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -846,6 +869,9 @@ public class OverlappedTests
         Application.Run (overlapped);
 
         Assert.Empty (Application.OverlappedChildren);
+        Assert.NotNull (Application.OverlappedTop);
+        Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -856,97 +882,132 @@ public class OverlappedTests
         var win1 = new Window { Width = 5, Height = 5, Visible = false };
         var win2 = new Window { X = 1, Y = 1, Width = 5, Height = 5 };
         ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
-        RunState rs = Application.Begin (overlapped);
-        Application.Begin (win1);
-        Application.Begin (win2);
-        Assert.Equal (win2, Application.Current);
-        var firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌───┐
- │   │
- │   │
- │   │
- └───┘",
-                                                      _output
-                                                     );
-
-        Attribute [] attributes =
-        {
-            // 0
-            Colors.ColorSchemes ["TopLevel"].Normal,
-
-            // 1
-            Colors.ColorSchemes ["Base"].Normal
-        };
-
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
-0000000000
-0111110000
-0111110000
-0111110000
-0111110000
-0111110000
-0000000000
-0000000000
-0000000000
-0000000000",
-                                               null,
-                                               attributes
-                                              );
-
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed }
-                                                          )
-                                 );
-        Assert.Equal (win2, Application.MouseGrabView);
-
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = 2,
-                                                               Y = 2,
-                                                               Flags = MouseFlags.Button1Pressed
-                                                                       | MouseFlags.ReportMousePosition
-                                                           }
-                                                          )
-                                 );
+        RunState rsOverlapped = Application.Begin (overlapped);
 
         // Need to fool MainLoop into thinking it's running
         Application.MainLoop.Running = true;
-        Application.RunIteration (ref rs, ref firstIteration);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-  ┌───┐
-  │   │
-  │   │
-  │   │
-  └───┘",
-                                                      _output
-                                                     );
+        // RunIteration must be call on each iteration because
+        // it's using the Begin and not the Run method
+        var firstIteration = false;
+        Application.RunIteration (ref rsOverlapped, ref firstIteration);
 
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
-0000000000
-0000000000
-0011111000
-0011111000
-0011111000
-0011111000
-0011111000
-0000000000
-0000000000
-0000000000",
-                                               null,
-                                               attributes
-                                              );
+        Assert.Equal (overlapped, rsOverlapped.Toplevel);
+        Assert.Equal (Application.Top, rsOverlapped.Toplevel);
+        Assert.Equal (Application.OverlappedTop, rsOverlapped.Toplevel);
+        Assert.Equal (Application.Current, rsOverlapped.Toplevel);
+        Assert.Equal (overlapped, Application.Current);
 
+        RunState rsWin1 = Application.Begin (win1);
+        Application.RunIteration (ref rsOverlapped, ref firstIteration);
+
+        Assert.Equal (overlapped, rsOverlapped.Toplevel);
+        Assert.Equal (Application.Top, rsOverlapped.Toplevel);
+        Assert.Equal (Application.OverlappedTop, rsOverlapped.Toplevel);
+        // The win1 Visible is false and cannot be set as the Current
+        Assert.Equal (Application.Current, rsOverlapped.Toplevel);
+        Assert.Equal (overlapped, Application.Current);
+        Assert.Equal (win1, rsWin1.Toplevel);
+
+        RunState rsWin2 = Application.Begin (win2);
+        Application.RunIteration (ref rsOverlapped, ref firstIteration);
+
+        // Here the Current and the rsOverlapped.Toplevel is now the win2
+        // and not the original overlapped
+        Assert.Equal (win2, rsOverlapped.Toplevel);
+        Assert.Equal (Application.Top, overlapped);
+        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Equal (Application.Current, rsWin2.Toplevel);
+        Assert.Equal (win2, Application.Current);
+        Assert.Equal (win1, rsWin1.Toplevel);
+
+        // Tests that rely on visuals are too fragile. If border style changes they break.
+        // Instead we should just rely on the test above.
+
+        Application.OnMouseEvent (new MouseEvent { Position = new (1, 1), Flags = MouseFlags.Button1Pressed });
+        Assert.Equal (win2.Border, Application.MouseGrabView);
+
+        Application.RunIteration (ref rsOverlapped, ref firstIteration);
+
+        Assert.Equal (win2, rsOverlapped.Toplevel);
+        Assert.Equal (Application.Top, overlapped);
+        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Equal (Application.Current, rsWin2.Toplevel);
+        Assert.Equal (win2, Application.Current);
+        Assert.Equal (win1, rsWin1.Toplevel);
+
+        Application.OnMouseEvent (new MouseEvent
+        {
+            Position = new (2, 2), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+        });
+
+        Application.RunIteration (ref rsOverlapped, ref firstIteration);
+
+        Assert.Equal (win2, rsOverlapped.Toplevel);
+        Assert.Equal (Application.Top, overlapped);
+        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Equal (Application.Current, rsWin2.Toplevel);
+        Assert.Equal (win2, Application.Current);
+        Assert.Equal (win1, rsWin1.Toplevel);
+
+        // Tests that rely on visuals are too fragile. If border style changes they break.
+        // Instead we should just rely on the test above.
+
+        // This will end the win2 and not the overlapped
+        Application.End (rsOverlapped);
+        // rsOverlapped has been disposed and Toplevel property is null
+        // So we must use another valid RunState to iterate
+        Application.RunIteration (ref rsWin1, ref firstIteration);
+#if DEBUG_IDISPOSABLE
+        Assert.True (rsOverlapped.WasDisposed);
+#endif
+        Assert.Null (rsOverlapped.Toplevel);
+        Assert.Equal (Application.Top, overlapped);
+        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Equal (Application.Current, rsWin1.Toplevel);
+        Assert.Equal (win1, Application.Current);
+        Assert.Equal (win1, rsWin1.Toplevel);
+
+        Application.End (rsWin1);
+        // rsWin1 has been disposed and Toplevel property is null
+        // So we must use another valid RunState to iterate
+        Application.RunIteration (ref rsWin2, ref firstIteration);
+#if DEBUG_IDISPOSABLE
+        Assert.True (rsOverlapped.WasDisposed);
+        Assert.True (rsWin1.WasDisposed);
+#endif
+        Assert.Null (rsOverlapped.Toplevel);
+        Assert.Equal (Application.Top, overlapped);
+        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Equal (Application.Current, overlapped);
+        Assert.Null (rsWin1.Toplevel);
+        // See here that the only Toplevel that needs to End is the overlapped
+        // which the rsWin2 now has the Toplevel set to the overlapped
+        Assert.Equal (overlapped, rsWin2.Toplevel);
+
+        Application.End (rsWin2);
+        // There is no more RunState to iteration
+#if DEBUG_IDISPOSABLE
+        Assert.True (rsOverlapped.WasDisposed);
+        Assert.True (rsWin1.WasDisposed);
+        Assert.True (rsWin2.WasDisposed);
+#endif
+        Assert.Null (rsOverlapped.Toplevel);
+        Assert.Equal (Application.Top, overlapped);
+        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Null (Application.Current);
+        Assert.Null (rsWin1.Toplevel);
+        Assert.Null (rsWin2.Toplevel);
+
+#if DEBUG_IDISPOSABLE
+        Assert.False (win2.WasDisposed);
+        Assert.False (win1.WasDisposed);
+        Assert.False (overlapped.WasDisposed);
+#endif
+        // Now dispose all them
+        win2.Dispose ();
+        win1.Dispose ();
+        overlapped.Dispose ();
         Application.Shutdown ();
     }
 

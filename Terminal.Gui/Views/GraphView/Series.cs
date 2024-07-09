@@ -12,7 +12,7 @@ public interface ISeries
     /// <param name="graph">Graph series is to be drawn onto</param>
     /// <param name="drawBounds">Visible area of the graph in Console Screen units (excluding margins)</param>
     /// <param name="graphBounds">Visible area of the graph in Graph space units</param>
-    void DrawSeries (GraphView graph, Rect drawBounds, RectangleF graphBounds);
+    void DrawSeries (GraphView graph, Rectangle drawBounds, RectangleF graphBounds);
 }
 
 /// <summary>Series composed of any number of discrete data points</summary>
@@ -29,7 +29,7 @@ public class ScatterSeries : ISeries
     public List<PointF> Points { get; set; } = new ();
 
     /// <summary>Draws all points directly onto the graph</summary>
-    public void DrawSeries (GraphView graph, Rect drawBounds, RectangleF graphBounds)
+    public void DrawSeries (GraphView graph, Rectangle drawBounds, RectangleF graphBounds)
     {
         if (Fill.Color.HasValue)
         {
@@ -64,7 +64,7 @@ public class MultiBarSeries : ISeries
     {
         subSeries = new BarSeries [numberOfBarsPerCategory];
 
-        if (colors != null && colors.Length != numberOfBarsPerCategory)
+        if (colors is { } && colors.Length != numberOfBarsPerCategory)
         {
             throw new ArgumentException (
                                          "Number of colors must match the number of bars",
@@ -81,7 +81,7 @@ public class MultiBarSeries : ISeries
             // Only draw labels for the first bar in each category
             subSeries [i].DrawLabels = i == 0;
 
-            if (colors != null)
+            if (colors is { })
             {
                 subSeries [i].OverrideBarColor = colors [i];
             }
@@ -105,7 +105,7 @@ public class MultiBarSeries : ISeries
     /// <param name="graph"></param>
     /// <param name="drawBounds"></param>
     /// <param name="graphBounds"></param>
-    public void DrawSeries (GraphView graph, Rect drawBounds, RectangleF graphBounds)
+    public void DrawSeries (GraphView graph, Rectangle drawBounds, RectangleF graphBounds)
     {
         foreach (BarSeries bar in subSeries)
         {
@@ -172,7 +172,7 @@ public class BarSeries : ISeries
     /// <param name="graph"></param>
     /// <param name="drawBounds">Screen area of the graph excluding margins</param>
     /// <param name="graphBounds">Graph space area that should be drawn into <paramref name="drawBounds"/></param>
-    public virtual void DrawSeries (GraphView graph, Rect drawBounds, RectangleF graphBounds)
+    public virtual void DrawSeries (GraphView graph, Rectangle drawBounds, RectangleF graphBounds)
     {
         for (var i = 0; i < Bars.Count; i++)
         {
@@ -192,7 +192,7 @@ public class BarSeries : ISeries
                 screenStart.X = graph.AxisY.GetAxisXPosition (graph);
 
                 // dont draw bar off the right of the control
-                screenEnd.X = Math.Min (graph.Bounds.Width - 1, screenEnd.X);
+                screenEnd.X = Math.Min (graph.Viewport.Width - 1, screenEnd.X);
 
                 // if bar is off the screen
                 if (screenStart.Y < 0 || screenStart.Y > drawBounds.Height - graph.MarginBottom)

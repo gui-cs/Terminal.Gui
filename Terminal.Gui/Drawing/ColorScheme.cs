@@ -1,5 +1,5 @@
-﻿#nullable enable
-using System.Globalization;
+#nullable enable
+using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -13,7 +13,7 @@ namespace Terminal.Gui;
 ///     </para>
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
-public class ColorScheme : IEquatable<ColorScheme>
+public record ColorScheme : IEqualityOperators<ColorScheme, ColorScheme, bool>
 {
     private readonly Attribute _disabled;
     private readonly Attribute _focus;
@@ -26,12 +26,9 @@ public class ColorScheme : IEquatable<ColorScheme>
 
     /// <summary>Creates a new instance, initialized with the values from <paramref name="scheme"/>.</summary>
     /// <param name="scheme">The scheme to initialize the new instance with.</param>
-    public ColorScheme (ColorScheme scheme)
+    public ColorScheme (ColorScheme? scheme)
     {
-        if (scheme is null)
-        {
-            throw new ArgumentNullException (nameof (scheme));
-        }
+        ArgumentNullException.ThrowIfNull (scheme);
 
         _normal = scheme.Normal;
         _focus = scheme.Focus;
@@ -49,6 +46,21 @@ public class ColorScheme : IEquatable<ColorScheme>
         _hotNormal = attribute;
         _disabled = attribute;
         _hotFocus = attribute;
+    }
+
+    /// <summary>Creates a new instance, initialized with the values provided.</summary>
+    public ColorScheme (
+        Attribute normal,
+        Attribute focus,
+        Attribute hotNormal,
+        Attribute disabled,
+        Attribute hotFocus)
+    {
+        _normal = normal;
+        _focus = focus;
+        _hotNormal = hotNormal;
+        _disabled = disabled;
+        _hotFocus = hotFocus;
     }
 
     /// <summary>The default foreground and background color for text when the view is disabled.</summary>
@@ -89,7 +101,7 @@ public class ColorScheme : IEquatable<ColorScheme>
     /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
     /// <param name="other"></param>
     /// <returns>true if the two objects are equal</returns>
-    public bool Equals (ColorScheme? other)
+    public virtual bool Equals (ColorScheme? other)
     {
         return other is { }
                && EqualityComparer<Attribute>.Default.Equals (_normal, other._normal)
@@ -99,130 +111,13 @@ public class ColorScheme : IEquatable<ColorScheme>
                && EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
     }
 
-    /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
-    /// <param name="obj"></param>
-    /// <returns>true if the two objects are equal</returns>
-    public override bool Equals (object? obj) { return Equals (obj as ColorScheme); }
-
     /// <summary>Returns a hashcode for this instance.</summary>
     /// <returns>hashcode for this instance</returns>
     public override int GetHashCode ()
     {
-        int hashCode = -1242460230;
-        hashCode = hashCode * -1521134295 + _normal.GetHashCode ();
-        hashCode = hashCode * -1521134295 + _focus.GetHashCode ();
-        hashCode = hashCode * -1521134295 + _hotNormal.GetHashCode ();
-        hashCode = hashCode * -1521134295 + _hotFocus.GetHashCode ();
-        hashCode = hashCode * -1521134295 + _disabled.GetHashCode ();
-
-        return hashCode;
+        return HashCode.Combine (_normal, _focus, _hotNormal, _hotFocus, _disabled);
     }
-
-    /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns><c>true</c> if the two objects are equivalent</returns>
-    public static bool operator == (ColorScheme left, ColorScheme right) { return EqualityComparer<ColorScheme>.Default.Equals (left, right); }
-
-    /// <summary>Compares two <see cref="ColorScheme"/> objects for inequality.</summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns><c>true</c> if the two objects are not equivalent</returns>
-    public static bool operator != (ColorScheme left, ColorScheme right) { return !(left == right); }
 
     /// <inheritdoc/>
     public override string ToString () { return $"Normal: {Normal}; Focus: {Focus}; HotNormal: {HotNormal}; HotFocus: {HotFocus}; Disabled: {Disabled}"; }
-}
-
-/// <summary>
-///     Holds the <see cref="ColorScheme"/>s that define the <see cref="Attribute"/>s that are used by views to render
-///     themselves.
-/// </summary>
-public static class Colors
-{
-    static Colors () { Reset (); }
-
-    /// <summary>Gets a dictionary of defined <see cref="ColorScheme"/> objects.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         The <see cref="ColorSchemes"/> dictionary includes the following keys, by default:
-    ///         <list type="table">
-    ///             <listheader>
-    ///                 <term>Built-in Color Scheme</term> <description>Description</description>
-    ///             </listheader>
-    ///             <item>
-    ///                 <term>Base</term> <description>The base color scheme used for most Views.</description>
-    ///             </item>
-    ///             <item>
-    ///                 <term>TopLevel</term>
-    ///                 <description>The application Toplevel color scheme; used for the <see cref="Toplevel"/> View.</description>
-    ///             </item>
-    ///             <item>
-    ///                 <term>Dialog</term>
-    ///                 <description>
-    ///                     The dialog color scheme; used for <see cref="Dialog"/>, <see cref="MessageBox"/>, and
-    ///                     other views dialog-like views.
-    ///                 </description>
-    ///             </item>
-    ///             <item>
-    ///                 <term>Menu</term>
-    ///                 <description>
-    ///                     The menu color scheme; used for <see cref="MenuBar"/>, <see cref="ContextMenu"/>, and
-    ///                     <see cref="StatusBar"/>.
-    ///                 </description>
-    ///             </item>
-    ///             <item>
-    ///                 <term>Error</term>
-    ///                 <description>
-    ///                     The color scheme for showing errors, such as in
-    ///                     <see cref="MessageBox.ErrorQuery(string, string, string[])"/>.
-    ///                 </description>
-    ///             </item>
-    ///         </list>
-    ///     </para>
-    ///     <para>Changing the values of an entry in this dictionary will affect all views that use the scheme.</para>
-    ///     <para>
-    ///         <see cref="ConfigurationManager"/> can be used to override the default values for these schemes and add
-    ///         additional schemes. See <see cref="ConfigurationManager.Themes"/>.
-    ///     </para>
-    /// </remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
-    [JsonConverter (typeof (DictionaryJsonConverter<ColorScheme>))]
-    public static Dictionary<string, ColorScheme>
-        ColorSchemes { get; private set; } // Serialization requires this to have a setter (private set;)
-
-    /// <summary>Resets the <see cref="ColorSchemes"/> dictionary to the default values.</summary>
-    public static Dictionary<string, ColorScheme> Reset ()
-    {
-        ColorSchemes ??= new Dictionary<string, ColorScheme> (
-                                                              5,
-                                                              CultureInfo.InvariantCulture.CompareInfo
-                                                                         .GetStringComparer (
-                                                                                             CompareOptions.IgnoreCase
-                                                                                            )
-                                                             );
-        ColorSchemes.Clear ();
-        ColorSchemes.Add ("TopLevel", new ColorScheme ());
-        ColorSchemes.Add ("Base", new ColorScheme ());
-        ColorSchemes.Add ("Dialog", new ColorScheme ());
-        ColorSchemes.Add ("Menu", new ColorScheme ());
-        ColorSchemes.Add ("Error", new ColorScheme ());
-
-        return ColorSchemes;
-    }
-
-    private class SchemeNameComparerIgnoreCase : IEqualityComparer<string>
-    {
-        public bool Equals (string x, string y)
-        {
-            if (x != null && y != null)
-            {
-                return string.Equals (x, y, StringComparison.InvariantCultureIgnoreCase);
-            }
-
-            return false;
-        }
-
-        public int GetHashCode (string obj) { return obj.ToLowerInvariant ().GetHashCode (); }
-    }
 }

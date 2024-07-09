@@ -23,8 +23,10 @@ public class ResponderTests
     [Fact]
     public void Disposing_Event_Notify_All_Subscribers_On_The_First_Container ()
     {
+    #if DEBUG_IDISPOSABLE
         // Only clear before because need to test after assert
         Responder.Instances.Clear ();
+    #endif
 
         var container1 = new View { Id = "Container1" };
         var count = 0;
@@ -57,14 +59,18 @@ public class ResponderTests
 
         container1.Dispose ();
 
+    #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
+    #endif
     }
 
     [Fact]
     public void Disposing_Event_Notify_All_Subscribers_On_The_Second_Container ()
     {
+    #if DEBUG_IDISPOSABLE
         // Only clear before because need to test after assert
         Responder.Instances.Clear ();
+    #endif
 
         var container1 = new View { Id = "Container1" };
 
@@ -97,7 +103,9 @@ public class ResponderTests
 
         container2.Dispose ();
 
+    #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
+    #endif
     }
 
     [Fact]
@@ -105,28 +113,28 @@ public class ResponderTests
     public void IsOverridden_False_IfNotOverridden ()
     {
         // MouseEvent IS defined on Responder but NOT overridden
-        Assert.False (Responder.IsOverridden (new Responder (), "MouseEvent"));
+        Assert.False (Responder.IsOverridden (new Responder (), "OnMouseEvent"));
 
         // MouseEvent is defined on Responder and NOT overrident on View
         Assert.False (
                       Responder.IsOverridden (
-                                              new View { Text = "View does not override MouseEvent" },
-                                              "MouseEvent"
+                                              new View { Text = "View does not override OnMouseEvent" },
+                                              "OnMouseEvent"
                                              )
                      );
 
         Assert.False (
                       Responder.IsOverridden (
-                                              new DerivedView { Text = "DerivedView does not override MouseEvent" },
-                                              "MouseEvent"
+                                              new DerivedView { Text = "DerivedView does not override OnMouseEvent" },
+                                              "OnMouseEvent"
                                              )
                      );
 
         // MouseEvent is NOT defined on DerivedView 
         Assert.False (
                       Responder.IsOverridden (
-                                              new DerivedView { Text = "DerivedView does not override MouseEvent" },
-                                              "MouseEvent"
+                                              new DerivedView { Text = "DerivedView does not override OnMouseEvent" },
+                                              "OnMouseEvent"
                                              )
                      );
 
@@ -153,8 +161,8 @@ public class ResponderTests
         // MouseEvent is defined on Responder IS overriden on ScrollBarView (but not View)
         Assert.True (
                      Responder.IsOverridden (
-                                             new ScrollBarView { Text = "ScrollBarView overrides MouseEvent" },
-                                             "MouseEvent"
+                                             new ScrollBarView { Text = "ScrollBarView overrides OnMouseEvent" },
+                                             "OnMouseEvent"
                                             )
                     );
 
@@ -172,8 +180,8 @@ public class ResponderTests
         // ScrollBarView overrides both MouseEvent (from Responder) and Redraw (from View)
         Assert.True (
                      Responder.IsOverridden (
-                                             new ScrollBarView { Text = "ScrollBarView overrides MouseEvent" },
-                                             "MouseEvent"
+                                             new ScrollBarView { Text = "ScrollBarView overrides OnMouseEvent" },
+                                             "OnMouseEvent"
                                             )
                     );
 
@@ -181,13 +189,6 @@ public class ResponderTests
                      Responder.IsOverridden (
                                              new ScrollBarView { Text = "ScrollBarView overrides OnDrawContent" },
                                              "OnDrawContent"
-                                            )
-                    );
-
-        Assert.True (
-                     Responder.IsOverridden (
-                                             new Button { Text = "Button overrides MouseEvent" },
-                                             "MouseEvent"
                                             )
                     );
 #if DEBUG_IDISPOSABLE
@@ -221,10 +222,6 @@ public class ResponderTests
         var r = new Responder ();
         Assert.NotNull (r);
         Assert.Equal ("Terminal.Gui.Responder", r.ToString ());
-        Assert.False (r.CanFocus);
-        Assert.False (r.HasFocus);
-        Assert.True (r.Enabled);
-        Assert.True (r.Visible);
         r.Dispose ();
     }
 
@@ -237,9 +234,9 @@ public class ResponderTests
         //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
         Assert.False (r.OnKeyDown (new Key { KeyCode = KeyCode.Null }));
         Assert.False (r.OnKeyUp (new Key { KeyCode = KeyCode.Null }));
-        Assert.False (r.MouseEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
-        Assert.False (r.OnMouseEnter (new MouseEvent { Flags = MouseFlags.AllEvents }));
-        Assert.False (r.OnMouseLeave (new MouseEvent { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.NewMouseEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.NewMouseEnterEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.NewMouseLeaveEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
 
         var v = new View ();
         Assert.False (r.OnEnter (v));
@@ -256,8 +253,9 @@ public class ResponderTests
     public void Responder_Not_Notifying_Dispose ()
     {
         // Only clear before because need to test after assert
+    #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
-
+    #endif
         var container1 = new View { Id = "Container1" };
 
         var view = new View { Id = "View" };
@@ -279,7 +277,9 @@ public class ResponderTests
         Assert.Null (view.SuperView);
 
         // Trying access disposed properties
+    #if DEBUG_IDISPOSABLE
         Assert.True (container2.Subviews [0].WasDisposed);
+    #endif
         Assert.False (container2.Subviews [0].CanFocus);
         Assert.Null (container2.Subviews [0].Margin);
         Assert.Null (container2.Subviews [0].Border);
@@ -288,7 +288,9 @@ public class ResponderTests
 
         container2.Dispose ();
 
+    #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
+    #endif
     }
 
     public class DerivedView : View

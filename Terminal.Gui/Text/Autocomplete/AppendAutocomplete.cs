@@ -59,24 +59,24 @@ public class AppendAutocomplete : AutocompleteBase
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me, bool fromHost = false) { return false; }
+    public override bool OnMouseEvent (MouseEvent me, bool fromHost = false) { return false; }
 
     /// <inheritdoc/>
     public override bool ProcessKey (Key a)
     {
-        KeyCode key = a.KeyCode;
+        Key key = a.KeyCode;
 
         if (key == SelectionKey)
         {
             return AcceptSelectionIfAny ();
         }
 
-        if (key == KeyCode.CursorUp)
+        if (key == Key.CursorUp)
         {
             return CycleSuggestion (1);
         }
 
-        if (key == KeyCode.CursorDown)
+        if (key == Key.CursorDown)
         {
             return CycleSuggestion (-1);
         }
@@ -117,7 +117,7 @@ public class AppendAutocomplete : AutocompleteBase
         Suggestion suggestion = Suggestions.ElementAt (SelectedIdx);
         string fragment = suggestion.Replacement.Substring (suggestion.Remove);
 
-        int spaceAvailable = textField.Bounds.Width - textField.Text.GetColumns ();
+        int spaceAvailable = textField.Viewport.Width - textField.Text.GetColumns ();
         int spaceRequired = fragment.EnumerateRunes ().Sum (c => c.GetColumns ());
 
         if (spaceAvailable < spaceRequired)

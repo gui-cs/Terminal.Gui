@@ -2,6 +2,7 @@
 // Driver.cs: Curses-based Driver
 //
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Terminal.Gui.ConsoleDrivers;
 using Unix.Terminal;
@@ -213,8 +214,12 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests && Col >= 0 && Col < Cols && Row >= 0 && Row < Rows)
         {
             Curses.move (Row, Col);
+            Curses.raw ();
+            Curses.noecho ();
+            Curses.refresh ();
         }
     }
+
 
     public override void UpdateScreen ()
     {
@@ -282,7 +287,7 @@ internal class CursesDriver : ConsoleDriver
         StopReportingMouseMoves ();
         SetCursorVisibility (CursorVisibility.Default);
 
-        if (_mainLoopDriver != null)
+        if (_mainLoopDriver is { })
         {
             _mainLoopDriver.RemoveWatch (_processInputToken);
         }
@@ -510,9 +515,10 @@ internal class CursesDriver : ConsoleDriver
             {
                 // The ESC-number handling, debatable.
                 // Simulates the AltMask itself by pressing Alt + Space.
+                // Needed for macOS
                 if (wch2 == (int)KeyCode.Space)
                 {
-                    k = KeyCode.AltMask;
+                    k = KeyCode.AltMask | KeyCode.Space;
                 }
                 else if (wch2 - (int)KeyCode.Space >= (uint)KeyCode.A
                          && wch2 - (int)KeyCode.Space <= (uint)KeyCode.Z)
@@ -527,47 +533,57 @@ internal class CursesDriver : ConsoleDriver
                 {
                     k = (KeyCode)((uint)KeyCode.AltMask + (uint)KeyCode.D0 + (wch2 - (uint)KeyCode.D0));
                 }
-                else if (wch2 == Curses.KeyCSI)
+                else
                 {
                     ConsoleKeyInfo [] cki =
-                    {
-                        new ((char)KeyCode.Esc, 0, false, false, false), new ('[', 0, false, false, false)
-                    };
+                    [
+                        new ((char)KeyCode.Esc, 0, false, false, false), new ((char)wch2, 0, false, false, false)
+                    ];
                     HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
 
                     return;
                 }
-                else
-                {
-                    // Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
-                    if (((KeyCode)wch2 & KeyCode.CtrlMask) != 0)
-                    {
-                        k = (KeyCode)((uint)KeyCode.CtrlMask + (wch2 & ~(int)KeyCode.CtrlMask));
-                    }
+                //else if (wch2 == Curses.KeyCSI)
+                //{
+                //    ConsoleKeyInfo [] cki =
+                //    {
+                //        new ((char)KeyCode.Esc, 0, false, false, false), new ('[', 0, false, false, false)
+                //    };
+                //    HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
 
-                    if (wch2 == 0)
-                    {
-                        k = KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Space;
-                    }
-                    else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z)
-                    {
-                        k = KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.Space;
-                    }
-                    else if (wch2 < 256)
-                    {
-                        k = (KeyCode)wch2; // | KeyCode.AltMask;
-                    }
-                    else
-                    {
-                        k = (KeyCode)((uint)(KeyCode.AltMask | KeyCode.CtrlMask) + wch2);
-                    }
-                }
+                //    return;
+                //}
+                //else
+                //{
+                //    // Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
+                //    if (((KeyCode)wch2 & KeyCode.CtrlMask) != 0)
+                //    {
+                //        k = (KeyCode)((uint)KeyCode.CtrlMask + (wch2 & ~(int)KeyCode.CtrlMask));
+                //    }
+
+                //    if (wch2 == 0)
+                //    {
+                //        k = KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Space;
+                //    }
+                //    //else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z)
+                //    //{
+                //    //    k = KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.Space;
+                //    //}
+                //    else if (wch2 < 256)
+                //    {
+                //        k = (KeyCode)wch2; // | KeyCode.AltMask;
+                //    }
+                //    else
+                //    {
+                //        k = (KeyCode)((uint)(KeyCode.AltMask | KeyCode.CtrlMask) + wch2);
+                //    }
+                //}
 
                 key = new Key (k);
             }
             else
             {
-                key = new Key (KeyCode.Esc);
+                key = Key.Esc;
             }
 
             OnKeyDown (key);
@@ -576,6 +592,13 @@ internal class CursesDriver : ConsoleDriver
         else if (wch == Curses.KeyTab)
         {
             k = MapCursesKey (wch);
+            OnKeyDown (new Key (k));
+            OnKeyUp (new Key (k));
+        }
+        else if (wch == 127)
+        {
+            // Backspace needed for macOS
+            k = KeyCode.Backspace;
             OnKeyDown (new Key (k));
             OnKeyUp (new Key (k));
         }
@@ -605,6 +628,13 @@ internal class CursesDriver : ConsoleDriver
                 k = KeyCode.Enter;
             }
 
+            // Strip the KeyCode.Space flag off if it's set
+            //if (k != KeyCode.Space && k.HasFlag (KeyCode.Space))
+            if (Key.GetIsKeyCodeAtoZ (k) && (k & KeyCode.Space) != 0)
+            {
+                k &= ~KeyCode.Space;
+            }
+
             OnKeyDown (new Key (k));
             OnKeyUp (new Key (k));
         }
@@ -615,7 +645,7 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests && Curses.CheckWinChange ())
         {
             ClearContents ();
-            OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
+            OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
         }
     }
 
@@ -798,6 +828,9 @@ internal class CursesDriver : ConsoleDriver
                    || flag.HasFlag (MouseFlags.Button4DoubleClicked);
         }
 
+        Debug.WriteLine ($"CursesDriver: ({pos.X},{pos.Y}) - {mouseFlag}");
+
+
         if ((WasButtonReleased (mouseFlag) && IsButtonNotPressed (_lastMouseFlags)) || (IsButtonClickedOrDoubleClicked (mouseFlag) && _lastMouseFlags == 0))
         {
             return;
@@ -805,8 +838,10 @@ internal class CursesDriver : ConsoleDriver
 
         _lastMouseFlags = mouseFlag;
 
-        var me = new MouseEvent { Flags = mouseFlag, X = pos.X, Y = pos.Y };
-        OnMouseEvent (new MouseEventEventArgs (me));
+        var me = new MouseEvent { Flags = mouseFlag, Position = pos };
+        //Debug.WriteLine ($"CursesDriver: ({me.Position}) - {me.Flags}");
+
+        OnMouseEvent (me);
     }
 
     #region Color Handling
@@ -817,7 +852,7 @@ internal class CursesDriver : ConsoleDriver
     /// <returns></returns>
     private static Attribute MakeColor (short foreground, short background)
     {
-        var v = (short)(foreground | (background << 4));
+        var v = (short)((ushort)foreground | (background << 4));
 
         // TODO: for TrueColor - Use InitExtendedPair
         Curses.InitColorPair (v, foreground, background);
@@ -835,7 +870,7 @@ internal class CursesDriver : ConsoleDriver
     ///     bits, and the background color is stored in the least significant 4 bits. The Terminal.GUi Color values are
     ///     converted to curses color encoding before being encoded.
     /// </remarks>
-    public override Attribute MakeColor (Color foreground, Color background)
+    public override Attribute MakeColor (in Color foreground, in Color background)
     {
         if (!RunningUnitTests)
         {

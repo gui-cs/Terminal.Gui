@@ -1,11 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <!-- https://stackoverflow.com/questions/294216/why-does-c-sharp-forbid-generic-attribute-types -->
-    <!-- for AutoInitShutdown attribute -->
-    <LangVersion>Preview</LangVersion>
-    <IsPackable>false</IsPackable>
-    <UseDataCollector />
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- In the source tree the version will always be 2.0 for all projects. -->
     <!-- Do not modify these. -->
@@ -14,24 +8,37 @@
     <Version>2.0</Version>
     <InformationalVersion>2.0</InformationalVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE</DefineConstants>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>12</LangVersion>
+    <IsPackable>false</IsPackable>
+    <UseDataCollector />
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineTrace>true</DefineTrace>
+    <DebugType>portable</DebugType>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoLogo>true</NoLogo>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineDebug>true</DefineDebug>
+    <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="ReportGenerator" Version="5.2.0" />
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="20.0.4" />
-    <PackageReference Include="xunit" Version="2.6.6" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="ReportGenerator" Version="5.3.7" />
+    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.0.22" />
+    <PackageReference Include="xunit" Version="2.9.0" />
     <PackageReference Include="Xunit.Combinatorial" Version="1.6.24" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6">
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="6.0.0">
+    <PackageReference Include="coverlet.collector" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -46,8 +53,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Using Include="System.Drawing" />
     <Using Include="Terminal.Gui" />
     <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
   </ItemGroup>
   <PropertyGroup Label="FineCodeCoverage">
     <Enabled>
@@ -67,7 +78,5 @@
     <IncludeTestAssembly>
       False
     </IncludeTestAssembly>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 </Project>

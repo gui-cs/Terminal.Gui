@@ -1,74 +1,114 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
-/// <summary>The <see cref="CheckBox"/> <see cref="View"/> shows an on/off toggle that the user can set</summary>
+/// <summary>
+///     Represents the state of a <see cref="CheckBox"/>.
+/// </summary>
+public enum CheckState
+{
+    None,
+    Checked,
+    UnChecked
+}
+
+/// <summary>Shows a check box that can be toggled.</summary>
 public class CheckBox : View
 {
-    private readonly Rune _charChecked;
-    private readonly Rune _charNullChecked;
-    private readonly Rune _charUnChecked;
-    private bool _allowNullChecked;
-    private bool? _checked = false;
+    private bool _allowNone;
+    private CheckState _checked = CheckState.UnChecked;
 
     /// <summary>
-    ///     Initializes a new instance of <see cref="CheckBox"/> based on the given text, using
-    ///     <see cref="LayoutStyle.Computed"/> layout.
+    ///     Initializes a new instance of <see cref="CheckBox"/>.
     /// </summary>
     public CheckBox ()
     {
-        _charNullChecked = Glyphs.NullChecked;
-        _charChecked = Glyphs.Checked;
-        _charUnChecked = Glyphs.UnChecked;
-        HotKeySpecifier = (Rune)'_';
-
-        // Ensures a height of 1 if AutoSize is set to false
-        Height = 1;
+        Width = Dim.Auto (DimAutoStyle.Text);
+        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
         CanFocus = true;
-        AutoSize = true;
 
         // Things this view knows how to do
-        AddCommand (Command.ToggleChecked, () => ToggleChecked ());
-
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        if (!HasFocus)
-                        {
-                            SetFocus ();
-                        }
-
-                        ToggleChecked ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.Accept, OnToggle);
+        AddCommand (Command.HotKey, OnToggle);
 
         // Default keybindings for this view
-        KeyBindings.Add (Key.Space, Command.ToggleChecked);
+        KeyBindings.Add (Key.Space, Command.Accept);
+
+        TitleChanged += Checkbox_TitleChanged;
+
+        HighlightStyle = Gui.HighlightStyle.PressedOutside | Gui.HighlightStyle.Pressed;
+        MouseClick += CheckBox_MouseClick;
+    }
+
+    private void CheckBox_MouseClick (object? sender, MouseEventEventArgs e)
+    {
+        e.Handled = OnToggle () == true;
+    }
+
+    private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
+    {
+        base.Text = e.CurrentValue;
+        TextFormatter.HotKeySpecifier = HotKeySpecifier;
+    }
+
+    /// <inheritdoc />
+    public override string Text
+    {
+        get => base.Title;
+        set => base.Text = base.Title = value;
+    }
+
+    /// <inheritdoc />
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
     }
 
     /// <summary>
-    ///     If <see langword="true"/> allows <see cref="Checked"/> to be null, true or false. If <see langword="false"/>
-    ///     only allows <see cref="Checked"/> to be true or false.
+    ///     If <see langword="true"/> allows <see cref="State"/> to be <see cref="CheckState.None"/>.
     /// </summary>
-    public bool AllowNullChecked
+    public bool AllowCheckStateNone
     {
-        get => _allowNullChecked;
+        get => _allowNone;
         set
         {
-            _allowNullChecked = value;
-            Checked ??= false;
+            if (_allowNone == value)
+            {
+                return;
+            }
+            _allowNone = value;
+
+            if (State == CheckState.None)
+            {
+                State = CheckState.UnChecked;
+            }
         }
     }
 
-    /// <summary>The state of the <see cref="CheckBox"/></summary>
-    public bool? Checked
+    /// <summary>
+    ///     The state of the <see cref="CheckBox"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///        If <see cref="AllowCheckStateNone"/> is <see langword="true"/> and <see cref="CheckState.None"/>, the <see cref="CheckBox"/>
+    ///        will display the <c>ConfigurationManager.Glyphs.CheckStateNone</c> character (☒).
+    ///     </para>
+    ///     <para>
+    ///        If <see cref="CheckState.UnChecked"/>, the <see cref="CheckBox"/>
+    ///        will display the <c>ConfigurationManager.Glyphs.CheckStateUnChecked</c> character (☐).
+    ///     </para>
+    ///     <para>
+    ///        If <see cref="CheckState.Checked"/>, the <see cref="CheckBox"/>
+    ///        will display the <c>ConfigurationManager.Glyphs.CheckStateChecked</c> character (☑).
+    ///     </para>
+    /// </remarks>
+    public CheckState State
     {
         get => _checked;
         set
         {
-            if (value == null && !AllowNullChecked)
+            if (_checked == value || (value is CheckState.None && !AllowCheckStateNone))
             {
                 return;
             }
@@ -79,150 +119,92 @@ public class CheckBox : View
         }
     }
 
-    /// <inheritdoc/>
-    public override Key HotKey
+    /// <summary>Called when the <see cref="State"/> property changes. Invokes the cancelable <see cref="Toggle"/> event.</summary>
+    /// <remarks>
+    /// </remarks>
+    /// <returns>If <see langword="true"/> the <see cref="Toggle"/> event was canceled.</returns>
+    /// <remarks>
+    ///     Toggling cycles through the states <see cref="CheckState.None"/>, <see cref="CheckState.Checked"/>, and <see cref="CheckState.UnChecked"/>.
+    /// </remarks>
+    public bool? OnToggle ()
     {
-        get => base.HotKey;
-        set
+        CheckState oldValue = State;
+        CancelEventArgs<CheckState> e = new (ref _checked, ref oldValue);
+
+        switch (State)
         {
-            if (value is null)
-            {
-                throw new ArgumentException (nameof (value));
-            }
+            case CheckState.None:
+                e.NewValue = CheckState.Checked;
 
-            Key prev = base.HotKey;
+                break;
+            case CheckState.Checked:
+                e.NewValue = CheckState.UnChecked;
 
-            if (prev != value)
-            {
-                base.HotKey = TextFormatter.HotKey = value;
-
-                // Also add Alt+HotKey
-                if (prev != Key.Empty && KeyBindings.TryGet (prev.WithAlt, out _))
+                break;
+            case CheckState.UnChecked:
+                if (AllowCheckStateNone)
                 {
-                    if (value.KeyCode == KeyCode.Null)
-                    {
-                        KeyBindings.Remove (prev.WithAlt);
-                    }
-                    else
-                    {
-                        KeyBindings.Replace (prev.WithAlt, value.WithAlt);
-                    }
+                    e.NewValue = CheckState.None;
                 }
-                else if (value != Key.Empty)
+                else
                 {
-                    KeyBindings.Add (value.WithAlt, Command.Accept);
+                    e.NewValue = CheckState.Checked;
                 }
-            }
-        }
-    }
 
-    /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
-    {
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) || !CanFocus)
-        {
-            return false;
+                break;
         }
 
-        ToggleChecked ();
+        Toggle?.Invoke (this, e);
+        if (e.Cancel)
+        {
+            return e.Cancel;
+        }
+
+        // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
+        if (OnAccept () == true)
+        {
+            return true;
+        }
+
+        State = e.NewValue;
 
         return true;
     }
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
-    /// <summary>Called when the <see cref="Checked"/> property changes. Invokes the <see cref="Toggled"/> event.</summary>
-    public virtual void OnToggled (ToggleEventArgs e) { Toggled?.Invoke (this, e); }
-
-    /// <inheritdoc/>
-    public override void PositionCursor () { Move (0, 0); }
-
-    /// <summary>Toggled event, raised when the <see cref="CheckBox"/>  is toggled.</summary>
+    /// <summary>Toggle event, raised when the <see cref="CheckBox"/> is toggled.</summary>
     /// <remarks>
-    ///     Client code can hook up to this event, it is raised when the <see cref="CheckBox"/> is activated either with
-    ///     the mouse or the keyboard. The passed <c>bool</c> contains the previous state.
+    /// <para>
+    ///    This event can be cancelled. If cancelled, the <see cref="CheckBox"/> will not change its state.
+    /// </para>
     /// </remarks>
-    public event EventHandler<ToggleEventArgs> Toggled;
+    public event EventHandler<CancelEventArgs<CheckState>>? Toggle;
 
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
         switch (TextAlignment)
         {
-            case TextAlignment.Left:
-            case TextAlignment.Centered:
-            case TextAlignment.Justified:
-                TextFormatter.Text = $"{GetCheckedState ()} {GetFormatterText ()}";
+            case Alignment.Start:
+            case Alignment.Center:
+            case Alignment.Fill:
+                TextFormatter.Text = $"{GetCheckedGlyph ()} {Text}";
 
                 break;
-            case TextAlignment.Right:
-                TextFormatter.Text = $"{GetFormatterText ()} {GetCheckedState ()}";
+            case Alignment.End:
+                TextFormatter.Text = $"{Text} {GetCheckedGlyph ()}";
 
                 break;
         }
     }
 
-    private Rune GetCheckedState ()
+    private Rune GetCheckedGlyph ()
     {
-        return Checked switch
-               {
-                   true => _charChecked,
-                   false => _charUnChecked,
-                   var _ => _charNullChecked
-               };
-    }
-
-    private string GetFormatterText ()
-    {
-        if (AutoSize || string.IsNullOrEmpty (Text) || Frame.Width <= 2)
+        return State switch
         {
-            return Text;
-        }
-
-        return Text [..Math.Min (Frame.Width - 2, Text.GetRuneCount ())];
-    }
-
-    private bool ToggleChecked ()
-    {
-        if (!HasFocus)
-        {
-            SetFocus ();
-        }
-
-        bool? previousChecked = Checked;
-
-        if (AllowNullChecked)
-        {
-            switch (previousChecked)
-            {
-                case null:
-                    Checked = true;
-
-                    break;
-                case true:
-                    Checked = false;
-
-                    break;
-                case false:
-                    Checked = null;
-
-                    break;
-            }
-        }
-        else
-        {
-            Checked = !Checked;
-        }
-
-        OnToggled (new ToggleEventArgs (previousChecked, Checked));
-        SetNeedsDisplay ();
-
-        return true;
+            CheckState.Checked => Glyphs.CheckStateChecked,
+            CheckState.UnChecked => Glyphs.CheckStateUnChecked,
+            CheckState.None => Glyphs.CheckStateNone,
+            _ => throw new ArgumentOutOfRangeException ()
+        };
     }
 }

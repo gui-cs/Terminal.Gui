@@ -1,10 +1,10 @@
-﻿namespace Terminal.Gui;
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete'
 ///     options.
 /// </summary>
-public abstract class PopupAutocomplete : AutocompleteBase
+public abstract partial class PopupAutocomplete : AutocompleteBase
 {
     private bool closed;
     private ColorScheme colorScheme;
@@ -23,7 +23,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
     {
         get
         {
-            if (colorScheme == null)
+            if (colorScheme is null)
             {
                 colorScheme = Colors.ColorSchemes ["Menu"];
             }
@@ -42,7 +42,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             hostControl = value;
             top = hostControl.SuperView;
 
-            if (top != null)
+            if (top is { })
             {
                 top.DrawContent += Top_DrawContent;
                 top.DrawContentComplete += Top_DrawContentComplete;
@@ -57,7 +57,9 @@ public abstract class PopupAutocomplete : AutocompleteBase
     /// </summary>
     public virtual int ScrollOffset { get; set; }
 
+    #nullable enable
     private Point? LastPopupPos { get; set; }
+    #nullable restore
 
     /// <inheritdoc/>
     public override void EnsureSelectedIdxIsValid ()
@@ -84,7 +86,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
     /// <param name="me">The mouse event.</param>
     /// <param name="fromHost">If was called from the popup or from the host.</param>
     /// <returns><c>true</c>if the mouse can be handled <c>false</c>otherwise.</returns>
-    public override bool MouseEvent (MouseEvent me, bool fromHost = false)
+    public override bool OnMouseEvent (MouseEvent me, bool fromHost = false)
     {
         if (fromHost)
         {
@@ -114,7 +116,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             }
 
             // not in the popup
-            if (Visible && HostControl != null)
+            if (Visible && HostControl is { })
             {
                 Visible = false;
                 closed = false;
@@ -125,7 +127,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (popup == null || Suggestions.Count == 0)
+        if (popup is null || Suggestions.Count == 0)
         {
             ManipulatePopup ();
 
@@ -141,7 +143,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
         if (me.Flags == MouseFlags.Button1Clicked)
         {
-            SelectedIdx = me.Y - ScrollOffset;
+            SelectedIdx = me.Position.Y - ScrollOffset;
 
             return Select ();
         }
@@ -167,11 +169,11 @@ public abstract class PopupAutocomplete : AutocompleteBase
     ///     Handle key events before <see cref="HostControl"/> e.g. to make key events like up/down apply to the
     ///     autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
-    /// <param name="a">The key event.</param>
+    /// <param name="key">The key event.</param>
     /// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-    public override bool ProcessKey (Key a)
+    public override bool ProcessKey (Key key)
     {
-        if (SuggestionGenerator.IsWordChar ((Rune)a))
+        if (SuggestionGenerator.IsWordChar ((Rune)key))
         {
             Visible = true;
             ManipulatePopup ();
@@ -180,7 +182,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (a.KeyCode == Reopen)
+        if (key == Reopen)
         {
             Context.Canceled = false;
 
@@ -199,14 +201,14 @@ public abstract class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (a.KeyCode == KeyCode.CursorDown)
+        if (key == Key.CursorDown)
         {
             MoveDown ();
 
             return true;
         }
 
-        if (a.KeyCode == KeyCode.CursorUp)
+        if (key == Key.CursorUp)
         {
             MoveUp ();
 
@@ -225,12 +227,12 @@ public abstract class PopupAutocomplete : AutocompleteBase
             return false;
         }*/
 
-        if (a.KeyCode == SelectionKey)
+        if (key == SelectionKey)
         {
             return Select ();
         }
 
-        if (a.KeyCode == CloseKey)
+        if (key == CloseKey)
         {
             Close ();
             Context.Canceled = true;
@@ -247,7 +249,7 @@ public abstract class PopupAutocomplete : AutocompleteBase
     {
         if (!Context.Canceled && Suggestions.Count > 0 && !Visible && HostControl?.HasFocus == true)
         {
-            ProcessKey (new Key ((KeyCode)Suggestions [0].Title [0]));
+            ProcessKey (new Key (Suggestions [0].Title [0]));
         }
         else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0)
         {
@@ -269,13 +271,13 @@ public abstract class PopupAutocomplete : AutocompleteBase
         if (PopupInsideContainer)
         {
             // don't overspill vertically
-            height = Math.Min (HostControl.Bounds.Height - renderAt.Y, MaxHeight);
+            height = Math.Min (HostControl.Viewport.Height - renderAt.Y, MaxHeight);
 
             // There is no space below, lets see if can popup on top
-            if (height < Suggestions.Count && HostControl.Bounds.Height - renderAt.Y >= height)
+            if (height < Suggestions.Count && HostControl.Viewport.Height - renderAt.Y >= height)
             {
                 // Verifies that the upper limit available is greater than the lower limit
-                if (renderAt.Y > HostControl.Bounds.Height - renderAt.Y)
+                if (renderAt.Y > HostControl.Viewport.Height - renderAt.Y)
                 {
                     renderAt.Y = Math.Max (renderAt.Y - Math.Min (Suggestions.Count + 1, MaxHeight + 1), 0);
                     height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), LastPopupPos.Value.Y - 1);
@@ -285,13 +287,13 @@ public abstract class PopupAutocomplete : AutocompleteBase
         else
         {
             // don't overspill vertically
-            height = Math.Min (Math.Min (top.Bounds.Height - HostControl.Frame.Bottom, MaxHeight), Suggestions.Count);
+            height = Math.Min (Math.Min (top.Viewport.Height - HostControl.Frame.Bottom, MaxHeight), Suggestions.Count);
 
             // There is no space below, lets see if can popup on top
             if (height < Suggestions.Count && HostControl.Frame.Y - top.Frame.Y >= height)
             {
                 // Verifies that the upper limit available is greater than the lower limit
-                if (HostControl.Frame.Y > top.Bounds.Height - HostControl.Frame.Y)
+                if (HostControl.Frame.Y > top.Viewport.Height - HostControl.Frame.Y)
                 {
                     renderAt.Y = Math.Max (HostControl.Frame.Y - Math.Min (Suggestions.Count, MaxHeight), 0);
                     height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), HostControl.Frame.Y);
@@ -321,51 +323,51 @@ public abstract class PopupAutocomplete : AutocompleteBase
         if (PopupInsideContainer)
         {
             // don't overspill horizontally, let's see if can be displayed on the left
-            if (width > HostControl.Bounds.Width - renderAt.X)
+            if (width > HostControl.Viewport.Width - renderAt.X)
             {
                 // Verifies that the left limit available is greater than the right limit
-                if (renderAt.X > HostControl.Bounds.Width - renderAt.X)
+                if (renderAt.X > HostControl.Viewport.Width - renderAt.X)
                 {
                     renderAt.X -= Math.Min (width, LastPopupPos.Value.X);
                     width = Math.Min (width, LastPopupPos.Value.X);
                 }
                 else
                 {
-                    width = Math.Min (width, HostControl.Bounds.Width - renderAt.X);
+                    width = Math.Min (width, HostControl.Viewport.Width - renderAt.X);
                 }
             }
         }
         else
         {
             // don't overspill horizontally, let's see if can be displayed on the left
-            if (width > top.Bounds.Width - (renderAt.X + HostControl.Frame.X))
+            if (width > top.Viewport.Width - (renderAt.X + HostControl.Frame.X))
             {
                 // Verifies that the left limit available is greater than the right limit
-                if (renderAt.X + HostControl.Frame.X > top.Bounds.Width - (renderAt.X + HostControl.Frame.X))
+                if (renderAt.X + HostControl.Frame.X > top.Viewport.Width - (renderAt.X + HostControl.Frame.X))
                 {
                     renderAt.X -= Math.Min (width, LastPopupPos.Value.X);
                     width = Math.Min (width, LastPopupPos.Value.X);
                 }
                 else
                 {
-                    width = Math.Min (width, top.Bounds.Width - renderAt.X);
+                    width = Math.Min (width, top.Viewport.Width - renderAt.X);
                 }
             }
         }
 
         if (PopupInsideContainer)
         {
-            popup.Frame = new Rect (
-                                    new Point (HostControl.Frame.X + renderAt.X, HostControl.Frame.Y + renderAt.Y),
-                                    new Size (width, height)
-                                   );
+            popup.Frame = new (
+                               new (HostControl.Frame.X + renderAt.X, HostControl.Frame.Y + renderAt.Y),
+                               new (width, height)
+                              );
         }
         else
         {
-            popup.Frame = new Rect (
-                                    new Point (HostControl.Frame.X + renderAt.X, renderAt.Y),
-                                    new Size (width, height)
-                                   );
+            popup.Frame = new (
+                               renderAt with { X = HostControl.Frame.X + renderAt.X },
+                               new (width, height)
+                              );
         }
 
         popup.Move (0, 0);
@@ -463,11 +465,11 @@ public abstract class PopupAutocomplete : AutocompleteBase
     /// <param name="me"></param>
     protected void RenderSelectedIdxByMouse (MouseEvent me)
     {
-        if (SelectedIdx != me.Y - ScrollOffset)
+        if (SelectedIdx != me.Position.Y - ScrollOffset)
         {
-            SelectedIdx = me.Y - ScrollOffset;
+            SelectedIdx = me.Position.Y - ScrollOffset;
 
-            if (LastPopupPos != null)
+            if (LastPopupPos is { })
             {
                 RenderOverlay ((Point)LastPopupPos);
             }
@@ -516,13 +518,13 @@ public abstract class PopupAutocomplete : AutocompleteBase
 
     private void ManipulatePopup ()
     {
-        if (Visible && popup == null)
+        if (Visible && popup is null)
         {
-            popup = new Popup (this) { Frame = Rect.Empty };
+            popup = new Popup (this) { Frame = Rectangle.Empty };
             top?.Add (popup);
         }
 
-        if (!Visible && popup != null)
+        if (!Visible && popup is { })
         {
             top?.Remove (popup);
             popup.Dispose ();
@@ -551,29 +553,5 @@ public abstract class PopupAutocomplete : AutocompleteBase
     {
         Visible = false;
         ManipulatePopup ();
-    }
-
-    private class Popup : View
-    {
-        private readonly PopupAutocomplete autocomplete;
-
-        public Popup (PopupAutocomplete autocomplete)
-        {
-            this.autocomplete = autocomplete;
-            CanFocus = true;
-            WantMousePositionReports = true;
-        }
-
-        public override bool MouseEvent (MouseEvent mouseEvent) { return autocomplete.MouseEvent (mouseEvent); }
-
-        public override void OnDrawContent (Rect contentArea)
-        {
-            if (autocomplete.LastPopupPos == null)
-            {
-                return;
-            }
-
-            autocomplete.RenderOverlay ((Point)autocomplete.LastPopupPos);
-        }
     }
 }

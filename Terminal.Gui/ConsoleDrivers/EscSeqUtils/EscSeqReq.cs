@@ -48,11 +48,11 @@ public class EscSeqRequests
         {
             EscSeqReqStatus found = Statuses.Find (x => x.Terminator == terminator);
 
-            if (found == null)
+            if (found is null)
             {
                 Statuses.Add (new EscSeqReqStatus (terminator, numReq));
             }
-            else if (found != null && found.NumOutstanding < found.NumRequests)
+            else if (found is { } && found.NumOutstanding < found.NumRequests)
             {
                 found.NumOutstanding = Math.Min (found.NumOutstanding + numReq, found.NumRequests);
             }
@@ -71,12 +71,12 @@ public class EscSeqRequests
         {
             EscSeqReqStatus found = Statuses.Find (x => x.Terminator == terminator);
 
-            if (found == null)
+            if (found is null)
             {
                 return false;
             }
 
-            if (found != null && found.NumOutstanding > 0)
+            if (found is { NumOutstanding: > 0 })
             {
                 return true;
             }
@@ -102,16 +102,16 @@ public class EscSeqRequests
         {
             EscSeqReqStatus found = Statuses.Find (x => x.Terminator == terminator);
 
-            if (found == null)
+            if (found is null)
             {
                 return;
             }
 
-            if (found != null && found.NumOutstanding == 0)
+            if (found is { } && found.NumOutstanding == 0)
             {
                 Statuses.Remove (found);
             }
-            else if (found != null && found.NumOutstanding > 0)
+            else if (found is { } && found.NumOutstanding > 0)
             {
                 found.NumOutstanding--;
 

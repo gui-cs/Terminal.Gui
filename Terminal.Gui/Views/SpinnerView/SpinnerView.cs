@@ -28,8 +28,8 @@ public class SpinnerView : View
     /// <summary>Creates a new instance of the <see cref="SpinnerView"/> class.</summary>
     public SpinnerView ()
     {
-        Width = 1;
-        Height = 1;
+        Width = Dim.Auto (minimumContentDim: 1);
+        Height = Dim.Auto (minimumContentDim: 1);
         _delay = DEFAULT_DELAY;
         _bounce = false;
         SpinReverse = false;
@@ -189,7 +189,7 @@ public class SpinnerView : View
 
     private void AddAutoSpinTimeout ()
     {
-        if (_timeout != null)
+        if (_timeout is { })
         {
             return;
         }
@@ -251,7 +251,7 @@ public class SpinnerView : View
 
     private void RemoveAutoSpinTimeout ()
     {
-        if (_timeout != null)
+        if (_timeout is { })
         {
             Application.RemoveTimeout (_timeout);
             _timeout = null;

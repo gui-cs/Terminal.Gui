@@ -32,27 +32,21 @@ namespace Terminal.Gui;
 ///         <see cref="Enabled"/>, <see cref="Visible"/>, and <see cref="CanFocus"/> will receive focus.
 ///     </para>
 ///     <para>
-///         Views that are focusable should implement the <see cref="PositionCursor"/> to make sure that the cursor is
-///         placed in a location that makes sense. Unix terminals do not have a way of hiding the cursor, so it can be
+///         Views that are focusable should override <see cref="PositionCursor"/> to make sure that the cursor is
+///         placed in a location that makes sense. Some terminals do not have a way of hiding the cursor, so it can be
 ///         distracting to have the cursor left at the last focused view. So views should make sure that they place the
-///         cursor in a visually sensible place.
+///         cursor in a visually sensible place. The default implementation of <see cref="PositionCursor"/> will place the
+///         cursor at either the hotkey (if defined) or <c>0,0</c>.
 ///     </para>
 ///     <para>
 ///         The View defines the base functionality for user interface elements in Terminal.Gui. Views can contain one or
 ///         more subviews, can respond to user input and render themselves on the screen.
 ///     </para>
 ///     <para>
-///         View supports two layout styles: <see cref="LayoutStyle.Absolute"/> or <see cref="LayoutStyle.Computed"/>.
-///         The style is determined by the values of <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and
-///         <see cref="Height"/>. If any of these is set to non-absolute <see cref="Pos"/> or <see cref="Dim"/> object,
-///         then the layout style is <see cref="LayoutStyle.Computed"/>. Otherwise it is <see cref="LayoutStyle.Absolute"/>
-///         .
-///     </para>
-///     <para>
 ///         To create a View using Absolute layout, call a constructor that takes a Rect parameter to specify the
 ///         absolute position and size or simply set <see cref="View.Frame "/>). To create a View using Computed layout use
 ///         a constructor that does not take a Rect parameter and set the X, Y, Width and Height properties on the view to
-///         non-absolute values. Both approaches use coordinates that are relative to the <see cref="Bounds"/> of the
+///         non-absolute values. Both approaches use coordinates that are relative to the <see cref="Viewport"/> of the
 ///         <see cref="SuperView"/> the View is added to.
 ///     </para>
 ///     <para>
@@ -73,13 +67,13 @@ namespace Terminal.Gui;
 ///         a View can be accessed with the <see cref="SuperView"/> property.
 ///     </para>
 ///     <para>
-///         To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rect)"/>.
+///         To flag a region of the View's <see cref="Viewport"/> to be redrawn call
+///         <see cref="SetNeedsDisplay(Rectangle)"/>
+///         .
 ///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 ///     </para>
 ///     <para>
-///         The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has changed. The default
-///         processing system will keep the size and dimensions for views that use the <see cref="LayoutStyle.Absolute"/>,
-///         and will recompute the Adornments for the views that use <see cref="LayoutStyle.Computed"/>.
+///         The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has changed.
 ///     </para>
 ///     <para>
 ///         Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews should use for
@@ -113,191 +107,33 @@ namespace Terminal.Gui;
 
 public partial class View : Responder, ISupportInitializeNotification
 {
-    private bool _oldEnabled;
-    private string _title = string.Empty;
-
-    /// <summary>Gets or sets whether a view is cleared if the <see cref="Visible"/> property is <see langword="false"/>.</summary>
-    public bool ClearOnVisibleFalse { get; set; } = true;
+    /// <summary>
+    ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
+    ///     <see cref="HandledEventArgs.Handled"/>
+    ///     to cancel the event.
+    /// </summary>
+    public event EventHandler<HandledEventArgs> Accept;
 
     /// <summary>Gets or sets arbitrary data for the view.</summary>
     /// <remarks>This property is not used internally.</remarks>
     public object Data { get; set; }
-
-    /// <summary>
-    ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
-    ///     of new views.
-    /// </summary>
-    public static ConsoleDriver Driver => Application.Driver;
-
-    /// <inheritdoc/>
-    public override bool Enabled
-    {
-        get => base.Enabled;
-        set
-        {
-            if (base.Enabled != value)
-            {
-                if (value)
-                {
-                    if (SuperView == null || SuperView?.Enabled == true)
-                    {
-                        base.Enabled = value;
-                    }
-                }
-                else
-                {
-                    base.Enabled = value;
-                }
-
-                if (!value && HasFocus)
-                {
-                    SetHasFocus (false, this);
-                }
-
-                OnEnabledChanged ();
-                SetNeedsDisplay ();
-
-                if (_subviews != null)
-                {
-                    foreach (View view in _subviews)
-                    {
-                        if (!value)
-                        {
-                            view._oldEnabled = view.Enabled;
-                            view.Enabled = false;
-                        }
-                        else
-                        {
-                            view.Enabled = view._oldEnabled;
-                            view._addingView = false;
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     /// <summary>Gets or sets an identifier for the view;</summary>
     /// <value>The identifier.</value>
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
 
-    /// <summary>
-    ///     The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="Border"/>.
-    ///     <see cref="Thickness.Top"/> is greater than 0.
-    /// </summary>
-    /// <value>The title.</value>
-    public string Title
-    {
-        get => _title;
-        set
-        {
-            if (!OnTitleChanging (_title, value))
-            {
-                string old = _title;
-                _title = value;
-                SetNeedsDisplay ();
-#if DEBUG
-                if (_title != null && string.IsNullOrEmpty (Id))
-                {
-                    Id = _title;
-                }
-#endif // DEBUG
-                OnTitleChanged (old, _title);
-            }
-        }
-    }
-
-    /// <inheritdoc/>
-    /// >
-    public override bool Visible
-    {
-        get => base.Visible;
-        set
-        {
-            if (base.Visible != value)
-            {
-                base.Visible = value;
-
-                if (!value)
-                {
-                    if (HasFocus)
-                    {
-                        SetHasFocus (false, this);
-                    }
-
-                    if (ClearOnVisibleFalse)
-                    {
-                        Clear ();
-                    }
-                }
-
-                OnVisibleChanged ();
-                SetNeedsDisplay ();
-            }
-        }
-    }
-
-    /// <summary>Event fired when the <see cref="Enabled"/> value is being changed.</summary>
-    public event EventHandler EnabledChanged;
-
-    /// <inheritdoc/>
-    public override void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
-
-    /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
-    /// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
-    /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
-    public virtual void OnTitleChanged (string oldTitle, string newTitle)
-    {
-        var args = new TitleEventArgs (oldTitle, newTitle);
-        TitleChanged?.Invoke (this, args);
-    }
-
-    /// <summary>
-    ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
-    ///     be cancelled.
-    /// </summary>
-    /// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
-    /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
-    /// <returns>`true` if an event handler canceled the Title change.</returns>
-    public virtual bool OnTitleChanging (string oldTitle, string newTitle)
-    {
-        var args = new TitleEventArgs (oldTitle, newTitle);
-        TitleChanging?.Invoke (this, args);
-
-        return args.Cancel;
-    }
-
-    /// <inheritdoc/>
-    public override void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
-
-    /// <summary>Event fired after the <see cref="View.Title"/> has been changed.</summary>
-    public event EventHandler<TitleEventArgs> TitleChanged;
-
-    /// <summary>
-    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to `true`
-    ///     to cancel the Title change.
-    /// </summary>
-    public event EventHandler<TitleEventArgs> TitleChanging;
-
     /// <summary>Pretty prints the View</summary>
     /// <returns></returns>
     public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
-
-    /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
-    public event EventHandler VisibleChanged;
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         LineCanvas.Dispose ();
 
-        Margin?.Dispose ();
-        Margin = null;
-        Border?.Dispose ();
-        Border = null;
-        Padding?.Dispose ();
-        Padding = null;
+        DisposeKeyboard ();
+        DisposeAdornments ();
 
         for (int i = InternalSubviews.Count - 1; i >= 0; i--)
         {
@@ -310,57 +146,56 @@ public partial class View : Responder, ISupportInitializeNotification
         Debug.Assert (InternalSubviews.Count == 0);
     }
 
-    private bool CanBeVisible (View view)
+    /// <summary>
+    ///     Called when the <see cref="Command.Accept"/> command is invoked. Raises <see cref="Accept"/>
+    ///     event.
+    /// </summary>
+    /// <returns>
+    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
+    ///     If <see langword="null"/> no event was raised.
+    /// </returns>
+    protected bool? OnAccept ()
     {
-        if (!view.Visible)
-        {
-            return false;
-        }
+        var args = new HandledEventArgs ();
+        Accept?.Invoke (this, args);
 
-        for (View c = view.SuperView; c != null; c = c.SuperView)
-        {
-            if (!c.Visible)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return Accept is null ? null : args.Handled;
     }
 
     #region Constructors and Initialization
+
+    /// <summary>
+    ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
+    ///     of new views.
+    /// </summary>
+    public static ConsoleDriver Driver => Application.Driver;
 
     /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
     /// <remarks>
     ///     <para>
     ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view. The <see cref="View"/> will be created using
-    ///         <see cref="LayoutStyle.Absolute"/> coordinates. The initial size ( <see cref="View.Frame"/>) will be adjusted
-    ///         to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines.
-    ///     </para>
-    ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
-    ///     <para>
-    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>.
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view, changing it to <see cref="LayoutStyle.Computed"/>.
+    ///         control the size and location of the view.
     ///     </para>
     /// </remarks>
     public View ()
     {
-        TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
-        TextDirection = TextDirection.LeftRight_TopBottom;
-        Text = string.Empty;
+        SetupAdornments ();
+        SetupKeyboard ();
+
+        //SetupMouse ();
+        SetupText ();
 
         CanFocus = false;
         TabIndex = -1;
         TabStop = false;
-
-        AddCommands ();
-
-        Margin = CreateAdornment (typeof (Margin)) as Margin;
-        Border = CreateAdornment (typeof (Border)) as Border;
-        Padding = CreateAdornment (typeof (Padding)) as Padding;
     }
+
+    /// <summary>
+    ///     Event called only once when the <see cref="View"/> is being initialized for the first time. Allows
+    ///     configurations and assignments to be performed before the <see cref="View"/> being shown.
+    ///     View implements <see cref="ISupportInitializeNotification"/> to allow for more sophisticated initialization.
+    /// </summary>
+    public event EventHandler Initialized;
 
     /// <summary>
     ///     Get or sets if  the <see cref="View"/> has been initialized (via <see cref="ISupportInitialize.BeginInit"/>
@@ -401,6 +236,8 @@ public partial class View : Responder, ISupportInitializeNotification
         _oldCanFocus = CanFocus;
         _oldTabIndex = _tabIndex;
 
+        BeginInitAdornments ();
+
         if (_subviews?.Count > 0)
         {
             foreach (View view in _subviews)
@@ -429,16 +266,16 @@ public partial class View : Responder, ISupportInitializeNotification
 
         IsInitialized = true;
 
+        EndInitAdornments ();
+
         // TODO: Move these into ViewText.cs as EndInit_Text() to consolodate.
         // TODO: Verify UpdateTextDirection really needs to be called here.
-        // These calls were moved from BeginInit as they access Bounds which is indeterminate until EndInit is called.
+        // These calls were moved from BeginInit as they access Viewport which is indeterminate until EndInit is called.
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
-        SetHotKey ();
-
         OnResizeNeeded ();
 
-        if (_subviews != null)
+        if (_subviews is { })
         {
             foreach (View view in _subviews)
             {
@@ -453,4 +290,231 @@ public partial class View : Responder, ISupportInitializeNotification
     }
 
     #endregion Constructors and Initialization
+
+    #region Visibility
+
+    private bool _enabled = true;
+    private bool _oldEnabled;
+
+    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> can respond to user interaction.</summary>
+    public virtual bool Enabled
+    {
+        get => _enabled;
+        set
+        {
+            if (_enabled == value)
+            {
+                return;
+            }
+
+            _enabled = value;
+
+            if (!_enabled && HasFocus)
+            {
+                SetHasFocus (false, this);
+            }
+
+            OnEnabledChanged ();
+            SetNeedsDisplay ();
+
+            if (_subviews is null)
+            {
+                return;
+            }
+
+            foreach (View view in _subviews)
+            {
+                if (!_enabled)
+                {
+                    view._oldEnabled = view.Enabled;
+                    view.Enabled = _enabled;
+                }
+                else
+                {
+                    view.Enabled = view._oldEnabled;
+                    view._addingView = _enabled;
+                }
+            }
+        }
+    }
+
+    /// <summary>Event fired when the <see cref="Enabled"/> value is being changed.</summary>
+    public event EventHandler EnabledChanged;
+
+    /// <summary>Method invoked when the <see cref="Enabled"/> property from a view is changed.</summary>
+    public virtual void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
+
+    private bool _visible = true;
+
+    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> and all its child controls are displayed.</summary>
+    public virtual bool Visible
+    {
+        get => _visible;
+        set
+        {
+            if (_visible == value)
+            {
+                return;
+            }
+
+            _visible = value;
+
+            if (!_visible)
+            {
+                if (HasFocus)
+                {
+                    SetHasFocus (false, this);
+                }
+
+                if (IsInitialized && ClearOnVisibleFalse)
+                {
+                    Clear ();
+                }
+            }
+
+            OnVisibleChanged ();
+            SetNeedsDisplay ();
+        }
+    }
+
+    /// <summary>Method invoked when the <see cref="Visible"/> property from a view is changed.</summary>
+    public virtual void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
+
+    /// <summary>Gets or sets whether a view is cleared if the <see cref="Visible"/> property is <see langword="false"/>.</summary>
+    public bool ClearOnVisibleFalse { get; set; } = true;
+
+    /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
+    public event EventHandler VisibleChanged;
+
+    private static bool CanBeVisible (View view)
+    {
+        if (!view.Visible)
+        {
+            return false;
+        }
+
+        for (View c = view.SuperView; c != null; c = c.SuperView)
+        {
+            if (!c.Visible)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    #endregion Visibility
+
+    #region Title
+
+    private string _title = string.Empty;
+
+    /// <summary>Gets the <see cref="Gui.TextFormatter"/> used to format <see cref="Title"/>.</summary>
+    internal TextFormatter TitleTextFormatter { get; init; } = new ();
+
+    /// <summary>
+    ///     The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="Border"/>.
+    ///     <see cref="Thickness.Top"/> is greater than 0. The title can be used to set the <see cref="HotKey"/>
+    ///     for the view by prefixing character with <see cref="HotKeySpecifier"/> (e.g. <c>"T_itle"</c>).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Set the <see cref="HotKeySpecifier"/> to enable hotkey support. To disable Title-based hotkey support set
+    ///         <see cref="HotKeySpecifier"/> to <c>(Rune)0xffff</c>.
+    ///     </para>
+    ///     <para>
+    ///         Only the first HotKey specifier found in <see cref="Title"/> is supported.
+    ///     </para>
+    ///     <para>
+    ///         To cause the hotkey to be rendered with <see cref="Text"/>,
+    ///         set <c>View.</c><see cref="TextFormatter.HotKeySpecifier"/> to the desired character.
+    ///     </para>
+    /// </remarks>
+    /// <value>The title.</value>
+    public string Title
+    {
+        get
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            return _title;
+        }
+        set
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            if (value == _title)
+            {
+                return;
+            }
+
+            if (!OnTitleChanging (ref value))
+            {
+                string old = _title;
+                _title = value;
+                TitleTextFormatter.Text = _title;
+
+                SetTitleTextFormatterSize ();
+                SetHotKeyFromTitle ();
+                SetNeedsDisplay ();
+#if DEBUG
+                if (_title is { } && string.IsNullOrEmpty (Id))
+                {
+                    Id = _title;
+                }
+#endif // DEBUG
+                OnTitleChanged ();
+            }
+        }
+    }
+
+    private void SetTitleTextFormatterSize ()
+    {
+        TitleTextFormatter.Size = new (
+                                       TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
+                                       - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
+                                              ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                                              : 0),
+                                       1);
+    }
+
+    /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
+    protected void OnTitleChanged ()
+    {
+        TitleChanged?.Invoke (this, new (ref _title));
+    }
+
+    /// <summary>
+    ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
+    ///     be cancelled.
+    /// </summary>
+    /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
+    /// <returns>`true` if an event handler canceled the Title change.</returns>
+    protected bool OnTitleChanging (ref string newTitle)
+    {
+        CancelEventArgs<string> args = new (ref _title, ref newTitle);
+        TitleChanging?.Invoke (this, args);
+
+        return args.Cancel;
+    }
+
+    /// <summary>Event fired after the <see cref="View.Title"/> has been changed.</summary>
+    public event EventHandler<EventArgs<string>> TitleChanged;
+
+    /// <summary>
+    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to `true`
+    ///     to cancel the Title change.
+    /// </summary>
+    public event EventHandler<CancelEventArgs<string>> TitleChanging;
+
+    #endregion
 }

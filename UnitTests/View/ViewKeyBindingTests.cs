@@ -2,10 +2,9 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class ViewKeyBindingTests
+public class ViewKeyBindingTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public ViewKeyBindingTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     [AutoInitShutdown]
@@ -15,19 +14,20 @@ public class ViewKeyBindingTests
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
-        Application.OnKeyDown (new Key (KeyCode.A));
+        Application.OnKeyDown (Key.A);
         Assert.True (invoked);
 
         invoked = false;
-        Application.OnKeyDown (new Key (KeyCode.H));
+        Application.OnKeyDown (Key.H);
         Assert.True (invoked);
 
         invoked = false;
         Assert.False (view.HasFocus);
-        Application.OnKeyDown (new Key (KeyCode.F));
+        Application.OnKeyDown (Key.F);
         Assert.False (invoked);
         Assert.False (view.FocusedCommand);
 
@@ -35,12 +35,13 @@ public class ViewKeyBindingTests
         view.CanFocus = true;
         view.SetFocus ();
         Assert.True (view.HasFocus);
-        Application.OnKeyDown (new Key (KeyCode.F));
+        Application.OnKeyDown (Key.F);
         Assert.True (invoked);
 
         Assert.True (view.ApplicationCommand);
         Assert.True (view.HotKeyCommand);
         Assert.True (view.FocusedCommand);
+        top.Dispose ();
     }
 
     [Fact]
@@ -51,10 +52,11 @@ public class ViewKeyBindingTests
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
-        Application.OnKeyDown (new Key (KeyCode.Z));
+        Application.OnKeyDown (Key.Z);
         Assert.False (invoked);
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
@@ -62,11 +64,12 @@ public class ViewKeyBindingTests
 
         invoked = false;
         Assert.False (view.HasFocus);
-        Application.OnKeyDown (new Key (KeyCode.F));
+        Application.OnKeyDown (Key.F);
         Assert.False (invoked);
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);
+        top.Dispose ();
     }
 
     [Fact]
@@ -77,24 +80,26 @@ public class ViewKeyBindingTests
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         invoked = false;
-        Application.OnKeyDown (new Key (KeyCode.H));
+        Application.OnKeyDown (Key.H);
         Assert.True (invoked);
         Assert.True (view.HotKeyCommand);
 
         view.HotKey = KeyCode.Z;
         invoked = false;
         view.HotKeyCommand = false;
-        Application.OnKeyDown (new Key (KeyCode.H)); // old hot key
+        Application.OnKeyDown (Key.H); // old hot key
         Assert.False (invoked);
         Assert.False (view.HotKeyCommand);
 
-        Application.OnKeyDown (new Key (KeyCode.Z)); // new hot key
+        Application.OnKeyDown (Key.Z); // new hot key
         Assert.True (invoked);
         Assert.True (view.HotKeyCommand);
+        top.Dispose ();
     }
 
     [Fact]
@@ -105,16 +110,18 @@ public class ViewKeyBindingTests
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
-        Application.OnKeyDown (new Key (KeyCode.Z));
+        Application.OnKeyDown (Key.Z);
         Assert.False (invoked);
         Assert.False (view.HotKeyCommand);
 
         invoked = false;
-        Application.OnKeyDown (new Key (KeyCode.F));
+        Application.OnKeyDown (Key.F);
         Assert.False (view.HotKeyCommand);
+        top.Dispose ();
     }
 
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)
@@ -124,12 +131,12 @@ public class ViewKeyBindingTests
         public ScopedKeyBindingView ()
         {
             AddCommand (Command.Save, () => ApplicationCommand = true);
-            AddCommand (Command.Default, () => HotKeyCommand = true);
+            AddCommand (Command.HotKey, () => HotKeyCommand = true);
             AddCommand (Command.Left, () => FocusedCommand = true);
 
-            KeyBindings.Add (KeyCode.A, KeyBindingScope.Application, Command.Save);
+            KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Save);
             HotKey = KeyCode.H;
-            KeyBindings.Add (KeyCode.F, KeyBindingScope.Focused, Command.Left);
+            KeyBindings.Add (Key.F, KeyBindingScope.Focused, Command.Left);
         }
 
         public bool ApplicationCommand { get; set; }

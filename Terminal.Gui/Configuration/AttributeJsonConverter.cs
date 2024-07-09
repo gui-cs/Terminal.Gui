@@ -13,7 +13,7 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
     {
         get
         {
-            if (_instance == null)
+            if (_instance is null)
             {
                 _instance = new AttributeJsonConverter ();
             }
@@ -37,7 +37,7 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
         {
             if (reader.TokenType == JsonTokenType.EndObject)
             {
-                if (foreground == null || background == null)
+                if (foreground is null || background is null)
                 {
                     throw new JsonException ("Both Foreground and Background colors must be provided.");
                 }

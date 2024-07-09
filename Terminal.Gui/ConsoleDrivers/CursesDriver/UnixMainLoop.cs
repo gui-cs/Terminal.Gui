@@ -118,7 +118,7 @@ internal class UnixMainLoop : IMainLoopDriver
             _cursesDriver.ProcessWinChange ();
         }
 
-        if (_pollMap == null)
+        if (_pollMap is null)
         {
             return;
         }
@@ -159,7 +159,7 @@ internal class UnixMainLoop : IMainLoopDriver
     /// </remarks>
     internal object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
     {
-        if (callback == null)
+        if (callback is null)
         {
             throw new ArgumentNullException (nameof (callback));
         }

@@ -9,7 +9,7 @@ public class SettingsScopeTests
     public void Apply_ShouldApplyProperties ()
     {
         // arrange
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
+        Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
 
         Assert.Equal (
                       KeyCode.PageDown | KeyCode.CtrlMask,
@@ -20,13 +20,11 @@ public class SettingsScopeTests
                       KeyCode.PageUp | KeyCode.CtrlMask,
                       ((Key)Settings ["Application.AlternateBackwardKey"].PropertyValue).KeyCode
                      );
-        Assert.False ((bool)Settings ["Application.IsMouseDisabled"].PropertyValue);
 
         // act
-        Settings ["Application.QuitKey"].PropertyValue = new Key (KeyCode.Q);
-        Settings ["Application.AlternateForwardKey"].PropertyValue = new Key (KeyCode.F);
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = new Key (KeyCode.B);
-        Settings ["Application.IsMouseDisabled"].PropertyValue = true;
+        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
 
         Settings.Apply ();
 
@@ -34,28 +32,25 @@ public class SettingsScopeTests
         Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
         Assert.Equal (KeyCode.F, Application.AlternateForwardKey.KeyCode);
         Assert.Equal (KeyCode.B, Application.AlternateBackwardKey.KeyCode);
-        Assert.True (Application.IsMouseDisabled);
     }
 
     [Fact]
     [AutoInitShutdown]
     public void CopyUpdatedPropertiesFrom_ShouldCopyChangedPropertiesOnly ()
     {
-        Settings ["Application.QuitKey"].PropertyValue = new Key (KeyCode.End);
+        Settings ["Application.QuitKey"].PropertyValue = Key.End;
         ;
 
         var updatedSettings = new SettingsScope ();
 
         ///Don't set Quitkey
-        updatedSettings ["Application.AlternateForwardKey"].PropertyValue = new Key (KeyCode.F);
-        updatedSettings ["Application.AlternateBackwardKey"].PropertyValue = new Key (KeyCode.B);
-        updatedSettings ["Application.IsMouseDisabled"].PropertyValue = true;
+        updatedSettings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
+        updatedSettings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
 
         Settings.Update (updatedSettings);
         Assert.Equal (KeyCode.End, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
         Assert.Equal (KeyCode.F, ((Key)updatedSettings ["Application.AlternateForwardKey"].PropertyValue).KeyCode);
         Assert.Equal (KeyCode.B, ((Key)updatedSettings ["Application.AlternateBackwardKey"].PropertyValue).KeyCode);
-        Assert.True ((bool)updatedSettings ["Application.IsMouseDisabled"].PropertyValue);
     }
 
     [Fact]
@@ -72,7 +67,6 @@ public class SettingsScopeTests
         Assert.True (Settings ["Application.QuitKey"].PropertyValue is Key);
         Assert.True (Settings ["Application.AlternateForwardKey"].PropertyValue is Key);
         Assert.True (Settings ["Application.AlternateBackwardKey"].PropertyValue is Key);
-        Assert.True (Settings ["Application.IsMouseDisabled"].PropertyValue is bool);
 
         Assert.True (Settings ["Theme"].PropertyValue is string);
         Assert.Equal ("Default", Settings ["Theme"].PropertyValue as string);

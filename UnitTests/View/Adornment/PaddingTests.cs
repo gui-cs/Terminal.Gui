@@ -2,22 +2,19 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class PaddingTests
+public class PaddingTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public PaddingTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [SetupFakeDriver]
     public void Padding_Uses_Parent_ColorScheme ()
     {
         ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
         var view = new View { Height = 3, Width = 3 };
-        view.Padding.Thickness = new Thickness (1);
+        view.Padding.Thickness = new (1);
 
-        view.ColorScheme = new ColorScheme
+        view.ColorScheme = new()
         {
-            Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red)
+            Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         };
 
         Assert.Equal (ColorName.Red, view.Padding.GetNormalColor ().Foreground.GetClosestNamedColor ());
@@ -25,16 +22,16 @@ public class PaddingTests
 
         view.BeginInit ();
         view.EndInit ();
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.FramePadding;
+        View.Diagnostics = ViewDiagnosticFlags.Padding;
         view.Draw ();
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsAre (
                                              @"
-LTR
-L R
-BBB",
-                                             _output
+PPP
+P P
+PPP",
+                                             output
                                             );
         TestHelpers.AssertDriverAttributesAre ("0", null, view.GetNormalColor ());
     }

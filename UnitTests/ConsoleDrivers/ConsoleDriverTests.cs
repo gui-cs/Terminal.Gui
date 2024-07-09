@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.Text;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -42,21 +43,21 @@ public class ConsoleDriverTests
         foreach (char r in text.Reverse ())
         {
             ConsoleKey ck = char.IsLetter (r) ? (ConsoleKey)char.ToUpper (r) : (ConsoleKey)r;
-            var cki = new ConsoleKeyInfo (r, ck, false, false, false);
+            var cki = new ConsoleKeyInfo (r, ck, char.IsUpper(r), false, false);
             mKeys.Push (cki);
         }
 
         Console.MockKeyPresses = mKeys;
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var view = new View { CanFocus = true };
         var rText = "";
         var idx = 0;
 
         view.KeyDown += (s, e) =>
                         {
-                            Assert.Equal (text [idx], (char)e.KeyCode);
-                            rText += (char)e.KeyCode;
+                            Assert.Equal (new Rune(text [idx]), e.AsRune);
+                            rText += e.AsRune;
                             Assert.Equal (rText, text.Substring (0, idx + 1));
                             e.Handled = true;
                             idx++;
@@ -71,10 +72,11 @@ public class ConsoleDriverTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.Equal ("MockKeyPresses", rText);
 
+        top.Dispose ();
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
@@ -86,7 +88,7 @@ public class ConsoleDriverTests
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var view = new View { CanFocus = true };
         var count = 0;
         var wasKeyPressed = false;
@@ -104,10 +106,11 @@ public class ConsoleDriverTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.False (wasKeyPressed);
 
+        top.Dispose ();
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
     }
@@ -208,8 +211,8 @@ public class ConsoleDriverTests
         driver.SizeChanged += (s, e) =>
                               {
                                   wasTerminalResized = true;
-                                  Assert.Equal (120, e.Size.Width);
-                                  Assert.Equal (40, e.Size.Height);
+                                  Assert.Equal (120, e.Size.GetValueOrDefault ().Width);
+                                  Assert.Equal (40, e.Size.GetValueOrDefault ().Height);
                               };
 
         Assert.Equal (80, driver.Cols);
@@ -218,7 +221,7 @@ public class ConsoleDriverTests
 
         driver.Cols = 120;
         driver.Rows = 40;
-        driver.OnSizeChanged (new SizeChangedEventArgs (new Size (driver.Cols, driver.Rows)));
+        driver.OnSizeChanged (new SizeChangedEventArgs (new (driver.Cols, driver.Rows)));
         Assert.Equal (120, driver.Cols);
         Assert.Equal (40, driver.Rows);
         Assert.True (wasTerminalResized);
@@ -253,7 +256,7 @@ public class ConsoleDriverTests
     //";
 
     //					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-    //					Assert.Equal (new Rect (0, 0, 20, 8), pos);
+    //					Assert.Equal (new (0, 0, 20, 8), pos);
 
     //					Assert.True (dlg.ProcessKey (new (Key.Tab)));
     //					dlg.Draw ();
@@ -270,7 +273,7 @@ public class ConsoleDriverTests
     //";
 
     //					pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-    //					Assert.Equal (new Rect (0, 0, 20, 8), pos);
+    //					Assert.Equal (new (0, 0, 20, 8), pos);
 
     //					win.RequestStop ();
     //				});

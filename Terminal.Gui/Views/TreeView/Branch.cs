@@ -16,7 +16,7 @@ internal class Branch<T> where T : class
         this.tree = tree;
         Model = model;
 
-        if (parentBranchIfAny != null)
+        if (parentBranchIfAny is { })
         {
             Depth = parentBranchIfAny.Depth + 1;
             Parent = parentBranchIfAny;
@@ -49,7 +49,7 @@ internal class Branch<T> where T : class
     public bool CanExpand ()
     {
         // if we do not know the children yet
-        if (ChildBranches == null)
+        if (ChildBranches is null)
         {
             //if there is a rapid method for determining whether there are children
             if (tree.TreeBuilder.SupportsCanExpand)
@@ -194,12 +194,12 @@ internal class Branch<T> where T : class
         Attribute modelColor = textColor;
 
         // if custom color delegate invoke it
-        if (tree.ColorGetter != null)
+        if (tree.ColorGetter is { })
         {
             ColorScheme modelScheme = tree.ColorGetter (Model);
 
             // if custom color scheme is defined for this Model
-            if (modelScheme != null)
+            if (modelScheme is { })
             {
                 // use it
                 modelColor = isSelected ? modelScheme.Focus : modelScheme.Normal;
@@ -252,7 +252,7 @@ internal class Branch<T> where T : class
     /// <summary>Expands the current branch if possible.</summary>
     public void Expand ()
     {
-        if (ChildBranches == null)
+        if (ChildBranches is null)
         {
             FetchChildren ();
         }
@@ -266,7 +266,7 @@ internal class Branch<T> where T : class
     /// <summary>Fetch the children of this branch. This method populates <see cref="ChildBranches"/>.</summary>
     public virtual void FetchChildren ()
     {
-        if (tree.TreeBuilder == null)
+        if (tree.TreeBuilder is null)
         {
             return;
         }
@@ -331,7 +331,7 @@ internal class Branch<T> where T : class
 
         // we don't want to loose the state of our children so lets be selective about how we refresh
         //if we don't know about any children yet just use the normal method
-        if (ChildBranches == null)
+        if (ChildBranches is null)
         {
             FetchChildren ();
         }
@@ -379,7 +379,7 @@ internal class Branch<T> where T : class
     {
         Collapse ();
 
-        if (ChildBranches != null)
+        if (ChildBranches is { })
         {
             foreach (KeyValuePair<T, Branch<T>> child in ChildBranches)
             {
@@ -393,7 +393,7 @@ internal class Branch<T> where T : class
     {
         Expand ();
 
-        if (ChildBranches != null)
+        if (ChildBranches is { })
         {
             foreach (KeyValuePair<T, Branch<T>> child in ChildBranches)
             {
@@ -482,7 +482,7 @@ internal class Branch<T> where T : class
         Refresh (false);
 
         // if we know about our children
-        if (ChildBranches != null)
+        if (ChildBranches is { })
         {
             if (IsExpanded)
             {
@@ -506,7 +506,7 @@ internal class Branch<T> where T : class
     {
         Branch<T> cur = Parent;
 
-        while (cur != null)
+        while (cur is { })
         {
             yield return cur;
 
@@ -521,7 +521,7 @@ internal class Branch<T> where T : class
     /// <returns></returns>
     private bool IsLast ()
     {
-        if (Parent == null)
+        if (Parent is null)
         {
             return this == tree.roots.Values.LastOrDefault ();
         }

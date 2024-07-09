@@ -1,21 +1,16 @@
 ﻿using System.Globalization;
 using Xunit.Abstractions;
 
-//using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
-
 namespace Terminal.Gui.ViewsTests;
 
-public class ContextMenuTests
+public class ContextMenuTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public ContextMenuTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [AutoInitShutdown]
     public void ContextMenu_Constructors ()
     {
         var cm = new ContextMenu ();
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
         Assert.Empty (cm.MenuItems.Children);
         Assert.Null (cm.Host);
         cm.Position = new Point (20, 10);
@@ -77,8 +72,9 @@ public class ContextMenuTests
             ]
         };
 
-        Application.Top.Add (menu);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (menu);
+        Application.Begin (top);
 
         Assert.Null (Application.MouseGrabView);
 
@@ -106,142 +102,15 @@ public class ContextMenuTests
         Assert.True (ContextMenu.IsShow);
         Assert.Equal (cm.MenuBar, Application.MouseGrabView);
         Assert.False (menu.IsMenuOpen);
-        Assert.False (menu.MouseEvent (new MouseEvent { X = 1, Flags = MouseFlags.ReportMousePosition, View = menu }));
+        Assert.False (menu.NewMouseEvent (new MouseEvent { Position = new (1, 0), Flags = MouseFlags.ReportMousePosition, View = menu }));
         Assert.True (ContextMenu.IsShow);
         Assert.Equal (cm.MenuBar, Application.MouseGrabView);
         Assert.False (menu.IsMenuOpen);
-        Assert.True (menu.MouseEvent (new MouseEvent { X = 1, Flags = MouseFlags.Button1Clicked, View = menu }));
+        Assert.True (menu.NewMouseEvent (new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1Clicked, View = menu }));
         Assert.False (ContextMenu.IsShow);
         Assert.Equal (menu, Application.MouseGrabView);
         Assert.True (menu.IsMenuOpen);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void ContextMenu_On_Toplevel_With_A_MenuBar_TextField_StatusBar ()
-    {
-        Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
-
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new MenuBarItem ("File", "", null),
-                new MenuBarItem ("Edit", "", null)
-            ]
-        };
-
-        var label = new Label { X = 2, Y = 3, Text = "Label:" };
-
-        var tf = new TextField { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 20, Text = "TextField" };
-
-        var statusBar = new StatusBar (
-                                       [
-                                           new StatusItem (KeyCode.F1, "~F1~ Help", null),
-                                           new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
-                                       ]
-                                      );
-
-        Application.Top.Add (menu, label, tf, statusBar);
-        ((FakeDriver)Application.Driver).SetBufferSize (45, 17);
-        Application.Begin (Application.Top);
-
-        Assert.Equal (new Rect (9, 3, 20, 1), tf.Frame);
-        Assert.True (tf.HasFocus);
-
-        tf.ContextMenu.Show ();
-        Assert.True (ContextMenu.IsShow);
-        Assert.Equal (new Point (9, 3), tf.ContextMenu.Position);
-        Application.Top.Draw ();
-
-        var expected = @"
- File  Edit                     
-                                
-                                
-  Label: TextField              
-         ┌─────────────────────┐
-         │ Select All   Ctrl+T │
-         │ Delete All   Ctrl+R │
-         │ Copy         Ctrl+C │
-         │ Cut          Ctrl+X │
-         │ Paste        Ctrl+V │
-         │ Undo         Ctrl+Z │
-         │ Redo         Ctrl+Y │
-         └─────────────────────┘
-                                
-                                
-                                
- F1 Help │ ^Q Quit              
-";
-
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 32, 17), pos);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void ContextMenu_On_Toplevel_With_A_MenuBar_Window_TextField_StatusBar ()
-    {
-        Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
-
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new MenuBarItem ("File", "", null),
-                new MenuBarItem ("Edit", "", null)
-            ]
-        };
-
-        var label = new Label { X = 2, Y = 3, Text = "Label:" };
-
-        var tf = new TextField { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 20, Text = "TextField" };
-
-        var win = new Window ();
-        win.Add (label, tf);
-
-        var statusBar = new StatusBar (
-                                       new []
-                                       {
-                                           new StatusItem (KeyCode.F1, "~F1~ Help", null),
-                                           new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
-                                       }
-                                      );
-
-        Application.Top.Add (menu, win, statusBar);
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (44, 17);
-
-        Assert.Equal (new Rect (9, 3, 20, 1), tf.Frame);
-        Assert.True (tf.HasFocus);
-
-        tf.ContextMenu.Show ();
-        Assert.True (ContextMenu.IsShow);
-        Assert.Equal (new Point (10, 5), tf.ContextMenu.Position);
-        Application.Top.Draw ();
-
-        var expected = @"
- File  Edit                                 
-┌──────────────────────────────────────────┐
-│                                          │
-│                                          │
-│                                          │
-│  Label: TextField                        │
-│         ┌─────────────────────┐          │
-│         │ Select All   Ctrl+T │          │
-│         │ Delete All   Ctrl+R │          │
-│         │ Copy         Ctrl+C │          │
-│         │ Cut          Ctrl+X │          │
-│         │ Paste        Ctrl+V │          │
-│         │ Undo         Ctrl+Z │          │
-│         │ Redo         Ctrl+Y │          │
-│         └─────────────────────┘          │
-└──────────────────────────────────────────┘
- F1 Help │ ^Q Quit                          
-";
-
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 44, 17), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -250,27 +119,23 @@ public class ContextMenuTests
     {
         ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 
-        Assert.Equal (new Rect (0, 0, 20, 15), Application.Driver.Clip);
-        TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver.Clip);
+        TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 
         var top = new Toplevel { X = 2, Y = 2, Width = 15, Height = 4 };
         top.Add (new TextField { X = Pos.Center (), Width = 10, Text = "Test" });
         RunState rs = Application.Begin (top);
 
-        Assert.Equal (new Rect (2, 2, 15, 4), top.Frame);
+        Assert.Equal (new Rectangle (2, 2, 15, 4), top.Frame);
         Assert.Equal (top, Application.Top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
     Test",
-                                                      _output
+                                                      output
                                                      );
 
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 8, Y = 2, Flags = MouseFlags.Button3Clicked }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new MouseEvent { Position = new (8, 2), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -287,23 +152,24 @@ public class ContextMenuTests
 │ Undo         Ctrl+
 │ Redo         Ctrl+
 └───────────────────",
-                                                      _output
+                                                      output
                                                      );
 
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]
     [AutoInitShutdown]
     public void Draw_A_ContextMenu_Over_A_Dialog ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var win = new Window ();
         top.Add (win);
-        Application.Begin (top);
+        RunState rsTop = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 
-        Assert.Equal (new Rect (0, 0, 20, 15), win.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 15), win.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -322,15 +188,15 @@ public class ContextMenuTests
 │                  │
 │                  │
 └──────────────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
         var dialog = new Window { X = 2, Y = 2, Width = 15, Height = 4 };
         dialog.Add (new TextField { X = Pos.Center (), Width = 10, Text = "Test" });
-        RunState rs = Application.Begin (dialog);
+        RunState rsDialog = Application.Begin (dialog);
 
-        Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
+        Assert.Equal (new Rectangle (2, 2, 15, 4), dialog.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -349,17 +215,13 @@ public class ContextMenuTests
 │                  │
 │                  │
 └──────────────────┘",
-                                                      _output
+                                                      output
                                                      );
 
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 9, Y = 3, Flags = MouseFlags.Button3Clicked }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new MouseEvent { Position = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rsDialog, ref firstIteration);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -378,10 +240,12 @@ public class ContextMenuTests
 └───────────────────
 │                  │
 └──────────────────┘",
-                                                      _output
+                                                      output
                                                      );
 
-        Application.End (rs);
+        Application.End (rsDialog);
+        Application.End (rsTop);
+        top.Dispose ();
     }
 
     [Fact]
@@ -390,15 +254,15 @@ public class ContextMenuTests
     {
         ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 
-        Assert.Equal (new Rect (0, 0, 20, 15), Application.Driver.Clip);
-        TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver.Clip);
+        TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
         var dialog = new Window { X = 2, Y = 2, Width = 15, Height = 4 };
         dialog.Add (new TextField { X = Pos.Center (), Width = 10, Text = "Test" });
         RunState rs = Application.Begin (dialog);
 
-        Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
+        Assert.Equal (new Rectangle (2, 2, 15, 4), dialog.Frame);
         Assert.Equal (dialog, Application.Top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -407,14 +271,10 @@ public class ContextMenuTests
   │ Test        │
   │             │
   └─────────────┘",
-                                                      _output
+                                                      output
                                                      );
 
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 9, Y = 3, Flags = MouseFlags.Button3Clicked }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new MouseEvent { Position = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -432,10 +292,11 @@ public class ContextMenuTests
 │ Undo         Ctrl+
 │ Redo         Ctrl+
 └───────────────────",
-                                                      _output
+                                                      output
                                                      );
 
         Application.End (rs);
+        dialog.Dispose ();
     }
 
     [Fact]
@@ -454,10 +315,13 @@ public class ContextMenuTests
         };
 
         Assert.Equal (new Point (-1, -2), cm.Position);
+        
+        Toplevel top = new ();
+        Application.Begin (top);
 
         cm.Show ();
         Assert.Equal (new Point (-1, -2), cm.Position);
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
 ┌──────┐
@@ -466,8 +330,8 @@ public class ContextMenuTests
 └──────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 1, 8, 4), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new Rectangle (0, 1, 8, 4), pos);
 
         cm.ForceMinimumPosToZero = false;
         cm.Show ();
@@ -480,8 +344,9 @@ public class ContextMenuTests
 ──────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (1, 0, 7, 3), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new Rectangle (1, 0, 7, 3), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -499,7 +364,7 @@ public class ContextMenuTests
                                         )
         };
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         Application.Begin (top);
         top.Running = true;
 
@@ -510,36 +375,7 @@ public class ContextMenuTests
 
         top.RequestStop ();
         Assert.False (ContextMenu.IsShow);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Key_Changing ()
-    {
-        var lbl = new Label { Text = "Original" };
-
-        var cm = new ContextMenu ();
-
-        lbl.KeyDown += (s, e) =>
-                       {
-                           if (e == cm.Key)
-                           {
-                               lbl.Text = "Replaced";
-                               e.Handled = true;
-                           }
-                       };
-
-        Toplevel top = Application.Top;
-        top.Add (lbl);
-        Application.Begin (top);
-
-        Assert.True (lbl.NewKeyDownEvent (cm.Key));
-        Assert.Equal ("Replaced", lbl.Text);
-
-        lbl.Text = "Original";
-        cm.Key = KeyCode.Space | KeyCode.CtrlMask;
-        Assert.True (lbl.NewKeyDownEvent (cm.Key));
-        Assert.Equal ("Replaced", lbl.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -547,27 +383,29 @@ public class ContextMenuTests
     public void Key_Open_And_Close_The_ContextMenu ()
     {
         var tf = new TextField ();
-        Application.Top.Add (tf);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tf);
+        Application.Begin (top);
 
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.F10 | KeyCode.ShiftMask)));
+        Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
         Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.F10 | KeyCode.ShiftMask)));
+        Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
         Assert.Null (tf.ContextMenu.MenuBar);
+        top.Dispose ();
     }
 
     [Fact]
     [AutoInitShutdown]
     public void KeyChanged_Event ()
     {
-        var oldKey = KeyCode.Null;
+        var oldKey = Key.Empty;
         var cm = new ContextMenu ();
 
-        cm.KeyChanged += (s, e) => oldKey = (KeyCode)e.OldKey;
+        cm.KeyChanged += (s, e) => oldKey = e.OldKey;
 
-        cm.Key = KeyCode.Space | KeyCode.CtrlMask;
-        Assert.Equal (KeyCode.Space | KeyCode.CtrlMask, cm.Key);
-        Assert.Equal (KeyCode.F10 | KeyCode.ShiftMask, oldKey);
+        cm.Key = Key.Space.WithCtrl;
+        Assert.Equal (Key.Space.WithCtrl, cm.Key);
+        Assert.Equal (ContextMenu.DefaultKey, oldKey);
     }
 
     [Fact]
@@ -585,8 +423,10 @@ public class ContextMenuTests
                                         )
         };
 
+        Toplevel top = new ();
+        Application.Begin (top);
         cm.Show ();
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
           ┌──────┐
@@ -595,7 +435,7 @@ public class ContextMenuTests
           └──────┘
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        TestHelpers.AssertDriverContentsAre (expected, output);
 
         cm.MenuItems = new MenuBarItem (
                                         [
@@ -616,7 +456,8 @@ public class ContextMenuTests
           └─────────┘
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        TestHelpers.AssertDriverContentsAre (expected, output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -651,10 +492,13 @@ public class ContextMenuTests
 
         Assert.Equal (new Point (-1, -2), cm.Position);
 
-        cm.Show ();
-        Assert.Equal (new Point (-1, -2), cm.Position);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         Application.Begin (top);
+
+        cm.Show ();
+        Application.Refresh ();
+
+        Assert.Equal (new Point (-1, -2), cm.Position);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -667,13 +511,13 @@ public class ContextMenuTests
 │ Six    │
 └────────┘
 ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (
                      top.Subviews [0]
-                        .MouseEvent (
-                                     new MouseEvent { X = 0, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                        .NewMouseEvent (
+                                     new MouseEvent { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -695,7 +539,7 @@ public class ContextMenuTests
           │ SubMenu7  │
           └───────────┘
 ",
-                                                      _output
+                                                      output
                                                      );
 
         ((FakeDriver)Application.Driver).SetBufferSize (40, 20);
@@ -715,13 +559,13 @@ public class ContextMenuTests
                               │ Six    │
                               └────────┘
 ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (
                      top.Subviews [0]
-                        .MouseEvent (
-                                     new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                        .NewMouseEvent (
+                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -743,7 +587,7 @@ public class ContextMenuTests
                  │ SubMenu7  │          
                  └───────────┘          
 ",
-                                                      _output
+                                                      output
                                                      );
 
         cm.Position = new Point (41, 9);
@@ -762,13 +606,13 @@ public class ContextMenuTests
                               │ Six    │
                               └────────┘
 ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (
                      top.Subviews [0]
-                        .MouseEvent (
-                                     new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                        .NewMouseEvent (
+                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -787,7 +631,7 @@ public class ContextMenuTests
                  │ SubMenu7  │          
                  └───────────┘          
 ",
-                                                      _output
+                                                      output
                                                      );
 
         cm.Position = new Point (41, 22);
@@ -806,13 +650,13 @@ public class ContextMenuTests
                               │ Six    │
                               └────────┘
 ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (
                      top.Subviews [0]
-                        .MouseEvent (
-                                     new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                        .NewMouseEvent (
+                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -830,7 +674,7 @@ public class ContextMenuTests
                  │ SubMenu7  ││ Six    │
                  └───────────┘└────────┘
 ",
-                                                      _output
+                                                      output
                                                      );
 
         ((FakeDriver)Application.Driver).SetBufferSize (18, 8);
@@ -850,13 +694,13 @@ public class ContextMenuTests
         │ Six    │
         └────────┘
 ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (
                      top.Subviews [0]
-                        .MouseEvent (
-                                     new MouseEvent { X = 30, Y = 4, Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                        .NewMouseEvent (
+                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                     )
                     );
         Application.Refresh ();
@@ -873,8 +717,9 @@ public class ContextMenuTests
 │ SubMenu6  │    │
 │ SubMenu7  │────┘
 ",
-                                                      _output
+                                                      output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -894,21 +739,21 @@ public class ContextMenuTests
                               }
                           };
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (lbl);
         Application.Begin (top);
 
-        Assert.True (lbl.OnMouseEvent (new MouseEvent { Flags = cm.MouseFlags }));
+        Assert.True (lbl.NewMouseEvent (new MouseEvent { Flags = cm.MouseFlags }));
         Assert.Equal ("Replaced", lbl.Text);
 
         lbl.Text = "Original";
         cm.MouseFlags = MouseFlags.Button2Clicked;
-        Assert.True (lbl.OnMouseEvent (new MouseEvent { Flags = cm.MouseFlags }));
+        Assert.True (lbl.NewMouseEvent (new MouseEvent { Flags = cm.MouseFlags }));
         Assert.Equal ("Replaced", lbl.Text);
+        top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void MouseFlagsChanged_Event ()
     {
         var oldMouseFlags = new MouseFlags ();
@@ -936,8 +781,10 @@ public class ContextMenuTests
                                         )
         };
 
+        Toplevel top = new ();
+        Application.Begin (top);
         cm.Show ();
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
           ┌──────┐
@@ -946,7 +793,7 @@ public class ContextMenuTests
           └──────┘
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        TestHelpers.AssertDriverContentsAre (expected, output);
 
         cm.Position = new Point (5, 10);
 
@@ -960,7 +807,8 @@ public class ContextMenuTests
      └──────┘
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        TestHelpers.AssertDriverContentsAre (expected, output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -968,7 +816,7 @@ public class ContextMenuTests
     public void RequestStop_While_ContextMenu_Is_Open_Does_Not_Throws ()
     {
         ContextMenu cm = Create_ContextMenu_With_Two_MenuItem (10, 5);
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var isMenuAllClosed = false;
         MenuBarItem mi = null;
         int iterations = -1;
@@ -987,6 +835,7 @@ public class ContextMenuTests
                                                      {
                                                          var dialog1 = new Dialog ();
                                                          Application.Run (dialog1);
+                                                         dialog1.Dispose ();
                                                          Assert.False (ContextMenu.IsShow);
                                                          Assert.True (isMenuAllClosed);
                                                      };
@@ -1024,16 +873,18 @@ public class ContextMenuTests
                        {
                            var dialog2 = new Dialog ();
                            Application.Run (dialog2);
+                           dialog2.Dispose ();
                            Assert.False (ContextMenu.IsShow);
                            Assert.True (isMenuAllClosed);
                            isTopClosed = true;
                        };
 
-        Application.Run ();
+        Application.Run (top);
 
         Assert.True (isTopClosed);
         Assert.False (ContextMenu.IsShow);
         Assert.True (isMenuAllClosed);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1044,7 +895,7 @@ public class ContextMenuTests
 
         var cm = new ContextMenu
         {
-            Position = new Point (0, 0),
+            Position = Point.Empty,
             MenuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
@@ -1053,22 +904,25 @@ public class ContextMenuTests
                                         )
         };
 
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
 
+        Toplevel top = new ();
+        Application.Begin (top);
         cm.Show ();
-        Assert.Equal (new Point (0, 0), cm.Position);
-        Application.Begin (Application.Top);
+        Assert.Equal (Point.Empty, cm.Position);
+        Application.Refresh ();
 
         var expected = @"
 ┌──────┐
 │ One  │
 │ Two  │";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 8, 3), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new Rectangle (0, 0, 8, 3), pos);
 
         cm.Hide ();
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1079,7 +933,7 @@ public class ContextMenuTests
 
         var cm = new ContextMenu
         {
-            Position = new Point (0, 0),
+            Position = Point.Empty,
             MenuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
@@ -1088,11 +942,13 @@ public class ContextMenuTests
                                         )
         };
 
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
 
+        Toplevel top = new ();
+        Application.Begin (top);
         cm.Show ();
-        Assert.Equal (new Point (0, 0), cm.Position);
-        Application.Begin (Application.Top);
+        Assert.Equal (Point.Empty, cm.Position);
+        Application.Refresh ();
 
         var expected = @"
 ┌────
@@ -1100,11 +956,12 @@ public class ContextMenuTests
 │ Two
 └────";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 1, 5, 4), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new Rectangle (0, 1, 5, 4), pos);
 
         cm.Hide ();
-        Assert.Equal (new Point (0, 0), cm.Position);
+        Assert.Equal (Point.Empty, cm.Position);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1132,13 +989,14 @@ public class ContextMenuTests
                                         )
         };
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
         Assert.Equal (new Point (10, 5), cm.Position);
 
         cm.Show ();
-        Application.Top.Draw ();
+        top.Draw ();
         Assert.Equal (new Point (10, 5), cm.Position);
 
         var expected = @"
@@ -1149,8 +1007,8 @@ public class ContextMenuTests
           └──────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (10, 5, 18, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new Rectangle (10, 5, 18, 5), pos);
 
         cm.Hide ();
         Assert.Equal (new Point (10, 5), cm.Position);
@@ -1172,11 +1030,12 @@ public class ContextMenuTests
      └──────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (5, 10, 13, 7), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new Rectangle (5, 10, 13, 7), pos);
 
         cm.Hide ();
         Assert.Equal (new Point (5, 12), cm.Position);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1196,9 +1055,11 @@ public class ContextMenuTests
 
         Assert.Equal (new Point (80, 25), cm.Position);
 
+        Toplevel top = new ();
+        Application.Begin (top);
         cm.Show ();
         Assert.Equal (new Point (80, 25), cm.Position);
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
                                                                         ┌──────┐
@@ -1207,11 +1068,12 @@ public class ContextMenuTests
                                                                         └──────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (72, 21, 80, 4), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new Rectangle (72, 21, 80, 4), pos);
 
         cm.Hide ();
         Assert.Equal (new Point (80, 25), cm.Position);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1238,15 +1100,16 @@ public class ContextMenuTests
                                         )
         };
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
-        Assert.Equal (new Rect (70, 24, 10, 1), view.Frame);
+        Assert.Equal (new Rectangle (70, 24, 10, 1), view.Frame);
         Assert.Equal (Point.Empty, cm.Position);
 
         cm.Show ();
         Assert.Equal (new Point (70, 24), cm.Position);
-        Application.Top.Draw ();
+        top.Draw ();
 
         var expected = @"
                                                                       ┌──────┐
@@ -1256,11 +1119,12 @@ public class ContextMenuTests
                                                                       View    
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (70, 20, 78, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new Rectangle (70, 20, 78, 5), pos);
 
         cm.Hide ();
         Assert.Equal (new Point (70, 24), cm.Position);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1269,10 +1133,11 @@ public class ContextMenuTests
     {
         ContextMenu cm = Create_ContextMenu_With_Two_MenuItem (10, 5);
 
+        Toplevel top = new ();
+        Application.Begin (top);
         cm.Show ();
         Assert.True (ContextMenu.IsShow);
-
-        Application.Begin (Application.Top);
+        Application.Refresh ();
 
         var expected = @"
           ┌──────┐
@@ -1281,7 +1146,7 @@ public class ContextMenuTests
           └──────┘
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        TestHelpers.AssertDriverContentsAre (expected, output);
 
         cm.Hide ();
         Assert.False (ContextMenu.IsShow);
@@ -1290,7 +1155,8 @@ public class ContextMenuTests
 
         expected = "";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        TestHelpers.AssertDriverContentsAre (expected, output);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1320,11 +1186,11 @@ public class ContextMenuTests
                                         ),
             UseSubMenusSingleFrame = true
         };
-
+        Toplevel top = new ();
+        RunState rs = Application.Begin (top);
         cm.Show ();
-        RunState rs = Application.Begin (Application.Top);
-
-        Assert.Equal (new Rect (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1333,19 +1199,16 @@ public class ContextMenuTests
      │ Two   ►│
      │ Three  │
      └────────┘",
-                                                      _output
+                                                      output
                                                      );
 
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 5, Y = 13, Flags = MouseFlags.Button1Clicked }
-                                                          )
-                                 );
+        // X=5 is the border and so need to use at least one more
+        Application.OnMouseEvent (new MouseEvent { Position = new (6, 13), Flags = MouseFlags.Button1Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
-        Assert.Equal (new Rect (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
-        Assert.Equal (new Rect (5, 11, 15, 6), Application.Top.Subviews [1].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 15, 6), Application.Top.Subviews [1].Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1355,18 +1218,14 @@ public class ContextMenuTests
      │ Sub-Menu 1  │
      │ Sub-Menu 2  │
      └─────────────┘",
-                                                      _output
+                                                      output
                                                      );
 
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 5, Y = 12, Flags = MouseFlags.Button1Clicked }
-                                                          )
-                                 );
+        Application.OnMouseEvent (new MouseEvent { Position = new (6, 12), Flags = MouseFlags.Button1Clicked });
 
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
-        Assert.Equal (new Rect (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1375,10 +1234,119 @@ public class ContextMenuTests
      │ Two   ►│
      │ Three  │
      └────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Application.End (rs);
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void UseSubMenusSingleFrame_False_By_Mouse ()
+    {
+        var cm = new ContextMenu
+        {
+            Position = new Point (5, 10),
+            MenuItems = new MenuBarItem (
+                                         "Numbers",
+                                         [
+                                             new MenuItem ("One", "", null),
+                                             new MenuBarItem (
+                                                              "Two",
+                                                              [
+                                                                  new MenuItem (
+                                                                                "Two-Menu 1",
+                                                                                "",
+                                                                                null
+                                                                               ),
+                                                                  new MenuItem ("Two-Menu 2", "", null)
+                                                              ]
+                                                             ),
+                                             new MenuBarItem ("Three",
+                                                              [
+                                                                  new MenuItem (
+                                                                                "Three-Menu 1",
+                                                                                "",
+                                                                                null
+                                                                               ),
+                                                                  new MenuItem ("Three-Menu 2", "", null)
+                                                              ]
+                                                             )
+                                         ]
+                                        )
+        };
+        Toplevel top = new ();
+        RunState rs = Application.Begin (top);
+        cm.Show ();
+
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Application.Refresh ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+     ┌────────┐
+     │ One    │
+     │ Two   ►│
+     │ Three ►│
+     └────────┘",
+                                                      output
+                                                     );
+
+        Application.OnMouseEvent (new MouseEvent { Position = new (6, 13), Flags = MouseFlags.ReportMousePosition });
+
+        var firstIteration = false;
+        Application.RunIteration (ref rs, ref firstIteration);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+     ┌────────┐               
+     │ One    │               
+     │ Two   ►│┌─────────────┐
+     │ Three ►││ Two-Menu 1  │
+     └────────┘│ Two-Menu 2  │
+               └─────────────┘",
+                                                      output
+                                                     );
+
+        Application.OnMouseEvent (new MouseEvent { Position = new (6, 14), Flags = MouseFlags.ReportMousePosition });
+
+        firstIteration = false;
+        Application.RunIteration (ref rs, ref firstIteration);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+     ┌────────┐                 
+     │ One    │                 
+     │ Two   ►│                 
+     │ Three ►│┌───────────────┐
+     └────────┘│ Three-Menu 1  │
+               │ Three-Menu 2  │
+               └───────────────┘",
+                                                      output
+                                                     );
+
+        Application.OnMouseEvent (new MouseEvent { Position = new (6, 13), Flags = MouseFlags.ReportMousePosition });
+
+        firstIteration = false;
+        Application.RunIteration (ref rs, ref firstIteration);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+     ┌────────┐               
+     │ One    │               
+     │ Two   ►│┌─────────────┐
+     │ Three ►││ Two-Menu 1  │
+     └────────┘│ Two-Menu 2  │
+               └─────────────┘",
+                                                      output
+                                                     );
+
+        Application.End (rs);
+        top.Dispose ();
     }
 
     private ContextMenu Create_ContextMenu_With_Two_MenuItem (int x, int y)

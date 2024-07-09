@@ -3,11 +3,8 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class TabViewTests
+public class TabViewTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public TabViewTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     public void AddTab_SameTabMoreThanOnce ()
     {
@@ -35,8 +32,8 @@ public class TabViewTests
         var tv = new TabView ();
         Tab tab1;
         Tab tab2;
-        tv.AddTab (tab1 = new Tab { DisplayText = "Tab1", View = new TextField { Text = "hi" } }, false);
-        tv.AddTab (tab2 = new Tab { DisplayText = "Tab1", View = new Label { Text = "hi2" } }, true);
+        tv.AddTab (tab1 = new() { DisplayText = "Tab1", View = new TextField { Text = "hi" } }, false);
+        tv.AddTab (tab2 = new() { DisplayText = "Tab1", View = new Label { Text = "hi2" } }, true);
 
         Assert.Equal (2, tv.Tabs.Count);
         Assert.Equal (tab2, tv.SelectedTab);
@@ -130,42 +127,37 @@ public class TabViewTests
 │hi                │
 └──────────────────┘
 ",
-                                             _output
+                                             output
                                             );
 
         Tab clicked = null;
 
         tv.TabClicked += (s, e) => { clicked = e.Tab; };
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
-        MouseEventEventArgs args;
+        MouseEvent args;
 
         // Waving mouse around does not trigger click
         for (var i = 0; i < 100; i++)
         {
-            args = new MouseEventEventArgs (
-                                            new MouseEvent { X = i, Y = 1, Flags = MouseFlags.ReportMousePosition }
-                                           );
+            args = new() { Position = new (i, 1), Flags = MouseFlags.ReportMousePosition };
             Application.OnMouseEvent (args);
             Application.Refresh ();
             Assert.Null (clicked);
             Assert.Equal (tab1, tv.SelectedTab);
         }
 
-        args = new MouseEventEventArgs (
-                                        new MouseEvent { X = 3, Y = 1, Flags = MouseFlags.Button1Clicked }
-                                       );
+        args = new() { Position = new (3, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Equal (tab1, clicked);
         Assert.Equal (tab1, tv.SelectedTab);
 
         // Click to tab2
-        args = new MouseEventEventArgs (
-                                        new MouseEvent { X = 6, Y = 1, Flags = MouseFlags.Button1Clicked }
-                                       );
+        args = new() { Position = new (6, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Equal (tab2, clicked);
@@ -178,9 +170,7 @@ public class TabViewTests
                              e.MouseEvent.Handled = true;
                          };
 
-        args = new MouseEventEventArgs (
-                                        new MouseEvent { X = 3, Y = 1, Flags = MouseFlags.Button1Clicked }
-                                       );
+        args = new() { Position = new (3, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
 
@@ -188,15 +178,14 @@ public class TabViewTests
         Assert.Equal (tab1, clicked);
         Assert.Equal (tab2, tv.SelectedTab);
 
-        args = new MouseEventEventArgs (
-                                        new MouseEvent { X = 12, Y = 1, Flags = MouseFlags.Button1Clicked }
-                                       );
+        args = new() { Position = new (12, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
 
         // Clicking beyond last tab should raise event with null Tab
         Assert.Null (clicked);
         Assert.Equal (tab2, tv.SelectedTab);
+        top.Dispose ();
     }
 
     [Fact]
@@ -223,7 +212,7 @@ public class TabViewTests
 │hi   │
 └─────┘
 ",
-                                             _output
+                                             output
                                             );
 
         Tab clicked = null;
@@ -239,13 +228,12 @@ public class TabViewTests
                                      newChanged = e.NewTab;
                                  };
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         // Click the right arrow
-        var args = new MouseEventEventArgs (
-                                            new MouseEvent { X = 6, Y = 2, Flags = MouseFlags.Button1Clicked }
-                                           );
+        var args = new MouseEvent { Position = new (6, 2), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -261,13 +249,11 @@ public class TabViewTests
 │hi2  │
 └─────┘
 ",
-                                             _output
+                                             output
                                             );
 
         // Click the left arrow
-        args = new MouseEventEventArgs (
-                                        new MouseEvent { X = 0, Y = 2, Flags = MouseFlags.Button1Clicked }
-                                       );
+        args = new() { Position = new (0, 2), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -283,8 +269,9 @@ public class TabViewTests
 │hi   │
 └─────┘
 ",
-                                             _output
+                                             output
                                             );
+        top.Dispose ();
     }
 
     [Fact]
@@ -316,7 +303,7 @@ public class TabViewTests
 │└─────┘│
 └───────┘
 ",
-                                             _output
+                                             output
                                             );
 
         Tab clicked = null;
@@ -332,13 +319,12 @@ public class TabViewTests
                                      newChanged = e.NewTab;
                                  };
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         // Click the right arrow
-        var args = new MouseEventEventArgs (
-                                            new MouseEvent { X = 7, Y = 3, Flags = MouseFlags.Button1Clicked }
-                                           );
+        var args = new MouseEvent { Position = new (7, 3), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -356,13 +342,11 @@ public class TabViewTests
 │└─────┘│
 └───────┘
 ",
-                                             _output
+                                             output
                                             );
 
         // Click the left arrow
-        args = new MouseEventEventArgs (
-                                        new MouseEvent { X = 1, Y = 3, Flags = MouseFlags.Button1Clicked }
-                                       );
+        args = new() { Position = new (1, 3), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -380,8 +364,9 @@ public class TabViewTests
 │└─────┘│
 └───────┘
 ",
-                                             _output
+                                             output
                                             );
+        top.Dispose ();
     }
 
     [Fact]
@@ -396,13 +381,12 @@ public class TabViewTests
         var btn = new Button
         {
             Y = Pos.Bottom (tv) + 1,
-            AutoSize = false,
             Height = 1,
             Width = 7,
             Text = "Ok"
         };
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv, btn);
         Application.Begin (top);
 
@@ -432,7 +416,7 @@ public class TabViewTests
                                  };
 
         // Press the cursor right key to select the next tab
-        args = new Key (Key.CursorRight);
+        args = new (Key.CursorRight);
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab1, oldChanged);
@@ -442,7 +426,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor down key to focus the selected tab view hosting
-        args = new Key (Key.CursorDown);
+        args = new (Key.CursorDown);
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab2, tv.SelectedTab);
@@ -462,7 +446,7 @@ public class TabViewTests
         Assert.Null (top.Focused.MostFocused);
 
         // Press the cursor up key to focus the selected tab view hosting again
-        args = new Key (Key.CursorUp);
+        args = new (Key.CursorUp);
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab2, tv.SelectedTab);
@@ -470,7 +454,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor up key to focus the selected tab
-        args = new Key (Key.CursorUp);
+        args = new (Key.CursorUp);
         Application.OnKeyDown (args);
         Application.Refresh ();
 
@@ -480,7 +464,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor left key to select the previous tab
-        args = new Key (Key.CursorLeft);
+        args = new (Key.CursorLeft);
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab2, oldChanged);
@@ -490,7 +474,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the end key to select the last tab
-        args = new Key (Key.End);
+        args = new (Key.End);
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab1, oldChanged);
@@ -500,7 +484,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the home key to select the first tab
-        args = new Key (Key.Home);
+        args = new (Key.Home);
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab2, oldChanged);
@@ -510,7 +494,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the page down key to select the next set of tabs
-        args = new Key (Key.PageDown);
+        args = new (Key.PageDown);
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab1, oldChanged);
@@ -520,7 +504,7 @@ public class TabViewTests
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the page up key to select the previous set of tabs
-        args = new Key (Key.PageUp);
+        args = new (Key.PageUp);
         Application.OnKeyDown (args);
         Application.Refresh ();
         Assert.Equal (tab2, oldChanged);
@@ -528,6 +512,7 @@ public class TabViewTests
         Assert.Equal (tab1, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+        top.Dispose ();
     }
 
     [Fact]
@@ -608,13 +593,13 @@ public class TabViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new TabStyle { ShowTopLine = false };
+        tv.Style = new() { ShowTopLine = false };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -627,18 +612,18 @@ public class TabViewTests
 │h│
 │ │
 └─┘",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new TabStyle { ShowTopLine = false };
+        tv.Style = new() { ShowTopLine = false };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -651,18 +636,18 @@ public class TabViewTests
 │hi│
 │  │
 └──┘",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_False_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new TabStyle { ShowTopLine = false };
+        tv.Style = new() { ShowTopLine = false };
         tv.ApplyStyleChanges ();
 
         // Ensures that the tab bar subview gets the bounds of the parent TabView
@@ -681,7 +666,7 @@ public class TabViewTests
 │hi      │
 │        │
 └────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         tv.SelectedTab = tab2;
@@ -695,7 +680,7 @@ public class TabViewTests
 │hi2     │
 │        │
 └────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         tv.SelectedTab = tab1;
@@ -713,7 +698,7 @@ public class TabViewTests
 │hi      │
 │        │
 └────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         //switch to tab2
@@ -727,7 +712,7 @@ public class TabViewTests
 │hi2     │
 │        │
 └────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         // now make both tabs too long
@@ -743,18 +728,18 @@ public class TabViewTests
 │hi2     │
 │        │
 └────────┘",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new() { ShowTopLine = false, TabsOnBottom = true };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -767,18 +752,18 @@ public class TabViewTests
 │ │
 │╭►
 ││ ",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new() { ShowTopLine = false, TabsOnBottom = true };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -791,18 +776,18 @@ public class TabViewTests
 │  │
 │ ╭►
 │T│ ",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_True_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new() { ShowTopLine = false, TabsOnBottom = true };
         tv.ApplyStyleChanges ();
 
         // Ensures that the tab bar subview gets the bounds of the parent TabView
@@ -821,7 +806,7 @@ public class TabViewTests
 │        │
 │  ╭──┬──╯
 │12│13│   ",
-                                                      _output
+                                                      output
                                                      );
 
         tv.SelectedTab = tab2;
@@ -835,7 +820,7 @@ public class TabViewTests
 │        │
 ├──╮  ╭──╯
 │12│13│   ",
-                                                      _output
+                                                      output
                                                      );
 
         tv.SelectedTab = tab1;
@@ -853,7 +838,7 @@ public class TabViewTests
 │        │
 │       ╭►
 │1234567│ ",
-                                                      _output
+                                                      output
                                                      );
 
         //switch to tab2
@@ -867,7 +852,7 @@ public class TabViewTests
 │        │
 ◄  ╭─────╯
 │13│      ",
-                                                      _output
+                                                      output
                                                      );
 
         // now make both tabs too long
@@ -883,12 +868,12 @@ public class TabViewTests
 │        │
 ◄       ╭╯
 │abcdefg│ ",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _, false);
@@ -905,12 +890,12 @@ public class TabViewTests
 │╰►
 │h│
 └─┘",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _, false);
@@ -927,12 +912,12 @@ public class TabViewTests
 │ ╰►
 │hi│
 └──┘",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_False_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
@@ -955,7 +940,7 @@ public class TabViewTests
 │  ╰──┴──╮
 │hi      │
 └────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         tv.SelectedTab = tab2;
@@ -969,7 +954,7 @@ public class TabViewTests
 ├──╯  ╰──╮
 │hi2     │
 └────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         tv.SelectedTab = tab1;
@@ -987,7 +972,7 @@ public class TabViewTests
 │       ╰►
 │hi      │
 └────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         //switch to tab2
@@ -1001,7 +986,7 @@ public class TabViewTests
 ◄  ╰─────╮
 │hi2     │
 └────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         // now make both tabs too long
@@ -1017,12 +1002,12 @@ public class TabViewTests
 ◄       ╰╮
 │hi2     │
 └────────┘",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_False_With_Unicode ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
@@ -1044,7 +1029,7 @@ public class TabViewTests
 │    ╰─────────────►
 │hi                │
 └──────────────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         tv.SelectedTab = tab2;
@@ -1058,18 +1043,18 @@ public class TabViewTests
 ◄              ╰───╮
 │hi2               │
 └──────────────────┘",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new TabStyle { TabsOnBottom = true };
+        tv.Style = new() { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -1082,18 +1067,18 @@ public class TabViewTests
 │╭►
 ││ 
 ╰╯ ",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new TabStyle { TabsOnBottom = true };
+        tv.Style = new() { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -1106,18 +1091,18 @@ public class TabViewTests
 │ ╭►
 │T│ 
 ╰─╯ ",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_True_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new TabStyle { TabsOnBottom = true };
+        tv.Style = new() { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
 
         // Ensures that the tab bar subview gets the bounds of the parent TabView
@@ -1136,7 +1121,7 @@ public class TabViewTests
 │  ╭──┬──╯
 │12│13│   
 ╰──┴──╯   ",
-                                                      _output
+                                                      output
                                                      );
 
         // Test first tab name too long
@@ -1152,7 +1137,7 @@ public class TabViewTests
 │       ╭►
 │1234567│ 
 ╰───────╯ ",
-                                                      _output
+                                                      output
                                                      );
 
         //switch to tab2
@@ -1166,7 +1151,7 @@ public class TabViewTests
 ◄  ╭─────╯
 │13│      
 ╰──╯      ",
-                                                      _output
+                                                      output
                                                      );
 
         // now make both tabs too long
@@ -1182,18 +1167,18 @@ public class TabViewTests
 ◄       ╭╯
 │abcdefg│ 
 ╰───────╯ ",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_True_With_Unicode ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
         tv.Width = 20;
         tv.Height = 5;
-        tv.Style = new TabStyle { TabsOnBottom = true };
+        tv.Style = new() { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
 
         tv.LayoutSubviews ();
@@ -1211,7 +1196,7 @@ public class TabViewTests
 │    ╭─────────────►
 │Tab0│              
 ╰────╯              ",
-                                                      _output
+                                                      output
                                                      );
 
         tv.SelectedTab = tab2;
@@ -1225,7 +1210,7 @@ public class TabViewTests
 ◄              ╭───╯
 │Les Misérables│    
 ╰──────────────╯    ",
-                                                      _output
+                                                      output
                                                      );
     }
 
@@ -1238,9 +1223,9 @@ public class TabViewTests
         Tab tab4;
         Tab tab5;
 
-        tv.AddTab (tab3 = new Tab (), false);
-        tv.AddTab (tab4 = new Tab (), false);
-        tv.AddTab (tab5 = new Tab (), false);
+        tv.AddTab (tab3 = new (), false);
+        tv.AddTab (tab4 = new (), false);
+        tv.AddTab (tab5 = new (), false);
 
         tv.SelectedTab = tab1;
 
@@ -1284,6 +1269,27 @@ public class TabViewTests
         Application.Shutdown ();
     }
 
+    [Fact]
+    public void RemoveTab_ThatHasFocus ()
+    {
+        TabView tv = GetTabView (out Tab _, out Tab tab2);
+
+        tv.SelectedTab = tab2;
+        tab2.HasFocus = true;
+
+        Assert.Equal (2, tv.Tabs.Count);
+
+        foreach (Tab t in tv.Tabs.ToArray ())
+        {
+            tv.RemoveTab (t);
+        }
+
+        Assert.Empty (tv.Tabs);
+
+        // Shutdown must be called to safely clean up Application if Init has been called
+        Application.Shutdown ();
+    }
+
     private TabView GetTabView () { return GetTabView (out _, out _); }
 
     private TabView GetTabView (out Tab tab1, out Tab tab2, bool initFakeDriver = true)
@@ -1296,13 +1302,13 @@ public class TabViewTests
         var tv = new TabView ();
         tv.BeginInit ();
         tv.EndInit ();
-        tv.ColorScheme = new ColorScheme ();
+        tv.ColorScheme = new ();
 
         tv.AddTab (
-                   tab1 = new Tab { DisplayText = "Tab1", View = new TextField { Width = 2, Text = "hi" } },
+                   tab1 = new() { DisplayText = "Tab1", View = new TextField { Width = 2, Text = "hi" } },
                    false
                   );
-        tv.AddTab (tab2 = new Tab { DisplayText = "Tab2", View = new Label { Text = "hi2" } }, false);
+        tv.AddTab (tab2 = new() { DisplayText = "Tab2", View = new Label { Text = "hi2" } }, false);
 
         return tv;
     }

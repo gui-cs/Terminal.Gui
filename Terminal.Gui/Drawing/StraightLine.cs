@@ -45,7 +45,8 @@ public class StraightLine
     ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
     ///     furthest left/top and Size is defined by the line that extends the furthest right/bottom.
     /// </summary>
-    internal Rect Bounds
+    // PERF: Probably better to store the rectangle rather than make a new one on every single access to Viewport.
+    internal Rectangle Viewport
     {
         get
         {
@@ -59,7 +60,7 @@ public class StraightLine
             int width = Orientation == Orientation.Horizontal ? size : 1;
             int height = Orientation == Orientation.Vertical ? size : 1;
 
-            return new Rect (x, y, width, height);
+            return new (x, y, width, height);
         }
     }
 

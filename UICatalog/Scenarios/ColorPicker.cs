@@ -4,107 +4,118 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Color Picker", "Illustrates ColorPicker View.")]
-[ScenarioCategory ("Colors"), ScenarioCategory ("Controls")]
-public class ColorPickers : Scenario {
-	/// <summary>
-	/// Foreground ColorPicker.
-	/// </summary>
-	ColorPicker _foregroundColorPicker;
+[ScenarioCategory ("Colors")]
+[ScenarioCategory ("Controls")]
+public class ColorPickers : Scenario
+{
+    /// <summary>
+    ///     Foreground ColorPicker.
+    /// </summary>
+    private ColorPicker _foregroundColorPicker;
 
-	/// <summary>
-	/// Background ColorPicker.
-	/// </summary>
-	ColorPicker _backgroundColorPicker;
+    /// <summary>
+    ///     Background ColorPicker.
+    /// </summary>
+    private ColorPicker _backgroundColorPicker;
 
     /// <summary>Setup the scenario.</summary>
-    public override void Setup ()
+    public override void Main ()
     {
-        // Scenario Window's.
-        Win.Title = GetName ();
+        Application.Init ();
 
-		// Foreground ColorPicker.
-		_foregroundColorPicker = new ColorPicker () {
-			Text = "Foreground:",
-			X = 0,
-			Y = 0,
-			Height = Dim.Fill (),
-			Width = Dim.Percent (60),
-			BoxHeight = 1,
-			BoxWidth = 1,
-			BorderStyle = LineStyle.Single,
-			Style = ColorPickerStyle.Rgb
-		};
-		_foregroundColorPicker.ColorChanged += ColorChanged;
-		Win.Add (_foregroundColorPicker);
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
 
-		var _blueSlider = new ScrollBarView (_foregroundColorPicker, true, false) {
-			IsVertical = true,
-			Visible = true,
-			ShowScrollIndicator = true,
-			Width = 1,
-			Size = 255
-		};
-		_blueSlider.ChangedPosition += (s, e) => {
-			_foregroundColorPicker.BlueValue = _blueSlider.Position;
-		};
-		Win.Add (_blueSlider);
+        // Foreground ColorPicker.
+        _foregroundColorPicker = new()
+        {
+            Text = "Foreground:",
+            X = 0,
+            Y = 0,
+            Height = Dim.Fill (),
+            Width = Dim.Percent (60),
+            BoxHeight = 1,
+            BoxWidth = 1,
+            BorderStyle = LineStyle.Single,
+            Style = ColorPickerStyle.Rgb
+        };
+        _foregroundColorPicker.ColorChanged += ColorChanged;
+        app.Add (_foregroundColorPicker);
 
-		// Background ColorPicker.
-		_backgroundColorPicker = new ColorPicker () {
-			Text = "Background:",
-			Y = 0,
-			X = 0,
-			BoxHeight = 1,
-			BoxWidth = 4,
-			BorderStyle = LineStyle.Single
-		};
-		_backgroundColorPicker.X = Pos.AnchorEnd () - (Pos.Right (_backgroundColorPicker) - Pos.Left (_backgroundColorPicker));
-		_backgroundColorPicker.ColorChanged += ColorChanged;
-		Win.Add (_backgroundColorPicker);
+        var _blueSlider = new ScrollBarView (_foregroundColorPicker, true, false)
+        {
+            IsVertical = true,
+            Visible = true,
+            ShowScrollIndicator = true,
+            Width = 1,
+            Size = 255
+        };
+        _blueSlider.ChangedPosition += (s, e) => { _foregroundColorPicker.BlueValue = _blueSlider.Position; };
+        app.Add (_blueSlider);
 
-		// Set default colors.
-		//_foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground;
-		//_backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background;
-	}
+        // Background ColorPicker.
+        _backgroundColorPicker = new()
+        {
+            Text = "Background:",
+            Y = 0,
+            X = 0,
+            BoxHeight = 1,
+            BoxWidth = 4,
+            BorderStyle = LineStyle.Single
+        };
+        _backgroundColorPicker.X = Pos.AnchorEnd () - (Pos.Right (_backgroundColorPicker) - Pos.Left (_backgroundColorPicker));
+        _backgroundColorPicker.ColorChanged += ColorChanged;
+        app.Add (_backgroundColorPicker);
 
-	/// <summary>
-	/// Fired when foreground color is changed.
-	/// </summary>
-	void ColorChanged (object sender, EventArgs e)
-	{
-		var color = (Color)((ColorPicker)sender).SelectedColor;
-		((ColorPicker)sender).Title = $"{color} ({(int)color.GetClosestNamedColor ()}) #{color.R:X2}{color.G:X2}{color.B:X2}";
-		((ColorPicker)sender).ColorScheme = new ColorScheme (new Attribute (GetCompliment (color), color)) {
-			Normal = new Attribute (GetCompliment (color), color),
-			Focus = new Attribute (GetCompliment (color), color)
-		};
-		//UpdateDemoLabel ();
-	}
+        app.Initialized += (s, e) => app.LayoutSubviews ();
 
-	public Color GetCompliment (Color original)
-	{
-		int inverseRed = 255 - original.R;
-		int inverseGreen = 255 - original.G;
-		int inverseBlue = 255 - original.B;
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
+    }
 
-		return new Color (inverseRed, inverseGreen, inverseBlue);
-	}
+    /// <summary>
+    ///     Fired when foreground color is changed.
+    /// </summary>
+    private void ColorChanged (object sender, EventArgs e)
+    {
+        Color color = ((ColorPicker)sender).SelectedColor;
+        ((ColorPicker)sender).Title = $"{color} ({(int)color.GetClosestNamedColor ()}) #{color.R:X2}{color.G:X2}{color.B:X2}";
 
-	public Color GetMonochromatic (Color original)
-	{
-		float brightnessFactor = 0.5f; // 50% reduction for this example
-		int adjustedRed = (int)(original.R * brightnessFactor);
-		int adjustedGreen = (int)(original.G * brightnessFactor);
-		int adjustedBlue = (int)(original.B * brightnessFactor);
+        ((ColorPicker)sender).ColorScheme = new (new Attribute (GetCompliment (color), color))
+        {
+            Normal = new (GetCompliment (color), color),
+            Focus = new (GetCompliment (color), color)
+        };
 
-		return new Color (adjustedRed, adjustedGreen, adjustedBlue);
-	}
+        //UpdateDemoLabel ();
+    }
 
+    public Color GetCompliment (Color original)
+    {
+        int inverseRed = 255 - original.R;
+        int inverseGreen = 255 - original.G;
+        int inverseBlue = 255 - original.B;
 
-	/// <summary>
-	/// Update Demo Label.
-	/// </summary>
-	//private void UpdateDemoLabel () => _demoView.ColorScheme = new ColorScheme () {
-	//	Normal = new Attribute (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor)
-	//};
+        return new (inverseRed, inverseGreen, inverseBlue);
+    }
+
+    public Color GetMonochromatic (Color original)
+    {
+        var brightnessFactor = 0.5f; // 50% reduction for this example
+        var adjustedRed = (int)(original.R * brightnessFactor);
+        var adjustedGreen = (int)(original.G * brightnessFactor);
+        var adjustedBlue = (int)(original.B * brightnessFactor);
+
+        return new (adjustedRed, adjustedGreen, adjustedBlue);
+    }
+
+    /// <summary>
+    /// Update Demo Label.
+    /// </summary>
+    //private void UpdateDemoLabel () => _demoView.ColorScheme = new ColorScheme () {
+    //	Normal = new Attribute (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor)
+    //};
 }

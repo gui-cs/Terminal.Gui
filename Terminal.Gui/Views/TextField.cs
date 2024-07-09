@@ -1,3 +1,4 @@
+using System.Data;
 using System.Globalization;
 using Terminal.Gui.Resources;
 
@@ -8,10 +9,8 @@ namespace Terminal.Gui;
 public class TextField : View
 {
     private readonly HistoryText _historyText;
-    private readonly CursorVisibility _savedCursorVisibility;
     private CultureInfo _currentCulture;
     private int _cursorPosition;
-    private CursorVisibility _desiredCursorVisibility;
     private bool _isButtonPressed;
     private bool _isButtonReleased;
     private bool _isDrawing;
@@ -20,34 +19,29 @@ public class TextField : View
     private string _selectedText;
     private int _start;
     private List<Rune> _text;
-    private CursorVisibility _visibility;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="TextField"/> class.
     /// </summary>
     public TextField ()
     {
         _historyText = new HistoryText ();
-        _desiredCursorVisibility = CursorVisibility.Default;
         _isButtonReleased = true;
         _selectedStart = -1;
         _text = new List<Rune> ();
         CaptionColor = new Color (Color.DarkGray);
         ReadOnly = false;
         Autocomplete = new TextFieldAutocomplete ();
-        Height = 1;
+        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
         Used = true;
         WantMousePositionReports = true;
-        _savedCursorVisibility = _desiredCursorVisibility;
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
         Initialized += TextField_Initialized;
-
-        LayoutComplete += TextField_LayoutComplete;
 
         // Things this view knows how to do
         AddCommand (
@@ -340,82 +334,91 @@ public class TextField : View
                     }
                    );
 
+        // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
+        // event was fired and set Cancel = true.
+        AddCommand (Command.Accept, () => OnAccept () == false);
+
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
-        KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask, Command.DeleteCharRight);
+        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
+        KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
-        KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
+        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
 
-        KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.LeftHomeExtend);
-        KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.LeftHomeExtend);
-        KeyBindings.Add (KeyCode.A | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.LeftHomeExtend);
+        KeyBindings.Add (Key.Home.WithShift, Command.LeftHomeExtend);
+        KeyBindings.Add (Key.Home.WithShift.WithCtrl, Command.LeftHomeExtend);
+        KeyBindings.Add (Key.A.WithShift.WithCtrl, Command.LeftHomeExtend);
 
-        KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.RightEndExtend);
-        KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.RightEndExtend);
-        KeyBindings.Add (KeyCode.E | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.RightEndExtend);
+        KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
+        KeyBindings.Add (Key.End.WithShift.WithCtrl, Command.RightEndExtend);
+        KeyBindings.Add (Key.E.WithShift.WithCtrl, Command.RightEndExtend);
 
-        KeyBindings.Add (KeyCode.Home, Command.LeftHome);
-        KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask, Command.LeftHome);
-        KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.LeftHome);
+        KeyBindings.Add (Key.Home, Command.LeftHome);
+        KeyBindings.Add (Key.Home.WithCtrl, Command.LeftHome);
+        KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
 
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.ShiftMask, Command.LeftExtend);
-        KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask, Command.LeftExtend);
+        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
+        KeyBindings.Add (Key.CursorUp.WithShift, Command.LeftExtend);
 
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.ShiftMask, Command.RightExtend);
-        KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.RightExtend);
+        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
+        KeyBindings.Add (Key.CursorDown.WithShift, Command.RightExtend);
 
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.WordLeftExtend);
-        KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.WordLeftExtend);
-        KeyBindings.Add (('B' + KeyCode.ShiftMask) | KeyCode.AltMask, Command.WordLeftExtend);
+        KeyBindings.Add (Key.CursorLeft.WithShift.WithCtrl, Command.WordLeftExtend);
+        KeyBindings.Add (Key.CursorUp.WithShift.WithCtrl, Command.WordLeftExtend);
 
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.WordRightExtend);
-        KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.WordRightExtend);
-        KeyBindings.Add (('F' + KeyCode.ShiftMask) | KeyCode.AltMask, Command.WordRightExtend);
+        KeyBindings.Add (Key.CursorRight.WithShift.WithCtrl, Command.WordRightExtend);
+        KeyBindings.Add (Key.CursorDown.WithShift.WithCtrl, Command.WordRightExtend);
 
-        KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-        KeyBindings.Add (KeyCode.B | KeyCode.CtrlMask, Command.Left);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.B.WithCtrl, Command.Left);
 
-        KeyBindings.Add (KeyCode.End, Command.RightEnd);
-        KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask, Command.RightEnd);
-        KeyBindings.Add (KeyCode.E | KeyCode.CtrlMask, Command.RightEnd);
+        KeyBindings.Add (Key.End, Command.RightEnd);
+        KeyBindings.Add (Key.End.WithCtrl, Command.RightEnd);
+        KeyBindings.Add (Key.E.WithCtrl, Command.RightEnd);
 
-        KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-        KeyBindings.Add (KeyCode.F | KeyCode.CtrlMask, Command.Right);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.F.WithCtrl, Command.Right);
 
-        KeyBindings.Add (KeyCode.K | KeyCode.CtrlMask, Command.CutToEndLine);
-        KeyBindings.Add (KeyCode.K | KeyCode.AltMask, Command.CutToStartLine);
+        KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndLine);
+        KeyBindings.Add (Key.K.WithCtrl.WithShift, Command.CutToStartLine);
 
-        KeyBindings.Add (KeyCode.Z | KeyCode.CtrlMask, Command.Undo);
-        KeyBindings.Add (KeyCode.Backspace | KeyCode.AltMask, Command.Undo);
+        KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
 
-        KeyBindings.Add (KeyCode.Y | KeyCode.CtrlMask, Command.Redo);
+        KeyBindings.Add (Key.Y.WithCtrl, Command.Redo);
 
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.WordLeft);
-        KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.WordLeft);
-        KeyBindings.Add ('B' + KeyCode.AltMask, Command.WordLeft);
+        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
+        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.WordLeft);
 
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.WordRight);
-        KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.WordRight);
-        KeyBindings.Add ('F' + KeyCode.AltMask, Command.WordRight);
+        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
+        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.WordRight);
 
-        KeyBindings.Add (KeyCode.Delete | KeyCode.CtrlMask, Command.KillWordForwards);
-        KeyBindings.Add (KeyCode.Backspace | KeyCode.CtrlMask, Command.KillWordBackwards);
-        KeyBindings.Add (KeyCode.Insert, Command.ToggleOverwrite);
-        KeyBindings.Add (KeyCode.C | KeyCode.CtrlMask, Command.Copy);
-        KeyBindings.Add (KeyCode.X | KeyCode.CtrlMask, Command.Cut);
-        KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.Paste);
-        KeyBindings.Add (KeyCode.T | KeyCode.CtrlMask, Command.SelectAll);
+#if UNIX_KEY_BINDINGS
+        KeyBindings.Add (Key.F.WithShift.WithAlt, Command.WordRightExtend);
+        KeyBindings.Add (Key.K.WithAlt, Command.CutToStartLine);
+        KeyBindings.Add (Key.B.WithShift.WithAlt, Command.WordLeftExtend);
+        KeyBindings.Add (Key.B.WithAlt, Command.WordLeft);
+        KeyBindings.Add (Key.F.WithAlt, Command.WordRight);
+        KeyBindings.Add (Key.Backspace.WithAlt, Command.Undo);
+#endif
 
-        KeyBindings.Add (KeyCode.R | KeyCode.CtrlMask, Command.DeleteAll);
-        KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.DeleteAll);
+        KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordForwards);
+        KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordBackwards);
+        KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
+        KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
+        KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
+        KeyBindings.Add (Key.V.WithCtrl, Command.Paste);
+        KeyBindings.Add (Key.T.WithCtrl, Command.SelectAll);
+
+        KeyBindings.Add (Key.R.WithCtrl, Command.DeleteAll);
+        KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
         ContextMenu = new ContextMenu { Host = this, MenuItems = BuildContextMenuBarItem () };
         ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
-        KeyBindings.Add (ContextMenu.Key.KeyCode, KeyBindingScope.HotKey, Command.ShowContextMenu);
+        KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
+        KeyBindings.Add (Key.Enter, Command.Accept);
     }
 
     /// <summary>
@@ -423,13 +426,6 @@ public class TextField : View
     ///     <see cref="ISuggestionGenerator"/> to enable this feature.
     /// </summary>
     public IAutocomplete Autocomplete { get; set; }
-
-    /// <inheritdoc/>
-    public sealed override bool CanFocus
-    {
-        get => base.CanFocus;
-        set => base.CanFocus = value;
-    }
 
     /// <summary>
     ///     Gets or sets the text to render in control when no value has been entered yet and the <see cref="View"/> does
@@ -463,21 +459,6 @@ public class TextField : View
             }
 
             PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
-        }
-    }
-
-    /// <summary>Get / Set the wished cursor when the field is focused</summary>
-    public CursorVisibility DesiredCursorVisibility
-    {
-        get => _desiredCursorVisibility;
-        set
-        {
-            if ((_desiredCursorVisibility != value || _visibility != value) && HasFocus)
-            {
-                Application.Driver.SetCursorVisibility (value);
-            }
-
-            _desiredCursorVisibility = _visibility = value;
         }
     }
 
@@ -551,9 +532,11 @@ public class TextField : View
                 return;
             }
 
-            TextChangingEventArgs newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
+            string newText = value.Replace ("\t", "").Split ("\n") [0];
+            CancelEventArgs<string> args = new (ref oldText, ref newText);
+            OnTextChanging (args);
 
-            if (newText.Cancel)
+            if (args.Cancel)
             {
                 if (_cursorPosition > _text.Count)
                 {
@@ -564,7 +547,9 @@ public class TextField : View
             }
 
             ClearAllSelection ();
-            _text = newText.NewText.EnumerateRunes ().ToList ();
+
+            // Note we use NewValue here; TextChanging subscribers may have changed it
+            _text = args.NewValue.EnumerateRunes ().ToList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {
@@ -580,7 +565,7 @@ public class TextField : View
                                  );
             }
 
-            TextChanged?.Invoke (this, new TextChangedEventArgs (oldText));
+            OnTextChanged ();
 
             ProcessAutocomplete ();
 
@@ -755,7 +740,7 @@ public class TextField : View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme == null)
+        if (ColorScheme is null)
         {
             cs = new ColorScheme ();
         }
@@ -773,11 +758,11 @@ public class TextField : View
     {
         foreach (char ch in toAdd)
         {
-            KeyCode key;
+            Key key;
 
             try
             {
-                key = (KeyCode)ch;
+                key = ch;
             }
             catch (Exception)
             {
@@ -786,7 +771,7 @@ public class TextField : View
                                             );
             }
 
-            InsertText (new Key { KeyCode = key }, useOldCursorPos);
+            InsertText (key, useOldCursorPos);
         }
     }
 
@@ -796,7 +781,7 @@ public class TextField : View
         ClearAllSelection ();
         (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0);
 
-        if (newPos == null)
+        if (newPos is null)
         {
             return;
         }
@@ -819,7 +804,7 @@ public class TextField : View
         ClearAllSelection ();
         (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0);
 
-        if (newPos == null)
+        if (newPos is null)
         {
             return;
         }
@@ -836,7 +821,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent ev)
+    protected internal override bool OnMouseEvent (MouseEvent ev)
     {
         if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed)
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
@@ -845,7 +830,7 @@ public class TextField : View
             && !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
             && !ev.Flags.HasFlag (ContextMenu.MouseFlags))
         {
-            return false;
+            return base.OnMouseEvent (ev);
         }
 
         if (!CanFocus)
@@ -859,7 +844,7 @@ public class TextField : View
         }
 
         // Give autocomplete first opportunity to respond to mouse clicks
-        if (SelectedLength == 0 && Autocomplete.MouseEvent (ev, true))
+        if (SelectedLength == 0 && Autocomplete.OnMouseEvent (ev, true))
         {
             return true;
         }
@@ -883,7 +868,7 @@ public class TextField : View
             _isButtonReleased = false;
             PrepareSelection (x);
 
-            if (Application.MouseGrabView == null)
+            if (Application.MouseGrabView is null)
             {
                 Application.GrabMouse (this);
             }
@@ -906,7 +891,7 @@ public class TextField : View
             {
                 (int col, int row)? newPosBw = GetModel ().WordBackward (x, 0);
 
-                if (newPosBw == null)
+                if (newPosBw is null)
                 {
                     return true;
                 }
@@ -922,7 +907,7 @@ public class TextField : View
 
             (int col, int row)? newPosFw = GetModel ().WordForward (x, 0);
 
-            if (newPosFw == null)
+            if (newPosFw is null)
             {
                 return true;
             }
@@ -948,7 +933,7 @@ public class TextField : View
             ShowContextMenu ();
         }
 
-        SetNeedsDisplay ();
+        //SetNeedsDisplay ();
 
         return true;
 
@@ -970,7 +955,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         _isDrawing = true;
 
@@ -1053,18 +1038,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
-        }
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key a)
+    public override bool? OnInvokingKeyBindings (Key a, KeyBindingScope scope)
     {
         // Give autocomplete first opportunity to respond to key presses
         if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a))
@@ -1072,13 +1046,13 @@ public class TextField : View
             return true;
         }
 
-        return base.OnInvokingKeyBindings (a);
+        return base.OnInvokingKeyBindings (a, scope);
     }
 
     /// <inheritdoc/>
     public override bool OnLeave (View view)
     {
-        if (Application.MouseGrabView != null && Application.MouseGrabView == this)
+        if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
             Application.UngrabMouse ();
         }
@@ -1131,14 +1105,13 @@ public class TextField : View
     }
 
     /// <summary>Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.</summary>
-    /// <param name="newText">The new text to be replaced.</param>
-    /// <returns>Returns the <see cref="TextChangingEventArgs"/></returns>
-    public virtual TextChangingEventArgs OnTextChanging (string newText)
+    /// <param name="args">The event arguments..</param>
+    /// <returns><see langword="true"/> if the event was cancelled.</returns>
+    public bool OnTextChanging (CancelEventArgs<string> args)
     {
-        var ev = new TextChangingEventArgs (newText);
-        TextChanging?.Invoke (this, ev);
+        TextChanging?.Invoke (this, args);
 
-        return ev;
+        return args.Cancel;
     }
 
     /// <summary>Paste the selected text from the clipboard.</summary>
@@ -1169,13 +1142,8 @@ public class TextField : View
     }
 
     /// <summary>Sets the cursor position.</summary>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
-        if (!IsInitialized)
-        {
-            return;
-        }
-
         ProcessAutocomplete ();
 
         var col = 0;
@@ -1192,31 +1160,8 @@ public class TextField : View
         }
 
         int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
-        int offB = OffSetBackground ();
-        Rect containerFrame = SuperView?.BoundsToScreen (SuperView.Bounds) ?? default (Rect);
-        Rect thisFrame = BoundsToScreen (Bounds);
-
-        if (pos > -1
-            && col >= pos
-            && pos < Frame.Width + offB
-            && containerFrame.IntersectsWith (thisFrame))
-        {
-            RestoreCursorVisibility ();
-            Move (col, 0);
-        }
-        else
-        {
-            HideCursorVisibility ();
-
-            if (pos < 0)
-            {
-                Move (pos, 0);
-            }
-            else
-            {
-                Move (pos - offB, 0);
-            }
-        }
+        Move (pos, 0);
+        return new Point (pos, 0);
     }
 
     /// <summary>Redoes the latest changes.</summary>
@@ -1228,21 +1173,6 @@ public class TextField : View
         }
 
         _historyText.Redo ();
-
-        //if (string.IsNullOrEmpty (Clipboard.Contents))
-        //	return true;
-        //var clip = TextModel.ToRunes (Clipboard.Contents);
-        //if (clip == null)
-        //	return true;
-
-        //if (point == text.Count) {
-        //	point = text.Count;
-        //	SetText(text.Concat(clip).ToList());
-        //} else {
-        //	point += clip.Count;
-        //	SetText(text.GetRange(0, oldCursorPos).Concat(clip).Concat(text.GetRange(oldCursorPos, text.Count - oldCursorPos)));
-        //}
-        //Adjust ();
     }
 
     /// <summary>Selects all text.</summary>
@@ -1258,17 +1188,17 @@ public class TextField : View
         SetNeedsDisplay ();
     }
 
-    /// <summary>
-    ///     Changed event, raised when the text has changed.
-    ///     <remarks>
-    ///         This event is raised when the <see cref="Text"/> changes. The passed <see cref="EventArgs"/> is a
-    ///         <see cref="string"/> containing the old value.
-    ///     </remarks>
-    /// </summary>
-    public event EventHandler<TextChangedEventArgs> TextChanged;
+    ///// <summary>
+    /////     Changed event, raised when the text has changed.
+    /////     <remarks>
+    /////         This event is raised when the <see cref="Text"/> changes. The passed <see cref="EventArgs"/> is a
+    /////         <see cref="string"/> containing the old value.
+    /////     </remarks>
+    ///// </summary>
+    //public event EventHandler<StateEventArgs<string>> TextChanged;
 
     /// <summary>Changing event, raised before the <see cref="Text"/> changes and can be canceled or changing the new text.</summary>
-    public event EventHandler<TextChangingEventArgs> TextChanging;
+    public event EventHandler<CancelEventArgs<string>> TextChanging;
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()
@@ -1298,6 +1228,10 @@ public class TextField : View
         {
             return;
         }
+
+        // TODO: This is a lame prototype proving it should be easy for TextField to 
+        // TODO: support Width = Dim.Auto (DimAutoStyle: Content).
+        //SetContentSize(new (TextModel.DisplaySize (_text).size, 1));
 
         int offB = OffSetBackground ();
         bool need = NeedsDisplay || !Used;
@@ -1449,7 +1383,7 @@ public class TextField : View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme == null)
+        if (ColorScheme is null)
         {
             cs = new ColorScheme ();
         }
@@ -1462,17 +1396,9 @@ public class TextField : View
         return new Attribute (cs.Disabled.Foreground, cs.Focus.Background);
     }
 
-    private void HideCursorVisibility ()
-    {
-        if (_desiredCursorVisibility != CursorVisibility.Invisible)
-        {
-            DesiredCursorVisibility = CursorVisibility.Invisible;
-        }
-    }
-
     private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
     {
-        if (obj == null)
+        if (obj is null)
         {
             return;
         }
@@ -1663,7 +1589,7 @@ public class TextField : View
         ClearAllSelection ();
         (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0);
 
-        if (newPos == null)
+        if (newPos is null)
         {
             return;
         }
@@ -1689,7 +1615,7 @@ public class TextField : View
             {
                 (int col, int row)? newPos = GetModel ().WordBackward (x, 0);
 
-                if (newPos == null)
+                if (newPos is null)
                 {
                     return;
                 }
@@ -1709,7 +1635,7 @@ public class TextField : View
         ClearAllSelection ();
         (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0);
 
-        if (newPos == null)
+        if (newPos is null)
         {
             return;
         }
@@ -1729,7 +1655,7 @@ public class TextField : View
             int x = _start > -1 && _start > _cursorPosition ? _start : _cursorPosition;
             (int col, int row)? newPos = GetModel ().WordForward (x, 0);
 
-            if (newPos == null)
+            if (newPos is null)
             {
                 return;
             }
@@ -1743,6 +1669,7 @@ public class TextField : View
         }
     }
 
+    // BUGBUG: This assumes Frame == Viewport. It's also not clear what the intention is. For now, changed to always return 0.
     private int OffSetBackground ()
     {
         var offB = 0;
@@ -1752,25 +1679,12 @@ public class TextField : View
             offB = SuperView.Frame.Right - Frame.Right - 1;
         }
 
-        return offB;
+        return 0;//offB;
     }
 
     private int PositionCursor (MouseEvent ev)
     {
-        // We could also set the cursor position.
-        int x;
-        int pX = TextModel.GetColFromX (_text, ScrollOffset, ev.X);
-
-        if (_text.Count == 0)
-        {
-            x = pX - ev.OfX;
-        }
-        else
-        {
-            x = pX;
-        }
-
-        return PositionCursor (x, false);
+        return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.Position.X), false);
     }
 
     private int PositionCursor (int x, bool getX = true)
@@ -1840,7 +1754,7 @@ public class TextField : View
 
             SetNeedsDisplay ();
         }
-        else if (SelectedLength > 0 || _selectedText != null)
+        else if (SelectedLength > 0 || _selectedText is { })
         {
             ClearAllSelection ();
         }
@@ -1887,22 +1801,12 @@ public class TextField : View
         Move (0, 0);
         string render = Caption;
 
-        if (render.GetColumns () > Bounds.Width)
+        if (render.GetColumns () > Viewport.Width)
         {
-            render = render [..Bounds.Width];
+            render = render [..Viewport.Width];
         }
 
         Driver.AddStr (render);
-    }
-
-    private void RestoreCursorVisibility ()
-    {
-        Application.Driver.GetCursorVisibility (out _visibility);
-
-        if (_desiredCursorVisibility != _savedCursorVisibility || _visibility != _savedCursorVisibility)
-        {
-            DesiredCursorVisibility = _savedCursorVisibility;
-        }
     }
 
     private void SetClipboard (IEnumerable<Rune> text)
@@ -1950,22 +1854,13 @@ public class TextField : View
     {
         _cursorPosition = Text.GetRuneCount ();
 
-        if (Bounds.Width > 0)
+        if (Viewport.Width > 0)
         {
-            ScrollOffset = _cursorPosition > Bounds.Width + 1 ? _cursorPosition - Bounds.Width + 1 : 0;
+            ScrollOffset = _cursorPosition > Viewport.Width + 1 ? _cursorPosition - Viewport.Width + 1 : 0;
         }
 
         Autocomplete.HostControl = this;
         Autocomplete.PopupInsideContainer = false;
-    }
-
-    private void TextField_LayoutComplete (object sender, LayoutEventArgs e)
-    {
-        // Don't let height > 1
-        if (Frame.Height > 1)
-        {
-            Height = 1;
-        }
     }
 }
 

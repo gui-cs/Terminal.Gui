@@ -13,97 +13,51 @@ public class Label : View
     /// <inheritdoc/>
     public Label ()
     {
-        Height = 1;
-        AutoSize = true;
+        Height = Dim.Auto (DimAutoStyle.Text);
+        Width = Dim.Auto (DimAutoStyle.Text);
 
         // Things this view knows how to do
-        AddCommand (
-                    Command.Default,
-                    () =>
-                    {
-                        // BUGBUG: This is a hack, but it does work.
-                        bool can = CanFocus;
-                        CanFocus = true;
-                        SetFocus ();
-                        SuperView.FocusNext ();
-                        CanFocus = can;
-
-                        return true;
-                    }
-                   );
-        AddCommand (Command.Accept, () => AcceptKey ());
+        AddCommand (Command.HotKey, FocusNext);
 
         // Default key bindings for this view
-        KeyBindings.Add (KeyCode.Space, Command.Accept);
+        KeyBindings.Add (Key.Space, Command.Accept);
+
+        TitleChanged += Label_TitleChanged;
+        MouseClick += Label_MouseClick;
     }
 
-    /// <summary>
-    ///     The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View"/> or
-    ///     if the user presses the action key while this view is focused. (TODO: IsDefault)
-    /// </summary>
-    /// <remarks>
-    ///     Client code can hook up to this event, it is raised when the button is activated either with the mouse or the
-    ///     keyboard.
-    /// </remarks>
-    public event EventHandler Clicked;
-
-    /// <summary>Virtual method to invoke the <see cref="Clicked"/> event.</summary>
-    public virtual void OnClicked () { Clicked?.Invoke (this, EventArgs.Empty); }
-
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
+    private void Label_MouseClick (object sender, MouseEventEventArgs e)
     {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
+        e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
-    /// <summary>Method invoked when a mouse event is generated</summary>
-    /// <param name="mouseEvent"></param>
-    /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
-    public override bool OnMouseEvent (MouseEvent mouseEvent)
+    private void Label_TitleChanged (object sender, EventArgs<string> e)
     {
-        var args = new MouseEventEventArgs (mouseEvent);
-
-        if (OnMouseClick (args))
-        {
-            return true;
-        }
-
-        if (MouseEvent (mouseEvent))
-        {
-            return true;
-        }
-
-        if (mouseEvent.Flags == MouseFlags.Button1Clicked)
-        {
-            if (!HasFocus && SuperView != null)
-            {
-                if (!SuperView.HasFocus)
-                {
-                    SuperView.SetFocus ();
-                }
-
-                SetFocus ();
-                SetNeedsDisplay ();
-            }
-
-            OnClicked ();
-
-            return true;
-        }
-
-        return false;
+        base.Text = e.CurrentValue;
+        TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
-    private bool AcceptKey ()
+    /// <inheritdoc />
+    public override string Text
     {
-        if (!HasFocus)
-        {
-            SetFocus ();
-        }
+        get => base.Title;
+        set => base.Text = base.Title = value;
+    }
 
-        OnClicked ();
+    /// <inheritdoc />
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
+    }
+
+    private new bool? FocusNext ()
+    {
+        var me = SuperView?.Subviews.IndexOf (this) ?? -1;
+        if (me != -1 && me < SuperView?.Subviews.Count - 1)
+        {
+            SuperView?.Subviews [me + 1].SetFocus ();
+        }
 
         return true;
     }

@@ -1,345 +1,95 @@
-﻿using Xunit.Abstractions;
+using System.ComponentModel;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class ButtonTests
+public class ButtonTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public ButtonTests (ITestOutputHelper output) { _output = output; }
-
+    // Test that Title and Text are the same
     [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_False_With_Fixed_Width ()
+    public void Text_Mirrors_Title ()
     {
-        var tab = new View ();
+        var view = new Button ();
+        view.Title = "Hello";
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
 
-        var lblWidth = 8;
-
-        var view = new View
-        {
-            Y = 1,
-            Width = lblWidth,
-            Height = 1,
-            TextAlignment = TextAlignment.Right,
-            Text = "Find:"
-        };
-        tab.Add (view);
-
-        var txtToFind = new TextField
-        {
-            X = Pos.Right (view) + 1, Y = Pos.Top (view), Width = 20, Text = "Testing buttons."
-        };
-        tab.Add (txtToFind);
-
-        var btnFindNext = new Button
-        {
-            AutoSize = false,
-            X = Pos.Right (txtToFind) + 1,
-            Y = Pos.Top (view),
-            Width = 20,
-            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            TextAlignment = TextAlignment.Centered,
-            IsDefault = true,
-            Text = "Find _Next"
-        };
-        tab.Add (btnFindNext);
-
-        var btnFindPrevious = new Button
-        {
-            AutoSize = false,
-            X = Pos.Right (txtToFind) + 1,
-            Y = Pos.Top (btnFindNext) + 1,
-            Width = 20,
-            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            TextAlignment = TextAlignment.Centered,
-            Text = "Find _Previous"
-        };
-        tab.Add (btnFindPrevious);
-
-        var btnCancel = new Button
-        {
-            AutoSize = false,
-            X = Pos.Right (txtToFind) + 1,
-            Y = Pos.Top (btnFindPrevious) + 2,
-            Width = 20,
-            TextAlignment = TextAlignment.Centered,
-            Text = "Cancel"
-        };
-        tab.Add (btnCancel);
-
-        var ckbMatchCase = new CheckBox { X = 0, Y = Pos.Top (txtToFind) + 2, Checked = true, Text = "Match c_ase" };
-        tab.Add (ckbMatchCase);
-
-        var ckbMatchWholeWord = new CheckBox
-        {
-            X = 0, Y = Pos.Top (ckbMatchCase) + 1, Checked = false, Text = "Match _whole word"
-        };
-        tab.Add (ckbMatchWholeWord);
-
-        var tabView = new TabView { Width = Dim.Fill (), Height = Dim.Fill () };
-        tabView.AddTab (new Tab { DisplayText = "Find", View = tab }, true);
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-
-        tab.Width = view.Width + txtToFind.Width + btnFindNext.Width + 2;
-        tab.Height = btnFindNext.Height + btnFindPrevious.Height + btnCancel.Height + 4;
-
-        win.Add (tabView);
-        Application.Top.Add (win);
-
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (54, 11);
-
-        Assert.Equal (new Rect (0, 0, 54, 11), win.Frame);
-        Assert.Equal (new Rect (0, 0, 52, 9), tabView.Frame);
-        Assert.Equal (new Rect (0, 0, 50, 7), tab.Frame);
-        Assert.Equal (new Rect (0, 1, 8, 1), view.Frame);
-        Assert.Equal (new Rect (9, 1, 20, 1), txtToFind.Frame);
-
-        Assert.Equal (0, txtToFind.ScrollOffset);
-        Assert.Equal (16, txtToFind.CursorPosition);
-
-        Assert.Equal (new Rect (30, 1, 20, 1), btnFindNext.Frame);
-        Assert.Equal (new Rect (30, 2, 20, 1), btnFindPrevious.Frame);
-        Assert.Equal (new Rect (30, 4, 20, 1), btnCancel.Frame);
-        Assert.Equal (new Rect (0, 3, 12, 1), ckbMatchCase.Frame);
-        Assert.Equal (new Rect (0, 4, 18, 1), ckbMatchWholeWord.Frame);
-
-        var btn1 =
-            $"{
-                CM.Glyphs.LeftBracket
-            }{
-                CM.Glyphs.LeftDefaultIndicator
-            } Find Next {
-                CM.Glyphs.RightDefaultIndicator
-            }{
-                CM.Glyphs.RightBracket
-            }";
-        var btn2 = $"{CM.Glyphs.LeftBracket} Find Previous {CM.Glyphs.RightBracket}";
-        var btn3 = $"{CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}";
-
-        var expected = @$"
-┌────────────────────────────────────────────────────┐
-│╭────╮                                              │
-││Find│                                              │
-││    ╰─────────────────────────────────────────────╮│
-││                                                  ││
-││   Find: Testing buttons.       {
-    btn1
-}   ││
-││                               {
-    btn2
-}  ││
-││{
-    CM.Glyphs.Checked
-} Match case                                      ││
-││{
-    CM.Glyphs.UnChecked
-} Match whole word                 {
-    btn3
-}     ││
-│└──────────────────────────────────────────────────┘│
-└────────────────────────────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{CM.Glyphs.LeftBracket} Hello {CM.Glyphs.RightBracket}", view.TextFormatter.Text);
+        view.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_Stays_True_AnchorEnd ()
+    public void Title_Mirrors_Text ()
     {
-        var btn = new Button { Y = Pos.Center (), Text = "Say Hello 你", AutoSize = true };
-        var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
+        var view = new Button ();
+        view.Text = "Hello";
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{CM.Glyphs.LeftBracket} Hello {CM.Glyphs.RightBracket}", view.TextFormatter.Text);
 
-        btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
-        btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (btn);
-        Application.Top.Add (win);
-
-        Assert.True (btn.AutoSize);
-        Assert.True (btn.AutoSize);
-
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│            {
-    btnTxt
-}│
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-
-        Assert.True (btn.AutoSize);
-        btn.Text = "Say Hello 你 changed";
-        btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
-        Assert.True (btn.AutoSize);
-        Application.Refresh ();
-
-        expected = @$"
-┌────────────────────────────┐
-│                            │
-│    {
-    btnTxt
-}│
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
+        view.Dispose ();
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_Stays_True_Center ()
+    [Theory]
+    [InlineData ("01234", 0, 0, 0, 0)]
+    [InlineData ("01234", 1, 0, 1, 0)]
+    [InlineData ("01234", 0, 1, 0, 1)]
+    [InlineData ("01234", 1, 1, 1, 1)]
+    [InlineData ("01234", 10, 1, 10, 1)]
+    [InlineData ("01234", 10, 3, 10, 3)]
+    [InlineData ("0_1234", 0, 0, 0, 0)]
+    [InlineData ("0_1234", 1, 0, 1, 0)]
+    [InlineData ("0_1234", 0, 1, 0, 1)]
+    [InlineData ("0_1234", 1, 1, 1, 1)]
+    [InlineData ("0_1234", 10, 1, 10, 1)]
+    [InlineData ("0_12你", 10, 3, 10, 3)]
+    [InlineData ("0_12你", 0, 0, 0, 0)]
+    [InlineData ("0_12你", 1, 0, 1, 0)]
+    [InlineData ("0_12你", 0, 1, 0, 1)]
+    [InlineData ("0_12你", 1, 1, 1, 1)]
+    [InlineData ("0_12你", 10, 1, 10, 1)]
+    public void Button_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
-        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (btn);
-        Application.Top.Add (win);
-
-        Assert.True (btn.AutoSize);
-        Assert.True (btn.AutoSize);
-
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│      {
-    CM.Glyphs.LeftBracket
-} Say Hello 你 {
-    CM.Glyphs.RightBracket
-}      │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-
-        Assert.True (btn.AutoSize);
-        btn.Text = "Say Hello 你 changed";
-        Assert.True (btn.AutoSize);
-        Application.Refresh ();
-
-        expected = @$"
-┌────────────────────────────┐
-│                            │
-│  {
-    CM.Glyphs.LeftBracket
-} Say Hello 你 changed {
-    CM.Glyphs.RightBracket
-}  │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_Stays_True_With_EmptyText ()
-    {
-        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), AutoSize = true };
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (btn);
-        Application.Top.Add (win);
-
-        Assert.True (btn.AutoSize);
-        Assert.True (btn.AutoSize);
-
-        btn.Text = "Say Hello 你";
-        btn.Text = "Say Hello 你";
-
-        Assert.True (btn.AutoSize);
-        Assert.True (btn.AutoSize);
-
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│      {
-    CM.Glyphs.LeftBracket
-} Say Hello 你 {
-    CM.Glyphs.RightBracket
-}      │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-    }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void Button_AutoSize_False_With_Fixed_Width ()
-    {
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 5);
-
-        var top = new View { Width = 20, Height = 5 };
-
         var btn1 = new Button
         {
-            AutoSize = false,
-            X = Pos.Center (),
-            Y = Pos.Center (),
-            Width = 16,
-            Height = 1,
-            Text = "Open me!"
+            Text = text,
+            Width = width,
+            Height = height,
         };
 
-        var btn2 = new Button
-        {
-            AutoSize = false,
-            X = Pos.Center (),
-            Y = Pos.Center () + 1,
-            Width = 16,
-            Height = 1,
-            Text = "Close me!"
-        };
-        top.Add (btn1, btn2);
-        top.BeginInit ();
-        top.EndInit ();
-        top.Draw ();
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.GetContentSize ());
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.Size);
 
-        Assert.Equal ("{Width=16, Height=1}", btn1.TextFormatter.Size.ToString ());
-        Assert.Equal ("{Width=16, Height=1}", btn2.TextFormatter.Size.ToString ());
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @$"
-    {
-        CM.Glyphs.LeftBracket
-    } {
-        btn1.Text
-    } {
-        CM.Glyphs.RightBracket
+        btn1.Dispose ();
     }
-   {
-       CM.Glyphs.LeftBracket
-   } {
-       btn2.Text
-   } {
-       CM.Glyphs.RightBracket
-   }",
-                                                      _output
-                                                     );
+
+    [Theory]
+    [InlineData (0, 0, 0, 0)]
+    [InlineData (1, 0, 1, 0)]
+    [InlineData (0, 1, 0, 1)]
+    [InlineData (1, 1, 1, 1)]
+    [InlineData (10, 1, 10, 1)]
+    [InlineData (10, 3, 10, 3)]
+    public void Button_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
+    {
+        var btn1 = new Button
+        {
+            Width = width,
+            Height = height,
+        };
+
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.Size);
+
+        btn1.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Button_HotKeyChanged_EventFires ()
     {
         var btn = new Button { Text = "_Yar" };
@@ -367,10 +117,10 @@ public class ButtonTests
         Assert.Same (btn, sender);
         Assert.Equal (KeyCode.Y, args.OldKey);
         Assert.Equal (KeyCode.R, args.NewKey);
+        btn.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Button_HotKeyChanged_EventFires_WithNone ()
     {
         var btn = new Button ();
@@ -388,6 +138,7 @@ public class ButtonTests
         Assert.Same (btn, sender);
         Assert.Equal (KeyCode.Null, args.OldKey);
         Assert.Equal (KeyCode.R, args.NewKey);
+        btn.Dispose ();
     }
 
     [Fact]
@@ -398,21 +149,22 @@ public class ButtonTests
         Assert.Equal (string.Empty, btn.Text);
         btn.BeginInit ();
         btn.EndInit ();
+        btn.SetRelativeLayout (new (100, 100));
 
         Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.False (btn.IsDefault);
-        Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
+        Assert.Equal (Alignment.Center, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new Rect (0, 0, 4, 1), btn.Bounds);
-        Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
+        Assert.Equal (new (0, 0, 4, 1), btn.Viewport);
+        Assert.Equal (new (0, 0, 4, 1), btn.Frame);
         Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.False (btn.IsDefault);
-        Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
+        Assert.Equal (Alignment.Center, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new Rect (0, 0, 4, 1), btn.Bounds);
-        Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
+        Assert.Equal (new (0, 0, 4, 1), btn.Viewport);
+        Assert.Equal (new (0, 0, 4, 1), btn.Frame);
 
         Assert.Equal (string.Empty, btn.Title);
         Assert.Equal (KeyCode.Null, btn.HotKey);
@@ -420,15 +172,16 @@ public class ButtonTests
         btn.Draw ();
 
         var expected = @$"
-{
-    CM.Glyphs.LeftBracket
-}  {
-    CM.Glyphs.RightBracket
-}
+{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}
 ";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        btn.Dispose ();
 
-        btn = new Button { Text = "_Test", IsDefault = true };
+        btn = new () { Text = "_Test", IsDefault = true };
+        Assert.Equal (new (10, 1), btn.TextFormatter.Size);
+
+
+
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
@@ -436,44 +189,38 @@ public class ButtonTests
         Assert.Equal ("_Test", btn.Text);
 
         Assert.Equal (
-                      $"{
-                          CM.Glyphs.LeftBracket
-                      }{
-                          CM.Glyphs.LeftDefaultIndicator
-                      } Test {
-                          CM.Glyphs.RightDefaultIndicator
-                      }{
-                          CM.Glyphs.RightBracket
-                      }",
+                      $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}",
                       btn.TextFormatter.Format ()
                      );
         Assert.True (btn.IsDefault);
-        Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
+        Assert.Equal (Alignment.Center, btn.TextAlignment);
         Assert.True (btn.CanFocus);
-        Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
-        Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
+
+        btn.SetRelativeLayout (new (100, 100));
+        // 0123456789012345678901234567890123456789
+        // [* Test *]
+        Assert.Equal ('_', btn.HotKeySpecifier.Value);
+        Assert.Equal (10, btn.TextFormatter.Format ().Length);
+        Assert.Equal (new (10, 1), btn.TextFormatter.Size);
+        Assert.Equal (new (10, 1), btn.GetContentSize ());
+        Assert.Equal (new (0, 0, 10, 1), btn.Viewport);
+        Assert.Equal (new (0, 0, 10, 1), btn.Frame);
         Assert.Equal (KeyCode.T, btn.HotKey);
 
-        btn = new Button { X = 1, Y = 2, Text = "_abc", IsDefault = true };
+        btn.Dispose ();
+
+        btn = new () { X = 1, Y = 2, Text = "_abc", IsDefault = true };
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ("_abc", btn.Text);
         Assert.Equal (Key.A, btn.HotKey);
 
         Assert.Equal (
-                      $"{
-                          CM.Glyphs.LeftBracket
-                      }{
-                          CM.Glyphs.LeftDefaultIndicator
-                      } abc {
-                          CM.Glyphs.RightDefaultIndicator
-                      }{
-                          CM.Glyphs.RightBracket
-                      }",
+                      $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}",
                       btn.TextFormatter.Format ()
                      );
         Assert.True (btn.IsDefault);
-        Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
+        Assert.Equal (Alignment.Center, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
 
@@ -481,44 +228,121 @@ public class ButtonTests
         btn.Draw ();
 
         expected = @$"
- {
-     CM.Glyphs.LeftBracket
- }{
-     CM.Glyphs.LeftDefaultIndicator
- } abc {
-     CM.Glyphs.RightDefaultIndicator
- }{
-     CM.Glyphs.RightBracket
- }
+ {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}
 ";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-        Assert.Equal (new Rect (0, 0, 9, 1), btn.Bounds);
-        Assert.Equal (new Rect (1, 2, 9, 1), btn.Frame);
+        Assert.Equal (new (0, 0, 9, 1), btn.Viewport);
+        Assert.Equal (new (1, 2, 9, 1), btn.Frame);
+        btn.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void HotKeyChange_Works ()
     {
         var clicked = false;
         var btn = new Button { Text = "_Test" };
-        btn.Clicked += (s, e) => clicked = true;
-        Application.Top.Add (btn);
-        Application.Begin (Application.Top);
+        btn.Accept += (s, e) => clicked = true;
 
         Assert.Equal (KeyCode.T, btn.HotKey);
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T)));
+        Assert.True (btn.NewKeyDownEvent (Key.T));
         Assert.True (clicked);
 
         clicked = false;
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.AltMask)));
+        Assert.True (btn.NewKeyDownEvent (Key.T.WithAlt));
         Assert.True (clicked);
 
         clicked = false;
         btn.HotKey = KeyCode.E;
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.E | KeyCode.AltMask)));
+        Assert.True (btn.NewKeyDownEvent (Key.E.WithAlt));
         Assert.True (clicked);
+    }
+
+    [Theory]
+    [InlineData (false, 0)]
+    [InlineData (true, 1)]
+    public void Space_Fires_Accept (bool focused, int expected)
+    {
+        View superView = new View ()
+        {
+            CanFocus = true,
+        };
+
+        Button button = new ();
+
+        button.CanFocus = focused;
+
+        int acceptInvoked = 0;
+        button.Accept += (s, e) => acceptInvoked++;
+
+        superView.Add (button);
+        button.SetFocus ();
+        Assert.Equal (focused, button.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (expected, acceptInvoked);
+
+        superView.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (false, 0)]
+    [InlineData (true, 1)]
+    public void Enter_Fires_Accept (bool focused, int expected)
+    {
+        View superView = new View ()
+        {
+            CanFocus = true,
+        };
+
+        Button button = new ();
+
+        button.CanFocus = focused;
+
+        int acceptInvoked = 0;
+        button.Accept += (s, e) => acceptInvoked++;
+
+        superView.Add (button);
+        button.SetFocus ();
+        Assert.Equal (focused, button.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (expected, acceptInvoked);
+
+        superView.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (false, 1)]
+    [InlineData (true, 1)]
+    public void HotKey_Fires_Accept (bool focused, int expected)
+    {
+        View superView = new View ()
+        {
+            CanFocus = true,
+        };
+
+        Button button = new ()
+        {
+            HotKey = Key.A
+        };
+
+        button.CanFocus = focused;
+
+        int acceptInvoked = 0;
+        button.Accept += (s, e) => acceptInvoked++;
+
+        superView.Add (button);
+        button.SetFocus ();
+        Assert.Equal (focused, button.HasFocus);
+
+        superView.NewKeyDownEvent (Key.A);
+
+        Assert.Equal (expected, acceptInvoked);
+
+        superView.Dispose ();
     }
 
     /// <summary>
@@ -532,46 +356,49 @@ public class ButtonTests
         var pressed = 0;
         var btn = new Button { Text = "Press Me" };
 
-        btn.Clicked += (s, e) => pressed++;
+        btn.Accept += (s, e) => pressed++;
 
         // The Button class supports the Default and Accept command
-        Assert.Contains (Command.Default, btn.GetSupportedCommands ());
+        Assert.Contains (Command.HotKey, btn.GetSupportedCommands ());
         Assert.Contains (Command.Accept, btn.GetSupportedCommands ());
 
-        Application.Top.Add (btn);
-        Application.Begin (Application.Top);
-        Application.Top.Add (btn);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (btn);
+        Application.Begin (top);
 
-        // default keybinding is Space which results in keypress
-        Application.OnKeyDown (new Key ((KeyCode)' '));
+        Assert.True (btn.HasFocus);
+
+        // default keybinding is Space which results in Command.Accept (when focused)
+        Application.OnKeyDown (new ((KeyCode)' '));
         Assert.Equal (1, pressed);
 
         // remove the default keybinding (Space)
-        btn.KeyBindings.Clear (Command.Default, Command.Accept);
+        btn.KeyBindings.Clear (Command.HotKey);
+        btn.KeyBindings.Clear (Command.Accept);
 
         // After clearing the default keystroke the Space button no longer does anything for the Button
-        Application.OnKeyDown (new Key ((KeyCode)' '));
+        Application.OnKeyDown (new ((KeyCode)' '));
         Assert.Equal (1, pressed);
 
         // Set a new binding of b for the click (Accept) event
-        btn.KeyBindings.Add (KeyCode.B, Command.Default, Command.Accept);
+        btn.KeyBindings.Add (Key.B, Command.HotKey); // b will now trigger the Accept command (when focused or not)
 
         // now pressing B should call the button click event
-        Application.OnKeyDown (new Key (KeyCode.B));
+        Application.OnKeyDown (Key.B);
         Assert.Equal (2, pressed);
 
         // now pressing Shift-B should NOT call the button click event
-        Application.OnKeyDown (new Key (KeyCode.ShiftMask | KeyCode.B));
+        Application.OnKeyDown (Key.B.WithShift);
         Assert.Equal (2, pressed);
 
         // now pressing Alt-B should NOT call the button click event
-        Application.OnKeyDown (new Key (KeyCode.AltMask | KeyCode.B));
+        Application.OnKeyDown (Key.B.WithAlt);
         Assert.Equal (2, pressed);
 
         // now pressing Shift-Alt-B should NOT call the button click event
-        Application.OnKeyDown (new Key (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.B));
+        Application.OnKeyDown (Key.B.WithAlt.WithShift);
         Assert.Equal (2, pressed);
+        top.Dispose ();
     }
 
     [Fact]
@@ -580,17 +407,18 @@ public class ButtonTests
     {
         var clicked = false;
         var btn = new Button { Text = "_Test" };
-        btn.Clicked += (s, e) => clicked = true;
-        Application.Top.Add (btn);
-        Application.Begin (Application.Top);
+        btn.Accept += (s, e) => clicked = true;
+        var top = new Toplevel ();
+        top.Add (btn);
+        Application.Begin (top);
 
         // Hot key. Both alone and with alt
         Assert.Equal (KeyCode.T, btn.HotKey);
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T)));
+        Assert.True (btn.NewKeyDownEvent (Key.T));
         Assert.True (clicked);
         clicked = false;
 
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.AltMask)));
+        Assert.True (btn.NewKeyDownEvent (Key.T.WithAlt));
         Assert.True (clicked);
         clicked = false;
 
@@ -604,32 +432,32 @@ public class ButtonTests
         // IsDefault = false
         // Space and Enter should work
         Assert.False (btn.IsDefault);
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (btn.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
         // IsDefault = true
         // Space and Enter should work
         btn.IsDefault = true;
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (btn.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
         // Toplevel does not handle Enter, so it should get passed on to button
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (Application.Top.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
         // Direct
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (btn.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
-        Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Space)));
+        Assert.True (btn.NewKeyDownEvent (Key.Space));
         Assert.True (clicked);
         clicked = false;
 
-        Assert.True (btn.NewKeyDownEvent (new Key ((KeyCode)'T')));
+        Assert.True (btn.NewKeyDownEvent (new ((KeyCode)'T')));
         Assert.True (clicked);
         clicked = false;
 
@@ -638,6 +466,48 @@ public class ButtonTests
         Assert.True (btn.NewKeyDownEvent (btn.HotKey));
         Assert.True (clicked);
         clicked = false;
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void HotKey_Command_Accepts ()
+    {
+        var button = new Button ();
+        var accepted = false;
+
+        button.Accept += ButtonOnAccept;
+        button.InvokeCommand (Command.HotKey);
+
+        Assert.True (accepted);
+        button.Dispose ();
+
+        return;
+
+        void ButtonOnAccept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
+    {
+        var button = new Button ();
+        var acceptInvoked = false;
+
+        button.Accept += ButtonAccept;
+
+        bool? ret = button.InvokeCommand (Command.Accept);
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
+
+        button.Dispose ();
+
+        return;
+
+        void ButtonAccept (object sender, HandledEventArgs e)
+        {
+            acceptInvoked = true;
+            e.Handled = true;
+        }
     }
 
     [Fact]
@@ -662,6 +532,7 @@ public class ButtonTests
         btn.Text = "Te_st";
         Assert.Equal ("Te_st", btn.Text);
         Assert.Equal (KeyCode.S, btn.HotKey);
+        super.Dispose ();
     }
 
     [Fact]
@@ -676,6 +547,7 @@ public class ButtonTests
 
         // with cast
         Assert.Equal ("heyb", ((Button)b).Text);
+        b.Dispose ();
     }
 
     [Fact]
@@ -685,34 +557,31 @@ public class ButtonTests
         var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.False (btn.IsInitialized);
-        Assert.False (btn.IsInitialized);
 
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
         Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
+        Assert.Equal (new (0, 0, 16, 1), btn.Viewport);
         var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
         var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│      {
-    btnTxt
-}      │
+│      {btnTxt}      │
 │                            │
 └────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -722,33 +591,97 @@ public class ButtonTests
         var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
         Assert.False (btn.IsInitialized);
-        Assert.False (btn.IsInitialized);
 
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
         Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
+        Assert.Equal (new (0, 0, 16, 1), btn.Viewport);
         var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
         var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│      {
-    btnTxt
-}      │
+│      {btnTxt}      │
 │                            │
 └────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
+        top.Dispose ();
     }
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_ButtonClick_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    {
+        var me = new MouseEvent ();
+
+        var button = new Button ()
+        {
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true
+        };
+
+        var acceptCount = 0;
+
+        button.Accept += (s, e) => acceptCount++;
+
+        me.Flags = pressed;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        me.Flags = released;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        me.Flags = clicked;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        button.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
+    public void WantContinuousButtonPressed_True_ButtonPressRelease_Accepts (MouseFlags pressed, MouseFlags released)
+    {
+        var me = new MouseEvent ();
+
+        var button = new Button ()
+        {
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true
+        };
+
+        var acceptCount = 0;
+
+        button.Accept += (s, e) => acceptCount++;
+
+        me.Flags = pressed;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        me.Flags = released;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, acceptCount);
+
+        button.Dispose ();
+    }
+
 }

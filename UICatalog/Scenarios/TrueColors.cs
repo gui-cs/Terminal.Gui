@@ -7,8 +7,15 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Colors")]
 public class TrueColors : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
+
         var x = 2;
         var y = 1;
 
@@ -18,97 +25,135 @@ public class TrueColors : Scenario
         {
             X = x, Y = y++, Text = $"Current driver is {Application.Driver.GetType ().Name}"
         };
-        Win.Add (lblDriverName);
+        app.Add (lblDriverName);
         y++;
 
         var cbSupportsTrueColor = new CheckBox
         {
             X = x,
             Y = y++,
-            Checked = canTrueColor,
+            State = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
             CanFocus = false,
+            Enabled = false,
             Text = "Driver supports true color "
         };
-        Win.Add (cbSupportsTrueColor);
+        app.Add (cbSupportsTrueColor);
 
         var cbUseTrueColor = new CheckBox
         {
             X = x,
             Y = y++,
-            Checked = Application.Force16Colors,
+            State = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Force 16 colors"
         };
-        cbUseTrueColor.Toggled += (_, evt) => { Application.Force16Colors = evt.NewValue ?? false; };
-        Win.Add (cbUseTrueColor);
+        cbUseTrueColor.Toggle += (_, evt) => { Application.Force16Colors = evt.NewValue == CheckState.Checked; };
+        app.Add (cbUseTrueColor);
 
         y += 2;
-        SetupGradient ("Red gradient", x, ref y, i => new Color (i, 0));
-        SetupGradient ("Green gradient", x, ref y, i => new Color (0, i));
-        SetupGradient ("Blue gradient", x, ref y, i => new Color (0, 0, i));
-        SetupGradient ("Yellow gradient", x, ref y, i => new Color (i, i));
-        SetupGradient ("Magenta gradient", x, ref y, i => new Color (i, 0, i));
-        SetupGradient ("Cyan gradient", x, ref y, i => new Color (0, i, i));
-        SetupGradient ("Gray gradient", x, ref y, i => new Color (i, i, i));
+        SetupGradient ("Red gradient", x, ref y, i => new (i, 0));
+        SetupGradient ("Green gradient", x, ref y, i => new (0, i));
+        SetupGradient ("Blue gradient", x, ref y, i => new (0, 0, i));
+        SetupGradient ("Yellow gradient", x, ref y, i => new (i, i));
+        SetupGradient ("Magenta gradient", x, ref y, i => new (i, 0, i));
+        SetupGradient ("Cyan gradient", x, ref y, i => new (0, i, i));
+        SetupGradient ("Gray gradient", x, ref y, i => new (i, i, i));
 
-        Win.Add (
+        app.Add (
                  new Label { X = Pos.AnchorEnd (44), Y = 2, Text = "Mouse over to get the gradient view color:" }
                 );
 
-        Win.Add (
+        app.Add (
                  new Label { X = Pos.AnchorEnd (44), Y = 4, Text = "Red:" }
                 );
 
-        Win.Add (
+        app.Add (
                  new Label { X = Pos.AnchorEnd (44), Y = 5, Text = "Green:" }
                 );
 
-        Win.Add (
+        app.Add (
                  new Label { X = Pos.AnchorEnd (44), Y = 6, Text = "Blue:" }
                 );
 
+        app.Add (
+                 new Label { X = Pos.AnchorEnd (44), Y = 8, Text = "Darker:" }
+                );
+
+        app.Add (
+                 new Label { X = Pos.AnchorEnd (44), Y = 9, Text = "Lighter:" }
+                );
+
         var lblRed = new Label { X = Pos.AnchorEnd (32), Y = 4, Text = "na" };
-        Win.Add (lblRed);
+        app.Add (lblRed);
         var lblGreen = new Label { X = Pos.AnchorEnd (32), Y = 5, Text = "na" };
-        Win.Add (lblGreen);
+        app.Add (lblGreen);
         var lblBlue = new Label { X = Pos.AnchorEnd (32), Y = 6, Text = "na" };
-        Win.Add (lblBlue);
+        app.Add (lblBlue);
+
+        var lblDarker = new Label { X = Pos.AnchorEnd (32), Y = 8, Text = "     " };
+        app.Add (lblDarker);
+
+        var lblLighter = new Label { X = Pos.AnchorEnd (32), Y = 9, Text = "    " };
+        app.Add (lblLighter);
 
         Application.MouseEvent += (s, e) =>
                                   {
-                                      if (e.MouseEvent.View != null)
+                                      if (e.View == null)
                                       {
-                                          Attribute normal = e.MouseEvent.View.GetNormalColor ();
+                                          return;
+                                      }
+
+                                      if (e.Flags == MouseFlags.Button1Clicked)
+                                      {
+                                          Attribute normal = e.View.GetNormalColor ();
+
+                                          lblLighter.ColorScheme = new (e.View.ColorScheme)
+                                          {
+                                              Normal = new (
+                                                            normal.Foreground,
+                                                            normal.Background.GetHighlightColor ()
+                                                           )
+                                          };
+                                      }
+                                      else
+                                      {
+                                          Attribute normal = e.View.GetNormalColor ();
                                           lblRed.Text = normal.Foreground.R.ToString ();
                                           lblGreen.Text = normal.Foreground.G.ToString ();
                                           lblBlue.Text = normal.Foreground.B.ToString ();
                                       }
                                   };
-    }
+        Application.Run (app);
+        app.Dispose ();
 
-    private void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc)
-    {
-        var gradient = new Label { X = x, Y = y++, Text = name };
-        Win.Add (gradient);
+        Application.Shutdown ();
 
-        for (int dx = x, i = 0; i <= 256; i += 4)
+        return;
+
+        void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc)
         {
-            var l = new Label
-            {
-                X = dx++,
-                Y = y,
-                ColorScheme = new ColorScheme
-                {
-                    Normal = new Attribute (
-                                            colorFunc (Math.Clamp (i, 0, 255)),
-                                            colorFunc (Math.Clamp (i, 0, 255))
-                                           )
-                },
-                Text = " "
-            };
-            Win.Add (l);
-        }
+            var gradient = new Label { X = x, Y = y++, Text = name };
+            app.Add (gradient);
 
-        y += 2;
+            for (int dx = x, i = 0; i <= 256; i += 4)
+            {
+                var l = new Label
+                {
+                    X = dx++,
+                    Y = y,
+                    ColorScheme = new()
+                    {
+                        Normal = new (
+                                      colorFunc (Math.Clamp (i, 0, 255)),
+                                      colorFunc (Math.Clamp (i, 0, 255))
+                                     )
+                    },
+                    Text = " "
+                };
+                app.Add (l);
+            }
+
+            y += 2;
+        }
     }
 }

@@ -1,15 +1,46 @@
-﻿using Xunit.Abstractions;
-
-//using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
-
-// Alias Console to MockConsole so we don't accidentally use Console
+﻿using System.Text;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-public class TitleTests
+public class TitleTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper output;
-    public TitleTests (ITestOutputHelper output) { this.output = output; }
+    [SetupFakeDriver]
+    [Fact]
+    public void Change_View_Size_Update_Title_Size ()
+    {
+        var view = new View
+        {
+            Title = "_Hello World",
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            BorderStyle = LineStyle.Single
+        };
+        var top = new Toplevel ();
+        top.Add (view);
+        top.BeginInit ();
+        top.EndInit ();
+
+        Assert.Equal (string.Empty, view.Text);
+        Assert.Equal (new (2, 2), view.Frame.Size);
+        top.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌┐
+└┘",
+                                                      output);
+
+        var text = "This text will increment the view size and display the title.";
+        view.Text = text;
+        top.Draw ();
+        Assert.Equal (text, view.Text);
+
+        // SetupFakeDriver only create a screen with 25 cols and 25 rows
+        Assert.Equal (new (text.Length, 1), view.GetContentSize ());
+
+        top.Dispose ();
+    }
 
     [Fact]
     public void Set_Title_Fires_TitleChanged ()
@@ -22,8 +53,7 @@ public class TitleTests
 
         r.TitleChanged += (s, args) =>
                           {
-                              Assert.Equal (expectedOld, args.OldTitle);
-                              Assert.Equal (r.Title, args.NewTitle);
+                              Assert.Equal (r.Title, args.CurrentValue);
                           };
 
         expected = "title";
@@ -46,8 +76,8 @@ public class TitleTests
 
         r.TitleChanging += (s, args) =>
                            {
-                               Assert.Equal (expectedOld, args.OldTitle);
-                               Assert.Equal (expectedDuring, args.NewTitle);
+                               Assert.Equal (expectedOld, args.CurrentValue);
+                               Assert.Equal (expectedDuring, args.NewValue);
                                args.Cancel = cancel;
                            };
 
@@ -65,5 +95,14 @@ public class TitleTests
         r.Title = expectedDuring = "title";
         Assert.Equal (expectedAfter, r.Title);
         r.Dispose ();
+    }
+
+    // Setting Text does NOT set the HotKey
+    [Fact]
+    public void Title_Does_Set_HotKey ()
+    {
+        var view = new View { HotKeySpecifier = (Rune)'_', Title = "_Hello World" };
+
+        Assert.Equal (Key.H, view.HotKey);
     }
 }

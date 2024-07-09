@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -619,30 +620,38 @@ public class MainLoopTests
                        );
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public async Task InvokeLeakTest ()
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    //[InlineData (typeof (NetDriver))] // BUGBUG: NetDriver never exits in this test
+
+    //[InlineData (typeof (ANSIDriver))]
+    //[InlineData (typeof (WindowsDriver))] // BUGBUG: NetDriver never exits in this test
+    //[InlineData (typeof (CursesDriver))] // BUGBUG: CursesDriver never exits in this test
+    public async Task InvokeLeakTest (Type driverType)
     {
+        Application.Init (driverName: driverType.Name);
         Random r = new ();
         TextField tf = new ();
-        Application.Top.Add (tf);
+        var top = new Toplevel ();
+        top.Add (tf);
 
-        const int numPasses = 5;
+        const int numPasses = 2;
         const int numIncrements = 500;
         const int pollMs = 2500;
 
         Task task = Task.Run (() => RunTest (r, tf, numPasses, numIncrements, pollMs));
 
         // blocks here until the RequestStop is processed at the end of the test
-        Application.Run ();
+        Application.Run (top);
 
         await task; // Propagate exception if any occurred
 
         Assert.Equal (numIncrements * numPasses, tbCounter);
+        top.Dispose ();
+        Application.Shutdown ();
     }
 
     [Theory]
-    [AutoInitShutdown]
     [MemberData (nameof (TestAddIdle))]
     public void Mainloop_Invoke_Or_AddIdle_Can_Be_Used_For_Events_Or_Actions (
         Action action,
@@ -656,6 +665,9 @@ public class MainLoopTests
         int pfour
     )
     {
+        // TODO: Expand this test to test all drivers
+        Application.Init (new FakeDriver());
+
         total = 0;
         btn = null;
         clickMe = pclickMe;
@@ -670,9 +682,10 @@ public class MainLoopTests
 
         var btnLaunch = new Button { Text = "Open Window" };
 
-        btnLaunch.Clicked += (s, e) => action ();
+        btnLaunch.Accept += (s, e) => action ();
 
-        Application.Top.Add (btnLaunch);
+        var top = new Toplevel ();
+        top.Add (btnLaunch);
 
         int iterations = -1;
 
@@ -684,7 +697,7 @@ public class MainLoopTests
                                      {
                                          Assert.Null (btn);
                                          Assert.Equal (zero, total);
-                                         Assert.True (btnLaunch.NewKeyDownEvent (new Key (KeyCode.Space)));
+                                         Assert.True (btnLaunch.NewKeyDownEvent (Key.Space));
 
                                          if (btn == null)
                                          {
@@ -701,7 +714,7 @@ public class MainLoopTests
                                      {
                                          Assert.Equal (clickMe, btn.Text);
                                          Assert.Equal (zero, total);
-                                         Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Space)));
+                                         Assert.True (btn.NewKeyDownEvent (Key.Space));
                                          Assert.Equal (cancel, btn.Text);
                                          Assert.Equal (one, total);
                                      }
@@ -711,11 +724,14 @@ public class MainLoopTests
                                      }
                                  };
 
-        Application.Run ();
+        Application.Run (top);
+        top.Dispose ();
 
         Assert.True (taskCompleted);
         Assert.Equal (clickMe, btn.Text);
         Assert.Equal (four, total);
+
+        Application.Shutdown ();
     }
 
     [Fact]
@@ -902,11 +918,11 @@ public class MainLoopTests
 
         btn = new Button { Text = "Click Me" };
 
-        btn.Clicked += RunAsyncTest;
+        btn.Accept += RunAsyncTest;
 
         var totalbtn = new Button { X = Pos.Right (btn), Text = "total" };
 
-        totalbtn.Clicked += (s, e) => { MessageBox.Query ("Count", $"Count is {total}", "Ok"); };
+        totalbtn.Accept += (s, e) => { MessageBox.Query ("Count", $"Count is {total}", "Ok"); };
 
         startWindow.Add (btn);
         startWindow.Add (totalbtn);

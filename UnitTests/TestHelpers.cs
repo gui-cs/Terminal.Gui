@@ -8,23 +8,21 @@ using Xunit.Sdk;
 
 namespace Terminal.Gui;
 
-// This class enables test functions annotated with the [AutoInitShutdown] attribute to 
-// automatically call Application.Init at start of the test and Application.Shutdown after the
-// test exits. 
-// 
-// This is necessary because a) Application is a singleton and Init/Shutdown must be called
-// as a pair, and b) all unit test functions should be atomic..
+/// <summary>
+///     This class enables test functions annotated with the [AutoInitShutdown] attribute to
+///     automatically call Application.Init at start of the test and Application.Shutdown after the
+///     test exits.
+///     This is necessary because a) Application is a singleton and Init/Shutdown must be called
+///     as a pair, and b) all unit test functions should be atomic..
+/// </summary>
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 {
-    private readonly Type _driverType;
-
     /// <summary>
     ///     Initializes a [AutoInitShutdown] attribute, which determines if/how Application.Init and Application.Shutdown
     ///     are automatically called Before/After a test runs.
     /// </summary>
     /// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
-    /// <param name="autoShutdown">If true, Application.Shutdown will be called After the test runs.</param>
     /// <param name="consoleDriverType">
     ///     Determines which ConsoleDriver (FakeDriver, WindowsDriver, CursesDriver, NetDriver)
     ///     will be used when Application.Init is called. If null FakeDriver will be used. Only valid if
@@ -63,14 +61,19 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         ConfigurationManager.Locations = configLocation;
     }
 
-    private bool AutoInit { get; }
+    private readonly Type _driverType;
 
     public override void After (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
 
+        // Turn off diagnostic flags in case some test left them on
+        View.Diagnostics = ViewDiagnosticFlags.Off;
+
         if (AutoInit)
         {
+            // TODO: This Dispose call is here until all unit tests that don't correctly dispose Toplevel's they create are fixed.
+            Application.Top?.Dispose ();
             Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
             if (Responder.Instances.Count == 0)
@@ -82,6 +85,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 Responder.Instances.Clear ();
             }
 #endif
+            ConfigurationManager.Reset ();
         }
     }
 
@@ -91,6 +95,8 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
+            ConfigurationManager.Reset ();
+
 #if DEBUG_IDISPOSABLE
 
             // Clear out any lingering Responder instances from previous tests
@@ -106,6 +112,8 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
         }
     }
+
+    private bool AutoInit { get; }
 }
 
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
@@ -116,6 +124,8 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     public override void After (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
+        base.After (methodUnderTest);
+
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
 #endif
@@ -124,6 +134,7 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+        base.Before (methodUnderTest);
 #if DEBUG_IDISPOSABLE
 
         // Clear out any lingering Responder instances from previous tests
@@ -133,6 +144,7 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     }
 }
 
+// TODO: Make this inherit from TestRespondersDisposed so that all tests that don't dispose Views correctly can be identified and fixed
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 {
@@ -145,7 +157,12 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
     public override void After (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
+
+        // Turn off diagnostic flags in case some test left them on
+        View.Diagnostics = ViewDiagnosticFlags.Off;
+
         Application.Driver = null;
+        base.After (methodUnderTest);
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -153,14 +170,15 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
         Assert.Null (Application.Driver);
         Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
+        base.Before (methodUnderTest);
     }
 }
 
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class TestDateAttribute : BeforeAfterTestAttribute
 {
-    private readonly CultureInfo _currentCulture = CultureInfo.CurrentCulture;
     public TestDateAttribute () { CultureInfo.CurrentCulture = CultureInfo.InvariantCulture; }
+    private readonly CultureInfo _currentCulture = CultureInfo.CurrentCulture;
 
     public override void After (MethodInfo methodUnderTest)
     {
@@ -173,6 +191,8 @@ public class TestDateAttribute : BeforeAfterTestAttribute
 
 internal partial class TestHelpers
 {
+    private const char SpaceChar = ' ';
+    private static readonly Rune SpaceRune = (Rune)SpaceChar;
 #pragma warning disable xUnit1013 // Public method should be marked as test
     /// <summary>
     ///     Verifies <paramref name="expectedAttributes"/> are found at the locations specified by
@@ -217,24 +237,12 @@ internal partial class TestHelpers
                 switch (match.Count)
                 {
                     case 0:
-                        throw new Exception (
-                                             $"{DriverContentsToString (driver)}\n"
-                                             + $"Expected Attribute {
-                                                 val
-                                             } (PlatformColor = {
-                                                 val.Value.PlatformColor
-                                             }) at Contents[{
-                                                 line
-                                             },{
-                                                 c
-                                             }] {
-                                                 contents [line, c]
-                                             } ((PlatformColor = {
-                                                 contents [line, c].Attribute.Value.PlatformColor
-                                             }) was not found.\n"
-                                             + $"  Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n"
-                                             + $"  But Was: <not found>"
-                                            );
+                        throw new (
+                                   $"{Application.ToString (driver)}\n"
+                                   + $"Expected Attribute {val} (PlatformColor = {val.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n"
+                                   + $"  Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n"
+                                   + $"  But Was: <not found>"
+                                  );
                     case > 1:
                         throw new ArgumentException (
                                                      $"Bad value for expectedColors, {match.Count} Attributes had the same Value"
@@ -246,12 +254,12 @@ internal partial class TestHelpers
 
                 if (colorUsed != userExpected)
                 {
-                    throw new Exception (
-                                         $"{DriverContentsToString (driver)}\n"
-                                         + $"Unexpected Attribute at Contents[{line},{c}] {contents [line, c]}.\n"
-                                         + $"  Expected: {userExpected} ({expectedAttributes [int.Parse (userExpected.ToString ())]})\n"
-                                         + $"  But Was:   {colorUsed} ({val})\n"
-                                        );
+                    throw new (
+                               $"{Application.ToString (driver)}\n"
+                               + $"Unexpected Attribute at Contents[{line},{c}] {contents [line, c]}.\n"
+                               + $"  Expected: {userExpected} ({expectedAttributes [int.Parse (userExpected.ToString ())]})\n"
+                               + $"  But Was:   {colorUsed} ({val})\n"
+                              );
                 }
             }
 
@@ -273,7 +281,7 @@ internal partial class TestHelpers
     )
     {
 #pragma warning restore xUnit1013 // Public method should be marked as test
-        string actualLook = DriverContentsToString (driver);
+        var actualLook = Application.ToString (driver ?? Application.Driver);
 
         if (string.Equals (expectedLook, actualLook))
         {
@@ -305,14 +313,13 @@ internal partial class TestHelpers
     }
 
     /// <summary>
-    ///     Asserts that the driver contents are equal to the expected look, and that the cursor is at the expected
-    ///     position.
+    ///     Asserts that the driver contents are equal to the provided string.
     /// </summary>
     /// <param name="expectedLook"></param>
     /// <param name="output"></param>
     /// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <returns></returns>
-    public static Rect AssertDriverContentsWithFrameAre (
+    public static Rectangle AssertDriverContentsWithFrameAre (
         string expectedLook,
         ITestOutputHelper output,
         ConsoleDriver driver = null
@@ -328,43 +335,43 @@ internal partial class TestHelpers
 
         Cell [,] contents = driver.Contents;
 
-        for (var r = 0; r < driver.Rows; r++)
+        for (var rowIndex = 0; rowIndex < driver.Rows; rowIndex++)
         {
-            List<Rune> runes = new ();
+            List<Rune> runes = [];
 
-            for (var c = 0; c < driver.Cols; c++)
+            for (var colIndex = 0; colIndex < driver.Cols; colIndex++)
             {
-                Rune rune = contents [r, c].Rune;
+                Rune runeAtCurrentLocation = contents [rowIndex, colIndex].Rune;
 
-                if (rune != (Rune)' ')
+                if (runeAtCurrentLocation != SpaceRune)
                 {
                     if (x == -1)
                     {
-                        x = c;
-                        y = r;
+                        x = colIndex;
+                        y = rowIndex;
 
-                        for (var i = 0; i < c; i++)
+                        for (var i = 0; i < colIndex; i++)
                         {
-                            runes.InsertRange (i, new List<Rune> { (Rune)' ' });
+                            runes.InsertRange (i, [SpaceRune]);
                         }
                     }
 
-                    if (rune.GetColumns () > 1)
+                    if (runeAtCurrentLocation.GetColumns () > 1)
                     {
-                        c++;
+                        colIndex++;
                     }
 
-                    if (c + 1 > w)
+                    if (colIndex + 1 > w)
                     {
-                        w = c + 1;
+                        w = colIndex + 1;
                     }
 
-                    h = r - y + 1;
+                    h = rowIndex - y + 1;
                 }
 
                 if (x > -1)
                 {
-                    runes.Add (rune);
+                    runes.Add (runeAtCurrentLocation);
                 }
 
                 // See Issue #2616
@@ -423,30 +430,27 @@ internal partial class TestHelpers
 
         if (string.Equals (expectedLook, actualLook))
         {
-            return new Rect (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
+            return new (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
         }
 
         // standardize line endings for the comparison
-        expectedLook = expectedLook.Replace ("\r\n", "\n");
-        actualLook = actualLook.Replace ("\r\n", "\n");
+        expectedLook = expectedLook.ReplaceLineEndings ();
+        actualLook = actualLook.ReplaceLineEndings ();
 
         // Remove the first and the last line ending from the expectedLook
-        if (expectedLook.StartsWith ("\n"))
+        if (expectedLook.StartsWith (Environment.NewLine))
         {
-            expectedLook = expectedLook [1..];
+            expectedLook = expectedLook [Environment.NewLine.Length..];
         }
 
-        if (expectedLook.EndsWith ("\n"))
+        if (expectedLook.EndsWith (Environment.NewLine))
         {
-            expectedLook = expectedLook [..^1];
+            expectedLook = expectedLook [..^Environment.NewLine.Length];
         }
-
-        output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-        output?.WriteLine (" But Was:" + Environment.NewLine + actualLook);
 
         Assert.Equal (expectedLook, actualLook);
 
-        return new Rect (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
+        return new (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
     }
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
@@ -476,162 +480,7 @@ internal partial class TestHelpers
     }
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
-    public static string DriverContentsToString (ConsoleDriver driver = null)
-    {
-        var sb = new StringBuilder ();
-        driver ??= Application.Driver;
-
-        Cell [,] contents = driver.Contents;
-
-        for (var r = 0; r < driver.Rows; r++)
-        {
-            for (var c = 0; c < driver.Cols; c++)
-            {
-                Rune rune = contents [r, c].Rune;
-
-                if (rune.DecodeSurrogatePair (out char [] sp))
-                {
-                    sb.Append (sp);
-                }
-                else
-                {
-                    sb.Append ((char)rune.Value);
-                }
-
-                if (rune.GetColumns () > 1)
-                {
-                    c++;
-                }
-
-                // See Issue #2616
-                //foreach (var combMark in contents [r, c].CombiningMarks) {
-                //	sb.Append ((char)combMark.Value);
-                //}
-            }
-
-            sb.AppendLine ();
-        }
-
-        return sb.ToString ();
-    }
-
-    /// <summary>Gets a list of instances of all classes derived from View.</summary>
-    /// <returns>List of View objects</returns>
-    public static List<View> GetAllViews ()
-    {
-        return typeof (View).Assembly.GetTypes ()
-                            .Where (
-                                    type => type.IsClass
-                                            && !type.IsAbstract
-                                            && type.IsPublic
-                                            && type.IsSubclassOf (typeof (View))
-                                   )
-                            .Select (type => GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ())))
-                            .ToList ();
-    }
-
-    /// <summary>
-    ///     Verifies the console used all the <paramref name="expectedColors"/> when rendering. If one or more of the
-    ///     expected colors are not used then the failure will output both the colors that were found to be used and which of
-    ///     your expectations was not met.
-    /// </summary>
-    /// <param name="driver">if null uses <see cref="Application.Driver"/></param>
-    /// <param name="expectedColors"></param>
-    internal static void AssertDriverUsedColors (ConsoleDriver driver = null, params Attribute [] expectedColors)
-    {
-        driver ??= Application.Driver;
-        Cell [,] contents = driver.Contents;
-
-        List<Attribute> toFind = expectedColors.ToList ();
-
-        // Contents 3rd column is an Attribute
-        HashSet<Attribute> colorsUsed = new ();
-
-        for (var r = 0; r < driver.Rows; r++)
-        {
-            for (var c = 0; c < driver.Cols; c++)
-            {
-                Attribute? val = contents [r, c].Attribute;
-
-                if (val.HasValue)
-                {
-                    colorsUsed.Add (val.Value);
-
-                    Attribute match = toFind.FirstOrDefault (e => e == val);
-
-                    // need to check twice because Attribute is a struct and therefore cannot be null
-                    if (toFind.Any (e => e == val))
-                    {
-                        toFind.Remove (match);
-                    }
-                }
-            }
-        }
-
-        if (!toFind.Any ())
-        {
-            return;
-        }
-
-        var sb = new StringBuilder ();
-        sb.AppendLine ("The following colors were not used:" + string.Join ("; ", toFind.Select (a => a.ToString ())));
-        sb.AppendLine ("Colors used were:" + string.Join ("; ", colorsUsed.Select (a => a.ToString ())));
-
-        throw new Exception (sb.ToString ());
-    }
-
-    private static void AddArguments (Type paramType, List<object> pTypes)
-    {
-        if (paramType == typeof (Rect))
-        {
-            pTypes.Add (Rect.Empty);
-        }
-        else if (paramType == typeof (string))
-        {
-            pTypes.Add (string.Empty);
-        }
-        else if (paramType == typeof (int))
-        {
-            pTypes.Add (0);
-        }
-        else if (paramType == typeof (bool))
-        {
-            pTypes.Add (true);
-        }
-        else if (paramType.Name == "IList")
-        {
-            pTypes.Add (new List<object> ());
-        }
-        else if (paramType.Name == "View")
-        {
-            var top = new Toplevel ();
-            var view = new View ();
-            top.Add (view);
-            pTypes.Add (view);
-        }
-        else if (paramType.Name == "View[]")
-        {
-            pTypes.Add (new View [] { });
-        }
-        else if (paramType.Name == "Stream")
-        {
-            pTypes.Add (new MemoryStream ());
-        }
-        else if (paramType.Name == "String")
-        {
-            pTypes.Add (string.Empty);
-        }
-        else if (paramType.Name == "TreeView`1[T]")
-        {
-            pTypes.Add (string.Empty);
-        }
-        else
-        {
-            pTypes.Add (null);
-        }
-    }
-
-    private static View GetTypeInitializer (Type type, ConstructorInfo ctor)
+    public static View CreateViewFromType (Type type, ConstructorInfo ctor)
     {
         View viewType = null;
 
@@ -700,6 +549,119 @@ internal partial class TestHelpers
         return viewType;
     }
 
+    public static List<Type> GetAllViewClasses ()
+    {
+        return typeof (View).Assembly.GetTypes ()
+                            .Where (
+                                    myType => myType.IsClass
+                                              && !myType.IsAbstract
+                                              && myType.IsPublic
+                                              && myType.IsSubclassOf (typeof (View))
+                                   )
+                            .ToList ();
+    }
+
+    /// <summary>
+    ///     Verifies the console used all the <paramref name="expectedColors"/> when rendering. If one or more of the
+    ///     expected colors are not used then the failure will output both the colors that were found to be used and which of
+    ///     your expectations was not met.
+    /// </summary>
+    /// <param name="driver">if null uses <see cref="Application.Driver"/></param>
+    /// <param name="expectedColors"></param>
+    internal static void AssertDriverUsedColors (ConsoleDriver driver = null, params Attribute [] expectedColors)
+    {
+        driver ??= Application.Driver;
+        Cell [,] contents = driver.Contents;
+
+        List<Attribute> toFind = expectedColors.ToList ();
+
+        // Contents 3rd column is an Attribute
+        HashSet<Attribute> colorsUsed = new ();
+
+        for (var r = 0; r < driver.Rows; r++)
+        {
+            for (var c = 0; c < driver.Cols; c++)
+            {
+                Attribute? val = contents [r, c].Attribute;
+
+                if (val.HasValue)
+                {
+                    colorsUsed.Add (val.Value);
+
+                    Attribute match = toFind.FirstOrDefault (e => e == val);
+
+                    // need to check twice because Attribute is a struct and therefore cannot be null
+                    if (toFind.Any (e => e == val))
+                    {
+                        toFind.Remove (match);
+                    }
+                }
+            }
+        }
+
+        if (!toFind.Any ())
+        {
+            return;
+        }
+
+        var sb = new StringBuilder ();
+        sb.AppendLine ("The following colors were not used:" + string.Join ("; ", toFind.Select (a => a.ToString ())));
+        sb.AppendLine ("Colors used were:" + string.Join ("; ", colorsUsed.Select (a => a.ToString ())));
+
+        throw new (sb.ToString ());
+    }
+
+    private static void AddArguments (Type paramType, List<object> pTypes)
+    {
+        if (paramType == typeof (Rectangle))
+        {
+            pTypes.Add (Rectangle.Empty);
+        }
+        else if (paramType == typeof (string))
+        {
+            pTypes.Add (string.Empty);
+        }
+        else if (paramType == typeof (int))
+        {
+            pTypes.Add (0);
+        }
+        else if (paramType == typeof (bool))
+        {
+            pTypes.Add (true);
+        }
+        else if (paramType.Name == "IList")
+        {
+            pTypes.Add (new List<object> ());
+        }
+        else if (paramType.Name == "View")
+        {
+            var top = new Toplevel ();
+            var view = new View ();
+            top.Add (view);
+            pTypes.Add (view);
+        }
+        else if (paramType.Name == "View[]")
+        {
+            pTypes.Add (new View [] { });
+        }
+        else if (paramType.Name == "Stream")
+        {
+            pTypes.Add (new MemoryStream ());
+        }
+        else if (paramType.Name == "String")
+        {
+            pTypes.Add (string.Empty);
+        }
+        else if (paramType.Name == "TreeView`1[T]")
+        {
+            pTypes.Add (string.Empty);
+        }
+        else
+        {
+            pTypes.Add (null);
+        }
+    }
+
     [GeneratedRegex ("^\\s+", RegexOptions.Multiline)]
     private static partial Regex LeadingWhitespaceRegEx ();
 
@@ -719,4 +681,24 @@ internal partial class TestHelpers
 
     [GeneratedRegex ("\\s+$", RegexOptions.Multiline)]
     private static partial Regex TrailingWhiteSpaceRegEx ();
+}
+
+public class TestsAllViews
+{
+    public static IEnumerable<object []> AllViewTypes =>
+        typeof (View).Assembly
+                     .GetTypes ()
+                     .Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && type.IsSubclassOf (typeof (View)))
+                     .Select (type => new object [] { type });
+
+    public static View CreateInstanceIfNotGeneric (Type type)
+    {
+        if (type.IsGenericType)
+        {
+            // Return null for generic types
+            return null;
+        }
+
+        return Activator.CreateInstance (type) as View;
+    }
 }

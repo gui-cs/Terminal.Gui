@@ -309,17 +309,17 @@ public class Snake : Scenario
 
         public SnakeState State { get; }
 
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
 
             Driver.SetAttribute (white);
             Clear ();
 
             var canvas = new LineCanvas ();
 
-            canvas.AddLine (new Point (0, 0), State.Width, Orientation.Horizontal, LineStyle.Double);
-            canvas.AddLine (new Point (0, 0), State.Height, Orientation.Vertical, LineStyle.Double);
+            canvas.AddLine (Point.Empty, State.Width, Orientation.Horizontal, LineStyle.Double);
+            canvas.AddLine (Point.Empty, State.Height, Orientation.Vertical, LineStyle.Double);
             canvas.AddLine (new Point (0, State.Height - 1), State.Width, Orientation.Horizontal, LineStyle.Double);
             canvas.AddLine (new Point (State.Width - 1, 0), State.Height, Orientation.Vertical, LineStyle.Double);
 
@@ -341,7 +341,7 @@ public class Snake : Scenario
                                );
             }
 
-            foreach (KeyValuePair<Point, Rune> p in canvas.GetMap (Bounds))
+            foreach (KeyValuePair<Point, Rune> p in canvas.GetMap (Viewport))
             {
                 AddRune (p.Key.X, p.Key.Y, p.Value);
             }

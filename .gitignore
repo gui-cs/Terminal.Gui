@@ -1,29 +1,63 @@
-bin
-obj
-~$*
-*.userprefs
-*~
-packages
-.vs
+# Build artifacts
+[Bb]in/
+[Oo]bj/
+[Rr]elease/
+[Dd]ebug/
+[Xx]64/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
 
-# User-specific files
+# User-local settings and caches
+*.rsuser
+*.suo
 *.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+_ReSharper.**
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+.devcontainer/
+.vscode/
+.vs/
+
+# Visual Studio cache files
+# files ending in .cache can be ignored
+*.[Cc]ache
+# but keep track of directories ending in .cache
+!?*.[Cc]ache/
+
+# Roslyn generated cs files
+**.g.cs
+
+# Common temporary files
+~$*
+*~
+
+# NuGet Stuff
+*.nupkg
+*.snupkg
+# Exclude everything in packages directory except the packages/build directory
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
 
 # API Docs
 docfx/api
 docfx/_site
 
-# Unit Tests
+# Test Results
 UnitTests/TestResults
 TestResults
 
-#git merge files
-*.orig
-
-.vscode/
+# git merge files
+.orig
+.theirs
+.ours
 
 demo.*
 
 *.deb
 
 *.tui/
+
+*.dotCover

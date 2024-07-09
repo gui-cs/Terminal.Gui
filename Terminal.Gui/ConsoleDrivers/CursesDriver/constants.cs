@@ -106,7 +106,6 @@ public partial class Curses
     public const int KeyPPage = 0x153;
     public const int KeyHome = 0x106;
     public const int KeyMouse = 0x199;
-    public const int KeyCSI = 0x5b;
     public const int KeyEnd = 0x168;
     public const int KeyDeleteChar = 0x14a;
     public const int KeyInsertChar = 0x14b;

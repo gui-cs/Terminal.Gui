@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         Toplevels can run as modal (popup) views, started by calling
-///         <see cref="Application.Run(Toplevel, Func{Exception,bool})"/>. They return control to the caller when
+///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. They return control to the caller when
 ///         <see cref="Application.RequestStop(Toplevel)"/> has been called (which sets the <see cref="Toplevel.Running"/>
 ///         property to <c>false</c>).
 ///     </para>
@@ -15,33 +15,23 @@ namespace Terminal.Gui;
 ///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init"/>.
 ///         The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created
 ///         and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and call
-///         <see cref="Application.Run(Toplevel, Func{Exception,bool})"/>.
+///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
 ///     </para>
 /// </remarks>
 public partial class Toplevel : View
 {
-    internal static Point? _dragPosition;
-
-    private Point _startGrabPoint;
-
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout,
+    ///     Initializes a new instance of the <see cref="Toplevel"/> class,
     ///     defaulting to full screen. The <see cref="View.Width"/> and <see cref="View.Height"/> properties will be set to the
     ///     dimensions of the terminal using <see cref="Dim.Fill"/>.
     /// </summary>
     public Toplevel ()
     {
+        Arrangement = ViewArrangement.Fixed;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
 
         ColorScheme = Colors.ColorSchemes ["TopLevel"];
-
-        Application.GrabbingMouse += Application_GrabbingMouse;
-        Application.UnGrabbingMouse += Application_UnGrabbingMouse;
-
-        // TODO: v2 - ALL Views (Responders??!?!) should support the commands related to 
-        //    - Focus
-        //  Move the appropriate AddCommand calls to `Responder`
 
         // Things this view knows how to do
         AddCommand (
@@ -128,22 +118,31 @@ public partial class Toplevel : View
         KeyBindings.Add (Key.Tab.WithCtrl, Command.NextViewOrTop);
         KeyBindings.Add (Key.Tab.WithShift.WithCtrl, Command.PreviousViewOrTop);
 
-        KeyBindings.Add (Key.F5, Command.Refresh);
+        // TODO: Refresh Key should be configurable
+        KeyBindings.Add (Key.F5, KeyBindingScope.Application, Command.Refresh);
         KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
         KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
+        if (Environment.OSVersion.Platform == PlatformID.Unix)
+        {
+            KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
+        }
+
 #if UNIX_KEY_BINDINGS
-        KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
         KeyBindings.Add (Key.L.WithCtrl, Command.Refresh); // Unix
         KeyBindings.Add (Key.F.WithCtrl, Command.NextView); // Unix
         KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
         KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView); // Unix
 #endif
+        MouseClick += Toplevel_MouseClick;
+
+        CanFocus = true;
     }
 
-    /// <summary>Gets or sets a value indicating whether this <see cref="Toplevel"/> can focus.</summary>
-    /// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
-    public override bool CanFocus => SuperView == null ? true : base.CanFocus;
+    private void Toplevel_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        e.Handled = InvokeCommand (Command.HotKey) == true;
+    }
 
     /// <summary>
     ///     <see langword="true"/> if was already loaded by the <see cref="Application.Begin(Toplevel)"/>
@@ -187,11 +186,11 @@ public partial class Toplevel : View
     public event EventHandler<ToplevelEventArgs> Activate;
 
     /// <inheritdoc/>
-    public override void Add (View view)
+    public override View Add (View view)
     {
         CanFocus = true;
         AddMenuStatusBar (view);
-        base.Add (view);
+        return base.Add (view);
     }
 
     /// <summary>
@@ -236,100 +235,6 @@ public partial class Toplevel : View
     /// </summary>
     public event EventHandler Loaded;
 
-    /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent mouseEvent)
-    {
-        if (!CanFocus)
-        {
-            return true;
-        }
-
-        //System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
-
-        int nx, ny;
-
-        if (!_dragPosition.HasValue
-            && (mouseEvent.Flags == MouseFlags.Button1Pressed
-                || mouseEvent.Flags == MouseFlags.Button2Pressed
-                || mouseEvent.Flags == MouseFlags.Button3Pressed))
-        {
-            SetFocus ();
-            Application.BringOverlappedTopToFront ();
-
-            // Only start grabbing if the user clicks on the title bar.
-            // BUGBUG: Assumes Frame == Border and Title is always at Y == 0
-            if (mouseEvent.Y == 0 && mouseEvent.Flags == MouseFlags.Button1Pressed)
-            {
-                _startGrabPoint = new Point (mouseEvent.X, mouseEvent.Y);
-                _dragPosition = new Point ();
-                nx = mouseEvent.X - mouseEvent.OfX;
-                ny = mouseEvent.Y - mouseEvent.OfY;
-                _dragPosition = new Point (nx, ny);
-                Application.GrabMouse (this);
-            }
-
-            //System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
-            return true;
-        }
-
-        if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) || mouseEvent.Flags == MouseFlags.Button3Pressed)
-        {
-            if (_dragPosition.HasValue)
-            {
-                if (SuperView == null)
-                {
-                    // Redraw the entire app window using just our Frame. Since we are 
-                    // Application.Top, and our Frame always == our Bounds (Location is always (0,0))
-                    // our Frame is actually view-relative (which is what Redraw takes).
-                    // We need to pass all the view bounds because since the windows was 
-                    // moved around, we don't know exactly what was the affected region.
-                    Application.Top.SetNeedsDisplay ();
-                }
-                else
-                {
-                    SuperView.SetNeedsDisplay ();
-                }
-
-                // BUGBUG: Assumes Frame == Border?
-                GetLocationThatFits (
-                                     this,
-                                     mouseEvent.X
-                                     + (SuperView == null
-                                            ? mouseEvent.OfX - _startGrabPoint.X
-                                            : Frame.X - _startGrabPoint.X),
-                                     mouseEvent.Y
-                                     + (SuperView == null
-                                            ? mouseEvent.OfY - _startGrabPoint.Y
-                                            : Frame.Y - _startGrabPoint.Y),
-                                     out nx,
-                                     out ny,
-                                     out _,
-                                     out _
-                                    );
-
-                _dragPosition = new Point (nx, ny);
-                X = nx;
-                Y = ny;
-
-                //System.Diagnostics.Debug.WriteLine ($"Drag: nx:{nx},ny:{ny}");
-
-                SetNeedsDisplay ();
-
-                return true;
-            }
-        }
-
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && _dragPosition.HasValue)
-        {
-            _dragPosition = null;
-            Application.UngrabMouse ();
-        }
-
-        //System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");
-        //System.Diagnostics.Debug.WriteLine ($"Toplevel: {mouseEvent}");
-        return false;
-    }
-
     /// <summary>Virtual method to invoke the <see cref="AlternateBackwardKeyChanged"/> event.</summary>
     /// <param name="e"></param>
     public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e)
@@ -347,7 +252,7 @@ public partial class Toplevel : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         if (!Visible)
         {
@@ -366,12 +271,12 @@ public partial class Toplevel : View
             {
                 foreach (Toplevel top in Application.OverlappedChildren.AsEnumerable ().Reverse ())
                 {
-                    if (top.Frame.IntersectsWith (Bounds))
+                    if (top.Frame.IntersectsWith (Viewport))
                     {
                         if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible)
                         {
                             top.SetNeedsLayout ();
-                            top.SetNeedsDisplay (top.Bounds);
+                            top.SetNeedsDisplay (top.Viewport);
                             top.Draw ();
                             top.OnRenderLineCanvas ();
                         }
@@ -382,20 +287,20 @@ public partial class Toplevel : View
             // This should not be here, but in base
             foreach (View view in Subviews)
             {
-                if (view.Frame.IntersectsWith (Bounds) && !OutsideTopFrame (this))
+                if (view.Frame.IntersectsWith (Viewport) && !OutsideTopFrame (this))
                 {
                     //view.SetNeedsLayout ();
-                    view.SetNeedsDisplay (view.Bounds);
+                    view.SetNeedsDisplay ();
                     view.SetSubViewNeedsDisplay ();
                 }
             }
 
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
 
             // This is causing the menus drawn incorrectly if UseSubMenusSingleFrame is true
-            //if (this.MenuBar != null && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu != null) {
+            //if (this.MenuBar is { } && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu is { }) {
             //	// TODO: Hack until we can get compositing working right.
-            //	this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Bounds);
+            //	this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Viewport);
             //}
         }
     }
@@ -431,44 +336,37 @@ public partial class Toplevel : View
     }
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (!IsOverlappedContainer)
         {
-            base.PositionCursor ();
-
-            if (Focused == null)
+            if (Focused is null)
             {
                 EnsureFocus ();
-
-                if (Focused == null)
-                {
-                    Driver.SetCursorVisibility (CursorVisibility.Invisible);
-                }
             }
 
-            return;
+            return null;
         }
 
-        if (Focused == null)
+        // This code path only happens when the Toplevel is an Overlapped container
+
+        if (Focused is null)
         {
+            // TODO: this is an Overlapped hack
             foreach (Toplevel top in Application.OverlappedChildren)
             {
                 if (top != this && top.Visible)
                 {
                     top.SetFocus ();
 
-                    return;
+                    return null;
                 }
             }
         }
 
-        base.PositionCursor ();
+        var cursor2 = base.PositionCursor ();
 
-        if (Focused == null)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
-        }
+        return null; 
     }
 
     /// <summary>
@@ -478,35 +376,39 @@ public partial class Toplevel : View
     /// <param name="top">The Toplevel to adjust.</param>
     public virtual void PositionToplevel (Toplevel top)
     {
-        View superView = GetLocationThatFits (
+
+        View superView = GetLocationEnsuringFullVisibility (
                                               top,
                                               top.Frame.X,
                                               top.Frame.Y,
                                               out int nx,
                                               out int ny,
-                                              out _,
                                               out StatusBar sb
                                              );
+
+        if (superView is null)
+        {
+            return;
+        }
+
         var layoutSubviews = false;
         var maxWidth = 0;
 
-        if (superView.Margin != null && superView == top.SuperView)
+        if (superView.Margin is { } && superView == top.SuperView)
         {
             maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
 
-        if ((superView != top || top?.SuperView != null || (top != Application.Top && top.Modal) || (top?.SuperView == null && top.IsOverlapped))
-
-            // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
-            && (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) /*&& top.LayoutStyle == LayoutStyle.Computed*/)
+        if ((superView != top || top?.SuperView is { } || (top != Application.Top && top.Modal) || (top?.SuperView is null && top.IsOverlapped))
+            && (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y))
         {
-            if ((top.X == null || top.X is Pos.PosAbsolute) && top.Frame.X != nx)
+            if ((top.X is null || top.X is PosAbsolute) && top.Frame.X != nx)
             {
                 top.X = nx;
                 layoutSubviews = true;
             }
 
-            if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Frame.Y != ny)
+            if ((top.Y is null || top.Y is PosAbsolute) && top.Frame.Y != ny)
             {
                 top.Y = ny;
                 layoutSubviews = true;
@@ -517,8 +419,8 @@ public partial class Toplevel : View
         if (sb != null
             && !top.Subviews.Contains (sb)
             && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-            && top.Height is Dim.DimFill
-            && -top.Height.Anchor (0) < 1)
+            && top.Height is DimFill
+            && -top.Height.GetAnchor (0) < 1)
         {
             top.Height = Dim.Fill (sb.Visible ? 1 : 0);
             layoutSubviews = true;
@@ -543,20 +445,20 @@ public partial class Toplevel : View
     ///     perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set. changes.
     ///     <para>
     ///         A Ready event handler is a good place to finalize initialization after calling
-    ///         <see cref="Application.Run(Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
+    ///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
     ///     </para>
     /// </summary>
     public event EventHandler Ready;
 
     /// <inheritdoc/>
-    public override void Remove (View view)
+    public override View Remove (View view)
     {
-        if (this is Toplevel Toplevel && Toplevel.MenuBar != null)
+        if (this is Toplevel { MenuBar: { } })
         {
             RemoveMenuStatusBar (view);
         }
 
-        base.Remove (view);
+        return base.Remove (view);
     }
 
     /// <inheritdoc/>
@@ -647,16 +549,6 @@ public partial class Toplevel : View
     /// </summary>
     public event EventHandler Unloaded;
 
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        Application.GrabbingMouse -= Application_GrabbingMouse;
-        Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
-
-        _dragPosition = null;
-        base.Dispose (disposing);
-    }
-
     internal void AddMenuStatusBar (View view)
     {
         if (view is MenuBar)
@@ -668,154 +560,6 @@ public partial class Toplevel : View
         {
             StatusBar = view as StatusBar;
         }
-    }
-
-    /// <summary>
-    ///     Gets a new location of the <see cref="Toplevel"/> that is within the Bounds of the <paramref name="top"/>'s
-    ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.
-    /// </summary>
-    /// <remarks>
-    ///     If <paramref name="top"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not
-    ///     <see cref="Application.Top"/> the position will be bound by the <see cref="ConsoleDriver.Cols"/> and
-    ///     <see cref="ConsoleDriver.Rows"/>.
-    /// </remarks>
-    /// <param name="top">The Toplevel that is to be moved.</param>
-    /// <param name="targetX">The target x location.</param>
-    /// <param name="targetY">The target y location.</param>
-    /// <param name="nx">The x location that will ensure <paramref name="top"/> will be visible.</param>
-    /// <param name="ny">The y location that will ensure <paramref name="top"/> will be visible.</param>
-    /// <param name="menuBar">The new top most menuBar</param>
-    /// <param name="statusBar">The new top most statusBar</param>
-    /// <returns>
-    ///     Either <see cref="Application.Top"/> (if <paramref name="top"/> does not have a Super View) or
-    ///     <paramref name="top"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.
-    /// </returns>
-    internal View GetLocationThatFits (
-        Toplevel top,
-        int targetX,
-        int targetY,
-        out int nx,
-        out int ny,
-        out MenuBar menuBar,
-        out StatusBar statusBar
-    )
-    {
-        int maxWidth;
-        View superView;
-
-        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
-        {
-            maxWidth = Driver.Cols;
-            superView = Application.Top;
-        }
-        else
-        {
-            // Use the SuperView's Bounds, not Frame
-            maxWidth = top.SuperView.Bounds.Width;
-            superView = top.SuperView;
-        }
-
-        if (superView.Margin != null && superView == top.SuperView)
-        {
-            maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
-        }
-
-        if (top.Frame.Width <= maxWidth)
-        {
-            nx = Math.Max (targetX, 0);
-            nx = nx + top.Frame.Width > maxWidth ? Math.Max (maxWidth - top.Frame.Width, 0) : nx;
-
-            if (nx > top.Frame.X + top.Frame.Width)
-            {
-                nx = Math.Max (top.Frame.Right, 0);
-            }
-        }
-        else
-        {
-            nx = targetX;
-        }
-
-        //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
-        bool menuVisible, statusVisible;
-
-        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
-        {
-            menuVisible = Application.Top.MenuBar?.Visible == true;
-            menuBar = Application.Top.MenuBar;
-        }
-        else
-        {
-            View t = top.SuperView;
-
-            while (t is not Toplevel)
-            {
-                t = t.SuperView;
-            }
-
-            menuVisible = ((Toplevel)t).MenuBar?.Visible == true;
-            menuBar = ((Toplevel)t).MenuBar;
-        }
-
-        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
-        {
-            maxWidth = menuVisible ? 1 : 0;
-        }
-        else
-        {
-            maxWidth = 0;
-        }
-
-        ny = Math.Max (targetY, maxWidth);
-
-        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
-        {
-            statusVisible = Application.Top.StatusBar?.Visible == true;
-            statusBar = Application.Top.StatusBar;
-        }
-        else
-        {
-            View t = top.SuperView;
-
-            while (t is not Toplevel)
-            {
-                t = t.SuperView;
-            }
-
-            statusVisible = ((Toplevel)t).StatusBar?.Visible == true;
-            statusBar = ((Toplevel)t).StatusBar;
-        }
-
-        if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)
-        {
-            maxWidth = statusVisible ? Driver.Rows - 1 : Driver.Rows;
-        }
-        else
-        {
-            maxWidth = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
-        }
-
-        if (superView.Margin != null && superView == top.SuperView)
-        {
-            maxWidth -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
-        }
-
-        ny = Math.Min (ny, maxWidth);
-
-        if (top.Frame.Height <= maxWidth)
-        {
-            ny = ny + top.Frame.Height > maxWidth
-                     ? Math.Max (maxWidth - top.Frame.Height, menuVisible ? 1 : 0)
-                     : ny;
-
-            if (ny > top.Frame.Y + top.Frame.Height)
-            {
-                ny = Math.Max (top.Frame.Bottom, 0);
-            }
-        }
-
-        //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
-
-        return superView;
     }
 
     internal virtual void OnActivate (Toplevel deactivated) { Activate?.Invoke (this, new ToplevelEventArgs (deactivated)); }
@@ -901,25 +645,9 @@ public partial class Toplevel : View
         }
     }
 
-    private void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
-    {
-        if (Application.MouseGrabView == this && _dragPosition.HasValue)
-        {
-            e.Cancel = true;
-        }
-    }
-
-    private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
-    {
-        if (Application.MouseGrabView == this && _dragPosition.HasValue)
-        {
-            e.Cancel = true;
-        }
-    }
-
     private void FocusNearestView (IEnumerable<View> views, NavigationDirection direction)
     {
-        if (views == null)
+        if (views is null)
         {
             return;
         }
@@ -948,7 +676,7 @@ public partial class Toplevel : View
 
                 focusProcessed = true;
 
-                if (SuperView.Focused != null && SuperView.Focused != this)
+                if (SuperView.Focused is { } && SuperView.Focused != this)
                 {
                     return;
                 }
@@ -964,7 +692,7 @@ public partial class Toplevel : View
 
     private View GetDeepestFocusedSubview (View view)
     {
-        if (view == null)
+        if (view is null)
         {
             return null;
         }
@@ -1002,12 +730,12 @@ public partial class Toplevel : View
 
     private void MoveNextViewOrTop ()
     {
-        if (Application.OverlappedTop == null)
+        if (Application.OverlappedTop is null)
         {
             Toplevel top = Modal ? this : Application.Top;
             top.FocusNext ();
 
-            if (top.Focused == null)
+            if (top.Focused is null)
             {
                 top.FocusNext ();
             }
@@ -1043,12 +771,12 @@ public partial class Toplevel : View
 
     private void MovePreviousViewOrTop ()
     {
-        if (Application.OverlappedTop == null)
+        if (Application.OverlappedTop is null)
         {
             Toplevel top = Modal ? this : Application.Top;
             top.FocusPrev ();
 
-            if (top.Focused == null)
+            if (top.Focused is null)
             {
                 top.FocusPrev ();
             }
@@ -1074,9 +802,9 @@ public partial class Toplevel : View
 
     private void QuitToplevel ()
     {
-        if (Application.OverlappedTop != null)
+        if (Application.OverlappedTop is { })
         {
-            Application.OverlappedTop.RequestStop ();
+            RequestStop (this);
         }
         else
         {
@@ -1097,12 +825,12 @@ public class ToplevelEqualityComparer : IEqualityComparer<Toplevel>
     /// <returns><see langword="true"/> if the specified objects are equal; otherwise, <see langword="false"/>.</returns>
     public bool Equals (Toplevel x, Toplevel y)
     {
-        if (y == null && x == null)
+        if (y is null && x is null)
         {
             return true;
         }
 
-        if (x == null || y == null)
+        if (x is null || y is null)
         {
             return false;
         }
@@ -1124,7 +852,7 @@ public class ToplevelEqualityComparer : IEqualityComparer<Toplevel>
     /// </exception>
     public int GetHashCode (Toplevel obj)
     {
-        if (obj == null)
+        if (obj is null)
         {
             throw new ArgumentNullException ();
         }
@@ -1165,12 +893,12 @@ public sealed class ToplevelComparer : IComparer<Toplevel>
             return 0;
         }
 
-        if (x == null)
+        if (x is null)
         {
             return -1;
         }
 
-        if (y == null)
+        if (y is null)
         {
             return 1;
         }

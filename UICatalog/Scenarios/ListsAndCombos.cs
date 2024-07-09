@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Terminal.Gui;
@@ -15,19 +15,19 @@ public class ListsAndCombos : Scenario
     public override void Setup ()
     {
         //TODO: Duplicated code in Demo.cs Consider moving to shared assembly
-        List<string> items = new ();
+        ObservableCollection<string> items = [];
 
         foreach (string dir in new [] { "/etc", @$"{Environment.GetEnvironmentVariable ("SystemRoot")}\System32" })
         {
             if (Directory.Exists (dir))
             {
-                items = Directory.GetFiles (dir)
-                                 .Union (Directory.GetDirectories (dir))
-                                 .Select (Path.GetFileName)
-                                 .Where (x => char.IsLetterOrDigit (x [0]))
-                                 .OrderBy (x => x)
-                                 .Select (x => x)
-                                 .ToList ();
+                items = new (Directory.GetFiles (dir)
+                                      .Union (Directory.GetDirectories (dir))
+                                      .Select (Path.GetFileName)
+                                      .Where (x => char.IsLetterOrDigit (x [0]))
+                                      .OrderBy (x => x)
+                                      .Select (x => x)
+                                      .ToList ());
             }
         }
 
@@ -36,7 +36,7 @@ public class ListsAndCombos : Scenario
         {
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             X = 0,
-            AutoSize = false,
+
             Width = Dim.Percent (40),
             Text = "Listview"
         };
@@ -47,7 +47,7 @@ public class ListsAndCombos : Scenario
             Y = Pos.Bottom (lbListView) + 1,
             Height = Dim.Fill (2),
             Width = Dim.Percent (40),
-            Source = new ListWrapper (items)
+            Source = new ListWrapper<string> (items)
         };
         listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem];
         Win.Add (lbListView, listview);
@@ -92,7 +92,7 @@ public class ListsAndCombos : Scenario
         {
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             X = Pos.Right (lbListView) + 1,
-            AutoSize = false,
+
             Width = Dim.Percent (40),
             Text = "ComboBox"
         };
@@ -145,13 +145,13 @@ public class ListsAndCombos : Scenario
                                 };
 
         var btnMoveUp = new Button { X = 1, Y = Pos.Bottom (lbListView), Text = "Move _Up" };
-        btnMoveUp.Clicked += (s, e) => { listview.MoveUp (); };
+        btnMoveUp.Accept += (s, e) => { listview.MoveUp (); };
 
         var btnMoveDown = new Button
         {
             X = Pos.Right (btnMoveUp) + 1, Y = Pos.Bottom (lbListView), Text = "Move _Down"
         };
-        btnMoveDown.Clicked += (s, e) => { listview.MoveDown (); };
+        btnMoveDown.Accept += (s, e) => { listview.MoveDown (); };
 
         Win.Add (btnMoveUp, btnMoveDown);
     }

@@ -21,7 +21,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     /// <summary>Retrieves the values of the properties of this scope from their corresponding static properties.</summary>
     public void RetrieveValues ()
     {
-        foreach (KeyValuePair<string, ConfigProperty> p in this.Where (cp => cp.Value.PropertyInfo != null))
+        foreach (KeyValuePair<string, ConfigProperty> p in this.Where (cp => cp.Value.PropertyInfo is { }))
         {
             p.Value.RetrieveValue ();
         }

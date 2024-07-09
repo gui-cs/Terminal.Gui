@@ -1,58 +1,12 @@
-﻿#nullable enable
+#nullable enable
 namespace Terminal.Gui;
-
-/// <summary>Defines the style of lines for a <see cref="LineCanvas"/>.</summary>
-public enum LineStyle
-{
-    /// <summary>No border is drawn.</summary>
-    None,
-
-    /// <summary>The border is drawn using thin line CM.Glyphs.</summary>
-    Single,
-
-    /// <summary>The border is drawn using thin line glyphs with dashed (double and triple) straight lines.</summary>
-    Dashed,
-
-    /// <summary>The border is drawn using thin line glyphs with short dashed (triple and quadruple) straight lines.</summary>
-    Dotted,
-
-    /// <summary>The border is drawn using thin double line CM.Glyphs.</summary>
-    Double,
-
-    /// <summary>The border is drawn using heavy line CM.Glyphs.</summary>
-    Heavy,
-
-    /// <summary>The border is drawn using heavy line glyphs with dashed (double and triple) straight lines.</summary>
-    HeavyDashed,
-
-    /// <summary>The border is drawn using heavy line glyphs with short dashed (triple and quadruple) straight lines.</summary>
-    HeavyDotted,
-
-    /// <summary>The border is drawn using thin line glyphs with rounded corners.</summary>
-    Rounded,
-
-    /// <summary>The border is drawn using thin line glyphs with rounded corners and dashed (double and triple) straight lines.</summary>
-    RoundedDashed,
-
-    /// <summary>
-    ///     The border is drawn using thin line glyphs with rounded corners and short dashed (triple and quadruple)
-    ///     straight lines.
-    /// </summary>
-    RoundedDotted
-
-    // TODO: Support Ruler
-    ///// <summary> 
-    ///// The border is drawn as a diagnostic ruler ("|123456789...").
-    ///// </summary>
-    //Ruler
-}
 
 /// <summary>Facilitates box drawing and line intersection detection and rendering.  Does not support diagonal lines.</summary>
 public class LineCanvas : IDisposable
 {
-    private readonly List<StraightLine> _lines = new ();
+    private readonly List<StraightLine> _lines = [];
 
-    private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new ()
+    private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> _runeResolvers = new ()
     {
         {
             IntersectionRuneType.ULCorner,
@@ -94,7 +48,7 @@ public class LineCanvas : IDisposable
         // TODO: Add other resolvers
     };
 
-    private Rect _cachedBounds;
+    private Rectangle _cachedViewport;
 
     /// <summary>Creates a new instance.</summary>
     public LineCanvas ()
@@ -113,40 +67,37 @@ public class LineCanvas : IDisposable
     ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
     ///     furthest left/top and Size is defined by the line that extends the furthest right/bottom.
     /// </summary>
-    public Rect Bounds
+    public Rectangle Viewport
     {
         get
         {
-            if (_cachedBounds.IsEmpty)
+            if (_cachedViewport.IsEmpty)
             {
                 if (_lines.Count == 0)
                 {
-                    return _cachedBounds;
+                    return _cachedViewport;
                 }
 
-                Rect bounds = _lines [0].Bounds;
+                Rectangle viewport = _lines [0].Viewport;
 
                 for (var i = 1; i < _lines.Count; i++)
                 {
-                    StraightLine line = _lines [i];
-                    Rect lineBounds = line.Bounds;
-                    bounds = Rect.Union (bounds, lineBounds);
+                    viewport = Rectangle.Union (viewport, _lines [i].Viewport);
                 }
 
-                if (bounds.Width == 0)
+                if (viewport is {Width: 0} or {Height: 0})
                 {
-                    bounds.Width = 1;
+                    viewport = viewport with
+                    {
+                        Width = Math.Clamp (viewport.Width, 1, short.MaxValue),
+                        Height = Math.Clamp (viewport.Height, 1, short.MaxValue)
+                    };
                 }
 
-                if (bounds.Height == 0)
-                {
-                    bounds.Height = 1;
-                }
-
-                _cachedBounds = new Rect (bounds.X, bounds.Y, bounds.Width, bounds.Height);
+                _cachedViewport = viewport;
             }
 
-            return _cachedBounds;
+            return _cachedViewport;
         }
     }
 
@@ -183,7 +134,7 @@ public class LineCanvas : IDisposable
         Attribute? attribute = default
     )
     {
-        _cachedBounds = Rect.Empty;
+        _cachedViewport = Rectangle.Empty;
         _lines.Add (new StraightLine (start, length, orientation, style, attribute));
     }
 
@@ -191,14 +142,14 @@ public class LineCanvas : IDisposable
     /// <param name="line"></param>
     public void AddLine (StraightLine line)
     {
-        _cachedBounds = Rect.Empty;
+        _cachedViewport = Rectangle.Empty;
         _lines.Add (line);
     }
 
     /// <summary>Clears all lines from the LineCanvas.</summary>
     public void Clear ()
     {
-        _cachedBounds = Rect.Empty;
+        _cachedViewport = Rectangle.Empty;
         _lines.Clear ();
     }
 
@@ -206,7 +157,7 @@ public class LineCanvas : IDisposable
     ///     Clears any cached states from the canvas Call this method if you make changes to lines that have already been
     ///     added.
     /// </summary>
-    public void ClearCache () { _cachedBounds = Rect.Empty; }
+    public void ClearCache () { _cachedViewport = Rectangle.Empty; }
 
     /// <summary>
     ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
@@ -214,23 +165,23 @@ public class LineCanvas : IDisposable
     ///     intersection symbols.
     /// </summary>
     /// <returns>A map of all the points within the canvas.</returns>
-    public Dictionary<Point, Cell> GetCellMap ()
+    public Dictionary<Point, Cell?> GetCellMap ()
     {
-        Dictionary<Point, Cell> map = new ();
+        Dictionary<Point, Cell?> map = new ();
 
         // walk through each pixel of the bitmap
-        for (int y = Bounds.Y; y < Bounds.Y + Bounds.Height; y++)
+        for (int y = Viewport.Y; y < Viewport.Y + Viewport.Height; y++)
         {
-            for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++)
+            for (int x = Viewport.X; x < Viewport.X + Viewport.Width; x++)
             {
                 IntersectionDefinition? [] intersects = _lines
                                                         .Select (l => l.Intersects (x, y))
-                                                        .Where (i => i != null)
+                                                        .Where (i => i is { })
                                                         .ToArray ();
 
                 Cell? cell = GetCellForIntersects (Application.Driver, intersects);
 
-                if (cell != null)
+                if (cell is { })
                 {
                     map.Add (new Point (x, y), cell);
                 }
@@ -249,7 +200,7 @@ public class LineCanvas : IDisposable
     /// </summary>
     /// <param name="inArea">A rectangle to constrain the search by.</param>
     /// <returns>A map of the points within the canvas that intersect with <paramref name="inArea"/>.</returns>
-    public Dictionary<Point, Rune> GetMap (Rect inArea)
+    public Dictionary<Point, Rune> GetMap (Rectangle inArea)
     {
         Dictionary<Point, Rune> map = new ();
 
@@ -260,12 +211,12 @@ public class LineCanvas : IDisposable
             {
                 IntersectionDefinition? [] intersects = _lines
                                                         .Select (l => l.Intersects (x, y))
-                                                        .Where (i => i != null)
+                                                        .Where (i => i is { })
                                                         .ToArray ();
 
                 Rune? rune = GetRuneForIntersects (Application.Driver, intersects);
 
-                if (rune != null)
+                if (rune is { })
                 {
                     map.Add (new Point (x, y), rune.Value);
                 }
@@ -281,7 +232,7 @@ public class LineCanvas : IDisposable
     ///     intersection symbols.
     /// </summary>
     /// <returns>A map of all the points within the canvas.</returns>
-    public Dictionary<Point, Rune> GetMap () { return GetMap (Bounds); }
+    public Dictionary<Point, Rune> GetMap () { return GetMap (Viewport); }
 
     /// <summary>Merges one line canvas into this one.</summary>
     /// <param name="lineCanvas"></param>
@@ -299,7 +250,7 @@ public class LineCanvas : IDisposable
     {
         StraightLine? l = _lines.LastOrDefault ();
 
-        if (l != null)
+        if (l is { })
         {
             _lines.Remove (l);
         }
@@ -309,13 +260,13 @@ public class LineCanvas : IDisposable
 
     /// <summary>
     ///     Returns the contents of the line canvas rendered to a string. The string will include all columns and rows,
-    ///     even if <see cref="Bounds"/> has negative coordinates. For example, if the canvas contains a single line that
+    ///     even if <see cref="Viewport"/> has negative coordinates. For example, if the canvas contains a single line that
     ///     starts at (-1,-1) with a length of 2, the rendered string will have a length of 2.
     /// </summary>
     /// <returns>The canvas rendered to a string.</returns>
     public override string ToString ()
     {
-        if (Bounds.IsEmpty)
+        if (Viewport.IsEmpty)
         {
             return string.Empty;
         }
@@ -324,13 +275,13 @@ public class LineCanvas : IDisposable
         Dictionary<Point, Rune> runeMap = GetMap ();
 
         // Create the rune canvas
-        Rune [,] canvas = new Rune [Bounds.Height, Bounds.Width];
+        Rune [,] canvas = new Rune [Viewport.Height, Viewport.Width];
 
         // Copy the rune map to the canvas, adjusting for any negative coordinates
         foreach (KeyValuePair<Point, Rune> kvp in runeMap)
         {
-            int x = kvp.Key.X - Bounds.X;
-            int y = kvp.Key.Y - Bounds.Y;
+            int x = kvp.Key.X - Viewport.X;
+            int y = kvp.Key.Y - Viewport.Y;
             canvas [y, x] = kvp.Value;
         }
 
@@ -358,7 +309,7 @@ public class LineCanvas : IDisposable
 
     private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
     {
-        foreach (KeyValuePair<IntersectionRuneType, IntersectionRuneResolver> irr in runeResolvers)
+        foreach (KeyValuePair<IntersectionRuneType, IntersectionRuneResolver> irr in _runeResolvers)
         {
             irr.Value.SetGlyphs ();
         }
@@ -404,7 +355,7 @@ public class LineCanvas : IDisposable
 
         IntersectionRuneType runeType = GetRuneTypeForIntersects (intersects);
 
-        if (runeResolvers.TryGetValue (runeType, out IntersectionRuneResolver? resolver))
+        if (_runeResolvers.TryGetValue (runeType, out IntersectionRuneResolver? resolver))
         {
             return resolver.GetRuneForIntersects (driver, intersects);
         }
@@ -892,68 +843,4 @@ public class LineCanvas : IDisposable
             _normal = Glyphs.URCorner;
         }
     }
-}
-
-internal class IntersectionDefinition
-{
-    internal IntersectionDefinition (Point point, IntersectionType type, StraightLine line)
-    {
-        Point = point;
-        Type = type;
-        Line = line;
-    }
-
-    /// <summary>The line that intersects <see cref="Point"/></summary>
-    internal StraightLine Line { get; }
-
-    /// <summary>The point at which the intersection happens</summary>
-    internal Point Point { get; }
-
-    /// <summary>Defines how <see cref="Line"/> position relates to <see cref="Point"/>.</summary>
-    internal IntersectionType Type { get; }
-}
-
-/// <summary>The type of Rune that we will use before considering double width, curved borders etc</summary>
-internal enum IntersectionRuneType
-{
-    None,
-    Dot,
-    ULCorner,
-    URCorner,
-    LLCorner,
-    LRCorner,
-    TopTee,
-    BottomTee,
-    RightTee,
-    LeftTee,
-    Cross,
-    HLine,
-    VLine
-}
-
-internal enum IntersectionType
-{
-    /// <summary>There is no intersection</summary>
-    None,
-
-    /// <summary>A line passes directly over this point traveling along the horizontal axis</summary>
-    PassOverHorizontal,
-
-    /// <summary>A line passes directly over this point traveling along the vertical axis</summary>
-    PassOverVertical,
-
-    /// <summary>A line starts at this point and is traveling up</summary>
-    StartUp,
-
-    /// <summary>A line starts at this point and is traveling right</summary>
-    StartRight,
-
-    /// <summary>A line starts at this point and is traveling down</summary>
-    StartDown,
-
-    /// <summary>A line starts at this point and is traveling left</summary>
-    StartLeft,
-
-    /// <summary>A line exists at this point who has 0 length</summary>
-    Dot
 }

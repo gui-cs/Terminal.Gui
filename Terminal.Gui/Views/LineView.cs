@@ -14,14 +14,14 @@ public class LineView : View
         switch (orientation)
         {
             case Orientation.Horizontal:
-                Height = 1;
+                Height = Dim.Auto (minimumContentDim: 1);
                 Width = Dim.Fill ();
                 LineRune = Glyphs.HLine;
 
                 break;
             case Orientation.Vertical:
                 Height = Dim.Fill ();
-                Width = 1;
+                Width = Dim.Auto (minimumContentDim: 1);
                 LineRune = Glyphs.VLine;
 
                 break;
@@ -54,16 +54,16 @@ public class LineView : View
     public Rune? StartingAnchor { get; set; }
 
     /// <summary>Draws the line including any starting/ending anchors</summary>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         Move (0, 0);
         Driver.SetAttribute (GetNormalColor ());
 
         int hLineWidth = Math.Max (1, Glyphs.HLine.GetColumns ());
 
-        int dEnd = Orientation == Orientation.Horizontal ? Bounds.Width : Bounds.Height;
+        int dEnd = Orientation == Orientation.Horizontal ? Viewport.Width : Viewport.Height;
 
         for (var d = 0; d < dEnd; d += hLineWidth)
         {

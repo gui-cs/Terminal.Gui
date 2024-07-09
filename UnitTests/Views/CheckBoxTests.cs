@@ -1,315 +1,239 @@
-﻿using Xunit.Abstractions;
+using System.ComponentModel;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class CheckBoxTests
+public class CheckBoxTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public CheckBoxTests (ITestOutputHelper output) { _output = output; }
+    private static readonly Size _size25x1 = new (25, 1);
+
+    [Theory]
+    [InlineData ("01234", 0, 0, 0, 0)]
+    [InlineData ("01234", 1, 0, 1, 0)]
+    [InlineData ("01234", 0, 1, 0, 1)]
+    [InlineData ("01234", 1, 1, 1, 1)]
+    [InlineData ("01234", 10, 1, 10, 1)]
+    [InlineData ("01234", 10, 3, 10, 3)]
+    [InlineData ("0_1234", 0, 0, 0, 0)]
+    [InlineData ("0_1234", 1, 0, 1, 0)]
+    [InlineData ("0_1234", 0, 1, 0, 1)]
+    [InlineData ("0_1234", 1, 1, 1, 1)]
+    [InlineData ("0_1234", 10, 1, 10, 1)]
+    [InlineData ("0_12你", 10, 3, 10, 3)]
+    [InlineData ("0_12你", 0, 0, 0, 0)]
+    [InlineData ("0_12你", 1, 0, 1, 0)]
+    [InlineData ("0_12你", 0, 1, 0, 1)]
+    [InlineData ("0_12你", 1, 1, 1, 1)]
+    [InlineData ("0_12你", 10, 1, 10, 1)]
+    public void CheckBox_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
+    {
+        var checkBox = new CheckBox
+        {
+            X = 0,
+            Y = 0,
+            Width = width,
+            Height = height,
+            Text = text
+        };
+
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Frame.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Viewport.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.Size);
+
+        checkBox.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0, 0)]
+    [InlineData (1, 0, 1, 0)]
+    [InlineData (0, 1, 0, 1)]
+    [InlineData (1, 1, 1, 1)]
+    [InlineData (10, 1, 10, 1)]
+    [InlineData (10, 3, 10, 3)]
+    public void CheckBox_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
+    {
+        var checkBox = new CheckBox
+        {
+            X = 0,
+            Y = 0,
+            Width = width,
+            Height = height
+        };
+
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Frame.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Viewport.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.Size);
+
+        checkBox.Dispose ();
+    }
+
+    // Test that Title and Text are the same
+    [Fact]
+    public void Text_Mirrors_Title ()
+    {
+        var view = new CheckBox ();
+        view.Title = "Hello";
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{CM.Glyphs.CheckStateUnChecked} Hello", view.TextFormatter.Text);
+    }
 
     [Fact]
-    [AutoInitShutdown]
-    public void AllowNullChecked_Get_Set ()
+    public void Title_Mirrors_Text ()
+    {
+        var view = new CheckBox ();
+        view.Text = "Hello";
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{CM.Glyphs.CheckStateUnChecked} Hello", view.TextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void AllowNoneChecked_Get_Set ()
     {
         var checkBox = new CheckBox { Text = "Check this out 你" };
-        Toplevel top = Application.Top;
-        top.Add (checkBox);
-        Application.Begin (top);
 
-        Assert.False (checkBox.Checked);
-        Assert.True (checkBox.NewKeyDownEvent (new Key (KeyCode.Space)));
-        Assert.True (checkBox.Checked);
-        Assert.True (checkBox.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
-        Assert.False (checkBox.Checked);
+        Assert.Equal (CheckState.UnChecked, checkBox.State);
+        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
+        Assert.Equal (CheckState.Checked, checkBox.State);
+        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        Assert.Equal (CheckState.UnChecked, checkBox.State);
 
-        checkBox.AllowNullChecked = true;
-        Assert.True (checkBox.NewKeyDownEvent (new Key (KeyCode.Space)));
-        Assert.Null (checkBox.Checked);
-        Application.Refresh ();
+        checkBox.AllowCheckStateNone = true;
+        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
+        Assert.Equal (CheckState.None, checkBox.State);
+        checkBox.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @$"
-{
-    CM.Glyphs.NullChecked
-} Check this out 你",
-                                                      _output
+{CM.Glyphs.CheckStateNone} Check this out 你",
+                                                      output
                                                      );
-        Assert.True (checkBox.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
-        Assert.True (checkBox.Checked);
-        Assert.True (checkBox.NewKeyDownEvent (new Key (KeyCode.Space)));
-        Assert.False (checkBox.Checked);
-        Assert.True (checkBox.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
-        Assert.Null (checkBox.Checked);
+        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        Assert.Equal (CheckState.Checked, checkBox.State);
+        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
+        Assert.Equal (CheckState.UnChecked, checkBox.State);
+        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        Assert.Equal (CheckState.None, checkBox.State);
 
-        checkBox.AllowNullChecked = false;
-        Assert.False (checkBox.Checked);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_Stays_True_AnchorEnd_With_HotKeySpecifier ()
-    {
-        var checkBox = new CheckBox { Y = Pos.Center (), Text = "C_heck this out 你" };
-
-        checkBox.X = Pos.AnchorEnd () - Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
-        win.Add (checkBox);
-        Application.Top.Add (win);
-
-        Assert.True (checkBox.AutoSize);
-
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        var expected = @$"
-┌┤Test Demo 你├──────────────┐
-│                            │
-│         {
-    CM.Glyphs.UnChecked
-} Check this out 你│
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-
-        Assert.True (checkBox.AutoSize);
-        checkBox.Text = "Check this out 你 changed";
-        Assert.True (checkBox.AutoSize);
-        Application.Refresh ();
-
-        expected = @$"
-┌┤Test Demo 你├──────────────┐
-│                            │
-│ {
-    CM.Glyphs.UnChecked
-} Check this out 你 changed│
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_Stays_True_AnchorEnd_Without_HotKeySpecifier ()
-    {
-        var checkBox = new CheckBox { Y = Pos.Center (), Text = "Check this out 你" };
-
-        checkBox.X = Pos.AnchorEnd () - Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
-        win.Add (checkBox);
-        Application.Top.Add (win);
-
-        Assert.True (checkBox.AutoSize);
-
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        var expected = @$"
-┌┤Test Demo 你├──────────────┐
-│                            │
-│         {
-    CM.Glyphs.UnChecked
-} Check this out 你│
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-
-        Assert.True (checkBox.AutoSize);
-        checkBox.Text = "Check this out 你 changed";
-        Assert.True (checkBox.AutoSize);
-        Application.Refresh ();
-
-        expected = @$"
-┌┤Test Demo 你├──────────────┐
-│                            │
-│ {
-    CM.Glyphs.UnChecked
-} Check this out 你 changed│
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_StaysVisible ()
-    {
-        var checkBox = new CheckBox { X = 1, Y = Pos.Center (), Text = "Check this out 你" };
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
-        win.Add (checkBox);
-        Application.Top.Add (win);
-
-        Assert.False (checkBox.IsInitialized);
-
-        RunState runstate = Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        Assert.True (checkBox.IsInitialized);
-        Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
-        Assert.Equal ("Check this out 你", checkBox.Text);
-        Assert.Equal ($"{CM.Glyphs.UnChecked} Check this out 你", checkBox.TextFormatter.Text);
-        Assert.True (checkBox.AutoSize);
-        Assert.Equal ("Absolute(19)", checkBox.Width.ToString ());
-
-        checkBox.Checked = true;
-        Assert.Equal ($"{CM.Glyphs.Checked} Check this out 你", checkBox.TextFormatter.Text);
-
-        checkBox.AutoSize = false;
-
-        // It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
-        checkBox.Text = "Check this out 你 changed";
-        var firstIteration = false;
-        Application.RunIteration (ref runstate, ref firstIteration);
-
-        // BUGBUG - v2 - Autosize is busted; disabling tests for now
-        Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
-
-        var expected = @"
-┌┤Test Demo 你├──────────────┐
-│                            │
-│ ☑ Check this out 你        │
-│                            │
-└────────────────────────────┘";
-
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
-
-        checkBox.Width = 19;
-
-        // It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
-        checkBox.Text = "Check this out 你 changed";
-        Application.RunIteration (ref runstate, ref firstIteration);
-        Assert.False (checkBox.AutoSize);
-        Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
-
-        expected = @"
-┌┤Test Demo 你├──────────────┐
-│                            │
-│ ☑ Check this out 你        │
-│                            │
-└────────────────────────────┘";
-
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
-
-        checkBox.AutoSize = true;
-        Application.RunIteration (ref runstate, ref firstIteration);
-        Assert.Equal (new Rect (1, 1, 27, 1), checkBox.Frame);
-
-        expected = @"
-┌┤Test Demo 你├──────────────┐
-│                            │
-│ ☑ Check this out 你 changed│
-│                            │
-└────────────────────────────┘";
-
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        checkBox.AllowCheckStateNone = false;
+        Assert.Equal (CheckState.UnChecked, checkBox.State);
     }
 
     [Fact]
     public void Constructors_Defaults ()
     {
         var ckb = new CheckBox ();
-        Assert.True (ckb.AutoSize);
-        Assert.False (ckb.Checked);
-        Assert.False (ckb.AllowNullChecked);
+        Assert.True (ckb.Width is DimAuto);
+        Assert.True (ckb.Height is DimAuto);
+        Assert.Equal (CheckState.UnChecked, ckb.State);
+        Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal (string.Empty, ckb.Text);
-        Assert.Equal ($"{CM.Glyphs.UnChecked} ", ckb.TextFormatter.Text);
+        Assert.Equal ($"{CM.Glyphs.CheckStateUnChecked} ", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-        Assert.Equal (new Rect (0, 0, 2, 1), ckb.Frame);
+        Assert.Equal (new (0, 0, 2, 1), ckb.Frame);
 
-        ckb = new CheckBox { Text = "Test", Checked = true };
-        Assert.True (ckb.AutoSize);
-        Assert.True (ckb.Checked);
-        Assert.False (ckb.AllowNullChecked);
+        ckb = new () { Text = "Test", State = CheckState.Checked };
+        Assert.True (ckb.Width is DimAuto);
+        Assert.True (ckb.Height is DimAuto);
+        Assert.Equal (CheckState.Checked, ckb.State);
+        Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal ("Test", ckb.Text);
-        Assert.Equal ($"{CM.Glyphs.Checked} Test", ckb.TextFormatter.Text);
+        Assert.Equal ($"{CM.Glyphs.CheckStateChecked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-        Assert.Equal (new Rect (0, 0, 6, 1), ckb.Frame);
+        Assert.Equal (new (0, 0, 6, 1), ckb.Frame);
 
-        ckb = new CheckBox { Text = "Test", X = 1, Y = 2 };
-        Assert.True (ckb.AutoSize);
-        Assert.False (ckb.Checked);
-        Assert.False (ckb.AllowNullChecked);
+        ckb = new () { Text = "Test", X = 1, Y = 2 };
+        Assert.True (ckb.Width is DimAuto);
+        Assert.True (ckb.Height is DimAuto);
+        Assert.Equal (CheckState.UnChecked, ckb.State);
+        Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal ("Test", ckb.Text);
-        Assert.Equal ($"{CM.Glyphs.UnChecked} Test", ckb.TextFormatter.Text);
+        Assert.Equal ($"{CM.Glyphs.CheckStateUnChecked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-        Assert.Equal (new Rect (1, 2, 6, 1), ckb.Frame);
+        Assert.Equal (new (1, 2, 6, 1), ckb.Frame);
 
-        ckb = new CheckBox { Text = "Test", X = 3, Y = 4, Checked = true };
-        Assert.True (ckb.AutoSize);
-        Assert.True (ckb.Checked);
-        Assert.False (ckb.AllowNullChecked);
+        ckb = new () { Text = "Test", X = 3, Y = 4, State = CheckState.Checked };
+        Assert.True (ckb.Width is DimAuto);
+        Assert.True (ckb.Height is DimAuto);
+        Assert.Equal (CheckState.Checked, ckb.State);
+        Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal ("Test", ckb.Text);
-        Assert.Equal ($"{CM.Glyphs.Checked} Test", ckb.TextFormatter.Text);
+        Assert.Equal ($"{CM.Glyphs.CheckStateChecked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-        Assert.Equal (new Rect (3, 4, 6, 1), ckb.Frame);
+        Assert.Equal (new (3, 4, 6, 1), ckb.Frame);
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void KeyBindings_Command ()
     {
         var toggled = false;
         var ckb = new CheckBox ();
-        ckb.Toggled += (s, e) => toggled = true;
-        Application.Top.Add (ckb);
-        Application.Begin (Application.Top);
+        ckb.Toggle += (s, e) => toggled = true;
 
-        Assert.False (ckb.Checked);
+        Assert.Equal (CheckState.UnChecked, ckb.State);
         Assert.False (toggled);
-        Assert.Equal (KeyCode.Null, ckb.HotKey);
+        Assert.Equal (Key.Empty, ckb.HotKey);
 
         ckb.Text = "_Test";
-        Assert.Equal (KeyCode.T, ckb.HotKey);
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.T)));
-        Assert.True (ckb.Checked);
+        Assert.Equal (Key.T, ckb.HotKey);
+        Assert.True (ckb.NewKeyDownEvent (Key.T));
+        Assert.Equal (CheckState.Checked, ckb.State);
         Assert.True (toggled);
 
         ckb.Text = "T_est";
         toggled = false;
-        Assert.Equal (KeyCode.E, ckb.HotKey);
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.E | KeyCode.AltMask)));
+        Assert.Equal (Key.E, ckb.HotKey);
+        Assert.True (ckb.NewKeyDownEvent (Key.E.WithAlt));
         Assert.True (toggled);
-        Assert.False (ckb.Checked);
+        Assert.Equal (CheckState.UnChecked, ckb.State);
 
         toggled = false;
-        Assert.Equal (KeyCode.E, ckb.HotKey);
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.E)));
+        Assert.Equal (Key.E, ckb.HotKey);
+        Assert.True (ckb.NewKeyDownEvent (Key.E));
         Assert.True (toggled);
-        Assert.True (ckb.Checked);
+        Assert.Equal (CheckState.Checked, ckb.State);
 
         toggled = false;
-        Assert.True (Application.Top.NewKeyDownEvent (new Key ((KeyCode)' ')));
+        Assert.True (ckb.NewKeyDownEvent (Key.Space));
         Assert.True (toggled);
-        Assert.False (ckb.Checked);
+        Assert.Equal (CheckState.UnChecked, ckb.State);
 
         toggled = false;
-        Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Space)));
+        Assert.True (ckb.NewKeyDownEvent (Key.Space));
         Assert.True (toggled);
-        Assert.True (ckb.Checked);
-        Assert.True (ckb.AutoSize);
+        Assert.Equal (CheckState.Checked, ckb.State);
 
-        Application.Refresh ();
+        toggled = false;
+        Assert.False (ckb.NewKeyDownEvent (Key.Enter));
+        Assert.False (toggled);
+        Assert.Equal (CheckState.Checked, ckb.State);
+    }
 
-        var expected = @$"
-{
-    CM.Glyphs.Checked
-} Test
-";
+    [Fact]
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
+    {
+        var ckb = new CheckBox ();
+        var acceptInvoked = false;
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 6, 1), pos);
+        ckb.Accept += ViewOnAccept;
+
+        bool? ret = ckb.InvokeCommand (Command.Accept);
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
+
+        return;
+
+        void ViewOnAccept (object sender, HandledEventArgs e)
+        {
+            acceptInvoked = true;
+            e.Handled = true;
+        }
     }
 
     [Fact]
@@ -321,50 +245,46 @@ public class CheckBoxTests
             X = 1,
             Y = Pos.Center (),
             Text = "Check this out 你",
-            TextAlignment = TextAlignment.Centered,
-            AutoSize = false,
+            TextAlignment = Alignment.Center,
             Width = 25
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
-        Assert.Equal (TextAlignment.Centered, checkBox.TextAlignment);
-        Assert.Equal (new Rect (1, 1, 25, 1), checkBox.Frame);
-        Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
-        Assert.False (checkBox.AutoSize);
+        Assert.Equal (Alignment.Center, checkBox.TextAlignment);
+        Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
+        Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│    {
-    CM.Glyphs.UnChecked
-} Check this out 你     │
+│    {CM.Glyphs.CheckStateUnChecked} Check this out 你     │
 │                            │
 └────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
 
-        checkBox.Checked = true;
+        checkBox.State = CheckState.Checked;
         Application.Refresh ();
 
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│    {
-    CM.Glyphs.Checked
-} Check this out 你     │
+│    {CM.Glyphs.CheckStateChecked} Check this out 你     │
 │                            │
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -376,8 +296,7 @@ public class CheckBoxTests
             X = 1,
             Y = Pos.Center (),
             Text = "Check first out 你",
-            TextAlignment = TextAlignment.Justified,
-            AutoSize = false,
+            TextAlignment = Alignment.Fill,
             Width = 25
         };
 
@@ -386,63 +305,54 @@ public class CheckBoxTests
             X = 1,
             Y = Pos.Bottom (checkBox1),
             Text = "Check second out 你",
-            TextAlignment = TextAlignment.Justified,
-            AutoSize = false,
+            TextAlignment = Alignment.Fill,
             Width = 25
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox1, checkBox2);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 6);
 
-        Assert.Equal (TextAlignment.Justified, checkBox1.TextAlignment);
-        Assert.Equal (new Rect (1, 1, 25, 1), checkBox1.Frame);
-        Assert.Equal (new Size (25, 1), checkBox1.TextFormatter.Size);
-        Assert.Equal (TextAlignment.Justified, checkBox2.TextAlignment);
-        Assert.Equal (new Rect (1, 2, 25, 1), checkBox2.Frame);
-        Assert.Equal (new Size (25, 1), checkBox2.TextFormatter.Size);
+        Assert.Equal (Alignment.Fill, checkBox1.TextAlignment);
+        Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
+        Assert.Equal (Alignment.Fill, checkBox2.TextAlignment);
+        Assert.Equal (new (1, 2, 25, 1), checkBox2.Frame);
 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {
-    CM.Glyphs.UnChecked
-}   Check  first  out  你  │
-│ {
-    CM.Glyphs.UnChecked
-}  Check  second  out  你  │
+│ {CM.Glyphs.CheckStateUnChecked}   Check  first  out  你  │
+│ {CM.Glyphs.CheckStateUnChecked}  Check  second  out  你  │
 │                            │
 └────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 6), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 6), pos);
 
-        checkBox1.Checked = true;
-        Assert.Equal (new Rect (1, 1, 25, 1), checkBox1.Frame);
-        Assert.Equal (new Size (25, 1), checkBox1.TextFormatter.Size);
-        checkBox2.Checked = true;
-        Assert.Equal (new Rect (1, 2, 25, 1), checkBox2.Frame);
-        Assert.Equal (new Size (25, 1), checkBox2.TextFormatter.Size);
+        checkBox1.State = CheckState.Checked;
+        Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
+        Assert.Equal (_size25x1, checkBox1.TextFormatter.Size);
+        checkBox2.State = CheckState.Checked;
+        Assert.Equal (new (1, 2, 25, 1), checkBox2.Frame);
+        Assert.Equal (_size25x1, checkBox2.TextFormatter.Size);
         Application.Refresh ();
 
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {
-    CM.Glyphs.Checked
-}   Check  first  out  你  │
-│ {
-    CM.Glyphs.Checked
-}  Check  second  out  你  │
+│ {CM.Glyphs.CheckStateChecked}   Check  first  out  你  │
+│ {CM.Glyphs.CheckStateChecked}  Check  second  out  你  │
 │                            │
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 6), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 6), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -454,48 +364,45 @@ public class CheckBoxTests
             X = 1,
             Y = Pos.Center (),
             Text = "Check this out 你",
-            AutoSize = false,
             Width = 25
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
-        Assert.Equal (TextAlignment.Left, checkBox.TextAlignment);
-        Assert.Equal (new Rect (1, 1, 25, 1), checkBox.Frame);
-        Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
+        Assert.Equal (Alignment.Start, checkBox.TextAlignment);
+        Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
+        Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {
-    CM.Glyphs.UnChecked
-} Check this out 你        │
+│ {CM.Glyphs.CheckStateUnChecked} Check this out 你        │
 │                            │
 └────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
 
-        checkBox.Checked = true;
+        checkBox.State = CheckState.Checked;
         Application.Refresh ();
 
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {
-    CM.Glyphs.Checked
-} Check this out 你        │
+│ {CM.Glyphs.CheckStateChecked} Check this out 你        │
 │                            │
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
+        top.Dispose ();
     }
 
     [Fact]
@@ -507,49 +414,88 @@ public class CheckBoxTests
             X = 1,
             Y = Pos.Center (),
             Text = "Check this out 你",
-            TextAlignment = TextAlignment.Right,
-            AutoSize = false,
+            TextAlignment = Alignment.End,
             Width = 25
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        Application.Top.Add (win);
+        var top = new Toplevel ();
+        top.Add (win);
 
-        Application.Begin (Application.Top);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
-        Assert.Equal (TextAlignment.Right, checkBox.TextAlignment);
-        Assert.Equal (new Rect (1, 1, 25, 1), checkBox.Frame);
-        Assert.Equal (new Size (25, 1), checkBox.TextFormatter.Size);
-        Assert.False (checkBox.AutoSize);
+        Assert.Equal (Alignment.End, checkBox.TextAlignment);
+        Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
+        Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│       Check this out 你 {
-    CM.Glyphs.UnChecked
-}  │
+│       Check this out 你 {CM.Glyphs.CheckStateUnChecked}  │
 │                            │
 └────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
 
-        checkBox.Checked = true;
+        checkBox.State = CheckState.Checked;
         Application.Refresh ();
 
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│       Check this out 你 {
-    CM.Glyphs.Checked
-}  │
+│       Check this out 你 {CM.Glyphs.CheckStateChecked}  │
 │                            │
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-        Assert.Equal (new Rect (0, 0, 30, 5), pos);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Assert.Equal (new (0, 0, 30, 5), pos);
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void HotKey_Command_Fires_Accept ()
+    {
+        var cb = new CheckBox ();
+        var accepted = false;
+
+        cb.Accept += CheckBoxOnAccept;
+        cb.InvokeCommand (Command.HotKey);
+
+        Assert.True (accepted);
+
+        return;
+
+        void CheckBoxOnAccept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Theory]
+    [InlineData (CheckState.Checked)]
+    [InlineData (CheckState.UnChecked)]
+    [InlineData (CheckState.None)]
+    public void Toggled_Cancel_Event_Prevents_Toggle (CheckState initialState)
+    {
+        var ckb = new CheckBox { AllowCheckStateNone = true };
+        var checkedInvoked = false;
+
+        ckb.Toggle += CheckBoxToggle;
+
+        ckb.State = initialState;
+        Assert.Equal (initialState, ckb.State);
+        bool? ret = ckb.OnToggle ();
+        Assert.True (ret);
+        Assert.True (checkedInvoked);
+        Assert.Equal (initialState, ckb.State);
+
+        return;
+
+        void CheckBoxToggle (object sender, CancelEventArgs e)
+        {
+            checkedInvoked = true;
+            e.Cancel = true;
+        }
     }
 }

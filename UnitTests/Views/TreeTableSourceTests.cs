@@ -13,22 +13,23 @@ public class TreeTableSourceTests : IDisposable
     {
         _output = output;
 
-        _origChecked = ConfigurationManager.Glyphs.Checked;
-        _origUnchecked = ConfigurationManager.Glyphs.UnChecked;
-        ConfigurationManager.Glyphs.Checked = new Rune ('☑');
-        ConfigurationManager.Glyphs.UnChecked = new Rune ('☐');
+        _origChecked = ConfigurationManager.Glyphs.CheckStateChecked;
+        _origUnchecked = ConfigurationManager.Glyphs.CheckStateUnChecked;
+        ConfigurationManager.Glyphs.CheckStateChecked = new Rune ('☑');
+        ConfigurationManager.Glyphs.CheckStateUnChecked = new Rune ('☐');
     }
 
     public void Dispose ()
     {
-        ConfigurationManager.Glyphs.Checked = _origChecked;
-        ConfigurationManager.Glyphs.UnChecked = _origUnchecked;
+        ConfigurationManager.Glyphs.CheckStateChecked = _origChecked;
+        ConfigurationManager.Glyphs.CheckStateUnChecked = _origUnchecked;
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeTableSource_BasicExpanding_WithKeyboard ()
     {
+        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
@@ -51,7 +52,7 @@ public class TreeTableSourceTests : IDisposable
         Assert.Equal (0, tv.SelectedColumn);
 
         // when pressing right we should expand the top route
-        tv.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        tv.NewKeyDownEvent (Key.CursorRight);
 
         tv.Draw ();
 
@@ -68,7 +69,7 @@ public class TreeTableSourceTests : IDisposable
         TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // when pressing left we should collapse the top route again
-        tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+        tv.NewKeyDownEvent (Key.CursorLeft);
 
         tv.Draw ();
 
@@ -84,9 +85,11 @@ public class TreeTableSourceTests : IDisposable
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeTableSource_BasicExpanding_WithMouse ()
     {
+        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
@@ -108,7 +111,7 @@ public class TreeTableSourceTests : IDisposable
         Assert.Equal (0, tv.SelectedRow);
         Assert.Equal (0, tv.SelectedColumn);
 
-        Assert.True (tv.OnMouseEvent (new MouseEvent { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (tv.NewMouseEvent (new MouseEvent { Position = new (2, 2), Flags = MouseFlags.Button1Clicked }));
 
         tv.Draw ();
 
@@ -125,15 +128,15 @@ public class TreeTableSourceTests : IDisposable
         TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Clicking to the right/left of the expand/collapse does nothing
-        tv.OnMouseEvent (new MouseEvent { X = 3, Y = 2, Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEvent { Position = new (3, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         TestHelpers.AssertDriverContentsAre (expected, _output);
-        tv.OnMouseEvent (new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEvent { Position = new (1, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Clicking on the + again should collapse
-        tv.OnMouseEvent (new MouseEvent { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEvent { Position = new (2, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
 
         expected =
@@ -150,11 +153,14 @@ public class TreeTableSourceTests : IDisposable
     [AutoInitShutdown]
     public void TestTreeTableSource_CombinedWithCheckboxes ()
     {
+        Toplevel top = new ();
         TableView tv = GetTreeTable (out TreeView<IDescribedThing> treeSource);
 
         CheckBoxTableSourceWrapperByIndex checkSource;
         tv.Table = checkSource = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
         tv.Style.GetOrCreateColumnStyle (2).MinAcceptableWidth = 1;
+        top.Add (tv);
+        Application.Begin (top);
 
         tv.Draw ();
 
@@ -175,13 +181,13 @@ public class TreeTableSourceTests : IDisposable
         Assert.Equal (0, tv.SelectedColumn);
 
         // when pressing right we move to tree column
-        tv.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        tv.NewKeyDownEvent (Key.CursorRight);
 
         // now we are in tree column
         Assert.Equal (0, tv.SelectedRow);
         Assert.Equal (1, tv.SelectedColumn);
 
-        Application.Top.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+        top.NewKeyDownEvent (Key.CursorRight);
 
         tv.Draw ();
 
@@ -198,8 +204,8 @@ public class TreeTableSourceTests : IDisposable
 
         TestHelpers.AssertDriverContentsAre (expected, _output);
 
-        tv.NewKeyDownEvent (new Key (KeyCode.CursorDown));
-        tv.NewKeyDownEvent (new Key (KeyCode.Space));
+        tv.NewKeyDownEvent (Key.CursorDown);
+        tv.NewKeyDownEvent (Key.Space);
         tv.Draw ();
 
         expected =
@@ -220,6 +226,7 @@ public class TreeTableSourceTests : IDisposable
 
         Assert.Equal ("Ford Trans-Am", selected.Name);
         Assert.Equal ("Talking thunderbird car", selected.Description);
+        top.Dispose ();
     }
 
     private TableView GetTreeTable (out TreeView<IDescribedThing> tree)
@@ -227,7 +234,7 @@ public class TreeTableSourceTests : IDisposable
         var tableView = new TableView ();
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tableView.Bounds = new Rect (0, 0, 40, 6);
+        tableView.Viewport = new Rectangle (0, 0, 40, 6);
 
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
@@ -280,9 +287,10 @@ public class TreeTableSourceTests : IDisposable
         tableView.EndInit ();
         tableView.LayoutSubviews ();
 
-        Application.Top.Add (tableView);
-        Application.Top.EnsureFocus ();
-        Assert.Equal (tableView, Application.Top.MostFocused);
+        var top = new Toplevel ();
+        top.Add (tableView);
+        top.EnsureFocus ();
+        Assert.Equal (tableView, top.MostFocused);
 
         return tableView;
     }

@@ -42,6 +42,7 @@ public class SpinnerViewTests
         // Dispose clears timeout
         view.Dispose ();
         Assert.Empty (Application.MainLoop._timeouts);
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -62,6 +63,7 @@ public class SpinnerViewTests
 
         expected = "/";
         TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -94,17 +96,19 @@ public class SpinnerViewTests
 
         //expected = "|";
         //TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Application.Top.Dispose ();
     }
 
     private SpinnerView GetSpinnerView ()
     {
         var view = new SpinnerView ();
 
-        Application.Top.Add (view);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
 
-        Assert.Equal (1, view.Width);
-        Assert.Equal (1, view.Height);
+        Assert.Equal (1, view.Frame.Width);
+        Assert.Equal (1, view.Frame.Height);
 
         return view;
     }

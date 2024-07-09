@@ -172,7 +172,7 @@ public class TreeViewFileSystem : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        Top.Add (menu);
 
         _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = 0, Width = Dim.Percent (50), Height = Dim.Fill () };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
@@ -223,7 +223,7 @@ public class TreeViewFileSystem : Scenario
     {
         _miCursor.Checked = !_miCursor.Checked;
 
-        _treeViewFiles.DesiredCursorVisibility =
+        _treeViewFiles.CursorVisibility =
             _miCursor.Checked == true ? CursorVisibility.Default : CursorVisibility.Invisible;
     }
 
@@ -482,7 +482,7 @@ public class TreeViewFileSystem : Scenario
         // if user right clicks
         if (obj.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
         {
-            IFileSystemInfo rightClicked = _treeViewFiles.GetObjectOnRow (obj.MouseEvent.Y);
+            IFileSystemInfo rightClicked = _treeViewFiles.GetObjectOnRow (obj.MouseEvent.Position.Y);
 
             // nothing was clicked
             if (rightClicked == null)
@@ -492,8 +492,8 @@ public class TreeViewFileSystem : Scenario
 
             ShowContextMenu (
                              new Point (
-                                        obj.MouseEvent.X + _treeViewFiles.Frame.X,
-                                        obj.MouseEvent.Y + _treeViewFiles.Frame.Y + 2
+                                        obj.MouseEvent.Position.X + _treeViewFiles.Frame.X,
+                                        obj.MouseEvent.Position.Y + _treeViewFiles.Frame.Y + 2
                                        ),
                              rightClicked
                             );

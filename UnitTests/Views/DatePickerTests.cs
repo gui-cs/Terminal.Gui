@@ -49,8 +49,9 @@ public class DatePickerTests
         var date = new DateTime (9999, 11, 15);
         var datePicker = new DatePicker (date);
 
-        Application.Top.Add (datePicker);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (datePicker);
+        Application.Begin (top);
 
         // Set focus to next month button
         datePicker.FocusNext ();
@@ -58,12 +59,13 @@ public class DatePickerTests
         datePicker.FocusNext ();
 
         // Change month to December
-        Assert.True (datePicker.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (12, datePicker.Date.Month);
 
         // Date should not change as next month button is disabled
-        Assert.False (datePicker.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.False (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (12, datePicker.Date.Month);
+        top.Dispose ();
     }
 
     [Fact]
@@ -72,21 +74,23 @@ public class DatePickerTests
     {
         var date = new DateTime (1, 2, 15);
         var datePicker = new DatePicker (date);
+        var top = new Toplevel ();
 
         // Move focus to previous month button
-        Application.Top.Add (datePicker);
-        Application.Begin (Application.Top);
+        top.Add (datePicker);
+        Application.Begin (top);
 
         // set focus to the previous month button
         datePicker.FocusNext ();
         datePicker.FocusNext ();
 
         // Change month to January 
-        Assert.True (datePicker.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (1, datePicker.Date.Month);
 
         // Date should not change as previous month button is disabled
-        Assert.False (datePicker.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.False (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (1, datePicker.Date.Month);
+        top.Dispose ();
     }
 }

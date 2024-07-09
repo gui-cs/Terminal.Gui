@@ -3,7 +3,7 @@
 public partial class Toplevel
 {
     /// <summary>Gets or sets if this Toplevel is in overlapped mode within a Toplevel container.</summary>
-    public bool IsOverlapped => Application.OverlappedTop != null && Application.OverlappedTop != this && !Modal;
+    public bool IsOverlapped => Application.OverlappedTop is { } && Application.OverlappedTop != this && !Modal;
 
     /// <summary>Gets or sets if this Toplevel is a container for overlapped children.</summary>
     public bool IsOverlappedContainer { get; set; }
@@ -19,7 +19,7 @@ public static partial class Application
     {
         get
         {
-            if (OverlappedTop != null)
+            if (OverlappedTop is { })
             {
                 List<Toplevel> _overlappedChildren = new ();
 
@@ -38,11 +38,12 @@ public static partial class Application
         }
     }
 
+    #nullable enable
     /// <summary>
     ///     The <see cref="Toplevel"/> object used for the application on startup which
     ///     <see cref="Toplevel.IsOverlappedContainer"/> is true.
     /// </summary>
-    public static Toplevel OverlappedTop
+    public static Toplevel? OverlappedTop
     {
         get
         {
@@ -54,18 +55,19 @@ public static partial class Application
             return null;
         }
     }
+    #nullable restore
 
     /// <summary>Brings the superview of the most focused overlapped view is on front.</summary>
     public static void BringOverlappedTopToFront ()
     {
-        if (OverlappedTop != null)
+        if (OverlappedTop is { })
         {
             return;
         }
 
         View top = FindTopFromView (Top?.MostFocused);
 
-        if (top != null && Top.Subviews.Count > 1 && Top.Subviews [Top.Subviews.Count - 1] != top)
+        if (top is Toplevel && Top.Subviews.Count > 1 && Top.Subviews [^1] != top)
         {
             Top.BringSubviewToFront (top);
         }
@@ -77,19 +79,19 @@ public static partial class Application
     /// <returns>The matched view.</returns>
     public static Toplevel GetTopOverlappedChild (Type type = null, string [] exclude = null)
     {
-        if (OverlappedTop == null)
+        if (OverlappedTop is null)
         {
             return null;
         }
 
         foreach (Toplevel top in OverlappedChildren)
         {
-            if (type != null && top.GetType () == type && exclude?.Contains (top.Data.ToString ()) == false)
+            if (type is { } && top.GetType () == type && exclude?.Contains (top.Data.ToString ()) == false)
             {
                 return top;
             }
 
-            if ((type != null && top.GetType () != type) || exclude?.Contains (top.Data.ToString ()) == true)
+            if ((type is { } && top.GetType () != type) || exclude?.Contains (top.Data.ToString ()) == true)
             {
                 continue;
             }
@@ -108,7 +110,7 @@ public static partial class Application
     /// <returns></returns>
     public static bool MoveToOverlappedChild (Toplevel top)
     {
-        if (top.Visible && OverlappedTop != null && Current?.Modal == false)
+        if (top.Visible && OverlappedTop is { } && Current?.Modal == false)
         {
             lock (_topLevels)
             {
@@ -125,7 +127,7 @@ public static partial class Application
     /// <summary>Move to the next Overlapped child from the <see cref="OverlappedTop"/>.</summary>
     public static void OverlappedMoveNext ()
     {
-        if (OverlappedTop != null && !Current.Modal)
+        if (OverlappedTop is { } && !Current.Modal)
         {
             lock (_topLevels)
             {
@@ -156,7 +158,7 @@ public static partial class Application
     /// <summary>Move to the previous Overlapped child from the <see cref="OverlappedTop"/>.</summary>
     public static void OverlappedMovePrevious ()
     {
-        if (OverlappedTop != null && !Current.Modal)
+        if (OverlappedTop is { } && !Current.Modal)
         {
             lock (_topLevels)
             {
@@ -186,7 +188,7 @@ public static partial class Application
 
     private static bool OverlappedChildNeedsDisplay ()
     {
-        if (OverlappedTop == null)
+        if (OverlappedTop is null)
         {
             return false;
         }
@@ -206,7 +208,7 @@ public static partial class Application
 
     private static bool SetCurrentOverlappedAsTop ()
     {
-        if (OverlappedTop == null && Current != Top && Current?.SuperView == null && Current?.Modal == false)
+        if (OverlappedTop is null && Current != Top && Current?.SuperView is null && Current?.Modal == false)
         {
             Top = Current;
 

@@ -33,7 +33,7 @@ public sealed class ContextMenu : IDisposable
     {
         if (IsShow)
         {
-            if (_menuBar.SuperView != null)
+            if (_menuBar.SuperView is { })
             {
                 Hide ();
             }
@@ -113,9 +113,10 @@ public sealed class ContextMenu : IDisposable
             IsShow = false;
         }
 
-        if (_container != null)
+        if (_container is { })
         {
             _container.Closing -= Container_Closing;
+            _container.Deactivate -= Container_Deactivate;
         }
     }
 
@@ -135,20 +136,20 @@ public sealed class ContextMenu : IDisposable
     /// <summary>Shows (opens) the ContextMenu, displaying the <see cref="MenuItem"/>s it contains.</summary>
     public void Show ()
     {
-        if (_menuBar != null)
+        if (_menuBar is { })
         {
             Hide ();
         }
 
         _container = Application.Current;
         _container.Closing += Container_Closing;
-        Rect frame = Application.Driver.Bounds;
+        _container.Deactivate += Container_Deactivate;
+        Rectangle frame = Application.Driver.Screen;
         Point position = Position;
 
-        if (Host != null)
+        if (Host is { })
         {
-            Host.BoundsToScreen (frame.X, frame.Y, out int x, out int y);
-            var pos = new Point (x, y);
+            Point pos = Host.ViewportToScreen (frame).Location;
             pos.Y += Host.Frame.Height - 1;
 
             if (position != pos)
@@ -157,7 +158,7 @@ public sealed class ContextMenu : IDisposable
             }
         }
 
-        Rect rect = Menu.MakeFrame (position.X, position.Y, MenuItems.Children);
+        Rectangle rect = Menu.MakeFrame (position.X, position.Y, MenuItems.Children);
 
         if (rect.Right >= frame.Right)
         {
@@ -179,14 +180,13 @@ public sealed class ContextMenu : IDisposable
         {
             if (frame.Bottom - rect.Height - 1 >= 0 || !ForceMinimumPosToZero)
             {
-                if (Host == null)
+                if (Host is null)
                 {
                     position.Y = frame.Bottom - rect.Height - 1;
                 }
                 else
                 {
-                    Host.BoundsToScreen (frame.X, frame.Y, out int x, out int y);
-                    var pos = new Point (x, y);
+                    Point pos = Host.ViewportToScreen (frame).Location;
                     position.Y = pos.Y - rect.Height - 1;
                 }
             }
@@ -219,6 +219,7 @@ public sealed class ContextMenu : IDisposable
         _menuBar.OpenMenu ();
     }
 
+    private void Container_Deactivate (object sender, ToplevelEventArgs e) { Hide (); }
     private void Container_Closing (object sender, ToplevelClosingEventArgs obj) { Hide (); }
     private void MenuBar_MenuAllClosed (object sender, EventArgs e) { Dispose (); }
 }

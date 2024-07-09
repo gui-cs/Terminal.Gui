@@ -15,11 +15,11 @@ public class TableStyle
     /// </summary>
     public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
 
-    /// <summary>Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)</summary>
+    /// <summary>Collection of columns for which you want special rendering (e.g. custom column lengths, text justification, etc.)</summary>
     public Dictionary<int, ColumnStyle> ColumnStyles { get; set; } = new ();
 
     /// <summary>
-    ///     Determines rendering when the last column in the table is visible but it's content or
+    ///     Determines rendering when the last column in the table is visible, but it's content or
     ///     <see cref="ColumnStyle.MaxWidth"/> is less than the remaining space in the control.  True (the default) will expand
     ///     the column to fill the remaining bounds of the control.  False will draw a column ending line and leave a blank
     ///     column that cannot be selected in the remaining space.

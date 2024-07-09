@@ -2,6 +2,7 @@
 // NetDriver.cs: The System.Console-based .NET driver, works on Windows and Unix, but is not particularly efficient.
 //
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.NetEvents;
@@ -207,7 +208,7 @@ internal class NetEvents : IDisposable
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            Task.Delay (100);
+            Task.Delay (100, cancellationToken).Wait (cancellationToken);
 
             if (Console.KeyAvailable)
             {
@@ -222,7 +223,7 @@ internal class NetEvents : IDisposable
 
     private void ProcessInputQueue ()
     {
-        while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
+        while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
         {
             try
             {
@@ -241,13 +242,8 @@ internal class NetEvents : IDisposable
                 ConsoleModifiers mod = 0;
                 ConsoleKeyInfo newConsoleKeyInfo = default;
 
-                while (true)
+                while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
                 {
-                    if (_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
                     ConsoleKeyInfo consoleKeyInfo;
 
                     try
@@ -262,7 +258,7 @@ internal class NetEvents : IDisposable
                     if ((consoleKeyInfo.KeyChar == (char)KeyCode.Esc && !_isEscSeq)
                         || (consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq))
                     {
-                        if (_cki == null && consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)
+                        if (_cki is null && consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)
                         {
                             _cki = EscSeqUtils.ResizeArray (
                                                             new ConsoleKeyInfo (
@@ -292,7 +288,7 @@ internal class NetEvents : IDisposable
                         break;
                     }
 
-                    if (consoleKeyInfo.KeyChar == (char)KeyCode.Esc && _isEscSeq && _cki != null)
+                    if (consoleKeyInfo.KeyChar == (char)KeyCode.Esc && _isEscSeq && _cki is { })
                     {
                         ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
                         _cki = null;
@@ -337,7 +333,7 @@ internal class NetEvents : IDisposable
             while (!cancellationToken.IsCancellationRequested)
             {
                 // Wait for a while then check if screen has changed sizes
-                Task.Delay (500, cancellationToken);
+                Task.Delay (500, cancellationToken).Wait (cancellationToken);
 
                 int buffHeight, buffWidth;
 
@@ -366,18 +362,13 @@ internal class NetEvents : IDisposable
             cancellationToken.ThrowIfCancellationRequested ();
         }
 
-        while (true)
+        while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
         {
-            if (_inputReadyCancellationTokenSource.IsCancellationRequested)
-            {
-                return;
-            }
-
-            _winChange.Wait (_inputReadyCancellationTokenSource.Token);
-            _winChange.Reset ();
-
             try
             {
+                _winChange.Wait (_inputReadyCancellationTokenSource.Token);
+                _winChange.Reset ();
+
                 RequestWindowSize (_inputReadyCancellationTokenSource.Token);
             }
             catch (OperationCanceledException)
@@ -408,7 +399,7 @@ internal class NetEvents : IDisposable
         _inputQueue.Enqueue (
                              new InputResult
                              {
-                                 EventType = EventType.WindowSize, WindowSizeEvent = new WindowSizeEvent { Size = new Size (w, h) }
+                                 EventType = EventType.WindowSize, WindowSizeEvent = new WindowSizeEvent { Size = new (w, h) }
                              }
                             );
 
@@ -851,11 +842,37 @@ internal class NetDriver : ConsoleDriver
         { }
     }
 
-    #region Not Implemented
+    public override void Suspend ()
+    {
+        if (Environment.OSVersion.Platform != PlatformID.Unix)
+        {
+            return;
+        }
 
-    public override void Suspend () { throw new NotImplementedException (); }
+        StopReportingMouseMoves ();
 
-    #endregion
+        if (!RunningUnitTests)
+        {
+            Console.ResetColor ();
+            Console.Clear ();
+
+            //Disable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+            //Set cursor key to cursor.
+            Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+
+            Platform.Suspend ();
+
+            //Enable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+
+            SetContentsAsDirty ();
+            Refresh ();
+        }
+
+        StartReportingMouseMoves ();
+    }
 
     public override void UpdateScreen ()
     {
@@ -873,10 +890,10 @@ internal class NetDriver : ConsoleDriver
         int rows = Rows;
         int cols = Cols;
         var output = new StringBuilder ();
-        var redrawAttr = new Attribute ();
+        Attribute? redrawAttr = null;
         int lastCol = -1;
 
-        CursorVisibility? savedVisibitity = _cachedCursorVisibility;
+        CursorVisibility? savedVisibility = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
 
         for (int row = top; row < rows; row++)
@@ -1005,7 +1022,7 @@ internal class NetDriver : ConsoleDriver
 
         SetCursorPosition (0, 0);
 
-        _cachedCursorVisibility = savedVisibitity;
+        _cachedCursorVisibility = savedVisibility;
 
         void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
         {
@@ -1135,7 +1152,9 @@ internal class NetDriver : ConsoleDriver
 
                 break;
             case EventType.Mouse:
-                OnMouseEvent (new MouseEventEventArgs (ToDriverMouse (inputEvent.MouseEvent)));
+                MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
+                //Debug.WriteLine ($"NetDriver: ({me.X},{me.Y}) - {me.Flags}");
+                OnMouseEvent (me);
 
                 break;
             case EventType.WindowSize:
@@ -1148,7 +1167,7 @@ internal class NetDriver : ConsoleDriver
                 ResizeScreen ();
                 ClearContents ();
                 _winSizeChanging = false;
-                OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
+                OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
 
                 break;
             case EventType.RequestResponse:
@@ -1203,13 +1222,17 @@ internal class NetDriver : ConsoleDriver
                 }
 #pragma warning restore CA1416
             }
+            // INTENT: Why are these eating the exceptions?
+            // Comments would be good here.
             catch (IOException)
             {
-                Clip = new Rect (0, 0, Cols, Rows);
+                // CONCURRENCY: Unsynchronized access to Clip is not safe.
+                Clip = new (0, 0, Cols, Rows);
             }
             catch (ArgumentOutOfRangeException)
             {
-                Clip = new Rect (0, 0, Cols, Rows);
+                // CONCURRENCY: Unsynchronized access to Clip is not safe.
+                Clip = new (0, 0, Cols, Rows);
             }
         }
         else
@@ -1217,7 +1240,8 @@ internal class NetDriver : ConsoleDriver
             Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
         }
 
-        Clip = new Rect (0, 0, Cols, Rows);
+        // CONCURRENCY: Unsynchronized access to Clip is not safe.
+        Clip = new (0, 0, Cols, Rows);
     }
 
     #endregion
@@ -1307,7 +1331,7 @@ internal class NetDriver : ConsoleDriver
     {
         EnsureCursorVisibility ();
 
-        if (Col >= 0 && Col < Cols && Row >= 0 && Row < Rows)
+        if (Col >= 0 && Col < Cols && Row >= 0 && Row <= Rows)
         {
             SetCursorPosition (Col, Row);
             SetWindowPosition (0, Row);
@@ -1325,12 +1349,9 @@ internal class NetDriver : ConsoleDriver
     {
         _cachedCursorVisibility = visibility;
 
-        bool isVisible = RunningUnitTests
-                             ? visibility == CursorVisibility.Default
-                             : Console.CursorVisible = visibility == CursorVisibility.Default;
-        Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+        Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
 
-        return isVisible;
+        return visibility == CursorVisibility.Default;
     }
 
     public override bool EnsureCursorVisibility ()
@@ -1371,7 +1392,7 @@ internal class NetDriver : ConsoleDriver
 
     private MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
     {
-        //System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
+       //System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
 
         MouseFlags mouseFlag = 0;
 
@@ -1515,7 +1536,7 @@ internal class NetDriver : ConsoleDriver
             mouseFlag |= MouseFlags.ButtonAlt;
         }
 
-        return new MouseEvent { X = me.Position.X, Y = me.Position.Y, Flags = mouseFlag };
+        return new MouseEvent { Position = me.Position, Flags = mouseFlag };
     }
 
     #endregion Mouse Handling
@@ -1575,37 +1596,15 @@ internal class NetDriver : ConsoleDriver
                 return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
         }
 
-        ConsoleKey key = keyInfo.Key;
-
-        // A..Z are special cased:
-        // - Alone, they represent lowercase a...z
-        // - With ShiftMask they are A..Z
-        // - If CapsLock is on the above is reversed.
-        // - If Alt and/or Ctrl are present, treat as upper case
-        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
-        {
-            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
-                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
-            {
-                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
-            }
-
-            if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-            {
-                // If ShiftMask is on  add the ShiftMask
-                if (char.IsUpper (keyInfo.KeyChar))
-                {
-                    return (KeyCode)(uint)keyInfo.Key | KeyCode.ShiftMask;
-                }
-            }
-
-            return (KeyCode)keyInfo.KeyChar;
-        }
-
         // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
         if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
         {
-            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
+            if (keyInfo.Modifiers.HasFlag(ConsoleModifiers.Control) && keyInfo.Key == ConsoleKey.I)
+            {
+                return KeyCode.Tab;
+            }
+
+            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
         }
 
         // Handle control keys (e.g. CursorUp)
@@ -1615,7 +1614,51 @@ internal class NetDriver : ConsoleDriver
             return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
         }
 
-        return (KeyCode)keyInfo.KeyChar;
+        if (((ConsoleKey)keyInfo.KeyChar) is >= ConsoleKey.A and <= ConsoleKey.Z)
+        {
+            // Shifted
+            keyInfo = new ConsoleKeyInfo (
+                                          keyInfo.KeyChar,
+                                          (ConsoleKey)keyInfo.KeyChar,
+                                          true,
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+        }
+
+        if ((ConsoleKey)keyInfo.KeyChar - 32 is >= ConsoleKey.A and <= ConsoleKey.Z)
+        {
+            // Unshifted
+            keyInfo = new ConsoleKeyInfo (
+                                          keyInfo.KeyChar,
+                                          (ConsoleKey)(keyInfo.KeyChar - 32),
+                                          false,
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+        }
+
+        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z )
+        {
+            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
+                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+            {
+                // NetDriver doesn't support Shift-Ctrl/Shift-Alt combos
+                return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.Key);
+            }
+
+            if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+            {
+                // If ShiftMask is on  add the ShiftMask
+                if (char.IsUpper (keyInfo.KeyChar))
+                {
+                    return (KeyCode)keyInfo.Key | KeyCode.ShiftMask;
+                }
+            }
+
+            return (KeyCode)keyInfo.Key;
+        }
+
+
+        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
     }
 
     #endregion Keyboard Handling
@@ -1637,7 +1680,7 @@ internal class NetMainLoop : IMainLoopDriver
     private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
     private readonly Queue<InputResult?> _resultQueue = new ();
     private readonly ManualResetEventSlim _waitForProbe = new (false);
-    private CancellationTokenSource _eventReadyTokenSource = new ();
+    private readonly CancellationTokenSource _eventReadyTokenSource = new ();
     private MainLoop _mainLoop;
 
     /// <summary>Initializes the class with the console driver.</summary>
@@ -1646,7 +1689,7 @@ internal class NetMainLoop : IMainLoopDriver
     /// <exception cref="ArgumentNullException"></exception>
     public NetMainLoop (ConsoleDriver consoleDriver = null)
     {
-        if (consoleDriver == null)
+        if (consoleDriver is null)
         {
             throw new ArgumentNullException (nameof (consoleDriver));
         }
@@ -1689,13 +1732,12 @@ internal class NetMainLoop : IMainLoopDriver
             _eventReady.Reset ();
         }
 
+        _eventReadyTokenSource.Token.ThrowIfCancellationRequested ();
+
         if (!_eventReadyTokenSource.IsCancellationRequested)
         {
             return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
         }
-
-        _eventReadyTokenSource.Dispose ();
-        _eventReadyTokenSource = new CancellationTokenSource ();
 
         return true;
     }
@@ -1727,7 +1769,7 @@ internal class NetMainLoop : IMainLoopDriver
 
     private void NetInputHandler ()
     {
-        while (_mainLoop != null)
+        while (_mainLoop is { })
         {
             try
             {
@@ -1753,26 +1795,21 @@ internal class NetMainLoop : IMainLoopDriver
                 return;
             }
 
+            _inputHandlerTokenSource.Token.ThrowIfCancellationRequested ();
+
             if (_resultQueue.Count == 0)
             {
                 _resultQueue.Enqueue (_netEvents.DequeueInput ());
             }
 
-            try
+            while (_resultQueue.Count > 0 && _resultQueue.Peek () is null)
             {
-                while (_resultQueue.Peek () == null)
-                {
-                    _resultQueue.Dequeue ();
-                }
-
-                if (_resultQueue.Count > 0)
-                {
-                    _eventReady.Set ();
-                }
+                _resultQueue.Dequeue ();
             }
-            catch (InvalidOperationException)
+
+            if (_resultQueue.Count > 0)
             {
-                // Ignore
+                _eventReady.Set ();
             }
         }
     }

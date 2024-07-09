@@ -16,21 +16,31 @@ public class HexEditor : Scenario
     private HexView _hexView;
     private MenuItem _miAllowEdits;
     private bool _saved = true;
-    private StatusItem _siPositionChanged;
+    private Shortcut _siPositionChanged;
     private StatusBar _statusBar;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName () + "-" + _fileName ?? "Untitled";
+        Application.Init ();
+        Toplevel app = new Toplevel ()
+        {
+            ColorScheme = Colors.ColorSchemes ["Base"]
+        };
 
         CreateDemoFile (_fileName);
 
-        //CreateUnicodeDemoFile (_fileName);
-
-        _hexView = new HexView (LoadFile ()) { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+        _hexView = new HexView (new MemoryStream (Encoding.UTF8.GetBytes ("Demo text.")))
+        {
+            X = 0,
+            Y = 1,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1),
+            Title = _fileName ?? "Untitled",
+            BorderStyle = LineStyle.Rounded,
+        };
         _hexView.Edited += _hexView_Edited;
         _hexView.PositionChanged += _hexView_PositionChanged;
-        Win.Add (_hexView);
+        app.Add (_hexView);
 
         var menu = new MenuBar
         {
@@ -74,20 +84,20 @@ public class HexEditor : Scenario
                                 )
             ]
         };
-        Application.Top.Add (menu);
+        app.Add (menu);
 
         _statusBar = new StatusBar (
                                     new []
                                     {
-                                        new (KeyCode.F2, "~F2~ Open", () => Open ()),
-                                        new (KeyCode.F3, "~F3~ Save", () => Save ()),
+                                        new (Key.F2, "Open", () => Open ()),
+                                        new (Key.F3, "Save", () => Save ()),
                                         new (
                                              Application.QuitKey,
-                                             $"{Application.QuitKey} to Quit",
+                                             $"Quit",
                                              () => Quit ()
                                             ),
-                                        _siPositionChanged = new StatusItem (
-                                                                             KeyCode.Null,
+                                        _siPositionChanged = new Shortcut (
+                                                                             Key.Empty,
                                                                              $"Position: {
                                                                                  _hexView.Position
                                                                              } Line: {
@@ -100,8 +110,17 @@ public class HexEditor : Scenario
                                                                              () => { }
                                                                             )
                                     }
-                                   );
-        Application.Top.Add (_statusBar);
+                                   )
+        {
+            AlignmentModes = AlignmentModes.IgnoreFirstOrLast
+        };
+        app.Add (_statusBar);
+
+        _hexView.Source = LoadFile ();
+
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
     }
 
     private void _hexView_Edited (object sender, HexViewEditEventArgs e) { _saved = false; }
@@ -109,16 +128,7 @@ public class HexEditor : Scenario
     private void _hexView_PositionChanged (object sender, HexViewEventArgs obj)
     {
         _siPositionChanged.Title =
-            $"Position: {
-                obj.Position
-            } Line: {
-                obj.CursorPosition.Y
-            } Col: {
-                obj.CursorPosition.X
-            } Line length: {
-                obj.BytesPerLine
-            }";
-        _statusBar.SetNeedsDisplay ();
+            $"Position: {obj.Position} Line: {obj.CursorPosition.Y} Col: {obj.CursorPosition.X} Line length: {obj.BytesPerLine}";
     }
 
     private void Copy () { MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok"); }
@@ -154,7 +164,7 @@ public class HexEditor : Scenario
     {
         var stream = new MemoryStream ();
 
-        if (!_saved && _hexView != null && _hexView.Edits.Count > 0)
+        if (!_saved && _hexView.Edits.Count > 0)
         {
             if (MessageBox.ErrorQuery (
                                        "Save",
@@ -175,12 +185,12 @@ public class HexEditor : Scenario
         {
             byte [] bin = File.ReadAllBytes (_fileName);
             stream.Write (bin);
-            Win.Title = GetName () + "-" + _fileName;
+            _hexView.Title = _fileName;
             _saved = true;
         }
         else
         {
-            Win.Title = GetName () + "-" + (_fileName ?? "Untitled");
+            _hexView.Title = (_fileName ?? "Untitled");
         }
 
         return stream;
@@ -203,6 +213,7 @@ public class HexEditor : Scenario
             _hexView.Source = LoadFile ();
             _hexView.DisplayStart = 0;
         }
+        d.Dispose ();
     }
 
     private void Paste () { MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok"); }

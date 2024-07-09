@@ -21,7 +21,7 @@ public class TabView : View
     private TabToRender [] _tabLocations;
     private int _tabScrollOffset;
 
-    /// <summary>Initializes a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="TabView"/> class.</summary>
     public TabView ()
     {
         CanFocus = true;
@@ -124,14 +124,14 @@ public class TabView : View
                    );
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-        KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-        KeyBindings.Add (KeyCode.Home, Command.LeftHome);
-        KeyBindings.Add (KeyCode.End, Command.RightEnd);
-        KeyBindings.Add (KeyCode.CursorDown, Command.NextView);
-        KeyBindings.Add (KeyCode.CursorUp, Command.PreviousView);
-        KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
-        KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.Home, Command.LeftHome);
+        KeyBindings.Add (Key.End, Command.RightEnd);
+        KeyBindings.Add (Key.CursorDown, Command.NextView);
+        KeyBindings.Add (Key.CursorUp, Command.PreviousView);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
     }
 
     /// <summary>
@@ -151,9 +151,9 @@ public class TabView : View
 
             Tab old = _selectedTab;
 
-            if (_selectedTab != null)
+            if (_selectedTab is { })
             {
-                if (_selectedTab.View != null)
+                if (_selectedTab.View is { })
                 {
                     // remove old content
                     _contentView.Remove (_selectedTab.View);
@@ -162,10 +162,10 @@ public class TabView : View
 
             _selectedTab = value;
 
-            if (value != null)
+            if (value is { })
             {
                 // add new content
-                if (_selectedTab.View != null)
+                if (_selectedTab.View is { })
                 {
                     _contentView.Add (_selectedTab.View);
                 }
@@ -177,7 +177,7 @@ public class TabView : View
             {
                 if (old?.HasFocus == true)
                 {
-                    SelectedTab.SetFocus ();
+                    SelectedTab?.SetFocus ();
                 }
 
                 OnSelectedTabChanged (old, value);
@@ -214,7 +214,7 @@ public class TabView : View
         _tabs.Add (tab);
         _tabsBar.Add (tab);
 
-        if (SelectedTab == null || andSelect)
+        if (SelectedTab is null || andSelect)
         {
             SelectedTab = tab;
 
@@ -291,13 +291,13 @@ public class TabView : View
     /// <summary>Updates <see cref="TabScrollOffset"/> to ensure that <see cref="SelectedTab"/> is visible.</summary>
     public void EnsureSelectedTabIsVisible ()
     {
-        if (!IsInitialized || SelectedTab == null)
+        if (!IsInitialized || SelectedTab is null)
         {
             return;
         }
 
         // if current viewport does not include the selected tab
-        if (!CalculateViewport (Bounds).Any (r => Equals (SelectedTab, r.Tab)))
+        if (!CalculateViewport (Viewport).Any (r => Equals (SelectedTab, r.Tab)))
         {
             // Set scroll offset so the first tab rendered is the
             TabScrollOffset = Math.Max (0, Tabs.IndexOf (SelectedTab));
@@ -311,14 +311,14 @@ public class TabView : View
     public int EnsureValidScrollOffsets (int value) { return Math.Max (Math.Min (value, Tabs.Count - 1), 0); }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         Driver.SetAttribute (GetNormalColor ());
 
         if (Tabs.Any ())
         {
-            Rect savedClip = ClipToBounds ();
-            _tabsBar.OnDrawContent (contentArea);
+            Rectangle savedClip = SetClip ();
+            _tabsBar.OnDrawContent (viewport);
             _contentView.SetNeedsDisplay ();
             _contentView.Draw ();
             Driver.Clip = savedClip;
@@ -326,7 +326,7 @@ public class TabView : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContentComplete (Rect contentArea) { _tabsBar.OnDrawContentComplete (contentArea); }
+    public override void OnDrawContentComplete (Rectangle viewport) { _tabsBar.OnDrawContentComplete (viewport); }
 
     /// <summary>
     ///     Removes the given <paramref name="tab"/> from <see cref="Tabs"/>. Caller is responsible for disposing the
@@ -335,7 +335,7 @@ public class TabView : View
     /// <param name="tab"></param>
     public void RemoveTab (Tab tab)
     {
-        if (tab == null || !_tabs.Contains (tab))
+        if (tab is null || !_tabs.Contains (tab))
         {
             return;
         }
@@ -346,7 +346,7 @@ public class TabView : View
         _tabs.Remove (tab);
 
         // if the currently selected tab is no longer a member of Tabs
-        if (SelectedTab == null || !Tabs.Contains (SelectedTab))
+        if (SelectedTab is null || !Tabs.Contains (SelectedTab))
         {
             // select the tab closest to the one that disappeared
             int toSelect = Math.Max (idx - 1, 0);
@@ -381,7 +381,7 @@ public class TabView : View
         }
 
         // if there is only one tab anyway or nothing is selected
-        if (Tabs.Count == 1 || SelectedTab == null)
+        if (Tabs.Count == 1 || SelectedTab is null)
         {
             SelectedTab = Tabs.ElementAt (0);
             SetNeedsDisplay ();
@@ -437,7 +437,7 @@ public class TabView : View
 
     /// <summary>Returns which tabs to render at each x location.</summary>
     /// <returns></returns>
-    private IEnumerable<TabToRender> CalculateViewport (Rect bounds)
+    private IEnumerable<TabToRender> CalculateViewport (Rectangle bounds)
     {
         UnSetCurrentTabs ();
 
@@ -447,7 +447,7 @@ public class TabView : View
         // Starting at the first or scrolled to tab
         foreach (Tab tab in Tabs.Skip (TabScrollOffset))
         {
-            if (prevTab != null)
+            if (prevTab is { })
             {
                 tab.X = Pos.Right (prevTab);
             }
@@ -533,11 +533,11 @@ public class TabView : View
         return Style.ShowTopLine ? 3 : 2;
     }
 
-    private void Tab_MouseClick (object sender, MouseEventEventArgs e) { e.Handled = _tabsBar.MouseEvent (e.MouseEvent); }
+    private void Tab_MouseClick (object sender, MouseEventEventArgs e) { e.Handled = _tabsBar.NewMouseEvent (e.MouseEvent) == true; }
 
     private void UnSetCurrentTabs ()
     {
-        if (_tabLocations != null)
+        if (_tabLocations is { })
         {
             foreach (TabToRender tabToRender in _tabLocations)
             {
@@ -564,7 +564,7 @@ public class TabView : View
             _host = host;
 
             CanFocus = true;
-            Height = 1;
+            Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == GetContentSize ().
             Width = Dim.Fill ();
 
             _rightScrollIndicator = new View
@@ -590,7 +590,7 @@ public class TabView : View
             Add (_rightScrollIndicator, _leftScrollIndicator);
         }
 
-        public override bool MouseEvent (MouseEvent me)
+        protected internal override bool OnMouseEvent  (MouseEvent me)
         {
             Tab hit = me.View is Tab ? (Tab)me.View : null;
 
@@ -627,11 +627,11 @@ public class TabView : View
             {
                 var scrollIndicatorHit = 0;
 
-                if (me.View != null && me.View.Id == "rightScrollIndicator")
+                if (me.View is { } && me.View.Id == "rightScrollIndicator")
                 {
                     scrollIndicatorHit = 1;
                 }
-                else if (me.View != null && me.View.Id == "leftScrollIndicator")
+                else if (me.View is { } && me.View.Id == "leftScrollIndicator")
                 {
                     scrollIndicatorHit = -1;
                 }
@@ -645,7 +645,7 @@ public class TabView : View
                     return true;
                 }
 
-                if (hit != null)
+                if (hit is { })
                 {
                     _host.SelectedTab = hit;
                     SetNeedsDisplay ();
@@ -657,9 +657,9 @@ public class TabView : View
             return false;
         }
 
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
-            _host._tabLocations = _host.CalculateViewport (Bounds).ToArray ();
+            _host._tabLocations = _host.CalculateViewport (Viewport).ToArray ();
 
             // clear any old text
             Clear ();
@@ -670,9 +670,9 @@ public class TabView : View
             Driver.SetAttribute (GetNormalColor ());
         }
 
-        public override void OnDrawContentComplete (Rect contentArea)
+        public override void OnDrawContentComplete (Rectangle viewport)
         {
-            if (_host._tabLocations == null)
+            if (_host._tabLocations is null)
             {
                 return;
             }
@@ -683,7 +683,7 @@ public class TabView : View
             for (var i = 0; i < tabLocations.Length; i++)
             {
                 View tab = tabLocations [i].Tab;
-                Rect vts = tab.BoundsToScreen (tab.Bounds);
+                Rectangle vts = tab.ViewportToScreen (tab.Viewport);
                 var lc = new LineCanvas ();
                 int selectedOffset = _host.Style.ShowTopLine && tabLocations [i].IsSelected ? 0 : 1;
 
@@ -1115,7 +1115,7 @@ public class TabView : View
 
                     int lastSelectedTab = !_host.Style.ShowTopLine && i == selectedTab ? 1 :
                                           _host.Style.TabsOnBottom ? 1 : 0;
-                    Rect tabsBarVts = BoundsToScreen (Bounds);
+                    Rectangle tabsBarVts = ViewportToScreen (Viewport);
                     int lineLength = tabsBarVts.Right - vts.Right;
 
                     // Right horizontal line
@@ -1204,13 +1204,6 @@ public class TabView : View
             }
         }
 
-        public override bool OnEnter (View view)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-            return base.OnEnter (view);
-        }
-
         private int GetUnderlineYPosition ()
         {
             if (_host.Style.TabsOnBottom)
@@ -1238,7 +1231,7 @@ public class TabView : View
 
             View selected = null;
             int topLine = _host.Style.ShowTopLine ? 1 : 0;
-            int width = Bounds.Width;
+            int width = Viewport.Width;
 
             foreach (TabToRender toRender in tabLocations)
             {
@@ -1259,7 +1252,7 @@ public class TabView : View
                         tab.Margin.Thickness = new Thickness (0, 0, 0, topLine);
                     }
                 }
-                else if (selected == null)
+                else if (selected is null)
                 {
                     if (_host.Style.TabsOnBottom)
                     {
@@ -1272,7 +1265,7 @@ public class TabView : View
                         tab.Margin.Thickness = new Thickness (0, 0, 0, 0);
                     }
 
-                    tab.Width = Math.Max (tab.Width.Anchor (0) - 1, 1);
+                    tab.Width = Math.Max (tab.Width.GetAnchor (0) - 1, 1);
                 }
                 else
                 {
@@ -1287,7 +1280,7 @@ public class TabView : View
                         tab.Margin.Thickness = new Thickness (0, 0, 0, 0);
                     }
 
-                    tab.Width = Math.Max (tab.Width.Anchor (0) - 1, 1);
+                    tab.Width = Math.Max (tab.Width.GetAnchor (0) - 1, 1);
                 }
 
                 tab.Text = toRender.TextToRender;
@@ -1314,7 +1307,7 @@ public class TabView : View
                 }
 
                 tab.TextFormatter.Draw (
-                                        tab.BoundsToScreen (tab.Bounds),
+                                        tab.ViewportToScreen (tab.Viewport),
                                         prevAttr,
                                         ColorScheme.HotNormal
                                        );
@@ -1332,7 +1325,7 @@ public class TabView : View
 
             TabToRender selected = _host._tabLocations.FirstOrDefault (t => t.IsSelected);
 
-            if (selected == null)
+            if (selected is null)
             {
                 return;
             }
@@ -1360,7 +1353,7 @@ public class TabView : View
             // if there are more tabs to the right not visible
             if (ShouldDrawRightScrollIndicator ())
             {
-                _rightScrollIndicator.X = Bounds.Width - 1;
+                _rightScrollIndicator.X = Viewport.Width - 1;
                 _rightScrollIndicator.Y = y;
 
                 // indicate that

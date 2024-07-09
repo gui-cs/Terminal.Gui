@@ -6,9 +6,11 @@
 using System;
 using Terminal.Gui;
 
-Application.Run<ExampleWindow> ();
+var app = Application.Run<ExampleWindow> ();
 
-Console.WriteLine ($"Username: {((ExampleWindow)Application.Top).UserNameText.Text}");
+Console.WriteLine ($"Username: {app.UserNameText.Text}");
+
+app.Dispose ();
 
 // Before the application exits, reset Terminal.Gui for clean shutdown
 Application.Shutdown ();
@@ -61,7 +63,7 @@ public class ExampleWindow : Window
         };
 
         // When login button is clicked display a message popup
-        btnLogin.Clicked += (s, e) =>
+        btnLogin.Accept += (s, e) =>
                             {
                                 if (UserNameText.Text == "admin" && passwordText.Text == "password")
                                 {

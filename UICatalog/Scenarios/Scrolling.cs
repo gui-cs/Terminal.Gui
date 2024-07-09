@@ -1,42 +1,54 @@
 ﻿using System;
-using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Scrolling", "Demonstrates ScrollView etc...")]
+[ScenarioMetadata ("Scrolling", "Demonstrates scrolling etc...")]
 [ScenarioCategory ("Controls")]
-[ScenarioCategory ("ScrollView")]
+[ScenarioCategory ("Scrolling")]
 [ScenarioCategory ("Tests")]
 public class Scrolling : Scenario
 {
-    public override void Setup ()
+    private ViewDiagnosticFlags _diagnosticFlags;
+
+    public override void Main ()
     {
-        // Offset Win to stress clipping
-        Win.X = 1;
-        Win.Y = 1;
-        Win.Width = Dim.Fill (1);
-        Win.Height = Dim.Fill (1);
+        Application.Init ();
+        _diagnosticFlags = View.Diagnostics;
+        View.Diagnostics = ViewDiagnosticFlags.Ruler;
+
+        var app = new Window
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+
+            // Offset to stress clipping
+            X = 3,
+            Y = 3,
+            Width = Dim.Fill (3),
+            Height = Dim.Fill (3)
+        };
+
         var label = new Label { X = 0, Y = 0 };
-        Win.Add (label);
+        app.Add (label);
 
         var scrollView = new ScrollView
         {
             Id = "scrollView",
             X = 2,
             Y = Pos.Bottom (label) + 1,
-            Width = 50,
+            Width = 60,
             Height = 20,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            ContentSize = new Size (200, 100),
 
-            //ContentOffset = new Point (0, 0),
+            //ContentOffset = Point.Empty,
             ShowVerticalScrollIndicator = true,
             ShowHorizontalScrollIndicator = true
         };
+        // BUGBUG: set_ContentSize is supposed to be `protected`. 
+        scrollView.SetContentSize (new (120, 40));
+        scrollView.Padding.Thickness = new (1);
 
-        label.Text =
-            $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
+        label.Text = $"{scrollView}\nContentSize: {scrollView.GetContentSize ()}\nContentOffset: {scrollView.ContentOffset}";
 
         const string rule = "0123456789";
 
@@ -44,7 +56,7 @@ public class Scrolling : Scenario
         {
             X = 0,
             Y = 0,
-            AutoSize = false,
+
             Width = Dim.Fill (),
             Height = 2,
             ColorScheme = Colors.ColorSchemes ["Error"]
@@ -57,45 +69,26 @@ public class Scrolling : Scenario
         {
             X = 0,
             Y = 0,
-            AutoSize = false,
+
             Width = 1,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Error"]
         };
         scrollView.Add (verticalRuler);
 
-        void Top_Loaded (object sender, EventArgs args)
-        {
-            horizontalRuler.Text =
-                rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)) [
-                                                                                                      ..horizontalRuler.Bounds.Width]
-                + "\n"
-                + "|         ".Repeat (
-                                       (int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)
-                                      ) [
-                                         ..horizontalRuler.Bounds.Width];
-
-            verticalRuler.Text =
-                vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length))
-                    [..(verticalRuler.Bounds.Height * 2)];
-            Application.Top.Loaded -= Top_Loaded;
-        }
-
-        Application.Top.Loaded += Top_Loaded;
-
         var pressMeButton = new Button { X = 3, Y = 3, Text = "Press me!" };
-        pressMeButton.Clicked += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
+        pressMeButton.Accept += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
         scrollView.Add (pressMeButton);
 
         var aLongButton = new Button
         {
             X = 3,
             Y = 4,
-            AutoSize = false,
+
             Width = Dim.Fill (3),
             Text = "A very long button. Should be wide enough to demo clipping!"
         };
-        aLongButton.Clicked += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
+        aLongButton.Accept += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
         scrollView.Add (aLongButton);
 
         scrollView.Add (
@@ -132,113 +125,91 @@ public class Scrolling : Scenario
                        );
 
         // Demonstrate AnchorEnd - Button is anchored to bottom/right
-        var anchorButton = new Button { Y = Pos.AnchorEnd () - 1, Text = "Bottom Right" };
+        var anchorButton = new Button { Y = Pos.AnchorEnd (0) - 1, Text = "Bottom Right" };
 
         // TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
-        anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
+        anchorButton.X = Pos.AnchorEnd (0) - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 
-        anchorButton.Clicked += (s, e) =>
-                                {
-                                    // This demonstrates how to have a dynamically sized button
-                                    // Each time the button is clicked the button's text gets longer
-                                    // The call to Win.LayoutSubviews causes the Computed layout to
-                                    // get updated. 
-                                    anchorButton.Text += "!";
-                                    Win.LayoutSubviews ();
-                                };
+        anchorButton.Accept += (s, e) =>
+                               {
+                                   // This demonstrates how to have a dynamically sized button
+                                   // Each time the button is clicked the button's text gets longer
+                                   // The call to Win.LayoutSubviews causes the Computed layout to
+                                   // get updated. 
+                                   anchorButton.Text += "!";
+                                   app.LayoutSubviews ();
+                               };
         scrollView.Add (anchorButton);
 
-        Win.Add (scrollView);
+        app.Add (scrollView);
 
         var hCheckBox = new CheckBox
         {
             X = Pos.X (scrollView),
             Y = Pos.Bottom (scrollView),
             Text = "Horizontal Scrollbar",
-            Checked = scrollView.ShowHorizontalScrollIndicator
+            State = scrollView.ShowHorizontalScrollIndicator ? CheckState.Checked : CheckState.UnChecked
         };
-        Win.Add (hCheckBox);
+        app.Add (hCheckBox);
 
         var vCheckBox = new CheckBox
         {
             X = Pos.Right (hCheckBox) + 3,
             Y = Pos.Bottom (scrollView),
             Text = "Vertical Scrollbar",
-            Checked = scrollView.ShowVerticalScrollIndicator
+            State = scrollView.ShowVerticalScrollIndicator ? CheckState.Checked : CheckState.UnChecked
         };
-        Win.Add (vCheckBox);
+        app.Add (vCheckBox);
 
         var t = "Auto Hide Scrollbars";
 
         var ahCheckBox = new CheckBox
         {
-            X = Pos.Left (scrollView), Y = Pos.Bottom (hCheckBox), Text = t, Checked = scrollView.AutoHideScrollBars
+            X = Pos.Left (scrollView), Y = Pos.Bottom (hCheckBox), Text = t, State = scrollView.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
         var k = "Keep Content Always In Viewport";
 
         var keepCheckBox = new CheckBox
         {
-            X = Pos.Left (scrollView), Y = Pos.Bottom (ahCheckBox), Text = k, Checked = scrollView.AutoHideScrollBars
+            X = Pos.Left (scrollView), Y = Pos.Bottom (ahCheckBox), Text = k, State = scrollView.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
 
-        hCheckBox.Toggled += (s, e) =>
+        hCheckBox.Toggle += (s, e) =>
                              {
-                                 if (ahCheckBox.Checked == false)
+                                 if (ahCheckBox.State == CheckState.UnChecked)
                                  {
-                                     scrollView.ShowHorizontalScrollIndicator = (bool)hCheckBox.Checked;
+                                     scrollView.ShowHorizontalScrollIndicator = e.NewValue == CheckState.Checked;
                                  }
                                  else
                                  {
-                                     hCheckBox.Checked = true;
+                                     hCheckBox.State = CheckState.Checked;
                                      MessageBox.Query ("Message", "Disable Auto Hide Scrollbars first.", "Ok");
                                  }
                              };
 
-        vCheckBox.Toggled += (s, e) =>
+        vCheckBox.Toggle += (s, e) =>
                              {
-                                 if (ahCheckBox.Checked == false)
+                                 if (ahCheckBox.State == CheckState.UnChecked)
                                  {
-                                     scrollView.ShowVerticalScrollIndicator = (bool)vCheckBox.Checked;
+                                     scrollView.ShowVerticalScrollIndicator = e.NewValue == CheckState.Checked;
                                  }
                                  else
                                  {
-                                     vCheckBox.Checked = true;
+                                     vCheckBox.State = CheckState.Checked;
                                      MessageBox.Query ("Message", "Disable Auto Hide Scrollbars first.", "Ok");
                                  }
                              };
 
-        ahCheckBox.Toggled += (s, e) =>
+        ahCheckBox.Toggle += (s, e) =>
                               {
-                                  scrollView.AutoHideScrollBars = (bool)ahCheckBox.Checked;
-                                  hCheckBox.Checked = true;
-                                  vCheckBox.Checked = true;
+                                  scrollView.AutoHideScrollBars = e.NewValue == CheckState.Checked;
+                                  hCheckBox.State = CheckState.Checked;
+                                  vCheckBox.State = CheckState.Checked;
                               };
-        Win.Add (ahCheckBox);
+        app.Add (ahCheckBox);
 
-        keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
-        Win.Add (keepCheckBox);
-
-        //var scrollView2 = new ScrollView (new Rect (55, 2, 20, 8)) {
-        //	ContentSize = new Size (20, 50),
-        //	//ContentOffset = new Point (0, 0),
-        //	ShowVerticalScrollIndicator = true,
-        //	ShowHorizontalScrollIndicator = true
-        //};
-        //var filler = new Filler (new Rect (0, 0, 60, 40));
-        //scrollView2.Add (filler);
-        //scrollView2.DrawContent += (s,e) => {
-        //	scrollView2.ContentSize = filler.GetContentSize ();
-        //};
-        //Win.Add (scrollView2);
-
-        //// This is just to debug the visuals of the scrollview when small
-        //var scrollView3 = new ScrollView (new Rect (55, 15, 3, 3)) {
-        //	ContentSize = new Size (100, 100),
-        //	ShowVerticalScrollIndicator = true,
-        //	ShowHorizontalScrollIndicator = true
-        //};
-        //scrollView3.Add (new Box10x (0, 0));
-        //Win.Add (scrollView3);
+        keepCheckBox.Toggle += (s, e) => scrollView.KeepContentAlwaysInViewport = e.NewValue == CheckState.Checked;
+        app.Add (keepCheckBox);
 
         var count = 0;
 
@@ -246,15 +217,17 @@ public class Scrolling : Scenario
         {
             X = Pos.Right (scrollView) + 1,
             Y = Pos.AnchorEnd (1),
-            AutoSize = false,
+
             Width = 50,
             Text = "Mouse: "
         };
-        Win.Add (mousePos);
-        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}"; };
+        app.Add (mousePos);
+        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.Position}) - {a.Flags} {count++}"; };
 
+        // Add a progress bar to cause constant redraws
         var progress = new ProgressBar { X = Pos.Right (scrollView) + 1, Y = Pos.AnchorEnd (2), Width = 50 };
-        Win.Add (progress);
+
+        app.Add (progress);
 
         var pulsing = true;
 
@@ -267,117 +240,38 @@ public class Scrolling : Scenario
 
         Application.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
-        void Top_Unloaded (object sender, EventArgs args)
+        app.Loaded += App_Loaded;
+        app.Unloaded += app_Unloaded;
+
+        Application.Run (app);
+        app.Loaded -= App_Loaded;
+        app.Unloaded -= app_Unloaded;
+        app.Dispose ();
+        Application.Shutdown ();
+
+        return;
+
+        // Local functions
+        void App_Loaded (object sender, EventArgs args)
         {
+            horizontalRuler.Text =
+                rule.Repeat ((int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length)) [
+                                                                                                        ..horizontalRuler.Viewport.Width]
+                + "\n"
+                + "|         ".Repeat (
+                                       (int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length)
+                                      ) [
+                                         ..horizontalRuler.Viewport.Width];
+
+            verticalRuler.Text =
+                vrule.Repeat ((int)Math.Ceiling (verticalRuler.Viewport.Height * 2 / (double)rule.Length))
+                    [..(verticalRuler.Viewport.Height * 2)];
+        }
+
+        void app_Unloaded (object sender, EventArgs args)
+        {
+            View.Diagnostics = _diagnosticFlags;
             pulsing = false;
-            Application.Top.Unloaded -= Top_Unloaded;
-        }
-
-        Application.Top.Unloaded += Top_Unloaded;
-    }
-
-    private class Box10x : View
-    {
-        private readonly int _h = 50;
-        private readonly int _w = 40;
-        public Box10x (int x, int y) { Frame = new Rect (x, y, 20, 10); }
-        public bool WantCursorPosition { get; set; } = false;
-        public Size GetContentSize () { return new Size (_w, _h); }
-
-        public override void OnDrawContent (Rect contentArea)
-        {
-            //Point pos = new Point (region.X, region.Y);
-            Driver.SetAttribute (ColorScheme.Focus);
-
-            for (var y = 0; y < _h; y++)
-            {
-                Move (0, y);
-                Driver.AddStr (y.ToString ());
-
-                for (var x = 0; x < _w - y.ToString ().Length; x++)
-                {
-                    //Driver.AddRune ((Rune)('0' + (x + y) % 10));
-                    if (y.ToString ().Length < _w)
-                    {
-                        Driver.AddStr (" ");
-                    }
-                }
-            }
-
-            //Move (pos.X, pos.Y);
-        }
-
-        public void SetCursorPosition (Point pos) { throw new NotImplementedException (); }
-    }
-
-    private class Filler : View
-    {
-        private int _h = 50;
-        private int _w = 40;
-
-        public Filler (Rect rect)
-        {
-            _w = rect.Width;
-            _h = rect.Height;
-            Frame = rect;
-        }
-
-        public Size GetContentSize () { return new Size (_w, _h); }
-
-        public override void OnDrawContent (Rect contentArea)
-        {
-            Driver.SetAttribute (ColorScheme.Focus);
-            Rect f = Frame;
-            _w = 0;
-            _h = 0;
-
-            for (var y = 0; y < f.Width; y++)
-            {
-                Move (0, y);
-                var nw = 0;
-
-                for (var x = 0; x < f.Height; x++)
-                {
-                    Rune r;
-
-                    switch (x % 3)
-                    {
-                        case 0:
-                            char er = y.ToString ().ToCharArray (0, 1) [0];
-                            nw += er.ToString ().Length;
-                            Driver.AddRune ((Rune)er);
-
-                            if (y > 9)
-                            {
-                                er = y.ToString ().ToCharArray (1, 1) [0];
-                                nw += er.ToString ().Length;
-                                Driver.AddRune ((Rune)er);
-                            }
-
-                            r = (Rune)'.';
-
-                            break;
-                        case 1:
-                            r = (Rune)'o';
-
-                            break;
-                        default:
-                            r = (Rune)'O';
-
-                            break;
-                    }
-
-                    Driver.AddRune (r);
-                    nw += r.Utf8SequenceLength;
-                }
-
-                if (nw > _w)
-                {
-                    _w = nw;
-                }
-
-                _h = y + 1;
-            }
         }
     }
 }

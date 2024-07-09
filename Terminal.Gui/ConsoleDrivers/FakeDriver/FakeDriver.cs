@@ -318,7 +318,7 @@ public class FakeDriver : ConsoleDriver
 
             if (keyInfo.KeyChar != (uint)key)
             {
-                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
             }
 
             if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)
@@ -430,7 +430,7 @@ public class FakeDriver : ConsoleDriver
     {
         ResizeScreen ();
         ClearContents ();
-        OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
+        OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
     }
 
     public virtual void ResizeScreen ()
@@ -455,7 +455,8 @@ public class FakeDriver : ConsoleDriver
             }
         }
 
-        Clip = new Rect (0, 0, Cols, Rows);
+        // CONCURRENCY: Unsynchronized access to Clip is not safe.
+        Clip = new (0, 0, Cols, Rows);
     }
 
     public override void UpdateCursor ()
@@ -513,7 +514,7 @@ public class FakeDriver : ConsoleDriver
 
         protected override string GetClipboardDataImpl ()
         {
-            if (FakeException != null)
+            if (FakeException is { })
             {
                 throw FakeException;
             }
@@ -523,12 +524,12 @@ public class FakeDriver : ConsoleDriver
 
         protected override void SetClipboardDataImpl (string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException (nameof (text));
             }
 
-            if (FakeException != null)
+            if (FakeException is { })
             {
                 throw FakeException;
             }

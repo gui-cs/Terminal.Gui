@@ -8,17 +8,14 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Proof of Concept")]
 public class LineCanvasExperiment : Scenario
 {
-    public override void Init () { Application.Init (); }
-
-    /// <summary>Setup the scenario.</summary>
-    public override void Setup ()
+    public override void Main ()
     {
-        //var menu = new MenuBar (new MenuBarItem [] {
-        //new MenuBarItem ("_File", new MenuItem [] {
-        //	new MenuItem ("_Quit", "", () => Application.RequestStop()),
-        //}) });
+        Application.Init ();
 
-        //Application.Top.Add (menu);
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
 
         var frame1 = new FrameView
         {
@@ -31,13 +28,12 @@ public class LineCanvasExperiment : Scenario
         };
         frame1.BorderStyle = LineStyle.Double;
 
-        //ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
+        //View.Diagnostics ^= DiagnosticFlags.FrameRuler;
 
-        Application.Top.Add (frame1);
+        app.Add (frame1);
 
         var win1 = new Window
         {
-            AutoSize = false,
             Title = "win1",
             Text = "Win1 30%/50% Heavy",
             X = 20,
@@ -48,7 +44,7 @@ public class LineCanvasExperiment : Scenario
             BorderStyle = LineStyle.Heavy,
             SuperViewRendersLineCanvas = true
         };
-        win1.Padding.Thickness = new Thickness (1);
+        win1.Padding.Thickness = new (1);
 
         frame1.Add (win1);
 
@@ -136,9 +132,13 @@ public class LineCanvasExperiment : Scenario
             SuperViewRendersLineCanvas = true
         };
         marginWindow.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
-        marginWindow.Margin.Thickness = new Thickness (1);
-        marginWindow.Border.Thickness = new Thickness (1, 2, 1, 1);
+        marginWindow.Margin.Thickness = new (1);
+        marginWindow.Border.Thickness = new (1, 2, 1, 1);
 
         frame1.Add (marginWindow);
+
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
     }
 }

@@ -32,7 +32,7 @@ namespace Terminal.Gui;
 /// var secondStep = new WizardStep ("Second Step");
 /// wizard.AddStep(secondStep);
 /// secondStep.HelpText = "This is the help text for the Second Step.";
-/// var lbl = new Label () { Text = "Name:",  AutoSize = true };
+/// var lbl = new Label () { Text = "Name:" };
 /// secondStep.Add(lbl);
 /// 
 /// var name = new TextField { X = Pos.Right (lbl) + 1, Width = Dim.Fill () - 1 };
@@ -54,28 +54,10 @@ public class Wizard : Dialog
     private readonly LinkedList<WizardStep> _steps = new ();
     private WizardStep _currentStep;
     private bool _finishedPressed;
-
-    ///// <summary>
-    ///// The title of the Wizard, shown at the top of the Wizard with " - currentStep.Title" appended.
-    ///// </summary>
-    ///// <remarks>
-    ///// The Title is only displayed when the <see cref="Wizard"/> <see cref="Wizard.Modal"/> is set to <c>false</c>.
-    ///// </remarks>
-    //public new string Title {
-    //	get {
-    //		// The base (Dialog) Title holds the full title ("Wizard Title - Step Title")
-    //		return base.Title;
-    //	}
-    //	set {
-    //		wizardTitle = value;
-    //		base.Title = $"{wizardTitle}{(steps.Count > 0 && currentStep != null ? " - " + currentStep.Title : string.Empty)}";
-    //	}
-    //}
     private string _wizardTitle = string.Empty;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="Wizard"/> class.
     /// </summary>
     /// <remarks>
     ///     The Wizard will be vertically and horizontally centered in the container. After initialization use <c>X</c>,
@@ -83,9 +65,9 @@ public class Wizard : Dialog
     /// </remarks>
     public Wizard ()
     {
-        // Using Justify causes the Back and Next buttons to be hard justified against
-        // the left and right edge
-        ButtonAlignment = ButtonAlignments.Justify;
+        // TODO: LastEndRestStart will enable a "Quit" button to always appear at the far left
+        ButtonAlignment = Alignment.Start;
+        ButtonAlignmentModes |= AlignmentModes.IgnoreFirstOrLast;
         BorderStyle = LineStyle.Double;
 
         //// Add a horiz separator
@@ -93,15 +75,15 @@ public class Wizard : Dialog
         Add (separator);
 
         // BUGBUG: Space is to work around https://github.com/gui-cs/Terminal.Gui/issues/1812
-        BackButton = new Button { AutoSize = true, Text = Strings.wzBack };
+        BackButton = new () { Text = Strings.wzBack };
         AddButton (BackButton);
 
-        NextFinishButton = new Button { AutoSize = true, Text = Strings.wzFinish };
+        NextFinishButton = new () { Text = Strings.wzFinish };
         NextFinishButton.IsDefault = true;
         AddButton (NextFinishButton);
 
-        BackButton.Clicked += BackBtn_Clicked;
-        NextFinishButton.Clicked += NextfinishBtn_Clicked;
+        BackButton.Accept += BackBtn_Clicked;
+        NextFinishButton.Accept += NextfinishBtn_Clicked;
 
         Loaded += Wizard_Loaded;
         Closing += Wizard_Closing;
@@ -110,7 +92,7 @@ public class Wizard : Dialog
         if (Modal)
         {
             KeyBindings.Clear (Command.QuitToplevel);
-            KeyBindings.Add (KeyCode.Esc, Command.QuitToplevel);
+            KeyBindings.Add (Key.Esc, Command.QuitToplevel);
         }
 
         SetNeedsLayout ();
@@ -143,7 +125,7 @@ public class Wizard : Dialog
     ///             <description>Add the Wizard to a containing view with <see cref="View.Add(View)"/>.</description>
     ///         </item>
     ///     </list>
-    ///     If a non-Modal Wizard is added to the application after <see cref="Application.Run(Func{Exception, bool})"/> has
+    ///     If a non-Modal Wizard is added to the application after <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> has
     ///     been called the first step must be explicitly set by setting <see cref="CurrentStep"/> to
     ///     <see cref="GetNextStep()"/>:
     ///     <code>
@@ -169,7 +151,7 @@ public class Wizard : Dialog
             }
             else
             {
-                if (SuperView != null)
+                if (SuperView is { })
                 {
                     ColorScheme = SuperView.ColorScheme;
                 }
@@ -247,7 +229,7 @@ public class Wizard : Dialog
     {
         LinkedListNode<WizardStep> step = null;
 
-        if (CurrentStep == null)
+        if (CurrentStep is null)
         {
             // Get first step, assume it is next
             step = _steps.First;
@@ -257,14 +239,14 @@ public class Wizard : Dialog
             // Get the step after current
             step = _steps.Find (CurrentStep);
 
-            if (step != null)
+            if (step is { })
             {
                 step = step.Next;
             }
         }
 
         // step now points to the potential next step
-        while (step != null)
+        while (step is { })
         {
             if (step.Value.Enabled)
             {
@@ -289,7 +271,7 @@ public class Wizard : Dialog
     {
         LinkedListNode<WizardStep> step = null;
 
-        if (CurrentStep == null)
+        if (CurrentStep is null)
         {
             // Get last step, assume it is previous
             step = _steps.Last;
@@ -299,14 +281,14 @@ public class Wizard : Dialog
             // Get the step before current
             step = _steps.Find (CurrentStep);
 
-            if (step != null)
+            if (step is { })
             {
                 step = step.Previous;
             }
         }
 
         // step now points to the potential previous step
-        while (step != null)
+        while (step is { })
         {
             if (step.Value.Enabled)
             {
@@ -327,7 +309,7 @@ public class Wizard : Dialog
     {
         WizardStep previous = GetPreviousStep ();
 
-        if (previous != null)
+        if (previous is { })
         {
             GoToStep (previous);
         }
@@ -341,7 +323,7 @@ public class Wizard : Dialog
     {
         WizardStep nextStep = GetNextStep ();
 
-        if (nextStep != null)
+        if (nextStep is { })
         {
             GoToStep (nextStep);
         }
@@ -352,7 +334,7 @@ public class Wizard : Dialog
     /// <returns>True if the transition to the step succeeded. False if the step was not found or the operation was cancelled.</returns>
     public bool GoToStep (WizardStep newStep)
     {
-        if (OnStepChanging (_currentStep, newStep) || (newStep != null && !newStep.Enabled))
+        if (OnStepChanging (_currentStep, newStep) || (newStep is { } && !newStep.Enabled))
         {
             return false;
         }
@@ -408,21 +390,19 @@ public class Wizard : Dialog
     ///     <see cref="OnProcessKeyDown"/> to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a
     ///     non-modal (see <see cref="Wizard.Modal"/>.
     /// </summary>
-    /// <param name="a"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public override bool OnProcessKeyDown (Key a)
+    public override bool OnProcessKeyDown (Key key)
     {
         //// BUGBUG: Why is this not handled by a key binding???
         if (!Modal)
         {
-            switch (a.KeyCode)
+            if (key == Key.Esc)
             {
-                // BUGBUG: This should be handled by Dialog 
-                case KeyCode.Esc:
-                    var args = new WizardButtonEventArgs ();
-                    Cancelled?.Invoke (this, args);
+                var args = new WizardButtonEventArgs ();
+                Cancelled?.Invoke (this, args);
 
-                    return false;
+                return false;
             }
         }
 
@@ -532,7 +512,7 @@ public class Wizard : Dialog
 
     private void UpdateButtonsAndTitle ()
     {
-        if (CurrentStep == null)
+        if (CurrentStep is null)
         {
             return;
         }
@@ -582,11 +562,11 @@ public class Wizard : Dialog
         // gets the first step if CurrentStep == null
     }
 
-    private void Wizard_TitleChanged (object sender, TitleEventArgs e)
+    private void Wizard_TitleChanged (object sender, EventArgs<string> e)
     {
         if (string.IsNullOrEmpty (_wizardTitle))
         {
-            _wizardTitle = e.NewTitle;
+            _wizardTitle = e.CurrentValue;
         }
     }
 }

@@ -21,7 +21,7 @@ public class TimeField : TextField
     private bool _isShort;
     private TimeSpan _time;
 
-    /// <summary>Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Computed"/> positioning.</summary>
+    /// <summary>Initializes a new instance of <see cref="TimeField"/>.</summary>
     public TimeField ()
     {
         CultureInfo cultureInfo = CultureInfo.CurrentCulture;
@@ -59,11 +59,10 @@ public class TimeField : TextField
         AddCommand (Command.Right, () => MoveRight ());
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
+        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
         KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
         KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-        KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
 
         KeyBindings.Add (Key.Home, Command.LeftHome);
         KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
@@ -76,6 +75,10 @@ public class TimeField : TextField
 
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.F.WithCtrl, Command.Right);
+
+#if UNIX_KEY_BINDINGS
+        KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
+#endif
     }
 
     /// <inheritdoc/>
@@ -160,13 +163,13 @@ public class TimeField : TextField
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent ev)
+    protected internal override bool OnMouseEvent  (MouseEvent ev)
     {
-        bool result = base.MouseEvent (ev);
+        bool result = base.OnMouseEvent (ev);
 
         if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            int point = ev.X;
+            int point = ev.Position.X;
             AdjCursorPosition (point);
         }
 
@@ -427,15 +430,15 @@ public class TimeField : TextField
         return true;
     }
 
-    private void TextField_TextChanging (object sender, TextChangingEventArgs e)
+    private void TextField_TextChanging (object sender, CancelEventArgs<string> e)
     {
         try
         {
             var spaces = 0;
 
-            for (var i = 0; i < e.NewText.Length; i++)
+            for (var i = 0; i < e.NewValue.Length; i++)
             {
-                if (e.NewText [i] == ' ')
+                if (e.NewValue [i] == ' ')
                 {
                     spaces++;
                 }
@@ -446,17 +449,17 @@ public class TimeField : TextField
             }
 
             spaces += FieldLength;
-            string trimedText = e.NewText [..spaces];
+            string trimedText = e.NewValue [..spaces];
             spaces -= FieldLength;
             trimedText = trimedText.Replace (new string (' ', spaces), " ");
 
-            if (trimedText != e.NewText)
+            if (trimedText != e.NewValue)
             {
-                e.NewText = trimedText;
+                e.NewValue = trimedText;
             }
 
             if (!TimeSpan.TryParseExact (
-                                         e.NewText.Trim (),
+                                         e.NewValue.Trim (),
                                          Format.Trim (),
                                          CultureInfo.CurrentCulture,
                                          TimeSpanStyles.None,

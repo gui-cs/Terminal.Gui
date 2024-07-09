@@ -22,7 +22,7 @@ public class ConfigurationEditor : Scenario
     };
 
     private static Action _editorColorSchemeChanged;
-    private StatusItem _lenStatusItem;
+    private Shortcut _lenShortcut;
     private TileView _tileView;
 
     [SerializableConfigurationProperty (Scope = typeof (AppScope))]
@@ -36,51 +36,50 @@ public class ConfigurationEditor : Scenario
         }
     }
 
-    // Don't create a Window, just return the top-level view
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
-        ConfigurationManager.Themes.Theme = Theme;
-        ConfigurationManager.Apply ();
-        Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
-    }
 
-    public void Save ()
-    {
-        if (_tileView.MostFocused is ConfigTextView editor)
-        {
-            editor.Save ();
-        }
-    }
+        Toplevel top = new ();
 
-    public override void Setup ()
-    {
         _tileView = new TileView (0)
         {
             Width = Dim.Fill (), Height = Dim.Fill (1), Orientation = Orientation.Vertical, LineStyle = LineStyle.Single
         };
 
-        Application.Top.Add (_tileView);
+        top.Add (_tileView);
 
-        _lenStatusItem = new StatusItem (KeyCode.CharMask, "Len: ", null);
+        _lenShortcut = new Shortcut ()
+        {
+            Title = "Len: ",
+        };
 
-        var statusBar = new StatusBar (
-                                       new []
-                                       {
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} Quit",
-                                                () => Quit ()
-                                               ),
-                                           new (KeyCode.F5, "~F5~ Reload", () => Reload ()),
-                                           new (KeyCode.CtrlMask | KeyCode.S, "~^S~ Save", () => Save ()),
-                                           _lenStatusItem
-                                       }
-                                      );
+        var quitShortcut = new Shortcut ()
+        {
+            Key = Application.QuitKey,
+            Title = $"{Application.QuitKey} Quit",
+            Action = Quit
+        };
 
-        Application.Top.Add (statusBar);
+        var reloadShortcut = new Shortcut ()
+        {
+            Key = Key.F5.WithShift,
+            Title = "Reload",
+        };
+        reloadShortcut.Accept += (s, e) => { Reload (); };
 
-        Application.Top.Loaded += (s, a) => Open ();
+        var saveShortcut = new Shortcut ()
+        {
+            Key = Key.F4,
+            Title = "Save",
+            Action = Save
+        };
+
+        var statusBar = new StatusBar ([quitShortcut, reloadShortcut, saveShortcut, _lenShortcut]);
+
+        top.Add (statusBar);
+
+        top.Loaded += (s, a) => Open ();
 
         _editorColorSchemeChanged += () =>
                                      {
@@ -94,6 +93,18 @@ public class ConfigurationEditor : Scenario
                                      };
 
         _editorColorSchemeChanged.Invoke ();
+
+        Application.Run (top);
+        top.Dispose ();
+
+        Application.Shutdown ();
+    }
+    public void Save ()
+    {
+        if (_tileView.MostFocused is ConfigTextView editor)
+        {
+            editor.Save ();
+        }
     }
 
     private void Open ()
@@ -122,7 +133,7 @@ public class ConfigurationEditor : Scenario
 
             textView.Read ();
 
-            textView.Enter += (s, e) => { _lenStatusItem.Title = $"Len:{textView.Text.Length}"; };
+            textView.Enter += (s, e) => { _lenShortcut.Title = $"Len:{textView.Text.Length}"; };
         }
 
         Application.Top.LayoutSubviews ();

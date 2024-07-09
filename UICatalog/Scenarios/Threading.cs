@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui;
@@ -10,7 +10,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Threading")]
 public class Threading : Scenario
 {
-    private readonly List<string> _log = [];
+    private readonly ObservableCollection<string> _log = [];
     private Action _action;
     private Button _btnActionCancel;
     private CancellationTokenSource _cancellationTokenSource;
@@ -28,7 +28,7 @@ public class Threading : Scenario
                   {
                       _itemsList.Source = null;
                       LogJob ("Loading task lambda");
-                      List<string> items = await LoadDataAsync ();
+                      ObservableCollection<string> items = await LoadDataAsync ();
                       LogJob ("Returning from task lambda");
                       await _itemsList.SetSourceAsync (items);
                   };
@@ -37,7 +37,7 @@ public class Threading : Scenario
                    {
                        _itemsList.Source = null;
                        LogJob ("Loading task handler");
-                       List<string> items = await LoadDataAsync ();
+                       ObservableCollection<string> items = await LoadDataAsync ();
                        LogJob ("Returning from task handler");
                        await _itemsList.SetSourceAsync (items);
                    };
@@ -47,14 +47,14 @@ public class Threading : Scenario
                     _itemsList.Source = null;
                     LogJob ("Loading task synchronous");
 
-                    List<string> items =
+                    ObservableCollection<string> items =
                         ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
                     LogJob ("Returning from task synchronous");
                     _itemsList.SetSource (items);
                 };
 
         _btnActionCancel = new Button { X = 1, Y = 1, Text = "Cancelable Load Items" };
-        _btnActionCancel.Clicked += (s, e) => Application.Invoke (CallLoadItemsAsync);
+        _btnActionCancel.Accept += (s, e) => Application.Invoke (CallLoadItemsAsync);
 
         Win.Add (new Label { X = Pos.X (_btnActionCancel), Y = Pos.Y (_btnActionCancel) + 4, Text = "Data Items:" });
 
@@ -76,30 +76,30 @@ public class Threading : Scenario
             Width = 50,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            Source = new ListWrapper (_log)
+            Source = new ListWrapper<string> (_log)
         };
 
         var text = new TextField { X = 1, Y = 3, Width = 100, Text = "Type anything after press the button" };
 
         var btnAction = new Button { X = 80, Y = 10, Text = "Load Data Action" };
-        btnAction.Clicked += (s, e) => _action.Invoke ();
+        btnAction.Accept += (s, e) => _action.Invoke ();
         var btnLambda = new Button { X = 80, Y = 12, Text = "Load Data Lambda" };
-        btnLambda.Clicked += (s, e) => _lambda.Invoke ();
+        btnLambda.Accept += (s, e) => _lambda.Invoke ();
         var btnHandler = new Button { X = 80, Y = 14, Text = "Load Data Handler" };
-        btnHandler.Clicked += (s, e) => _handler.Invoke (null, EventArgs.Empty);
+        btnHandler.Accept += (s, e) => _handler.Invoke (null, EventArgs.Empty);
         var btnSync = new Button { X = 80, Y = 16, Text = "Load Data Synchronous" };
-        btnSync.Clicked += (s, e) => _sync.Invoke ();
+        btnSync.Accept += (s, e) => _sync.Invoke ();
         var btnMethod = new Button { X = 80, Y = 18, Text = "Load Data Method" };
-        btnMethod.Clicked += async (s, e) => await MethodAsync ();
+        btnMethod.Accept += async (s, e) => await MethodAsync ();
         var btnClearData = new Button { X = 80, Y = 20, Text = "Clear Data" };
 
-        btnClearData.Clicked += (s, e) =>
+        btnClearData.Accept += (s, e) =>
                                 {
                                     _itemsList.Source = null;
                                     LogJob ("Cleaning Data");
                                 };
         var btnQuit = new Button { X = 80, Y = 22, Text = "Quit" };
-        btnQuit.Clicked += (s, e) => Application.RequestStop ();
+        btnQuit.Accept += (s, e) => Application.RequestStop ();
 
         Win.Add (
                  _itemsList,
@@ -118,10 +118,10 @@ public class Threading : Scenario
         void Top_Loaded (object sender, EventArgs args)
         {
             _btnActionCancel.SetFocus ();
-            Application.Top.Loaded -= Top_Loaded;
+            Top.Loaded -= Top_Loaded;
         }
 
-        Application.Top.Loaded += Top_Loaded;
+        Top.Loaded += Top_Loaded;
     }
 
     private async void CallLoadItemsAsync ()
@@ -148,7 +148,7 @@ public class Threading : Scenario
             }
 
             LogJob ($"Calling task Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
-            List<string> items = await Task.Run (LoadItemsAsync, _cancellationTokenSource.Token);
+            ObservableCollection<string> items = await Task.Run (LoadItemsAsync, _cancellationTokenSource.Token);
 
             if (!_cancellationTokenSource.IsCancellationRequested)
             {
@@ -177,12 +177,12 @@ public class Threading : Scenario
     {
         _itemsList.Source = null;
         LogJob ("Loading task");
-        List<string> items = await LoadDataAsync ();
+        ObservableCollection<string> items = await LoadDataAsync ();
         LogJob ("Returning from task");
         await _itemsList.SetSourceAsync (items);
     }
 
-    private async Task<List<string>> LoadDataAsync ()
+    private async Task<ObservableCollection<string>> LoadDataAsync ()
     {
         _itemsList.Source = null;
         LogJob ("Starting delay");
@@ -211,7 +211,7 @@ public class Threading : Scenario
         ];
     }
 
-    private async Task<List<string>> LoadItemsAsync ()
+    private async Task<ObservableCollection<string>> LoadItemsAsync ()
     {
         // Do something that takes lot of times.
         LogJob ($"Starting delay Thread:{Thread.CurrentThread.ManagedThreadId} {DateTime.Now}");
@@ -231,7 +231,7 @@ public class Threading : Scenario
     {
         _itemsList.Source = null;
         LogJob ("Loading task method");
-        List<string> items = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+        ObservableCollection<string> items = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
         await Task.Delay (3000);
         LogJob ("Returning from task method");
         await _itemsList.SetSourceAsync (items);

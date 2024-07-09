@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.ComponentModel;
+using System.Text;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -29,9 +30,7 @@ public class TreeViewTests
         tree.BeginInit ();
         tree.EndInit ();
 
-        tree.Bounds = new Rect (0, 0, 10, 10);
-
-        InitFakeDriver ();
+        tree.Viewport = new Rectangle (0, 0, 10, 10);
 
         //-+Factory
         Assert.Equal (9, tree.GetContentWidth (true));
@@ -48,7 +47,6 @@ public class TreeViewTests
         //-+Factory
         Assert.Equal (9, tree.GetContentWidth (true));
 
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -59,9 +57,7 @@ public class TreeViewTests
         tree.EndInit ();
 
         // control only allows 1 row to be viewed at once
-        tree.Bounds = new Rect (0, 0, 20, 1);
-
-        InitFakeDriver ();
+        tree.Viewport = new Rectangle (0, 0, 20, 1);
 
         //-+Factory
         Assert.Equal (9, tree.GetContentWidth (true));
@@ -94,13 +90,11 @@ public class TreeViewTests
         tree.ScrollOffsetVertical = 5;
         Assert.Equal (0, tree.GetContentWidth (true));
         Assert.Equal (13, tree.GetContentWidth (false));
-
-        Application.Shutdown ();
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void DesiredCursorVisibility_MultiSelect ()
+    public void CursorVisibility_MultiSelect ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
 
@@ -109,19 +103,21 @@ public class TreeViewTests
         tv.AddObject (n1);
         tv.AddObject (n2);
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.True (tv.MultiSelect);
         Assert.True (tv.HasFocus);
-        Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+        Assert.Equal (CursorVisibility.Invisible, tv.CursorVisibility);
 
         tv.SelectAll ();
-        tv.DesiredCursorVisibility = CursorVisibility.Default;
-        Application.Refresh ();
+        tv.CursorVisibility = CursorVisibility.Default;
+        Application.PositionCursor (top);
         Application.Driver.GetCursorVisibility (out CursorVisibility visibility);
-        Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
         Assert.Equal (CursorVisibility.Default, visibility);
+        top.Dispose ();
     }
 
     [Fact]
@@ -233,7 +229,7 @@ public class TreeViewTests
         tree.EndInit ();
 
         // Make tree bounds 1 in height so that EnsureVisible always requires updating scroll offset
-        tree.Bounds = new Rect (0, 0, 50, 1);
+        tree.Viewport = new Rectangle (0, 0, 50, 1);
 
         Assert.Null (tree.SelectedObject);
         Assert.Equal (0, tree.ScrollOffsetVertical);
@@ -288,7 +284,6 @@ public class TreeViewTests
 
         Assert.False (tree.IsExpanded (c));
 
-        Application.Shutdown ();
     }
 
     /// <summary>Tests that <see cref="TreeView.Expand(object)"/> and <see cref="TreeView.IsExpanded(object)"/> are consistent</summary>
@@ -356,8 +351,6 @@ public class TreeViewTests
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
-        InitFakeDriver ();
-
         object activated = null;
         var called = false;
 
@@ -371,28 +364,25 @@ public class TreeViewTests
         Assert.False (called);
 
         // no object is selected yet so no event should happen
-        tree.NewKeyDownEvent (new Key (KeyCode.Enter));
+        tree.NewKeyDownEvent (Key.Enter);
 
         Assert.Null (activated);
         Assert.False (called);
 
         // down to select factory
-        tree.NewKeyDownEvent (new Key (KeyCode.CursorDown));
+        tree.NewKeyDownEvent (Key.CursorDown);
 
-        tree.NewKeyDownEvent (new Key (KeyCode.Enter));
+        tree.NewKeyDownEvent (Key.Enter);
 
         Assert.True (called);
         Assert.Same (f, activated);
-
-        Application.Shutdown ();
     }
 
     [Fact]
+
     public void ObjectActivated_CustomKey ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
-
-        InitFakeDriver ();
 
         tree.ObjectActivationKey = KeyCode.Delete;
         object activated = null;
@@ -408,35 +398,32 @@ public class TreeViewTests
         Assert.False (called);
 
         // no object is selected yet so no event should happen
-        tree.NewKeyDownEvent (new Key (KeyCode.Enter));
+        tree.NewKeyDownEvent (Key.Enter);
 
         Assert.Null (activated);
         Assert.False (called);
 
         // down to select factory
-        tree.NewKeyDownEvent (new Key (KeyCode.CursorDown));
+        tree.NewKeyDownEvent (Key.CursorDown);
 
-        tree.NewKeyDownEvent (new Key (KeyCode.Enter));
+        tree.NewKeyDownEvent (Key.Enter);
 
         // Enter is not the activation key in this unit test
         Assert.Null (activated);
         Assert.False (called);
 
         // Delete is the activation key in this test so should result in activation occurring
-        tree.NewKeyDownEvent (new Key (KeyCode.Delete));
+        tree.NewKeyDownEvent (Key.Delete);
 
         Assert.True (called);
         Assert.Same (f, activated);
 
-        Application.Shutdown ();
     }
 
     [Fact]
     public void ObjectActivationButton_DoubleClick ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
-
-        InitFakeDriver ();
 
         object activated = null;
         var called = false;
@@ -451,21 +438,18 @@ public class TreeViewTests
         Assert.False (called);
 
         // double click triggers activation
-        tree.MouseEvent (new MouseEvent { Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.True (called);
         Assert.Same (f, activated);
         Assert.Same (f, tree.SelectedObject);
 
-        Application.Shutdown ();
     }
 
     [Fact]
     public void ObjectActivationButton_RightClick ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
-
-        InitFakeDriver ();
 
         tree.ObjectActivationButton = MouseFlags.Button2Clicked;
         tree.ExpandAll ();
@@ -483,18 +467,16 @@ public class TreeViewTests
         Assert.False (called);
 
         // double click does nothing because we changed button binding to right click
-        tree.MouseEvent (new MouseEvent { Y = 1, Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new MouseEvent { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Null (activated);
         Assert.False (called);
 
-        tree.MouseEvent (new MouseEvent { Y = 1, Flags = MouseFlags.Button2Clicked });
+        tree.NewMouseEvent (new MouseEvent { Position = new (0, 1), Flags = MouseFlags.Button2Clicked });
 
         Assert.True (called);
         Assert.Same (car1, activated);
         Assert.Same (car1, tree.SelectedObject);
-
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -502,7 +484,6 @@ public class TreeViewTests
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
-        InitFakeDriver ();
 
         // disable activation
         tree.ObjectActivationButton = null;
@@ -520,13 +501,11 @@ public class TreeViewTests
         Assert.False (called);
 
         // double click does nothing because we changed button to null
-        tree.MouseEvent (new MouseEvent { Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.False (called);
         Assert.Null (activated);
         Assert.Null (tree.SelectedObject);
-
-        Application.Shutdown ();
     }
 
     /// <summary>
@@ -714,7 +693,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestBottomlessTreeView_MaxDepth_3 ()
     {
         TreeView<string> tv = new () { Width = 20, Height = 10 };
@@ -752,7 +731,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestBottomlessTreeView_MaxDepth_5 ()
     {
         TreeView<string> tv = new () { Width = 20, Height = 10 };
@@ -819,7 +798,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestGetObjectOnRow ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -874,7 +853,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestGetObjectRow ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -942,7 +921,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeView_DrawLineEvent ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1008,7 +987,7 @@ public class TreeViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeView_DrawLineEvent_Handled ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1054,7 +1033,7 @@ FFFFFFFFFF
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeView_DrawLineEvent_WithScrolling ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1117,7 +1096,7 @@ oot two
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeView_Filter ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1201,7 +1180,7 @@ oot two
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeViewColor ()
     {
         var tv = new TreeView { Width = 20, Height = 10 };
@@ -1301,13 +1280,6 @@ oot two
         Assert.Equal (2, tree.GetChildren (root).Count ());
     }
 
-    private void InitFakeDriver ()
-    {
-        var driver = new FakeDriver ();
-        Application.Init (driver);
-        driver.Init ();
-    }
-
     /// <summary>Test object which considers for equality only <see cref="Name"/></summary>
     private class EqualityTestObject
     {
@@ -1347,4 +1319,95 @@ oot two
     }
 
     #endregion
+
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new TreeView ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var treeView = new TreeView ();
+        var accepted = false;
+
+treeView.Accept += OnAccept;
+treeView.InvokeCommand (Command.HotKey);
+
+Assert.False (accepted);
+
+return;
+void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+
+    [Fact]
+    public void Accept_Command_Accepts_and_ActivatesObject ()
+    {
+        var treeView = CreateTree (out Factory f, out Car car1, out _);
+        Assert.NotNull (car1);
+        treeView.SelectedObject = car1;
+
+        var accepted = false;
+        var activated = false;
+        object selectedObject = null;
+
+        treeView.Accept += Accept;
+        treeView.ObjectActivated += ObjectActivated;
+
+        treeView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.True (activated);
+        Assert.Equal (car1, selectedObject);
+
+        return;
+
+        void ObjectActivated (object sender, ObjectActivatedEventArgs<object> e)
+        {
+            activated = true;
+            selectedObject = e.ActivatedObject;
+        }
+        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Cancel_Event_Prevents_ObjectActivated ()
+    {
+        var treeView = CreateTree (out Factory f, out Car car1, out _);
+        treeView.SelectedObject = car1;
+        var accepted = false;
+        var activated = false;
+        object selectedObject = null;
+
+        treeView.Accept += Accept;
+        treeView.ObjectActivated += ObjectActivated;
+
+        treeView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.False (activated);
+        Assert.Null (selectedObject);
+
+        return;
+
+        void ObjectActivated (object sender, ObjectActivatedEventArgs<object> e)
+        {
+            activated = true;
+            selectedObject = e.ActivatedObject;
+        }
+
+        void Accept (object sender, HandledEventArgs e)
+        {
+            accepted = true;
+            e.Handled = true;
+        }
+    }
 }

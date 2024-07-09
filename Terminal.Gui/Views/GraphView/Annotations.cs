@@ -18,7 +18,7 @@ public interface IAnnotation
 
     /// <summary>
     ///     Called once after series have been rendered (or before if <see cref="BeforeSeries"/> is true). Use
-    ///     <see cref="View.Driver"/> to draw and <see cref="View.Bounds"/> to avoid drawing outside of graph
+    ///     <see cref="View.Driver"/> to draw and <see cref="View.Viewport"/> to avoid drawing outside of graph
     /// </summary>
     /// <param name="graph"></param>
     void Render (GraphView graph);
@@ -62,7 +62,7 @@ public class TextAnnotation : IAnnotation
 
     /// <summary>
     ///     Draws the <see cref="Text"/> at the given coordinates with truncation to avoid spilling over
-    ///     <see name="View.Bounds"/> of the <paramref name="graph"/>
+    ///     <see name="View.Viewport"/> of the <paramref name="graph"/>
     /// </summary>
     /// <param name="graph"></param>
     /// <param name="x">Screen x position to start drawing string</param>
@@ -70,7 +70,7 @@ public class TextAnnotation : IAnnotation
     protected void DrawText (GraphView graph, int x, int y)
     {
         // the draw point is out of control bounds
-        if (!graph.Bounds.Contains (new Point (x, y)))
+        if (!graph.Viewport.Contains (new Point (x, y)))
         {
             return;
         }
@@ -83,7 +83,7 @@ public class TextAnnotation : IAnnotation
 
         graph.Move (x, y);
 
-        int availableWidth = graph.Bounds.Width - x;
+        int availableWidth = graph.Viewport.Width - x;
 
         if (availableWidth <= 0)
         {
@@ -108,14 +108,14 @@ public class LegendAnnotation : View, IAnnotation
     private readonly List<Tuple<GraphCellToRender, string>> _entries = new ();
 
     /// <summary>Creates a new empty legend at the empty screen coordinates.</summary>
-    public LegendAnnotation () : this (Rect.Empty) { }
+    public LegendAnnotation () : this (Rectangle.Empty) { }
 
     /// <summary>Creates a new empty legend at the given screen coordinates.</summary>
     /// <param name="legendBounds">
     ///     Defines the area available for the legend to render in (within the graph).  This is in
     ///     screen units (i.e. not graph space)
     /// </param>
-    public LegendAnnotation (Rect legendBounds)
+    public LegendAnnotation (Rectangle legendBounds)
     {
         X = legendBounds.X;
         Y = legendBounds.Y;
@@ -127,7 +127,7 @@ public class LegendAnnotation : View, IAnnotation
     /// <summary>Returns false i.e. Legends render after series</summary>
     public bool BeforeSeries => false;
 
-    /// <summary>Draws the Legend and all entries into the area within <see cref="View.Bounds"/></summary>
+    /// <summary>Draws the Legend and all entries into the area within <see cref="View.Viewport"/></summary>
     /// <param name="graph"></param>
     public void Render (GraphView graph)
     {
@@ -165,13 +165,13 @@ public class LegendAnnotation : View, IAnnotation
             // add the text
             Move (1, linesDrawn);
 
-            string str = TextFormatter.ClipOrPad (entry.Item2, Bounds.Width - 1);
+            string str = TextFormatter.ClipOrPad (entry.Item2, Viewport.Width - 1);
             Application.Driver.AddStr (str);
 
             linesDrawn++;
 
             // Legend has run out of space
-            if (linesDrawn >= Bounds.Height)
+            if (linesDrawn >= Viewport.Height)
             {
                 break;
             }
@@ -182,7 +182,7 @@ public class LegendAnnotation : View, IAnnotation
     /// <param name="graphCellToRender">The symbol appearing on the graph that should appear in the legend</param>
     /// <param name="text">
     ///     Text to render on this line of the legend.  Will be truncated if outside of Legend
-    ///     <see cref="View.Bounds"/>
+    ///     <see cref="View.Viewport"/>
     /// </param>
     public void AddEntry (GraphCellToRender graphCellToRender, string text) { _entries.Add (Tuple.Create (graphCellToRender, text)); }
 }

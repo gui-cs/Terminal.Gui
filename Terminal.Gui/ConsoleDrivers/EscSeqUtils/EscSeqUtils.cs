@@ -1,7 +1,3 @@
-﻿using System.Diagnostics;
-using System.Management;
-using System.Runtime.InteropServices;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -44,12 +40,12 @@ public static class EscSeqUtils
     /// <summary>
     ///     Escape key code (ASCII 27/0x1B).
     /// </summary>
-    public static readonly char KeyEsc = (char)KeyCode.Esc;
+    public const char KeyEsc = (char)KeyCode.Esc;
 
     /// <summary>
     ///     ESC [ - The CSI (Control Sequence Introducer).
     /// </summary>
-    public static readonly string CSI = $"{KeyEsc}[";
+    public const string CSI = "\u001B[";
 
     /// <summary>
     ///     ESC [ ? 1047 h - Activate xterm alternative buffer (no backscroll)
@@ -131,6 +127,9 @@ public static class EscSeqUtils
     private static bool isButtonDoubleClicked;
 
     //private static MouseFlags? lastMouseButtonReleased;
+    // QUESTION: What's the difference between isButtonClicked and isButtonPressed?
+    // Some clarity or comments would be handy, here.
+    // It also seems like some enforcement of valid states might be a good idea.
     private static bool isButtonPressed;
     private static bool isButtonTripleClicked;
 
@@ -164,7 +163,7 @@ public static class EscSeqUtils
     /// <param name="key">The <see cref="ConsoleKey"/> which may changes.</param>
     /// <param name="cki">The <see cref="ConsoleKeyInfo"/> array.</param>
     /// <param name="mod">The <see cref="ConsoleModifiers"/> which may changes.</param>
-    /// <param name="c1Control">The control returned by the <see cref="GetC1ControlChar(char)"/> method.</param>
+    /// <param name="c1Control">The control returned by the <see cref="GetC1ControlChar"/> method.</param>
     /// <param name="code">The code returned by the <see cref="GetEscapeResult(char[])"/> method.</param>
     /// <param name="values">The values returned by the <see cref="GetEscapeResult(char[])"/> method.</param>
     /// <param name="terminator">The terminator returned by the <see cref="GetEscapeResult(char[])"/> method.</param>
@@ -196,11 +195,12 @@ public static class EscSeqUtils
         buttonState = new List<MouseFlags> { 0 };
         pos = default (Point);
         isResponse = false;
+        char keyChar = '\0';
 
         switch (c1Control)
         {
             case "ESC":
-                if (values == null && string.IsNullOrEmpty (terminator))
+                if (values is null && string.IsNullOrEmpty (terminator))
                 {
                     key = ConsoleKey.Escape;
 
@@ -243,10 +243,10 @@ public static class EscSeqUtils
 
                 break;
             case "SS3":
-                key = GetConsoleKey (terminator [0], values [0], ref mod);
+                key = GetConsoleKey (terminator [0], values [0], ref mod, ref keyChar);
 
                 newConsoleKeyInfo = new ConsoleKeyInfo (
-                                                        '\0',
+                                                        keyChar,
                                                         key,
                                                         (mod & ConsoleModifiers.Shift) != 0,
                                                         (mod & ConsoleModifiers.Alt) != 0,
@@ -262,7 +262,7 @@ public static class EscSeqUtils
                     return;
                 }
 
-                if (escSeqRequests != null && escSeqRequests.HasResponse (terminator))
+                if (escSeqRequests is { } && escSeqRequests.HasResponse (terminator))
                 {
                     isResponse = true;
                     escSeqRequests.Remove (terminator);
@@ -272,7 +272,7 @@ public static class EscSeqUtils
 
                 if (!string.IsNullOrEmpty (terminator))
                 {
-                    key = GetConsoleKey (terminator [0], values [0], ref mod);
+                    key = GetConsoleKey (terminator [0], values [0], ref mod, ref keyChar);
 
                     if (key != 0 && values.Length > 1)
                     {
@@ -280,7 +280,7 @@ public static class EscSeqUtils
                     }
 
                     newConsoleKeyInfo = new ConsoleKeyInfo (
-                                                            '\0',
+                                                            keyChar,
                                                             key,
                                                             (mod & ConsoleModifiers.Shift) != 0,
                                                             (mod & ConsoleModifiers.Alt) != 0,
@@ -303,51 +303,36 @@ public static class EscSeqUtils
         }
     }
 
+    #nullable enable
     /// <summary>
     ///     Gets the c1Control used in the called escape sequence.
     /// </summary>
     /// <param name="c">The char used.</param>
     /// <returns>The c1Control.</returns>
-    public static string GetC1ControlChar (char c)
+    [Pure]
+    public static string GetC1ControlChar (in char c)
     {
         // These control characters are used in the vtXXX emulation.
-        switch (c)
-        {
-            case 'D':
-                return "IND"; // Index
-            case 'E':
-                return "NEL"; // Next Line
-            case 'H':
-                return "HTS"; // Tab Set
-            case 'M':
-                return "RI"; // Reverse Index
-            case 'N':
-                return "SS2"; // Single Shift Select of G2 Character Set: affects next character only
-            case 'O':
-                return "SS3"; // Single Shift Select of G3 Character Set: affects next character only
-            case 'P':
-                return "DCS"; // Device Control String
-            case 'V':
-                return "SPA"; // Start of Guarded Area
-            case 'W':
-                return "EPA"; // End of Guarded Area
-            case 'X':
-                return "SOS"; // Start of String
-            case 'Z':
-                return "DECID"; // Return Terminal ID Obsolete form of CSI c (DA)
-            case '[':
-                return "CSI"; // Control Sequence Introducer
-            case '\\':
-                return "ST"; // String Terminator
-            case ']':
-                return "OSC"; // Operating System Command
-            case '^':
-                return "PM"; // Privacy Message
-            case '_':
-                return "APC"; // Application Program Command
-            default:
-                return ""; // Not supported
-        }
+        return c switch
+               {
+                   'D' => "IND", // Index
+                   'E' => "NEL", // Next Line
+                   'H' => "HTS", // Tab Set
+                   'M' => "RI", // Reverse Index
+                   'N' => "SS2", // Single Shift Select of G2 Character Set: affects next character only
+                   'O' => "SS3", // Single Shift Select of G3 Character Set: affects next character only
+                   'P' => "DCS", // Device Control String
+                   'V' => "SPA", // Start of Guarded Area
+                   'W' => "EPA", // End of Guarded Area
+                   'X' => "SOS", // Start of String
+                   'Z' => "DECID", // Return Terminal ID Obsolete form of CSI c (DA)
+                   '[' => "CSI", // Control Sequence Introducer
+                   '\\' => "ST", // String Terminator
+                   ']' => "OSC", // Operating System Command
+                   '^' => "PM", // Privacy Message
+                   '_' => "APC", // Application Program Command
+                   _ => string.Empty
+               };
     }
 
     /// <summary>
@@ -358,124 +343,65 @@ public static class EscSeqUtils
     ///     <see cref="CSI_SendDeviceAttributes2"/>.
     /// </param>
     /// <param name="value">The value.</param>
-    /// <param name="mod">The <see cref="ConsoleModifiers"/> which may changes.</param>
+    /// <param name="mod">The <see cref="ConsoleModifiers"/> which may change.</param>
+    /// <param name="keyChar">Normally is '\0' but on some cases may need other value.</param>
     /// <returns>The <see cref="ConsoleKey"/> and probably the <see cref="ConsoleModifiers"/>.</returns>
-    public static ConsoleKey GetConsoleKey (char terminator, string value, ref ConsoleModifiers mod)
+    public static ConsoleKey GetConsoleKey (char terminator, string? value, ref ConsoleModifiers mod, ref char keyChar)
     {
-        ConsoleKey key;
-
-        switch (terminator)
+        if (terminator == 'Z')
         {
-            case 'A':
-                key = ConsoleKey.UpArrow;
-
-                break;
-            case 'B':
-                key = ConsoleKey.DownArrow;
-
-                break;
-            case 'C':
-                key = ConsoleKey.RightArrow;
-
-                break;
-            case 'D':
-                key = ConsoleKey.LeftArrow;
-
-                break;
-            case 'F':
-                key = ConsoleKey.End;
-
-                break;
-            case 'H':
-                key = ConsoleKey.Home;
-
-                break;
-            case 'P':
-                key = ConsoleKey.F1;
-
-                break;
-            case 'Q':
-                key = ConsoleKey.F2;
-
-                break;
-            case 'R':
-                key = ConsoleKey.F3;
-
-                break;
-            case 'S':
-                key = ConsoleKey.F4;
-
-                break;
-            case 'Z':
-                key = ConsoleKey.Tab;
-                mod |= ConsoleModifiers.Shift;
-
-                break;
-            case '~':
-                switch (value)
-                {
-                    case "2":
-                        key = ConsoleKey.Insert;
-
-                        break;
-                    case "3":
-                        key = ConsoleKey.Delete;
-
-                        break;
-                    case "5":
-                        key = ConsoleKey.PageUp;
-
-                        break;
-                    case "6":
-                        key = ConsoleKey.PageDown;
-
-                        break;
-                    case "15":
-                        key = ConsoleKey.F5;
-
-                        break;
-                    case "17":
-                        key = ConsoleKey.F6;
-
-                        break;
-                    case "18":
-                        key = ConsoleKey.F7;
-
-                        break;
-                    case "19":
-                        key = ConsoleKey.F8;
-
-                        break;
-                    case "20":
-                        key = ConsoleKey.F9;
-
-                        break;
-                    case "21":
-                        key = ConsoleKey.F10;
-
-                        break;
-                    case "23":
-                        key = ConsoleKey.F11;
-
-                        break;
-                    case "24":
-                        key = ConsoleKey.F12;
-
-                        break;
-                    default:
-                        key = 0;
-
-                        break;
-                }
-
-                break;
-            default:
-                key = 0;
-
-                break;
+            mod |= ConsoleModifiers.Shift;
         }
 
-        return key;
+        if (terminator == 'l')
+        {
+            keyChar = '+';
+        }
+
+        if (terminator == 'm')
+        {
+            keyChar = '-';
+        }
+
+        return (terminator, value) switch
+               {
+                   ('A', _) => ConsoleKey.UpArrow,
+                   ('B', _) => ConsoleKey.DownArrow,
+                   ('C', _) => ConsoleKey.RightArrow,
+                   ('D', _) => ConsoleKey.LeftArrow,
+                   ('F', _) => ConsoleKey.End,
+                   ('H', _) => ConsoleKey.Home,
+                   ('P', _) => ConsoleKey.F1,
+                   ('Q', _) => ConsoleKey.F2,
+                   ('R', _) => ConsoleKey.F3,
+                   ('S', _) => ConsoleKey.F4,
+                   ('Z', _) => ConsoleKey.Tab,
+                   ('~', "2") => ConsoleKey.Insert,
+                   ('~', "3") => ConsoleKey.Delete,
+                   ('~', "5") => ConsoleKey.PageUp,
+                   ('~', "6") => ConsoleKey.PageDown,
+                   ('~', "15") => ConsoleKey.F5,
+                   ('~', "17") => ConsoleKey.F6,
+                   ('~', "18") => ConsoleKey.F7,
+                   ('~', "19") => ConsoleKey.F8,
+                   ('~', "20") => ConsoleKey.F9,
+                   ('~', "21") => ConsoleKey.F10,
+                   ('~', "23") => ConsoleKey.F11,
+                   ('~', "24") => ConsoleKey.F12,
+                   ('l', _) => ConsoleKey.Add,
+                   ('m', _) => ConsoleKey.Subtract,
+                   ('p', _) => ConsoleKey.Insert,
+                   ('q', _) => ConsoleKey.End,
+                   ('r', _) => ConsoleKey.DownArrow,
+                   ('s', _) => ConsoleKey.PageDown,
+                   ('t', _) => ConsoleKey.LeftArrow,
+                   ('u', _) => ConsoleKey.Clear,
+                   ('v', _) => ConsoleKey.RightArrow,
+                   ('w', _) => ConsoleKey.Home,
+                   ('x', _) => ConsoleKey.UpArrow,
+                   ('y', _) => ConsoleKey.PageUp,
+                   (_, _) => 0
+               };
     }
 
     /// <summary>
@@ -483,39 +409,32 @@ public static class EscSeqUtils
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The <see cref="ConsoleModifiers"/> or zero.</returns>
-    public static ConsoleModifiers GetConsoleModifiers (string value)
+    public static ConsoleModifiers GetConsoleModifiers (string? value)
     {
-        switch (value)
-        {
-            case "2":
-                return ConsoleModifiers.Shift;
-            case "3":
-                return ConsoleModifiers.Alt;
-            case "4":
-                return ConsoleModifiers.Shift | ConsoleModifiers.Alt;
-            case "5":
-                return ConsoleModifiers.Control;
-            case "6":
-                return ConsoleModifiers.Shift | ConsoleModifiers.Control;
-            case "7":
-                return ConsoleModifiers.Alt | ConsoleModifiers.Control;
-            case "8":
-                return ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control;
-            default:
-                return 0;
-        }
+        return value switch
+               {
+                   "2" => ConsoleModifiers.Shift,
+                   "3" => ConsoleModifiers.Alt,
+                   "4" => ConsoleModifiers.Shift | ConsoleModifiers.Alt,
+                   "5" => ConsoleModifiers.Control,
+                   "6" => ConsoleModifiers.Shift | ConsoleModifiers.Control,
+                   "7" => ConsoleModifiers.Alt | ConsoleModifiers.Control,
+                   "8" => ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control,
+                   _ => 0
+               };
     }
+    #nullable restore
 
     /// <summary>
     ///     Gets all the needed information about a escape sequence.
     /// </summary>
     /// <param name="kChar">The array with all chars.</param>
     /// <returns>
-    ///     The c1Control returned by <see cref="GetC1ControlChar(char)"/>, code, values and terminating.
+    ///     The c1Control returned by <see cref="GetC1ControlChar"/>, code, values and terminating.
     /// </returns>
     public static (string c1Control, string code, string [] values, string terminating) GetEscapeResult (char [] kChar)
     {
-        if (kChar == null || kChar.Length == 0)
+        if (kChar is null || kChar.Length == 0)
         {
             return (null, null, null, null);
         }
@@ -537,10 +456,10 @@ public static class EscSeqUtils
 
         string c1Control = GetC1ControlChar (kChar [1]);
         string code = null;
-        int nSep = kChar.Count (x => x == ';') + 1;
+        int nSep = kChar.Count (static x => x == ';') + 1;
         var values = new string [nSep];
         var valueIdx = 0;
-        var terminating = "";
+        var terminating = string.Empty;
 
         for (var i = 2; i < kChar.Length; i++)
         {
@@ -548,6 +467,7 @@ public static class EscSeqUtils
 
             if (char.IsDigit (c))
             {
+                // PERF: Ouch
                 values [valueIdx] += c.ToString ();
             }
             else if (c == ';')
@@ -556,10 +476,12 @@ public static class EscSeqUtils
             }
             else if (valueIdx == nSep - 1 || i == kChar.Length - 1)
             {
+                // PERF: Ouch
                 terminating += c.ToString ();
             }
             else
             {
+                // PERF: Ouch
                 code += c.ToString ();
             }
         }
@@ -572,6 +494,7 @@ public static class EscSeqUtils
     /// </summary>
     /// <param name="cki"></param>
     /// <returns>The char array of the escape sequence.</returns>
+    // PERF: This is expensive
     public static char [] GetKeyCharArray (ConsoleKeyInfo [] cki)
     {
         char [] kChar = { };
@@ -602,16 +525,18 @@ public static class EscSeqUtils
     )
     {
         MouseFlags buttonState = 0;
-        pos = new Point ();
+        pos = Point.Empty;
         var buttonCode = 0;
         var foundButtonCode = false;
         var foundPoint = 0;
-        var value = "";
+        string value = string.Empty;
         char [] kChar = GetKeyCharArray (cki);
 
+        // PERF: This loop could benefit from use of Spans and other strategies to avoid copies.
         //System.Diagnostics.Debug.WriteLine ($"kChar: {new string (kChar)}");
         for (var i = 0; i < kChar.Length; i++)
         {
+            // PERF: Copy
             char c = kChar [i];
 
             if (c == '<')
@@ -620,6 +545,7 @@ public static class EscSeqUtils
             }
             else if (foundButtonCode && c != ';')
             {
+                // PERF: Ouch
                 value += c.ToString ();
             }
             else if (c == ';')
@@ -635,7 +561,7 @@ public static class EscSeqUtils
                     pos.X = int.Parse (value) - 1;
                 }
 
-                value = "";
+                value = string.Empty;
                 foundPoint++;
             }
             else if (foundPoint > 0 && c != 'm' && c != 'M')
@@ -846,7 +772,7 @@ public static class EscSeqUtils
             }
         }
 
-        mouseFlags = new List<MouseFlags> { MouseFlags.AllEvents };
+        mouseFlags = [MouseFlags.AllEvents];
 
         if (lastMouseButtonPressed != null
             && !isButtonPressed
@@ -866,23 +792,22 @@ public static class EscSeqUtils
                  || buttonState == MouseFlags.Button2Pressed
                  || buttonState == MouseFlags.Button3Pressed
                  || buttonState == MouseFlags.Button4Pressed)
-             && lastMouseButtonPressed == null)
-            || (isButtonPressed && lastMouseButtonPressed != null && buttonState.HasFlag (MouseFlags.ReportMousePosition)))
+             && lastMouseButtonPressed is null)
+            || (isButtonPressed && lastMouseButtonPressed is { } && buttonState.HasFlag (MouseFlags.ReportMousePosition)))
         {
             mouseFlags [0] = buttonState;
             lastMouseButtonPressed = buttonState;
             isButtonPressed = true;
 
-            if (point is null)
-            {
-                point = pos;
-            }
+            point = pos;
 
             if ((mouseFlags [0] & MouseFlags.ReportMousePosition) == 0)
             {
                 Application.MainLoop.AddIdle (
                                               () =>
                                               {
+                                                  // INTENT: What's this trying to do?
+                                                  // The task itself is not awaited.
                                                   Task.Run (
                                                             async () => await ProcessContinuousButtonPressedAsync (
                                                                          buttonState,
@@ -1019,42 +944,6 @@ public static class EscSeqUtils
         //}
     }
 
-    // TODO: Move this out of here and into ConsoleDriver or somewhere else.
-    /// <summary>
-    ///     Get the terminal that holds the console driver.
-    /// </summary>
-    /// <param name="process">The process.</param>
-    /// <returns>If supported the executable console process, null otherwise.</returns>
-    public static Process GetParentProcess (Process process)
-    {
-        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
-        {
-            return null;
-        }
-
-        string query = "SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = " + process.Id;
-
-        using (var mos = new ManagementObjectSearcher (query))
-        {
-            foreach (ManagementObject mo in mos.Get ())
-            {
-                if (mo ["ParentProcessId"] != null)
-                {
-                    try
-                    {
-                        var id = Convert.ToInt32 (mo ["ParentProcessId"]);
-
-                        return Process.GetProcessById (id);
-                    }
-                    catch
-                    { }
-                }
-            }
-        }
-
-        return null;
-    }
-
     /// <summary>
     ///     Ensures a console key is mapped to one that works correctly with ANSI escape sequences.
     /// </summary>
@@ -1131,7 +1020,7 @@ public static class EscSeqUtils
     /// <returns>The <see cref="ConsoleKeyInfo"/> resized.</returns>
     public static ConsoleKeyInfo [] ResizeArray (ConsoleKeyInfo consoleKeyInfo, ConsoleKeyInfo [] cki)
     {
-        Array.Resize (ref cki, cki == null ? 1 : cki.Length + 1);
+        Array.Resize (ref cki, cki is null ? 1 : cki.Length + 1);
         cki [cki.Length - 1] = consoleKeyInfo;
 
         return cki;
@@ -1226,18 +1115,21 @@ public static class EscSeqUtils
 
     private static async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag, Action<MouseFlags, Point> continuousButtonPressedHandler)
     {
+        // PERF: Pause and poll in a hot loop.
+        // This should be replaced with event dispatch and a synchronization primitive such as AutoResetEvent.
+        // Will make a massive difference in responsiveness.
         while (isButtonPressed)
         {
             await Task.Delay (100);
 
             View view = Application.WantContinuousButtonPressedView;
 
-            if (view == null)
+            if (view is null)
             {
                 break;
             }
 
-            if (isButtonPressed && lastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
+            if (isButtonPressed && lastMouseButtonPressed is { } && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
             {
                 Application.Invoke (() => continuousButtonPressedHandler (mouseFlag, point ?? Point.Empty));
             }

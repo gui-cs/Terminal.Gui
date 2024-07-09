@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -44,7 +45,10 @@ public class SettingsScope : Scope<SettingsScope>
             Update (JsonSerializer.Deserialize<SettingsScope> (stream, _serializerOptions)!);
             OnUpdated ();
             Debug.WriteLine ($"ConfigurationManager: Read configuration from \"{source}\"");
-            Sources.Add (source);
+            if (!Sources.Contains (source))
+            {
+                Sources.Add (source);
+            }
 
             return this;
         }
@@ -70,7 +74,10 @@ public class SettingsScope : Scope<SettingsScope>
         if (!File.Exists (realPath))
         {
             Debug.WriteLine ($"ConfigurationManager: Configuration file \"{realPath}\" does not exist.");
-            Sources.Add (filePath);
+            if (!Sources.Contains (filePath))
+            {
+                Sources.Add (filePath);
+            }
 
             return this;
         }
@@ -102,7 +109,7 @@ public class SettingsScope : Scope<SettingsScope>
     /// <param name="resourceName"></param>
     public SettingsScope? UpdateFromResource (Assembly assembly, string resourceName)
     {
-        if (resourceName == null || string.IsNullOrEmpty (resourceName))
+        if (resourceName is null || string.IsNullOrEmpty (resourceName))
         {
             Debug.WriteLine (
                              $"ConfigurationManager: Resource \"{resourceName}\" does not exist in \"{assembly.GetName ().Name}\"."
@@ -111,9 +118,12 @@ public class SettingsScope : Scope<SettingsScope>
             return this;
         }
 
+        // BUG: Not trim-compatible
+        // Not a bug, per se, but it's easily fixable by just loading the file.
+        // Defaults can just be field initializers for involved types.
         using Stream? stream = assembly.GetManifestResourceStream (resourceName)!;
 
-        if (stream == null)
+        if (stream is null)
         {
             Debug.WriteLine (
                              $"ConfigurationManager: Failed to read resource \"{resourceName}\" from \"{assembly.GetName ().Name}\"."

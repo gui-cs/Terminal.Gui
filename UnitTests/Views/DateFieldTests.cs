@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -11,42 +12,42 @@ public class DateFieldTests
         var df = new DateField ();
         Assert.Equal (DateTime.MinValue, df.Date);
         Assert.Equal (1, df.CursorPosition);
-        Assert.Equal (new Rect (0, 0, 12, 1), df.Frame);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), df.Frame);
         Assert.Equal (" 01/01/0001", df.Text);
 
         DateTime date = DateTime.Now;
         df = new DateField (date);
         Assert.Equal (date, df.Date);
         Assert.Equal (1, df.CursorPosition);
-        Assert.Equal (new Rect (0, 0, 12, 1), df.Frame);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), df.Frame);
         Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
 
         df = new DateField (date) { X = 1, Y = 2 };
         Assert.Equal (date, df.Date);
         Assert.Equal (1, df.CursorPosition);
-        Assert.Equal (new Rect (1, 2, 12, 1), df.Frame);
+        Assert.Equal (new Rectangle (1, 2, 12, 1), df.Frame);
         Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
     }
 
     [Fact]
     [TestDate]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void Copy_Paste ()
     {
         var df1 = new DateField (DateTime.Parse ("12/12/1971"));
         var df2 = new DateField (DateTime.Parse ("12/31/2023"));
 
         // Select all text
-        Assert.True (df2.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.ShiftMask)));
+        Assert.True (df2.NewKeyDownEvent (Key.End.WithShift));
         Assert.Equal (1, df2.SelectedStart);
         Assert.Equal (10, df2.SelectedLength);
         Assert.Equal (11, df2.CursorPosition);
 
         // Copy from df2
-        Assert.True (df2.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)));
+        Assert.True (df2.NewKeyDownEvent (Key.C.WithCtrl));
 
         // Paste into df1
-        Assert.True (df1.NewKeyDownEvent (new Key (KeyCode.V | KeyCode.CtrlMask)));
+        Assert.True (df1.NewKeyDownEvent (Key.V.WithCtrl));
         Assert.Equal (" 12/31/2023", df1.Text);
         Assert.Equal (11, df1.CursorPosition);
     }
@@ -70,22 +71,22 @@ public class DateFieldTests
         var df = new DateField ();
 
         // Start selection
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.ShiftMask)));
+        Assert.True (df.NewKeyDownEvent (Key.CursorLeft.WithShift));
         Assert.Equal (1, df.SelectedStart);
         Assert.Equal (1, df.SelectedLength);
         Assert.Equal (0, df.CursorPosition);
 
         // Without selection
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (df.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal (-1, df.SelectedStart);
         Assert.Equal (0, df.SelectedLength);
         Assert.Equal (1, df.CursorPosition);
         df.CursorPosition = 10;
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.ShiftMask)));
+        Assert.True (df.NewKeyDownEvent (Key.CursorRight.WithShift));
         Assert.Equal (10, df.SelectedStart);
         Assert.Equal (1, df.SelectedLength);
         Assert.Equal (11, df.CursorPosition);
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (df.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (-1, df.SelectedStart);
         Assert.Equal (0, df.SelectedLength);
         Assert.Equal (10, df.CursorPosition);
@@ -106,43 +107,45 @@ public class DateFieldTests
     public void KeyBindings_Command ()
     {
         var df = new DateField (DateTime.Parse ("12/12/1971")) { ReadOnly = true };
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (df.NewKeyDownEvent (Key.Delete));
         Assert.Equal (" 12/12/1971", df.Text);
         df.ReadOnly = false;
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.D | KeyCode.CtrlMask)));
+        Assert.True (df.NewKeyDownEvent (Key.D.WithCtrl));
         Assert.Equal (" 02/12/1971", df.Text);
         df.CursorPosition = 4;
         df.ReadOnly = true;
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (df.NewKeyDownEvent (Key.Delete));
         Assert.Equal (" 02/12/1971", df.Text);
         df.ReadOnly = false;
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (df.NewKeyDownEvent (Key.Backspace));
         Assert.Equal (" 02/02/1971", df.Text);
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.Home)));
+        Assert.True (df.NewKeyDownEvent (Key.Home));
         Assert.Equal (1, df.CursorPosition);
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (df.NewKeyDownEvent (Key.End));
         Assert.Equal (10, df.CursorPosition);
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.A | KeyCode.CtrlMask)));
+        Assert.True (df.NewKeyDownEvent (Key.A.WithCtrl));
         Assert.Equal (1, df.CursorPosition);
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.E | KeyCode.CtrlMask)));
+        Assert.True (df.NewKeyDownEvent (Key.E.WithCtrl));
         Assert.Equal (10, df.CursorPosition);
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (df.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal (9, df.CursorPosition);
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (df.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (10, df.CursorPosition);
 
         // Non-numerics are ignored
-        Assert.False (df.NewKeyDownEvent (new Key (KeyCode.A)));
+        Assert.False (df.NewKeyDownEvent (Key.A));
         df.ReadOnly = true;
         df.CursorPosition = 1;
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.D1)));
+        Assert.True (df.NewKeyDownEvent (Key.D1));
         Assert.Equal (" 02/02/1971", df.Text);
         df.ReadOnly = false;
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.D1)));
+        Assert.True (df.NewKeyDownEvent (Key.D1));
         Assert.Equal (" 12/02/1971", df.Text);
         Assert.Equal (2, df.CursorPosition);
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.D | KeyCode.AltMask)));
+#if UNIX_KEY_BINDINGS
+        Assert.True (df.NewKeyDownEvent (Key.D.WithAlt));
         Assert.Equal (" 10/02/1971", df.Text);
+#endif
     }
 
     [Fact]
@@ -156,13 +159,13 @@ public class DateFieldTests
         };
 
         // Now select the separator /
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.ShiftMask)));
+        Assert.True (df.NewKeyDownEvent (Key.CursorRight.WithShift));
         Assert.Equal (2, df.SelectedStart);
         Assert.Equal (1, df.SelectedLength);
         Assert.Equal (3, df.CursorPosition);
 
         // Type 3 over the separator
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.D3)));
+        Assert.True (df.NewKeyDownEvent (Key.D3));
 
         // The format was normalized and replaced again with /
         Assert.Equal (" 12/12/1971", df.Text);
@@ -172,6 +175,12 @@ public class DateFieldTests
     [Fact]
     public void Using_All_Culture_StandardizeDateFormat ()
     {
+        // BUGBUG: This is a workaround for the issue with the date separator in macOS. See https://github.com/gui-cs/Terminal.Gui/issues/3592
+        if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
+        {
+            return;
+        }
+
         CultureInfo cultureBackup = CultureInfo.CurrentCulture;
 
         DateTime date = DateTime.Parse ("1/1/1971");
@@ -185,6 +194,7 @@ public class DateFieldTests
             {
                 separator = separator.Replace ("\u200f", "");
             }
+
 
             string format = culture.DateTimeFormat.ShortDatePattern;
             var df = new DateField (date);
@@ -282,7 +292,7 @@ public class DateFieldTests
         };
 
         // Type 3 over the separator
-        Assert.True (df.NewKeyDownEvent (new Key (KeyCode.D3)));
+        Assert.True (df.NewKeyDownEvent (Key.D3));
 
         // If InvariantCulture was used this will fail but not with PT culture
         Assert.Equal (" 13/12/1971", df.Text);

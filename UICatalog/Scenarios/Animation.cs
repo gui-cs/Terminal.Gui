@@ -17,22 +17,31 @@ public class Animation : Scenario
 {
     private bool _isDisposed;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        base.Setup ();
+        Application.Init();
+
+        var win = new Window
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+        };
 
         var imageView = new ImageView { Width = Dim.Fill (), Height = Dim.Fill () - 2 };
 
-        Win.Add (imageView);
+        win.Add (imageView);
 
-        var lbl = new Label { Y = Pos.AnchorEnd (2), Text = "Image by Wikiscient" };
-        Win.Add (lbl);
+        var lbl = new Label { Y = Pos.AnchorEnd (), Text = "Image by Wikiscient" };
+        win.Add (lbl);
 
         var lbl2 = new Label
         {
-            Y = Pos.AnchorEnd (1), Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
+           X = Pos.AnchorEnd(), Y = Pos.AnchorEnd (), Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
         };
-        Win.Add (lbl2);
+        win.Add (lbl2);
 
         DirectoryInfo dir;
 
@@ -78,6 +87,10 @@ public class Animation : Scenario
                       }
                   }
                  );
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     protected override void Dispose (bool disposing)
@@ -160,19 +173,19 @@ public class Animation : Scenario
         private int frameCount;
         private Image<Rgba32> [] fullResImages;
         private Image<Rgba32> [] matchSizes;
-        private Rect oldSize = Rect.Empty;
+        private Rectangle oldSize = Rectangle.Empty;
         public void NextFrame () { currentFrame = (currentFrame + 1) % frameCount; }
 
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
 
-            if (oldSize != Bounds)
+            if (oldSize != Viewport)
             {
                 // Invalidate cached images now size has changed
                 matchSizes = new Image<Rgba32> [frameCount];
                 brailleCache = new string [frameCount];
-                oldSize = Bounds;
+                oldSize = Viewport;
             }
 
             Image<Rgba32> imgScaled = matchSizes [currentFrame];
@@ -183,7 +196,7 @@ public class Animation : Scenario
                 Image<Rgba32> imgFull = fullResImages [currentFrame];
 
                 // keep aspect ratio
-                int newSize = Math.Min (Bounds.Width, Bounds.Height);
+                int newSize = Math.Min (Viewport.Width, Viewport.Height);
 
                 // generate one
                 matchSizes [currentFrame] = imgScaled = imgFull.Clone (

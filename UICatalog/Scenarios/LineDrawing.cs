@@ -36,18 +36,21 @@ public class LineDrawing : Scenario
         public DrawingArea () { AddLayer (); }
         public LineStyle LineStyle { get; set; }
 
-        public override void OnDrawContentComplete (Rect contentArea)
+        public override void OnDrawContentComplete (Rectangle viewport)
         {
-            base.OnDrawContentComplete (contentArea);
+            base.OnDrawContentComplete (viewport);
 
             foreach (LineCanvas canvas in _layers)
             {
-                foreach (KeyValuePair<Point, Cell> c in canvas.GetCellMap ())
+                foreach (KeyValuePair<Point, Cell?> c in canvas.GetCellMap ())
                 {
-                    Driver.SetAttribute (c.Value.Attribute ?? ColorScheme.Normal);
+                    if (c.Value is { })
+                    {
+                        Driver.SetAttribute (c.Value.Value.Attribute ?? ColorScheme.Normal);
 
-                    // TODO: #2616 - Support combining sequences that don't normalize
-                    AddRune (c.Key.X, c.Key.Y, c.Value.Rune);
+                        // TODO: #2616 - Support combining sequences that don't normalize
+                        AddRune (c.Key.X, c.Key.Y, c.Value.Value.Rune);
+                    }
                 }
             }
         }
@@ -84,7 +87,7 @@ public class LineDrawing : Scenario
             return false;
         }
 
-        public override bool OnMouseEvent (MouseEvent mouseEvent)
+        protected override bool OnMouseEvent (MouseEvent mouseEvent)
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
             {
@@ -92,7 +95,7 @@ public class LineDrawing : Scenario
                 {
                     // Mouse pressed down
                     _currentLine = new StraightLine (
-                                                     new Point (mouseEvent.X, mouseEvent.Y),
+                                                     mouseEvent.Position,
                                                      0,
                                                      Orientation.Vertical,
                                                      LineStyle,
@@ -105,7 +108,7 @@ public class LineDrawing : Scenario
                 {
                     // Mouse dragged
                     Point start = _currentLine.Start;
-                    var end = new Point (mouseEvent.X, mouseEvent.Y);
+                    var end = mouseEvent.Position;
                     var orientation = Orientation.Vertical;
                     int length = end.Y - start.Y;
 
@@ -208,7 +211,7 @@ public class LineDrawing : Scenario
 
             _addLayerBtn = new Button { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
-            _addLayerBtn.Clicked += (s, a) => AddLayer?.Invoke ();
+            _addLayerBtn.Accept += (s, a) => AddLayer?.Invoke ();
             Add (_colorPicker, _stylePicker, _addLayerBtn);
         }
 

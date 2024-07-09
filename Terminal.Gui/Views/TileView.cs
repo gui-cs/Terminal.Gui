@@ -156,33 +156,36 @@ public class TileView : View
             return;
         }
 
-        Rect contentArea = Bounds;
+        Rectangle viewport = Viewport;
 
         if (HasBorder ())
         {
-            contentArea = new Rect (
-                                    contentArea.X + 1,
-                                    contentArea.Y + 1,
-                                    Math.Max (0, contentArea.Width - 2),
-                                    Math.Max (0, contentArea.Height - 2)
-                                   );
+            viewport = new (
+                            viewport.X + 1,
+                            viewport.Y + 1,
+                            Math.Max (0, viewport.Width - 2),
+                            Math.Max (0, viewport.Height - 2)
+                           );
         }
 
-        Setup (contentArea);
+        Setup (viewport);
         base.LayoutSubviews ();
     }
 
-    /// <summary>Overridden so no Frames get drawn (BUGBUG: v2 fix this hack)</summary>
+    // BUG: v2 fix this hack
+    // QUESTION: Does this need to be fixed before events are refactored?
+    /// <summary>Overridden so no Frames get drawn</summary>
     /// <returns></returns>
     public override bool OnDrawAdornments () { return false; }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         Driver.SetAttribute (ColorScheme.Normal);
+
         Clear ();
 
-        base.OnDrawContent (contentArea);
+        base.OnDrawContent (viewport);
 
         var lc = new LineCanvas ();
 
@@ -193,19 +196,19 @@ public class TileView : View
         {
             if (HasBorder ())
             {
-                lc.AddLine (new Point (0, 0), Bounds.Width, Orientation.Horizontal, LineStyle);
-                lc.AddLine (new Point (0, 0), Bounds.Height, Orientation.Vertical, LineStyle);
+                lc.AddLine (Point.Empty, Viewport.Width, Orientation.Horizontal, LineStyle);
+                lc.AddLine (Point.Empty, Viewport.Height, Orientation.Vertical, LineStyle);
 
                 lc.AddLine (
-                            new Point (Bounds.Width - 1, Bounds.Height - 1),
-                            -Bounds.Width,
+                            new Point (Viewport.Width - 1, Viewport.Height - 1),
+                            -Viewport.Width,
                             Orientation.Horizontal,
                             LineStyle
                            );
 
                 lc.AddLine (
-                            new Point (Bounds.Width - 1, Bounds.Height - 1),
-                            -Bounds.Height,
+                            new Point (Viewport.Width - 1, Viewport.Height - 1),
+                            -Viewport.Height,
                             Orientation.Vertical,
                             LineStyle
                            );
@@ -215,8 +218,8 @@ public class TileView : View
             {
                 bool isRoot = _splitterLines.Contains (line);
 
-                line.BoundsToScreen (0, 0, out int x1, out int y1);
-                Point origin = ScreenToFrame (x1, y1);
+                Rectangle screen = line.ViewportToScreen (Rectangle.Empty);
+                Point origin = ScreenToFrame (screen.Location);
                 int length = line.Orientation == Orientation.Horizontal ? line.Frame.Width : line.Frame.Height;
 
                 if (!isRoot)
@@ -239,7 +242,7 @@ public class TileView : View
 
         Driver.SetAttribute (ColorScheme.Normal);
 
-        foreach (KeyValuePair<Point, Rune> p in lc.GetMap (Bounds))
+        foreach (KeyValuePair<Point, Rune> p in lc.GetMap (Viewport))
         {
             AddRune (p.Key.X, p.Key.Y, p.Value);
         }
@@ -312,7 +315,7 @@ public class TileView : View
         _tiles = new List<Tile> ();
         _splitterDistances = new List<Pos> ();
 
-        if (_splitterLines != null)
+        if (_splitterLines is { })
         {
             foreach (TileViewLineView sl in _splitterLines)
             {
@@ -408,20 +411,20 @@ public class TileView : View
     ///         <see cref="Tile.MinSize"/>, location of other splitters etc.
     ///     </para>
     ///     <para>
-    ///         Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(float)"/>) are supported for
+    ///         Only absolute values (e.g. 10) and percent values (i.e. <see cref="Pos.Percent(int)"/>) are supported for
     ///         this property.
     ///     </para>
     /// </summary>
     public bool SetSplitterPos (int idx, Pos value)
     {
-        if (!(value is Pos.PosAbsolute) && !(value is Pos.PosFactor))
+        if (!(value is PosAbsolute) && !(value is PosPercent))
         {
             throw new ArgumentException (
                                          $"Only Percent and Absolute values are supported. Passed value was {value.GetType ().Name}"
                                         );
         }
 
-        int fullSpace = _orientation == Orientation.Vertical ? Bounds.Width : Bounds.Height;
+        int fullSpace = _orientation == Orientation.Vertical ? Viewport.Width : Viewport.Height;
 
         if (fullSpace != 0 && !IsValidNewSplitterPos (idx, value, fullSpace))
         {
@@ -580,7 +583,7 @@ public class TileView : View
     {
         TileView root = this;
 
-        while (root.parentTileView != null)
+        while (root.parentTileView is { })
         {
             root = root.parentTileView;
         }
@@ -598,11 +601,11 @@ public class TileView : View
 
         TileViewLineView nextSplitter = visibleSplitterLines [i];
         Pos nextSplitterPos = Orientation == Orientation.Vertical ? nextSplitter.X : nextSplitter.Y;
-        int nextSplitterDistance = nextSplitterPos.Anchor (space);
+        int nextSplitterDistance = nextSplitterPos.GetAnchor (space);
 
         TileViewLineView lastSplitter = i >= 1 ? visibleSplitterLines [i - 1] : null;
         Pos lastSplitterPos = Orientation == Orientation.Vertical ? lastSplitter?.X : lastSplitter?.Y;
-        int lastSplitterDistance = lastSplitterPos?.Anchor (space) ?? 0;
+        int lastSplitterDistance = lastSplitterPos?.GetAnchor (space) ?? 0;
 
         int distance = nextSplitterDistance - lastSplitterDistance;
 
@@ -653,8 +656,8 @@ public class TileView : View
 
     private bool IsValidNewSplitterPos (int idx, Pos value, int fullSpace)
     {
-        int newSize = value.Anchor (fullSpace);
-        bool isGettingBigger = newSize > _splitterDistances [idx].Anchor (fullSpace);
+        int newSize = value.GetAnchor (fullSpace);
+        bool isGettingBigger = newSize > _splitterDistances [idx].GetAnchor (fullSpace);
         int lastSplitterOrBorder = HasBorder () ? 1 : 0;
         int nextSplitterOrBorder = HasBorder () ? fullSpace - 1 : fullSpace;
 
@@ -679,7 +682,7 @@ public class TileView : View
         // Do not allow splitter to move left of the one before
         if (idx > 0)
         {
-            int posLeft = _splitterDistances [idx - 1].Anchor (fullSpace);
+            int posLeft = _splitterDistances [idx - 1].GetAnchor (fullSpace);
 
             if (newSize <= posLeft)
             {
@@ -692,7 +695,7 @@ public class TileView : View
         // Do not allow splitter to move right of the one after
         if (idx + 1 < _splitterDistances.Count)
         {
-            int posRight = _splitterDistances [idx + 1].Anchor (fullSpace);
+            int posRight = _splitterDistances [idx + 1].GetAnchor (fullSpace);
 
             if (newSize >= posRight)
             {
@@ -756,9 +759,9 @@ public class TileView : View
         return false;
     }
 
-    private void Setup (Rect contentArea)
+    private void Setup (Rectangle viewport)
     {
-        if (contentArea.IsEmpty || contentArea.Height <= 0 || contentArea.Width <= 0)
+        if (viewport.IsEmpty || viewport.Height <= 0 || viewport.Width <= 0)
         {
             return;
         }
@@ -801,18 +804,20 @@ public class TileView : View
 
             if (Orientation == Orientation.Vertical)
             {
-                tile.ContentView.X = i == 0 ? contentArea.X : Pos.Right (visibleSplitterLines [i - 1]);
-                tile.ContentView.Y = contentArea.Y;
-                tile.ContentView.Height = contentArea.Height;
-                tile.ContentView.Width = GetTileWidthOrHeight (i, Bounds.Width, visibleTiles, visibleSplitterLines);
+                tile.ContentView.X = i == 0 ? viewport.X : Pos.Right (visibleSplitterLines [i - 1]);
+                tile.ContentView.Y = viewport.Y;
+                tile.ContentView.Height = viewport.Height;
+                tile.ContentView.Width = GetTileWidthOrHeight (i, Viewport.Width, visibleTiles, visibleSplitterLines);
             }
             else
             {
-                tile.ContentView.X = contentArea.X;
-                tile.ContentView.Y = i == 0 ? contentArea.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
-                tile.ContentView.Width = contentArea.Width;
-                tile.ContentView.Height = GetTileWidthOrHeight (i, Bounds.Height, visibleTiles, visibleSplitterLines);
+                tile.ContentView.X = viewport.X;
+                tile.ContentView.Y = i == 0 ? viewport.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
+                tile.ContentView.Width = viewport.Width;
+                tile.ContentView.Height = GetTileWidthOrHeight (i, Viewport.Height, visibleTiles, visibleSplitterLines);
             }
+            //  BUGBUG: This should not be needed. If any of the pos/dim setters above actually changed values, NeedsDisplay should have already been set. 
+            tile.ContentView.SetNeedsDisplay ();
         }
     }
 
@@ -835,17 +840,15 @@ public class TileView : View
         /// </summary>
         public Point GetLocalCoordinateForTitle (TileView intoCoordinateSpace)
         {
-            Tile.ContentView.BoundsToScreen (0, 0, out int screenCol, out int screenRow);
-            screenRow--;
-
-            return intoCoordinateSpace.ScreenToFrame (screenCol, screenRow);
+            Rectangle screen = Tile.ContentView.ViewportToScreen (Rectangle.Empty);
+            return intoCoordinateSpace.ScreenToFrame (new (screen.X, screen.Y - 1));
         }
 
         internal string GetTrimmedTitle ()
         {
             Dim spaceDim = Tile.ContentView.Width;
 
-            int spaceAbs = spaceDim.Anchor (Parent.Bounds.Width);
+            int spaceAbs = spaceDim.GetAnchor (Parent.Viewport.Width);
 
             var title = $" {Tile.Title} ";
 
@@ -880,10 +883,10 @@ public class TileView : View
 
             AddCommand (Command.LineDown, () => { return MoveSplitter (0, 1); });
 
-            KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-            KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-            KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-            KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+            KeyBindings.Add (Key.CursorRight, Command.Right);
+            KeyBindings.Add (Key.CursorLeft, Command.Left);
+            KeyBindings.Add (Key.CursorUp, Command.LineUp);
+            KeyBindings.Add (Key.CursorDown, Command.LineDown);
         }
 
         public int Idx { get; }
@@ -891,15 +894,15 @@ public class TileView : View
 
         public void DrawSplitterSymbol ()
         {
-            if (dragPosition != null || CanFocus)
+            if (dragPosition is { } || CanFocus)
             {
-                Point location = moveRuneRenderLocation ?? new Point (Bounds.Width / 2, Bounds.Height / 2);
+                Point location = moveRuneRenderLocation ?? new Point (Viewport.Width / 2, Viewport.Height / 2);
 
                 AddRune (location.X, location.Y, Glyphs.Diamond);
             }
         }
 
-        public override bool MouseEvent (MouseEvent mouseEvent)
+        protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
         {
             if (!dragPosition.HasValue && mouseEvent.Flags == MouseFlags.Button1Pressed)
             {
@@ -909,7 +912,7 @@ public class TileView : View
 
                 if (mouseEvent.Flags == MouseFlags.Button1Pressed)
                 {
-                    dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+                    dragPosition = mouseEvent.Position;
                     dragOrignalPos = Orientation == Orientation.Horizontal ? Y : X;
                     Application.GrabMouse (this);
 
@@ -919,7 +922,7 @@ public class TileView : View
                     {
                         moveRuneRenderLocation = new Point (
                                                             0,
-                                                            Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y))
+                                                            Math.Max (1, Math.Min (Viewport.Height - 2, mouseEvent.Position.Y))
                                                            );
                     }
                 }
@@ -935,15 +938,15 @@ public class TileView : View
                 // how far has user dragged from original location?						
                 if (Orientation == Orientation.Horizontal)
                 {
-                    int dy = mouseEvent.Y - dragPosition.Value.Y;
+                    int dy = mouseEvent.Position.Y - dragPosition.Value.Y;
                     Parent.SetSplitterPos (Idx, Offset (Y, dy));
-                    moveRuneRenderLocation = new Point (mouseEvent.X, 0);
+                    moveRuneRenderLocation = new Point (mouseEvent.Position.X, 0);
                 }
                 else
                 {
-                    int dx = mouseEvent.X - dragPosition.Value.X;
+                    int dx = mouseEvent.Position.X - dragPosition.Value.X;
                     Parent.SetSplitterPos (Idx, Offset (X, dx));
-                    moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y)));
+                    moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Viewport.Height - 2, mouseEvent.Position.Y)));
                 }
 
                 Parent.SetNeedsDisplay ();
@@ -969,48 +972,46 @@ public class TileView : View
             return false;
         }
 
-        public override void OnDrawContent (Rect contentArea)
+        public override void OnDrawContent (Rectangle viewport)
         {
-            base.OnDrawContent (contentArea);
+            base.OnDrawContent (viewport);
 
             DrawSplitterSymbol ();
         }
 
-        public override bool OnEnter (View view)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Default);
-            PositionCursor ();
-
-            return base.OnEnter (view);
-        }
-
-        public override void PositionCursor ()
+        public override Point? PositionCursor ()
         {
             base.PositionCursor ();
 
-            Point location = moveRuneRenderLocation ?? new Point (Bounds.Width / 2, Bounds.Height / 2);
+            Point location = moveRuneRenderLocation ?? new Point (Viewport.Width / 2, Viewport.Height / 2);
             Move (location.X, location.Y);
+
+            return null; // Hide cursor
         }
 
         /// <summary>
         ///     <para>
-        ///         Determines the absolute position of <paramref name="p"/> and returns a <see cref="Pos.PosFactor"/> that
+        ///         Determines the absolute position of <paramref name="p"/> and returns a <see cref="PosPercent"/> that
         ///         describes the percentage of that.
         ///     </para>
         ///     <para>
-        ///         Effectively turning any <see cref="Pos"/> into a <see cref="Pos.PosFactor"/> (as if created with
-        ///         <see cref="Pos.Percent(float)"/>)
+        ///         Effectively turning any <see cref="Pos"/> into a <see cref="PosPercent"/> (as if created with
+        ///         <see cref="Pos.Percent(int)"/>)
         ///     </para>
         /// </summary>
-        /// <param name="p">The <see cref="Pos"/> to convert to <see cref="Pos.Percent(float)"/></param>
+        /// <param name="p">The <see cref="Pos"/> to convert to <see cref="Pos.Percent(int)"/></param>
         /// <param name="parentLength">The Height/Width that <paramref name="p"/> lies within</param>
         /// <returns></returns>
-        private Pos ConvertToPosFactor (Pos p, int parentLength)
+        private Pos ConvertToPosPercent (Pos p, int parentLength)
         {
-            // calculate position in the 'middle' of the cell at p distance along parentLength
-            float position = p.Anchor (parentLength) + 0.5f;
+            // Calculate position in the 'middle' of the cell at p distance along parentLength
+            float position = p.GetAnchor (parentLength) + 0.5f;
 
-            return new Pos.PosFactor (position / parentLength);
+            // Calculate the percentage
+            int percent = (int)Math.Round ((position / parentLength) * 100);
+
+            // Return a new PosPercent object
+            return Pos.Percent (percent);
         }
 
         /// <summary>
@@ -1028,14 +1029,14 @@ public class TileView : View
         /// <param name="newValue"></param>
         private bool FinalisePosition (Pos oldValue, Pos newValue)
         {
-            if (oldValue is Pos.PosFactor)
+            if (oldValue is PosPercent)
             {
                 if (Orientation == Orientation.Horizontal)
                 {
-                    return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Bounds.Height));
+                    return Parent.SetSplitterPos (Idx, ConvertToPosPercent (newValue, Parent.Viewport.Height));
                 }
 
-                return Parent.SetSplitterPos (Idx, ConvertToPosFactor (newValue, Parent.Bounds.Width));
+                return Parent.SetSplitterPos (Idx, ConvertToPosPercent (newValue, Parent.Viewport.Width));
             }
 
             return Parent.SetSplitterPos (Idx, newValue);
@@ -1069,10 +1070,10 @@ public class TileView : View
 
         private Pos Offset (Pos pos, int delta)
         {
-            int posAbsolute = pos.Anchor (
+            int posAbsolute = pos.GetAnchor (
                                           Orientation == Orientation.Horizontal
-                                              ? Parent.Bounds.Height
-                                              : Parent.Bounds.Width
+                                              ? Parent.Viewport.Height
+                                              : Parent.Viewport.Width
                                          );
 
             return posAbsolute + delta;

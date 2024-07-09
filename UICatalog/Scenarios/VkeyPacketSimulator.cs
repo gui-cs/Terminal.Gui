@@ -28,14 +28,14 @@ public class VkeyPacketSimulator : Scenario
 
         var inputHorizontalRuler = new Label
         {
-            Y = Pos.Bottom (btnInput), AutoSize = false, Width = Dim.Fill (), ColorScheme = Colors.ColorSchemes ["Error"]
+            Y = Pos.Bottom (btnInput), Width = Dim.Fill (), ColorScheme = Colors.ColorSchemes ["Error"]
         };
         Win.Add (inputHorizontalRuler);
 
         var inputVerticalRuler = new Label
         {
             Y = Pos.Bottom (btnInput),
-            AutoSize = false,
+
             Width = 1,
             ColorScheme = Colors.ColorSchemes ["Error"],
             TextDirection = TextDirection.TopBottom_LeftRight
@@ -52,7 +52,7 @@ public class VkeyPacketSimulator : Scenario
         };
         Win.Add (tvInput);
 
-        label = new Label { X = Pos.Center (), Y = Pos.Bottom (tvInput), Text = "Output" };
+        label = new() { X = Pos.Center (), Y = Pos.Bottom (tvInput), Text = "Output" };
         Win.Add (label);
 
         var btnOutput = new Button { X = Pos.AnchorEnd (17), Y = Pos.Top (label), Text = "Select Output" };
@@ -61,7 +61,7 @@ public class VkeyPacketSimulator : Scenario
         var outputHorizontalRuler = new Label
         {
             Y = Pos.Bottom (btnOutput),
-            AutoSize = false,
+
             Width = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Error"]
         };
@@ -70,7 +70,7 @@ public class VkeyPacketSimulator : Scenario
         var outputVerticalRuler = new Label
         {
             Y = Pos.Bottom (btnOutput),
-            AutoSize = false,
+
             Width = 1,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Error"],
@@ -104,7 +104,7 @@ public class VkeyPacketSimulator : Scenario
                                 if (_outputStarted)
                                 {
                                     // If the key wasn't handled by the TextView will popup a Dialog with the keys pressed.
-                                    bool? handled = tvOutput.OnInvokingKeyBindings (e);
+                                    bool? handled = tvOutput.OnInvokingKeyBindings (e, KeyBindingScope.HotKey | KeyBindingScope.Focused);
 
                                     if (handled == null || handled == false)
                                     {
@@ -113,12 +113,10 @@ public class VkeyPacketSimulator : Scenario
                                             Application.Invoke (
                                                                 () => MessageBox.Query (
                                                                                         "Keys",
-                                                                                        $"'{
-                                                                                            Key.ToString (
+                                                                                        $"'{Key.ToString (
                                                                                                           e.KeyCode,
                                                                                                           MenuBar.ShortcutDelimiter
-                                                                                                         )
-                                                                                        }' pressed!",
+                                                                                                         )}' pressed!",
                                                                                         "Ok"
                                                                                        )
                                                                );
@@ -242,43 +240,47 @@ public class VkeyPacketSimulator : Scenario
                              }
                          };
 
-        btnInput.Clicked += (s, e) =>
+        btnInput.Accept += (s, e) =>
+                           {
+                               if (!tvInput.HasFocus && _keyboardStrokes.Count == 0)
+                               {
+                                   tvInput.SetFocus ();
+                               }
+                           };
+
+        btnOutput.Accept += (s, e) =>
                             {
-                                if (!tvInput.HasFocus && _keyboardStrokes.Count == 0)
+                                if (!tvOutput.HasFocus && _keyboardStrokes.Count == 0)
                                 {
-                                    tvInput.SetFocus ();
+                                    tvOutput.SetFocus ();
                                 }
                             };
-
-        btnOutput.Clicked += (s, e) =>
-                             {
-                                 if (!tvOutput.HasFocus && _keyboardStrokes.Count == 0)
-                                 {
-                                     tvOutput.SetFocus ();
-                                 }
-                             };
 
         tvInput.SetFocus ();
 
         void Win_LayoutComplete (object sender, LayoutEventArgs obj)
         {
+            if (inputHorizontalRuler.Viewport.Width == 0 || inputVerticalRuler.Viewport.Height == 0)
+            {
+                return;
+            }
             inputHorizontalRuler.Text = outputHorizontalRuler.Text =
                                             ruler.Repeat (
                                                           (int)Math.Ceiling (
-                                                                             inputHorizontalRuler.Bounds.Width
+                                                                             inputHorizontalRuler.Viewport.Width
                                                                              / (double)ruler.Length
                                                                             )
                                                          ) [
-                                                            ..inputHorizontalRuler.Bounds.Width];
+                                                            ..inputHorizontalRuler.Viewport.Width];
             inputVerticalRuler.Height = tvInput.Frame.Height + 1;
 
             inputVerticalRuler.Text =
-                ruler.Repeat ((int)Math.Ceiling (inputVerticalRuler.Bounds.Height / (double)ruler.Length)) [
-                     ..inputVerticalRuler.Bounds.Height];
+                ruler.Repeat ((int)Math.Ceiling (inputVerticalRuler.Viewport.Height / (double)ruler.Length)) [
+                     ..inputVerticalRuler.Viewport.Height];
 
             outputVerticalRuler.Text =
-                ruler.Repeat ((int)Math.Ceiling (outputVerticalRuler.Bounds.Height / (double)ruler.Length)) [
-                     ..outputVerticalRuler.Bounds.Height];
+                ruler.Repeat ((int)Math.Ceiling (outputVerticalRuler.Viewport.Height / (double)ruler.Length)) [
+                     ..outputVerticalRuler.Viewport.Height];
         }
 
         Win.LayoutComplete += Win_LayoutComplete;

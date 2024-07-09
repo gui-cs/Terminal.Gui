@@ -94,9 +94,9 @@ public partial class ColorTests
                     nameof (ColorTestsTheoryDataGenerators.TryParse_string_Returns_True_For_Valid_Inputs),
                     MemberType = typeof (ColorTestsTheoryDataGenerators)
                 )]
-    public void TryParse_string_Returns_True_For_Valid_Inputs (string input, int expectedColorArgb)
+    public void TryParse_string_Returns_True_For_Valid_Inputs (string? input, int expectedColorArgb)
     {
-        bool tryParseStatus = Color.TryParse (input, out Color? color);
+        bool tryParseStatus = Color.TryParse (input ?? string.Empty, out Color? color);
         Assert.True (tryParseStatus);
         Assert.NotNull (color);
         Assert.IsType<Color> (color);
@@ -108,11 +108,7 @@ public static partial class ColorTestsTheoryDataGenerators
 {
     public static TheoryData<string?> TryParse_string_Returns_False_For_Invalid_Inputs ()
     {
-        TheoryData<string?> values =
-            [
-                null
-            ]
-            ;
+        TheoryData<string?> values = [];
 
         for (var i = char.MinValue; i < 255; i++)
         {

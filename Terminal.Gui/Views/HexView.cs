@@ -31,13 +31,14 @@ public class HexView : View
     private const int displayWidth = 9;
 
     private int bpl;
-    private CursorVisibility desiredCursorVisibility = CursorVisibility.Default;
     private long displayStart, pos;
-    private SortedDictionary<long, byte> edits = new ();
+    private SortedDictionary<long, byte> edits = [];
     private bool firstNibble, leftSide;
     private Stream source;
+    private static readonly Rune SpaceCharRune = new (' ');
+    private static readonly Rune PeriodCharRune = new ('.');
 
-    /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="HexView"/> class.</summary>
     /// <param name="source">
     ///     The <see cref="Stream"/> to view and edit as hex, this <see cref="Stream"/> must support seeking,
     ///     or an exception will be thrown.
@@ -45,16 +46,22 @@ public class HexView : View
     public HexView (Stream source)
     {
         Source = source;
+        // BUG: This will always call the most-derived definition of CanFocus.
+        // Either seal it or don't set it here.
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
         leftSide = true;
         firstNibble = true;
 
+        // PERF: Closure capture of 'this' creates a lot of overhead.
+        // BUG: Closure capture of 'this' may have unexpected results depending on how this is called.
+        // The above two comments apply to all of the lambdas passed to all calls to AddCommand below.
         // Things this view knows how to do
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.Right, () => MoveRight ());
         AddCommand (Command.LineDown, () => MoveDown (bytesPerLine));
         AddCommand (Command.LineUp, () => MoveUp (bytesPerLine));
-        AddCommand (Command.ToggleChecked, () => ToggleSide ());
+        AddCommand (Command.Accept, () => ToggleSide ());
         AddCommand (Command.PageUp, () => MoveUp (bytesPerLine * Frame.Height));
         AddCommand (Command.PageDown, () => MoveDown (bytesPerLine * Frame.Height));
         AddCommand (Command.TopHome, () => MoveHome ());
@@ -69,29 +76,29 @@ public class HexView : View
                    );
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-        KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
-        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-        KeyBindings.Add (KeyCode.Enter, Command.ToggleChecked);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.Enter, Command.Accept);
 
-        KeyBindings.Add ('v' + KeyCode.AltMask, Command.PageUp);
-        KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
 
-        KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.PageDown);
-        KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
 
-        KeyBindings.Add (KeyCode.Home, Command.TopHome);
-        KeyBindings.Add (KeyCode.End, Command.BottomEnd);
-        KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.StartOfLine);
-        KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.EndOfLine);
-        KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.StartOfPage);
-        KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.EndOfPage);
+        KeyBindings.Add (Key.Home, Command.TopHome);
+        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.StartOfLine);
+        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.EndOfLine);
+        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.StartOfPage);
+        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.EndOfPage);
 
         LayoutComplete += HexView_LayoutComplete;
     }
 
-    /// <summary>Initializes a <see cref="HexView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="HexView"/> class.</summary>
     public HexView () : this (new MemoryStream ()) { }
 
     /// <summary>
@@ -111,7 +118,7 @@ public class HexView : View
         {
             if (!IsInitialized)
             {
-                return new Point (0, 0);
+                return Point.Empty;
             }
 
             var delta = (int)position;
@@ -119,21 +126,6 @@ public class HexView : View
             int item = delta % bytesPerLine + 1;
 
             return new Point (item, line);
-        }
-    }
-
-    /// <summary>Get / Set the wished cursor when the field is focused</summary>
-    public CursorVisibility DesiredCursorVisibility
-    {
-        get => desiredCursorVisibility;
-        set
-        {
-            if (desiredCursorVisibility != value && HasFocus)
-            {
-                Application.Driver.SetCursorVisibility (value);
-            }
-
-            desiredCursorVisibility = value;
         }
     }
 
@@ -173,7 +165,7 @@ public class HexView : View
         get => source;
         set
         {
-            if (value == null)
+            if (value is null)
             {
                 throw new ArgumentNullException ("source");
             }
@@ -233,7 +225,7 @@ public class HexView : View
             source.WriteByte (kv.Value);
             source.Flush ();
 
-            if (stream != null)
+            if (stream is { })
             {
                 stream.Position = kv.Key;
                 stream.WriteByte (kv.Value);
@@ -255,10 +247,8 @@ public class HexView : View
     public event EventHandler<HexViewEditEventArgs> Edited;
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent me)
+    protected internal override bool OnMouseEvent  (MouseEvent me)
     {
-        // BUGBUG: Test this with a border! Assumes Frame == Bounds!
-
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
             && !me.Flags.HasFlag (MouseFlags.WheeledDown)
@@ -286,7 +276,7 @@ public class HexView : View
             return true;
         }
 
-        if (me.X < displayWidth)
+        if (me.Position.X < displayWidth)
         {
             return true;
         }
@@ -295,14 +285,14 @@ public class HexView : View
         int blocksSize = nblocks * 14;
         int blocksRightOffset = displayWidth + blocksSize - 1;
 
-        if (me.X > blocksRightOffset + bytesPerLine - 1)
+        if (me.Position.X > blocksRightOffset + bytesPerLine - 1)
         {
             return true;
         }
 
-        leftSide = me.X >= blocksRightOffset;
-        long lineStart = me.Y * bytesPerLine + displayStart;
-        int x = me.X - displayWidth + 1;
+        leftSide = me.Position.X >= blocksRightOffset;
+        long lineStart = me.Position.Y * bytesPerLine + displayStart;
+        int x = me.Position.X - displayWidth + 1;
         int block = x / 14;
         x -= block * 2;
         int empty = x % 3;
@@ -317,7 +307,7 @@ public class HexView : View
 
         if (leftSide)
         {
-            position = Math.Min (lineStart + me.X - blocksRightOffset, source.Length);
+            position = Math.Min (lineStart + me.Position.X - blocksRightOffset, source.Length);
         }
         else
         {
@@ -344,36 +334,33 @@ public class HexView : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rect contentArea)
+    public override void OnDrawContent (Rectangle viewport)
     {
         Attribute currentAttribute;
         Attribute current = ColorScheme.Focus;
         Driver.SetAttribute (current);
         Move (0, 0);
 
-        // BUGBUG: Bounds!!!!
-        Rect frame = Frame;
-
         int nblocks = bytesPerLine / bsize;
-        var data = new byte [nblocks * bsize * frame.Height];
+        var data = new byte [nblocks * bsize * viewport.Height];
         Source.Position = displayStart;
         int n = source.Read (data, 0, data.Length);
 
         Attribute activeColor = ColorScheme.HotNormal;
         Attribute trackingColor = ColorScheme.HotFocus;
 
-        for (var line = 0; line < frame.Height; line++)
+        for (var line = 0; line < viewport.Height; line++)
         {
-            var lineRect = new Rect (0, line, frame.Width, 1);
+            Rectangle lineRect = new (0, line, viewport.Width, 1);
 
-            if (!Bounds.Contains (lineRect))
+            if (!Viewport.Contains (lineRect))
             {
                 continue;
             }
 
             Move (0, line);
             Driver.SetAttribute (ColorScheme.HotNormal);
-            Driver.AddStr (string.Format ("{0:x8} ", displayStart + line * nblocks * bsize));
+            Driver.AddStr ($"{displayStart + line * nblocks * bsize:x8} ");
 
             currentAttribute = ColorScheme.HotNormal;
             SetAttribute (GetNormalColor ());
@@ -394,9 +381,9 @@ public class HexView : View
                         SetAttribute (GetNormalColor ());
                     }
 
-                    Driver.AddStr (offset >= n && !edited ? "  " : string.Format ("{0:x2}", value));
+                    Driver.AddStr (offset >= n && !edited ? "  " : $"{value:x2}");
                     SetAttribute (GetNormalColor ());
-                    Driver.AddRune ((Rune)' ');
+                    Driver.AddRune (SpaceCharRune);
                 }
 
                 Driver.AddStr (block + 1 == nblocks ? " " : "| ");
@@ -410,17 +397,17 @@ public class HexView : View
 
                 if (offset >= n && !edited)
                 {
-                    c = (Rune)' ';
+                    c = SpaceCharRune;
                 }
                 else
                 {
                     if (b < 32)
                     {
-                        c = (Rune)'.';
+                        c = PeriodCharRune;
                     }
                     else if (b > 127)
                     {
-                        c = (Rune)'.';
+                        c = PeriodCharRune;
                     }
                     else
                     {
@@ -455,14 +442,6 @@ public class HexView : View
     /// <param name="e">The key value pair.</param>
     public virtual void OnEdited (HexViewEditEventArgs e) { Edited?.Invoke (this, e); }
 
-    ///<inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
-
-        return base.OnEnter (view);
-    }
-
     /// <summary>
     ///     Method used to invoke the <see cref="PositionChanged"/> event passing the <see cref="HexViewEventArgs"/>
     ///     arguments.
@@ -478,7 +457,7 @@ public class HexView : View
         }
 
         // Ignore control characters and other special keys
-        if (keyEvent.KeyCode < KeyCode.Space || keyEvent.KeyCode > KeyCode.CharMask)
+        if (keyEvent < Key.Space || keyEvent.KeyCode > KeyCode.CharMask)
         {
             return false;
         }
@@ -540,7 +519,7 @@ public class HexView : View
     public event EventHandler<HexViewEventArgs> PositionChanged;
 
     ///<inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         var delta = (int)(position - displayStart);
         int line = delta / bytesPerLine;
@@ -548,14 +527,15 @@ public class HexView : View
         int block = item / bsize;
         int column = item % bsize * 3;
 
-        if (leftSide)
+        int x = displayWidth + block * 14 + column + (firstNibble ? 0 : 1);
+        int y = line;
+        if (!leftSide)
         {
-            Move (displayWidth + block * 14 + column + (firstNibble ? 0 : 1), line);
+            x = displayWidth + bytesPerLine / bsize * 14 + item - 1;
         }
-        else
-        {
-            Move (displayWidth + bytesPerLine / bsize * 14 + item - 1, line);
-        }
+
+        Move (x, y);
+        return new (x, y);
     }
 
     internal void SetDisplayStart (long value)
@@ -604,24 +584,23 @@ public class HexView : View
         // Small buffers will just show the position, with the bsize field value (4 bytes)
         bytesPerLine = bsize;
 
-        if (Bounds.Width - displayWidth > 17)
+        if (Viewport.Width - displayWidth > 17)
         {
-            bytesPerLine = bsize * ((Bounds.Width - displayWidth) / 18);
+            bytesPerLine = bsize * ((Viewport.Width - displayWidth) / 18);
         }
     }
 
     private bool MoveDown (int bytes)
     {
-        // BUGBUG: Bounds!
         RedisplayLine (position);
 
         if (position + bytes < source.Length)
         {
             position += bytes;
         }
-        else if ((bytes == bytesPerLine * Frame.Height && source.Length >= DisplayStart + bytesPerLine * Frame.Height)
-                 || (bytes <= bytesPerLine * Frame.Height - bytesPerLine
-                     && source.Length <= DisplayStart + bytesPerLine * Frame.Height))
+        else if ((bytes == bytesPerLine * Viewport.Height && source.Length >= DisplayStart + bytesPerLine * Viewport.Height)
+                 || (bytes <= bytesPerLine * Viewport.Height - bytesPerLine
+                     && source.Length <= DisplayStart + bytesPerLine * Viewport.Height))
         {
             long p = position;
 
@@ -633,7 +612,7 @@ public class HexView : View
             position = p;
         }
 
-        if (position >= DisplayStart + bytesPerLine * Frame.Height)
+        if (position >= DisplayStart + bytesPerLine * Viewport.Height)
         {
             SetDisplayStart (DisplayStart + bytes);
             SetNeedsDisplay ();
@@ -650,8 +629,7 @@ public class HexView : View
     {
         position = source.Length;
 
-        // BUGBUG: Bounds!
-        if (position >= DisplayStart + bytesPerLine * Frame.Height)
+        if (position >= DisplayStart + bytesPerLine * Viewport.Height)
         {
             SetDisplayStart (position);
             SetNeedsDisplay ();
@@ -737,8 +715,7 @@ public class HexView : View
             position++;
         }
 
-        // BUGBUG: Bounds!
-        if (position >= DisplayStart + bytesPerLine * Frame.Height)
+        if (position >= DisplayStart + bytesPerLine * Viewport.Height)
         {
             SetDisplayStart (DisplayStart + bytesPerLine);
             SetNeedsDisplay ();
@@ -786,8 +763,7 @@ public class HexView : View
         var delta = (int)(pos - DisplayStart);
         int line = delta / bytesPerLine;
 
-        // BUGBUG: Bounds!
-        SetNeedsDisplay (new Rect (0, line, Frame.Width, 1));
+        SetNeedsDisplay (new (0, line, Viewport.Width, 1));
     }
 
     private bool ToggleSide ()

@@ -1,17 +1,10 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
 
-//using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
-
-// Alias Console to MockConsole so we don't accidentally use Console
-
 namespace Terminal.Gui.DrawingTests;
 
-public class ThicknessTests
+public class ThicknessTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public ThicknessTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     public void Constructor_Defaults ()
     {
@@ -60,32 +53,32 @@ public class ThicknessTests
     {
         ((FakeDriver)Application.Driver).SetBufferSize (60, 60);
         var t = new Thickness (0, 0, 0, 0);
-        var r = new Rect (5, 5, 40, 15);
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
+        var r = new Rectangle (5, 5, 40, 15);
+        View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
         Application.Driver.FillRect (
-                                     new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+                                     new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
        Test (Left=0,Top=0,Right=0,Bottom=0)",
-                                                      _output
+                                                      output
                                                      );
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (5, 5, 40, 15);
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
+        r = new Rectangle (5, 5, 40, 15);
+        View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
         Application.Driver.FillRect (
-                                     new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+                                     new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -104,19 +97,19 @@ public class ThicknessTests
      T                                      T
      T                                      T
      TTTest (Left=1,Top=1,Right=1,Bottom=1)TT",
-                                                      _output
+                                                      output
                                                      );
 
         t = new Thickness (1, 2, 3, 4);
-        r = new Rect (5, 5, 40, 15);
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
+        r = new Rectangle (5, 5, 40, 15);
+        View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
         Application.Driver.FillRect (
-                                     new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+                                     new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -135,19 +128,19 @@ public class ThicknessTests
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      TTTest (Left=1,Top=2,Right=3,Bottom=4)TT",
-                                                      _output
+                                                      output
                                                      );
 
         t = new Thickness (-1, 1, 1, 1);
-        r = new Rect (5, 5, 40, 15);
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
+        r = new Rectangle (5, 5, 40, 15);
+        View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
         Application.Driver.FillRect (
-                                     new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+                                     new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -166,7 +159,7 @@ public class ThicknessTests
                                             T
                                             T
      TTest (Left=-1,Top=1,Right=1,Bottom=1)TT",
-                                                      _output
+                                                      output
                                                      );
     }
 
@@ -177,16 +170,17 @@ public class ThicknessTests
         // Add a frame so we can see the ruler
         var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        Application.Top.Add (f);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (f);
+        Application.Begin (top);
 
         ((FakeDriver)Application.Driver).SetBufferSize (45, 20);
         var t = new Thickness (0, 0, 0, 0);
-        var r = new Rect (2, 2, 40, 15);
+        var r = new Rectangle (2, 2, 40, 15);
         Application.Refresh ();
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+        View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsAre (
                                              @"
@@ -210,15 +204,15 @@ public class ThicknessTests
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                             _output
+                                             output
                                             );
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (1, 1, 40, 15);
+        r = new Rectangle (1, 1, 40, 15);
         Application.Refresh ();
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+        View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsAre (
                                              @"
@@ -242,15 +236,15 @@ public class ThicknessTests
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                             _output
+                                             output
                                             );
 
         t = new Thickness (1, 2, 3, 4);
-        r = new Rect (2, 2, 40, 15);
+        r = new Rectangle (2, 2, 40, 15);
         Application.Refresh ();
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+        View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -274,15 +268,15 @@ public class ThicknessTests
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         t = new Thickness (-1, 1, 1, 1);
-        r = new Rect (5, 5, 40, 15);
+        r = new Rectangle (5, 5, 40, 15);
         Application.Refresh ();
-        ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+        View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
-        ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+        View.Diagnostics = ViewDiagnosticFlags.Off;
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -306,8 +300,9 @@ public class ThicknessTests
 │                                           2
 │                                           3
 └────|123456789|123456789|123456789|123456789",
-                                                      _output
+                                                      output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -340,19 +335,35 @@ public class ThicknessTests
         Assert.Equal (t.GetHashCode (), t.GetHashCode ());
     }
 
+    // Test Thickness.GetInside(Rectangle)
+    [Theory]
+    [InlineData (0, 0, 10, 10, 1, 1, 8, 8)]
+    [InlineData (1, 0, 10, 10, 2, 1, 8, 8)]
+    [InlineData (0, 1, 10, 10, 1, 2, 8, 8)]
+    public void GetInside_Uniform (int x, int y, int width, int height, int expectedX, int expectedY, int expectedWidth, int expectedHeight)
+    {
+        var t = new Thickness (1, 1, 1, 1); // Uniform thickness for simplicity
+        var r = new Rectangle (x, y, width, height);
+        Rectangle inside = t.GetInside (r);
+        Assert.Equal (expectedX, inside.X);
+        Assert.Equal (expectedY, inside.Y);
+        Assert.Equal (expectedWidth, inside.Width);
+        Assert.Equal (expectedHeight, inside.Height);
+    }
+
     [Fact]
     public void GetInsideTests_Mixed_Pos_Neg_Thickness_Non_Empty_Size ()
     {
         var t = new Thickness (-1, 1, -1, 1);
-        var r = new Rect (0, 0, 3, 3);
-        Rect inside = t.GetInside (r);
+        var r = new Rectangle (0, 0, 3, 3);
+        Rectangle inside = t.GetInside (r);
         Assert.Equal (-1, inside.X);
         Assert.Equal (1, inside.Y);
         Assert.Equal (5, inside.Width);
         Assert.Equal (1, inside.Height);
 
         t = new Thickness (-1, 1, -1, 1);
-        r = new Rect (-1, -1, 3, 3);
+        r = new Rectangle (-1, -1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (-2, inside.X);
         Assert.Equal (0, inside.Y);
@@ -360,7 +371,7 @@ public class ThicknessTests
         Assert.Equal (1, inside.Height);
 
         t = new Thickness (-1, 1, -1, 1);
-        r = new Rect (1, 1, 3, 3);
+        r = new Rectangle (1, 1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (2, inside.Y);
@@ -368,7 +379,7 @@ public class ThicknessTests
         Assert.Equal (1, inside.Height);
 
         t = new Thickness (-2, -1, 0, 1);
-        r = new Rect (-1, 0, 50, 60);
+        r = new Rectangle (-1, 0, 50, 60);
         inside = t.GetInside (r);
         Assert.Equal (-3, inside.X);
         Assert.Equal (-1, inside.Y);
@@ -380,15 +391,15 @@ public class ThicknessTests
     public void GetInsideTests_Negative_Thickness_Non_Empty_Size ()
     {
         var t = new Thickness (-1, -1, -1, -1);
-        var r = new Rect (0, 0, 3, 3);
-        Rect inside = t.GetInside (r);
+        var r = new Rectangle (0, 0, 3, 3);
+        Rectangle inside = t.GetInside (r);
         Assert.Equal (-1, inside.X);
         Assert.Equal (-1, inside.Y);
         Assert.Equal (5, inside.Width);
         Assert.Equal (5, inside.Height);
 
         t = new Thickness (-1, -1, -1, -1);
-        r = new Rect (-1, -1, 3, 3);
+        r = new Rectangle (-1, -1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (-2, inside.X);
         Assert.Equal (-2, inside.Y);
@@ -396,7 +407,7 @@ public class ThicknessTests
         Assert.Equal (5, inside.Height);
 
         t = new Thickness (-1, -1, -1, -1);
-        r = new Rect (1, 1, 3, 3);
+        r = new Rectangle (1, 1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
@@ -404,7 +415,7 @@ public class ThicknessTests
         Assert.Equal (5, inside.Height);
 
         t = new Thickness (-1, -2, -3, -4);
-        r = new Rect (-1, 0, 50, 60);
+        r = new Rectangle (-1, 0, 50, 60);
         inside = t.GetInside (r);
         Assert.Equal (-2, inside.X);
         Assert.Equal (-2, inside.Y);
@@ -416,15 +427,15 @@ public class ThicknessTests
     public void GetInsideTests_Positive_Thickness_Non_Empty_Size ()
     {
         var t = new Thickness (1, 1, 1, 1);
-        var r = new Rect (0, 0, 3, 3);
-        Rect inside = t.GetInside (r);
+        var r = new Rectangle (0, 0, 3, 3);
+        Rectangle inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
         Assert.Equal (1, inside.Width);
         Assert.Equal (1, inside.Height);
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (-1, -1, 3, 3);
+        r = new Rectangle (-1, -1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
@@ -432,7 +443,7 @@ public class ThicknessTests
         Assert.Equal (1, inside.Height);
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (1, 1, 3, 3);
+        r = new Rectangle (1, 1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (2, inside.X);
         Assert.Equal (2, inside.Y);
@@ -440,7 +451,7 @@ public class ThicknessTests
         Assert.Equal (1, inside.Height);
 
         t = new Thickness (1, 2, 3, 4);
-        r = new Rect (-1, 0, 50, 60);
+        r = new Rectangle (-1, 0, 50, 60);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (2, inside.Y);
@@ -452,15 +463,15 @@ public class ThicknessTests
     public void GetInsideTests_Positive_Thickness_Too_Small_Rect_Means_Empty_Size ()
     {
         var t = new Thickness (1, 1, 1, 1);
-        var r = Rect.Empty;
-        Rect inside = t.GetInside (r);
+        var r = Rectangle.Empty;
+        Rectangle inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (0, 0, 1, 1);
+        r = new Rectangle (0, 0, 1, 1);
         inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
@@ -468,7 +479,7 @@ public class ThicknessTests
         Assert.Equal (0, inside.Height);
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (1, 1, 1, 1);
+        r = new Rectangle (1, 1, 1, 1);
         inside = t.GetInside (r);
         Assert.Equal (2, inside.X);
         Assert.Equal (2, inside.Y);
@@ -476,7 +487,7 @@ public class ThicknessTests
         Assert.Equal (0, inside.Height);
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (0, 0, 1, 0);
+        r = new Rectangle (0, 0, 1, 0);
         inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
@@ -484,7 +495,7 @@ public class ThicknessTests
         Assert.Equal (0, inside.Height);
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (0, 0, 0, 1);
+        r = new Rectangle (0, 0, 0, 1);
         inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
@@ -492,7 +503,7 @@ public class ThicknessTests
         Assert.Equal (0, inside.Height);
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (-1, -1, 0, 1);
+        r = new Rectangle (-1, -1, 0, 1);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
@@ -500,7 +511,7 @@ public class ThicknessTests
         Assert.Equal (0, inside.Height);
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (0, 0, 2, 2);
+        r = new Rectangle (0, 0, 2, 2);
         inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
@@ -508,7 +519,7 @@ public class ThicknessTests
         Assert.Equal (0, inside.Height);
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (-1, -1, 2, 2);
+        r = new Rectangle (-1, -1, 2, 2);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
@@ -516,7 +527,7 @@ public class ThicknessTests
         Assert.Equal (0, inside.Height);
 
         t = new Thickness (1, 1, 1, 1);
-        r = new Rect (1, 1, 2, 2);
+        r = new Rectangle (1, 1, 2, 2);
         inside = t.GetInside (r);
         Assert.Equal (2, inside.X);
         Assert.Equal (2, inside.Y);
@@ -524,7 +535,7 @@ public class ThicknessTests
         Assert.Equal (0, inside.Height);
 
         t = new Thickness (1, 2, 3, 4);
-        r = new Rect (-1, 0, 4, 6);
+        r = new Rectangle (-1, 0, 4, 6);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (2, inside.Y);
@@ -536,15 +547,15 @@ public class ThicknessTests
     public void GetInsideTests_Zero_Thickness ()
     {
         var t = new Thickness (0, 0, 0, 0);
-        var r = Rect.Empty;
-        Rect inside = t.GetInside (r);
+        var r = Rectangle.Empty;
+        Rectangle inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
         t = new Thickness (0, 0, 0, 0);
-        r = new Rect (0, 0, 1, 1);
+        r = new Rectangle (0, 0, 1, 1);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
@@ -552,7 +563,7 @@ public class ThicknessTests
         Assert.Equal (1, inside.Height);
 
         t = new Thickness (0, 0, 0, 0);
-        r = new Rect (1, 1, 1, 1);
+        r = new Rectangle (1, 1, 1, 1);
         inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
@@ -560,7 +571,7 @@ public class ThicknessTests
         Assert.Equal (1, inside.Height);
 
         t = new Thickness (0, 0, 0, 0);
-        r = new Rect (0, 0, 1, 0);
+        r = new Rectangle (0, 0, 1, 0);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
@@ -568,7 +579,7 @@ public class ThicknessTests
         Assert.Equal (0, inside.Height);
 
         t = new Thickness (0, 0, 0, 0);
-        r = new Rect (0, 0, 0, 1);
+        r = new Rectangle (0, 0, 0, 1);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
@@ -576,7 +587,7 @@ public class ThicknessTests
         Assert.Equal (1, inside.Height);
 
         t = new Thickness (0, 0, 0, 0);
-        r = new Rect (-1, -1, 0, 1);
+        r = new Rectangle (-1, -1, 0, 1);
         inside = t.GetInside (r);
         Assert.Equal (-1, inside.X);
         Assert.Equal (-1, inside.Y);
@@ -644,9 +655,9 @@ public class ThicknessTests
     [InlineData (-1, -1, 10, 10, -2, -2, false)] // Outside the outer rectangle
     public void TestContains_Uniform1 (int x, int y, int width, int height, int pointX, int pointY, bool expected)
     {
-        var rect = new Rect (x, y, width, height);
+        var rect = new Rectangle (x, y, width, height);
         var thickness = new Thickness (1, 1, 1, 1); // Uniform thickness for simplicity
-        bool result = thickness.Contains (rect, pointX, pointY);
+        bool result = thickness.Contains (rect, new (pointX, pointY));
         Assert.Equal (expected, result);
     }
 
@@ -683,9 +694,9 @@ public class ThicknessTests
     [InlineData (-1, -1, 4, 4, 3, 3, false)] // outside outer rect
     public void TestContains_Uniform2 (int x, int y, int width, int height, int pointX, int pointY, bool expected)
     {
-        var rect = new Rect (x, y, width, height);
+        var rect = new Rectangle (x, y, width, height);
         var thickness = new Thickness (2, 2, 2, 2); // Uniform thickness for simplicity
-        bool result = thickness.Contains (rect, pointX, pointY);
+        bool result = thickness.Contains (rect, new (pointX, pointY));
         Assert.Equal (expected, result);
     }
 
@@ -718,9 +729,9 @@ public class ThicknessTests
         bool expected
     )
     {
-        var rect = new Rect (x, y, width, height);
+        var rect = new Rectangle (x, y, width, height);
         var thickness = new Thickness (0, 0, 0, 0); // Uniform thickness for simplicity
-        bool result = thickness.Contains (rect, pointX, pointY);
+        bool result = thickness.Contains (rect, new (pointX, pointY));
         Assert.Equal (expected, result);
     }
 
@@ -768,5 +779,84 @@ public class ThicknessTests
         Assert.Equal (0, t.Right);
         Assert.Equal (0, t.Bottom);
         Assert.Equal (0, t.Horizontal);
+    }
+
+    // Test Thickness.Add
+    [Theory]
+    [InlineData (
+                    1,
+                    2,
+                    3,
+                    4,
+                    1,
+                    2,
+                    3,
+                    4,
+                    2,
+                    4,
+                    6,
+                    8)]
+    [InlineData (
+                    1,
+                    2,
+                    3,
+                    4,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    2,
+                    3,
+                    4)]
+    [InlineData (
+                    1,
+                    2,
+                    3,
+                    4,
+                    -1,
+                    -2,
+                    -3,
+                    -4,
+                    0,
+                    0,
+                    0,
+                    0)]
+    [InlineData (
+                    1,
+                    2,
+                    3,
+                    4,
+                    1,
+                    1,
+                    1,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5)]
+
+    public void AddTest (
+        int left,
+        int top,
+        int right,
+        int bottom,
+        int left2,
+        int top2,
+        int right2,
+        int bottom2,
+        int expectedLeft,
+        int expectedTop,
+        int expectedRight,
+        int expectedBottom
+    )
+    {
+        var t = new Thickness (left, top, right, bottom);
+        var t2 = new Thickness (left2, top2, right2, bottom2);
+        var result = t.Add (t2);
+        Assert.Equal (expectedLeft, result.Left);
+        Assert.Equal (expectedTop, result.Top);
+        Assert.Equal (expectedRight, result.Right);
+        Assert.Equal (expectedBottom, result.Bottom);
     }
 }

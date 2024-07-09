@@ -3,11 +3,8 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class RuneCellTests
+public class RuneCellTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public RuneCellTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     public void Constructor_Defaults ()
     {
@@ -24,13 +21,13 @@ public class RuneCellTests
 
         var rc2 = new RuneCell
         {
-            Rune = new Rune ('a'), ColorScheme = new ColorScheme { Normal = new Attribute (Color.Red) }
+            Rune = new ('a'), ColorScheme = new() { Normal = new (Color.Red) }
         };
         Assert.False (rc1.Equals (rc2));
         Assert.False (rc2.Equals (rc1));
 
-        rc1.Rune = new Rune ('a');
-        rc1.ColorScheme = new ColorScheme ();
+        rc1.Rune = new ('a');
+        rc1.ColorScheme = new ();
         Assert.Equal (rc1.Rune, rc2.Rune);
         Assert.False (rc1.Equals (rc2));
         Assert.False (rc2.Equals (rc1));
@@ -44,10 +41,10 @@ public class RuneCellTests
         Assert.True (rc1.Equals (rc2));
         Assert.True (rc2.Equals (rc1));
 
-        rc1.Rune = new Rune ('a');
-        rc1.ColorScheme = new ColorScheme ();
-        rc2.Rune = new Rune ('a');
-        rc2.ColorScheme = new ColorScheme ();
+        rc1.Rune = new ('a');
+        rc1.ColorScheme = new ();
+        rc2.Rune = new ('a');
+        rc2.ColorScheme = new ();
         Assert.True (rc1.Equals (rc2));
         Assert.True (rc2.Equals (rc1));
     }
@@ -64,16 +61,17 @@ public class RuneCellTests
 
             foreach (Rune rune in csName.EnumerateRunes ())
             {
-                runeCells.Add (new RuneCell { Rune = rune, ColorScheme = color.Value });
+                runeCells.Add (new() { Rune = rune, ColorScheme = color.Value });
             }
 
-            runeCells.Add (new RuneCell { Rune = (Rune)'\n', ColorScheme = color.Value });
+            runeCells.Add (new() { Rune = (Rune)'\n', ColorScheme = color.Value });
         }
 
         TextView tv = CreateTextView ();
         tv.Load (runeCells);
-        Application.Top.Add (tv);
-        RunState rs = Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        RunState rs = Application.Begin (top);
         Assert.True (tv.InheritsPreviousColorScheme);
 
         var expectedText = @"
@@ -82,7 +80,7 @@ Base
 Dialog  
 Menu    
 Error   ";
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, output);
 
         Attribute [] attributes =
         {
@@ -112,16 +110,16 @@ Error   ";
 
         tv.WordWrap = true;
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, output);
         TestHelpers.AssertDriverAttributesAre (expectedColor, Application.Driver, attributes);
 
-        tv.CursorPosition = new Point (6, 2);
+        tv.CursorPosition = new (6, 2);
         tv.SelectionStartColumn = 0;
         tv.SelectionStartRow = 0;
         Assert.Equal ($"TopLevel{Environment.NewLine}Base{Environment.NewLine}Dialog", tv.SelectedText);
         tv.Copy ();
         tv.Selecting = false;
-        tv.CursorPosition = new Point (2, 4);
+        tv.CursorPosition = new (2, 4);
         tv.Paste ();
         Application.Refresh ();
 
@@ -133,7 +131,7 @@ Menu
 ErTopLevel
 Base      
 Dialogror ";
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, output);
 
         expectedColor = @"
 0000000000
@@ -146,7 +144,7 @@ Dialogror ";
         TestHelpers.AssertDriverAttributesAre (expectedColor, Application.Driver, attributes);
 
         tv.Undo ();
-        tv.CursorPosition = new Point (0, 3);
+        tv.CursorPosition = new (0, 3);
         tv.SelectionStartColumn = 0;
         tv.SelectionStartRow = 0;
 
@@ -156,7 +154,7 @@ Dialogror ";
                      );
         tv.Copy ();
         tv.Selecting = false;
-        tv.CursorPosition = new Point (2, 4);
+        tv.CursorPosition = new (2, 4);
         tv.Paste ();
         Application.Refresh ();
 
@@ -169,7 +167,7 @@ ErTopLevel
 Base      
 Dialog    
 ror       ";
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, output);
 
         expectedColor = @"
 0000000000
@@ -183,21 +181,22 @@ ror       ";
         TestHelpers.AssertDriverAttributesAre (expectedColor, Application.Driver, attributes);
 
         Application.End (rs);
+        top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void RuneCell_LoadRuneCells_Without_ColorScheme_Is_Never_Null ()
     {
         List<RuneCell> cells = new ()
         {
-            new RuneCell { Rune = new Rune ('T') },
-            new RuneCell { Rune = new Rune ('e') },
-            new RuneCell { Rune = new Rune ('s') },
-            new RuneCell { Rune = new Rune ('t') }
+            new() { Rune = new ('T') },
+            new() { Rune = new ('e') },
+            new() { Rune = new ('s') },
+            new() { Rune = new ('t') }
         };
         TextView tv = CreateTextView ();
-        Application.Top.Add (tv);
+        var top = new Toplevel ();
+        top.Add (tv);
         tv.Load (cells);
 
         for (var i = 0; i < tv.Lines; i++)
@@ -240,14 +239,15 @@ ror       ";
 
         tv.Text = $"{TextModel.ToString (text [0])}\n{TextModel.ToString (text [1])}\n";
         Assert.False (tv.WordWrap);
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 This is the first line. 
 This is the second line.",
-                                                      _output
+                                                      output
                                                      );
 
         tv.Width = 10;
@@ -265,10 +265,11 @@ This is
 the    
 second 
 line.  ",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.Equal (eventCount, (text [0].Count + text [1].Count) * 2);
+        top.Dispose ();
     }
 
     [Fact]
@@ -278,7 +279,7 @@ line.  ",
 
         var rc2 = new RuneCell
         {
-            Rune = new Rune ('a'), ColorScheme = new ColorScheme { Normal = new Attribute (Color.Red) }
+            Rune = new ('a'), ColorScheme = new() { Normal = new (Color.Red) }
         };
         Assert.Equal ("U+0000 '\0'; null", rc1.ToString ());
 
@@ -289,5 +290,5 @@ line.  ",
     }
 
     // TODO: Move the tests below to View or Color - they test ColorScheme, not RuneCell primitives.
-    private TextView CreateTextView () { return new TextView { Width = 30, Height = 10 }; }
+    private TextView CreateTextView () { return new() { Width = 30, Height = 10 }; }
 }

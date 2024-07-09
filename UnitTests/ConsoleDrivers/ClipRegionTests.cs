@@ -38,12 +38,12 @@ public class ClipRegionTests
         Assert.Equal ((Rune)'x', driver.Contents [5, 5].Rune);
 
         // Clear the contents
-        driver.FillRect (new Rect (0, 0, driver.Rows, driver.Cols), ' ');
+        driver.FillRect (new Rectangle (0, 0, driver.Rows, driver.Cols), ' ');
         Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
 
         // Setup the region with a single rectangle, fill screen with 'x'
-        driver.Clip = new Rect (5, 5, 5, 5);
-        driver.FillRect (new Rect (0, 0, driver.Rows, driver.Cols), 'x');
+        driver.Clip = new Rectangle (5, 5, 5, 5);
+        driver.FillRect (new Rectangle (0, 0, driver.Rows, driver.Cols), 'x');
         Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
         Assert.Equal ((Rune)' ', driver.Contents [4, 9].Rune);
         Assert.Equal ((Rune)'x', driver.Contents [5, 5].Rune);
@@ -66,7 +66,7 @@ public class ClipRegionTests
         Application.Init (driver);
 
         // Define a clip rectangle
-        driver.Clip = Rect.Empty;
+        driver.Clip = Rectangle.Empty;
 
         // negative
         Assert.False (driver.IsValidLocation (4, 5));
@@ -111,7 +111,7 @@ public class ClipRegionTests
         Assert.False (driver.IsValidLocation (driver.Cols, driver.Rows));
 
         // Define a clip rectangle
-        driver.Clip = new Rect (5, 5, 5, 5);
+        driver.Clip = new Rectangle (5, 5, 5, 5);
 
         // positive
         Assert.True (driver.IsValidLocation (5, 5));

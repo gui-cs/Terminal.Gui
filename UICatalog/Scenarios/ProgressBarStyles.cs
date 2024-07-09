@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using Terminal.Gui;
@@ -20,41 +22,44 @@ public class ProgressBarStyles : Scenario
     private const uint _timerTick = 20;
     private Timer _fractionTimer;
     private Timer _pulseTimer;
+    private ListView _pbList;
 
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
-        ConfigurationManager.Themes.Theme = Theme;
-        ConfigurationManager.Apply ();
 
-        var editor = new AdornmentsEditor
+        Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}", BorderStyle = LineStyle.Single
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}", BorderStyle = LineStyle.Single,
         };
-        editor.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+
+        var editor = new AdornmentsEditor ()
+        {
+            AutoSelectViewToEdit = false
+        };
+        app.Add (editor);
+
+        View container = new ()
+        {
+            X = Pos.Right (editor),
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+        };
+        app.Add (container);
 
         const float fractionStep = 0.01F;
 
-        var pbList = new ListView
+        _pbList = new ListView
         {
             Title = "Focused ProgressBar",
-            Y = 0,
+            Y = Pos.Align (Alignment.Start),
             X = Pos.Center (),
-            Width = 30,
-            Height = 7,
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
             BorderStyle = LineStyle.Single
         };
-
-        pbList.SelectedItemChanged += (sender, e) =>
-                                      {
-                                          editor.ViewToEdit = editor.Subviews.First (
-                                                                                     v =>
-                                                                                         v.GetType () == typeof (ProgressBar)
-                                                                                         && v.Title == (string)e.Value
-                                                                                    );
-                                      };
-        editor.Add (pbList);
-        pbList.SelectedItem = 0;
+        container.Add (_pbList);
 
         #region ColorPicker
 
@@ -64,20 +69,27 @@ public class ProgressBarStyles : Scenario
 
             var dialog = new Dialog { Title = text };
 
-            dialog.LayoutComplete += (sender, args) =>
+            dialog.Initialized += (sender, args) =>
                                      {
                                          // TODO: Replace with Dim.Auto
-                                         dialog.X = pbList.Frame.X;
-                                         dialog.Y = pbList.Frame.Height;
-
-                                         dialog.Bounds = new Rect (0, 0, colorPicker.Frame.Width, colorPicker.Frame.Height);
-
-                                         Application.Top.LayoutSubviews ();
+                                         dialog.X = _pbList.Frame.X;
+                                         dialog.Y = _pbList.Frame.Height;
                                      };
+
+            dialog.LayoutComplete += (sender, args) =>
+                                    {
+                                        dialog.Viewport = Rectangle.Empty with
+                                        {
+                                            Width = colorPicker.Frame.Width,
+                                            Height = colorPicker.Frame.Height
+                                        };
+                                        Application.Top.LayoutSubviews ();
+                                    };
 
             dialog.Add (colorPicker);
             colorPicker.ColorChanged += (s, e) => { dialog.RequestStop (); };
             Application.Run (dialog);
+            dialog.Dispose ();
 
             ColorName retColor = colorPicker.SelectedColor.GetClosestNamedColor ();
             colorPicker.Dispose ();
@@ -87,11 +99,13 @@ public class ProgressBarStyles : Scenario
 
         var fgColorPickerBtn = new Button
         {
-            Text = "Foreground HotNormal Color", X = Pos.Center (), Y = Pos.Bottom (pbList)
+            Text = "Foreground HotNormal Color",
+            X = Pos.Center (),
+            Y = Pos.Align (Alignment.Start),
         };
-        editor.Add (fgColorPickerBtn);
+        container.Add (fgColorPickerBtn);
 
-        fgColorPickerBtn.Clicked += (s, e) =>
+        fgColorPickerBtn.Accept += (s, e) =>
                                     {
                                         ColorName newColor = ChooseColor (
                                                                           fgColorPickerBtn.Text,
@@ -112,11 +126,13 @@ public class ProgressBarStyles : Scenario
 
         var bgColorPickerBtn = new Button
         {
-            X = Pos.Center (), Y = Pos.Bottom (fgColorPickerBtn), Text = "Background HotNormal Color"
+            X = Pos.Center (),
+            Y = Pos.Align (Alignment.Start),
+            Text = "Background HotNormal Color"
         };
-        editor.Add (bgColorPickerBtn);
+        container.Add (bgColorPickerBtn);
 
-        bgColorPickerBtn.Clicked += (s, e) =>
+        bgColorPickerBtn.Accept += (s, e) =>
                                     {
                                         ColorName newColor = ChooseColor (
                                                                           fgColorPickerBtn.Text,
@@ -144,40 +160,46 @@ public class ProgressBarStyles : Scenario
         {
             BorderStyle = LineStyle.Single,
             Title = "ProgressBarFormat",
-            X = Pos.Left (pbList),
-            Y = Pos.Bottom (bgColorPickerBtn) + 1,
+            X = Pos.Center (),
+            Y = Pos.Align (Alignment.Start),
             RadioLabels = pbFormatEnum.Select (e => e.ToString ()).ToArray ()
         };
-        editor.Add (rbPBFormat);
+        container.Add (rbPBFormat);
 
-        var button = new Button { X = Pos.Center (), Y = Pos.Bottom (rbPBFormat) + 1, Text = "Start timer" };
-
-        editor.Add (button);
+        var button = new Button
+        {
+            X = Pos.Center (),
+            Y = Pos.Align (Alignment.Start),
+            Text = "Start timer"
+        };
+        container.Add (button);
 
         var blocksPB = new ProgressBar
         {
             Title = "Blocks",
             X = Pos.Center (),
-            Y = Pos.Bottom (button) + 1,
-            Width = Dim.Width (pbList),
+            Y = Pos.Align (Alignment.Start),
+            Width = Dim.Percent (50),
             BorderStyle = LineStyle.Single,
             CanFocus = true
         };
-        editor.Add (blocksPB);
+        container.Add (blocksPB);
+
+        rbPBFormat.SelectedItem = (int)blocksPB.ProgressBarFormat;
 
         var continuousPB = new ProgressBar
         {
             Title = "Continuous",
             X = Pos.Center (),
-            Y = Pos.Bottom (blocksPB) + 1,
-            Width = Dim.Width (pbList),
+            Y = Pos.Align (Alignment.Start),
+            Width = Dim.Percent (50),
             ProgressBarStyle = ProgressBarStyle.Continuous,
             BorderStyle = LineStyle.Single,
             CanFocus = true
         };
-        editor.Add (continuousPB);
+        container.Add (continuousPB);
 
-        button.Clicked += (s, e) =>
+        button.Accept += (s, e) =>
                           {
                               if (_fractionTimer == null)
                               {
@@ -211,40 +233,53 @@ public class ProgressBarStyles : Scenario
 
         var ckbBidirectional = new CheckBox
         {
-            X = Pos.Center (), Y = Pos.Bottom (continuousPB) + 1, Text = "BidirectionalMarquee", Checked = true
+            X = Pos.Center (),
+            Y = Pos.Bottom (continuousPB),
+            Text = "BidirectionalMarquee", 
+            State = CheckState.Checked
         };
-        editor.Add (ckbBidirectional);
+        container.Add (ckbBidirectional);
 
         var marqueesBlocksPB = new ProgressBar
         {
             Title = "Marquee Blocks",
             X = Pos.Center (),
-            Y = Pos.Bottom (ckbBidirectional) + 1,
-            Width = Dim.Width (pbList),
+            Y = Pos.Align (Alignment.Start),
+            Width = Dim.Percent (50),
             ProgressBarStyle = ProgressBarStyle.MarqueeBlocks,
             BorderStyle = LineStyle.Single,
             CanFocus = true
         };
-        editor.Add (marqueesBlocksPB);
+        container.Add (marqueesBlocksPB);
 
         var marqueesContinuousPB = new ProgressBar
         {
             Title = "Marquee Continuous",
             X = Pos.Center (),
-            Y = Pos.Bottom (marqueesBlocksPB) + 1,
-            Width = Dim.Width (pbList),
+            Y = Pos.Align (Alignment.Start),
+            Width = Dim.Percent (50),
             ProgressBarStyle = ProgressBarStyle.MarqueeContinuous,
             BorderStyle = LineStyle.Single,
             CanFocus = true
         };
-        editor.Add (marqueesContinuousPB);
+        container.Add (marqueesContinuousPB);
 
-        pbList.SetSource (
-                          editor.Subviews.Where (v => v.GetType () == typeof (ProgressBar))
-                                .Select (v => v.Title)
-                                .ToList ()
+        _pbList.SetSource (
+                          new ObservableCollection<string> (
+                                                            container.Subviews.Where (v => v.GetType () == typeof (ProgressBar))
+                                                                     .Select (v => v.Title)
+                                                                     .ToList ())
                          );
-        pbList.SelectedItem = 0;
+
+        _pbList.SelectedItemChanged += (sender, e) =>
+                                      {
+                                          editor.ViewToEdit = container.Subviews.First (
+                                                                                        v =>
+                                                                                            v.GetType () == typeof (ProgressBar)
+                                                                                            && v.Title == (string)e.Value
+                                                                                       );
+                                      };
+
 
         rbPBFormat.SelectedItemChanged += (s, e) =>
                                           {
@@ -254,17 +289,22 @@ public class ProgressBarStyles : Scenario
                                               marqueesContinuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
                                           };
 
-        ckbBidirectional.Toggled += (s, e) =>
-                                    {
-                                        ckbBidirectional.Checked = marqueesBlocksPB.BidirectionalMarquee =
-                                                                       marqueesContinuousPB.BidirectionalMarquee = (bool)!e.OldValue;
-                                    };
+        ckbBidirectional.Toggle += (s, e) =>
+                                   {
+                                       ckbBidirectional.State = e.NewValue;
+                                       marqueesBlocksPB.BidirectionalMarquee =
+                                                                  marqueesContinuousPB.BidirectionalMarquee = e.NewValue == CheckState.Checked;
+                                   };
+
+
+
+        app.Initialized += App_Initialized;
+        app.Unloaded += App_Unloaded;
 
         _pulseTimer = new Timer (
                                  _ =>
                                  {
-                                     marqueesBlocksPB.Text =
-                                         marqueesContinuousPB.Text = DateTime.Now.TimeOfDay.ToString ();
+                                     marqueesBlocksPB.Text = marqueesContinuousPB.Text = DateTime.Now.TimeOfDay.ToString ();
                                      marqueesBlocksPB.Pulse ();
                                      marqueesContinuousPB.Pulse ();
                                      Application.Wakeup ();
@@ -273,10 +313,13 @@ public class ProgressBarStyles : Scenario
                                  0,
                                  300
                                 );
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
 
-        Application.Top.Unloaded += Top_Unloaded;
+        return;
 
-        void Top_Unloaded (object sender, EventArgs args)
+        void App_Unloaded (object sender, EventArgs args)
         {
             if (_fractionTimer != null)
             {
@@ -290,12 +333,12 @@ public class ProgressBarStyles : Scenario
                 _pulseTimer = null;
             }
 
-            Application.Top.Unloaded -= Top_Unloaded;
+            app.Unloaded -= App_Unloaded;
         }
-
-        Application.Run (editor);
-        Application.Shutdown ();
     }
 
-    public override void Run () { }
+    private void App_Initialized (object sender, EventArgs e)
+    {
+        _pbList.SelectedItem = 0;
+    }
 }

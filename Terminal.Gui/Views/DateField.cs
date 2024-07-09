@@ -21,10 +21,10 @@ public class DateField : TextField
     private string _format;
     private string _separator;
 
-    /// <summary>Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a new instance of <see cref="DateField"/>.</summary>
     public DateField () : this (DateTime.MinValue) { }
 
-    /// <summary>Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a new instance of <see cref="DateField"/>.</summary>
     /// <param name="date"></param>
     public DateField (DateTime date)
     {
@@ -114,14 +114,13 @@ public class DateField : TextField
     }
 
     /// <inheritdoc/>
-    public override bool MouseEvent (MouseEvent ev)
+    protected internal override bool OnMouseEvent  (MouseEvent ev)
     {
-        bool result = base.MouseEvent (ev);
+        bool result = base.OnMouseEvent (ev);
 
         if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            int point = ev.X;
-            AdjCursorPosition (point);
+            AdjCursorPosition (ev.Position.X);
         }
 
         return result;
@@ -183,15 +182,15 @@ public class DateField : TextField
         }
     }
 
-    private void DateField_Changing (object sender, TextChangingEventArgs e)
+    private void DateField_Changing (object sender, CancelEventArgs<string> e)
     {
         try
         {
             var spaces = 0;
 
-            for (var i = 0; i < e.NewText.Length; i++)
+            for (var i = 0; i < e.NewValue.Length; i++)
             {
-                if (e.NewText [i] == ' ')
+                if (e.NewValue [i] == ' ')
                 {
                     spaces++;
                 }
@@ -202,14 +201,14 @@ public class DateField : TextField
             }
 
             spaces += FormatLength;
-            string trimedText = e.NewText [..spaces];
+            string trimedText = e.NewValue [..spaces];
             spaces -= FormatLength;
             trimedText = trimedText.Replace (new string (' ', spaces), " ");
             var date = Convert.ToDateTime (trimedText).ToString (_format.Trim ());
 
-            if ($" {date}" != e.NewText)
+            if ($" {date}" != e.NewValue)
             {
-                e.NewText = $" {date}".Replace (RightToLeftMark, "");
+                e.NewValue = $" {date}".Replace (RightToLeftMark, "");
             }
 
             AdjCursorPosition (CursorPosition);
@@ -402,11 +401,10 @@ public class DateField : TextField
         AddCommand (Command.Right, () => MoveRight ());
 
         // Default keybindings for this view
-        KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
+        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
         KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
         KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-        KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
 
         KeyBindings.Add (Key.Home, Command.LeftHome);
         KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
@@ -419,6 +417,11 @@ public class DateField : TextField
 
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.F.WithCtrl, Command.Right);
+
+#if UNIX_KEY_BINDINGS
+        KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
+#endif
+
     }
 
     private bool SetText (Rune key)

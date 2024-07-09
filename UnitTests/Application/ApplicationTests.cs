@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using Microsoft.VisualBasic;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -39,11 +40,42 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void Begin_Sets_Application_Top_To_Console_Size ()
     {
-        Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
-        Application.Begin (Application.Top);
-        Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
+        Assert.Null (Application.Top);
+        Toplevel top = new ();
+        Application.Begin (top);
+        Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
         ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
-        Assert.Equal (new Rect (0, 0, 5, 5), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 5, 5), Application.Top.Frame);
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void End_And_Shutdown_Should_Not_Dispose_ApplicationTop ()
+    {
+        Init ();
+
+        RunState rs = Application.Begin (new ());
+        Assert.Equal (rs.Toplevel, Application.Top);
+        Application.End (rs);
+
+#if DEBUG_IDISPOSABLE
+        Assert.True (rs.WasDisposed);
+        Assert.False (Application.Top.WasDisposed); // Is true because the rs.Toplevel is the same as Application.Top
+#endif
+
+        Assert.Null (rs.Toplevel);
+
+        Toplevel top = Application.Top;
+
+#if DEBUG_IDISPOSABLE
+        Exception exception = Record.Exception (() => Shutdown ());
+        Assert.NotNull (exception);
+        Assert.False (top.WasDisposed);
+        top.Dispose ();
+        Assert.True (top.WasDisposed);
+#endif
+        Shutdown ();
+        Assert.Null (Application.Top);
     }
 
     [Fact]
@@ -81,6 +113,7 @@ public class ApplicationTests
         Assert.NotNull (Application.MainLoop);
         Assert.NotNull (Application.Driver);
 
+        topLevel.Dispose ();
         Shutdown ();
 
         Assert.Null (Application.Top);
@@ -100,6 +133,7 @@ public class ApplicationTests
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driverName: driverType.Name);
         Assert.NotNull (Application.Driver);
+        Assert.NotEqual (driver, Application.Driver);
         Assert.Equal (driverType, Application.Driver.GetType ());
         Shutdown ();
     }
@@ -114,8 +148,12 @@ public class ApplicationTests
         Shutdown ();
     }
 
-    [Fact]
-    public void Init_ResetState_Resets_Properties ()
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (NetDriver))]
+    [InlineData (typeof (WindowsDriver))]
+    [InlineData (typeof (CursesDriver))]
+    public void Init_ResetState_Resets_Properties (Type driverType)
     {
         ConfigurationManager.ThrowOnJsonErrors = true;
 
@@ -123,7 +161,7 @@ public class ApplicationTests
 
         // Set some values
 
-        Application.Init ();
+        Application.Init (driverName: driverType.Name);
         Application._initialized = true;
 
         // Reset
@@ -141,7 +179,8 @@ public class ApplicationTests
 
             // Don't check Application.ForceDriver
             // Assert.Empty (Application.ForceDriver);
-            Assert.False (Application.Force16Colors);
+            // Don't check Application.Force16Colors
+            //Assert.False (Application.Force16Colors);
             Assert.Null (Application.Driver);
             Assert.Null (Application.MainLoop);
             Assert.False (Application.EndAfterFirstIteration);
@@ -158,6 +197,9 @@ public class ApplicationTests
             Assert.Equal (-1, Application._mainThreadId);
             Assert.Empty (Application._topLevels);
             Assert.Null (Application._mouseEnteredView);
+
+            // Keyboard
+            Assert.Empty (Application.GetViewsWithKeyBindings ());
 
             // Events - Can't check
             //Assert.Null (Application.NotifyNewRunState);
@@ -181,7 +223,7 @@ public class ApplicationTests
         Application._mainThreadId = 1;
 
         //Application._topLevels = new List<Toplevel> ();
-        Application._mouseEnteredView = new View ();
+        Application._mouseEnteredView = new ();
 
         //Application.SupportedCultures = new List<CultureInfo> ();
         Application.Force16Colors = true;
@@ -191,10 +233,11 @@ public class ApplicationTests
         Application.AlternateBackwardKey = Key.A;
         Application.AlternateForwardKey = Key.B;
         Application.QuitKey = Key.C;
+        Application.AddKeyBinding (Key.A, new View ());
 
         //Application.OverlappedChildren = new List<View> ();
         //Application.OverlappedTop = 
-        Application._mouseEnteredView = new View ();
+        Application._mouseEnteredView = new ();
 
         //Application.WantContinuousButtonPressedView = new View ();
 
@@ -228,17 +271,79 @@ public class ApplicationTests
 #endif
     }
 
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (NetDriver))]
+    [InlineData (typeof (WindowsDriver))]
+    [InlineData (typeof (CursesDriver))]
+    public void Init_Shutdown_Fire_InitializedChanged (Type driverType)
+    {
+        bool initialized = false;
+        bool shutdown = false;
+
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+
+        Application.Init (driverName: driverType.Name);
+        Assert.True (initialized);
+        Assert.False (shutdown);
+
+        Application.Shutdown ();
+        Assert.True (initialized);
+        Assert.True (shutdown);
+
+        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+
+        return;
+
+        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
+        {
+            if (a.CurrentValue)
+            {
+                initialized = true;
+            }
+            else
+            {
+                shutdown = true;
+            }
+        }
+    }
+
+
+    [Fact]
+    public void Run_Iteration_Fires ()
+    {
+        int iteration = 0;
+
+        Application.Init (new FakeDriver ());
+
+        Application.Iteration += Application_Iteration;
+        Application.Run<Toplevel> ().Dispose ();
+
+        Assert.Equal (1, iteration);
+        Application.Shutdown ();
+
+        return;
+
+        void Application_Iteration (object sender, IterationEventArgs e)
+        {
+            if (iteration > 0)
+            {
+                Assert.Fail ();
+            }
+            iteration++;
+            Application.RequestStop ();
+        }
+    }
+
+
     [Fact]
     public void Init_Unbalanced_Throws ()
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel topLevel = null;
-
         Assert.Throws<InvalidOperationException> (
                                                   () =>
                                                       Application.InternalInit (
-                                                                                () => topLevel = new TestToplevel (),
                                                                                 new FakeDriver ()
                                                                                )
                                                  );
@@ -249,8 +354,7 @@ public class ApplicationTests
         Assert.Null (Application.Driver);
 
         // Now try the other way
-        topLevel = null;
-        Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver ());
+        Application.InternalInit (new FakeDriver ());
 
         Assert.Throws<InvalidOperationException> (() => Application.Init (new FakeDriver ()));
         Shutdown ();
@@ -261,7 +365,7 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void InitWithTopLevelFactory_Begin_End_Cleans_Up ()
+    public void InitWithoutTopLevelFactory_Begin_End_Cleans_Up ()
     {
         // Begin will cause Run() to be called, which will call Begin(). Thus will block the tests
         // if we don't stop
@@ -269,8 +373,8 @@ public class ApplicationTests
 
         // NOTE: Run<T>, when called after Init has been called behaves differently than
         // when called if Init has not been called.
-        Toplevel topLevel = null;
-        Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver ());
+        Toplevel topLevel = new ();
+        Application.InternalInit (new FakeDriver ());
 
         RunState runstate = null;
 
@@ -297,6 +401,7 @@ public class ApplicationTests
         Assert.NotNull (Application.MainLoop);
         Assert.NotNull (Application.Driver);
 
+        topLevel.Dispose ();
         Shutdown ();
 
         Assert.Null (Application.Top);
@@ -309,12 +414,13 @@ public class ApplicationTests
     public void Internal_Properties_Correct ()
     {
         Assert.True (Application._initialized);
-        Assert.NotNull (Application.Top);
-        RunState rs = Application.Begin (Application.Top);
+        Assert.Null (Application.Top);
+        RunState rs = Application.Begin (new ());
         Assert.Equal (Application.Top, rs.Toplevel);
         Assert.Null (Application.MouseGrabView); // public
         Assert.Null (Application.WantContinuousButtonPressedView); // public
         Assert.False (Application.MoveToOverlappedChild (Application.Top));
+        Application.Top.Dispose ();
     }
 
     // Invoke Tests
@@ -332,6 +438,7 @@ public class ApplicationTests
         Application.MainLoop.Running = true;
         Application.RunIteration (ref rs, ref firstIteration);
         Assert.Equal (1, actionCalled);
+        top.Dispose ();
         Application.Shutdown ();
     }
 
@@ -339,6 +446,8 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void SetCurrentAsTop_Run_A_Not_Modal_Toplevel_Make_It_The_Current_Application_Top ()
     {
+        var top = new Toplevel ();
+
         var t1 = new Toplevel ();
         var t2 = new Toplevel ();
         var t3 = new Toplevel ();
@@ -430,6 +539,14 @@ public class ApplicationTests
         Application.Run (t1);
 
         Assert.Equal (t1, Application.Top);
+
+        // top wasn't run and so never was added to toplevel's stack
+        Assert.NotEqual (top, Application.Top);
+#if DEBUG_IDISPOSABLE
+        Assert.False (Application.Top.WasDisposed);
+        t1.Dispose ();
+        Assert.True (Application.Top.WasDisposed);
+#endif
     }
 
     private void Init ()
@@ -470,14 +587,19 @@ public class ApplicationTests
     #region RunTests
 
     [Fact]
-    public void Run_T_After_InitWithDriver_with_TopLevel_Throws ()
+    public void Run_T_After_InitWithDriver_with_TopLevel_Does_Not_Throws ()
     {
         // Setup Mock driver
         Init ();
 
-        // Run<Toplevel> when already initialized with a Driver will throw (because Toplevel is not dervied from TopLevel)
-        Assert.Throws<ArgumentException> (() => Application.Run<Toplevel> ());
+        Application.Iteration += (s, e) => Application.RequestStop ();
 
+        // Run<Toplevel> when already initialized or not with a Driver will not throw (because Window is derived from Toplevel)
+        // Using another type not derived from Toplevel will throws at compile time
+        Application.Run<Window> ();
+        Assert.True (Application.Top is Window);
+
+        Application.Top.Dispose ();
         Shutdown ();
 
         Assert.Null (Application.Top);
@@ -486,14 +608,25 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Run_T_After_InitWithDriver_with_TopLevel_and_Driver_Throws ()
+    public void Run_T_After_InitWithDriver_with_TopLevel_and_Driver_Does_Not_Throws ()
     {
         // Setup Mock driver
         Init ();
 
-        // Run<Toplevel> when already initialized with a Driver will throw (because Toplevel is not dervied from TopLevel)
-        Assert.Throws<ArgumentException> (() => Application.Run<Toplevel> (null, new FakeDriver ()));
+        Application.Iteration += (s, e) => Application.RequestStop ();
 
+        // Run<Toplevel> when already initialized or not with a Driver will not throw (because Window is derived from Toplevel)
+        // Using another type not derived from Toplevel will throws at compile time
+        Application.Run<Window> (null, new FakeDriver ());
+        Assert.True (Application.Top is Window);
+
+        Application.Top.Dispose ();
+
+        // Run<Toplevel> when already initialized or not with a Driver will not throw (because Dialog is derived from Toplevel)
+        Application.Run<Dialog> (null, new FakeDriver ());
+        Assert.True (Application.Top is Dialog);
+
+        Application.Top.Dispose ();
         Shutdown ();
 
         Assert.Null (Application.Top);
@@ -502,6 +635,41 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
+    public void Run_T_After_Init_Does_Not_Disposes_Application_Top ()
+    {
+        Init ();
+
+        // Init doesn't create a Toplevel and assigned it to Application.Top
+        // but Begin does
+        var initTop = new Toplevel ();
+
+        Application.Iteration += (s, a) =>
+                                 {
+                                     Assert.NotEqual (initTop, Application.Top);
+#if DEBUG_IDISPOSABLE
+                                     Assert.False (initTop.WasDisposed);
+#endif
+                                     Application.RequestStop ();
+                                 };
+
+        Application.Run<TestToplevel> ();
+
+#if DEBUG_IDISPOSABLE
+        Assert.False (initTop.WasDisposed);
+        initTop.Dispose ();
+        Assert.True (initTop.WasDisposed);
+#endif
+        Application.Top.Dispose ();
+        Shutdown ();
+
+        Assert.Null (Application.Top);
+        Assert.Null (Application.MainLoop);
+        Assert.Null (Application.Driver);
+    }
+
+    [Fact]
+    [TestRespondersDisposed]
     public void Run_T_After_InitWithDriver_with_TestTopLevel_DoesNotThrow ()
     {
         // Setup Mock driver
@@ -512,6 +680,7 @@ public class ApplicationTests
         // Init has been called and we're passing no driver to Run<TestTopLevel>. This is ok.
         Application.Run<TestToplevel> ();
 
+        Application.Top.Dispose ();
         Shutdown ();
 
         Assert.Null (Application.Top);
@@ -520,7 +689,8 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Run_T_After_InitNullDriver_with_TestTopLevel_Throws ()
+    [TestRespondersDisposed]
+    public void Run_T_After_InitNullDriver_with_TestTopLevel_DoesNotThrow ()
     {
         Application.ForceDriver = "FakeDriver";
 
@@ -529,9 +699,10 @@ public class ApplicationTests
 
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
-        // Init has been called without selecting a driver and we're passing no driver to Run<TestTopLevel>. Bad
+        // Init has been called, selecting FakeDriver; we're passing no driver to Run<TestTopLevel>. Should be fine.
         Application.Run<TestToplevel> ();
 
+        Application.Top.Dispose ();
         Shutdown ();
 
         Assert.Null (Application.Top);
@@ -540,13 +711,12 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
     public void Run_T_Init_Driver_Cleared_with_TestTopLevel_Throws ()
     {
         Init ();
 
         Application.Driver = null;
-
-        Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         // Init has been called, but Driver has been set to null. Bad.
         Assert.Throws<InvalidOperationException> (() => Application.Run<TestToplevel> ());
@@ -559,6 +729,7 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
     public void Run_T_NoInit_DoesNotThrow ()
     {
         Application.ForceDriver = "FakeDriver";
@@ -568,6 +739,7 @@ public class ApplicationTests
         Application.Run<TestToplevel> ();
         Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
 
+        Application.Top.Dispose ();
         Shutdown ();
 
         Assert.Null (Application.Top);
@@ -576,6 +748,7 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
     public void Run_T_NoInit_WithDriver_DoesNotThrow ()
     {
         Application.Iteration += (s, a) => { Application.RequestStop (); };
@@ -583,6 +756,7 @@ public class ApplicationTests
         // Init has NOT been called and we're passing a valid driver to Run<TestTopLevel>. This is ok.
         Application.Run<TestToplevel> (null, new FakeDriver ());
 
+        Application.Top.Dispose ();
         Shutdown ();
 
         Assert.Null (Application.Top);
@@ -591,6 +765,7 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
     public void Run_RequestStop_Stops ()
     {
         // Setup Mock driver
@@ -605,6 +780,7 @@ public class ApplicationTests
 
         Application.Run (top);
 
+        top.Dispose ();
         Application.Shutdown ();
         Assert.Null (Application.Current);
         Assert.Null (Application.Top);
@@ -613,6 +789,7 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
     public void Run_RunningFalse_Stops ()
     {
         // Setup Mock driver
@@ -627,6 +804,7 @@ public class ApplicationTests
 
         Application.Run (top);
 
+        top.Dispose ();
         Application.Shutdown ();
         Assert.Null (Application.Current);
         Assert.Null (Application.Top);
@@ -635,16 +813,18 @@ public class ApplicationTests
     }
 
     [Fact]
+    [TestRespondersDisposed]
     public void Run_Loaded_Ready_Unlodaded_Events ()
     {
         Init ();
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var count = 0;
         top.Loaded += (s, e) => count++;
         top.Ready += (s, e) => count++;
         top.Unloaded += (s, e) => count++;
         Application.Iteration += (s, a) => Application.RequestStop ();
-        Application.Run ();
+        Application.Run (top);
+        top.Dispose ();
         Application.Shutdown ();
         Assert.Equal (3, count);
     }
@@ -658,7 +838,7 @@ public class ApplicationTests
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
         Dialog d = null;
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.DrawContent += (s, a) => count++;
         int iteration = -1;
 
@@ -669,18 +849,13 @@ public class ApplicationTests
                                      if (iteration == 0)
                                      {
                                          // TODO: Don't use Dialog here as it has more layout logic. Use Window instead.
-                                         d = new Dialog ();
+                                         d = new ();
                                          d.DrawContent += (s, a) => count++;
                                          Application.Run (d);
                                      }
                                      else if (iteration < 3)
                                      {
-                                         Application.OnMouseEvent (
-                                                                   new MouseEventEventArgs (
-                                                                                            new MouseEvent
-                                                                                                { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition }
-                                                                                           )
-                                                                  );
+                                         Application.OnMouseEvent (new () { Flags = MouseFlags.ReportMousePosition });
                                          Assert.False (top.NeedsDisplay);
                                          Assert.False (top.SubViewNeedsDisplay);
                                          Assert.False (top.LayoutNeeded);
@@ -693,7 +868,8 @@ public class ApplicationTests
                                          Application.RequestStop ();
                                      }
                                  };
-        Application.Run ();
+        Application.Run (top);
+        top.Dispose ();
         Application.Shutdown ();
 
         // 1 - First top load, 1 - Dialog load, 1 - Dialog unload, Total - 3.
@@ -707,98 +883,178 @@ public class ApplicationTests
         Init ();
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
-        var w = new Window { Width = 5, Height = 5 };
+        var w = new Window
+        {
+            Width = 5, Height = 5,
+            Arrangement = ViewArrangement.Movable
+        };
         ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
         RunState rs = Application.Begin (w);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌───┐
-│   │
-│   │
-│   │
-└───┘",
-                                                      _output
-                                                     );
+        // Don't use visuals to test as style of border can change over time.
+        Assert.Equal (new Point (0, 0), w.Frame.Location);
 
-        Attribute [] attributes =
-        {
-            // 0
-            new (ColorName.White, ColorName.Black),
-
-            // 1
-            Colors.ColorSchemes ["Base"].Normal
-        };
-
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
-1111100000
-1111100000
-1111100000
-1111100000
-1111100000
-",
-                                               null,
-                                               attributes
-                                              );
-
-        // TODO: In PR #2920 this breaks because the mouse is not grabbed anymore.
-        // TODO: Move the mouse grap/drag mode from Toplevel to Border.
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed }
-                                                          )
-                                 );
-        Assert.Equal (w, Application.MouseGrabView);
+        Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+        Assert.Equal (w.Border, Application.MouseGrabView);
+        Assert.Equal (new Point (0, 0), w.Frame.Location);
 
         // Move down and to the right.
-        Application.OnMouseEvent (
-                                  new MouseEventEventArgs (
-                                                           new MouseEvent
-                                                           {
-                                                               X = 1,
-                                                               Y = 1,
-                                                               Flags = MouseFlags.Button1Pressed
-                                                                       | MouseFlags.ReportMousePosition
-                                                           }
-                                                          )
-                                 );
-        Application.Refresh ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌───┐
- │   │
- │   │
- │   │
- └───┘",
-                                                      _output
-                                                     );
-
-        attributes = new []
-        {
-            // 0
-            new (ColorName.White, ColorName.Black),
-
-            // 1
-            Colors.ColorSchemes ["Base"].Normal
-        };
-
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
-0000000000
-0111110000
-0111110000
-0111110000
-0111110000
-0111110000
-",
-                                               null,
-                                               attributes
-                                              );
+        Application.OnMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Assert.Equal (new Point (1, 1), w.Frame.Location);
 
         Application.End (rs);
+        w.Dispose ();
         Application.Shutdown ();
+    }
+
+    [Fact]
+    public void End_Does_Not_Dispose ()
+    {
+        Init ();
+
+        var top = new Toplevel ();
+
+        Window w = new ();
+        w.Ready += (s, e) => Application.RequestStop (); // Causes `End` to be called
+        Application.Run (w);
+
+#if DEBUG_IDISPOSABLE
+        Assert.False (w.WasDisposed);
+#endif
+
+        Assert.NotNull (w);
+        Assert.Equal (string.Empty, w.Title); // Valid - w has not been disposed. The user may want to run it again
+        Assert.NotNull (Application.Top);
+        Assert.Equal (w, Application.Top);
+        Assert.NotEqual (top, Application.Top);
+        Assert.Null (Application.Current);
+
+        Application.Run (w); // Valid - w has not been disposed.
+
+#if DEBUG_IDISPOSABLE
+        Assert.False (w.WasDisposed);
+        Exception exception = Record.Exception (Application.Shutdown); // Invalid - w has not been disposed.
+        Assert.NotNull (exception);
+
+        w.Dispose ();
+        Assert.True (w.WasDisposed);
+
+        exception = Record.Exception (
+                                      () => Application.Run (
+                                                             w)); // Invalid - w has been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
+        Assert.NotNull (exception);
+
+        exception = Record.Exception (() => Assert.Equal (string.Empty, w.Title)); // Invalid - w has been disposed and cannot be accessed
+        Assert.NotNull (exception);
+        exception = Record.Exception (() => w.Title = "NewTitle"); // Invalid - w has been disposed and cannot be accessed
+        Assert.NotNull (exception);
+#endif
+        Application.Shutdown ();
+        Assert.NotNull (w);
+        Assert.Null (Application.Current);
+        Assert.NotNull (top);
+        Assert.Null (Application.Top);
+    }
+
+    [Fact]
+    public void Run_Creates_Top_Without_Init ()
+    {
+        var driver = new FakeDriver ();
+
+        Assert.Null (Application.Top);
+
+        Application.Iteration += (s, e) =>
+                                 {
+                                     Assert.NotNull (Application.Top);
+                                     Application.RequestStop ();
+                                 };
+        Toplevel top = Application.Run (null, driver);
+#if DEBUG_IDISPOSABLE
+        Assert.Equal (top, Application.Top);
+        Assert.False (top.WasDisposed);
+        Exception exception = Record.Exception (Application.Shutdown);
+        Assert.NotNull (exception);
+        Assert.False (top.WasDisposed);
+#endif
+
+        // It's up to caller to dispose it
+        top.Dispose ();
+
+#if DEBUG_IDISPOSABLE
+        Assert.True (top.WasDisposed);
+#endif
+        Assert.NotNull (Application.Top);
+
+        Application.Shutdown ();
+        Assert.Null (Application.Top);
+    }
+
+    [Fact]
+    public void Run_T_Creates_Top_Without_Init ()
+    {
+        var driver = new FakeDriver ();
+
+        Assert.Null (Application.Top);
+
+        Application.Iteration += (s, e) =>
+                                 {
+                                     Assert.NotNull (Application.Top);
+                                     Application.RequestStop ();
+                                 };
+        Application.Run<Toplevel> (null, driver);
+#if DEBUG_IDISPOSABLE
+        Assert.False (Application.Top.WasDisposed);
+        Exception exception = Record.Exception (Application.Shutdown);
+        Assert.NotNull (exception);
+        Assert.False (Application.Top.WasDisposed);
+
+        // It's up to caller to dispose it
+        Application.Top.Dispose ();
+        Assert.True (Application.Top.WasDisposed);
+#endif
+        Assert.NotNull (Application.Top);
+
+        Application.Shutdown ();
+        Assert.Null (Application.Top);
+    }
+
+    [Fact]
+    public void Run_t_Does_Not_Creates_Top_Without_Init ()
+    {
+        // When a Toplevel is created it must already have all the Application configuration loaded
+        // This is only possible by two ways:
+        // 1 - Using Application.Init first
+        // 2 - Using Application.Run() or Application.Run<T>()
+        // The Application.Run(new(Toplevel)) must always call Application.Init() first because
+        // the new(Toplevel) may be a derived class that is possible using Application static
+        // properties that is only available after the Application.Init was called
+        var driver = new FakeDriver ();
+
+        Assert.Null (Application.Top);
+
+        Assert.Throws<InvalidOperationException> (() => Application.Run (new Toplevel ()));
+
+        Application.Init (driver);
+        Application.Iteration += (s, e) =>
+                                 {
+                                     Assert.NotNull (Application.Top);
+                                     Application.RequestStop ();
+                                 };
+        Application.Run (new Toplevel ());
+#if DEBUG_IDISPOSABLE
+        Assert.False (Application.Top.WasDisposed);
+        Exception exception = Record.Exception (Application.Shutdown);
+        Assert.NotNull (exception);
+        Assert.False (Application.Top.WasDisposed);
+
+        // It's up to caller to dispose it
+        Application.Top.Dispose ();
+        Assert.True (Application.Top.WasDisposed);
+#endif
+        Assert.NotNull (Application.Top);
+
+        Application.Shutdown ();
+        Assert.Null (Application.Top);
     }
 
     // TODO: Add tests for Run that test errorHandler
@@ -838,4 +1094,123 @@ public class ApplicationTests
     }
 
     #endregion
+
+
+    private object _timeoutLock;
+
+    [Fact]
+    public void AddTimeout_Fires ()
+    {
+        Assert.Null (_timeoutLock);
+        _timeoutLock = new object ();
+
+        uint timeoutTime = 250;
+        bool initialized = false;
+        int iteration = 0;
+        bool shutdown = false;
+        object timeout = null;
+        int timeoutCount = 0;
+
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+
+        Application.Init (new FakeDriver ());
+        Assert.True (initialized);
+        Assert.False (shutdown);
+
+        _output.WriteLine ("Application.Run<Toplevel> ().Dispose ()..");
+        Application.Run<Toplevel> ().Dispose ();
+        _output.WriteLine ("Back from Application.Run<Toplevel> ().Dispose ()");
+
+        Assert.True (initialized);
+        Assert.False (shutdown);
+
+        Assert.Equal (1, timeoutCount);
+        Application.Shutdown ();
+
+        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+
+        lock (_timeoutLock)
+        {
+            if (timeout is { })
+            {
+                Application.RemoveTimeout (timeout);
+                timeout = null;
+            }
+        }
+
+        Assert.True (initialized);
+        Assert.True (shutdown);
+
+#if DEBUG_IDISPOSABLE
+        Assert.Empty (Responder.Instances);
+#endif
+        lock (_timeoutLock)
+        {
+            _timeoutLock = null;
+        }
+
+        return;
+
+        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
+        {
+            if (a.CurrentValue)
+            {
+                Application.Iteration += OnApplicationOnIteration;
+                initialized = true;
+
+                lock (_timeoutLock)
+                {
+                    _output.WriteLine ($"Setting timeout for {timeoutTime}ms");
+                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (timeoutTime), TimeoutCallback);
+                }
+
+            }
+            else
+            {
+                Application.Iteration -= OnApplicationOnIteration;
+                shutdown = true;
+            }
+        }
+
+        bool TimeoutCallback ()
+        {
+            lock (_timeoutLock)
+            {
+                _output.WriteLine ($"TimeoutCallback. Count: {++timeoutCount}. Application Iteration: {iteration}");
+                if (timeout is { })
+                {
+                    _output.WriteLine ($"  Nulling timeout.");
+                    timeout = null;
+                }
+            }
+
+            // False means "don't re-do timer and remove it"
+            return false;
+        }
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            lock (_timeoutLock)
+            {
+                if (timeoutCount > 0)
+                {
+                    _output.WriteLine ($"Iteration #{iteration} - Timeout fired. Calling Application.RequestStop.");
+                    Application.RequestStop ();
+
+                    return;
+                }
+            }
+            iteration++;
+
+            // Simulate a delay
+            Thread.Sleep ((int)timeoutTime / 10);
+
+            // Worst case scenario - something went wrong
+            if (Application._initialized && iteration > 25)
+            {
+                _output.WriteLine ($"Too many iterations ({iteration}): Calling Application.RequestStop.");
+                Application.RequestStop ();
+            }
+        }
+    }
 }

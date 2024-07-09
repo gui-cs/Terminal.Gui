@@ -4,91 +4,88 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class KeyboardEventTests
+public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
 {
-    private readonly ITestOutputHelper _output;
-    public KeyboardEventTests (ITestOutputHelper output) { _output = output; }
-
     /// <summary>
-    ///     This tests that when a new key down event is sent to the view the view will fire the 3 key-down related
+    ///     This tests that when a new key down event is sent to the view  will fire the 3 key-down related
     ///     events: KeyDown, InvokingKeyBindings, and ProcessKeyDown. Note that KeyUp is independent.
     /// </summary>
-    [Fact]
-    public void AllViews_KeyDown_All_EventsFire ()
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_KeyDown_All_EventsFire (Type viewType)
     {
-        foreach (View view in TestHelpers.GetAllViews ())
+        var view = CreateInstanceIfNotGeneric (viewType);
+
+        if (view == null)
         {
-            if (view == null)
-            {
-                _output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
+            output.WriteLine ($"ERROR: Skipping generic view: {viewType}");
 
-                continue;
-            }
-
-            _output.WriteLine ($"Testing {view.GetType ().Name}");
-
-            var keyDown = false;
-
-            view.KeyDown += (s, a) =>
-                            {
-                                a.Handled = false; // don't handle it so the other events are called
-                                keyDown = true;
-                            };
-
-            var invokingKeyBindings = false;
-
-            view.InvokingKeyBindings += (s, a) =>
-                                        {
-                                            a.Handled = false; // don't handle it so the other events are called
-                                            invokingKeyBindings = true;
-                                        };
-
-            var keyDownProcessed = false;
-
-            view.ProcessKeyDown += (s, a) =>
-                                   {
-                                       a.Handled = true;
-                                       keyDownProcessed = true;
-                                   };
-
-            Assert.True (view.NewKeyDownEvent (Key.A)); // this will be true because the ProcessKeyDown event handled it
-            Assert.True (keyDown);
-            Assert.True (invokingKeyBindings);
-            Assert.True (keyDownProcessed);
-            view.Dispose ();
+            return;
         }
+
+        output.WriteLine ($"Testing {viewType}");
+
+        var keyDown = false;
+
+        view.KeyDown += (s, a) =>
+                        {
+                            a.Handled = false; // don't handle it so the other events are called
+                            keyDown = true;
+                        };
+
+        var invokingKeyBindings = false;
+
+        view.InvokingKeyBindings += (s, a) =>
+                                    {
+                                        a.Handled = false; // don't handle it so the other events are called
+                                        invokingKeyBindings = true;
+                                    };
+
+        var keyDownProcessed = false;
+
+        view.ProcessKeyDown += (s, a) =>
+                               {
+                                   a.Handled = true;
+                                   keyDownProcessed = true;
+                               };
+
+        Assert.True (view.NewKeyDownEvent (Key.A)); // this will be true because the ProcessKeyDown event handled it
+        Assert.True (keyDown);
+        Assert.True (invokingKeyBindings);
+        Assert.True (keyDownProcessed);
+        view.Dispose ();
     }
 
     /// <summary>
     ///     This tests that when a new key up event is sent to the view the view will fire the 1 key-up related event:
     ///     KeyUp
     /// </summary>
-    [Fact]
-    public void AllViews_KeyUp_All_EventsFire ()
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_KeyUp_All_EventsFire (Type viewType)
     {
-        foreach (View view in TestHelpers.GetAllViews ())
+        var view = CreateInstanceIfNotGeneric (viewType);
+
+        if (view == null)
         {
-            if (view == null)
-            {
-                _output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
+            output.WriteLine ($"ERROR: Generic view {viewType}");
 
-                continue;
-            }
-
-            _output.WriteLine ($"Testing {view.GetType ().Name}");
-
-            var keyUp = false;
-
-            view.KeyUp += (s, a) =>
-                          {
-                              a.Handled = true;
-                              keyUp = true;
-                          };
-
-            Assert.True (view.NewKeyUpEvent (Key.A)); // this will be true because the KeyUp event handled it
-            Assert.True (keyUp);
-            view.Dispose ();
+            return;
         }
+
+        output.WriteLine ($"Testing {view.GetType ().Name}");
+
+        var keyUp = false;
+
+        view.KeyUp += (s, a) =>
+                      {
+                          a.Handled = true;
+                          keyUp = true;
+                      };
+
+        Assert.True (view.NewKeyUpEvent (Key.A)); // this will be true because the KeyUp event handled it
+        Assert.True (keyUp);
+        view.Dispose ();
     }
 
     [Theory]
@@ -133,24 +130,24 @@ public class KeyboardEventTests
         //Assert.True (view.OnProcessKeyDownWasCalled);
 
         view.NewKeyDownEvent (
-                              new Key (
-                                       KeyCode.Null
-                                       | (shift ? KeyCode.ShiftMask : 0)
-                                       | (alt ? KeyCode.AltMask : 0)
-                                       | (control ? KeyCode.CtrlMask : 0)
-                                      )
+                              new (
+                                   KeyCode.Null
+                                   | (shift ? KeyCode.ShiftMask : 0)
+                                   | (alt ? KeyCode.AltMask : 0)
+                                   | (control ? KeyCode.CtrlMask : 0)
+                                  )
                              );
         Assert.True (keyPressed);
         Assert.True (view.OnKeyDownContinued);
         Assert.True (view.OnKeyPressedContinued);
 
         view.NewKeyUpEvent (
-                            new Key (
-                                     KeyCode.Null
-                                     | (shift ? KeyCode.ShiftMask : 0)
-                                     | (alt ? KeyCode.AltMask : 0)
-                                     | (control ? KeyCode.CtrlMask : 0)
-                                    )
+                            new (
+                                 KeyCode.Null
+                                 | (shift ? KeyCode.ShiftMask : 0)
+                                 | (alt ? KeyCode.AltMask : 0)
+                                 | (control ? KeyCode.CtrlMask : 0)
+                                )
                            );
         Assert.True (keyUp);
         Assert.True (view.OnKeyUpContinued);
@@ -188,7 +185,7 @@ public class KeyboardEventTests
                                    Assert.Equal (KeyCode.N, e.KeyCode);
                                };
 
-        view.NewKeyDownEvent (new Key (KeyCode.N));
+        view.NewKeyDownEvent (Key.N);
         Assert.True (keyPressInvoked);
         Assert.True (invokingKeyBindingsInvoked);
         Assert.True (processKeyPressInvoked);
@@ -197,7 +194,7 @@ public class KeyboardEventTests
         invokingKeyBindingsInvoked = false;
         processKeyPressInvoked = false;
         setHandledTo = true;
-        view.NewKeyDownEvent (new Key (KeyCode.N));
+        view.NewKeyDownEvent (Key.N);
         Assert.True (keyPressInvoked);
         Assert.True (invokingKeyBindingsInvoked);
         Assert.False (processKeyPressInvoked);
@@ -241,7 +238,7 @@ public class KeyboardEventTests
                                    keyPressed = true;
                                };
 
-        view.NewKeyDownEvent (new Key (KeyCode.A));
+        view.NewKeyDownEvent (Key.A);
         Assert.True (keyDown);
         Assert.True (invokingKeyBindings);
         Assert.False (keyPressed);
@@ -289,7 +286,7 @@ public class KeyboardEventTests
                                    keyPressed = true;
                                };
 
-        view.NewKeyDownEvent (new Key (KeyCode.A));
+        view.NewKeyDownEvent (Key.A);
         Assert.True (keyDown);
         Assert.False (invokingKeyBindings);
         Assert.False (keyPressed);
@@ -328,14 +325,14 @@ public class KeyboardEventTests
                                    Assert.Equal (KeyCode.N, e.KeyCode);
                                };
 
-        view.NewKeyDownEvent (new Key (KeyCode.N));
+        view.NewKeyDownEvent (Key.N);
         Assert.True (invokingKeyBindingsInvoked);
         Assert.True (processKeyPressInvoked);
 
         invokingKeyBindingsInvoked = false;
         processKeyPressInvoked = false;
         setHandledTo = true;
-        view.NewKeyDownEvent (new Key (KeyCode.N));
+        view.NewKeyDownEvent (Key.N);
         Assert.False (invokingKeyBindingsInvoked);
         Assert.False (processKeyPressInvoked);
     }
@@ -378,7 +375,7 @@ public class KeyboardEventTests
                                    keyPressed = true;
                                };
 
-        view.NewKeyDownEvent (new Key (KeyCode.A));
+        view.NewKeyDownEvent (Key.A);
         Assert.True (keyDown);
         Assert.True (invokingKeyBindings);
         Assert.True (keyPressed);
@@ -406,7 +403,7 @@ public class KeyboardEventTests
                           keyUp = true;
                       };
 
-        view.NewKeyUpEvent (new Key (KeyCode.A));
+        view.NewKeyUpEvent (Key.A);
         Assert.True (keyUp);
 
         Assert.False (view.OnKeyUpContinued);
@@ -424,7 +421,7 @@ public class KeyboardEventTests
         var view = new KeyBindingsTestView ();
         view.CommandReturns = toReturn;
 
-        bool? result = view.OnInvokingKeyBindings (new Key (KeyCode.A));
+        bool? result = view.OnInvokingKeyBindings (Key.A, KeyBindingScope.HotKey | KeyBindingScope.Focused);
         Assert.Equal (expected, result);
     }
 
@@ -434,8 +431,8 @@ public class KeyboardEventTests
         public KeyBindingsTestView ()
         {
             CanFocus = true;
-            AddCommand (Command.Default, () => CommandReturns);
-            KeyBindings.Add (KeyCode.A, Command.Default);
+            AddCommand (Command.HotKey, () => CommandReturns);
+            KeyBindings.Add (Key.A, Command.HotKey);
         }
 
         public bool? CommandReturns { get; set; }
@@ -452,9 +449,9 @@ public class KeyboardEventTests
         public bool OnKeyUpContinued { get; set; }
         public override string Text { get; set; }
 
-        public override bool? OnInvokingKeyBindings (Key keyEvent)
+        public override bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
         {
-            bool? handled = base.OnInvokingKeyBindings (keyEvent);
+            bool? handled = base.OnInvokingKeyBindings (keyEvent, scope);
 
             if (handled != null && (bool)handled)
             {

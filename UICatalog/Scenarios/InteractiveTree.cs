@@ -10,52 +10,48 @@ public class InteractiveTree : Scenario
 {
     private TreeView _treeView;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
-        Win.Y = 1; // menu
-        Win.Height = Dim.Fill (1); // status bar
+        Application.Init ();
+        var appWindow = new Toplevel ()
+        {
+            Title = GetName (),
+        };
 
         var menu = new MenuBar
         {
             Menus =
             [
-                new MenuBarItem ("_File", new MenuItem [] { new ("_Quit", "", Quit) })
+                new ("_File", new MenuItem [] { new ("_Quit", "", Quit) })
             ]
         };
-        Application.Top.Add (menu);
+        appWindow.Add (menu);
 
-        _treeView = new TreeView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        _treeView = new ()
+        {
+            X = 0,
+            Y = 1,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1)
+        };
         _treeView.KeyDown += TreeView_KeyPress;
 
-        Win.Add (_treeView);
+        appWindow.Add (_treeView);
 
         var statusBar = new StatusBar (
-                                       new StatusItem []
+                                       new Shortcut []
                                        {
-                                           new (
-                                                Application.QuitKey,
-                                                $"{Application.QuitKey} to Quit",
-                                                Quit
-                                               ),
-                                           new (
-                                                KeyCode.CtrlMask | KeyCode.C,
-                                                "~^C~ Add Child",
-                                                AddChildNode
-                                               ),
-                                           new (
-                                                KeyCode.CtrlMask | KeyCode.T,
-                                                "~^T~ Add Root",
-                                                AddRootNode
-                                               ),
-                                           new (
-                                                KeyCode.CtrlMask | KeyCode.R,
-                                                "~^R~ Rename Node",
-                                                RenameNode
-                                               )
+                                           new (Application.QuitKey, "Quit", Quit),
+                                           new (Key.C.WithCtrl, "Add Child", AddChildNode),
+                                           new (Key.T.WithCtrl, "Add Root", AddRootNode),
+                                           new (Key.R.WithCtrl, "Rename Node", RenameNode)
                                        }
                                       );
-        Application.Top.Add (statusBar);
+        appWindow.Add (statusBar);
+
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+        Application.Shutdown ();
     }
 
     private void AddChildNode ()
@@ -86,13 +82,13 @@ public class InteractiveTree : Scenario
 
         var ok = new Button { Text = "Ok", IsDefault = true };
 
-        ok.Clicked += (s, e) =>
-                      {
-                          okPressed = true;
-                          Application.RequestStop ();
-                      };
+        ok.Accept += (s, e) =>
+                     {
+                         okPressed = true;
+                         Application.RequestStop ();
+                     };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Clicked += (s, e) => Application.RequestStop ();
+        cancel.Accept += (s, e) => Application.RequestStop ();
         var d = new Dialog { Title = title, Buttons = [ok, cancel] };
 
         var lbl = new Label { X = 0, Y = 1, Text = label };
@@ -103,6 +99,7 @@ public class InteractiveTree : Scenario
         tf.SetFocus ();
 
         Application.Run (d);
+        d.Dispose ();
 
         enteredText = okPressed ? tf.Text : null;
 
@@ -127,7 +124,7 @@ public class InteractiveTree : Scenario
 
     private void TreeView_KeyPress (object sender, Key obj)
     {
-        if (obj.KeyCode == KeyCode.Delete)
+        if (obj.KeyCode == Key.Delete)
         {
             ITreeNode toDelete = _treeView.SelectedObject;
 

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
@@ -19,7 +20,7 @@ public class TextViewTests
         Assert.True (_textView.Multiline);
         Assert.Equal (4, _textView.TabWidth);
         Assert.True (_textView.AllowsTab);
-        _textView.NewKeyDownEvent (new Key (KeyCode.Enter));
+        _textView.NewKeyDownEvent (Key.Enter);
 
         Assert.Equal (
                       Environment.NewLine + "TAB to jump between text fields.",
@@ -31,7 +32,7 @@ public class TextViewTests
         Assert.False (_textView.Multiline);
         Assert.Equal (0, _textView.TabWidth);
         Assert.False (_textView.AllowsTab);
-        _textView.NewKeyDownEvent (new Key (KeyCode.Enter));
+        _textView.NewKeyDownEvent (Key.Enter);
 
         Assert.Equal (
                       Environment.NewLine + "TAB to jump between text fields.",
@@ -59,11 +60,12 @@ public class TextViewTests
     [TextViewTestsAutoInitShutdown]
     public void BackTab_Test_Follow_By_Tab ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      _textView.Text = "";
@@ -84,7 +86,7 @@ public class TextViewTests
                                      while (col > 0)
                                      {
                                          col--;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask));
+                                         _textView.NewKeyDownEvent (Key.Tab.WithShift);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
@@ -93,7 +95,7 @@ public class TextViewTests
                                      while (col < 100)
                                      {
                                          col++;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.Tab));
+                                         _textView.NewKeyDownEvent (Key.Tab);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
@@ -103,46 +105,14 @@ public class TextViewTests
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
-    }
-
-    [Fact]
-    [TextViewTestsAutoInitShutdown]
-    public void BottomOffset_Sets_To_Zero_Adjust_TopRow ()
-    {
-        var text = "";
-
-        for (var i = 0; i < 12; i++)
-        {
-            text += $"This is the line {i}\n";
-        }
-
-        var tv = new TextView { Width = 10, Height = 10, BottomOffset = 1 };
-        tv.Text = text;
-
-        tv.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.End));
-
-        Assert.Equal (4, tv.TopRow);
-        Assert.Equal (1, tv.BottomOffset);
-
-        tv.BottomOffset = 0;
-        Assert.Equal (3, tv.TopRow);
-        Assert.Equal (0, tv.BottomOffset);
-
-        tv.BottomOffset = 2;
-        Assert.Equal (5, tv.TopRow);
-        Assert.Equal (2, tv.BottomOffset);
-
-        tv.BottomOffset = 0;
-        Assert.Equal (3, tv.TopRow);
-        Assert.Equal (0, tv.BottomOffset);
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void CanFocus_False_Wont_Focus_With_Mouse ()
     {
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         var tv = new TextView { Width = Dim.Fill (), CanFocus = false, ReadOnly = true, Text = "some text" };
 
         var fv = new FrameView
@@ -159,7 +129,7 @@ public class TextViewTests
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
 
-        tv.MouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        tv.NewMouseEvent (new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Empty (tv.SelectedText);
         Assert.False (tv.CanFocus);
@@ -170,7 +140,7 @@ public class TextViewTests
         Assert.Throws<InvalidOperationException> (() => tv.CanFocus = true);
         fv.CanFocus = true;
         tv.CanFocus = true;
-        tv.MouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        tv.NewMouseEvent (new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Equal ("some ", tv.SelectedText);
         Assert.True (tv.CanFocus);
@@ -179,7 +149,7 @@ public class TextViewTests
         Assert.True (fv.HasFocus);
 
         fv.CanFocus = false;
-        tv.MouseEvent (new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked });
+        tv.NewMouseEvent (new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Equal ("some ", tv.SelectedText); // Setting CanFocus to false don't change the SelectedText
         Assert.False (tv.CanFocus);
@@ -221,16 +191,10 @@ public class TextViewTests
         var tv = new TextView { Width = 50, Height = 10, Text = text };
         tv.ContentsChanged += (s, e) => { eventcount++; };
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -281,8 +245,9 @@ public class TextViewTests
                                   Assert.Equal (expectedCol, e.Col);
                               };
 
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
         Assert.Equal (1, eventcount);
     }
 
@@ -293,7 +258,7 @@ public class TextViewTests
         var eventcount = 0;
 
         var tv = new TextView { Width = 50, Height = 10 };
-        tv.CursorPosition = new Point (0, 0);
+        tv.CursorPosition = Point.Empty;
 
         tv.ContentsChanged += (s, e) => { eventcount++; };
 
@@ -302,7 +267,7 @@ public class TextViewTests
         tv.InsertText ("a");
         Assert.Equal (1, eventcount);
 
-        tv.CursorPosition = new Point (0, 0);
+        tv.CursorPosition = Point.Empty;
         tv.InsertText ("bcd");
         Assert.Equal (4, eventcount);
 
@@ -368,8 +333,9 @@ public class TextViewTests
 
         Assert.Equal ("abc", tv.Text);
 
-        Application.Top.Add (tv);
-        RunState rs = Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        RunState rs = Application.Begin (top);
         Assert.Equal (1, eventcount); // for Initialize
 
         expectedCol = 0;
@@ -396,8 +362,9 @@ public class TextViewTests
                                   Assert.Equal (expectedCol, e.Col);
                               };
 
-        Application.Top.Add (tv);
-        RunState rs = Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        RunState rs = Application.Begin (top);
         Assert.Equal (1, eventcount); // for Initialize
 
         expectedCol = 0;
@@ -405,7 +372,7 @@ public class TextViewTests
         Assert.Equal (2, eventcount);
 
         expectedCol = 1;
-        tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.ShiftMask));
+        tv.NewKeyDownEvent (Key.Y.WithShift);
         Assert.Equal (3, eventcount);
         Assert.Equal ("Yay", tv.Text);
     }
@@ -424,27 +391,27 @@ public class TextViewTests
         Assert.Equal (expectedEventCount, eventcount);
 
         expectedEventCount++;
-        Assert.True (_textView.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (_textView.NewKeyDownEvent (Key.Enter));
         Assert.Equal (expectedEventCount, eventcount);
 
         // Undo
         expectedEventCount++;
-        Assert.True (_textView.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (_textView.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal (expectedEventCount, eventcount);
 
         // Redo
         expectedEventCount++;
-        Assert.True (_textView.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (_textView.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal (expectedEventCount, eventcount);
 
         // Undo
         expectedEventCount++;
-        Assert.True (_textView.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (_textView.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal (expectedEventCount, eventcount);
 
         // Redo
         expectedEventCount++;
-        Assert.True (_textView.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (_textView.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal (expectedEventCount, eventcount);
     }
 
@@ -548,7 +515,7 @@ public class TextViewTests
         tv.ContentsChanged += (s, e) => { eventcount++; };
         Assert.Equal (0, eventcount);
 
-        tv.CursorPosition = new Point (0, 0);
+        tv.CursorPosition = Point.Empty;
 
         Assert.Equal (0, eventcount);
     }
@@ -560,7 +527,7 @@ public class TextViewTests
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
         _textView.CursorPosition = new Point (24, 0);
-        _textView.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)); // Copy
+        _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
         _textView.SelectionStartColumn = 0;
@@ -568,13 +535,13 @@ public class TextViewTests
         Assert.Equal (new Point (24, 0), _textView.CursorPosition);
         Assert.True (_textView.Selecting);
         _textView.Selecting = false;
-        _textView.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)); // Paste
+        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
         Assert.Equal (new Point (28, 0), _textView.CursorPosition);
         Assert.False (_textView.Selecting);
         Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
         _textView.SelectionStartColumn = 24;
         _textView.SelectionStartRow = 0;
-        _textView.NewKeyDownEvent (new Key (KeyCode.W | KeyCode.CtrlMask)); // Cut
+        _textView.NewKeyDownEvent (Key.W.WithCtrl); // Cut
         Assert.Equal (new Point (24, 0), _textView.CursorPosition);
         Assert.False (_textView.Selecting);
         Assert.Equal ("", _textView.SelectedText);
@@ -582,7 +549,7 @@ public class TextViewTests
         _textView.SelectionStartColumn = 0;
         _textView.SelectionStartRow = 0;
         _textView.Selecting = false;
-        _textView.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)); // Paste
+        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
         Assert.Equal (new Point (28, 0), _textView.CursorPosition);
         Assert.False (_textView.Selecting);
         Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
@@ -595,15 +562,15 @@ public class TextViewTests
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
         _textView.CursorPosition = new Point (24, 0);
-        _textView.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)); // Copy
+        _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-        _textView.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)); // Paste
+        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
-        _textView.NewKeyDownEvent (new Key (KeyCode.W | KeyCode.CtrlMask)); // Cut
-        _textView.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)); // Paste
+        _textView.NewKeyDownEvent (Key.W.WithCtrl); // Cut
+        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
     }
 
@@ -614,9 +581,9 @@ public class TextViewTests
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
         _textView.CursorPosition = new Point (24, 0);
-        _textView.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)); // Copy
+        _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
-        _textView.NewKeyDownEvent (new Key (KeyCode.W | KeyCode.CtrlMask)); // Cut
+        _textView.NewKeyDownEvent (Key.W.WithCtrl); // Cut
         Assert.Equal ("", _textView.SelectedText);
     }
 
@@ -626,9 +593,9 @@ public class TextViewTests
     {
         _textView.SelectionStartColumn = 0;
         _textView.SelectionStartRow = 0;
-        _textView.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)); // Copy
+        _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("", _textView.SelectedText);
-        _textView.NewKeyDownEvent (new Key (KeyCode.W | KeyCode.CtrlMask)); // Cut
+        _textView.NewKeyDownEvent (Key.W.WithCtrl); // Cut
         Assert.Equal ("", _textView.SelectedText);
     }
 
@@ -655,50 +622,26 @@ public class TextViewTests
     {
         _textView.Text = "This is the first line.\nThis is the second line.\n";
         _textView.CursorPosition = new Point (0, _textView.Lines - 1);
-        _textView.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)); // Copy
-        _textView.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)); // Paste
+        _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
+        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }{
-                          Environment.NewLine
-                      }",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}",
                       _textView.Text
                      );
         _textView.CursorPosition = new Point (3, 1);
-        _textView.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)); // Copy
-        _textView.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)); // Paste
+        _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
+        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }{
-                          Environment.NewLine
-                      }",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}",
                       _textView.Text
                      );
         Assert.Equal (new Point (3, 2), _textView.CursorPosition);
-        _textView.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)); // Paste
+        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }{
-                          Environment.NewLine
-                      }",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}",
                       _textView.Text
                      );
         Assert.Equal (new Point (3, 3), _textView.CursorPosition);
@@ -748,19 +691,19 @@ public class TextViewTests
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
         _textView.CursorPosition = new Point (24, 0);
-        _textView.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)); // Copy
+        _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
 
         _textView.NewKeyDownEvent (
-                                   new Key (KeyCode.W | KeyCode.CtrlMask)
+                                   Key.W.WithCtrl
                                   ); // Selecting is set to false after Cut.
         Assert.Equal ("", _textView.SelectedText);
         _textView.ReadOnly = false;
         Assert.False (_textView.Selecting);
         _textView.Selecting = true; // Needed to set Selecting to true.
-        _textView.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)); // Copy
+        _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
-        _textView.NewKeyDownEvent (new Key (KeyCode.W | KeyCode.CtrlMask)); // Cut
+        _textView.NewKeyDownEvent (Key.W.WithCtrl); // Cut
         Assert.Equal ("", _textView.SelectedText);
     }
 
@@ -771,8 +714,9 @@ public class TextViewTests
         const string text = "This is the first line.\nThis is the second line.\n";
         var tv = new TextView { Width = Dim.Fill (), Height = Dim.Fill (), Text = text };
         string envText = tv.Text;
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -787,7 +731,7 @@ This is the second line.
 
         tv.CursorPosition = new Point (3, 0);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         tv.Draw ();
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
@@ -801,7 +745,7 @@ This is the second line.
 
         tv.CursorPosition = new Point (0, 1);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         tv.Draw ();
         Assert.Equal (new Point (22, 0), tv.CursorPosition);
 
@@ -812,7 +756,7 @@ Ths is the first line.This is the second line.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         tv.Draw ();
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
@@ -826,7 +770,7 @@ This is the second line.
 
         while (tv.Text != envText)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (envText, tv.Text);
@@ -841,8 +785,9 @@ This is the second line.
         const string text = "This is the first line.\nThis is the second line.\n";
         var tv = new TextView { Width = Dim.Fill (), Height = Dim.Fill (), Text = text, WordWrap = true };
         string envText = tv.Text;
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.True (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -857,7 +802,7 @@ This is the second line.
 
         tv.CursorPosition = new Point (3, 0);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         tv.Draw ();
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
@@ -871,7 +816,7 @@ This is the second line.
 
         tv.CursorPosition = new Point (0, 1);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         tv.Draw ();
         Assert.Equal (new Point (22, 0), tv.CursorPosition);
 
@@ -882,7 +827,7 @@ Ths is the first line.This is the second line.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         tv.Draw ();
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
@@ -896,7 +841,7 @@ This is the second line.
 
         while (tv.Text != envText)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (envText, tv.Text);
@@ -911,8 +856,9 @@ This is the second line.
         const string text = "This is the first line.\nThis is the second line.\n";
         var tv = new TextView { Width = Dim.Fill (), Height = Dim.Fill (), Text = text };
         string envText = tv.Text;
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -927,7 +873,7 @@ This is the second line.
 
         tv.CursorPosition = new Point (2, 0);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete));
         tv.Draw ();
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
@@ -941,7 +887,7 @@ This is the second line.
 
         tv.CursorPosition = new Point (22, 0);
         Assert.Equal (new Point (22, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete));
         tv.Draw ();
         Assert.Equal (new Point (22, 0), tv.CursorPosition);
 
@@ -952,7 +898,7 @@ Ths is the first line.This is the second line.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         tv.Draw ();
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
@@ -966,7 +912,7 @@ This is the second line.
 
         while (tv.Text != envText)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (envText, tv.Text);
@@ -981,8 +927,9 @@ This is the second line.
         const string text = "This is the first line.\nThis is the second line.\n";
         var tv = new TextView { Width = Dim.Fill (), Height = Dim.Fill (), Text = text, WordWrap = true };
         string envText = tv.Text;
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.True (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -997,7 +944,7 @@ This is the second line.
 
         tv.CursorPosition = new Point (2, 0);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete));
         tv.Draw ();
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
@@ -1011,7 +958,7 @@ This is the second line.
 
         tv.CursorPosition = new Point (22, 0);
         Assert.Equal (new Point (22, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete));
         tv.Draw ();
         Assert.Equal (new Point (22, 0), tv.CursorPosition);
 
@@ -1022,7 +969,7 @@ Ths is the first line.This is the second line.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         tv.Draw ();
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
@@ -1036,7 +983,7 @@ This is the second line.
 
         while (tv.Text != envText)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (envText, tv.Text);
@@ -1057,34 +1004,44 @@ This is the second line.
 
         var tv = new TextView { Width = 10, Height = 10 };
         tv.Text = text;
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.Equal (0, tv.LeftColumn);
-        tv.PositionCursor ();
-        Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Application.PositionCursor (top);
+        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
 
         for (var i = 0; i < 12; i++)
         {
-            tv.MouseEvent (new MouseEvent { Flags = MouseFlags.WheeledRight });
-            tv.PositionCursor ();
+            tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledRight });
             Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
-            Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+            Application.PositionCursor (top);
+            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
+            Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
         }
 
         for (var i = 11; i > 0; i--)
         {
-            tv.MouseEvent (new MouseEvent { Flags = MouseFlags.WheeledLeft });
-            tv.PositionCursor ();
+            tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledLeft });
             Assert.Equal (i - 1, tv.LeftColumn);
+
+            Application.PositionCursor (top);
+            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
 
             if (i - 1 == 0)
             {
-                Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+                Assert.Equal (CursorVisibility.Default, cursorVisibility);
             }
             else
             {
-                Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+                Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
             }
         }
+
+        top.Dispose ();
+        Application.Shutdown ();
     }
 
     [Fact]
@@ -1100,34 +1057,44 @@ This is the second line.
 
         var tv = new TextView { Width = 10, Height = 10 };
         tv.Text = text;
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.Equal (0, tv.TopRow);
-        tv.PositionCursor ();
-        Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+        Application.PositionCursor (top);
+        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
 
         for (var i = 0; i < 12; i++)
         {
-            tv.MouseEvent (new MouseEvent { Flags = MouseFlags.WheeledDown });
-            tv.PositionCursor ();
+            tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledDown });
+            Application.PositionCursor (top);
             Assert.Equal (i + 1, tv.TopRow);
-            Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
+            Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
         }
 
         for (var i = 12; i > 0; i--)
         {
-            tv.MouseEvent (new MouseEvent { Flags = MouseFlags.WheeledUp });
-            tv.PositionCursor ();
+            tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledUp });
+            Application.PositionCursor (top);
             Assert.Equal (i - 1, tv.TopRow);
+
+            Application.PositionCursor (top);
+            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
 
             if (i - 1 == 0)
             {
-                Assert.Equal (CursorVisibility.Default, tv.DesiredCursorVisibility);
+                Assert.Equal (CursorVisibility.Default, cursorVisibility);
             }
             else
             {
-                Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
+                Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
             }
         }
+
+        top.Dispose ();
+        Application.Shutdown ();
     }
 
     [Fact]
@@ -1149,16 +1116,10 @@ This is the second line.
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Text = text };
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1169,13 +1130,7 @@ This is the second line.
         tv.ClearHistoryChanges ();
 
         Assert.Equal (
-                      $"{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1217,45 +1172,45 @@ This is the second line.
         Assert.False (tv.IsDirty);
         Assert.False (tv.HasHistoryChanges);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D1)));
+        Assert.True (tv.NewKeyDownEvent (Key.D1));
         Assert.Equal ("1", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"1{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D2)));
+        Assert.True (tv.NewKeyDownEvent (Key.D2));
         Assert.Equal ($"1{Environment.NewLine}2", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Assert.Equal ($"1{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Assert.Equal ("1", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
         // IsDirty cannot be based on HasHistoryChanges because HasHistoryChanges is greater than 0
         // The only way is comparing from the original text
@@ -1270,34 +1225,34 @@ This is the second line.
     {
         var tv = new TextView ();
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D1)));
+        Assert.True (tv.NewKeyDownEvent (Key.D1));
         Assert.Equal ("1", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D2)));
+        Assert.True (tv.NewKeyDownEvent (Key.D2));
         Assert.Equal ("12", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D3)));
+        Assert.True (tv.NewKeyDownEvent (Key.D3));
         Assert.Equal ("123", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("12", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D4)));
+        Assert.True (tv.NewKeyDownEvent (Key.D4));
         Assert.Equal ("124", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("124", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
@@ -1312,14 +1267,10 @@ This is the second line.
 
         tv.CursorPosition = new Point (23, 0);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("", tv.SelectedText);
@@ -1327,46 +1278,30 @@ This is the second line.
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (23, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (23, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (23, 0), tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1383,14 +1318,10 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (17, 0);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.W | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.W.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("", tv.SelectedText);
@@ -1401,68 +1332,48 @@ This is the second line.
         tv.SelectionStartRow = 1;
         tv.CursorPosition = new Point (18, 1);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (17, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1479,14 +1390,10 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (17, 0);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.W | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.W.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("", tv.SelectedText);
@@ -1496,27 +1403,23 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (11, 1);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
         Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (17, 0), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (17, 0), tv.CursorPosition);
@@ -1532,7 +1435,7 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (18, 1);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.W | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.W.WithCtrl));
         Assert.Equal ($"This is the  line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
@@ -1540,34 +1443,26 @@ This is the second line.
 
         tv.Selecting = false;
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (18, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"This is the  line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1586,23 +1481,23 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (12, 2);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'a')));
+        Assert.True (tv.NewKeyDownEvent (Key.A));
         Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -1615,7 +1510,7 @@ This is the second line.
         var text = "\nThis is the first line.\nThis is the second line.";
         var tv = new TextView { Text = text };
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.",
@@ -1623,44 +1518,32 @@ This is the second line.
                      );
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"{
-                          Environment.NewLine
-                      }{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.",
+                      $"{Environment.NewLine}{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"{
-                          Environment.NewLine
-                      }{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.",
+                      $"{Environment.NewLine}{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1676,33 +1559,27 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (12, 2);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'a')));
+        Assert.True (tv.NewKeyDownEvent (Key.A));
         Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.{
-                          Environment.NewLine
-                      }",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1710,33 +1587,27 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.{
-                          Environment.NewLine
-                      }",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1744,12 +1615,12 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -1764,61 +1635,39 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (17, 0);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'a')));
+        Assert.True (tv.NewKeyDownEvent (Key.A));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1826,61 +1675,39 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1888,31 +1715,19 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1926,58 +1741,58 @@ This is the second line.
         var text = "First line.\nSecond line.";
         var tv = new TextView { Text = text };
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.K.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal ("First line.", Clipboard.Contents);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.K.WithCtrl));
         Assert.Equal ("Second line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal ($"First line.{Environment.NewLine}", Clipboard.Contents);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.K.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal ($"First line.{Environment.NewLine}Second line.", Clipboard.Contents);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("Second line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("Second line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
     }
 
     [Fact]
@@ -1987,64 +1802,64 @@ This is the second line.
         var text = "First line.\nSecond line.";
         var tv = new TextView { Text = text };
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.K.WithAlt));
         Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal ("Second line.", Clipboard.Contents);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.K.WithAlt));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal ($"Second line.{Environment.NewLine}", Clipboard.Contents);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.K.WithAlt));
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal ($"Second line.{Environment.NewLine}First line.", Clipboard.Contents);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
     }
 
     [Fact]
@@ -2053,125 +1868,125 @@ This is the second line.
         var text = "First line.\nSecond line.";
         var tv = new TextView { Text = text };
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (11, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ("First line", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (10, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ("First ", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("First ", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("First line", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (10, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (11, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (11, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("First line", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (10, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("First ", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
     }
 
     [Fact]
@@ -2180,83 +1995,83 @@ This is the second line.
         var text = "First line.\nSecond line.";
         var tv = new TextView { Text = text };
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ("Second line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ("line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("Second line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("Second line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
     }
 
     [Fact]
@@ -2265,16 +2080,12 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2289,11 +2100,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2307,11 +2114,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2333,17 +2136,13 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
             switch (i)
             {
                 case 0:
                     Assert.Equal (
-                                  $"This the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This  the third line.",
+                                  $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This  the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (5, 2), tv.CursorPosition);
@@ -2351,11 +2150,7 @@ This is the second line.
                     break;
                 case 1:
                     Assert.Equal (
-                                  $"This the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This i the third line.",
+                                  $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This i the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (6, 2), tv.CursorPosition);
@@ -2363,11 +2158,7 @@ This is the second line.
                     break;
                 case 2:
                     Assert.Equal (
-                                  $"This the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (7, 2), tv.CursorPosition);
@@ -2377,11 +2168,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2389,17 +2176,13 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
             switch (i)
             {
                 case 0:
                     Assert.Equal (
-                                  $"This  the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This  the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (5, 0), tv.CursorPosition);
@@ -2407,11 +2190,7 @@ This is the second line.
                     break;
                 case 1:
                     Assert.Equal (
-                                  $"This i the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This i the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (6, 0), tv.CursorPosition);
@@ -2419,11 +2198,7 @@ This is the second line.
                     break;
                 case 2:
                     Assert.Equal (
-                                  $"This is the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (7, 0), tv.CursorPosition);
@@ -2433,11 +2208,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2445,17 +2216,13 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
             switch (i)
             {
                 case 0:
                     Assert.Equal (
-                                  $"This is the first line.{
-                                      Environment.NewLine
-                                  }This  the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This is the first line.{Environment.NewLine}This  the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (5, 1), tv.CursorPosition);
@@ -2463,11 +2230,7 @@ This is the second line.
                     break;
                 case 1:
                     Assert.Equal (
-                                  $"This is the first line.{
-                                      Environment.NewLine
-                                  }This i the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This is the first line.{Environment.NewLine}This i the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (6, 1), tv.CursorPosition);
@@ -2475,11 +2238,7 @@ This is the second line.
                     break;
                 case 2:
                     Assert.Equal (
-                                  $"This is the first line.{
-                                      Environment.NewLine
-                                  }This is the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (7, 1), tv.CursorPosition);
@@ -2489,11 +2248,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2501,15 +2256,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2517,15 +2268,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2533,7 +2280,7 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
@@ -2550,16 +2297,12 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2574,11 +2317,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2592,11 +2331,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This ise first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2618,15 +2353,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This ise first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2634,15 +2365,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2650,15 +2377,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2666,15 +2389,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2682,15 +2401,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This ise first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2698,7 +2413,7 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
@@ -2715,16 +2430,12 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2735,11 +2446,7 @@ This is the second line.
         tv.InsertText (messy);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2749,11 +2456,7 @@ This is the second line.
         tv.InsertText (messy);
 
         Assert.Equal (
-                      $"This is messy the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2763,11 +2466,7 @@ This is the second line.
         tv.InsertText (messy);
 
         Assert.Equal (
-                      $"This is messy the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is messy the third line.",
+                      $"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is messy the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2775,15 +2474,11 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is messy the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2791,15 +2486,11 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2807,15 +2498,11 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2823,15 +2510,11 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2839,15 +2522,11 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is messy the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2855,15 +2534,11 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is messy the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is messy the third line.",
+                      $"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is messy the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2876,44 +2551,36 @@ This is the second line.
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Text = text };
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl.WithShift));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (23, 2), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'a')));
+        Assert.True (tv.NewKeyDownEvent (Key.A));
         Assert.Equal ($"{Environment.NewLine}a", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2921,31 +2588,27 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}a", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2953,12 +2616,12 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}a", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -2974,14 +2637,10 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (18, 1);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ($"first line.{Environment.NewLine}This is the second", tv.SelectedText);
@@ -2991,46 +2650,30 @@ This is the second line.
         tv.Selecting = false;
         tv.CursorPosition = new Point (17, 1);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the seconfirst line.{
-                          Environment.NewLine
-                      }This is the secondd line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the seconfirst line.{Environment.NewLine}This is the secondd line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (18, 2), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (17, 1), tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the seconfirst line.{
-                          Environment.NewLine
-                      }This is the secondd line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the seconfirst line.{Environment.NewLine}This is the secondd line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -3047,14 +2690,10 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (18, 1);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ($"first line.{Environment.NewLine}This is the second", tv.SelectedText);
@@ -3063,46 +2702,30 @@ This is the second line.
 
         tv.Selecting = false;
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the secondfirst line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the secondfirst line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (18, 2), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (18, 1), tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the secondfirst line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the secondfirst line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -3116,11 +2739,7 @@ This is the second line.
         var tv = new TextView { Text = text };
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -3128,23 +2747,15 @@ This is the second line.
         Assert.False (tv.IsDirty);
         Assert.False (tv.HasHistoryChanges);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl.WithShift));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.SelectedText
                      );
         Assert.Equal (3, tv.Lines);
@@ -3153,24 +2764,20 @@ This is the second line.
         Assert.False (tv.IsDirty);
         Assert.False (tv.HasHistoryChanges);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("", tv.SelectedText);
@@ -3181,11 +2788,11 @@ This is the second line.
         Assert.True (tv.HasHistoryChanges);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
@@ -3198,11 +2805,7 @@ This is the second line.
         var tv = new TextView { Text = text };
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -3210,23 +2813,15 @@ This is the second line.
         Assert.False (tv.IsDirty);
         Assert.False (tv.HasHistoryChanges);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl.WithShift));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.SelectedText
                      );
         Assert.Equal (3, tv.Lines);
@@ -3235,24 +2830,20 @@ This is the second line.
         Assert.False (tv.IsDirty);
         Assert.False (tv.HasHistoryChanges);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete));
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("", tv.SelectedText);
@@ -3263,11 +2854,11 @@ This is the second line.
         Assert.True (tv.HasHistoryChanges);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
@@ -3280,16 +2871,12 @@ This is the second line.
         var text =
             $"This is the first line.{Environment.NewLine}This is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -3349,7 +2936,7 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
             switch (i)
             {
@@ -3380,11 +2967,7 @@ This is the second line.
                     break;
                 case 5:
                     Assert.Equal (
-                                  $"This is the first line.{
-                                      Environment.NewLine
-                                  }This is the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (7, 0), tv.CursorPosition);
@@ -3394,11 +2977,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -3409,7 +2988,7 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
             switch (i)
             {
@@ -3460,7 +3039,7 @@ This is the second line.
     {
         var text = "One\nTwo\nThree";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -3474,7 +3053,7 @@ This is the second line.
         tv.CursorPosition = new Point (0, 1);
         Assert.Equal (3 + Environment.NewLine.Length, tv.SelectedLength);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D1)));
+        Assert.True (tv.NewKeyDownEvent (Key.D1));
         Assert.Equal ($"1Two{Environment.NewLine}Three", tv.Text);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
@@ -3485,32 +3064,32 @@ This is the second line.
         tv.CursorPosition = new Point (1, 1);
         Assert.Equal (4 + Environment.NewLine.Length, tv.SelectedLength);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D2)));
+        Assert.True (tv.NewKeyDownEvent (Key.D2));
         Assert.Equal ("12hree", tv.Text);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"1Two{Environment.NewLine}Three", tv.Text);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.False (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"1Two{Environment.NewLine}Three", tv.Text);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("12hree", tv.Text);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
@@ -3523,7 +3102,7 @@ This is the second line.
     {
         var text = "One\nTwo\nThree\n";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -3537,7 +3116,7 @@ This is the second line.
         tv.CursorPosition = new Point (0, 1);
         Assert.Equal (3 + Environment.NewLine.Length, tv.SelectedLength);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D1)));
+        Assert.True (tv.NewKeyDownEvent (Key.D1));
         Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
@@ -3548,32 +3127,32 @@ This is the second line.
         tv.CursorPosition = new Point (1, 1);
         Assert.Equal (4 + Environment.NewLine.Length, tv.SelectedLength);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D2)));
+        Assert.True (tv.NewKeyDownEvent (Key.D2));
         Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.False (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
@@ -3585,7 +3164,7 @@ This is the second line.
     public void HistoryText_Undo_Redo_Multi_Line_Selected_With_Empty_Text ()
     {
         var tv = new TextView { Width = 10, Height = 2 };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -3594,85 +3173,85 @@ This is the second line.
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.False (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.O | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.O.WithShift));
         Assert.Equal ("O", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'n')));
+        Assert.True (tv.NewKeyDownEvent (Key.N));
         Assert.Equal ("On", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'e')));
+        Assert.True (tv.NewKeyDownEvent (Key.E));
         Assert.Equal ("One", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"One{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.T.WithShift));
         Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'w')));
+        Assert.True (tv.NewKeyDownEvent (Key.W));
         Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (2, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'o')));
+        Assert.True (tv.NewKeyDownEvent (Key.O));
         Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (3, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.T.WithShift));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'h')));
+        Assert.True (tv.NewKeyDownEvent (Key.H));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (2, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'r')));
+        Assert.True (tv.NewKeyDownEvent (Key.R));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (3, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'e')));
+        Assert.True (tv.NewKeyDownEvent (Key.E));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (4, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'e')));
+        Assert.True (tv.NewKeyDownEvent (Key.E));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (5, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 3), tv.CursorPosition);
@@ -3683,7 +3262,7 @@ This is the second line.
         tv.CursorPosition = new Point (0, 1);
         Assert.Equal (3 + Environment.NewLine.Length, tv.SelectedLength);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D1)));
+        Assert.True (tv.NewKeyDownEvent (Key.D1));
         Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -3695,7 +3274,7 @@ This is the second line.
         tv.CursorPosition = new Point (1, 1);
         Assert.Equal (4 + Environment.NewLine.Length, tv.SelectedLength);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D2)));
+        Assert.True (tv.NewKeyDownEvent (Key.D2));
         Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
@@ -3703,231 +3282,231 @@ This is the second line.
         Assert.True (tv.IsDirty);
 
         // Undoing
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (5, 2), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (4, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (3, 2), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (2, 2), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 2), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (3, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (2, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("One", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("On", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("O", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.False (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.False (tv.IsDirty);
 
         // Redoing
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("O", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("On", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("One", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (2, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (3, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 2), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (2, 2), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (3, 2), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (4, 2), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (5, 2), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 3), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
@@ -3940,7 +3519,7 @@ This is the second line.
     public void HistoryText_Undo_Redo_Multi_Line_With_Empty_Text ()
     {
         var tv = new TextView { Width = 10, Height = 2 };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -3949,267 +3528,267 @@ This is the second line.
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.False (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.O | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.O.WithShift));
         Assert.Equal ("O", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'n')));
+        Assert.True (tv.NewKeyDownEvent (Key.N));
         Assert.Equal ("On", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'e')));
+        Assert.True (tv.NewKeyDownEvent (Key.E));
         Assert.Equal ("One", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"One{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.T.WithShift));
         Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'w')));
+        Assert.True (tv.NewKeyDownEvent (Key.W));
         Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (2, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'o')));
+        Assert.True (tv.NewKeyDownEvent (Key.O));
         Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (3, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.T.WithShift));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'h')));
+        Assert.True (tv.NewKeyDownEvent (Key.H));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (2, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'r')));
+        Assert.True (tv.NewKeyDownEvent (Key.R));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (3, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'e')));
+        Assert.True (tv.NewKeyDownEvent (Key.E));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (4, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'e')));
+        Assert.True (tv.NewKeyDownEvent (Key.E));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (5, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 3), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
         // Undoing
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (5, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (4, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (3, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (2, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (3, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (2, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("One", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("On", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("O", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.False (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.False (tv.IsDirty);
 
         // Redoing
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("O", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("On", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("One", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (1, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (2, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (3, 1), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (2, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (3, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (4, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (5, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 3), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 3), tv.CursorPosition);
@@ -4225,36 +3804,36 @@ This is the second line.
         tv.SelectionStartColumn = 6;
         tv.CursorPosition = new Point (6, 2);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Tab)));
+        Assert.True (tv.NewKeyDownEvent (Key.Tab));
         Assert.Equal ("First \tline.", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Tab.WithShift));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("First \tline.", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (7, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (6, 2), tv.CursorPosition);
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("First \tline.", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (6, 0), tv.CursorPosition);
@@ -4266,7 +3845,7 @@ This is the second line.
         var text = "First line.\nSecond line.\nThird line.";
         var tv = new TextView { Width = 80, Height = 5, Text = text };
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Tab)));
+        Assert.True (tv.NewKeyDownEvent (Key.Tab));
 
         Assert.Equal (
                       $"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.",
@@ -4275,13 +3854,13 @@ This is the second line.
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Tab.WithShift));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
                       $"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.",
@@ -4291,14 +3870,14 @@ This is the second line.
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
                       $"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.",
@@ -4307,10 +3886,10 @@ This is the second line.
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
     }
 
     [Fact]
@@ -4325,9 +3904,9 @@ This is the second line.
         Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
                       $"Inserted{Environment.NewLine}NewLineThis is the first line.{Environment.NewLine}This is the second line.",
@@ -4337,13 +3916,13 @@ This is the second line.
         Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
                       $"Inserted{Environment.NewLine}NewLineThis is the first line.{Environment.NewLine}This is the second line.",
@@ -4363,14 +3942,10 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (17, 0);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("first", tv.SelectedText);
@@ -4380,27 +3955,23 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (11, 1);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
         Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (17, 0), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (17, 0), tv.CursorPosition);
@@ -4412,16 +3983,12 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4436,11 +4003,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4448,15 +4011,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4464,15 +4023,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4485,16 +4040,12 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4509,11 +4060,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4521,15 +4068,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4537,15 +4080,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4558,16 +4097,12 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4578,11 +4113,7 @@ This is the second line.
         tv.InsertText (messy);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4590,15 +4121,11 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4606,15 +4133,11 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4627,16 +4150,12 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4654,11 +4173,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This  second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This  second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4669,15 +4184,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4688,15 +4199,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This  second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This  second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4712,16 +4219,12 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4739,11 +4242,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This isecond line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This isecond line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4754,15 +4253,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4773,15 +4268,11 @@ This is the second line.
 
         for (var i = 0; i < ntimes; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This isecond line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This isecond line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4797,16 +4288,12 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4820,11 +4307,7 @@ This is the second line.
         tv.InsertText (messy);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4835,15 +4318,11 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4854,15 +4333,11 @@ This is the second line.
 
         for (var i = 0; i < messy.Length; i++)
         {
-            Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+            Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4881,30 +4356,20 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (17, 0);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4912,30 +4377,20 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4943,16 +4398,10 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -4969,30 +4418,20 @@ This is the second line.
         tv.SelectionStartRow = 1;
         tv.CursorPosition = new Point (18, 1);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5000,30 +4439,20 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5031,16 +4460,10 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5057,61 +4480,39 @@ This is the second line.
         tv.SelectionStartRow = 1;
         tv.CursorPosition = new Point (18, 1);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key ((KeyCode)'a')));
+        Assert.True (tv.NewKeyDownEvent (Key.A));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (1, 2), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5119,61 +4520,39 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (1, 2), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
         Assert.True (tv.IsDirty);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5181,31 +4560,19 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5221,20 +4588,16 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (17, 2);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5242,20 +4605,16 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5263,7 +4622,7 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
@@ -5278,7 +4637,7 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (18, 1);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
                       $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
@@ -5288,14 +4647,10 @@ This is the second line.
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5303,7 +4658,7 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
                       $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
@@ -5313,14 +4668,10 @@ This is the second line.
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
         // Undo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5328,7 +4679,7 @@ This is the second line.
         Assert.False (tv.IsDirty);
 
         // Redo
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
                       $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
@@ -5394,7 +4745,7 @@ This is the second line.
         Assert.False (gaveFullTurn);
         Assert.Equal ((new Point (2, 0), true), tm.FindNextText ("is", out gaveFullTurn));
         Assert.True (gaveFullTurn);
-        tm.ResetContinuousFind (new Point (0, 0));
+        tm.ResetContinuousFind (Point.Empty);
         Assert.Equal ((new Point (5, 1), true), tm.FindPreviousText ("is", out gaveFullTurn));
         Assert.False (gaveFullTurn);
         Assert.Equal ((new Point (2, 1), true), tm.FindPreviousText ("is", out gaveFullTurn));
@@ -5423,16 +4774,12 @@ This is the second line.
     {
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Width = 10, Height = 2, Text = text };
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5443,66 +4790,50 @@ This is the second line.
         var g = (SingleWordSuggestionGenerator)tv.Autocomplete.SuggestionGenerator;
 
         tv.CanFocus = false;
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
         tv.CanFocus = true;
-        Assert.False (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.False (tv.NewKeyDownEvent (Key.CursorLeft));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl));
         Assert.Equal (2, tv.CurrentRow);
         Assert.Equal (23, tv.CurrentColumn);
         Assert.Equal (tv.CurrentColumn, tv.GetCurrentLine ().Count);
         Assert.Equal (new Point (23, 2), tv.CursorPosition);
-        Assert.False (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.False (tv.NewKeyDownEvent (Key.CursorRight));
         Assert.NotNull (tv.Autocomplete);
         Assert.Empty (g.AllSuggestions);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.F | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.F.WithShift));
         tv.Draw ();
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.F",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
                       tv.Text
                      );
         Assert.Equal (new Point (24, 2), tv.CursorPosition);
         Assert.Empty (tv.Autocomplete.Suggestions);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Z | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         tv.Draw ();
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (new Point (23, 2), tv.CursorPosition);
         Assert.Empty (tv.Autocomplete.Suggestions);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.R | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         tv.Draw ();
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.F",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
                       tv.Text
                      );
         Assert.Equal (new Point (24, 2), tv.CursorPosition);
         Assert.Empty (tv.Autocomplete.Suggestions);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (new Point (23, 2), tv.CursorPosition);
@@ -5519,28 +4850,20 @@ This is the second line.
         Assert.Equal ("line", g.AllSuggestions [4]);
         Assert.Equal ("second", g.AllSuggestions [5]);
         Assert.Equal ("third", g.AllSuggestions [^1]);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.F | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.F.WithShift));
         tv.Draw ();
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.F",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
                       tv.Text
                      );
         Assert.Equal (new Point (24, 2), tv.CursorPosition);
         Assert.Single (tv.Autocomplete.Suggestions);
         Assert.Equal ("first", tv.Autocomplete.Suggestions [0].Replacement);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (28, 2), tv.CursorPosition);
@@ -5550,199 +4873,171 @@ This is the second line.
         tv.Autocomplete.ClearSuggestions ();
         Assert.Empty (g.AllSuggestions);
         Assert.Empty (tv.Autocomplete.Suggestions);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.PageUp)));
+        Assert.True (tv.NewKeyDownEvent (Key.PageUp));
         Assert.Equal (24, tv.GetCurrentLine ().Count);
         Assert.Equal (new Point (24, 1), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key ('V' + KeyCode.AltMask)));
+        Assert.True (tv.NewKeyDownEvent (new Key (Key.V.WithAlt)));
         Assert.Equal (23, tv.GetCurrentLine ().Count);
         Assert.Equal (new Point (23, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.PageDown)));
+        Assert.True (tv.NewKeyDownEvent (Key.PageDown));
         Assert.Equal (24, tv.GetCurrentLine ().Count);
         Assert.Equal (new Point (23, 1), tv.CursorPosition); // gets the previous length
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.V | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.V.WithCtrl));
         Assert.Equal (28, tv.GetCurrentLine ().Count);
         Assert.Equal (new Point (23, 2), tv.CursorPosition); // gets the previous length
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.PageUp | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.PageUp.WithShift));
         Assert.Equal (24, tv.GetCurrentLine ().Count);
         Assert.Equal (new Point (23, 1), tv.CursorPosition); // gets the previous length
         Assert.Equal (24 + Environment.NewLine.Length, tv.SelectedLength);
         Assert.Equal ($".{Environment.NewLine}This is the third line.", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.PageDown | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.PageDown.WithShift));
         Assert.Equal (28, tv.GetCurrentLine ().Count);
         Assert.Equal (new Point (23, 2), tv.CursorPosition); // gets the previous length
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Home | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Home.WithCtrl));
         Assert.Equal (Point.Empty, tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.N | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.N.WithCtrl));
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.P | KeyCode.CtrlMask)));
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.True (tv.NewKeyDownEvent (Key.P.WithCtrl));
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.True (tv.NewKeyDownEvent (Key.CursorUp));
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorDown | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorDown.WithShift));
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
         Assert.Equal (23 + Environment.NewLine.Length, tv.SelectedLength);
         Assert.Equal ($"This is the first line.{Environment.NewLine}", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorUp | KeyCode.ShiftMask)));
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.True (tv.NewKeyDownEvent (Key.CursorUp.WithShift));
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.F | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.F.WithCtrl));
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.B | KeyCode.CtrlMask)));
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.True (tv.NewKeyDownEvent (Key.B.WithCtrl));
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithShift));
         Assert.Equal (new Point (1, 0), tv.CursorPosition);
         Assert.Equal (1, tv.SelectedLength);
         Assert.Equal ("T", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.ShiftMask)));
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithShift));
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete));
 
         Assert.Equal (
-                      $"his is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"his is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.D | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.D.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.True (tv.NewKeyDownEvent (Key.End));
 
         Assert.Equal (
-                      $"is is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (21, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
 
         Assert.Equal (
-                      $"is is the first line{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first line{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (20, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Home)));
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.True (tv.NewKeyDownEvent (Key.Home));
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.End.WithShift));
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
         Assert.Equal (19, tv.SelectedLength);
         Assert.Equal ("is is the first lin", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Home | KeyCode.ShiftMask)));
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.True (tv.NewKeyDownEvent (Key.Home.WithShift));
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.E | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.E.WithCtrl));
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.A | KeyCode.CtrlMask)));
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.True (tv.NewKeyDownEvent (Key.A.WithCtrl));
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.K.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.Equal ("is is the first lin", Clipboard.Contents);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5751,25 +5046,21 @@ This is the second line.
         Assert.False (tv.Selecting);
         Assert.Equal ("is is the first lin", Clipboard.Contents);
         tv.CursorPosition = Point.Empty;
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl.WithShift));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.Equal ("is is the first lin", Clipboard.Contents);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5777,36 +5068,32 @@ This is the second line.
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.Equal ("is is the first lin", Clipboard.Contents);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.K.WithAlt));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         tv.ReadOnly = true;
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         tv.ReadOnly = false;
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5815,14 +5102,10 @@ This is the second line.
         Assert.False (tv.Selecting);
         Assert.Equal (0, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Space | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Space.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5831,14 +5114,10 @@ This is the second line.
         Assert.True (tv.Selecting);
         Assert.Equal (19, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Space | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Space.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5848,14 +5127,10 @@ This is the second line.
         Assert.Equal (19, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
         tv.SelectionStartColumn = 0;
-        Assert.True (tv.NewKeyDownEvent (new Key ('C' + KeyCode.AltMask)));
+        Assert.True (tv.NewKeyDownEvent (new Key (Key.C.WithAlt)));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5864,14 +5139,10 @@ This is the second line.
         Assert.True (tv.Selecting);
         Assert.Equal (0, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5880,46 +5151,46 @@ This is the second line.
         Assert.True (tv.Selecting);
         Assert.Equal (0, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
-        Assert.True (tv.NewKeyDownEvent (new Key ('W' + KeyCode.AltMask)));
+        Assert.True (tv.NewKeyDownEvent (new Key (Key.W.WithAlt)));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.Equal (0, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
         Assert.Equal ("is is the first lin", Clipboard.Contents);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.W | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.W.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.Equal (0, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
         Assert.Equal ("", Clipboard.Contents);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.X | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.X.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.Equal (0, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
         Assert.Equal ("", Clipboard.Contents);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5929,7 +5200,7 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorLeft)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5939,7 +5210,7 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorLeft | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithShift.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5949,7 +5220,7 @@ This is the second line.
         Assert.Equal (6, tv.SelectedLength);
         Assert.Equal ("third ", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key ('B' + KeyCode.AltMask)));
+        Assert.True (tv.NewKeyDownEvent (new Key (Key.B.WithAlt)));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5959,7 +5230,7 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorRight)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5969,7 +5240,7 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.CursorRight | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithShift.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5979,7 +5250,7 @@ This is the second line.
         Assert.Equal (6, tv.SelectedLength);
         Assert.Equal ("third ", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key ('F' + KeyCode.AltMask)));
+        Assert.True (tv.NewKeyDownEvent (new Key (Key.F.WithAlt)));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5989,7 +5260,7 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key ('F' + KeyCode.AltMask)));
+        Assert.True (tv.NewKeyDownEvent (new Key (Key.F.WithAlt)));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5999,7 +5270,7 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key ('F' + KeyCode.AltMask)));
+        Assert.True (tv.NewKeyDownEvent (new Key (Key.F.WithAlt)));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -6009,30 +5280,30 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Home | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Home.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Delete | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl));
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
         Assert.Equal (new Point (28, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
         Assert.Equal (new Point (18, 1), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
@@ -6040,18 +5311,18 @@ This is the second line.
         Assert.False (tv.Selecting);
         Assert.True (tv.AllowsReturn);
         tv.AllowsReturn = false;
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.False (tv.Selecting);
-        Assert.False (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.False (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.False (tv.AllowsReturn);
         tv.AllowsReturn = true;
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
@@ -6062,7 +5333,7 @@ This is the second line.
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.True (tv.AllowsReturn);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.End | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.End.WithShift.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
@@ -6072,17 +5343,17 @@ This is the second line.
         Assert.Equal (42 + Environment.NewLine.Length, tv.SelectedLength);
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.Home | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Home.WithShift.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
                       tv.Text
                      );
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (Environment.NewLine.Length, tv.SelectedLength);
         Assert.Equal ($"{Environment.NewLine}", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.CtrlMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.T.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
@@ -6097,12 +5368,12 @@ This is the second line.
                      );
         Assert.True (tv.Selecting);
         Assert.True (tv.Used);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Insert)));
+        Assert.True (tv.NewKeyDownEvent (Key.InsertChar));
         Assert.False (tv.Used);
         Assert.True (tv.AllowsTab);
         Assert.Equal (new Point (18, 2), tv.CursorPosition);
         tv.AllowsTab = false;
-        Assert.False (tv.NewKeyDownEvent (new Key (KeyCode.Tab)));
+        Assert.False (tv.NewKeyDownEvent (Key.Tab));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
@@ -6113,7 +5384,7 @@ This is the second line.
         Assert.Equal (new Point (18, 2), tv.CursorPosition);
         Assert.True (tv.Selecting);
         tv.Selecting = false;
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Tab)));
+        Assert.True (tv.NewKeyDownEvent (Key.Tab));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t",
@@ -6121,7 +5392,7 @@ This is the second line.
                      );
         Assert.True (tv.AllowsTab);
         tv.AllowsTab = false;
-        Assert.False (tv.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask)));
+        Assert.False (tv.NewKeyDownEvent (Key.Tab.WithShift));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t",
@@ -6129,16 +5400,16 @@ This is the second line.
                      );
         Assert.False (tv.AllowsTab);
         tv.AllowsTab = true;
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask)));
+        Assert.True (tv.NewKeyDownEvent (Key.Tab.WithShift));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
                       tv.Text
                      );
         Assert.True (tv.AllowsTab);
-        Assert.False (tv.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+        Assert.False (tv.NewKeyDownEvent (Key.Tab.WithCtrl));
         Assert.False (tv.NewKeyDownEvent (Application.AlternateForwardKey));
-        Assert.False (tv.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
+        Assert.False (tv.NewKeyDownEvent (Key.Tab.WithCtrl.WithShift));
         Assert.False (tv.NewKeyDownEvent (Application.AlternateBackwardKey));
 
         Assert.True (tv.NewKeyDownEvent (ContextMenu.DefaultKey));
@@ -6156,7 +5427,7 @@ This is the second line.
 
         while (!iterationsFinished)
         {
-            _textView.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask));
+            _textView.NewKeyDownEvent (Key.Backspace.WithCtrl);
 
             switch (iteration)
             {
@@ -6218,7 +5489,7 @@ This is the second line.
 
         while (!iterationsFinished)
         {
-            _textView.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask));
+            _textView.NewKeyDownEvent (Key.Backspace.WithCtrl);
 
             switch (iteration)
             {
@@ -6350,7 +5621,7 @@ This is the second line.
 
         while (!iterationsFinished)
         {
-            _textView.NewKeyDownEvent (new Key (KeyCode.Delete | KeyCode.CtrlMask));
+            _textView.NewKeyDownEvent (Key.Delete.WithCtrl);
 
             switch (iteration)
             {
@@ -6405,7 +5676,7 @@ This is the second line.
 
         while (!iterationsFinished)
         {
-            _textView.NewKeyDownEvent (new Key (KeyCode.Delete | KeyCode.CtrlMask));
+            _textView.NewKeyDownEvent (Key.Delete.WithCtrl);
 
             switch (iteration)
             {
@@ -6528,7 +5799,7 @@ This is the second line.
             switch (iteration)
             {
                 case 0:
-                    _textView.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.CtrlMask));
+                    _textView.NewKeyDownEvent (Key.K.WithCtrl);
                     Assert.Equal (0, _textView.CursorPosition.X);
                     Assert.Equal (0, _textView.CursorPosition.Y);
                     Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.Text);
@@ -6548,7 +5819,7 @@ This is the second line.
 
                     break;
                 case 2:
-                    _textView.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.CtrlMask));
+                    _textView.NewKeyDownEvent (Key.K.WithCtrl);
                     Assert.Equal (0, _textView.CursorPosition.X);
                     Assert.Equal (0, _textView.CursorPosition.Y);
                     Assert.Equal ("", _textView.Text);
@@ -6559,7 +5830,7 @@ This is the second line.
                                  );
 
                     // Paste
-                    _textView.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask));
+                    _textView.NewKeyDownEvent (Key.Y.WithCtrl);
 
                     Assert.Equal (
                                   $"This is the first line.{Environment.NewLine}This is the second line.",
@@ -6591,7 +5862,7 @@ This is the second line.
             switch (iteration)
             {
                 case 0:
-                    _textView.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask));
+                    _textView.NewKeyDownEvent (Key.K.WithAlt);
                     Assert.Equal (0, _textView.CursorPosition.X);
                     Assert.Equal (1, _textView.CursorPosition.Y);
                     Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text);
@@ -6611,7 +5882,7 @@ This is the second line.
 
                     break;
                 case 2:
-                    _textView.NewKeyDownEvent (new Key (KeyCode.K | KeyCode.AltMask));
+                    _textView.NewKeyDownEvent (Key.K.WithAlt);
                     Assert.Equal (0, _textView.CursorPosition.X);
                     Assert.Equal (0, _textView.CursorPosition.Y);
                     Assert.Equal ("", _textView.Text);
@@ -6622,7 +5893,7 @@ This is the second line.
                                  );
 
                     // Paste inverted
-                    _textView.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask));
+                    _textView.NewKeyDownEvent (Key.Y.WithCtrl);
 
                     Assert.Equal (
                                   $"This is the second line.{Environment.NewLine}This is the first line.",
@@ -6652,7 +5923,7 @@ This is the second line.
         Assert.Equal (new Point (9, 0), tv.CursorPosition);
         Assert.Equal (0, tv.LeftColumn);
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         tv.CursorPosition = new Point (10, 0);
         Assert.Equal (new Point (10, 0), tv.CursorPosition);
         Assert.Equal (1, tv.LeftColumn);
@@ -6780,8 +6051,8 @@ This is the second line.
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 
         Assert.True (
-                     _textView.MouseEvent (
-                                           new MouseEvent { X = 12, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }
+                     _textView.NewMouseEvent (
+                                           new MouseEvent { Position = new (12, 0), Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }
                                           )
                     );
         Assert.Equal (0, _textView.SelectionStartColumn);
@@ -6790,7 +6061,7 @@ This is the second line.
         Assert.True (_textView.Selecting);
         Assert.Equal ("TAB to jump ", _textView.SelectedText);
 
-        Assert.True (_textView.MouseEvent (new MouseEvent { X = 12, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (_textView.NewMouseEvent (new MouseEvent { Position = new (12, 0), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (new Point (12, 0), _textView.CursorPosition);
@@ -6798,8 +6069,8 @@ This is the second line.
         Assert.Equal ("TAB to jump ", _textView.SelectedText);
 
         Assert.True (
-                     _textView.MouseEvent (
-                                           new MouseEvent { X = 19, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }
+                     _textView.NewMouseEvent (
+                                           new MouseEvent { Position = new (19, 0), Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }
                                           )
                     );
         Assert.Equal (0, _textView.SelectionStartRow);
@@ -6808,7 +6079,7 @@ This is the second line.
         Assert.True (_textView.Selecting);
         Assert.Equal ("TAB to jump between", _textView.SelectedText);
 
-        Assert.True (_textView.MouseEvent (new MouseEvent { X = 19, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (_textView.NewMouseEvent (new MouseEvent { Position = new (19, 0), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (new Point (19, 0), _textView.CursorPosition);
@@ -6816,8 +6087,8 @@ This is the second line.
         Assert.Equal ("TAB to jump between", _textView.SelectedText);
 
         Assert.True (
-                     _textView.MouseEvent (
-                                           new MouseEvent { X = 24, Y = 0, Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }
+                     _textView.NewMouseEvent (
+                                           new MouseEvent { Position = new (24, 0), Flags = MouseFlags.Button1Pressed | MouseFlags.ButtonShift }
                                           )
                     );
         Assert.Equal (0, _textView.SelectionStartRow);
@@ -6826,14 +6097,14 @@ This is the second line.
         Assert.True (_textView.Selecting);
         Assert.Equal ("TAB to jump between text", _textView.SelectedText);
 
-        Assert.True (_textView.MouseEvent (new MouseEvent { X = 24, Y = 0, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (_textView.NewMouseEvent (new MouseEvent { Position = new (24, 0), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (new Point (24, 0), _textView.CursorPosition);
         Assert.True (_textView.Selecting);
         Assert.Equal ("TAB to jump between text", _textView.SelectedText);
 
-        Assert.True (_textView.MouseEvent (new MouseEvent { X = 24, Y = 0, Flags = MouseFlags.Button1Pressed }));
+        Assert.True (_textView.NewMouseEvent (new MouseEvent { Position = new (24, 0), Flags = MouseFlags.Button1Pressed }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (new Point (24, 0), _textView.CursorPosition);
@@ -6853,7 +6124,7 @@ This is the second line.
             tv.Text += new string ('x', 100) + (i == 99 ? "" : Environment.NewLine);
         }
 
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         tv.CursorPosition = new Point (5, 50);
         Assert.Equal (new Point (5, 50), tv.CursorPosition);
 
@@ -6869,8 +6140,6 @@ This is the second line.
         Assert.True (_textView.AllowsReturn);
         Assert.Equal (4, _textView.TabWidth);
         Assert.True (_textView.AllowsTab);
-        Assert.Equal ("Absolute(30)", _textView.Width.ToString ());
-        Assert.Equal ("Absolute(10)", _textView.Height.ToString ());
         Assert.False (_textView.WordWrap);
 
         _textView.WordWrap = true;
@@ -6880,8 +6149,6 @@ This is the second line.
         Assert.False (_textView.AllowsReturn);
         Assert.Equal (0, _textView.TabWidth);
         Assert.False (_textView.AllowsTab);
-        Assert.Equal ("Absolute(30)", _textView.Width.ToString ());
-        Assert.Equal ("Absolute(1)", _textView.Height.ToString ());
         Assert.False (_textView.WordWrap);
 
         _textView.WordWrap = true;
@@ -6891,8 +6158,6 @@ This is the second line.
         Assert.True (_textView.AllowsReturn);
         Assert.Equal (4, _textView.TabWidth);
         Assert.True (_textView.AllowsTab);
-        Assert.Equal ("Absolute(30)", _textView.Width.ToString ());
-        Assert.Equal ("Absolute(10)", _textView.Height.ToString ());
         Assert.False (_textView.WordWrap);
     }
 
@@ -6903,9 +6168,9 @@ This is the second line.
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
         _textView.CursorPosition = new Point (24, 0);
-        _textView.NewKeyDownEvent (new Key (KeyCode.C | KeyCode.CtrlMask)); // Copy
+        _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
-        _textView.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.CtrlMask)); // Paste
+        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
         Assert.Equal ("", _textView.SelectedText);
     }
 
@@ -6919,38 +6184,6 @@ This is the second line.
         Exception exception = Record.Exception (() => tv.ReplaceAllText (textToFind, false, false, textToReplace));
         Assert.Null (exception);
         Assert.Equal (textToReplace, tv.Text);
-    }
-
-    [Fact]
-    [TextViewTestsAutoInitShutdown]
-    public void RightOffset_Sets_To_Zero_Adjust_leftColumn ()
-    {
-        var text = "";
-
-        for (var i = 0; i < 12; i++)
-        {
-            text += $"{i.ToString () [^1]}";
-        }
-
-        var tv = new TextView { Width = 10, Height = 10, RightOffset = 1 };
-        tv.Text = text;
-
-        tv.NewKeyDownEvent (new Key (KeyCode.End));
-
-        Assert.Equal (4, tv.LeftColumn);
-        Assert.Equal (1, tv.RightOffset);
-
-        tv.RightOffset = 0;
-        Assert.Equal (3, tv.LeftColumn);
-        Assert.Equal (0, tv.RightOffset);
-
-        tv.RightOffset = 2;
-        Assert.Equal (5, tv.LeftColumn);
-        Assert.Equal (2, tv.RightOffset);
-
-        tv.RightOffset = 0;
-        Assert.Equal (3, tv.LeftColumn);
-        Assert.Equal (0, tv.RightOffset);
     }
 
     [Fact]
@@ -6969,7 +6202,7 @@ This is the second line.
         tv.ScrollTo (50);
         Assert.Equal (0, tv.CursorPosition.Y);
 
-        tv.NewKeyDownEvent (new Key (KeyCode.P));
+        tv.NewKeyDownEvent (Key.P);
     }
 
     [Fact]
@@ -6984,9 +6217,9 @@ This is the second line.
             tv.Text += new string ('x', 100) + (i == 99 ? "" : Environment.NewLine);
         }
 
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         tv.ScrollTo (50);
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
 
         tv.CursorPosition = new Point (tv.LeftColumn, tv.TopRow);
         Assert.Equal (new Point (0, 50), tv.CursorPosition);
@@ -6997,10 +6230,11 @@ This is the second line.
     public void Selected_Text_Shows ()
     {
         // Proves #3022 is fixed (TextField selected text does not show in v2)
-        Application.Top.Add (_textView);
-        RunState rs = Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (_textView);
+        RunState rs = Application.Begin (top);
 
-        _textView.CursorPosition = new Point (0, 0);
+        _textView.CursorPosition = Point.Empty;
         _textView.SelectionStartColumn = 0;
         _textView.SelectionStartRow = 0;
 
@@ -7013,7 +6247,7 @@ This is the second line.
         //                                             TAB to jump between text fields.
         TestHelpers.AssertDriverAttributesAre ("0000000", Application.Driver, attributes);
 
-        _textView.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
+        _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
         var first = true;
         Application.RunIteration (ref rs, ref first);
@@ -7107,11 +6341,12 @@ This is the second line.
     [TextViewTestsAutoInitShutdown]
     public void Tab_Test_Follow_By_BackTab ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      _textView.Text = "";
@@ -7122,7 +6357,7 @@ This is the second line.
                                      while (col < 100)
                                      {
                                          col++;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.Tab));
+                                         _textView.NewKeyDownEvent (Key.Tab);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
@@ -7131,28 +6366,29 @@ This is the second line.
                                      while (col > 0)
                                      {
                                          col--;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask));
+                                         _textView.NewKeyDownEvent (Key.Tab.WithShift);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
                                      }
 
-                                     Application.Top.Remove (_textView);
+                                     top.Remove (_textView);
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void Tab_Test_Follow_By_BackTab_With_Text ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      var col = 0;
@@ -7163,7 +6399,7 @@ This is the second line.
                                      while (col < 100)
                                      {
                                          col++;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.Tab));
+                                         _textView.NewKeyDownEvent (Key.Tab);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
@@ -7172,28 +6408,29 @@ This is the second line.
                                      while (col > 0)
                                      {
                                          col--;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask));
+                                         _textView.NewKeyDownEvent (Key.Tab.WithShift);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
                                      }
 
-                                     Application.Top.Remove (_textView);
+                                     top.Remove (_textView);
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void Tab_Test_Follow_By_CursorLeft_And_Then_Follow_By_CursorRight ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      _textView.Text = "";
@@ -7204,7 +6441,7 @@ This is the second line.
                                      while (col < 100)
                                      {
                                          col++;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.Tab));
+                                         _textView.NewKeyDownEvent (Key.Tab);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
@@ -7213,7 +6450,7 @@ This is the second line.
                                      while (col > 0)
                                      {
                                          col--;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+                                         _textView.NewKeyDownEvent (Key.CursorLeft);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
@@ -7222,28 +6459,29 @@ This is the second line.
                                      while (col < 100)
                                      {
                                          col++;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+                                         _textView.NewKeyDownEvent (Key.CursorRight);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
                                      }
 
-                                     Application.Top.Remove (_textView);
+                                     top.Remove (_textView);
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void Tab_Test_Follow_By_CursorLeft_And_Then_Follow_By_CursorRight_With_Text ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      Assert.Equal ("TAB to jump between text fields.", _textView.Text);
@@ -7254,7 +6492,7 @@ This is the second line.
                                      while (col < 100)
                                      {
                                          col++;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.Tab));
+                                         _textView.NewKeyDownEvent (Key.Tab);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
@@ -7265,7 +6503,7 @@ This is the second line.
                                      while (col > 0)
                                      {
                                          col--;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.CursorLeft));
+                                         _textView.NewKeyDownEvent (Key.CursorLeft);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
@@ -7274,28 +6512,29 @@ This is the second line.
                                      while (col < 100)
                                      {
                                          col++;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.CursorRight));
+                                         _textView.NewKeyDownEvent (Key.CursorRight);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
                                      }
 
-                                     Application.Top.Remove (_textView);
+                                     top.Remove (_textView);
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void Tab_Test_Follow_By_Home_And_Then_Follow_By_End_And_Then_Follow_By_BackTab_With_Text ()
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
 
         Application.Iteration += (s, a) =>
                                  {
-                                     int width = _textView.Bounds.Width - 1;
+                                     int width = _textView.Viewport.Width - 1;
                                      Assert.Equal (30, width + 1);
                                      Assert.Equal (10, _textView.Height);
                                      var col = 0;
@@ -7308,19 +6547,19 @@ This is the second line.
                                      while (col < 100)
                                      {
                                          col++;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.Tab));
+                                         _textView.NewKeyDownEvent (Key.Tab);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
                                      }
 
-                                     _textView.NewKeyDownEvent (new Key (KeyCode.Home));
+                                     _textView.NewKeyDownEvent (Key.Home);
                                      col = 0;
                                      Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                      leftCol = 0;
                                      Assert.Equal (leftCol, _textView.LeftColumn);
 
-                                     _textView.NewKeyDownEvent (new Key (KeyCode.End));
+                                     _textView.NewKeyDownEvent (Key.End);
                                      col = _textView.Text.Length;
                                      Assert.Equal (132, _textView.Text.Length);
                                      Assert.Equal (new Point (col, 0), _textView.CursorPosition);
@@ -7339,7 +6578,7 @@ This is the second line.
                                      while (col > 0)
                                      {
                                          col--;
-                                         _textView.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask));
+                                         _textView.NewKeyDownEvent (Key.Tab.WithShift);
                                          Assert.Equal (new Point (col, 0), _textView.CursorPosition);
                                          leftCol = GetLeftCol (leftCol);
                                          Assert.Equal (leftCol, _textView.LeftColumn);
@@ -7348,19 +6587,20 @@ This is the second line.
                                      Assert.Equal ("TAB to jump between text fields.", _textView.Text);
                                      Assert.Equal (32, _textView.Text.Length);
 
-                                     Application.Top.Remove (_textView);
+                                     top.Remove (_textView);
                                      Application.RequestStop ();
                                  };
 
-        Application.Run ();
+        Application.Run (top);
     }
 
     [Fact]
     [TextViewTestsAutoInitShutdown]
     public void TabWidth_Setting_To_Zero_Keeps_AllowsTab ()
     {
-        Application.Top.Add (_textView);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (_textView);
+        Application.Begin (top);
 
         Assert.Equal (4, _textView.TabWidth);
         Assert.True (_textView.AllowsTab);
@@ -7371,7 +6611,7 @@ This is the second line.
         Assert.True (_textView.AllowsTab);
         Assert.True (_textView.AllowsReturn);
         Assert.True (_textView.Multiline);
-        _textView.NewKeyDownEvent (new Key (KeyCode.Tab));
+        _textView.NewKeyDownEvent (Key.Tab);
         Assert.Equal ("\tTAB to jump between text fields.", _textView.Text);
         Application.Refresh ();
 
@@ -7390,7 +6630,7 @@ TAB to jump between text field",
                                                       _output
                                                      );
 
-        _textView.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask));
+        _textView.NewKeyDownEvent (Key.Tab.WithShift);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
         Assert.True (_textView.NeedsDisplay);
         Application.Refresh ();
@@ -7428,7 +6668,7 @@ TAB to jump between text field",
 
         _textView.Text = "ay";
         Assert.Equal (1, eventcount);
-        _textView.NewKeyDownEvent (new Key (KeyCode.Y | KeyCode.ShiftMask));
+        _textView.NewKeyDownEvent (Key.Y.WithShift);
         Assert.Equal (1, eventcount);
         Assert.Equal ("Yay", _textView.Text);
     }
@@ -7454,13 +6694,14 @@ TAB to jump between text field",
 
         var win = new Window ();
         win.Add (tv);
-        Application.Top.Add (win);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (win);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (15, 15);
         Application.Refresh ();
 
         //this passes
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (
                                                                  @"
 ┌─────────────┐
 │             │
@@ -7480,11 +6721,11 @@ TAB to jump between text field",
                                                                  _output
                                                                 );
 
-        Assert.Equal (new Rect (0, 0, 15, 15), pos);
+        Assert.Equal (new Rectangle (0, 0, 15, 15), pos);
 
         Assert.True (tv.Used);
         tv.Used = false;
-        tv.CursorPosition = new Point (0, 0);
+        tv.CursorPosition = Point.Empty;
         tv.InsertText ("\r\naaa\r\nbbb");
         Application.Refresh ();
 
@@ -7530,13 +6771,14 @@ TAB to jump between text field",
 
         var win = new Window ();
         win.Add (tv);
-        Application.Top.Add (win);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (win);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (15, 15);
         Application.Refresh ();
 
         //this passes
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (
+        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (
                                                                  @"
 ┌─────────────┐
 │             │
@@ -7556,11 +6798,11 @@ TAB to jump between text field",
                                                                  _output
                                                                 );
 
-        Assert.Equal (new Rect (0, 0, 15, 15), pos);
+        Assert.Equal (new Rectangle (0, 0, 15, 15), pos);
 
         Assert.True (tv.Used);
         tv.Used = false;
-        tv.CursorPosition = new Point (0, 0);
+        tv.CursorPosition = Point.Empty;
         tv.InsertText ("\naaa\nbbb");
         Application.Refresh ();
 
@@ -7605,14 +6847,14 @@ TAB to jump between text field",
     {
         var tv = new TextView { Width = 10, Text = " " };
 
-        var ev = new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
+        var ev = new MouseEvent { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
 
-        tv.MouseEvent (ev);
+        tv.NewMouseEvent (ev);
         Assert.Equal (1, tv.SelectedLength);
 
-        ev = new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
+        ev = new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked };
 
-        tv.MouseEvent (ev);
+        tv.NewMouseEvent (ev);
         Assert.Equal (1, tv.SelectedLength);
     }
 
@@ -7627,8 +6869,9 @@ TAB to jump between text field",
             Width = Dim.Fill (), Height = Dim.Fill (), Text = "This is the first line.\nThis is the second line.\n"
         };
         tv.UnwrappedCursorPosition += (s, e) => { cp = e.Point; };
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -7657,7 +6900,7 @@ This is the second line.
                                                      );
 
         ((FakeDriver)Application.Driver).SetBufferSize (6, 25);
-        tv.SetRelativeLayout (Application.Driver.Bounds);
+        tv.SetRelativeLayout (Application.Driver.Screen.Size);
         tv.Draw ();
         Assert.Equal (new Point (4, 2), tv.CursorPosition);
         Assert.Equal (new Point (12, 0), cp);
@@ -7680,7 +6923,7 @@ line.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         tv.Draw ();
         Assert.Equal (new Point (0, 3), tv.CursorPosition);
         Assert.Equal (new Point (12, 0), cp);
@@ -7703,7 +6946,7 @@ line.
                                                       _output
                                                      );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         tv.Draw ();
         Assert.Equal (new Point (1, 3), tv.CursorPosition);
         Assert.Equal (new Point (13, 0), cp);
@@ -7726,7 +6969,7 @@ line.
                                                       _output
                                                      );
 
-        Assert.True (tv.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed }));
+        Assert.True (tv.NewMouseEvent (new MouseEvent { Position = new (0, 3), Flags = MouseFlags.Button1Pressed }));
         tv.Draw ();
         Assert.Equal (new Point (0, 3), tv.CursorPosition);
         Assert.Equal (new Point (13, 0), cp);
@@ -7757,13 +7000,13 @@ line.
         _textView.Used = false;
         _textView.CursorPosition = new Point (10, 0);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-        _textView.NewKeyDownEvent (new Key ((KeyCode)0x75)); // u
+        _textView.NewKeyDownEvent (Key.U); // u
         Assert.Equal ("TAB to jumu between text fields.", _textView.Text);
-        _textView.NewKeyDownEvent (new Key ((KeyCode)0x73)); // s
+        _textView.NewKeyDownEvent (Key.S); // s
         Assert.Equal ("TAB to jumusbetween text fields.", _textView.Text);
-        _textView.NewKeyDownEvent (new Key ((KeyCode)0x65)); // e
+        _textView.NewKeyDownEvent (Key.E); // e
         Assert.Equal ("TAB to jumuseetween text fields.", _textView.Text);
-        _textView.NewKeyDownEvent (new Key ((KeyCode)0x64)); // d
+        _textView.NewKeyDownEvent (Key.D); // d
         Assert.Equal ("TAB to jumusedtween text fields.", _textView.Text);
     }
 
@@ -7773,13 +7016,13 @@ line.
     {
         _textView.CursorPosition = new Point (10, 0);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-        _textView.NewKeyDownEvent (new Key ((KeyCode)0x75)); // u
+        _textView.NewKeyDownEvent (Key.U); // u
         Assert.Equal ("TAB to jumup between text fields.", _textView.Text);
-        _textView.NewKeyDownEvent (new Key ((KeyCode)0x73)); // s
+        _textView.NewKeyDownEvent (Key.S); // s
         Assert.Equal ("TAB to jumusp between text fields.", _textView.Text);
-        _textView.NewKeyDownEvent (new Key ((KeyCode)0x65)); // e
+        _textView.NewKeyDownEvent (Key.E); // e
         Assert.Equal ("TAB to jumusep between text fields.", _textView.Text);
-        _textView.NewKeyDownEvent (new Key ((KeyCode)0x64)); // d
+        _textView.NewKeyDownEvent (Key.D); // d
         Assert.Equal ("TAB to jumusedp between text fields.", _textView.Text);
     }
 
@@ -7801,7 +7044,7 @@ line.
 
         while (!iterationsFinished)
         {
-            _textView.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask));
+            _textView.NewKeyDownEvent (Key.CursorLeft.WithCtrl.WithShift);
 
             switch (iteration)
             {
@@ -7965,7 +7208,7 @@ line.
 
         while (_textView.CursorPosition.X > 0)
         {
-            _textView.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask));
+            _textView.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
 
             switch (iteration)
             {
@@ -8050,7 +7293,7 @@ line.
 
         while (_textView.CursorPosition.X > 0)
         {
-            _textView.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask));
+            _textView.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
 
             switch (iteration)
             {
@@ -8170,7 +7413,7 @@ line.
 
         while (_textView.CursorPosition.X > 0)
         {
-            _textView.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask));
+            _textView.NewKeyDownEvent (Key.CursorLeft.WithCtrl.WithShift);
 
             switch (iteration)
             {
@@ -8255,7 +7498,7 @@ line.
 
         while (_textView.CursorPosition.X > 0)
         {
-            _textView.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask));
+            _textView.NewKeyDownEvent (Key.CursorLeft.WithCtrl.WithShift);
 
             switch (iteration)
             {
@@ -8461,12 +7704,12 @@ line.
     [TextViewTestsAutoInitShutdown]
     public void WordForward_With_No_Selection ()
     {
-        _textView.CursorPosition = new Point (0, 0);
+        _textView.CursorPosition = Point.Empty;
         var iteration = 0;
 
         while (_textView.CursorPosition.X < _textView.Text.Length)
         {
-            _textView.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask));
+            _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl);
 
             switch (iteration)
             {
@@ -8537,12 +7780,12 @@ line.
         //                          1         2         3         4         5    
         //                0123456789012345678901234567890123456789012345678901234=55 (Length)
         _textView.Text = "TAB   t  o  jump         b  etween    t ext   f ields .";
-        _textView.CursorPosition = new Point (0, 0);
+        _textView.CursorPosition = Point.Empty;
         var iteration = 0;
 
         while (_textView.CursorPosition.X < _textView.Text.Length)
         {
-            _textView.NewKeyDownEvent (new Key (KeyCode.CursorRight | KeyCode.CtrlMask));
+            _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl);
 
             switch (iteration)
             {
@@ -8655,7 +7898,7 @@ line.
     [TextViewTestsAutoInitShutdown]
     public void WordForward_With_Selection ()
     {
-        _textView.CursorPosition = new Point (0, 0);
+        _textView.CursorPosition = Point.Empty;
         _textView.SelectionStartColumn = 0;
         _textView.SelectionStartRow = 0;
         var iteration = 0;
@@ -8797,10 +8040,11 @@ line.
     public void WordWrap_Deleting_Backwards ()
     {
         var tv = new TextView { Width = 5, Height = 2, WordWrap = true, Text = "aaaa" };
-        Application.Top.Add (tv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
-        Assert.Equal (new Point (0, 0), tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.LeftColumn);
 
         TestHelpers.AssertDriverContentsAre (
@@ -8811,7 +8055,7 @@ aaaa
                                             );
 
         tv.CursorPosition = new Point (5, 0);
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Application.Refresh ();
         Assert.Equal (0, tv.LeftColumn);
 
@@ -8822,7 +8066,7 @@ aaa
                                              _output
                                             );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Application.Refresh ();
         Assert.Equal (0, tv.LeftColumn);
 
@@ -8833,7 +8077,7 @@ aa
                                              _output
                                             );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Application.Refresh ();
         Assert.Equal (0, tv.LeftColumn);
 
@@ -8844,7 +8088,7 @@ a
                                              _output
                                             );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Application.Refresh ();
         Assert.Equal (0, tv.LeftColumn);
 
@@ -8855,7 +8099,7 @@ a
                                              _output
                                             );
 
-        Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Application.Refresh ();
         Assert.Equal (0, tv.LeftColumn);
 
@@ -8872,10 +8116,11 @@ a
     [InlineData (KeyCode.Delete)]
     public void WordWrap_Draw_Typed_Keys_After_Text_Is_Deleted (KeyCode del)
     {
-        Application.Top.Add (_textView);
+        var top = new Toplevel ();
+        top.Add (_textView);
         _textView.Text = "Line 1.\nLine 2.";
         _textView.WordWrap = true;
-        Application.Begin (Application.Top);
+        Application.Begin (top);
 
         Assert.True (_textView.WordWrap);
 
@@ -8886,15 +8131,15 @@ Line 2.",
                                                       _output
                                                      );
 
-        Assert.True (_textView.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.ShiftMask)));
+        Assert.True (_textView.NewKeyDownEvent (Key.End.WithShift));
         Assert.Equal ("Line 1.", _textView.SelectedText);
 
         Assert.True (_textView.NewKeyDownEvent (new Key (del)));
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre ("Line 2.", _output);
 
-        Assert.True (_textView.NewKeyDownEvent (new Key (KeyCode.H | KeyCode.ShiftMask)));
-        Assert.NotEqual (Rect.Empty, _textView._needsDisplayRect);
+        Assert.True (_textView.NewKeyDownEvent (Key.H.WithShift));
+        Assert.NotEqual (Rectangle.Empty, _textView._needsDisplayRect);
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -8934,7 +8179,7 @@ Line 2.",
     }
 
     [Fact]
-    [TextViewTestsAutoInitShutdown]
+    [AutoInitShutdown]
     public void WordWrap_ReadOnly_CursorPosition_SelectedText_Copy ()
     {
         //          0123456789
@@ -8948,8 +8193,9 @@ Line 2.",
                      );
         tv.WordWrap = true;
 
-        Application.Top.Add (tv);
-        Application.Top.LayoutSubviews ();
+        var top = new Toplevel ();
+        top.Add (tv);
+        top.LayoutSubviews ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -8968,18 +8214,17 @@ line.
         tv.ReadOnly = true;
         tv.CursorPosition = new Point (6, 2);
         Assert.Equal (new Point (5, 2), tv.CursorPosition);
-        Application.Top.LayoutSubviews ();
+        top.LayoutSubviews ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
-This is  
-the first
-line.    
-This is  
-the      
-second   
-line.    
+This is   
+the first 
+line.     
+This is   
+the second
+line.     
 ",
                                                       _output
                                                      );
@@ -9052,7 +8297,8 @@ line.
                      );
         tv.WordWrap = true;
 
-        Application.Top.Add (tv);
+        var top = new Toplevel ();
+        top.Add (tv);
 
         tv.LayoutSubviews ();
         tv.Draw ();
@@ -9159,4 +8405,157 @@ line.
             _textView.Text = Encoding.Unicode.GetString (ms);
         }
     }
+
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new TextView ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var view = new TextView ();
+        var accepted = false;
+        view.Accept += OnAccept;
+        view.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Command_Fires_Accept ()
+    {
+        var view = new TextView ();
+
+        var accepted = false;
+        view.Accept += Accept;
+        view.InvokeCommand (Command.Accept);
+        Assert.True (accepted);
+
+        return;
+
+        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+
+    [Theory]
+    [InlineData (false, 1)]
+    [InlineData (true, 0)]
+    public void Enter_Key_Fires_Accept (bool multiline, int expectedAccepts)
+    {
+        var view = new TextView ()
+        {
+            Multiline = multiline,
+        };
+
+        int accepted = 0;
+        view.Accept += Accept;
+        view.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedAccepts, accepted);
+
+        return;
+
+        void Accept (object sender, HandledEventArgs e) { accepted++; }
+    }
+
+    [Theory]
+    [InlineData (false, false, 1, 0)]
+    [InlineData (false, true, 1, 1)]
+    [InlineData (true, false, 0, 0)]
+    [InlineData (true, true, 0, 0)]
+    public void Accept_Handler_Handled_Prevents_Default_Button_Accept (bool multiline, bool handleAccept, int expectedAccepts, int expectedButtonAccepts)
+    {
+        var superView = new Window ();
+        var tv = new TextView ()
+        {
+            Multiline = multiline
+        };
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tv, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        var textViewAccept = 0;
+        tv.Accept += TextViewAccept;
+
+        tv.SetFocus ();
+        Assert.True (tv.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedAccepts, textViewAccept);
+        Assert.Equal (expectedButtonAccepts, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedAccepts, textViewAccept);
+        Assert.Equal (expectedButtonAccepts + 1, buttonAccept);
+
+        return;
+
+        void TextViewAccept (object sender, HandledEventArgs e)
+        {
+            textViewAccept++;
+            e.Handled = handleAccept;
+        }
+
+        void ButtonAccept (object sender, HandledEventArgs e)
+        {
+            buttonAccept++;
+        }
+    }
+
+    [Theory]
+    [InlineData (true, 0)]
+    [InlineData (false, 1)]
+    public void Accept_No_Handler_Enables_Default_Button_Accept (bool multiline, int expectedButtonAccept)
+    {
+        var superView = new Window ();
+        var tv = new TextView ()
+        {
+            Multiline = multiline
+        };
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tv, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        tv.SetFocus ();
+        Assert.True (tv.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedButtonAccept, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedButtonAccept + 1, buttonAccept);
+
+        return;
+
+        void ButtonAccept (object sender, HandledEventArgs e)
+        {
+            buttonAccept++;
+        }
+    }
+
 }

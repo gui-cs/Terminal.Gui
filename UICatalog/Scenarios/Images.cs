@@ -28,7 +28,7 @@ public class Images : Scenario
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 0,
-            Checked = canTrueColor,
+            State = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
             CanFocus = false,
             Text = "supports true color "
         };
@@ -38,11 +38,11 @@ public class Images : Scenario
         {
             X = Pos.Right (cbSupportsTrueColor) + 2,
             Y = 0,
-            Checked = !Application.Force16Colors,
+            State = !Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Use true color"
         };
-        cbUseTrueColor.Toggled += (_, evt) => Application.Force16Colors = !evt.NewValue ?? false;
+        cbUseTrueColor.Toggle += (_, evt) => Application.Force16Colors = evt.NewValue == CheckState.UnChecked;
         Win.Add (cbUseTrueColor);
 
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
@@ -54,7 +54,7 @@ public class Images : Scenario
         };
         Win.Add (imageView);
 
-        btnOpenImage.Clicked += (_, _) =>
+        btnOpenImage.Accept += (_, _) =>
                                 {
                                     var ofd = new OpenDialog { Title = "Open Image", AllowsMultipleSelection = false };
                                     Application.Run (ofd);
@@ -66,10 +66,13 @@ public class Images : Scenario
 
                                     if (ofd.Canceled)
                                     {
+                                        ofd.Dispose ();
                                         return;
                                     }
 
                                     string path = ofd.FilePaths [0];
+
+                                    ofd.Dispose ();
 
                                     if (string.IsNullOrWhiteSpace (path))
                                     {
@@ -105,7 +108,7 @@ public class Images : Scenario
         private Image<Rgba32> _fullResImage;
         private Image<Rgba32> _matchSize;
 
-        public override void OnDrawContent (Rect bounds)
+        public override void OnDrawContent (Rectangle bounds)
         {
             base.OnDrawContent (bounds);
 

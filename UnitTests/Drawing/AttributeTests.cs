@@ -12,7 +12,6 @@ public class AttributeTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void ColorAndColorNamesConstructor ()
     {
         // Arrange & Act
@@ -26,7 +25,6 @@ public class AttributeTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void ColorConstructor ()
     {
         // Arrange & Act
@@ -143,11 +141,8 @@ public class AttributeTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Equals_Initialized ()
     {
-        Assert.NotNull (Application.Driver);
-
         var attr1 = new Attribute (Color.Red, Color.Green);
         var attr2 = new Attribute (Color.Red, Color.Green);
 
@@ -324,7 +319,6 @@ public class AttributeTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void NotEquals_Initialized ()
     {
         var attr1 = new Attribute (Color.Red, Color.Green);
@@ -342,19 +336,6 @@ public class AttributeTests
 
         Assert.False (attr1.Equals (attr2));
         Assert.False (attr2.Equals (attr1));
-    }
-
-    [Fact]
-    public void PlatformColorConstructor ()
-    {
-        // Arrange & Act
-        var attribute = new Attribute (42);
-
-        // Assert
-        //Assert.True (attribute.Initialized);
-        Assert.Equal (42, attribute.PlatformColor);
-        Assert.Equal (new Color (Color.White), attribute.Foreground);
-        Assert.Equal (new Color (Color.Black), attribute.Background);
     }
 
     [Fact]

@@ -2,11 +2,8 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.TextTests;
 
-public class AppendAutocompleteTests
+public class AppendAutocompleteTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper output;
-    public AppendAutocompleteTests (ITestOutputHelper output) { this.output = output; }
-
     [Fact]
     [AutoInitShutdown]
     public void TestAutoAppend_AfterCloseKey_NoAutocomplete ()
@@ -34,6 +31,7 @@ public class AppendAutocompleteTests
         // But can tab away
         Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
         Assert.NotSame (tf, Application.Top.Focused);
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -63,6 +61,7 @@ public class AppendAutocompleteTests
         tf.PositionCursor ();
         TestHelpers.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("fi", tf.Text);
+        Application.Top.Dispose ();
     }
 
     [Theory]
@@ -94,6 +93,7 @@ public class AppendAutocompleteTests
         tf.PositionCursor ();
         TestHelpers.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -116,6 +116,7 @@ public class AppendAutocompleteTests
         tf.Draw ();
         TestHelpers.AssertDriverContentsAre ("f", output);
         Assert.Equal ("f ", tf.Text);
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -136,6 +137,7 @@ public class AppendAutocompleteTests
         tf.Draw ();
         TestHelpers.AssertDriverContentsAre ("fx", output);
         Assert.Equal ("fx", tf.Text);
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -151,10 +153,10 @@ public class AppendAutocompleteTests
         tf.Draw ();
         tf.PositionCursor ();
         TestHelpers.AssertDriverContentsAre ("", output);
-        tf.NewKeyDownEvent (new Key ((KeyCode)'m'));
-        tf.NewKeyDownEvent (new Key ((KeyCode)'y'));
-        tf.NewKeyDownEvent (new Key (KeyCode.Space));
-        tf.NewKeyDownEvent (new Key ((KeyCode)'f'));
+        tf.NewKeyDownEvent (Key.M);
+        tf.NewKeyDownEvent (Key.Y);
+        tf.NewKeyDownEvent (Key.Space);
+        tf.NewKeyDownEvent (Key.F);
         Assert.Equal ("my f", tf.Text);
 
         // Even though there is no match on case we should still get the suggestion
@@ -168,6 +170,7 @@ public class AppendAutocompleteTests
         tf.Draw ();
         TestHelpers.AssertDriverContentsAre ("my FISH", output);
         Assert.Equal ("my FISH", tf.Text);
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -203,6 +206,7 @@ public class AppendAutocompleteTests
         // Second tab should move focus (nothing to autocomplete)
         Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
         Assert.NotSame (tf, Application.Top.Focused);
+        Application.Top.Dispose ();
     }
 
     [Theory]
@@ -220,6 +224,7 @@ public class AppendAutocompleteTests
         tf.PositionCursor ();
         TestHelpers.AssertDriverContentsAre (expectRender, output);
         Assert.Equal ("f", tf.Text);
+        Application.Top.Dispose ();
     }
 
     private TextField GetTextFieldsInView ()
@@ -227,7 +232,7 @@ public class AppendAutocompleteTests
         var tf = new TextField { Width = 10 };
         var tf2 = new TextField { Y = 1, Width = 10 };
 
-        Toplevel top = Application.Top;
+        Toplevel top = new ();
         top.Add (tf);
         top.Add (tf2);
 

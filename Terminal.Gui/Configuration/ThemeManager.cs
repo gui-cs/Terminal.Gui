@@ -78,7 +78,7 @@ public class ThemeManager : IDictionary<string, ThemeScope>
                    Dictionary<string, ThemeScope>; // themes ?? new Dictionary<string, ThemeScope> ();
         set =>
 
-            //if (themes == null || value == null) {
+            //if (themes is null || value is null) {
             //	themes = value;
             //} else {
             //	themes = (Dictionary<string, ThemeScope>)DeepMemberwiseCopy (value!, themes!)!;
@@ -111,7 +111,7 @@ public class ThemeManager : IDictionary<string, ThemeScope>
 
     internal static void GetHardCodedDefaults ()
     {
-        Debug.WriteLine ("Themes.GetHardCodedDefaults()");
+        //Debug.WriteLine ("Themes.GetHardCodedDefaults()");
         var theme = new ThemeScope ();
         theme.RetrieveValues ();
 
@@ -125,7 +125,7 @@ public class ThemeManager : IDictionary<string, ThemeScope>
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>
     internal void OnThemeChanged (string theme)
     {
-        Debug.WriteLine ($"Themes.OnThemeChanged({theme}) -> {Theme}");
+        //Debug.WriteLine ($"Themes.OnThemeChanged({theme}) -> {Theme}");
         ThemeChanged?.Invoke (this, new ThemeManagerEventArgs (theme));
     }
 

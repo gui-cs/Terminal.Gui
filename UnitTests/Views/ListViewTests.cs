@@ -1,13 +1,13 @@
 ﻿using System.Collections;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class ListViewTests
+public class ListViewTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public ListViewTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     public void Constructors_Defaults ()
     {
@@ -16,44 +16,45 @@ public class ListViewTests
         Assert.True (lv.CanFocus);
         Assert.Equal (-1, lv.SelectedItem);
 
-        lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        lv = new () { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
 
-        lv = new ListView { Source = new NewListDataSource () };
+        lv = new() { Source = new NewListDataSource () };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
 
-        lv = new ListView
+        lv = new()
         {
-            Y = 1, Width = 10, Height = 20, Source = new ListWrapper (new List<string> { "One", "Two", "Three" })
+            Y = 1, Width = 10, Height = 20, Source = new ListWrapper<string> (["One", "Two", "Three"])
         };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
-        Assert.Equal (new Rect (0, 1, 10, 20), lv.Frame);
+        Assert.Equal (new (0, 1, 10, 20), lv.Frame);
 
-        lv = new ListView { Y = 1, Width = 10, Height = 20, Source = new NewListDataSource () };
+        lv = new() { Y = 1, Width = 10, Height = 20, Source = new NewListDataSource () };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
-        Assert.Equal (new Rect (0, 1, 10, 20), lv.Frame);
+        Assert.Equal (new (0, 1, 10, 20), lv.Frame);
     }
 
     [Fact]
     [AutoInitShutdown]
     public void Ensures_Visibility_SelectedItem_On_MoveDown_And_MoveUp ()
     {
-        List<string> source = new ();
+        ObservableCollection<string> source = [];
 
         for (var i = 0; i < 20; i++)
         {
             source.Add ($"Line{i}");
         }
 
-        var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill (), Source = new ListWrapper (source) };
+        var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill (), Source = new ListWrapper<string> (source) };
         var win = new Window ();
         win.Add (lv);
-        Application.Top.Add (win);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (win);
+        Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (12, 12);
         Application.Refresh ();
 
@@ -73,10 +74,10 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
-        Assert.True (lv.ScrollDown (10));
+        Assert.True (lv.ScrollVertical (10));
         lv.Draw ();
         Assert.Equal (-1, lv.SelectedItem);
 
@@ -94,7 +95,7 @@ public class ListViewTests
 │Line18    │
 │Line19    │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveDown ());
@@ -115,7 +116,7 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveEnd ());
@@ -125,21 +126,21 @@ public class ListViewTests
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
+│Line10    │
+│Line11    │
+│Line12    │
+│Line13    │
+│Line14    │
+│Line15    │
+│Line16    │
+│Line17    │
+│Line18    │
 │Line19    │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
-        Assert.True (lv.ScrollUp (20));
+        Assert.True (lv.ScrollVertical (-20));
         lv.Draw ();
         Assert.Equal (19, lv.SelectedItem);
 
@@ -157,7 +158,7 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveDown ());
@@ -178,10 +179,10 @@ public class ListViewTests
 │Line18    │
 │Line19    │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
-        Assert.True (lv.ScrollUp (20));
+        Assert.True (lv.ScrollVertical (-20));
         lv.Draw ();
         Assert.Equal (19, lv.SelectedItem);
 
@@ -199,7 +200,7 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveDown ());
@@ -220,7 +221,7 @@ public class ListViewTests
 │Line18    │
 │Line19    │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveHome ());
@@ -241,10 +242,10 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
-        Assert.True (lv.ScrollDown (20));
+        Assert.True (lv.ScrollVertical (20));
         lv.Draw ();
         Assert.Equal (0, lv.SelectedItem);
 
@@ -262,7 +263,7 @@ public class ListViewTests
 │          │
 │          │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         Assert.True (lv.MoveUp ());
@@ -283,24 +284,26 @@ public class ListViewTests
 │Line8     │
 │Line9     │
 └──────────┘",
-                                                      _output
+                                                      output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
     [AutoInitShutdown]
     public void EnsureSelectedItemVisible_SelectedItem ()
     {
-        List<string> source = new ();
+        ObservableCollection<string> source = [];
 
         for (var i = 0; i < 10; i++)
         {
             source.Add ($"Item {i}");
         }
 
-        var lv = new ListView { Width = 10, Height = 5, Source = new ListWrapper (source) };
-        Application.Top.Add (lv);
-        Application.Begin (Application.Top);
+        var lv = new ListView { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
+        var top = new Toplevel ();
+        top.Add (lv);
+        Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -309,7 +312,7 @@ Item 1
 Item 2
 Item 3
 Item 4",
-                                                      _output
+                                                      output
                                                      );
 
         // EnsureSelectedItemVisible is auto enabled on the OnSelectedChanged
@@ -323,28 +326,30 @@ Item 3
 Item 4
 Item 5
 Item 6",
-                                                      _output
+                                                      output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
     [AutoInitShutdown]
     public void EnsureSelectedItemVisible_Top ()
     {
-        List<string> source = new () { "First", "Second" };
-        var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper (source) };
+        ObservableCollection<string> source = ["First", "Second"];
+        var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper<string> (source) };
         lv.SelectedItem = 1;
-        Application.Top.Add (lv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (lv);
+        Application.Begin (top);
 
         Assert.Equal ("Second ", GetContents (0));
-        Assert.Equal (new string (' ', 7), GetContents (1));
+        Assert.Equal (new (' ', 7), GetContents (1));
 
         lv.MoveUp ();
         lv.Draw ();
 
         Assert.Equal ("First  ", GetContents (0));
-        Assert.Equal (new string (' ', 7), GetContents (1));
+        Assert.Equal (new (' ', 7), GetContents (1));
 
         string GetContents (int line)
         {
@@ -357,37 +362,131 @@ Item 6",
 
             return item;
         }
+        top.Dispose ();
     }
 
     [Fact]
     public void KeyBindings_Command ()
     {
-        List<string> source = new () { "One", "Two", "Three" };
-        var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper (source) };
+        ObservableCollection<string> source = ["One", "Two", "Three"];
+        var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper<string> (source) };
         lv.BeginInit ();
         lv.EndInit ();
         Assert.Equal (-1, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
+        Assert.True (lv.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (0, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
+        Assert.True (lv.NewKeyDownEvent (Key.CursorUp));
         Assert.Equal (0, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.PageDown)));
+        Assert.True (lv.NewKeyDownEvent (Key.PageDown));
         Assert.Equal (2, lv.SelectedItem);
         Assert.Equal (2, lv.TopItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.PageUp)));
+        Assert.True (lv.NewKeyDownEvent (Key.PageUp));
         Assert.Equal (0, lv.SelectedItem);
         Assert.Equal (0, lv.TopItem);
         Assert.False (lv.Source.IsMarked (lv.SelectedItem));
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Space)));
+        Assert.True (lv.NewKeyDownEvent (Key.Space));
         Assert.True (lv.Source.IsMarked (lv.SelectedItem));
         var opened = false;
         lv.OpenSelectedItem += (s, _) => opened = true;
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Enter)));
+        Assert.True (lv.NewKeyDownEvent (Key.Enter));
         Assert.True (opened);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.End)));
+        Assert.True (lv.NewKeyDownEvent (Key.End));
         Assert.Equal (2, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Home)));
+        Assert.True (lv.NewKeyDownEvent (Key.Home));
         Assert.Equal (0, lv.SelectedItem);
+    }
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new ListView ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var listView = new ListView ();
+        var accepted = false;
+
+        listView.Accept += OnAccept;
+        listView.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Command_Accepts_and_Opens_Selected_Item ()
+    {
+        ObservableCollection<string> source = ["One", "Two", "Three"];
+        var listView = new ListView { Source = new ListWrapper<string> (source) };
+        listView.SelectedItem = 0;
+
+        var accepted = false;
+        var opened = false;
+        var selectedValue = string.Empty;
+
+        listView.Accept += Accept;
+        listView.OpenSelectedItem += OpenSelectedItem;
+
+        listView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.True (opened);
+        Assert.Equal (source [0], selectedValue);
+
+        return;
+
+        void OpenSelectedItem (object sender, ListViewItemEventArgs e)
+        {
+            opened = true;
+            selectedValue = e.Value.ToString ();
+        }
+
+        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Cancel_Event_Prevents_OpenSelectedItem ()
+    {
+        ObservableCollection<string> source = ["One", "Two", "Three"];
+        var listView = new ListView { Source = new ListWrapper<string> (source) };
+        listView.SelectedItem = 0;
+
+        var accepted = false;
+        var opened = false;
+        var selectedValue = string.Empty;
+
+        listView.Accept += Accept;
+        listView.OpenSelectedItem += OpenSelectedItem;
+
+        listView.InvokeCommand (Command.Accept);
+
+        Assert.True (accepted);
+        Assert.False (opened);
+        Assert.Equal (string.Empty, selectedValue);
+
+        return;
+
+        void OpenSelectedItem (object sender, ListViewItemEventArgs e)
+        {
+            opened = true;
+            selectedValue = e.Value.ToString ();
+        }
+
+        void Accept (object sender, HandledEventArgs e)
+        {
+            accepted = true;
+            e.Handled = true;
+        }
     }
 
     /// <summary>
@@ -397,7 +496,7 @@ Item 6",
     [Fact]
     public void ListViewProcessKeyReturnValue_WithMultipleCommands ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three", "Four" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three", "Four"]) };
 
         Assert.NotNull (lv.Source);
 
@@ -405,9 +504,9 @@ Item 6",
         Assert.Equal (-1, lv.SelectedItem);
 
         // bind shift down to move down twice in control
-        lv.KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDown, Command.LineDown);
+        lv.KeyBindings.Add (Key.CursorDown.WithShift, Command.LineDown, Command.LineDown);
 
-        var ev = new Key (KeyCode.CursorDown | KeyCode.ShiftMask);
+        Key ev = Key.CursorDown.WithShift;
 
         Assert.True (lv.NewKeyDownEvent (ev), "The first time we move down 2 it should be possible");
 
@@ -415,7 +514,7 @@ Item 6",
         Assert.Equal (1, lv.SelectedItem);
 
         // clear the items
-        lv.SetSource (null);
+        lv.SetSource<string> (null);
 
         // Press key combo again - return should be false this time as none of the Commands are allowable
         Assert.False (lv.NewKeyDownEvent (ev), "We cannot move down so will not respond to this");
@@ -424,7 +523,7 @@ Item 6",
     [Fact]
     public void ListViewSelectThenDown ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         lv.AllowsMarking = true;
 
         Assert.NotNull (lv.Source);
@@ -437,9 +536,9 @@ Item 6",
         Assert.False (lv.Source.IsMarked (1));
         Assert.False (lv.Source.IsMarked (2));
 
-        lv.KeyBindings.Add (KeyCode.Space | KeyCode.ShiftMask, Command.ToggleChecked, Command.LineDown);
+        lv.KeyBindings.Add (Key.Space.WithShift, Command.Select, Command.LineDown);
 
-        var ev = new Key (KeyCode.Space | KeyCode.ShiftMask);
+        Key ev = Key.Space.WithShift;
 
         // view should indicate that it has accepted and consumed the event
         Assert.True (lv.NewKeyDownEvent (ev));
@@ -488,7 +587,7 @@ Item 6",
     [Fact]
     public void ListWrapper_StartsWith ()
     {
-        var lw = new ListWrapper (new List<string> { "One", "Two", "Three" });
+        var lw = new ListWrapper<string> (["One", "Two", "Three"]);
 
         Assert.Equal (1, lw.StartsWith ("t"));
         Assert.Equal (1, lw.StartsWith ("tw"));
@@ -497,7 +596,7 @@ Item 6",
         Assert.Equal (1, lw.StartsWith ("TW"));
         Assert.Equal (2, lw.StartsWith ("TH"));
 
-        lw = new ListWrapper (new List<string> { "One", "Two", "Three" });
+        lw = new (["One", "Two", "Three"]);
 
         Assert.Equal (1, lw.StartsWith ("t"));
         Assert.Equal (1, lw.StartsWith ("tw"));
@@ -522,22 +621,24 @@ Item 6",
     public void RowRender_Event ()
     {
         var rendered = false;
-        List<string> source = new () { "one", "two", "three" };
+        ObservableCollection<string> source = ["one", "two", "three"];
         var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
         lv.RowRender += (s, _) => rendered = true;
-        Application.Top.Add (lv);
-        Application.Begin (Application.Top);
+        var top = new Toplevel ();
+        top.Add (lv);
+        Application.Begin (top);
         Assert.False (rendered);
 
         lv.SetSource (source);
         lv.Draw ();
         Assert.True (rendered);
+        top.Dispose ();
     }
 
     [Fact]
     public void SelectedItem_Get_Set ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.Equal (-1, lv.SelectedItem);
         Assert.Throws<ArgumentException> (() => lv.SelectedItem = 3);
         Exception exception = Record.Exception (() => lv.SelectedItem = -1);
@@ -547,34 +648,40 @@ Item 6",
     [Fact]
     public void SetSource_Preserves_ListWrapper_Instance_If_Not_Null ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two" }) };
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two"]) };
 
         Assert.NotNull (lv.Source);
 
-        lv.SetSource (null);
+        lv.SetSource<string> (null);
         Assert.NotNull (lv.Source);
 
         lv.Source = null;
         Assert.Null (lv.Source);
 
-        lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two" }) };
+        lv = new () { Source = new ListWrapper<string> (["One", "Two"]) };
         Assert.NotNull (lv.Source);
 
-        lv.SetSourceAsync (null);
+        lv.SetSourceAsync<string> (null);
         Assert.NotNull (lv.Source);
     }
 
     [Fact]
     public void SettingEmptyKeybindingThrows ()
     {
-        var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
-        Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (KeyCode.Space));
+        var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
+        Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (Key.Space));
     }
 
     private class NewListDataSource : IListDataSource
     {
-        public int Count => throw new NotImplementedException ();
-        public int Length => throw new NotImplementedException ();
+        /// <inheritdoc />
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        public int Count => 0;
+        public int Length => 0;
+
+        public bool SuspendCollectionChangedEvent { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+
         public bool IsMarked (int item) { throw new NotImplementedException (); }
 
         public void Render (
@@ -593,71 +700,460 @@ Item 6",
 
         public void SetMark (int item, bool value) { throw new NotImplementedException (); }
         public IList ToList () { return new List<string> { "One", "Two", "Three" }; }
+
+        public void Dispose ()
+        {
+            throw new NotImplementedException ();
+        }
     }
 
-    // No longer needed given PR #2920
-    //		[Fact, AutoInitShutdown]
-    //		public void Clicking_On_Border_Is_Ignored ()
-    //		{
-    //			var selected = "";
-    //			var lv = new ListView {
-    //				Height = 5,
-    //				Width = 7,
-    //				BorderStyle = LineStyle.Single
-    //			};
-    //			lv.SetSource (new List<string> { "One", "Two", "Three", "Four" });
-    //			lv.SelectedItemChanged += (s, e) => selected = e.Value.ToString ();
-    //			Application.Top.Add (lv);
-    //			Application.Begin (Application.Top);
+    [Fact]
+    [AutoInitShutdown]
+    public void Clicking_On_Border_Is_Ignored ()
+    {
+        var selected = "";
 
-    //			Assert.Equal (new Thickness (1), lv.Border.Thickness);
-    //			Assert.Equal (-1, lv.SelectedItem);
-    //			Assert.Equal ("", lv.Text);
-    //			TestHelpers.AssertDriverContentsWithFrameAre (@"
-    //┌─────┐
-    //│One  │
-    //│Two  │
-    //│Three│
-    //└─────┘", output);
+        var lv = new ListView
+        {
+            Height = 5,
+            Width = 7,
+            BorderStyle = LineStyle.Single
+        };
+        lv.SetSource (["One", "Two", "Three", "Four"]);
+        lv.SelectedItemChanged += (s, e) => selected = e.Value.ToString ();
+        var top = new Toplevel ();
+        top.Add (lv);
+        Application.Begin (top);
 
-    //			Assert.True (lv.MouseEvent (new MouseEvent {
-    //				X = 0,
-    //				Y = 0,
-    //				Flags = MouseFlags.Button1Clicked
-    //			}));
-    //			Assert.Equal ("", selected);
-    //			Assert.Equal (-1, lv.SelectedItem);
+        Assert.Equal (new (1), lv.Border.Thickness);
+        Assert.Equal (-1, lv.SelectedItem);
+        Assert.Equal ("", lv.Text);
 
-    //			Assert.True (lv.MouseEvent (new MouseEvent {
-    //				X = 0,
-    //				Y = 1,
-    //				Flags = MouseFlags.Button1Clicked
-    //			}));
-    //			Assert.Equal ("One", selected);
-    //			Assert.Equal (0, lv.SelectedItem);
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─────┐
+│One  │
+│Two  │
+│Three│
+└─────┘",
+                                                      output);
 
-    //			Assert.True (lv.MouseEvent (new MouseEvent {
-    //				X = 0,
-    //				Y = 2,
-    //				Flags = MouseFlags.Button1Clicked
-    //			}));
-    //			Assert.Equal ("Two", selected);
-    //			Assert.Equal (1, lv.SelectedItem);
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Assert.Equal ("", selected);
+        Assert.Equal (-1, lv.SelectedItem);
 
-    //			Assert.True (lv.MouseEvent (new MouseEvent {
-    //				X = 0,
-    //				Y = 3,
-    //				Flags = MouseFlags.Button1Clicked
-    //			}));
-    //			Assert.Equal ("Three", selected);
-    //			Assert.Equal (2, lv.SelectedItem);
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = new (1, 1), Flags = MouseFlags.Button1Clicked
+                                  });
+        Assert.Equal ("One", selected);
+        Assert.Equal (0, lv.SelectedItem);
 
-    //			Assert.True (lv.MouseEvent (new MouseEvent {
-    //				X = 0,
-    //				Y = 4,
-    //				Flags = MouseFlags.Button1Clicked
-    //			}));
-    //			Assert.Equal ("Three", selected);
-    //			Assert.Equal (2, lv.SelectedItem);
-    //		}
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = new (1, 2), Flags = MouseFlags.Button1Clicked
+                                  });
+        Assert.Equal ("Two", selected);
+        Assert.Equal (1, lv.SelectedItem);
+
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = new (1, 3), Flags = MouseFlags.Button1Clicked
+                                  });
+        Assert.Equal ("Three", selected);
+        Assert.Equal (2, lv.SelectedItem);
+
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = new (1, 4), Flags = MouseFlags.Button1Clicked
+                                  });
+        Assert.Equal ("Three", selected);
+        Assert.Equal (2, lv.SelectedItem);
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void LeftItem_TopItem_Tests ()
+    {
+        ObservableCollection<string> source = [];
+
+        for (int i = 0; i < 5; i++)
+        {
+            source.Add ($"Item {i}");
+        }
+
+        var lv = new ListView
+        {
+            X = 1,
+            Width = 10,
+            Height = 5,
+            Source = new ListWrapper<string> (source)
+        };
+        var top = new Toplevel ();
+        top.Add (lv);
+        Application.Begin (top);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+ Item 0
+ Item 1
+ Item 2
+ Item 3
+ Item 4",
+                                                      output);
+
+        lv.LeftItem = 1;
+        lv.TopItem = 1;
+        Application.Refresh ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+ tem 1
+ tem 2
+ tem 3
+ tem 4",
+                                                      output);
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void CollectionChanged_Event ()
+    {
+        var added = 0;
+        var removed = 0;
+        ObservableCollection<string> source = [];
+        var lv = new ListView { Source = new ListWrapper<string> (source) };
+
+        lv.CollectionChanged += (sender, args) =>
+                                {
+                                    if (args.Action == NotifyCollectionChangedAction.Add)
+                                    {
+                                        added++;
+                                    }
+                                    else if (args.Action == NotifyCollectionChangedAction.Remove)
+                                    {
+                                        removed++;
+                                    }
+                                };
+
+        for (int i = 0; i < 3; i++)
+        {
+            source.Add ($"Item{i}");
+        }
+        Assert.Equal (3, added);
+        Assert.Equal (0, removed);
+
+        added = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            source.Remove (source [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, removed);
+        Assert.Empty (source);
+    }
+
+    [Fact]
+    public void CollectionChanged_Event_Is_Only_Subscribed_Once ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        IList<string> source1 = [];
+        var lv = new ListView { Source = new ListWrapper<string> (new ( source1)) };
+
+        lv.CollectionChanged += (sender, args) =>
+                                {
+                                    if (args.Action == NotifyCollectionChangedAction.Add)
+                                    {
+                                        added++;
+                                    }
+                                    else if (args.Action == NotifyCollectionChangedAction.Remove)
+                                    {
+                                        removed++;
+                                    }
+                                    else
+                                    {
+                                        otherActions++;
+                                    }
+                                };
+
+        ObservableCollection<string> source2 = [];
+        lv.Source = new ListWrapper<string> (source2);
+        ObservableCollection<string> source3 = [];
+        lv.Source = new ListWrapper<string> (source3);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+            source2.Add ($"Item{i}");
+            source3.Add ($"Item{i}");
+        }
+        Assert.Equal (3, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        added = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+            source2.Remove (source2 [0]);
+            source3.Remove (source3 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+        Assert.Empty (source2);
+        Assert.Empty (source3);
+    }
+
+    [Fact]
+    public void CollectionChanged_Event_UnSubscribe_Previous_If_New_Is_Null ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        ObservableCollection<string> source1 = [];
+        var lv = new ListView { Source = new ListWrapper<string> (source1) };
+
+        lv.CollectionChanged += (sender, args) =>
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                removed++;
+            }
+            else
+            {
+                otherActions++;
+            }
+        };
+
+        lv.Source = new ListWrapper<string> (null);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+    }
+
+    [Fact]
+    public void ListWrapper_CollectionChanged_Event_Is_Only_Subscribed_Once ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        ObservableCollection<string> source1 = [];
+        ListWrapper<string> lw = new (source1);
+
+        lw.CollectionChanged += (sender, args) =>
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                removed++;
+            }
+            else
+            {
+                otherActions++;
+            }
+        };
+
+        ObservableCollection<string> source2 = [];
+        lw = new (source2);
+        ObservableCollection<string> source3 = [];
+        lw = new (source3);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+            source2.Add ($"Item{i}");
+            source3.Add ($"Item{i}");
+        }
+
+        Assert.Equal (3, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        added = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+            source2.Remove (source2 [0]);
+            source3.Remove (source3 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+        Assert.Empty (source2);
+        Assert.Empty (source3);
+    }
+
+    [Fact]
+    public void ListWrapper_CollectionChanged_Event_UnSubscribe_Previous_Is_Disposed ()
+    {
+        var added = 0;
+        var removed = 0;
+        var otherActions = 0;
+        ObservableCollection<string> source1 = [];
+        ListWrapper<string> lw = new (source1);
+
+        lw.CollectionChanged += Lw_CollectionChanged;
+
+        lw.Dispose ();
+        lw = new (null);
+        Assert.Equal (0, lw.Count);
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+
+        for (int i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (0, removed);
+        Assert.Equal (0, otherActions);
+        Assert.Empty (source1);
+
+
+        void Lw_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                removed++;
+            }
+            else
+            {
+                otherActions++;
+            }
+        }
+    }
+
+    [Fact]
+    public void ListWrapper_SuspendCollectionChangedEvent_ResumeSuspendCollectionChangedEvent_Tests ()
+    {
+        var added = 0;
+        ObservableCollection<string> source = [];
+        ListWrapper<string> lw = new (source);
+
+        lw.CollectionChanged += Lw_CollectionChanged;
+
+        lw.SuspendCollectionChangedEvent = true;
+
+        for (int i = 0; i < 3; i++)
+        {
+            source.Add ($"Item{i}");
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, lw.Count);
+        Assert.Equal (3, source.Count);
+
+        lw.SuspendCollectionChangedEvent = false;
+
+        for (int i = 3; i < 6; i++)
+        {
+            source.Add ($"Item{i}");
+        }
+        Assert.Equal (3, added);
+        Assert.Equal (6, lw.Count);
+        Assert.Equal (6, source.Count);
+
+
+        void Lw_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+        }
+    }
+
+    [Fact]
+    public void ListView_SuspendCollectionChangedEvent_ResumeSuspendCollectionChangedEvent_Tests ()
+    {
+        var added = 0;
+        ObservableCollection<string> source = [];
+        ListView lv = new ListView { Source = new ListWrapper<string> (source) };
+
+        lv.CollectionChanged += Lw_CollectionChanged;
+
+        lv.SuspendCollectionChangedEvent ();
+
+        for (int i = 0; i < 3; i++)
+        {
+            source.Add ($"Item{i}");
+        }
+        Assert.Equal (0, added);
+        Assert.Equal (3, lv.Source.Count);
+        Assert.Equal (3, source.Count);
+
+        lv.ResumeSuspendCollectionChangedEvent ();
+
+        for (int i = 3; i < 6; i++)
+        {
+            source.Add ($"Item{i}");
+        }
+        Assert.Equal (3, added);
+        Assert.Equal (6, lv.Source.Count);
+        Assert.Equal (6, source.Count);
+
+
+        void Lw_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                added++;
+            }
+        }
+    }
 }
