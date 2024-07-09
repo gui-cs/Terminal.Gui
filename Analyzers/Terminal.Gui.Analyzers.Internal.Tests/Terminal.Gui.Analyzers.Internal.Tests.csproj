@@ -14,13 +14,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.9.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.9.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.10.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.10.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.10.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.9.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.10.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="NUnit" Version="4.1.0" />
     <PackageReference Include="NUnit.Analyzers" Version="4.2.0">
       <PrivateAssets>all</PrivateAssets>
@@ -43,6 +43,10 @@
     <Using Include="Terminal.Gui.Analyzers" />
     <Using Include="Terminal.Gui.Analyzers.Internal" />
     <Using Include="System.Diagnostics.CodeAnalysis" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
   </ItemGroup>
 
 </Project>
