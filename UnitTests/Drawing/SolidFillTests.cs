@@ -1,4 +1,3 @@
-﻿
 namespace Terminal.Gui.DrawingTests;
 
 public class SolidFillTests
@@ -11,7 +10,7 @@ public class SolidFillTests
         var solidFill = new SolidFill (expectedColor);
 
         // Act
-        var resultColor = solidFill.GetColor (new Point (0, 0));
+        Color resultColor = solidFill.GetColor (new (0, 0));
 
         // Assert
         Assert.Equal (expectedColor, resultColor);
@@ -30,7 +29,7 @@ public class SolidFillTests
         var solidFill = new SolidFill (expectedColor);
 
         // Act
-        var resultColor = solidFill.GetColor (new Point (x, y));
+        Color resultColor = solidFill.GetColor (new (x, y));
 
         // Assert
         Assert.Equal (expectedColor, resultColor);

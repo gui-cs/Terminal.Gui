@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +8,6 @@ namespace Terminal.Gui.DrawingTests;
 
 public class FillPairTests
 {
-
     [Fact]
     public void GetAttribute_ReturnsCorrectColors ()
     {
@@ -21,11 +20,10 @@ public class FillPairTests
         var fillPair = new FillPair (foregroundFill, backgroundFill);
 
         // Act
-        var resultAttribute = fillPair.GetAttribute (new Point (0, 0));
+        Attribute resultAttribute = fillPair.GetAttribute (new (0, 0));
 
         // Assert
         Assert.Equal (foregroundColor, resultAttribute.Foreground);
         Assert.Equal (backgroundColor, resultAttribute.Background);
     }
 }
-

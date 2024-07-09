@@ -5,9 +5,9 @@ namespace Terminal.Gui;
 public class LineCanvas : IDisposable
 {
     /// <summary>
-    /// Optional <see cref="FillPair"/> which when present overrides the <see cref="StraightLine.Attribute"/>
-    /// (colors) of lines in the canvas.  This can be used e.g. to apply a global <see cref="GradientFill"/> 
-    /// across all lines.
+    ///     Optional <see cref="FillPair"/> which when present overrides the <see cref="StraightLine.Attribute"/>
+    ///     (colors) of lines in the canvas. This can be used e.g. to apply a global <see cref="GradientFill"/>
+    ///     across all lines.
     /// </summary>
     public FillPair? Fill { get; set; }
 
@@ -142,7 +142,7 @@ public class LineCanvas : IDisposable
     )
     {
         _cachedViewport = Rectangle.Empty;
-        _lines.Add (new StraightLine (start, length, orientation, style, attribute));
+        _lines.Add (new (start, length, orientation, style, attribute));
     }
 
     /// <summary>Adds a new line to the canvas</summary>
@@ -190,7 +190,7 @@ public class LineCanvas : IDisposable
 
                 if (cell is { })
                 {
-                    map.Add (new Point (x, y), cell);
+                    map.Add (new (x, y), cell);
                 }
             }
         }
@@ -225,7 +225,7 @@ public class LineCanvas : IDisposable
 
                 if (rune is { })
                 {
-                    map.Add (new Point (x, y), rune.Value);
+                    map.Add (new (x, y), rune.Value);
                 }
             }
         }
@@ -333,8 +333,7 @@ public class LineCanvas : IDisposable
 
     private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects)
     {
-        return Fill != null ? Fill.GetAttribute (intersects [0]!.Point) :
-            intersects [0]!.Line.Attribute;
+        return Fill != null ? Fill.GetAttribute (intersects [0]!.Point) : intersects [0]!.Line.Attribute;
     }
 
     private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
@@ -439,12 +438,12 @@ public class LineCanvas : IDisposable
                        useThickDotted ? Glyphs.VLineHvDa4 : Glyphs.VLine;
 
             default:
-                throw new Exception (
-                                     "Could not find resolver or switch case for "
-                                     + nameof (runeType)
-                                     + ":"
-                                     + runeType
-                                    );
+                throw new (
+                           "Could not find resolver or switch case for "
+                           + nameof (runeType)
+                           + ":"
+                           + runeType
+                          );
         }
     }
 

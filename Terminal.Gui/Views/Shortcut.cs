@@ -104,7 +104,7 @@ public class Shortcut : View
         void OnInitialized (object sender, EventArgs e)
         {
             SuperViewRendersLineCanvas = true;
-            Border.ShowTitle = false;
+            Border.Settings &= ~BorderSettings.Title;
 
             ShowHide ();
 
