@@ -118,11 +118,11 @@ public partial class View
 
         if (ViewportSettings.HasFlag (ViewportSettings.ClearContentOnly))
         {
-            Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize));
+            Rectangle visibleContent = ViewportToScreen (new Rectangle (new (-Viewport.X, -Viewport.Y), GetContentSize ()));
             toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
-        Attribute prev = Driver.SetAttribute (GetNormalColor());
+        Attribute prev = Driver.SetAttribute (GetNormalColor ());
         Driver.FillRect (toClear);
         Driver.SetAttribute (prev);
 
@@ -146,7 +146,7 @@ public partial class View
 
         Driver.Clip = Rectangle.Intersect (prevClip, ViewportToScreen (Viewport with { Location = new (0, 0) }));
 
-        Attribute prev = Driver.SetAttribute (new (color ?? GetNormalColor().Background));
+        Attribute prev = Driver.SetAttribute (new (color ?? GetNormalColor ().Background));
         Driver.FillRect (toClear);
         Driver.SetAttribute (prev);
 
@@ -184,7 +184,7 @@ public partial class View
         if (ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly))
         {
             // Clamp the Clip to the just content area that is within the viewport
-            Rectangle visibleContent = ViewportToScreen (new (new (-Viewport.X, -Viewport.Y), ContentSize));
+            Rectangle visibleContent = ViewportToScreen (new Rectangle (new (-Viewport.X, -Viewport.Y), GetContentSize ()));
             clip = Rectangle.Intersect (clip, visibleContent);
         }
 
@@ -244,6 +244,18 @@ public partial class View
         if (Driver is { })
         {
             Driver.Clip = prevClip;
+        }
+
+        OnRenderLineCanvas ();
+
+        // TODO: This is a hack to force the border subviews to draw.
+        if (Border?.Subviews is { })
+        {
+            foreach (View view in Border.Subviews)
+            {
+                view.SetNeedsDisplay ();
+                view.Draw ();
+            }
         }
 
         // Invoke DrawContentCompleteEvent
@@ -341,7 +353,7 @@ public partial class View
     public virtual Attribute GetFocusColor ()
     {
         ColorScheme cs = ColorScheme;
-        if (ColorScheme is null)
+        if (cs is null)
         {
             cs = new ();
         }
@@ -359,7 +371,7 @@ public partial class View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme is null)
+        if (cs is null)
         {
             cs = new ();
         }
@@ -377,7 +389,7 @@ public partial class View
     {
         ColorScheme cs = ColorScheme;
 
-        if (ColorScheme is null)
+        if (cs is null)
         {
             cs = new ();
         }
@@ -408,7 +420,7 @@ public partial class View
             return false;
         }
 
-        Rectangle screen = ViewportToScreen (new (col, row, 0, 0));
+        var screen = ViewportToScreen (new Point (col, row));
         Driver?.Move (screen.X, screen.Y);
 
         return true;
@@ -447,12 +459,12 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         The <see cref="Viewport"/> Location and Size indicate what part of the View's content, defined
-    ///         by <see cref="ContentSize"/>, is visible and should be drawn. The coordinates taken by <see cref="Move"/> and
+    ///         by <see cref="GetContentSize ()"/>, is visible and should be drawn. The coordinates taken by <see cref="Move"/> and
     ///         <see cref="AddRune"/> are relative to <see cref="Viewport"/>, thus if <c>ViewPort.Location.Y</c> is <c>5</c>
     ///         the 6th row of the content should be drawn using <c>MoveTo (x, 5)</c>.
     ///     </para>
     ///     <para>
-    ///         If <see cref="ContentSize"/> is larger than <c>ViewPort.Size</c> drawing code should use <see cref="Viewport"/>
+    ///         If <see cref="GetContentSize ()"/> is larger than <c>ViewPort.Size</c> drawing code should use <see cref="Viewport"/>
     ///         to constrain drawing for better performance.
     ///     </para>
     ///     <para>
@@ -487,7 +499,7 @@ public partial class View
 
             // This should NOT clear 
             // TODO: If the output is not in the Viewport, do nothing
-            var drawRect = new Rectangle (ContentToScreen (Point.Empty), ContentSize);
+            var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
 
             TextFormatter?.Draw (
                                  drawRect,
@@ -544,14 +556,17 @@ public partial class View
         // If we have a SuperView, it'll render our frames.
         if (!SuperViewRendersLineCanvas && LineCanvas.Viewport != Rectangle.Empty)
         {
-            foreach (KeyValuePair<Point, Cell> p in LineCanvas.GetCellMap ())
+            foreach (KeyValuePair<Point, Cell?> p in LineCanvas.GetCellMap ())
             {
                 // Get the entire map
-                Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
-                Driver.Move (p.Key.X, p.Key.Y);
+                if (p.Value is { })
+                {
+                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme.Normal);
+                    Driver.Move (p.Key.X, p.Key.Y);
 
-                // TODO: #2616 - Support combining sequences that don't normalize
-                Driver.AddRune (p.Value.Rune);
+                    // TODO: #2616 - Support combining sequences that don't normalize
+                    Driver.AddRune (p.Value.Value.Rune);
+                }
             }
 
             LineCanvas.Clear ();
@@ -566,14 +581,17 @@ public partial class View
                 subview.LineCanvas.Clear ();
             }
 
-            foreach (KeyValuePair<Point, Cell> p in LineCanvas.GetCellMap ())
+            foreach (KeyValuePair<Point, Cell?> p in LineCanvas.GetCellMap ())
             {
                 // Get the entire map
-                Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
-                Driver.Move (p.Key.X, p.Key.Y);
+                if (p.Value is { })
+                {
+                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme.Normal);
+                    Driver.Move (p.Key.X, p.Key.Y);
 
-                // TODO: #2616 - Support combining sequences that don't normalize
-                Driver.AddRune (p.Value.Rune);
+                    // TODO: #2616 - Support combining sequences that don't normalize
+                    Driver.AddRune (p.Value.Value.Rune);
+                }
             }
 
             LineCanvas.Clear ();
@@ -589,17 +607,14 @@ public partial class View
     /// </remarks>
     public void SetNeedsDisplay ()
     {
-        if (IsInitialized)
-        {
-            SetNeedsDisplay (Viewport);
-        }
+        SetNeedsDisplay (Viewport);
     }
 
     /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="region"/>.</summary>
     /// <remarks>
     ///     <para>
     ///         The location of <paramref name="region"/> is relative to the View's content, bound by <c>Size.Empty</c> and
-    ///         <see cref="ContentSize"/>.
+    ///         <see cref="GetContentSize ()"/>.
     ///     </para>
     ///     <para>
     ///         If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
@@ -609,13 +624,6 @@ public partial class View
     /// <param name="region">The content-relative region that needs to be redrawn.</param>
     public void SetNeedsDisplay (Rectangle region)
     {
-        if (!IsInitialized)
-        {
-            _needsDisplayRect = region;
-
-            return;
-        }
-
         if (_needsDisplayRect.IsEmpty)
         {
             _needsDisplayRect = region;
@@ -652,16 +660,16 @@ public partial class View
     {
         SubViewNeedsDisplay = true;
 
+        if (this is Adornment adornment)
+        {
+            adornment.Parent?.SetSubViewNeedsDisplay ();
+        }
+
         if (SuperView is { SubViewNeedsDisplay: false })
         {
             SuperView.SetSubViewNeedsDisplay ();
 
             return;
-        }
-
-        if (this is Adornment adornment)
-        {
-            adornment.Parent?.SetSubViewNeedsDisplay ();
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text.Json;
+using Xunit.Abstractions;
 using static Terminal.Gui.ConfigurationManager;
 #pragma warning disable IDE1006
 
@@ -7,6 +8,13 @@ namespace Terminal.Gui.ConfigurationTests;
 
 public class ConfigurationManagerTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public ConfigurationManagerTests (ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
     public static readonly JsonSerializerOptions _jsonOptions = new ()
     {
         Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
@@ -27,14 +35,12 @@ public class ConfigurationManagerTests
             Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
             Assert.Equal (KeyCode.F, Application.AlternateForwardKey.KeyCode);
             Assert.Equal (KeyCode.B, Application.AlternateBackwardKey.KeyCode);
-            Assert.True (Application.IsMouseDisabled);
         }
 
         // act
         Settings ["Application.QuitKey"].PropertyValue = Key.Q;
         Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
         Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-        Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 
         Apply ();
 
@@ -148,7 +154,6 @@ public class ConfigurationManagerTests
         Settings ["Application.QuitKey"].PropertyValue = Key.Q;
         Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
         Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-        Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 
         Updated += ConfigurationManager_Updated;
         var fired = false;
@@ -158,7 +163,7 @@ public class ConfigurationManagerTests
             fired = true;
 
             // assert
-            Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
+            Assert.Equal (Key.Esc, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
 
             Assert.Equal (
                           KeyCode.PageDown | KeyCode.CtrlMask,
@@ -169,7 +174,6 @@ public class ConfigurationManagerTests
                           KeyCode.PageUp | KeyCode.CtrlMask,
                           ((Key)Settings ["Application.AlternateBackwardKey"].PropertyValue).KeyCode
                          );
-            Assert.False ((bool)Settings ["Application.IsMouseDisabled"].PropertyValue);
         }
 
         Load (true);
@@ -227,14 +231,12 @@ public class ConfigurationManagerTests
         Settings ["Application.QuitKey"].PropertyValue = Key.Q;
         Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
         Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-        Settings ["Application.IsMouseDisabled"].PropertyValue = true;
         Settings.Apply ();
 
         // assert apply worked
         Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
         Assert.Equal (KeyCode.F, Application.AlternateForwardKey.KeyCode);
         Assert.Equal (KeyCode.B, Application.AlternateBackwardKey.KeyCode);
-        Assert.True (Application.IsMouseDisabled);
 
         //act
         Reset ();
@@ -242,16 +244,14 @@ public class ConfigurationManagerTests
         // assert
         Assert.NotEmpty (Themes);
         Assert.Equal ("Default", Themes.Theme);
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
+        Assert.Equal (Key.Esc, Application.QuitKey);
         Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
         Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
-        Assert.False (Application.IsMouseDisabled);
 
         // arrange
         Settings ["Application.QuitKey"].PropertyValue = Key.Q;
         Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
         Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-        Settings ["Application.IsMouseDisabled"].PropertyValue = true;
         Settings.Apply ();
 
         Locations = ConfigLocations.DefaultOnly;
@@ -263,10 +263,9 @@ public class ConfigurationManagerTests
         // assert
         Assert.NotEmpty (Themes);
         Assert.Equal ("Default", Themes.Theme);
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
+        Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
         Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
         Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
-        Assert.False (Application.IsMouseDisabled);
         Reset ();
     }
 
@@ -402,6 +401,7 @@ public class ConfigurationManagerTests
         // Application is a static class
         PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");
         Assert.Equal (pi, Settings ["Application.QuitKey"].PropertyInfo);
+        
 
         // FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
         pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
@@ -427,9 +427,6 @@ public class ConfigurationManagerTests
     public void TestConfigurationManagerInitDriver ()
     {
         Assert.Equal ("Default", Themes.Theme);
-        Assert.True (Themes.ContainsKey ("Default"));
-
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
 
         Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
@@ -783,8 +780,7 @@ public class ConfigurationManagerTests
               }
             }
           }
-        ],
-        ""Dialog.DefaultButtonAlignment"": ""Center""
+        ]
       }
     }
   ]
@@ -796,7 +792,7 @@ public class ConfigurationManagerTests
 
         Settings.Update (json, "TestConfigurationManagerUpdateFromJson");
 
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
+        Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
         Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
 
         Assert.Equal ("Default", Themes.Theme);

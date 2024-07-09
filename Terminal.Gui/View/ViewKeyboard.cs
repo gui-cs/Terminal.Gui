@@ -1,16 +1,33 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui;
 
 public partial class View
 {
-    private void AddCommands ()
+    /// <summary>
+    ///  Helper to configure all things keyboard related for a View. Called from the View constructor.
+    /// </summary>
+    private void SetupKeyboard ()
     {
+        KeyBindings = new (this);
+        HotKeySpecifier = (Rune)'_';
+        TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
+
         // By default, the HotKey command sets the focus
         AddCommand (Command.HotKey, OnHotKey);
 
         // By default, the Accept command raises the Accept event
         AddCommand (Command.Accept, OnAccept);
+    }
+
+    /// <summary>
+    ///    Helper to dispose all things keyboard related for a View. Called from the View Dispose method.
+    /// </summary>
+    private void DisposeKeyboard ()
+    {
+        TitleTextFormatter.HotKeyChanged -= TitleTextFormatter_HotKeyChanged;
+        KeyBindings.Clear ();
     }
 
     #region HotKey Support
@@ -113,9 +130,10 @@ public partial class View
     /// </remarks>
     /// <param name="prevHotKey">The HotKey <paramref name="hotKey"/> is replacing. Key bindings for this key will be removed.</param>
     /// <param name="hotKey">The new HotKey. If <see cref="Key.Empty"/> <paramref name="prevHotKey"/> bindings will be removed.</param>
+    /// <param name="context">Arbitrary context that can be associated with this key binding.</param>
     /// <returns><see langword="true"/> if the HotKey bindings were added.</returns>
     /// <exception cref="ArgumentException"></exception>
-    public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey)
+    public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey, [CanBeNull] object context = null)
     {
         if (_hotKey == hotKey)
         {
@@ -178,15 +196,16 @@ public partial class View
         // Add the new 
         if (newKey != Key.Empty)
         {
+            KeyBinding keyBinding = new ([Command.HotKey], KeyBindingScope.HotKey, context);
             // Add the base and Alt key
-            KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.HotKey);
-            KeyBindings.Add (newKey.WithAlt, KeyBindingScope.HotKey, Command.HotKey);
+            KeyBindings.Add (newKey, keyBinding);
+            KeyBindings.Add (newKey.WithAlt, keyBinding);
 
             // If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
             if (newKey.IsKeyCodeAtoZ)
             {
-                KeyBindings.Add (newKey.WithShift, KeyBindingScope.HotKey, Command.HotKey);
-                KeyBindings.Add (newKey.WithShift.WithAlt, KeyBindingScope.HotKey, Command.HotKey);
+                KeyBindings.Add (newKey.WithShift, keyBinding);
+                KeyBindings.Add (newKey.WithShift.WithAlt, keyBinding);
             }
         }
 
@@ -205,7 +224,7 @@ public partial class View
         }
         set
         {
-            TitleTextFormatter.HotKeySpecifier = value;
+            TitleTextFormatter.HotKeySpecifier = TextFormatter.HotKeySpecifier = value;
             SetHotKeyFromTitle ();
         }
     }
@@ -396,7 +415,9 @@ public partial class View
             return true;
         }
 
-        bool? handled = OnInvokingKeyBindings (keyEvent);
+        // TODO: NewKeyDownEvent returns bool. It should be bool? so state of InvokeCommand can be reflected up stack
+
+        bool? handled = OnInvokingKeyBindings (keyEvent, KeyBindingScope.HotKey | KeyBindingScope.Focused);
 
         if (handled is { } && (bool)handled)
         {
@@ -601,9 +622,9 @@ public partial class View
     #region Key Bindings
 
     /// <summary>Gets the key bindings for this view.</summary>
-    public KeyBindings KeyBindings { get; } = new ();
+    public KeyBindings KeyBindings { get; internal set; }
 
-    private Dictionary<Command, Func<bool?>> CommandImplementations { get; } = new ();
+    private Dictionary<Command, Func<CommandContext, bool?>> CommandImplementations { get; } = new ();
 
     /// <summary>
     ///     Low-level API called when a user presses a key; invokes any key bindings set on the view. This is called
@@ -614,14 +635,15 @@ public partial class View
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
     /// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+    /// <param name="scope">The scope.</param>
     /// <returns>
     ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled
     ///     and no other view should see it.
     /// </returns>
-    public virtual bool? OnInvokingKeyBindings (Key keyEvent)
+    public virtual bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
     {
-        // fire event only if there's an app or hotkey binding for the key
-        if (KeyBindings.TryGet (keyEvent, KeyBindingScope.Application | KeyBindingScope.HotKey, out KeyBinding _))
+        // fire event only if there's an hotkey binding for the key
+        if (KeyBindings.TryGet (keyEvent, scope, out KeyBinding kb))
         {
             InvokingKeyBindings?.Invoke (this, keyEvent);
             if (keyEvent.Handled)
@@ -637,7 +659,7 @@ public partial class View
         //   `InvokeKeyBindings` returns `false`. Continue passing the event (return `false` from `OnInvokeKeyBindings`)..
         // * If key bindings were found, and any handled the key (at least one `Command` returned `true`),
         //   `InvokeKeyBindings` returns `true`. Continue passing the event (return `false` from `OnInvokeKeyBindings`).
-        bool? handled = InvokeKeyBindings (keyEvent);
+        bool? handled = InvokeKeyBindings (keyEvent, scope);
 
         if (handled is { } && (bool)handled)
         {
@@ -646,22 +668,22 @@ public partial class View
             return true;
         }
 
-        if (Margin is {} && ProcessAdornmentKeyBindings (Margin, keyEvent, ref handled))
+        if (Margin is { } && ProcessAdornmentKeyBindings (Margin, keyEvent, scope, ref handled))
         {
             return true;
         }
 
-        if (Padding is {} && ProcessAdornmentKeyBindings (Padding, keyEvent, ref handled))
+        if (Padding is { } && ProcessAdornmentKeyBindings (Padding, keyEvent, scope, ref handled))
         {
             return true;
         }
 
-        if (Border is {} && ProcessAdornmentKeyBindings (Border, keyEvent, ref handled))
+        if (Border is { } && ProcessAdornmentKeyBindings (Border, keyEvent, scope, ref handled))
         {
             return true;
         }
 
-        if (ProcessSubViewKeyBindings (keyEvent, ref handled))
+        if (ProcessSubViewKeyBindings (keyEvent, scope, ref handled))
         {
             return true;
         }
@@ -669,11 +691,11 @@ public partial class View
         return handled;
     }
 
-    private bool ProcessAdornmentKeyBindings (Adornment adornment, Key keyEvent, ref bool? handled)
+    private bool ProcessAdornmentKeyBindings (Adornment adornment, Key keyEvent, KeyBindingScope scope, ref bool? handled)
     {
         foreach (View subview in adornment?.Subviews)
         {
-            handled = subview.OnInvokingKeyBindings (keyEvent);
+            handled = subview.OnInvokingKeyBindings (keyEvent, scope);
 
             if (handled is { } && (bool)handled)
             {
@@ -684,23 +706,69 @@ public partial class View
         return false;
     }
 
-    private bool ProcessSubViewKeyBindings (Key keyEvent, ref bool? handled)
+    private bool ProcessSubViewKeyBindings (Key keyEvent, KeyBindingScope scope, ref bool? handled, bool invoke = true)
     {
         // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
         foreach (View subview in Subviews)
         {
-            if (subview.KeyBindings.TryGet (keyEvent, KeyBindingScope.HotKey, out KeyBinding binding))
+            if (subview.KeyBindings.TryGet (keyEvent, scope, out KeyBinding binding))
             {
-                //keyEvent.Scope = KeyBindingScope.HotKey;
-                handled = subview.OnInvokingKeyBindings (keyEvent);
+                if (binding.Scope == KeyBindingScope.Focused && !subview.HasFocus)
+                {
+                    continue;
+                }
+
+                if (!invoke)
+                {
+                    return true;
+                }
+
+                handled = subview.OnInvokingKeyBindings (keyEvent, scope);
 
                 if (handled is { } && (bool)handled)
                 {
                     return true;
                 }
             }
+
+            bool recurse = subview.ProcessSubViewKeyBindings (keyEvent, scope, ref handled, invoke);
+            if (recurse || (handled is { } && (bool)handled))
+            {
+                return true;
+            }
         }
 
+        return false;
+    }
+
+    // TODO: This is a "prototype" debug check. It may be too annyoing vs. useful.
+    // TODO: A better approach would be have Application hold a list of bound Hotkeys, similar to
+    // TODO: how Application holds a list of Application Scoped key bindings and then check that list.
+    /// <summary>
+    /// Returns true if Key is bound in this view heirarchy. For debugging
+    /// </summary>
+    /// <param name="key">The key to test.</param>
+    /// <param name="boundView">Returns the view the key is bound to.</param>
+    /// <returns></returns>
+    public bool IsHotKeyKeyBound (Key key, out View boundView)
+    {
+        // recurse through the subviews to find the views that has the key bound
+        boundView = null;
+
+        foreach (View subview in Subviews)
+        {
+            if (subview.KeyBindings.TryGet (key, KeyBindingScope.HotKey, out _))
+            {
+                boundView = subview;
+                return true;
+            }
+
+            if (subview.IsHotKeyKeyBound (key, out boundView))
+            {
+                return true;
+            }
+
+        }
         return false;
     }
 
@@ -715,19 +783,41 @@ public partial class View
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </summary>
     /// <param name="key">The key event passed.</param>
+    /// <param name="scope">The scope.</param>
     /// <returns>
     ///     <see langword="null"/> if no command was bound the <paramref name="key"/>. <see langword="true"/> if
     ///     commands were invoked and at least one handled the command. <see langword="false"/> if commands were invoked and at
     ///     none handled the command.
     /// </returns>
-    protected bool? InvokeKeyBindings (Key key)
+    protected bool? InvokeKeyBindings (Key key, KeyBindingScope scope)
     {
         bool? toReturn = null;
 
-        if (!KeyBindings.TryGet (key, out KeyBinding binding))
+        if (!KeyBindings.TryGet (key, scope, out KeyBinding binding))
         {
             return null;
         }
+
+#if DEBUG
+
+        // TODO: Determine if App scope bindings should be fired first or last (currently last).
+        if (Application.TryGetKeyBindings (key, out List<View> views))
+        {
+            var boundView = views [0];
+            var commandBinding = boundView.KeyBindings.Get (key);
+            Debug.WriteLine ($"WARNING: InvokeKeyBindings ({key}) - An Application scope binding exists for this key. The registered view will not invoke Command.{commandBinding.Commands [0]}: {boundView}.");
+        }
+
+        // TODO: This is a "prototype" debug check. It may be too annyoing vs. useful.
+        // Scour the bindings up our View heirarchy
+        // to ensure that the key is not already bound to a different set of commands.
+        if (SuperView?.IsHotKeyKeyBound (key, out View previouslyBoundView) ?? false)
+        {
+            Debug.WriteLine ($"WARNING: InvokeKeyBindings ({key}) - A subview or peer has bound this Key and will not see it: {previouslyBoundView}.");
+        }
+
+#endif
+
 
         foreach (Command command in binding.Commands)
         {
@@ -739,7 +829,7 @@ public partial class View
             }
 
             // each command has its own return value
-            bool? thisReturn = InvokeCommand (command);
+            bool? thisReturn = InvokeCommand (command, key, binding);
 
             // if we haven't got anything yet, the current command result should be used
             toReturn ??= thisReturn;
@@ -758,12 +848,14 @@ public partial class View
     ///     Invokes the specified commands.
     /// </summary>
     /// <param name="commands"></param>
+    /// <param name="key">The key that caused the commands to be invoked, if any.</param>
+    /// <param name="keyBinding"></param>
     /// <returns>
     ///     <see langword="null"/> if no command was found.
-    ///     <see langword="true"/> if the command was invoked and it handled the command.
-    ///     <see langword="false"/> if the command was invoked and it did not handle the command.
+    ///     <see langword="true"/> if the command was invoked the command was handled.
+    ///     <see langword="false"/> if the command was invoked and the command was not handled.
     /// </returns>
-    public bool? InvokeCommands (Command [] commands)
+    public bool? InvokeCommands (Command [] commands, [CanBeNull] Key key = null, [CanBeNull] KeyBinding? keyBinding = null)
     {
         bool? toReturn = null;
 
@@ -775,7 +867,7 @@ public partial class View
             }
 
             // each command has its own return value
-            bool? thisReturn = InvokeCommand (command);
+            bool? thisReturn = InvokeCommand (command, key, keyBinding);
 
             // if we haven't got anything yet, the current command result should be used
             toReturn ??= thisReturn;
@@ -791,42 +883,68 @@ public partial class View
     }
 
     /// <summary>Invokes the specified command.</summary>
-    /// <param name="command"></param>
+    /// <param name="command">The command to invoke.</param>
+    /// <param name="key">The key that caused the command to be invoked, if any.</param>
+    /// <param name="keyBinding"></param>
     /// <returns>
-    ///     <see langword="null"/> if no command was found. <see langword="true"/> if the command was invoked and it
-    ///     handled the command. <see langword="false"/> if the command was invoked and it did not handle the command.
+    ///     <see langword="null"/> if no command was found. <see langword="true"/> if the command was invoked, and it
+    ///     handled the command. <see langword="false"/> if the command was invoked, and it did not handle the command.
     /// </returns>
-    public bool? InvokeCommand (Command command)
+    public bool? InvokeCommand (Command command, [CanBeNull] Key key = null, [CanBeNull] KeyBinding? keyBinding = null)
     {
-        if (!CommandImplementations.ContainsKey (command))
+        if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?> implementation))
         {
-            return null;
+            var context = new CommandContext (command, key, keyBinding); // Create the context here
+            return implementation (context);
         }
 
-        return CommandImplementations [command] ();
+        return null;
     }
 
     /// <summary>
     ///     <para>
     ///         Sets the function that will be invoked for a <see cref="Command"/>. Views should call
-    ///         <see cref="AddCommand"/> for each command they support.
+    ///        AddCommand for each command they support.
     ///     </para>
     ///     <para>
-    ///         If <see cref="AddCommand"/> has already been called for <paramref name="command"/> <paramref name="f"/> will
+    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
     ///         replace the old one.
     ///     </para>
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     This version of AddCommand is for commands that require <see cref="CommandContext"/>. Use <see cref="AddCommand(Command,Func{System.Nullable{bool}})"/>
+    ///     in cases where the command does not require a <see cref="CommandContext"/>.
+    /// </para>
+    /// </remarks>
+    /// <param name="command">The command.</param>
+    /// <param name="f">The function.</param>
+    protected void AddCommand (Command command, Func<CommandContext, bool?> f)
+    {
+        CommandImplementations [command] = f;
+    }
+
+    /// <summary>
+    ///     <para>
+    ///         Sets the function that will be invoked for a <see cref="Command"/>. Views should call
+    ///        AddCommand for each command they support.
+    ///     </para>
+    ///     <para>
+    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
+    ///         replace the old one.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     This version of AddCommand is for commands that do not require a <see cref="CommandContext"/>.
+    ///     If the command requires context, use <see cref="AddCommand(Command,Func{CommandContext,System.Nullable{bool}})"/>
+    /// </para>
+    /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="f">The function.</param>
     protected void AddCommand (Command command, Func<bool?> f)
     {
-        // if there is already an implementation of this command
-        // replace that implementation
-        // else record how to perform the action (this should be the normal case)
-        if (CommandImplementations is { })
-        {
-            CommandImplementations [command] = f;
-        }
+        CommandImplementations [command] = ctx => f ();
     }
 
     /// <summary>Returns all commands that are supported by this <see cref="View"/>.</summary>

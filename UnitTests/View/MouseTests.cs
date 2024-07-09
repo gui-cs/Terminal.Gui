@@ -1,9 +1,8 @@
-﻿using Terminal.Gui.ViewsTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-public class MouseTests (ITestOutputHelper output)
+public class MouseTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
     [InlineData (false, false, false)]
@@ -27,7 +26,7 @@ public class MouseTests (ITestOutputHelper output)
             testView.SetFocus ();
         }
 
-        testView.NewMouseEvent (new () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked });
+        testView.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (superView.HasFocus);
         Assert.Equal (expectedHasFocus, testView.HasFocus);
     }
@@ -73,11 +72,12 @@ public class MouseTests (ITestOutputHelper output)
         Application.Begin (top);
 
         Assert.Equal (new Point (4, 4), testView.Frame.Location);
-        Application.OnMouseEvent (new () { X = xy, Y = xy, Flags = MouseFlags.Button1Pressed });
+        Application.OnMouseEvent (new () { Position = new (xy, xy), Flags = MouseFlags.Button1Pressed });
 
-        Application.OnMouseEvent (new () { X = xy + 1, Y = xy + 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new () { Position = new (xy + 1, xy + 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
 
         Assert.Equal (expectedMoved, new Point (5, 5) == testView.Frame.Location);
+        top.Dispose ();
     }
 
     [Theory]
@@ -93,30 +93,29 @@ public class MouseTests (ITestOutputHelper output)
         Assert.Equal (mouseFlagsFromEvent, expectedMouseFlagsFromEvent);
     }
 
-    public static TheoryData<View, string> AllViews => TestHelpers.GetAllViewsTheoryData ();
-
-
     [Theory]
-    [MemberData (nameof (AllViews))]
+    [MemberData (nameof (AllViewTypes))]
 
-    public void AllViews_Enter_Leave_Events (View view, string viewName)
+    public void AllViews_Enter_Leave_Events (Type viewType)
     {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
         if (view == null)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
             return;
         }
 
         if (!view.CanFocus)
         {
-            output.WriteLine ($"Ignoring {viewName} - It can't focus.");
+            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
 
             return;
         }
 
         if (view is Toplevel && ((Toplevel)view).Modal)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Modal Toplevel");
+            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
 
             return;
         }
@@ -137,7 +136,6 @@ public class MouseTests (ITestOutputHelper output)
             CanFocus = true,
         };
 
-        view.AutoSize = false;
         view.X = Pos.Right (otherView);
         view.Y = 0;
         view.Width = 10;
@@ -189,26 +187,28 @@ public class MouseTests (ITestOutputHelper output)
 
 
     [Theory]
-    [MemberData (nameof (AllViews))]
+    [MemberData (nameof (AllViewTypes))]
 
-    public void AllViews_Enter_Leave_Events_Visible_False (View view, string viewName)
+    public void AllViews_Enter_Leave_Events_Visible_False (Type viewType)
     {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
         if (view == null)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
             return;
         }
 
         if (!view.CanFocus)
         {
-            output.WriteLine ($"Ignoring {viewName} - It can't focus.");
+            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
 
             return;
         }
 
         if (view is Toplevel && ((Toplevel)view).Modal)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Modal Toplevel");
+            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
 
             return;
         }
@@ -230,7 +230,6 @@ public class MouseTests (ITestOutputHelper output)
         };
 
         view.Visible = false;
-        view.AutoSize = false;
         view.X = Pos.Right (otherView);
         view.Y = 0;
         view.Width = 10;
@@ -304,12 +303,14 @@ public class MouseTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData (nameof (AllViews))]
-    public void AllViews_NewMouseEvent_Enabled_False_Does_Not_Set_Handled (View view, string viewName)
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_NewMouseEvent_Enabled_False_Does_Not_Set_Handled (Type viewType)
     {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
         if (view == null)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
             return;
         }
 
@@ -321,12 +322,14 @@ public class MouseTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData (nameof (AllViews))]
-    public void AllViews_NewMouseEvent_Clicked_Enabled_False_Does_Not_Set_Handled (View view, string viewName)
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_NewMouseEvent_Clicked_Enabled_False_Does_Not_Set_Handled (Type viewType)
     {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
         if (view == null)
         {
-            output.WriteLine ($"Ignoring {viewName} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
             return;
         }
 
@@ -375,7 +378,7 @@ public class MouseTests (ITestOutputHelper output)
         Assert.Equal (0, clickedCount);
         me.Handled = false;
 
-        me.Flags =clicked;
+        me.Flags = clicked;
         view.NewMouseEvent (me);
         Assert.Equal (1, clickedCount);
 
@@ -384,11 +387,11 @@ public class MouseTests (ITestOutputHelper output)
 
 
     [Theory]
-    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
-    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_Button_Clicked_Clicks (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    [InlineData (MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_Button_Clicked_Clicks (MouseFlags clicked)
     {
         var me = new MouseEvent ();
 
@@ -402,7 +405,7 @@ public class MouseTests (ITestOutputHelper output)
         var clickedCount = 0;
 
         view.MouseClick += (s, e) => clickedCount++;
-        
+
         me.Flags = clicked;
         view.NewMouseEvent (me);
         Assert.Equal (1, clickedCount);
@@ -411,11 +414,11 @@ public class MouseTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
-    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_Button_Press_Release_Clicks (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released)]
+    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released)]
+    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
+    public void WantContinuousButtonPressed_True_Button_Press_Release_Clicks (MouseFlags pressed, MouseFlags released)
     {
         var me = new MouseEvent ();
 
@@ -501,21 +504,21 @@ public class MouseTests (ITestOutputHelper output)
 
         // Start in Viewport
         me.Flags = MouseFlags.Button1Pressed;
-        me.X = 0;
+        me.Position = me.Position with { X = 0 };
         view.NewMouseEvent (me);
         Assert.Equal (1, clickedCount);
         me.Handled = false;
 
         // Move out of Viewport
         me.Flags = MouseFlags.Button1Pressed;
-        me.X = 1;
+        me.Position = me.Position with { X = 1 };
         view.NewMouseEvent (me);
         Assert.Equal (2, clickedCount);
         me.Handled = false;
 
         // Move into Viewport
         me.Flags = MouseFlags.Button1Pressed;
-        me.X = 0;
+        me.Position = me.Position with { X = 0 };
         view.NewMouseEvent (me);
         Assert.Equal (3, clickedCount);
         me.Handled = false;
@@ -530,6 +533,7 @@ public class MouseTests (ITestOutputHelper output)
     {
         var view = new View ()
         {
+            CanFocus = true,
             HighlightStyle = highlightOnPress,
             Height = 1,
             Width = 1
@@ -561,9 +565,9 @@ public class MouseTests (ITestOutputHelper output)
 
         return;
 
-        void View_Highlight (object sender, HighlightEventArgs e)
+        void View_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
         {
-            if (e.HighlightStyle == HighlightStyle.None)
+            if (e.NewValue == HighlightStyle.None)
             {
                 disablingHighlight++;
             }
@@ -584,6 +588,7 @@ public class MouseTests (ITestOutputHelper output)
     {
         var view = new View ()
         {
+            CanFocus = true,
             HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside,
             Height = 1,
             Width = 1
@@ -594,12 +599,12 @@ public class MouseTests (ITestOutputHelper output)
         bool inViewport = view.Viewport.Contains (x, 0);
 
         // Start at 0,0 ; in viewport
-        view.NewMouseEvent (new () { X = 0, Flags = MouseFlags.Button1Pressed });
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
         Assert.Equal (1, enablingHighlight);
         Assert.Equal (0, disablingHighlight);
 
         // Move to x,0 
-        view.NewMouseEvent (new () { X = x, Flags = MouseFlags.Button1Pressed });
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
 
         if (inViewport)
         {
@@ -613,7 +618,7 @@ public class MouseTests (ITestOutputHelper output)
         }
 
         // Move backto 0,0 ; in viewport
-        view.NewMouseEvent (new () { X = 0, Flags = MouseFlags.Button1Pressed });
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
         if (inViewport)
         {
             Assert.Equal (3, enablingHighlight);
@@ -629,9 +634,9 @@ public class MouseTests (ITestOutputHelper output)
 
         return;
 
-        void View_Highlight (object sender, HighlightEventArgs e)
+        void View_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
         {
-            if (e.HighlightStyle == HighlightStyle.None)
+            if (e.NewValue == HighlightStyle.None)
             {
                 disablingHighlight++;
             }
@@ -641,5 +646,4 @@ public class MouseTests (ITestOutputHelper output)
             }
         }
     }
-
 }

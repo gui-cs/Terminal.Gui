@@ -16,14 +16,16 @@ public class Scrolling : Scenario
         Application.Init ();
         _diagnosticFlags = View.Diagnostics;
         View.Diagnostics = ViewDiagnosticFlags.Ruler;
-        var app = new Window ()
+
+        var app = new Window
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+
             // Offset to stress clipping
             X = 3,
             Y = 3,
             Width = Dim.Fill (3),
-            Height = Dim.Fill (3),
+            Height = Dim.Fill (3)
         };
 
         var label = new Label { X = 0, Y = 0 };
@@ -37,15 +39,16 @@ public class Scrolling : Scenario
             Width = 60,
             Height = 20,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            ContentSize = new (120, 40),
 
             //ContentOffset = Point.Empty,
             ShowVerticalScrollIndicator = true,
             ShowHorizontalScrollIndicator = true
         };
+        // BUGBUG: set_ContentSize is supposed to be `protected`. 
+        scrollView.SetContentSize (new (120, 40));
         scrollView.Padding.Thickness = new (1);
 
-        label.Text = $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
+        label.Text = $"{scrollView}\nContentSize: {scrollView.GetContentSize ()}\nContentOffset: {scrollView.ContentOffset}";
 
         const string rule = "0123456789";
 
@@ -53,7 +56,7 @@ public class Scrolling : Scenario
         {
             X = 0,
             Y = 0,
-            AutoSize = false,
+
             Width = Dim.Fill (),
             Height = 2,
             ColorScheme = Colors.ColorSchemes ["Error"]
@@ -66,7 +69,7 @@ public class Scrolling : Scenario
         {
             X = 0,
             Y = 0,
-            AutoSize = false,
+
             Width = 1,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Error"]
@@ -81,7 +84,7 @@ public class Scrolling : Scenario
         {
             X = 3,
             Y = 4,
-            AutoSize = false,
+
             Width = Dim.Fill (3),
             Text = "A very long button. Should be wide enough to demo clipping!"
         };
@@ -95,7 +98,7 @@ public class Scrolling : Scenario
                             Y = 5,
                             Width = 50,
                             ColorScheme = Colors.ColorSchemes ["Dialog"],
-                            Text = "This is a test of...",
+                            Text = "This is a test of..."
                         }
                        );
 
@@ -106,7 +109,7 @@ public class Scrolling : Scenario
                             Y = 10,
                             Width = 50,
                             ColorScheme = Colors.ColorSchemes ["Dialog"],
-                            Text = "... the emergency broadcast system.",
+                            Text = "... the emergency broadcast system."
                         }
                        );
 
@@ -117,15 +120,15 @@ public class Scrolling : Scenario
                             Y = 99,
                             Width = 50,
                             ColorScheme = Colors.ColorSchemes ["Dialog"],
-                            Text = "Last line",
+                            Text = "Last line"
                         }
                        );
 
         // Demonstrate AnchorEnd - Button is anchored to bottom/right
-        var anchorButton = new Button { Y = Pos.AnchorEnd () - 1, Text = "Bottom Right" };
+        var anchorButton = new Button { Y = Pos.AnchorEnd (0) - 1, Text = "Bottom Right" };
 
         // TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
-        anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
+        anchorButton.X = Pos.AnchorEnd (0) - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 
         anchorButton.Accept += (s, e) =>
                                {
@@ -145,7 +148,7 @@ public class Scrolling : Scenario
             X = Pos.X (scrollView),
             Y = Pos.Bottom (scrollView),
             Text = "Horizontal Scrollbar",
-            Checked = scrollView.ShowHorizontalScrollIndicator
+            State = scrollView.ShowHorizontalScrollIndicator ? CheckState.Checked : CheckState.UnChecked
         };
         app.Add (hCheckBox);
 
@@ -154,7 +157,7 @@ public class Scrolling : Scenario
             X = Pos.Right (hCheckBox) + 3,
             Y = Pos.Bottom (scrollView),
             Text = "Vertical Scrollbar",
-            Checked = scrollView.ShowVerticalScrollIndicator
+            State = scrollView.ShowVerticalScrollIndicator ? CheckState.Checked : CheckState.UnChecked
         };
         app.Add (vCheckBox);
 
@@ -162,50 +165,50 @@ public class Scrolling : Scenario
 
         var ahCheckBox = new CheckBox
         {
-            X = Pos.Left (scrollView), Y = Pos.Bottom (hCheckBox), Text = t, Checked = scrollView.AutoHideScrollBars
+            X = Pos.Left (scrollView), Y = Pos.Bottom (hCheckBox), Text = t, State = scrollView.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
         var k = "Keep Content Always In Viewport";
 
         var keepCheckBox = new CheckBox
         {
-            X = Pos.Left (scrollView), Y = Pos.Bottom (ahCheckBox), Text = k, Checked = scrollView.AutoHideScrollBars
+            X = Pos.Left (scrollView), Y = Pos.Bottom (ahCheckBox), Text = k, State = scrollView.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
 
-        hCheckBox.Toggled += (s, e) =>
+        hCheckBox.Toggle += (s, e) =>
                              {
-                                 if (ahCheckBox.Checked == false)
+                                 if (ahCheckBox.State == CheckState.UnChecked)
                                  {
-                                     scrollView.ShowHorizontalScrollIndicator = (bool)hCheckBox.Checked;
+                                     scrollView.ShowHorizontalScrollIndicator = e.NewValue == CheckState.Checked;
                                  }
                                  else
                                  {
-                                     hCheckBox.Checked = true;
+                                     hCheckBox.State = CheckState.Checked;
                                      MessageBox.Query ("Message", "Disable Auto Hide Scrollbars first.", "Ok");
                                  }
                              };
 
-        vCheckBox.Toggled += (s, e) =>
+        vCheckBox.Toggle += (s, e) =>
                              {
-                                 if (ahCheckBox.Checked == false)
+                                 if (ahCheckBox.State == CheckState.UnChecked)
                                  {
-                                     scrollView.ShowVerticalScrollIndicator = (bool)vCheckBox.Checked;
+                                     scrollView.ShowVerticalScrollIndicator = e.NewValue == CheckState.Checked;
                                  }
                                  else
                                  {
-                                     vCheckBox.Checked = true;
+                                     vCheckBox.State = CheckState.Checked;
                                      MessageBox.Query ("Message", "Disable Auto Hide Scrollbars first.", "Ok");
                                  }
                              };
 
-        ahCheckBox.Toggled += (s, e) =>
+        ahCheckBox.Toggle += (s, e) =>
                               {
-                                  scrollView.AutoHideScrollBars = (bool)ahCheckBox.Checked;
-                                  hCheckBox.Checked = true;
-                                  vCheckBox.Checked = true;
+                                  scrollView.AutoHideScrollBars = e.NewValue == CheckState.Checked;
+                                  hCheckBox.State = CheckState.Checked;
+                                  vCheckBox.State = CheckState.Checked;
                               };
         app.Add (ahCheckBox);
 
-        keepCheckBox.Toggled += (s, e) => scrollView.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
+        keepCheckBox.Toggle += (s, e) => scrollView.KeepContentAlwaysInViewport = e.NewValue == CheckState.Checked;
         app.Add (keepCheckBox);
 
         var count = 0;
@@ -214,12 +217,12 @@ public class Scrolling : Scenario
         {
             X = Pos.Right (scrollView) + 1,
             Y = Pos.AnchorEnd (1),
-            AutoSize = false,
+
             Width = 50,
             Text = "Mouse: "
         };
         app.Add (mousePos);
-        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.X},{a.Y}) - {a.Flags} {count++}"; };
+        Application.MouseEvent += (sender, a) => { mousePos.Text = $"Mouse: ({a.Position}) - {a.Flags} {count++}"; };
 
         // Add a progress bar to cause constant redraws
         var progress = new ProgressBar { X = Pos.Right (scrollView) + 1, Y = Pos.AnchorEnd (2), Width = 50 };
@@ -244,6 +247,7 @@ public class Scrolling : Scenario
         app.Loaded -= App_Loaded;
         app.Unloaded -= app_Unloaded;
         app.Dispose ();
+        Application.Shutdown ();
 
         return;
 

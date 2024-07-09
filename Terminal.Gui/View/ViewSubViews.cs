@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 public partial class View
@@ -31,30 +33,32 @@ public partial class View
 
     /// <summary>Adds a subview (child) to this view.</summary>
     /// <remarks>
-    /// <para>
-    ///     The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
-    ///     <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
-    /// </para>
-    /// <para>
-    ///     Subviews will be disposed when this View is disposed. In other-words, calling this method causes
-    ///     the lifecycle of the subviews to be transferred to this View.
-    /// </para>
+    ///     <para>
+    ///         The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
+    ///         <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
+    ///     </para>
+    ///     <para>
+    ///         Subviews will be disposed when this View is disposed. In other-words, calling this method causes
+    ///         the lifecycle of the subviews to be transferred to this View.
+    ///     </para>
     /// </remarks>
-    public virtual void Add (View view)
+    /// <param name="view">The view to add.</param>
+    /// <returns>The view that was added.</returns>
+    public virtual View Add (View view)
     {
         if (view is null)
         {
-            return;
+            return view;
         }
 
         if (_subviews is null)
         {
-            _subviews = new List<View> ();
+            _subviews = new ();
         }
 
         if (_tabIndexes is null)
         {
-            _tabIndexes = new List<View> ();
+            _tabIndexes = new ();
         }
 
         _subviews.Add (view);
@@ -72,6 +76,7 @@ public partial class View
                 SuperView._addingView = false;
             }
 
+            // QUESTION: This automatic behavior of setting CanFocus to true on the SuperView is not documented, and is annoying.
             CanFocus = true;
             view._tabIndex = _tabIndexes.IndexOf (view);
             _addingView = false;
@@ -83,7 +88,7 @@ public partial class View
             view.Enabled = false;
         }
 
-        OnAdded (new SuperViewChangedEventArgs (this, view));
+        OnAdded (new (this, view));
 
         if (IsInitialized && !view.IsInitialized)
         {
@@ -91,21 +96,24 @@ public partial class View
             view.EndInit ();
         }
 
+        CheckDimAuto ();
         SetNeedsLayout ();
         SetNeedsDisplay ();
+
+        return view;
     }
 
     /// <summary>Adds the specified views (children) to the view.</summary>
     /// <param name="views">Array of one or more views (can be optional parameter).</param>
     /// <remarks>
-    /// <para>
-    ///     The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
-    ///     <seealso cref="Remove(View)"/> and <seealso cref="RemoveAll"/>.
-    /// </para>
-    /// <para>
-    ///     Subviews will be disposed when this View is disposed. In other-words, calling this method causes
-    ///     the lifecycle of the subviews to be transferred to this View.
-    /// </para>
+    ///     <para>
+    ///         The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
+    ///         <seealso cref="Remove(View)"/> and <seealso cref="RemoveAll"/>.
+    ///     </para>
+    ///     <para>
+    ///         Subviews will be disposed when this View is disposed. In other-words, calling this method causes
+    ///         the lifecycle of the subviews to be transferred to this View.
+    ///     </para>
     /// </remarks>
     public void Add (params View [] views)
     {
@@ -198,16 +206,17 @@ public partial class View
 
     /// <summary>Removes a subview added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
     /// <remarks>
-    /// <para>
-    ///     Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the Subview's
-    ///     lifecycle to be transferred to the caller; the caller muse call <see cref="Dispose"/>.
-    /// </para>
+    ///     <para>
+    ///         Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the
+    ///         Subview's
+    ///         lifecycle to be transferred to the caller; the caller muse call <see cref="Dispose"/>.
+    ///     </para>
     /// </remarks>
-    public virtual void Remove (View view)
+    public virtual View Remove (View view)
     {
         if (view is null || _subviews is null)
         {
-            return;
+            return view;
         }
 
         Rectangle touched = view.Frame;
@@ -226,22 +235,26 @@ public partial class View
             }
         }
 
-        OnRemoved (new SuperViewChangedEventArgs (this, view));
+        OnRemoved (new (this, view));
 
         if (Focused == view)
         {
             Focused = null;
         }
+
+        return view;
     }
 
     /// <summary>
-    /// Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
+    ///     Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the Subview's
-    ///     lifecycle to be transferred to the caller; the caller must call <see cref="Dispose"/> on any Views that were added.
-    /// </para>
+    ///     <para>
+    ///         Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the
+    ///         Subview's
+    ///         lifecycle to be transferred to the caller; the caller must call <see cref="Dispose"/> on any Views that were
+    ///         added.
+    ///     </para>
     /// </remarks>
     public virtual void RemoveAll ()
     {
@@ -378,7 +391,6 @@ public partial class View
         }
     }
 
-
     /// <summary>Event fired when the <see cref="CanFocus"/> value is being changed.</summary>
     public event EventHandler CanFocusChanged;
 
@@ -435,7 +447,7 @@ public partial class View
                 SetHasFocus (false, this);
                 SuperView?.EnsureFocus ();
 
-                if (SuperView is { } && SuperView.Focused is null)
+                if (SuperView is { Focused: null })
                 {
                     SuperView.FocusNext ();
 
@@ -474,6 +486,11 @@ public partial class View
                         }
                     }
                 }
+
+                if (this is Toplevel && Application.Current.Focused != this)
+                {
+                    Application.BringOverlappedTopToFront ();
+                }
             }
 
             OnCanFocusChanged ();
@@ -481,29 +498,30 @@ public partial class View
         }
     }
 
-    /// <summary>Method invoked when a view gets focus.</summary>
+    /// <summary>
+    /// Called when a view gets focus.
+    /// </summary>
     /// <param name="view">The view that is losing focus.</param>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
     public virtual bool OnEnter (View view)
     {
-        var args = new FocusEventArgs (view);
+        var args = new FocusEventArgs (view, this);
         Enter?.Invoke (this, args);
 
         if (args.Handled)
         {
             return true;
         }
-        
+
         return false;
     }
-
 
     /// <summary>Method invoked when a view loses focus.</summary>
     /// <param name="view">The view that is getting focus.</param>
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
     public virtual bool OnLeave (View view)
     {
-        var args = new FocusEventArgs (view);
+        var args = new FocusEventArgs (this, view);
         Leave?.Invoke (this, args);
 
         if (args.Handled)
@@ -511,16 +529,16 @@ public partial class View
             return true;
         }
 
-        Driver?.SetCursorVisibility (CursorVisibility.Invisible);
-
         return false;
     }
 
-    /// <summary>Returns the currently focused view inside this view, or null if nothing is focused.</summary>
+    // BUGBUG: This API is poorly defined and implemented. It does not specify what it means if THIS view is focused and has no subviews.
+    /// <summary>Returns the currently focused Subview inside this view, or null if nothing is focused.</summary>
     /// <value>The focused.</value>
     public View Focused { get; private set; }
 
-    /// <summary>Returns the most focused view in the chain of subviews (the leaf view that has the focus).</summary>
+    // BUGBUG: This API is poorly defined and implemented. It does not specify what it means if THIS view is focused and has no subviews.
+    /// <summary>Returns the most focused Subview in the chain of subviews (the leaf view that has the focus).</summary>
     /// <value>The most focused View.</value>
     public View MostFocused
     {
@@ -848,43 +866,34 @@ public partial class View
         return view.Focused is { } ? GetMostFocused (view.Focused) : view;
     }
 
-    /// <summary>Positions the cursor in the right position based on the currently focused view in the chain.</summary>
-    /// Views that are focusable should override
-    /// <see cref="PositionCursor"/>
-    /// to ensure
-    /// the cursor is placed in a location that makes sense. Unix terminals do not have
-    /// a way of hiding the cursor, so it can be distracting to have the cursor left at
-    /// the last focused view. Views should make sure that they place the cursor
-    /// in a visually sensible place.
-    public virtual void PositionCursor ()
+    /// <summary>
+    /// Gets or sets the cursor style to be used when the view is focused. The default is <see cref="CursorVisibility.Invisible"/>.
+    /// </summary>
+    public CursorVisibility CursorVisibility { get; set; } = CursorVisibility.Invisible;
+
+    /// <summary>
+    ///     Positions the cursor in the right position based on the currently focused view in the chain.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Views that are focusable should override <see cref="PositionCursor"/> to make sure that the cursor is
+    ///         placed in a location that makes sense. Some terminals do not have a way of hiding the cursor, so it can be
+    ///         distracting to have the cursor left at the last focused view. So views should make sure that they place the
+    ///         cursor in a visually sensible place. The default implementation of <see cref="PositionCursor"/> will place the
+    ///         cursor at either the hotkey (if defined) or <c>0,0</c>.
+    ///     </para>
+    /// </remarks>
+    /// <returns>Viewport-relative cursor position. Return <see langword="null"/> to ensure the cursor is not visible.</returns>
+    public virtual Point? PositionCursor ()
     {
-        if (!CanBeVisible (this) || !Enabled)
+        if (IsInitialized && CanFocus && HasFocus)
         {
-            return;
-        }
-
-        // BUGBUG: v2 - This needs to support Subviews of Adornments too
-
-        if (Focused is null && SuperView is { })
-        {
-            SuperView.EnsureFocus ();
-        }
-        else if (Focused is { Visible: true, Enabled: true, Frame: { Width: > 0, Height: > 0 } })
-        {
-            Focused.PositionCursor ();
-        }
-        else if (Focused?.Visible == true && Focused?.Enabled == false)
-        {
-            Focused = null;
-        }
-        else if (CanFocus && HasFocus && Visible && Frame.Width > 0 && Frame.Height > 0)
-        {
+            // By default, position the cursor at the hotkey (if any) or 0, 0.
             Move (TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition, 0);
         }
-        else
-        {
-            Move (_frame.X, _frame.Y);
-        }
+
+        // Returning null will hide the cursor.
+        return null;
     }
 
     #endregion Focus

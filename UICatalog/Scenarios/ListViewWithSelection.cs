@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Text;
 using JetBrains.Annotations;
 using Terminal.Gui;
@@ -11,36 +13,45 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("ListView")]
 public class ListViewWithSelection : Scenario
 {
-    public CheckBox _allowMarkingCB;
-    public CheckBox _allowMultipleCB;
-    public CheckBox _customRenderCB;
-    public ListView _listView;
-    public List<Scenario> _scenarios;
+    private CheckBox _allowMarkingCB;
+    private CheckBox _allowMultipleCB;
+    private CheckBox _customRenderCB;
+    private ListView _listView;
+    private ObservableCollection<Scenario> _scenarios;
+    private Window _appWindow;
 
-    public override void Setup ()
+    /// <inheritdoc />
+    public override void Main ()
     {
+        Application.Init ();
+
+        _appWindow = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+        };
+
         _scenarios = GetScenarios ();
 
         _customRenderCB = new CheckBox { X = 0, Y = 0, Text = "Use custom rendering" };
-        Win.Add (_customRenderCB);
-        _customRenderCB.Toggled += _customRenderCB_Toggled;
+        _appWindow.Add (_customRenderCB);
+        _customRenderCB.Toggle += _customRenderCB_Toggle;
 
         _allowMarkingCB = new CheckBox
         {
-            X = Pos.Right (_customRenderCB) + 1, Y = 0, Text = "Allow Marking", AllowNullChecked = false
+            X = Pos.Right (_customRenderCB) + 1, Y = 0, Text = "Allow Marking", AllowCheckStateNone = false
         };
-        Win.Add (_allowMarkingCB);
-        _allowMarkingCB.Toggled += AllowMarkingCB_Toggled;
+        _appWindow.Add (_allowMarkingCB);
+        _allowMarkingCB.Toggle += AllowMarkingCB_Toggle;
 
         _allowMultipleCB = new CheckBox
         {
             X = Pos.Right (_allowMarkingCB) + 1,
             Y = 0,
-            Visible = (bool)_allowMarkingCB.Checked,
+            Visible = _allowMarkingCB.State == CheckState.Checked,
             Text = "Allow Multi-Select"
         };
-        Win.Add (_allowMultipleCB);
-        _allowMultipleCB.Toggled += AllowMultipleCB_Toggled;
+        _appWindow.Add (_allowMultipleCB);
+        _allowMultipleCB.Toggle += AllowMultipleCB_Toggle;
 
         _listView = new ListView
         {
@@ -54,42 +65,42 @@ public class ListViewWithSelection : Scenario
             AllowsMultipleSelection = false
         };
         _listView.RowRender += ListView_RowRender;
-        Win.Add (_listView);
+        _appWindow.Add (_listView);
 
         var scrollBar = new ScrollBarView (_listView, true);
 
         scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         _listView.TopItem = scrollBar.Position;
+        {
+            _listView.TopItem = scrollBar.Position;
 
-                                         if (_listView.TopItem != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = _listView.TopItem;
-                                         }
+            if (_listView.TopItem != scrollBar.Position)
+            {
+                scrollBar.Position = _listView.TopItem;
+            }
 
-                                         _listView.SetNeedsDisplay ();
-                                     };
+            _listView.SetNeedsDisplay ();
+        };
 
         scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
-                                                        {
-                                                            _listView.LeftItem = scrollBar.OtherScrollBarView.Position;
+        {
+            _listView.LeftItem = scrollBar.OtherScrollBarView.Position;
 
-                                                            if (_listView.LeftItem != scrollBar.OtherScrollBarView.Position)
-                                                            {
-                                                                scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
-                                                            }
+            if (_listView.LeftItem != scrollBar.OtherScrollBarView.Position)
+            {
+                scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+            }
 
-                                                            _listView.SetNeedsDisplay ();
-                                                        };
+            _listView.SetNeedsDisplay ();
+        };
 
         _listView.DrawContent += (s, e) =>
-                                 {
-                                     scrollBar.Size = _listView.Source.Count;
-                                     scrollBar.Position = _listView.TopItem;
-                                     scrollBar.OtherScrollBarView.Size = _listView.MaxLength;
-                                     scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
-                                     scrollBar.Refresh ();
-                                 };
+        {
+            scrollBar.Size = _listView.Source.Count;
+            scrollBar.Position = _listView.TopItem;
+            scrollBar.OtherScrollBarView.Size = _listView.MaxLength;
+            scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+            scrollBar.Refresh ();
+        };
 
         _listView.SetSource (_scenarios);
 
@@ -97,15 +108,19 @@ public class ListViewWithSelection : Scenario
 
         var keepCheckBox = new CheckBox
         {
-            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, Checked = scrollBar.AutoHideScrollBars
+            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, State = scrollBar.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
-        keepCheckBox.Toggled += (s, e) => scrollBar.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
-        Win.Add (keepCheckBox);
+        keepCheckBox.Toggle += (s, e) => scrollBar.KeepContentAlwaysInViewport = e.NewValue == CheckState.Checked;
+        _appWindow.Add (keepCheckBox);
+
+        Application.Run (_appWindow);
+        _appWindow.Dispose ();
+        Application.Shutdown ();
     }
 
-    private void _customRenderCB_Toggled (object sender, StateEventArgs<bool?> stateEventArgs)
+    private void _customRenderCB_Toggle (object sender, CancelEventArgs<CheckState> stateEventArgs)
     {
-        if (stateEventArgs.OldValue == true)
+        if (stateEventArgs.CurrentValue == CheckState.Checked)
         {
             _listView.SetSource (_scenarios);
         }
@@ -114,20 +129,20 @@ public class ListViewWithSelection : Scenario
             _listView.Source = new ScenarioListDataSource (_scenarios);
         }
 
-        Win.SetNeedsDisplay ();
+        _appWindow.SetNeedsDisplay ();
     }
 
-    private void AllowMarkingCB_Toggled (object sender, [NotNull] StateEventArgs<bool?> stateEventArgs)
+    private void AllowMarkingCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMarking = (bool)!stateEventArgs.OldValue;
+        _listView.AllowsMarking = stateEventArgs.NewValue == CheckState.Checked;
         _allowMultipleCB.Visible = _listView.AllowsMarking;
-        Win.SetNeedsDisplay ();
+        _appWindow.SetNeedsDisplay ();
     }
 
-    private void AllowMultipleCB_Toggled (object sender, [NotNull] StateEventArgs<bool?> stateEventArgs)
+    private void AllowMultipleCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMultipleSelection = (bool)!stateEventArgs.OldValue;
-        Win.SetNeedsDisplay ();
+        _listView.AllowsMultipleSelection = stateEventArgs.NewValue == CheckState.Checked;
+        _appWindow.SetNeedsDisplay ();
     }
 
     private void ListView_RowRender (object sender, ListViewRowEventArgs obj)
@@ -158,21 +173,21 @@ public class ListViewWithSelection : Scenario
     internal class ScenarioListDataSource : IListDataSource
     {
         private readonly int _nameColumnWidth = 30;
-        private int count;
-        private BitArray marks;
-        private List<Scenario> scenarios;
-        public ScenarioListDataSource (List<Scenario> itemList) { Scenarios = itemList; }
+        private int _count;
+        private BitArray _marks;
+        private ObservableCollection<Scenario> _scenarios;
+        public ScenarioListDataSource (ObservableCollection<Scenario> itemList) { Scenarios = itemList; }
 
-        public List<Scenario> Scenarios
+        public ObservableCollection<Scenario> Scenarios
         {
-            get => scenarios;
+            get => _scenarios;
             set
             {
                 if (value != null)
                 {
-                    count = value.Count;
-                    marks = new BitArray (count);
-                    scenarios = value;
+                    _count = value.Count;
+                    _marks = new BitArray (_count);
+                    _scenarios = value;
                     Length = GetMaxLengthItem ();
                 }
             }
@@ -180,16 +195,19 @@ public class ListViewWithSelection : Scenario
 
         public bool IsMarked (int item)
         {
-            if (item >= 0 && item < count)
+            if (item >= 0 && item < _count)
             {
-                return marks [item];
+                return _marks [item];
             }
 
             return false;
         }
 
+        /// <inheritdoc />
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
         public int Count => Scenarios != null ? Scenarios.Count : 0;
         public int Length { get; private set; }
+        public bool SuspendCollectionChangedEvent { get => throw new System.NotImplementedException (); set => throw new System.NotImplementedException (); }
 
         public void Render (
             ListView container,
@@ -214,9 +232,9 @@ public class ListViewWithSelection : Scenario
 
         public void SetMark (int item, bool value)
         {
-            if (item >= 0 && item < count)
+            if (item >= 0 && item < _count)
             {
-                marks [item] = value;
+                _marks [item] = value;
             }
         }
 
@@ -224,17 +242,17 @@ public class ListViewWithSelection : Scenario
 
         private int GetMaxLengthItem ()
         {
-            if (scenarios?.Count == 0)
+            if (_scenarios?.Count == 0)
             {
                 return 0;
             }
 
             var maxLength = 0;
 
-            for (var i = 0; i < scenarios.Count; i++)
+            for (var i = 0; i < _scenarios.Count; i++)
             {
                 string s = string.Format (
-                                          string.Format ("{{0,{0}}}", -_nameColumnWidth),
+                                          $"{{0,{-_nameColumnWidth}}}",
                                           Scenarios [i].GetName ()
                                          );
                 var sc = $"{s}  {Scenarios [i].GetDescription ()}";
@@ -275,6 +293,11 @@ public class ListViewWithSelection : Scenario
                 driver.AddRune ((Rune)' ');
                 used++;
             }
+        }
+
+        public void Dispose ()
+        {
+            _scenarios = null;
         }
     }
 }

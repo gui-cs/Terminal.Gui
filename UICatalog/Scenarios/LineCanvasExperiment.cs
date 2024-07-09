@@ -8,10 +8,16 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Proof of Concept")]
 public class LineCanvasExperiment : Scenario
 {
-    /// <summary>Setup the scenario.</summary>
     public override void Main ()
     {
-        var app = new Window
+        Application.Init ();
+
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
+
+        var frame1 = new FrameView
         {
             Title = "LineCanvas Experiments",
             X = 0,
@@ -24,20 +30,21 @@ public class LineCanvasExperiment : Scenario
 
         //View.Diagnostics ^= DiagnosticFlags.FrameRuler;
 
-        //var win1 = new Window
-        //{
-        //    AutoSize = false,
-        //    Title = "win1",
-        //    Text = "Win1 30%/50% Heavy",
-        //    X = 20,
-        //    Y = 0,
-        //    Width = 30, //Dim.Percent (30) - 5,
-        //    Height = 10, //Dim.Percent (50) - 5,
-        //    //ColorScheme = Colors.ColorSchemes ["Base"],
-        //    BorderStyle = LineStyle.Heavy,
-        //    SuperViewRendersLineCanvas = true
-        //};
-        //win1.Padding.Thickness = new Thickness (1);
+        app.Add (frame1);
+
+        var win1 = new Window
+        {
+            Title = "win1",
+            Text = "Win1 30%/50% Heavy",
+            X = 20,
+            Y = 0,
+            Width = 30, //Dim.Percent (30) - 5,
+            Height = 10, //Dim.Percent (50) - 5,
+            //ColorScheme = Colors.ColorSchemes ["Base"],
+            BorderStyle = LineStyle.Heavy,
+            SuperViewRendersLineCanvas = true
+        };
+        win1.Padding.Thickness = new (1);
 
         //app.Add (win1);
 
@@ -133,37 +140,25 @@ public class LineCanvasExperiment : Scenario
         //};
         //app.Add (line);
 
-        //line = new Line
-        //{
-        //    Id = "line2",
-        //    X = 1,
-        //    Y = 1,
-        //    Width = 1,
-        //    Height = 10,
-        //    Orientation = Orientation.Vertical,
-        //    SuperViewRendersLineCanvas = true
-        //};
-        //app.Add (line);
-
-        var label = new View ()
+        var marginWindow = new Window
         {
-            //Arrangement = ViewArrangement.Movable,
-            Id = "label1",
-            Text = "Label",
-            Title = "label1",
-            X = 5,
-            Y = 4,
-            Width = 15,
-            Height = 6,
-            //TextAlignment = TextAlignment.Centered,
-            //SuperViewRendersLineCanvas = true,
-            //BorderStyle = LineStyle.Double
+            Title = "Positive Margin",
+            X = 0,
+            Y = 8,
+            Width = 25,
+            Height = 10,
+
+            //ColorScheme = Colors.ColorSchemes ["Error"],
+            SuperViewRendersLineCanvas = true
         };
-        label.Border.Thickness = new Thickness (1, 3, 1, 1);
-        label.Border.LineStyle = LineStyle.Double;
-        app.Add (label);
+        marginWindow.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
+        marginWindow.Margin.Thickness = new (1);
+        marginWindow.Border.Thickness = new (1, 2, 1, 1);
+
+        frame1.Add (marginWindow);
 
         Application.Run (app);
         app.Dispose ();
+        Application.Shutdown ();
     }
 }

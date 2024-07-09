@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.Threading;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -100,6 +101,7 @@ public class OverlappedTests
         Assert.Empty (Application.OverlappedChildren);
         Assert.NotNull (Application.OverlappedTop);
         Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -182,6 +184,7 @@ public class OverlappedTests
         Application.Run (top1);
 
         Assert.Null (Application.OverlappedChildren);
+        top1.Dispose ();
     }
 
     [Fact]
@@ -237,6 +240,7 @@ public class OverlappedTests
                                  };
 
         Application.Run (overlapped);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -338,6 +342,7 @@ public class OverlappedTests
         Assert.Empty (Application.OverlappedChildren);
         Assert.NotNull (Application.OverlappedTop);
         Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -429,6 +434,7 @@ public class OverlappedTests
         Assert.Empty (Application.OverlappedChildren);
         Assert.NotNull (Application.OverlappedTop);
         Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -514,6 +520,7 @@ public class OverlappedTests
         Assert.Empty (Application.OverlappedChildren);
         Assert.NotNull (Application.OverlappedTop);
         Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -609,6 +616,7 @@ public class OverlappedTests
         Assert.Empty (Application.OverlappedChildren);
         Assert.NotNull (Application.OverlappedTop);
         Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -625,6 +633,7 @@ public class OverlappedTests
                             };
 
         Application.Run (overlapped);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -703,6 +712,7 @@ public class OverlappedTests
         Assert.Empty (Application.OverlappedChildren);
         Assert.NotNull (Application.OverlappedTop);
         Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -782,6 +792,7 @@ public class OverlappedTests
         Assert.Empty (Application.OverlappedChildren);
         Assert.NotNull (Application.OverlappedTop);
         Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -860,6 +871,7 @@ public class OverlappedTests
         Assert.Empty (Application.OverlappedChildren);
         Assert.NotNull (Application.OverlappedTop);
         Assert.NotNull (Application.Top);
+        overlapped.Dispose ();
     }
 
     [Fact]
@@ -912,7 +924,7 @@ public class OverlappedTests
         // Tests that rely on visuals are too fragile. If border style changes they break.
         // Instead we should just rely on the test above.
 
-        Application.OnMouseEvent (new MouseEvent { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed });
+        Application.OnMouseEvent (new MouseEvent { Position = new (1, 1), Flags = MouseFlags.Button1Pressed });
         Assert.Equal (win2.Border, Application.MouseGrabView);
 
         Application.RunIteration (ref rsOverlapped, ref firstIteration);
@@ -926,10 +938,7 @@ public class OverlappedTests
 
         Application.OnMouseEvent (new MouseEvent
         {
-            X = 2,
-            Y = 2,
-            Flags = MouseFlags.Button1Pressed
-                    | MouseFlags.ReportMousePosition
+            Position = new (2, 2), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
         });
 
         Application.RunIteration (ref rsOverlapped, ref firstIteration);

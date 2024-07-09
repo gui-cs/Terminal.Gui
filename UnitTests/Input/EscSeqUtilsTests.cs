@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
-
-namespace Terminal.Gui.InputTests;
+﻿namespace Terminal.Gui.InputTests;
 
 public class EscSeqUtilsTests
 {
@@ -53,7 +50,7 @@ public class EscSeqUtilsTests
         Assert.Null (_values);
         Assert.Null (_terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -61,7 +58,7 @@ public class EscSeqUtilsTests
 
         ClearAll ();
         _cki = new ConsoleKeyInfo [] { new ('\u001b', 0, false, false, false), new ('\u0012', 0, false, false, false) };
-        expectedCki = new ConsoleKeyInfo ('\u0012', ConsoleKey.R, false, true, true);
+        expectedCki = new ('\u0012', ConsoleKey.R, false, true, true);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,
@@ -88,7 +85,7 @@ public class EscSeqUtilsTests
         Assert.Null (_values);
         Assert.Equal ("\u0012", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -96,7 +93,7 @@ public class EscSeqUtilsTests
 
         ClearAll ();
         _cki = new ConsoleKeyInfo [] { new ('\u001b', 0, false, false, false), new ('r', 0, false, false, false) };
-        expectedCki = new ConsoleKeyInfo ('R', ConsoleKey.R, false, true, false);
+        expectedCki = new ('R', ConsoleKey.R, false, true, false);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,
@@ -123,7 +120,7 @@ public class EscSeqUtilsTests
         Assert.Null (_values);
         Assert.Equal ("r", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -136,7 +133,7 @@ public class EscSeqUtilsTests
         {
             new ('\u001b', 0, false, false, false), new ('O', 0, false, false, false), new ('R', 0, false, false, false)
         };
-        expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, false, false, false);
+        expectedCki = new ('\0', ConsoleKey.F3, false, false, false);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,
@@ -164,7 +161,7 @@ public class EscSeqUtilsTests
         Assert.Null (_values [0]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -182,7 +179,7 @@ public class EscSeqUtilsTests
             new ('2', 0, false, false, false),
             new ('R', 0, false, false, false)
         };
-        expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, true, false, false);
+        expectedCki = new ('\0', ConsoleKey.F3, true, false, false);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,
@@ -211,7 +208,7 @@ public class EscSeqUtilsTests
         Assert.Equal ("2", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -228,7 +225,7 @@ public class EscSeqUtilsTests
             new ('3', 0, false, false, false),
             new ('R', 0, false, false, false)
         };
-        expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, false, true, false);
+        expectedCki = new ('\0', ConsoleKey.F3, false, true, false);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,
@@ -257,7 +254,7 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -274,7 +271,7 @@ public class EscSeqUtilsTests
             new ('4', 0, false, false, false),
             new ('R', 0, false, false, false)
         };
-        expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, true, true, false);
+        expectedCki = new ('\0', ConsoleKey.F3, true, true, false);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,
@@ -303,7 +300,7 @@ public class EscSeqUtilsTests
         Assert.Equal ("4", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -320,7 +317,7 @@ public class EscSeqUtilsTests
             new ('5', 0, false, false, false),
             new ('R', 0, false, false, false)
         };
-        expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, false, false, true);
+        expectedCki = new ('\0', ConsoleKey.F3, false, false, true);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,
@@ -349,7 +346,7 @@ public class EscSeqUtilsTests
         Assert.Equal ("5", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -366,7 +363,7 @@ public class EscSeqUtilsTests
             new ('6', 0, false, false, false),
             new ('R', 0, false, false, false)
         };
-        expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, true, false, true);
+        expectedCki = new ('\0', ConsoleKey.F3, true, false, true);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,
@@ -395,7 +392,7 @@ public class EscSeqUtilsTests
         Assert.Equal ("6", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -412,7 +409,7 @@ public class EscSeqUtilsTests
             new ('7', 0, false, false, false),
             new ('R', 0, false, false, false)
         };
-        expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, false, true, true);
+        expectedCki = new ('\0', ConsoleKey.F3, false, true, true);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,
@@ -441,7 +438,7 @@ public class EscSeqUtilsTests
         Assert.Equal ("7", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -458,7 +455,7 @@ public class EscSeqUtilsTests
             new ('8', 0, false, false, false),
             new ('R', 0, false, false, false)
         };
-        expectedCki = new ConsoleKeyInfo ('\0', ConsoleKey.F3, true, true, true);
+        expectedCki = new ('\0', ConsoleKey.F3, true, true, true);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,
@@ -487,7 +484,7 @@ public class EscSeqUtilsTests
         Assert.Equal ("8", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -537,8 +534,8 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("M", _terminating);
         Assert.True (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { MouseFlags.Button1Pressed }, _mouseFlags);
-        Assert.Equal (new Point (1, 2), _pos);
+        Assert.Equal (new() { MouseFlags.Button1Pressed }, _mouseFlags);
+        Assert.Equal (new (1, 2), _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
@@ -590,10 +587,10 @@ public class EscSeqUtilsTests
         Assert.Equal (2, _mouseFlags.Count);
 
         Assert.Equal (
-                      new List<MouseFlags> { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
+                      new() { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
                       _mouseFlags
                      );
-        Assert.Equal (new Point (1, 2), _pos);
+        Assert.Equal (new (1, 2), _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
@@ -642,8 +639,8 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("M", _terminating);
         Assert.True (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { MouseFlags.Button1DoubleClicked }, _mouseFlags);
-        Assert.Equal (new Point (1, 2), _pos);
+        Assert.Equal (new() { MouseFlags.Button1DoubleClicked }, _mouseFlags);
+        Assert.Equal (new (1, 2), _pos);
         Assert.False (_isReq);
 
         ClearAll ();
@@ -690,8 +687,8 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("M", _terminating);
         Assert.True (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { MouseFlags.Button1TripleClicked }, _mouseFlags);
-        Assert.Equal (new Point (1, 2), _pos);
+        Assert.Equal (new() { MouseFlags.Button1TripleClicked }, _mouseFlags);
+        Assert.Equal (new (1, 2), _pos);
         Assert.False (_isReq);
 
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill (), WantContinuousButtonPressed = true };
@@ -699,7 +696,7 @@ public class EscSeqUtilsTests
         top.Add (view);
         Application.Begin (top);
 
-        Application.OnMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = 0 });
+        Application.OnMouseEvent (new() { Position = new (0, 0), Flags = 0 });
 
         ClearAll ();
 
@@ -745,8 +742,8 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("M", _terminating);
         Assert.True (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { MouseFlags.Button1Pressed }, _mouseFlags);
-        Assert.Equal (new Point (1, 2), _pos);
+        Assert.Equal (new() { MouseFlags.Button1Pressed }, _mouseFlags);
+        Assert.Equal (new (1, 2), _pos);
         Assert.False (_isReq);
 
         Application.Iteration += (s, a) =>
@@ -756,18 +753,19 @@ public class EscSeqUtilsTests
                                          // set Application.WantContinuousButtonPressedView to null
                                          view.WantContinuousButtonPressed = false;
 
-                                         Application.OnMouseEvent (new MouseEvent { X = 0, Y = 0, Flags = 0 });
+                                         Application.OnMouseEvent (new() { Position = new (0, 0), Flags = 0 });
 
                                          Application.RequestStop ();
                                      }
                                  };
 
         Application.Run (top);
+        top.Dispose ();
 
         Assert.Null (Application.WantContinuousButtonPressedView);
 
         Assert.Equal (MouseFlags.Button1Pressed, _arg1);
-        Assert.Equal (new Point (1, 2), _arg2);
+        Assert.Equal (new (1, 2), _arg2);
 
         ClearAll ();
 
@@ -813,8 +811,8 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("m", _terminating);
         Assert.True (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { MouseFlags.Button1Released }, _mouseFlags);
-        Assert.Equal (new Point (1, 2), _pos);
+        Assert.Equal (new() { MouseFlags.Button1Released }, _mouseFlags);
+        Assert.Equal (new (1, 2), _pos);
         Assert.False (_isReq);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
@@ -822,7 +820,7 @@ public class EscSeqUtilsTests
         ClearAll ();
 
         Assert.Null (_escSeqReqProc);
-        _escSeqReqProc = new EscSeqRequests ();
+        _escSeqReqProc = new ();
         _escSeqReqProc.Add ("t");
 
         _cki = new ConsoleKeyInfo []
@@ -870,7 +868,7 @@ public class EscSeqUtilsTests
         Assert.Equal ("20", _values [^1]);
         Assert.Equal ("t", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new List<MouseFlags> { 0 }, _mouseFlags);
+        Assert.Equal (new() { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
         Assert.True (_isReq);
         Assert.Equal (0, (int)_arg1);
@@ -921,48 +919,48 @@ public class EscSeqUtilsTests
         var expectedCki = new ConsoleKeyInfo ('r', 0, false, false, false);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
-        cki = new ConsoleKeyInfo ('r', 0, true, false, false);
-        expectedCki = new ConsoleKeyInfo ('r', 0, true, false, false);
+        cki = new ('r', 0, true, false, false);
+        expectedCki = new ('r', 0, true, false, false);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
-        cki = new ConsoleKeyInfo ('r', 0, false, true, false);
-        expectedCki = new ConsoleKeyInfo ('r', 0, false, true, false);
+        cki = new ('r', 0, false, true, false);
+        expectedCki = new ('r', 0, false, true, false);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
-        cki = new ConsoleKeyInfo ('r', 0, false, false, true);
-        expectedCki = new ConsoleKeyInfo ('r', 0, false, false, true);
+        cki = new ('r', 0, false, false, true);
+        expectedCki = new ('r', 0, false, false, true);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
-        cki = new ConsoleKeyInfo ('r', 0, true, true, false);
-        expectedCki = new ConsoleKeyInfo ('r', 0, true, true, false);
+        cki = new ('r', 0, true, true, false);
+        expectedCki = new ('r', 0, true, true, false);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
-        cki = new ConsoleKeyInfo ('r', 0, false, true, true);
-        expectedCki = new ConsoleKeyInfo ('r', 0, false, true, true);
+        cki = new ('r', 0, false, true, true);
+        expectedCki = new ('r', 0, false, true, true);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
-        cki = new ConsoleKeyInfo ('r', 0, true, true, true);
-        expectedCki = new ConsoleKeyInfo ('r', 0, true, true, true);
+        cki = new ('r', 0, true, true, true);
+        expectedCki = new ('r', 0, true, true, true);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
-        cki = new ConsoleKeyInfo ('\u0012', 0, false, false, false);
-        expectedCki = new ConsoleKeyInfo ('R', ConsoleKey.R, false, false, true);
+        cki = new ('\u0012', 0, false, false, false);
+        expectedCki = new ('R', ConsoleKey.R, false, false, true);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
-        cki = new ConsoleKeyInfo ('\0', (ConsoleKey)64, false, false, true);
-        expectedCki = new ConsoleKeyInfo (' ', ConsoleKey.Spacebar, false, false, true);
+        cki = new ('\0', (ConsoleKey)64, false, false, true);
+        expectedCki = new (' ', ConsoleKey.Spacebar, false, false, true);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
-        cki = new ConsoleKeyInfo ('\r', 0, false, false, false);
-        expectedCki = new ConsoleKeyInfo ('\r', ConsoleKey.Enter, false, false, false);
+        cki = new ('\r', 0, false, false, false);
+        expectedCki = new ('\r', ConsoleKey.Enter, false, false, false);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
-        cki = new ConsoleKeyInfo ('\u007f', 0, false, false, false);
-        expectedCki = new ConsoleKeyInfo ('\u007f', ConsoleKey.Backspace, false, false, false);
+        cki = new ('\u007f', 0, false, false, false);
+        expectedCki = new ('\u007f', ConsoleKey.Backspace, false, false, false);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
-        cki = new ConsoleKeyInfo ('R', 0, false, false, false);
-        expectedCki = new ConsoleKeyInfo ('R', 0, false, false, false);
+        cki = new ('R', 0, false, false, false);
+        expectedCki = new ('R', 0, false, false, false);
         Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
     }
 
@@ -970,32 +968,45 @@ public class EscSeqUtilsTests
     public void GetConsoleKey_Tests ()
     {
         ConsoleModifiers mod = 0;
-        Assert.Equal (ConsoleKey.UpArrow, EscSeqUtils.GetConsoleKey ('A', "", ref mod));
-        Assert.Equal (ConsoleKey.DownArrow, EscSeqUtils.GetConsoleKey ('B', "", ref mod));
-        Assert.Equal (_key = ConsoleKey.RightArrow, EscSeqUtils.GetConsoleKey ('C', "", ref mod));
-        Assert.Equal (ConsoleKey.LeftArrow, EscSeqUtils.GetConsoleKey ('D', "", ref mod));
-        Assert.Equal (ConsoleKey.End, EscSeqUtils.GetConsoleKey ('F', "", ref mod));
-        Assert.Equal (ConsoleKey.Home, EscSeqUtils.GetConsoleKey ('H', "", ref mod));
-        Assert.Equal (ConsoleKey.F1, EscSeqUtils.GetConsoleKey ('P', "", ref mod));
-        Assert.Equal (ConsoleKey.F2, EscSeqUtils.GetConsoleKey ('Q', "", ref mod));
-        Assert.Equal (ConsoleKey.F3, EscSeqUtils.GetConsoleKey ('R', "", ref mod));
-        Assert.Equal (ConsoleKey.F4, EscSeqUtils.GetConsoleKey ('S', "", ref mod));
-        Assert.Equal (ConsoleKey.Tab, EscSeqUtils.GetConsoleKey ('Z', "", ref mod));
+        char keyChar = '\0';
+        Assert.Equal (ConsoleKey.UpArrow, EscSeqUtils.GetConsoleKey ('A', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.DownArrow, EscSeqUtils.GetConsoleKey ('B', "", ref mod, ref keyChar));
+        Assert.Equal (_key = ConsoleKey.RightArrow, EscSeqUtils.GetConsoleKey ('C', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.LeftArrow, EscSeqUtils.GetConsoleKey ('D', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.End, EscSeqUtils.GetConsoleKey ('F', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.Home, EscSeqUtils.GetConsoleKey ('H', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F1, EscSeqUtils.GetConsoleKey ('P', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F2, EscSeqUtils.GetConsoleKey ('Q', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F3, EscSeqUtils.GetConsoleKey ('R', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F4, EscSeqUtils.GetConsoleKey ('S', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.Tab, EscSeqUtils.GetConsoleKey ('Z', "", ref mod, ref keyChar));
         Assert.Equal (ConsoleModifiers.Shift, mod);
-        Assert.Equal (0, (int)EscSeqUtils.GetConsoleKey ('\0', "", ref mod));
-        Assert.Equal (ConsoleKey.Insert, EscSeqUtils.GetConsoleKey ('~', "2", ref mod));
-        Assert.Equal (ConsoleKey.Delete, EscSeqUtils.GetConsoleKey ('~', "3", ref mod));
-        Assert.Equal (ConsoleKey.PageUp, EscSeqUtils.GetConsoleKey ('~', "5", ref mod));
-        Assert.Equal (ConsoleKey.PageDown, EscSeqUtils.GetConsoleKey ('~', "6", ref mod));
-        Assert.Equal (ConsoleKey.F5, EscSeqUtils.GetConsoleKey ('~', "15", ref mod));
-        Assert.Equal (ConsoleKey.F6, EscSeqUtils.GetConsoleKey ('~', "17", ref mod));
-        Assert.Equal (ConsoleKey.F7, EscSeqUtils.GetConsoleKey ('~', "18", ref mod));
-        Assert.Equal (ConsoleKey.F8, EscSeqUtils.GetConsoleKey ('~', "19", ref mod));
-        Assert.Equal (ConsoleKey.F9, EscSeqUtils.GetConsoleKey ('~', "20", ref mod));
-        Assert.Equal (ConsoleKey.F10, EscSeqUtils.GetConsoleKey ('~', "21", ref mod));
-        Assert.Equal (ConsoleKey.F11, EscSeqUtils.GetConsoleKey ('~', "23", ref mod));
-        Assert.Equal (ConsoleKey.F12, EscSeqUtils.GetConsoleKey ('~', "24", ref mod));
-        Assert.Equal (0, (int)EscSeqUtils.GetConsoleKey ('~', "", ref mod));
+        Assert.Equal (0, (int)EscSeqUtils.GetConsoleKey ('\0', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.Insert, EscSeqUtils.GetConsoleKey ('~', "2", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.Delete, EscSeqUtils.GetConsoleKey ('~', "3", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.PageUp, EscSeqUtils.GetConsoleKey ('~', "5", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.PageDown, EscSeqUtils.GetConsoleKey ('~', "6", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F5, EscSeqUtils.GetConsoleKey ('~', "15", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F6, EscSeqUtils.GetConsoleKey ('~', "17", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F7, EscSeqUtils.GetConsoleKey ('~', "18", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F8, EscSeqUtils.GetConsoleKey ('~', "19", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F9, EscSeqUtils.GetConsoleKey ('~', "20", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F10, EscSeqUtils.GetConsoleKey ('~', "21", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F11, EscSeqUtils.GetConsoleKey ('~', "23", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.F12, EscSeqUtils.GetConsoleKey ('~', "24", ref mod, ref keyChar));
+        Assert.Equal (0, (int)EscSeqUtils.GetConsoleKey ('~', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.Add, EscSeqUtils.GetConsoleKey ('l', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.Subtract, EscSeqUtils.GetConsoleKey ('m', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.Insert, EscSeqUtils.GetConsoleKey ('p', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.End, EscSeqUtils.GetConsoleKey ('q', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.DownArrow, EscSeqUtils.GetConsoleKey ('r', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.PageDown, EscSeqUtils.GetConsoleKey ('s', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.LeftArrow, EscSeqUtils.GetConsoleKey ('t', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.Clear, EscSeqUtils.GetConsoleKey ('u', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.RightArrow, EscSeqUtils.GetConsoleKey ('v', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.Home, EscSeqUtils.GetConsoleKey ('w', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.UpArrow, EscSeqUtils.GetConsoleKey ('x', "", ref mod, ref keyChar));
+        Assert.Equal (ConsoleKey.PageUp, EscSeqUtils.GetConsoleKey ('y', "", ref mod, ref keyChar));
     }
 
     [Fact]
@@ -1062,8 +1073,8 @@ public class EscSeqUtilsTests
             new ('M', 0, false, false, false)
         };
         EscSeqUtils.GetMouse (cki, out List<MouseFlags> mouseFlags, out Point pos, ProcessContinuousButtonPressed);
-        Assert.Equal (new List<MouseFlags> { MouseFlags.Button1Pressed }, mouseFlags);
-        Assert.Equal (new Point (1, 2), pos);
+        Assert.Equal (new() { MouseFlags.Button1Pressed }, mouseFlags);
+        Assert.Equal (new (1, 2), pos);
 
         cki = new ConsoleKeyInfo []
         {
@@ -1081,10 +1092,10 @@ public class EscSeqUtilsTests
         Assert.Equal (2, mouseFlags.Count);
 
         Assert.Equal (
-                      new List<MouseFlags> { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
+                      new() { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
                       mouseFlags
                      );
-        Assert.Equal (new Point (1, 2), pos);
+        Assert.Equal (new (1, 2), pos);
 
         cki = new ConsoleKeyInfo []
         {
@@ -1099,8 +1110,8 @@ public class EscSeqUtilsTests
             new ('M', 0, false, false, false)
         };
         EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
-        Assert.Equal (new List<MouseFlags> { MouseFlags.Button1DoubleClicked }, mouseFlags);
-        Assert.Equal (new Point (1, 2), pos);
+        Assert.Equal (new() { MouseFlags.Button1DoubleClicked }, mouseFlags);
+        Assert.Equal (new (1, 2), pos);
 
         cki = new ConsoleKeyInfo []
         {
@@ -1115,8 +1126,8 @@ public class EscSeqUtilsTests
             new ('M', 0, false, false, false)
         };
         EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
-        Assert.Equal (new List<MouseFlags> { MouseFlags.Button1TripleClicked }, mouseFlags);
-        Assert.Equal (new Point (1, 2), pos);
+        Assert.Equal (new() { MouseFlags.Button1TripleClicked }, mouseFlags);
+        Assert.Equal (new (1, 2), pos);
 
         cki = new ConsoleKeyInfo []
         {
@@ -1131,8 +1142,8 @@ public class EscSeqUtilsTests
             new ('m', 0, false, false, false)
         };
         EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
-        Assert.Equal (new List<MouseFlags> { MouseFlags.Button1Released }, mouseFlags);
-        Assert.Equal (new Point (1, 2), pos);
+        Assert.Equal (new() { MouseFlags.Button1Released }, mouseFlags);
+        Assert.Equal (new (1, 2), pos);
     }
 
     [Fact]

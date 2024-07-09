@@ -21,7 +21,7 @@ namespace Terminal.Gui;
 ///     <para>
 ///         The subviews that are added to this <see cref="Gui.ScrollView"/> are offset by the
 ///         <see cref="ContentOffset"/> property.  The view itself is a window into the space represented by the
-///         <see cref="View.ContentSize"/>.
+///         <see cref="View.GetContentSize ()"/>.
 ///     </para>
 ///     <para>Use the</para>
 /// </remarks>
@@ -38,8 +38,7 @@ public class ScrollView : View
     private bool _showVerticalScrollIndicator;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="Gui.ScrollView"/> class.
     /// </summary>
     public ScrollView ()
     {
@@ -88,10 +87,10 @@ public class ScrollView : View
         AddCommand (Command.PageDown, () => ScrollDown (Viewport.Height));
         AddCommand (Command.PageLeft, () => ScrollLeft (Viewport.Width));
         AddCommand (Command.PageRight, () => ScrollRight (Viewport.Width));
-        AddCommand (Command.TopHome, () => ScrollUp (ContentSize.Height));
-        AddCommand (Command.BottomEnd, () => ScrollDown (ContentSize.Height));
-        AddCommand (Command.LeftHome, () => ScrollLeft (ContentSize.Width));
-        AddCommand (Command.RightEnd, () => ScrollRight (ContentSize.Width));
+        AddCommand (Command.TopHome, () => ScrollUp (GetContentSize ().Height));
+        AddCommand (Command.BottomEnd, () => ScrollDown (GetContentSize ().Height));
+        AddCommand (Command.LeftHome, () => ScrollLeft (GetContentSize ().Width));
+        AddCommand (Command.RightEnd, () => ScrollRight (GetContentSize ().Width));
 
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
@@ -127,7 +126,7 @@ public class ScrollView : View
                            }
 
                            SetContentOffset (_contentOffset);
-                           _contentView.Frame = new Rectangle (ContentOffset, ContentSize);
+                           _contentView.Frame = new Rectangle (ContentOffset, GetContentSize ());
 
                            // PERF: How about calls to Point.Offset instead?
                            _vertical.ChangedPosition += delegate { ContentOffset = new Point (ContentOffset.X, _vertical.Position); };
@@ -138,9 +137,13 @@ public class ScrollView : View
 
     private void ScrollViewContentSizeChanged (object sender, SizeChangedEventArgs e)
     {
-        _contentView.Frame = new Rectangle (ContentOffset, e.Size with {Width = e.Size.Width-1, Height = e.Size.Height-1});
-        _vertical.Size = e.Size.Height;
-        _horizontal.Size = e.Size.Width;
+        if (e.Size is null)
+        {
+            return;
+        }
+        _contentView.Frame = new Rectangle (ContentOffset, e.Size.Value with { Width = e.Size.Value.Width - 1, Height = e.Size.Value.Height - 1 });
+        _vertical.Size = e.Size.Value.Height;
+        _horizontal.Size = e.Size.Value.Width;
     }
 
     private void Application_UnGrabbedMouse (object sender, ViewEventArgs e)
@@ -216,12 +219,12 @@ public class ScrollView : View
     //    get => ContentSize;
     //    set
     //    {
-    //        if (ContentSize != value)
+    //        if (GetContentSize () != value)
     //        {
     //            ContentSize = value;
     //            _contentView.Frame = new Rectangle (_contentOffset, value);
-    //            _vertical.Size = ContentSize.Height;
-    //            _horizontal.Size = ContentSize.Width;
+    //            _vertical.Size = GetContentSize ().Height;
+    //            _horizontal.Size = GetContentSize ().Width;
     //            SetNeedsDisplay ();
     //        }
     //    }
@@ -240,26 +243,26 @@ public class ScrollView : View
                 _horizontal.OtherScrollBarView.KeepContentAlwaysInViewport = value;
                 Point p = default;
 
-                if (value && -_contentOffset.X + Viewport.Width > ContentSize.Width)
+                if (value && -_contentOffset.X + Viewport.Width > GetContentSize ().Width)
                 {
                     p = new Point (
-                                   ContentSize.Width - Viewport.Width + (_showVerticalScrollIndicator ? 1 : 0),
+                                   GetContentSize ().Width - Viewport.Width + (_showVerticalScrollIndicator ? 1 : 0),
                                    -_contentOffset.Y
                                   );
                 }
 
-                if (value && -_contentOffset.Y + Viewport.Height > ContentSize.Height)
+                if (value && -_contentOffset.Y + Viewport.Height > GetContentSize ().Height)
                 {
                     if (p == default (Point))
                     {
                         p = new Point (
                                        -_contentOffset.X,
-                                       ContentSize.Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0)
+                                       GetContentSize ().Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0)
                                       );
                     }
                     else
                     {
-                        p.Y = ContentSize.Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0);
+                        p.Y = GetContentSize ().Height - Viewport.Height + (_showHorizontalScrollIndicator ? 1 : 0);
                     }
                 }
 
@@ -343,7 +346,7 @@ public class ScrollView : View
 
     /// <summary>Adds the view to the scrollview.</summary>
     /// <param name="view">The view to add to the scrollview.</param>
-    public override void Add (View view)
+    public override View Add (View view)
     {
         if (view is ScrollBarView.ContentBottomRightCorner)
         {
@@ -362,6 +365,7 @@ public class ScrollView : View
         }
 
         SetNeedsLayout ();
+        return view;
     }
 
     /// <inheritdoc/>
@@ -381,17 +385,6 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        if (Subviews.Count == 0 || !Subviews.Any (subview => subview.CanFocus))
-        {
-            Application.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
     public override bool OnKeyDown (Key a)
     {
         if (base.OnKeyDown (a))
@@ -399,7 +392,7 @@ public class ScrollView : View
             return true;
         }
 
-        bool? result = InvokeKeyBindings (a);
+        bool? result = InvokeKeyBindings (a, KeyBindingScope.HotKey | KeyBindingScope.Focused);
 
         if (result is { })
         {
@@ -410,7 +403,7 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (!Enabled)
         {
@@ -434,11 +427,11 @@ public class ScrollView : View
         {
             ScrollLeft (1);
         }
-        else if (me.X == _vertical.Frame.X && ShowVerticalScrollIndicator)
+        else if (me.Position.X == _vertical.Frame.X && ShowVerticalScrollIndicator)
         {
             _vertical.NewMouseEvent (me);
         }
-        else if (me.Y == _horizontal.Frame.Y && ShowHorizontalScrollIndicator)
+        else if (me.Position.Y == _horizontal.Frame.Y && ShowHorizontalScrollIndicator)
         {
             _horizontal.NewMouseEvent (me);
         }
@@ -447,29 +440,28 @@ public class ScrollView : View
             Application.UngrabMouse ();
         }
 
-        return base.OnMouseEvent(me);
+        return base.OnMouseEvent (me);
     }
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (InternalSubviews.Count == 0)
         {
             Move (0, 0);
+
+            return null; // Don't show the cursor
         }
-        else
-        {
-            base.PositionCursor ();
-        }
+        return base.PositionCursor ();
     }
 
     /// <summary>Removes the view from the scrollview.</summary>
     /// <param name="view">The view to remove from the scrollview.</param>
-    public override void Remove (View view)
+    public override View Remove (View view)
     {
         if (view is null)
         {
-            return;
+            return view;
         }
 
         SetNeedsDisplay ();
@@ -488,6 +480,8 @@ public class ScrollView : View
         {
             CanFocus = false;
         }
+
+        return view;
     }
 
     /// <summary>Removes all widgets from this container.</summary>
@@ -615,7 +609,7 @@ public class ScrollView : View
     {
         // INTENT: Unclear intent. How about a call to Offset?
         _contentOffset = new Point (-Math.Abs (offset.X), -Math.Abs (offset.Y));
-        _contentView.Frame = new Rectangle (_contentOffset, ContentSize);
+        _contentView.Frame = new Rectangle (_contentOffset, GetContentSize ());
         int p = Math.Max (0, -_contentOffset.Y);
 
         if (_vertical.Position != p)
@@ -646,7 +640,7 @@ public class ScrollView : View
         bool v = false, h = false;
         var p = false;
 
-        if (Viewport.Height == 0 || Viewport.Height > ContentSize.Height)
+        if (GetContentSize () is { } && (Viewport.Height == 0 || Viewport.Height > GetContentSize ().Height))
         {
             if (ShowVerticalScrollIndicator)
             {
@@ -655,7 +649,7 @@ public class ScrollView : View
 
             v = false;
         }
-        else if (Viewport.Height > 0 && Viewport.Height == ContentSize.Height)
+        else if (GetContentSize () is { } && Viewport.Height > 0 && Viewport.Height == GetContentSize ().Height)
         {
             p = true;
         }
@@ -669,7 +663,7 @@ public class ScrollView : View
             v = true;
         }
 
-        if (Viewport.Width == 0 || Viewport.Width > ContentSize.Width)
+        if (GetContentSize () is { } && (Viewport.Width == 0 || Viewport.Width > GetContentSize ().Width))
         {
             if (ShowHorizontalScrollIndicator)
             {
@@ -678,7 +672,7 @@ public class ScrollView : View
 
             h = false;
         }
-        else if (Viewport.Width > 0 && Viewport.Width == ContentSize.Width && p)
+        else if (GetContentSize () is { } && Viewport.Width > 0 && Viewport.Width == GetContentSize ().Width && p)
         {
             if (ShowHorizontalScrollIndicator)
             {

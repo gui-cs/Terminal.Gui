@@ -1,8 +1,14 @@
-﻿namespace Terminal.Gui;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+
+namespace Terminal.Gui;
 
 public partial class View
 {
-    private void CreateAdornments ()
+    /// <summary>
+    ///    Initializes the Adornments of the View. Called by the constructor.
+    /// </summary>
+    private void SetupAdornments ()
     {
         //// TODO: Move this to Adornment as a static factory method
         if (this is not Adornment)
@@ -54,6 +60,32 @@ public partial class View
     /// </remarks>
     public Margin Margin { get; private set; }
 
+    private ShadowStyle _shadowStyle;
+    /// <summary>
+    ///     Gets or sets whether the View is shown with a shadow effect. The shadow is drawn on the right and bottom sides of the
+    ///     Margin.
+    /// </summary>
+    /// <remarks>
+    ///     Setting this property to <see langword="true"/> will add a shadow to the right and bottom sides of the Margin.
+    ///     The View 's <see cref="Frame"/> will be expanded to include the shadow.
+    /// </remarks>
+    public virtual ShadowStyle ShadowStyle
+    {
+        get => _shadowStyle;
+        set
+        {
+            if (_shadowStyle == value)
+            {
+                return;
+            }
+            _shadowStyle = value;
+            if (Margin is { })
+            {
+                Margin.ShadowStyle = value;
+            }
+        }
+    }
+
     /// <summary>
     ///     The <see cref="Adornment"/> that offsets the <see cref="Viewport"/> from the <see cref="Margin"/>.
     ///     The Border provides the space for a visual border (drawn using
@@ -92,28 +124,77 @@ public partial class View
         get => Border?.LineStyle ?? LineStyle.Single;
         set
         {
-            if (Border is null)
-            {
-                return;
-            }
+            var old = Border?.LineStyle ?? LineStyle.None;
+            CancelEventArgs<LineStyle> e = new (ref old, ref value);
+            OnBorderStyleChanging (e);
 
-            if (value != LineStyle.None)
-            {
-                if (Border.Thickness == Thickness.Empty)
-                {
-                    Border.Thickness = new (1);
-                }
-            }
-            else
-            {
-                Border.Thickness = new (0);
-            }
-
-            Border.LineStyle = value;
-            LayoutAdornments ();
-            SetNeedsLayout ();
         }
     }
+
+    /// <summary>
+    /// Called when the <see cref="BorderStyle"/> is changing. Invokes <see cref="BorderStyleChanging"/>, which allows the event to be cancelled.
+    /// </summary>
+    /// <remarks>
+    ///     Override <see cref="SetBorderStyle"/> to prevent the <see cref="BorderStyle"/> from changing.
+    /// </remarks>
+    /// <param name="e"></param>
+    protected void OnBorderStyleChanging (CancelEventArgs<LineStyle> e)
+    {
+        if (Border is null)
+        {
+            return;
+        }
+
+        BorderStyleChanging?.Invoke (this, e);
+        if (e.Cancel)
+        {
+            return;
+        }
+
+        SetBorderStyle (e.NewValue);
+        LayoutAdornments ();
+        SetNeedsLayout ();
+
+        return;
+    }
+
+    /// <summary>
+    ///     Sets the <see cref="BorderStyle"/> of the view to the specified value.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///          <see cref="BorderStyle"/> is a helper for manipulating the view's <see cref="Border"/>. Setting this property to any value other
+    ///         than <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
+    ///         <see cref="Adornment.Thickness"/> to `1` and <see cref="BorderStyle"/> to the value.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
+    ///         <see cref="Adornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
+    ///     </para>
+    ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
+    /// </remarks>
+    /// <param name="value"></param>
+    public virtual void SetBorderStyle (LineStyle value)
+    {
+        if (value != LineStyle.None)
+        {
+            if (Border.Thickness == Thickness.Empty)
+            {
+                Border.Thickness = new (1);
+            }
+        }
+        else
+        {
+            Border.Thickness = new (0);
+        }
+
+        Border.LineStyle = value;
+    }
+
+    /// <summary>
+    ///     Fired when the <see cref="BorderStyle"/> is changing. Allows the event to be cancelled.
+    /// </summary>
+    public event EventHandler<CancelEventArgs<LineStyle>> BorderStyleChanging;
 
     /// <summary>
     ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="Viewport"/>
@@ -135,8 +216,20 @@ public partial class View
     /// <summary>
     ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     The <see cref="Viewport"/> is offset from the <see cref="Frame"/> by the thickness returned by this method.
+    /// </para>
+    /// </remarks>
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
-    public Thickness GetAdornmentsThickness () { return Margin.Thickness + Border.Thickness + Padding.Thickness; }
+    public Thickness GetAdornmentsThickness ()
+    {
+        if (Margin is null)
+        {
+            return Thickness.Empty;
+        }
+        return Margin.Thickness + Border.Thickness + Padding.Thickness;
+    }
 
     /// <summary>Lays out the Adornments of the View.</summary>
     /// <remarks>

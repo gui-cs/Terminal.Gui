@@ -31,7 +31,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         subView.Margin.Thickness = new Thickness (subViewMargin);
         view.Margin.Add (subView);
 
-        var foundView = View.FindDeepestView (view, 0, 0);
+        var foundView = View.FindDeepestView (view, new (0, 0));
 
         bool found = foundView == subView || foundView == subView.Margin;
         Assert.Equal (expectedFound, found);
@@ -58,7 +58,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         };
         view.Padding.Add (subView);
 
-        Assert.Equal (view.Padding, View.FindDeepestView (view, 0, 0));
+        Assert.Equal (view.Padding, View.FindDeepestView (view, new (0, 0)));
     }
 
     [Fact]

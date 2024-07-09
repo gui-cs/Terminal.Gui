@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Terminal.Gui;
 
@@ -16,7 +17,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Mouse and Keyboard")]
 public class CollectionNavigatorTester : Scenario
 {
-    private readonly List<string> _items = new []
+    private ObservableCollection<string> _items = new ObservableCollection<string> (new ObservableCollection<string> ()
     {
         "a",
         "b",
@@ -71,7 +72,7 @@ public class CollectionNavigatorTester : Scenario
         "q",
         "quit",
         "quitter"
-    }.ToList ();
+    }.ToList ());
 
     private ListView _listView;
     private TreeView _treeView;
@@ -129,7 +130,7 @@ public class CollectionNavigatorTester : Scenario
 
         Top.Add (menu);
 
-        _items.Sort (StringComparer.OrdinalIgnoreCase);
+        _items = new (_items.OrderBy (i => i, StringComparer.OrdinalIgnoreCase));
 
         CreateListView ();
         var vsep = new LineView (Orientation.Vertical) { X = Pos.Right (_listView), Y = 1, Height = Dim.Fill () };
@@ -142,10 +143,9 @@ public class CollectionNavigatorTester : Scenario
         var label = new Label
         {
             Text = "ListView",
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             X = 0,
             Y = 1, // for menu
-            AutoSize = false,
             Width = Dim.Percent (50),
             Height = 1
         };
@@ -172,10 +172,9 @@ public class CollectionNavigatorTester : Scenario
         var label = new Label
         {
             Text = "TreeView",
-            TextAlignment = TextAlignment.Centered,
+            TextAlignment = Alignment.Center,
             X = Pos.Right (_listView) + 2,
             Y = 1, // for menu
-            AutoSize = false,
             Width = Dim.Percent (50),
             Height = 1
         };

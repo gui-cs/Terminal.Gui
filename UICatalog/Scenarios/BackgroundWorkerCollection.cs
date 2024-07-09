@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
@@ -87,25 +88,23 @@ public class BackgroundWorkerCollection : Scenario
             ;
             _menu.MenuOpening += Menu_MenuOpening;
             Add (_menu);
-
             var statusBar = new StatusBar (
                                            new []
                                            {
-                                               new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit ()),
-                                               new StatusItem (
-                                                               KeyCode.CtrlMask | KeyCode.R,
-                                                               "~^R~ Run Worker",
-                                                               () => _workerApp.RunWorker ()
-                                                              ),
-                                               new StatusItem (
-                                                               KeyCode.CtrlMask | KeyCode.C,
-                                                               "~^C~ Cancel Worker",
-                                                               () => _workerApp.CancelWorker ()
-                                                              )
+                                               new Shortcut (Application.QuitKey, $"Quit", Quit),
+                                               new Shortcut (
+                                                             Key.R.WithCtrl,
+                                                             "Run Worker",
+                                                             () => _workerApp.RunWorker ()
+                                                            ),
+                                               new Shortcut (
+                                                             Key.C.WithCtrl,
+                                                             "Cancel Worker",
+                                                             () => _workerApp.CancelWorker ()
+                                                            )
                                            }
                                           );
             Add (statusBar);
-
             Ready += OverlappedMain_Ready;
             Activate += OverlappedMain_Activate;
             Deactivate += OverlappedMain_Deactivate;
@@ -247,7 +246,7 @@ public class BackgroundWorkerCollection : Scenario
         private readonly ListView _listView;
         private readonly Button _start;
 
-        public StagingUIController (Staging staging, List<string> list) : this ()
+        public StagingUIController (Staging staging, ObservableCollection<string> list) : this ()
         {
             Staging = staging;
             _label.Text = "Work list:";
@@ -335,7 +334,7 @@ public class BackgroundWorkerCollection : Scenario
     private class WorkerApp : Toplevel
     {
         private readonly ListView _listLog;
-        private readonly List<string> _log = [];
+        private readonly ObservableCollection<string> _log = [];
         private List<StagingUIController> _stagingsUi;
         private Dictionary<Staging, BackgroundWorker> _stagingWorkers;
 
@@ -357,7 +356,7 @@ public class BackgroundWorkerCollection : Scenario
                 Y = 0,
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
-                Source = new ListWrapper (_log)
+                Source = new ListWrapper<string> (_log)
             };
             Add (_listLog);
 
@@ -464,7 +463,7 @@ public class BackgroundWorkerCollection : Scenario
                                                           );
                                                  Application.Refresh ();
 
-                                                 var stagingUI = new StagingUIController (staging, e.Result as List<string>)
+                                                 var stagingUI = new StagingUIController (staging, e.Result as ObservableCollection<string>)
                                                  {
                                                      Modal = false,
                                                      Title =

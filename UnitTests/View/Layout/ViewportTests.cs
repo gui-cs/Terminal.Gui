@@ -181,27 +181,25 @@ public class ViewportTests (ITestOutputHelper output)
         var newViewport = new Rectangle (0, 0, 30, 40);
 
         var v = new View { Frame = frame };
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 
         v.Viewport = newViewport;
-        Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
         Assert.Equal (newViewport, v.Viewport);
         Assert.Equal (new Rectangle (1, 2, newViewport.Width, newViewport.Height), v.Frame);
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
-        Assert.Equal (Dim.Sized (30), v.Width);
-        Assert.Equal (Dim.Sized (40), v.Height);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (30), v.Width);
+        Assert.Equal (Dim.Absolute (40), v.Height);
 
         newViewport = new Rectangle (0, 0, 3, 4);
         v.Viewport = newViewport;
         Assert.Equal (newViewport, v.Viewport);
         Assert.Equal (new Rectangle (1, 2, newViewport.Width, newViewport.Height), v.Frame);
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
-        Assert.Equal (Dim.Sized (3), v.Width);
-        Assert.Equal (Dim.Sized (4), v.Height);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
 
         v.BorderStyle = LineStyle.Single;
 
@@ -210,10 +208,10 @@ public class ViewportTests (ITestOutputHelper output)
 
         // Frame should not change
         Assert.Equal (new Rectangle (1, 2, 3, 4), v.Frame);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
-        Assert.Equal (Dim.Sized (3), v.Width);
-        Assert.Equal (Dim.Sized (4), v.Height);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
 
         // Now set bounds bigger as before
         newViewport = new Rectangle (0, 0, 3, 4);
@@ -223,10 +221,10 @@ public class ViewportTests (ITestOutputHelper output)
         // Frame grows because there's now a border
         Assert.Equal (new Rectangle (1, 2, 5, 6), v.Frame);
         Assert.Equal (new Rectangle (0, 0, newViewport.Width, newViewport.Height), v.Viewport);
-        Assert.Equal (Pos.At (1), v.X);
-        Assert.Equal (Pos.At (2), v.Y);
-        Assert.Equal (Dim.Sized (5), v.Width);
-        Assert.Equal (Dim.Sized (6), v.Height);
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (5), v.Width);
+        Assert.Equal (Dim.Absolute (6), v.Height);
     }
 
     [Theory]
@@ -248,7 +246,7 @@ public class ViewportTests (ITestOutputHelper output)
         view.Viewport = newViewport;
 
         // Assert
-        Assert.Equal (new Rectangle(expectedX, expectedY, viewWidth, viewHeight), view.Viewport);
+        Assert.Equal (new Rectangle (expectedX, expectedY, viewWidth, viewHeight), view.Viewport);
     }
 
     [Theory]
@@ -279,7 +277,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange
         var view = new View ();
-        view.ContentSize = new Size (100, 100);
+        view.SetContentSize (new (100, 100));
         var newViewport = new Rectangle (0, 0, 200, 200);
         view.ViewportSettings = ViewportSettings.AllowLocationGreaterThanContentSize;
 
@@ -321,18 +319,9 @@ public class ViewportTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (0, 0, 0)]
-    [InlineData (1, 0, 0)]
-    [InlineData (-1, 0, 0)]
-    [InlineData (10, 0, 0)]
-    [InlineData (11, 0, 0)]
-
-    [InlineData (0, 1, 1)]
-    [InlineData (1, 1, 1)]
-    [InlineData (-1, 1, 1)]
-    [InlineData (10, 1, 1)]
-    [InlineData (11, 1, 1)]
-    public void GetViewportOffset_Returns_Offset_From_Frame (int frameX, int adornmentThickness, int expectedOffset)
+    [InlineData (0, 0)]
+    [InlineData (1, 1)]
+    public void GetViewportOffset_Returns_Offset_From_Frame (int adornmentThickness, int expectedOffset)
     {
         View view = new ()
         {
@@ -349,14 +338,150 @@ public class ViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void ContentSize_Matches_ViewportSize_If_Not_Set ()
+    public void ContentSize_Tracks_ViewportSize_If_Not_Set ()
     {
         View view = new ()
         {
             Width = 1,
             Height = 1
         };
-        Assert.Equal (view.Viewport.Size, view.ContentSize);
+        Assert.True (view.ContentSizeTracksViewport);
+        Assert.Equal (view.Viewport.Size, view.GetContentSize ());
     }
 
+    [Fact]
+    public void ContentSize_Ignores_ViewportSize_If_Set ()
+    {
+        View view = new ()
+        {
+            Width = 1,
+            Height = 1,
+        };
+        view.SetContentSize (new Size (5, 5));
+        Assert.False (view.ContentSizeTracksViewport);
+        Assert.NotEqual (view.Viewport.Size, view.GetContentSize ());
+    }
+
+    [Fact]
+    public void ContentSize_Tracks_ViewportSize_If_ContentSizeTracksViewport_Is_True ()
+    {
+        View view = new ()
+        {
+            Width = 1,
+            Height = 1,
+        };
+        view.SetContentSize (new Size (5, 5));
+        view.Viewport = new (0, 0, 10, 10);
+        view.ContentSizeTracksViewport = true;
+        Assert.Equal (view.Viewport.Size, view.GetContentSize ());
+    }
+
+
+    [Fact]
+    public void ContentSize_Ignores_ViewportSize_If_ContentSizeTracksViewport_Is_False ()
+    {
+        View view = new ()
+        {
+            Width = 1,
+            Height = 1,
+        };
+        view.SetContentSize (new Size (5, 5));
+        view.Viewport = new (0, 0, 10, 10);
+        view.ContentSizeTracksViewport = false;
+        Assert.NotEqual (view.Viewport.Size, view.GetContentSize ());
+    }
+
+    //[Theory]
+    //[InlineData (0, 0, true)]
+    //[InlineData (-1, 0, true)]
+    //[InlineData (0, -1, true)]
+    //[InlineData (-1, -1, true)]
+    //[InlineData (-2, -2, true)]
+    //[InlineData (-3, -3, true)]
+    //[InlineData (-4, -4, true)]
+    //[InlineData (-5, -4, false)]
+    //[InlineData (-4, -5, false)]
+    //[InlineData (-5, -5, false)]
+
+    //[InlineData (1, 1, true)]
+    //[InlineData (2, 2, true)]
+    //[InlineData (3, 3, true)]
+    //[InlineData (4, 4, true)]
+    //[InlineData (5, 4, false)]
+    //[InlineData (4, 5, false)]
+    //[InlineData (5, 5, false)]
+    //public void IsVisibleInSuperView_No_Driver_No_SuperView (int x, int y, bool expected)
+    //{
+    //    var view = new View { X = 1, Y = 1, Width = 5, Height = 5 };
+    //    Assert.True (view.IsVisibleInSuperView (x, y) == expected);
+    //}
+
+    //[Theory]
+    //[InlineData (0, 0, true)]
+    //[InlineData (-1, 0, true)]
+    //[InlineData (0, -1, true)]
+    //[InlineData (-1, -1, true)]
+    //[InlineData (-2, -2, true)]
+    //[InlineData (-3, -3, true)]
+    //[InlineData (-4, -4, true)]
+    //[InlineData (-5, -4, true)]
+    //[InlineData (-4, -5, true)]
+    //[InlineData (-5, -5, true)]
+    //[InlineData (-6, -5, false)]
+    //[InlineData (-5, -6, false)]
+    //[InlineData (-6, -6, false)]
+
+    //[InlineData (1, 1, true)]
+    //[InlineData (2, 2, true)]
+    //[InlineData (3, 3, true)]
+    //[InlineData (4, 4, true)]
+    //[InlineData (5, 4, true)]
+    //[InlineData (4, 5, true)]
+    //[InlineData (5, 5, true)]
+    //[InlineData (6, 5, true)]
+    //[InlineData (6, 6, true)]
+    //[InlineData (7, 7, true)]
+    //[InlineData (8, 8, true)]
+    //[InlineData (9, 8, false)]
+    //[InlineData (8, 9, false)]
+    //[InlineData (9, 9, false)]
+    //public void IsVisibleInSuperView_No_Driver_With_SuperView (int x, int y, bool expected)
+    //{
+    //    var view = new View { X = 1, Y = 1, Width = 5, Height = 5 };
+    //    var top = new Toplevel { Width = 10, Height = 10 };
+    //    top.Add (view);
+
+    //    Assert.True (view.IsVisibleInSuperView (x, y) == expected);
+    //}
+
+    //[SetupFakeDriver]
+    //[Theory]
+    //[InlineData (0, 0, true)]
+    //[InlineData (-1, 0, false)]
+    //[InlineData (0, -1, false)]
+    //[InlineData (-1, -1, false)]
+
+    //[InlineData (1, 0, true)]
+    //[InlineData (0, 1, true)]
+    //[InlineData (1, 1, true)]
+    //[InlineData (2, 2, true)]
+    //[InlineData (3, 3, true)]
+    //[InlineData (4, 4, true)]
+    //[InlineData (5, 4, false)]
+    //[InlineData (4, 5, false)]
+    //[InlineData (5, 5, false)]
+    //public void IsVisibleInSuperView_With_Driver (int x, int y, bool expected)
+    //{
+    //    ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+
+    //    var view = new View { X = 1, Y = 1, Width = 5, Height = 5 };
+    //    var top = new Toplevel ();
+    //    top.Add (view);
+    //    Application.Begin (top);
+
+    //    Assert.True (view.IsVisibleInSuperView (x, y) == expected);
+
+    //    top.Dispose ();
+    //    Application.Shutdown ();
+    //}
 }

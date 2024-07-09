@@ -1,12 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
-using static UICatalog.Scenarios.Adornments;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Content Scrolling", "Demonstrates using View.Viewport and View.ContentSize to scroll content.")]
+[ScenarioMetadata ("Content Scrolling", "Demonstrates using View.Viewport and View.GetContentSize () to scroll content.")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Drawing")]
 [ScenarioCategory ("Scrolling")]
@@ -21,12 +20,14 @@ public class ContentScrolling : Scenario
             Width = Dim.Fill ();
             Height = Dim.Fill ();
             ColorScheme = Colors.ColorSchemes ["Base"];
-            Text = "Text (ScrollingDemoView.Text). This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
+
+            Text =
+                "Text (ScrollingDemoView.Text). This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
             CanFocus = true;
             BorderStyle = LineStyle.Rounded;
             Arrangement = ViewArrangement.Fixed;
 
-            ContentSize = new (60, 40);
+            SetContentSize (new (60, 40));
             ViewportSettings |= ViewportSettings.ClearContentOnly;
             ViewportSettings |= ViewportSettings.ClipContentOnly;
 
@@ -45,7 +46,7 @@ public class ContentScrolling : Scenario
 
             // Add a status label to the border that shows Viewport and ContentSize values. Bit of a hack.
             // TODO: Move to Padding with controls
-            Border.Add (new Label { AutoSize = false, X = 20 });
+            Border.Add (new Label { X = 20 });
             LayoutComplete += VirtualDemoView_LayoutComplete;
 
             MouseEvent += VirtualDemoView_MouseEvent;
@@ -86,7 +87,7 @@ public class ContentScrolling : Scenario
 
             if (status is { })
             {
-                status.Title = $"Frame: {Frame}\n\nViewport: {Viewport}, ContentSize = {ContentSize}";
+                status.Title = $"Frame: {Frame}\n\nViewport: {Viewport}, ContentSize = {GetContentSize ()}";
                 status.Width = Border.Frame.Width - status.Frame.X - Border.Thickness.Right;
                 status.Height = Border.Thickness.Top;
             }
@@ -104,15 +105,21 @@ public class ContentScrolling : Scenario
         Window app = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+
+            // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
+            ColorScheme = Colors.ColorSchemes ["Toplevel"]
         };
 
-        var editor = new AdornmentsEditor ();
+        var editor = new AdornmentsEditor
+        {
+            AutoSelectViewToEdit = true
+        };
         app.Add (editor);
 
         var view = new ScrollingDemoView
         {
             Title = "Demo View",
-            X = Pos.Right(editor),
+            X = Pos.Right (editor),
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
@@ -128,12 +135,12 @@ public class ContentScrolling : Scenario
             Y = 0,
             CanFocus = false
         };
-        cbAllowNegativeX.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowNegativeX);
-        cbAllowNegativeX.Toggled += AllowNegativeX_Toggled;
+        cbAllowNegativeX.State = view.ViewportSettings.HasFlag(ViewportSettings.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
+        cbAllowNegativeX.Toggle += AllowNegativeX_Toggle;
 
-        void AllowNegativeX_Toggled (object sender, StateEventArgs<bool?> e)
+        void AllowNegativeX_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
-            if (e.NewValue == true)
+            if (e.NewValue == CheckState.Checked)
             {
                 view.ViewportSettings |= ViewportSettings.AllowNegativeX;
             }
@@ -152,12 +159,12 @@ public class ContentScrolling : Scenario
             Y = 0,
             CanFocus = false
         };
-        cbAllowNegativeY.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowNegativeY);
-        cbAllowNegativeY.Toggled += AllowNegativeY_Toggled;
+        cbAllowNegativeY.State = view.ViewportSettings.HasFlag(ViewportSettings.AllowNegativeY) ? CheckState.Checked : CheckState.UnChecked;
+        cbAllowNegativeY.Toggle += AllowNegativeY_Toggle;
 
-        void AllowNegativeY_Toggled (object sender, StateEventArgs<bool?> e)
+        void AllowNegativeY_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
-            if (e.NewValue == true)
+            if (e.NewValue == CheckState.Checked)
             {
                 view.ViewportSettings |= ViewportSettings.AllowNegativeY;
             }
@@ -175,12 +182,12 @@ public class ContentScrolling : Scenario
             Y = Pos.Bottom (cbAllowNegativeX),
             CanFocus = false
         };
-        cbAllowXGreaterThanContentWidth.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth);
-        cbAllowXGreaterThanContentWidth.Toggled += AllowXGreaterThanContentWidth_Toggled;
+        cbAllowXGreaterThanContentWidth.State = view.ViewportSettings.HasFlag(ViewportSettings.AllowXGreaterThanContentWidth) ? CheckState.Checked : CheckState.UnChecked;
+        cbAllowXGreaterThanContentWidth.Toggle += AllowXGreaterThanContentWidth_Toggle;
 
-        void AllowXGreaterThanContentWidth_Toggled (object sender, StateEventArgs<bool?> e)
+        void AllowXGreaterThanContentWidth_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
-            if (e.NewValue == true)
+            if (e.NewValue == CheckState.Checked)
             {
                 view.ViewportSettings |= ViewportSettings.AllowXGreaterThanContentWidth;
             }
@@ -199,12 +206,12 @@ public class ContentScrolling : Scenario
             Y = Pos.Bottom (cbAllowNegativeX),
             CanFocus = false
         };
-        cbAllowYGreaterThanContentHeight.Checked = view.ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight);
-        cbAllowYGreaterThanContentHeight.Toggled += AllowYGreaterThanContentHeight_Toggled;
+        cbAllowYGreaterThanContentHeight.State = view.ViewportSettings.HasFlag(ViewportSettings.AllowYGreaterThanContentHeight) ? CheckState.Checked : CheckState.UnChecked;
+        cbAllowYGreaterThanContentHeight.Toggle += AllowYGreaterThanContentHeight_Toggle;
 
-        void AllowYGreaterThanContentHeight_Toggled (object sender, StateEventArgs<bool?> e)
+        void AllowYGreaterThanContentHeight_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
-            if (e.NewValue == true)
+            if (e.NewValue == CheckState.Checked)
             {
                 view.ViewportSettings |= ViewportSettings.AllowYGreaterThanContentHeight;
             }
@@ -222,15 +229,15 @@ public class ContentScrolling : Scenario
             Y = Pos.Bottom (cbAllowYGreaterThanContentHeight)
         };
 
-        var contentSizeWidth = new Buttons.NumericUpDown<int>
+        Buttons.NumericUpDown<int> contentSizeWidth = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.Width,
+            Value = view.GetContentSize ().Width,
             X = Pos.Right (labelContentSize) + 1,
             Y = Pos.Top (labelContentSize)
         };
         contentSizeWidth.ValueChanging += ContentSizeWidth_ValueChanged;
 
-        void ContentSizeWidth_ValueChanged (object sender, StateEventArgs<int> e)
+        void ContentSizeWidth_ValueChanged (object sender, CancelEventArgs<int> e)
         {
             if (e.NewValue < 0)
             {
@@ -238,8 +245,8 @@ public class ContentScrolling : Scenario
 
                 return;
             }
-
-            view.ContentSize = view.ContentSize with { Width = e.NewValue };
+            // BUGBUG: set_ContentSize is supposed to be `protected`. 
+            view.SetContentSize (view.GetContentSize () with { Width = e.NewValue });
         }
 
         var labelComma = new Label
@@ -249,16 +256,16 @@ public class ContentScrolling : Scenario
             Y = Pos.Top (labelContentSize)
         };
 
-        var contentSizeHeight = new Buttons.NumericUpDown<int>
+        Buttons.NumericUpDown<int> contentSizeHeight = new Buttons.NumericUpDown<int>
         {
-            Value = view.ContentSize.Height,
+            Value = view.GetContentSize ().Height,
             X = Pos.Right (labelComma) + 1,
             Y = Pos.Top (labelContentSize),
             CanFocus = false
         };
         contentSizeHeight.ValueChanging += ContentSizeHeight_ValueChanged;
 
-        void ContentSizeHeight_ValueChanged (object sender, StateEventArgs<int> e)
+        void ContentSizeHeight_ValueChanged (object sender, CancelEventArgs<int> e)
         {
             if (e.NewValue < 0)
             {
@@ -266,8 +273,8 @@ public class ContentScrolling : Scenario
 
                 return;
             }
-
-            view.ContentSize = view.ContentSize with { Height = e.NewValue };
+            // BUGBUG: set_ContentSize is supposed to be `protected`. 
+            view.SetContentSize (view.GetContentSize () with { Height = e.NewValue });
         }
 
         var cbClearOnlyVisible = new CheckBox
@@ -277,12 +284,12 @@ public class ContentScrolling : Scenario
             Y = Pos.Top (labelContentSize),
             CanFocus = false
         };
-        cbClearOnlyVisible.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClearContentOnly);
-        cbClearOnlyVisible.Toggled += ClearVisibleContentOnly_Toggled;
+        cbClearOnlyVisible.State = view.ViewportSettings.HasFlag(ViewportSettings.ClearContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+        cbClearOnlyVisible.Toggle += ClearVisibleContentOnly_Toggle;
 
-        void ClearVisibleContentOnly_Toggled (object sender, StateEventArgs<bool?> e)
+        void ClearVisibleContentOnly_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
-            if (e.NewValue == true)
+            if (e.NewValue == CheckState.Checked)
             {
                 view.ViewportSettings |= ViewportSettings.ClearContentOnly;
             }
@@ -299,12 +306,12 @@ public class ContentScrolling : Scenario
             Y = Pos.Top (labelContentSize),
             CanFocus = false
         };
-        cbDoNotClipContent.Checked = view.ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly);
-        cbDoNotClipContent.Toggled += ClipVisibleContentOnly_Toggled;
+        cbDoNotClipContent.State = view.ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+        cbDoNotClipContent.Toggle += ClipVisibleContentOnly_Toggle;
 
-        void ClipVisibleContentOnly_Toggled (object sender, StateEventArgs<bool?> e)
+        void ClipVisibleContentOnly_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
-            if (e.NewValue == true)
+            if (e.NewValue == CheckState.Checked)
             {
                 view.ViewportSettings |= ViewportSettings.ClipContentOnly;
             }
@@ -319,7 +326,7 @@ public class ContentScrolling : Scenario
         // Add demo views to show that things work correctly
         var textField = new TextField { X = 20, Y = 7, Width = 15, Text = "Test TextField" };
 
-        var colorPicker = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (11), Y = 10 };
+        var colorPicker = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (), Y = 10 };
         colorPicker.BorderStyle = LineStyle.RoundedDotted;
 
         colorPicker.ColorChanged += (s, e) =>
@@ -349,25 +356,16 @@ public class ContentScrolling : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (textView) + 1,
-            Width = 30,
-            Height = 10
+            Width = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (() => view.GetContentSize ().Width)),
+            Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent (20)),
         };
 
         charMap.Accept += (s, e) =>
                               MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
 
-        var buttonAnchoredRight = new Button
+        var buttonAnchored = new Button
         {
-            X = Pos.AnchorEnd (10), Y = 0, Text = "Button"
-        };
-
-        var labelAnchoredBottomLeft = new Label
-        {
-            AutoSize = false,
-            Y = Pos.AnchorEnd (3),
-            Width = 25,
-            Height = Dim.Fill (),
-            Text = "Label\nY=AnchorEnd(3),Height=Dim.Fill()"
+            X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Bottom Right"
         };
 
         view.Margin.Data = "Margin";
@@ -378,7 +376,7 @@ public class ContentScrolling : Scenario
 
         view.Padding.Data = "Padding";
 
-        view.Add (buttonAnchoredRight, textField, colorPicker, charMap, textView, labelAnchoredBottomLeft);
+        view.Add (buttonAnchored, textField, colorPicker, charMap, textView);
 
         var longLabel = new Label
         {
@@ -390,6 +388,20 @@ public class ContentScrolling : Scenario
         };
         longLabel.TextFormatter.WordWrap = true;
         view.Add (longLabel);
+
+        List<object> options = new () { "Option 1", "Option 2", "Option 3" };
+
+        Slider slider = new (options)
+        {
+            X = 0,
+            Y = Pos.Bottom (textField) + 1,
+            Orientation = Orientation.Vertical,
+            Type = SliderType.Multiple,
+            AllowEmpty = false,
+            BorderStyle = LineStyle.Double,
+            Title = "_Slider"
+        };
+        view.Add (slider);
 
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 

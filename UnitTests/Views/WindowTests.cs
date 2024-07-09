@@ -26,6 +26,7 @@ public class WindowTests
 
         Exception exception = Record.Exception (() => win.NewKeyDownEvent (KeyCode.AltMask));
         Assert.Null (exception);
+        top.Dispose ();
     }
 
     [Fact]
@@ -44,14 +45,7 @@ public class WindowTests
             ]
         };
 
-        var sb = new StatusBar (
-                                new StatusItem []
-                                {
-                                    new ((KeyCode)Key.Q.WithCtrl, "~^Q~ Quit", null),
-                                    new ((KeyCode)Key.O.WithCtrl, "~^O~ Open", null),
-                                    new ((KeyCode)Key.C.WithCtrl, "~^C~ Copy", null)
-                                }
-                               );
+        var sb = new StatusBar ();
 
         var fv = new FrameView { Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1), Title = "Frame View" };
         var win = new Window ();
@@ -71,7 +65,7 @@ public class WindowTests
 ││                ││
 ││                ││
 │└────────────────┘│
-│ ^Q Quit │ ^O Open│
+│                  │
 └──────────────────┘",
                                                       _output
                                                      );
@@ -98,7 +92,7 @@ public class WindowTests
 ││                                    ││
 ││                                    ││
 │└────────────────────────────────────┘│
-│ ^Q Quit │ ^O Open │ ^C Copy          │
+│                                      │
 └──────────────────────────────────────┘",
                                                       _output
                                                      );
@@ -115,10 +109,11 @@ public class WindowTests
 ││                ││
 ││                ││
 │└────────────────┘│
-│ ^Q Quit │ ^O Open│
+│                  │
 └──────────────────┘",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -130,7 +125,6 @@ public class WindowTests
         Assert.Equal (string.Empty, defaultWindow.Title);
 
         // Toplevels have Width/Height set to Dim.Fill
-        Assert.Equal (LayoutStyle.Computed, defaultWindow.LayoutStyle);
 
         // If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
         Assert.Equal ($"Window(){defaultWindow.Frame}", defaultWindow.ToString ());
@@ -156,17 +150,6 @@ public class WindowTests
         using var windowWithFrameRectEmpty = new Window { Frame = Rectangle.Empty, Title = "title" };
         Assert.NotNull (windowWithFrameRectEmpty);
         Assert.Equal ("title", windowWithFrameRectEmpty.Title);
-        Assert.Equal (LayoutStyle.Absolute, windowWithFrameRectEmpty.LayoutStyle);
-        Assert.Equal ("title", windowWithFrameRectEmpty.Title);
-        Assert.Equal (LayoutStyle.Absolute, windowWithFrameRectEmpty.LayoutStyle);
-        // TODO: Fix things so that this works in release and debug
-        // BUG: This also looks like it might be unintended behavior.
-        // Can actually also be removed, since the tests below make it redundant.
-    #if DEBUG
-        Assert.Equal ($"Window(title){windowWithFrameRectEmpty.Frame}", windowWithFrameRectEmpty.ToString ());
-    #else
-        Assert.Equal ($"Window(){windowWithFrameRectEmpty.Frame}", windowWithFrameRectEmpty.ToString ());
-    #endif
         Assert.True (windowWithFrameRectEmpty.CanFocus);
         Assert.False (windowWithFrameRectEmpty.HasFocus);
         Assert.Equal (Rectangle.Empty, windowWithFrameRectEmpty.Viewport);
@@ -178,9 +161,9 @@ public class WindowTests
         Assert.Equal (0, windowWithFrameRectEmpty.Width);
         Assert.Equal (0, windowWithFrameRectEmpty.Height);
         Assert.False (windowWithFrameRectEmpty.IsCurrentTop);
-    #if DEBUG
+#if DEBUG
         Assert.Equal (windowWithFrameRectEmpty.Title, windowWithFrameRectEmpty.Id);
-    #endif
+#endif
         Assert.False (windowWithFrameRectEmpty.WantContinuousButtonPressed);
         Assert.False (windowWithFrameRectEmpty.WantMousePositionReports);
         Assert.Null (windowWithFrameRectEmpty.SuperView);
@@ -193,13 +176,11 @@ public class WindowTests
         windowWithFrame1234.Title = "title";
         Assert.Equal ("title", windowWithFrame1234.Title);
         Assert.NotNull (windowWithFrame1234);
-        Assert.Equal (LayoutStyle.Absolute, windowWithFrame1234.LayoutStyle);
-        Assert.Equal (LayoutStyle.Absolute, windowWithFrame1234.LayoutStyle);
-    #if DEBUG
+#if DEBUG
         Assert.Equal ($"Window(title){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
-    #else
+#else
         Assert.Equal ($"Window(){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
-    #endif
+#endif
         Assert.True (windowWithFrame1234.CanFocus);
         Assert.False (windowWithFrame1234.HasFocus);
         Assert.Equal (new (0, 0, 1, 2), windowWithFrame1234.Viewport);
@@ -211,9 +192,9 @@ public class WindowTests
         Assert.Equal (3, windowWithFrame1234.Width);
         Assert.Equal (4, windowWithFrame1234.Height);
         Assert.False (windowWithFrame1234.IsCurrentTop);
-    #if DEBUG
+#if DEBUG
         Assert.Equal (windowWithFrame1234.Title, windowWithFrame1234.Id);
-    #endif
+#endif
         Assert.False (windowWithFrame1234.WantContinuousButtonPressed);
         Assert.False (windowWithFrame1234.WantMousePositionReports);
         Assert.Null (windowWithFrame1234.SuperView);
@@ -238,5 +219,6 @@ public class WindowTests
         Assert.True (view1.HasFocus);
         Assert.False (win2.HasFocus);
         Assert.False (view2.HasFocus);
+        win1.Dispose ();
     }
 }

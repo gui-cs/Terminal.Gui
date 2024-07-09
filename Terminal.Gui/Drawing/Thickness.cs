@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
@@ -9,31 +10,22 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Use the helper API (<see cref="GetInside(Rectangle)"/> to get the rectangle describing the insides of the frame,
+///         Use the helper API (<see cref="GetInside(Rectangle)"/> to get the rectangle describing the insides of the
+///         frame,
 ///         with the thickness widths subtracted.
 ///     </para>
-///     <para>Use the helper API (<see cref="Draw(Rectangle, string)"/> to draw the frame with the specified thickness.</para>
+///     <para>
+///         Use the helper API (<see cref="Draw(Rectangle, string)"/> to draw the frame with the specified thickness.
+///     </para>
+///     <para>
+///         Thickness uses <see langword="float"/> intenrally. As a result, there is a potential precision loss for very
+///         large numbers. This is typically not an issue for UI dimensions but could be relevant in other contexts.
+///     </para>
 /// </remarks>
-public class Thickness : IEquatable<Thickness>
+public record struct Thickness
 {
-    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
-    [JsonInclude]
-    public int Bottom;
-
-    /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
-    [JsonInclude]
-    public int Left;
-
-    /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
-    [JsonInclude]
-    public int Right;
-
-    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
-    [JsonInclude]
-    public int Top;
-
     /// <summary>Initializes a new instance of the <see cref="Thickness"/> class with all widths set to 0.</summary>
-    public Thickness () { }
+    public Thickness () { _sides = Vector4.Zero; }
 
     /// <summary>Initializes a new instance of the <see cref="Thickness"/> class with a uniform width to each side.</summary>
     /// <param name="width"></param>
@@ -55,68 +47,37 @@ public class Thickness : IEquatable<Thickness>
         Bottom = bottom;
     }
 
-    // TODO: add operator overloads
-    /// <summary>Gets an empty thickness.</summary>
-    public static Thickness Empty => new (0);
+    private Vector4 _sides;
 
     /// <summary>
-    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides
-    ///     of the rectangle to half the specified value.
+    ///     Adds the thickness widths of another <see cref="Thickness"/> to the current <see cref="Thickness"/>, returning a
+    ///     new <see cref="Thickness"/>.
     /// </summary>
-    public int Horizontal
-    {
-        get => Left + Right;
-        set => Left = Right = value / 2;
-    }
-
-    /// <summary>
-    ///     Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom
-    ///     sides of the rectangle to half the specified value.
-    /// </summary>
-    public int Vertical
-    {
-        get => Top + Bottom;
-        set => Top = Bottom = value / 2;
-    }
-
-    // IEquitable
-    /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
     /// <param name="other"></param>
-    /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-    public bool Equals (Thickness other) { return other is { } && Left == other.Left && Right == other.Right && Top == other.Top && Bottom == other.Bottom; }
+    /// <returns></returns>
+    public readonly Thickness Add (Thickness other) { return new (Left + other.Left, Top + other.Top, Right + other.Right, Bottom + other.Bottom); }
+
+    /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
+    [JsonInclude]
+    public int Bottom
+    {
+        get => (int)_sides.W;
+        set => _sides.W = value;
+    }
 
     /// <summary>
-    ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside of
+    ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside
     ///     the rectangle described by <see cref="GetInside(Rectangle)"/>.
     /// </summary>
     /// <param name="outside">Describes the location and size of the rectangle that contains the thickness.</param>
-    /// <param name="x">The x coord to check.</param>
-    /// <param name="y">The y coord to check.</param>
+    /// <param name="location">The coordinate to check.</param>
     /// <returns><see langword="true"/> if the specified coordinate is within the thickness; <see langword="false"/> otherwise.</returns>
-    public bool Contains (Rectangle outside, int x, int y)
+    public bool Contains (in Rectangle outside, in Point location)
     {
         Rectangle inside = GetInside (outside);
 
-        return outside.Contains (x, y) && !inside.Contains (x, y);
+        return outside.Contains (location) && !inside.Contains (location);
     }
-
-    /// <summary>
-    /// Adds the thickness widths of another <see cref="Thickness"/> to the current <see cref="Thickness"/>, returning a new <see cref="Thickness"/>.
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    public Thickness Add (Thickness other)
-    {
-        return new Thickness (Left + other.Left, Top + other.Top, Right + other.Right, Bottom + other.Bottom);
-    }
-
-    /// <summary>
-    /// Adds the thickness widths of another <see cref="Thickness"/> to another <see cref="Thickness"/>.
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
-    public static Thickness operator + (Thickness a, Thickness b) { return a.Add (b); }
 
     /// <summary>Draws the <see cref="Thickness"/> rectangle with an optional diagnostics label.</summary>
     /// <remarks>
@@ -194,7 +155,7 @@ public class Thickness : IEquatable<Thickness>
                                         );
         }
 
-        if (View.Diagnostics.HasFlag(ViewDiagnosticFlags.Ruler))
+        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))
         {
             // PERF: This can almost certainly be simplified down to a single point offset and fewer calls to Draw
             // Top
@@ -232,8 +193,9 @@ public class Thickness : IEquatable<Thickness>
             var tf = new TextFormatter
             {
                 Text = label is null ? string.Empty : $"{label} {this}",
-                Alignment = TextAlignment.Centered,
-                VerticalAlignment = VerticalTextAlignment.Bottom
+                Alignment = Alignment.Center,
+                VerticalAlignment = Alignment.End,
+                AutoSize = true
             };
             tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect);
         }
@@ -241,31 +203,8 @@ public class Thickness : IEquatable<Thickness>
         return GetInside (rect);
     }
 
-    /// <summary>Determines whether the specified object is equal to the current object.</summary>
-    /// <param name="obj">The object to compare with the current object.</param>
-    /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-    public override bool Equals (object obj)
-    {
-        //Check for null and compare run-time types.
-        if (obj is null || !GetType ().Equals (obj.GetType ()))
-        {
-            return false;
-        }
-
-        return Equals ((Thickness)obj);
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode ()
-    {
-        var hashCode = 1380952125;
-        hashCode = hashCode * -1521134295 + Left.GetHashCode ();
-        hashCode = hashCode * -1521134295 + Right.GetHashCode ();
-        hashCode = hashCode * -1521134295 + Top.GetHashCode ();
-        hashCode = hashCode * -1521134295 + Bottom.GetHashCode ();
-
-        return hashCode;
-    }
+    /// <summary>Gets an empty thickness.</summary>
+    public static Thickness Empty => new (0);
 
     /// <summary>
     ///     Returns a rectangle describing the location and size of the inside area of <paramref name="rect"/> with the
@@ -290,23 +229,59 @@ public class Thickness : IEquatable<Thickness>
         return new (x, y, width, height);
     }
 
-    /// <inheritdoc/>
-    public static bool operator == (Thickness left, Thickness right) { return EqualityComparer<Thickness>.Default.Equals (left, right); }
+    /// <summary>
+    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides
+    ///     of the rectangle to half the specified value.
+    /// </summary>
+    public int Horizontal
+    {
+        get => Left + Right;
+        set => Left = Right = value / 2;
+    }
 
-    /// <inheritdoc/>
-    public static bool operator != (Thickness left, Thickness right) { return !(left == right); }
+    /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
+    [JsonInclude]
+    public int Left
+    {
+        get => (int)_sides.X;
+        set => _sides.X = value;
+    }
+
+    /// <summary>
+    ///     Adds the thickness widths of another <see cref="Thickness"/> to another <see cref="Thickness"/>.
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static Thickness operator + (Thickness a, Thickness b) { return a.Add (b); }
+
+    /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
+    [JsonInclude]
+    public int Right
+    {
+        get => (int)_sides.Z;
+        set => _sides.Z = value;
+    }
+
+    /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
+    [JsonInclude]
+    public int Top
+    {
+        get => (int)_sides.Y;
+        set => _sides.Y = value;
+    }
 
     /// <summary>Returns the thickness widths of the Thickness formatted as a string.</summary>
     /// <returns>The thickness widths as a string.</returns>
     public override string ToString () { return $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})"; }
 
-    private int validate (int width)
+    /// <summary>
+    ///     Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom
+    ///     sides of the rectangle to half the specified value.
+    /// </summary>
+    public int Vertical
     {
-        if (width < 0)
-        {
-            throw new ArgumentException ("Thickness widths cannot be negative.");
-        }
-
-        return width;
+        get => Top + Bottom;
+        set => Top = Bottom = value / 2;
     }
 }

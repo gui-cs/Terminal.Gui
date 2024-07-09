@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.</summary>
-public class RadioGroup : View
+public class RadioGroup : View, IDesignable
 {
     private int _cursor;
     private List<(int pos, int length)> _horizontal;
@@ -11,19 +11,26 @@ public class RadioGroup : View
     private int _selected;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     layout.
+    ///     Initializes a new instance of the <see cref="RadioGroup"/> class.
     /// </summary>
     public RadioGroup ()
     {
         CanFocus = true;
+
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content);
 
         // Things this view knows how to do
         AddCommand (
                     Command.LineUp,
                     () =>
                     {
-                        MoveUp ();
+                        if (!HasFocus)
+                        {
+                            return false;
+                        }
+
+                        MoveUpLeft ();
 
                         return true;
                     }
@@ -33,7 +40,11 @@ public class RadioGroup : View
                     Command.LineDown,
                     () =>
                     {
-                        MoveDown ();
+                        if (!HasFocus)
+                        {
+                            return false;
+                        }
+                        MoveDownRight ();
 
                         return true;
                     }
@@ -43,6 +54,10 @@ public class RadioGroup : View
                     Command.TopHome,
                     () =>
                     {
+                        if (!HasFocus)
+                        {
+                            return false;
+                        }
                         MoveHome ();
 
                         return true;
@@ -53,6 +68,10 @@ public class RadioGroup : View
                     Command.BottomEnd,
                     () =>
                     {
+                        if (!HasFocus)
+                        {
+                            return false;
+                        }
                         MoveEnd ();
 
                         return true;
@@ -63,35 +82,67 @@ public class RadioGroup : View
                     Command.Accept,
                     () =>
                     {
-                        SelectItem ();
-                        return !OnAccept ();
+                        SelectedItem = _cursor;
+
+                        return OnAccept () is true or null;
                     }
                    );
 
-        // Default keybindings for this view
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
-        KeyBindings.Add (Key.Home, Command.TopHome);
-        KeyBindings.Add (Key.End, Command.BottomEnd);
-        KeyBindings.Add (Key.Space, Command.Accept);
+        AddCommand (
+                    Command.HotKey,
+                    ctx =>
+                    {
+                        SetFocus ();
+                        if (ctx.KeyBinding?.Context is { } && (int)ctx.KeyBinding?.Context! < _radioLabels.Count)
+                        {
+                            SelectedItem = (int)ctx.KeyBinding?.Context!;
+
+                            return OnAccept () is true or null;
+                        }
+
+                        return true;
+                    });
+
+        SetupKeyBindings ();
 
         LayoutStarted += RadioGroup_LayoutStarted;
 
-        HighlightStyle = Gui.HighlightStyle.PressedOutside | Gui.HighlightStyle.Pressed;
+        HighlightStyle = HighlightStyle.PressedOutside | HighlightStyle.Pressed;
 
         MouseClick += RadioGroup_MouseClick;
     }
 
     // TODO: Fix InvertColorsOnPress - only highlight the selected item
 
+    private void SetupKeyBindings ()
+    {
+        KeyBindings.Clear ();
+
+        // Default keybindings for this view
+        if (Orientation == Orientation.Vertical)
+        {
+            KeyBindings.Add (Key.CursorUp, Command.LineUp);
+            KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        }
+        else
+        {
+            KeyBindings.Add (Key.CursorLeft, Command.LineUp);
+            KeyBindings.Add (Key.CursorRight, Command.LineDown);
+        }
+
+        KeyBindings.Add (Key.Home, Command.TopHome);
+        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Space, Command.Accept);
+    }
+
     private void RadioGroup_MouseClick (object sender, MouseEventEventArgs e)
     {
         SetFocus ();
 
-        int boundsX = e.MouseEvent.X;
-        int boundsY = e.MouseEvent.Y;
+        int viewportX = e.MouseEvent.Position.X;
+        int viewportY = e.MouseEvent.Position.Y;
 
-        int pos = _orientation == Orientation.Horizontal ? boundsX : boundsY;
+        int pos = _orientation == Orientation.Horizontal ? viewportX : viewportY;
 
         int rCount = _orientation == Orientation.Horizontal
                          ? _horizontal.Last ().pos + _horizontal.Last ().length
@@ -100,8 +151,8 @@ public class RadioGroup : View
         if (pos < rCount)
         {
             int c = _orientation == Orientation.Horizontal
-                        ? _horizontal.FindIndex (x => x.pos <= boundsX && x.pos + x.length - 2 >= boundsX)
-                        : boundsY;
+                        ? _horizontal.FindIndex (x => x.pos <= viewportX && x.pos + x.length - 2 >= viewportX)
+                        : viewportY;
 
             if (c > -1)
             {
@@ -125,9 +176,8 @@ public class RadioGroup : View
             if (_horizontalSpace != value && _orientation == Orientation.Horizontal)
             {
                 _horizontalSpace = value;
-                SetWidthHeight (_radioLabels);
                 UpdateTextFormatterText ();
-                SetNeedsDisplay ();
+                SetContentSize ();
             }
         }
     }
@@ -143,7 +193,7 @@ public class RadioGroup : View
     }
 
     /// <summary>
-    ///     The radio labels to display. A key binding will be added for each radio radio enabling the user to select
+    ///     The radio labels to display. A key binding will be added for each radio enabling the user to select
     ///     and/or focus the radio label using the keyboard. See <see cref="View.HotKey"/> for details on how HotKeys work.
     /// </summary>
     /// <value>The radio labels.</value>
@@ -164,21 +214,18 @@ public class RadioGroup : View
             int prevCount = _radioLabels.Count;
             _radioLabels = value.ToList ();
 
-            foreach (string label in _radioLabels)
+            for (var index = 0; index < _radioLabels.Count; index++)
             {
+                string label = _radioLabels [index];
+
                 if (TextFormatter.FindHotKey (label, HotKeySpecifier, out _, out Key hotKey))
                 {
-                    AddKeyBindingsForHotKey (Key.Empty, hotKey);
+                    AddKeyBindingsForHotKey (Key.Empty, hotKey, index);
                 }
             }
 
-            if (IsInitialized && prevCount != _radioLabels.Count)
-            {
-                SetWidthHeight (_radioLabels);
-            }
-
             SelectedItem = 0;
-            SetNeedsDisplay ();
+            SetContentSize ();
         }
     }
 
@@ -276,47 +323,6 @@ public class RadioGroup : View
         }
     }
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key keyEvent)
-    {
-        // This is a bit of a hack. We want to handle the key bindings for the radio group but
-        // InvokeKeyBindings doesn't pass any context so we can't tell if the key binding is for
-        // the radio group or for one of the radio buttons. So before we call the base class
-        // we set SelectedItem appropriately.
-
-        Key key = keyEvent;
-
-        if (KeyBindings.TryGet (key, out _))
-        {
-            // Search RadioLabels 
-            for (var i = 0; i < _radioLabels.Count; i++)
-            {
-                if (TextFormatter.FindHotKey (
-                                              _radioLabels [i],
-                                              HotKeySpecifier,
-                                              out _,
-                                              out Key hotKey,
-                                              true
-                                             )
-                    && key.NoAlt.NoCtrl.NoShift == hotKey)
-                {
-                    SelectedItem = i;
-                    break;
-                }
-            }
-        }
-
-        return base.OnInvokingKeyBindings (keyEvent);
-    }
-
     /// <summary>Called when the view orientation has changed. Invokes the <see cref="OrientationChanged"/> event.</summary>
     /// <param name="newOrientation"></param>
     /// <returns>True of the event was cancelled.</returns>
@@ -328,7 +334,8 @@ public class RadioGroup : View
         if (!args.Cancel)
         {
             _orientation = newOrientation;
-            SetNeedsLayout ();
+            SetupKeyBindings ();
+            SetContentSize ();
         }
 
         return args.Cancel;
@@ -339,9 +346,13 @@ public class RadioGroup : View
     /// <param name="selectedItem"></param>
     /// <param name="previousSelectedItem"></param>
     public virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem)
-    {
+    { 
+        if (_selected == selectedItem)
+        {
+            return;
+        }
         _selected = selectedItem;
-        SelectedItemChanged?.Invoke (this, new SelectedItemChangedArgs (selectedItem, previousSelectedItem));
+        SelectedItemChanged?.Invoke (this, new (selectedItem, previousSelectedItem));
     }
 
     /// <summary>
@@ -351,19 +362,29 @@ public class RadioGroup : View
     public event EventHandler<OrientationEventArgs> OrientationChanged;
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
+        var x = 0;
+        var y = 0;
+
         switch (Orientation)
         {
             case Orientation.Vertical:
-                Move (0, _cursor);
+                y = _cursor;
 
                 break;
             case Orientation.Horizontal:
-                Move (_horizontal [_cursor].pos, 0);
+                x = _horizontal [_cursor].pos;
 
                 break;
+
+            default:
+                return null;
         }
+
+        Move (x, y);
+
+        return null; // Don't show the cursor
     }
 
     /// <summary>Allow to invoke the <see cref="SelectedItemChanged"/> after their creation.</summary>
@@ -373,42 +394,7 @@ public class RadioGroup : View
     /// <summary>Invoked when the selected radio label has changed.</summary>
     public event EventHandler<SelectedItemChangedArgs> SelectedItemChanged;
 
-    private void CalculateHorizontalPositions ()
-    {
-        if (_orientation == Orientation.Horizontal)
-        {
-            _horizontal = new List<(int pos, int length)> ();
-            var start = 0;
-            var length = 0;
-
-            for (var i = 0; i < _radioLabels.Count; i++)
-            {
-                start += length;
-
-                length = _radioLabels [i].GetColumns () + 2 + (i < _radioLabels.Count - 1 ? _horizontalSpace : 0);
-                _horizontal.Add ((start, length));
-            }
-        }
-    }
-
-    private static Rectangle MakeRect (int x, int y, List<string> radioLabels)
-    {
-        if (radioLabels is null)
-        {
-            return new (x, y, 0, 0);
-        }
-
-        var width = 0;
-
-        foreach (string s in radioLabels)
-        {
-            width = Math.Max (s.GetColumns () + 2, width);
-        }
-
-        return new (x, y, width, radioLabels.Count);
-    }
-
-    private void MoveDown ()
+    private void MoveDownRight ()
     {
         if (_cursor + 1 < _radioLabels.Count)
         {
@@ -425,7 +411,7 @@ public class RadioGroup : View
     private void MoveEnd () { _cursor = Math.Max (_radioLabels.Count - 1, 0); }
     private void MoveHome () { _cursor = 0; }
 
-    private void MoveUp ()
+    private void MoveUpLeft ()
     {
         if (_cursor > 0)
         {
@@ -439,40 +425,47 @@ public class RadioGroup : View
         }
     }
 
-    private void RadioGroup_LayoutStarted (object sender, EventArgs e) { SetWidthHeight (_radioLabels); }
-    private void SelectItem () { SelectedItem = _cursor; }
+    private void RadioGroup_LayoutStarted (object sender, EventArgs e) { SetContentSize (); }
 
-    private void SetWidthHeight (List<string> radioLabels)
+    private void SetContentSize ()
     {
         switch (_orientation)
         {
             case Orientation.Vertical:
-                Rectangle r = MakeRect (0, 0, radioLabels);
+                var width = 0;
 
-                if (IsInitialized)
+                foreach (string s in _radioLabels)
                 {
-                    Width = r.Width + GetAdornmentsThickness ().Horizontal;
-                    Height = radioLabels.Count + GetAdornmentsThickness ().Vertical;
+                    width = Math.Max (s.GetColumns () + 2, width);
                 }
+
+                SetContentSize (new (width, _radioLabels.Count));
 
                 break;
 
             case Orientation.Horizontal:
-                CalculateHorizontalPositions ();
+                _horizontal = new ();
+                var start = 0;
                 var length = 0;
 
-                foreach ((int pos, int length) item in _horizontal)
+                for (var i = 0; i < _radioLabels.Count; i++)
                 {
-                    length += item.length;
+                    start += length;
+
+                    length = _radioLabels [i].GetColumns () + 2 + (i < _radioLabels.Count - 1 ? _horizontalSpace : 0);
+                    _horizontal.Add ((start, length));
                 }
 
-                if (IsInitialized)
-                {
-                    Width = length + GetAdornmentsThickness ().Vertical;
-                    Height = 1 + GetAdornmentsThickness ().Horizontal;
-                }
+                SetContentSize (new (_horizontal.Sum (item => item.length), 1));
 
                 break;
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        RadioLabels = new [] { "Option _1", "Option _2", "Option _3" };
+        return true;
     }
 }

@@ -32,7 +32,7 @@ namespace Terminal.Gui;
 /// var secondStep = new WizardStep ("Second Step");
 /// wizard.AddStep(secondStep);
 /// secondStep.HelpText = "This is the help text for the Second Step.";
-/// var lbl = new Label () { Text = "Name:",  AutoSize = true };
+/// var lbl = new Label () { Text = "Name:" };
 /// secondStep.Add(lbl);
 /// 
 /// var name = new TextField { X = Pos.Right (lbl) + 1, Width = Dim.Fill () - 1 };
@@ -54,28 +54,10 @@ public class Wizard : Dialog
     private readonly LinkedList<WizardStep> _steps = new ();
     private WizardStep _currentStep;
     private bool _finishedPressed;
-
-    ///// <summary>
-    ///// The title of the Wizard, shown at the top of the Wizard with " - currentStep.Title" appended.
-    ///// </summary>
-    ///// <remarks>
-    ///// The Title is only displayed when the <see cref="Wizard"/> <see cref="Wizard.Modal"/> is set to <c>false</c>.
-    ///// </remarks>
-    //public new string Title {
-    //	get {
-    //		// The base (Dialog) Title holds the full title ("Wizard Title - Step Title")
-    //		return base.Title;
-    //	}
-    //	set {
-    //		wizardTitle = value;
-    //		base.Title = $"{wizardTitle}{(steps.Count > 0 && currentStep is { } ? " - " + currentStep.Title : string.Empty)}";
-    //	}
-    //}
     private string _wizardTitle = string.Empty;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="Wizard"/> class.
     /// </summary>
     /// <remarks>
     ///     The Wizard will be vertically and horizontally centered in the container. After initialization use <c>X</c>,
@@ -83,9 +65,9 @@ public class Wizard : Dialog
     /// </remarks>
     public Wizard ()
     {
-        // Using Justify causes the Back and Next buttons to be hard justified against
-        // the left and right edge
-        ButtonAlignment = ButtonAlignments.Justify;
+        // TODO: LastEndRestStart will enable a "Quit" button to always appear at the far left
+        ButtonAlignment = Alignment.Start;
+        ButtonAlignmentModes |= AlignmentModes.IgnoreFirstOrLast;
         BorderStyle = LineStyle.Double;
 
         //// Add a horiz separator
@@ -93,10 +75,10 @@ public class Wizard : Dialog
         Add (separator);
 
         // BUGBUG: Space is to work around https://github.com/gui-cs/Terminal.Gui/issues/1812
-        BackButton = new Button { AutoSize = true, Text = Strings.wzBack };
+        BackButton = new () { Text = Strings.wzBack };
         AddButton (BackButton);
 
-        NextFinishButton = new Button { AutoSize = true, Text = Strings.wzFinish };
+        NextFinishButton = new () { Text = Strings.wzFinish };
         NextFinishButton.IsDefault = true;
         AddButton (NextFinishButton);
 
@@ -143,7 +125,7 @@ public class Wizard : Dialog
     ///             <description>Add the Wizard to a containing view with <see cref="View.Add(View)"/>.</description>
     ///         </item>
     ///     </list>
-    ///     If a non-Modal Wizard is added to the application after <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/> has
+    ///     If a non-Modal Wizard is added to the application after <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> has
     ///     been called the first step must be explicitly set by setting <see cref="CurrentStep"/> to
     ///     <see cref="GetNextStep()"/>:
     ///     <code>
@@ -417,10 +399,10 @@ public class Wizard : Dialog
         {
             if (key == Key.Esc)
             {
-                    var args = new WizardButtonEventArgs ();
-                    Cancelled?.Invoke (this, args);
+                var args = new WizardButtonEventArgs ();
+                Cancelled?.Invoke (this, args);
 
-                    return false;
+                return false;
             }
         }
 
@@ -580,11 +562,11 @@ public class Wizard : Dialog
         // gets the first step if CurrentStep == null
     }
 
-    private void Wizard_TitleChanged (object sender, StateEventArgs<string> e)
+    private void Wizard_TitleChanged (object sender, EventArgs<string> e)
     {
         if (string.IsNullOrEmpty (_wizardTitle))
         {
-            _wizardTitle = e.NewValue;
+            _wizardTitle = e.CurrentValue;
         }
     }
 }

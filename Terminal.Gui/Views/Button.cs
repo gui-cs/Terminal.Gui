@@ -5,6 +5,8 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
+using System.Text.Json.Serialization;
+
 namespace Terminal.Gui;
 
 /// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="View.Accept"/> event.</summary>
@@ -25,7 +27,7 @@ namespace Terminal.Gui;
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
 /// </remarks>
-public class Button : View
+public class Button : View, IDesignable
 {
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
@@ -33,27 +35,34 @@ public class Button : View
     private readonly Rune _rightDefault;
     private bool _isDefault;
 
-    /// <summary>Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
-    /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
+    /// <summary>
+    /// Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+
+    /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
     {
-        TextAlignment = TextAlignment.Centered;
-        VerticalTextAlignment = VerticalTextAlignment.Middle;
+        TextAlignment = Alignment.Center;
+        VerticalTextAlignment = Alignment.Center;
 
         _leftBracket = Glyphs.LeftBracket;
         _rightBracket = Glyphs.RightBracket;
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
-        // Ensures a height of 1 if AutoSize is set to false
-        Height = 1;
+        Height = Dim.Auto (DimAutoStyle.Text);
+        Width = Dim.Auto (DimAutoStyle.Text);
 
         CanFocus = true;
-        AutoSize = true;
         HighlightStyle |= HighlightStyle.Pressed;
 #if HOVER
         HighlightStyle |= HighlightStyle.Hover;
 #endif
+
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>
         {
@@ -66,6 +75,8 @@ public class Button : View
 
         TitleChanged += Button_TitleChanged;
         MouseClick += Button_MouseClick;
+
+        ShadowStyle = DefaultShadow;
     }
 
     private bool _wantContinuousButtonPressed;
@@ -96,12 +107,12 @@ public class Button : View
 
     private void Button_MouseClick (object sender, MouseEventEventArgs e)
     {
-       e.Handled = InvokeCommand (Command.HotKey) == true;
+        e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
-    private void Button_TitleChanged (object sender, StateEventArgs<string> e)
+    private void Button_TitleChanged (object sender, EventArgs<string> e)
     {
-        base.Text = e.NewValue;
+        base.Text = e.CurrentValue;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
@@ -139,15 +150,7 @@ public class Button : View
     public bool NoPadding { get; set; }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (HotKey.IsValid && Text != "")
         {
@@ -156,13 +159,12 @@ public class Button : View
                 if (TextFormatter.Text [i] == Text [0])
                 {
                     Move (i, 0);
-
-                    return;
+                    return null; // Don't show the cursor
                 }
             }
         }
 
-        base.PositionCursor ();
+        return base.PositionCursor ();
     }
 
     /// <inheritdoc/>
@@ -187,5 +189,13 @@ public class Button : View
                 TextFormatter.Text = $"{_leftBracket} {Text} {_rightBracket}";
             }
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        Title = "_Button";
+
+        return true;
     }
 }

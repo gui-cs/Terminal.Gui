@@ -9,10 +9,8 @@ namespace Terminal.Gui;
 public class TextField : View
 {
     private readonly HistoryText _historyText;
-    private readonly CursorVisibility _savedCursorVisibility;
     private CultureInfo _currentCulture;
     private int _cursorPosition;
-    private CursorVisibility _desiredCursorVisibility;
     private bool _isButtonPressed;
     private bool _isButtonReleased;
     private bool _isDrawing;
@@ -21,34 +19,29 @@ public class TextField : View
     private string _selectedText;
     private int _start;
     private List<Rune> _text;
-    private CursorVisibility _visibility;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="TextField"/> class.
     /// </summary>
     public TextField ()
     {
         _historyText = new HistoryText ();
-        _desiredCursorVisibility = CursorVisibility.Default;
         _isButtonReleased = true;
         _selectedStart = -1;
         _text = new List<Rune> ();
         CaptionColor = new Color (Color.DarkGray);
         ReadOnly = false;
         Autocomplete = new TextFieldAutocomplete ();
-        Height = 1;
+        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
         Used = true;
         WantMousePositionReports = true;
-        _savedCursorVisibility = _desiredCursorVisibility;
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
         Initialized += TextField_Initialized;
-
-        LayoutComplete += TextField_LayoutComplete;
 
         // Things this view knows how to do
         AddCommand (
@@ -341,9 +334,9 @@ public class TextField : View
                     }
                    );
 
-        // OnAccept returns true if the event is canceled.
-        // By Default pressing ENTER should be ignored (Invoke(Command.Accept) should return false).
-        AddCommand (Command.Accept, () => OnAccept () != true);
+        // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
+        // event was fired and set Cancel = true.
+        AddCommand (Command.Accept, () => OnAccept () == false);
 
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
@@ -469,21 +462,6 @@ public class TextField : View
         }
     }
 
-    /// <summary>Get / Set the wished cursor when the field is focused</summary>
-    public CursorVisibility DesiredCursorVisibility
-    {
-        get => _desiredCursorVisibility;
-        set
-        {
-            if ((_desiredCursorVisibility != value || _visibility != value) && HasFocus)
-            {
-                Application.Driver.SetCursorVisibility (value);
-            }
-
-            _desiredCursorVisibility = _visibility = value;
-        }
-    }
-
     /// <summary>
     ///     Indicates whatever the text has history changes or not. <see langword="true"/> if the text has history changes
     ///     <see langword="false"/> otherwise.
@@ -554,9 +532,11 @@ public class TextField : View
                 return;
             }
 
-            StateEventArgs<string> newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
+            string newText = value.Replace ("\t", "").Split ("\n") [0];
+            CancelEventArgs<string> args = new (ref oldText, ref newText);
+            OnTextChanging (args);
 
-            if (newText.Cancel)
+            if (args.Cancel)
             {
                 if (_cursorPosition > _text.Count)
                 {
@@ -567,7 +547,9 @@ public class TextField : View
             }
 
             ClearAllSelection ();
-            _text = newText.NewValue.EnumerateRunes ().ToList ();
+
+            // Note we use NewValue here; TextChanging subscribers may have changed it
+            _text = args.NewValue.EnumerateRunes ().ToList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {
@@ -583,7 +565,7 @@ public class TextField : View
                                  );
             }
 
-            OnTextChanged (oldText, StringExtensions.ToString (_text));
+            OnTextChanged ();
 
             ProcessAutocomplete ();
 
@@ -776,11 +758,11 @@ public class TextField : View
     {
         foreach (char ch in toAdd)
         {
-            KeyCode key;
+            Key key;
 
             try
             {
-                key = (KeyCode)ch;
+                key = ch;
             }
             catch (Exception)
             {
@@ -789,7 +771,7 @@ public class TextField : View
                                             );
             }
 
-            InsertText (new Key { KeyCode = key }, useOldCursorPos);
+            InsertText (key, useOldCursorPos);
         }
     }
 
@@ -839,7 +821,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent ev)
+    protected internal override bool OnMouseEvent (MouseEvent ev)
     {
         if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed)
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
@@ -951,7 +933,7 @@ public class TextField : View
             ShowContextMenu ();
         }
 
-        SetNeedsDisplay ();
+        //SetNeedsDisplay ();
 
         return true;
 
@@ -1056,18 +1038,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
-        }
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key a)
+    public override bool? OnInvokingKeyBindings (Key a, KeyBindingScope scope)
     {
         // Give autocomplete first opportunity to respond to key presses
         if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a))
@@ -1075,7 +1046,7 @@ public class TextField : View
             return true;
         }
 
-        return base.OnInvokingKeyBindings (a);
+        return base.OnInvokingKeyBindings (a, scope);
     }
 
     /// <inheritdoc/>
@@ -1134,14 +1105,13 @@ public class TextField : View
     }
 
     /// <summary>Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.</summary>
-    /// <param name="newText">The new text to be replaced.</param>
-    /// <returns>Returns the <see cref="StringEventArgs"/></returns>
-    public virtual StateEventArgs<string> OnTextChanging (string newText)
+    /// <param name="args">The event arguments..</param>
+    /// <returns><see langword="true"/> if the event was cancelled.</returns>
+    public bool OnTextChanging (CancelEventArgs<string> args)
     {
-        StateEventArgs<string> ev = new (string.Empty, newText);
-        TextChanging?.Invoke (this, ev);
+        TextChanging?.Invoke (this, args);
 
-        return ev;
+        return args.Cancel;
     }
 
     /// <summary>Paste the selected text from the clipboard.</summary>
@@ -1172,13 +1142,8 @@ public class TextField : View
     }
 
     /// <summary>Sets the cursor position.</summary>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
-        if (!IsInitialized)
-        {
-            return;
-        }
-
         ProcessAutocomplete ();
 
         var col = 0;
@@ -1195,31 +1160,8 @@ public class TextField : View
         }
 
         int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
-        int offB = OffSetBackground ();
-        Rectangle containerFrame = SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle);
-        Rectangle thisFrame = ViewportToScreen (Viewport);
-
-        if (pos > -1
-            && col >= pos
-            && pos < Frame.Width + offB
-            && containerFrame.IntersectsWith (thisFrame))
-        {
-            RestoreCursorVisibility ();
-            Move (col, 0);
-        }
-        else
-        {
-            HideCursorVisibility ();
-
-            if (pos < 0)
-            {
-                Move (pos, 0);
-            }
-            else
-            {
-                Move (pos - offB, 0);
-            }
-        }
+        Move (pos, 0);
+        return new Point (pos, 0);
     }
 
     /// <summary>Redoes the latest changes.</summary>
@@ -1231,21 +1173,6 @@ public class TextField : View
         }
 
         _historyText.Redo ();
-
-        //if (string.IsNullOrEmpty (Clipboard.Contents))
-        //	return true;
-        //var clip = TextModel.ToRunes (Clipboard.Contents);
-        //if (clip is null)
-        //	return true;
-
-        //if (point == text.Count) {
-        //	point = text.Count;
-        //	SetText(text.Concat(clip).ToList());
-        //} else {
-        //	point += clip.Count;
-        //	SetText(text.GetRange(0, oldCursorPos).Concat(clip).Concat(text.GetRange(oldCursorPos, text.Count - oldCursorPos)));
-        //}
-        //Adjust ();
     }
 
     /// <summary>Selects all text.</summary>
@@ -1271,7 +1198,7 @@ public class TextField : View
     //public event EventHandler<StateEventArgs<string>> TextChanged;
 
     /// <summary>Changing event, raised before the <see cref="Text"/> changes and can be canceled or changing the new text.</summary>
-    public event EventHandler<StateEventArgs<string>> TextChanging;
+    public event EventHandler<CancelEventArgs<string>> TextChanging;
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()
@@ -1301,6 +1228,10 @@ public class TextField : View
         {
             return;
         }
+
+        // TODO: This is a lame prototype proving it should be easy for TextField to 
+        // TODO: support Width = Dim.Auto (DimAutoStyle: Content).
+        //SetContentSize(new (TextModel.DisplaySize (_text).size, 1));
 
         int offB = OffSetBackground ();
         bool need = NeedsDisplay || !Used;
@@ -1463,14 +1394,6 @@ public class TextField : View
         }
 
         return new Attribute (cs.Disabled.Foreground, cs.Focus.Background);
-    }
-
-    private void HideCursorVisibility ()
-    {
-        if (_desiredCursorVisibility != CursorVisibility.Invisible)
-        {
-            DesiredCursorVisibility = CursorVisibility.Invisible;
-        }
     }
 
     private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
@@ -1761,7 +1684,7 @@ public class TextField : View
 
     private int PositionCursor (MouseEvent ev)
     {
-        return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.X), false);
+        return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.Position.X), false);
     }
 
     private int PositionCursor (int x, bool getX = true)
@@ -1886,16 +1809,6 @@ public class TextField : View
         Driver.AddStr (render);
     }
 
-    private void RestoreCursorVisibility ()
-    {
-        Application.Driver.GetCursorVisibility (out _visibility);
-
-        if (_desiredCursorVisibility != _savedCursorVisibility || _visibility != _savedCursorVisibility)
-        {
-            DesiredCursorVisibility = _savedCursorVisibility;
-        }
-    }
-
     private void SetClipboard (IEnumerable<Rune> text)
     {
         if (!Secret)
@@ -1948,15 +1861,6 @@ public class TextField : View
 
         Autocomplete.HostControl = this;
         Autocomplete.PopupInsideContainer = false;
-    }
-
-    private void TextField_LayoutComplete (object sender, LayoutEventArgs e)
-    {
-        // Don't let height > 1
-        if (Frame.Height > 1)
-        {
-            Height = 1;
-        }
     }
 }
 

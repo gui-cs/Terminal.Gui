@@ -79,7 +79,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
         var loginProgressLabel = new Label
         {
-            AutoSize = false,  X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Width = 40, Height = 1, Text = idle
+            X = Pos.Left (previous), Y = Pos.Top (previous) + 1, Width = 40, Height = 1, Text = idle
         };
 
         ViewModel

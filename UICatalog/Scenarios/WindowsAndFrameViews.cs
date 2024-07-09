@@ -8,8 +8,15 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Layout")]
 public class WindowsAndFrameViews : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
+
         static int About ()
         {
             return MessageBox.Query (
@@ -26,11 +33,7 @@ public class WindowsAndFrameViews : Scenario
         // list of Windows we create
         List<View> listWin = new ();
 
-        //Ignore the Win that UI Catalog created and create a new one
-        Top.Remove (Win);
-        Win?.Dispose ();
-
-        Win = new Window
+        var win = new Window
         {
             Title = $"{listWin.Count} - Scenario: {GetName ()}",
             X = Pos.Center (),
@@ -39,8 +42,8 @@ public class WindowsAndFrameViews : Scenario
             Height = 10,
             ColorScheme = Colors.ColorSchemes ["Dialog"]
         };
-        Win.Padding.Thickness = new Thickness (padding);
-        Win.Margin.Thickness = new Thickness (margin);
+        win.Padding.Thickness = new (padding);
+        win.Margin.Thickness = new (margin);
 
         var paddingButton = new Button
         {
@@ -50,21 +53,21 @@ public class WindowsAndFrameViews : Scenario
             Text = $"Padding of container is {padding}"
         };
         paddingButton.Accept += (s, e) => About ();
-        Win.Add (paddingButton);
+        win.Add (paddingButton);
 
-        Win.Add (
+        win.Add (
                  new Button
                  {
                      X = Pos.Center (),
-                     Y = Pos.AnchorEnd (1),
+                     Y = Pos.AnchorEnd (),
                      ColorScheme = Colors.ColorSchemes ["Error"],
                      Text = "Press ME! (Y = Pos.AnchorEnd(1))"
                  }
                 );
-        Top.Add (Win);
+        app.Add (win);
 
         // add it to our list
-        listWin.Add (Win);
+        listWin.Add (win);
 
         // create 3 more Windows in a loop, adding them Application.Top
         // Each with a
@@ -75,9 +78,9 @@ public class WindowsAndFrameViews : Scenario
         // 
         for (var pad = 0; pad < 3; pad++)
         {
-            Window win = null;
+            Window loopWin = null;
 
-            win = new Window
+            loopWin = new()
             {
                 Title = $"{listWin.Count} - Window Loop - padding = {pad}",
                 X = margin,
@@ -85,9 +88,9 @@ public class WindowsAndFrameViews : Scenario
                 Width = Dim.Fill (margin),
                 Height = contentHeight + pad * 2 + 2
             };
-            win.Padding.Thickness = new Thickness (pad);
+            loopWin.Padding.Thickness = new (pad);
 
-            win.ColorScheme = Colors.ColorSchemes ["Dialog"];
+            loopWin.ColorScheme = Colors.ColorSchemes ["Dialog"];
 
             var pressMeButton = new Button
             {
@@ -95,8 +98,8 @@ public class WindowsAndFrameViews : Scenario
             };
 
             pressMeButton.Accept += (s, e) =>
-                                         MessageBox.ErrorQuery (win.Title, "Neat?", "Yes", "No");
-            win.Add (pressMeButton);
+                                        MessageBox.ErrorQuery (loopWin.Title, "Neat?", "Yes", "No");
+            loopWin.Add (pressMeButton);
 
             var subWin = new Window
             {
@@ -110,15 +113,15 @@ public class WindowsAndFrameViews : Scenario
             };
 
             subWin.Add (
-                        new TextField { Y = 1, ColorScheme = Colors.ColorSchemes ["Error"], Text = "Edit me! " + win.Title }
+                        new TextField { Y = 1, ColorScheme = Colors.ColorSchemes ["Error"], Text = "Edit me! " + loopWin.Title }
                        );
-            win.Add (subWin);
+            loopWin.Add (subWin);
 
             var frameView = new FrameView
             {
                 X = Pos.Percent (50),
                 Y = 1,
-                Width = Dim.Percent (100, true), // Or Dim.Percent (50)
+                Width = Dim.Percent (100, DimPercentMode.Position), // Or Dim.Percent (50)
                 Height = 5,
                 ColorScheme = Colors.ColorSchemes ["Base"],
                 Text = "The Text in the FrameView",
@@ -128,27 +131,15 @@ public class WindowsAndFrameViews : Scenario
             frameView.Add (
                            new TextField { Y = 1, Text = "Edit Me!" }
                           );
-            win.Add (frameView);
+            loopWin.Add (frameView);
 
-            Top.Add (win);
-            listWin.Add (win);
+            app.Add (loopWin);
+            listWin.Add (loopWin);
         }
 
-        // Add a FrameView (frame) to Application.Top
-        // Position it at Bottom, using the list of Windows we created above.
-        // Fill it with
-        //   a label
-        //   a SubWindow containing (subWinofFV)
-        //      a TextField
-        //	    two checkboxes
-        //   a Sub FrameView containing (subFrameViewofFV)
-        //      a TextField
-        //      two CheckBoxes	
-        //   a checkbox
-        //   a checkbox
         FrameView frame = null;
 
-        frame = new FrameView
+        frame = new()
         {
             X = margin,
             Y = Pos.Bottom (listWin.Last ()) + margin / 2,
@@ -199,22 +190,23 @@ public class WindowsAndFrameViews : Scenario
 
         subFrameViewofFV.Add (new CheckBox { Y = 1, Text = "Check me" });
 
-        // BUGBUG: This checkbox is not shown even though frameViewFV has 3 rows in 
-        // its client area. #522
         subFrameViewofFV.Add (new CheckBox { Y = 2, Text = "Or, Check me" });
 
         frame.Add (
-                   new CheckBox { X = 0, Y = Pos.AnchorEnd (1), Text = "Btn1 (Y = Pos.AnchorEnd (1))" }
+                   new CheckBox { X = 0, Y = Pos.AnchorEnd (), Text = "Btn1 (Y = Pos.AnchorEnd ())" }
                   );
-        var c = new CheckBox { Y = Pos.AnchorEnd (1), Text = "Btn2 (Y = Pos.AnchorEnd (1))" };
-        c.X = Pos.AnchorEnd () - (Pos.Right (c) - Pos.Left (c));
+        var c = new CheckBox { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Btn2 (Y = Pos.AnchorEnd ())" };
         frame.Add (c);
 
         frame.Add (subFrameViewofFV);
 
-        Top.Add (frame);
+        app.Add (frame);
         listWin.Add (frame);
 
-        Top.ColorScheme = Colors.ColorSchemes ["Base"];
+        app.ColorScheme = Colors.ColorSchemes ["Base"];
+
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
     }
 }

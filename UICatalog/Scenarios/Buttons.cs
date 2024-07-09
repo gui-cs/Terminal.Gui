@@ -14,6 +14,8 @@ public class Buttons : Scenario
 {
     public override void Main ()
     {
+        Application.Init ();
+
         Window main = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
@@ -29,11 +31,18 @@ public class Buttons : Scenario
 
         // This is the default button (IsDefault = true); if user presses ENTER in the TextField
         // the scenario will quit
-        var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (1), IsDefault = true, Text = "_Quit" };
+        var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (), IsDefault = true, Text = "_Quit" };
         defaultButton.Accept += (s, e) => Application.RequestStop ();
         main.Add (defaultButton);
 
-        var swapButton = new Button { X = 50, Text = "S_wap Default (Absolute Layout)" };
+        var swapButton = new Button
+        {
+            X = 50,
+            Width = 45,
+            Height = 3,
+            Text = "S_wap Default (Size = 45, 3)",
+            ColorScheme = Colors.ColorSchemes ["Error"]
+        };
 
         swapButton.Accept += (s, e) =>
                              {
@@ -51,29 +60,23 @@ public class Buttons : Scenario
                              };
         }
 
-        var colorButtonsLabel = new Label { X = 0, Y = Pos.Bottom (editLabel) + 1, Text = "Color Buttons:" };
+        var colorButtonsLabel = new Label { X = 0, Y = Pos.Bottom (swapButton) + 1, Text = "Color Buttons: " };
         main.Add (colorButtonsLabel);
 
         View prev = colorButtonsLabel;
-
-        //With this method there is no need to call Application.TopReady += () => Application.TopRedraw (Top.Bounds);
-        Pos x = Pos.Right (colorButtonsLabel) + 2;
 
         foreach (KeyValuePair<string, ColorScheme> colorScheme in Colors.ColorSchemes)
         {
             var colorButton = new Button
             {
-                ColorScheme = colorScheme.Value,
-                X = Pos.Right (prev) + 2,
+                X = Pos.Right (prev),
                 Y = Pos.Y (colorButtonsLabel),
-                Text = $"_{colorScheme.Key}"
+                Text = $"_{colorScheme.Key}",
+                ColorScheme = colorScheme.Value,
             };
             DoMessage (colorButton, colorButton.Text);
             main.Add (colorButton);
             prev = colorButton;
-
-            // BUGBUG: AutoSize is true and the X doesn't change
-            //x += colorButton.Frame.Width + 2;
         }
 
         Button button;
@@ -91,7 +94,7 @@ public class Buttons : Scenario
 
         // Note the 'N' in 'Newline' will be the hotkey
         main.Add (
-                  button = new () { X = 2, Y = Pos.Bottom (button) + 1, Text = "a Newline\nin the button" }
+                  button = new () { X = 2, Y = Pos.Bottom (button) + 1, Height = 2, Text = "a Newline\nin the button" }
                  );
         button.Accept += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
@@ -110,16 +113,14 @@ public class Buttons : Scenario
 
         var removeButton = new Button
         {
-            X = 2, Y = Pos.Bottom (button) + 1, ColorScheme = Colors.ColorSchemes ["Error"], Text = "Remove this button"
+            X = 2, Y = Pos.Bottom (button) + 1,
+            ColorScheme = Colors.ColorSchemes ["Error"], Text = "Remove this button"
         };
         main.Add (removeButton);
 
         // This in interesting test case because `moveBtn` and below are laid out relative to this one!
         removeButton.Accept += (s, e) =>
                                {
-                                   // Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
-                                   //main.Remove (removeButton);
-
                                    removeButton.Visible = false;
                                };
 
@@ -128,7 +129,7 @@ public class Buttons : Scenario
             X = 0,
             Y = Pos.Bottom (removeButton) + 1,
             Width = Dim.Percent (50),
-            Height = 5,
+            Height = 6,
             Title = "Computed Layout"
         };
         main.Add (computedFrame);
@@ -138,9 +139,7 @@ public class Buttons : Scenario
         {
             X = 0,
             Y = Pos.Center () - 1,
-            AutoSize = false,
             Width = 30,
-            Height = 1,
             ColorScheme = Colors.ColorSchemes ["Error"],
             Text = "Move This \u263b Button v_ia Pos"
         };
@@ -148,29 +147,22 @@ public class Buttons : Scenario
         moveBtn.Accept += (s, e) =>
                           {
                               moveBtn.X = moveBtn.Frame.X + 5;
-
-                              // This is already fixed with the call to SetNeedDisplay() in the Pos Dim.
-                              //computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
                           };
         computedFrame.Add (moveBtn);
 
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
         var sizeBtn = new Button
         {
-            X = 0,
             Y = Pos.Center () + 1,
-            AutoSize = false,
+            X = 0,
             Width = 30,
-            Height = 1,
+            Text = "Grow This \u263a Button _via Pos",
             ColorScheme = Colors.ColorSchemes ["Error"],
-            Text = "Size This \u263a Button _via Pos"
         };
 
         sizeBtn.Accept += (s, e) =>
                           {
                               sizeBtn.Width = sizeBtn.Frame.Width + 5;
-
-                              //computedFrame.LayoutSubviews (); // FIXED: This call should not be needed. View.X is not causing relayout correctly
                           };
         computedFrame.Add (sizeBtn);
 
@@ -179,7 +171,7 @@ public class Buttons : Scenario
             X = Pos.Right (computedFrame),
             Y = Pos.Bottom (removeButton) + 1,
             Width = Dim.Fill (),
-            Height = 5,
+            Height = 6,
             Title = "Absolute Layout"
         };
         main.Add (absoluteFrame);
@@ -217,7 +209,8 @@ public class Buttons : Scenario
 
         var label = new Label
         {
-            X = 2, Y = Pos.Bottom (computedFrame) + 1, Text = "Text Alignment (changes the four buttons above): "
+            X = 2, Y = Pos.Bottom (computedFrame) + 1, 
+            Text = "Text Alignment (changes the four buttons above): "
         };
         main.Add (label);
 
@@ -226,7 +219,7 @@ public class Buttons : Scenario
             X = 4,
             Y = Pos.Bottom (label) + 1,
             SelectedItem = 2,
-            RadioLabels = new [] { "Left", "Right", "Centered", "Justified" }
+            RadioLabels = new [] { "Start", "End", "Center", "Fill" }
         };
         main.Add (radioGroup);
 
@@ -268,8 +261,6 @@ public class Buttons : Scenario
         {
             X = 2,
             Y = Pos.Bottom (radioGroup) + 1,
-            AutoSize = false,
-            Height = 1,
             Width = Dim.Width (computedFrame) - 2,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = mhkb
@@ -283,9 +274,7 @@ public class Buttons : Scenario
         {
             X = Pos.Left (absoluteFrame) + 1,
             Y = Pos.Bottom (radioGroup) + 1,
-            AutoSize = false,
-            Height = 1,
-            Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
+            Width = Dim.Width (absoluteFrame) - 2,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = muhkb
         };
@@ -297,39 +286,39 @@ public class Buttons : Scenario
                                               switch (args.SelectedItem)
                                               {
                                                   case 0:
-                                                      moveBtn.TextAlignment = TextAlignment.Left;
-                                                      sizeBtn.TextAlignment = TextAlignment.Left;
-                                                      moveBtnA.TextAlignment = TextAlignment.Left;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Left;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Left;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Left;
+                                                      moveBtn.TextAlignment = Alignment.Start;
+                                                      sizeBtn.TextAlignment = Alignment.Start;
+                                                      moveBtnA.TextAlignment = Alignment.Start;
+                                                      sizeBtnA.TextAlignment = Alignment.Start;
+                                                      moveHotKeyBtn.TextAlignment = Alignment.Start;
+                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.Start;
 
                                                       break;
                                                   case 1:
-                                                      moveBtn.TextAlignment = TextAlignment.Right;
-                                                      sizeBtn.TextAlignment = TextAlignment.Right;
-                                                      moveBtnA.TextAlignment = TextAlignment.Right;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Right;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Right;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Right;
+                                                      moveBtn.TextAlignment = Alignment.End;
+                                                      sizeBtn.TextAlignment = Alignment.End;
+                                                      moveBtnA.TextAlignment = Alignment.End;
+                                                      sizeBtnA.TextAlignment = Alignment.End;
+                                                      moveHotKeyBtn.TextAlignment = Alignment.End;
+                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.End;
 
                                                       break;
                                                   case 2:
-                                                      moveBtn.TextAlignment = TextAlignment.Centered;
-                                                      sizeBtn.TextAlignment = TextAlignment.Centered;
-                                                      moveBtnA.TextAlignment = TextAlignment.Centered;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Centered;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Centered;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Centered;
+                                                      moveBtn.TextAlignment = Alignment.Center;
+                                                      sizeBtn.TextAlignment = Alignment.Center;
+                                                      moveBtnA.TextAlignment = Alignment.Center;
+                                                      sizeBtnA.TextAlignment = Alignment.Center;
+                                                      moveHotKeyBtn.TextAlignment = Alignment.Center;
+                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.Center;
 
                                                       break;
                                                   case 3:
-                                                      moveBtn.TextAlignment = TextAlignment.Justified;
-                                                      sizeBtn.TextAlignment = TextAlignment.Justified;
-                                                      moveBtnA.TextAlignment = TextAlignment.Justified;
-                                                      sizeBtnA.TextAlignment = TextAlignment.Justified;
-                                                      moveHotKeyBtn.TextAlignment = TextAlignment.Justified;
-                                                      moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Justified;
+                                                      moveBtn.TextAlignment = Alignment.Fill;
+                                                      sizeBtn.TextAlignment = Alignment.Fill;
+                                                      moveBtnA.TextAlignment = Alignment.Fill;
+                                                      sizeBtnA.TextAlignment = Alignment.Fill;
+                                                      moveHotKeyBtn.TextAlignment = Alignment.Fill;
+                                                      moveUnicodeHotKeyBtn.TextAlignment = Alignment.Fill;
 
                                                       break;
                                               }
@@ -352,7 +341,7 @@ public class Buttons : Scenario
         };
         numericUpDown.ValueChanged += NumericUpDown_ValueChanged;
 
-        void NumericUpDown_ValueChanged (object sender, StateEventArgs<int> e) { }
+        void NumericUpDown_ValueChanged (object sender, EventArgs<int> e) { }
 
         main.Add (label, numericUpDown);
 
@@ -396,14 +385,15 @@ public class Buttons : Scenario
             X = Pos.Right (repeatButton) + 1,
             Y = Pos.Top (repeatButton),
             Title = "Enabled",
-            Checked = true
+            State = CheckState.Checked
         };
-        enableCB.Toggled += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
+        enableCB.Toggle += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
         main.Add (label, repeatButton, enableCB);
 
         main.Ready += (s, e) => radioGroup.Refresh ();
         Application.Run (main);
         main.Dispose ();
+        Application.Shutdown ();
     }
 
     /// <summary>
@@ -428,13 +418,11 @@ public class Buttons : Scenario
                 throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
             }
 
-            // TODO: Use Dim.Auto for the Width and Height
-            Height = 1;
-            Width = Dim.Function (() => Digits + 2); // button + 3 for number + button
+            Width = Dim.Auto (DimAutoStyle.Content); //Dim.Function (() => Digits + 2); // button + 3 for number + button
+            Height = Dim.Auto (DimAutoStyle.Content);
 
             _down = new ()
             {
-                AutoSize = false,
                 Height = 1,
                 Width = 1,
                 NoPadding = true,
@@ -442,24 +430,23 @@ public class Buttons : Scenario
                 Title = $"{CM.Glyphs.DownArrow}",
                 WantContinuousButtonPressed = true,
                 CanFocus = false,
+                ShadowStyle = ShadowStyle.None,
             };
 
             _number = new ()
             {
                 Text = Value.ToString (),
-                AutoSize = false,
                 X = Pos.Right (_down),
                 Y = Pos.Top (_down),
-                Width = Dim.Function (() => Digits),
+                Width = Dim.Func (() => Digits),
                 Height = 1,
-                TextAlignment = TextAlignment.Centered,
+                TextAlignment = Alignment.Center,
                 CanFocus = true
             };
 
             _up = new ()
             {
-                AutoSize = false,
-                X = Pos.AnchorEnd (1),
+                X = Pos.AnchorEnd (),
                 Y = Pos.Top (_number),
                 Height = 1,
                 Width = 1,
@@ -468,6 +455,7 @@ public class Buttons : Scenario
                 Title = $"{CM.Glyphs.UpArrow}",
                 WantContinuousButtonPressed = true,
                 CanFocus = false,
+                ShadowStyle = ShadowStyle.None,
             };
 
             CanFocus = true;
@@ -498,12 +486,12 @@ public class Buttons : Scenario
 
             return;
 
-            void OnDownButtonOnAccept (object s, CancelEventArgs e)
+            void OnDownButtonOnAccept (object s, HandledEventArgs e)
             {
                 InvokeCommand (Command.ScrollDown);
             }
 
-            void OnUpButtonOnAccept (object s, CancelEventArgs e)
+            void OnUpButtonOnAccept (object s, HandledEventArgs e)
             {
                 InvokeCommand (Command.ScrollUp);
             }
@@ -530,7 +518,7 @@ public class Buttons : Scenario
                 }
 
                 T oldValue = value;
-                StateEventArgs<T> args = new StateEventArgs<T> (_value, value);
+                CancelEventArgs<T> args = new (ref _value, ref value);
                 ValueChanging?.Invoke (this, args);
 
                 if (args.Cancel)
@@ -540,21 +528,21 @@ public class Buttons : Scenario
 
                 _value = value;
                 _number.Text = _value.ToString ();
-                ValueChanged?.Invoke (this, new (oldValue, _value));
+                ValueChanged?.Invoke (this, new (ref _value));
             }
         }
 
         /// <summary>
-        /// Fired when the value is about to change. Set <see cref="StateEventArgs{T}.Cancel"/> to true to prevent the change.
+        /// Fired when the value is about to change. Set <see cref="CancelEventArgs{T}.Cancel"/> to true to prevent the change.
         /// </summary>
         [CanBeNull]
-        public event EventHandler<StateEventArgs<T>> ValueChanging;
+        public event EventHandler<CancelEventArgs<T>> ValueChanging;
 
         /// <summary>
         /// Fired when the value has changed.
         /// </summary>
         [CanBeNull]
-        public event EventHandler<StateEventArgs<T>> ValueChanged;
+        public event EventHandler<EventArgs<T>> ValueChanged;
 
         /// <summary>
         /// The number of digits to display. The <see cref="View.Viewport"/> will be resized to fit this number of characters plus the buttons. The default is 3.

@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     The Label <see cref="View"/> displays a string at a given position and supports multiple lines separated by
@@ -15,8 +13,8 @@ public class Label : View
     /// <inheritdoc/>
     public Label ()
     {
-        Height = 1;
-        AutoSize = true;
+        Height = Dim.Auto (DimAutoStyle.Text);
+        Width = Dim.Auto (DimAutoStyle.Text);
 
         // Things this view knows how to do
         AddCommand (Command.HotKey, FocusNext);
@@ -33,9 +31,9 @@ public class Label : View
         e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
-    private void Label_TitleChanged (object sender, StateEventArgs<string> e)
+    private void Label_TitleChanged (object sender, EventArgs<string> e)
     {
-        base.Text = e.NewValue;
+        base.Text = e.CurrentValue;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
@@ -62,12 +60,5 @@ public class Label : View
         }
 
         return true;
-    }
-
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-        return base.OnEnter (view);
     }
 }

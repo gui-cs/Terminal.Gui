@@ -7,10 +7,22 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("DateTime")]
 public class DatePickers : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+        };
+
         var datePicker = new DatePicker { Y = Pos.Center (), X = Pos.Center () };
 
-        Win.Add (datePicker);
+        app.Add (datePicker);
+
+        Application.Run (app);
+        app.Dispose ();
+
+        Application.Shutdown ();
     }
 }

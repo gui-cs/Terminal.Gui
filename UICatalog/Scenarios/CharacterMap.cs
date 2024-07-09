@@ -77,19 +77,8 @@ public class CharacterMap : Scenario
         };
         top.Add (_errorLabel);
 
-#if TEXT_CHANGED_TO_JUMP
-        jumpEdit.TextChanged += JumpEdit_TextChanged;
-#else
         jumpEdit.Accept += JumpEditOnAccept;
 
-        void JumpEditOnAccept (object sender, CancelEventArgs e)
-        {
-            JumpEdit_TextChanged (sender, new (jumpEdit.Text, jumpEdit.Text));
-
-            // Cancel the event to prevent ENTER from being handled elsewhere
-            e.Cancel = true;
-        }
-#endif
         _categoryList = new () { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
         _categoryList.FullRowSelect = true;
 
@@ -109,7 +98,7 @@ public class CharacterMap : Scenario
         // if user clicks the mouse in TableView
         _categoryList.MouseClick += (s, e) =>
                                     {
-                                        _categoryList.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
+                                        _categoryList.ScreenToCell (e.MouseEvent.Position, out int? clickedCol);
 
                                         if (clickedCol != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
                                         {
@@ -180,6 +169,84 @@ public class CharacterMap : Scenario
 
         Application.Run (top);
         top.Dispose ();
+        Application.Shutdown ();
+
+        return;
+
+        void JumpEditOnAccept (object sender, HandledEventArgs e)
+        {
+            if (jumpEdit.Text.Length == 0)
+            {
+                return;
+            }
+
+            uint result = 0;
+
+            if (jumpEdit.Text.StartsWith ("U+", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u"))
+            {
+                try
+                {
+                    result = uint.Parse (jumpEdit.Text [2..], NumberStyles.HexNumber);
+                }
+                catch (FormatException)
+                {
+                    _errorLabel.Text = "Invalid hex value";
+
+                    return;
+                }
+            }
+            else if (jumpEdit.Text.StartsWith ("0", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u"))
+            {
+                try
+                {
+                    result = uint.Parse (jumpEdit.Text, NumberStyles.HexNumber);
+                }
+                catch (FormatException)
+                {
+                    _errorLabel.Text = "Invalid hex value";
+
+                    return;
+                }
+            }
+            else
+            {
+                try
+                {
+                    result = uint.Parse (jumpEdit.Text, NumberStyles.Integer);
+                }
+                catch (FormatException)
+                {
+                    _errorLabel.Text = "Invalid value";
+
+                    return;
+                }
+            }
+
+            if (result > RuneExtensions.MaxUnicodeCodePoint)
+            {
+                _errorLabel.Text = "Beyond maximum codepoint";
+
+                return;
+            }
+
+            _errorLabel.Text = $"U+{result:x5}";
+
+            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+
+            _categoryList.SelectedRow = table.Data
+                                             .Select ((item, index) => new { item, index })
+                                             .FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)
+                                             ?.index
+                                        ?? -1;
+            _categoryList.EnsureSelectedCellIsVisible ();
+
+            // Ensure the typed glyph is selected 
+            _charMap.SelectedCodePoint = (int)result;
+
+
+            // Cancel the event to prevent ENTER from being handled elsewhere
+            e.Handled = true;
+        }
     }
 
     private void _categoryList_Initialized (object sender, EventArgs e) { _charMap.Width = Dim.Fill () - _categoryList.Width; }
@@ -239,83 +306,10 @@ public class CharacterMap : Scenario
         return item;
     }
 
-    private void JumpEdit_TextChanged (object sender, StateEventArgs<string> e)
-    {
-        var jumpEdit = sender as TextField;
-
-        if (jumpEdit.Text.Length == 0)
-        {
-            return;
-        }
-
-        uint result = 0;
-
-        if (jumpEdit.Text.StartsWith ("U+", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u"))
-        {
-            try
-            {
-                result = uint.Parse (jumpEdit.Text [2..], NumberStyles.HexNumber);
-            }
-            catch (FormatException)
-            {
-                _errorLabel.Text = "Invalid hex value";
-
-                return;
-            }
-        }
-        else if (jumpEdit.Text.StartsWith ("0", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u"))
-        {
-            try
-            {
-                result = uint.Parse (jumpEdit.Text, NumberStyles.HexNumber);
-            }
-            catch (FormatException)
-            {
-                _errorLabel.Text = "Invalid hex value";
-
-                return;
-            }
-        }
-        else
-        {
-            try
-            {
-                result = uint.Parse (jumpEdit.Text, NumberStyles.Integer);
-            }
-            catch (FormatException)
-            {
-                _errorLabel.Text = "Invalid value";
-
-                return;
-            }
-        }
-
-        if (result > RuneExtensions.MaxUnicodeCodePoint)
-        {
-            _errorLabel.Text = "Beyond maximum codepoint";
-
-            return;
-        }
-
-        _errorLabel.Text = $"U+{result:x5}";
-
-        EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-
-        _categoryList.SelectedRow = table.Data
-                                         .Select ((item, index) => new { item, index })
-                                         .FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)
-                                         ?.index
-                                    ?? -1;
-        _categoryList.EnsureSelectedCellIsVisible ();
-
-        // Ensure the typed glyph is selected 
-        _charMap.SelectedCodePoint = (int)result;
-    }
 }
 
 internal class CharMap : View
 {
-    private const CursorVisibility _cursor = CursorVisibility.Default;
     private const int COLUMN_WIDTH = 3;
 
     private ContextMenu _contextMenu = new ();
@@ -327,8 +321,9 @@ internal class CharMap : View
     {
         ColorScheme = Colors.ColorSchemes ["Dialog"];
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
 
-        ContentSize = new (RowWidth, (MaxCodePoint / 16 + 2) * _rowHeight);
+        SetContentSize (new (RowWidth, (MaxCodePoint / 16 + 2) * _rowHeight));
 
         AddCommand (
                     Command.ScrollUp,
@@ -472,7 +467,6 @@ internal class CharMap : View
 
         var up = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (1),
             Y = 0,
             Height = 1,
@@ -483,11 +477,10 @@ internal class CharMap : View
             WantContinuousButtonPressed = true,
             CanFocus = false
         };
-        up.Accept += (sender, args) => { args.Cancel = ScrollVertical (-1) == true; };
+        up.Accept += (sender, args) => { args.Handled = ScrollVertical (-1) == true; };
 
         var down = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (1),
             Y = Pos.AnchorEnd (2),
             Height = 1,
@@ -502,7 +495,6 @@ internal class CharMap : View
 
         var left = new Button
         {
-            AutoSize = false,
             X = 0,
             Y = Pos.AnchorEnd (1),
             Height = 1,
@@ -517,7 +509,6 @@ internal class CharMap : View
 
         var right = new Button
         {
-            AutoSize = false,
             X = Pos.AnchorEnd (2),
             Y = Pos.AnchorEnd (1),
             Height = 1,
@@ -807,24 +798,7 @@ internal class CharMap : View
         }
     }
 
-    public override bool OnEnter (View view)
-    {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (_cursor);
-        }
-
-        return base.OnEnter (view);
-    }
-
-    public override bool OnLeave (View view)
-    {
-        Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-        return base.OnLeave (view);
-    }
-
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
         if (HasFocus
             && Cursor.X >= RowLabelWidth
@@ -832,13 +806,14 @@ internal class CharMap : View
             && Cursor.Y > 0
             && Cursor.Y < Viewport.Height)
         {
-            Driver.SetCursorVisibility (_cursor);
             Move (Cursor.X, Cursor.Y);
         }
         else
         {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
+            return null;
         }
+
+        return Cursor;
     }
 
     public event EventHandler<ListViewItemEventArgs> SelectedCodePointChanged;
@@ -870,23 +845,18 @@ internal class CharMap : View
             return;
         }
 
-        args.Handled = true;
-
-        if (me.Y == 0)
+        if (me.Position.Y == 0)
         {
-            me.Y = Cursor.Y;
+            me.Position = me.Position with { Y = Cursor.Y };
         }
 
-        if (me.Y > 0)
-        { }
-
-        if (me.X < RowLabelWidth || me.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)
+        if (me.Position.X < RowLabelWidth || me.Position.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)
         {
-            me.X = Cursor.X;
+            me.Position = me.Position with { X = Cursor.X };
         }
 
-        int row = (me.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
-        int col = (me.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
+        int row = (me.Position.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
+        int col = (me.Position.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
 
         if (col > 15)
         {
@@ -905,10 +875,16 @@ internal class CharMap : View
             Hover?.Invoke (this, new (val, null));
         }
 
+        if (!HasFocus && CanFocus)
+        {
+            SetFocus ();
+        }
+
+        args.Handled = true;
+
         if (me.Flags == MouseFlags.Button1Clicked)
         {
             SelectedCodePoint = val;
-
             return;
         }
 
@@ -926,7 +902,7 @@ internal class CharMap : View
 
             _contextMenu = new ()
             {
-                Position = new (me.X + 1, me.Y + 1),
+                Position = new (me.Position.X + 1, me.Position.Y + 1),
                 MenuItems = new (
                                  new MenuItem []
                                  {
@@ -973,12 +949,11 @@ internal class CharMap : View
         var errorLabel = new Label
         {
             Text = UcdApiClient.BaseUrl,
-            AutoSize = false,
             X = 0,
             Y = 1,
             Width = Dim.Fill (),
             Height = Dim.Fill (1),
-            TextAlignment = TextAlignment.Centered
+            TextAlignment = Alignment.Center
         };
         var spinner = new SpinnerView { X = Pos.Center (), Y = Pos.Center (), Style = new Aesthetic () };
         spinner.AutoSpin = true;
@@ -1024,7 +999,7 @@ internal class CharMap : View
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                            { WriteIndented = true }
+                                                        { WriteIndented = true }
                                                        );
             }
 
@@ -1101,7 +1076,7 @@ internal class CharMap : View
             };
             dlg.Add (label);
 
-            var json = new TextView
+            var json = new TextView ()
             {
                 X = 0,
                 Y = Pos.Bottom (label),
@@ -1110,6 +1085,7 @@ internal class CharMap : View
                 ReadOnly = true,
                 Text = decResponse
             };
+
             dlg.Add (json);
 
             Application.Run (dlg);

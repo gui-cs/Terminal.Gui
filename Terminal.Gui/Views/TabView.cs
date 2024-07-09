@@ -21,7 +21,7 @@ public class TabView : View
     private TabToRender [] _tabLocations;
     private int _tabScrollOffset;
 
-    /// <summary>Initializes a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
+    /// <summary>Initializes a <see cref="TabView"/> class.</summary>
     public TabView ()
     {
         CanFocus = true;
@@ -564,7 +564,7 @@ public class TabView : View
             _host = host;
 
             CanFocus = true;
-            Height = 1;
+            Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == GetContentSize ().
             Width = Dim.Fill ();
 
             _rightScrollIndicator = new View
@@ -1204,13 +1204,6 @@ public class TabView : View
             }
         }
 
-        public override bool OnEnter (View view)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-            return base.OnEnter (view);
-        }
-
         private int GetUnderlineYPosition ()
         {
             if (_host.Style.TabsOnBottom)
@@ -1272,7 +1265,7 @@ public class TabView : View
                         tab.Margin.Thickness = new Thickness (0, 0, 0, 0);
                     }
 
-                    tab.Width = Math.Max (tab.Width.Anchor (0) - 1, 1);
+                    tab.Width = Math.Max (tab.Width.GetAnchor (0) - 1, 1);
                 }
                 else
                 {
@@ -1287,7 +1280,7 @@ public class TabView : View
                         tab.Margin.Thickness = new Thickness (0, 0, 0, 0);
                     }
 
-                    tab.Width = Math.Max (tab.Width.Anchor (0) - 1, 1);
+                    tab.Width = Math.Max (tab.Width.GetAnchor (0) - 1, 1);
                 }
 
                 tab.Text = toRender.TextToRender;

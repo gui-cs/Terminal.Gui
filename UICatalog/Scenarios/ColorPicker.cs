@@ -24,62 +24,69 @@ public class ColorPickers : Scenario
     private ColorPicker foregroundColorPicker;
 
     /// <summary>Setup the scenario.</summary>
-    public override void Setup ()
+    public override void Main ()
     {
-        // Scenario Window's.
-        Win.Title = GetName ();
+        Application.Init ();
+
+        Window app = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+        };
 
         // Foreground ColorPicker.
         foregroundColorPicker = new ColorPicker { Title = "Foreground Color", BorderStyle = LineStyle.Single };
         foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
-        Win.Add (foregroundColorPicker);
+        app.Add (foregroundColorPicker);
 
         _foregroundColorLabel = new Label
         {
             X = Pos.Left (foregroundColorPicker), Y = Pos.Bottom (foregroundColorPicker) + 1
         };
-        Win.Add (_foregroundColorLabel);
+        app.Add (_foregroundColorLabel);
 
         // Background ColorPicker.
         backgroundColorPicker = new ColorPicker
         {
             Title = "Background Color",
-            // TODO: Replace with Pos.AnchorEnd () when #2900 is done
-            X = Pos.AnchorEnd ((8 * 4) + 2), // 8 box * 4 width + 2 for border
+            X = Pos.AnchorEnd (),
             BoxHeight = 1,
             BoxWidth = 4,
-            BorderStyle = LineStyle.Single
+            BorderStyle = LineStyle.Single,
         };
 
-        //backgroundColorPicker.X = Pos.AnchorEnd () - (Pos.Right (backgroundColorPicker) - Pos.Left (backgroundColorPicker));
         backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
-        Win.Add (backgroundColorPicker);
-        _backgroundColorLabel = new Label ();
+        app.Add (backgroundColorPicker);
+        _backgroundColorLabel = new Label ()
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.Bottom (backgroundColorPicker) + 1
+        };
 
-        _backgroundColorLabel.X =
-            Pos.AnchorEnd () - (Pos.Right (_backgroundColorLabel) - Pos.Left (_backgroundColorLabel));
-        _backgroundColorLabel.Y = Pos.Bottom (backgroundColorPicker) + 1;
-        Win.Add (_backgroundColorLabel);
+        app.Add (_backgroundColorLabel);
 
         // Demo Label.
         _demoView = new View
         {
             Title = "Color Sample",
             Text = "Lorem Ipsum",
-            TextAlignment = TextAlignment.Centered,
-            VerticalTextAlignment = VerticalTextAlignment.Middle,
+            TextAlignment = Alignment.Center,
+            VerticalTextAlignment = Alignment.Center,
             BorderStyle = LineStyle.Heavy,
             X = Pos.Center (),
             Y = Pos.Center (),
             Height = 5,
             Width = 20
         };
-        Win.Add (_demoView);
+        app.Add (_demoView);
 
         // Set default colors.
         foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground.GetClosestNamedColor ();
         backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background.GetClosestNamedColor ();
-        Win.Initialized += (s, e) => Win.LayoutSubviews ();
+        app.Initialized += (s, e) => app.LayoutSubviews ();
+
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
     }
 
     /// <summary>Fired when background color is changed.</summary>

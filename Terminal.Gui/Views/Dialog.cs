@@ -9,75 +9,95 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
-///     <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>. This will execute the dialog until it terminates via the
-///     [ESC] or [CTRL-Q] key, or when one of the views or buttons added to the dialog calls
+///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. This will execute the dialog until
+///     it terminates via the <see cref="Application.QuitKey"/> (`Esc` by default),
+///     or when one of the views or buttons added to the dialog calls
 ///     <see cref="Application.RequestStop"/>.
 /// </remarks>
 public class Dialog : Window
 {
-    /// <summary>Determines the horizontal alignment of the Dialog buttons.</summary>
-    public enum ButtonAlignments
-    {
-        /// <summary>Center-aligns the buttons (the default).</summary>
-        Center = 0,
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
 
-        /// <summary>Justifies the buttons</summary>
-        Justify,
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
 
-        /// <summary>Left-aligns the buttons</summary>
-        Left,
+    /// <summary>
+    ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumWidth { get; set; } = 25;
 
-        /// <summary>Right-aligns the buttons</summary>
-        Right
-    }
+    /// <summary>
+    ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumHeight { get; set; } = 25;
 
-    // TODO: Reenable once border/borderframe design is settled
+
+    /// <summary>
+    /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
 
-    //[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    //public static Border DefaultBorder { get; set; } = new Border () {
-    //	LineStyle = LineStyle.Single,
-    //};
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+
     private readonly List<Button> _buttons = new ();
 
-    private bool _inLayout;
-
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning with no <see cref="Button"/>s.
+    ///     Initializes a new instance of the <see cref="Dialog"/> class with no <see cref="Button"/>s.
     /// </summary>
     /// <remarks>
-    ///     By default, <see cref="View.X"/> and <see cref="View.Y"/> are set to <c>Pos.Center ()</c> and
-    ///     <see cref="View.Width"/> and <see cref="View.Height"/> are set to <c>Width = Dim.Percent (85)</c>, centering the
-    ///     Dialog vertically and horizontally.
+    ///     By default, <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> are
+    ///     set
+    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of <see cref="Application.Top"/>, if there is one. Otherwise,
+    ///     it will be bound by the screen dimensions.
     /// </remarks>
     public Dialog ()
     {
         Arrangement = ViewArrangement.Movable;
+        ShadowStyle = DefaultShadow;
+        BorderStyle = DefaultBorderStyle;
+
         X = Pos.Center ();
         Y = Pos.Center ();
-        ValidatePosDim = true;
 
-        Width = Dim.Percent (85); // Dim.Auto (min: Dim.Percent (10));
-        Height = Dim.Percent (85); //Dim.Auto (min: Dim.Percent (50));
-
+        Width = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
+        Height = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
+        ButtonAlignmentModes = DefaultButtonAlignmentModes;
 
-        AddCommand (Command.QuitToplevel, () =>
-                                          {
-                                              Canceled = true;
-                                              RequestStop ();
-                                              return true;
-                                          });
+        AddCommand (
+                    Command.QuitToplevel,
+                    () =>
+                    {
+                        Canceled = true;
+                        RequestStop ();
+
+                        return true;
+                    });
         KeyBindings.Add (Key.Esc, Command.QuitToplevel);
     }
-
 
     private bool _canceled;
 
@@ -104,12 +124,17 @@ public class Dialog : Window
             }
 #endif
             _canceled = value;
-            return;
         }
     }
 
+    // TODO: Update button.X = Pos.Justify when alignment changes
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
-    public ButtonAlignments ButtonAlignment { get; set; }
+    public Alignment ButtonAlignment { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the alignment modes for the dialog's buttons.
+    /// </summary>
+    public AlignmentModes ButtonAlignmentModes { get; set; }
 
     /// <summary>Optional buttons to lay out at the bottom of the dialog.</summary>
     public Button [] Buttons
@@ -129,12 +154,6 @@ public class Dialog : Window
         }
     }
 
-    /// <summary>The default <see cref="ButtonAlignments"/> for <see cref="Dialog"/>.</summary>
-    /// <remarks>This property can be set in a Theme.</remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static ButtonAlignments DefaultButtonAlignment { get; set; } = ButtonAlignments.Center;
-
     /// <summary>
     ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
     ///     <see cref="Dialog"/>
@@ -147,7 +166,10 @@ public class Dialog : Window
             return;
         }
 
-        //button.AutoSize = false; // BUGBUG: v2 - Hack to get around autosize not accounting for Margin?
+        // Use a distinct GroupId so users can use Pos.Align for other views in the Dialog
+        button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
+        button.Y = Pos.AnchorEnd ();
+
         _buttons.Add (button);
         Add (button);
 
@@ -156,139 +178,6 @@ public class Dialog : Window
         if (IsInitialized)
         {
             LayoutSubviews ();
-        }
-    }
-
-    /// <inheritdoc/>
-    public override void LayoutSubviews ()
-    {
-        if (_inLayout)
-        {
-            return;
-        }
-
-        _inLayout = true;
-        LayoutButtons ();
-        base.LayoutSubviews ();
-        _inLayout = false;
-    }
-
-    // Get the width of all buttons, not including any Margin.
-    internal int GetButtonsWidth ()
-    {
-        if (_buttons.Count == 0)
-        {
-            return 0;
-        }
-
-        //var widths = buttons.Select (b => b.TextFormatter.GetFormattedSize ().Width + b.BorderFrame.Thickness.Horizontal + b.Padding.Thickness.Horizontal);
-        IEnumerable<int> widths = _buttons.Select (b => b.Frame.Width);
-
-        return widths.Sum ();
-    }
-
-    private void LayoutButtons ()
-    {
-        if (_buttons.Count == 0 || !IsInitialized)
-        {
-            return;
-        }
-
-        var shiftLeft = 0;
-
-        int buttonsWidth = GetButtonsWidth ();
-
-        switch (ButtonAlignment)
-        {
-            case ButtonAlignments.Center:
-                // Center Buttons
-                shiftLeft = (Viewport.Width - buttonsWidth - _buttons.Count - 1) / 2 + 1;
-
-                for (int i = _buttons.Count - 1; i >= 0; i--)
-                {
-                    Button button = _buttons [i];
-                    shiftLeft += button.Frame.Width + (i == _buttons.Count - 1 ? 0 : 1);
-
-                    if (shiftLeft > -1)
-                    {
-                        button.X = Pos.AnchorEnd (shiftLeft);
-                    }
-                    else
-                    {
-                        button.X = Viewport.Width - shiftLeft;
-                    }
-
-                    button.Y = Pos.AnchorEnd (1);
-                }
-
-                break;
-
-            case ButtonAlignments.Justify:
-                // Justify Buttons
-                // leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
-
-                var spacing = (int)Math.Ceiling ((double)(Viewport.Width - buttonsWidth) / (_buttons.Count - 1));
-
-                for (int i = _buttons.Count - 1; i >= 0; i--)
-                {
-                    Button button = _buttons [i];
-
-                    if (i == _buttons.Count - 1)
-                    {
-                        shiftLeft += button.Frame.Width;
-                        button.X = Pos.AnchorEnd (shiftLeft);
-                    }
-                    else
-                    {
-                        if (i == 0)
-                        {
-                            // first (leftmost) button 
-                            int left = Viewport.Width;
-                            button.X = Pos.AnchorEnd (left);
-                        }
-                        else
-                        {
-                            shiftLeft += button.Frame.Width + spacing;
-                            button.X = Pos.AnchorEnd (shiftLeft);
-                        }
-                    }
-
-                    button.Y = Pos.AnchorEnd (1);
-                }
-
-                break;
-
-            case ButtonAlignments.Left:
-                // Left Align Buttons
-                Button prevButton = _buttons [0];
-                prevButton.X = 0;
-                prevButton.Y = Pos.AnchorEnd (1);
-
-                for (var i = 1; i < _buttons.Count; i++)
-                {
-                    Button button = _buttons [i];
-                    button.X = Pos.Right (prevButton) + 1;
-                    button.Y = Pos.AnchorEnd (1);
-                    prevButton = button;
-                }
-
-                break;
-
-            case ButtonAlignments.Right:
-                // Right align buttons
-                shiftLeft = _buttons [_buttons.Count - 1].Frame.Width;
-                _buttons [_buttons.Count - 1].X = Pos.AnchorEnd (shiftLeft);
-                _buttons [_buttons.Count - 1].Y = Pos.AnchorEnd (1);
-
-                for (int i = _buttons.Count - 2; i >= 0; i--)
-                {
-                    Button button = _buttons [i];
-                    shiftLeft += button.Frame.Width + 1;
-                    button.X = Pos.AnchorEnd (shiftLeft);
-                    button.Y = Pos.AnchorEnd (1);
-                }
-
-                break;
         }
     }
 }

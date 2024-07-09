@@ -14,7 +14,7 @@ public sealed class MyScenario : Scenario
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
         };
 
         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };

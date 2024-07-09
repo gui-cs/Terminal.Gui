@@ -40,8 +40,7 @@ public class WizardStep : FrameView
     private readonly TextView _helpTextView = new ();
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
+    ///     Initializes a new instance of the <see cref="Wizard"/> class.
     /// </summary>
     public WizardStep ()
     {
@@ -127,7 +126,7 @@ public class WizardStep : FrameView
 
     /// <summary>Add the specified <see cref="View"/> to the <see cref="WizardStep"/>.</summary>
     /// <param name="view"><see cref="View"/> to add to this container</param>
-    public override void Add (View view)
+    public override View Add (View view)
     {
         _contentView.Add (view);
 
@@ -137,15 +136,17 @@ public class WizardStep : FrameView
         }
 
         ShowHide ();
+
+        return view;
     }
 
     /// <summary>Removes a <see cref="View"/> from <see cref="WizardStep"/>.</summary>
     /// <remarks></remarks>
-    public override void Remove (View view)
+    public override View Remove (View view)
     {
         if (view is null)
         {
-            return;
+            return view;
         }
 
         SetNeedsDisplay ();
@@ -166,6 +167,8 @@ public class WizardStep : FrameView
         }
 
         ShowHide ();
+
+        return view;
     }
 
     /// <summary>Removes all <see cref="View"/>s from the <see cref="WizardStep"/>.</summary>

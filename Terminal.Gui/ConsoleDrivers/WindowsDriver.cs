@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -156,10 +157,7 @@ internal class WindowsConsole
             }
         }
 
-        if (!_initialCursorVisibility.HasValue && GetCursorVisibility (out CursorVisibility visibility))
-        {
-            _initialCursorVisibility = visibility;
-        }
+        SetInitialCursorVisibility ();
 
         if (!SetConsoleActiveScreenBuffer (_screenBuffer))
         {
@@ -216,11 +214,11 @@ internal class WindowsConsole
         }
         else if (info.dwSize > 50)
         {
-            visibility = CursorVisibility.Box;
+            visibility = CursorVisibility.Default;
         }
         else
         {
-            visibility = CursorVisibility.Underline;
+            visibility = CursorVisibility.Default;
         }
 
         return true;
@@ -815,6 +813,11 @@ internal class WindowsConsole
     [StructLayout (LayoutKind.Sequential)]
     public struct ConsoleCursorInfo
     {
+        /// <summary>
+        /// The percentage of the character cell that is filled by the cursor.This value is between 1 and 100.
+        /// The cursor appearance varies, ranging from completely filling the cell to showing up as a horizontal
+        /// line at the bottom of the cell.
+        /// </summary>
         public uint dwSize;
         public bool bVisible;
     }
@@ -1436,6 +1439,8 @@ internal class WindowsDriver : ConsoleDriver
 #if HACK_CHECK_WINCHANGED
         _mainLoopDriver.WinChanged = ChangeWin;
 #endif
+
+        WinConsole?.SetInitialCursorVisibility ();
         return new MainLoop (_mainLoopDriver);
     }
 
@@ -1478,7 +1483,7 @@ internal class WindowsDriver : ConsoleDriver
             case WindowsConsole.EventType.Mouse:
                 MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
 
-               if (me is null || me.Flags == MouseFlags.None)
+                if (me is null || me.Flags == MouseFlags.None)
                 {
                     break;
                 }
@@ -1489,8 +1494,7 @@ internal class WindowsDriver : ConsoleDriver
                 {
                     OnMouseEvent (new ()
                     {
-                        X = me.X,
-                        Y = me.Y,
+                        Position = me.Position,
                         Flags = ProcessButtonClick (inputEvent.MouseEvent)
                     });
                 }
@@ -1517,23 +1521,28 @@ internal class WindowsDriver : ConsoleDriver
 #if HACK_CHECK_WINCHANGED
     private void ChangeWin (object s, SizeChangedEventArgs e)
     {
-        int w = e.Size.Width;
+        if (e.Size is null)
+        {
+            return;
+        }
 
-        if (w == Cols - 3 && e.Size.Height < Rows)
+        int w = e.Size.Value.Width;
+
+        if (w == Cols - 3 && e.Size.Value.Height < Rows)
         {
             w += 3;
         }
 
         Left = 0;
         Top = 0;
-        Cols = e.Size.Width;
-        Rows = e.Size.Height;
+        Cols = e.Size.Value.Width;
+        Rows = e.Size.Value.Height;
 
         if (!RunningUnitTests)
         {
             Size newSize = WinConsole.SetConsoleWindow (
                                                         (short)Math.Max (w, 16),
-                                                        (short)Math.Max (e.Size.Height, 0));
+                                                        (short)Math.Max (e.Size.Value.Height, 0));
 
             Cols = newSize.Width;
             Rows = newSize.Height;
@@ -1804,8 +1813,7 @@ internal class WindowsDriver : ConsoleDriver
         {
             var me = new MouseEvent
             {
-                X = _pointMove.X,
-                Y = _pointMove.Y,
+                Position = _pointMove,
                 Flags = mouseFlag
             };
 
@@ -2119,8 +2127,7 @@ internal class WindowsDriver : ConsoleDriver
 
         return new MouseEvent
         {
-            X = mouseEvent.MousePosition.X,
-            Y = mouseEvent.MousePosition.Y,
+            Position = new (mouseEvent.MousePosition.X, mouseEvent.MousePosition.Y),
             Flags = mouseFlag
         };
     }
@@ -2334,11 +2341,9 @@ internal class WindowsMainLoop : IMainLoopDriver
 
 internal class WindowsClipboard : ClipboardBase
 {
-    private const uint _cfUnicodeText = 13;
+    private const uint CF_UNICODE_TEXT = 13;
 
-    public WindowsClipboard () { IsSupported = IsClipboardFormatAvailable (_cfUnicodeText); }
-
-    public override bool IsSupported { get; }
+    public override bool IsSupported { get; } = IsClipboardFormatAvailable (CF_UNICODE_TEXT);
 
     protected override string GetClipboardDataImpl ()
     {
@@ -2349,7 +2354,7 @@ internal class WindowsClipboard : ClipboardBase
                 return string.Empty;
             }
 
-            nint handle = GetClipboardData (_cfUnicodeText);
+            nint handle = GetClipboardData (CF_UNICODE_TEXT);
 
             if (handle == nint.Zero)
             {
@@ -2421,7 +2426,7 @@ internal class WindowsClipboard : ClipboardBase
                 GlobalUnlock (target);
             }
 
-            if (SetClipboardData (_cfUnicodeText, hGlobal) == default (nint))
+            if (SetClipboardData (CF_UNICODE_TEXT, hGlobal) == default (nint))
             {
                 ThrowWin32 ();
             }

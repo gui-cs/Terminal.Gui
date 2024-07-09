@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- In the source tree the version will always be 2.0 for all projects. -->
@@ -14,27 +14,27 @@
     <IsPackable>false</IsPackable>
     <UseDataCollector />
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineTrace>True</DefineTrace>
+    <DefineTrace>true</DefineTrace>
     <DebugType>portable</DebugType>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
     <ImplicitUsings>enable</ImplicitUsings>
-    <NoLogo>True</NoLogo>
+    <NoLogo>true</NoLogo>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineDebug>True</DefineDebug>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineDebug>true</DefineDebug>
     <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <Optimize>True</Optimize>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="ReportGenerator" Version="5.2.4" />
-    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.0.2" />
-    <PackageReference Include="xunit" Version="2.7.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="ReportGenerator" Version="5.3.7" />
+    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.0.22" />
+    <PackageReference Include="xunit" Version="2.9.0" />
     <PackageReference Include="Xunit.Combinatorial" Version="1.6.24" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.8">
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -57,6 +57,9 @@
     <Using Include="Terminal.Gui" />
     <Using Include="Xunit" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
+  </ItemGroup>
   <PropertyGroup Label="FineCodeCoverage">
     <Enabled>
       False
@@ -75,7 +78,5 @@
     <IncludeTestAssembly>
       False
     </IncludeTestAssembly>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 </Project>

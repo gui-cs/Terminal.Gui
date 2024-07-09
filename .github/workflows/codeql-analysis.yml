@@ -4,7 +4,7 @@ name: "Code scanning"
 
 on:
   push:
-    branches: [main]
+    branches: [main, v2_release]
     paths-ignore:
       - '**/*.md'
       - '**/*.txt'
@@ -12,7 +12,7 @@ on:
       - docs
       - docfx
   pull_request:
-    branches: [main]
+    branches: [main, v2_release]
     paths-ignore:
       - '**/*.md'
       - '**/*.txt'

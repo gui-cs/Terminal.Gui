@@ -1,0 +1,10 @@
+{
+  "solution": {
+    "path": "Terminal.sln",
+    "projects": [
+      "Analyzers\\Terminal.Gui.Analyzers.Internal.Debugging\\Terminal.Gui.Analyzers.Internal.Debugging.csproj",
+      "Analyzers\\Terminal.Gui.Analyzers.Internal.Tests\\Terminal.Gui.Analyzers.Internal.Tests.csproj",
+      "Analyzers\\Terminal.Gui.Analyzers.Internal\\Terminal.Gui.Analyzers.Internal.csproj",
+    ]
+  }
+}

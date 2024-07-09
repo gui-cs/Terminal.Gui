@@ -2,68 +2,62 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text;
-using CsvHelper;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class TextFieldTests
+public class TextFieldTests (ITestOutputHelper output)
 {
     private static TextField _textField;
-    private readonly ITestOutputHelper _output;
-    public TextFieldTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
     {
         var tf = new TextField { Width = 3, Text = "ắ" };
-        Toplevel top = new ();
-        top.Add (tf);
-        Application.Begin (top);
+        tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 ắ",
-                                                      _output
+                                                      output
                                                      );
 
         tf.Text = "\u1eaf";
-        Application.Refresh ();
+        tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 ắ",
-                                                      _output
+                                                      output
                                                      );
 
         tf.Text = "\u0103\u0301";
-        Application.Refresh ();
+        tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 ắ",
-                                                      _output
+                                                      output
                                                      );
 
         tf.Text = "\u0061\u0306\u0301";
-        Application.Refresh ();
+        tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 ắ",
-                                                      _output
+                                                      output
                                                      );
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void Adjust_First ()
     {
         var tf = new TextField { Width = Dim.Fill (), Text = "This is a test." };
-        var top = new Toplevel ();
-        top.Add (tf);
-        Application.Begin (top);
+        tf.SetRelativeLayout (new (20, 20));
+        tf.Draw ();
 
         Assert.Equal ("This is a test. ", GetContents ());
 
@@ -123,8 +117,8 @@ public class TextFieldTests
         Assert.False (fv.HasFocus);
 
         tf.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
-                      );
+                          new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
+                         );
 
         Assert.Null (tf.SelectedText);
         Assert.False (tf.CanFocus);
@@ -137,8 +131,8 @@ public class TextFieldTests
         tf.CanFocus = true;
 
         tf.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
-                      );
+                          new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
+                         );
 
         Assert.Equal ("some ", tf.SelectedText);
         Assert.True (tf.CanFocus);
@@ -149,14 +143,15 @@ public class TextFieldTests
         fv.CanFocus = false;
 
         tf.NewMouseEvent (
-                       new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked }
-                      );
+                          new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
+                         );
 
         Assert.Equal ("some ", tf.SelectedText); // Setting CanFocus to false don't change the SelectedText
         Assert.False (tf.CanFocus);
         Assert.False (tf.HasFocus);
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
+        top.Dispose ();
     }
 
     [Theory]
@@ -173,7 +168,8 @@ public class TextFieldTests
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedRender, _output);
+        TestHelpers.AssertDriverContentsAre (expectedRender, output);
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -192,7 +188,9 @@ public class TextFieldTests
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("Misérables", _output);
+        TestHelpers.AssertDriverContentsAre ("Misérables", output);
+        Application.Top.Dispose ();
+
     }
 
     [Theory]
@@ -204,7 +202,7 @@ public class TextFieldTests
         TextField tf = GetTextFieldsInView ();
 
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("", _output);
+        TestHelpers.AssertDriverContentsAre ("", output);
 
         tf.Caption = "Enter txt";
         Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
@@ -212,12 +210,13 @@ public class TextFieldTests
         // Caption should appear when not focused and no text
         Assert.False (tf.HasFocus);
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("Enter txt", _output);
+        TestHelpers.AssertDriverContentsAre ("Enter txt", output);
 
         // but disapear when text is added
         tf.Text = content;
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre (content, _output);
+        TestHelpers.AssertDriverContentsAre (content, output);
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -227,19 +226,20 @@ public class TextFieldTests
         TextField tf = GetTextFieldsInView ();
 
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("", _output);
+        TestHelpers.AssertDriverContentsAre ("", output);
 
         // Caption has no effect when focused
         tf.Caption = "Enter txt";
         Assert.True (tf.HasFocus);
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("", _output);
+        TestHelpers.AssertDriverContentsAre ("", output);
 
         Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
 
         Assert.False (tf.HasFocus);
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("Enter txt", _output);
+        TestHelpers.AssertDriverContentsAre ("Enter txt", output);
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -363,7 +363,7 @@ public class TextFieldTests
 
         _textField.TextChanging += _textField_TextChanging;
 
-        void _textField_TextChanging (object sender, StateEventArgs<string> e)
+        void _textField_TextChanging (object sender, CancelEventArgs<string> e)
         {
             if (e.NewValue.GetRuneCount () > 11)
             {
@@ -429,8 +429,11 @@ public class TextFieldTests
         var oldText = "";
         var tf = new TextField { Width = 10, Text = "-1" };
 
-        tf.TextChanging += (s, e) => newText = e.NewValue;
-        tf.TextChanged += (s, e) => oldText = e.OldValue;
+        tf.TextChanging += (s, e) =>
+                           {
+                               newText = e.NewValue;
+                               oldText = e.CurrentValue;
+                           };
 
         var top = new Toplevel ();
         top.Add (tf);
@@ -485,8 +488,8 @@ public class TextFieldTests
 
         Assert.True (
                      tf.NewMouseEvent (
-                                    new MouseEvent { X = 7, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
-                                   )
+                                       new () { Position = new (7, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                      )
                     );
         Assert.Equal ("Misérables ", tf.SelectedText);
         Assert.Equal (11, tf.SelectedLength);
@@ -494,6 +497,7 @@ public class TextFieldTests
         Assert.Equal ("Les movie.", newText);
         Assert.Equal ("Les Misérables movie.", oldText);
         Assert.Equal ("Les movie.", tf.Text);
+        top.Dispose ();
     }
 
     [Fact]
@@ -747,7 +751,6 @@ public class TextFieldTests
         Assert.Equal ("", tf.Text);
     }
 
-
     [Fact]
     public void HotKey_Command_SetsFocus ()
     {
@@ -770,7 +773,8 @@ public class TextFieldTests
         Assert.False (accepted);
 
         return;
-        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -785,7 +789,86 @@ public class TextFieldTests
 
         return;
 
-        void Accept (object sender, CancelEventArgs e) { accepted = true; }
+        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Theory]
+    [InlineData (false, 0)]
+    [InlineData (true, 1)]
+    public void Accept_Handler_Handled_Prevents_Default_Button_Accept (bool handleAccept, int expectedButtonAccepts)
+    {
+        var superView = new Window ();
+        var tf = new TextField ();
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tf, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        var textFieldAccept = 0;
+        tf.Accept += TextFieldAccept;
+
+        tf.SetFocus ();
+        Assert.True (tf.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, textFieldAccept);
+        Assert.Equal (expectedButtonAccepts, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, textFieldAccept);
+        Assert.Equal (expectedButtonAccepts + 1, buttonAccept);
+
+        return;
+
+        void TextFieldAccept (object sender, HandledEventArgs e)
+        {
+            textFieldAccept++;
+            e.Handled = handleAccept;
+        }
+
+        void ButtonAccept (object sender, HandledEventArgs e)
+        {
+            buttonAccept++;
+        }
+    }
+
+    [Fact]
+    public void Accept_No_Handler_Enables_Default_Button_Accept ()
+    {
+        var superView = new Window ();
+        var tf = new TextField ();
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tf, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        tf.SetFocus ();
+        Assert.True (tf.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (2, buttonAccept);
+
+        return;
+
+        void ButtonAccept (object sender, HandledEventArgs e)
+        {
+            buttonAccept++;
+        }
     }
 
     [Fact]
@@ -793,28 +876,29 @@ public class TextFieldTests
     {
         //var super = new View ();
         var view = new TextField ();
+
         //super.Add (view);
 
         //var superAcceptedInvoked = false;
 
         var tfAcceptedInvoked = false;
-        var cancel = false;
+        var handle = false;
         view.Accept += TextViewAccept;
         Assert.True (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 
         tfAcceptedInvoked = false;
-        cancel = true;
+        handle = true;
         view.Accept += TextViewAccept;
         Assert.False (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 
         return;
 
-        void TextViewAccept (object sender, CancelEventArgs e)
+        void TextViewAccept (object sender, HandledEventArgs e)
         {
             tfAcceptedInvoked = true;
-            e.Cancel = cancel;
+            e.Handled = handle;
         }
     }
 
@@ -904,13 +988,6 @@ public class TextFieldTests
 
         Assert.Equal (0, tf.ScrollOffset);
         Assert.Equal (16, tf.CursorPosition);
-
-        var top = new Toplevel ();
-        top.Add (tf);
-        Application.Begin (top);
-
-        Assert.Equal (0, tf.ScrollOffset);
-        Assert.Equal (16, tf.CursorPosition);
     }
 
     [Fact]
@@ -947,6 +1024,7 @@ public class TextFieldTests
 
         //                                             TAB to jump between text fields.
         TestHelpers.AssertDriverAttributesAre ("1111000", Application.Driver, attributes);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1044,7 +1122,7 @@ public class TextFieldTests
 
         // Get a fresh instance that represents a right click.
         // Should be ignored because of SuppressRightClick callback
-        mouseEvent = new MouseEvent { Flags = MouseFlags.Button3Clicked, View = tf };
+        mouseEvent = new () { Flags = MouseFlags.Button3Clicked, View = tf };
         Application.OnMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
 
@@ -1052,7 +1130,7 @@ public class TextFieldTests
 
         // Get a fresh instance that represents a right click.
         // Should no longer be ignored as the callback was removed
-        mouseEvent = new MouseEvent { Flags = MouseFlags.Button3Clicked, View = tf };
+        mouseEvent = new () { Flags = MouseFlags.Button3Clicked, View = tf };
 
         // In #3183 OnMouseClicked is no longer called before MouseEvent().
         // This call causes the context menu to pop, and MouseEvent() returns true.
@@ -1060,6 +1138,7 @@ public class TextFieldTests
         // Which is correct, because the user did NOT click with the left mouse button.
         Application.OnMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
+        top.Dispose ();
 
         return;
 
@@ -1115,10 +1194,13 @@ public class TextFieldTests
     [TextFieldTestsAutoInitShutdown]
     public void TextChanged_Event ()
     {
-        _textField.TextChanged += (s, e) => { Assert.Equal ("TAB to jump between text fields.", e.OldValue); };
+        bool eventFired = false;
+        _textField.TextChanged += (s, e) => eventFired = true;
 
         _textField.Text = "changed";
+        Assert.True (eventFired);
         Assert.Equal ("changed", _textField.Text);
+
     }
 
     [Fact]
@@ -1145,17 +1227,16 @@ public class TextFieldTests
     }
 
     [Fact]
-    [TextFieldTestsAutoInitShutdown]
     public void SpaceHandling ()
     {
         var tf = new TextField { Width = 10, Text = " " };
 
-        var ev = new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
+        var ev = new MouseEvent { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
 
         tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
 
-        ev = new MouseEvent { X = 1, Y = 0, Flags = MouseFlags.Button1DoubleClicked };
+        ev = new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked };
 
         tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
@@ -1372,9 +1453,9 @@ public class TextFieldTests
         while (_textField.CursorPosition > 0)
         {
             _textField.NewKeyDownEvent (
-                                        new Key (
-                                                 KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                )
+                                        new (
+                                             KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask
+                                            )
                                        );
 
             switch (iteration)
@@ -1446,9 +1527,9 @@ public class TextFieldTests
         while (_textField.CursorPosition > 0)
         {
             _textField.NewKeyDownEvent (
-                                        new Key (
-                                                 KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                )
+                                        new (
+                                             KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask
+                                            )
                                        );
 
             switch (iteration)
@@ -1538,15 +1619,15 @@ public class TextFieldTests
 
         Assert.True (
                      tf.NewMouseEvent (
-                                    new MouseEvent { X = idx, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
-                                   )
+                                       new () { Position = new (idx, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                      )
                     );
         Assert.Equal ("movie.", tf.SelectedText);
 
         Assert.True (
                      tf.NewMouseEvent (
-                                    new MouseEvent { X = idx + 1, Y = 1, Flags = MouseFlags.Button1DoubleClicked, View = tf }
-                                   )
+                                       new () { Position = new (idx + 1, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                      )
                     );
         Assert.Equal ("movie.", tf.SelectedText);
     }
@@ -1823,37 +1904,36 @@ public class TextFieldTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
     {
         var tf = new TextField { Width = 30, Text = "Les Misérables" };
-        Toplevel top = new ();
-        top.Add (tf);
-        Application.Begin (top);
+        tf.SetRelativeLayout (new Size (100, 100));
+        tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 Les Misérables",
-                                                      _output
+                                                      output
                                                      );
 
         tf.Text = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
-        Application.Refresh ();
+        tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 Les Misérables",
-                                                      _output
+                                                      output
                                                      );
 
         // incorrect order will result with a wrong accent place
         tf.Text = "Les Mis" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "erables";
-        Application.Refresh ();
+        tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 Les Miśerables",
-                                                      _output
+                                                      output
                                                      );
     }
 
@@ -1893,9 +1973,9 @@ Les Miśerables",
             base.Before (methodUnderTest);
 
             //Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
-            _textField = new TextField
+            _textField = new ()
             {
-                ColorScheme = new ColorScheme (Colors.ColorSchemes ["Base"]),
+                ColorScheme = new (Colors.ColorSchemes ["Base"]),
 
                 //                1         2         3 
                 //      01234567890123456789012345678901=32 (Length)

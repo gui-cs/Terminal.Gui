@@ -860,12 +860,23 @@ public static class ConsoleKeyMapping
                 keyCode = KeyCode.F24;
 
                 break;
+            case ConsoleKey.Clear:
+                keyCode = KeyCode.Clear;
+
+                break;
             case ConsoleKey.Tab:
                 keyCode = KeyCode.Tab;
 
                 break;
             default:
-                keyCode = (KeyCode)consoleKeyInfo.KeyChar;
+                if ((int)consoleKeyInfo.KeyChar is >= 1 and <= 26)
+                {
+                    keyCode = (KeyCode)(consoleKeyInfo.KeyChar + 64);
+                }
+                else
+                {
+                    keyCode = (KeyCode)consoleKeyInfo.KeyChar;
+                }
 
                 break;
         }

@@ -793,7 +793,6 @@ public class TileViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringInsertTile ()
     {
         TileView tv = GetTileView (20, 10);
@@ -822,7 +821,6 @@ public class TileViewTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRebuildForTileCount ()
     {
         TileView tv = GetTileView (20, 10);
@@ -850,7 +848,6 @@ public class TileViewTests
     }
 
     [Theory]
-    [AutoInitShutdown]
     [InlineData (0)]
     [InlineData (1)]
     public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRemoveTile (int idx)
@@ -1663,7 +1660,7 @@ public class TileViewTests
         var ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Right (tileView)));
         Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosView", ex.Message);
 
-        ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Function (() => 1)));
+        ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Func (() => 1)));
         Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosFunc", ex.Message);
 
         // Also not allowed because this results in a PosCombine
@@ -1758,7 +1755,7 @@ public class TileViewTests
         Assert.False (tileView.SetSplitterPos (0, 0));
 
         // position should remain where it was, at 50%
-        Assert.Equal (Pos.Percent (50f), tileView.SplitterDistances.ElementAt (0));
+        Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
 
         tileView.Draw ();
 
@@ -1959,7 +1956,7 @@ public class TileViewTests
     {
         TileView tileView = Get11By3TileView (out LineView line);
         tileView.SetSplitterPos (0, Pos.Percent (50));
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
         tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
 
         tileView.Draw ();
@@ -1983,7 +1980,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Even when moving the splitter location it should stay a Percentage based one
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
 
         // and 2 to the left
         line.NewKeyDownEvent (Key.CursorLeft);
@@ -1998,7 +1995,7 @@ public class TileViewTests
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Even when moving the splitter location it should stay a Percentage based one
-        Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
+        Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
     }
 
     [Fact]
@@ -2282,27 +2279,27 @@ public class TileViewTests
 
         tv.Tiles.ElementAt (0)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
                            );
 
         tv.Tiles.ElementAt (1)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
                            );
 
         tv.Tiles.ElementAt (2)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('3', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('3', 100) }
                            );
 
         tv.Tiles.ElementAt (3)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('4', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('4', 100) }
                            );
 
         tv.Tiles.ElementAt (4)
           .ContentView.Add (
-                            new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('5', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('5', 100) }
                            );
 
         var top = new Toplevel ();
@@ -2397,14 +2394,13 @@ public class TileViewTests
 
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
-                                   new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
+                                   new Label { Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
                                   );
 
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
                                    new Label
                                    {
-                                       AutoSize = false,
                                        Width = Dim.Fill (),
                                        Height = 1,
                                        Y = 1,
@@ -2414,14 +2410,13 @@ public class TileViewTests
 
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
-                                   new Label { AutoSize = false, Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
+                                   new Label { Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
                                   );
 
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
                                    new Label
                                    {
-                                       AutoSize = false,
                                        Width = Dim.Fill (),
                                        Height = 1,
                                        Y = 1,

@@ -1,16 +1,29 @@
 using System.Collections;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
 /// <summary>Implement <see cref="IListDataSource"/> to provide custom rendering for a <see cref="ListView"/>.</summary>
-public interface IListDataSource
+public interface IListDataSource: IDisposable
 {
+    /// <summary>
+    /// Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
+    /// </summary>
+    event NotifyCollectionChangedEventHandler CollectionChanged;
+
     /// <summary>Returns the number of elements to display</summary>
     int Count { get; }
 
     /// <summary>Returns the maximum length of elements to display</summary>
     int Length { get; }
+
+    /// <summary>
+    /// Allow suspending the <see cref="CollectionChanged"/> event from being invoked,
+    /// if <see langword="true"/>, otherwise is <see langword="false"/>.
+    /// </summary>
+    bool SuspendCollectionChangedEvent { get; set; }
 
     /// <summary>Should return whether the specified item is currently marked.</summary>
     /// <returns><see langword="true"/>, if marked, <see langword="false"/> otherwise.</returns>
@@ -64,7 +77,7 @@ public interface IListDataSource
 ///     </para>
 ///     <para>
 ///         By default <see cref="ListView"/> uses <see cref="object.ToString"/> to render the items of any
-///         <see cref="IList"/> object (e.g. arrays, <see cref="List{T}"/>, and other collections). Alternatively, an
+///         <see cref="ObservableCollection{T}"/> object (e.g. arrays, <see cref="List{T}"/>, and other collections). Alternatively, an
 ///         object that implements <see cref="IListDataSource"/> can be provided giving full control of what is rendered.
 ///     </para>
 ///     <para>
@@ -88,7 +101,7 @@ public interface IListDataSource
 ///         first item that starts with what the user types will be selected.
 ///     </para>
 /// </remarks>
-public class ListView : View
+public class ListView : View, IDesignable
 {
     private bool _allowsMarking;
     private bool _allowsMultipleSelection = true;
@@ -258,13 +271,19 @@ public class ListView : View
         set
         {
             if (_source == value)
-
             {
                 return;
             }
+
+            _source?.Dispose ();
             _source = value;
 
-            ContentSize = new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width);
+            if (_source is { })
+            {
+                _source.CollectionChanged += Source_CollectionChanged;
+            }
+
+            SetContentSize (new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width));
             if (IsInitialized)
             {
                 Viewport = Viewport with { Y = 0 };
@@ -275,6 +294,20 @@ public class ListView : View
             _lastSelectedItem = -1;
             SetNeedsDisplay ();
         }
+    }
+
+    private void Source_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+    {
+        SetContentSize (new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width));
+
+        if (Source is { Count: > 0 } && _selected > Source.Count - 1)
+        {
+            SelectedItem = Source.Count - 1;
+        }
+
+        SetNeedsDisplay ();
+
+        OnCollectionChanged (e);
     }
 
     /// <summary>Gets or sets the index of the item that will appear at the top of the <see cref="View.Viewport"/>.</summary>
@@ -336,7 +369,7 @@ public class ListView : View
             }
             else if (Viewport.Height > 0 && _selected >= Viewport.Y + Viewport.Height)
             {
-                Viewport = Viewport with { Y = _selected - Viewport.Height + 1};
+                Viewport = Viewport with { Y = _selected - Viewport.Height + 1 };
             }
 
             LayoutStarted -= ListView_LayoutStarted;
@@ -408,19 +441,19 @@ public class ListView : View
 
         if (me.Flags == MouseFlags.WheeledLeft)
         {
-            ScrollHorizontal(-1);
+            ScrollHorizontal (-1);
 
             return true;
         }
 
-        if (me.Y + Viewport.Y >= _source.Count
-            || me.Y + Viewport.Y < 0
-            || me.Y + Viewport.Y > Viewport.Y + Viewport.Height)
+        if (me.Position.Y + Viewport.Y >= _source.Count
+            || me.Position.Y + Viewport.Y < 0
+            || me.Position.Y + Viewport.Y > Viewport.Y + Viewport.Height)
         {
             return true;
         }
 
-        _selected = Viewport.Y + me.Y;
+        _selected = Viewport.Y + me.Position.Y;
 
         if (AllowsAll ())
         {
@@ -501,7 +534,12 @@ public class ListView : View
 
             if (Viewport.Y + _selected > Viewport.Height - 1)
             {
-                Viewport = Viewport with { Y = _selected };
+                Viewport = Viewport with
+                {
+                    Y = _selected < Viewport.Height - 1
+                            ? Math.Max (Viewport.Height - _selected + 1, 0)
+                            : Math.Max (_selected - Viewport.Height + 1, 0)
+                };
             }
 
             OnSelectedChanged ();
@@ -686,8 +724,8 @@ public class ListView : View
                 if (_allowsMarking)
                 {
                     Driver.AddRune (
-                                    _source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected :
-                                    AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected
+                                    _source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                    AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected
                                    );
                     Driver.AddRune ((Rune)' ');
                 }
@@ -700,11 +738,6 @@ public class ListView : View
     /// <inheritdoc/>
     public override bool OnEnter (View view)
     {
-        if (IsInitialized)
-        {
-            Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-
         if (_lastSelectedItem != _selected)
         {
             EnsureSelectedItemVisible ();
@@ -781,16 +814,18 @@ public class ListView : View
     public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
     /// <inheritdoc/>
-    public override void PositionCursor ()
+    public override Point? PositionCursor ()
     {
-        if (_allowsMarking)
+        int x = 0;
+        int y = _selected - Viewport.Y;
+        if (!_allowsMarking)
         {
-            Move (0, _selected - Viewport.Y);
+            x = Viewport.Width - 1;
         }
-        else
-        {
-            Move (Viewport.Width - 1, _selected - Viewport.Y);
-        }
+
+        Move (x, y);
+
+        return null; // Don't show the cursor
     }
 
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
@@ -799,21 +834,26 @@ public class ListView : View
     /// <summary>This event is raised when the selected item in the <see cref="ListView"/> has changed.</summary>
     public event EventHandler<ListViewItemEventArgs> SelectedItemChanged;
 
+    /// <summary>
+    /// Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
+    /// </summary>
+    public event NotifyCollectionChangedEventHandler CollectionChanged;
+
     /// <summary>Sets the source of the <see cref="ListView"/> to an <see cref="IList"/>.</summary>
     /// <value>An object implementing the IList interface.</value>
     /// <remarks>
-    ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custome
+    ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custom
     ///     rendering.
     /// </remarks>
-    public void SetSource (IList source)
+    public void SetSource<T> (ObservableCollection<T> source)
     {
-        if (source is null && (Source is null || !(Source is ListWrapper)))
+        if (source is null && Source is not ListWrapper<T>)
         {
             Source = null;
         }
         else
         {
-            Source = new ListWrapper (source);
+            Source = new ListWrapper<T> (source);
         }
     }
 
@@ -823,18 +863,18 @@ public class ListView : View
     ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custom
     ///     rendering.
     /// </remarks>
-    public Task SetSourceAsync (IList source)
+    public Task SetSourceAsync<T> (ObservableCollection<T> source)
     {
         return Task.Factory.StartNew (
                                       () =>
                                       {
-                                          if (source is null && (Source is null || !(Source is ListWrapper)))
+                                          if (source is null && (Source is null || !(Source is ListWrapper<T>)))
                                           {
                                               Source = null;
                                           }
                                           else
                                           {
-                                              Source = new ListWrapper (source);
+                                              Source = new ListWrapper<T> (source);
                                           }
 
                                           return source;
@@ -846,35 +886,125 @@ public class ListView : View
     }
 
     private void ListView_LayoutStarted (object sender, LayoutEventArgs e) { EnsureSelectedItemVisible (); }
+    /// <summary>
+    /// Call the event to raises the <see cref="CollectionChanged"/>.
+    /// </summary>
+    /// <param name="e"></param>
+    protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e) { CollectionChanged?.Invoke (this, e); }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        _source?.Dispose ();
+
+        base.Dispose (disposing);
+    }
+
+    /// <summary>
+    /// Allow suspending the <see cref="CollectionChanged"/> event from being invoked,
+    /// </summary>
+    public void SuspendCollectionChangedEvent ()
+    {
+        if (Source is { })
+        {
+            Source.SuspendCollectionChangedEvent = true;
+        }
+    }
+
+    /// <summary>
+    /// Allow resume the <see cref="CollectionChanged"/> event from being invoked,
+    /// </summary>
+    public void ResumeSuspendCollectionChangedEvent ()
+    {
+        if (Source is { })
+        {
+            Source.SuspendCollectionChangedEvent = false;
+        }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        var source = new ListWrapper<string> (["List Item 1", "List Item two", "List Item Quattro", "Last List Item"]);
+        Source = source;
+
+        return true;
+    }
 }
 
 /// <summary>
 ///     Provides a default implementation of <see cref="IListDataSource"/> that renders <see cref="ListView"/> items
 ///     using <see cref="object.ToString()"/>.
 /// </summary>
-public class ListWrapper : IListDataSource
+public class ListWrapper<T> : IListDataSource, IDisposable
 {
-    private readonly int _count;
-    private readonly BitArray _marks;
-    private readonly IList _source;
+    private int _count;
+    private BitArray _marks;
+    private readonly ObservableCollection<T> _source;
 
     /// <inheritdoc/>
-    public ListWrapper (IList source)
+    public ListWrapper (ObservableCollection<T> source)
     {
         if (source is { })
         {
             _count = source.Count;
             _marks = new BitArray (_count);
             _source = source;
+            _source.CollectionChanged += Source_CollectionChanged;
             Length = GetMaxLengthItem ();
         }
     }
 
-    /// <inheritdoc/>
-    public int Count => _source is { } ? _source.Count : 0;
+    private void Source_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (!SuspendCollectionChangedEvent)
+        {
+            CheckAndResizeMarksIfRequired ();
+            CollectionChanged?.Invoke (sender, e);
+        }
+    }
+
+    /// <inheritdoc />
+    public event NotifyCollectionChangedEventHandler CollectionChanged;
 
     /// <inheritdoc/>
-    public int Length { get; }
+    public int Count => _source?.Count ?? 0;
+
+    /// <inheritdoc/>
+    public int Length { get; private set; }
+
+    private bool _suspendCollectionChangedEvent;
+
+    /// <inheritdoc />
+    public bool SuspendCollectionChangedEvent
+    {
+        get => _suspendCollectionChangedEvent;
+        set
+        {
+            _suspendCollectionChangedEvent = value;
+
+            if (!_suspendCollectionChangedEvent)
+            {
+                CheckAndResizeMarksIfRequired ();
+            }
+        }
+    }
+
+    private void CheckAndResizeMarksIfRequired ()
+    {
+        if (_source != null && _count != _source.Count)
+        {
+            _count = _source.Count;
+            BitArray newMarks = new BitArray (_count);
+            for (var i = 0; i < Math.Min (_marks.Length, newMarks.Length); i++)
+            {
+                newMarks [i] = _marks [i];
+            }
+            _marks = newMarks;
+
+            Length = GetMaxLengthItem ();
+        }
+    }
 
     /// <inheritdoc/>
     public void Render (
@@ -889,25 +1019,25 @@ public class ListWrapper : IListDataSource
     )
     {
         container.Move (Math.Max (col - start, 0), line);
-        object t = _source? [item];
 
-        if (t is null)
+        if (_source is { })
         {
-            RenderUstr (driver, "", col, line, width);
-        }
-        else
-        {
-            if (t is string u)
+            object t = _source [item];
+
+            if (t is null)
             {
-                RenderUstr (driver, u, col, line, width, start);
-            }
-            else if (t is string s)
-            {
-                RenderUstr (driver, s, col, line, width, start);
+                RenderUstr (driver, "", col, line, width);
             }
             else
             {
-                RenderUstr (driver, t.ToString (), col, line, width, start);
+                if (t is string s)
+                {
+                    RenderUstr (driver, s, col, line, width, start);
+                }
+                else
+                {
+                    RenderUstr (driver, t.ToString (), col, line, width, start);
+                }
             }
         }
     }
@@ -1005,13 +1135,22 @@ public class ListWrapper : IListDataSource
     private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
     {
         string str = start > ustr.GetColumns () ? string.Empty : ustr.Substring (Math.Min (start, ustr.ToRunes ().Length - 1));
-        string u = TextFormatter.ClipAndJustify (str, width, TextAlignment.Left);
+        string u = TextFormatter.ClipAndJustify (str, width, Alignment.Start);
         driver.AddStr (u);
         width -= u.GetColumns ();
 
         while (width-- > 0)
         {
             driver.AddRune ((Rune)' ');
+        }
+    }
+
+    /// <inheritdoc />
+    public void Dispose ()
+    {
+        if (_source is { })
+        {
+            _source.CollectionChanged -= Source_CollectionChanged;
         }
     }
 }

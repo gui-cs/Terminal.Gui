@@ -42,12 +42,15 @@ public class LineDrawing : Scenario
 
             foreach (LineCanvas canvas in _layers)
             {
-                foreach (KeyValuePair<Point, Cell> c in canvas.GetCellMap ())
+                foreach (KeyValuePair<Point, Cell?> c in canvas.GetCellMap ())
                 {
-                    Driver.SetAttribute (c.Value.Attribute ?? ColorScheme.Normal);
+                    if (c.Value is { })
+                    {
+                        Driver.SetAttribute (c.Value.Value.Attribute ?? ColorScheme.Normal);
 
-                    // TODO: #2616 - Support combining sequences that don't normalize
-                    AddRune (c.Key.X, c.Key.Y, c.Value.Rune);
+                        // TODO: #2616 - Support combining sequences that don't normalize
+                        AddRune (c.Key.X, c.Key.Y, c.Value.Value.Rune);
+                    }
                 }
             }
         }
@@ -92,7 +95,7 @@ public class LineDrawing : Scenario
                 {
                     // Mouse pressed down
                     _currentLine = new StraightLine (
-                                                     new Point (mouseEvent.X, mouseEvent.Y),
+                                                     mouseEvent.Position,
                                                      0,
                                                      Orientation.Vertical,
                                                      LineStyle,
@@ -105,7 +108,7 @@ public class LineDrawing : Scenario
                 {
                     // Mouse dragged
                     Point start = _currentLine.Start;
-                    var end = new Point (mouseEvent.X, mouseEvent.Y);
+                    var end = mouseEvent.Position;
                     var orientation = Orientation.Vertical;
                     int length = end.Y - start.Y;
 

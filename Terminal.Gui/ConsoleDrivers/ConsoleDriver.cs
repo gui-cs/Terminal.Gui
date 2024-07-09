@@ -315,12 +315,31 @@ public abstract class ConsoleDriver
                 {
                     Contents [row, c] = new Cell
                     {
-                        Rune = (Rune)' ', 
-                        Attribute = new Attribute (Color.White, Color.Black), 
+                        Rune = (Rune)' ',
+                        Attribute = new Attribute (Color.White, Color.Black),
                         IsDirty = true
                     };
-                    _dirtyLines [row] = true;
                 }
+                _dirtyLines [row] = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sets <see cref="Contents"/> as dirty for situations where views
+    /// don't need layout and redrawing, but just refresh the screen.
+    /// </summary>
+    public void SetContentsAsDirty ()
+    {
+        lock (Contents)
+        {
+            for (var row = 0; row < Rows; row++)
+            {
+                for (var c = 0; c < Cols; c++)
+                {
+                    Contents [row, c].IsDirty = true;
+                }
+                _dirtyLines [row] = true;
             }
         }
     }

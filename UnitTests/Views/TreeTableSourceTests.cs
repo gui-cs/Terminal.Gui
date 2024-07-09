@@ -13,22 +13,23 @@ public class TreeTableSourceTests : IDisposable
     {
         _output = output;
 
-        _origChecked = ConfigurationManager.Glyphs.Checked;
-        _origUnchecked = ConfigurationManager.Glyphs.UnChecked;
-        ConfigurationManager.Glyphs.Checked = new Rune ('☑');
-        ConfigurationManager.Glyphs.UnChecked = new Rune ('☐');
+        _origChecked = ConfigurationManager.Glyphs.CheckStateChecked;
+        _origUnchecked = ConfigurationManager.Glyphs.CheckStateUnChecked;
+        ConfigurationManager.Glyphs.CheckStateChecked = new Rune ('☑');
+        ConfigurationManager.Glyphs.CheckStateUnChecked = new Rune ('☐');
     }
 
     public void Dispose ()
     {
-        ConfigurationManager.Glyphs.Checked = _origChecked;
-        ConfigurationManager.Glyphs.UnChecked = _origUnchecked;
+        ConfigurationManager.Glyphs.CheckStateChecked = _origChecked;
+        ConfigurationManager.Glyphs.CheckStateUnChecked = _origUnchecked;
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeTableSource_BasicExpanding_WithKeyboard ()
     {
+        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
@@ -84,9 +85,11 @@ public class TreeTableSourceTests : IDisposable
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void TestTreeTableSource_BasicExpanding_WithMouse ()
     {
+        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
@@ -108,7 +111,7 @@ public class TreeTableSourceTests : IDisposable
         Assert.Equal (0, tv.SelectedRow);
         Assert.Equal (0, tv.SelectedColumn);
 
-        Assert.True (tv.NewMouseEvent (new MouseEvent { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked }));
+        Assert.True (tv.NewMouseEvent (new MouseEvent { Position = new (2, 2), Flags = MouseFlags.Button1Clicked }));
 
         tv.Draw ();
 
@@ -125,15 +128,15 @@ public class TreeTableSourceTests : IDisposable
         TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Clicking to the right/left of the expand/collapse does nothing
-        tv.NewMouseEvent (new MouseEvent { X = 3, Y = 2, Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEvent { Position = new (3, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         TestHelpers.AssertDriverContentsAre (expected, _output);
-        tv.NewMouseEvent (new MouseEvent { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEvent { Position = new (1, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Clicking on the + again should collapse
-        tv.NewMouseEvent (new MouseEvent { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEvent { Position = new (2, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
 
         expected =
@@ -223,6 +226,7 @@ public class TreeTableSourceTests : IDisposable
 
         Assert.Equal ("Ford Trans-Am", selected.Name);
         Assert.Equal ("Talking thunderbird car", selected.Description);
+        top.Dispose ();
     }
 
     private TableView GetTreeTable (out TreeView<IDescribedThing> tree)

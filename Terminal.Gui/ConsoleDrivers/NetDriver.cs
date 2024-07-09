@@ -208,7 +208,7 @@ internal class NetEvents : IDisposable
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            Task.Delay (100);
+            Task.Delay (100, cancellationToken).Wait (cancellationToken);
 
             if (Console.KeyAvailable)
             {
@@ -223,7 +223,7 @@ internal class NetEvents : IDisposable
 
     private void ProcessInputQueue ()
     {
-        while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
+        while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
         {
             try
             {
@@ -242,13 +242,8 @@ internal class NetEvents : IDisposable
                 ConsoleModifiers mod = 0;
                 ConsoleKeyInfo newConsoleKeyInfo = default;
 
-                while (true)
+                while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
                 {
-                    if (_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
                     ConsoleKeyInfo consoleKeyInfo;
 
                     try
@@ -338,7 +333,7 @@ internal class NetEvents : IDisposable
             while (!cancellationToken.IsCancellationRequested)
             {
                 // Wait for a while then check if screen has changed sizes
-                Task.Delay (500, cancellationToken);
+                Task.Delay (500, cancellationToken).Wait (cancellationToken);
 
                 int buffHeight, buffWidth;
 
@@ -367,13 +362,8 @@ internal class NetEvents : IDisposable
             cancellationToken.ThrowIfCancellationRequested ();
         }
 
-        while (true)
+        while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
         {
-            if (_inputReadyCancellationTokenSource.IsCancellationRequested)
-            {
-                return;
-            }
-
             try
             {
                 _winChange.Wait (_inputReadyCancellationTokenSource.Token);
@@ -852,11 +842,37 @@ internal class NetDriver : ConsoleDriver
         { }
     }
 
-    #region Not Implemented
+    public override void Suspend ()
+    {
+        if (Environment.OSVersion.Platform != PlatformID.Unix)
+        {
+            return;
+        }
 
-    public override void Suspend () { throw new NotImplementedException (); }
+        StopReportingMouseMoves ();
 
-    #endregion
+        if (!RunningUnitTests)
+        {
+            Console.ResetColor ();
+            Console.Clear ();
+
+            //Disable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+            //Set cursor key to cursor.
+            Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+
+            Platform.Suspend ();
+
+            //Enable alternative screen buffer.
+            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+
+            SetContentsAsDirty ();
+            Refresh ();
+        }
+
+        StartReportingMouseMoves ();
+    }
 
     public override void UpdateScreen ()
     {
@@ -877,7 +893,7 @@ internal class NetDriver : ConsoleDriver
         Attribute? redrawAttr = null;
         int lastCol = -1;
 
-        CursorVisibility? savedVisibitity = _cachedCursorVisibility;
+        CursorVisibility? savedVisibility = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
 
         for (int row = top; row < rows; row++)
@@ -1006,7 +1022,7 @@ internal class NetDriver : ConsoleDriver
 
         SetCursorPosition (0, 0);
 
-        _cachedCursorVisibility = savedVisibitity;
+        _cachedCursorVisibility = savedVisibility;
 
         void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
         {
@@ -1137,7 +1153,7 @@ internal class NetDriver : ConsoleDriver
                 break;
             case EventType.Mouse:
                 MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
-                Debug.WriteLine ($"NetDriver: ({me.X},{me.Y}) - {me.Flags}");
+                //Debug.WriteLine ($"NetDriver: ({me.X},{me.Y}) - {me.Flags}");
                 OnMouseEvent (me);
 
                 break;
@@ -1333,12 +1349,9 @@ internal class NetDriver : ConsoleDriver
     {
         _cachedCursorVisibility = visibility;
 
-        bool isVisible = RunningUnitTests
-                             ? visibility == CursorVisibility.Default
-                             : Console.CursorVisible = visibility == CursorVisibility.Default;
-        Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+        Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
 
-        return isVisible;
+        return visibility == CursorVisibility.Default;
     }
 
     public override bool EnsureCursorVisibility ()
@@ -1523,7 +1536,7 @@ internal class NetDriver : ConsoleDriver
             mouseFlag |= MouseFlags.ButtonAlt;
         }
 
-        return new MouseEvent { X = me.Position.X, Y = me.Position.Y, Flags = mouseFlag };
+        return new MouseEvent { Position = me.Position, Flags = mouseFlag };
     }
 
     #endregion Mouse Handling
@@ -1591,10 +1604,7 @@ internal class NetDriver : ConsoleDriver
                 return KeyCode.Tab;
             }
 
-            if (keyInfo.Key == ConsoleKey.Tab)
-            {
-                return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
-            }
+            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
         }
 
         // Handle control keys (e.g. CursorUp)
@@ -1648,7 +1658,7 @@ internal class NetDriver : ConsoleDriver
         }
 
 
-        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
+        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
     }
 
     #endregion Keyboard Handling
@@ -1670,7 +1680,7 @@ internal class NetMainLoop : IMainLoopDriver
     private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
     private readonly Queue<InputResult?> _resultQueue = new ();
     private readonly ManualResetEventSlim _waitForProbe = new (false);
-    private CancellationTokenSource _eventReadyTokenSource = new ();
+    private readonly CancellationTokenSource _eventReadyTokenSource = new ();
     private MainLoop _mainLoop;
 
     /// <summary>Initializes the class with the console driver.</summary>
@@ -1722,13 +1732,12 @@ internal class NetMainLoop : IMainLoopDriver
             _eventReady.Reset ();
         }
 
+        _eventReadyTokenSource.Token.ThrowIfCancellationRequested ();
+
         if (!_eventReadyTokenSource.IsCancellationRequested)
         {
             return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
         }
-
-        _eventReadyTokenSource.Dispose ();
-        _eventReadyTokenSource = new CancellationTokenSource ();
 
         return true;
     }
@@ -1786,26 +1795,21 @@ internal class NetMainLoop : IMainLoopDriver
                 return;
             }
 
+            _inputHandlerTokenSource.Token.ThrowIfCancellationRequested ();
+
             if (_resultQueue.Count == 0)
             {
                 _resultQueue.Enqueue (_netEvents.DequeueInput ());
             }
 
-            try
+            while (_resultQueue.Count > 0 && _resultQueue.Peek () is null)
             {
-                while (_resultQueue.Peek () is null)
-                {
-                    _resultQueue.Dequeue ();
-                }
-
-                if (_resultQueue.Count > 0)
-                {
-                    _eventReady.Set ();
-                }
+                _resultQueue.Dequeue ();
             }
-            catch (InvalidOperationException)
+
+            if (_resultQueue.Count > 0)
             {
-                // Ignore
+                _eventReady.Set ();
             }
         }
     }

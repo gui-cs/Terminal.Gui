@@ -59,6 +59,8 @@ public class ASCIICustomButtonTest : Scenario
         Application.Run (top);
         top.Dispose ();
 
+        Application.Shutdown ();
+
         return;
 
         void ChangeWindowSize ()
@@ -81,8 +83,6 @@ public class ASCIICustomButtonTest : Scenario
         public void CustomInitialize ()
         {
             _border = new FrameView { Width = Width, Height = Height };
-
-            AutoSize = false;
 
             var fillText = new StringBuilder ();
 
@@ -198,7 +198,6 @@ public class ASCIICustomButtonTest : Scenario
 
                 var button = new ASCIICustomButton
                 {
-                    AutoSize = false,
                     Id = j.ToString (),
                     Text = $"section {j}",
                     Y = yPos,
@@ -217,7 +216,6 @@ public class ASCIICustomButtonTest : Scenario
 
             var closeButton = new ASCIICustomButton
             {
-                AutoSize = false,
                 Id = "close",
                 Text = "Close",
                 Y = Pos.Bottom (prevButton),
@@ -239,7 +237,8 @@ public class ASCIICustomButtonTest : Scenario
                 pages++;
             }
 
-            _scrollView.ContentSize = new (25, pages * BUTTONS_ON_PAGE * BUTTON_HEIGHT);
+            // BUGBUG: set_ContentSize is supposed to be `protected`. 
+            _scrollView.SetContentSize (new (25, pages * BUTTONS_ON_PAGE * BUTTON_HEIGHT));
 
             if (_smallerWindow)
             {
@@ -273,7 +272,7 @@ public class ASCIICustomButtonTest : Scenario
                 case KeyCode.End:
                     _scrollView.ContentOffset = new Point (
                                                            _scrollView.ContentOffset.X,
-                                                           -(_scrollView.ContentSize.Height
+                                                           -(_scrollView.GetContentSize ().Height
                                                              - _scrollView.Frame.Height
                                                              + (_scrollView.ShowHorizontalScrollIndicator ? 1 : 0))
                                                           );
@@ -291,7 +290,7 @@ public class ASCIICustomButtonTest : Scenario
                                                            Math.Max (
                                                                      _scrollView.ContentOffset.Y
                                                                      - _scrollView.Frame.Height,
-                                                                     -(_scrollView.ContentSize.Height
+                                                                     -(_scrollView.GetContentSize ().Height
                                                                        - _scrollView.Frame.Height
                                                                        + (_scrollView.ShowHorizontalScrollIndicator
                                                                               ? 1

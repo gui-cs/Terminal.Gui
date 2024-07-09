@@ -13,11 +13,10 @@ public class ColorPickerTests
         colorPicker.BeginInit ();
         colorPicker.EndInit ();
         colorPicker.LayoutSubviews ();
-        Assert.Equal (new Rectangle (0, 0, 32, 4), colorPicker.Frame);
+        Assert.Equal (new (0, 0, 32, 4), colorPicker.Frame);
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void KeyBindings_Command ()
     {
         var colorPicker = new ColorPicker ();
@@ -52,14 +51,14 @@ public class ColorPickerTests
         top.Add (colorPicker);
         Application.Begin (top);
 
-        Assert.False (colorPicker.NewMouseEvent (new MouseEvent ()));
+        Assert.False (colorPicker.NewMouseEvent (new ()));
 
-        Assert.True (colorPicker.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1Clicked, X = 4, Y = 1 }));
+        Assert.True (colorPicker.NewMouseEvent (new() { Position = new (4, 1), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (ColorName.Blue, colorPicker.SelectedColor);
+        top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void SelectedColorAndCursor ()
     {
         var colorPicker = new ColorPicker ();
@@ -71,7 +70,7 @@ public class ColorPickerTests
         Assert.Equal (0, colorPicker.Cursor.X);
         Assert.Equal (0, colorPicker.Cursor.Y);
 
-        colorPicker.Cursor = new Point (7, 1);
+        colorPicker.Cursor = new (7, 1);
         Assert.Equal (ColorName.White, colorPicker.SelectedColor);
 
         colorPicker.Cursor = Point.Empty;
