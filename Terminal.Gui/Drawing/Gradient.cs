@@ -34,7 +34,9 @@ public enum GradientDirection
 }
 
 /// <summary>
-/// Describes
+/// Describes a <see cref="Spectrum"/> of colors that can be combined
+/// to make a color gradient.  Use <see cref="BuildCoordinateColorMapping"/>
+/// to create into gradient fill area maps.
 /// </summary>
 public class Gradient
 {
