@@ -13,11 +13,20 @@ on:
 jobs:
   build_and_test:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Turn off fail-fast to let all runners run even if there are errors
+      fail-fast: true
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
     timeout-minutes: 10
     steps:
-    
-    - uses: actions/checkout@v4
+
+# Build
+
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
@@ -32,23 +41,39 @@ jobs:
     - name: Build Debug
       run: dotnet build --configuration Debug --no-restore
 
-      # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
-      # Without it, the test runner crashes on ubuntu (but not Windows)/
+# Test
+    # Note: The --blame and VSTEST_DUMP_PATH stuff is needed to diagnose the test runner crashing on ubuntu/mac
+    # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
+    # Without it, the test runner crashes on ubuntu (but not Windows or mac)
+
+    - name: MacOS - Patch test runner settings to stop on fail
+      if: runner.os == 'macOS'
+      run: |
+        brew install gnu-sed
+        gsed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
+
+    - name: Windows/Linux - Patch test runner settings to stop on fail
+      if: runner.os != 'macOS'
+      run: |
+          sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
+
+    - name: Set VSTEST_DUMP_PATH
+      shell: bash
+      run: echo "{VSTEST_DUMP_PATH}={logs/${{ runner.os }}/}" >> $GITHUB_ENV
+
     - name: Test
       run: |
-        sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
-        dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
-       
-        # mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
+       dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
+     
+       # mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
     - name: Upload Test Logs
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: test-logs
+        name: test-logs-${{ runner.os }}
         path: |
           logs/    
-          uploads/
           UnitTests/TestResults/
   
     # Note: this step is currently not writing to the gist for some reason
