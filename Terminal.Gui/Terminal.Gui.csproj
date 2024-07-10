@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <!-- =================================================================== -->
   <!-- Version numbers -->
   <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
@@ -19,7 +19,7 @@
   <!-- .NET Build Settings -->
   <!-- =================================================================== -->
   <PropertyGroup>
-    <TargetFrameworks>net8.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>12</LangVersion>
     <RootNamespace>$(AssemblyName)</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
