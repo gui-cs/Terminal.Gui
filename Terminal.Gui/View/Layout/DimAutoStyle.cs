@@ -1,4 +1,4 @@
-using Terminal.Gui.Analyzers.Internal.Attributes;
+
 
 namespace Terminal.Gui;
 
@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 ///     Specifies how <see cref="Dim.Auto"/> will compute the dimension.
 /// </summary>
 [Flags]
-[GenerateEnumExtensionMethods (FastHasFlags = true)]
+
 public enum DimAutoStyle
 {
     /// <summary>
