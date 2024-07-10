@@ -43,7 +43,6 @@ jobs:
     - name: Build Release
       run: |
         dotnet-gitversion /updateprojectfiles
-        dotnet build ./Analyzers/Terminal.Gui.Analyzers.Internal --no-incremental --nologo --force --configuration Release
         dotnet build --no-incremental --nologo --force --configuration Release
 
     - name: Pack
