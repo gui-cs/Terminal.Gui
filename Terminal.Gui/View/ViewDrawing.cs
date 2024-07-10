@@ -28,9 +28,21 @@ public partial class View
         }
     }
 
+    private readonly LineCanvas _lineCanvas = new ();
+
     /// <summary>The canvas that any line drawing that is to be shared by subviews of this view should add lines to.</summary>
     /// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
-    public LineCanvas LineCanvas { get; } = new ();
+    public LineCanvas LineCanvas
+    {
+        get
+        {
+            //if (SuperView is Adornment adornment)
+            //{
+            //    return adornment.Parent.LineCanvas;
+            //}
+            return _lineCanvas;
+        }
+    }
 
     // The view-relative region that needs to be redrawn. Marked internal for unit tests.
     internal Rectangle _needsDisplayRect = Rectangle.Empty;
@@ -234,7 +246,7 @@ public partial class View
             Driver.Clip = prevClip;
         }
 
-        OnRenderLineCanvas ();
+        //OnRenderLineCanvas ();
 
         // TODO: This is a hack to force the border subviews to draw.
         if (Border?.Subviews is { })
@@ -248,6 +260,8 @@ public partial class View
 
         // Invoke DrawContentCompleteEvent
         OnDrawContentComplete (Viewport);
+
+        OnRenderLineCanvas ();
 
         // BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
         ClearLayoutNeeded ();

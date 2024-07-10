@@ -24,9 +24,9 @@ public class LineCanvasExperiment : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["Base"]
+            ColorScheme = Colors.ColorSchemes ["Base"],
+            BorderStyle = LineStyle.None
         };
-        frame1.BorderStyle = LineStyle.Double;
 
         //View.Diagnostics ^= DiagnosticFlags.FrameRuler;
 
@@ -46,79 +46,99 @@ public class LineCanvasExperiment : Scenario
         };
         win1.Padding.Thickness = new (1);
 
-        frame1.Add (win1);
+        //app.Add (win1);
 
-        var win2 = new Window
-        {
-            Title = "win2",
-            Text = "Win2 right of win1, 30%/70% Single.",
-            X = Pos.Right (win1) - 1,
-            Y = 0,
-            Width = Dim.Percent (30),
-            Height = Dim.Percent (70),
+        //var win2 = new Window
+        //{
+        //    Title = "win2",
+        //    Text = "Win2 right of win1, 30%/70% Single.",
+        //    X = Pos.Right (win1) - 1,
+        //    Y = 0,
+        //    Width = Dim.Percent (30),
+        //    Height = Dim.Percent (70),
 
-            //ColorScheme = Colors.ColorSchemes ["Error"],
-            SuperViewRendersLineCanvas = true
-        };
+        //    //ColorScheme = Colors.ColorSchemes ["Error"],
+        //    SuperViewRendersLineCanvas = true
+        //};
 
-        frame1.Add (win2);
+        //app.Add (win2);
 
-        var view3 = new FrameView
-        {
-            Title = "View 3",
-            Text = "View3 right of win2 Fill/Fill Single",
-            X = Pos.Right (win2) - 1,
-            Y = 0,
-            Width = Dim.Fill (-1),
-            Height = Dim.Fill (-1),
-            SuperViewRendersLineCanvas = true
+        //var view3 = new FrameView
+        //{
+        //    Title = "View 3",
+        //    Text = "View3 right of win2 Fill/Fill Single",
+        //    X = Pos.Right (win2) - 1,
+        //    Y = 0,
+        //    Width = Dim.Fill (-1),
+        //    Height = Dim.Fill (-1),
+        //    SuperViewRendersLineCanvas = true
 
-            //ColorScheme = Colors.ColorSchemes ["Menu"],
-        };
+        //    //ColorScheme = Colors.ColorSchemes ["Menu"],
+        //};
 
-        frame1.Add (view3);
+        //app.Add (view3);
 
-        var view4 = new FrameView
-        {
-            Title = "View 4",
-            Text = "View4 below win2 win2.Width/5 Single",
-            X = Pos.Left (win2),
-            Y = Pos.Bottom (win2) - 1,
-            Width = win2.Width,
-            Height = 5,
-            SuperViewRendersLineCanvas = true
+        //var view4 = new FrameView
+        //{
+        //    Title = "View 4",
+        //    Text = "View4 below win2 win2.Width/5 Single",
+        //    X = Pos.Left (win2),
+        //    Y = Pos.Bottom (win2) - 1,
+        //    Width = win2.Width,
+        //    Height = 5,
+        //    SuperViewRendersLineCanvas = true
 
-            //ColorScheme = Colors.ColorSchemes ["TopLevel"],
-        };
+        //    //ColorScheme = Colors.ColorSchemes ["TopLevel"],
+        //};
 
-        frame1.Add (view4);
+        //app.Add (view4);
 
-        var win5 = new Window
-        {
-            Title = "Win 5",
-            Text = "win5 below View4 view4.Width/5 Double",
-            X = Pos.Left (win2),
-            Y = Pos.Bottom (view4) - 1,
-            Width = view4.Width,
-            Height = 5,
+        //var win5 = new Window
+        //{
+        //    Title = "Win 5",
+        //    Text = "win5 below View4 view4.Width/5 Double",
+        //    X = Pos.Left (win2),
+        //    Y = Pos.Bottom (view4) - 1,
+        //    Width = view4.Width,
+        //    Height = 5,
 
-            //ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            SuperViewRendersLineCanvas = true,
-            BorderStyle = LineStyle.Double
-        };
+        //    //ColorScheme = Colors.ColorSchemes ["TopLevel"],
+        //    SuperViewRendersLineCanvas = true,
+        //    BorderStyle = LineStyle.Double
+        //};
 
-        frame1.Add (win5);
+        //app.Add (win5);
 
-        var line = new Line
-        {
-            X = 1,
-            Y = 1,
-            Width = 10,
-            Height = 1,
-            Orientation = Orientation.Horizontal,
-            SuperViewRendersLineCanvas = true
-        };
-        frame1.Add (line);
+
+        //var marginWindow = new Window
+        //{
+        //    Title = "Positive Margin",
+        //    X = 15,
+        //    Y = 10,
+        //    Width = 10,
+        //    Height = 10,
+
+        //    //ColorScheme = Colors.ColorSchemes ["Error"],
+        //    SuperViewRendersLineCanvas = true
+        //};
+        //marginWindow.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
+        //marginWindow.Margin.Thickness = new Thickness (1);
+        //marginWindow.Border.Thickness = new Thickness (1, 2, 1, 1);
+
+        //app.Add (marginWindow);
+
+
+        //var line = new Line
+        //{
+        //    Id = "line1",
+        //    X = 1,
+        //    Y = 1,
+        //    Width = 10,
+        //    Height = 1,
+        //    Orientation = Orientation.Horizontal,
+        //    SuperViewRendersLineCanvas = true
+        //};
+        //app.Add (line);
 
         var marginWindow = new Window
         {
