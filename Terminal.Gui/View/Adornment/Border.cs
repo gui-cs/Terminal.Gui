@@ -78,7 +78,7 @@ public class Border : Adornment
         if ((Parent?.Arrangement & ViewArrangement.Movable) != 0)
         {
             HighlightStyle |= HighlightStyle.Hover;
-        }   
+        }
 #endif
 
         base.BeginInit ();
@@ -149,31 +149,32 @@ public class Border : Adornment
         }
     }
 
-    Rectangle GetBorderRectangle (Rectangle screenRect)
+    private Rectangle GetBorderRectangle (Rectangle screenRect)
     {
         return new (
-                                      screenRect.X + Math.Max (0, Thickness.Left - 1),
-                                      screenRect.Y + Math.Max (0, Thickness.Top - 1),
-                                      Math.Max (
-                                                0,
-                                                screenRect.Width
-                                                - Math.Max (
-                                                            0,
-                                                            Math.Max (0, Thickness.Left - 1)
-                                                            + Math.Max (0, Thickness.Right - 1)
-                                                           )
-                                               ),
-                                      Math.Max (
-                                                0,
-                                                screenRect.Height
-                                                - Math.Max (
-                                                            0,
-                                                            Math.Max (0, Thickness.Top - 1)
-                                                            + Math.Max (0, Thickness.Bottom - 1)
-                                                           )
-                                               )
-                                     );
+                    screenRect.X + Math.Max (0, Thickness.Left - 1),
+                    screenRect.Y + Math.Max (0, Thickness.Top - 1),
+                    Math.Max (
+                              0,
+                              screenRect.Width
+                              - Math.Max (
+                                          0,
+                                          Math.Max (0, Thickness.Left - 1)
+                                          + Math.Max (0, Thickness.Right - 1)
+                                         )
+                             ),
+                    Math.Max (
+                              0,
+                              screenRect.Height
+                              - Math.Max (
+                                          0,
+                                          Math.Max (0, Thickness.Top - 1)
+                                          + Math.Max (0, Thickness.Bottom - 1)
+                                         )
+                             )
+                   );
     }
+
     /// <summary>
     ///     Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for setting the
     ///     <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the views that comprise the border. If
@@ -196,21 +197,22 @@ public class Border : Adornment
         set => _lineStyle = value;
     }
 
-    private bool _showTitle = true;
+    private BorderSettings _settings = BorderSettings.Title;
 
     /// <summary>
-    ///     Gets or sets whether the title should be shown. The default is <see langword="true"/>.
+    ///     Gets or sets the settings for the border.
     /// </summary>
-    public bool ShowTitle
+    public BorderSettings Settings
     {
-        get => _showTitle;
+        get => _settings;
         set
         {
-            if (value == _showTitle)
+            if (value == _settings)
             {
                 return;
             }
-            _showTitle = value;
+
+            _settings = value;
 
             Parent?.SetNeedsDisplay ();
         }
@@ -220,24 +222,25 @@ public class Border : Adornment
 
     private Color? _savedForeColor;
 
-    private void Border_Highlight (object sender, HighlightEventArgs e)
+    private void Border_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
     {
         if (!Parent.Arrangement.HasFlag (ViewArrangement.Movable))
         {
             e.Cancel = true;
+
             return;
         }
 
-        if (e.HighlightStyle.HasFlag (HighlightStyle.Pressed))
+        if (e.NewValue.HasFlag (HighlightStyle.Pressed))
         {
             if (!_savedForeColor.HasValue)
             {
                 _savedForeColor = ColorScheme.Normal.Foreground;
             }
 
-            ColorScheme cs = new ColorScheme (ColorScheme)
+            var cs = new ColorScheme (ColorScheme)
             {
-                Normal = new Attribute (ColorScheme.Normal.Foreground.GetHighlightColor (), ColorScheme.Normal.Background)
+                Normal = new (ColorScheme.Normal.Foreground.GetHighlightColor (), ColorScheme.Normal.Background)
             };
             ColorScheme = cs;
         }
@@ -252,14 +255,15 @@ public class Border : Adornment
         }
 #endif
 
-        if (e.HighlightStyle == HighlightStyle.None && _savedForeColor.HasValue)
+        if (e.NewValue == HighlightStyle.None && _savedForeColor.HasValue)
         {
-            ColorScheme cs = new ColorScheme (ColorScheme)
+            var cs = new ColorScheme (ColorScheme)
             {
-                Normal = new Attribute (_savedForeColor.Value, ColorScheme.Normal.Background)
+                Normal = new (_savedForeColor.Value, ColorScheme.Normal.Background)
             };
             ColorScheme = cs;
         }
+
         Parent?.SetNeedsDisplay ();
         e.Cancel = true;
     }
@@ -267,7 +271,7 @@ public class Border : Adornment
     private Point? _dragPosition;
     private Point _startGrabPoint;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
         if (base.OnMouseEvent (mouseEvent))
@@ -299,6 +303,7 @@ public class Border : Adornment
                 _startGrabPoint = new (mouseEvent.Position.X + Frame.X, mouseEvent.Position.Y + Frame.Y);
                 _dragPosition = mouseEvent.Position;
                 Application.GrabMouse (this);
+
                 SetHighlight (HighlightStyle);
             }
 
@@ -321,16 +326,17 @@ public class Border : Adornment
 
                 _dragPosition = mouseEvent.Position;
 
-                Point parentLoc = Parent.SuperView?.ScreenToViewport (new (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y)) ?? mouseEvent.ScreenPosition;
+                Point parentLoc = Parent.SuperView?.ScreenToViewport (new (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
+                                  ?? mouseEvent.ScreenPosition;
 
                 GetLocationEnsuringFullVisibility (
-                                     Parent,
-                                     parentLoc.X - _startGrabPoint.X,
-                                     parentLoc.Y - _startGrabPoint.Y,
-                                     out int nx,
-                                     out int ny,
-                                     out _
-                                    );
+                                                   Parent,
+                                                   parentLoc.X - _startGrabPoint.X,
+                                                   parentLoc.Y - _startGrabPoint.Y,
+                                                   out int nx,
+                                                   out int ny,
+                                                   out _
+                                                  );
 
                 Parent.X = nx;
                 Parent.Y = ny;
@@ -350,7 +356,6 @@ public class Border : Adornment
 
         return false;
     }
-
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
@@ -402,7 +407,7 @@ public class Border : Adornment
         // ...thickness extends outward (border/title is always as far in as possible)
         // PERF: How about a call to Rectangle.Offset?
 
-        var borderBounds = GetBorderRectangle (screenBounds);
+        Rectangle borderBounds = GetBorderRectangle (screenBounds);
         int topTitleLineY = borderBounds.Y;
         int titleY = borderBounds.Y;
         var titleBarsLength = 0; // the little vertical thingies
@@ -420,7 +425,7 @@ public class Border : Adornment
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };
 
-        if (ShowTitle)
+        if (Settings.FastHasFlags (BorderSettings.Title))
         {
             if (Thickness.Top == 2)
             {
@@ -452,9 +457,10 @@ public class Border : Adornment
             }
         }
 
-        if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && ShowTitle && !string.IsNullOrEmpty (Parent?.Title))
+        if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title) && !string.IsNullOrEmpty (Parent?.Title))
         {
-            var focus = Parent.GetNormalColor ();
+            Attribute focus = Parent.GetNormalColor ();
+
             if (Parent.SuperView is { } && Parent.SuperView?.Subviews!.Count (s => s.CanFocus) > 1)
             {
                 // Only use focus color if there are multiple focusable views
@@ -491,7 +497,7 @@ public class Border : Adornment
             {
                 // ╔╡Title╞═════╗
                 // ╔╡╞═════╗
-                if (borderBounds.Width < 4 || !ShowTitle || string.IsNullOrEmpty (Parent?.Title))
+                if (borderBounds.Width < 4 || !Settings.FastHasFlags (BorderSettings.Title) || string.IsNullOrEmpty (Parent?.Title))
                 {
                     // ╔╡╞╗ should be ╔══╗
                     lc.AddLine (
@@ -630,7 +636,7 @@ public class Border : Adornment
             Driver.SetAttribute (prevAttr);
 
             // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
-            if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))
+            if (Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))
             {
                 // Top
                 var hruler = new Ruler { Length = screenBounds.Width, Orientation = Orientation.Horizontal };
@@ -641,7 +647,7 @@ public class Border : Adornment
                 }
 
                 // Redraw title 
-                if (drawTop && maxTitleWidth > 0 && ShowTitle)
+                if (drawTop && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title))
                 {
                     Parent.TitleTextFormatter.Draw (
                                                     new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
@@ -669,6 +675,45 @@ public class Border : Adornment
                     vruler.Draw (new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
                 }
             }
+
+            // TODO: This should not be done on each draw?
+            if (Settings.FastHasFlags (BorderSettings.Gradient))
+            {
+                SetupGradientLineCanvas (lc, screenBounds);
+            }
+            else
+            {
+                lc.Fill = null;
+            }
         }
+    }
+
+    private void SetupGradientLineCanvas (LineCanvas lc, Rectangle rect)
+    {
+        GetAppealingGradientColors (out List<Color> stops, out List<int> steps);
+
+        var g = new Gradient (stops, steps);
+
+        var fore = new GradientFill (rect, g, GradientDirection.Diagonal);
+        var back = new SolidFill (GetNormalColor ().Background);
+
+        lc.Fill = new (fore, back);
+    }
+
+    private static void GetAppealingGradientColors (out List<Color> stops, out List<int> steps)
+    {
+        // Define the colors of the gradient stops with more appealing colors
+        stops = new()
+        {
+            new (0, 128, 255), // Bright Blue
+            new (0, 255, 128), // Bright Green
+            new (255, 255), // Bright Yellow
+            new (255, 128), // Bright Orange
+            new (255, 0, 128) // Bright Pink
+        };
+
+        // Define the number of steps between each color for smoother transitions
+        // If we pass only a single value then it will assume equal steps between all pairs
+        steps = new() { 15 };
     }
 }

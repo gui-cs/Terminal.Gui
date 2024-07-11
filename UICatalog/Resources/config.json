@@ -1,6 +1,5 @@
 {
   "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-  "Application.QuitKey": "Esc",
   "FileDialog.MaxSearchResults": 10000,
   "FileDialogStyle.DefaultUseColors": false,
   "FileDialogStyle.DefaultUseUnicodeCharacters": false,
@@ -31,8 +30,139 @@
   },
   "Themes": [
     {
+      "Hot Dog Stand": {
+        "Button.DefaultShadow": "Opaque",
+        "Dialog.DefaultShadow": "Transparent",
+        "Dialog.DefaultButtonAlignment": "Center",
+        "ColorSchemes": [
+          {
+            "Toplevel": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "#FFFF00"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotNormal": {
+                "Foreground": "#FF0000",
+                "Background": "#FFFF00"
+              },
+              "HotFocus": {
+                "Foreground": "#FFFF00",
+                "Background": "White"
+              },
+              "Disabled": {
+                "Foreground": "BrightGreen",
+                "Background": "Gray"
+              }
+            }
+          },
+          {
+            "Base": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "#FFFF00"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotNormal": {
+                "Foreground": "#FF0000",
+                "Background": "#FFFF00"
+              },
+              "HotFocus": {
+                "Foreground": "#FFFF00",
+                "Background": "White"
+              },
+              "Disabled": {
+                "Foreground": "BrightGreen",
+                "Background": "Gray"
+              }
+            }
+          },
+          {
+            "Dialog": {
+              "Normal": {
+                "Foreground": "Gray",
+                "Background": "#FF0000"
+              },
+              "Focus": {
+                "Foreground": "#FF0000",
+                "Background": "White"
+              },
+              "HotNormal": {
+                "Foreground": "#FF0000",
+                "Background": "#FFF000"
+              },
+              "HotFocus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Disabled": {
+                "Foreground": "BrightYellow",
+                "Background": "Gray"
+              }
+            }
+          },
+          {
+            "Menu": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "WHite"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotNormal": {
+                "Foreground": "#FF00",
+                "Background": "White"
+              },
+              "HotFocus": {
+                "Foreground": "#FF00",
+                "Background": "Black"
+              },
+              "Disabled": {
+                "Foreground": "Gray",
+                "Background": "White"
+              }
+            }
+          },
+          {
+            "Error": {
+              "Normal": {
+                "Foreground": "#FF00",
+                "Background": "#FFF000"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "#FFF000"
+              },
+              "HotNormal": {
+                "Foreground": "DarkGray",
+                "Background": "BrightYellow"
+              },
+              "HotFocus": {
+                "Foreground": "Red",
+                "Background": "BrightYellow"
+              },
+              "Disabled": {
+                "Foreground": "Gray",
+                "Background": "BrightYellow"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "UI Catalog Theme": {
-        "Dialog.DefaultButtonAlignment": "Fill",
+        "Button.DefaultShadow": "Opaque",
+        "Dialog.DefaultShadow": "Transparent",
+        "Dialog.DefaultButtonAlignment": "Center",
         "ColorSchemes": [
           {
             "UI Catalog Scheme": {

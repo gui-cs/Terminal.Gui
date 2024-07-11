@@ -10,8 +10,8 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
 ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. This will execute the dialog until
-///     it terminates via the
-///     [ESC] or [CTRL-Q] key, or when one of the views or buttons added to the dialog calls
+///     it terminates via the <see cref="Application.QuitKey"/> (`Esc` by default),
+///     or when one of the views or buttons added to the dialog calls
 ///     <see cref="Application.RequestStop"/>.
 /// </remarks>
 public class Dialog : Window
@@ -42,16 +42,23 @@ public class Dialog : Window
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     public static int DefaultMinimumHeight { get; set; } = 25;
 
-    // TODO: Reenable once border/borderframe design is settled
+
+    /// <summary>
+    /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
 
-    //[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    //public static Border DefaultBorder { get; set; } = new Border () {
-    //	LineStyle = LineStyle.Single,
-    //};
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter))]
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+
     private readonly List<Button> _buttons = new ();
 
     /// <summary>
@@ -60,11 +67,15 @@ public class Dialog : Window
     /// <remarks>
     ///     By default, <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> are
     ///     set
-    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of the screen dimensions.
+    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of <see cref="Application.Top"/>, if there is one. Otherwise,
+    ///     it will be bound by the screen dimensions.
     /// </remarks>
     public Dialog ()
     {
         Arrangement = ViewArrangement.Movable;
+        ShadowStyle = DefaultShadow;
+        BorderStyle = DefaultBorderStyle;
+
         X = Pos.Center ();
         Y = Pos.Center ();
 

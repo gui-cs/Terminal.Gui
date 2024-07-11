@@ -11,8 +11,6 @@ public class Line : View
         SuperViewRendersLineCanvas = true;
     }
 
-    public Dim Length { get; set; } = Dim.Fill ();
-
     private Orientation _orientation;
 
     /// <summary>
@@ -30,12 +28,9 @@ public class Line : View
             {
                 case Orientation.Horizontal:
                     Height = 1;
-                    // Width = Length;
-                    //Border.Thickness = new Thickness (1, 0, 1, 0);
 
                     break;
                 case Orientation.Vertical:
-                    Height = Length;
                     Width = 1;
 
                     break;

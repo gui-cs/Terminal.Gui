@@ -195,7 +195,7 @@ public class Wizards : Scenario
                                            var thirdStepEnabledCeckBox = new CheckBox
                                            {
                                                Text = "Enable Step _3",
-                                               Checked = false,
+                                               State = CheckState.UnChecked,
                                                X = Pos.Left (lastNameField),
                                                Y = Pos.Bottom (lastNameField)
                                            };
@@ -242,8 +242,8 @@ public class Wizards : Scenario
                                                X = Pos.Right (progLbl), Y = Pos.Top (progLbl), Width = 40, Fraction = 0.42F
                                            };
                                            thirdStep.Add (progLbl, progressBar);
-                                           thirdStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked;
-                                           thirdStepEnabledCeckBox.Toggled += (s, e) => { thirdStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked; };
+                                           thirdStep.Enabled = thirdStepEnabledCeckBox.State == CheckState.Checked;
+                                           thirdStepEnabledCeckBox.Toggle += (s, e) => { thirdStep.Enabled = thirdStepEnabledCeckBox.State == CheckState.Checked; };
 
                                            // Add 4th step
                                            var fourthStep = new WizardStep { Title = "Step Four" };
@@ -320,7 +320,7 @@ public class Wizards : Scenario
                                                "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
 
                                            var finalFinalStepEnabledCeckBox =
-                                               new CheckBox { Text = "Enable _Final Final Step", Checked = false, X = 0, Y = 1 };
+                                               new CheckBox { Text = "Enable _Final Final Step", State = CheckState.UnChecked, X = 0, Y = 1 };
                                            lastStep.Add (finalFinalStepEnabledCeckBox);
 
                                            // Add an optional FINAL last step
@@ -329,11 +329,11 @@ public class Wizards : Scenario
 
                                            finalFinalStep.HelpText =
                                                "This step only shows if it was enabled on the other last step.";
-                                           finalFinalStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked;
+                                           finalFinalStep.Enabled = thirdStepEnabledCeckBox.State == CheckState.Checked;
 
-                                           finalFinalStepEnabledCeckBox.Toggled += (s, e) =>
+                                           finalFinalStepEnabledCeckBox.Toggle += (s, e) =>
                                                                                    {
-                                                                                       finalFinalStep.Enabled = (bool)finalFinalStepEnabledCeckBox.Checked;
+                                                                                       finalFinalStep.Enabled = finalFinalStepEnabledCeckBox.State == CheckState.Checked;
                                                                                    };
 
                                            Application.Run (wizard);

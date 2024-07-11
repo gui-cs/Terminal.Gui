@@ -69,9 +69,6 @@ Function Set-PowerShellEnvironment {
   New-Variable -Name SolutionFilePath -Value (Join-Path -Resolve $RepositoryRootDirectory "Terminal.sln") -Option ReadOnly -Scope Global -Visibility Public
   New-Variable -Name TerminalGuiProjectDirectory -Value (Join-Path -Resolve $RepositoryRootDirectory "Terminal.Gui") -Option ReadOnly -Scope Global -Visibility Public
   New-Variable -Name TerminalGuiProjectFilePath -Value (Join-Path -Resolve $TerminalGuiProjectDirectory "Terminal.Gui.csproj") -Option ReadOnly -Scope Global -Visibility Public
-  New-Variable -Name AnalyzersDirectory -Value (Join-Path -Resolve $RepositoryRootDirectory "Analyzers") -Option ReadOnly -Scope Global -Visibility Public
-  New-Variable -Name InternalAnalyzersProjectDirectory -Value (Join-Path -Resolve $AnalyzersDirectory "Terminal.Gui.Analyzers.Internal") -Option ReadOnly -Scope Global -Visibility Public
-  New-Variable -Name InternalAnalyzersProjectFilePath -Value (Join-Path -Resolve $InternalAnalyzersProjectDirectory "Terminal.Gui.Analyzers.Internal.csproj") -Option ReadOnly -Scope Global -Visibility Public
 
   # Save existing PSModulePath for optional reset later.
   # If it is already saved, do not overwrite, but continue anyway.
@@ -137,9 +134,6 @@ Function Reset-PowerShellEnvironment {
   Remove-Variable -Name TerminalGuiProjectDirectory -Scope Global -Force -ErrorAction SilentlyContinue
   Remove-Variable -Name TerminalGuiProjectFilePath -Scope Global -Force -ErrorAction SilentlyContinue
   Remove-Variable -Name ScriptsDirectory -Scope Global -Force -ErrorAction SilentlyContinue
-  Remove-Variable -Name AnalyzersDirectory -Scope Global -Force -ErrorAction SilentlyContinue
-  Remove-Variable -Name InternalAnalyzersProjectDirectory -Scope Global -Force -ErrorAction SilentlyContinue
-  Remove-Variable -Name InternalAnalyzersProjectFilePath -Scope Global -Force -ErrorAction SilentlyContinue
 }
 
 # This ensures the environment is reset when unloading the module.

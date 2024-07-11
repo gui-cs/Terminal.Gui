@@ -828,6 +828,7 @@ Three ",
         Assert.Equal ("Tw", cb.Text);
         Assert.False (cb.IsShow);
         cb.SetSource<string> (null);
+        Assert.False (cb.IsShow);
         Assert.False (cb.NewKeyDownEvent (Key.Enter));
         Assert.True (cb.NewKeyDownEvent (Key.F4)); // with no source also expand empty
         Assert.True (cb.IsShow);

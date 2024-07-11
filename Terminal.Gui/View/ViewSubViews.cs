@@ -505,7 +505,7 @@ public partial class View
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
     public virtual bool OnEnter (View view)
     {
-        var args = new FocusEventArgs (view);
+        var args = new FocusEventArgs (view, this);
         Enter?.Invoke (this, args);
 
         if (args.Handled)
@@ -521,7 +521,7 @@ public partial class View
     /// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
     public virtual bool OnLeave (View view)
     {
-        var args = new FocusEventArgs (view);
+        var args = new FocusEventArgs (this, view);
         Leave?.Invoke (this, args);
 
         if (args.Handled)

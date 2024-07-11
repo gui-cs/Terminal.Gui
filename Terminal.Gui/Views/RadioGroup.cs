@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.</summary>
-public class RadioGroup : View
+public class RadioGroup : View, IDesignable
 {
     private int _cursor;
     private List<(int pos, int length)> _horizontal;
@@ -84,7 +84,7 @@ public class RadioGroup : View
                     {
                         SelectedItem = _cursor;
 
-                        return !OnAccept ();
+                        return OnAccept () is true or null;
                     }
                    );
 
@@ -97,7 +97,7 @@ public class RadioGroup : View
                         {
                             SelectedItem = (int)ctx.KeyBinding?.Context!;
 
-                            return !OnAccept();
+                            return OnAccept () is true or null;
                         }
 
                         return true;
@@ -226,32 +226,6 @@ public class RadioGroup : View
 
             SelectedItem = 0;
             SetContentSize ();
-        }
-    }
-
-    /// <inheritdoc/>
-    public override string Text
-    {
-        get
-        {
-            if (_radioLabels.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            // Return labels as a CSV string
-            return string.Join (",", _radioLabels);
-        }
-        set
-        {
-            if (string.IsNullOrEmpty (value))
-            {
-                RadioLabels = [];
-            }
-            else
-            {
-                RadioLabels = value.Split (',').Select (x => x.Trim ()).ToArray ();
-            }
         }
     }
 
@@ -486,5 +460,12 @@ public class RadioGroup : View
 
                 break;
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        RadioLabels = new [] { "Option _1", "Option _2", "Option _3" };
+        return true;
     }
 }

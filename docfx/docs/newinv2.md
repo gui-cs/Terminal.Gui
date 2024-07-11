@@ -55,6 +55,7 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 
 * The `Key` class replaces the `KeyEvent` struct and provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level `KeyCode` enum when possible. See [Key](~/api/Terminal.Gui.Key.yml) for more details.
 * The preferred way to handle single keystrokes is to use **Key Bindings**. Key Bindings map a key press to a [Command](~/api/Terminal.Gui.Command.yml). A view can declare which commands it supports, and provide a lambda that implements the functionality of the command, using `View.AddCommand()`. Use the `View.Keybindings` to configure the key bindings.
+* For better consistency and user experience, the default key for closing an app or `Toplevel` is now `Esc` (it was previously `Ctrl+Q`).
 
 ## Updated Mouse API
 

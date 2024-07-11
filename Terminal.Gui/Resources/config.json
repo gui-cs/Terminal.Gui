@@ -10,7 +10,8 @@
   // note that not all values here will be recreated (e.g. the Light and Dark themes and any property initialized
   // null).
   //
-  "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+  // TODO: V2 - Reference via http
+  "$schema": "../../docfx/schemas/tui-config-schema.json",
 
   // Set this to true in a .config file to be loaded to cause JSON parsing errors
   // to throw exceptions. 
@@ -18,8 +19,8 @@
 
   "Application.AlternateBackwardKey": "Ctrl+PageUp",
   "Application.AlternateForwardKey": "Ctrl+PageDown",
-  "Application.QuitKey": "Ctrl+Q",
-  "Application.IsMouseDisabled": false,
+  "Application.QuitKey": "Esc",
+
   "Theme": "Default",
   "Themes": [
     {
@@ -28,6 +29,9 @@
         "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
         "FrameView.DefaultBorderStyle": "Single",
         "Window.DefaultBorderStyle": "Single",
+        "Dialog.DefaultBorderStyle": "Single",
+        "MessageBox.DefaultBorderStyle": "Double",
+        "Button.DefaultShadow": "None",
         "ColorSchemes": [
           {
             "TopLevel": {

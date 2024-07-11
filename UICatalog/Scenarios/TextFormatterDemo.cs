@@ -58,23 +58,11 @@ public class TextFormatterDemo : Scenario
             X = 0,
             Y = Pos.Bottom (blockText) + 1,
             Text = "Unicode",
-            Checked = app.HotKeySpecifier == (Rune)' '
+            State = app.HotKeySpecifier == (Rune)' ' ? CheckState.Checked : CheckState.UnChecked
         };
 
         app.Add (unicodeCheckBox);
-
-        static IEnumerable<T> GetUniqueEnumValues<T> () where T : Enum
-        {
-            var values = new HashSet<T> ();
-            foreach (T v in Enum.GetValues (typeof (T)))
-            {
-                if (values.Add (v))
-                {
-                    yield return v;
-                }
-            }
-        }
-
+        
         List<Alignment> alignments = new () { Alignment.Start, Alignment.End, Alignment.Center, Alignment.Fill };
         Label [] singleLines = new Label [alignments.Count];
         Label [] multipleLines = new Label [alignments.Count];
@@ -133,12 +121,12 @@ public class TextFormatterDemo : Scenario
             label = multipleLines [i];
         }
 
-        unicodeCheckBox.Toggled += (s, e) =>
+        unicodeCheckBox.Toggle += (s, e) =>
                                    {
                                        for (int i = 0; i < alignments.Count; i++)
                                        {
-                                           singleLines [i].Text = e.OldValue == true ? text : unicode;
-                                           multipleLines [i].Text = e.OldValue == true ? text : unicode;
+                                           singleLines [i].Text = e.CurrentValue == CheckState.Checked ? text : unicode;
+                                           multipleLines [i].Text = e.CurrentValue == CheckState.Checked ? text : unicode;
                                        }
                                    };
 

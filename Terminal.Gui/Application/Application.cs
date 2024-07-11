@@ -308,7 +308,7 @@ public static partial class Application
         SupportedCultures = GetSupportedCultures ();
         _mainThreadId = Thread.CurrentThread.ManagedThreadId;
         _initialized = true;
-        InitializedChanged?.Invoke (null, new (false, _initialized));
+        InitializedChanged?.Invoke (null, new (in _initialized));
     }
 
     private static void Driver_SizeChanged (object sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
@@ -349,16 +349,18 @@ public static partial class Application
         // TODO: Throw an exception if Init hasn't been called.
         ResetState ();
         PrintJsonErrors ();
-        InitializedChanged?.Invoke (null, new (true, _initialized));
+        InitializedChanged?.Invoke (null, new (in _initialized));
     }
 
+#nullable enable
     /// <summary>
-    ///     This event is fired after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
+    ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
     /// </summary>
     /// <remarks>
     ///     Intended to support unit tests that need to know when the application has been initialized.
     /// </remarks>
-    public static event EventHandler<StateEventArgs<bool>> InitializedChanged;
+    public static event EventHandler<EventArgs<bool>>? InitializedChanged;
+#nullable restore
 
     #endregion Initialization (Init/Shutdown)
 
@@ -973,6 +975,7 @@ public static partial class Application
 
         if (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || OverlappedChildNeedsDisplay ())
         {
+            state.Toplevel.SetNeedsDisplay ();
             state.Toplevel.Draw ();
             Driver.UpdateScreen ();
 
@@ -1436,4 +1439,62 @@ public static partial class Application
     }
 
     #endregion Toplevel handling
+
+    /// <summary>
+    ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
+    /// </summary>
+    /// <returns>A string representation of the Application </returns>
+    public new static string ToString ()
+    {
+        ConsoleDriver driver = Driver;
+
+        if (driver is null)
+        {
+            return string.Empty;
+        }
+
+        return ToString (driver);
+    }
+
+    /// <summary>
+    ///     Gets a string representation of the Application rendered by the provided <see cref="ConsoleDriver"/>.
+    /// </summary>
+    /// <param name="driver">The driver to use to render the contents.</param>
+    /// <returns>A string representation of the Application </returns>
+    public static string ToString (ConsoleDriver driver)
+    {
+        var sb = new StringBuilder ();
+
+        Cell [,] contents = driver.Contents;
+
+        for (var r = 0; r < driver.Rows; r++)
+        {
+            for (var c = 0; c < driver.Cols; c++)
+            {
+                Rune rune = contents [r, c].Rune;
+
+                if (rune.DecodeSurrogatePair (out char [] sp))
+                {
+                    sb.Append (sp);
+                }
+                else
+                {
+                    sb.Append ((char)rune.Value);
+                }
+
+                if (rune.GetColumns () > 1)
+                {
+                    c++;
+                }
+
+                // See Issue #2616
+                //foreach (var combMark in contents [r, c].CombiningMarks) {
+                //	sb.Append ((char)combMark.Value);
+                //}
+            }
+
+            sb.AppendLine ();
+        }
+        return sb.ToString ();
+    }
 }

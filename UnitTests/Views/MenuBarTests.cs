@@ -64,7 +64,7 @@ public class MenuBarTests (ITestOutputHelper output)
  Nullable Checked       
 ┌──────────────────────┐
 │ {
-    CM.Glyphs.NullChecked
+    CM.Glyphs.CheckStateNone
 } Check this out 你  │
 └──────────────────────┘",
                                                       output
@@ -1253,14 +1253,16 @@ wo
         MenuItem mbiCurrent = null;
         MenuItem miCurrent = null;
 
-        MenuBar menu = MenuBarScenario.CreateTestMenu (
-                                                       s =>
+        MenuBar menu = new MenuBar ();
+        menu.EnableForDesign (
+                               new Func<object, bool> (s =>
                                                        {
-                                                           miAction = s;
+                                                           miAction = s as string;
 
                                                            return true;
-                                                       }
-                                                      );
+                                                       })
+                              );
+
         menu.Key = KeyCode.F9;
         menu.MenuOpening += (s, e) => mbiCurrent = e.CurrentMenu;
         menu.MenuOpened += (s, e) => { miCurrent = e.MenuItem; };
@@ -1290,7 +1292,7 @@ wo
     [Theory]
     [AutoInitShutdown]
     [InlineData ("New", KeyCode.CtrlMask | KeyCode.N)]
-    [InlineData ("Quit", KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.Q)]
+    [InlineData ("Quit", KeyCode.CtrlMask | KeyCode.Q)]
     [InlineData ("Copy", KeyCode.CtrlMask | KeyCode.C)]
     [InlineData ("Replace", KeyCode.CtrlMask | KeyCode.H)]
     [InlineData ("1", KeyCode.F1)]
@@ -1301,14 +1303,16 @@ wo
         MenuItem mbiCurrent = null;
         MenuItem miCurrent = null;
 
-        MenuBar menu = MenuBarScenario.CreateTestMenu (
-                                                       s =>
+        MenuBar menu = new MenuBar ();
+        menu.EnableForDesign (
+                               new Func<object, bool> (s =>
                                                        {
-                                                           miAction = s;
+                                                           miAction = s as string;
 
                                                            return true;
-                                                       }
-                                                      );
+                                                       })
+                              );
+
         menu.Key = KeyCode.F9;
         menu.MenuOpening += (s, e) => mbiCurrent = e.CurrentMenu;
         menu.MenuOpened += (s, e) => { miCurrent = e.MenuItem; };

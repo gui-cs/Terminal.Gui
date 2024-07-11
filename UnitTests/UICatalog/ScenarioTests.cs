@@ -7,8 +7,6 @@ namespace UICatalog.Tests;
 
 public class ScenarioTests : TestsAllViews
 {
-    private readonly ITestOutputHelper _output;
-
     public ScenarioTests (ITestOutputHelper output)
     {
 #if DEBUG_IDISPOSABLE
@@ -17,11 +15,7 @@ public class ScenarioTests : TestsAllViews
         _output = output;
     }
 
-    public static IEnumerable<object []> AllScenarioTypes =>
-        typeof (Scenario).Assembly
-                     .GetTypes ()
-                     .Where (type => type.IsClass && !type.IsAbstract && type.IsSubclassOf (typeof (Scenario)))
-                     .Select (type => new object [] { type });
+    private readonly ITestOutputHelper _output;
 
     private object _timeoutLock;
 
@@ -34,17 +28,17 @@ public class ScenarioTests : TestsAllViews
     public void All_Scenarios_Quit_And_Init_Shutdown_Properly (Type scenarioType)
     {
         Assert.Null (_timeoutLock);
-        _timeoutLock = new object ();
+        _timeoutLock = new ();
 
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
 
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
-        Scenario scenario = (Scenario)Activator.CreateInstance (scenarioType);
+        var scenario = (Scenario)Activator.CreateInstance (scenarioType);
 
         uint abortTime = 1500;
-        bool initialized = false;
-        bool shutdown = false;
+        var initialized = false;
+        var shutdown = false;
         object timeout = null;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
@@ -65,7 +59,6 @@ public class ScenarioTests : TestsAllViews
             }
         }
 
-
         Assert.True (initialized);
         Assert.True (shutdown);
 
@@ -80,24 +73,19 @@ public class ScenarioTests : TestsAllViews
 
         return;
 
-
-        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
         {
-            if (a.NewValue)
+            if (a.CurrentValue)
             {
-                Assert.Equal (Key.Q.WithCtrl, Application.QuitKey);
-
                 Application.Iteration += OnApplicationOnIteration;
                 initialized = true;
+
                 lock (_timeoutLock)
                 {
                     timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
                 }
+
                 _output.WriteLine ($"Initialized '{Application.Driver}'");
-                //Dictionary<Key, List<View>> bindings = Application.GetKeyBindings ();
-                //Assert.NotEmpty (bindings);
-                //_output.WriteLine ($"bindings: {string.Join (",", bindings.Keys)}");
-                //Assert.True (bindings.ContainsKey (Application.QuitKey));
             }
             else
             {
@@ -116,10 +104,12 @@ public class ScenarioTests : TestsAllViews
                     timeout = null;
                 }
             }
+
             Assert.Fail (
                          $"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
 
             Application.ResetState (true);
+
             return false;
         }
 
@@ -133,6 +123,12 @@ public class ScenarioTests : TestsAllViews
             }
         }
     }
+
+    public static IEnumerable<object []> AllScenarioTypes =>
+        typeof (Scenario).Assembly
+                         .GetTypes ()
+                         .Where (type => type.IsClass && !type.IsAbstract && type.IsSubclassOf (typeof (Scenario)))
+                         .Select (type => new object [] { type });
 
     [Fact]
     public void Run_All_Views_Tester_Scenario ()
@@ -563,7 +559,7 @@ public class ScenarioTests : TestsAllViews
                 && view.GetType ().GetProperty ("Source") != null
                 && view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource))
             {
-                var source = new ListWrapper<string> (["Test Text #1", "Test Text #2", "Test Text #3"]);
+                ListWrapper<string> source = new (["Test Text #1", "Test Text #2", "Test Text #3"]);
                 view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
             }
 
@@ -637,8 +633,7 @@ public class ScenarioTests : TestsAllViews
 
         Application.KeyDown += (sender, args) =>
                                {
-                                   // See #2474 for why this is commented out
-                                   Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.KeyCode);
+                                   Assert.Equal (Application.QuitKey, args.KeyCode);
                                };
 
         generic.Main ();

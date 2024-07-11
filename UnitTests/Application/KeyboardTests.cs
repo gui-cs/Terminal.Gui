@@ -36,31 +36,32 @@ public class KeyboardTests
         Application.Begin (top);
         top.Running = true;
 
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
-        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+        Key prevKey = Application.QuitKey;
+
+        Application.OnKeyDown (Application.QuitKey);
         Assert.True (isQuiting);
 
         isQuiting = false;
-        Application.OnKeyDown (Key.Q.WithCtrl);
+        Application.OnKeyDown (Application.QuitKey);
         Assert.True (isQuiting);
 
         isQuiting = false;
         Application.QuitKey = Key.C.WithCtrl;
-        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+        Application.OnKeyDown (prevKey); // Should not quit
         Assert.False (isQuiting);
-        Application.OnKeyDown (Key.Q.WithCtrl);
+        Application.OnKeyDown (Key.Q.WithCtrl);// Should not quit
         Assert.False (isQuiting);
 
         Application.OnKeyDown (Application.QuitKey);
         Assert.True (isQuiting);
 
         // Reset the QuitKey to avoid throws errors on another tests
-        Application.QuitKey = Key.Q.WithCtrl;
+        Application.QuitKey = prevKey;
         top.Dispose ();
     }
 
     [Fact]
-    public void QuitKey_Default_Is_CtrlQ ()
+    public void QuitKey_Default_Is_Esc ()
     {
         Application.ResetState (true);
         // Before Init
@@ -68,7 +69,7 @@ public class KeyboardTests
 
         Application.Init (new FakeDriver ());
         // After Init
-        Assert.Equal (Key.Q.WithCtrl, Application.QuitKey);
+        Assert.Equal (Key.Esc, Application.QuitKey);
 
         Application.Shutdown();
     }
@@ -128,10 +129,10 @@ public class KeyboardTests
 
         return;
 
-        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
         {
-            _output.WriteLine ("OnApplicationOnInitializedChanged: {0}", a.NewValue);
-            if (a.NewValue)
+            _output.WriteLine ("OnApplicationOnInitializedChanged: {0}", a.CurrentValue);
+            if (a.CurrentValue)
             {
                 Application.Iteration += OnApplicationOnIteration;
                 initialized = true;
@@ -397,6 +398,8 @@ public class KeyboardTests
         // Setup some fake keypresses (This)
         var input = "Tests";
 
+        Key originalQuitKey = Application.QuitKey;
+        Application.QuitKey = Key.Q.WithCtrl;
         // Put a control-q in at the end
         FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo ('Q', ConsoleKey.Q, false, false, true));
 
@@ -458,6 +461,7 @@ public class KeyboardTests
                      };
 
         Application.Run (top);
+        Application.QuitKey = originalQuitKey;
 
         // Input string should match output
         Assert.Equal (input, output);

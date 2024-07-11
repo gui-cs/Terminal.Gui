@@ -271,7 +271,7 @@ public class Scenario : IDisposable
 
     /// <summary>Defines the category names used to categorize a <see cref="Scenario"/></summary>
     [AttributeUsage (AttributeTargets.Class, AllowMultiple = true)]
-    public class ScenarioCategory (string Name) : System.Attribute
+    public class ScenarioCategory (string name) : System.Attribute
     {
         /// <summary>Static helper function to get the <see cref="Scenario"/> Categories given a Type</summary>
         /// <param name="t"></param>
@@ -291,15 +291,15 @@ public class Scenario : IDisposable
         public static string GetName (Type t) { return ((ScenarioCategory)GetCustomAttributes (t) [0]).Name; }
 
         /// <summary>Category Name</summary>
-        public string Name { get; set; } = Name;
+        public string Name { get; set; } = name;
     }
 
     /// <summary>Defines the metadata (Name and Description) for a <see cref="Scenario"/></summary>
     [AttributeUsage (AttributeTargets.Class)]
-    public class ScenarioMetadata (string Name, string Description) : System.Attribute
+    public class ScenarioMetadata (string name, string description) : System.Attribute
     {
         /// <summary><see cref="Scenario"/> Description</summary>
-        public string Description { get; set; } = Description;
+        public string Description { get; set; } = description;
 
         /// <summary>Static helper function to get the <see cref="Scenario"/> Description given a Type</summary>
         /// <param name="t"></param>
@@ -312,6 +312,6 @@ public class Scenario : IDisposable
         public static string GetName (Type t) { return ((ScenarioMetadata)GetCustomAttributes (t) [0]).Name; }
 
         /// <summary><see cref="Scenario"/> Name</summary>
-        public string Name { get; set; } = Name;
+        public string Name { get; set; } = name;
     }
 }

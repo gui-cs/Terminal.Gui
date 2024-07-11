@@ -460,14 +460,16 @@ At 0,0
             ColorScheme = Colors.ColorSchemes ["Menu"], X = 0, Y = 0, Text = "This should be the first line."
         };
 
-        var button = new Button
+        var view = new View
         {
             X = 0, // don't overcomplicate unit tests
             Y = 1,
+            Height = Dim.Auto (DimAutoStyle.Text),
+            Width = Dim.Auto(DimAutoStyle.Text),
             Text = "Press me!"
         };
 
-        frame.Add (label, button);
+        frame.Add (label, view);
 
         frame.X = Pos.Center ();
         frame.Y = Pos.Center ();
@@ -486,7 +488,7 @@ At 0,0
 
         label.LayoutComplete += (s, e) => { Assert.Equal (new (0, 0, 38, 1), label._needsDisplayRect); };
 
-        button.LayoutComplete += (s, e) => { Assert.Equal (new (0, 0, 13, 1), button._needsDisplayRect); };
+        view.LayoutComplete += (s, e) => { Assert.Equal (new (0, 0, 13, 1), view._needsDisplayRect); };
 
         Assert.Equal (new (0, 0, 80, 25), top.Frame);
         Assert.Equal (new (20, 8, 40, 8), frame.Frame);
@@ -501,7 +503,7 @@ At 0,0
                                     )
                      );
         Assert.Equal (new (0, 0, 30, 1), label.Frame);
-        Assert.Equal (new (0, 1, 13, 1), button.Frame); // this proves frame was set
+        Assert.Equal (new (0, 1, 9, 1), view.Frame); // this proves frame was set
         Application.End (runState);
         top.Dispose ();
     }
@@ -1196,7 +1198,7 @@ At 0,0
 
         return;
 
-        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void ViewOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -1213,10 +1215,10 @@ At 0,0
 
         return;
 
-        void ViewOnAccept (object sender, CancelEventArgs e)
+        void ViewOnAccept (object sender, HandledEventArgs e)
         {
             acceptInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -1233,7 +1235,7 @@ At 0,0
 
         return;
 
-        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void ViewOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]

@@ -25,7 +25,7 @@ jobs:
           includePrerelease: true
 
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0
+      uses: gittools/actions/gitversion/execute@v1
       with:
         useConfigFile: true
         #additionalArguments: /b develop
@@ -43,7 +43,6 @@ jobs:
     - name: Build Release
       run: |
         dotnet-gitversion /updateprojectfiles
-        dotnet build ./Analyzers/Terminal.Gui.Analyzers.Internal --no-incremental --nologo --force --configuration Release
         dotnet build --no-incremental --nologo --force --configuration Release
 
     - name: Pack
