@@ -25,7 +25,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineTrace>true</DefineTrace>
     <DebugType>portable</DebugType>
-    <DefineConstants>$(DefineConstants);CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
     <ImplicitUsings>enable</ImplicitUsings>
     <NoLogo>true</NoLogo>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
@@ -53,7 +53,7 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <PackageReference Include="ColorHelper" Version="[1.8.1,2)" />
-    <PackageReference Include="JetBrains.Annotations" Version="[2024,)" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="[4.10,5)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="[4.10,5)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[4.10,5)" PrivateAssets="all" />
