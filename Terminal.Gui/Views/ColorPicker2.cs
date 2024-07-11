@@ -26,6 +26,9 @@ public class ColorPicker2 : View
             if (_value != value)
             {
                 _value = value;
+
+                // TODO: results in jitter
+                UpdateBarsFromColor (Value);
                 tfHex.Text = value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
             }
         }
@@ -68,6 +71,12 @@ public class ColorPicker2 : View
         sb.ValueChanged += RebuildColor;
         lb.ValueChanged += RebuildColor;
 
+        var lbHex = new Label ()
+        {
+            Text = "Hex:",
+            X = 0,
+            Y = 3
+        };
         tfHex = new TextField ()
         {
             Y = 3,
@@ -78,11 +87,12 @@ public class ColorPicker2 : View
         Add (hb);
         Add (sb);
         Add (lb);
+        Add (lbHex);
         Add (tfHex);
 
         tfHex.Leave += (_,_)=> UpdateValueFromTextField ();
-        UpdateBarsFromColor (Value);
     }
+
 
     private void UpdateValueFromTextField ()
     {
@@ -90,6 +100,16 @@ public class ColorPicker2 : View
         {
             Value = newColor.Value;
         }
+    }
+
+    /// <inheritdoc />
+    public override void OnDrawContent (Rectangle viewport)
+    {
+        base.OnDrawContent (viewport);
+        var normal = GetNormalColor ();
+        Driver.SetAttribute (new Attribute (Value, normal.Background));
+        AddRune (13,3,(Rune)'■');
+
     }
 
     private void UpdateBarsFromColor (Color color)
