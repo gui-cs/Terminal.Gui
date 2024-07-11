@@ -19,7 +19,7 @@
   <!-- .NET Build Settings -->
   <!-- =================================================================== -->
   <PropertyGroup>
-    <TargetFrameworks>net8.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>12</LangVersion>
     <RootNamespace>$(AssemblyName)</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -73,6 +73,7 @@
     <Using Include="JetBrains.Annotations.PureAttribute" Alias="PureAttribute" />
     <Using Include="System.Drawing" />
     <Using Include="System.Text" />
+    <Using Include="Terminal.Gui.EnumExtensions" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Assembliy names for which internal items are visible -->
