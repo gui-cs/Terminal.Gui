@@ -32,7 +32,7 @@ jobs:
 
     - name: Setup Pages
       if: github.ref_name == 'main' ||  github.ref_name == 'develop'
-      uses: actions/configure-pages@v4
+      uses: actions/configure-pages@v5
       
     - name: Upload artifact
       if: github.ref_name == 'main' ||  github.ref_name == 'develop'
