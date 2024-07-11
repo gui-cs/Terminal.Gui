@@ -16,6 +16,33 @@ public class ColorPicker2 : View
 
     public ColorPicker2 ()
     {
+        var hb = new HueBar ()
+        {
+            Text = "H:",
+            X = 0,
+            Y = 0,
+            Height = 1,
+            Width = Dim.Fill (),
+            Value = Value
+        };
+
+        var sb = new SaturationBar ()
+        {
+            Text = "S:",
+            Y = 1,
+            Height = 1,
+            Width = Dim.Fill (),
+            Value = Value
+        };
+
+        var lb = new LightnessBar ()
+        {
+            Text = "L:",
+            Y = 2,
+            Height = 1,
+            Width = Dim.Fill (),
+            Value = Value
+        };
         tfHex = new TextField ()
         {
             Y = 3,
@@ -26,56 +53,94 @@ public class ColorPicker2 : View
         // Revert to "g" when https://github.com/gui-cs/Terminal.Gui/issues/3603 is fixed
         tfHex.Text = Value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
 
+        Add (hb);
+        Add (sb);
+        Add (lb);
         Add (tfHex);
+    }
+}
+
+public abstract class ColorBar : View
+{
+    private Color _value;
+    public Color Value
+    {
+        get => _value;
+        set
+        {
+            this.OnColorChanged (value, _value);
+            _value = value;
+        }
+    }
+
+    /// <summary>Fired when a color is picked.</summary>
+    public event EventHandler<ColorEventArgs> ColorChanged;
+
+    protected ColorBar ()
+    {
+        Height = 1;
+        Width = Dim.Fill ();
+        CanFocus = true;
+
+    }
+
+    protected virtual void OnColorChanged (Color color, Color prevColor)
+    {
+
+        // Ensure this view updates when the Value changes.
+        ColorChanged?.Invoke (this,new ColorEventArgs (){Color=color,PreviousColor = prevColor});
+
+        // Invalidate the view so it gets redrawn.
+        this.SetNeedsDisplay ();
+
     }
 
     public override void OnDrawContent (Rectangle viewport)
     {
         base.OnDrawContent (viewport);
 
-        Move (0, 0);
-        Driver.AddStr ("H:");
-        DrawHue (2, 0, viewport.Width - 2);
+        var xOffset = 0;
+        if (!string.IsNullOrWhiteSpace (Text))
+        {
+            Move (0, 0);
+            Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
+            Driver.AddStr (Text);
 
-        Driver.SetAttribute (GetNormalColor ());
-        Move (0, 1);
-        Driver.AddStr ("S:");
-        DrawSaturation (2, 1, viewport.Width - 2);
+            // TODO: How to do this properly? TextFormatter relevant methods are private (i.e. Sum Rune Widths)
+            xOffset = Text.Length;
+        }
 
-        Driver.SetAttribute (GetNormalColor ());
-        Move (0, 2);
-        Driver.AddStr ("L:");
-        DrawLightness (2, 2, viewport.Width - 2);
-
-        Driver.SetAttribute (GetNormalColor ());
-        Move (0, 3);
-        Driver.AddStr ("Hex:");
+        DrawBar (xOffset, 0, viewport.Width);
     }
 
-    private void DrawHue (int xOffset, int yOffset, int width)
+    protected abstract void DrawBar (int xOffset, int yOffset, int width);
+}
+public class HueBar : ColorBar
+{
+    protected override void DrawBar (int xOffset, int yOffset, int width)
     {
         // Define the colors of the rainbow
         var stops = new List<Color>
-        {
-            new Color(255, 0, 0),     // Red
-            new Color(255, 165, 0),   // Orange
-            new Color(255, 255, 0),   // Yellow
-            new Color(0, 128, 0),     // Green
-            new Color(0, 0, 255),     // Blue
-            new Color(75, 0, 130),    // Indigo
-            new Color(238, 130, 238)  // Violet
-        };
+            {
+                new Color(255, 0, 0),     // Red
+                new Color(255, 165, 0),   // Orange
+                new Color(255, 255, 0),   // Yellow
+                new Color(0, 128, 0),     // Green
+                new Color(0, 0, 255),     // Blue
+                new Color(75, 0, 130),    // Indigo
+                new Color(238, 130, 238)  // Violet
+            };
 
         // Define the number of steps between each color
         var steps = new List<int>
-        {
-            20, // between Red and Orange
-            20, // between Orange and Yellow
-            20, // between Yellow and Green
-            20, // between Green and Blue
-            20, // between Blue and Indigo
-            20  // between Indigo and Violet
-        };
+            {
+                20, // between Red and Orange
+                20, // between Orange and Yellow
+                20, // between Yellow and Green
+                20, // between Green and Blue
+                20, // between Blue and Indigo
+                20  // between Indigo and Violet
+            };
 
         // Create the gradient
         var rainbowGradient = new Gradient (stops, steps, true);
@@ -108,8 +173,10 @@ public class ColorPicker2 : View
         Application.Driver.SetAttribute (new Attribute (Color.Black, triangleColor));
         AddRune (closestPosition + xOffset, yOffset, new Rune ('▲'));
     }
-
-    private void DrawSaturation (int xOffset, int yOffset, int width)
+}
+public class SaturationBar : ColorBar
+{
+    protected override void DrawBar (int xOffset, int yOffset, int width)
     {
         var hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (Value.R, Value.G, Value.B));
         var selectedSaturation = hsl.S;
@@ -142,8 +209,10 @@ public class ColorPicker2 : View
         Application.Driver.SetAttribute (new Attribute (ColorName.Black, closestColor));
         AddRune (closestPosition + xOffset, yOffset, new Rune ('▲'));
     }
-
-    private void DrawLightness (int xOffset, int yOffset, int width)
+}
+public class LightnessBar : ColorBar
+{
+    protected override void DrawBar (int xOffset, int yOffset, int width)
     {
         var hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (Value.R, Value.G, Value.B));
         var selectedLightness = hsl.L;
@@ -175,10 +244,5 @@ public class ColorPicker2 : View
         Move (closestPosition + xOffset, yOffset);
         Application.Driver.SetAttribute (new Attribute (ColorName.Black, closestColor));
         AddRune (closestPosition + xOffset, yOffset, new Rune ('▲'));
-    }
-
-    private Attribute GetNormalColor ()
-    {
-        return new Attribute (Color.White, Color.Black);
     }
 }
