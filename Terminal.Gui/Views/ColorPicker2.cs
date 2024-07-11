@@ -13,7 +13,7 @@ public class ColorPicker2 : View
     private Color _value = Color.Red;
     private readonly LightnessBar lb;
     private readonly HueBar hb;
-    private SaturationBar sb;
+    private readonly SaturationBar sb;
 
     /// <summary>
     /// The color selected in the picker
@@ -21,7 +21,14 @@ public class ColorPicker2 : View
     public Color Value
     {
         get => _value;
-        set => _value = value;
+        set
+        {
+            if (_value != value)
+            {
+                _value = value;
+                tfHex.Text = value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
+            }
+        }
     }
 
     public ColorPicker2 ()
@@ -67,25 +74,39 @@ public class ColorPicker2 : View
             X = 4,
             Width = 8
         };
-
-        // Revert to "g" when https://github.com/gui-cs/Terminal.Gui/issues/3603 is fixed
-        tfHex.Text = Value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
-
-
+        
         Add (hb);
         Add (sb);
         Add (lb);
         Add (tfHex);
+
+        tfHex.Leave += (_,_)=> UpdateValueFromTextField ();
+        UpdateBarsFromColor (Value);
     }
 
+    private void UpdateValueFromTextField ()
+    {
+        if (Color.TryParse (tfHex.Text, out var newColor))
+        {
+            Value = newColor.Value;
+        }
+    }
 
-    void RebuildColor (object sender, EventArgs<double> e)
+    private void UpdateBarsFromColor (Color color)
+    {
+        var hsl = ColorConverter.RgbToHsl (new RGB (color.R, color.G, color.B));
+        hb.Value = hsl.H / 360.0;
+        sb.Value = hsl.S / 100.0;
+        lb.Value = hsl.L / 100.0;
+    }
+
+    private void RebuildColor (object sender, EventArgs<double> e)
     {
         var hsl = new HSL ((int)(360 * hb.Value), (byte)(100 * sb.Value), (byte)(100 * lb.Value));
-
         var rgb = ColorConverter.HslToRgb (hsl);
         Value = new Color (rgb.R, rgb.G, rgb.B);
     }
+
 }
 public abstract class ColorBar : View
 {
@@ -103,10 +124,14 @@ public abstract class ColorBar : View
     public double Value
     {
         get => _value;
-        private set
+        set
         {
-            _value = Math.Clamp (value, 0, 1);
-            OnValueChanged ();
+            var clampedValue = Math.Clamp (value, 0, 1);
+            if (_value != clampedValue)
+            {
+                _value = clampedValue;
+                OnValueChanged ();
+            }
         }
     }
 
@@ -136,7 +161,6 @@ public abstract class ColorBar : View
     /// </summary>
     protected int BarWidth { get; private set; }
 
-
     /// <inheritdoc />
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
@@ -165,7 +189,7 @@ public abstract class ColorBar : View
         }
 
         BarWidth = viewport.Width - xOffset;
-        cellWidth = 1d / BarWidth;
+        cellWidth = 1d / (BarWidth - 1);
         BarStartsAt = xOffset;
 
         DrawBar (xOffset, 0, BarWidth);
@@ -199,50 +223,25 @@ public abstract class ColorBar : View
 
     protected virtual void OnValueChanged ()
     {
-        ValueChanged?.Invoke (this,new (ref _value));
+        ValueChanged?.Invoke (this, new EventArgs<double> (_value));
         // Notify subscribers if any, and redraw the view
         this.SetNeedsDisplay ();
     }
 }
 
 
+
 internal class HueBar : ColorBar
 {
-    private readonly Gradient rainbowGradient;
-
-    public HueBar ()
-    {
-        // Define the colors of the rainbow
-        var stops = new List<Color>
-        {
-            new Color(255, 0, 0),     // Red
-            new Color(255, 165, 0),   // Orange
-            new Color(255, 255, 0),   // Yellow
-            new Color(0, 128, 0),     // Green
-            new Color(0, 0, 255),     // Blue
-            new Color(75, 0, 130),    // Indigo
-            new Color(238, 130, 238)  // Violet
-        };
-
-        // Define the number of steps between each color
-        var steps = new List<int>
-        {
-            20, // between Red and Orange
-            20, // between Orange and Yellow
-            20, // between Yellow and Green
-            20, // between Green and Blue
-            20, // between Blue and Indigo
-            20  // between Indigo and Violet
-        };
-
-        // Create the gradient
-        rainbowGradient = new Gradient (stops, steps, true);
-    }
-
     /// <inheritdoc />
     protected override Color GetColor (double fraction)
     {
-        return rainbowGradient.GetColorAtFraction (fraction);
+        var hsl = new HSL ((int)(360 * fraction), 100, 50);
+        var rgb = ColorConverter.HslToRgb (hsl);
+
+        return new Color (rgb.R, rgb.G, rgb.B);
+
+
     }
 }
 
