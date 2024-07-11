@@ -159,14 +159,39 @@ public abstract class ColorBar : View
         Width = Dim.Fill ();
         CanFocus = true;
 
-        AddCommand (Command.Left, (_) => AdjustAndReturn (-1));
-        AddCommand (Command.Right, (_) => AdjustAndReturn (1));
+        AddCommand (Command.Left, (_) => Adjust (-1));
+        AddCommand (Command.Right, (_) => Adjust (1));
+
+        AddCommand (Command.LeftExtend, (_) => Adjust (- MaxValue/20));
+        AddCommand (Command.RightExtend, (_) => Adjust (MaxValue / 20));
+
+        AddCommand (Command.LeftHome, (_) => SetZero ());
+        AddCommand (Command.RightEnd, (_) => SetMax ());
+
 
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
+        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
+        KeyBindings.Add (Key.Home, Command.LeftHome);
+        KeyBindings.Add (Key.End, Command.RightEnd);
     }
 
-    protected bool? AdjustAndReturn (int delta)
+    private bool? SetMax ()
+    {
+        Value = MaxValue;
+
+        return true;
+    }
+
+    private bool? SetZero ()
+    {
+        Value = 0;
+
+        return true;
+    }
+
+    protected bool? Adjust (int delta)
     {
         Value += delta;
         return true;
