@@ -1,7 +1,101 @@
 ﻿using ColorHelper;
+using static Terminal.Gui.ColorPicker2;
 using ColorConverter = ColorHelper.ColorConverter;
 
 namespace Terminal.Gui;
+
+
+public enum ColorModel
+{
+    HSV,
+    HSL
+}
+
+internal interface IColorBar
+{
+    int Value { get; set; }
+}
+
+internal class ColorModelStrategy
+{
+    public IEnumerable<ColorBar> CreateBars (ColorModel model)
+    {
+        switch (model)
+        {
+            case ColorModel.HSV:
+                throw new NotImplementedException ();
+                break;
+            case ColorModel.HSL:
+                var h = new HueBar ()
+                {
+                    Text = "H:"
+                };
+
+                yield return h;
+
+                var s = new SaturationBar ()
+                {
+                    Text = "S:"
+                };
+
+
+                var l = new LightnessBar ()
+                {
+                    Text = "L:",
+                };
+
+                s.HBar = h;
+                s.LBar = l;
+
+                l.HBar = h;
+                l.SBar = s;
+
+                yield return s;
+                yield return l;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException (nameof (model), model, null);
+        }
+    }
+
+    public Color GetColorFromBars (IList<IColorBar> bars, ColorModel model)
+    {
+        switch (model)
+        {
+            case ColorModel.HSV:
+                throw new NotImplementedException ();
+                break;
+            case ColorModel.HSL:
+                RGB rgb = ColorConverter.HslToRgb (new HSL (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value));
+
+                return new Color (rgb.R, rgb.G, rgb.B);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException (nameof (model), model, null);
+        }
+    }
+
+    public void SetBarsToColor (IList<IColorBar> bars, Color newValue, ColorModel model)
+    {
+        switch (model)
+        {
+            case ColorModel.HSV:
+                break;
+            case ColorModel.HSL:
+
+                var newHsl = ColorConverter.RgbToHsl (new RGB (newValue.R, newValue.G, newValue.B));
+                bars [0].Value = newHsl.H;
+                bars [1].Value = newHsl.S;
+                bars [2].Value = newHsl.L;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException (nameof (model), model, null);
+        }
+
+
+
+    }
+}
 
 /// <summary>
 /// True color picker using HSL
@@ -11,9 +105,9 @@ public class ColorPicker2 : View
     private readonly TextField tfHex;
 
     private Color _value = Color.Red;
-    private readonly LightnessBar lb;
-    private readonly HueBar hb;
-    private readonly SaturationBar sb;
+    private readonly ColorModelStrategy _strategy;
+    private readonly List<IColorBar> _bars = new List<IColorBar> ();
+    private readonly ColorModel _model;
 
     /// <summary>
     /// The color selected in the picker
@@ -33,59 +127,34 @@ public class ColorPicker2 : View
         }
     }
 
-    public ColorPicker2 ()
+
+    public ColorPicker2 (ColorModel model)
     {
-        hb = new HueBar ()
+        _model = model;
+        _strategy = new ColorModelStrategy ();
+
+        int y = 0;
+        foreach (var bar in  _strategy.CreateBars (model))
         {
-            Text = "H:",
-            X = 0,
-            Y = 0,
-            Height = 1,
-            Width = Dim.Fill ()
-        };
-
-        sb = new SaturationBar ()
-        {
-            Text = "S:",
-            Y = 1,
-            Height = 1,
-            Width = Dim.Fill ()
-        };
-
-        lb = new LightnessBar ()
-        {
-            Text = "L:",
-            Y = 2,
-            Height = 1,
-            Width = Dim.Fill ()
-        };
-
-        sb.HBar = hb;
-        sb.LBar = lb;
-
-        lb.HBar = hb;
-        lb.SBar = sb;
-
-        hb.ValueChanged += RebuildColor;
-        sb.ValueChanged += RebuildColor;
-        lb.ValueChanged += RebuildColor;
+            bar.Y = y++;
+            bar.ValueChanged += RebuildColor;
+            _bars.Add (bar);
+            Add (bar);
+        }
 
         var lbHex = new Label ()
         {
             Text = "Hex:",
             X = 0,
-            Y = 3
+            Y = y
         };
         tfHex = new TextField ()
         {
-            Y = 3,
+            Y = y,
             X = 4,
             Width = 8
         };
 
-        Add (hb);
-        Add (sb);
-        Add (lb);
         Add (lbHex);
         Add (tfHex);
 
@@ -111,23 +180,17 @@ public class ColorPicker2 : View
 
     private void UpdateBarsFromColor (Color color)
     {
-        var hsl = ColorConverter.RgbToHsl (new RGB (color.R, color.G, color.B));
-        hb.Value = hsl.H;
-        sb.Value = hsl.S;
-        lb.Value = hsl.L;
+        _strategy.SetBarsToColor (_bars,color, _model);
     }
 
     private void RebuildColor (object sender, EventArgs<int> e)
     {
-        var hsl = new HSL (hb.Value, (byte)sb.Value, (byte)lb.Value);
-        var rgb = ColorConverter.HslToRgb (hsl);
-        _value = new Color (rgb.R, rgb.G, rgb.B);
-
+        _value = _strategy.GetColorFromBars (_bars, _model);
         tfHex.Text = _value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
     }
 }
 
-public abstract class ColorBar : View
+public abstract class ColorBar : View, IColorBar
 {
     protected int BarStartsAt;
 
@@ -317,6 +380,23 @@ internal class LightnessBar : ColorBar
     {
         var hsl = new HSL (HBar.Value, (byte)SBar.Value, (byte)(MaxValue * fraction));
         var rgb = ColorConverter.HslToRgb (hsl);
+
+        return new Color (rgb.R, rgb.G, rgb.B);
+    }
+}
+class ValueBar : ColorBar
+{
+    public HueBar HBar { get; set; }
+    public SaturationBar SBar { get; set; }
+
+    /// <inheritdoc />
+    protected override int MaxValue => 100;
+
+    /// <inheritdoc />
+    protected override Color GetColor (double fraction)
+    {
+        var hsv = new HSV (HBar.Value, (byte)SBar.Value, (byte)(MaxValue * fraction));
+        var rgb = ColorConverter.HsvToRgb (hsv);
 
         return new Color (rgb.R, rgb.G, rgb.B);
     }
