@@ -1,12 +1,10 @@
-using Terminal.Gui.Analyzers.Internal.Attributes;
+
 
 namespace Terminal.Gui;
 
 /// <summary>
 /// Indicates the mode for a <see cref="DimPercent"/> object.
 /// </summary>
-[GenerateEnumExtensionMethods]
-
 public enum DimPercentMode
 {
     /// <summary>

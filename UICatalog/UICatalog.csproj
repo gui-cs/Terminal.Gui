@@ -45,6 +45,7 @@
     <Using Include="System.Drawing.PointF" Alias="PointF" />
     <Using Include="System.Drawing.Size" Alias="Size" />
     <Using Include="System.Drawing.SizeF" Alias="SizeF" />
+    <Using Include="Terminal.Gui.EnumExtensions" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
