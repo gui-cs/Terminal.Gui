@@ -23,63 +23,105 @@ internal class ColorModelStrategy
         switch (model)
         {
             case ColorModel.HSV:
-                throw new NotImplementedException ();
+                return CreateHsvBars ();
                 break;
             case ColorModel.HSL:
-                var h = new HueBar ()
-                {
-                    Text = "H:"
-                };
-
-                yield return h;
-
-                var s = new SaturationBar ()
-                {
-                    Text = "S:"
-                };
-
-
-                var l = new LightnessBar ()
-                {
-                    Text = "L:",
-                };
-
-                s.HBar = h;
-                s.LBar = l;
-
-                l.HBar = h;
-                l.SBar = s;
-
-                yield return s;
-                yield return l;
-                break;
+                return CreateHslBars ();
             default:
                 throw new ArgumentOutOfRangeException (nameof (model), model, null);
         }
     }
 
+    private IEnumerable<ColorBar> CreateHslBars ()
+    {
+
+        var h = new HueBar ()
+        {
+            Text = "H:"
+        };
+
+        yield return h;
+
+        var s = new SaturationBar ()
+        {
+            Text = "S:"
+        };
+
+
+        var l = new LightnessBar ()
+        {
+            Text = "L:",
+        };
+
+        s.HBar = h;
+        s.LBar = l;
+
+        l.HBar = h;
+        l.SBar = s;
+
+        yield return s;
+        yield return l;
+    }
+
+    private IEnumerable<ColorBar> CreateHsvBars ()
+    {
+
+        var h = new HueBar ()
+        {
+            Text = "H:"
+        };
+
+        yield return h;
+
+        var s = new SaturationBar ()
+        {
+            Text = "S:"
+        };
+
+
+        var v = new ValueBar ()
+        {
+            Text = "V:",
+        };
+
+        s.HBar = h;
+        s.VBar = v;
+
+        v.HBar = h;
+        v.SBar = s;
+
+        yield return s;
+        yield return v;
+    }
     public Color GetColorFromBars (IList<IColorBar> bars, ColorModel model)
     {
         switch (model)
         {
             case ColorModel.HSV:
-                throw new NotImplementedException ();
-                break;
+                return ToColor(
+                               ColorConverter.HsvToRgb (new HSV (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value))
+                               );
             case ColorModel.HSL:
-                RGB rgb = ColorConverter.HslToRgb (new HSL (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value));
-
-                return new Color (rgb.R, rgb.G, rgb.B);
-                break;
+                return ToColor (
+                                ColorConverter.HslToRgb (new HSL (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value))
+                                );
             default:
                 throw new ArgumentOutOfRangeException (nameof (model), model, null);
         }
     }
+
+    private Color ToColor (RGB rgb) => new (rgb.R, rgb.G, rgb.B);
 
     public void SetBarsToColor (IList<IColorBar> bars, Color newValue, ColorModel model)
     {
         switch (model)
         {
             case ColorModel.HSV:
+                var newHsv = ColorConverter.RgbToHsv (new RGB (newValue.R, newValue.G, newValue.B));
+                bars [0].Value = newHsv.H;
+                bars [1].Value = newHsv.S;
+                bars [2].Value = newHsv.V;
+                break;
                 break;
             case ColorModel.HSL:
 
@@ -91,9 +133,6 @@ internal class ColorModelStrategy
             default:
                 throw new ArgumentOutOfRangeException (nameof (model), model, null);
         }
-
-
-
     }
 }
 
@@ -352,7 +391,10 @@ internal class HueBar : ColorBar
 internal class SaturationBar : ColorBar
 {
     public HueBar HBar { get; set; }
+
+    // Should only have either LBar or VBar not both
     public LightnessBar LBar { get; set; }
+    public ValueBar VBar { get; set; }
 
     /// <inheritdoc />
     protected override int MaxValue => 100;
@@ -360,10 +402,25 @@ internal class SaturationBar : ColorBar
     /// <inheritdoc />
     protected override Color GetColor (double fraction)
     {
-        var hsl = new HSL (HBar.Value, (byte)(MaxValue * fraction), (byte)LBar.Value);
-        var rgb = ColorConverter.HslToRgb (hsl);
+        if (LBar != null)
+        {
+            var hsl = new HSL (HBar.Value, (byte)(MaxValue * fraction), (byte)LBar.Value);
+            var rgb = ColorConverter.HslToRgb (hsl);
 
-        return new Color (rgb.R, rgb.G, rgb.B);
+            return new Color (rgb.R, rgb.G, rgb.B);
+        }
+
+        if (VBar != null)
+        {
+
+            var hsv = new HSV (HBar.Value, (byte)(MaxValue * fraction), (byte)VBar.Value);
+            var rgb = ColorConverter.HsvToRgb (hsv);
+
+            return new Color (rgb.R, rgb.G, rgb.B);
+        }
+
+        throw new Exception ("SaturationBar requires either Lightness or Value to render");
+
     }
 }
 
