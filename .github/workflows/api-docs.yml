@@ -49,7 +49,7 @@ jobs:
 
     - name: v2_develop Repository Dispatch ${{ github.ref_name }}
       if: github.ref_name == 'v2_develop'
-      uses: peter-evans/repository-dispatch@v2
+      uses: peter-evans/repository-dispatch@v3
       with:
         token: ${{ secrets.V2DOCS_TOKEN }}
         repository: gui-cs/Terminal.GuiV2Docs
