@@ -3,7 +3,9 @@ name: Build and publish API docs
 on:
   push:
   # only publish v2 (main or develop); v2 is published via the Terminal.GuiV2Docs repo
-    branches: [main, develop]
+    branches: [v1_release, v1_develop]
+    paths: 
+      - docfx/**
 
 permissions:
   id-token: write 

@@ -7,22 +7,23 @@ using Terminal.Gui;
 
 Application.Run<ExampleWindow> ();
 
-System.Console.WriteLine ($"Username: {((ExampleWindow)Application.Top).usernameText.Text}");
-
 // Before the application exits, reset Terminal.Gui for clean shutdown
 Application.Shutdown ();
 
+System.Console.WriteLine ($@"Username: {ExampleWindow.Username}");
+
 // Defines a top-level window with border and title
 public class ExampleWindow : Window {
+	public static string Username { get; internal set; }
 	public TextField usernameText;
-	
+
 	public ExampleWindow ()
 	{
 		Title = "Example App (Ctrl+Q to quit)";
 
 		// Create input components and labels
-		var usernameLabel = new Label () { 
-			Text = "Username:" 
+		var usernameLabel = new Label () {
+			Text = "Username:"
 		};
 
 		usernameText = new TextField ("") {
@@ -50,7 +51,7 @@ public class ExampleWindow : Window {
 		// Create login button
 		var btnLogin = new Button () {
 			Text = "Login",
-			Y = Pos.Bottom(passwordLabel) + 1,
+			Y = Pos.Bottom (passwordLabel) + 1,
 			// center the login button horizontally
 			X = Pos.Center (),
 			IsDefault = true,
@@ -60,6 +61,7 @@ public class ExampleWindow : Window {
 		btnLogin.Clicked += () => {
 			if (usernameText.Text == "admin" && passwordText.Text == "password") {
 				MessageBox.Query ("Logging In", "Login Successful", "Ok");
+				Username = usernameText.Text.ToString ();
 				Application.RequestStop ();
 			} else {
 				MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");

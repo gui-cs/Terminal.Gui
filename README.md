@@ -38,7 +38,7 @@ dotnet run
 * [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/docs/index.html)
 * [API Documentation](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui)
 
-_The Documentation matches the most recent Nuget release from the `main` branch ([![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui))_
+_The Documentation matches the most recent Nuget release from the `v1_release_` branch ([![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui))_
 
 See the [`Terminal.Gui/` README](https://github.com/gui-cs/Terminal.Gui/tree/master/Terminal.Gui) for an overview of how the library is structured. The [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/docs/index.html) provides insight into core concepts.
 
@@ -64,28 +64,32 @@ The team is looking forward to seeing new amazing projects made by the community
 The following example shows a basic Terminal.Gui application in C#:
 
 ```csharp
+// This is a simple example application.  For the full range of functionality
+// see the UICatalog project
+
 // A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
 
 using Terminal.Gui;
 
 Application.Run<ExampleWindow> ();
 
-System.Console.WriteLine ($"Username: {((ExampleWindow)Application.Top).usernameText.Text}");
-
 // Before the application exits, reset Terminal.Gui for clean shutdown
 Application.Shutdown ();
 
+System.Console.WriteLine ($@"Username: {ExampleWindow.Username}");
+
 // Defines a top-level window with border and title
 public class ExampleWindow : Window {
+	public static string Username { get; internal set; }
 	public TextField usernameText;
-	
+
 	public ExampleWindow ()
 	{
 		Title = "Example App (Ctrl+Q to quit)";
 
 		// Create input components and labels
-		var usernameLabel = new Label () { 
-			Text = "Username:" 
+		var usernameLabel = new Label () {
+			Text = "Username:"
 		};
 
 		usernameText = new TextField ("") {
@@ -113,7 +117,7 @@ public class ExampleWindow : Window {
 		// Create login button
 		var btnLogin = new Button () {
 			Text = "Login",
-			Y = Pos.Bottom(passwordLabel) + 1,
+			Y = Pos.Bottom (passwordLabel) + 1,
 			// center the login button horizontally
 			X = Pos.Center (),
 			IsDefault = true,
@@ -123,6 +127,7 @@ public class ExampleWindow : Window {
 		btnLogin.Clicked += () => {
 			if (usernameText.Text == "admin" && passwordText.Text == "password") {
 				MessageBox.Query ("Logging In", "Login Successful", "Ok");
+				Username = usernameText.Text.ToString ();
 				Application.RequestStop ();
 			} else {
 				MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");

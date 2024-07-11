@@ -394,6 +394,10 @@ namespace Terminal.Gui {
 								}
 							}
 						}
+
+						if (SuperView is Toplevel && Application.Current?.Focused != SuperView) {
+							Application.EnsuresTopOnFront ();
+						}
 					}
 					OnCanFocusChanged ();
 					SetNeedsDisplay ();
