@@ -12,10 +12,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
-    <PackageReference Include="ReactiveUI" Version="20.0.1" />
+    <PackageReference Include="ReactiveUI" Version="20.1.1" />
     <PackageReference Include="ReactiveMarbles.ObservableEvents.SourceGenerator" Version="1.3.1" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
   </ItemGroup>
 </Project>

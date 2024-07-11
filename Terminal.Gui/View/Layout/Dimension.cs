@@ -1,12 +1,10 @@
-using Terminal.Gui.Analyzers.Internal.Attributes;
+
 
 namespace Terminal.Gui;
 
 /// <summary>
 ///     Indicates the dimension for <see cref="Dim"/> operations.
 /// </summary>
-
-[GenerateEnumExtensionMethods]
 public enum Dimension
 {
     /// <summary>
