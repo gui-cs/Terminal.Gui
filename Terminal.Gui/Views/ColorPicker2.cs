@@ -7,6 +7,7 @@ namespace Terminal.Gui;
 
 public enum ColorModel
 {
+    RGB,
     HSV,
     HSL
 }
@@ -22,9 +23,10 @@ internal class ColorModelStrategy
     {
         switch (model)
         {
+            case ColorModel.RGB:
+                return CreateRgbBars ();
             case ColorModel.HSV:
                 return CreateHsvBars ();
-                break;
             case ColorModel.HSL:
                 return CreateHslBars ();
             default:
@@ -34,7 +36,6 @@ internal class ColorModelStrategy
 
     private IEnumerable<ColorBar> CreateHslBars ()
     {
-
         var h = new HueBar ()
         {
             Text = "H:"
@@ -63,6 +64,33 @@ internal class ColorModelStrategy
         yield return l;
     }
 
+    private IEnumerable<ColorBar> CreateRgbBars ()
+    {
+        var r = new RBar ()
+        {
+            Text = "R:"
+        };
+        var g = new GBar ()
+        {
+            Text = "G:"
+        };
+        var b = new BBar ()
+        {
+            Text = "B:"
+        };
+        r.GBar = g;
+        r.BBar = b;
+
+        g.RBar = r;
+        g.BBar = b;
+
+        b.RBar = r;
+        b.GBar = g;
+
+        yield return r;
+        yield return g;
+        yield return b;
+    }
     private IEnumerable<ColorBar> CreateHsvBars ()
     {
 
@@ -97,6 +125,8 @@ internal class ColorModelStrategy
     {
         switch (model)
         {
+            case ColorModel.RGB:
+                return ToColor (new RGB ((byte)bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value));
             case ColorModel.HSV:
                 return ToColor(
                                ColorConverter.HsvToRgb (new HSV (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value))
@@ -116,12 +146,16 @@ internal class ColorModelStrategy
     {
         switch (model)
         {
+            case ColorModel.RGB:
+                bars [0].Value = newValue.R;
+                bars [1].Value = newValue.G;
+                bars [2].Value = newValue.B;
+                break;
             case ColorModel.HSV:
                 var newHsv = ColorConverter.RgbToHsv (new RGB (newValue.R, newValue.G, newValue.B));
                 bars [0].Value = newHsv.H;
                 bars [1].Value = newHsv.S;
                 bars [2].Value = newHsv.V;
-                break;
                 break;
             case ColorModel.HSL:
 
@@ -455,6 +489,54 @@ class ValueBar : ColorBar
         var hsv = new HSV (HBar.Value, (byte)SBar.Value, (byte)(MaxValue * fraction));
         var rgb = ColorConverter.HsvToRgb (hsv);
 
+        return new Color (rgb.R, rgb.G, rgb.B);
+    }
+}
+
+
+class RBar : ColorBar
+{
+    public GBar GBar { get; set; }
+    public BBar BBar { get; set; }
+
+    /// <inheritdoc />
+    protected override int MaxValue => 255;
+
+    /// <inheritdoc />
+    protected override Color GetColor (double fraction)
+    {
+        var rgb = new RGB ((byte)(MaxValue*fraction), (byte)GBar.Value, (byte)BBar.Value);
+        return new Color (rgb.R, rgb.G, rgb.B);
+    }
+}
+
+class GBar : ColorBar
+{
+    public RBar RBar { get; set; }
+    public BBar BBar { get; set; }
+
+    /// <inheritdoc />
+    protected override int MaxValue => 255;
+
+    /// <inheritdoc />
+    protected override Color GetColor (double fraction)
+    {
+        var rgb = new RGB ((byte)RBar.Value, (byte)(MaxValue * fraction), (byte)BBar.Value);
+        return new Color (rgb.R, rgb.G, rgb.B);
+    }
+}
+class BBar : ColorBar
+{
+    public RBar RBar { get; set; }
+    public GBar GBar { get; set; }
+
+    /// <inheritdoc />
+    protected override int MaxValue => 255;
+
+    /// <inheritdoc />
+    protected override Color GetColor (double fraction)
+    {
+        var rgb = new RGB ((byte)RBar.Value, (byte)GBar.Value, (byte)(MaxValue * fraction));
         return new Color (rgb.R, rgb.G, rgb.B);
     }
 }
