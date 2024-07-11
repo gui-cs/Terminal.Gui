@@ -12,8 +12,8 @@ We welcome contributions from the community. See [Issues](https://github.com/gui
 
 Terminal.Gui uses the [GitFlow](https://nvie.com/posts/a-successful-git-branching-model/) branching model. 
 
-* The `main` branch is always stable, and always matches the most recently released Nuget package.
-* The `develop` branch is where bug-fixes to v1.x happens. It is the default branch.
+* The `v1_release` branch is always stable, and always matches the most recently released Nuget package.
+* The `v1__develop` branch is where bug-fixes to v1.x happens. It is the default branch.
 * The `v2_develop` branch is where development on v2.x happens. 
 
 ### Forking Terminal.Gui
