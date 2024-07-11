@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -106,17 +107,17 @@ public class Shortcuts : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
         };
 
-        ((CheckBox)vShortcut3.CommandView).Toggled += (s, e) =>
+        ((CheckBox)vShortcut3.CommandView).Toggle += (s, e) =>
                                                       {
                                                           if (vShortcut3.CommandView is CheckBox cb)
                                                           {
-                                                              eventSource.Add ($"Toggled: {cb.Text}");
+                                                              eventSource.Add ($"Toggle: {cb.Text}");
                                                               eventLog.MoveDown ();
 
                                                               var max = 0;
                                                               var toAlign = Application.Top.Subviews.Where (v => v is Shortcut { Orientation: Orientation.Vertical, Width: not DimAbsolute });
 
-                                                              if (e.NewValue == true)
+                                                              if (e.NewValue == CheckState.Checked)
                                                               {
                                                                   foreach (Shortcut peer in toAlign)
                                                                   {
@@ -141,7 +142,7 @@ public class Shortcuts : Scenario
             Width = Dim.Width (vShortcut3),
             CommandView = new Button
             {
-                Title = "B_utton",
+                Title = "_Button",
             },
             HelpText = "Width is Fill",
             Key = Key.K,
@@ -165,18 +166,18 @@ public class Shortcuts : Scenario
             CommandView = new CheckBox { Text = "_CanFocus" },
         };
 
-        ((CheckBox)vShortcut5.CommandView).Toggled += (s, e) =>
+        ((CheckBox)vShortcut5.CommandView).Toggle += (s, e) =>
                                                      {
                                                          if (vShortcut5.CommandView is CheckBox cb)
                                                          {
-                                                             eventSource.Add ($"Toggled: {cb.Text}");
+                                                             eventSource.Add ($"Toggle: {cb.Text}");
                                                              eventLog.MoveDown ();
 
                                                              foreach (Shortcut peer in Application.Top.Subviews.Where (v => v is Shortcut)!)
                                                              {
                                                                  if (peer.CanFocus)
                                                                  {
-                                                                     peer.CommandView.CanFocus = e.NewValue == true;
+                                                                     peer.CommandView.CanFocus = e.NewValue == CheckState.Checked;
                                                                  }
                                                              }
                                                          }
@@ -360,13 +361,23 @@ public class Shortcuts : Scenario
                                    {
                                        eventSource.Add ($"Accept: {shortcut!.CommandView.Text}");
                                        eventLog.MoveDown ();
-                                       args.Cancel = true;
+                                       args.Handled = true;
                                    };
+
+                shortcut.CommandView.Accept += (o, args) =>
+                                               {
+                                                   eventSource.Add ($"CommandView.Accept: {shortcut!.CommandView.Text}");
+                                                   eventLog.MoveDown ();
+                                               };
             }
         }
 
-        //((CheckBox)vShortcut5.CommandView).OnToggled ();
+        //((CheckBox)vShortcut5.CommandView).OnToggle ();
     }
 
-    private void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
+    private void Button_Clicked (object sender, HandledEventArgs e)
+    {
+        //e.Cancel = true;
+        MessageBox.Query ("Hi", $"You clicked {sender}"); 
+    }
 }

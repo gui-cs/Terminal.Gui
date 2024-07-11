@@ -415,6 +415,8 @@ public partial class View
             return true;
         }
 
+        // TODO: NewKeyDownEvent returns bool. It should be bool? so state of InvokeCommand can be reflected up stack
+
         bool? handled = OnInvokingKeyBindings (keyEvent, KeyBindingScope.HotKey | KeyBindingScope.Focused);
 
         if (handled is { } && (bool)handled)

@@ -129,7 +129,7 @@ public class Buttons : Scenario
             X = 0,
             Y = Pos.Bottom (removeButton) + 1,
             Width = Dim.Percent (50),
-            Height = 5,
+            Height = 6,
             Title = "Computed Layout"
         };
         main.Add (computedFrame);
@@ -140,7 +140,6 @@ public class Buttons : Scenario
             X = 0,
             Y = Pos.Center () - 1,
             Width = 30,
-            Height = 1,
             ColorScheme = Colors.ColorSchemes ["Error"],
             Text = "Move This \u263b Button v_ia Pos"
         };
@@ -157,7 +156,6 @@ public class Buttons : Scenario
             Y = Pos.Center () + 1,
             X = 0,
             Width = 30,
-            Height = 1,
             Text = "Grow This \u263a Button _via Pos",
             ColorScheme = Colors.ColorSchemes ["Error"],
         };
@@ -173,7 +171,7 @@ public class Buttons : Scenario
             X = Pos.Right (computedFrame),
             Y = Pos.Bottom (removeButton) + 1,
             Width = Dim.Fill (),
-            Height = 5,
+            Height = 6,
             Title = "Absolute Layout"
         };
         main.Add (absoluteFrame);
@@ -211,7 +209,8 @@ public class Buttons : Scenario
 
         var label = new Label
         {
-            X = 2, Y = Pos.Bottom (computedFrame) + 1, Text = "Text Alignment (changes the four buttons above): "
+            X = 2, Y = Pos.Bottom (computedFrame) + 1, 
+            Text = "Text Alignment (changes the four buttons above): "
         };
         main.Add (label);
 
@@ -262,7 +261,6 @@ public class Buttons : Scenario
         {
             X = 2,
             Y = Pos.Bottom (radioGroup) + 1,
-            Height = 1,
             Width = Dim.Width (computedFrame) - 2,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = mhkb
@@ -276,7 +274,6 @@ public class Buttons : Scenario
         {
             X = Pos.Left (absoluteFrame) + 1,
             Y = Pos.Bottom (radioGroup) + 1,
-            Height = 1,
             Width = Dim.Width (absoluteFrame) - 2,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = muhkb
@@ -344,7 +341,7 @@ public class Buttons : Scenario
         };
         numericUpDown.ValueChanged += NumericUpDown_ValueChanged;
 
-        void NumericUpDown_ValueChanged (object sender, StateEventArgs<int> e) { }
+        void NumericUpDown_ValueChanged (object sender, EventArgs<int> e) { }
 
         main.Add (label, numericUpDown);
 
@@ -388,9 +385,9 @@ public class Buttons : Scenario
             X = Pos.Right (repeatButton) + 1,
             Y = Pos.Top (repeatButton),
             Title = "Enabled",
-            Checked = true
+            State = CheckState.Checked
         };
-        enableCB.Toggled += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
+        enableCB.Toggle += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
         main.Add (label, repeatButton, enableCB);
 
         main.Ready += (s, e) => radioGroup.Refresh ();
@@ -433,6 +430,7 @@ public class Buttons : Scenario
                 Title = $"{CM.Glyphs.DownArrow}",
                 WantContinuousButtonPressed = true,
                 CanFocus = false,
+                ShadowStyle = ShadowStyle.None,
             };
 
             _number = new ()
@@ -457,6 +455,7 @@ public class Buttons : Scenario
                 Title = $"{CM.Glyphs.UpArrow}",
                 WantContinuousButtonPressed = true,
                 CanFocus = false,
+                ShadowStyle = ShadowStyle.None,
             };
 
             CanFocus = true;
@@ -487,12 +486,12 @@ public class Buttons : Scenario
 
             return;
 
-            void OnDownButtonOnAccept (object s, CancelEventArgs e)
+            void OnDownButtonOnAccept (object s, HandledEventArgs e)
             {
                 InvokeCommand (Command.ScrollDown);
             }
 
-            void OnUpButtonOnAccept (object s, CancelEventArgs e)
+            void OnUpButtonOnAccept (object s, HandledEventArgs e)
             {
                 InvokeCommand (Command.ScrollUp);
             }
@@ -519,7 +518,7 @@ public class Buttons : Scenario
                 }
 
                 T oldValue = value;
-                StateEventArgs<T> args = new StateEventArgs<T> (_value, value);
+                CancelEventArgs<T> args = new (ref _value, ref value);
                 ValueChanging?.Invoke (this, args);
 
                 if (args.Cancel)
@@ -529,21 +528,21 @@ public class Buttons : Scenario
 
                 _value = value;
                 _number.Text = _value.ToString ();
-                ValueChanged?.Invoke (this, new (oldValue, _value));
+                ValueChanged?.Invoke (this, new (ref _value));
             }
         }
 
         /// <summary>
-        /// Fired when the value is about to change. Set <see cref="StateEventArgs{T}.Cancel"/> to true to prevent the change.
+        /// Fired when the value is about to change. Set <see cref="CancelEventArgs{T}.Cancel"/> to true to prevent the change.
         /// </summary>
         [CanBeNull]
-        public event EventHandler<StateEventArgs<T>> ValueChanging;
+        public event EventHandler<CancelEventArgs<T>> ValueChanging;
 
         /// <summary>
         /// Fired when the value has changed.
         /// </summary>
         [CanBeNull]
-        public event EventHandler<StateEventArgs<T>> ValueChanged;
+        public event EventHandler<EventArgs<T>> ValueChanged;
 
         /// <summary>
         /// The number of digits to display. The <see cref="View.Viewport"/> will be resized to fit this number of characters plus the buttons. The default is 3.

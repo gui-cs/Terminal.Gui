@@ -219,7 +219,8 @@ public class DatePicker : View
             Text = GetBackButtonText (),
             WantContinuousButtonPressed = true,
             NoPadding = true,
-            NoDecorations = true
+            NoDecorations = true,
+            ShadowStyle = ShadowStyle.None
         };
 
         _previousMonthButton.Accept += (sender, e) =>
@@ -237,7 +238,8 @@ public class DatePicker : View
             Text = GetForwardButtonText (),
             WantContinuousButtonPressed = true,
             NoPadding = true,
-            NoDecorations = true
+            NoDecorations = true,
+            ShadowStyle = ShadowStyle.None
         };
 
         _nextMonthButton.Accept += (sender, e) =>

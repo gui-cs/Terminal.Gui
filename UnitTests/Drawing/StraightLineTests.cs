@@ -2,10 +2,9 @@
 
 namespace Terminal.Gui.DrawingTests;
 
-public class StraightLineTests
+public class StraightLineTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper output;
-    public StraightLineTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper _output = output;
 
     [InlineData (
                     Orientation.Horizontal,
@@ -320,8 +319,8 @@ public class StraightLineTests
         int expectedHeight
     )
     {
-        var sl = new StraightLine (new Point (x, y), length, orientation, LineStyle.Single);
+        var sl = new StraightLine (new (x, y), length, orientation, LineStyle.Single);
 
-        Assert.Equal (new Rectangle (expectedX, expectedY, expectedWidth, expectedHeight), sl.Viewport);
+        Assert.Equal (new (expectedX, expectedY, expectedWidth, expectedHeight), sl.Viewport);
     }
 }

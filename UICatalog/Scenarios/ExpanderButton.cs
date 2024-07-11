@@ -36,6 +36,7 @@ public class ExpanderButton : Button
         Height = 1;
         NoDecorations = true;
         NoPadding = true;
+        ShadowStyle = ShadowStyle.None;
 
         AddCommand (Command.HotKey, Toggle);
         AddCommand (Command.ToggleExpandCollapse, Toggle);
@@ -132,15 +133,16 @@ public class ExpanderButton : Button
 
     /// <summary>Called when the orientation is changing. Invokes the <see cref="OrientationChanging"/> event.</summary>
     /// <param name="newOrientation"></param>
+    /// <param name="newValue"></param>
     /// <returns>True of the event was cancelled.</returns>
     protected virtual bool OnCollapsedChanging (bool newValue)
     {
-        StateEventArgs<bool> args = new (Collapsed, newValue);
+        CancelEventArgs<bool> args = new (ref _collapsed, ref newValue);
         CollapsedChanging?.Invoke (this, args);
 
         if (!args.Cancel)
         {
-            _collapsed = newValue;
+            _collapsed = args.NewValue;
 
             ExpandOrCollapse (_collapsed);
 
@@ -167,7 +169,7 @@ public class ExpanderButton : Button
     ///     Fired when the orientation has changed. Can be cancelled by setting
     ///     <see cref="OrientationEventArgs.Cancel"/> to true.
     /// </summary>
-    public event EventHandler<StateEventArgs<bool>> CollapsedChanging;
+    public event EventHandler<CancelEventArgs<bool>> CollapsedChanging;
 
     /// <summary>
     ///     Collapses or Expands the view.

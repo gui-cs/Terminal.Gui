@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.ViewsTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -566,9 +565,9 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         return;
 
-        void View_Highlight (object sender, HighlightEventArgs e)
+        void View_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
         {
-            if (e.HighlightStyle == HighlightStyle.None)
+            if (e.NewValue == HighlightStyle.None)
             {
                 disablingHighlight++;
             }
@@ -635,9 +634,9 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         return;
 
-        void View_Highlight (object sender, HighlightEventArgs e)
+        void View_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
         {
-            if (e.HighlightStyle == HighlightStyle.None)
+            if (e.NewValue == HighlightStyle.None)
             {
                 disablingHighlight++;
             }

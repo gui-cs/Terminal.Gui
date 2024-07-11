@@ -9,29 +9,31 @@ public class BorderEditor : AdornmentEditor
 {
     private CheckBox _ckbTitle;
     private RadioGroup _rbBorderStyle;
+    private CheckBox _ckbGradient;
 
     public BorderEditor ()
     {
         Title = "_Border";
         Initialized += BorderEditor_Initialized;
         AdornmentChanged += BorderEditor_AdornmentChanged;
-
     }
 
     private void BorderEditor_AdornmentChanged (object sender, EventArgs e)
     {
-        _ckbTitle.Checked = ((Border)AdornmentToEdit).ShowTitle;
+        _ckbTitle.State = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Title) ? CheckState.Checked : CheckState.UnChecked;
         _rbBorderStyle.SelectedItem = (int)((Border)AdornmentToEdit).LineStyle;
+        _ckbGradient.State = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Gradient) ? CheckState.Checked : CheckState.UnChecked;
     }
 
     private void BorderEditor_Initialized (object sender, EventArgs e)
     {
-
         List<LineStyle> borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
 
-        _rbBorderStyle = new RadioGroup
+        _rbBorderStyle = new()
         {
             X = 0,
+
+            // BUGBUG: Hack until dimauto is working properly
             Y = Pos.Bottom (Subviews [^1]),
             Width = Dim.Width (Subviews [^2]) + Dim.Width (Subviews [^1]) - 1,
             SelectedItem = (int)(((Border)AdornmentToEdit)?.LineStyle ?? LineStyle.None),
@@ -45,20 +47,33 @@ public class BorderEditor : AdornmentEditor
 
         _rbBorderStyle.SelectedItemChanged += OnRbBorderStyleOnSelectedItemChanged;
 
-        _ckbTitle = new CheckBox
+        _ckbTitle = new()
         {
             X = 0,
             Y = Pos.Bottom (_rbBorderStyle),
 
-            Checked = true,
+            State = CheckState.Checked,
             SuperViewRendersLineCanvas = true,
-            Text = "Show Title",
+            Text = "Title",
             Enabled = AdornmentToEdit is { }
         };
 
-
-        _ckbTitle.Toggled += OnCkbTitleOnToggled;
+        _ckbTitle.Toggle += OnCkbTitleOnToggle;
         Add (_ckbTitle);
+
+        _ckbGradient = new ()
+        {
+            X = 0,
+            Y = Pos.Bottom (_ckbTitle),
+
+            State = CheckState.Checked,
+            SuperViewRendersLineCanvas = true,
+            Text = "Gradient",
+            Enabled = AdornmentToEdit is { }
+        };
+
+        _ckbGradient.Toggle += OnCkbGradientOnToggle;
+        Add (_ckbGradient);
 
         return;
 
@@ -80,6 +95,32 @@ public class BorderEditor : AdornmentEditor
             LayoutSubviews ();
         }
 
-        void OnCkbTitleOnToggled (object sender, StateEventArgs<bool?> args) { ((Border)AdornmentToEdit).ShowTitle = args.NewValue!.Value; }
+        void OnCkbTitleOnToggle (object sender, CancelEventArgs<CheckState> args)
+        {
+            if (args.NewValue == CheckState.Checked)
+
+            {
+                ((Border)AdornmentToEdit).Settings |= BorderSettings.Title;
+            }
+            else
+
+            {
+                ((Border)AdornmentToEdit).Settings &= ~BorderSettings.Title;
+            }
+        }
+
+        void OnCkbGradientOnToggle (object sender, CancelEventArgs<CheckState> args)
+        {
+            if (args.NewValue == CheckState.Checked)
+
+            {
+                ((Border)AdornmentToEdit).Settings |= BorderSettings.Gradient;
+            }
+            else
+
+            {
+                ((Border)AdornmentToEdit).Settings &= ~BorderSettings.Gradient;
+            }
+        }
     }
 }

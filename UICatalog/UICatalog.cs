@@ -330,7 +330,6 @@ internal class UICatalogApp
             // made by Scenario.Init() above
             // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
-
             VerifyObjectsWereDisposed ();
         }
 
@@ -388,6 +387,8 @@ internal class UICatalogApp
 
         public UICatalogTopLevel ()
         {
+            _diagnosticFlags = View.Diagnostics;
+
             _themeMenuItems = CreateThemeMenuItems ();
             _themeMenuBarItem = new ("_Themes", _themeMenuItems);
 
@@ -450,6 +451,7 @@ internal class UICatalogApp
             StatusBar = new ()
             {
                 Visible = ShowStatusBar,
+                AlignmentModes = AlignmentModes.IgnoreFirstOrLast
             };
 
             if (StatusBar is { })
@@ -473,20 +475,18 @@ internal class UICatalogApp
                     CommandView = new CheckBox ()
                     {
                         Title = "16 color mode",
-                        Checked = Application.Force16Colors,
+                        State = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
                         CanFocus = false,
                     },
                     HelpText = "",
                     Key = Key.F6,
                 };
 
-                ShForce16Colors.Accept += (sender, args) =>
+                ((CheckBox)ShForce16Colors.CommandView).Toggle += (sender, args) =>
                                           {
-                                              ((CheckBox)ShForce16Colors.CommandView).Checked =
-                                                  Application.Force16Colors = (bool)!((CheckBox)ShForce16Colors.CommandView).Checked!;
+                                              Application.Force16Colors = args.NewValue == CheckState.Checked;
                                               MiForce16Colors!.Checked = Application.Force16Colors;
                                               Application.Refresh ();
-
                                           };
 
                 //ShDiagnostics = new Shortcut ()
@@ -525,7 +525,7 @@ internal class UICatalogApp
                 AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Categories",
-                BorderStyle = LineStyle.Single,
+                BorderStyle = LineStyle.Rounded,
                 SuperViewRendersLineCanvas = true,
                 Source = new ListWrapper<string> (_categories)
             };
@@ -545,7 +545,7 @@ internal class UICatalogApp
                 //AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Scenarios",
-                BorderStyle = LineStyle.Single,
+                BorderStyle = CategoryList.BorderStyle,
                 SuperViewRendersLineCanvas = true
             };
 
@@ -1006,7 +1006,7 @@ internal class UICatalogApp
             MiForce16Colors.Action += () =>
                                       {
                                           MiForce16Colors.Checked = Application.Force16Colors = (bool)!MiForce16Colors.Checked!;
-                                          ((CheckBox)ShForce16Colors!.CommandView!).Checked = Application.Force16Colors;
+                                          ((CheckBox)ShForce16Colors!.CommandView!).State = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                                           Application.Refresh ();
                                       };
             menuItems.Add (MiForce16Colors);

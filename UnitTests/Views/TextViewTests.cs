@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -193,13 +194,7 @@ public class TextViewTests
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -631,13 +626,7 @@ public class TextViewTests
         _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }{
-                          Environment.NewLine
-                      }",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}",
                       _textView.Text
                      );
         _textView.CursorPosition = new Point (3, 1);
@@ -645,32 +634,14 @@ public class TextViewTests
         _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }{
-                          Environment.NewLine
-                      }",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}",
                       _textView.Text
                      );
         Assert.Equal (new Point (3, 2), _textView.CursorPosition);
         _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }{
-                          Environment.NewLine
-                      }",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}",
                       _textView.Text
                      );
         Assert.Equal (new Point (3, 3), _textView.CursorPosition);
@@ -1148,13 +1119,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1165,13 +1130,7 @@ This is the second line.
         tv.ClearHistoryChanges ();
 
         Assert.Equal (
-                      $"{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1311,11 +1270,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("", tv.SelectedText);
@@ -1326,13 +1281,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1342,11 +1291,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1356,13 +1301,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1382,11 +1321,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.W.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("", tv.SelectedText);
@@ -1400,11 +1335,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1414,11 +1345,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1427,11 +1354,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1441,11 +1364,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1454,11 +1373,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1478,11 +1393,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.W.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("", tv.SelectedText);
@@ -1501,11 +1412,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the  line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1539,11 +1446,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1559,11 +1462,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1624,13 +1523,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"{
-                          Environment.NewLine
-                      }{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.",
+                      $"{Environment.NewLine}{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1650,13 +1543,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"{
-                          Environment.NewLine
-                      }{
-                          Environment.NewLine
-                      }This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.",
+                      $"{Environment.NewLine}{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1692,13 +1579,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.{
-                          Environment.NewLine
-                      }",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1726,13 +1607,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.{
-                          Environment.NewLine
-                      }",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1763,13 +1638,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1778,13 +1647,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.A));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1794,13 +1657,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1810,11 +1667,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1825,13 +1678,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1840,13 +1687,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1856,13 +1697,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1872,11 +1707,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -1887,13 +1718,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -1902,13 +1727,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -2266,11 +2085,7 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2285,11 +2100,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2303,11 +2114,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2335,11 +2142,7 @@ This is the second line.
             {
                 case 0:
                     Assert.Equal (
-                                  $"This the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This  the third line.",
+                                  $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This  the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (5, 2), tv.CursorPosition);
@@ -2347,11 +2150,7 @@ This is the second line.
                     break;
                 case 1:
                     Assert.Equal (
-                                  $"This the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This i the third line.",
+                                  $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This i the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (6, 2), tv.CursorPosition);
@@ -2359,11 +2158,7 @@ This is the second line.
                     break;
                 case 2:
                     Assert.Equal (
-                                  $"This the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (7, 2), tv.CursorPosition);
@@ -2373,11 +2168,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2391,11 +2182,7 @@ This is the second line.
             {
                 case 0:
                     Assert.Equal (
-                                  $"This  the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This  the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (5, 0), tv.CursorPosition);
@@ -2403,11 +2190,7 @@ This is the second line.
                     break;
                 case 1:
                     Assert.Equal (
-                                  $"This i the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This i the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (6, 0), tv.CursorPosition);
@@ -2415,11 +2198,7 @@ This is the second line.
                     break;
                 case 2:
                     Assert.Equal (
-                                  $"This is the first line.{
-                                      Environment.NewLine
-                                  }This the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (7, 0), tv.CursorPosition);
@@ -2429,11 +2208,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2447,11 +2222,7 @@ This is the second line.
             {
                 case 0:
                     Assert.Equal (
-                                  $"This is the first line.{
-                                      Environment.NewLine
-                                  }This  the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This is the first line.{Environment.NewLine}This  the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (5, 1), tv.CursorPosition);
@@ -2459,11 +2230,7 @@ This is the second line.
                     break;
                 case 1:
                     Assert.Equal (
-                                  $"This is the first line.{
-                                      Environment.NewLine
-                                  }This i the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This is the first line.{Environment.NewLine}This i the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (6, 1), tv.CursorPosition);
@@ -2471,11 +2238,7 @@ This is the second line.
                     break;
                 case 2:
                     Assert.Equal (
-                                  $"This is the first line.{
-                                      Environment.NewLine
-                                  }This is the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (7, 1), tv.CursorPosition);
@@ -2485,11 +2248,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2501,11 +2260,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2517,11 +2272,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2551,11 +2302,7 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2570,11 +2317,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2588,11 +2331,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This ise first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2618,11 +2357,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This ise first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2634,11 +2369,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2650,11 +2381,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2666,11 +2393,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2682,11 +2405,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This ise first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2716,11 +2435,7 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2731,11 +2446,7 @@ This is the second line.
         tv.InsertText (messy);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2745,11 +2456,7 @@ This is the second line.
         tv.InsertText (messy);
 
         Assert.Equal (
-                      $"This is messy the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2759,11 +2466,7 @@ This is the second line.
         tv.InsertText (messy);
 
         Assert.Equal (
-                      $"This is messy the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is messy the third line.",
+                      $"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is messy the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2775,11 +2478,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is messy the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2791,11 +2490,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2807,11 +2502,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2823,11 +2514,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2839,11 +2526,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is messy the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2855,11 +2538,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is messy the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is messy the third line.",
+                      $"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is messy the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2875,11 +2554,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl.WithShift));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2905,11 +2580,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2937,11 +2608,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -2973,11 +2640,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ($"first line.{Environment.NewLine}This is the second", tv.SelectedText);
@@ -2990,13 +2653,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the seconfirst line.{
-                          Environment.NewLine
-                      }This is the secondd line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the seconfirst line.{Environment.NewLine}This is the secondd line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -3006,11 +2663,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -3020,13 +2673,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the seconfirst line.{
-                          Environment.NewLine
-                      }This is the secondd line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the seconfirst line.{Environment.NewLine}This is the secondd line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -3046,11 +2693,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ($"first line.{Environment.NewLine}This is the second", tv.SelectedText);
@@ -3062,13 +2705,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the secondfirst line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the secondfirst line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -3078,11 +2715,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -3092,13 +2725,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the secondfirst line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the secondfirst line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -3112,11 +2739,7 @@ This is the second line.
         var tv = new TextView { Text = text };
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -3127,20 +2750,12 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl.WithShift));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.SelectedText
                      );
         Assert.Equal (3, tv.Lines);
@@ -3162,11 +2777,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("", tv.SelectedText);
@@ -3194,11 +2805,7 @@ This is the second line.
         var tv = new TextView { Text = text };
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -3209,20 +2816,12 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl.WithShift));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.SelectedText
                      );
         Assert.Equal (3, tv.Lines);
@@ -3244,11 +2843,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("", tv.SelectedText);
@@ -3281,11 +2876,7 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -3376,11 +2967,7 @@ This is the second line.
                     break;
                 case 5:
                     Assert.Equal (
-                                  $"This is the first line.{
-                                      Environment.NewLine
-                                  }This is the second line.{
-                                      Environment.NewLine
-                                  }This is the third line.",
+                                  $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                                   tv.Text
                                  );
                     Assert.Equal (new Point (7, 0), tv.CursorPosition);
@@ -3390,11 +2977,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4362,11 +3945,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal ("first", tv.SelectedText);
@@ -4385,11 +3964,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4413,11 +3988,7 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4432,11 +4003,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4448,11 +4015,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4464,11 +4027,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4486,11 +4045,7 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4505,11 +4060,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4521,11 +4072,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4537,11 +4084,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This ise second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4559,11 +4102,7 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4574,11 +4113,7 @@ This is the second line.
         tv.InsertText (messy);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4590,11 +4125,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4606,11 +4137,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4628,11 +4155,7 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4650,11 +4173,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This  second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This  second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4669,11 +4188,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4688,11 +4203,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This  second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This  second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4713,11 +4224,7 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4735,11 +4242,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This isecond line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This isecond line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4754,11 +4257,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4773,11 +4272,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This isecond line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This isecond line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4798,11 +4293,7 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4816,11 +4307,7 @@ This is the second line.
         tv.InsertText (messy);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4835,11 +4322,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4854,11 +4337,7 @@ This is the second line.
         }
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is messy second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is messy second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4880,13 +4359,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -4896,11 +4369,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4911,13 +4380,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -4927,11 +4390,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4942,13 +4401,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -4968,13 +4421,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -4984,11 +4431,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -4999,13 +4442,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5015,11 +4452,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5030,13 +4463,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5056,13 +4483,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5071,13 +4492,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.A));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5087,13 +4502,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5103,11 +4512,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5118,13 +4523,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5133,13 +4532,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5149,13 +4542,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5165,11 +4552,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5180,13 +4563,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      } line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5195,13 +4572,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the {
-                          Environment.NewLine
-                      }a line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (4, tv.Lines);
@@ -5226,11 +4597,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5247,11 +4614,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5287,11 +4650,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5312,11 +4671,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5424,11 +4779,7 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (3, tv.Lines);
@@ -5456,11 +4807,7 @@ This is the second line.
         tv.Draw ();
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.F",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
                       tv.Text
                      );
         Assert.Equal (new Point (24, 2), tv.CursorPosition);
@@ -5469,11 +4816,7 @@ This is the second line.
         tv.Draw ();
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (new Point (23, 2), tv.CursorPosition);
@@ -5482,11 +4825,7 @@ This is the second line.
         tv.Draw ();
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.F",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
                       tv.Text
                      );
         Assert.Equal (new Point (24, 2), tv.CursorPosition);
@@ -5494,11 +4833,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
                       tv.Text
                      );
         Assert.Equal (new Point (23, 2), tv.CursorPosition);
@@ -5519,11 +4854,7 @@ This is the second line.
         tv.Draw ();
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.F",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
                       tv.Text
                      );
         Assert.Equal (new Point (24, 2), tv.CursorPosition);
@@ -5532,11 +4863,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (28, 2), tv.CursorPosition);
@@ -5626,11 +4953,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Delete));
 
         Assert.Equal (
-                      $"This is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -5640,11 +4963,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Delete));
 
         Assert.Equal (
-                      $"his is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"his is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (Point.Empty, tv.CursorPosition);
@@ -5654,44 +4973,28 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.D.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.End));
 
         Assert.Equal (
-                      $"is is the first line.{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (21, 0), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
 
         Assert.Equal (
-                      $"is is the first line{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first line{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (20, 0), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5734,11 +5037,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5761,11 +5060,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5798,11 +5093,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5814,11 +5105,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Space.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5830,11 +5117,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.Space.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5847,11 +5130,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (new Key (Key.C.WithAlt)));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -5863,11 +5142,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
-                      $"is is the first lin{
-                          Environment.NewLine
-                      }This is the second line.{
-                          Environment.NewLine
-                      }This is the third line.first",
+                      $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
                       tv.Text
                      );
         Assert.Equal (new Point (19, 0), tv.CursorPosition);
@@ -9130,4 +8405,157 @@ line.
             _textView.Text = Encoding.Unicode.GetString (ms);
         }
     }
+
+
+    [Fact]
+    public void HotKey_Command_SetsFocus ()
+    {
+        var view = new TextView ();
+
+        view.CanFocus = true;
+        Assert.False (view.HasFocus);
+        view.InvokeCommand (Command.HotKey);
+        Assert.True (view.HasFocus);
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Accept ()
+    {
+        var view = new TextView ();
+        var accepted = false;
+        view.Accept += OnAccept;
+        view.InvokeCommand (Command.HotKey);
+
+        Assert.False (accepted);
+
+        return;
+
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+    [Fact]
+    public void Accept_Command_Fires_Accept ()
+    {
+        var view = new TextView ();
+
+        var accepted = false;
+        view.Accept += Accept;
+        view.InvokeCommand (Command.Accept);
+        Assert.True (accepted);
+
+        return;
+
+        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+    }
+
+
+    [Theory]
+    [InlineData (false, 1)]
+    [InlineData (true, 0)]
+    public void Enter_Key_Fires_Accept (bool multiline, int expectedAccepts)
+    {
+        var view = new TextView ()
+        {
+            Multiline = multiline,
+        };
+
+        int accepted = 0;
+        view.Accept += Accept;
+        view.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedAccepts, accepted);
+
+        return;
+
+        void Accept (object sender, HandledEventArgs e) { accepted++; }
+    }
+
+    [Theory]
+    [InlineData (false, false, 1, 0)]
+    [InlineData (false, true, 1, 1)]
+    [InlineData (true, false, 0, 0)]
+    [InlineData (true, true, 0, 0)]
+    public void Accept_Handler_Handled_Prevents_Default_Button_Accept (bool multiline, bool handleAccept, int expectedAccepts, int expectedButtonAccepts)
+    {
+        var superView = new Window ();
+        var tv = new TextView ()
+        {
+            Multiline = multiline
+        };
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tv, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        var textViewAccept = 0;
+        tv.Accept += TextViewAccept;
+
+        tv.SetFocus ();
+        Assert.True (tv.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedAccepts, textViewAccept);
+        Assert.Equal (expectedButtonAccepts, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedAccepts, textViewAccept);
+        Assert.Equal (expectedButtonAccepts + 1, buttonAccept);
+
+        return;
+
+        void TextViewAccept (object sender, HandledEventArgs e)
+        {
+            textViewAccept++;
+            e.Handled = handleAccept;
+        }
+
+        void ButtonAccept (object sender, HandledEventArgs e)
+        {
+            buttonAccept++;
+        }
+    }
+
+    [Theory]
+    [InlineData (true, 0)]
+    [InlineData (false, 1)]
+    public void Accept_No_Handler_Enables_Default_Button_Accept (bool multiline, int expectedButtonAccept)
+    {
+        var superView = new Window ();
+        var tv = new TextView ()
+        {
+            Multiline = multiline
+        };
+        var button = new Button ()
+        {
+            IsDefault = true,
+        };
+
+        superView.Add (tv, button);
+
+        var buttonAccept = 0;
+        button.Accept += ButtonAccept;
+
+        tv.SetFocus ();
+        Assert.True (tv.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedButtonAccept, buttonAccept);
+
+        button.SetFocus ();
+        superView.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedButtonAccept + 1, buttonAccept);
+
+        return;
+
+        void ButtonAccept (object sender, HandledEventArgs e)
+        {
+            buttonAccept++;
+        }
+    }
+
 }

@@ -81,7 +81,7 @@ RequiredModules = @(
 
 # Modules to import as nested modules of this module.
 # This module is just a shortcut that loads all of our modules.
-NestedModules = @('./Terminal.Gui.PowerShell.Core.psd1', './Terminal.Gui.PowerShell.Analyzers.psd1', './Terminal.Gui.PowerShell.Git.psd1', './Terminal.Gui.PowerShell.Build.psd1')
+NestedModules = @('./Terminal.Gui.PowerShell.Core.psd1', './Terminal.Gui.PowerShell.Git.psd1', './Terminal.Gui.PowerShell.Build.psd1')
 
 # Functions to export from this module.
 # Not filtered, so exports all functions exported by all nested modules.
