@@ -26,10 +26,8 @@ public class ColorPicker2 : View
             if (_value != value)
             {
                 _value = value;
-
-                // TODO: results in jitter
-                UpdateBarsFromColor (Value);
                 tfHex.Text = value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
+                UpdateBarsFromColor (value);
             }
         }
     }
@@ -83,16 +81,15 @@ public class ColorPicker2 : View
             X = 4,
             Width = 8
         };
-        
+
         Add (hb);
         Add (sb);
         Add (lb);
         Add (lbHex);
         Add (tfHex);
 
-        tfHex.Leave += (_,_)=> UpdateValueFromTextField ();
+        tfHex.Leave += (_, _) => UpdateValueFromTextField ();
     }
-
 
     private void UpdateValueFromTextField ()
     {
@@ -108,16 +105,32 @@ public class ColorPicker2 : View
         base.OnDrawContent (viewport);
         var normal = GetNormalColor ();
         Driver.SetAttribute (new Attribute (Value, normal.Background));
-        AddRune (13,3,(Rune)'■');
-
+        AddRune (13, 3, (Rune)'■');
     }
-
     private void UpdateBarsFromColor (Color color)
     {
         var hsl = ColorConverter.RgbToHsl (new RGB (color.R, color.G, color.B));
-        hb.Value = hsl.H / 360.0;
-        sb.Value = hsl.S / 100.0;
-        lb.Value = hsl.L / 100.0;
+
+        // Update HueBar value
+        double newHValue = hsl.H / 360.0;
+        if (Math.Abs (hb.Value - newHValue) > 0.001) // Using tolerance to avoid jitter
+        {
+            hb.Value = newHValue;
+        }
+
+        // Update SaturationBar value only if it changes the integer byte value of S
+        double newSValue = hsl.S / 100.0;
+        if ((byte)(100 * sb.Value) != hsl.S)
+        {
+            sb.Value = newSValue;
+        }
+
+        // Update LightnessBar value only if it changes the integer byte value of L
+        double newLValue = hsl.L / 100.0;
+        if ((byte)(100 * lb.Value) != hsl.L)
+        {
+            lb.Value = newLValue;
+        }
     }
 
     private void RebuildColor (object sender, EventArgs<double> e)
@@ -126,8 +139,8 @@ public class ColorPicker2 : View
         var rgb = ColorConverter.HslToRgb (hsl);
         Value = new Color (rgb.R, rgb.G, rgb.B);
     }
-
 }
+
 public abstract class ColorBar : View
 {
     /// <summary>
@@ -147,7 +160,7 @@ public abstract class ColorBar : View
         set
         {
             var clampedValue = Math.Clamp (value, 0, 1);
-            if (_value != clampedValue)
+            if (Math.Abs (_value - clampedValue) > 0.0001) // Using a tolerance to avoid jitter due to minor changes
             {
                 _value = clampedValue;
                 OnValueChanged ();
@@ -249,8 +262,6 @@ public abstract class ColorBar : View
     }
 }
 
-
-
 internal class HueBar : ColorBar
 {
     /// <inheritdoc />
@@ -260,8 +271,6 @@ internal class HueBar : ColorBar
         var rgb = ColorConverter.HslToRgb (hsl);
 
         return new Color (rgb.R, rgb.G, rgb.B);
-
-
     }
 }
 
@@ -269,7 +278,6 @@ internal class SaturationBar : ColorBar
 {
     public HueBar HBar { get; set; }
     public LightnessBar LBar { get; set; }
-
 
     /// <inheritdoc />
     protected override Color GetColor (double fraction)
@@ -283,14 +291,13 @@ internal class SaturationBar : ColorBar
 
 internal class LightnessBar : ColorBar
 {
-
     public HueBar HBar { get; set; }
     public SaturationBar SBar { get; set; }
-    
+
     /// <inheritdoc />
     protected override Color GetColor (double fraction)
     {
-        var hsl = new HSL ((int)(HBar.Value * 360), (byte)(100 * SBar.Value), (byte)(100 * Value));
+        var hsl = new HSL ((int)(HBar.Value * 360), (byte)(100 * SBar.Value), (byte)(100 * fraction));
         var rgb = ColorConverter.HslToRgb (hsl);
 
         return new Color (rgb.R, rgb.G, rgb.B);
