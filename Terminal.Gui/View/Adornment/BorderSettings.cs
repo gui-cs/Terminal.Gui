@@ -1,4 +1,4 @@
-using Terminal.Gui.Analyzers.Internal.Attributes;
+
 
 namespace Terminal.Gui;
 
@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 /// Determines the settings for <see cref="Border"/>.
 /// </summary>
 [Flags]
-[GenerateEnumExtensionMethods (FastHasFlags = true)]
+
 public enum BorderSettings
 {
     /// <summary>
