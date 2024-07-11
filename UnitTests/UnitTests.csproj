@@ -29,16 +29,16 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-    <PackageReference Include="ReportGenerator" Version="5.3.7" />
-    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.0.22" />
-    <PackageReference Include="xunit" Version="2.9.0" />
-    <PackageReference Include="Xunit.Combinatorial" Version="1.6.24" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="[17.10,18)" />
+    <PackageReference Include="ReportGenerator" Version="[5.3.7,6)" />
+    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="[21.0.22,22)" />
+    <PackageReference Include="xunit" Version="[2.9.0,3)" />
+    <PackageReference Include="Xunit.Combinatorial" Version="[1.6.24,2)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2,3)">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="6.0.2">
+    <PackageReference Include="coverlet.collector" Version="[6.0.2,7)">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -56,9 +56,6 @@
     <Using Include="System.Drawing" />
     <Using Include="Terminal.Gui" />
     <Using Include="Xunit" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
   </ItemGroup>
   <PropertyGroup Label="FineCodeCoverage">
     <Enabled>

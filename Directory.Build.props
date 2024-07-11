@@ -1,6 +1,6 @@
 <Project>
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" PrivateAssets="all" />
-    <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.149" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Annotations" Version="[2024,)" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.ExternalAnnotations" Version="[10.2.149,)" PrivateAssets="all" />
   </ItemGroup>
 </Project>
