@@ -246,7 +246,7 @@ public partial class View
             Driver.Clip = prevClip;
         }
 
-        //OnRenderLineCanvas ();
+        OnRenderLineCanvas ();
 
         // TODO: This is a hack to force the border subviews to draw.
         if (Border?.Subviews is { })
@@ -261,7 +261,7 @@ public partial class View
         // Invoke DrawContentCompleteEvent
         OnDrawContentComplete (Viewport);
 
-        OnRenderLineCanvas ();
+        //OnRenderLineCanvas ();
 
         // BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
         ClearLayoutNeeded ();

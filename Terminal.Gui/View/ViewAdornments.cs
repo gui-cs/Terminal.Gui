@@ -237,7 +237,7 @@ public partial class View
     /// </remarks>
     internal virtual void LayoutAdornments ()
     {
-        if (Margin is null)
+        if (Margin is null || !Margin.IsInitialized)
         {
             return; // CreateAdornments () has not been called yet
         }

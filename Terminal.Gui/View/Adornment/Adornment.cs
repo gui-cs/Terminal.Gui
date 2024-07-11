@@ -190,11 +190,6 @@ public class Adornment : View
     /// <returns></returns>
     public override bool OnRenderLineCanvas ()
     {
-        if (Parent?.Text == "Label")
-        {
-
-        }
-
         return base.OnRenderLineCanvas();
     }
 
@@ -211,7 +206,6 @@ public class Adornment : View
     #endregion View Overrides
 
     #region Mouse Support
-
 
     /// <summary>
     /// Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness.

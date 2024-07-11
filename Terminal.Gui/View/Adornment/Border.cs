@@ -1,4 +1,6 @@
-#define SUBVIEW_BASED_BORDER 
+#define SUBVIEW_BASED_BORDER
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>The Border for a <see cref="View"/>.</summary>
@@ -88,85 +90,89 @@ public class Border : Adornment
         }
 #endif
 
-        base.BeginInit ();
+        //base.BeginInit();
 
-#if SUBVIEW_BASED_BORDER
         SuperViewRendersLineCanvas = false;
 
-        if (Parent is { })
+        TopLeft = new ()
         {
-            TopLeft = new ()
-            {
-                Orientation = Orientation.Horizontal,
-                SuperViewRendersLineCanvas = true,
-                BorderStyle = LineStyle
-            };
-            Add (TopLeft);
+            Orientation = Orientation.Horizontal,
+            SuperViewRendersLineCanvas = true,
+            BorderStyle = LineStyle
+        };
+        Add (TopLeft);
 
-            TopRight = new ()
-            {
-                Orientation = Orientation.Horizontal,
-                SuperViewRendersLineCanvas = true,
-                BorderStyle = LineStyle
-            };
-            Add (TopRight);
+        TopRight = new ()
+        {
+            Orientation = Orientation.Horizontal,
+            SuperViewRendersLineCanvas = true,
+            BorderStyle = LineStyle
+        };
+        Add (TopRight);
 
-            Left = new ()
-            {
-                Orientation = Orientation.Vertical,
-                SuperViewRendersLineCanvas = true,
-                BorderStyle = LineStyle,
-            };
-            Add (Left);
+        Left = new ()
+        {
+            Orientation = Orientation.Vertical,
+            SuperViewRendersLineCanvas = true,
+            BorderStyle = LineStyle,
+        };
+        Add (Left);
 
-            Right = new ()
-            {
-                Orientation = Orientation.Vertical,
-                SuperViewRendersLineCanvas = true,
-                BorderStyle = LineStyle,
-            };
+        Right = new ()
+        {
+            Orientation = Orientation.Vertical,
+            SuperViewRendersLineCanvas = true,
+            BorderStyle = LineStyle,
+        };
 
-            Add (Right);
+        Add (Right);
 
-            Bottom = new ()
-            {
-                Orientation = Orientation.Horizontal,
-                SuperViewRendersLineCanvas = true,
-                BorderStyle = LineStyle,
-            };
-            Add (Bottom);
+        Bottom = new ()
+        {
+            Orientation = Orientation.Horizontal,
+            SuperViewRendersLineCanvas = true,
+            BorderStyle = LineStyle,
+        };
+        Add (Bottom);
 
-            TitleLabel = new View ()
-            {
-                Id = "TitleLabel",
-                Text = Parent.Title,
-                CanFocus = false,
-                SuperViewRendersLineCanvas = true,
-                TextAlignment = Alignment.Center,
-                VerticalTextAlignment = Alignment.Center,
-            };
-            Add (TitleLabel);
+        TitleLabel = new View ()
+        {
+            Id = "TitleLabel",
+            Text = Parent.Title,
+            CanFocus = false,
+            SuperViewRendersLineCanvas = true,
+            TextAlignment = Alignment.Center,
+            VerticalTextAlignment = Alignment.Center,
+        };
+        Add (TitleLabel);
 
-            //CloseButton = new Button ()
-            //{
-            //    Text = "X",
-            //    CanFocus = true,
-            //    Visible = false,
-            //    NoPadding = true,
-            //    NoDecorations = true,
-            //    WantContinuousButtonPressed = true,
-            //    SuperViewRendersLineCanvas = true,
-            //};
+        //CloseButton = new Button ()
+        //{
+        //    Text = "X",
+        //    CanFocus = true,
+        //    Visible = false,
+        //    NoPadding = true,
+        //    NoDecorations = true,
+        //    WantContinuousButtonPressed = true,
+        //    SuperViewRendersLineCanvas = true,
+        //};
 
-            //CloseButton.Accept += (s, e) =>
-            //{
-            //    e.Handled = Parent.InvokeCommand (Command.QuitToplevel) == true;
-            //};
-            //Add (CloseButton);
+        //CloseButton.Accept += (s, e) =>
+        //{
+        //    e.Handled = Parent.InvokeCommand (Command.QuitToplevel) == true;
+        //};
+        //Add (CloseButton);
 
-            SetSubviewLayout ();
-        }
-#endif
+        Debug.Assert (IsInitialized == false);
+
+        SetSubviewLayout ();
+    }
+
+    /// <inheritdoc />
+    public override void EndInit ()
+    {
+        Debug.Assert (TopLeft is { });
+        base.EndInit ();
     }
 
     private void SetSubviewLayout ()
@@ -235,7 +241,7 @@ public class Border : Adornment
         {
             base.ColorScheme = value;
 #if SUBVIEW_BASED_BORDER
-            if (IsInitialized && TopLeft is { })
+            if (IsInitialized)
             {
                 TopLeft.ColorScheme = value;
                 TopRight.ColorScheme = value;
@@ -277,7 +283,7 @@ public class Border : Adornment
 
             _lineStyle = value;
 #if SUBVIEW_BASED_BORDER
-            if (IsInitialized && Parent is { } && TopLeft is { })
+            if (IsInitialized)
             {
                 TopLeft.BorderStyle = value;
                 TopRight.BorderStyle = value;

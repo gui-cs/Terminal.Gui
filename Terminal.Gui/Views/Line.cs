@@ -84,7 +84,7 @@ public class Line : View
                     pos,
                     length,
                     Orientation,
-                    BorderStyle,
+                    Border.LineStyle,
                     GetNormalColor()
                    );
     }
