@@ -2,25 +2,26 @@ mode: ContinuousDeployment
 tag-prefix: '[vV]'
 continuous-delivery-fallback-tag: pre
 branches:
-  develop:
+  v1_develop:
     mode: ContinuousDeployment
     tag: pre
-    regex: develop
+    regex: v1_develop
     source-branches:
-    - main
+    - v1_release
     pre-release-weight: 100
-  main:
+  v1_release:
     tag: rc
     increment: Patch
+    regex: v1_release
     source-branches:
-    - develop
-    - main
-  feature:
+    - v1_develop
+    - v1_release
+  v1_feature:
     tag: useBranchName
     regex: ^features?[/-]
     source-branches:
-    - develop
-    - main
+    - v1_develop
+    - v1_release
   pull-request:
     tag: PullRequest.{BranchName}
     increment: Inherit

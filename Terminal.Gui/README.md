@@ -51,9 +51,9 @@ Doing so will update the `.csproj` files in your branch with version info, which
 
 The following actions will publish the Terminal.Gui package to Nuget:
 
-* A new version tag is defined and pushed to `main` - this is the normal release process.
-* A push to the `main` branch without a new version tag - this is a release-candidate build and will be of the form `1.2.3-rc.4`
-* A push to the `develop` branch - this is a pre-release build and will be of the form `1.2.3-pre.4`
+* A new version tag is defined and pushed to `v1_release` - this is the normal release process.
+* A push to the `v1_release` branch without a new version tag - this is a release-candidate build and will be of the form `1.2.3-rc.4`
+* A push to the `v1_develop` branch - this is a pre-release build and will be of the form `1.2.3-pre.4`
 
 ## Publishing a Release of Terminal.Gui
 
@@ -71,17 +71,17 @@ The `tag` must be of the form `v<major>.<minor>.<patch>`, e.g. `v1.2.3`.
 
 ### 1) Verify the `develop` branch is ready for release
 
-* Ensure everything is committed and pushed to the `develop` branch
-* Ensure your local `develop` branch is up-to-date with `upstream/develop`
+* Ensure everything is committed and pushed to the `v1_develop` branch
+* Ensure your local `v1_develop` branch is up-to-date with `upstream/v1_develop`
 
-### 2) Create a pull request for the release in the `develop` branch
+### 2) Create a pull request for the release in the `v1_develop` branch
 
 The PR title should be of the form "Release v1.2.3"
 
 ```powershell
-git checkout develop
-git pull upstream develop
-git checkout -b v2_3_4
+git checkout v1_develop
+git pull upstream v1_develop
+git checkout -b v1_2_3
 <touch a file>
 git add .
 git commit -m "Release v1.2.3"
@@ -90,36 +90,36 @@ git push
 
 Go to the link printed by `git push` and fill out the Pull Request.
 
-### 3) On github.com, verify the build action worked on your fork, then merge the PR to `develop`
+### 3) On github.com, verify the build action worked on your fork, then merge the PR to `v1_develop`
 
 * Merging the PR will trigger the publish action on `upstream` (the main repo) and publish the Nuget package as a pre-release (e.g. `1.2.3-pre.1`).
 
 ### 4) Pull the merged `develop` from `upstream`
 
 ```powershell
-git checkout develop
-git pull upstream develop
+git checkout v1_develop
+git pull upstream v1_develop
 ```
 
 ### 5) Merge `develop` into `main`
 
 ```powershell
-git checkout main
-git pull upstream main
-git merge develop
+git checkout v1_release
+git pull upstream v1_release
+git merge v1_develop
 ```
 
 Fix any merge errors.
 
-At this point, to release a release candidate, push the `main` branch `upstream` without a new tag.
+At this point, to release a release candidate, push the `v1_release` branch `upstream` without a new tag.
 
 ```powershell
-git push upstream main
+git push upstream v1_release
 ```
 
 This will publish `1.2.3-rc.1` to Nuget.
 
-### 6) Create a new annotated tag for the release on `main`
+### 6) Create a new annotated tag for the release on `v1_release`
 
 ```powershell
 git tag v1.2.3 -a -m "Release v1.2.3"
@@ -146,13 +146,13 @@ https://www.nuget.org/packages/Terminal.Gui
 
 Generate release notes with the list of PRs since the last release.
 
-### 11) Update the `develop` branch with the new version
+### 11) Update the `v1_develop` branch with the new version
 
 ```powershell
-git checkout develop
-git pull upstream develop
-git merge main
-git push upstream develop
+git checkout v1_develop
+git pull upstream v1_develop
+git merge v1_release
+git push upstream v1_develop
 ```
 
 ## Nuget
