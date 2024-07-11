@@ -341,10 +341,11 @@ public abstract class ColorBar : View, IColorBar
     /// <inheritdoc />
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
-        if (mouseEvent.Position.X >= BarStartsAt)
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && mouseEvent.Position.X >= BarStartsAt)
         {
             Value = MaxValue * (mouseEvent.Position.X - BarStartsAt) / BarWidth;
             mouseEvent.Handled = true;
+            FocusFirst ();
             return true;
         }
 
