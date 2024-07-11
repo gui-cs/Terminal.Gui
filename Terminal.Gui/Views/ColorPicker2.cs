@@ -1,4 +1,5 @@
 ﻿using ColorHelper;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -9,10 +10,16 @@ public class ColorPicker2 : View
 {
     private readonly TextField tfHex;
 
+    private Color _value = Color.Red;
+
     /// <summary>
     /// The color selected in the picker
     /// </summary>
-    public Color Value { get; set; } = Color.Red;
+    public Color Value
+    {
+        get => _value;
+        set => _value = value;
+    }
 
     public ColorPicker2 ()
     {
@@ -25,6 +32,7 @@ public class ColorPicker2 : View
             Width = Dim.Fill (),
             Value = Value
         };
+        hb.ColorChanged += SubBarChangedColor;
 
         var sb = new SaturationBar ()
         {
@@ -34,6 +42,7 @@ public class ColorPicker2 : View
             Width = Dim.Fill (),
             Value = Value
         };
+        sb.ColorChanged += SubBarChangedColor;
 
         var lb = new LightnessBar ()
         {
@@ -43,6 +52,8 @@ public class ColorPicker2 : View
             Width = Dim.Fill (),
             Value = Value
         };
+        lb.ColorChanged += SubBarChangedColor;
+
         tfHex = new TextField ()
         {
             Y = 3,
@@ -57,6 +68,14 @@ public class ColorPicker2 : View
         Add (sb);
         Add (lb);
         Add (tfHex);
+    }
+
+    private void SubBarChangedColor (object sender, ColorEventArgs e)
+    {
+        _value = e.Color;
+
+        // Revert to "g" when https://github.com/gui-cs/Terminal.Gui/issues/3603 is fixed
+        tfHex.Text = e.Color.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
     }
 }
 
@@ -76,28 +95,81 @@ public abstract class ColorBar : View
     /// <summary>Fired when a color is picked.</summary>
     public event EventHandler<ColorEventArgs> ColorChanged;
 
+    protected int ManyDelta = 5;
+
     protected ColorBar ()
     {
         Height = 1;
         Width = Dim.Fill ();
         CanFocus = true;
 
+        AddCommand (Command.Left, (_) => AdjustAndReturn (-1));
+        AddCommand (Command.Right, (_) => AdjustAndReturn (1));
+
+        AddCommand (Command.LeftExtend, (_) => AdjustAndReturn (-ManyDelta));
+        AddCommand (Command.RightExtend, (_) => AdjustAndReturn (ManyDelta));
+
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+
+        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
+        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
     }
 
+    protected abstract void Adjust (int delta);
+
+    protected bool? AdjustAndReturn (int delta)
+    {
+        Adjust (delta);
+        return true;
+    }
+
+    /// <summary>
+    /// Last know width of the bar as passed to <see cref="DrawBar"/>.
+    /// </summary>
+    protected int BarWidth { get; private set; }
+
+    // Used to determine what change should happen when mouse clicks
+    private Dictionary<Point, Color> _colorsRendered = new Dictionary<Point, Color> ();
+
+    protected void AddBarCell (int x, int y, Color color)
+    {
+        _colorsRendered.Add (new Point (x,y),color);
+
+        Application.Driver.SetAttribute (new Attribute (color, color));
+        AddRune (x, y, new Rune ('█'));
+    }
     protected virtual void OnColorChanged (Color color, Color prevColor)
     {
-
         // Ensure this view updates when the Value changes.
-        ColorChanged?.Invoke (this,new ColorEventArgs (){Color=color,PreviousColor = prevColor});
+        ColorChanged?.Invoke (this, new ColorEventArgs { Color = color, PreviousColor = prevColor });
 
         // Invalidate the view so it gets redrawn.
         this.SetNeedsDisplay ();
+    }
+
+    /// <inheritdoc />
+    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    {
+        if (_colorsRendered.TryGetValue (mouseEvent.Position, out Color value))
+        {
+            Value = value;
+            mouseEvent.Handled = true;
+
+            // TODO: is this correct or should rest of event chain still get a call in?
+            return true;
+        }
+
+        return base.OnMouseEvent (mouseEvent);
 
     }
 
     public override void OnDrawContent (Rectangle viewport)
     {
         base.OnDrawContent (viewport);
+
+        // Clear our knowledge of what the bar looks like
+        _colorsRendered.Clear ();
 
         var xOffset = 0;
         if (!string.IsNullOrWhiteSpace (Text))
@@ -110,11 +182,13 @@ public abstract class ColorBar : View
             xOffset = Text.Length;
         }
 
-        DrawBar (xOffset, 0, viewport.Width);
+        BarWidth = viewport.Width - xOffset;
+        DrawBar (xOffset, 0, BarWidth);
     }
 
     protected abstract void DrawBar (int xOffset, int yOffset, int width);
 }
+
 public class HueBar : ColorBar
 {
     protected override void DrawBar (int xOffset, int yOffset, int width)
@@ -163,8 +237,7 @@ public class HueBar : ColorBar
                 closestPosition = x;
             }
 
-            Application.Driver.SetAttribute (new Attribute (color, color));
-            AddRune (x + xOffset, yOffset, new Rune ('█'));
+            AddBarCell (x + xOffset, yOffset, color);
         }
 
         // Draw the triangle at the closest position
@@ -173,7 +246,28 @@ public class HueBar : ColorBar
         Application.Driver.SetAttribute (new Attribute (Color.Black, triangleColor));
         AddRune (closestPosition + xOffset, yOffset, new Rune ('▲'));
     }
+
+    protected override void Adjust (int delta)
+    {
+        var hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (Value.R, Value.G, Value.B));
+        double stepSize = 360.0 / ((double)BarWidth - 1);
+        double newHue = hsl.H + delta * stepSize;
+
+        if (newHue < 0)
+        {
+            newHue = 0;
+        }
+        else if (newHue > 360)
+        {
+            newHue = 360;
+        }
+
+        hsl.H = (int)newHue;
+        var rgb = ColorHelper.ColorConverter.HslToRgb (hsl);
+        Value = new Color (rgb.R, rgb.G, rgb.B);
+    }
 }
+
 public class SaturationBar : ColorBar
 {
     protected override void DrawBar (int xOffset, int yOffset, int width)
@@ -200,8 +294,7 @@ public class SaturationBar : ColorBar
                 closestColor = color;
             }
 
-            Application.Driver.SetAttribute (new Attribute (color, color));
-            AddRune (x + xOffset, yOffset, new Rune ('█'));
+            AddBarCell (x + xOffset, yOffset, color);
         }
 
         // Draw the triangle at the closest position
@@ -209,7 +302,28 @@ public class SaturationBar : ColorBar
         Application.Driver.SetAttribute (new Attribute (ColorName.Black, closestColor));
         AddRune (closestPosition + xOffset, yOffset, new Rune ('▲'));
     }
+
+    protected override void Adjust (int delta)
+    {
+        var hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (Value.R, Value.G, Value.B));
+        double stepSize = 100.0 / ((double)BarWidth - 1);
+        double newSaturation = hsl.S + delta * stepSize;
+
+        if (newSaturation < 0)
+        {
+            newSaturation = 0;
+        }
+        else if (newSaturation > 100)
+        {
+            newSaturation = 100;
+        }
+
+        hsl.S = (byte)newSaturation;
+        var rgb = ColorHelper.ColorConverter.HslToRgb (hsl);
+        Value = new Color (rgb.R, rgb.G, rgb.B);
+    }
 }
+
 public class LightnessBar : ColorBar
 {
     protected override void DrawBar (int xOffset, int yOffset, int width)
@@ -236,13 +350,33 @@ public class LightnessBar : ColorBar
                 closestColor = color;
             }
 
-            Application.Driver.SetAttribute (new Attribute (color, color));
-            AddRune (x + xOffset, yOffset, new Rune ('█'));
+            AddBarCell (x+xOffset,yOffset,color);
         }
 
         // Draw the triangle at the closest position
         Move (closestPosition + xOffset, yOffset);
         Application.Driver.SetAttribute (new Attribute (ColorName.Black, closestColor));
         AddRune (closestPosition + xOffset, yOffset, new Rune ('▲'));
+    }
+
+
+    protected override void Adjust (int delta)
+    {
+        var hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (Value.R, Value.G, Value.B));
+        double stepSize = 100.0 / ((double)BarWidth - 1);
+        double newLightness = hsl.L + delta * stepSize;
+
+        if (newLightness < 0)
+        {
+            newLightness = 0;
+        }
+        else if (newLightness > 100)
+        {
+            newLightness = 100;
+        }
+
+        hsl.L = (byte)newLightness;
+        var rgb = ColorHelper.ColorConverter.HslToRgb (hsl);
+        Value = new Color (rgb.R, rgb.G, rgb.B);
     }
 }
