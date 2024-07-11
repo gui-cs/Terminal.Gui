@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using System.ComponentModel;
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Provides a proportional control for scrolling through content. Used within a <see cref="ScrollBar"/>.
@@ -73,7 +75,7 @@ public class Scroll : View
                 return;
             }
 
-            StateEventArgs<int> args = OnPositionChanging (_position, value);
+            CancelEventArgs<int> args = OnPositionChanging (_position, value);
 
             if (args.Cancel)
             {
@@ -85,25 +87,24 @@ public class Scroll : View
                 AdjustSlider ();
             }
 
-            int oldPos = _position;
             _position = value;
-            OnPositionChanged (oldPos);
+            OnPositionChanged (_position);
         }
     }
 
     /// <summary>Raised when the <see cref="Position"/> has changed.</summary>
-    public event EventHandler<StateEventArgs<int>> PositionChanged;
+    public event EventHandler<EventArgs<int>> PositionChanged;
 
-    /// <summary>Raised when the <see cref="Position"/> is changing. Set <see cref="StateEventArgs{T}.Cancel"/> to <see langword="true"/> to prevent the position from being changed.</summary>
-    public event EventHandler<StateEventArgs<int>> PositionChanging;
+    /// <summary>Raised when the <see cref="Position"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to prevent the position from being changed.</summary>
+    public event EventHandler<CancelEventArgs<int>> PositionChanging;
 
-    /// <summary>Virtual method called when <see cref="Position"/> has changed. Fires <see cref="PositionChanged"/>.</summary>
-    protected virtual void OnPositionChanged (int oldPos) { PositionChanged?.Invoke (this, new (oldPos, Position)); }
+    /// <summary>Virtual method called when <see cref="Position"/> has changed. Raises <see cref="PositionChanged"/>.</summary>
+    protected virtual void OnPositionChanged (int position) { PositionChanged?.Invoke (this, new (ref position)); }
 
-    /// <summary>Virtual method called when <see cref="Position"/> is changing. Fires <see cref="PositionChanging"/>, which is cancelable.</summary>
-    protected virtual StateEventArgs<int> OnPositionChanging (int oldPos, int newPos)
+    /// <summary>Virtual method called when <see cref="Position"/> is changing. Raises <see cref="PositionChanging"/>, which is cancelable.</summary>
+    protected virtual CancelEventArgs<int> OnPositionChanging (int currentPos, int newPos)
     {
-        StateEventArgs<int> args = new (oldPos, newPos);
+        CancelEventArgs<int> args = new (ref currentPos, ref newPos);
         PositionChanging?.Invoke (this, args);
 
         return args;
@@ -118,18 +119,17 @@ public class Scroll : View
         get => _size;
         set
         {
-            int oldSize = _size;
             _size = value;
-            OnSizeChanged (oldSize);
+            OnSizeChanged (_size);
             AdjustSlider ();
         }
     }
 
     /// <summary>Raised when <see cref="Size"/> has changed.</summary>
-    public event EventHandler<StateEventArgs<int>> SizeChanged;
+    public event EventHandler<EventArgs<int>> SizeChanged;
 
-    /// <summary>Virtual method called when <see cref="Size"/> has changed. Fires <see cref="SizeChanged"/>.</summary>
-    protected void OnSizeChanged (int oldSize) { SizeChanged?.Invoke (this, new (oldSize, Size)); }
+    /// <summary>Virtual method called when <see cref="Size"/> has changed. Raises <see cref="SizeChanged"/>.</summary>
+    protected void OnSizeChanged (int size) { SizeChanged?.Invoke (this, new (ref size)); }
 
     private int GetPositionFromSliderLocation (int location)
     {

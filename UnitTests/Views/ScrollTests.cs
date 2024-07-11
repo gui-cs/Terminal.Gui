@@ -899,13 +899,13 @@ public class ScrollTests
         scroll.PositionChanged -= Scroll_PositionChanged;
 
 
-        void Scroll_PositionChanging (object sender, StateEventArgs<int> e)
+        void Scroll_PositionChanging (object sender, CancelEventArgs<int> e)
         {
             changing++;
             e.Cancel = cancel;
         }
 
-        void Scroll_PositionChanged (object sender, StateEventArgs<int> e) => changed++;
+        void Scroll_PositionChanged (object sender, EventArgs<int> e) => changed++;
 
         void Reset ()
         {

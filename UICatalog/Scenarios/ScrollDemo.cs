@@ -181,11 +181,11 @@ public class ScrollDemo : Scenario
 
         scroll.SizeChanged += (s, e) =>
                               {
-                                  lblSizeChanged.Text = $"SizeChanged event - OldValue: {e.OldValue}; NewValue: {e.NewValue}";
+                                  lblSizeChanged.Text = $"SizeChanged event - CurrentValue: {e.CurrentValue}";
 
-                                  if (scrollSize.Value != e.NewValue)
+                                  if (scrollSize.Value != e.CurrentValue)
                                   {
-                                      scrollSize.Value = e.NewValue;
+                                      scrollSize.Value = e.CurrentValue;
                                   }
                               };
 
@@ -195,7 +195,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblPosChanging);
 
-        scroll.PositionChanging += (s, e) => { lblPosChanging.Text = $"PositionChanging event - OldValue: {e.OldValue}; NewValue: {e.NewValue}"; };
+        scroll.PositionChanging += (s, e) => { lblPosChanging.Text = $"PositionChanging event - CurrentValue: {e.CurrentValue}; NewValue: {e.NewValue}"; };
 
         var lblPositionChanged = new Label
         {
@@ -205,8 +205,8 @@ public class ScrollDemo : Scenario
 
         scroll.PositionChanged += (s, e) =>
                                   {
-                                      lblPositionChanged.Text = $"PositionChanged event - OldValue: {e.OldValue}; NewValue: {e.NewValue}";
-                                      scrollPosition.Value = e.NewValue;
+                                      lblPositionChanged.Text = $"PositionChanged event - CurrentValue: {e.CurrentValue}";
+                                      scrollPosition.Value = e.CurrentValue;
                                   };
 
         var lblScrollFrame = new Label
