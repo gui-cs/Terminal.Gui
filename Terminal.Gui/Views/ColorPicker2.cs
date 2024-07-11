@@ -23,6 +23,7 @@ public class ColorPicker2 : View
         get => _value;
         set
         {
+            // External changes made by API caller
             if (_value != value)
             {
                 _value = value;
@@ -107,60 +108,42 @@ public class ColorPicker2 : View
         Driver.SetAttribute (new Attribute (Value, normal.Background));
         AddRune (13, 3, (Rune)'■');
     }
+
     private void UpdateBarsFromColor (Color color)
     {
         var hsl = ColorConverter.RgbToHsl (new RGB (color.R, color.G, color.B));
-
-        // Update HueBar value
-        double newHValue = hsl.H / 360.0;
-        if (Math.Abs (hb.Value - newHValue) > 0.001) // Using tolerance to avoid jitter
-        {
-            hb.Value = newHValue;
-        }
-
-        // Update SaturationBar value only if it changes the integer byte value of S
-        double newSValue = hsl.S / 100.0;
-        if ((byte)(100 * sb.Value) != hsl.S)
-        {
-            sb.Value = newSValue;
-        }
-
-        // Update LightnessBar value only if it changes the integer byte value of L
-        double newLValue = hsl.L / 100.0;
-        if ((byte)(100 * lb.Value) != hsl.L)
-        {
-            lb.Value = newLValue;
-        }
+        hb.Value = hsl.H;
+        sb.Value = hsl.S;
+        lb.Value = hsl.L;
     }
 
-    private void RebuildColor (object sender, EventArgs<double> e)
+    private void RebuildColor (object sender, EventArgs<int> e)
     {
-        var hsl = new HSL ((int)(360 * hb.Value), (byte)(100 * sb.Value), (byte)(100 * lb.Value));
+        var hsl = new HSL (hb.Value, (byte)sb.Value, (byte)lb.Value);
         var rgb = ColorConverter.HslToRgb (hsl);
-        Value = new Color (rgb.R, rgb.G, rgb.B);
+        _value = new Color (rgb.R, rgb.G, rgb.B);
+
+        tfHex.Text = _value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
     }
 }
 
 public abstract class ColorBar : View
 {
-    /// <summary>
-    /// How much color space is each cell in the bar
-    /// </summary>
-    private double cellWidth;
-
     protected int BarStartsAt;
 
     /// <summary>
     /// 0-1 for how much of the color element is present currently (HSL)
     /// </summary>
-    private double _value;
-    public double Value
+    private int _value;
+
+    protected abstract int MaxValue { get; }
+    public int Value
     {
         get => _value;
         set
         {
-            var clampedValue = Math.Clamp (value, 0, 1);
-            if (Math.Abs (_value - clampedValue) > 0.0001) // Using a tolerance to avoid jitter due to minor changes
+            var clampedValue = Math.Clamp (value, 0, MaxValue);
+            if (_value != clampedValue)
             {
                 _value = clampedValue;
                 OnValueChanged ();
@@ -168,7 +151,7 @@ public abstract class ColorBar : View
         }
     }
 
-    public event EventHandler<EventArgs<double>> ValueChanged;
+    public event EventHandler<EventArgs<int>> ValueChanged;
 
     protected ColorBar ()
     {
@@ -185,7 +168,7 @@ public abstract class ColorBar : View
 
     protected bool? AdjustAndReturn (int delta)
     {
-        Value += delta * cellWidth;
+        Value += delta;
         return true;
     }
 
@@ -199,7 +182,7 @@ public abstract class ColorBar : View
     {
         if (mouseEvent.Position.X >= BarStartsAt)
         {
-            Value = (double)(mouseEvent.Position.X - BarStartsAt) / BarWidth;
+            Value = MaxValue * (mouseEvent.Position.X - BarStartsAt) / BarWidth;
             mouseEvent.Handled = true;
             return true;
         }
@@ -222,7 +205,6 @@ public abstract class ColorBar : View
         }
 
         BarWidth = viewport.Width - xOffset;
-        cellWidth = 1d / (BarWidth - 1);
         BarStartsAt = xOffset;
 
         DrawBar (xOffset, 0, BarWidth);
@@ -230,7 +212,9 @@ public abstract class ColorBar : View
 
     private void DrawBar (int xOffset, int yOffset, int width)
     {
-        int selectedCell = (int)(Value * (width - 1));
+        var factor = (double)Value / MaxValue;
+
+        int selectedCell = (int)(factor * (width - 1));
 
         for (int x = 0; x < width; x++)
         {
@@ -256,7 +240,7 @@ public abstract class ColorBar : View
 
     protected virtual void OnValueChanged ()
     {
-        ValueChanged?.Invoke (this, new EventArgs<double> (_value));
+        ValueChanged?.Invoke (this, new EventArgs<int> (_value));
         // Notify subscribers if any, and redraw the view
         this.SetNeedsDisplay ();
     }
@@ -265,9 +249,12 @@ public abstract class ColorBar : View
 internal class HueBar : ColorBar
 {
     /// <inheritdoc />
+    protected override int MaxValue => 360;
+
+    /// <inheritdoc />
     protected override Color GetColor (double fraction)
     {
-        var hsl = new HSL ((int)(360 * fraction), 100, 50);
+        var hsl = new HSL ((int)(MaxValue * fraction), 100, 50);
         var rgb = ColorConverter.HslToRgb (hsl);
 
         return new Color (rgb.R, rgb.G, rgb.B);
@@ -280,9 +267,12 @@ internal class SaturationBar : ColorBar
     public LightnessBar LBar { get; set; }
 
     /// <inheritdoc />
+    protected override int MaxValue => 100;
+
+    /// <inheritdoc />
     protected override Color GetColor (double fraction)
     {
-        var hsl = new HSL ((int)(HBar.Value * 360), (byte)(100 * fraction), (byte)(100 * LBar.Value));
+        var hsl = new HSL (HBar.Value, (byte)(MaxValue * fraction), (byte)LBar.Value);
         var rgb = ColorConverter.HslToRgb (hsl);
 
         return new Color (rgb.R, rgb.G, rgb.B);
@@ -295,9 +285,12 @@ internal class LightnessBar : ColorBar
     public SaturationBar SBar { get; set; }
 
     /// <inheritdoc />
+    protected override int MaxValue => 100;
+
+    /// <inheritdoc />
     protected override Color GetColor (double fraction)
     {
-        var hsl = new HSL ((int)(HBar.Value * 360), (byte)(100 * SBar.Value), (byte)(100 * fraction));
+        var hsl = new HSL (HBar.Value, (byte)SBar.Value, (byte)(MaxValue * fraction));
         var rgb = ColorConverter.HslToRgb (hsl);
 
         return new Color (rgb.R, rgb.G, rgb.B);
