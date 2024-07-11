@@ -1,5 +1,4 @@
 ﻿using ColorHelper;
-using static Terminal.Gui.SpinnerStyle;
 using ColorConverter = ColorHelper.ColorConverter;
 
 namespace Terminal.Gui;
@@ -12,6 +11,9 @@ public class ColorPicker2 : View
     private readonly TextField tfHex;
 
     private Color _value = Color.Red;
+    private readonly LightnessBar lb;
+    private readonly HueBar hb;
+    private SaturationBar sb;
 
     /// <summary>
     /// The color selected in the picker
@@ -24,7 +26,7 @@ public class ColorPicker2 : View
 
     public ColorPicker2 ()
     {
-        var hb = new HueBar ()
+        hb = new HueBar ()
         {
             Text = "H:",
             X = 0,
@@ -33,7 +35,7 @@ public class ColorPicker2 : View
             Width = Dim.Fill ()
         };
 
-        var sb = new SaturationBar ()
+        sb = new SaturationBar ()
         {
             Text = "S:",
             Y = 1,
@@ -41,7 +43,7 @@ public class ColorPicker2 : View
             Width = Dim.Fill ()
         };
 
-        var lb = new LightnessBar ()
+        lb = new LightnessBar ()
         {
             Text = "L:",
             Y = 2,
@@ -55,6 +57,10 @@ public class ColorPicker2 : View
         lb.HBar = hb;
         lb.SBar = sb;
 
+        hb.ValueChanged += RebuildColor;
+        sb.ValueChanged += RebuildColor;
+        lb.ValueChanged += RebuildColor;
+
         tfHex = new TextField ()
         {
             Y = 3,
@@ -65,12 +71,21 @@ public class ColorPicker2 : View
         // Revert to "g" when https://github.com/gui-cs/Terminal.Gui/issues/3603 is fixed
         tfHex.Text = Value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
 
+
         Add (hb);
         Add (sb);
         Add (lb);
         Add (tfHex);
     }
 
+
+    void RebuildColor (object sender, EventArgs<double> e)
+    {
+        var hsl = new HSL ((int)(360 * hb.Value), (byte)(100 * sb.Value), (byte)(100 * lb.Value));
+
+        var rgb = ColorConverter.HslToRgb (hsl);
+        Value = new Color (rgb.R, rgb.G, rgb.B);
+    }
 }
 public abstract class ColorBar : View
 {
@@ -82,7 +97,7 @@ public abstract class ColorBar : View
     protected int BarStartsAt;
 
     /// <summary>
-    /// 0-1 for how much of the color element is present currently (HSV)
+    /// 0-1 for how much of the color element is present currently (HSL)
     /// </summary>
     private double _value;
     public double Value
@@ -94,6 +109,8 @@ public abstract class ColorBar : View
             OnValueChanged ();
         }
     }
+
+    public event EventHandler<EventArgs<double>> ValueChanged;
 
     protected ColorBar ()
     {
@@ -182,13 +199,14 @@ public abstract class ColorBar : View
 
     protected virtual void OnValueChanged ()
     {
+        ValueChanged?.Invoke (this,new (ref _value));
         // Notify subscribers if any, and redraw the view
         this.SetNeedsDisplay ();
     }
 }
 
 
-public class HueBar : ColorBar
+internal class HueBar : ColorBar
 {
     private readonly Gradient rainbowGradient;
 
@@ -228,7 +246,7 @@ public class HueBar : ColorBar
     }
 }
 
-public class SaturationBar : ColorBar
+internal class SaturationBar : ColorBar
 {
     public HueBar HBar { get; set; }
     public LightnessBar LBar { get; set; }
@@ -244,7 +262,7 @@ public class SaturationBar : ColorBar
     }
 }
 
-public class LightnessBar : ColorBar
+internal class LightnessBar : ColorBar
 {
 
     public HueBar HBar { get; set; }
