@@ -62,11 +62,6 @@
     <PackageReference Include="System.IO.Abstractions" Version="[21.0.22,22)" />
     <PackageReference Include="System.Text.Json" Version="[8.0.4,9)" />
     <PackageReference Include="Wcwidth" Version="[2,3)" />
-    <ProjectReference Include="..\Analyzers\Terminal.Gui.Analyzers.Internal\Terminal.Gui.Analyzers.Internal.csproj">
-      <PrivateAssets>all</PrivateAssets>
-      <OutputItemType>Analyzer</OutputItemType>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Global Usings and Type Aliases -->
