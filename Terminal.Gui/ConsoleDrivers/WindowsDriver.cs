@@ -116,7 +116,7 @@ internal class WindowsConsole
 
             var s = _stringBuilder.ToString ();
 
-            result = WriteConsole (_screenBuffer, s, (uint)s.Length, out uint _, null);
+            result = WriteConsole (_screenBuffer, s, (uint)s.Length, out uint _, nint.Zero);
         }
 
         if (!result)
@@ -134,7 +134,7 @@ internal class WindowsConsole
 
     public bool WriteANSI (string ansi)
     {
-        return WriteConsole (_screenBuffer, ansi, (uint)ansi.Length, out uint _, null);
+        return WriteConsole (_screenBuffer, ansi, (uint)ansi.Length, out uint _, nint.Zero);
     }
 
     public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
@@ -804,7 +804,7 @@ internal class WindowsConsole
         string lpbufer,
         uint NumberOfCharsToWriten,
         out uint lpNumberOfCharsWritten,
-        object lpReserved
+        nint lpReserved
     );
 
     [DllImport ("kernel32.dll")]
