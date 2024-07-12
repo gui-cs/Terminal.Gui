@@ -15,8 +15,9 @@ public class LineDrawing : Scenario
         var canvas = new DrawingArea { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         var tools = new ToolsView { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
+        tools.CurrentColor = canvas.GetNormalColor ();
 
-        tools.ColorChanged += c => canvas.SetColor (c);
+        tools.ColorChanged += (s,e) => canvas.SetAttribute (e);
         tools.SetStyle += b => canvas.LineStyle = b;
         tools.AddLayer += () => canvas.AddLayer ();
 
@@ -30,11 +31,17 @@ public class LineDrawing : Scenario
     {
         private readonly List<LineCanvas> _layers = new ();
         private readonly Stack<StraightLine> _undoHistory = new ();
-        private Color _currentColor = new (Color.White);
+        private Attribute _currentAttribute;
         private LineCanvas _currentLayer;
         private StraightLine _currentLine;
-        public DrawingArea () { AddLayer (); }
+
+        public DrawingArea ()
+        {
+            _currentAttribute = GetNormalColor ();
+            AddLayer ();
+        }
         public LineStyle LineStyle { get; set; }
+
 
         public override void OnDrawContentComplete (Rectangle viewport)
         {
@@ -99,7 +106,7 @@ public class LineDrawing : Scenario
                                                      0,
                                                      Orientation.Vertical,
                                                      LineStyle,
-                                                     new Attribute (_currentColor, GetNormalColor ().Background)
+                                                     _currentAttribute
                                                     );
 
                     _currentLayer.AddLine (_currentLine);
@@ -176,20 +183,30 @@ public class LineDrawing : Scenario
             _layers.Add (_currentLayer);
         }
 
-        internal void SetColor (Color c) { _currentColor = c; }
+        internal void SetAttribute (Attribute a) { _currentAttribute = a; }
     }
 
     private class ToolsView : Window
     {
         private Button _addLayerBtn;
-        private ColorPicker _colorPicker;
+        private AttributeView _colors;
         private RadioGroup _stylePicker;
+
+
+        public Attribute CurrentColor
+        {
+            get => _colors.Value;
+            set => _colors.Value = value;
+        }
 
         public ToolsView ()
         {
             BorderStyle = LineStyle.Dotted;
             Border.Thickness = new Thickness (1, 2, 1, 1);
             Initialized += ToolsView_Initialized;
+            _colors = new AttributeView ()
+            {
+            };
         }
 
         public event Action AddLayer;
@@ -198,13 +215,11 @@ public class LineDrawing : Scenario
         {
             base.BeginInit ();
 
-            _colorPicker = new ColorPicker { X = 0, Y = 0, BoxHeight = 1, BoxWidth = 2 };
-
-            _colorPicker.ColorChanged += (s, a) => ColorChanged?.Invoke (a.Color);
+            _colors.ValueChanged += (s, e) => ColorChanged?.Invoke (this, e);
 
             _stylePicker = new RadioGroup
             {
-                X = 0, Y = Pos.Bottom (_colorPicker), RadioLabels = Enum.GetNames (typeof (LineStyle)).ToArray ()
+                X = 0, Y = Pos.Bottom (_colors), RadioLabels = Enum.GetNames (typeof (LineStyle)).ToArray ()
             };
             _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem); };
             _stylePicker.SelectedItem = 1;
@@ -212,19 +227,19 @@ public class LineDrawing : Scenario
             _addLayerBtn = new Button { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
             _addLayerBtn.Accept += (s, a) => AddLayer?.Invoke ();
-            Add (_colorPicker, _stylePicker, _addLayerBtn);
+            Add (_colors, _stylePicker, _addLayerBtn);
         }
 
-        public event Action<Color> ColorChanged;
+        public event EventHandler<Attribute> ColorChanged;
         public event Action<LineStyle> SetStyle;
 
         private void ToolsView_Initialized (object sender, EventArgs e)
         {
             LayoutSubviews ();
 
-            Width = Math.Max (_colorPicker.Frame.Width, _stylePicker.Frame.Width) + GetAdornmentsThickness ().Horizontal;
+            Width = Math.Max (_colors.Frame.Width, _stylePicker.Frame.Width) + GetAdornmentsThickness ().Horizontal;
 
-            Height = _colorPicker.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height + GetAdornmentsThickness ().Vertical;
+            Height = _colors.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height + GetAdornmentsThickness ().Vertical;
             SuperView.LayoutSubviews ();
         }
     }

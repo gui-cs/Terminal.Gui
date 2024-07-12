@@ -178,9 +178,8 @@ public class ColorPicker2 : View
     private readonly TextField tfHex;
 
     private Color _value = Color.Red;
-    private readonly ColorModelStrategy _strategy;
-    private readonly List<IColorBar> _bars = new List<IColorBar> ();
-    private readonly ColorModel _model;
+    private readonly ColorModelStrategy _strategy = new ColorModelStrategy ();
+    private List<IColorBar> _bars = new List<IColorBar> ();
 
     /// <summary>
     /// The color selected in the picker
@@ -200,30 +199,31 @@ public class ColorPicker2 : View
         }
     }
 
+    private ColorModel _colorModel = ColorModel.HSV;
 
-    public ColorPicker2 (ColorModel model)
+    public ColorModel ColorModel
     {
-        _model = model;
-        _strategy = new ColorModelStrategy ();
-
-        int y = 0;
-        foreach (var bar in  _strategy.CreateBars (model))
+        get => _colorModel;
+        set
         {
-            bar.Y = y++;
-            bar.ValueChanged += RebuildColor;
-            _bars.Add (bar);
-            Add (bar);
+            _colorModel = value;
+            SetupBarsAccordingToModel ();
         }
+    }
+
+    public ColorPicker2 ()
+    {
+        SetupBarsAccordingToModel ();
 
         var lbHex = new Label ()
         {
             Text = "Hex:",
             X = 0,
-            Y = y
+            Y = 4
         };
         tfHex = new TextField ()
         {
-            Y = y,
+            Y = 4,
             X = 4,
             Width = 8
         };
@@ -232,6 +232,31 @@ public class ColorPicker2 : View
         Add (tfHex);
 
         tfHex.Leave += (_, _) => UpdateValueFromTextField ();
+    }
+
+    private void SetupBarsAccordingToModel ()
+    {
+        DisposeOldBars ();
+
+        int y = 0;
+        foreach (var bar in _strategy.CreateBars (_colorModel))
+        {
+            bar.Y = y++;
+            bar.ValueChanged += RebuildColor;
+            _bars.Add (bar);
+            Add (bar);
+        }
+    }
+
+    private void DisposeOldBars ()
+    {
+        foreach (ColorBar bar in _bars.Cast<ColorBar> ())
+        {
+            bar.ValueChanged -= RebuildColor;
+            Remove (bar);
+        }
+
+        _bars = new List<IColorBar> ();
     }
 
     private void UpdateValueFromTextField ()
@@ -253,12 +278,12 @@ public class ColorPicker2 : View
 
     private void UpdateBarsFromColor (Color color)
     {
-        _strategy.SetBarsToColor (_bars,color, _model);
+        _strategy.SetBarsToColor (_bars,color, _colorModel);
     }
 
     private void RebuildColor (object sender, EventArgs<int> e)
     {
-        _value = _strategy.GetColorFromBars (_bars, _model);
+        _value = _strategy.GetColorFromBars (_bars, _colorModel);
         tfHex.Text = _value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
     }
 }
