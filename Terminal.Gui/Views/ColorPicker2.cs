@@ -219,11 +219,11 @@ public class ColorPicker2 : View
         {
             Text = "Hex:",
             X = 0,
-            Y = 4
+            Y = 3
         };
         tfHex = new TextField ()
         {
-            Y = 4,
+            Y = 3,
             X = 4,
             Width = 8
         };

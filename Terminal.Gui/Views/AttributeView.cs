@@ -107,12 +107,17 @@ public class AttributeView : View
         var d = new Dialog ()
         {
             Title = title,
-            Height = 6
+            Height = 7
         };
 
         var btnOk = new Button ()
         {
-            Text = "Ok"
+
+            X = Pos.Center () - 5,
+            Y = 4,
+            Text = "Ok",
+            Width = Dim.Auto (),
+            IsDefault = true
         };
 
         btnOk.Accept += (s, e) =>
@@ -121,27 +126,42 @@ public class AttributeView : View
             e.Handled = true;
             Application.RequestStop ();
                         };
-        var btnCancel = new Button () { Text = "Cancel"};
+        var btnCancel = new Button ()
+        {
+            X = Pos.Center ()+5,
+            Y = 4,
+            Text = "Cancel",
+            Width = Dim.Auto ()
+        };
         btnCancel.Accept += (s, e) =>
         {
             e.Handled = true;
             Application.RequestStop ();
-                            };
+        };
 
+
+        d.Add(btnOk);
+        d.Add(btnCancel);
+
+        /* Does not work
         d.AddButton (btnOk);
         d.AddButton (btnCancel);
-
+        */
         var cp = new ColorPicker2
         {
             Value = current,
              Width = Dim.Fill (),
-             Height = Dim.Fill ()
+             Height = Dim.Fill (1)
         };
 
         d.Add (cp);
 
         Application.Run (d);
+        d.Dispose ();
         newColor = cp.Value;
+
+        SetNeedsDisplay();
+
         return accept;
     }
 }
