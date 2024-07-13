@@ -1,6 +1,7 @@
 ﻿// This is a simple example application for a self-contained single file.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Terminal.Gui;
 
 namespace SelfContained;
@@ -10,7 +11,23 @@ public static class Program
     [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, ConsoleDriver)")]
     private static void Main (string [] args)
     {
-        Application.Run<ExampleWindow> ().Dispose ();
+        Application.Init ();
+
+        if (Equals (Thread.CurrentThread.CurrentUICulture, CultureInfo.InvariantCulture))
+        {
+            System.Diagnostics.Debug.Assert (Application.SupportedCultures.Count == 0);
+        }
+        else
+        {
+            System.Diagnostics.Debug.Assert (Application.SupportedCultures.Count == 4);
+            System.Diagnostics.Debug.Assert (Equals (CultureInfo.CurrentCulture, Thread.CurrentThread.CurrentUICulture));
+        }
+
+        ExampleWindow app = new ();
+        Application.Run (app);
+
+        // Dispose the app object before shutdown
+        app.Dispose ();
 
         // Before the application exits, reset Terminal.Gui for clean shutdown
         Application.Shutdown ();

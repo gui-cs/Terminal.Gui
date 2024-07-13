@@ -193,6 +193,7 @@ public class ApplicationTests
             // Internal properties
             Assert.False (Application._initialized);
             Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
+            Assert.Equal (4, Application.SupportedCultures.Count);
             Assert.False (Application._forceFakeConsole);
             Assert.Equal (-1, Application._mainThreadId);
             Assert.Empty (Application._topLevels);
