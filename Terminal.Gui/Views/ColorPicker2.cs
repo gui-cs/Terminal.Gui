@@ -344,6 +344,11 @@ public class ColorPicker2 : View
         {
             Value = newColor.Value;
         }
+        else
+        {
+            // value is invalid, revert the value in the text field back to current state
+            SetTextFieldToValue ();
+        }
     }
 
     /// <inheritdoc />
@@ -415,7 +420,7 @@ public abstract class ColorBar : View, IColorBar
         Height = 1;
         Width = Dim.Fill ();
         CanFocus = true;
-        
+
         AddCommand (Command.Left, (_) => Adjust (-1));
         AddCommand (Command.Right, (_) => Adjust (1));
 
@@ -470,11 +475,14 @@ public abstract class ColorBar : View, IColorBar
     /// <inheritdoc />
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && mouseEvent.Position.X >= BarStartsAt)
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) )
         {
-            var v = MaxValue * ((double)mouseEvent.Position.X - BarStartsAt) / (BarWidth - 1);
+            if (mouseEvent.Position.X >= BarStartsAt)
+            {
+                var v = MaxValue * ((double)mouseEvent.Position.X - BarStartsAt) / (BarWidth - 1);
+                Value = Math.Clamp ((int)v, 0, MaxValue);
+            }
 
-            Value = Math.Clamp ((int)v, 0, MaxValue);
             mouseEvent.Handled = true;
             FocusFirst ();
             return true;

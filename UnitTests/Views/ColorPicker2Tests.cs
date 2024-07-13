@@ -327,7 +327,7 @@ Hex:#FF0000  ■
 
     [Fact]
     [AutoInitShutdown]
-    public void ColorPicker_ClickingBeyondBar_DoesNotChangeValue ()
+    public void ColorPicker_ClickingBeyondBar_ChangesToMaxValue ()
     {
         var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
@@ -351,10 +351,10 @@ Hex:#FF0000  ■
 
         var expected =
             @"
-R:▲█████████████████
+R:█████████████████▲
 G:▲█████████████████
 B:▲█████████████████
-Hex:#000000  ■
+Hex:#FF0000  ■
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -446,7 +446,7 @@ Hex:#000000  ■
         cp.Draw ();
 
         // Click on Green bar
-        cp.Focused.OnMouseEvent (new MouseEvent ()
+        cp.Subviews.OfType<GBar> ().Single().OnMouseEvent (new MouseEvent ()
         {
             Flags = MouseFlags.Button1Pressed,
             Position = new Point (0, 1)
@@ -457,10 +457,10 @@ Hex:#000000  ■
         Assert.IsAssignableFrom<GBar> (cp.Focused);
 
         // Click on Blue bar
-        cp.Focused.OnMouseEvent (new MouseEvent ()
+        cp.Subviews.OfType<BBar> ().Single ().OnMouseEvent (new MouseEvent ()
         {
             Flags = MouseFlags.Button1Pressed,
-            Position = new Point (0, 2)
+            Position = new Point (0, 6)
         });
 
         cp.Draw ();
@@ -501,7 +501,7 @@ Hex:#FF0000  ■
 
         var expectedHSV =
             @"
-H:█████████████████▲
+H:▲█████████████████
 S:█████████████████▲
 V:█████████████████▲
 Hex:#FF0000  ■
