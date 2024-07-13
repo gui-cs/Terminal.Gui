@@ -170,6 +170,19 @@ internal class ColorModelStrategy
     }
 }
 
+public class ColorPickerStyle
+{
+    /// <summary>
+    /// The color model for picking colors by RGB, HSV, etc.
+    /// </summary>
+    public ColorModel ColorModel { get; set; } = ColorModel.HSV;
+
+    /// <summary>
+    /// True to put the numerical value of bars on the right of the color bar
+    /// </summary>
+    public bool ShowTextFields { get; set; } = true;
+}
+
 /// <summary>
 /// True color picker using HSL
 /// </summary>
@@ -178,8 +191,16 @@ public class ColorPicker2 : View
     private readonly TextField tfHex;
 
     private Color _value = Color.Red;
-    private readonly ColorModelStrategy _strategy = new ColorModelStrategy ();
+
     private List<IColorBar> _bars = new List<IColorBar> ();
+    private Dictionary<IColorBar, TextField> _textFields = new Dictionary<IColorBar, TextField> ();
+    private readonly ColorModelStrategy _strategy = new ColorModelStrategy ();
+
+    /// <summary>
+    /// Style settings for the color picker.  After making changes ensure you call
+    /// <see cref="ApplyStyleChanges"/>.
+    /// </summary>
+    public ColorPickerStyle Style { get; set; } = new ColorPickerStyle();
 
     /// <summary>
     /// The color selected in the picker
@@ -199,21 +220,10 @@ public class ColorPicker2 : View
         }
     }
 
-    private ColorModel _colorModel = ColorModel.HSV;
-
-    public ColorModel ColorModel
-    {
-        get => _colorModel;
-        set
-        {
-            _colorModel = value;
-            SetupBarsAccordingToModel ();
-        }
-    }
 
     public ColorPicker2 ()
     {
-        SetupBarsAccordingToModel ();
+        ApplyStyleChanges ();
 
         var lbHex = new Label ()
         {
@@ -234,17 +244,50 @@ public class ColorPicker2 : View
         tfHex.Leave += (_, _) => UpdateValueFromTextField ();
     }
 
-    private void SetupBarsAccordingToModel ()
+    public void ApplyStyleChanges ()
     {
         DisposeOldBars ();
 
         int y = 0;
-        foreach (var bar in _strategy.CreateBars (_colorModel))
+        const int textFieldWidth = 4;
+
+        foreach (var bar in _strategy.CreateBars (Style.ColorModel))
         {
-            bar.Y = y++;
+            bar.Y = y;
+            bar.Width = Dim.Fill (textFieldWidth);
+
+
+            var tfValue = new TextField ()
+            {
+                X = Pos.AnchorEnd (textFieldWidth),
+                Y = y,
+                Width = textFieldWidth
+            };
+
+            y++;
+
             bar.ValueChanged += RebuildColor;
+            tfValue.Leave += UpdateSingleBarValueFromTextField;
+
             _bars.Add (bar);
+            _textFields.Add (bar,tfValue);
+
             Add (bar);
+            Add (tfValue);
+        }
+    }
+
+    private void UpdateSingleBarValueFromTextField (object sender, FocusEventArgs e)
+    {
+        foreach (var kvp in _textFields)
+        {
+            if (kvp.Value == sender)
+            {
+                if(int.TryParse(kvp.Value.Text, out var v))
+                {
+                    kvp.Key.Value = v;
+                }
+            }
         }
     }
 
@@ -253,6 +296,15 @@ public class ColorPicker2 : View
         foreach (ColorBar bar in _bars.Cast<ColorBar> ())
         {
             bar.ValueChanged -= RebuildColor;
+
+            if (_textFields.ContainsKey (bar))
+            {
+                var tf = _textFields [bar];
+                tf.Leave -= UpdateSingleBarValueFromTextField;
+                Remove (tf);
+                tf.Dispose ();
+
+            }
             Remove (bar);
         }
 
@@ -278,12 +330,17 @@ public class ColorPicker2 : View
 
     private void UpdateBarsFromColor (Color color)
     {
-        _strategy.SetBarsToColor (_bars,color, _colorModel);
+        _strategy.SetBarsToColor (_bars,color, Style.ColorModel);
     }
 
     private void RebuildColor (object sender, EventArgs<int> e)
     {
-        _value = _strategy.GetColorFromBars (_bars, _colorModel);
+        foreach(var kvp in _textFields)
+        {
+            kvp.Value.Text = kvp.Key.Value.ToString ();
+        }
+
+        _value = _strategy.GetColorFromBars (_bars, Style.ColorModel);
         tfHex.Text = _value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
     }
 }
@@ -319,7 +376,7 @@ public abstract class ColorBar : View, IColorBar
         Height = 1;
         Width = Dim.Fill ();
         CanFocus = true;
-
+        
         AddCommand (Command.Left, (_) => Adjust (-1));
         AddCommand (Command.Right, (_) => Adjust (1));
 
@@ -368,7 +425,7 @@ public abstract class ColorBar : View, IColorBar
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && mouseEvent.Position.X >= BarStartsAt)
         {
-            Value = MaxValue * (mouseEvent.Position.X - BarStartsAt) / BarWidth;
+            Value = Math.Clamp (MaxValue * (mouseEvent.Position.X - BarStartsAt) / (BarWidth - 1), 0, MaxValue);
             mouseEvent.Handled = true;
             FocusFirst ();
             return true;

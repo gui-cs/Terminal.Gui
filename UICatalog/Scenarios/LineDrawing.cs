@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Terminal.Gui;
 using static Terminal.Gui.SpinnerStyle;
 
@@ -19,6 +20,8 @@ class DrawLineTool : ITool
     /// <inheritdoc />
     public void OnMouseEvent (DrawingArea area, MouseEvent mouseEvent)
     {
+
+
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             if (_currentLine == null)
@@ -143,6 +146,12 @@ public class ToolsView : Window
         _colors = new AttributeView ()
         {
         };
+        Button btnSampleColor = new Button ()
+        {
+            X = 4,
+            Text = "✛"
+        };
+        Add (btnSampleColor);
     }
 
     public event Action AddLayer;
