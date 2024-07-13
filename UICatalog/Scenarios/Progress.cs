@@ -24,7 +24,7 @@ public class Progress : Scenario
     public override void Main ()
     {
         Application.Init ();
-        win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        win = new Window { Title = GetQuitKeyAndName () };
         // Demo #1 - Use System.Timer (and threading)
         var systemTimerDemo = new ProgressDemo
         {

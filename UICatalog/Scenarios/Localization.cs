@@ -45,7 +45,7 @@ public class Localization : Scenario
     {
         Application.Init ();
         var top = new Toplevel ();
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        var win = new Window { Title = GetQuitKeyAndName () };
         _cultureInfoSource = Application.SupportedCultures.Append (CultureInfo.InvariantCulture).ToArray ();
 
         _cultureInfoNameSource = Application.SupportedCultures.Select (c => $"{c.NativeName} ({c.Name})")

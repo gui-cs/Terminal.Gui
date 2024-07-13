@@ -56,7 +56,7 @@ public class ListColumns : Scenario
         Toplevel top = new ();
         Window appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         _listColView = new ()

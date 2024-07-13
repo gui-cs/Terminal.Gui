@@ -13,7 +13,7 @@ public class LineDrawing : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        var win = new Window { Title = GetQuitKeyAndName () };
         var canvas = new DrawingArea { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         var tools = new ToolsView { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };

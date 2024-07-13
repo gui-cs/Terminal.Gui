@@ -10,7 +10,7 @@ public class SendKeys : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        var win = new Window { Title = GetQuitKeyAndName () };
         var label = new Label { X = Pos.Center (), Y = Pos.Center () - 6, Text = "Insert the text to send:" };
         win.Add (label);
 

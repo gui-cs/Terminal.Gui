@@ -19,7 +19,7 @@ public class VkeyPacketSimulator : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        var win = new Window { Title = GetQuitKeyAndName () };
 
         var label = new Label { X = Pos.Center (), Text = "Input" };
         win.Add (label);

@@ -31,7 +31,7 @@ public class FileDialogExamples : Scenario
         Application.Init ();
         var y = 0;
         var x = 1;
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        var win = new Window { Title = GetQuitKeyAndName () };
 
         _cbMustExist = new CheckBox { State = CheckState.Checked, Y = y++, X = x, Text = "Must Exist" };
         win.Add (_cbMustExist);

@@ -93,6 +93,10 @@ public class Scenario : IDisposable
     /// <returns></returns>
     public string GetName () { return ScenarioMetadata.GetName (GetType ()); }
 
+    /// <summary>Helper to get the <see cref="Application.QuitKey"/> and the <see cref="Scenario"/> Name (defined in <see cref="ScenarioMetadata"/>)</summary>
+    /// <returns></returns>
+    public string GetQuitKeyAndName () { return $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"; }
+
     /// <summary>
     ///     Returns a list of all <see cref="Scenario"/> instanaces defined in the project, sorted by
     ///     <see cref="ScenarioMetadata.Name"/>.
@@ -165,7 +169,7 @@ public class Scenario : IDisposable
 
         Win = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
             X = 0,
             Y = 0,
             Width = Dim.Fill (),

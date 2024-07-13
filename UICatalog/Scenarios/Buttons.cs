@@ -18,7 +18,7 @@ public class Buttons : Scenario
 
         Window main = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         // Add a label & text field so we can demo IsDefault

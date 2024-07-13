@@ -14,7 +14,7 @@ public class BasicColors : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
         };
 
         var vx = 30;

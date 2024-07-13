@@ -32,7 +32,7 @@ public class ListsAndCombos : Scenario
             }
         }
 
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        var win = new Window { Title = GetQuitKeyAndName () };
         // ListView
         var lbListView = new Label
         {

@@ -11,7 +11,7 @@ public class Clipping : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        var win = new Window { Title = GetQuitKeyAndName () };
 
         var label = new Label
         {

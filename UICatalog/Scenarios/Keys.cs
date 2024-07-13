@@ -13,7 +13,7 @@ public class Keys : Scenario
         ObservableCollection<string> keyPressedList = [];
         ObservableCollection<string> invokingKeyBindingsList = new ();
 
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        var win = new Window { Title = GetQuitKeyAndName () };
         var editLabel = new Label { X = 0, Y = 0, Text = "Type text here:" };
         win.Add (editLabel);
 

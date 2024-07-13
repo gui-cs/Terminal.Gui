@@ -14,7 +14,7 @@ public class ComboBoxIteration : Scenario
         Application.Init ();
         ObservableCollection<string> items = ["one", "two", "three"];
 
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        var win = new Window { Title = GetQuitKeyAndName () };
         var lbListView = new Label { Width = 10, Height = 1 };
         win.Add (lbListView);
 

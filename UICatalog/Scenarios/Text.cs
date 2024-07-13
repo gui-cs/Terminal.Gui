@@ -20,7 +20,7 @@ public class Text : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        var win = new Window { Title = GetQuitKeyAndName () };
         // TextField is a simple, single-line text input control
         var label = new Label { Text = "_TextField:" };
         win.Add (label);

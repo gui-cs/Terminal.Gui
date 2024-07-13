@@ -23,7 +23,7 @@ public class Threading : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        var win = new Window { Title = GetQuitKeyAndName () };
         _action = LoadData;
 
         _lambda = async () =>

@@ -20,7 +20,7 @@ public class ComputedLayout : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
         };
 
         // Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width

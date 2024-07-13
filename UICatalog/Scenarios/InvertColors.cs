@@ -15,7 +15,7 @@ public class InvertColors : Scenario
         Application.Init ();
         var win = new Window
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
             ColorScheme = Colors.ColorSchemes ["TopLevel"]
         };
 
