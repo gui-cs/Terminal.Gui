@@ -113,7 +113,7 @@ public class LineDrawing : Scenario
         var canvas = new DrawingArea { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         var tools = new ToolsView { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
-        tools.CurrentColor = canvas.GetNormalColor ();
+       
 
         tools.ColorChanged += (s,e) => canvas.SetAttribute (e);
         tools.SetStyle += b => canvas.CurrentTool = new DrawLineTool (){LineStyle = b};
@@ -121,6 +121,8 @@ public class LineDrawing : Scenario
 
         Win.Add (canvas);
         Win.Add (tools);
+        tools.CurrentColor = canvas.GetNormalColor ();
+        canvas.CurrentAttribute = tools.CurrentColor;
 
         Win.KeyDown += (s, e) => { e.Handled = canvas.OnKeyDown (e); };
     }
@@ -191,7 +193,6 @@ public class DrawingArea : View
     public ITool CurrentTool { get; set; } = new DrawLineTool ();
     public DrawingArea ()
     {
-        CurrentAttribute = GetNormalColor ();
         AddLayer ();
     }
 
@@ -264,5 +265,201 @@ public class DrawingArea : View
     public void ClearUndo ()
     {
         _undoHistory.Clear ();
+    }
+}
+
+public class AttributeView : View
+{
+    public event EventHandler<Attribute> ValueChanged;
+    private Attribute _value;
+
+    public Attribute Value
+    {
+        get => _value;
+        set
+        {
+            _value = value;
+            ValueChanged?.Invoke (this, value);
+        }
+
+    }
+
+    private static readonly HashSet<(int, int)> ForegroundPoints = new HashSet<(int, int)>
+    {
+        (0, 0), (1, 0),(2,0),
+        (0, 1), (1, 1),(2,1)
+    };
+
+    private static readonly HashSet<(int, int)> BackgroundPoints = new HashSet<(int, int)>
+    {
+        (3, 1),
+        (1, 2), (2, 2),(3,2)
+    };
+
+    public AttributeView ()
+    {
+        Width = 4;
+        Height = 3;
+
+    }
+    /// <inheritdoc />
+    public override void OnDrawContent (Rectangle viewport)
+    {
+        base.OnDrawContent (viewport);
+
+        var fg = Value.Foreground;
+        var bg = Value.Background;
+
+        bool isTransparentFg = fg == GetNormalColor ().Background;
+        bool isTransparentBg = bg == GetNormalColor ().Background;
+
+        Driver.SetAttribute (new Attribute (fg, isTransparentFg ? Color.Gray : fg));
+        // Square of foreground color
+        foreach (var point in ForegroundPoints)
+        {
+            // Make pattern like this when it is same color as background of control
+            /*▓▒
+              ▒▓*/
+            Rune rune;
+
+            if (isTransparentFg)
+            {
+                rune = (Rune)(point.Item1 % 2 == point.Item2%2 ? '▓' : '▒');
+            }
+            else
+            {
+                rune = (Rune)'█';
+            }
+
+            AddRune (point.Item1, point.Item2, rune);
+        }
+
+        Driver.SetAttribute (new Attribute (bg, isTransparentBg ? Color.Gray : bg));
+        // Square of background color
+        foreach (var point in BackgroundPoints)
+        {
+            // Make pattern like this when it is same color as background of control
+            /*▓▒
+              ▒▓*/
+            Rune rune;
+
+            if (isTransparentBg)
+            {
+                rune = (Rune)(point.Item1 % 2 == point.Item2 % 2 ? '▓' : '▒');
+            }
+            else
+            {
+                rune = (Rune)'█';
+            }
+
+            AddRune (point.Item1, point.Item2, rune);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override bool OnMouseEvent (MouseEvent mouseEvent)
+    {
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        {
+            if (IsForegroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            {
+                ClickedInForeground ();
+            }
+            else if (IsBackgroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            {
+                ClickedInBackground ();
+            }
+        }
+        return base.OnMouseEvent (mouseEvent);
+    }
+
+    private bool IsForegroundPoint (int x, int y)
+    {
+        return ForegroundPoints.Contains ((x, y));
+    }
+
+    private bool IsBackgroundPoint (int x, int y)
+    {
+        return BackgroundPoints.Contains ((x, y));
+    }
+
+    private void ClickedInBackground ()
+    {
+        if (PromptFor ("Background", Value.Background, out var newColor))
+        {
+            Value = new Attribute (Value.Foreground, newColor);
+        }
+    }
+
+    private void ClickedInForeground ()
+    {
+        if (PromptFor ("Foreground", Value.Foreground, out var newColor))
+        {
+            Value = new Attribute (newColor, Value.Background);
+        }
+    }
+
+    private bool PromptFor (string title, Color current, out Color newColor)
+    {
+        bool accept = false;
+        var d = new Dialog ()
+        {
+            Title = title,
+            Height = 7
+        };
+
+        var btnOk = new Button ()
+        {
+
+            X = Pos.Center () - 5,
+            Y = 4,
+            Text = "Ok",
+            Width = Dim.Auto (),
+            IsDefault = true
+        };
+
+        btnOk.Accept += (s, e) =>
+        {
+            accept = true;
+            e.Handled = true;
+            Application.RequestStop ();
+        };
+        var btnCancel = new Button ()
+        {
+            X = Pos.Center () + 5,
+            Y = 4,
+            Text = "Cancel",
+            Width = Dim.Auto ()
+        };
+        btnCancel.Accept += (s, e) =>
+        {
+            e.Handled = true;
+            Application.RequestStop ();
+        };
+
+
+        d.Add (btnOk);
+        d.Add (btnCancel);
+
+        /* Does not work
+        d.AddButton (btnOk);
+        d.AddButton (btnCancel);
+        */
+        var cp = new ColorPicker2
+        {
+            Value = current,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1)
+        };
+
+        d.Add (cp);
+
+        Application.Run (d);
+        d.Dispose ();
+        newColor = cp.Value;
+
+        SetNeedsDisplay ();
+
+        return accept;
     }
 }
