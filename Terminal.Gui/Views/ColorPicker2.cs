@@ -297,9 +297,8 @@ public class ColorPicker2 : View
         {
             bar.ValueChanged -= RebuildColor;
 
-            if (_textFields.ContainsKey (bar))
+            if (_textFields.TryGetValue (bar, out TextField tf))
             {
-                var tf = _textFields [bar];
                 tf.Leave -= UpdateSingleBarValueFromTextField;
                 Remove (tf);
                 tf.Dispose ();
@@ -425,7 +424,9 @@ public abstract class ColorBar : View, IColorBar
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && mouseEvent.Position.X >= BarStartsAt)
         {
-            Value = Math.Clamp (MaxValue * (mouseEvent.Position.X - BarStartsAt) / (BarWidth - 1), 0, MaxValue);
+            var v = MaxValue * ((double)mouseEvent.Position.X - BarStartsAt) / (BarWidth - 1);
+
+            Value = Math.Clamp ((int)v, 0, MaxValue);
             mouseEvent.Handled = true;
             FocusFirst ();
             return true;
@@ -456,18 +457,18 @@ public abstract class ColorBar : View, IColorBar
 
     private void DrawBar (int xOffset, int yOffset, int width)
     {
-        var factor = (double)Value / MaxValue;
-
-        int selectedCell = (int)(factor * (width - 1));
+        // Each 1 unit of X in the bar corresponds to this much of Value
+        var cellValue = (double)MaxValue / (width - 1);
 
         for (int x = 0; x < width; x++)
         {
             double fraction = (double)x / (width - 1);
             Color color = GetColor (fraction);
 
-            Application.Driver.SetAttribute (new Attribute (color, color));
+            // Adjusted isSelectedCell calculation
+            bool isSelectedCell = Value > (x-1) * cellValue && Value <= x * cellValue;
 
-            if (x == selectedCell)
+            if (isSelectedCell)
             {
                 // Draw the triangle at the closest position
                 Application.Driver.SetAttribute (new Attribute (Color.Black, color));
@@ -475,10 +476,12 @@ public abstract class ColorBar : View, IColorBar
             }
             else
             {
+                Application.Driver.SetAttribute (new Attribute (color, color));
                 AddRune (x + xOffset, yOffset, new Rune ('█'));
             }
         }
     }
+
 
     protected abstract Color GetColor (double fraction);
 

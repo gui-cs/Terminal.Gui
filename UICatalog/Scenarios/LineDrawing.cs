@@ -143,15 +143,7 @@ public class ToolsView : Window
         BorderStyle = LineStyle.Dotted;
         Border.Thickness = new Thickness (1, 2, 1, 1);
         Initialized += ToolsView_Initialized;
-        _colors = new AttributeView ()
-        {
-        };
-        Button btnSampleColor = new Button ()
-        {
-            X = 4,
-            Text = "✛"
-        };
-        Add (btnSampleColor);
+        _colors = new ();
     }
 
     public event Action AddLayer;
