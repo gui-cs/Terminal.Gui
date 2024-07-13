@@ -19,13 +19,13 @@ public class Dialog : Window
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
+    [JsonConverter (typeof (JsonStringEnumConverter<Alignment>))]
     public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
 
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
+    [JsonConverter (typeof (JsonStringEnumConverter<AlignmentModes>))]
     public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
 
     /// <summary>
@@ -47,7 +47,7 @@ public class Dialog : Window
     /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
+    [JsonConverter (typeof (JsonStringEnumConverter<ShadowStyle>))]
     public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 
     /// <summary>
@@ -56,7 +56,7 @@ public class Dialog : Window
     /// </summary>
 
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
+    [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
     public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
     private readonly List<Button> _buttons = new ();

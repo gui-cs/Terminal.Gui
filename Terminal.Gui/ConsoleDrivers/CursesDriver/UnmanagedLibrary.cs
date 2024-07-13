@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #define GUICS
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace Unix.Terminal;
@@ -69,6 +70,7 @@ internal class UnmanagedLibrary
         }
     }
 
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
     static UnmanagedLibrary ()
     {
         PlatformID platform = Environment.OSVersion.Platform;

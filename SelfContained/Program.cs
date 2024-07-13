@@ -1,24 +1,30 @@
-﻿// This is a simple example application.  For the full range of functionality
-// see the UICatalog project
+﻿// This is a simple example application for a self-contained single file.
 
-// A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
-
-using System;
+using System.Diagnostics.CodeAnalysis;
 using Terminal.Gui;
 
-Application.Run<ExampleWindow> ().Dispose ();
+namespace SelfContained;
 
-// Before the application exits, reset Terminal.Gui for clean shutdown
-Application.Shutdown ();
+public static class Program
+{
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, ConsoleDriver)")]
+    private static void Main (string [] args)
+    {
+        Application.Run<ExampleWindow> ().Dispose ();
 
-// To see this output on the screen it must be done after shutdown,
-// which restores the previous screen.
-Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
+        // Before the application exits, reset Terminal.Gui for clean shutdown
+        Application.Shutdown ();
+
+        // To see this output on the screen it must be done after shutdown,
+        // which restores the previous screen.
+        Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
+    }
+}
 
 // Defines a top-level window with border and title
 public class ExampleWindow : Window
 {
-    public static string UserName;
+    public static string? UserName;
 
     public ExampleWindow ()
     {
