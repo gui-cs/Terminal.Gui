@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace UICatalog.Scenarios;
 
@@ -12,28 +11,26 @@ public interface ITool
     void OnMouseEvent (DrawingArea area, MouseEvent mouseEvent);
 }
 
-class DrawLineTool : ITool
+internal class DrawLineTool : ITool
 {
     private StraightLine _currentLine;
     public LineStyle LineStyle { get; set; } = LineStyle.Single;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void OnMouseEvent (DrawingArea area, MouseEvent mouseEvent)
     {
-
-
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             if (_currentLine == null)
             {
                 // Mouse pressed down
-                _currentLine = new StraightLine (
-                                                 mouseEvent.Position,
-                                                 0,
-                                                 Orientation.Vertical,
-                                                 LineStyle,
-                                                 area.CurrentAttribute
-                                                );
+                _currentLine = new (
+                                    mouseEvent.Position,
+                                    0,
+                                    Orientation.Vertical,
+                                    LineStyle,
+                                    area.CurrentAttribute
+                                   );
 
                 area.CurrentLayer.AddLine (_currentLine);
             }
@@ -41,7 +38,7 @@ class DrawLineTool : ITool
             {
                 // Mouse dragged
                 Point start = _currentLine.Start;
-                var end = mouseEvent.Position;
+                Point end = mouseEvent.Position;
                 var orientation = Orientation.Vertical;
                 int length = end.Y - start.Y;
 
@@ -83,19 +80,19 @@ class DrawLineTool : ITool
                     int idx = area.Layers.IndexOf (area.CurrentLayer);
                     area.Layers.Remove (area.CurrentLayer);
 
-                    area.CurrentLayer = new LineCanvas (
-                                                        area.CurrentLayer.Lines.Exclude (
-                                                                                         _currentLine.Start,
-                                                                                         _currentLine.Length,
-                                                                                         _currentLine.Orientation
-                                                                                        )
-                                                       );
+                    area.CurrentLayer = new (
+                                             area.CurrentLayer.Lines.Exclude (
+                                                                              _currentLine.Start,
+                                                                              _currentLine.Length,
+                                                                              _currentLine.Orientation
+                                                                             )
+                                            );
 
                     area.Layers.Insert (idx, area.CurrentLayer);
                 }
 
                 _currentLine = null;
-                area.ClearUndo();
+                area.ClearUndo ();
                 area.SetNeedsDisplay ();
             }
         }
@@ -107,16 +104,14 @@ class DrawLineTool : ITool
 [ScenarioCategory ("Drawing")]
 public class LineDrawing : Scenario
 {
-
     public override void Setup ()
     {
         var canvas = new DrawingArea { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         var tools = new ToolsView { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
-       
 
-        tools.ColorChanged += (s,e) => canvas.SetAttribute (e);
-        tools.SetStyle += b => canvas.CurrentTool = new DrawLineTool (){LineStyle = b};
+        tools.ColorChanged += (s, e) => canvas.SetAttribute (e);
+        tools.SetStyle += b => canvas.CurrentTool = new DrawLineTool { LineStyle = b };
         tools.AddLayer += () => canvas.AddLayer ();
 
         Win.Add (canvas);
@@ -127,12 +122,12 @@ public class LineDrawing : Scenario
         Win.KeyDown += (s, e) => { e.Handled = canvas.OnKeyDown (e); };
     }
 }
+
 public class ToolsView : Window
 {
     private Button _addLayerBtn;
-    private AttributeView _colors;
+    private readonly AttributeView _colors;
     private RadioGroup _stylePicker;
-
 
     public Attribute CurrentColor
     {
@@ -143,7 +138,7 @@ public class ToolsView : Window
     public ToolsView ()
     {
         BorderStyle = LineStyle.Dotted;
-        Border.Thickness = new Thickness (1, 2, 1, 1);
+        Border.Thickness = new (1, 2, 1, 1);
         Initialized += ToolsView_Initialized;
         _colors = new ();
     }
@@ -156,14 +151,14 @@ public class ToolsView : Window
 
         _colors.ValueChanged += (s, e) => ColorChanged?.Invoke (this, e);
 
-        _stylePicker = new RadioGroup
+        _stylePicker = new()
         {
             X = 0, Y = Pos.Bottom (_colors), RadioLabels = Enum.GetNames (typeof (LineStyle)).ToArray ()
         };
         _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem); };
         _stylePicker.SelectedItem = 1;
 
-        _addLayerBtn = new Button { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
+        _addLayerBtn = new() { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
         _addLayerBtn.Accept += (s, a) => AddLayer?.Invoke ();
         Add (_colors, _stylePicker, _addLayerBtn);
@@ -191,10 +186,7 @@ public class DrawingArea : View
     public LineCanvas CurrentLayer { get; set; }
 
     public ITool CurrentTool { get; set; } = new DrawLineTool ();
-    public DrawingArea ()
-    {
-        AddLayer ();
-    }
+    public DrawingArea () { AddLayer (); }
 
     public override void OnDrawContentComplete (Rectangle viewport)
     {
@@ -256,16 +248,13 @@ public class DrawingArea : View
 
     internal void AddLayer ()
     {
-        CurrentLayer = new LineCanvas ();
+        CurrentLayer = new ();
         Layers.Add (CurrentLayer);
     }
 
     internal void SetAttribute (Attribute a) { CurrentAttribute = a; }
 
-    public void ClearUndo ()
-    {
-        _undoHistory.Clear ();
-    }
+    public void ClearUndo () { _undoHistory.Clear (); }
 }
 
 public class AttributeView : View
@@ -281,41 +270,41 @@ public class AttributeView : View
             _value = value;
             ValueChanged?.Invoke (this, value);
         }
-
     }
 
-    private static readonly HashSet<(int, int)> ForegroundPoints = new HashSet<(int, int)>
+    private static readonly HashSet<(int, int)> ForegroundPoints = new()
     {
-        (0, 0), (1, 0),(2,0),
-        (0, 1), (1, 1),(2,1)
+        (0, 0), (1, 0), (2, 0),
+        (0, 1), (1, 1), (2, 1)
     };
 
-    private static readonly HashSet<(int, int)> BackgroundPoints = new HashSet<(int, int)>
+    private static readonly HashSet<(int, int)> BackgroundPoints = new()
     {
         (3, 1),
-        (1, 2), (2, 2),(3,2)
+        (1, 2), (2, 2), (3, 2)
     };
 
     public AttributeView ()
     {
         Width = 4;
         Height = 3;
-
     }
-    /// <inheritdoc />
+
+    /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
         base.OnDrawContent (viewport);
 
-        var fg = Value.Foreground;
-        var bg = Value.Background;
+        Color fg = Value.Foreground;
+        Color bg = Value.Background;
 
         bool isTransparentFg = fg == GetNormalColor ().Background;
         bool isTransparentBg = bg == GetNormalColor ().Background;
 
-        Driver.SetAttribute (new Attribute (fg, isTransparentFg ? Color.Gray : fg));
+        Driver.SetAttribute (new (fg, isTransparentFg ? Color.Gray : fg));
+
         // Square of foreground color
-        foreach (var point in ForegroundPoints)
+        foreach ((int, int) point in ForegroundPoints)
         {
             // Make pattern like this when it is same color as background of control
             /*▓▒
@@ -324,7 +313,7 @@ public class AttributeView : View
 
             if (isTransparentFg)
             {
-                rune = (Rune)(point.Item1 % 2 == point.Item2%2 ? '▓' : '▒');
+                rune = (Rune)(point.Item1 % 2 == point.Item2 % 2 ? '▓' : '▒');
             }
             else
             {
@@ -334,9 +323,10 @@ public class AttributeView : View
             AddRune (point.Item1, point.Item2, rune);
         }
 
-        Driver.SetAttribute (new Attribute (bg, isTransparentBg ? Color.Gray : bg));
+        Driver.SetAttribute (new (bg, isTransparentBg ? Color.Gray : bg));
+
         // Square of background color
-        foreach (var point in BackgroundPoints)
+        foreach ((int, int) point in BackgroundPoints)
         {
             // Make pattern like this when it is same color as background of control
             /*▓▒
@@ -356,7 +346,7 @@ public class AttributeView : View
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnMouseEvent (MouseEvent mouseEvent)
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
@@ -370,47 +360,42 @@ public class AttributeView : View
                 ClickedInBackground ();
             }
         }
+
         return base.OnMouseEvent (mouseEvent);
     }
 
-    private bool IsForegroundPoint (int x, int y)
-    {
-        return ForegroundPoints.Contains ((x, y));
-    }
+    private bool IsForegroundPoint (int x, int y) { return ForegroundPoints.Contains ((x, y)); }
 
-    private bool IsBackgroundPoint (int x, int y)
-    {
-        return BackgroundPoints.Contains ((x, y));
-    }
+    private bool IsBackgroundPoint (int x, int y) { return BackgroundPoints.Contains ((x, y)); }
 
     private void ClickedInBackground ()
     {
-        if (PromptFor ("Background", Value.Background, out var newColor))
+        if (PromptFor ("Background", Value.Background, out Color newColor))
         {
-            Value = new Attribute (Value.Foreground, newColor);
+            Value = new (Value.Foreground, newColor);
         }
     }
 
     private void ClickedInForeground ()
     {
-        if (PromptFor ("Foreground", Value.Foreground, out var newColor))
+        if (PromptFor ("Foreground", Value.Foreground, out Color newColor))
         {
-            Value = new Attribute (newColor, Value.Background);
+            Value = new (newColor, Value.Background);
         }
     }
 
     private bool PromptFor (string title, Color current, out Color newColor)
     {
-        bool accept = false;
-        var d = new Dialog ()
+        var accept = false;
+
+        var d = new Dialog
         {
             Title = title,
             Height = 7
         };
 
-        var btnOk = new Button ()
+        var btnOk = new Button
         {
-
             X = Pos.Center () - 5,
             Y = 4,
             Text = "Ok",
@@ -419,24 +404,25 @@ public class AttributeView : View
         };
 
         btnOk.Accept += (s, e) =>
-        {
-            accept = true;
-            e.Handled = true;
-            Application.RequestStop ();
-        };
-        var btnCancel = new Button ()
+                        {
+                            accept = true;
+                            e.Handled = true;
+                            Application.RequestStop ();
+                        };
+
+        var btnCancel = new Button
         {
             X = Pos.Center () + 5,
             Y = 4,
             Text = "Cancel",
             Width = Dim.Auto ()
         };
-        btnCancel.Accept += (s, e) =>
-        {
-            e.Handled = true;
-            Application.RequestStop ();
-        };
 
+        btnCancel.Accept += (s, e) =>
+                            {
+                                e.Handled = true;
+                                Application.RequestStop ();
+                            };
 
         d.Add (btnOk);
         d.Add (btnCancel);

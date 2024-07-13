@@ -1,17 +1,15 @@
-﻿using ColorHelper;
+﻿using Xunit.Abstractions;
 using Color = Terminal.Gui.Color;
-using Xunit.Abstractions;
 
 namespace UnitTests.Views;
 
 public class ColorPicker2Tests (ITestOutputHelper output)
 {
-
     [Fact]
     [AutoInitShutdown]
     public void ColorPicker_DefaultBootDraw ()
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = new (0, 0) };
 
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -39,7 +37,7 @@ Hex:#000000  ■
     [AutoInitShutdown]
     public void ColorPicker_RGB_KeyboardNavigation ()
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -72,7 +70,6 @@ B:▲█████████████████
 Hex:#0F0000  ■
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
-
 
         cp.NewKeyDownEvent (Key.CursorRight);
 
@@ -94,7 +91,7 @@ Hex:#1E0000  ■
     [AutoInitShutdown]
     public void ColorPicker_RGB_MouseNavigation ()
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -117,10 +114,10 @@ Hex:#000000  ■
         Assert.IsAssignableFrom<IColorBar> (cp.Focused);
 
         cp.Focused.OnMouseEvent (
-                                 new MouseEvent ()
+                                 new()
                                  {
                                      Flags = MouseFlags.Button1Pressed,
-                                     Position = new Point (3, 0)
+                                     Position = new (3, 0)
                                  });
 
         cp.Draw ();
@@ -134,12 +131,11 @@ Hex:#0F0000  ■
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
 
-
         cp.Focused.NewMouseEvent (
-                                  new MouseEvent ()
+                                  new()
                                   {
                                       Flags = MouseFlags.Button1Pressed,
-                                      Position = new Point (4, 0)
+                                      Position = new (4, 0)
                                   });
 
         cp.Draw ();
@@ -160,7 +156,7 @@ Hex:#1E0000  ■
     {
         yield return new object []
         {
-            new Color (255, 0, 0),
+            new Color (255, 0),
             @"
 R:█████████████████▲
 G:▲█████████████████
@@ -171,7 +167,7 @@ Hex:#FF0000  ■
 
         yield return new object []
         {
-            new Color (0, 255, 0),
+            new Color (0, 255),
             @"
 R:▲█████████████████
 G:█████████████████▲
@@ -191,7 +187,6 @@ Hex:#0000FF  ■
 "
         };
 
-
         yield return new object []
         {
             new Color (125, 125, 125),
@@ -209,7 +204,7 @@ Hex:#7D7D7D  ■
     [MemberData (nameof (ColorPickerTestData))]
     public void ColorPicker_RGB_NoText (Color c, string expected)
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = c };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = c };
 
         cp.Style.ShowTextFields = false;
         cp.Style.ColorModel = ColorModel.RGB;
@@ -221,7 +216,6 @@ Hex:#7D7D7D  ■
 
         cp.Draw ();
 
-
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         top.Dispose ();
@@ -231,7 +225,7 @@ Hex:#7D7D7D  ■
     {
         yield return new object []
         {
-            new Color (255, 0, 0),
+            new Color (255, 0),
             @"
 R:█████████████▲255 
 G:▲█████████████0
@@ -242,7 +236,7 @@ Hex:#FF0000  ■
 
         yield return new object []
         {
-            new Color (0, 255, 0),
+            new Color (0, 255),
             @"
 R:▲█████████████0
 G:█████████████▲255
@@ -262,7 +256,6 @@ Hex:#0000FF  ■
 "
         };
 
-
         yield return new object []
         {
             new Color (125, 125, 125),
@@ -280,7 +273,7 @@ Hex:#7D7D7D  ■
     [MemberData (nameof (ColorPickerTestData_WithTextFields))]
     public void ColorPicker_RGB_NoText_WithTextFields (Color c, string expected)
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = c };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = c };
 
         cp.Style.ShowTextFields = true;
         cp.Style.ColorModel = ColorModel.RGB;
@@ -292,7 +285,6 @@ Hex:#7D7D7D  ■
 
         cp.Draw ();
 
-
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         top.Dispose ();
@@ -302,7 +294,7 @@ Hex:#7D7D7D  ■
     [AutoInitShutdown]
     public void ColorPicker_ClickingAtEndOfBar_SetsMaxValue ()
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -315,10 +307,10 @@ Hex:#7D7D7D  ■
 
         // Click at the end of the Red bar
         cp.Focused.OnMouseEvent (
-                                 new MouseEvent ()
+                                 new()
                                  {
                                      Flags = MouseFlags.Button1Pressed,
-                                     Position = new Point (19, 0) // Assuming 0-based indexing
+                                     Position = new (19, 0) // Assuming 0-based indexing
                                  });
 
         cp.Draw ();
@@ -339,7 +331,7 @@ Hex:#FF0000  ■
     [AutoInitShutdown]
     public void ColorPicker_ClickingBeyondBar_ChangesToMaxValue ()
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -352,10 +344,10 @@ Hex:#FF0000  ■
 
         // Click beyond the bar
         cp.Focused.OnMouseEvent (
-                                 new MouseEvent ()
+                                 new()
                                  {
                                      Flags = MouseFlags.Button1Pressed,
-                                     Position = new Point (21, 0) // Beyond the bar
+                                     Position = new (21, 0) // Beyond the bar
                                  });
 
         cp.Draw ();
@@ -376,7 +368,7 @@ Hex:#FF0000  ■
     [AutoInitShutdown]
     public void ColorPicker_ChangeValueOnUI_UpdatesAllUIElements ()
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = true;
         cp.ApplyStyleChanges ();
@@ -388,7 +380,7 @@ Hex:#FF0000  ■
         cp.Draw ();
 
         // Change value using text field
-        var rBarTextField = cp.Subviews.OfType<TextField> ().First ();
+        TextField rBarTextField = cp.Subviews.OfType<TextField> ().First ();
 
         rBarTextField.Text = "128";
         rBarTextField.OnLeave (cp);
@@ -411,7 +403,7 @@ Hex:#800000  ■
     [AutoInitShutdown]
     public void ColorPicker_InvalidHexInput_DoesNotChangeColor ()
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = true;
         cp.ApplyStyleChanges ();
@@ -423,7 +415,7 @@ Hex:#800000  ■
         cp.Draw ();
 
         // Enter invalid hex value
-        var hexField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "#000000");
+        TextField hexField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "#000000");
         hexField.Text = "#ZZZZZZ";
         hexField.OnLeave (cp);
 
@@ -445,7 +437,7 @@ Hex:#000000  ■
     [AutoInitShutdown]
     public void ColorPicker_ClickingDifferentBars_ChangesFocus ()
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -460,10 +452,10 @@ Hex:#000000  ■
         cp.Subviews.OfType<GBar> ()
           .Single ()
           .OnMouseEvent (
-                         new MouseEvent ()
+                         new()
                          {
                              Flags = MouseFlags.Button1Pressed,
-                             Position = new Point (0, 1)
+                             Position = new (0, 1)
                          });
 
         cp.Draw ();
@@ -474,10 +466,10 @@ Hex:#000000  ■
         cp.Subviews.OfType<BBar> ()
           .Single ()
           .OnMouseEvent (
-                         new MouseEvent ()
+                         new()
                          {
                              Flags = MouseFlags.Button1Pressed,
-                             Position = new Point (0, 6)
+                             Position = new (0, 6)
                          });
 
         cp.Draw ();
@@ -491,7 +483,7 @@ Hex:#000000  ■
     [AutoInitShutdown]
     public void ColorPicker_SwitchingColorModels_ResetsBars ()
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (255, 0, 0) };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = new (255, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -532,7 +524,7 @@ Hex:#FF0000  ■
     [AutoInitShutdown]
     public void ColorPicker_SyncBetweenTextFieldAndBars ()
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        var cp = new ColorPicker2 { Width = 20, Height = 4, Value = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = true;
         cp.ApplyStyleChanges ();
@@ -544,7 +536,7 @@ Hex:#FF0000  ■
         cp.Draw ();
 
         // Change value using the bar
-        var rBar = cp.Subviews.OfType<RBar> ().First ();
+        RBar rBar = cp.Subviews.OfType<RBar> ().First ();
         rBar.Value = 128;
 
         cp.Draw ();
@@ -567,7 +559,7 @@ Hex:#800000  ■
     {
         Color oldColor = default;
         Color newColor = default;
-        int count = 0;
+        var count = 0;
 
         var cp = new ColorPicker2 ();
 
@@ -580,21 +572,20 @@ Hex:#800000  ■
                                Assert.Equal (cp.Value, e.Color);
                            };
 
-        cp.Value = new Color (1, 2, 3);
-        Assert.Equal (1,count);
-        Assert.Equal (new Color (1, 2, 3), newColor);
+        cp.Value = new (1, 2, 3);
+        Assert.Equal (1, count);
+        Assert.Equal (new (1, 2, 3), newColor);
 
-        cp.Value = new Color (2, 3, 4);
+        cp.Value = new (2, 3, 4);
 
         Assert.Equal (2, count);
-        Assert.Equal (new Color (1, 2, 3), oldColor);
-        Assert.Equal (new Color (2, 3, 4), newColor);
+        Assert.Equal (new (1, 2, 3), oldColor);
+        Assert.Equal (new (2, 3, 4), newColor);
 
         // Set to same value
-        cp.Value = new Color (2, 3, 4);
+        cp.Value = new (2, 3, 4);
 
         // Should have no effect
         Assert.Equal (2, count);
     }
 }
-

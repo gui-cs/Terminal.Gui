@@ -1,9 +1,7 @@
 ﻿using ColorHelper;
-using static Terminal.Gui.ColorPicker2;
 using ColorConverter = ColorHelper.ColorConverter;
 
 namespace Terminal.Gui;
-
 
 public enum ColorModel
 {
@@ -36,22 +34,21 @@ internal class ColorModelStrategy
 
     private IEnumerable<ColorBar> CreateHslBars ()
     {
-        var h = new HueBar ()
+        var h = new HueBar
         {
             Text = "H:"
         };
 
         yield return h;
 
-        var s = new SaturationBar ()
+        var s = new SaturationBar
         {
             Text = "S:"
         };
 
-
-        var l = new LightnessBar ()
+        var l = new LightnessBar
         {
-            Text = "L:",
+            Text = "L:"
         };
 
         s.HBar = h;
@@ -66,15 +63,17 @@ internal class ColorModelStrategy
 
     private IEnumerable<ColorBar> CreateRgbBars ()
     {
-        var r = new RBar ()
+        var r = new RBar
         {
             Text = "R:"
         };
-        var g = new GBar ()
+
+        var g = new GBar
         {
             Text = "G:"
         };
-        var b = new BBar ()
+
+        var b = new BBar
         {
             Text = "B:"
         };
@@ -91,25 +90,24 @@ internal class ColorModelStrategy
         yield return g;
         yield return b;
     }
+
     private IEnumerable<ColorBar> CreateHsvBars ()
     {
-
-        var h = new HueBar ()
+        var h = new HueBar
         {
             Text = "H:"
         };
 
         yield return h;
 
-        var s = new SaturationBar ()
+        var s = new SaturationBar
         {
             Text = "S:"
         };
 
-
-        var v = new ValueBar ()
+        var v = new ValueBar
         {
-            Text = "V:",
+            Text = "V:"
         };
 
         s.HBar = h;
@@ -121,26 +119,27 @@ internal class ColorModelStrategy
         yield return s;
         yield return v;
     }
+
     public Color GetColorFromBars (IList<IColorBar> bars, ColorModel model)
     {
         switch (model)
         {
             case ColorModel.RGB:
-                return ToColor (new RGB ((byte)bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value));
+                return ToColor (new ((byte)bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value));
             case ColorModel.HSV:
-                return ToColor(
-                               ColorConverter.HsvToRgb (new HSV (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value))
+                return ToColor (
+                                ColorConverter.HsvToRgb (new (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value))
                                );
             case ColorModel.HSL:
                 return ToColor (
-                                ColorConverter.HslToRgb (new HSL (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value))
-                                );
+                                ColorConverter.HslToRgb (new (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value))
+                               );
             default:
                 throw new ArgumentOutOfRangeException (nameof (model), model, null);
         }
     }
 
-    private Color ToColor (RGB rgb) => new (rgb.R, rgb.G, rgb.B);
+    private Color ToColor (RGB rgb) { return new (rgb.R, rgb.G, rgb.B); }
 
     public void SetBarsToColor (IList<IColorBar> bars, Color newValue, ColorModel model)
     {
@@ -150,19 +149,22 @@ internal class ColorModelStrategy
                 bars [0].Value = newValue.R;
                 bars [1].Value = newValue.G;
                 bars [2].Value = newValue.B;
+
                 break;
             case ColorModel.HSV:
-                var newHsv = ColorConverter.RgbToHsv (new RGB (newValue.R, newValue.G, newValue.B));
+                HSV newHsv = ColorConverter.RgbToHsv (new (newValue.R, newValue.G, newValue.B));
                 bars [0].Value = newHsv.H;
                 bars [1].Value = newHsv.S;
                 bars [2].Value = newHsv.V;
+
                 break;
             case ColorModel.HSL:
 
-                var newHsl = ColorConverter.RgbToHsl (new RGB (newValue.R, newValue.G, newValue.B));
+                HSL newHsl = ColorConverter.RgbToHsl (new (newValue.R, newValue.G, newValue.B));
                 bars [0].Value = newHsl.H;
                 bars [1].Value = newHsl.S;
                 bars [2].Value = newHsl.L;
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException (nameof (model), model, null);
@@ -173,18 +175,18 @@ internal class ColorModelStrategy
 public class ColorPickerStyle
 {
     /// <summary>
-    /// The color model for picking colors by RGB, HSV, etc.
+    ///     The color model for picking colors by RGB, HSV, etc.
     /// </summary>
     public ColorModel ColorModel { get; set; } = ColorModel.HSV;
 
     /// <summary>
-    /// True to put the numerical value of bars on the right of the color bar
+    ///     True to put the numerical value of bars on the right of the color bar
     /// </summary>
     public bool ShowTextFields { get; set; } = true;
 }
 
 /// <summary>
-/// True color picker using HSL
+///     True color picker using HSL
 /// </summary>
 public class ColorPicker2 : View
 {
@@ -193,24 +195,25 @@ public class ColorPicker2 : View
 
     private Color _value = Color.Black;
 
-    private List<IColorBar> _bars = new List<IColorBar> ();
-    private Dictionary<IColorBar, TextField> _textFields = new Dictionary<IColorBar, TextField> ();
-    private readonly ColorModelStrategy _strategy = new ColorModelStrategy ();
+    private List<IColorBar> _bars = new ();
+    private readonly Dictionary<IColorBar, TextField> _textFields = new ();
+    private readonly ColorModelStrategy _strategy = new ();
 
     /// <summary>
-    /// Style settings for the color picker.  After making changes ensure you call
-    /// <see cref="ApplyStyleChanges"/>.
+    ///     Style settings for the color picker.  After making changes ensure you call
+    ///     <see cref="ApplyStyleChanges"/>.
     /// </summary>
-    public ColorPickerStyle Style { get; set; } = new ColorPickerStyle();
+    public ColorPickerStyle Style { get; set; } = new ();
 
     /// <summary>
-    /// Fired when color is changed.
+    ///     Fired when color is changed.
     /// </summary>
     public event EventHandler<ColorEventArgs> ColorChanged;
 
-    private bool updating = false;
+    private bool updating;
+
     /// <summary>
-    /// The color selected in the picker
+    ///     The color selected in the picker
     /// </summary>
     public Color Value
     {
@@ -223,16 +226,18 @@ public class ColorPicker2 : View
 
                 if (_value != value)
                 {
-                    var old = _value;
+                    Color old = _value;
                     _value = value;
                     SetTextFieldToValue ();
                     UpdateBarsFromColor (value);
 
-                    ColorChanged?.Invoke (this, new ColorEventArgs ()
-                    {
-                        Color = value,
-                        PreviousColor = old
-                    });
+                    ColorChanged?.Invoke (
+                                          this,
+                                          new()
+                                          {
+                                              Color = value,
+                                              PreviousColor = old
+                                          });
                 }
             }
             finally
@@ -242,29 +247,24 @@ public class ColorPicker2 : View
         }
     }
 
-
-
-    public ColorPicker2 ()
-    {
-        ApplyStyleChanges ();
-    }
+    public ColorPicker2 () { ApplyStyleChanges (); }
 
     public void ApplyStyleChanges ()
     {
-        var oldValue = _value;
+        Color oldValue = _value;
         DisposeOldViews ();
 
-        int y = 0;
+        var y = 0;
         const int textFieldWidth = 4;
 
-        foreach (var bar in _strategy.CreateBars (Style.ColorModel))
+        foreach (ColorBar bar in _strategy.CreateBars (Style.ColorModel))
         {
             bar.Y = y;
-            bar.Width = Dim.Fill (Style.ShowTextFields ? textFieldWidth:0);
+            bar.Width = Dim.Fill (Style.ShowTextFields ? textFieldWidth : 0);
 
             if (Style.ShowTextFields)
             {
-                var tfValue = new TextField ()
+                var tfValue = new TextField
                 {
                     X = Pos.AnchorEnd (textFieldWidth),
                     Y = y,
@@ -294,13 +294,14 @@ public class ColorPicker2 : View
 
     private void CreateTextField ()
     {
-        lbHex = new Label ()
+        lbHex = new()
         {
             Text = "Hex:",
             X = 0,
             Y = 3
         };
-        tfHex = new TextField ()
+
+        tfHex = new()
         {
             Y = 3,
             X = 4,
@@ -315,11 +316,11 @@ public class ColorPicker2 : View
 
     private void UpdateSingleBarValueFromTextField (object sender, FocusEventArgs e)
     {
-        foreach (var kvp in _textFields)
+        foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
         {
             if (kvp.Value == sender)
             {
-                if(int.TryParse(kvp.Value.Text, out var v))
+                if (int.TryParse (kvp.Value.Text, out int v))
                 {
                     kvp.Key.Value = v;
                 }
@@ -338,12 +339,12 @@ public class ColorPicker2 : View
                 tf.Leave -= UpdateSingleBarValueFromTextField;
                 Remove (tf);
                 tf.Dispose ();
-
             }
+
             Remove (bar);
         }
 
-        _bars = new List<IColorBar> ();
+        _bars = new ();
         _textFields.Clear ();
 
         if (lbHex != null)
@@ -364,7 +365,7 @@ public class ColorPicker2 : View
 
     private void UpdateValueFromTextField (object sender, FocusEventArgs e)
     {
-        if (Color.TryParse (tfHex.Text, out var newColor))
+        if (Color.TryParse (tfHex.Text, out Color? newColor))
         {
             Value = newColor.Value;
         }
@@ -375,24 +376,24 @@ public class ColorPicker2 : View
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
         base.OnDrawContent (viewport);
-        var normal = GetNormalColor ();
-        Driver.SetAttribute (new Attribute (Value, normal.Background));
+        Attribute normal = GetNormalColor ();
+        Driver.SetAttribute (new (Value, normal.Background));
         AddRune (13, 3, (Rune)'■');
     }
 
     private void UpdateBarsFromColor (Color color)
     {
-        _strategy.SetBarsToColor (_bars,color, Style.ColorModel);
+        _strategy.SetBarsToColor (_bars, color, Style.ColorModel);
         SetTextFieldToValue ();
     }
 
     private void RebuildColor (object sender, EventArgs<int> e)
     {
-        foreach(var kvp in _textFields)
+        foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
         {
             kvp.Value.Text = kvp.Key.Value.ToString ();
         }
@@ -405,10 +406,7 @@ public class ColorPicker2 : View
         SetTextFieldToValue ();
     }
 
-    private void SetTextFieldToValue ()
-    {
-        tfHex.Text = _value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
-    }
+    private void SetTextFieldToValue () { tfHex.Text = _value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}"); }
 }
 
 public abstract class ColorBar : View, IColorBar
@@ -416,23 +414,25 @@ public abstract class ColorBar : View, IColorBar
     protected int BarStartsAt;
 
     /// <summary>
-    /// 0-1 for how much of the color element is present currently (HSL)
+    ///     0-1 for how much of the color element is present currently (HSL)
     /// </summary>
     private int _value;
 
     /// <summary>
-    /// The amount of <see cref="Value"/> represented by each cell width on the bar
-    /// Can be less than 1 e.g. if Saturation (0-100) and width > 100
+    ///     The amount of <see cref="Value"/> represented by each cell width on the bar
+    ///     Can be less than 1 e.g. if Saturation (0-100) and width > 100
     /// </summary>
     private double _cellValue = 1d;
 
     protected abstract int MaxValue { get; }
+
     public int Value
     {
         get => _value;
         set
         {
-            var clampedValue = Math.Clamp (value, 0, MaxValue);
+            int clampedValue = Math.Clamp (value, 0, MaxValue);
+
             if (_value != clampedValue)
             {
                 _value = clampedValue;
@@ -449,15 +449,14 @@ public abstract class ColorBar : View, IColorBar
         Width = Dim.Fill ();
         CanFocus = true;
 
-        AddCommand (Command.Left, (_) => Adjust (-1));
-        AddCommand (Command.Right, (_) => Adjust (1));
+        AddCommand (Command.Left, _ => Adjust (-1));
+        AddCommand (Command.Right, _ => Adjust (1));
 
-        AddCommand (Command.LeftExtend, (_) => Adjust (- MaxValue/20));
-        AddCommand (Command.RightExtend, (_) => Adjust (MaxValue / 20));
+        AddCommand (Command.LeftExtend, _ => Adjust (-MaxValue / 20));
+        AddCommand (Command.RightExtend, _ => Adjust (MaxValue / 20));
 
-        AddCommand (Command.LeftHome, (_) => SetZero ());
-        AddCommand (Command.RightEnd, (_) => SetMax ());
-
+        AddCommand (Command.LeftHome, _ => SetZero ());
+        AddCommand (Command.RightEnd, _ => SetMax ());
 
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
@@ -483,7 +482,7 @@ public abstract class ColorBar : View, IColorBar
 
     protected bool? Adjust (int delta)
     {
-        int change = (int)(delta * _cellValue);
+        var change = (int)(delta * _cellValue);
 
         // Ensure that the change is at least 1 or -1 if delta is non-zero
         if (change == 0 && delta != 0)
@@ -492,27 +491,29 @@ public abstract class ColorBar : View, IColorBar
         }
 
         Value += change;
+
         return true;
     }
 
     /// <summary>
-    /// Last known width of the bar as passed to <see cref="DrawBar"/>.
+    ///     Last known width of the bar as passed to <see cref="DrawBar"/>.
     /// </summary>
     protected int BarWidth { get; private set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) )
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             if (mouseEvent.Position.X >= BarStartsAt)
             {
-                var v = MaxValue * ((double)mouseEvent.Position.X - BarStartsAt) / (BarWidth - 1);
+                double v = MaxValue * ((double)mouseEvent.Position.X - BarStartsAt) / (BarWidth - 1);
                 Value = Math.Clamp ((int)v, 0, MaxValue);
             }
 
             mouseEvent.Handled = true;
             FocusFirst ();
+
             return true;
         }
 
@@ -524,6 +525,7 @@ public abstract class ColorBar : View, IColorBar
         base.OnDrawContent (viewport);
 
         var xOffset = 0;
+
         if (!string.IsNullOrWhiteSpace (Text))
         {
             Move (0, 0);
@@ -538,12 +540,13 @@ public abstract class ColorBar : View, IColorBar
 
         DrawBar (xOffset, 0, BarWidth);
     }
+
     private void DrawBar (int xOffset, int yOffset, int width)
     {
         // Each 1 unit of X in the bar corresponds to this much of Value
         _cellValue = (double)MaxValue / (width - 1);
 
-        for (int x = 0; x < width; x++)
+        for (var x = 0; x < width; x++)
         {
             double fraction = (double)x / (width - 1);
             Color color = GetColor (fraction);
@@ -555,6 +558,7 @@ public abstract class ColorBar : View, IColorBar
             double brightness = (0.299 * color.R + 0.587 * color.G + 0.114 * color.B) / 255;
 
             Color triangleColor = Color.Black;
+
             if (brightness < 0.15) // Threshold to determine if the color is too close to black
             {
                 triangleColor = Color.DarkGray;
@@ -563,41 +567,40 @@ public abstract class ColorBar : View, IColorBar
             if (isSelectedCell)
             {
                 // Draw the triangle at the closest position
-                Application.Driver.SetAttribute (new Attribute (triangleColor, color));
-                AddRune (x + xOffset, yOffset, new Rune ('▲'));
+                Application.Driver.SetAttribute (new (triangleColor, color));
+                AddRune (x + xOffset, yOffset, new ('▲'));
             }
             else
             {
-                Application.Driver.SetAttribute (new Attribute (color, color));
-                AddRune (x + xOffset, yOffset, new Rune ('█'));
+                Application.Driver.SetAttribute (new (color, color));
+                AddRune (x + xOffset, yOffset, new ('█'));
             }
         }
     }
-
-
 
     protected abstract Color GetColor (double fraction);
 
     protected virtual void OnValueChanged ()
     {
-        ValueChanged?.Invoke (this, new EventArgs<int> (_value));
+        ValueChanged?.Invoke (this, new (_value));
+
         // Notify subscribers if any, and redraw the view
-        this.SetNeedsDisplay ();
+        SetNeedsDisplay ();
     }
 }
 
 internal class HueBar : ColorBar
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override int MaxValue => 360;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override Color GetColor (double fraction)
     {
         var hsl = new HSL ((int)(MaxValue * fraction), 100, 50);
-        var rgb = ColorConverter.HslToRgb (hsl);
+        RGB rgb = ColorConverter.HslToRgb (hsl);
 
-        return new Color (rgb.R, rgb.G, rgb.B);
+        return new (rgb.R, rgb.G, rgb.B);
     }
 }
 
@@ -609,31 +612,29 @@ internal class SaturationBar : ColorBar
     public LightnessBar LBar { get; set; }
     public ValueBar VBar { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override int MaxValue => 100;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override Color GetColor (double fraction)
     {
         if (LBar != null)
         {
             var hsl = new HSL (HBar.Value, (byte)(MaxValue * fraction), (byte)LBar.Value);
-            var rgb = ColorConverter.HslToRgb (hsl);
+            RGB rgb = ColorConverter.HslToRgb (hsl);
 
-            return new Color (rgb.R, rgb.G, rgb.B);
+            return new (rgb.R, rgb.G, rgb.B);
         }
 
         if (VBar != null)
         {
-
             var hsv = new HSV (HBar.Value, (byte)(MaxValue * fraction), (byte)VBar.Value);
-            var rgb = ColorConverter.HsvToRgb (hsv);
+            RGB rgb = ColorConverter.HsvToRgb (hsv);
 
-            return new Color (rgb.R, rgb.G, rgb.B);
+            return new (rgb.R, rgb.G, rgb.B);
         }
 
-        throw new Exception ("SaturationBar requires either Lightness or Value to render");
-
+        throw new ("SaturationBar requires either Lightness or Value to render");
     }
 }
 
@@ -642,80 +643,84 @@ internal class LightnessBar : ColorBar
     public HueBar HBar { get; set; }
     public SaturationBar SBar { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override int MaxValue => 100;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override Color GetColor (double fraction)
     {
         var hsl = new HSL (HBar.Value, (byte)SBar.Value, (byte)(MaxValue * fraction));
-        var rgb = ColorConverter.HslToRgb (hsl);
+        RGB rgb = ColorConverter.HslToRgb (hsl);
 
-        return new Color (rgb.R, rgb.G, rgb.B);
+        return new (rgb.R, rgb.G, rgb.B);
     }
 }
-class ValueBar : ColorBar
+
+internal class ValueBar : ColorBar
 {
     public HueBar HBar { get; set; }
     public SaturationBar SBar { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override int MaxValue => 100;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override Color GetColor (double fraction)
     {
         var hsv = new HSV (HBar.Value, (byte)SBar.Value, (byte)(MaxValue * fraction));
-        var rgb = ColorConverter.HsvToRgb (hsv);
+        RGB rgb = ColorConverter.HsvToRgb (hsv);
 
-        return new Color (rgb.R, rgb.G, rgb.B);
+        return new (rgb.R, rgb.G, rgb.B);
     }
 }
 
-
-class RBar : ColorBar
+internal class RBar : ColorBar
 {
     public GBar GBar { get; set; }
     public BBar BBar { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override int MaxValue => 255;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override Color GetColor (double fraction)
     {
-        var rgb = new RGB ((byte)(MaxValue*fraction), (byte)GBar.Value, (byte)BBar.Value);
-        return new Color (rgb.R, rgb.G, rgb.B);
+        var rgb = new RGB ((byte)(MaxValue * fraction), (byte)GBar.Value, (byte)BBar.Value);
+
+        return new (rgb.R, rgb.G, rgb.B);
     }
 }
 
-class GBar : ColorBar
+internal class GBar : ColorBar
 {
     public RBar RBar { get; set; }
     public BBar BBar { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override int MaxValue => 255;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override Color GetColor (double fraction)
     {
         var rgb = new RGB ((byte)RBar.Value, (byte)(MaxValue * fraction), (byte)BBar.Value);
-        return new Color (rgb.R, rgb.G, rgb.B);
+
+        return new (rgb.R, rgb.G, rgb.B);
     }
 }
-class BBar : ColorBar
+
+internal class BBar : ColorBar
 {
     public RBar RBar { get; set; }
     public GBar GBar { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override int MaxValue => 255;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override Color GetColor (double fraction)
     {
         var rgb = new RGB ((byte)RBar.Value, (byte)GBar.Value, (byte)(MaxValue * fraction));
-        return new Color (rgb.R, rgb.G, rgb.B);
+
+        return new (rgb.R, rgb.G, rgb.B);
     }
 }
