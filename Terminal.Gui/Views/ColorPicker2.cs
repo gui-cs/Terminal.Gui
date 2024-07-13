@@ -237,7 +237,7 @@ public class ColorPicker2 : View
         foreach (var bar in _strategy.CreateBars (Style.ColorModel))
         {
             bar.Y = y;
-            bar.Width = Dim.Fill (textFieldWidth);
+            bar.Width = Dim.Fill (Style.ShowTextFields ? textFieldWidth:0);
 
             if (Style.ShowTextFields)
             {
