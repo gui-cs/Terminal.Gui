@@ -190,7 +190,7 @@ public class ColorPicker2 : View
 {
     private readonly TextField tfHex;
 
-    private Color _value = Color.Red;
+    private Color _value = Color.Black;
 
     private List<IColorBar> _bars = new List<IColorBar> ();
     private Dictionary<IColorBar, TextField> _textFields = new Dictionary<IColorBar, TextField> ();
@@ -214,7 +214,7 @@ public class ColorPicker2 : View
             if (_value != value)
             {
                 _value = value;
-                tfHex.Text = value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
+                SetTextFieldToValue ();
                 UpdateBarsFromColor (value);
             }
         }
@@ -223,8 +223,6 @@ public class ColorPicker2 : View
 
     public ColorPicker2 ()
     {
-        ApplyStyleChanges ();
-
         var lbHex = new Label ()
         {
             Text = "Hex:",
@@ -242,6 +240,9 @@ public class ColorPicker2 : View
         Add (tfHex);
 
         tfHex.Leave += (_, _) => UpdateValueFromTextField ();
+
+        ApplyStyleChanges ();
+        SetTextFieldToValue ();
     }
 
     public void ApplyStyleChanges ()
@@ -340,6 +341,11 @@ public class ColorPicker2 : View
         }
 
         _value = _strategy.GetColorFromBars (_bars, Style.ColorModel);
+        SetTextFieldToValue ();
+    }
+
+    private void SetTextFieldToValue ()
+    {
         tfHex.Text = _value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}");
     }
 }
