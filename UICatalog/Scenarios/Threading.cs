@@ -20,8 +20,10 @@ public class Threading : Scenario
     private ListView _logJob;
     private Action _sync;
 
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
         _action = LoadData;
 
         _lambda = async () =>
@@ -56,7 +58,7 @@ public class Threading : Scenario
         _btnActionCancel = new Button { X = 1, Y = 1, Text = "Cancelable Load Items" };
         _btnActionCancel.Accept += (s, e) => Application.Invoke (CallLoadItemsAsync);
 
-        Win.Add (new Label { X = Pos.X (_btnActionCancel), Y = Pos.Y (_btnActionCancel) + 4, Text = "Data Items:" });
+        win.Add (new Label { X = Pos.X (_btnActionCancel), Y = Pos.Y (_btnActionCancel) + 4, Text = "Data Items:" });
 
         _itemsList = new ListView
         {
@@ -67,7 +69,7 @@ public class Threading : Scenario
             ColorScheme = Colors.ColorSchemes ["TopLevel"]
         };
 
-        Win.Add (new Label { X = Pos.Right (_itemsList) + 10, Y = Pos.Y (_btnActionCancel) + 4, Text = "Task Logs:" });
+        win.Add (new Label { X = Pos.Right (_itemsList) + 10, Y = Pos.Y (_btnActionCancel) + 4, Text = "Task Logs:" });
 
         _logJob = new ListView
         {
@@ -101,7 +103,7 @@ public class Threading : Scenario
         var btnQuit = new Button { X = 80, Y = 22, Text = "Quit" };
         btnQuit.Accept += (s, e) => Application.RequestStop ();
 
-        Win.Add (
+        win.Add (
                  _itemsList,
                  _btnActionCancel,
                  _logJob,
@@ -115,13 +117,17 @@ public class Threading : Scenario
                  btnQuit
                 );
 
-        void Top_Loaded (object sender, EventArgs args)
+        void Win_Loaded (object sender, EventArgs args)
         {
             _btnActionCancel.SetFocus ();
-            Top.Loaded -= Top_Loaded;
+            win.Loaded -= Win_Loaded;
         }
 
-        Top.Loaded += Top_Loaded;
+        win.Loaded += Win_Loaded;
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     private async void CallLoadItemsAsync ()

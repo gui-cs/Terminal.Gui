@@ -15,9 +15,10 @@ public class Snake : Scenario
 {
     private bool isDisposed;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        base.Setup ();
+        Application.Init ();
+        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
 
         var state = new SnakeState ();
 
@@ -25,7 +26,7 @@ public class Snake : Scenario
 
         var snakeView = new SnakeView (state) { Width = state.Width, Height = state.Height };
 
-        Win.Add (snakeView);
+        win.Add (snakeView);
 
         var sw = new Stopwatch ();
 
@@ -51,6 +52,10 @@ public class Snake : Scenario
                       }
                   }
                  );
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     protected override void Dispose (bool disposing)

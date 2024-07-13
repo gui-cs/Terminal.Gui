@@ -15,14 +15,15 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Drawing")]
 public class Images : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
-        base.Setup ();
+        Application.Init ();
+        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName()}" };
 
         bool canTrueColor = Application.Driver.SupportsTrueColor;
 
         var lblDriverName = new Label { X = 0, Y = 0, Text = $"Driver is {Application.Driver.GetType ().Name}" };
-        Win.Add (lblDriverName);
+        win.Add (lblDriverName);
 
         var cbSupportsTrueColor = new CheckBox
         {
@@ -32,7 +33,7 @@ public class Images : Scenario
             CanFocus = false,
             Text = "supports true color "
         };
-        Win.Add (cbSupportsTrueColor);
+        win.Add (cbSupportsTrueColor);
 
         var cbUseTrueColor = new CheckBox
         {
@@ -43,63 +44,68 @@ public class Images : Scenario
             Text = "Use true color"
         };
         cbUseTrueColor.Toggle += (_, evt) => Application.Force16Colors = evt.NewValue == CheckState.UnChecked;
-        Win.Add (cbUseTrueColor);
+        win.Add (cbUseTrueColor);
 
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
-        Win.Add (btnOpenImage);
+        win.Add (btnOpenImage);
 
         var imageView = new ImageView
         {
             X = 0, Y = Pos.Bottom (lblDriverName), Width = Dim.Fill (), Height = Dim.Fill ()
         };
-        Win.Add (imageView);
+        win.Add (imageView);
 
         btnOpenImage.Accept += (_, _) =>
-                                {
-                                    var ofd = new OpenDialog { Title = "Open Image", AllowsMultipleSelection = false };
-                                    Application.Run (ofd);
+                               {
+                                   var ofd = new OpenDialog { Title = "Open Image", AllowsMultipleSelection = false };
+                                   Application.Run (ofd);
 
-                                    if (ofd.Path is { })
-                                    {
-                                        Directory.SetCurrentDirectory (Path.GetFullPath (Path.GetDirectoryName (ofd.Path)!));
-                                    }
+                                   if (ofd.Path is { })
+                                   {
+                                       Directory.SetCurrentDirectory (Path.GetFullPath (Path.GetDirectoryName (ofd.Path)!));
+                                   }
 
-                                    if (ofd.Canceled)
-                                    {
-                                        ofd.Dispose ();
-                                        return;
-                                    }
+                                   if (ofd.Canceled)
+                                   {
+                                       ofd.Dispose ();
 
-                                    string path = ofd.FilePaths [0];
+                                       return;
+                                   }
 
-                                    ofd.Dispose ();
+                                   string path = ofd.FilePaths [0];
 
-                                    if (string.IsNullOrWhiteSpace (path))
-                                    {
-                                        return;
-                                    }
+                                   ofd.Dispose ();
 
-                                    if (!File.Exists (path))
-                                    {
-                                        return;
-                                    }
+                                   if (string.IsNullOrWhiteSpace (path))
+                                   {
+                                       return;
+                                   }
 
-                                    Image<Rgba32> img;
+                                   if (!File.Exists (path))
+                                   {
+                                       return;
+                                   }
 
-                                    try
-                                    {
-                                        img = Image.Load<Rgba32> (File.ReadAllBytes (path));
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        MessageBox.ErrorQuery ("Could not open file", ex.Message, "Ok");
+                                   Image<Rgba32> img;
 
-                                        return;
-                                    }
+                                   try
+                                   {
+                                       img = Image.Load<Rgba32> (File.ReadAllBytes (path));
+                                   }
+                                   catch (Exception ex)
+                                   {
+                                       MessageBox.ErrorQuery ("Could not open file", ex.Message, "Ok");
 
-                                    imageView.SetImage (img);
-                                    Application.Refresh ();
-                                };
+                                       return;
+                                   }
+
+                                   imageView.SetImage (img);
+                                   Application.Refresh ();
+                               };
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     private class ImageView : View

@@ -317,7 +317,7 @@ public class DynamicStatusBar : Scenario
         {
             DataContext = new DynamicStatusItemModel ();
 
-            Title = $"{Application.QuitKey} to Quit";
+            Title = $"{Application.QuitKey} to Quit - Scenario: Dynamic StatusBar";
 
             var _frmStatusBar = new FrameView
             {

@@ -41,9 +41,11 @@ public class Localization : Scenario
         Application.Refresh ();
     }
 
-    public override void Setup ()
+    public override void Main ()
     {
-        base.Setup ();
+        Application.Init ();
+        var top = new Toplevel ();
+        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
         _cultureInfoSource = Application.SupportedCultures.Append (CultureInfo.InvariantCulture).ToArray ();
 
         _cultureInfoNameSource = Application.SupportedCultures.Select (c => $"{c.NativeName} ({c.Name})")
@@ -93,7 +95,7 @@ public class Localization : Scenario
                     )
             ]
         };
-        Top.Add (menu);
+        top.Add (menu);
 
         var selectLanguageLabel = new Label
         {
@@ -103,7 +105,7 @@ public class Localization : Scenario
             Width = Dim.Fill (2),
             Text = "Please select a language."
         };
-        Win.Add (selectLanguageLabel);
+        win.Add (selectLanguageLabel);
 
         _languageComboBox = new()
         {
@@ -117,7 +119,7 @@ public class Localization : Scenario
         };
         _languageComboBox.SetSource<string> (new (_cultureInfoNameSource));
         _languageComboBox.SelectedItemChanged += LanguageComboBox_SelectChanged;
-        Win.Add (_languageComboBox);
+        win.Add (_languageComboBox);
 
         var textAndFileDialogLabel = new Label
         {
@@ -129,13 +131,13 @@ public class Localization : Scenario
             Text =
                 "Right click on the text field to open a context menu, click the button to open a file dialog.\r\nOpen mode will loop through 'File', 'Directory' and 'Mixed' as 'Open' or 'Save' button clicked."
         };
-        Win.Add (textAndFileDialogLabel);
+        win.Add (textAndFileDialogLabel);
 
         var textField = new TextView
         {
             X = 2, Y = Pos.Bottom (textAndFileDialogLabel) + 1, Width = Dim.Fill (32), Height = 1
         };
-        Win.Add (textField);
+        win.Add (textField);
 
         _allowAnyCheckBox = new()
         {
@@ -144,21 +146,21 @@ public class Localization : Scenario
             State = CheckState.UnChecked,
             Text = "Allow any"
         };
-        Win.Add (_allowAnyCheckBox);
+        win.Add (_allowAnyCheckBox);
 
         var openDialogButton = new Button
         {
             X = Pos.Right (_allowAnyCheckBox) + 1, Y = Pos.Bottom (textAndFileDialogLabel) + 1, Text = "Open"
         };
         openDialogButton.Accept += (sender, e) => ShowFileDialog (false);
-        Win.Add (openDialogButton);
+        win.Add (openDialogButton);
 
         var saveDialogButton = new Button
         {
             X = Pos.Right (openDialogButton) + 1, Y = Pos.Bottom (textAndFileDialogLabel) + 1, Text = "Save"
         };
         saveDialogButton.Accept += (sender, e) => ShowFileDialog (true);
-        Win.Add (saveDialogButton);
+        win.Add (saveDialogButton);
 
         var wizardLabel = new Label
         {
@@ -168,13 +170,18 @@ public class Localization : Scenario
             Width = Dim.Fill (2),
             Text = "Click the button to open a wizard."
         };
-        Win.Add (wizardLabel);
+        win.Add (wizardLabel);
 
         var wizardButton = new Button { X = 2, Y = Pos.Bottom (wizardLabel) + 1, Text = "Open _wizard" };
         wizardButton.Accept += (sender, e) => ShowWizard ();
-        Win.Add (wizardButton);
+        win.Add (wizardButton);
 
-        Win.Unloaded += (sender, e) => Quit ();
+        win.Unloaded += (sender, e) => Quit ();
+        top.Add (win);
+
+        Application.Run (top);
+        top.Dispose ();
+        Application.Shutdown ();
     }
 
     public void ShowFileDialog (bool isSaveFile)

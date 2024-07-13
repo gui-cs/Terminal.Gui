@@ -12,8 +12,9 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("ComboBox")]
 public class ListsAndCombos : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
         //TODO: Duplicated code in Demo.cs Consider moving to shared assembly
         ObservableCollection<string> items = [];
 
@@ -31,6 +32,7 @@ public class ListsAndCombos : Scenario
             }
         }
 
+        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
         // ListView
         var lbListView = new Label
         {
@@ -50,7 +52,7 @@ public class ListsAndCombos : Scenario
             Source = new ListWrapper<string> (items)
         };
         listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem];
-        Win.Add (lbListView, listview);
+        win.Add (lbListView, listview);
 
         var scrollBar = new ScrollBarView (listview, true);
 
@@ -107,7 +109,7 @@ public class ListsAndCombos : Scenario
         comboBox.SetSource (items);
 
         comboBox.SelectedItemChanged += (s, text) => lbComboBox.Text = text.Value.ToString ();
-        Win.Add (lbComboBox, comboBox);
+        win.Add (lbComboBox, comboBox);
 
         var scrollBarCbx = new ScrollBarView (comboBox.Subviews [1], true);
 
@@ -153,6 +155,10 @@ public class ListsAndCombos : Scenario
         };
         btnMoveDown.Accept += (s, e) => { listview.MoveDown (); };
 
-        Win.Add (btnMoveUp, btnMoveDown);
+        win.Add (btnMoveUp, btnMoveDown);
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 }

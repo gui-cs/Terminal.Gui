@@ -10,9 +10,14 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class InvertColors : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        Application.Init ();
+        var win = new Window
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            ColorScheme = Colors.ColorSchemes ["TopLevel"]
+        };
 
         List<Label> labels = new ();
         ColorName [] foreColors = Enum.GetValues (typeof (ColorName)).Cast<ColorName> ().ToArray ();
@@ -25,7 +30,7 @@ public class InvertColors : Scenario
 
             var label = new Label { ColorScheme = new ColorScheme (), Y = y, Text = $"{fore} on {back}" };
             label.ColorScheme = new ColorScheme (label.ColorScheme) { Normal = color };
-            Win.Add (label);
+            win.Add (label);
             labels.Add (label);
         }
 
@@ -43,6 +48,10 @@ public class InvertColors : Scenario
                                   label.SetNeedsDisplay ();
                               }
                           };
-        Win.Add (button);
+        win.Add (button);
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 }

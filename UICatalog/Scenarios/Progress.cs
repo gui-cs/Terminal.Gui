@@ -15,13 +15,16 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Progress")]
 public class Progress : Scenario
 {
+    private Window win;
     private uint _mainLooopTimeoutTick = 100; // ms
     private object _mainLoopTimeout;
     private Timer _systemTimer;
     private uint _systemTimerTick = 100; // ms
 
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+        win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
         // Demo #1 - Use System.Timer (and threading)
         var systemTimerDemo = new ProgressDemo
         {
@@ -78,7 +81,7 @@ public class Progress : Scenario
                                                      Debug.WriteLine ("bad entry");
                                                  }
                                              };
-        Win.Add (systemTimerDemo);
+        win.Add (systemTimerDemo);
 
         // Demo #2 - Use Application.AddTimeout (no threads)
         var mainLoopTimeoutDemo = new ProgressDemo
@@ -135,7 +138,7 @@ public class Progress : Scenario
                                                          }
                                                      }
                                                  };
-        Win.Add (mainLoopTimeoutDemo);
+        win.Add (mainLoopTimeoutDemo);
 
         var startBoth = new Button { X = Pos.Center (), Y = Pos.Bottom (mainLoopTimeoutDemo) + 1, Text = "Start Both" };
 
@@ -144,12 +147,16 @@ public class Progress : Scenario
                                  systemTimerDemo.Start ();
                                  mainLoopTimeoutDemo.Start ();
                              };
-        Win.Add (startBoth);
+        win.Add (startBoth);
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     protected override void Dispose (bool disposing)
     {
-        foreach (ProgressDemo v in Win.Subviews.OfType<ProgressDemo> ())
+        foreach (ProgressDemo v in win.Subviews.OfType<ProgressDemo> ())
         {
             v?.StopBtnClick ();
         }

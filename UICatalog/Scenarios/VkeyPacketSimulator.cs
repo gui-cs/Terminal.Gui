@@ -16,13 +16,16 @@ public class VkeyPacketSimulator : Scenario
     private bool _outputStarted;
     private bool _wasUnknown;
 
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+
         var label = new Label { X = Pos.Center (), Text = "Input" };
-        Win.Add (label);
+        win.Add (label);
 
         var btnInput = new Button { X = Pos.AnchorEnd (16), Text = "Select Input" };
-        Win.Add (btnInput);
+        win.Add (btnInput);
 
         const string ruler = "|123456789";
 
@@ -30,17 +33,18 @@ public class VkeyPacketSimulator : Scenario
         {
             Y = Pos.Bottom (btnInput), Width = Dim.Fill (), ColorScheme = Colors.ColorSchemes ["Error"]
         };
-        Win.Add (inputHorizontalRuler);
+        win.Add (inputHorizontalRuler);
 
         var inputVerticalRuler = new Label
         {
             Y = Pos.Bottom (btnInput),
 
             Width = 1,
+            Height = Dim.Percent (50),
             ColorScheme = Colors.ColorSchemes ["Error"],
             TextDirection = TextDirection.TopBottom_LeftRight
         };
-        Win.Add (inputVerticalRuler);
+        win.Add (inputVerticalRuler);
 
         var tvInput = new TextView
         {
@@ -50,13 +54,13 @@ public class VkeyPacketSimulator : Scenario
             Width = Dim.Fill (),
             Height = Dim.Percent (50) - 1
         };
-        Win.Add (tvInput);
+        win.Add (tvInput);
 
         label = new() { X = Pos.Center (), Y = Pos.Bottom (tvInput), Text = "Output" };
-        Win.Add (label);
+        win.Add (label);
 
         var btnOutput = new Button { X = Pos.AnchorEnd (17), Y = Pos.Top (label), Text = "Select Output" };
-        Win.Add (btnOutput);
+        win.Add (btnOutput);
 
         var outputHorizontalRuler = new Label
         {
@@ -65,18 +69,18 @@ public class VkeyPacketSimulator : Scenario
             Width = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Error"]
         };
-        Win.Add (outputHorizontalRuler);
+        win.Add (outputHorizontalRuler);
 
         var outputVerticalRuler = new Label
         {
-            Y = Pos.Bottom (btnOutput),
+            Y = Pos.Bottom(btnOutput),
 
             Width = 1,
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["Error"],
             TextDirection = TextDirection.TopBottom_LeftRight
         };
-        Win.Add (outputVerticalRuler);
+        win.Add (outputVerticalRuler);
 
         var tvOutput = new TextView
         {
@@ -128,7 +132,7 @@ public class VkeyPacketSimulator : Scenario
                                 _stopOutput.Set ();
                             };
 
-        Win.Add (tvOutput);
+        win.Add (tvOutput);
 
         tvInput.KeyDown += (s, e) =>
                            {
@@ -283,6 +287,10 @@ public class VkeyPacketSimulator : Scenario
                      ..outputVerticalRuler.Viewport.Height];
         }
 
-        Win.LayoutComplete += Win_LayoutComplete;
+        win.LayoutComplete += Win_LayoutComplete;
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 }

@@ -9,18 +9,20 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("ComboBox")]
 public class ComboBoxIteration : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
         ObservableCollection<string> items = ["one", "two", "three"];
 
+        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
         var lbListView = new Label { Width = 10, Height = 1 };
-        Win.Add (lbListView);
+        win.Add (lbListView);
 
         var listview = new ListView
         {
             Y = Pos.Bottom (lbListView) + 1, Width = 10, Height = Dim.Fill (2), Source = new ListWrapper<string> (items)
         };
-        Win.Add (listview);
+        win.Add (listview);
 
         var lbComboBox = new Label
         {
@@ -53,8 +55,8 @@ public class ComboBoxIteration : Scenario
                                                 listview.SelectedItem = text.Item;
                                             }
                                         };
-        Win.Add (lbComboBox, comboBox);
-        Win.Add (new TextField { X = Pos.Right (listview) + 1, Y = Pos.Top (comboBox) + 3, Height = 1, Width = 20 });
+        win.Add (lbComboBox, comboBox);
+        win.Add (new TextField { X = Pos.Right (listview) + 1, Y = Pos.Top (comboBox) + 3, Height = 1, Width = 20 });
 
         var btnTwo = new Button { X = Pos.Right (comboBox) + 1, Text = "Two" };
 
@@ -65,7 +67,7 @@ public class ComboBoxIteration : Scenario
                               listview.SetSource (items);
                               listview.SelectedItem = 0;
                           };
-        Win.Add (btnTwo);
+        win.Add (btnTwo);
 
         var btnThree = new Button { X = Pos.Right (comboBox) + 1, Y = Pos.Top (comboBox), Text = "Three" };
 
@@ -76,6 +78,10 @@ public class ComboBoxIteration : Scenario
                                 listview.SetSource (items);
                                 listview.SelectedItem = 0;
                             };
-        Win.Add (btnThree);
+        win.Add (btnThree);
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 }

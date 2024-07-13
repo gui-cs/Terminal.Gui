@@ -53,17 +53,16 @@ public class ListColumns : Scenario
         Application.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        Toplevel appWindow = new ()
+        Toplevel top = new ();
+        Window appWindow = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
         };
 
         _listColView = new ()
         {
-            X = 0,
-            Y = 1,
             Width = Dim.Fill (),
-            Height = Dim.Fill (1),
+            Height = Dim.Fill (),
             Style = new ()
             {
                 ShowHeaders = false,
@@ -212,7 +211,7 @@ public class ListColumns : Scenario
             ]
         };
 
-        appWindow.Add (menu);
+        top.Add (menu);
 
         var statusBar = new StatusBar (
                                        new Shortcut []
@@ -223,7 +222,7 @@ public class ListColumns : Scenario
                                            new (Application.QuitKey, "Quit", Quit)
                                        }
                                       );
-        appWindow.Add (statusBar);
+        top.Add (statusBar);
 
         appWindow.Add (_listColView);
 
@@ -257,9 +256,11 @@ public class ListColumns : Scenario
 
         _listColView.KeyBindings.Add (Key.Space, Command.Accept);
 
+        top.Add (appWindow);
+
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
+        Application.Run (top);
+        top.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
