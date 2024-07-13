@@ -136,70 +136,7 @@ public class Scenario : IDisposable
     /// </remarks>
     public virtual void Main ()
     {
-        Init ();
-        Setup ();
-        Run ();
     }
-
-    /// <summary>
-    ///     Helper that calls <see cref="Application.Init"/> and creates the default <see cref="Terminal.Gui.Window"/>
-    ///     implementation with a frame and label
-    ///     showing the name of the <see cref="Scenario"/> and logic to exit back to the Scenario picker UI. Override
-    ///     <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The base implementation calls <see cref="Application.Init"/> and creates a <see cref="Window"/> for
-    ///         <see cref="Win"/> and adds it to <see cref="Application.Top"/>.
-    ///     </para>
-    ///     <para>
-    ///         Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Init"/> before
-    ///         creating any views or calling other Terminal.Gui APIs.
-    ///     </para>
-    /// </remarks>
-    [ObsoleteAttribute ("This method is obsolete and will be removed in v2. Use Main instead.", false)]
-    public virtual void Init ()
-    {
-        Application.Init ();
-
-        ConfigurationManager.Themes.Theme = Theme;
-        ConfigurationManager.Apply ();
-
-        Top = new ();
-
-        Win = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes [TopLevelColorScheme]
-        };
-        Top.Add (Win);
-    }
-
-    /// <summary>
-    ///     Runs the <see cref="Scenario"/>. Override to start the <see cref="Scenario"/> using a <see cref="Toplevel"/>
-    ///     different than `Top`.
-    /// </summary>
-    /// <remarks>
-    ///     Overrides that do not call the base.<see cref="Run"/>, must call <see cref="Application.Shutdown"/> before
-    ///     returning.
-    /// </remarks>
-    [ObsoleteAttribute ("This method is obsolete and will be removed in v2. Use Main instead.", false)]
-    public virtual void Run ()
-    {
-        // Must explicitly call Application.Shutdown method to shutdown.
-        Application.Run (Top);
-        Top.Dispose ();
-        Application.Shutdown ();
-    }
-
-    /// <summary>Override this to implement the <see cref="Scenario"/> setup logic (create controls, etc...).</summary>
-    /// <remarks>This is typically the best place to put scenario logic code.</remarks>
-    [ObsoleteAttribute ("This method is obsolete and will be removed in v2. Use Main instead.", false)]
-    public virtual void Setup () { }
 
     /// <summary>
     ///     The Toplevel for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/>.
