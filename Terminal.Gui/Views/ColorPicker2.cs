@@ -510,7 +510,6 @@ public abstract class ColorBar : View, IColorBar
 
         DrawBar (xOffset, 0, BarWidth);
     }
-
     private void DrawBar (int xOffset, int yOffset, int width)
     {
         // Each 1 unit of X in the bar corresponds to this much of Value
@@ -522,12 +521,21 @@ public abstract class ColorBar : View, IColorBar
             Color color = GetColor (fraction);
 
             // Adjusted isSelectedCell calculation
-            bool isSelectedCell = Value > (x-1) * _cellValue && Value <= x * _cellValue;
+            bool isSelectedCell = Value > (x - 1) * _cellValue && Value <= x * _cellValue;
+
+            // Check the brightness of the background color
+            double brightness = (0.299 * color.R + 0.587 * color.G + 0.114 * color.B) / 255;
+
+            Color triangleColor = Color.Black;
+            if (brightness < 0.15) // Threshold to determine if the color is too close to black
+            {
+                triangleColor = Color.DarkGray;
+            }
 
             if (isSelectedCell)
             {
                 // Draw the triangle at the closest position
-                Application.Driver.SetAttribute (new Attribute (Color.Black, color));
+                Application.Driver.SetAttribute (new Attribute (triangleColor, color));
                 AddRune (x + xOffset, yOffset, new Rune ('▲'));
             }
             else
@@ -537,6 +545,7 @@ public abstract class ColorBar : View, IColorBar
             }
         }
     }
+
 
 
     protected abstract Color GetColor (double fraction);
