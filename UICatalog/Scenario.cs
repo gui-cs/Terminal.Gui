@@ -138,24 +138,9 @@ public class Scenario : IDisposable
     {
     }
 
-    /// <summary>
-    ///     The Toplevel for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/>.
-    /// </summary>
-
-    //[ObsoleteAttribute ("This property is obsolete and will be removed in v2. Use Main instead.", false)]
-    public Toplevel Top { get; set; }
-
     /// <summary>Gets the Scenario Name + Description with the Description padded based on the longest known Scenario name.</summary>
     /// <returns></returns>
     public override string ToString () { return $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}"; }
-
-    /// <summary>
-    ///     The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in
-    ///     most cases.
-    /// </summary>
-
-    //[ObsoleteAttribute ("This property is obsolete and will be removed in v2. Use Main instead.", false)]
-    public Window Win { get; set; }
 
     #region IDispose
 
@@ -172,8 +157,6 @@ public class Scenario : IDisposable
         {
             if (disposing)
             {
-                Top?.Dispose ();
-                Win?.Dispose ();
             }
 
             _disposedValue = true;
