@@ -8,7 +8,7 @@ public class ColorPicker2Tests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void CellEventsBackgroundFill ()
+    public void ColorPicker_DefaultBootDraw ()
     {
         var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color(0,0,0) };
 
@@ -25,6 +25,75 @@ S:▲█████████████
 V:▲█████████████
 Hex:#000000  ■
 ";
+
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+        top.Dispose ();
+    }
+
+    public static IEnumerable<object []> ColorPickerTestData ()
+    {
+        yield return new object []
+        {
+            new Color(255, 0, 0),
+            @"
+R:█████████████▲
+G:▲█████████████
+B:▲█████████████
+Hex:#FF0000  ■
+"
+        };
+        yield return new object []
+        {
+            new Color(0, 255, 0),
+            @"
+R:▲█████████████
+G:█████████████▲
+B:▲█████████████
+Hex:#00FF00  ■
+"
+        };
+        yield return new object []
+        {
+            new Color(0, 0, 255),
+            @"
+R:▲█████████████
+G:▲█████████████
+B:█████████████▲
+Hex:#0000FF  ■
+"
+        };
+
+
+        yield return new object []
+        {
+            new Color(125, 125, 125),
+            @"
+R:███████▲██████
+G:███████▲██████
+B:███████▲██████
+Hex:#7D7D7D  ■
+"
+        };
+    }
+
+    [Theory]
+    [AutoInitShutdown]
+    [MemberData (nameof (ColorPickerTestData))]
+    public void ColorPicker_RGB_NoText (Color c, string expected)
+    {
+        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = c };
+
+        cp.Style.ShowTextFields = false;
+        cp.Style.ColorModel = ColorModel.RGB;
+        cp.ApplyStyleChanges ();
+
+        var top = new Toplevel ();
+        top.Add (cp);
+        Application.Begin (top);
+
+        cp.Draw ();
+
 
         TestHelpers.AssertDriverContentsAre (expected, output);
 

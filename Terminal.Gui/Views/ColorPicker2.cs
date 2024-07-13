@@ -257,25 +257,29 @@ public class ColorPicker2 : View
             bar.Y = y;
             bar.Width = Dim.Fill (textFieldWidth);
 
-
-            var tfValue = new TextField ()
+            if (Style.ShowTextFields)
             {
-                X = Pos.AnchorEnd (textFieldWidth),
-                Y = y,
-                Width = textFieldWidth
-            };
+                var tfValue = new TextField ()
+                {
+                    X = Pos.AnchorEnd (textFieldWidth),
+                    Y = y,
+                    Width = textFieldWidth
+                };
+                tfValue.Leave += UpdateSingleBarValueFromTextField;
+                _textFields.Add (bar, tfValue);
+                Add (tfValue);
+            }
 
             y++;
 
             bar.ValueChanged += RebuildColor;
-            tfValue.Leave += UpdateSingleBarValueFromTextField;
 
             _bars.Add (bar);
-            _textFields.Add (bar,tfValue);
 
             Add (bar);
-            Add (tfValue);
         }
+
+        UpdateBarsFromColor (Value);
     }
 
     private void UpdateSingleBarValueFromTextField (object sender, FocusEventArgs e)
