@@ -265,6 +265,7 @@ public class ColorPicker2 : View
         SetTextFieldToValue ();
 
         UpdateBarsFromColor (Value);
+        RebuildColor (this, default (EventArgs<int>));
     }
 
     private void CreateTextField ()
@@ -319,6 +320,7 @@ public class ColorPicker2 : View
         }
 
         _bars = new List<IColorBar> ();
+        _textFields.Clear ();
 
         if (lbHex != null)
         {
@@ -356,6 +358,7 @@ public class ColorPicker2 : View
     private void UpdateBarsFromColor (Color color)
     {
         _strategy.SetBarsToColor (_bars,color, Style.ColorModel);
+        SetTextFieldToValue ();
     }
 
     private void RebuildColor (object sender, EventArgs<int> e)

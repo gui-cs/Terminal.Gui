@@ -289,5 +289,259 @@ Hex:#7D7D7D  ■
 
         top.Dispose ();
     }
+    [Fact]
+    [AutoInitShutdown]
+    public void ColorPicker_ClickingAtEndOfBar_SetsMaxValue ()
+    {
+        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        cp.Style.ColorModel = ColorModel.RGB;
+        cp.Style.ShowTextFields = false;
+        cp.ApplyStyleChanges ();
+
+        var top = new Toplevel ();
+        top.Add (cp);
+        Application.Begin (top);
+
+        cp.Draw ();
+
+        // Click at the end of the Red bar
+        cp.Focused.OnMouseEvent (new MouseEvent ()
+        {
+            Flags = MouseFlags.Button1Pressed,
+            Position = new Point (19, 0) // Assuming 0-based indexing
+        });
+
+        cp.Draw ();
+
+        var expected =
+            @"
+R:█████████████████▲
+G:▲█████████████████
+B:▲█████████████████
+Hex:#FF0000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void ColorPicker_ClickingBeyondBar_DoesNotChangeValue ()
+    {
+        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        cp.Style.ColorModel = ColorModel.RGB;
+        cp.Style.ShowTextFields = false;
+        cp.ApplyStyleChanges ();
+
+        var top = new Toplevel ();
+        top.Add (cp);
+        Application.Begin (top);
+
+        cp.Draw ();
+
+        // Click beyond the bar
+        cp.Focused.OnMouseEvent (new MouseEvent ()
+        {
+            Flags = MouseFlags.Button1Pressed,
+            Position = new Point (21, 0) // Beyond the bar
+        });
+
+        cp.Draw ();
+
+        var expected =
+            @"
+R:▲█████████████████
+G:▲█████████████████
+B:▲█████████████████
+Hex:#000000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void ColorPicker_ChangeValueOnUI_UpdatesAllUIElements ()
+    {
+        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        cp.Style.ColorModel = ColorModel.RGB;
+        cp.Style.ShowTextFields = true;
+        cp.ApplyStyleChanges ();
+
+        var top = new Toplevel ();
+        top.Add (cp);
+        Application.Begin (top);
+
+        cp.Draw ();
+
+        // Change value using text field
+        var rBarTextField = cp.Subviews.OfType<TextField> ().First ();
+
+        rBarTextField.Text = "128";
+        rBarTextField.OnLeave (cp);
+
+        cp.Draw ();
+
+        var expected =
+            @"
+R:███████▲██████128
+G:▲█████████████0
+B:▲█████████████0
+Hex:#800000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void ColorPicker_InvalidHexInput_DoesNotChangeColor ()
+    {
+        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        cp.Style.ColorModel = ColorModel.RGB;
+        cp.Style.ShowTextFields = true;
+        cp.ApplyStyleChanges ();
+
+        var top = new Toplevel ();
+        top.Add (cp);
+        Application.Begin (top);
+
+        cp.Draw ();
+
+        // Enter invalid hex value
+        var hexField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "#000000");
+        hexField.Text = "#ZZZZZZ";
+        hexField.OnLeave (cp);
+
+        cp.Draw ();
+
+        var expected =
+            @"
+R:▲█████████████0
+G:▲█████████████0
+B:▲█████████████0
+Hex:#000000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void ColorPicker_ClickingDifferentBars_ChangesFocus ()
+    {
+        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        cp.Style.ColorModel = ColorModel.RGB;
+        cp.Style.ShowTextFields = false;
+        cp.ApplyStyleChanges ();
+
+        var top = new Toplevel ();
+        top.Add (cp);
+        Application.Begin (top);
+
+        cp.Draw ();
+
+        // Click on Green bar
+        cp.Focused.OnMouseEvent (new MouseEvent ()
+        {
+            Flags = MouseFlags.Button1Pressed,
+            Position = new Point (0, 1)
+        });
+
+        cp.Draw ();
+
+        Assert.IsAssignableFrom<GBar> (cp.Focused);
+
+        // Click on Blue bar
+        cp.Focused.OnMouseEvent (new MouseEvent ()
+        {
+            Flags = MouseFlags.Button1Pressed,
+            Position = new Point (0, 2)
+        });
+
+        cp.Draw ();
+
+        Assert.IsAssignableFrom<BBar> (cp.Focused);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void ColorPicker_SwitchingColorModels_ResetsBars ()
+    {
+        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (255, 0, 0) };
+        cp.Style.ColorModel = ColorModel.RGB;
+        cp.Style.ShowTextFields = false;
+        cp.ApplyStyleChanges ();
+
+        var top = new Toplevel ();
+        top.Add (cp);
+        Application.Begin (top);
+
+        cp.Draw ();
+
+        var expectedRGB =
+            @"
+R:█████████████████▲
+G:▲█████████████████
+B:▲█████████████████
+Hex:#FF0000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expectedRGB, output);
+
+        // Switch to HSV
+        cp.Style.ColorModel = ColorModel.HSV;
+        cp.ApplyStyleChanges ();
+        cp.Draw ();
+
+        var expectedHSV =
+            @"
+H:█████████████████▲
+S:█████████████████▲
+V:█████████████████▲
+Hex:#FF0000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expectedHSV, output);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void ColorPicker_SyncBetweenTextFieldAndBars ()
+    {
+        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        cp.Style.ColorModel = ColorModel.RGB;
+        cp.Style.ShowTextFields = true;
+        cp.ApplyStyleChanges ();
+
+        var top = new Toplevel ();
+        top.Add (cp);
+        Application.Begin (top);
+
+        cp.Draw ();
+
+        // Change value using the bar
+        var rBar = cp.Subviews.OfType<RBar> ().First ();
+        rBar.Value = 128;
+
+        cp.Draw ();
+
+        var expected =
+            @"
+R:███████▲██████128
+G:▲█████████████0
+B:▲█████████████0
+Hex:#800000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+        top.Dispose ();
+    }
 }
 
