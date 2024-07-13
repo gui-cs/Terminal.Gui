@@ -204,6 +204,12 @@ public class ColorPicker2 : View
     public ColorPickerStyle Style { get; set; } = new ColorPickerStyle();
 
     /// <summary>
+    /// Fired when color is changed.
+    /// </summary>
+    public event EventHandler<ColorEventArgs> ColorChanged;
+
+    private bool updating = false;
+    /// <summary>
     /// The color selected in the picker
     /// </summary>
     public Color Value
@@ -211,15 +217,31 @@ public class ColorPicker2 : View
         get => _value;
         set
         {
-            // External changes made by API caller
-            if (_value != value)
+            try
             {
-                _value = value;
-                SetTextFieldToValue ();
-                UpdateBarsFromColor (value);
+                updating = true;
+
+                if (_value != value)
+                {
+                    var old = _value;
+                    _value = value;
+                    SetTextFieldToValue ();
+                    UpdateBarsFromColor (value);
+
+                    ColorChanged?.Invoke (this, new ColorEventArgs ()
+                    {
+                        Color = value,
+                        PreviousColor = old
+                    });
+                }
+            }
+            finally
+            {
+                updating = false;
             }
         }
     }
+
 
 
     public ColorPicker2 ()
@@ -229,6 +251,7 @@ public class ColorPicker2 : View
 
     public void ApplyStyleChanges ()
     {
+        var oldValue = _value;
         DisposeOldViews ();
 
         int y = 0;
@@ -266,6 +289,7 @@ public class ColorPicker2 : View
 
         UpdateBarsFromColor (Value);
         RebuildColor (this, default (EventArgs<int>));
+        Value = oldValue;
     }
 
     private void CreateTextField ()
@@ -373,7 +397,11 @@ public class ColorPicker2 : View
             kvp.Value.Text = kvp.Key.Value.ToString ();
         }
 
-        _value = _strategy.GetColorFromBars (_bars, Style.ColorModel);
+        if (!updating)
+        {
+            Value = _strategy.GetColorFromBars (_bars, Style.ColorModel);
+        }
+
         SetTextFieldToValue ();
     }
 

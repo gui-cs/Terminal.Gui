@@ -11,7 +11,7 @@ public class ColorPicker2Tests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void ColorPicker_DefaultBootDraw ()
     {
-        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color(0,0,0) };
+        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
 
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -34,6 +34,7 @@ Hex:#000000  ■
 
         top.Dispose ();
     }
+
     [Fact]
     [AutoInitShutdown]
     public void ColorPicker_RGB_KeyboardNavigation ()
@@ -58,12 +59,12 @@ Hex:#000000  ■
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
 
-        Assert.IsAssignableFrom <IColorBar>(cp.Focused);
+        Assert.IsAssignableFrom<IColorBar> (cp.Focused);
         cp.NewKeyDownEvent (Key.CursorRight);
 
         cp.Draw ();
 
-         expected =
+        expected =
             @"
 R:█▲████████████████
 G:▲█████████████████
@@ -115,11 +116,12 @@ Hex:#000000  ■
 
         Assert.IsAssignableFrom<IColorBar> (cp.Focused);
 
-        cp.Focused.OnMouseEvent (new MouseEvent ()
-        {
-            Flags = MouseFlags.Button1Pressed,
-            Position = new Point (3,0)
-        });
+        cp.Focused.OnMouseEvent (
+                                 new MouseEvent ()
+                                 {
+                                     Flags = MouseFlags.Button1Pressed,
+                                     Position = new Point (3, 0)
+                                 });
 
         cp.Draw ();
 
@@ -133,11 +135,12 @@ Hex:#0F0000  ■
         TestHelpers.AssertDriverContentsAre (expected, output);
 
 
-        cp.Focused.NewMouseEvent (new MouseEvent ()
-        {
-            Flags = MouseFlags.Button1Pressed,
-            Position = new Point (4, 0)
-        });
+        cp.Focused.NewMouseEvent (
+                                  new MouseEvent ()
+                                  {
+                                      Flags = MouseFlags.Button1Pressed,
+                                      Position = new Point (4, 0)
+                                  });
 
         cp.Draw ();
 
@@ -152,11 +155,12 @@ Hex:#1E0000  ■
 
         top.Dispose ();
     }
+
     public static IEnumerable<object []> ColorPickerTestData ()
     {
         yield return new object []
         {
-            new Color(255, 0, 0),
+            new Color (255, 0, 0),
             @"
 R:█████████████████▲
 G:▲█████████████████
@@ -164,9 +168,10 @@ B:▲█████████████████
 Hex:#FF0000  ■
 "
         };
+
         yield return new object []
         {
-            new Color(0, 255, 0),
+            new Color (0, 255, 0),
             @"
 R:▲█████████████████
 G:█████████████████▲
@@ -174,9 +179,10 @@ B:▲█████████████████
 Hex:#00FF00  ■
 "
         };
+
         yield return new object []
         {
-            new Color(0, 0, 255),
+            new Color (0, 0, 255),
             @"
 R:▲█████████████████
 G:▲█████████████████
@@ -188,7 +194,7 @@ Hex:#0000FF  ■
 
         yield return new object []
         {
-            new Color(125, 125, 125),
+            new Color (125, 125, 125),
             @"
 R:█████████▲████████
 G:█████████▲████████
@@ -221,11 +227,11 @@ Hex:#7D7D7D  ■
         top.Dispose ();
     }
 
-    public static IEnumerable<object []> ColorPickerTestData_WithTextFields()
+    public static IEnumerable<object []> ColorPickerTestData_WithTextFields ()
     {
         yield return new object []
         {
-            new Color(255, 0, 0),
+            new Color (255, 0, 0),
             @"
 R:█████████████▲255 
 G:▲█████████████0
@@ -233,9 +239,10 @@ B:▲█████████████0
 Hex:#FF0000  ■
 "
         };
+
         yield return new object []
         {
-            new Color(0, 255, 0),
+            new Color (0, 255, 0),
             @"
 R:▲█████████████0
 G:█████████████▲255
@@ -243,9 +250,10 @@ B:▲█████████████0
 Hex:#00FF00  ■
 "
         };
+
         yield return new object []
         {
-            new Color(0, 0, 255),
+            new Color (0, 0, 255),
             @"
 R:▲█████████████0
 G:▲█████████████0
@@ -257,7 +265,7 @@ Hex:#0000FF  ■
 
         yield return new object []
         {
-            new Color(125, 125, 125),
+            new Color (125, 125, 125),
             @"
 R:███████▲██████125
 G:███████▲██████125
@@ -289,6 +297,7 @@ Hex:#7D7D7D  ■
 
         top.Dispose ();
     }
+
     [Fact]
     [AutoInitShutdown]
     public void ColorPicker_ClickingAtEndOfBar_SetsMaxValue ()
@@ -305,11 +314,12 @@ Hex:#7D7D7D  ■
         cp.Draw ();
 
         // Click at the end of the Red bar
-        cp.Focused.OnMouseEvent (new MouseEvent ()
-        {
-            Flags = MouseFlags.Button1Pressed,
-            Position = new Point (19, 0) // Assuming 0-based indexing
-        });
+        cp.Focused.OnMouseEvent (
+                                 new MouseEvent ()
+                                 {
+                                     Flags = MouseFlags.Button1Pressed,
+                                     Position = new Point (19, 0) // Assuming 0-based indexing
+                                 });
 
         cp.Draw ();
 
@@ -341,11 +351,12 @@ Hex:#FF0000  ■
         cp.Draw ();
 
         // Click beyond the bar
-        cp.Focused.OnMouseEvent (new MouseEvent ()
-        {
-            Flags = MouseFlags.Button1Pressed,
-            Position = new Point (21, 0) // Beyond the bar
-        });
+        cp.Focused.OnMouseEvent (
+                                 new MouseEvent ()
+                                 {
+                                     Flags = MouseFlags.Button1Pressed,
+                                     Position = new Point (21, 0) // Beyond the bar
+                                 });
 
         cp.Draw ();
 
@@ -446,22 +457,28 @@ Hex:#000000  ■
         cp.Draw ();
 
         // Click on Green bar
-        cp.Subviews.OfType<GBar> ().Single().OnMouseEvent (new MouseEvent ()
-        {
-            Flags = MouseFlags.Button1Pressed,
-            Position = new Point (0, 1)
-        });
+        cp.Subviews.OfType<GBar> ()
+          .Single ()
+          .OnMouseEvent (
+                         new MouseEvent ()
+                         {
+                             Flags = MouseFlags.Button1Pressed,
+                             Position = new Point (0, 1)
+                         });
 
         cp.Draw ();
 
         Assert.IsAssignableFrom<GBar> (cp.Focused);
 
         // Click on Blue bar
-        cp.Subviews.OfType<BBar> ().Single ().OnMouseEvent (new MouseEvent ()
-        {
-            Flags = MouseFlags.Button1Pressed,
-            Position = new Point (0, 6)
-        });
+        cp.Subviews.OfType<BBar> ()
+          .Single ()
+          .OnMouseEvent (
+                         new MouseEvent ()
+                         {
+                             Flags = MouseFlags.Button1Pressed,
+                             Position = new Point (0, 6)
+                         });
 
         cp.Draw ();
 
@@ -542,6 +559,42 @@ Hex:#800000  ■
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void ColorPicker_ChangedEvent_Fires ()
+    {
+        Color oldColor = default;
+        Color newColor = default;
+        int count = 0;
+
+        var cp = new ColorPicker2 ();
+
+        cp.ColorChanged += (s, e) =>
+                           {
+                               count++;
+                               oldColor = e.PreviousColor;
+                               newColor = e.Color;
+
+                               Assert.Equal (cp.Value, e.Color);
+                           };
+
+        cp.Value = new Color (1, 2, 3);
+        Assert.Equal (1,count);
+        Assert.Equal (new Color (1, 2, 3), newColor);
+
+        cp.Value = new Color (2, 3, 4);
+
+        Assert.Equal (2, count);
+        Assert.Equal (new Color (1, 2, 3), oldColor);
+        Assert.Equal (new Color (2, 3, 4), newColor);
+
+        // Set to same value
+        cp.Value = new Color (2, 3, 4);
+
+        // Should have no effect
+        Assert.Equal (2, count);
     }
 }
 
