@@ -59,7 +59,6 @@ Hex:#000000  ■
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         Assert.IsAssignableFrom <IColorBar>(cp.Focused);
-        cp.FocusFirst ();
         cp.NewKeyDownEvent (Key.CursorRight);
 
         cp.Draw ();
@@ -69,7 +68,21 @@ Hex:#000000  ■
 R:█▲████████████
 G:▲█████████████
 B:▲█████████████
-Hex:#AA0000  ■
+Hex:#130000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+        cp.NewKeyDownEvent (Key.CursorRight);
+
+        cp.Draw ();
+
+        expected =
+            @"
+R:██▲███████████
+G:▲█████████████
+B:▲█████████████
+Hex:#260000  ■
 ";
         TestHelpers.AssertDriverContentsAre (expected, output);
 

@@ -384,6 +384,12 @@ public abstract class ColorBar : View, IColorBar
     /// </summary>
     private int _value;
 
+    /// <summary>
+    /// The amount of <see cref="Value"/> represented by each cell width on the bar
+    /// Can be less than 1 e.g. if Saturation (0-100) and width > 100
+    /// </summary>
+    private double _cellValue = 1d;
+
     protected abstract int MaxValue { get; }
     public int Value
     {
@@ -441,7 +447,15 @@ public abstract class ColorBar : View, IColorBar
 
     protected bool? Adjust (int delta)
     {
-        Value += delta;
+        int change = (int)(delta * _cellValue);
+
+        // Ensure that the change is at least 1 or -1 if delta is non-zero
+        if (change == 0 && delta != 0)
+        {
+            change = delta > 0 ? 1 : -1;
+        }
+
+        Value += change;
         return true;
     }
 
@@ -489,7 +503,7 @@ public abstract class ColorBar : View, IColorBar
     private void DrawBar (int xOffset, int yOffset, int width)
     {
         // Each 1 unit of X in the bar corresponds to this much of Value
-        var cellValue = (double)MaxValue / (width - 1);
+        _cellValue = (double)MaxValue / (width - 1);
 
         for (int x = 0; x < width; x++)
         {
@@ -497,7 +511,7 @@ public abstract class ColorBar : View, IColorBar
             Color color = GetColor (fraction);
 
             // Adjusted isSelectedCell calculation
-            bool isSelectedCell = Value > (x-1) * cellValue && Value <= x * cellValue;
+            bool isSelectedCell = Value > (x-1) * _cellValue && Value <= x * _cellValue;
 
             if (isSelectedCell)
             {
