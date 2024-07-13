@@ -25,10 +25,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineTrace>true</DefineTrace>
     <DebugType>portable</DebugType>
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants>$(DefineConstants);CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
     <ImplicitUsings>enable</ImplicitUsings>
     <NoLogo>true</NoLogo>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineDebug>true</DefineDebug>
@@ -50,7 +53,7 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <PackageReference Include="ColorHelper" Version="[1.8.1,2)" />
-    <PackageReference Include="JetBrains.Annotations" Version="[2024,)" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="[4.10,5)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="[4.10,5)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[4.10,5)" PrivateAssets="all" />
@@ -59,11 +62,6 @@
     <PackageReference Include="System.IO.Abstractions" Version="[21.0.22,22)" />
     <PackageReference Include="System.Text.Json" Version="[8.0.4,9)" />
     <PackageReference Include="Wcwidth" Version="[2,3)" />
-    <ProjectReference Include="..\Analyzers\Terminal.Gui.Analyzers.Internal\Terminal.Gui.Analyzers.Internal.csproj">
-      <PrivateAssets>all</PrivateAssets>
-      <OutputItemType>Analyzer</OutputItemType>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Global Usings and Type Aliases -->

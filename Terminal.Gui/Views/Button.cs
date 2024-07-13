@@ -39,7 +39,7 @@ public class Button : View, IDesignable
     /// Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
+    [JsonConverter (typeof (JsonStringEnumConverter<ShadowStyle>))]
 
     public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 

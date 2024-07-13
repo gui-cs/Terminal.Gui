@@ -3,6 +3,7 @@
 //
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.NetEvents;
@@ -452,6 +453,7 @@ internal class NetEvents : IDisposable
         HandleKeyboardEvent (newConsoleKeyInfo);
     }
 
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
     private MouseButtonState MapMouseFlags (MouseFlags mouseFlags)
     {
         MouseButtonState mbs = default;
@@ -1249,6 +1251,7 @@ internal class NetDriver : ConsoleDriver
     #region Color Handling
 
     // Cache the list of ConsoleColor values.
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
     private static readonly HashSet<int> ConsoleColorValues = new (
                                                                    Enum.GetValues (typeof (ConsoleColor))
                                                                        .OfType<ConsoleColor> ()

@@ -37,10 +37,12 @@ dotnet run
 
 ## Showcase & Examples
 
-* **[UI Catalog](https://github.com/gui-cs/Terminal.GuiV2Docs/tree/master/UICatalog)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run --project UICatalog` to run the UI Catalog.
-* **[C# Example](https://github.com/gui-cs/Terminal.GuiV2Docs/tree/master/Example)** - Run `dotnet run` in the `Example` directory to run the C# Example.
-* **[F# Example](https://github.com/gui-cs/Terminal.GuiV2Docs/tree/master/FSharpExample)** - An example showing how to build a Terminal.Gui app using F#.
-* **[Reactive Example](https://github.com/gui-cs/Terminal.GuiV2Docs/tree/master/ReactiveExample)** - A sample app that shows how to use `System.Reactive` and `ReactiveUI` with `Terminal.Gui`. The app uses the MVVM architecture that may seem familiar to folks coming from WPF, Xamarin Forms, UWP, Avalonia, or Windows Forms. In this app, we implement the data bindings using ReactiveUI `WhenAnyValue` syntax and [Pharmacist](https://github.com/reactiveui/pharmacist) — a tool that converts all events in a NuGet package into observable wrappers.
+* **[UI Catalog](./UICatalog/README.md)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run --project UICatalog` to run the UI Catalog.
+* **[C# Example](./Example/README.md)** - Run `dotnet run` in the `Example` directory to run the C# Example.
+* **[F# Example](./FSharpExample/)** - An example showing how to build a Terminal.Gui app using F#.
+* **[Reactive Example](./ReactiveExample/README.md)** - A sample app that shows how to use `System.Reactive` and `ReactiveUI` with `Terminal.Gui`. The app uses the MVVM architecture that may seem familiar to folks coming from WPF, Xamarin Forms, UWP, Avalonia, or Windows Forms. In this app, we implement the data bindings using ReactiveUI `WhenAnyValue` syntax and [Pharmacist](https://github.com/reactiveui/pharmacist) — a tool that converts all events in a NuGet package into observable wrappers.
+* **[CommunityToolkit Example](./CommunityToolkitExample/README.md)** - A example of using the `CommunityToolkit.MVVM` framework's `ObservableObject`, `ObservableProperty`, and `IRecipient<T>` in conjunction with `Microsoft.Extensions.DependencyInjection`.
+* **[C# SelfContained](./SelfContained/README.md)** - An example showing how to publish a Terminal.Gui app using C# self-contained single file.
 * **[PowerShell's `Out-ConsoleGridView`](https://github.com/PowerShell/GraphicalTools)** - `OCGV` sends the output from a command to an interactive table. 
 * **[F7History](https://github.com/gui-cs/F7History)** - Graphical Command History for PowerShell (built on PowerShell's `Out-ConsoleGridView`).
 * **[PoshRedisViewer](https://github.com/En3Tho/PoshRedisViewer)** - A compact Redis viewer module for PowerShell written in F#.
@@ -49,9 +51,9 @@ dotnet run
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/gui-cs/Terminal.GuiV2Docs/blob/master/CONTRIBUTING.md).
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-Debates on architecture and design can be found in Issues tagged with [design](https://github.com/gui-cs/Terminal.GuiV2Docs/issues?q=is%3Aopen+is%3Aissue+label%3Adesign).
+Debates on architecture and design can be found in Issues tagged with [design](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Av2+label%3Adesign).
 
 ## History
 
