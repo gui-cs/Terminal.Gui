@@ -1,4 +1,5 @@
-﻿using Color = Terminal.Gui.Color;
+﻿using ColorHelper;
+using Color = Terminal.Gui.Color;
 using Xunit.Abstractions;
 
 namespace UnitTests.Views;
@@ -11,6 +12,9 @@ public class ColorPicker2Tests (ITestOutputHelper output)
     public void ColorPicker_DefaultBootDraw ()
     {
         var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color(0,0,0) };
+
+        cp.Style.ShowTextFields = false;
+        cp.ApplyStyleChanges ();
 
         var top = new Toplevel ();
         top.Add (cp);
@@ -30,7 +34,47 @@ Hex:#000000  ■
 
         top.Dispose ();
     }
+    [Fact]
+    [AutoInitShutdown]
+    public void ColorPicker_KeyboardNavigation ()
+    {
+        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        cp.Style.ColorModel = ColorModel.RGB;
+        cp.Style.ShowTextFields = false;
+        cp.ApplyStyleChanges ();
 
+        var top = new Toplevel ();
+        top.Add (cp);
+        Application.Begin (top);
+
+        cp.Draw ();
+
+        var expected =
+            @"
+R:▲█████████████
+G:▲█████████████
+B:▲█████████████
+Hex:#000000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+        Assert.IsAssignableFrom <IColorBar>(cp.Focused);
+        cp.FocusFirst ();
+        cp.NewKeyDownEvent (Key.CursorRight);
+
+        cp.Draw ();
+
+         expected =
+            @"
+R:█▲████████████
+G:▲█████████████
+B:▲█████████████
+Hex:#AA0000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+        top.Dispose ();
+    }
     public static IEnumerable<object []> ColorPickerTestData ()
     {
         yield return new object []

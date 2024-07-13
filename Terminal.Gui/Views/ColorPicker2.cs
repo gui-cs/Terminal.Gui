@@ -188,7 +188,8 @@ public class ColorPickerStyle
 /// </summary>
 public class ColorPicker2 : View
 {
-    private readonly TextField tfHex;
+    private TextField tfHex;
+    private Label lbHex;
 
     private Color _value = Color.Black;
 
@@ -223,31 +224,12 @@ public class ColorPicker2 : View
 
     public ColorPicker2 ()
     {
-        var lbHex = new Label ()
-        {
-            Text = "Hex:",
-            X = 0,
-            Y = 3
-        };
-        tfHex = new TextField ()
-        {
-            Y = 3,
-            X = 4,
-            Width = 8
-        };
-
-        Add (lbHex);
-        Add (tfHex);
-
-        tfHex.Leave += (_, _) => UpdateValueFromTextField ();
-
         ApplyStyleChanges ();
-        SetTextFieldToValue ();
     }
 
     public void ApplyStyleChanges ()
     {
-        DisposeOldBars ();
+        DisposeOldViews ();
 
         int y = 0;
         const int textFieldWidth = 4;
@@ -279,7 +261,31 @@ public class ColorPicker2 : View
             Add (bar);
         }
 
+        CreateTextField ();
+        SetTextFieldToValue ();
+
         UpdateBarsFromColor (Value);
+    }
+
+    private void CreateTextField ()
+    {
+        lbHex = new Label ()
+        {
+            Text = "Hex:",
+            X = 0,
+            Y = 3
+        };
+        tfHex = new TextField ()
+        {
+            Y = 3,
+            X = 4,
+            Width = 8
+        };
+
+        Add (lbHex);
+        Add (tfHex);
+
+        tfHex.Leave += UpdateValueFromTextField;
     }
 
     private void UpdateSingleBarValueFromTextField (object sender, FocusEventArgs e)
@@ -296,7 +302,7 @@ public class ColorPicker2 : View
         }
     }
 
-    private void DisposeOldBars ()
+    private void DisposeOldViews ()
     {
         foreach (ColorBar bar in _bars.Cast<ColorBar> ())
         {
@@ -313,9 +319,24 @@ public class ColorPicker2 : View
         }
 
         _bars = new List<IColorBar> ();
+
+        if (lbHex != null)
+        {
+            Remove (lbHex);
+            lbHex.Dispose ();
+            lbHex = null;
+        }
+
+        if (tfHex != null)
+        {
+            Remove (tfHex);
+            tfHex.Leave -= UpdateValueFromTextField;
+            tfHex.Dispose ();
+            tfHex = null;
+        }
     }
 
-    private void UpdateValueFromTextField ()
+    private void UpdateValueFromTextField (object sender, FocusEventArgs e)
     {
         if (Color.TryParse (tfHex.Text, out var newColor))
         {
