@@ -36,7 +36,7 @@ Hex:#000000  ■
     }
     [Fact]
     [AutoInitShutdown]
-    public void ColorPicker_KeyboardNavigation ()
+    public void ColorPicker_RGB_KeyboardNavigation ()
     {
         var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
@@ -74,6 +74,70 @@ Hex:#0F0000  ■
 
 
         cp.NewKeyDownEvent (Key.CursorRight);
+
+        cp.Draw ();
+
+        expected =
+            @"
+R:██▲███████████████
+G:▲█████████████████
+B:▲█████████████████
+Hex:#1E0000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void ColorPicker_RGB_MouseNavigation ()
+    {
+        var cp = new ColorPicker2 () { Width = 20, Height = 4, Value = new Color (0, 0, 0) };
+        cp.Style.ColorModel = ColorModel.RGB;
+        cp.Style.ShowTextFields = false;
+        cp.ApplyStyleChanges ();
+
+        var top = new Toplevel ();
+        top.Add (cp);
+        Application.Begin (top);
+
+        cp.Draw ();
+
+        var expected =
+            @"
+R:▲█████████████████
+G:▲█████████████████
+B:▲█████████████████
+Hex:#000000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+        Assert.IsAssignableFrom<IColorBar> (cp.Focused);
+
+        cp.Focused.OnMouseEvent (new MouseEvent ()
+        {
+            Flags = MouseFlags.Button1Pressed,
+            Position = new Point (3,0)
+        });
+
+        cp.Draw ();
+
+        expected =
+            @"
+R:█▲████████████████
+G:▲█████████████████
+B:▲█████████████████
+Hex:#0F0000  ■
+";
+        TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+        cp.Focused.NewMouseEvent (new MouseEvent ()
+        {
+            Flags = MouseFlags.Button1Pressed,
+            Position = new Point (4, 0)
+        });
 
         cp.Draw ();
 
