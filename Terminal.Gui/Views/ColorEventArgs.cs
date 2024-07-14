@@ -6,9 +6,9 @@ public class ColorEventArgs : EventArgs
     /// <summary>Initializes a new instance of <see cref="ColorEventArgs"/></summary>
     public ColorEventArgs () { }
 
-    /// <summary>The new Thickness.</summary>
+    /// <summary>The new Color.</summary>
     public Color Color { get; set; }
 
-    /// <summary>The previous Thickness.</summary>
+    /// <summary>The previous Color.</summary>
     public Color PreviousColor { get; set; }
 }
