@@ -23,7 +23,7 @@ public class Adornments : Scenario
             Arrangement = ViewArrangement.Movable,
             X = Pos.AnchorEnd(),
         };
-        editor.Border.Thickness = new Thickness (1, 2, 1, 1);
+        editor.Border.Thickness = new Thickness (1, 1, 1, 1);
 
         app.Add (editor);
 
@@ -99,6 +99,8 @@ public class Adornments : Scenario
 
         window.Initialized += (s, e) =>
                               {
+                                  window.BorderStyle = LineStyle.HeavyDotted;
+
                                   var labelInPadding = new Label { X = 1, Y = 0, Title = "_Text:" };
                                   window.Padding.Add (labelInPadding);
 

@@ -188,22 +188,24 @@ public class Adornment : View
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
-    public override bool OnRenderLineCanvas () { return false; }
-
-    /// <summary>
-    ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
-    ///     property throws an <see cref="InvalidOperationException"/>.
-    /// </summary>
-    public override bool SuperViewRendersLineCanvas
+    public override bool OnRenderLineCanvas ()
     {
-        get => false; 
-        set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
+        return base.OnRenderLineCanvas();
     }
+
+    ///// <summary>
+    /////     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
+    /////     property throws an <see cref="InvalidOperationException"/>.
+    ///// </summary>
+    //public override bool SuperViewRendersLineCanvas
+    //{
+    //    get => false; 
+    //    set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
+    //}
 
     #endregion View Overrides
 
     #region Mouse Support
-
 
     /// <summary>
     /// Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness.

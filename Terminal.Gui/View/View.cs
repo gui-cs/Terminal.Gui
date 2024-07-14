@@ -209,7 +209,7 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     <see cref="View"/> inheritance hierarchies to override base class layout code optimally by doing so only on first
     ///     run, instead of on every run.
     /// </para>
-    public virtual bool IsInitialized { get; set; }
+    public bool IsInitialized { get; set; }
 
     /// <summary>Signals the View that initialization is starting. See <see cref="ISupportInitialize"/>.</summary>
     /// <remarks>
@@ -236,8 +236,6 @@ public partial class View : Responder, ISupportInitializeNotification
         _oldCanFocus = CanFocus;
         _oldTabIndex = _tabIndex;
 
-        BeginInitAdornments ();
-
         if (_subviews?.Count > 0)
         {
             foreach (View view in _subviews)
@@ -248,6 +246,9 @@ public partial class View : Responder, ISupportInitializeNotification
                 }
             }
         }
+
+        BeginInitAdornments ();
+        EndInitAdornments ();
     }
 
     // TODO: Implement logic that allows EndInit to throw if BeginInit has not been called
@@ -265,8 +266,6 @@ public partial class View : Responder, ISupportInitializeNotification
         }
 
         IsInitialized = true;
-
-        EndInitAdornments ();
 
         // TODO: Move these into ViewText.cs as EndInit_Text() to consolodate.
         // TODO: Verify UpdateTextDirection really needs to be called here.

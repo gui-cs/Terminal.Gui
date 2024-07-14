@@ -44,7 +44,7 @@ public class AdornmentsEditor : View
 
     private void AdornmentsEditor_Initialized (object sender, EventArgs e)
     {
-        BorderStyle = LineStyle.Dotted;
+        //BorderStyle = LineStyle.Dotted;
 
         ExpanderButton expandButton = new ExpanderButton ()
         {

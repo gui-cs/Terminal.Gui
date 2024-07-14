@@ -49,6 +49,11 @@ public class Line : View
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
+        if (viewport.Width == 0 || viewport.Height == 0)
+        {
+            return;
+        }
+
         LineCanvas lc = LineCanvas;
 
         if (SuperViewRendersLineCanvas)
@@ -66,20 +71,21 @@ public class Line : View
 
         if (SuperViewRendersLineCanvas && Orientation == Orientation.Horizontal)
         {
-            pos.Offset (-SuperView.Border.Thickness.Left, 0);
-            length += SuperView.Border.Thickness.Horizontal;
+            pos.Offset (-SuperView.Border?.Thickness.Left ?? 0, 0);
+            length += SuperView.Border?.Thickness.Horizontal ?? 0;
         }
 
         if (SuperViewRendersLineCanvas && Orientation == Orientation.Vertical)
         {
-            pos.Offset (0, -SuperView.Border.Thickness.Top);
-            length += SuperView.Border.Thickness.Vertical;
+            pos.Offset (0, -SuperView.Border?.Thickness.Top ?? 0);
+            length += SuperView.Border?.Thickness.Vertical ?? 0;
         }
         lc.AddLine (
                     pos,
                     length,
                     Orientation,
-                    BorderStyle
+                    Border.LineStyle,
+                    GetNormalColor()
                    );
     }
 }
