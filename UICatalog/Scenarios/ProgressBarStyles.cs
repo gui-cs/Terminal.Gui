@@ -65,7 +65,7 @@ public class ProgressBarStyles : Scenario
 
         Color ChooseColor (string text, ColorName colorName)
         {
-            var colorPicker = new ColorPicker { Title = text, SelectedColor = colorName,Height = 6 };
+            var colorPicker = new ColorPicker { Title = text, SelectedColor = colorName,Height = 6, Width = 17};
 
             var dialog = new Dialog { Title = text };
 
@@ -101,7 +101,7 @@ public class ProgressBarStyles : Scenario
         {
             Text = "Foreground HotNormal Color",
             X = Pos.Center (),
-            Y = Pos.Align (Alignment.Start),
+            Y = Pos.Align (Alignment.Start)
         };
         container.Add (fgColorPickerBtn);
 

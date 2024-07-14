@@ -274,6 +274,7 @@ public class ColorPicker : View
     /// </summary>
     public ColorPicker ()
     {
+        CanFocus = true;
         Height = 4;
         Width = Dim.Fill ();
         ApplyStyleChanges ();

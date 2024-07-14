@@ -320,7 +320,7 @@ public class Shortcuts : Scenario
 
         var bgColor = new ColorPicker ()
         {
-            CanFocus = false,
+            CanFocus = false, Width = 17
         };
         bgColor.ColorChanged += (o, args) =>
                                 {

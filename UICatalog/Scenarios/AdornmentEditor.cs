@@ -14,7 +14,7 @@ public class AdornmentEditor : View
         BorderStyle = LineStyle.Single,
         SuperViewRendersLineCanvas = true,
         Enabled = false,
-        Height = 6
+        Height = 6, Width = 17
     };
 
     private readonly ColorPicker _foregroundColorPicker = new ()
@@ -23,7 +23,7 @@ public class AdornmentEditor : View
         BorderStyle = LineStyle.Single,
         SuperViewRendersLineCanvas = true,
         Enabled = false,
-        Height = 6
+        Height = 6, Width = 17
     };
 
     private Adornment _adornment;
