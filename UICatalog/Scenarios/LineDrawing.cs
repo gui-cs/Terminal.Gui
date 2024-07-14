@@ -127,6 +127,69 @@ public class LineDrawing : Scenario
         win.Dispose ();
         Application.Shutdown ();
     }
+
+    public static bool PromptForColor (string title, Color current, out Color newColor)
+    {
+        var accept = false;
+
+        var d = new Dialog
+        {
+            Title = title,
+            Height = 7
+        };
+
+        var btnOk = new Button
+        {
+            X = Pos.Center () - 5,
+            Y = 4,
+            Text = "Ok",
+            Width = Dim.Auto (),
+            IsDefault = true
+        };
+
+        btnOk.Accept += (s, e) =>
+                        {
+                            accept = true;
+                            e.Handled = true;
+                            Application.RequestStop ();
+                        };
+
+        var btnCancel = new Button
+        {
+            X = Pos.Center () + 5,
+            Y = 4,
+            Text = "Cancel",
+            Width = Dim.Auto ()
+        };
+
+        btnCancel.Accept += (s, e) =>
+                            {
+                                e.Handled = true;
+                                Application.RequestStop ();
+                            };
+
+        d.Add (btnOk);
+        d.Add (btnCancel);
+
+        /* Does not work
+        d.AddButton (btnOk);
+        d.AddButton (btnCancel);
+        */
+        var cp = new ColorPicker
+        {
+            SelectedColor = current,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1)
+        };
+
+        d.Add (cp);
+
+        Application.Run (d);
+        d.Dispose ();
+        newColor = cp.SelectedColor;
+
+        return accept;
+    }
 }
 
 public class ToolsView : Window
@@ -376,82 +439,19 @@ public class AttributeView : View
 
     private void ClickedInBackground ()
     {
-        if (PromptFor ("Background", Value.Background, out Color newColor))
+        if (LineDrawing.PromptForColor ("Background", Value.Background, out Color newColor))
         {
             Value = new (Value.Foreground, newColor);
+            SetNeedsDisplay ();
         }
     }
 
     private void ClickedInForeground ()
     {
-        if (PromptFor ("Foreground", Value.Foreground, out Color newColor))
+        if (LineDrawing.PromptForColor ("Foreground", Value.Foreground, out Color newColor))
         {
             Value = new (newColor, Value.Background);
+            SetNeedsDisplay ();
         }
-    }
-
-    private bool PromptFor (string title, Color current, out Color newColor)
-    {
-        var accept = false;
-
-        var d = new Dialog
-        {
-            Title = title,
-            Height = 7
-        };
-
-        var btnOk = new Button
-        {
-            X = Pos.Center () - 5,
-            Y = 4,
-            Text = "Ok",
-            Width = Dim.Auto (),
-            IsDefault = true
-        };
-
-        btnOk.Accept += (s, e) =>
-                        {
-                            accept = true;
-                            e.Handled = true;
-                            Application.RequestStop ();
-                        };
-
-        var btnCancel = new Button
-        {
-            X = Pos.Center () + 5,
-            Y = 4,
-            Text = "Cancel",
-            Width = Dim.Auto ()
-        };
-
-        btnCancel.Accept += (s, e) =>
-                            {
-                                e.Handled = true;
-                                Application.RequestStop ();
-                            };
-
-        d.Add (btnOk);
-        d.Add (btnCancel);
-
-        /* Does not work
-        d.AddButton (btnOk);
-        d.AddButton (btnCancel);
-        */
-        var cp = new ColorPicker
-        {
-            SelectedColor = current,
-            Width = Dim.Fill (),
-            Height = Dim.Fill (1)
-        };
-
-        d.Add (cp);
-
-        Application.Run (d);
-        d.Dispose ();
-        newColor = cp.SelectedColor;
-
-        SetNeedsDisplay ();
-
-        return accept;
     }
 }
