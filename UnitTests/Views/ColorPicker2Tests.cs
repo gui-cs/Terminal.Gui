@@ -3,7 +3,7 @@ using Color = Terminal.Gui.Color;
 
 namespace UnitTests.Views;
 
-public class ColorPicker2Tests (ITestOutputHelper output)
+public class ColorPicker2Tests
 {
     [Fact]
     [AutoInitShutdown]
@@ -25,9 +25,9 @@ public class ColorPicker2Tests (ITestOutputHelper output)
 
         // All bars should be at 0 with the triangle at 0 (+2 because of "H:", "S:" etc)
         var h = GetColorBar (cp, ColorPickerPart.Bar1);
-        Assert.Equal ("H:",h.Text);
-        Assert.Equal (2,h.TrianglePosition);
-        Assert.IsType <HueBar>(h);
+        Assert.Equal ("H:", h.Text);
+        Assert.Equal (2, h.TrianglePosition);
+        Assert.IsType<HueBar> (h);
 
         var s = GetColorBar (cp, ColorPickerPart.Bar2);
         Assert.Equal ("S:", s.Text);
@@ -39,7 +39,7 @@ public class ColorPicker2Tests (ITestOutputHelper output)
         Assert.Equal (2, v.TrianglePosition);
         Assert.IsType<ValueBar> (v);
 
-        var hex = GetTextField (cp,ColorPickerPart.Hex);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
         Assert.Equal ("#000000", hex.Text);
 
         top.Dispose ();
@@ -60,41 +60,36 @@ public class ColorPicker2Tests (ITestOutputHelper output)
 
         cp.Draw ();
 
-        var expected =
-            @"
-R:▲█████████████████
-G:▲█████████████████
-B:▲█████████████████
-Hex:#000000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        var r = GetColorBar (cp, ColorPickerPart.Bar1);
+        var g = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b = GetColorBar (cp, ColorPickerPart.Bar3);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        Assert.Equal ("R:", r.Text);
+        Assert.Equal (2, r.TrianglePosition);
+        Assert.IsType<RBar> (r);
+        Assert.Equal ("G:", g.Text);
+        Assert.Equal (2, g.TrianglePosition);
+        Assert.IsType<GBar> (g);
+        Assert.Equal ("B:", b.Text);
+        Assert.Equal (2, b.TrianglePosition);
+        Assert.IsType<BBar> (b);
+        Assert.Equal ("#000000", hex.Text);
 
         Assert.IsAssignableFrom<IColorBar> (cp.Focused);
         cp.NewKeyDownEvent (Key.CursorRight);
 
         cp.Draw ();
 
-        expected =
-            @"
-R:█▲████████████████
-G:▲█████████████████
-B:▲█████████████████
-Hex:#0F0000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        Assert.Equal (3, r.TrianglePosition);
+        Assert.Equal ("#0F0000", hex.Text);
 
         cp.NewKeyDownEvent (Key.CursorRight);
 
         cp.Draw ();
 
-        expected =
-            @"
-R:██▲███████████████
-G:▲█████████████████
-B:▲█████████████████
-Hex:#1E0000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        Assert.Equal (4, r.TrianglePosition);
+        Assert.Equal ("#1E0000", hex.Text);
 
         top.Dispose ();
     }
@@ -114,19 +109,26 @@ Hex:#1E0000  ■
 
         cp.Draw ();
 
-        var expected =
-            @"
-R:▲█████████████████
-G:▲█████████████████
-B:▲█████████████████
-Hex:#000000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        var r = GetColorBar (cp, ColorPickerPart.Bar1);
+        var g = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b = GetColorBar (cp, ColorPickerPart.Bar3);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        Assert.Equal ("R:", r.Text);
+        Assert.Equal (2, r.TrianglePosition);
+        Assert.IsType<RBar> (r);
+        Assert.Equal ("G:", g.Text);
+        Assert.Equal (2, g.TrianglePosition);
+        Assert.IsType<GBar> (g);
+        Assert.Equal ("B:", b.Text);
+        Assert.Equal (2, b.TrianglePosition);
+        Assert.IsType<BBar> (b);
+        Assert.Equal ("#000000", hex.Text);
 
         Assert.IsAssignableFrom<IColorBar> (cp.Focused);
 
         cp.Focused.OnMouseEvent (
-                                 new()
+                                 new ()
                                  {
                                      Flags = MouseFlags.Button1Pressed,
                                      Position = new (3, 0)
@@ -134,17 +136,11 @@ Hex:#000000  ■
 
         cp.Draw ();
 
-        expected =
-            @"
-R:█▲████████████████
-G:▲█████████████████
-B:▲█████████████████
-Hex:#0F0000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        Assert.Equal (3, r.TrianglePosition);
+        Assert.Equal ("#0F0000", hex.Text);
 
-        cp.Focused.NewMouseEvent (
-                                  new()
+        cp.Focused.OnMouseEvent (
+                                  new ()
                                   {
                                       Flags = MouseFlags.Button1Pressed,
                                       Position = new (4, 0)
@@ -152,14 +148,8 @@ Hex:#0F0000  ■
 
         cp.Draw ();
 
-        expected =
-            @"
-R:██▲███████████████
-G:▲█████████████████
-B:▲█████████████████
-Hex:#1E0000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        Assert.Equal (4, r.TrianglePosition);
+        Assert.Equal ("#1E0000", hex.Text);
 
         top.Dispose ();
     }
@@ -168,53 +158,33 @@ Hex:#1E0000  ■
     {
         yield return new object []
         {
-            new Color (255, 0),
-            @"
-R:█████████████████▲
-G:▲█████████████████
-B:▲█████████████████
-Hex:#FF0000  ■
-"
+            new Color(255, 0),
+            "R:", 19, "G:", 2, "B:", 2, "#FF0000"
         };
 
         yield return new object []
         {
-            new Color (0, 255),
-            @"
-R:▲█████████████████
-G:█████████████████▲
-B:▲█████████████████
-Hex:#00FF00  ■
-"
+            new Color(0, 255),
+            "R:", 2, "G:", 19, "B:", 2, "#00FF00"
         };
 
         yield return new object []
         {
-            new Color (0, 0, 255),
-            @"
-R:▲█████████████████
-G:▲█████████████████
-B:█████████████████▲
-Hex:#0000FF  ■
-"
+            new Color(0, 0, 255),
+            "R:", 2, "G:", 2, "B:", 19, "#0000FF"
         };
 
         yield return new object []
         {
-            new Color (125, 125, 125),
-            @"
-R:█████████▲████████
-G:█████████▲████████
-B:█████████▲████████
-Hex:#7D7D7D  ■
-"
+            new Color(125, 125, 125),
+            "R:", 11, "G:", 11, "B:", 11, "#7D7D7D"
         };
     }
 
     [Theory]
     [AutoInitShutdown]
     [MemberData (nameof (ColorPickerTestData))]
-    public void ColorPicker_RGB_NoText (Color c, string expected)
+    public void ColorPicker_RGB_NoText (Color c, string expectedR, int expectedRTriangle, string expectedG, int expectedGTriangle, string expectedB, int expectedBTriangle, string expectedHex)
     {
         var cp = new ColorPicker2 { Width = 20, Height = 4, Value = c };
 
@@ -228,7 +198,18 @@ Hex:#7D7D7D  ■
 
         cp.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        var r = GetColorBar (cp, ColorPickerPart.Bar1);
+        var g = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b = GetColorBar (cp, ColorPickerPart.Bar3);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        Assert.Equal (expectedR, r.Text);
+        Assert.Equal (expectedRTriangle, r.TrianglePosition);
+        Assert.Equal (expectedG, g.Text);
+        Assert.Equal (expectedGTriangle, g.TrianglePosition);
+        Assert.Equal (expectedB, b.Text);
+        Assert.Equal (expectedBTriangle, b.TrianglePosition);
+        Assert.Equal (expectedHex, hex.Text);
 
         top.Dispose ();
     }
@@ -237,53 +218,33 @@ Hex:#7D7D7D  ■
     {
         yield return new object []
         {
-            new Color (255, 0),
-            @"
-R:█████████████▲255 
-G:▲█████████████0
-B:▲█████████████0
-Hex:#FF0000  ■
-"
+            new Color(255, 0),
+            "R:", 15, 255, "G:", 2, 0, "B:", 2, 0, "#FF0000"
         };
 
         yield return new object []
         {
-            new Color (0, 255),
-            @"
-R:▲█████████████0
-G:█████████████▲255
-B:▲█████████████0
-Hex:#00FF00  ■
-"
+            new Color(0, 255),
+            "R:", 2, 0, "G:", 15, 255, "B:", 2, 0, "#00FF00"
         };
 
         yield return new object []
         {
-            new Color (0, 0, 255),
-            @"
-R:▲█████████████0
-G:▲█████████████0
-B:█████████████▲255
-Hex:#0000FF  ■
-"
+            new Color(0, 0, 255),
+            "R:", 2, 0, "G:", 2, 0, "B:", 15, 255, "#0000FF"
         };
 
         yield return new object []
         {
-            new Color (125, 125, 125),
-            @"
-R:███████▲██████125
-G:███████▲██████125
-B:███████▲██████125
-Hex:#7D7D7D  ■
-"
+            new Color(125, 125, 125),
+            "R:", 9, 125, "G:", 9, 125, "B:", 9, 125, "#7D7D7D"
         };
     }
 
     [Theory]
     [AutoInitShutdown]
     [MemberData (nameof (ColorPickerTestData_WithTextFields))]
-    public void ColorPicker_RGB_NoText_WithTextFields (Color c, string expected)
+    public void ColorPicker_RGB_NoText_WithTextFields (Color c, string expectedR, int expectedRTriangle, int expectedRValue, string expectedG, int expectedGTriangle, int expectedGValue, string expectedB, int expectedBTriangle, int expectedBValue, string expectedHex)
     {
         var cp = new ColorPicker2 { Width = 20, Height = 4, Value = c };
 
@@ -297,7 +258,24 @@ Hex:#7D7D7D  ■
 
         cp.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        var r = GetColorBar (cp, ColorPickerPart.Bar1);
+        var g = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b = GetColorBar (cp, ColorPickerPart.Bar3);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+        var rTextField = GetTextField (cp, ColorPickerPart.Bar1);
+        var gTextField = GetTextField (cp, ColorPickerPart.Bar2);
+        var bTextField = GetTextField (cp, ColorPickerPart.Bar3);
+
+        Assert.Equal (expectedR, r.Text);
+        Assert.Equal (expectedRTriangle, r.TrianglePosition);
+        Assert.Equal (expectedRValue.ToString (), rTextField.Text);
+        Assert.Equal (expectedG, g.Text);
+        Assert.Equal (expectedGTriangle, g.TrianglePosition);
+        Assert.Equal (expectedGValue.ToString (), gTextField.Text);
+        Assert.Equal (expectedB, b.Text);
+        Assert.Equal (expectedBTriangle, b.TrianglePosition);
+        Assert.Equal (expectedBValue.ToString (), bTextField.Text);
+        Assert.Equal (expectedHex, hex.Text);
 
         top.Dispose ();
     }
@@ -319,7 +297,7 @@ Hex:#7D7D7D  ■
 
         // Click at the end of the Red bar
         cp.Focused.OnMouseEvent (
-                                 new()
+                                 new ()
                                  {
                                      Flags = MouseFlags.Button1Pressed,
                                      Position = new (19, 0) // Assuming 0-based indexing
@@ -327,14 +305,18 @@ Hex:#7D7D7D  ■
 
         cp.Draw ();
 
-        var expected =
-            @"
-R:█████████████████▲
-G:▲█████████████████
-B:▲█████████████████
-Hex:#FF0000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        var r = GetColorBar (cp, ColorPickerPart.Bar1);
+        var g = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b = GetColorBar (cp, ColorPickerPart.Bar3);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        Assert.Equal ("R:", r.Text);
+        Assert.Equal (19, r.TrianglePosition);
+        Assert.Equal ("G:", g.Text);
+        Assert.Equal (2, g.TrianglePosition);
+        Assert.Equal ("B:", b.Text);
+        Assert.Equal (2, b.TrianglePosition);
+        Assert.Equal ("#FF0000", hex.Text);
 
         top.Dispose ();
     }
@@ -356,7 +338,7 @@ Hex:#FF0000  ■
 
         // Click beyond the bar
         cp.Focused.OnMouseEvent (
-                                 new()
+                                 new ()
                                  {
                                      Flags = MouseFlags.Button1Pressed,
                                      Position = new (21, 0) // Beyond the bar
@@ -364,14 +346,18 @@ Hex:#FF0000  ■
 
         cp.Draw ();
 
-        var expected =
-            @"
-R:█████████████████▲
-G:▲█████████████████
-B:▲█████████████████
-Hex:#FF0000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        var r = GetColorBar (cp, ColorPickerPart.Bar1);
+        var g = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b = GetColorBar (cp, ColorPickerPart.Bar3);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        Assert.Equal ("R:", r.Text);
+        Assert.Equal (19, r.TrianglePosition);
+        Assert.Equal ("G:", g.Text);
+        Assert.Equal (2, g.TrianglePosition);
+        Assert.Equal ("B:", b.Text);
+        Assert.Equal (2, b.TrianglePosition);
+        Assert.Equal ("#FF0000", hex.Text);
 
         top.Dispose ();
     }
@@ -392,21 +378,31 @@ Hex:#FF0000  ■
         cp.Draw ();
 
         // Change value using text field
-        TextField rBarTextField = cp.Subviews.OfType<TextField> ().First ();
+        TextField rBarTextField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "0");
 
         rBarTextField.Text = "128";
         rBarTextField.OnLeave (cp);
 
         cp.Draw ();
 
-        var expected =
-            @"
-R:███████▲██████128
-G:▲█████████████0
-B:▲█████████████0
-Hex:#800000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        var r = GetColorBar (cp, ColorPickerPart.Bar1);
+        var g = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b = GetColorBar (cp, ColorPickerPart.Bar3);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+        var rTextField = GetTextField (cp, ColorPickerPart.Bar1);
+        var gTextField = GetTextField (cp, ColorPickerPart.Bar2);
+        var bTextField = GetTextField (cp, ColorPickerPart.Bar3);
+
+        Assert.Equal ("R:", r.Text);
+        Assert.Equal (9, r.TrianglePosition);
+        Assert.Equal ("128", rTextField.Text);
+        Assert.Equal ("G:", g.Text);
+        Assert.Equal (2, g.TrianglePosition);
+        Assert.Equal ("0", gTextField.Text);
+        Assert.Equal ("B:", b.Text);
+        Assert.Equal (2, b.TrianglePosition);
+        Assert.Equal ("0", bTextField.Text);
+        Assert.Equal ("#800000", hex.Text);
 
         top.Dispose ();
     }
@@ -433,14 +429,18 @@ Hex:#800000  ■
 
         cp.Draw ();
 
-        var expected =
-            @"
-R:▲█████████████0
-G:▲█████████████0
-B:▲█████████████0
-Hex:#000000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        var r = GetColorBar (cp, ColorPickerPart.Bar1);
+        var g = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b = GetColorBar (cp, ColorPickerPart.Bar3);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        Assert.Equal ("R:", r.Text);
+        Assert.Equal (2, r.TrianglePosition);
+        Assert.Equal ("G:", g.Text);
+        Assert.Equal (2, g.TrianglePosition);
+        Assert.Equal ("B:", b.Text);
+        Assert.Equal (2, b.TrianglePosition);
+        Assert.Equal ("#000000", hex.Text);
 
         top.Dispose ();
     }
@@ -464,7 +464,7 @@ Hex:#000000  ■
         cp.Subviews.OfType<GBar> ()
           .Single ()
           .OnMouseEvent (
-                         new()
+                         new ()
                          {
                              Flags = MouseFlags.Button1Pressed,
                              Position = new (0, 1)
@@ -478,10 +478,10 @@ Hex:#000000  ■
         cp.Subviews.OfType<BBar> ()
           .Single ()
           .OnMouseEvent (
-                         new()
+                         new ()
                          {
                              Flags = MouseFlags.Button1Pressed,
-                             Position = new (0, 6)
+                             Position = new (0, 2)
                          });
 
         cp.Draw ();
@@ -506,28 +506,35 @@ Hex:#000000  ■
 
         cp.Draw ();
 
-        var expectedRGB =
-            @"
-R:█████████████████▲
-G:▲█████████████████
-B:▲█████████████████
-Hex:#FF0000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expectedRGB, output);
+        var r = GetColorBar (cp, ColorPickerPart.Bar1);
+        var g = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b = GetColorBar (cp, ColorPickerPart.Bar3);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        Assert.Equal ("R:", r.Text);
+        Assert.Equal (19, r.TrianglePosition);
+        Assert.Equal ("G:", g.Text);
+        Assert.Equal (2, g.TrianglePosition);
+        Assert.Equal ("B:", b.Text);
+        Assert.Equal (2, b.TrianglePosition);
+        Assert.Equal ("#FF0000", hex.Text);
 
         // Switch to HSV
         cp.Style.ColorModel = ColorModel.HSV;
         cp.ApplyStyleChanges ();
         cp.Draw ();
 
-        var expectedHSV =
-            @"
-H:▲█████████████████
-S:█████████████████▲
-V:█████████████████▲
-Hex:#FF0000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expectedHSV, output);
+        var h = GetColorBar (cp, ColorPickerPart.Bar1);
+        var s = GetColorBar (cp, ColorPickerPart.Bar2);
+        var v = GetColorBar (cp, ColorPickerPart.Bar3);
+
+        Assert.Equal ("H:", h.Text);
+        Assert.Equal (2, h.TrianglePosition);
+        Assert.Equal ("S:", s.Text);
+        Assert.Equal (19, s.TrianglePosition);
+        Assert.Equal ("V:", v.Text);
+        Assert.Equal (19, v.TrianglePosition);
+        Assert.Equal ("#FF0000", hex.Text);
 
         top.Dispose ();
     }
@@ -553,14 +560,24 @@ Hex:#FF0000  ■
 
         cp.Draw ();
 
-        var expected =
-            @"
-R:███████▲██████128
-G:▲█████████████0
-B:▲█████████████0
-Hex:#800000  ■
-";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        var r = GetColorBar (cp, ColorPickerPart.Bar1);
+        var g = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b = GetColorBar (cp, ColorPickerPart.Bar3);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+        var rTextField = GetTextField (cp, ColorPickerPart.Bar1);
+        var gTextField = GetTextField (cp, ColorPickerPart.Bar2);
+        var bTextField = GetTextField (cp, ColorPickerPart.Bar3);
+
+        Assert.Equal ("R:", r.Text);
+        Assert.Equal (9, r.TrianglePosition);
+        Assert.Equal ("128", rTextField.Text);
+        Assert.Equal ("G:", g.Text);
+        Assert.Equal (2, g.TrianglePosition);
+        Assert.Equal ("0", gTextField.Text);
+        Assert.Equal ("B:", b.Text);
+        Assert.Equal (2, b.TrianglePosition);
+        Assert.Equal ("0", bTextField.Text);
+        Assert.Equal ("#800000", hex.Text);
 
         top.Dispose ();
     }
@@ -572,6 +589,7 @@ Hex:#800000  ■
         Bar3 = 2,
         Hex = 3,
     }
+
     private TextField GetTextField (ColorPicker2 cp, ColorPickerPart toGet)
     {
         if (!cp.Style.ShowTextFields)
@@ -580,7 +598,6 @@ Hex:#800000  ■
             {
                 throw new NotSupportedException ("There are no bar text fields for ColorPicker because ShowTextFields is false");
             }
-
 
             return cp.Subviews.OfType<TextField> ().Single ();
         }
@@ -608,13 +625,13 @@ Hex:#800000  ■
         var cp = new ColorPicker2 ();
 
         cp.ColorChanged += (s, e) =>
-                           {
-                               count++;
-                               oldColor = e.PreviousColor;
-                               newColor = e.Color;
+        {
+            count++;
+            oldColor = e.PreviousColor;
+            newColor = e.Color;
 
-                               Assert.Equal (cp.Value, e.Color);
-                           };
+            Assert.Equal (cp.Value, e.Color);
+        };
 
         cp.Value = new (1, 2, 3);
         Assert.Equal (1, count);
