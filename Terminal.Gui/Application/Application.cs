@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 
@@ -56,7 +57,7 @@ public static partial class Application
         string assemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
 
         // Find the resource file name of the assembly
-        var resourceFilename = $"{Path.GetFileNameWithoutExtension (assembly.Location)}.resources.dll";
+        var resourceFilename = $"{Path.GetFileNameWithoutExtension (AppContext.BaseDirectory)}.resources.dll";
 
         // Return all culture for which satellite folder found with culture code.
         return culture.Where (
@@ -192,6 +193,8 @@ public static partial class Application
     ///     <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
     ///     specified the default driver for the platform will be used.
     /// </param>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public static void Init (ConsoleDriver driver = null, string driverName = null) { InternalInit (driver, driverName); }
 
     internal static bool _initialized;
@@ -206,6 +209,8 @@ public static partial class Application
     // Unit Tests - To initialize the app with a custom Toplevel, using the FakeDriver. calledViaRunT will be false, causing all state to be reset.
     // 
     // calledViaRunT: If false (default) all state will be reset. If true the state will not be reset.
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     internal static void InternalInit (
         ConsoleDriver driver = null,
         string driverName = null,
@@ -318,6 +323,7 @@ public static partial class Application
 
     /// <summary>Gets of list of <see cref="ConsoleDriver"/> types that are available.</summary>
     /// <returns></returns>
+    [RequiresUnreferencedCode ("AOT")]
     public static List<Type> GetDriverTypes ()
     {
         // use reflection to get the list of drivers
@@ -660,6 +666,8 @@ public static partial class Application
     ///     </para>
     /// </remarks>
     /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public static Toplevel Run (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) { return Run<Toplevel> (errorHandler, driver); }
 
     /// <summary>
@@ -683,6 +691,8 @@ public static partial class Application
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
         where T : Toplevel, new()
     {

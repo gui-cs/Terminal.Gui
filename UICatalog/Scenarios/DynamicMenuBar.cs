@@ -21,7 +21,7 @@ public class DynamicMenuBar : Scenario
         // Setup - Create a top-level application window and configure it.
         DynamicMenuBarSample appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         // Run - Start the application.

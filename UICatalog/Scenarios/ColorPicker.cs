@@ -30,7 +30,7 @@ public class ColorPickers : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
         };
 
         // Foreground ColorPicker.

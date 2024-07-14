@@ -74,19 +74,16 @@ public class CollectionNavigatorTester : Scenario
         "quitter"
     }.ToList ());
 
+    private Toplevel top;
     private ListView _listView;
     private TreeView _treeView;
 
     // Don't create a Window, just return the top-level view
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
-        Top = new ();
-        Top.ColorScheme = Colors.ColorSchemes ["Base"];
-    }
+        top = new Toplevel { ColorScheme = Colors.ColorSchemes ["Base"] };
 
-    public override void Setup ()
-    {
         var allowMarking = new MenuItem ("Allow _Marking", "", null)
         {
             CheckType = MenuItemCheckStyle.Checked, Checked = false
@@ -128,14 +125,18 @@ public class CollectionNavigatorTester : Scenario
             ]
         };
 
-        Top.Add (menu);
+        top.Add (menu);
 
         _items = new (_items.OrderBy (i => i, StringComparer.OrdinalIgnoreCase));
 
         CreateListView ();
         var vsep = new LineView (Orientation.Vertical) { X = Pos.Right (_listView), Y = 1, Height = Dim.Fill () };
-        Top.Add (vsep);
+        top.Add (vsep);
         CreateTreeView ();
+
+        Application.Run (top);
+        top.Dispose ();
+        Application.Shutdown ();
     }
 
     private void CreateListView ()
@@ -149,7 +150,7 @@ public class CollectionNavigatorTester : Scenario
             Width = Dim.Percent (50),
             Height = 1
         };
-        Top.Add (label);
+        top.Add (label);
 
         _listView = new ListView
         {
@@ -160,7 +161,7 @@ public class CollectionNavigatorTester : Scenario
             AllowsMarking = false,
             AllowsMultipleSelection = false
         };
-        Top.Add (_listView);
+        top.Add (_listView);
 
         _listView.SetSource (_items);
 
@@ -178,14 +179,14 @@ public class CollectionNavigatorTester : Scenario
             Width = Dim.Percent (50),
             Height = 1
         };
-        Top.Add (label);
+        top.Add (label);
 
         _treeView = new TreeView
         {
             X = Pos.Right (_listView) + 1, Y = Pos.Bottom (label), Width = Dim.Fill (), Height = Dim.Fill ()
         };
         _treeView.Style.HighlightModelTextOnly = true;
-        Top.Add (_treeView);
+        top.Add (_treeView);
 
         var root = new TreeNode ("IsLetterOrDigit examples");
 

@@ -8,24 +8,16 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Scrolling")]
 public class Clipping : Scenario
 {
-    public override void Init ()
+    public override void Main ()
     {
         Application.Init ();
-        Top = new ();
-        Top.ColorScheme = Colors.ColorSchemes ["Base"];
-    }
+        var win = new Window { Title = GetQuitKeyAndName () };
 
-    public override void Setup ()
-    {
-        //Win.X = 1;
-        //Win.Y = 2;
-        //Win.Width = Dim.Fill () - 4;
-        //Win.Height = Dim.Fill () - 2;
         var label = new Label
         {
             X = 0, Y = 0, Text = "ScrollView (new Rectangle (3, 3, 50, 20)) with a 200, 100 GetContentSize ()..."
         };
-        Top.Add (label);
+        win.Add (label);
 
         var scrollView = new ScrollView { X = 3, Y = 3, Width = 50, Height = 20 };
         scrollView.ColorScheme = Colors.ColorSchemes ["Menu"];
@@ -84,6 +76,10 @@ public class Clipping : Scenario
 
         scrollView.Add (embedded1);
 
-        Top.Add (scrollView);
+        win.Add (scrollView);
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 }

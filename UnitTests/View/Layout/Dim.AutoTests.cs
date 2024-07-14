@@ -1325,3 +1325,4 @@ public class DimAutoTests (ITestOutputHelper output)
 
     // Test variations of Frame
 }
+git

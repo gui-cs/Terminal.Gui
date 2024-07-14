@@ -43,6 +43,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelfContained", "SelfContained\SelfContained.csproj", "{524DEA78-7E7C-474D-B42D-52ED4C04FF14}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{58FDCA8F-08F7-4D80-9DA3-6A9AED01E163}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58FDCA8F-08F7-4D80-9DA3-6A9AED01E163}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58FDCA8F-08F7-4D80-9DA3-6A9AED01E163}.Release|Any CPU.Build.0 = Release|Any CPU
+		{524DEA78-7E7C-474D-B42D-52ED4C04FF14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{524DEA78-7E7C-474D-B42D-52ED4C04FF14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{524DEA78-7E7C-474D-B42D-52ED4C04FF14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{524DEA78-7E7C-474D-B42D-52ED4C04FF14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
