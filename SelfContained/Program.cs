@@ -1,5 +1,6 @@
 ﻿// This is a simple example application for a self-contained single file.
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Terminal.Gui;
@@ -13,15 +14,19 @@ public static class Program
     {
         Application.Init ();
 
+        #region The code in this region is not intended for use in a self-contained single-file. It's just here to make sure there is no functionality break with localization in Terminal.Gui using single-file
+
         if (Equals (Thread.CurrentThread.CurrentUICulture, CultureInfo.InvariantCulture))
         {
-            System.Diagnostics.Debug.Assert (Application.SupportedCultures.Count == 0);
+            Debug.Assert (Application.SupportedCultures.Count == 0);
         }
         else
         {
-            System.Diagnostics.Debug.Assert (Application.SupportedCultures.Count == 4);
-            System.Diagnostics.Debug.Assert (Equals (CultureInfo.CurrentCulture, Thread.CurrentThread.CurrentUICulture));
+            Debug.Assert (Application.SupportedCultures.Count == 4);
+            Debug.Assert (Equals (CultureInfo.CurrentCulture, Thread.CurrentThread.CurrentUICulture));
         }
+
+        #endregion
 
         ExampleWindow app = new ();
         Application.Run (app);
