@@ -305,12 +305,12 @@ internal class UICatalogApp
         _aboutMessage = new ();
         _aboutMessage.AppendLine (@"A comprehensive sample library for");
         _aboutMessage.AppendLine (@"");
-        _aboutMessage.AppendLine (@"  _______                  _             _   _____       _  ");
-        _aboutMessage.AppendLine (@" |__   __|                (_)           | | / ____|     (_) ");
-        _aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ");
-        _aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ");
-        _aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ");
-        _aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ");
+        _aboutMessage.AppendLine (@" _______                  _             _   _____       _ ");
+        _aboutMessage.AppendLine (@"|__   __|                (_)           | | / ____|     (_)");
+        _aboutMessage.AppendLine (@"   | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ ");
+        _aboutMessage.AppendLine (@"   | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |");
+        _aboutMessage.AppendLine (@"   | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |");
+        _aboutMessage.AppendLine (@"   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|");
         _aboutMessage.AppendLine (@"");
         _aboutMessage.AppendLine (@"v2 - Work in Progress");
         _aboutMessage.AppendLine (@"");
@@ -346,6 +346,7 @@ internal class UICatalogApp
         // 'app' closed cleanly.
         foreach (Responder? inst in Responder.Instances)
         {
+            
             Debug.Assert (inst.WasDisposed);
         }
 

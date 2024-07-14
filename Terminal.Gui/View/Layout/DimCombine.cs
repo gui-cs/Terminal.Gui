@@ -13,7 +13,7 @@ namespace Terminal.Gui;
 /// </remarks>
 /// <param name="left">The left dimension.</param>
 /// <param name="right">The right dimension.</param>
-public class DimCombine (AddOrSubtract add, Dim? left, Dim? right) : Dim
+public class DimCombine (AddOrSubtract add, Dim left, Dim right) : Dim
 {
     /// <summary>
     ///     Gets whether the two dimensions are added or subtracted.
@@ -23,12 +23,12 @@ public class DimCombine (AddOrSubtract add, Dim? left, Dim? right) : Dim
     /// <summary>
     ///     Gets the left dimension.
     /// </summary>
-    public Dim? Left { get; } = left;
+    public Dim Left { get; } = left;
 
     /// <summary>
     ///     Gets the right dimension.
     /// </summary>
-    public Dim? Right { get; } = right;
+    public Dim Right { get; } = right;
 
     /// <inheritdoc/>
     public override string ToString () { return $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})"; }

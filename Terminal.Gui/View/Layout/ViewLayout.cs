@@ -546,15 +546,106 @@ public partial class View
     public event EventHandler<LayoutEventArgs> LayoutStarted;
 
     /// <summary>
-    ///     Invoked when a view starts executing or when the dimensions of the view have changed, for example in response to
-    ///     the container view or terminal resizing.
+    ///     Adjusts <see cref="Frame"/> given the SuperView's ContentSize (nominally the same as
+    ///     <c>this.SuperView.GetContentSize ()</c>)
+    ///     and the position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and
+    ///     <see cref="Height"/>).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, or <see cref="Height"/> are
+    ///         absolute, they will be updated to reflect the new size and position of the view. Otherwise, they
+    ///         are left unchanged.
+    ///     </para>
+    ///     <para>
+    ///         If any of the view's subviews have a position or dimension dependent on either <see cref="GetContentSize"/> or other subviews, <see cref="LayoutSubview"/> on
+    ///         will be called for that subview.
+    ///     </para>
+    /// </remarks>
+    /// <param name="superviewContentSize">
+    ///     The size of the SuperView's content (nominally the same as <c>this.SuperView.GetContentSize ()</c>).
+    /// </param>
+    internal void SetRelativeLayout (Size superviewContentSize)
+    {
+        Debug.Assert (_x is { });
+        Debug.Assert (_y is { });
+        Debug.Assert (_width is { });
+        Debug.Assert (_height is { });
+
+        CheckDimAuto ();
+        int newX, newW, newY, newH;
+
+        // Calculate the new X, Y, Width, and Height
+        // If the Width or Height is Dim.Auto, calculate the Width or Height first. Otherwise, calculate the X or Y first.
+        if (_width is DimAuto)
+        {
+            newW = _width.Calculate (0, superviewContentSize.Width, this, Dimension.Width);
+            newX = _x.Calculate (superviewContentSize.Width, newW, this, Dimension.Width);
+        }
+        else
+        {
+            newX = _x.Calculate (superviewContentSize.Width, _width, this, Dimension.Width);
+            newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
+        }
+
+        if (_height is DimAuto)
+        {
+            newH = _height.Calculate (0, superviewContentSize.Height, this, Dimension.Height);
+            newY = _y.Calculate (superviewContentSize.Height, newH, this, Dimension.Height);
+        }
+        else
+        {
+            newY = _y.Calculate (superviewContentSize.Height, _height, this, Dimension.Height);
+            newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
+        }
+
+        Rectangle newFrame = new (newX, newY, newW, newH);
+
+        if (Frame != newFrame)
+        {
+            // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height
+            SetFrame (newFrame);
+
+            if (_x is PosAbsolute)
+            {
+                _x = Frame.X;
+            }
+
+            if (_y is PosAbsolute)
+            {
+                _y = Frame.Y;
+            }
+
+            if (_width is DimAbsolute)
+            {
+                _width = Frame.Width;
+            }
+
+            if (_height is DimAbsolute)
+            {
+                _height = Frame.Height;
+            }
+
+            if (!string.IsNullOrEmpty (Title))
+            {
+                SetTitleTextFormatterSize ();
+            }
+
+            SetNeedsLayout ();
+            SetNeedsDisplay ();
+        }
+    }
+
+
+    /// <summary>
+    ///     Invoked when the dimensions of the view have changed, for example in response to the container view or terminal resizing.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         The position and dimensions of the view are indeterminate until the view has been initialized. Therefore, the
     ///         behavior of this method is indeterminate if <see cref="IsInitialized"/> is <see langword="false"/>.
     ///     </para>
-    ///     <para>Raises the <see cref="LayoutComplete"/> event) before it returns.</para>
+    ///     <para>Raises the <see cref="LayoutComplete"/> event before it returns.</para>
     /// </remarks>
     public virtual void LayoutSubviews ()
     {
@@ -689,89 +780,11 @@ public partial class View
     }
 
     /// <summary>
-    ///     Adjusts <see cref="Frame"/> given the SuperView's ContentSize (nominally the same as
-    ///     <c>this.SuperView.GetContentSize ()</c>)
-    ///     and the position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and
-    ///     <see cref="Height"/>).
+    /// Collects all views and their dependencies from a given starting view for layout purposes. Used by <see cref="TopologicalSort"/> to create an ordered list of views to layout.
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         If <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, or <see cref="Height"/> are
-    ///         absolute, they will be updated to reflect the new size and position of the view. Otherwise, they
-    ///         are left unchanged.
-    ///     </para>
-    /// </remarks>
-    /// <param name="superviewContentSize">
-    ///     The size of the SuperView's content (nominally the same as <c>this.SuperView.GetContentSize ()</c>).
-    /// </param>
-    internal void SetRelativeLayout (Size superviewContentSize)
-    {
-        Debug.Assert (_x is { });
-        Debug.Assert (_y is { });
-        Debug.Assert (_width is { });
-        Debug.Assert (_height is { });
-
-        CheckDimAuto ();
-        int newX, newW, newY, newH;
-
-        if (_width is DimAuto)
-        {
-            newW = _width.Calculate (0, superviewContentSize.Width, this, Dimension.Width);
-            newX = _x.Calculate (superviewContentSize.Width, newW, this, Dimension.Width);
-        }
-        else
-        {
-            newX = _x.Calculate (superviewContentSize.Width, _width, this, Dimension.Width);
-            newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
-        }
-
-        if (_height is DimAuto)
-        {
-            newH = _height.Calculate (0, superviewContentSize.Height, this, Dimension.Height);
-            newY = _y.Calculate (superviewContentSize.Height, newH, this, Dimension.Height);
-        }
-        else
-        {
-            newY = _y.Calculate (superviewContentSize.Height, _height, this, Dimension.Height);
-            newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
-        }
-
-        Rectangle newFrame = new (newX, newY, newW, newH);
-
-        if (Frame != newFrame)
-        {
-            // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height
-            SetFrame (newFrame);
-
-            if (_x is PosAbsolute)
-            {
-                _x = Frame.X;
-            }
-
-            if (_y is PosAbsolute)
-            {
-                _y = Frame.Y;
-            }
-
-            if (_width is DimAbsolute)
-            {
-                _width = Frame.Width;
-            }
-
-            if (_height is DimAbsolute)
-            {
-                _height = Frame.Height;
-            }
-
-            if (!string.IsNullOrEmpty (Title))
-            {
-                SetTitleTextFormatterSize ();
-            }
-
-            SetNeedsLayout ();
-            SetNeedsDisplay ();
-        }
-    }
+    /// <param name="from">The starting view from which to collect dependencies.</param>
+    /// <param name="nNodes">A reference to a set of views representing nodes in the layout graph.</param>
+    /// <param name="nEdges">A reference to a set of tuples representing edges in the layout graph, where each tuple consists of a pair of views indicating a dependency.</param>
 
     internal void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
@@ -784,6 +797,13 @@ public partial class View
             CollectDim (v.Height, v, ref nNodes, ref nEdges);
         }
     }
+    /// <summary>
+    /// Collects dimension (where Width or Height is `DimView`) dependencies for a given view.
+    /// </summary>
+    /// <param name="dim">The dimension (width or height) to collect dependencies for.</param>
+    /// <param name="from">The view for which to collect dimension dependencies.</param>
+    /// <param name="nNodes">A reference to a set of views representing nodes in the layout graph.</param>
+    /// <param name="nEdges">A reference to a set of tuples representing edges in the layout graph, where each tuple consists of a pair of views indicating a dependency.</param>
 
     internal void CollectDim (Dim? dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
@@ -808,6 +828,13 @@ public partial class View
         }
     }
 
+    /// <summary>
+    /// Collects position (where X or Y is `PosView`) dependencies for a given view.
+    /// </summary>
+    /// <param name="pos">The position (X or Y) to collect dependencies for.</param>
+    /// <param name="from">The view for which to collect position dependencies.</param>
+    /// <param name="nNodes">A reference to a set of views representing nodes in the layout graph.</param>
+    /// <param name="nEdges">A reference to a set of tuples representing edges in the layout graph, where each tuple consists of a pair of views indicating a dependency.</param>
     internal void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
         switch (pos)

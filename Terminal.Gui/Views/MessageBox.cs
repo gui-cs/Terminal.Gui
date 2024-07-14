@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
@@ -368,8 +369,8 @@ public static class MessageBox
             ButtonAlignment = Alignment.Center,
             ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems,
             BorderStyle = MessageBox.DefaultBorderStyle,
-            Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1, Dim.Percent (90)),
-            Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1, Dim.Percent (90)),
+            Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: 1, maximumContentDim: Dim.Percent (90)),
+            Height = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: 2, maximumContentDim: Dim.Percent (90)),
         };
 
         if (width != 0)
@@ -384,36 +385,41 @@ public static class MessageBox
 
         d.ColorScheme = useErrorColors ? Colors.ColorSchemes ["Error"] : Colors.ColorSchemes ["Dialog"];
 
-        var messageLabel = new Label
+        d.LayoutComplete += (s, e) =>
         {
-            HotKeySpecifier = new Rune ('\xFFFF'),
-            Width = Dim.Auto (DimAutoStyle.Text),
-            Height = Dim.Auto (DimAutoStyle.Text),
-            Text = message,
-            TextAlignment = Alignment.Center,
-            X = Pos.Center (),
-            Y = 0,
-            //ColorScheme = Colors.ColorSchemes ["Error"],
+            if (wrapMessage)
+            {
+                int buttonHeight = buttonList.Count > 0 ? buttonList [0].Frame.Height : 0;
+                Debug.Assert (d.TextFormatter.WordWrap);
+                d.TextFormatter.Size = new Size (d.GetContentSize ().Width, Application.Driver.Screen.Height);
+                Size textSize = d.TextFormatter.GetAutoSize ();
+                textSize.Height += buttonHeight;
+
+                if (textSize != d.TextFormatter.Size)
+                {
+                    //d.TextFormatter.Size = textSize;
+                    //d.SetContentSize (textSize);
+                    d.SetNeedsLayout ();
+                    //d.SetRelativeLayout (Application.Driver.Screen.Size);
+                }
+            }
         };
 
-        messageLabel.TextFormatter.WordWrap = wrapMessage;
-        messageLabel.TextFormatter.MultiLine = !wrapMessage;
+        d.HotKeySpecifier = new Rune ('\xFFFF');
+        d.Text = message;
+        d.TextAlignment = Alignment.Center;
+        d.VerticalTextAlignment = Alignment.Start;
+        d.TextFormatter.WordWrap = wrapMessage;
+        d.TextFormatter.MultiLine = !wrapMessage;
 
-        if (wrapMessage)
+        // Add two lines to push buttons down two rows
+        // BUGBUG: The " " are here due to a bug in TextFormater.Format that strips trailing newlines when .Wordwrap = true
+       // d.Text += Environment.NewLine + " " + Environment.NewLine + " ";
+
+        d.ColorScheme = new ColorScheme (d.ColorScheme)
         {
-            int buttonHeight = buttonList.Count > 0 ? buttonList [0].Frame.Height : 0;
-
-            messageLabel.Width = Dim.Fill ();
-            messageLabel.Height = Dim.Func (() => GetWrapSize ().Height);
-            Size GetWrapSize ()
-            {
-                // A bit of a hack to get the height of the wrapped text.
-                messageLabel.TextFormatter.Size = d.GetContentSize () with { Height = 1000 };
-                return messageLabel.TextFormatter.FormatAndGetSize ();
-            }
-        }
-
-        d.Add (messageLabel);
+            Focus = d.ColorScheme.Normal
+        };
 
         // Setup actions
         Clicked = -1;
