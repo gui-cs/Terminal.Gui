@@ -159,7 +159,8 @@ public abstract class ColorBar : View, IColorBar
             Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
             Driver.AddStr (Text);
 
-            xOffset = Text.Length;
+            // TODO: is there a better method than this? this is what it is in TableView
+            xOffset = Text.EnumerateRunes ().Sum (c => c.GetColumns ());
         }
 
         _barWidth = viewport.Width - xOffset;
