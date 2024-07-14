@@ -104,8 +104,10 @@ internal class DrawLineTool : ITool
 [ScenarioCategory ("Drawing")]
 public class LineDrawing : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+        var win = new Window { Title = GetQuitKeyAndName () };
         var canvas = new DrawingArea { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         var tools = new ToolsView { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
@@ -114,12 +116,16 @@ public class LineDrawing : Scenario
         tools.SetStyle += b => canvas.CurrentTool = new DrawLineTool { LineStyle = b };
         tools.AddLayer += () => canvas.AddLayer ();
 
-        Win.Add (canvas);
-        Win.Add (tools);
+        win.Add (canvas);
+        win.Add (tools);
         tools.CurrentColor = canvas.GetNormalColor ();
         canvas.CurrentAttribute = tools.CurrentColor;
 
-        Win.KeyDown += (s, e) => { e.Handled = canvas.OnKeyDown (e); };
+        win.KeyDown += (s, e) => { e.Handled = canvas.OnKeyDown (e); };
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 }
 

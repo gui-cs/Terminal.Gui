@@ -16,7 +16,7 @@ public class TextFormatterDemo : Scenario
 
         var app = new Window
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         // Make Win smaller so sizing the window horizontally will make the

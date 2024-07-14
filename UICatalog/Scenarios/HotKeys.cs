@@ -13,7 +13,7 @@ public class HotKeys : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         var textViewLabel = new Label { Text = "_TextView:", X = 0, Y = 0 };

@@ -16,7 +16,7 @@ public class TextAlignmentAndDirection : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}世界 您好";

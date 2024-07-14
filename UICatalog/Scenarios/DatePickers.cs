@@ -13,7 +13,7 @@ public class DatePickers : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         var datePicker = new DatePicker { Y = Pos.Center (), X = Pos.Center () };
