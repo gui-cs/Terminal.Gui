@@ -47,6 +47,13 @@ public abstract class ColorBar : View, IColorBar
         }
     }
 
+    /// <inheritdoc />
+    public void SetValueWithoutRaisingEvent (int v)
+    {
+        _value = v;
+        SetNeedsDisplay ();
+    }
+
     /// <summary>
     /// The last drawn location in View's viewport where the Triangle appeared.
     /// Used exclusively for tests.
@@ -213,8 +220,6 @@ public abstract class ColorBar : View, IColorBar
     private void OnValueChanged ()
     {
         ValueChanged?.Invoke (this, new (in _value));
-
-        // Notify subscribers if any, and redraw the view
         SetNeedsDisplay ();
     }
 }

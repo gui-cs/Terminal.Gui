@@ -134,24 +134,24 @@ internal class ColorModelStrategy
         switch (model)
         {
             case ColorModel.RGB:
-                bars [0].Value = newValue.R;
-                bars [1].Value = newValue.G;
-                bars [2].Value = newValue.B;
+                bars [0].SetValueWithoutRaisingEvent(newValue.R);
+                bars [1].SetValueWithoutRaisingEvent (newValue.G);
+                bars [2].SetValueWithoutRaisingEvent (newValue.B);
 
                 break;
             case ColorModel.HSV:
                 HSV newHsv = ColorConverter.RgbToHsv (new (newValue.R, newValue.G, newValue.B));
-                bars [0].Value = newHsv.H;
-                bars [1].Value = newHsv.S;
-                bars [2].Value = newHsv.V;
+                bars [0].SetValueWithoutRaisingEvent(newHsv.H);
+                bars [1].SetValueWithoutRaisingEvent(newHsv.S);
+                bars [2].SetValueWithoutRaisingEvent(newHsv.V);
 
                 break;
             case ColorModel.HSL:
 
                 HSL newHsl = ColorConverter.RgbToHsl (new (newValue.R, newValue.G, newValue.B));
-                bars [0].Value = newHsl.H;
-                bars [1].Value = newHsl.S;
-                bars [2].Value = newHsl.L;
+                bars [0].SetValueWithoutRaisingEvent(newHsl.H);
+                bars [1].SetValueWithoutRaisingEvent(newHsl.S);
+                bars [2].SetValueWithoutRaisingEvent( newHsl.L);
 
                 break;
             default:

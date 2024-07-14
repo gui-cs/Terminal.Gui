@@ -25,7 +25,6 @@ public class ColorPicker : View
     /// </summary>
     public event EventHandler<ColorEventArgs> ColorChanged;
 
-    private bool _updating;
 
     /// <summary>
     ///     The color selected in the picker
@@ -33,33 +32,42 @@ public class ColorPicker : View
     public Color SelectedColor
     {
         get => _selectedColor;
-        set
+        set => SetSelectedColor (value,true);
+    }
+
+    private void SetSelectedColor (Color value, bool syncBars)
+    {
+
+        if (_selectedColor != value)
         {
-            try
-            {
-                _updating = true;
+            Color old = _selectedColor;
+            _selectedColor = value;
 
-                if (_selectedColor != value)
-                {
-                    Color old = _selectedColor;
-                    _selectedColor = value;
-                    SetTextFieldToValue ();
-                    UpdateBarsFromColor (value);
-
-                    ColorChanged?.Invoke (
-                                          this,
-                                          new()
-                                          {
-                                              Color = value,
-                                              PreviousColor = old
-                                          });
-                }
-            }
-            finally
-            {
-                _updating = false;
-            }
+            ColorChanged?.Invoke (
+                                  this,
+                                  new ()
+                                  {
+                                      Color = value,
+                                      PreviousColor = old
+                                  });
         }
+
+        SyncSubViewValues (syncBars);
+    }
+
+    private void SyncSubViewValues (bool syncBars)
+    {
+        if (syncBars)
+        {
+            _strategy.SetBarsToColor (_bars, _selectedColor, Style.ColorModel);
+        }
+
+        foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
+        {
+            kvp.Value.Text = kvp.Key.Value.ToString();
+        }
+
+        _tfHex.Text = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}");
     }
 
     /// <summary>
@@ -106,7 +114,7 @@ public class ColorPicker : View
 
             y++;
 
-            bar.ValueChanged += RebuildColor;
+            bar.ValueChanged += RebuildColorFromBar;
 
             _bars.Add (bar);
 
@@ -114,10 +122,6 @@ public class ColorPicker : View
         }
 
         CreateTextField ();
-        SetTextFieldToValue ();
-
-        UpdateBarsFromColor (SelectedColor);
-        RebuildColor (this, default (EventArgs<int>));
         SelectedColor = oldValue;
     }
 
@@ -161,7 +165,7 @@ public class ColorPicker : View
     {
         foreach (ColorBar bar in _bars.Cast<ColorBar> ())
         {
-            bar.ValueChanged -= RebuildColor;
+            bar.ValueChanged -= RebuildColorFromBar;
 
             if (_textFields.TryGetValue (bar, out TextField tf))
             {
@@ -201,7 +205,7 @@ public class ColorPicker : View
         else
         {
             // value is invalid, revert the value in the text field back to current state
-            SetTextFieldToValue ();
+            SyncSubViewValues (false);
         }
     }
 
@@ -214,26 +218,8 @@ public class ColorPicker : View
         AddRune (13, 3, (Rune)'■');
     }
 
-    private void UpdateBarsFromColor (Color color)
+    private void RebuildColorFromBar (object sender, EventArgs<int> e)
     {
-        _strategy.SetBarsToColor (_bars, color, Style.ColorModel);
-        SetTextFieldToValue ();
+        SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel),false);
     }
-
-    private void RebuildColor (object sender, EventArgs<int> e)
-    {
-        foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
-        {
-            kvp.Value.Text = kvp.Key.Value.ToString ();
-        }
-
-        if (!_updating)
-        {
-            SelectedColor = _strategy.GetColorFromBars (_bars, Style.ColorModel);
-        }
-
-        SetTextFieldToValue ();
-    }
-
-    private void SetTextFieldToValue () { _tfHex.Text = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}"); }
 }
