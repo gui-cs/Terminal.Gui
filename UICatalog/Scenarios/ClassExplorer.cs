@@ -17,11 +17,15 @@ public class ClassExplorer : Scenario
     private TextView _textView;
     private TreeView<object> _treeView;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
-        Win.Y = 1; // menu
-        Win.Height = Dim.Fill (1); // status bar
+        Application.Init ();
+        var top = new Toplevel ();
+
+        var win = new Window
+        {
+            Title = GetName ()
+        };
 
         var menu = new MenuBar
         {
@@ -55,15 +59,15 @@ public class ClassExplorer : Scenario
                                 )
             ]
         };
-        Top.Add (menu);
+        top.Add (menu);
 
         _treeView = new TreeView<object> { X = 0, Y = 1, Width = Dim.Percent (50), Height = Dim.Fill () };
 
         var lblSearch = new Label { Text = "Search" };
         var tfSearch = new TextField { Width = 20, X = Pos.Right (lblSearch) };
 
-        Win.Add (lblSearch);
-        Win.Add (tfSearch);
+        win.Add (lblSearch);
+        win.Add (tfSearch);
 
         TreeViewTextFilter<object> filter = new (_treeView);
         _treeView.Filter = filter;
@@ -83,11 +87,17 @@ public class ClassExplorer : Scenario
         _treeView.TreeBuilder = new DelegateTreeBuilder<object> (ChildGetter, CanExpand);
         _treeView.SelectionChanged += TreeView_SelectionChanged;
 
-        Win.Add (_treeView);
+        win.Add (_treeView);
 
         _textView = new TextView { X = Pos.Right (_treeView), Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        Win.Add (_textView);
+        win.Add (_textView);
+
+        top.Add (win);
+
+        Application.Run (top);
+        top.Dispose ();
+        Application.Shutdown ();
     }
 
     private bool CanExpand (object arg) { return arg is Assembly || arg is Type || arg is ShowForType; }

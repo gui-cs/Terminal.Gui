@@ -46,7 +46,7 @@ public class Editor : Scenario
         // Setup - Create a top-level application window and configure it.
         _appWindow = new ()
         {
-            //Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            //Title = GetQuitKeyAndName (),
             Title = _fileName ?? "Untitled",
             BorderStyle = LineStyle.None
         };

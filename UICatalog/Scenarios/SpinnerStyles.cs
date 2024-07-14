@@ -18,7 +18,7 @@ public class SpinnerViewStyles : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         const int DEFAULT_DELAY = 130;

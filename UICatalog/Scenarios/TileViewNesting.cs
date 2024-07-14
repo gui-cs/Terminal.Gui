@@ -19,11 +19,15 @@ public class TileViewNesting : Scenario
     private View _workArea;
 
     /// <summary>Setup the scenario.</summary>
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
         // Scenario Windows.
-        Win.Title = GetName ();
-        Win.Y = 1;
+        var win = new Window
+        {
+            Title = GetName (),
+            Y = 1
+        };
 
         var lblViews = new Label { Text = "Number Of Views:" };
         _textField = new() { X = Pos.Right (lblViews), Width = 10, Text = "2" };
@@ -52,19 +56,25 @@ public class TileViewNesting : Scenario
             ]
         };
 
-        Win.Add (lblViews);
-        Win.Add (_textField);
-        Win.Add (_cbHorizontal);
-        Win.Add (_cbBorder);
-        Win.Add (_cbTitles);
-        Win.Add (_cbUseLabels);
-        Win.Add (_workArea);
+        win.Add (lblViews);
+        win.Add (_textField);
+        win.Add (_cbHorizontal);
+        win.Add (_cbBorder);
+        win.Add (_cbTitles);
+        win.Add (_cbUseLabels);
+        win.Add (_workArea);
 
         SetupTileView ();
 
-        Top.Add (menu);
+        var top = new Toplevel ();
+        top.Add (menu);
+        top.Add (win);
 
-        Win.Loaded += (s, e) => _loaded = true;
+        top.Loaded += (s, e) => _loaded = true;
+
+        Application.Run (top);
+        top.Dispose ();
+        Application.Shutdown ();
     }
 
     private void AddMoreViews (TileView to)

@@ -104,7 +104,7 @@ public class ContentScrolling : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
 
             // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
             ColorScheme = Colors.ColorSchemes ["Toplevel"]

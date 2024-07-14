@@ -23,7 +23,7 @@ public class AnimationScenario : Scenario
 
         var win = new Window
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
             X = 0,
             Y = 0,
             Width = Dim.Fill (),

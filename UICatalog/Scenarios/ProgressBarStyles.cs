@@ -30,7 +30,7 @@ public class ProgressBarStyles : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}", BorderStyle = LineStyle.Single,
+            Title = GetQuitKeyAndName (), BorderStyle = LineStyle.Single,
         };
 
         var editor = new AdornmentsEditor ()

@@ -149,7 +149,7 @@ public class ASCIICustomButtonTest : Scenario
 
         public ScrollViewTestWindow ()
         {
-            Title = "ScrollViewTestWindow";
+            Title = $"{Application.QuitKey} to Quit - Scenario: ScrollViewTestWindow";
 
             Label titleLabel = null;
 

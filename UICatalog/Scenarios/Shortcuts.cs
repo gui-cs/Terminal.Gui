@@ -31,7 +31,7 @@ public class Shortcuts : Scenario
     private void App_Loaded (object sender, EventArgs e)
     {
         Application.QuitKey = Key.Z.WithCtrl;
-        Application.Top.Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}";
+        Application.Top.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
 

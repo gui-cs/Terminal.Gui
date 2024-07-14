@@ -9,8 +9,11 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Wizards")]
 public class Wizards : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+        var win = new Window { Title = GetQuitKeyAndName () };
+
         var frame = new FrameView
         {
             X = Pos.Center (),
@@ -19,7 +22,7 @@ public class Wizards : Scenario
             ColorScheme = Colors.ColorSchemes ["Base"],
             Title = "Wizard Options"
         };
-        Win.Add (frame);
+        win.Add (frame);
 
         var label = new Label { X = 0, Y = 0, TextAlignment = Alignment.End, Text = "Width:" };
         frame.Add (label);
@@ -78,25 +81,25 @@ public class Wizards : Scenario
         };
         frame.Add (titleEdit);
 
-        void Top_Loaded (object sender, EventArgs args)
+        void Win_Loaded (object sender, EventArgs args)
         {
             frame.Height = widthEdit.Frame.Height + heightEdit.Frame.Height + titleEdit.Frame.Height + 2;
-            Top.Loaded -= Top_Loaded;
+            win.Loaded -= Win_Loaded;
         }
 
-        Top.Loaded += Top_Loaded;
+        win.Loaded += Win_Loaded;
 
         label = new()
         {
             X = Pos.Center (), Y = Pos.AnchorEnd (1), TextAlignment = Alignment.End, Text = "Action:"
         };
-        Win.Add (label);
+        win.Add (label);
 
         var actionLabel = new Label
         {
             X = Pos.Right (label), Y = Pos.AnchorEnd (1), ColorScheme = Colors.ColorSchemes ["Error"]
         };
-        Win.Add (actionLabel);
+        win.Add (actionLabel);
 
         var showWizardButton = new Button
         {
@@ -344,6 +347,10 @@ public class Wizards : Scenario
                                            actionLabel.Text = "Invalid Options";
                                        }
                                    };
-        Win.Add (showWizardButton);
+        win.Add (showWizardButton);
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 }

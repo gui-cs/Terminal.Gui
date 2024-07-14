@@ -14,7 +14,7 @@ public class WindowsAndFrameViews : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         static int About ()
