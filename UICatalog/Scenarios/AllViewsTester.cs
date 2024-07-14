@@ -53,7 +53,7 @@ public class AllViewsTester : Scenario
 
         var app = new Window
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
             ColorScheme = Colors.ColorSchemes ["TopLevel"]
         };
 

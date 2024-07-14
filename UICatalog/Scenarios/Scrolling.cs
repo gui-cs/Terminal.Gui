@@ -19,7 +19,7 @@ public class Scrolling : Scenario
 
         var app = new Window
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
 
             // Offset to stress clipping
             X = 3,

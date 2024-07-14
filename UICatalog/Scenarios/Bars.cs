@@ -28,7 +28,7 @@ public class Bars : Scenario
     // QuitKey and it only sticks if changed after init
     private void App_Loaded (object sender, EventArgs e)
     {
-        Application.Top.Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}";
+        Application.Top.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
         ListView eventLog = new ListView ()
