@@ -170,7 +170,7 @@ public abstract class ColorBar : View, IColorBar
 
     private void DrawBar (int xOffset, int yOffset, int width)
     {
-        // Each 1 unit of X in the bar corresponds to this much of SelectedColor
+        // Each 1 unit of X in the bar corresponds to this much of Value
         _cellValue = (double)MaxValue / (width - 1);
 
         for (var x = 0; x < width; x++)

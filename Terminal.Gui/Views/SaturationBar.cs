@@ -33,6 +33,6 @@ internal class SaturationBar : ColorBar
             return new (rgb.R, rgb.G, rgb.B);
         }
 
-        throw new ("SaturationBar requires either Lightness or SelectedColor to render");
+        throw new ("SaturationBar requires either Lightness or Value to render");
     }
 }

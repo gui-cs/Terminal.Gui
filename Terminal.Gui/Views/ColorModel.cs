@@ -12,7 +12,7 @@ public enum ColorModel
     RGB,
 
     /// <summary>
-    /// Color modelled by storing Hue (360 degrees), Saturation (100%) and SelectedColor (100%)
+    /// Color modelled by storing Hue (360 degrees), Saturation (100%) and Value (100%)
     /// </summary>
     HSV,
 
