@@ -3,12 +3,28 @@ using ColorConverter = ColorHelper.ColorConverter;
 
 namespace Terminal.Gui;
 
+/// <summary>
+/// Describes away of modelling color e.g. Hue
+/// Saturation Lightness.
+/// </summary>
 public enum ColorModel
 {
+    /// <summary>
+    /// Color modelled by storing Red, Green and Blue as (0-255) ints
+    /// </summary>
     RGB,
+
+    /// <summary>
+    /// Color modelled by storing Hue (360 degrees), Saturation (100%) and Value (100%)
+    /// </summary>
     HSV,
+
+    /// <summary>
+    /// Color modelled by storing Hue (360 degrees), Saturation (100%) and Lightness (100%)
+    /// </summary>
     HSL
 }
+
 
 internal interface IColorBar
 {
@@ -172,6 +188,10 @@ internal class ColorModelStrategy
     }
 }
 
+/// <summary>
+/// Contains style settings for <see cref="ColorPicker2"/> e.g. which <see cref="ColorModel"/>
+/// to use.
+/// </summary>
 public class ColorPickerStyle
 {
     /// <summary>
@@ -190,8 +210,8 @@ public class ColorPickerStyle
 /// </summary>
 public class ColorPicker2 : View
 {
-    private TextField tfHex;
-    private Label lbHex;
+    private TextField _tfHex;
+    private Label _lbHex;
 
     private Color _value = Color.Black;
 
@@ -210,7 +230,7 @@ public class ColorPicker2 : View
     /// </summary>
     public event EventHandler<ColorEventArgs> ColorChanged;
 
-    private bool updating;
+    private bool _updating;
 
     /// <summary>
     ///     The color selected in the picker
@@ -222,7 +242,7 @@ public class ColorPicker2 : View
         {
             try
             {
-                updating = true;
+                _updating = true;
 
                 if (_value != value)
                 {
@@ -242,13 +262,21 @@ public class ColorPicker2 : View
             }
             finally
             {
-                updating = false;
+                _updating = false;
             }
         }
     }
 
+    /// <summary>
+    /// Creates a new instance of <see cref="ColorPicker2"/>. Use
+    /// <see cref="Style"/> to change color model. Use <see cref="Value"/>
+    /// to change initial <see cref="Color"/>.
+    /// </summary>
     public ColorPicker2 () { ApplyStyleChanges (); }
 
+    /// <summary>
+    /// Rebuild the user interface to reflect the new state of <see cref="Style"/>.
+    /// </summary>
     public void ApplyStyleChanges ()
     {
         Color oldValue = _value;
@@ -294,24 +322,24 @@ public class ColorPicker2 : View
 
     private void CreateTextField ()
     {
-        lbHex = new()
+        _lbHex = new()
         {
             Text = "Hex:",
             X = 0,
             Y = 3
         };
 
-        tfHex = new()
+        _tfHex = new()
         {
             Y = 3,
             X = 4,
             Width = 8
         };
 
-        Add (lbHex);
-        Add (tfHex);
+        Add (_lbHex);
+        Add (_tfHex);
 
-        tfHex.Leave += UpdateValueFromTextField;
+        _tfHex.Leave += UpdateValueFromTextField;
     }
 
     private void UpdateSingleBarValueFromTextField (object sender, FocusEventArgs e)
@@ -347,25 +375,25 @@ public class ColorPicker2 : View
         _bars = new ();
         _textFields.Clear ();
 
-        if (lbHex != null)
+        if (_lbHex != null)
         {
-            Remove (lbHex);
-            lbHex.Dispose ();
-            lbHex = null;
+            Remove (_lbHex);
+            _lbHex.Dispose ();
+            _lbHex = null;
         }
 
-        if (tfHex != null)
+        if (_tfHex != null)
         {
-            Remove (tfHex);
-            tfHex.Leave -= UpdateValueFromTextField;
-            tfHex.Dispose ();
-            tfHex = null;
+            Remove (_tfHex);
+            _tfHex.Leave -= UpdateValueFromTextField;
+            _tfHex.Dispose ();
+            _tfHex = null;
         }
     }
 
     private void UpdateValueFromTextField (object sender, FocusEventArgs e)
     {
-        if (Color.TryParse (tfHex.Text, out Color? newColor))
+        if (Color.TryParse (_tfHex.Text, out Color? newColor))
         {
             Value = newColor.Value;
         }
@@ -398,7 +426,7 @@ public class ColorPicker2 : View
             kvp.Value.Text = kvp.Key.Value.ToString ();
         }
 
-        if (!updating)
+        if (!_updating)
         {
             Value = _strategy.GetColorFromBars (_bars, Style.ColorModel);
         }
@@ -406,12 +434,19 @@ public class ColorPicker2 : View
         SetTextFieldToValue ();
     }
 
-    private void SetTextFieldToValue () { tfHex.Text = _value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}"); }
+    private void SetTextFieldToValue () { _tfHex.Text = _value.ToString ($"#{Value.R:X2}{Value.G:X2}{Value.B:X2}"); }
 }
 
+/// <summary>
+/// A bar representing a single component of a <see cref="Color"/> e.g.
+/// the Red portion of a <see cref="ColorModel.RGB"/>.
+/// </summary>
 public abstract class ColorBar : View, IColorBar
 {
-    protected int BarStartsAt;
+    /// <summary>
+    /// X coordinate that the bar starts at excluding any label.
+    /// </summary>
+    private int _barStartsAt;
 
     /// <summary>
     ///     0-1 for how much of the color element is present currently (HSL)
@@ -424,8 +459,16 @@ public abstract class ColorBar : View, IColorBar
     /// </summary>
     private double _cellValue = 1d;
 
+    /// <summary>
+    /// The maximum value allowed for this component e.g. Saturation allows up to 100 as it
+    /// is a percentage while Hue allows up to 360 as it is measured in degrees.
+    /// </summary>
     protected abstract int MaxValue { get; }
 
+    /// <summary>
+    /// The currently selected amount of the color component stored by this class e.g.
+    /// the amount of Hue in a <see cref="ColorModel.HSL"/>.
+    /// </summary>
     public int Value
     {
         get => _value;
@@ -441,8 +484,14 @@ public abstract class ColorBar : View, IColorBar
         }
     }
 
+    /// <summary>
+    /// Event fired when <see cref="Value"/> is changed to a new value
+    /// </summary>
     public event EventHandler<EventArgs<int>> ValueChanged;
 
+    /// <summary>
+    /// Creates a new instance of the <see cref="ColorBar"/> class.
+    /// </summary>
     protected ColorBar ()
     {
         Height = 1;
@@ -480,7 +529,7 @@ public abstract class ColorBar : View, IColorBar
         return true;
     }
 
-    protected bool? Adjust (int delta)
+    private bool? Adjust (int delta)
     {
         var change = (int)(delta * _cellValue);
 
@@ -498,16 +547,16 @@ public abstract class ColorBar : View, IColorBar
     /// <summary>
     ///     Last known width of the bar as passed to <see cref="DrawBar"/>.
     /// </summary>
-    protected int BarWidth { get; private set; }
+    private int _barWidth;
 
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            if (mouseEvent.Position.X >= BarStartsAt)
+            if (mouseEvent.Position.X >= _barStartsAt)
             {
-                double v = MaxValue * ((double)mouseEvent.Position.X - BarStartsAt) / (BarWidth - 1);
+                double v = MaxValue * ((double)mouseEvent.Position.X - _barStartsAt) / (_barWidth - 1);
                 Value = Math.Clamp ((int)v, 0, MaxValue);
             }
 
@@ -520,6 +569,7 @@ public abstract class ColorBar : View, IColorBar
         return base.OnMouseEvent (mouseEvent);
     }
 
+    /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
         base.OnDrawContent (viewport);
@@ -535,10 +585,10 @@ public abstract class ColorBar : View, IColorBar
             xOffset = Text.Length;
         }
 
-        BarWidth = viewport.Width - xOffset;
-        BarStartsAt = xOffset;
+        _barWidth = viewport.Width - xOffset;
+        _barStartsAt = xOffset;
 
-        DrawBar (xOffset, 0, BarWidth);
+        DrawBar (xOffset, 0, _barWidth);
     }
 
     private void DrawBar (int xOffset, int yOffset, int width)
@@ -578,11 +628,18 @@ public abstract class ColorBar : View, IColorBar
         }
     }
 
+    /// <summary>
+    /// When overriden in a derived class, returns the <see cref="Color"/> to
+    /// render at <paramref name="fraction"/> proportion of the full bars width.
+    /// e.g. 0.5 fraction of Saturation is 50% because Saturation goes from 0-100.
+    /// </summary>
+    /// <param name="fraction"></param>
+    /// <returns></returns>
     protected abstract Color GetColor (double fraction);
 
-    protected virtual void OnValueChanged ()
+    private void OnValueChanged ()
     {
-        ValueChanged?.Invoke (this, new (_value));
+        ValueChanged?.Invoke (this, new (in _value));
 
         // Notify subscribers if any, and redraw the view
         SetNeedsDisplay ();
