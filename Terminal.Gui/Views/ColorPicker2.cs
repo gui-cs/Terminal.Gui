@@ -485,6 +485,12 @@ public abstract class ColorBar : View, IColorBar
     }
 
     /// <summary>
+    /// The last drawn location in View's viewport where the Triangle appeared.
+    /// Used exclusively for tests.
+    /// </summary>
+    internal int TrianglePosition { get; private set; }
+
+    /// <summary>
     /// Event fired when <see cref="Value"/> is changed to a new value
     /// </summary>
     public event EventHandler<EventArgs<int>> ValueChanged;
@@ -548,6 +554,7 @@ public abstract class ColorBar : View, IColorBar
     ///     Last known width of the bar as passed to <see cref="DrawBar"/>.
     /// </summary>
     private int _barWidth;
+
 
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
@@ -619,6 +626,9 @@ public abstract class ColorBar : View, IColorBar
                 // Draw the triangle at the closest position
                 Application.Driver.SetAttribute (new (triangleColor, color));
                 AddRune (x + xOffset, yOffset, new ('▲'));
+
+                // Record for tests
+                TrianglePosition = x + xOffset;
             }
             else
             {

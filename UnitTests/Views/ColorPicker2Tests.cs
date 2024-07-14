@@ -7,7 +7,7 @@ public class ColorPicker2Tests (ITestOutputHelper output)
 {
     [Fact]
     [AutoInitShutdown]
-    public void ColorPicker_DefaultBootDraw ()
+    public void ColorPicker_Construct_DefaultValue ()
     {
         var cp = new ColorPicker2 { Width = 20, Height = 4, Value = new (0, 0) };
 
@@ -18,19 +18,28 @@ public class ColorPicker2Tests (ITestOutputHelper output)
         top.Add (cp);
         Application.Begin (top);
 
+        // Should be only a single text field (Hex) because ShowTextFields is false
+        Assert.Single (cp.Subviews.OfType<TextField> ());
+
         cp.Draw ();
 
-        var expected =
-            @"
-H:▲█████████████████
-S:▲█████████████████
-V:▲█████████████████
-Hex:#000000  ■
-";
+        // All bars should be at 0 with the triangle at 0 (+2 because of "H:", "S:" etc)
+        var h = GetColorBar (cp, ColorPickerPart.Bar1);
+        Assert.Equal ("H:",h.Text);
+        Assert.Equal (2,h.TrianglePosition);
+        Assert.IsType <HueBar>(h);
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        var s = GetColorBar (cp, ColorPickerPart.Bar2);
+        Assert.Equal ("S:", s.Text);
+        Assert.Equal (2, s.TrianglePosition);
+        Assert.IsType<SaturationBar> (s);
 
-        var hex = GetTextField (cp,TextFieldInColorPicker.Hex);
+        var v = GetColorBar (cp, ColorPickerPart.Bar3);
+        Assert.Equal ("V:", v.Text);
+        Assert.Equal (2, v.TrianglePosition);
+        Assert.IsType<ValueBar> (v);
+
+        var hex = GetTextField (cp,ColorPickerPart.Hex);
         Assert.Equal ("#000000", hex.Text);
 
         top.Dispose ();
@@ -556,18 +565,18 @@ Hex:#800000  ■
         top.Dispose ();
     }
 
-    enum TextFieldInColorPicker
+    enum ColorPickerPart
     {
         Bar1 = 0,
         Bar2 = 1,
         Bar3 = 2,
         Hex = 3,
     }
-    private TextField GetTextField (ColorPicker2 cp, TextFieldInColorPicker toGet)
+    private TextField GetTextField (ColorPicker2 cp, ColorPickerPart toGet)
     {
         if (!cp.Style.ShowTextFields)
         {
-            if (toGet <= TextFieldInColorPicker.Bar3)
+            if (toGet <= ColorPickerPart.Bar3)
             {
                 throw new NotSupportedException ("There are no bar text fields for ColorPicker because ShowTextFields is false");
             }
@@ -579,6 +588,14 @@ Hex:#800000  ■
         return cp.Subviews.OfType<TextField> ().ElementAt ((int)toGet);
     }
 
+    private ColorBar GetColorBar (ColorPicker2 cp, ColorPickerPart toGet)
+    {
+        if (toGet <= ColorPickerPart.Bar3)
+        {
+            return cp.Subviews.OfType<ColorBar> ().ElementAt ((int)toGet);
+        }
+        throw new NotSupportedException ("ColorPickerPart must be a bar");
+    }
 
     [Fact]
     [AutoInitShutdown]
