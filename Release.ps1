@@ -5,8 +5,8 @@ param(
     [int]$Version
 )
 
-$branch = "v2_develop"
-$tag = "v2.0.0-alpha.$Version"
+$branch = "v2_release"
+$tag = "$Version-prealpha"
 $releaseMessage = "Release $tag"
 
 try {
