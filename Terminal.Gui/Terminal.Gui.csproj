@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <!-- =================================================================== -->
   <!-- Version numbers -->
   <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
@@ -19,16 +19,19 @@
   <!-- .NET Build Settings -->
   <!-- =================================================================== -->
   <PropertyGroup>
-    <TargetFrameworks>net8.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>12</LangVersion>
     <RootNamespace>$(AssemblyName)</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineTrace>true</DefineTrace>
     <DebugType>portable</DebugType>
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants>$(DefineConstants);CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
     <ImplicitUsings>enable</ImplicitUsings>
     <NoLogo>true</NoLogo>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineDebug>true</DefineDebug>
@@ -49,21 +52,16 @@
   <!-- Dependencies -->
   <!-- =================================================================== -->
   <ItemGroup>
-    <PackageReference Include="ColorHelper" Version="1.8.1" />
-    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.9.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
+    <PackageReference Include="ColorHelper" Version="[1.8.1,2)" />
+    <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="[4.10,5)" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="[4.10,5)" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[4.10,5)" PrivateAssets="all" />
     <!-- Enable Nuget Source Link for github -->
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
-    <PackageReference Include="System.IO.Abstractions" Version="21.0.2" />
-    <PackageReference Include="System.Text.Json" Version="8.0.3" />
-    <PackageReference Include="Wcwidth" Version="2.0.0" />
-    <ProjectReference Include="..\Analyzers\Terminal.Gui.Analyzers.Internal\Terminal.Gui.Analyzers.Internal.csproj">
-      <PrivateAssets>all</PrivateAssets>
-      <OutputItemType>Analyzer</OutputItemType>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[8,9)" PrivateAssets="all" />
+    <PackageReference Include="System.IO.Abstractions" Version="[21.0.22,22)" />
+    <PackageReference Include="System.Text.Json" Version="[8.0.4,9)" />
+    <PackageReference Include="Wcwidth" Version="[2,3)" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Global Usings and Type Aliases -->
@@ -73,6 +71,7 @@
     <Using Include="JetBrains.Annotations.PureAttribute" Alias="PureAttribute" />
     <Using Include="System.Drawing" />
     <Using Include="System.Text" />
+    <Using Include="Terminal.Gui.EnumExtensions" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Assembliy names for which internal items are visible -->

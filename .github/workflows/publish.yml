@@ -19,7 +19,7 @@ jobs:
         fetch-depth: 0 # fetch-depth is needed for GitVersion
 
     - name: Install GitVersion 
-      uses: gittools/actions/gitversion/setup@v0
+      uses: gittools/actions/gitversion/setup@v1
       with:
           versionSpec: '5.x'
           includePrerelease: true
@@ -43,7 +43,6 @@ jobs:
     - name: Build Release
       run: |
         dotnet-gitversion /updateprojectfiles
-        dotnet build ./Analyzers/Terminal.Gui.Analyzers.Internal --no-incremental --nologo --force --configuration Release
         dotnet build --no-incremental --nologo --force --configuration Release
 
     - name: Pack

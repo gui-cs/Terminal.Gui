@@ -1,4 +1,4 @@
-using Terminal.Gui.Analyzers.Internal.Attributes;
+
 
 namespace Terminal.Gui;
 
@@ -6,7 +6,6 @@ namespace Terminal.Gui;
 ///     Determines alignment modes for <see cref="Alignment"/>.
 /// </summary>
 [Flags]
-[GenerateEnumExtensionMethods (FastHasFlags = true)]
 public enum AlignmentModes
 {
     /// <summary>

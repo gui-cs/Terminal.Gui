@@ -15,7 +15,7 @@ public class DimAutoDemo : Scenario
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
         };
 
         // For diagnostics

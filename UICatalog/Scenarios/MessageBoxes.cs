@@ -15,7 +15,7 @@ public class MessageBoxes : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         var frame = new FrameView

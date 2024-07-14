@@ -14,7 +14,7 @@ public class LineCanvasExperiment : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         var frame1 = new FrameView

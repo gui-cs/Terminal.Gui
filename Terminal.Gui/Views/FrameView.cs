@@ -36,6 +36,6 @@ public class FrameView : View
     ///     <see cref="FrameView"/>s.
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
+    [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 }

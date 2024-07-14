@@ -1,4 +1,4 @@
-﻿using Terminal.Gui.Analyzers.Internal.Attributes;
+﻿
 
 namespace Terminal.Gui;
 
@@ -10,7 +10,7 @@ namespace Terminal.Gui;
 ///     <para>Key bindings are scoped to the most-focused view (<see cref="Focused"/>) by default.</para>
 /// </remarks>
 [Flags]
-[GenerateEnumExtensionMethods (FastHasFlags = true)]
+
 public enum KeyBindingScope
 {
     /// <summary>The key binding is disabled.</summary>

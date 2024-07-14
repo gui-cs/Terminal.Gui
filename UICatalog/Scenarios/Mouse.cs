@@ -15,7 +15,7 @@ public class Mouse : Scenario
 
         Window win = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         Slider<MouseFlags> filterSlider = new ()

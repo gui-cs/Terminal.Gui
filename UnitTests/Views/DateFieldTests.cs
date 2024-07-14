@@ -194,6 +194,10 @@ public class DateFieldTests
             {
                 separator = separator.Replace ("\u200f", "");
             }
+            else if (culture.Name == "ar-SA" && RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
+            {
+                separator = " ";
+            }
 
 
             string format = culture.DateTimeFormat.ShortDatePattern;
@@ -206,6 +210,14 @@ public class DateFieldTests
                 {
                     case "ar-SA":
                         Assert.Equal ($" 04{separator}11{separator}1390", df.Text);
+
+                        break;
+                    case "en-SA" when RuntimeInformation.IsOSPlatform (OSPlatform.OSX):
+                        Assert.Equal ($" 04{separator}11{separator}1390", df.Text);
+
+                        break;
+                    case "en-TH" when RuntimeInformation.IsOSPlatform (OSPlatform.OSX):
+                        Assert.Equal ($" 01{separator}01{separator}2514", df.Text);
 
                         break;
                     case "th":

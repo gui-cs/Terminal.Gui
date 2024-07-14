@@ -10,8 +10,8 @@ We welcome contributions from the community. See [Issues](https://github.com/gui
 
 Terminal.Gui uses the [GitFlow](https://nvie.com/posts/a-successful-git-branching-model/) branching model. 
 
-* The `main` branch is always stable, and always matches the most recently released Nuget package.
-* The `develop` branch is where new development and bug-fixes happen. It is the default branch.
+* The `v1_release_` and `v2_release` branches are always stable, and always matches the most recently released Nuget package.
+* The `v1__develop` and `v2_develop` branches are where new development and bug-fixes happen. `v2_develop` is the default Github branch.
 
 ### Forking Terminal.Gui
 
@@ -33,11 +33,11 @@ You now have your own fork and a local repo that references it as `origin`. Your
 
 ### Starting to Make a Change
 
-Ensure your local `develop` (for v1) or `v2_develop` (for v2) branch is up-to-date with `upstream` (`github.com/gui-cs/Terminal.Gui`):
+Ensure your local `v1_develop` (for v1) or `v2_develop` (for v2) branch is up-to-date with `upstream` (`github.com/gui-cs/Terminal.Gui`):
 ```powershell
 cd ./Terminal.Gui
-git checkout develop
-git pull upstream develop
+git checkout v2_develop
+git pull upstream v2_develop
 ```
 
 Create a new local branch:

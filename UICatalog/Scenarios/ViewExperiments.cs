@@ -15,7 +15,7 @@ public class ViewExperiments : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         var containerLabel = new Label

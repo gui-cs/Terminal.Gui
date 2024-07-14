@@ -27,7 +27,7 @@ public class ListViewWithSelection : Scenario
 
         _appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
         };
 
         _scenarios = GetScenarios ();

@@ -42,7 +42,7 @@ internal class KeyCodeJsonConverter : JsonConverter<KeyCode>
                                 }
 
                                 // The enum uses "D0..D9" for the number keys
-                                if (Enum.TryParse (reader.GetString ().TrimStart ('D', 'd'), false, out key))
+                                if (Enum.TryParse (reader.GetString ()!.TrimStart ('D', 'd'), false, out key))
                                 {
                                     break;
                                 }

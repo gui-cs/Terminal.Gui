@@ -1,4 +1,4 @@
-using Terminal.Gui.Analyzers.Internal.Attributes;
+
 
 namespace Terminal.Gui;
 
@@ -6,7 +6,6 @@ namespace Terminal.Gui;
 ///     Indicates the side for <see cref="Pos"/> operations.
 /// </summary>
 ///
-[GenerateEnumExtensionMethods]
 public enum Side
 {
     /// <summary>

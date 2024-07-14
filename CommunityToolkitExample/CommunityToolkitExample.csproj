@@ -8,11 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="[8.2.2,9)" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="[8,9)" />
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
 

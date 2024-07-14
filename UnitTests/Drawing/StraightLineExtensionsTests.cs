@@ -2,11 +2,8 @@
 
 namespace Terminal.Gui.DrawingTests;
 
-public class StraightLineExtensionsTests
+public class StraightLineExtensionsTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public StraightLineExtensionsTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [AutoInitShutdown]
     public void LineCanvasIntegrationTest ()
@@ -18,7 +15,7 @@ public class StraightLineExtensionsTests
         lc.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Single);
 
         TestHelpers.AssertEqual (
-                                 _output,
+                                 output,
                                  @"
 ┌────────┐
 │        │
@@ -32,7 +29,7 @@ public class StraightLineExtensionsTests
         lc = new LineCanvas (origLines.Exclude (Point.Empty, 10, Orientation.Horizontal));
 
         TestHelpers.AssertEqual (
-                                 _output,
+                                 output,
                                  @"
 │        │
 │        │
@@ -44,7 +41,7 @@ public class StraightLineExtensionsTests
         lc = new LineCanvas (origLines.Exclude (new Point (0, 1), 10, Orientation.Horizontal));
 
         TestHelpers.AssertEqual (
-                                 _output,
+                                 output,
                                  @"
 ┌────────┐
           
@@ -57,7 +54,7 @@ public class StraightLineExtensionsTests
         lc = new LineCanvas (origLines.Exclude (new Point (0, 2), 10, Orientation.Horizontal));
 
         TestHelpers.AssertEqual (
-                                 _output,
+                                 output,
                                  @"
 ┌────────┐
 │        │
@@ -70,7 +67,7 @@ public class StraightLineExtensionsTests
         lc = new LineCanvas (origLines.Exclude (new Point (0, 3), 10, Orientation.Horizontal));
 
         TestHelpers.AssertEqual (
-                                 _output,
+                                 output,
                                  @"
 ┌────────┐
 │        │
@@ -83,7 +80,7 @@ public class StraightLineExtensionsTests
         lc = new LineCanvas (origLines.Exclude (new Point (0, 4), 10, Orientation.Horizontal));
 
         TestHelpers.AssertEqual (
-                                 _output,
+                                 output,
                                  @"
 ┌────────┐
 │        │
@@ -95,7 +92,7 @@ public class StraightLineExtensionsTests
         lc = new LineCanvas (origLines.Exclude (Point.Empty, 10, Orientation.Vertical));
 
         TestHelpers.AssertEqual (
-                                 _output,
+                                 output,
                                  @"
 ────────┐
         │
@@ -108,7 +105,7 @@ public class StraightLineExtensionsTests
         lc = new LineCanvas (origLines.Exclude (new Point (1, 0), 10, Orientation.Vertical));
 
         TestHelpers.AssertEqual (
-                                 _output,
+                                 output,
                                  @"
 ┌ ───────┐
 │        │
@@ -121,7 +118,7 @@ public class StraightLineExtensionsTests
         lc = new LineCanvas (origLines.Exclude (new Point (8, 0), 10, Orientation.Vertical));
 
         TestHelpers.AssertEqual (
-                                 _output,
+                                 output,
                                  @"
 ┌─────── ┐
 │        │
@@ -134,7 +131,7 @@ public class StraightLineExtensionsTests
         lc = new LineCanvas (origLines.Exclude (new Point (9, 0), 10, Orientation.Vertical));
 
         TestHelpers.AssertEqual (
-                                 _output,
+                                 output,
                                  @"
 ┌────────
 │        

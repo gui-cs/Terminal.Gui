@@ -22,7 +22,7 @@ public class MultiColouredTable : Scenario
         // Setup - Create a top-level application window and configure it.
         Toplevel appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         _tableView = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };

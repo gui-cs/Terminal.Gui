@@ -2,7 +2,6 @@
   "solution": {
     "path": "Terminal.sln",
     "projects": [
-      "Analyzers\\Terminal.Gui.Analyzers.Internal\\Terminal.Gui.Analyzers.Internal.csproj",
       "Terminal.Gui\\Terminal.Gui.csproj",
       "UICatalog\\UICatalog.csproj",
       "UnitTests\\UnitTests.csproj"
