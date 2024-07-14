@@ -120,6 +120,14 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             return;
         }
 
+        // This test seems to assume that a view has no subview components, it sends 2 tabs
+        // and wants there to be 2 Enter events. However ColorPicker is a container of multiple
+        // subviews so tab moves between sub elements in the picker
+        if (viewType == typeof (ColorPicker))
+        {
+            return;
+        }
+
         Application.Init (new FakeDriver ());
 
         Toplevel top = new ()
