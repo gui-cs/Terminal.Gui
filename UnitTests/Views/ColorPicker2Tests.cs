@@ -30,6 +30,9 @@ Hex:#000000  ■
 
         TestHelpers.AssertDriverContentsAre (expected, output);
 
+        var hex = GetTextField (cp,TextFieldInColorPicker.Hex);
+        Assert.Equal ("#000000", hex.Text);
+
         top.Dispose ();
     }
 
@@ -552,6 +555,30 @@ Hex:#800000  ■
 
         top.Dispose ();
     }
+
+    enum TextFieldInColorPicker
+    {
+        Bar1 = 0,
+        Bar2 = 1,
+        Bar3 = 2,
+        Hex = 3,
+    }
+    private TextField GetTextField (ColorPicker2 cp, TextFieldInColorPicker toGet)
+    {
+        if (!cp.Style.ShowTextFields)
+        {
+            if (toGet <= TextFieldInColorPicker.Bar3)
+            {
+                throw new NotSupportedException ("There are no bar text fields for ColorPicker because ShowTextFields is false");
+            }
+
+
+            return cp.Subviews.OfType<TextField> ().Single ();
+        }
+
+        return cp.Subviews.OfType<TextField> ().ElementAt ((int)toGet);
+    }
+
 
     [Fact]
     [AutoInitShutdown]
