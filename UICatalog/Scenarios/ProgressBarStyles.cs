@@ -63,9 +63,9 @@ public class ProgressBarStyles : Scenario
 
         #region ColorPicker
 
-        ColorName ChooseColor (string text, ColorName colorName)
+        Color ChooseColor (string text, ColorName colorName)
         {
-            var colorPicker = new ColorPicker { Title = text, SelectedColor = colorName };
+            var colorPicker = new ColorPicker { Title = text, SelectedColor = colorName,Height = 6 };
 
             var dialog = new Dialog { Title = text };
 
@@ -91,7 +91,7 @@ public class ProgressBarStyles : Scenario
             Application.Run (dialog);
             dialog.Dispose ();
 
-            ColorName retColor = colorPicker.SelectedColor;
+            Color retColor = colorPicker.SelectedColor;
             colorPicker.Dispose ();
 
             return retColor;
@@ -107,7 +107,7 @@ public class ProgressBarStyles : Scenario
 
         fgColorPickerBtn.Accept += (s, e) =>
                                     {
-                                        ColorName newColor = ChooseColor (
+                                        var newColor = ChooseColor (
                                                                           fgColorPickerBtn.Text,
                                                                           editor.ViewToEdit.ColorScheme.HotNormal.Foreground
                                                                                 .GetClosestNamedColor ()
@@ -134,7 +134,7 @@ public class ProgressBarStyles : Scenario
 
         bgColorPickerBtn.Accept += (s, e) =>
                                     {
-                                        ColorName newColor = ChooseColor (
+                                        var newColor = ChooseColor (
                                                                           fgColorPickerBtn.Text,
                                                                           editor.ViewToEdit.ColorScheme.HotNormal.Background
                                                                                 .GetClosestNamedColor ()

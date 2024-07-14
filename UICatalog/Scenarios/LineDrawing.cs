@@ -437,9 +437,9 @@ public class AttributeView : View
         d.AddButton (btnOk);
         d.AddButton (btnCancel);
         */
-        var cp = new ColorPicker2
+        var cp = new ColorPicker
         {
-            Value = current,
+            SelectedColor = current,
             Width = Dim.Fill (),
             Height = Dim.Fill (1)
         };
@@ -448,7 +448,7 @@ public class AttributeView : View
 
         Application.Run (d);
         d.Dispose ();
-        newColor = cp.Value;
+        newColor = cp.SelectedColor;
 
         SetNeedsDisplay ();
 

@@ -34,7 +34,12 @@ public class ColorPickers : Scenario
         };
 
         // Foreground ColorPicker.
-        foregroundColorPicker = new ColorPicker { Title = "Foreground Color", BorderStyle = LineStyle.Single };
+        foregroundColorPicker = new ColorPicker {
+            Title = "Foreground Color",
+            BorderStyle = LineStyle.Single,
+            Width = Dim.Percent (50),
+            Height = 6
+        };
         foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
         app.Add (foregroundColorPicker);
 
@@ -49,9 +54,9 @@ public class ColorPickers : Scenario
         {
             Title = "Background Color",
             X = Pos.AnchorEnd (),
-            BoxHeight = 1,
-            BoxWidth = 4,
+            Width = Dim.Percent (50),
             BorderStyle = LineStyle.Single,
+            Height = 6
         };
 
         backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;

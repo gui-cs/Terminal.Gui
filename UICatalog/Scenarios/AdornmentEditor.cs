@@ -11,21 +11,19 @@ public class AdornmentEditor : View
     private readonly ColorPicker _backgroundColorPicker = new ()
     {
         Title = "_BG",
-        BoxWidth = 1,
-        BoxHeight = 1,
         BorderStyle = LineStyle.Single,
         SuperViewRendersLineCanvas = true,
-        Enabled = false
+        Enabled = false,
+        Height = 6
     };
 
     private readonly ColorPicker _foregroundColorPicker = new ()
     {
         Title = "_FG",
-        BoxWidth = 1,
-        BoxHeight = 1,
         BorderStyle = LineStyle.Single,
         SuperViewRendersLineCanvas = true,
-        Enabled = false
+        Enabled = false,
+        Height = 6
     };
 
     private Adornment _adornment;
