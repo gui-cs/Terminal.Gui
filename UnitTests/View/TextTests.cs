@@ -778,56 +778,7 @@ Y
         Application.End (rs);
         top.Dispose ();
     }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void GetTextFormatterBoundsSize_GetSizeNeededForText_HotKeySpecifier ()
-    {
-        var text = "Say Hello 你";
-
-        // Frame: 0, 0, 12, 1
-        var horizontalView = new View
-        {
-            Width = Dim.Auto (), Height = Dim.Auto ()
-        };
-        horizontalView.TextFormatter.HotKeySpecifier = (Rune)'_';
-        horizontalView.Text = text;
-
-        // Frame: 0, 0, 1, 12
-        var verticalView = new View
-        {
-            Width = Dim.Auto (), Height = Dim.Auto (), TextDirection = TextDirection.TopBottom_LeftRight
-        };
-        verticalView.Text = text;
-        verticalView.TextFormatter.HotKeySpecifier = (Rune)'_';
-
-        var top = new Toplevel ();
-        top.Add (horizontalView, verticalView);
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (50, 50);
-
-        Assert.Equal (new (0, 0, 12, 1), horizontalView.Frame);
-        Assert.Equal (new (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
-        Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
-
-        Assert.Equal (new (0, 0, 2, 11), verticalView.Frame);
-        Assert.Equal (new (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
-        Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
-
-        text = "012345678你";
-        horizontalView.Text = text;
-        verticalView.Text = text;
-
-        Assert.Equal (new (0, 0, 11, 1), horizontalView.Frame);
-        Assert.Equal (new (11, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
-        Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
-
-        Assert.Equal (new (0, 0, 2, 10), verticalView.Frame);
-        Assert.Equal (new (2, 10), verticalView.GetSizeNeededForTextWithoutHotKey ());
-        Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
-        top.Dispose ();
-    }
-
+    
     [Theory]
     [AutoInitShutdown]
     [InlineData (true)]

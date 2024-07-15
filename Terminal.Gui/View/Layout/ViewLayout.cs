@@ -737,10 +737,10 @@ public partial class View
 
         // Determine our container's ContentSize - 
         //  First try SuperView.Viewport, then Application.Top, then Driver.Viewport.
-        //  Finally, if none of those are valid, use int.MaxValue (for Unit tests).
+        //  Finally, if none of those are valid, use 2048 (for Unit tests).
         Size superViewContentSize = SuperView is { IsInitialized: true } ? SuperView.GetContentSize () :
                            Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.GetContentSize () :
-                           Application.Driver?.Screen.Size ?? new (int.MaxValue, int.MaxValue);
+                           Application.Screen.Size;
 
         SetTextFormatterSize ();
 

@@ -20,7 +20,7 @@ public abstract class ConsoleDriver
 
     // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
     /// <summary>Gets the location and size of the terminal screen.</summary>
-    public Rectangle Screen => new (0, 0, Cols, Rows);
+    internal Rectangle Screen => new (0, 0, Cols, Rows);
 
     private Rectangle _clip;
 

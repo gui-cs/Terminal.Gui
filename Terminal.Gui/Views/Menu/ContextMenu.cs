@@ -144,7 +144,7 @@ public sealed class ContextMenu : IDisposable
         _container = Application.Current;
         _container.Closing += Container_Closing;
         _container.Deactivate += Container_Deactivate;
-        Rectangle frame = Application.Driver.Screen;
+        Rectangle frame = Application.Screen;
         Point position = Position;
 
         if (Host is { })

@@ -1,5 +1,7 @@
 #nullable enable
 
+using static Unix.Terminal.Curses;
+
 namespace Terminal.Gui;
 
 public partial class View
@@ -160,17 +162,6 @@ public partial class View
     }
 
     /// <summary>
-    ///     Gets the dimensions required for <see cref="Text"/> ignoring a <see cref="TextFormatter.HotKeySpecifier"/>.
-    /// </summary>
-    /// <returns></returns>
-    internal Size GetSizeNeededForTextWithoutHotKey ()
-    {
-        return new Size (
-                         TextFormatter.Size.Width - TextFormatter.GetHotKeySpecifierLength (),
-                         TextFormatter.Size.Height - TextFormatter.GetHotKeySpecifierLength (false));
-    }
-
-    /// <summary>
     ///     Internal API. Sets <see cref="TextFormatter"/>.Size to the current <see cref="Viewport"/> size, adjusted for
     ///     <see cref="TextFormatter.HotKeySpecifier"/>.
     /// </summary>
@@ -196,6 +187,7 @@ public partial class View
         if ((widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
             || (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text)))
         {
+            // BUGBUG: This ignores wordwrap and other formatting options.
             size = TextFormatter.GetAutoSize ();
 
             if (widthAuto is null || !widthAuto.Style.FastHasFlags (DimAutoStyle.Text))

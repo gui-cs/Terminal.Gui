@@ -833,10 +833,10 @@ At 0,0
             TextDirection = TextDirection.TopBottom_LeftRight,
             Width = Dim.Auto (),
             Height = Dim.Auto ()
-        }; // BUGBUG: AutoSize or Height need be set
+        };
+        r.TextFormatter.WordWrap = false;
         Assert.NotNull (r);
 
-        // BUGBUG: IsInitialized must be true to process calculation
         r.BeginInit ();
         r.EndInit ();
         Assert.False (r.CanFocus);

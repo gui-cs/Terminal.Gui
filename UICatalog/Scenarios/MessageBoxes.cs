@@ -47,7 +47,6 @@ public class MessageBoxes : Scenario
         {
             X = 0,
             Y = Pos.Bottom (label),
-
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,

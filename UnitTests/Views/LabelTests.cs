@@ -473,7 +473,7 @@ e
         var label = new Label { BorderStyle = LineStyle.Single, Text = "Test" };
         label.BeginInit ();
         label.EndInit ();
-        label.SetRelativeLayout (Application.Driver.Screen.Size);
+        label.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
         Assert.Equal (new (0, 0, 6, 3), label.Frame);

@@ -13,8 +13,9 @@ public class PosCenter : Pos
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
+        // Protect against negative dimensions
         int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension), 0);
 
-        return GetAnchor (superviewDimension - newDimension);
+        return superviewDimension / 2 - newDimension / 2;
     }
 }

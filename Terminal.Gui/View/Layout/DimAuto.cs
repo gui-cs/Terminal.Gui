@@ -63,19 +63,25 @@ public class DimAuto () : Dim
         var maxCalculatedSize = 0;
 
         int autoMin = MinimumContentDim?.GetAnchor (superviewContentSize) ?? 0;
-        int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? (dimension == Dimension.Width ? Application.Driver.Screen.Width : Application.Driver.Screen.Height);
+        int screen = dimension == Dimension.Width ? Application.Screen.Width * 4 : Application.Screen.Height * 4;
+        int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? screen;
 
         if (Style.FastHasFlags (DimAutoStyle.Text))
         {
             if (dimension == Dimension.Width)
             {
-                //us.TextFormatter.Size = us.GetContentSize ();
+                us.TextFormatter.Size = new (autoMax, 2048);
                 textSize = int.Max (autoMin, us.TextFormatter.FormatAndGetSize ().Width);
+                us.TextFormatter.Size = new Size (textSize, 2048);
             }
             else
             {
-                us.TextFormatter.Size = us.GetContentSize () with { Height = Application.Driver.Screen.Height };
+                if (us.TextFormatter.Size.Width == 0)
+                {
+                    us.TextFormatter.Size = us.TextFormatter.GetAutoSize ();
+                }
                 textSize = int.Max (autoMin, us.TextFormatter.FormatAndGetSize ().Height);
+                us.TextFormatter.Size = us.TextFormatter.Size with { Height = textSize };
             }
         }
 
@@ -629,15 +635,16 @@ public class DimAuto () : Dim
 
         // ************** We now definitively know `us.ContentSize` ***************
 
+        int oppositeScreen = dimension == Dimension.Width ? Application.Screen.Height * 4 : Application.Screen.Width * 4 ;
         foreach (var v in us.Subviews)
         {
             if (dimension == Dimension.Width)
             {
-                v.SetRelativeLayout (new Size (max, Application.Driver.Screen.Width));
+                v.SetRelativeLayout (new Size (max, oppositeScreen));
             }
             else
             {
-                v.SetRelativeLayout (new Size (Application.Driver.Screen.Height, max));
+                v.SetRelativeLayout (new Size (oppositeScreen, max));
             }
         }
 

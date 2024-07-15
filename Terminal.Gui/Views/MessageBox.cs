@@ -391,16 +391,13 @@ public static class MessageBox
             {
                 int buttonHeight = buttonList.Count > 0 ? buttonList [0].Frame.Height : 0;
                 Debug.Assert (d.TextFormatter.WordWrap);
-                d.TextFormatter.Size = new Size (d.GetContentSize ().Width, Application.Driver.Screen.Height);
+                d.TextFormatter.Size = new Size (d.GetContentSize ().Width, Application.Screen.Height);
                 Size textSize = d.TextFormatter.GetAutoSize ();
                 textSize.Height += buttonHeight;
 
                 if (textSize != d.TextFormatter.Size)
                 {
-                    //d.TextFormatter.Size = textSize;
-                    //d.SetContentSize (textSize);
                     d.SetNeedsLayout ();
-                    //d.SetRelativeLayout (Application.Driver.Screen.Size);
                 }
             }
         };
@@ -411,10 +408,6 @@ public static class MessageBox
         d.VerticalTextAlignment = Alignment.Start;
         d.TextFormatter.WordWrap = wrapMessage;
         d.TextFormatter.MultiLine = !wrapMessage;
-
-        // Add two lines to push buttons down two rows
-        // BUGBUG: The " " are here due to a bug in TextFormater.Format that strips trailing newlines when .Wordwrap = true
-       // d.Text += Environment.NewLine + " " + Environment.NewLine + " ";
 
         d.ColorScheme = new ColorScheme (d.ColorScheme)
         {

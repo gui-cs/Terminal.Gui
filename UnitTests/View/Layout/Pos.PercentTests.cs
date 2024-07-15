@@ -7,6 +7,20 @@ public class PosPercentTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
+    [Theory]
+    [InlineData (50, 10, 2, 5)]
+    [InlineData (50, 10, 10, 5)]
+    [InlineData (50, 10, 11, 5)]
+    [InlineData (50, 10, 12, 5)]
+    [InlineData (50, 19, 20, 9)]
+    public void PosPercent_Calculate_ReturnsExpectedValue (int percent, int superviewDimension, int width, int expectedX)
+    {
+        var posPercent = new PosPercent (percent);
+        int result = posPercent.Calculate (superviewDimension, new DimAbsolute (width), null!, Dimension.Width);
+        Assert.Equal (expectedX, result);
+    }
+
+
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Theory]

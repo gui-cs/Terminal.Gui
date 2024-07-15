@@ -54,12 +54,12 @@ public class TextFormatter
     internal Size GetAutoSize ()
     {
         Size size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
+
         return size with
         {
             Width = size.Width - GetHotKeySpecifierLength (),
             Height = size.Height - GetHotKeySpecifierLength (false)
         };
-
     }
     /// <summary>
     ///     Gets the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> characters
@@ -112,7 +112,7 @@ public class TextFormatter
             }
         }
     }
-    
+
     /// <summary>
     ///     Determines if the viewport width will be used or only the text width will be used,
     ///     If <see langword="true"/> all the viewport area will be filled with whitespaces and the same background color
@@ -191,7 +191,7 @@ public class TextFormatter
         {
             if (AutoSize)
             {
-                _size = EnableNeedsFormat (GetAutoSize());
+                _size = EnableNeedsFormat (GetAutoSize ());
             }
             else
             {
@@ -451,9 +451,9 @@ public class TextFormatter
             }
             else
             {
-               Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+                Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
 
-               return;
+                return;
             }
 
             int colOffset = screen.X < 0 ? Math.Abs (screen.X) : 0;
@@ -655,8 +655,20 @@ public class TextFormatter
             return Size.Empty;
         }
 
-        int width = GetLines ().Max (static line => line.GetColumns ());
-        int height = GetLines ().Count;
+        List<string> lines = GetLines ();
+
+        if (lines.Count == 0)
+        {
+            return Size.Empty;
+        }
+
+        int width = lines.Max (static line => line.GetColumns ());
+        int height = lines.Count;
+
+        if (IsVerticalDirection (Direction))
+        {
+            return new (height, width);
+        }
 
         return new (width, height);
     }
@@ -1666,13 +1678,13 @@ public class TextFormatter
     private static string PerformCorrectFormatDirection (TextDirection textDirection, string line)
     {
         return textDirection switch
-               {
-                   TextDirection.RightLeft_BottomTop
-                       or TextDirection.RightLeft_TopBottom
-                       or TextDirection.BottomTop_LeftRight
-                       or TextDirection.BottomTop_RightLeft => StringExtensions.ToString (line.EnumerateRunes ().Reverse ()),
-                   _ => line
-               };
+        {
+            TextDirection.RightLeft_BottomTop
+                or TextDirection.RightLeft_TopBottom
+                or TextDirection.BottomTop_LeftRight
+                or TextDirection.BottomTop_RightLeft => StringExtensions.ToString (line.EnumerateRunes ().Reverse ()),
+            _ => line
+        };
     }
 
     private static List<Rune> PerformCorrectFormatDirection (TextDirection textDirection, List<Rune> runes)
@@ -1683,13 +1695,13 @@ public class TextFormatter
     private static List<string> PerformCorrectFormatDirection (TextDirection textDirection, List<string> lines)
     {
         return textDirection switch
-               {
-                   TextDirection.TopBottom_RightLeft
-                       or TextDirection.LeftRight_BottomTop
-                       or TextDirection.RightLeft_BottomTop
-                       or TextDirection.BottomTop_RightLeft => lines.ToArray ().Reverse ().ToList (),
-                   _ => lines
-               };
+        {
+            TextDirection.TopBottom_RightLeft
+                or TextDirection.LeftRight_BottomTop
+                or TextDirection.RightLeft_BottomTop
+                or TextDirection.BottomTop_RightLeft => lines.ToArray ().Reverse ().ToList (),
+            _ => lines
+        };
     }
 
     /// <summary>Returns the number of lines needed to render the specified text given the width.</summary>
