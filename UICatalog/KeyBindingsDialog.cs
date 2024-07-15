@@ -19,8 +19,8 @@ internal class KeyBindingsDialog : Dialog
     {
         Title = "Keybindings";
 
-        //Height = 50;
-        //Width = 10;
+        Height = Dim.Percent(80);
+        Width = Dim.Percent(80);
         if (ViewTracker.Instance == null)
         {
             ViewTracker.Initialize ();
@@ -32,7 +32,7 @@ internal class KeyBindingsDialog : Dialog
         _commandsListView = new ListView
         {
             Width = Dim.Percent (50),
-            Height = Dim.Percent (100) - 1,
+            Height = Dim.Fill () - 1,
             Source = new ListWrapper<Command> (_commands),
             SelectedItem = 0
         };

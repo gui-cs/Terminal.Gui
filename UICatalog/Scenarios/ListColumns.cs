@@ -284,7 +284,7 @@ public class ListColumns : Scenario
         cancel.Accept += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = prompt, Buttons = [ok, cancel] };
 
-        var tf = new TextField { Text = getter (_listColView).ToString (), X = 0, Y = 1, Width = Dim.Fill () };
+        var tf = new TextField { Text = getter (_listColView).ToString (), X = 0, Y = 0, Width = Dim.Fill () };
 
         d.Add (tf);
         tf.SetFocus ();

@@ -60,6 +60,9 @@ public class FileDialog : Dialog
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem fileSystem)
     {
+        Height = Dim.Percent (80);
+        Width = Dim.Percent (80);
+
         // Assume canceled
         Canceled = true;
 

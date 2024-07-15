@@ -312,7 +312,7 @@ public class Dialogs : Scenario
             var addChar = new Button
             {
                 X = Pos.Center (),
-                Y = Pos.Center () + 1,
+                Y = Pos.Center () + 2,
                 Text = $"A_dd a {char.ConvertFromUtf32 (CODE_POINT)} to each button. This text is really long for a reason."
             };
 
@@ -325,8 +325,9 @@ public class Dialogs : Scenario
 
                                   dialog.LayoutSubviews ();
                               };
-            dialog.Closed += (s, e) => { buttonPressedLabel.Text = $"{clicked}"; };
             dialog.Add (addChar);
+
+            dialog.Closed += (s, e) => { buttonPressedLabel.Text = $"{clicked}"; };
         }
         catch (FormatException)
         {

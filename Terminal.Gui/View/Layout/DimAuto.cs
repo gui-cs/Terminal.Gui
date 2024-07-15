@@ -1,4 +1,5 @@
 #nullable enable
+using System.Diagnostics;
 using System.Drawing;
 
 namespace Terminal.Gui;
@@ -159,7 +160,18 @@ public class DimAuto () : Dim
                 {
                     View v = notDependentSubViews [i];
 
-                    int size = dimension == Dimension.Width ? v.X.GetAnchor (maxCalculatedSize) + v.Width.GetAnchor (maxCalculatedSize) : v.Y.GetAnchor (maxCalculatedSize) + v.Height.GetAnchor (maxCalculatedSize);
+                    int size = 0;
+
+                    if (dimension == Dimension.Width)
+                    {
+                        int width = v.Width!.Calculate (0, 0, v, dimension);
+                        size = v.X.GetAnchor (0) + width;
+                    }
+                    else
+                    {
+                        int height = v.Height!.Calculate (0, 0, v, dimension);
+                        size = v.Y.GetAnchor (0) + height;
+                    }
 
                     if (size > maxCalculatedSize)
                     {
@@ -169,7 +181,7 @@ public class DimAuto () : Dim
 
                 // ************** We now have some idea of `us.ContentSize` ***************
 
-
+                #region Centered
                 // [ ] PosCenter    - Position is dependent `us.ContentSize` AND `subview.Frame`
                 List<View> centeredSubViews;
                 if (dimension == Dimension.Width)
@@ -181,17 +193,110 @@ public class DimAuto () : Dim
                     centeredSubViews = us.Subviews.Where (v => v.Y.Has (typeof (PosCenter), out _)).ToList ();
                 }
 
+                int maxCentered = 0;
+
                 for (var i = 0; i < centeredSubViews.Count; i++)
                 {
                     View v = centeredSubViews [i];
 
-                    int maxCentered = dimension == Dimension.Width ?/* v.X.GetAnchor (maxCalculatedSize) +*/ v.Width.GetAnchor (maxCalculatedSize) : /*v.Y.GetAnchor (maxCalculatedSize) + */v.Height.GetAnchor(maxCalculatedSize);
-
-                    if (maxCentered > maxCalculatedSize)
+                    if (dimension == Dimension.Width)
                     {
-                        maxCalculatedSize = maxCentered;
+                        int width = v.Width!.Calculate (0, 0, v, dimension);
+                        maxCentered = (v.X.GetAnchor (0) + width) * 2;
+                    }
+                    else
+                    {
+                        int height = v.Height!.Calculate (0, 0, v, dimension);
+                        maxCentered = (v.Y.GetAnchor (0) + height) * 2;
                     }
                 }
+                maxCalculatedSize = int.Max (maxCalculatedSize, maxCentered);
+                #endregion Centered
+
+                #region Percent
+                // [ ] DimPercent   - Dimension is dependent on `us.ContentSize`
+                List<View> percentSubViews;
+                if (dimension == Dimension.Width)
+                {
+                    percentSubViews = us.Subviews.Where (v => v.Width.Has (typeof (DimPercent), out _)).ToList ();
+                }
+                else
+                {
+                    percentSubViews = us.Subviews.Where (v => v.Height.Has (typeof (DimPercent), out _)).ToList ();
+                }
+
+                int maxPercent = 0;
+
+                for (var i = 0; i < percentSubViews.Count; i++)
+                {
+                    View v = percentSubViews [i];
+
+                    if (dimension == Dimension.Width)
+                    {
+                        int width = v.Width!.Calculate (0, 0, v, dimension);
+                        maxPercent = (v.X.GetAnchor (0) + width);
+                    }
+                    else
+                    {
+                        int height = v.Height!.Calculate (0, 0, v, dimension);
+                        maxPercent = (v.Y.GetAnchor (0) + height);
+                    }
+                }
+                maxCalculatedSize = int.Max (maxCalculatedSize, maxPercent);
+                #endregion Percent
+
+
+                #region Aligned
+                // [ ] PosAlign     - Position is dependent on other views with `GroupId` AND `us.ContentSize`
+                int maxAlign = 0;
+                // Use Linq to get a list of distinct GroupIds from the subviews
+                List<int> groupIds = includedSubviews.Select (
+                                                              v =>
+                                                              {
+                                                                  if (dimension == Dimension.Width)
+                                                                  {
+                                                                      if (v.X.Has (typeof (PosAlign), out Pos posAlign))
+                                                                      {
+                                                                          return ((PosAlign)posAlign).GroupId;
+                                                                      }
+                                                                  }
+                                                                  else
+                                                                  {
+                                                                      if (v.Y.Has (typeof (PosAlign), out Pos posAlign))
+                                                                      {
+                                                                          return ((PosAlign)posAlign).GroupId;
+                                                                      }
+                                                                  }
+                                                                  return -1;
+                                                              }).Distinct ().ToList ();
+
+                foreach (var groupId in groupIds.Where (g => g != -1))
+                {
+                    // PERF: If this proves a perf issue, consider caching a ref to this list in each item
+                    List<PosAlign?> posAlignsInGroup = includedSubviews.Where (
+                        v =>
+                        {
+                            return dimension switch
+                            {
+                                Dimension.Width when v.X is PosAlign alignX => alignX.GroupId == groupId,
+                                Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId == groupId,
+                                _ => false
+                            };
+                        })
+                        .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
+                        .ToList ();
+
+                    if (posAlignsInGroup.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    maxAlign = PosAlign.CalculateMinDimension (groupId, includedSubviews, dimension);
+                }
+
+                maxCalculatedSize = int.Max (maxCalculatedSize, maxAlign);
+                #endregion Aligned
+
 
 
                 #region Anchored
@@ -225,7 +330,6 @@ public class DimAuto () : Dim
 
                 maxCalculatedSize = Math.Max (maxCalculatedSize, maxAnchorEnd);
                 #endregion Anchored
-
 
                 #region PosView
                 // [x] PosView      - Position is dependent on `subview.Target` - it can cause a change in `us.ContentSize`
@@ -404,51 +508,6 @@ public class DimAuto () : Dim
                 //        }
                 //        #endregion Not Anchored and Are Not Dependent
 
-
-                //        //#region Aligned
-
-                //        //// Now, handle subviews that are aligned
-                //        //// [x] PosAlign
-                //        //int maxAlign = 0;
-                //        //if (dimension == Dimension.Width)
-                //        //{
-                //        //    // Use Linq to get a list of distinct GroupIds from the subviews
-                //        //    List<int> groupIds = includedSubviews.Select (v => v.X is PosAlign posAlign ? posAlign.GroupId : -1).Distinct ().ToList ();
-
-                //        //    foreach (var groupId in groupIds)
-                //        //    {
-                //        //        List<int> dimensionsList = new ();
-
-                //        //        // PERF: If this proves a perf issue, consider caching a ref to this list in each item
-                //        //        List<PosAlign?> posAlignsInGroup = includedSubviews.Where (
-                //        //            v =>
-                //        //            {
-                //        //                return dimension switch
-                //        //                {
-                //        //                    Dimension.Width when v.X is PosAlign alignX => alignX.GroupId == groupId,
-                //        //                    Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId == groupId,
-                //        //                    _ => false
-                //        //                };
-                //        //            })
-                //        //            .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
-                //        //            .ToList ();
-
-                //        //        if (posAlignsInGroup.Count == 0)
-                //        //        {
-                //        //            continue;
-                //        //        }
-                //        // BUGBUG: ignores adornments
-
-                //        //        maxAlign = PosAlign.CalculateMinDimension (groupId, includedSubviews, dimension);
-                //        //    }
-                //        //}
-                //        //else
-                //        //{
-                //        //    subviews = includedSubviews.Where (v => v.Y is PosAlign).ToList ();
-                //        //}
-
-                //        //subviewsSize = int.Max (subviewsSize, maxAlign);
-                //        //#endregion Aligned
 
 
                 //        #region Auto
