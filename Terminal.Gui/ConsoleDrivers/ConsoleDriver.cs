@@ -426,6 +426,7 @@ public abstract class ConsoleDriver
     /// <param name="row">Row to move to.</param>
     public virtual void Move (int col, int row)
     {
+        //Debug.Assert (col >= 0 && row >= 0 && col < Contents.GetLength(1) && row < Contents.GetLength(0));
         Col = col;
         Row = row;
     }

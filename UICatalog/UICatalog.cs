@@ -382,7 +382,7 @@ internal class UICatalogApp
             _themeMenuBarItem = new ("_Themes", _themeMenuItems);
 
             _aboutMessage = new ();
-            _aboutMessage.AppendLine (@"A comprehensive sample library for");
+            _aboutMessage.AppendLine (@"UI Catalog: A comprehensive sample library for");
             _aboutMessage.AppendLine (
                                       """
                                        _______                  _             _   _____       _
@@ -395,7 +395,7 @@ internal class UICatalogApp
             _aboutMessage.AppendLine (@"");
             _aboutMessage.AppendLine (@"v2 - Pre-Alpha");
             _aboutMessage.AppendLine (@"");
-            _aboutMessage.Append (@"https://github.com/gui-cs/Terminal.Gui");
+            _aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
 
             MenuBar = new ()
             {
@@ -438,8 +438,8 @@ internal class UICatalogApp
                                   "_About...",
                                   "About UI Catalog",
                                   () => MessageBox.Query (
-                                                          "About UI Catalog",
-                                                          _aboutMessage!.ToString (),
+                                                          title: "",
+                                                          message: _aboutMessage!.ToString (),
                                                           wrapMessage: false,
                                                           buttons: "_Ok"
                                                          ),

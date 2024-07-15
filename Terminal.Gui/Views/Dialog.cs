@@ -169,7 +169,6 @@ public class Dialog : Window
         // Use a distinct GroupId so users can use Pos.Align for other views in the Dialog
         button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
         button.Y = Pos.AnchorEnd ();
-        button.Margin.Thickness = button.Margin.Thickness with { Top = 1 };
 
         _buttons.Add (button);
         Add (button);
