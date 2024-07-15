@@ -71,7 +71,7 @@ public class DimAuto () : Dim
             if (dimension == Dimension.Width)
             {
                 us.TextFormatter.Size = new (autoMax, 2048);
-                textSize = int.Max (autoMin, us.TextFormatter.FormatAndGetSize ().Width);
+                textSize = us.TextFormatter.FormatAndGetSize ().Width;
                 us.TextFormatter.Size = new Size (textSize, 2048);
             }
             else
@@ -80,7 +80,7 @@ public class DimAuto () : Dim
                 {
                     us.TextFormatter.Size = us.TextFormatter.GetAutoSize ();
                 }
-                textSize = int.Max (autoMin, us.TextFormatter.FormatAndGetSize ().Height);
+                textSize = us.TextFormatter.FormatAndGetSize ().Height;
                 us.TextFormatter.Size = us.TextFormatter.Size with { Height = textSize };
             }
         }
