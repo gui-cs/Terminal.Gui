@@ -184,7 +184,7 @@ public class ShadowStyleTests (ITestOutputHelper _output)
                     """
                     01▖$
                     AB▌$
-                    !▀▘$
+                    ▝▀▘$
                     !@#$
                     """)]
     [InlineData (

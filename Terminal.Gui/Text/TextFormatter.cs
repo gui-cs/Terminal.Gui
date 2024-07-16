@@ -662,13 +662,18 @@ public class TextFormatter
             return Size.Empty;
         }
 
-        int width = lines.Max (static line => line.GetColumns ());
-        int height = lines.Count;
+        int width;
+        int height;
 
         if (IsVerticalDirection (Direction))
         {
-            height = GetColumnsRequiredForVerticalText(lines, 0, lines.Count, TabWidth);
-            return new (height, lines.Max (static line => line.Length));
+            width = GetColumnsRequiredForVerticalText (lines, 0, lines.Count, TabWidth);
+            height = lines.Max (static line => line.Length);
+        }
+        else
+        {
+            width = lines.Max (static line => line.GetColumns());
+            height = lines.Count;
         }
 
         return new (width, height);
