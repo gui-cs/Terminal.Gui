@@ -1,4 +1,4 @@
-﻿// This is a simple example application for a self-contained single file.
+﻿// This is a test application for a self-contained single file.
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
