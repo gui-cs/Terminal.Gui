@@ -4,7 +4,7 @@
 /// A bar representing a single component of a <see cref="Color"/> e.g.
 /// the Red portion of a <see cref="ColorModel.RGB"/>.
 /// </summary>
-public abstract class ColorBar : View, IColorBar
+internal abstract class ColorBar : View, IColorBar
 {
     /// <summary>
     /// X coordinate that the bar starts at excluding any label.
@@ -48,7 +48,7 @@ public abstract class ColorBar : View, IColorBar
     }
 
     /// <inheritdoc />
-    public void SetValueWithoutRaisingEvent (int v)
+    void IColorBar.SetValueWithoutRaisingEvent (int v)
     {
         _value = v;
         SetNeedsDisplay ();
