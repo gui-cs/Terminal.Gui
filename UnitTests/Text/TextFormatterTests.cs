@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Abstractions;
 using static Terminal.Gui.SpinnerStyle;
 
@@ -6045,4 +6046,112 @@ B")]
         tf.Draw (new Rectangle (0, 0, 7, 7), Attribute.Default, Attribute.Default);
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
+
+    #region FormatAndGetSizeTests
+
+    // TODO: Add multi-line examples
+    // TODO: Add other TextDirection examples
+
+    [Theory]
+    [SetupFakeDriver]
+    [InlineData ("界1234", 10, 10, TextDirection.LeftRight_TopBottom, 6, 1, @"界1234")]
+    [InlineData ("01234", 10, 10, TextDirection.LeftRight_TopBottom, 5, 1, @"01234")]
+    [InlineData ("界1234", 10, 10, TextDirection.TopBottom_LeftRight, 2, 5, """
+                                                                           界
+                                                                           1 
+                                                                           2 
+                                                                           3 
+                                                                           4 
+                                                                           """)]
+    [InlineData ("01234", 10, 10, TextDirection.TopBottom_LeftRight, 1, 5, """
+                                                                           0
+                                                                           1
+                                                                           2
+                                                                           3
+                                                                           4
+                                                                           """)]
+    [InlineData ("界1234", 3, 3, TextDirection.LeftRight_TopBottom, 3, 2, """
+                                                                         界1
+                                                                         234
+                                                                         """)]
+    [InlineData ("01234", 3, 3, TextDirection.LeftRight_TopBottom, 3, 2, """
+                                                                         012
+                                                                         34 
+                                                                         """)]
+    [InlineData ("界1234", 3, 3, TextDirection.TopBottom_LeftRight, 3, 3, """
+                                                                         界3
+                                                                         1 4
+                                                                         2  
+                                                                         """)]
+    [InlineData ("01234", 3, 3, TextDirection.TopBottom_LeftRight, 2, 3, """
+                                                                         03
+                                                                         14
+                                                                         2 
+                                                                         """)]
+    public void FormatAndGetSize_Returns_Correct_Size (string text, int width, int height, TextDirection direction, int expectedWidth, int expectedHeight, string expectedDraw)
+    {
+        TextFormatter tf = new ()
+        {
+            Direction = direction,
+            Size = new (width, height),
+            Text = text
+        };
+        Assert.True (tf.WordWrap);
+        Size size = tf.FormatAndGetSize ();
+        Assert.Equal (new (expectedWidth, expectedHeight), size);
+
+        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedDraw, _output);
+    }
+
+    [Theory]
+    [SetupFakeDriver]
+    [InlineData ("界1234", 10, 10, TextDirection.LeftRight_TopBottom, 6, 1, @"界1234")]
+    [InlineData ("01234", 10, 10, TextDirection.LeftRight_TopBottom, 5, 1, @"01234")]
+    [InlineData ("界1234", 10, 10, TextDirection.TopBottom_LeftRight, 2, 5, """
+                                                                           界
+                                                                           1 
+                                                                           2 
+                                                                           3 
+                                                                           4 
+                                                                           """)]
+    [InlineData ("01234", 10, 10, TextDirection.TopBottom_LeftRight, 1, 5, """
+                                                                           0
+                                                                           1
+                                                                           2
+                                                                           3
+                                                                           4
+                                                                           """)]
+    [InlineData ("界1234", 3, 3, TextDirection.LeftRight_TopBottom, 3, 1, @"界1")]
+    [InlineData ("01234", 3, 3, TextDirection.LeftRight_TopBottom, 3, 1, @"012")]
+    [InlineData ("界1234", 3, 3, TextDirection.TopBottom_LeftRight, 2, 3, """
+                                                                         界
+                                                                         1 
+                                                                         2 
+                                                                         """)]
+    [InlineData ("01234", 3, 3, TextDirection.TopBottom_LeftRight, 1, 3, """
+                                                                         0
+                                                                         1
+                                                                         2
+                                                                         """)]
+    public void FormatAndGetSize_WordWrap_False_Returns_Correct_Size (string text, int width, int height, TextDirection direction, int expectedWidth, int expectedHeight, string expectedDraw)
+    {
+        TextFormatter tf = new ()
+        {
+            Direction = direction,
+            Size = new (width, height),
+            Text = text,
+            WordWrap = false
+        };
+        Assert.False (tf.WordWrap);
+        Size size = tf.FormatAndGetSize ();
+        Assert.Equal (new (expectedWidth, expectedHeight), size);
+
+        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (expectedDraw, _output);
+    }
+
+    #endregion
 }
