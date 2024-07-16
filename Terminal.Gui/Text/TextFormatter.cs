@@ -667,7 +667,8 @@ public class TextFormatter
 
         if (IsVerticalDirection (Direction))
         {
-            return new (height, width);
+            height = GetColumnsRequiredForVerticalText(lines, 0, lines.Count, TabWidth);
+            return new (height, lines.Max (static line => line.Length));
         }
 
         return new (width, height);

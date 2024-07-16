@@ -70,7 +70,7 @@ public class DimAuto () : Dim
         {
             if (dimension == Dimension.Width)
             {
-                us.TextFormatter.Size = new (autoMax, 2048);
+                us.TextFormatter.Size = new (superviewContentSize, 2048);
                 textSize = us.TextFormatter.FormatAndGetSize ().Width;
                 us.TextFormatter.Size = new Size (textSize, 2048);
             }

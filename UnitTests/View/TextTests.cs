@@ -472,8 +472,8 @@ Y
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_True_View_IsEmpty_False_Minimum_Width_Wide_Rune ()
+    [SetupFakeDriver]
+    public void DimAuto_Vertical_TextDirection_Wide_Rune ()
     {
         var text = "界View";
 
@@ -484,69 +484,26 @@ Y
             Width = Dim.Auto (),
             Height = Dim.Auto ()
         };
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (view);
-        var top = new Toplevel ();
-        top.Add (win);
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (4, 10);
+
+        view.SetRelativeLayout (new Size (4, 10));
 
         Assert.Equal (5, text.Length);
+
+        // Vertical text - 2 wide, 5 down
         Assert.Equal (new (0, 0, 2, 5), view.Frame);
         Assert.Equal (new (2, 5), view.TextFormatter.Size);
         Assert.Equal (new () { "界View" }, view.TextFormatter.GetLines ());
-        Assert.Equal (new (0, 0, 4, 10), win.Frame);
-        Assert.Equal (new (0, 0, 4, 10), Application.Top.Frame);
+
+        view.Draw ();
 
         var expected = @"
-┌──┐
-│界│
-│V │
-│i │
-│e │
-│w │
-│  │
-│  │
-│  │
-└──┘
-";
+界
+V 
+i 
+e 
+w ";
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (0, 0, 4, 10), pos);
-
-        text = "0123456789";
-        Assert.Equal (10, text.Length);
-
-        //view.Height = Dim.Fill () - text.Length;
-        Application.Refresh ();
-
-        Assert.Equal (new (0, 0, 2, 5), view.Frame);
-        Assert.Equal (new (2, 5), view.TextFormatter.Size);
-
-        Exception exception = Record.Exception (
-                                                () => Assert.Equal (
-                                                                    new () { "界View" },
-                                                                    view.TextFormatter.GetLines ()
-                                                                   )
-                                               );
-        Assert.Null (exception);
-
-        expected = @"
-┌──┐
-│界│
-│V │
-│i │
-│e │
-│w │
-│  │
-│  │
-│  │
-└──┘
-";
-
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (0, 0, 4, 10), pos);
-        top.Dispose ();
     }
 
     [Fact]
@@ -778,7 +735,7 @@ Y
         Application.End (rs);
         top.Dispose ();
     }
-    
+
     [Theory]
     [AutoInitShutdown]
     [InlineData (true)]
