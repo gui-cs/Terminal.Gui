@@ -1,0 +1,334 @@
+﻿namespace Terminal.Gui.LayoutTests;
+
+public partial class DimAutoTests
+{
+    // Tests all the Pos Types in Subview scenarios to ensure DimAutoStyle.Content is calculated correctly
+
+    #region PosAbsolute
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 19, 9)]
+    [InlineData (0, 20, 0, 10, 20, 10)]
+    [InlineData (0, 21, 0, 11, 21, 11)]
+    [InlineData (1, 21, 1, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    public void With_Subview_Using_PosAbsolute (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View
+        {
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+        };
+
+        var subview = new View
+        {
+            X = Pos.Absolute (10),
+            Y = Pos.Absolute (5),
+            Width = 20,
+            Height = 10
+        };
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+    }
+
+    #endregion PosAbsolute
+
+    #region PosPercent
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 19, 9)]
+    [InlineData (0, 20, 0, 10, 20, 10)]
+    [InlineData (0, 21, 0, 11, 20, 10)]
+    [InlineData (1, 21, 1, 11, 20, 10)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    public void With_Subview_Using_PosPercent (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View
+        {
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+        };
+
+        var subview = new View
+        {
+            X = Pos.Percent (50),
+            Y = Pos.Percent (50),
+            Width = 20,
+            Height = 10
+        };
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        // subview should be at 50% in the parent view
+        Assert.Equal ((int)(view.Viewport.Width * .50), subview.Frame.X);
+        Assert.Equal ((int)(view.Viewport.Height * .50), subview.Frame.Y);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 19, 9)]
+    [InlineData (0, 20, 0, 10, 20, 10)]
+    [InlineData (0, 21, 0, 11, 21, 11)]
+    [InlineData (1, 21, 1, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    public void With_Subview_Using_PosPercent_Combine (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View
+        {
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+        };
+
+        var subview = new View
+        {
+            X = Pos.Percent (50) + 1,
+            Y = 1 + Pos.Percent (50),
+            Width = 20,
+            Height = 10
+        };
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        // subview should be at 50% in the parent view
+        Assert.Equal ((int)(view.Viewport.Width * .50) + 1, subview.Frame.X);
+        Assert.Equal ((int)(view.Viewport.Height * .50) + 1, subview.Frame.Y);
+    }
+
+    #endregion PosPercent
+
+    #region PosCenter
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 19, 9)]
+    [InlineData (0, 20, 0, 10, 20, 10)]
+    [InlineData (0, 21, 0, 11, 20, 10)]
+    [InlineData (1, 21, 1, 11, 20, 10)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    public void With_Subview_Using_PosCenter (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View
+        {
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+        };
+
+        var subview = new View
+        {
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = 20,
+            Height = 10
+        };
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        // subview should be centered in the parent view + 1
+        Assert.Equal ((view.Viewport.Width - subview.Frame.Width) / 2, subview.Frame.X);
+        Assert.Equal ((view.Viewport.Height - subview.Frame.Height) / 2, subview.Frame.Y);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 19, 9)]
+    [InlineData (0, 18, 0, 8, 18, 8)]
+    [InlineData (0, 20, 0, 10, 20, 10)]
+    [InlineData (0, 21, 0, 11, 21, 11)]
+    [InlineData (1, 21, 1, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    public void With_Subview_Using_PosCenter_Combine (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View
+        {
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+        };
+
+        var subview = new View
+        {
+            X = Pos.Center () + 1,
+            Y = 1 + Pos.Center (),
+            Width = 20,
+            Height = 10
+        };
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        // subview should be centered in the parent view + 1
+        Assert.Equal ((view.Viewport.Width - subview.Frame.Width) / 2 + 1, subview.Frame.X);
+        Assert.Equal ((view.Viewport.Height - subview.Frame.Height) / 2 + 1, subview.Frame.Y);
+    }
+
+    #endregion PosCenter
+
+    #region PosView
+
+    // TODO: Need PosView tests
+
+    [Fact]
+    public void With_Subview_Using_PosView ()
+    {
+        var view = new View ()
+        {
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+        };
+        var subview1 = new View { X = 1, Y = 2, Width = 1, Height = 2 };
+        var subview2 = new View { X = Pos.Top (subview1), Y = Pos.Bottom (subview1), Width = 1, Height = 2 };
+        view.Add (subview1, subview2);
+
+        view.SetRelativeLayout (new (100, 100));
+
+        // subview1.X + subview1.Width + subview2.Width
+        Assert.Equal (1 + 1 + 1, view.Frame.Width);
+        // subview1.Y + subview1.Height + subview2.Height
+        Assert.Equal (2 + 2 + 2, view.Frame.Height);
+    }
+
+    #endregion PosView
+
+    #region PosAnchorEnd
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 19, 9)]
+    [InlineData (0, 18, 0, 8, 18, 8)]
+    [InlineData (0, 20, 0, 10, 20, 10)]
+    [InlineData (0, 21, 0, 11, 20, 10)]
+    [InlineData (1, 21, 1, 11, 20, 10)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    public void With_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View
+        {
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+        };
+
+        var subview = new View
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Width = 20,
+            Height = 10
+        };
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        // subview should be at the end of the view
+        Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
+        Assert.Equal (view.Viewport.Height - subview.Frame.Height, subview.Frame.Y);
+    }
+
+    #endregion PosAnchorEnd
+
+    #region PosFunc
+
+    [Fact]
+    public void With_Subview_Using_PosFunc ()
+    {
+        var view = new View ()
+        {
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+        };
+        var subview = new View { X = Pos.Func (() => 20), Y = Pos.Func (() => 25) };
+        view.Add (subview);
+
+        view.SetRelativeLayout (new (100, 100));
+
+        Assert.Equal (20, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
+    }
+
+    #endregion PosFunc
+
+    #region PosCombine
+
+    // TODO: Need more PosCombine tests
+
+    #endregion PosCombine
+}
