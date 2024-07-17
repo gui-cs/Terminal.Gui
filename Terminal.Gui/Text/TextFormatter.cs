@@ -670,11 +670,17 @@ public class TextFormatter
         {
             Alignment = Alignment.Start;
         }
+        Alignment prevVerticalAlignment = VerticalAlignment;
+        if (VerticalAlignment == Alignment.Fill)
+        {
+            VerticalAlignment = Alignment.Start;
+        }
 
         List<string> lines = GetLines ();
 
         // Undo hacks
         Alignment = prevAlignment;
+        VerticalAlignment = prevVerticalAlignment;
         Size = prevSize;
 
         if (lines.Count == 0)
