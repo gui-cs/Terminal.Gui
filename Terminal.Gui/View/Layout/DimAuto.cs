@@ -66,24 +66,29 @@ public class DimAuto () : Dim
         int screen = dimension == Dimension.Width ? Application.Screen.Width * 4 : Application.Screen.Height * 4;
         int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? screen;
 
+        Debug.Assert (autoMin <= autoMax, "MinimumContentDim must be less than or equal to MaximumContentDim.");
+
         if (Style.FastHasFlags (DimAutoStyle.Text))
         {
             if (dimension == Dimension.Width)
             {
-                us.TextFormatter.Size = new (superviewContentSize, 2048);
+                //us.TextFormatter.Size = new (superviewContentSize, 2048);
                 textSize = us.TextFormatter.FormatAndGetSize ().Width;
-                us.TextFormatter.Size = new Size (textSize, 2048);
+                //us.TextFormatter.Size = new Size (textSize, 2048);
             }
             else
             {
-                if (us.TextFormatter.Size.Width == 0)
-                {
-                    us.TextFormatter.Size = us.TextFormatter.GetAutoSize ();
-                }
+                //if (us.TextFormatter.Size.Width == 0)
+                //{
+                //    us.TextFormatter.Size = us.TextFormatter.GetAutoSize ();
+                //}
                 textSize = us.TextFormatter.FormatAndGetSize ().Height;
-                us.TextFormatter.Size = us.TextFormatter.Size with { Height = textSize };
+                //us.TextFormatter.Size = us.TextFormatter.Size with { Height = textSize };
             }
         }
+
+        List<View> viewsNeedingLayout = new List<View> ();
+
 
         if (Style.FastHasFlags (DimAutoStyle.Content))
         {
@@ -105,14 +110,14 @@ public class DimAuto () : Dim
                 // -------------------- Pos types that are dependent on `us.Subviews`
                 // [ ] PosAlign     - Position is dependent on other views with `GroupId` AND `us.ContentSize`
                 // [x] PosView      - Position is dependent on `subview.Target` - it can cause a change in `us.ContentSize`
-                // [x] PosCombine   - Position is dependent if `Pos.Has ([one of the above]` - it can cause a change in `us.ContentSize`
+                // [x] PosCombine   - Position is dependent if `Pos.Has [one of the above]` - it can cause a change in `us.ContentSize`
 
                 // -------------------- Pos types that are dependent on `us.ContentSize`
                 // [ ] PosAlign     - Position is dependent on other views with `GroupId` AND `us.ContentSize`
                 // [x] PosAnchorEnd - Position is dependent on `us.ContentSize` AND `subview.Frame` - it can cause a change in `us.ContentSize`
-                // [ ] PosCenter    - Position is dependent `us.ContentSize` AND `subview.Frame`
-                // [ ] PosPercent   - Position is dependent `us.ContentSize`
-                // [x] PosCombine   - Position is dependent if `Pos.Has ([one of the above]` - it can cause a change in `us.ContentSize`
+                // [ ] PosCenter    - Position is dependent `us.ContentSize` AND `subview.Frame` - 
+                // [ ] PosPercent   - Position is dependent `us.ContentSize` - Will always be 0 if there is no other content that makes the superview have a size.
+                // [x] PosCombine   - Position is dependent if `Pos.Has [one of the above]` - it can cause a change in `us.ContentSize`
 
                 // -------------------- Pos types that are not dependent on either `us.Subviews` or `us.ContentSize`
                 // [ ] PosAbsolute  - Position is fixed.
@@ -120,12 +125,12 @@ public class DimAuto () : Dim
 
                 // -------------------- Dim types that are dependent on `us.Subviews`
                 // [x] DimView      - Dimension is dependent on `subview.Target`
-                // [x] DimCombine   - Dimension is dependent if `Dim.Has ([one of the above]` - it can cause a change in `us.ContentSize`
+                // [x] DimCombine   - Dimension is dependent if `Dim.Has [one of the above]` - it can cause a change in `us.ContentSize`
 
                 // -------------------- Dim types that are dependent on `us.ContentSize`
-                // [ ] DimFill      - Dimension is dependent on `us.ContentSize`
-                // [ ] DimPercent   - Dimension is dependent on `us.ContentSize`
-                // [ ] DimCombine   - Dimension is dependent if `Dim.Has ([one of the above]`
+                // [ ] DimFill      - Dimension is dependent on `us.ContentSize` - Will always be 0 if there is no other content that makes the superview have a size.
+                // [ ] DimPercent   - Dimension is dependent on `us.ContentSize` - Will always be 0 if there is no other content that makes the superview have a size.
+                // [ ] DimCombine   - Dimension is dependent if `Dim.Has [one of the above]`
 
                 // -------------------- Dim types that are not dependent on either `us.Subviews` or `us.ContentSize`
                 // [ ] DimAuto      - Dimension is internally calculated
@@ -143,23 +148,29 @@ public class DimAuto () : Dim
                 List<View> notDependentSubViews;
                 if (dimension == Dimension.Width)
                 {
-                    notDependentSubViews = includedSubviews.Where (v => v.Width is { } &&
-                                                                        (v.X is PosAbsolute or PosFunc || v.Width is DimAuto or DimAbsolute or DimFunc) &&
-                                                                        !v.X.Has (typeof (PosAnchorEnd), out _) &&
-                                                                        !v.X.Has (typeof (PosAlign), out _) &&
-                                                                        !v.X.Has (typeof (PosView), out _) &&
-                                                                        !v.Width.Has (typeof (DimView), out _) &&
-                                                                        !v.X.Has (typeof (PosCenter), out _)).ToList ();
+                    notDependentSubViews = includedSubviews.Where (v => v.Width is { }
+                                                                        && (v.X is PosAbsolute or PosFunc || v.Width is DimAuto or DimAbsolute or DimFunc)
+                                                                        && !v.X.Has (typeof (PosAnchorEnd), out _)
+                                                                        && !v.X.Has (typeof (PosAlign), out _)
+                                                                        && !v.X.Has (typeof (PosView), out _)
+                                                                        && !v.X.Has (typeof (PosCenter), out _)
+                                                                        && !v.Width.Has (typeof (DimView), out _)
+                                                                        && !v.Width.Has (typeof (DimFill), out _)
+                                                                        && !v.Width.Has (typeof (DimPercent), out _)
+                                                                        ).ToList ();
                 }
                 else
                 {
-                    notDependentSubViews = includedSubviews.Where (v => v.Height is { } &&
-                                                                        (v.Y is PosAbsolute or PosFunc || v.Height is DimAuto or DimAbsolute or DimFunc) &&
-                                                                        !v.Y.Has (typeof (PosAnchorEnd), out _) &&
-                                                                        !v.Y.Has (typeof (PosAlign), out _) &&
-                                                                        !v.Y.Has (typeof (PosView), out _) &&
-                                                                        !v.Height.Has (typeof (DimView), out _) &&
-                                                                        !v.Y.Has (typeof (PosCenter), out _)).ToList ();
+                    notDependentSubViews = includedSubviews.Where (v => v.Height is { }
+                                                                        && (v.Y is PosAbsolute or PosFunc || v.Height is DimAuto or DimAbsolute or DimFunc)
+                                                                        && !v.Y.Has (typeof (PosAnchorEnd), out _)
+                                                                        && !v.Y.Has (typeof (PosAlign), out _)
+                                                                        && !v.Y.Has (typeof (PosView), out _)
+                                                                        && !v.Y.Has (typeof (PosCenter), out _)
+                                                                        && !v.Height.Has (typeof (DimView), out _)
+                                                                        && !v.Height.Has (typeof (DimFill), out _)
+                                                                        && !v.Height.Has (typeof (DimPercent), out _)
+                                                                        ).ToList ();
                 }
 
                 for (var i = 0; i < notDependentSubViews.Count; i++)
@@ -170,12 +181,12 @@ public class DimAuto () : Dim
 
                     if (dimension == Dimension.Width)
                     {
-                        int width = v.Width!.Calculate (0, 0, v, dimension);
+                        int width = v.Width!.Calculate (0, superviewContentSize, v, dimension);
                         size = v.X.GetAnchor (0) + width;
                     }
                     else
                     {
-                        int height = v.Height!.Calculate (0, 0, v, dimension);
+                        int height = v.Height!.Calculate (0, superviewContentSize, v, dimension);
                         size = v.Y.GetAnchor (0) + height;
                     }
 
@@ -199,6 +210,8 @@ public class DimAuto () : Dim
                     centeredSubViews = us.Subviews.Where (v => v.Y.Has (typeof (PosCenter), out _)).ToList ();
                 }
 
+                viewsNeedingLayout.AddRange (centeredSubViews);
+
                 int maxCentered = 0;
 
                 for (var i = 0; i < centeredSubViews.Count; i++)
@@ -207,48 +220,51 @@ public class DimAuto () : Dim
 
                     if (dimension == Dimension.Width)
                     {
-                        int width = v.Width!.Calculate (0, 0, v, dimension);
-                        maxCentered = (v.X.GetAnchor (0) + width) * 2;
+                        int width = v.Width!.Calculate (0, screen, v, dimension);
+                        maxCentered = (v.X.GetAnchor (0) + width);
                     }
                     else
                     {
-                        int height = v.Height!.Calculate (0, 0, v, dimension);
-                        maxCentered = (v.Y.GetAnchor (0) + height) * 2;
+                        int height = v.Height!.Calculate (0, screen, v, dimension);
+                        maxCentered = (v.Y.GetAnchor (0) + height);
                     }
                 }
                 maxCalculatedSize = int.Max (maxCalculatedSize, maxCentered);
                 #endregion Centered
 
                 #region Percent
-                // [ ] DimPercent   - Dimension is dependent on `us.ContentSize`
-                List<View> percentSubViews;
-                if (dimension == Dimension.Width)
-                {
-                    percentSubViews = us.Subviews.Where (v => v.Width.Has (typeof (DimPercent), out _)).ToList ();
-                }
-                else
-                {
-                    percentSubViews = us.Subviews.Where (v => v.Height.Has (typeof (DimPercent), out _)).ToList ();
-                }
+                //// [ ] DimPercent   - Dimension is dependent on `us.ContentSize`
+                ////     - DimPercent will always be 0 if there is no other content that makes the superview have a size.
+                //List<View> dimPercentSubViews;
+                //if (dimension == Dimension.Width)
+                //{
+                //    dimPercentSubViews = us.Subviews.Where (v => v.Width.Has (typeof (DimPercent), out _)).ToList ();
+                //}
+                //else
+                //{
+                //    dimPercentSubViews = us.Subviews.Where (v => v.Height.Has (typeof (DimPercent), out _)).ToList ();
+                //}
 
-                int maxPercent = 0;
+                //viewsNeedingLayout.AddRange (dimPercentSubViews);
 
-                for (var i = 0; i < percentSubViews.Count; i++)
-                {
-                    View v = percentSubViews [i];
+                //int maxDimPercent = 0;
 
-                    if (dimension == Dimension.Width)
-                    {
-                        int width = v.Width!.Calculate (0, 0, v, dimension);
-                        maxPercent = (v.X.GetAnchor (0) + width);
-                    }
-                    else
-                    {
-                        int height = v.Height!.Calculate (0, 0, v, dimension);
-                        maxPercent = (v.Y.GetAnchor (0) + height);
-                    }
-                }
-                maxCalculatedSize = int.Max (maxCalculatedSize, maxPercent);
+                //for (var i = 0; i < dimPercentSubViews.Count; i++)
+                //{
+                //    View v = dimPercentSubViews [i];
+
+                //    if (dimension == Dimension.Width)
+                //    {
+                //        int width = v.Width!.Calculate (0, superviewContentSize, null, dimension);
+                //        maxDimPercent = (v.X.GetAnchor (0) + width);
+                //    }
+                //    else
+                //    {
+                //        int height = v.Height!.Calculate (0, superviewContentSize, null, dimension);
+                //        maxDimPercent = (v.Y.GetAnchor (0) + height);
+                //    }
+                //}
+                //maxCalculatedSize = int.Max (maxCalculatedSize, maxDimPercent);
                 #endregion Percent
 
 
@@ -317,6 +333,8 @@ public class DimAuto () : Dim
                     anchoredSubViews = includedSubviews.Where (v => v.Y.Has (typeof (PosAnchorEnd), out _)).ToList ();
                 }
 
+                viewsNeedingLayout.AddRange (anchoredSubViews);
+
                 int maxAnchorEnd = 0;
                 for (var i = 0; i < anchoredSubViews.Count; i++)
                 {
@@ -325,13 +343,13 @@ public class DimAuto () : Dim
                     // Need to set the relative layout for PosAnchorEnd subviews to calculate the size
                     if (dimension == Dimension.Width)
                     {
-                        v.SetRelativeLayout (new Size (maxCalculatedSize, 0));
+                        v.SetRelativeLayout (new Size (maxCalculatedSize, screen));
                     }
                     else
                     {
-                        v.SetRelativeLayout (new Size (0, maxCalculatedSize));
+                        v.SetRelativeLayout (new Size (screen, maxCalculatedSize));
                     }
-                    maxAnchorEnd = dimension == Dimension.Width ? v.X.GetAnchor (maxCalculatedSize) + v.Frame.Width : v.Y.GetAnchor (maxCalculatedSize) + v.Frame.Height;
+                    maxAnchorEnd = dimension == Dimension.Width ? v.X.GetAnchor (maxCalculatedSize + v.Frame.Width) : v.Y.GetAnchor (maxCalculatedSize + v.Frame.Height);
                 }
 
                 maxCalculatedSize = Math.Max (maxCalculatedSize, maxAnchorEnd);
@@ -407,218 +425,6 @@ public class DimAuto () : Dim
                     }
                 }
                 #endregion DimView
-
-
-                // [x] DimCombine   - Dimension is dependent if `Dim.Has ([one of the above]` - it can cause a change in `us.ContentSize`
-
-
-
-
-
-
-
-                //        // ======================================================
-                //        // Now do PosAlign - It's dependent on other views with `GroupId` AND `us.ContentSize`
-                //        // ======================================================
-                //        // [ ] PosAlign     - Position is dependent on other views with `GroupId` AND `us.ContentSize`
-                //        #region Aligned
-
-                //        int maxAlign = 0;
-                //        if (dimension == Dimension.Width)
-                //        {
-                //            // Use Linq to get a list of distinct GroupIds from the subviews
-                //            List<int> groupIds = includedSubviews.Select (v => v.X is PosAlign posAlign ? posAlign.GroupId : -1).Distinct ().ToList ();
-
-                //            foreach (var groupId in groupIds)
-                //            {
-                //                List<int> dimensionsList = new ();
-
-                //                // PERF: If this proves a perf issue, consider caching a ref to this list in each item
-                //                List<PosAlign?> posAlignsInGroup = includedSubviews.Where (
-                //                    v =>
-                //                    {
-                //                        return dimension switch
-                //                        {
-                //                            Dimension.Width when v.X is PosAlign alignX => alignX.GroupId == groupId,
-                //                            Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId == groupId,
-                //                            _ => false
-                //                        };
-                //                    })
-                //                    .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
-                //                    .ToList ();
-
-                //                if (posAlignsInGroup.Count == 0)
-                //                {
-                //                    continue;
-                //                }
-                //                // BUGBUG: ignores adornments
-
-                //                maxAlign = PosAlign.CalculateMinDimension (groupId, includedSubviews, dimension);
-                //            }
-                //        }
-                //        else
-                //        {
-
-                //            // BUGBUG: Incompletge
-                //            subviews = includedSubviews.Where (v => v.Y is PosAlign).ToList ();
-                //        }
-
-                //        maxCalculatedSize = int.Max (maxCalculatedSize, maxAlign);
-                //        #endregion Aligned
-
-                //        // TODO: This whole body of code is a WIP (forhttps://github.com/gui-cs/Terminal.Gui/issues/3499).
-
-
-                //        List<View> subviews;
-
-                //        #region Not Anchored and Are Not Dependent
-                //        // Start with subviews that are not anchored to the end, aligned, or dependent on content size
-                //        // [x] PosAnchorEnd
-                //        // [x] PosAlign
-                //        // [ ] PosCenter
-                //        // [ ] PosPercent
-                //        // [ ] PosView
-                //        // [ ] PosFunc
-                //        // [x] DimFill
-                //        // [ ] DimPercent
-                //        // [ ] DimFunc
-                //        // [ ] DimView
-                //        if (dimension == Dimension.Width)
-                //        {
-                //            subviews = includedSubviews.Where (v => v.X is not PosAnchorEnd
-                //                                                   && v.X is not PosAlign
-                //                                                    // && v.X is not PosCenter
-                //                                                    && v.Width is not DimAuto
-                //                                                   && v.Width is not DimFill).ToList ();
-                //        }
-                //        else
-                //        {
-                //            subviews = includedSubviews.Where (v => v.Y is not PosAnchorEnd
-                //                                                   && v.Y is not PosAlign
-                //                                                    // && v.Y is not PosCenter
-                //                                                    && v.Height is not DimAuto
-                //                                                   && v.Height is not DimFill).ToList ();
-                //        }
-
-                //        for (var i = 0; i < subviews.Count; i++)
-                //        {
-                //            View v = subviews [i];
-
-                //            int size = dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
-
-                //            if (size > maxCalculatedSize)
-                //            {
-                //                // BUGBUG: Should we break here? Or choose min/max?
-                //                maxCalculatedSize = size;
-                //            }
-                //        }
-                //        #endregion Not Anchored and Are Not Dependent
-
-
-
-                //        #region Auto
-
-
-
-                //        #endregion Auto
-
-                //        //#region Center
-                //        //// Now, handle subviews that are Centered
-                //        //if (dimension == Dimension.Width)
-                //        //{
-                //        //    subviews = us.Subviews.Where (v => v.X is PosCenter).ToList ();
-                //        //}
-                //        //else
-                //        //{
-                //        //    subviews = us.Subviews.Where (v => v.Y is PosCenter).ToList ();
-                //        //}
-
-                //        //int maxCenter = 0;
-                //        //for (var i = 0; i < subviews.Count; i++)
-                //        //{
-                //        //    View v = subviews [i];
-                //        //    maxCenter = dimension == Dimension.Width ? v.Frame.Width : v.Frame.Height;
-                //        //}
-
-                //        //subviewsSize += maxCenter;
-                //        //#endregion Center
-
-                //        #region Are Dependent
-                //        // Now, go back to those that are dependent on content size
-
-
-                //        // Set relative layout for all DimAuto subviews
-                //        List<View> dimAutoSubViews;
-                //        int maxAuto = 0;
-                //        if (dimension == Dimension.Width)
-                //        {
-                //            dimAutoSubViews = includedSubviews.Where (v => v.Width is DimAuto).ToList ();
-                //        }
-                //        else
-                //        {
-                //            dimAutoSubViews = includedSubviews.Where (v => v.Height is DimAuto).ToList ();
-                //        }
-                //        for (var i = 0; i < dimAutoSubViews.Count; i++)
-                //        {
-                //            View v = dimAutoSubViews [i];
-
-                //            if (dimension == Dimension.Width)
-                //            {
-                //                // BUGBUG: ignores adornments
-
-                //                v.SetRelativeLayout (new Size (autoMax - maxCalculatedSize, 0));
-                //            }
-                //            else
-                //            {
-                //                // BUGBUG: ignores adornments
-
-                //                v.SetRelativeLayout (new Size (0, autoMax - maxCalculatedSize));
-                //            }
-
-                //            maxAuto = dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
-
-                //            if (maxAuto > maxCalculatedSize)
-                //            {
-                //                // BUGBUG: Should we break here? Or choose min/max?
-                //                maxCalculatedSize = maxAuto;
-                //            }
-                //        }
-
-                //        // [x] DimFill
-                //        // [ ] DimPercent
-                //        if (dimension == Dimension.Width)
-                //        {
-                //            subviews = includedSubviews.Where (v => v.Width is DimFill).ToList ();
-                //        }
-                //        else
-                //        {
-                //            subviews = includedSubviews.Where (v => v.Height is DimFill).ToList ();
-                //        }
-
-                //        int maxFill = 0;
-                //        for (var i = 0; i < subviews.Count; i++)
-                //        {
-                //            View v = subviews [i];
-
-                //            if (autoMax == int.MaxValue)
-                //            {
-                //                autoMax = superviewContentSize;
-                //            }
-                //            if (dimension == Dimension.Width)
-                //            {
-                //                // BUGBUG: ignores adornments
-                //                v.SetRelativeLayout (new Size (autoMax - maxCalculatedSize, 0));
-                //            }
-                //            else
-                //            {
-                //                // BUGBUG: ignores adornments
-                //                v.SetRelativeLayout (new Size (0, autoMax - maxCalculatedSize));
-                //            }
-                //            maxFill = dimension == Dimension.Width ? v.Frame.Width : v.Frame.Height;
-                //        }
-
-                //        maxCalculatedSize += maxFill;
-                //        #endregion Are Dependent
             }
         }
 
@@ -632,11 +438,11 @@ public class DimAuto () : Dim
         // And, if max: is set, it wins if smaller
         max = int.Min (max, autoMax);
 
-
         // ************** We now definitively know `us.ContentSize` ***************
 
-        int oppositeScreen = dimension == Dimension.Width ? Application.Screen.Height * 4 : Application.Screen.Width * 4 ;
-        foreach (var v in us.Subviews)
+        int oppositeScreen = dimension == Dimension.Width ? Application.Screen.Height * 4 : Application.Screen.Width * 4;
+
+        foreach (var v in viewsNeedingLayout)
         {
             if (dimension == Dimension.Width)
             {

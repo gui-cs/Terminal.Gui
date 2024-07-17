@@ -187,18 +187,38 @@ public partial class View
         if ((widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
             || (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text)))
         {
-            // BUGBUG: This ignores wordwrap and other formatting options.
-            size = TextFormatter.GetAutoSize ();
+            int width = 0;
+            int height = 0;
 
             if (widthAuto is null || !widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
             {
-                size.Width = GetContentSize ().Width;
+                width = GetContentSize ().Width;
             }
 
             if (heightAuto is null || !heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
             {
-                size.Height = GetContentSize ().Height;
+                height = GetContentSize ().Height;
             }
+
+            if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
+            {
+                if (height == 0 && heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
+                {
+                    height = Application.Screen.Height;
+                }
+                width = TextFormatter.FormatAndGetSize (new (Application.Screen.Width, height)).Width;
+            }
+
+            if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
+            {
+                if (width == 0 && widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
+                {
+                    width = Application.Screen.Height;
+                }
+                height = TextFormatter.FormatAndGetSize (new (width, Application.Screen.Height)).Height;
+            }
+
+            size = new (width, height);
         }
 
         TextFormatter.Size = size;

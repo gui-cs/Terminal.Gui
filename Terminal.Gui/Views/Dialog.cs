@@ -33,14 +33,14 @@ public class Dialog : Window
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 0;
+    public static int DefaultMinimumWidth { get; set; } = 80;
 
     /// <summary>
     ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 0;
+    public static int DefaultMinimumHeight { get; set; } = 80;
 
 
     /// <summary>

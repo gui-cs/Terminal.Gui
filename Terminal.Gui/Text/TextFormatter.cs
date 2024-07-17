@@ -648,14 +648,21 @@ public class TextFormatter
     /// <summary>Gets the size required to hold the formatted text, given the constraints placed by <see cref="Size"/>.</summary>
     /// <remarks>Causes a format, resetting <see cref="NeedsFormat"/> to <see langword="false"/>.</remarks>
     /// <returns>The size required to hold the formatted text.</returns>
-    public Size FormatAndGetSize ()
+    public Size FormatAndGetSize (Size? constrainSize = null)
     {
-        if (string.IsNullOrEmpty (Text) || Size.Height == 0 || Size.Width == 0)
+        if (constrainSize is null)
+        {
+            constrainSize = Size;
+        }
+        if (string.IsNullOrEmpty (Text) || constrainSize.Value.Height == 0 || constrainSize.Value.Width == 0)
         {
             return Size.Empty;
         }
 
+        Size prevSize = Size;
+        Size = constrainSize.Value;
         List<string> lines = GetLines ();
+        Size = prevSize;
 
         if (lines.Count == 0)
         {

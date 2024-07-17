@@ -592,51 +592,6 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (expectedWidth, superView.Frame.Width);
     }
 
-    //// Test Dim.Fill - Fill should not impact width of the DimAuto superview
-    //[Theory]
-    //[InlineData (0, 0, 0, 10, 10)]
-    //[InlineData (0, 1, 0, 10, 10)]
-    //[InlineData (0, 11, 0, 10, 10)]
-    //[InlineData (0, 10, 0, 10, 10)]
-    //[InlineData (0, 5, 0, 10, 10)]
-    //[InlineData (1, 5, 0, 10, 9)]
-    //[InlineData (1, 10, 0, 10, 9)]
-    //[InlineData (0, 0, 1, 10, 9)]
-    //[InlineData (0, 10, 1, 10, 9)]
-    //[InlineData (0, 5, 1, 10, 9)]
-    //[InlineData (1, 5, 1, 10, 8)]
-    //[InlineData (1, 10, 1, 10, 8)]
-    //public void Width_Fill_Fills (int subX, int superMinWidth, int fill, int expectedSuperWidth, int expectedSubWidth)
-    //{
-    //    var superView = new View
-    //    {
-    //        X = 0,
-    //        Y = 0,
-    //        Width = Dim.Auto (minimumContentDim: superMinWidth),
-    //        Height = 1,
-    //        ValidatePosDim = true
-    //    };
-
-    //    var subView = new View
-    //    {
-    //        X = subX,
-    //        Y = 0,
-    //        Width = Dim.Fill (fill),
-    //        Height = 1,
-    //        ValidatePosDim = true
-    //    };
-
-    //    superView.Add (subView);
-
-    //    superView.BeginInit ();
-    //    superView.EndInit ();
-    //    superView.SetRelativeLayout (new (10, 1));
-    //    Assert.Equal (expectedSuperWidth, superView.Frame.Width);
-    //    superView.LayoutSubviews ();
-    //    Assert.Equal (expectedSubWidth, subView.Frame.Width);
-    //    Assert.Equal (expectedSuperWidth, superView.Frame.Width);
-    //}
-
     [Theory]
     [InlineData (0, 1, 1)]
     [InlineData (1, 1, 1)]
@@ -726,6 +681,40 @@ public class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (expectedSubWidth, subView.Frame.Width);
     }
 
+    #region DimAutoStyle.Auto tests
+
+    [Fact]
+    public void DimAutoStyle_Auto_Text_Size_Is_Used ()
+    {
+        var view = new View ()
+        {
+            Text = "0123\n4567",
+            Width = Auto (),
+            Height = Auto (),
+        };
+
+        view.SetRelativeLayout (new Size (100, 100));
+        Assert.Equal (new (4, 2), view.Frame.Size);
+
+        var subView = new View ()
+        {
+            Text = "ABCD",
+            Width = Auto (),
+            Height = Auto (),
+        };
+        view.Add (subView);
+
+        view.SetRelativeLayout (new Size (100, 100));
+        Assert.Equal (new (4, 2), view.Frame.Size);
+
+        subView.Text = "ABCDE";
+
+        view.SetRelativeLayout (new Size (100, 100));
+        Assert.Equal (new (5, 2), view.Frame.Size);
+    }
+
+    #endregion
+
     [Fact]
     public void DimAutoStyle_Text_Viewport_Stays_Set ()
     {
@@ -755,83 +744,20 @@ public class DimAutoTests (ITestOutputHelper output)
         super.Dispose ();
     }
 
-
-    // TextFormatter.Size normally tracks ContentSize, but with DimAuto, tracks the text size
     [Theory]
     [InlineData ("", 0, 0)]
     [InlineData (" ", 1, 1)]
     [InlineData ("01234", 5, 1)]
-    public void DimAutoStyle_Text_TextFormatter_Size_Ignores_ContentSize (string text, int expectedW, int expectedH)
+    public void DimAutoStyle_Text_Ignores_ContentSize (string text, int expectedW, int expectedH)
     {
         var view = new View ();
         view.Width = Auto (DimAutoStyle.Text);
         view.Height = Auto (DimAutoStyle.Text);
         view.SetContentSize (new (1, 1));
         view.Text = text;
-        Assert.Equal (new (expectedW, expectedH), view.TextFormatter.Size);
+        view.SetRelativeLayout(Application.Screen.Size);
+        Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
-
-
-    // Test that changing TextFormatter does not impact View dimensions if Dim.Auto is not in play
-    [Fact]
-    public void Not_Used_TextFormatter_Does_Not_Change_View_Size ()
-    {
-        View view = new ()
-        {
-            Text = "_1234"
-        };
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.Equal (Size.Empty, view.Frame.Size);
-
-        view.TextFormatter.Text = "ABC";
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.Equal (Size.Empty, view.Frame.Size);
-
-        view.TextFormatter.Alignment = Alignment.Fill;
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.Equal (Size.Empty, view.Frame.Size);
-
-        view.TextFormatter.VerticalAlignment = Alignment.Center;
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.Equal (Size.Empty, view.Frame.Size);
-
-        view.TextFormatter.HotKeySpecifier = (Rune)'*';
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.Equal (Size.Empty, view.Frame.Size);
-
-        view.TextFormatter.Text = "*ABC";
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.Equal (Size.Empty, view.Frame.Size);
-    }
-
-
-    [Fact]
-    public void Not_Used_TextSettings_Do_Not_Change_View_Size ()
-    {
-        View view = new ()
-        {
-            Text = "_1234"
-        };
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.Equal (Size.Empty, view.Frame.Size);
-
-        view.TextAlignment = Alignment.Fill;
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.Equal (Size.Empty, view.Frame.Size);
-
-        view.VerticalTextAlignment = Alignment.Center;
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.Equal (Size.Empty, view.Frame.Size);
-
-        view.HotKeySpecifier = (Rune)'*';
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.Equal (Size.Empty, view.Frame.Size);
-
-        view.Text = "*ABC";
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.Equal (Size.Empty, view.Frame.Size);
-    }
-
 
     [Fact]
     public void TextFormatter_Settings_Change_View_Size ()
@@ -841,39 +767,50 @@ public class DimAutoTests (ITestOutputHelper output)
             Text = "_1234",
             Width = Dim.Auto ()
         };
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.NotEqual (Size.Empty, view.Frame.Size);
+        Assert.Equal (Size.Empty, view.Frame.Size); // Height is 0, so width is 0 regardless of text
+
+        view.Height = 1;
+        view.SetRelativeLayout (Application.Screen.Size);
+        Assert.Equal (new Size (4, 1), view.Frame.Size);
+        Size lastSize = view.Frame.Size;
 
         view.TextAlignment = Alignment.Fill;
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.NotEqual (Size.Empty, view.Frame.Size);
+        Assert.Equal (lastSize, view.Frame.Size);
 
         view = new ()
         {
             Text = "_1234",
-            Width = Dim.Auto ()
+            Width = Dim.Auto (),
+            Height = 1
         };
+        view.SetRelativeLayout (Application.Screen.Size);
+
+        lastSize = view.Frame.Size;
         view.VerticalTextAlignment = Alignment.Center;
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.NotEqual (Size.Empty, view.Frame.Size);
+        Assert.Equal (lastSize, view.Frame.Size);
 
         view = new ()
         {
             Text = "_1234",
-            Width = Dim.Auto ()
+            Width = Dim.Auto (),
+            Height = 1,
         };
+        view.SetRelativeLayout (Application.Screen.Size);
+        lastSize = view.Frame.Size;
         view.HotKeySpecifier = (Rune)'*';
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.NotEqual (Size.Empty, view.Frame.Size);
+        view.SetRelativeLayout (Application.Screen.Size);
+        Assert.NotEqual (lastSize, view.Frame.Size);
 
         view = new ()
         {
             Text = "_1234",
-            Width = Dim.Auto ()
+            Width = Dim.Auto (),
+            Height = 1
         };
-        view.Text = "*ABC";
-        Assert.False (view.TextFormatter.AutoSize);
-        Assert.NotEqual (Size.Empty, view.Frame.Size);
+        view.SetRelativeLayout (Application.Screen.Size);
+        lastSize = view.Frame.Size;
+        view.Text = "*ABCD";
+        Assert.NotEqual (lastSize, view.Frame.Size);
     }
 
     // Ensure TextFormatter.AutoSize is never used for View.Text
@@ -929,7 +866,6 @@ public class DimAutoTests (ITestOutputHelper output)
         };
         Assert.Equal (new (1, expected), view.TextFormatter.Size);
     }
-
 
     [SetupFakeDriver]
     [Fact]
@@ -1042,15 +978,16 @@ public class DimAutoTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (0, 50, 50)]
-    [InlineData (1, 50, 51)]
-    [InlineData (0, 25, 25)]
-    [InlineData (-1, 50, 49)]
-    public void With_Subview_Using_DimPercent (int subViewOffset, int percent, int expectedSize)
+    [InlineData (0, 0, 0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 50, 0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 0, 100, 100, 100, 100, 100, 100)]
+    [InlineData (0, 50, 100, 100, 100, 100, 100, 100)]
+    public void With_Subview_Using_DimPercent (int subViewOffset, int percent, int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View ()
         {
-            Width = 100, Height = 100
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
         };
         var subview = new View ()
         {
@@ -1061,47 +998,104 @@ public class DimAutoTests (ITestOutputHelper output)
         };
         view.Add (subview);
 
-        view.BeginInit ();
-        view.EndInit ();
-
         // Assuming the calculation is done after layout
-        int calculatedX = subview.X.Calculate (100, subview.Width, subview, Dimension.Width);
-        int calculatedY = subview.Y.Calculate (100, subview.Height, subview, Dimension.Height);
-        int calculatedWidth = subview.Width.Calculate (0, 100, view, Dimension.Width);
-        int calculatedHeight = subview.Height.Calculate (0, 100, view, Dimension.Height);
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
 
-        Assert.Equal (20, calculatedWidth); // subview's width
-        Assert.Equal (10, calculatedHeight); // subview's height
-        Assert.Equal (50, calculatedX);  // 50% of 100 (Width)
-        Assert.Equal (50, calculatedY);  // 50% of 100 (Height) 
+        Assert.Equal (expectedWidth, calculatedWidth); // subview's width
+        Assert.Equal (expectedHeight, calculatedHeight); // subview's height
+        Assert.Equal (subViewOffset, calculatedX);
+        Assert.Equal (subViewOffset, calculatedY);
+
+        view.SetRelativeLayout (new (100, 100));
+        view.LayoutSubviews ();
+
+        Assert.Equal (expectedWidth * (percent / 100f), subview.Viewport.Width);
+        Assert.Equal (expectedHeight * (percent / 100f), subview.Viewport.Height);
     }
 
     [Theory]
-    [InlineData (0, 0, 100)]
-    [InlineData (1, 0, 100)]
-    [InlineData (0, 1, 100)]
-    [InlineData (1, 1, 100)]
-    public void With_Subview_Using_DimFill (int subViewOffset, int dimFillMargin, int expectedSize)
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 0, 0)]
+    [InlineData (0, 20, 0, 10, 0, 0)]
+    [InlineData (0, 21, 0, 11, 0, 0)]
+    [InlineData (1, 21, 1, 11, 1, 1)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    public void With_Subview_Using_DimFill (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
-        // BUGBUG: THis test is totally bogus. Dim.Fill isnot working right yet.
         var view = new View ()
         {
-            Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 100, maximumContentDim: 100),
-            Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 100, maximumContentDim: 100),
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
         };
         var subview = new View ()
         {
-            X = subViewOffset,
-            Y = subViewOffset,
-            Width = Dim.Fill (dimFillMargin),
-            Height = Dim.Fill (dimFillMargin)
+            X = 0,
+            Y = 0,
+            Width = Fill (),
+            Height = Fill ()
         };
         view.Add (subview);
-        //view.LayoutSubviews ();
-        view.SetRelativeLayout (new (200, 200));
 
-        Assert.Equal (expectedSize, view.Frame.Width);
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
     }
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 2, 4)]
+    [InlineData (0, 20, 0, 10, 2, 4)]
+    [InlineData (0, 21, 0, 11, 2, 4)]
+    [InlineData (1, 21, 1, 11, 2, 4)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    public void With_Subview_Using_DimFill_And_Another_Subview (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View ()
+        {
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+        };
+        var absView = new View ()
+        {
+            X = 1,
+            Y = 2,
+            Width = 1,
+            Height = 2
+        };
+        view.Add (absView);
+        var subview = new View ()
+        {
+            X = 0,
+            Y = 0,
+            Width = Fill (),
+            Height = Fill ()
+        };
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+    }
+
 
     [Fact]
     public void With_Subview_Using_DimFunc ()
@@ -1150,7 +1144,7 @@ public class DimAutoTests (ITestOutputHelper output)
     [InlineData (0, 20, 0, 10, 20, 10)]
     [InlineData (0, 21, 0, 11, 21, 11)]
     [InlineData (1, 21, 1, 11, 21, 11)]
-    [InlineData (100, 21, 100, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
     public void With_Subview_Using_PosAbsolute (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View ()
@@ -1186,7 +1180,7 @@ public class DimAutoTests (ITestOutputHelper output)
     [InlineData (0, 20, 0, 10, 20, 10)]
     [InlineData (0, 21, 0, 11, 20, 10)]
     [InlineData (1, 21, 1, 11, 20, 10)]
-    [InlineData (100, 21, 100, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
     public void With_Subview_Using_PosPercent (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View ()
@@ -1228,7 +1222,7 @@ public class DimAutoTests (ITestOutputHelper output)
     [InlineData (0, 20, 0, 10, 20, 10)]
     [InlineData (0, 21, 0, 11, 21, 11)]
     [InlineData (1, 21, 1, 11, 21, 11)]
-    [InlineData (100, 21, 100, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
     public void With_Subview_Using_PosPercent_Combine (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View ()
@@ -1268,9 +1262,9 @@ public class DimAutoTests (ITestOutputHelper output)
     [InlineData (0, 0, 0, 0, 0, 0)]
     [InlineData (0, 19, 0, 9, 19, 9)]
     [InlineData (0, 20, 0, 10, 20, 10)]
-    [InlineData (0, 21, 0, 11, 21, 11)]
-    [InlineData (1, 21, 1, 11, 21, 11)]
-    [InlineData (100, 21, 100, 11, 21, 11)]
+    [InlineData (0, 21, 0, 11, 20, 10)]
+    [InlineData (1, 21, 1, 11, 20, 10)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
     public void With_Subview_Using_PosCenter (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View ()
@@ -1313,7 +1307,7 @@ public class DimAutoTests (ITestOutputHelper output)
     [InlineData (0, 20, 0, 10, 20, 10)]
     [InlineData (0, 21, 0, 11, 21, 11)]
     [InlineData (1, 21, 1, 11, 21, 11)]
-    [InlineData (100, 21, 100, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
     public void With_Subview_Using_PosCenter_Combine (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View ()
@@ -1357,7 +1351,7 @@ public class DimAutoTests (ITestOutputHelper output)
     [InlineData (0, 20, 0, 10, 20, 10)]
     [InlineData (0, 21, 0, 11, 20, 10)]
     [InlineData (1, 21, 1, 11, 20, 10)]
-    [InlineData (100, 21, 100, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
     public void With_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View ()
@@ -1469,12 +1463,14 @@ public class DimAutoTests (ITestOutputHelper output)
         View view = new ()
         {
             Width = Auto (),
+            Height = 1,
             Text = text
         };
 
         View subView = new ()
         {
             Width = dimension,
+            Height = 1,
         };
         view.Add (subView);
 

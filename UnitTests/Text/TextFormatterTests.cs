@@ -6047,6 +6047,68 @@ B")]
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
     }
 
+
+    // Test that changing TextFormatter does not impact View dimensions if Dim.Auto is not in play
+    [Fact]
+    public void Not_Used_TextFormatter_Does_Not_Change_View_Size ()
+    {
+        View view = new ()
+        {
+            Text = "_1234"
+        };
+        Assert.False (view.TextFormatter.AutoSize);
+        Assert.Equal (Size.Empty, view.Frame.Size);
+
+        view.TextFormatter.Text = "ABC";
+        Assert.False (view.TextFormatter.AutoSize);
+        Assert.Equal (Size.Empty, view.Frame.Size);
+
+        view.TextFormatter.Alignment = Alignment.Fill;
+        Assert.False (view.TextFormatter.AutoSize);
+        Assert.Equal (Size.Empty, view.Frame.Size);
+
+        view.TextFormatter.VerticalAlignment = Alignment.Center;
+        Assert.False (view.TextFormatter.AutoSize);
+        Assert.Equal (Size.Empty, view.Frame.Size);
+
+        view.TextFormatter.HotKeySpecifier = (Rune)'*';
+        Assert.False (view.TextFormatter.AutoSize);
+        Assert.Equal (Size.Empty, view.Frame.Size);
+
+        view.TextFormatter.Text = "*ABC";
+        Assert.False (view.TextFormatter.AutoSize);
+        Assert.Equal (Size.Empty, view.Frame.Size);
+    }
+
+
+    [Fact]
+    public void Not_Used_TextSettings_Do_Not_Change_View_Size ()
+    {
+        View view = new ()
+        {
+            Text = "_1234"
+        };
+        Assert.False (view.TextFormatter.AutoSize);
+        Assert.Equal (Size.Empty, view.Frame.Size);
+
+        view.TextAlignment = Alignment.Fill;
+        Assert.False (view.TextFormatter.AutoSize);
+        Assert.Equal (Size.Empty, view.Frame.Size);
+
+        view.VerticalTextAlignment = Alignment.Center;
+        Assert.False (view.TextFormatter.AutoSize);
+        Assert.Equal (Size.Empty, view.Frame.Size);
+
+        view.HotKeySpecifier = (Rune)'*';
+        Assert.False (view.TextFormatter.AutoSize);
+        Assert.Equal (Size.Empty, view.Frame.Size);
+
+        view.Text = "*ABC";
+        Assert.False (view.TextFormatter.AutoSize);
+        Assert.Equal (Size.Empty, view.Frame.Size);
+    }
+
+
     #region FormatAndGetSizeTests
 
     // TODO: Add multi-line examples

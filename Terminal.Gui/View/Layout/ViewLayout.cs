@@ -573,6 +573,8 @@ public partial class View
         Debug.Assert (_height is { });
 
         CheckDimAuto ();
+        SetTextFormatterSize ();
+
         int newX, newW, newY, newH;
 
         // Calculate the new X, Y, Width, and Height
@@ -630,7 +632,6 @@ public partial class View
             {
                 SetTitleTextFormatterSize ();
             }
-
             SetNeedsLayout ();
             SetNeedsDisplay ();
         }
@@ -741,8 +742,6 @@ public partial class View
         Size superViewContentSize = SuperView is { IsInitialized: true } ? SuperView.GetContentSize () :
                            Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.GetContentSize () :
                            Application.Screen.Size;
-
-        SetTextFormatterSize ();
 
         SetRelativeLayout (superViewContentSize);
 

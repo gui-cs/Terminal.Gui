@@ -79,7 +79,12 @@ public class Dialogs : Scenario
         frame.Add (heightEdit);
 
         frame.Add (
-                   new Label { X = Pos.Right (widthEdit) + 2, Y = Pos.Top (widthEdit), Text = "If height & width are both 0," }
+                   new Label
+                   {
+                       X = Pos.Right (widthEdit) + 2,
+                       Y = Pos.Top (widthEdit),
+                       Text = $"If width is 0, the dimension will be {Dialog.DefaultMinimumWidth}%."
+                   }
                   );
 
         frame.Add (
@@ -87,7 +92,7 @@ public class Dialogs : Scenario
                    {
                        X = Pos.Right (heightEdit) + 2,
                        Y = Pos.Top (heightEdit),
-                       Text = "the Dialog will size to 80% of container."
+                       Text = $"If height is 0, the dimension will be {Dialog.DefaultMinimumWidth}%."
                    }
                   );
 
@@ -263,16 +268,19 @@ public class Dialogs : Scenario
                 Buttons = buttons.ToArray ()
             };
 
-            if (height != 0 || width != 0)
+            if (width != 0)
+            {
+                dialog.Width = width;
+            }
+            if (height != 0)
             {
                 dialog.Height = height;
-                dialog.Width = width;
             }
 
             var add = new Button
             {
                 X = Pos.Center (),
-                Y = Pos.Center (),
+                Y = Pos.Center () - 1,
                 Text = "_Add a button"
             };
 
@@ -312,7 +320,7 @@ public class Dialogs : Scenario
             var addChar = new Button
             {
                 X = Pos.Center (),
-                Y = Pos.Center () + 2,
+                Y = Pos.Center () + 1,
                 Text = $"A_dd a {char.ConvertFromUtf32 (CODE_POINT)} to each button. This text is really long for a reason."
             };
 

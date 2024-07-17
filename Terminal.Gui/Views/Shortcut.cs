@@ -484,7 +484,7 @@ public override string Text
     get => HelpView?.Text;
     set
     {
-        if (HelpView != null)
+        if (HelpView is {})
         {
             HelpView.Text = value;
             ShowHide ();
@@ -500,7 +500,7 @@ public string HelpText
     get => HelpView?.Text;
     set
     {
-        if (HelpView != null)
+        if (HelpView is {})
         {
             HelpView.Text = value;
             ShowHide ();
