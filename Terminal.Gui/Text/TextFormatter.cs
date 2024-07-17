@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Terminal.Gui;
 
@@ -659,9 +660,21 @@ public class TextFormatter
             return Size.Empty;
         }
 
+        // HACK: This is a total hack to work around the fact that TextFormatter.Format does not match TextFormatter.Draw.
         Size prevSize = Size;
         Size = constrainSize.Value;
+
+        // HACK: Fill normally will fill the entire constraint size, but we need to know the actual size of the text.
+        Alignment prevAlignment = Alignment;
+        if (Alignment == Alignment.Fill)
+        {
+            Alignment = Alignment.Start;
+        }
+
         List<string> lines = GetLines ();
+
+        // Undo hacks
+        Alignment = prevAlignment;
         Size = prevSize;
 
         if (lines.Count == 0)
@@ -679,7 +692,7 @@ public class TextFormatter
         }
         else
         {
-            width = lines.Max (static line => line.GetColumns());
+            width = lines.Max (static line => line.GetColumns ());
             height = lines.Count;
         }
 

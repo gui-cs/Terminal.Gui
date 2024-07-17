@@ -810,13 +810,15 @@ w ";
         Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
 
+        // frame.Width is width + border wide (20 + 2) and 6 high
+
         if (autoSize)
         {
             Size expectedSize = new (11, 1);
             Assert.Equal (expectedSize, lblLeft.TextFormatter.Size);
             Assert.Equal (expectedSize, lblCenter.TextFormatter.Size);
             Assert.Equal (expectedSize, lblRight.TextFormatter.Size);
-           // Assert.Equal (expectedSize, lblJust.TextFormatter.Size);
+            Assert.Equal (expectedSize, lblJust.TextFormatter.Size);
         }
         else
         {
@@ -824,7 +826,7 @@ w ";
             Assert.Equal (expectedSize, lblLeft.TextFormatter.Size);
             Assert.Equal (expectedSize, lblCenter.TextFormatter.Size);
             Assert.Equal (expectedSize, lblRight.TextFormatter.Size);
-            //Assert.Equal (expectedSize, lblJust.TextFormatter.Size);
+            Assert.Equal (expectedSize, lblJust.TextFormatter.Size);
         }
 
         Assert.Equal (new (0, 0, width + 2, 6), frame.Frame);
@@ -943,7 +945,7 @@ w ";
             Assert.Equal (new (1, 11), lblLeft.TextFormatter.Size);
             Assert.Equal (new (1, 11), lblCenter.TextFormatter.Size);
             Assert.Equal (new (1, 11), lblRight.TextFormatter.Size);
-           // Assert.Equal (new (1, 11), lblJust.TextFormatter.Size);
+            Assert.Equal (new (1, 11), lblJust.TextFormatter.Size);
             Assert.Equal (new (0, 0, 9, height + 2), frame.Frame);
         }
         else
