@@ -143,9 +143,13 @@ public class ViewTests (ITestOutputHelper output)
     {
         var root = new View { Width = 20, Height = 10, ColorScheme = Colors.ColorSchemes ["Base"] };
 
+        string text = new ('c', 100);
+
         View v = label
-                     ? new Label { Text = new ('c', 100) }
-                     : new TextView { Height = 1, Text = new ('c', 100), Width = Dim.Fill () };
+                     // Label has Width/Height == AutoSize, so Frame.Size will be (100, 1)
+                     ? new Label { Text = text }
+                     // TextView has Width/Height == (Dim.Fill, 1), so Frame.Size will be 20 (width of root), 1
+                     : new TextView { Width = Dim.Fill (), Height = 1, Text = text };
 
         root.Add (v);
 
@@ -156,8 +160,7 @@ public class ViewTests (ITestOutputHelper output)
         if (label)
         {
             Assert.False (v.CanFocus);
-
-            //Assert.Equal (new Rectangle (0, 0, 20, 1), v.Frame);
+            Assert.Equal (new  (0, 0, text.Length, 1), v.Frame);
         }
         else
         {

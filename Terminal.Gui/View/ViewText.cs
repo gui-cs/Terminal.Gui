@@ -204,18 +204,18 @@ public partial class View
             {
                 if (height == 0 && heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
                 {
-                    height = Application.Screen.Height;
+                   height = Application.Screen.Width * 4;
                 }
-                width = TextFormatter.FormatAndGetSize (new (Application.Screen.Width, height)).Width;
+                width = TextFormatter.FormatAndGetSize (new (Application.Screen.Width * 4, height)).Width;
             }
 
             if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
             {
                 if (width == 0 && widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
                 {
-                    width = Application.Screen.Height;
+                    width = Application.Screen.Width * 4;
                 }
-                height = TextFormatter.FormatAndGetSize (new (width, Application.Screen.Height)).Height;
+                height = TextFormatter.FormatAndGetSize (new (width, Application.Screen.Height * 4)).Height;
             }
 
             size = new (width, height);

@@ -40,7 +40,7 @@ public class ShortcutTests
         Assert.IsType<DimAuto> (shortcut.Height);
         //shortcut.BeginInit();
         //shortcut.EndInit ();
-        shortcut.LayoutSubviews ();
+       // shortcut.LayoutSubviews ();
         shortcut.SetRelativeLayout (new (100, 100));
 
         // |0123456789

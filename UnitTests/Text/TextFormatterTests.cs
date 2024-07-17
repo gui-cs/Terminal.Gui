@@ -6150,6 +6150,9 @@ B")]
                                                                          14
                                                                          2 
                                                                          """)]
+
+    [InlineData ("01234", 2, 1, TextDirection.LeftRight_TopBottom, 2, 1, @"01")]
+
     public void FormatAndGetSize_Returns_Correct_Size (string text, int width, int height, TextDirection direction, int expectedWidth, int expectedHeight, string expectedDraw)
     {
         TextFormatter tf = new ()
