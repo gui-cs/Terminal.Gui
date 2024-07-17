@@ -1296,8 +1296,8 @@ public class DimAutoTests (ITestOutputHelper output)
         view.BeginInit ();
         view.EndInit ();
         // subview should be centered in the parent view + 1
-        Assert.Equal (view.Viewport.Width / 2 - subview.Frame.Width / 2, subview.Frame.X);
-        Assert.Equal (view.Viewport.Height / 2 - subview.Frame.Height / 2, subview.Frame.Y);
+        Assert.Equal ((view.Viewport.Width - subview.Frame.Width) / 2, subview.Frame.X);
+        Assert.Equal ((view.Viewport.Height - subview.Frame.Height) / 2, subview.Frame.Y);
     }
 
     [Theory]
@@ -1340,8 +1340,8 @@ public class DimAutoTests (ITestOutputHelper output)
         view.BeginInit ();
         view.EndInit ();
         // subview should be centered in the parent view + 1
-        Assert.Equal (view.Viewport.Width / 2 - subview.Frame.Width / 2 + 1, subview.Frame.X);
-        Assert.Equal (view.Viewport.Height / 2 - subview.Frame.Height / 2 + 1, subview.Frame.Y);
+        Assert.Equal ((view.Viewport.Width - subview.Frame.Width) / 2  + 1, subview.Frame.X);
+        Assert.Equal ((view.Viewport.Height - subview.Frame.Height) / 2 + 1, subview.Frame.Y);
     }
 
     [Theory]

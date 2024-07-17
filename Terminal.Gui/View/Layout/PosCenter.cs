@@ -16,6 +16,6 @@ public class PosCenter : Pos
         // Protect against negative dimensions
         int newDimension = Math.Max (dim.Calculate (0, superviewDimension, us, dimension), 0);
 
-        return superviewDimension / 2 - newDimension / 2;
+        return (superviewDimension - newDimension) / 2;
     }
 }
