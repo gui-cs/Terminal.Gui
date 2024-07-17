@@ -56,7 +56,7 @@ public class PosCenterTests (ITestOutputHelper output)
     [InlineData (10, 10, 0)]
     [InlineData (10, 11, 0)]
     [InlineData (10, 12, -1)]
-    [InlineData (19, 20, -1)]
+    [InlineData (19, 20, 0)]
     public void PosCenter_Calculate_ReturnsExpectedValue (int superviewDimension, int width, int expectedX)
     {
         var posCenter = new PosCenter ();
