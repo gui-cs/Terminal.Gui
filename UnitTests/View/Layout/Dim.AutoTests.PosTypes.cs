@@ -303,6 +303,55 @@ public partial class DimAutoTests
         Assert.Equal (view.Viewport.Height - subview.Frame.Height, subview.Frame.Y);
     }
 
+    [Theory]
+    [InlineData (0, 10, 0, 10, 10, 2)]
+    [InlineData (0, 5, 0, 5, 5, 3)] // max width of 5 should cause wordwrap at 5 giving a height of 2 + 1
+    //[InlineData (0, 19, 0, 9, 19, 9)]
+    //[InlineData (0, 20, 0, 10, 20, 10)]
+    //[InlineData (0, 21, 0, 11, 21, 11)]
+    //[InlineData (1, 21, 1, 11, 21, 11)]
+    //[InlineData (21, 21, 11, 11, 21, 11)]
+    public void With_Text_And_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View
+        {
+            Text = "01234ABCDE",
+            Width = Dim.Auto (),
+            Height = Dim.Auto ()
+        };
+
+        // Without a subview, width should be 10
+        // Without a subview, height should be 1
+        view.SetRelativeLayout (Application.Screen.Size);
+        Assert.Equal (10, view.Frame.Width);
+        Assert.Equal (1, view.Frame.Height);
+
+        view.Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth);
+        view.Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight);
+
+        var subview = new View
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Width = 1,
+            Height = 1
+        };
+
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+    }
+
     #endregion PosAnchorEnd
 
     #region PosFunc

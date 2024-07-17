@@ -1,3 +1,4 @@
+#nullable enable
 using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -15,7 +16,6 @@ public class TextFormatter
     private List<string> _lines = new ();
     private bool _multiLine;
     private bool _preserveTrailingSpaces;
-    private Size _size;
     private int _tabWidth = 4;
     private string _text;
     private Alignment _textAlignment = Alignment.Start;
@@ -177,6 +177,48 @@ public class TextFormatter
         set => _preserveTrailingSpaces = EnableNeedsFormat (value);
     }
 
+    private int? _width;
+
+    public int? Width
+    {
+        get => _width;
+        set
+        {
+            if (_width == value)
+            {
+                return;
+            }
+            _width = value;
+            if (_width is null || _height is null)
+            {
+                return;
+            }
+            Size size = EnableNeedsFormat (Size!.Value);
+            _width = size.Width;
+        }
+    }
+
+    private int? _height;
+
+    public int? Height
+    {
+        get => _height;
+        set
+        {
+            if (_height == value)
+            {
+                return;
+            }
+            _height = value;
+            if (_width is null || _height is null)
+            {
+                return;
+            }
+            Size size = EnableNeedsFormat (Size!.Value);
+            _height = size.Height;
+        }
+    }
+
     /// <summary>Gets or sets the size <see cref="Text"/> will be constrained to when formatted.</summary>
     /// <remarks>
     ///     <para>
@@ -185,18 +227,38 @@ public class TextFormatter
     ///     </para>
     ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
     /// </remarks>
-    public Size Size
+    public Size? Size
     {
-        get => _size;
+        get
+        {
+            if (_width is null || _height is null)
+            {
+                return null;
+            }
+
+            return new Size (_width.Value, _height.Value);
+        }
         set
         {
             if (AutoSize)
             {
-                _size = EnableNeedsFormat (GetAutoSize ());
+                Size size = EnableNeedsFormat (GetAutoSize ());
+                _width = size.Width;
+                _height = size.Height;
             }
             else
             {
-                _size = EnableNeedsFormat (value);
+                if (value is null)
+                {
+                    _width = null;
+                    _height = null;
+                }
+                else
+                {
+                    Size size = EnableNeedsFormat (value.Value);
+                    _width = size.Width;
+                    _height = size.Height;
+                }
             }
         }
     }
@@ -651,19 +713,20 @@ public class TextFormatter
     /// <returns>The size required to hold the formatted text.</returns>
     public Size FormatAndGetSize (Size? constrainSize = null)
     {
-        if (constrainSize is null)
+        if (string.IsNullOrEmpty (Text))
         {
-            constrainSize = Size;
-        }
-        if (string.IsNullOrEmpty (Text) || constrainSize.Value.Height == 0 || constrainSize.Value.Width == 0)
-        {
-            return Size.Empty;
+            return System.Drawing.Size.Empty;
         }
 
         // HACK: This is a total hack to work around the fact that TextFormatter.Format does not match TextFormatter.Draw.
-        Size prevSize = Size;
-        Size = constrainSize.Value;
-
+        int? prevWidth = _width;
+        int? prevHeight = _height;
+        if (constrainSize is { })
+        {
+            _width = constrainSize?.Width;
+            _height = constrainSize?.Height;
+        }
+        
         // HACK: Fill normally will fill the entire constraint size, but we need to know the actual size of the text.
         Alignment prevAlignment = Alignment;
         if (Alignment == Alignment.Fill)
@@ -681,11 +744,16 @@ public class TextFormatter
         // Undo hacks
         Alignment = prevAlignment;
         VerticalAlignment = prevVerticalAlignment;
-        Size = prevSize;
+
+        if (constrainSize is { })
+        {
+            _width = prevWidth ?? null;
+            _height = prevHeight ?? null;
+        }
 
         if (lines.Count == 0)
         {
-            return Size.Empty;
+            return System.Drawing.Size.Empty;
         }
 
         int width;
@@ -720,7 +788,7 @@ public class TextFormatter
     public List<string> GetLines ()
     {
         // With this check, we protect against subclasses with overrides of Text
-        if (string.IsNullOrEmpty (Text) || Size.Height == 0 || Size.Width == 0)
+        if (string.IsNullOrEmpty (Text) || Size is null || Size?.Height == 0 || Size?.Width == 0)
         {
             _lines = new List<string> { string.Empty };
             NeedsFormat = false;
@@ -745,9 +813,9 @@ public class TextFormatter
 
                 _lines = Format (
                                  text,
-                                 Size.Height,
+                                 Size!.Value.Height,
                                  VerticalAlignment == Alignment.Fill,
-                                 Size.Width > colsWidth && WordWrap,
+                                 Size!.Value.Width > colsWidth && WordWrap,
                                  PreserveTrailingSpaces,
                                  TabWidth,
                                  Direction,
@@ -757,7 +825,7 @@ public class TextFormatter
 
                 if (!AutoSize)
                 {
-                    colsWidth = GetMaxColsForWidth (_lines, Size.Width, TabWidth);
+                    colsWidth = GetMaxColsForWidth (_lines, Size!.Value.Width, TabWidth);
 
                     if (_lines.Count > colsWidth)
                     {
@@ -769,9 +837,9 @@ public class TextFormatter
             {
                 _lines = Format (
                                  text,
-                                 Size.Width,
+                                 Size!.Value.Width,
                                  Alignment == Alignment.Fill,
-                                 Size.Height > 1 && WordWrap,
+                                 Size!.Value.Height > 1 && WordWrap,
                                  PreserveTrailingSpaces,
                                  TabWidth,
                                  Direction,
@@ -779,9 +847,9 @@ public class TextFormatter
                                  this
                                 );
 
-                if (!AutoSize && _lines.Count > Size.Height)
+                if (!AutoSize && _lines.Count > Size!.Value.Height)
                 {
-                    _lines.RemoveRange (Size.Height, _lines.Count - Size.Height);
+                    _lines.RemoveRange (Size!.Value.Height, _lines.Count -  Size!.Value.Height);
                 }
             }
 
@@ -1952,7 +2020,7 @@ public class TextFormatter
     {
         if (string.IsNullOrEmpty (text))
         {
-            return new (new (x, y), Size.Empty);
+            return new (new (x, y), System.Drawing.Size.Empty);
         }
 
         int w, h;

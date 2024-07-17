@@ -369,8 +369,8 @@ public static class MessageBox
             ButtonAlignment = Alignment.Center,
             ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems,
             BorderStyle = MessageBox.DefaultBorderStyle,
-            Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: 1, maximumContentDim: Dim.Percent (90)),
-            Height = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: 2, maximumContentDim: Dim.Percent (90)),
+            Width = Dim.Auto  (DimAutoStyle.Auto, /*minimumContentDim: Dim.Percent (DefaultMinimumWidth), */ maximumContentDim: Dim.Percent (90)),
+            Height = Dim.Auto (DimAutoStyle.Auto, /*minimumContentDim: Dim.Percent (DefaultMinimumHeight),*/ maximumContentDim: Dim.Percent (90)),
         };
 
         if (width != 0)
@@ -385,22 +385,22 @@ public static class MessageBox
 
         d.ColorScheme = useErrorColors ? Colors.ColorSchemes ["Error"] : Colors.ColorSchemes ["Dialog"];
 
-        d.LayoutComplete += (s, e) =>
-        {
-            if (wrapMessage)
-            {
-                int buttonHeight = buttonList.Count > 0 ? buttonList [0].Frame.Height : 0;
-                Debug.Assert (d.TextFormatter.WordWrap);
-                d.TextFormatter.Size = new Size (d.GetContentSize ().Width, Application.Screen.Height);
-                Size textSize = d.TextFormatter.GetAutoSize ();
-                textSize.Height += buttonHeight;
+        //d.LayoutComplete += (s, e) =>
+        //{
+        //    if (wrapMessage)
+        //    {
+        //        int buttonHeight = buttonList.Count > 0 ? buttonList [0].Frame.Height : 0;
+        //        Debug.Assert (d.TextFormatter.WordWrap);
+        //        d.TextFormatter.Size = new Size (d.GetContentSize ().Width, Application.Screen.Height);
+        //        Size textSize = d.TextFormatter.GetAutoSize ();
+        //        textSize.Height += buttonHeight;
 
-                if (textSize != d.TextFormatter.Size)
-                {
-                    d.SetNeedsLayout ();
-                }
-            }
-        };
+        //        if (textSize != d.TextFormatter.Size)
+        //        {
+        //            d.SetNeedsLayout ();
+        //        }
+        //    }
+        //};
 
         d.HotKeySpecifier = new Rune ('\xFFFF');
         d.Text = message;

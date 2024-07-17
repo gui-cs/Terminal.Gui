@@ -576,6 +576,7 @@ public partial class View
         SetTextFormatterSize ();
 
         int newX, newW, newY, newH;
+        Rectangle oldFrame = Frame;
 
         // Calculate the new X, Y, Width, and Height
         // If the Width or Height is Dim.Auto, calculate the Width or Height first. Otherwise, calculate the X or Y first.
@@ -583,6 +584,7 @@ public partial class View
         {
             newW = _width.Calculate (0, superviewContentSize.Width, this, Dimension.Width);
             newX = _x.Calculate (superviewContentSize.Width, newW, this, Dimension.Width);
+            //SetFrame (oldFrame with { X = newX, Width = newW });
         }
         else
         {
@@ -600,6 +602,8 @@ public partial class View
             newY = _y.Calculate (superviewContentSize.Height, _height, this, Dimension.Height);
             newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
         }
+
+        SetFrame (oldFrame);
 
         Rectangle newFrame = new (newX, newY, newW, newH);
 
@@ -743,6 +747,7 @@ public partial class View
                            Application.Top is { } && Application.Top != this && Application.Top.IsInitialized ? Application.Top.GetContentSize () :
                            Application.Screen.Size;
 
+        SetTextFormatterSize ();
         SetRelativeLayout (superViewContentSize);
 
         if (IsInitialized)

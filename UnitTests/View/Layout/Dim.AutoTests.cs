@@ -509,7 +509,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Height = Auto (),
             Text = "01234"
         };
-
+        view.SetRelativeLayout (new (100, 100));
         Assert.Equal (new (0, 0, 5, 1), view.Frame);
         Assert.Equal (new (5, 1), view.GetContentSize ());
 
@@ -616,6 +616,61 @@ public partial class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (expectedViewport, view.Viewport);
 
         super.Dispose ();
+    }
+
+    [Theory]
+    [InlineData ("", 0, 0)]
+    [InlineData (" ", 1, 1)]
+    [InlineData ("01234", 5, 1)]
+    public void DimAutoStyle_Text_Sizes_Correctly (string text, int expectedW, int expectedH)
+    {
+        var view = new View ();
+        view.Width = Auto (DimAutoStyle.Text);
+        view.Height = Auto (DimAutoStyle.Text);
+
+        view.Text = text;
+
+        view.SetRelativeLayout (Application.Screen.Size);
+
+        Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
+
+    }
+
+    [Theory]
+    [InlineData ("", 0, 0, 0, 0)]
+    [InlineData (" ", 5, 5, 5, 5)]
+    [InlineData ("01234", 5, 5, 5, 5)]
+    [InlineData ("01234", 4, 3, 5, 3)]
+    [InlineData ("01234ABCDE", 5, 0, 10, 1)]
+    public void DimAutoStyle_Text_Sizes_Correctly_With_Min (string text, int minWidth, int minHeight, int expectedW, int expectedH)
+    {
+        var view = new View ();
+        view.Width = Auto (DimAutoStyle.Text, minimumContentDim: minWidth);
+        view.Height = Auto (DimAutoStyle.Text, minimumContentDim: minHeight);
+
+        view.Text = text;
+
+        view.SetRelativeLayout (Application.Screen.Size);
+
+        Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
+
+    }
+
+    [Theory]
+    [InlineData ("", 0, 0, 0)]
+    [InlineData (" ", 5, 1, 1)]
+    [InlineData ("01234", 5, 5, 1)]
+    [InlineData ("01234", 4, 4, 2)]
+    [InlineData ("01234ABCDE", 5, 5, 2)]
+    [InlineData ("01234ABCDE", 1, 1, 10)]
+    public void DimAutoStyle_Text_Sizes_Correctly_With_Max_Width (string text, int maxWidth, int expectedW, int expectedH)
+    {
+        var view = new View ();
+        view.Width = Auto (DimAutoStyle.Text, maximumContentDim: maxWidth);
+        view.Height = Auto (DimAutoStyle.Text);
+        view.Text = text;
+
+        Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
 
     [Theory]
@@ -775,7 +830,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Text = "_1234",
             Width = Auto ()
         };
-        Assert.Equal (Size.Empty, view.Frame.Size); // Height is 0, so width is 0 regardless of text
+        Assert.Equal (new (4, 0), view.Frame.Size);
 
         view.Height = 1;
         view.SetRelativeLayout (Application.Screen.Size);

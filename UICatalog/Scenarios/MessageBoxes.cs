@@ -65,7 +65,12 @@ public class MessageBoxes : Scenario
         frame.Add (heightEdit);
 
         frame.Add (
-                   new Label { X = Pos.Right (widthEdit) + 2, Y = Pos.Top (widthEdit), Text = "If height & width are both 0," }
+                   new Label
+                   {
+                       X = Pos.Right (widthEdit) + 2,
+                       Y = Pos.Top (widthEdit),
+                       Text = $"If width is 0, the dimension will be {MessageBox.DefaultMinimumWidth}%."
+                   }
                   );
 
         frame.Add (
@@ -73,7 +78,7 @@ public class MessageBoxes : Scenario
                    {
                        X = Pos.Right (heightEdit) + 2,
                        Y = Pos.Top (heightEdit),
-                       Text = "the MessageBox will be sized automatically."
+                       Text = $"If height is 0, the dimension will be {MessageBox.DefaultMinimumWidth}%."
                    }
                   );
 

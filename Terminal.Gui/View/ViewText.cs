@@ -180,48 +180,24 @@ public partial class View
         // Default is to use GetContentSize ().
         var size = GetContentSize ();
 
-        // TODO: This is a hack. Figure out how to move this into DimDimAuto
+        // TODO: This is a hack. Figure out how to move this logic into DimAuto
         // Use _width & _height instead of Width & Height to avoid debug spew
         DimAuto? widthAuto = _width as DimAuto;
         DimAuto? heightAuto = _height as DimAuto;
-        if ((widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
-            || (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text)))
+        if ((widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text)))
         {
-            int width = 0;
-            int height = 0;
-
-            if (widthAuto is null || !widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
-            {
-                width = GetContentSize ().Width;
-            }
-
-            if (heightAuto is null || !heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
-            {
-                height = GetContentSize ().Height;
-            }
-
-            if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
-            {
-                if (height == 0 && heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
-                {
-                   height = Application.Screen.Width * 4;
-                }
-                width = TextFormatter.FormatAndGetSize (new (Application.Screen.Width * 4, height)).Width;
-            }
-
-            if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
-            {
-                if (width == 0 && widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
-                {
-                    width = Application.Screen.Width * 4;
-                }
-                height = TextFormatter.FormatAndGetSize (new (width, Application.Screen.Height * 4)).Height;
-            }
-
-            size = new (width, height);
+            TextFormatter.Width = null;
         }
 
-        TextFormatter.Size = size;
+        if ((heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text)))
+        {
+            TextFormatter.Height = null;
+        }
+
+        if (TextFormatter.Size is { })
+        {
+            TextFormatter.Size = size;
+        }
     }
 
     private void UpdateTextDirection (TextDirection newDirection)

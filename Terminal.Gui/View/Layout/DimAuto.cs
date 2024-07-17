@@ -70,19 +70,40 @@ public class DimAuto () : Dim
 
         if (Style.FastHasFlags (DimAutoStyle.Text))
         {
+
             if (dimension == Dimension.Width)
             {
-                //us.TextFormatter.Size = new (superviewContentSize, 2048);
-                textSize = us.TextFormatter.FormatAndGetSize ().Width;
-                //us.TextFormatter.Size = new Size (textSize, 2048);
+                if (us.TextFormatter.Width is null)
+                {
+                    us.TextFormatter.Size = us.TextFormatter.FormatAndGetSize (new (int.Max (autoMax, superviewContentSize), screen));
+                }
+//                else
+                {
+                    textSize = us.TextFormatter.Width.Value;
+                }
             }
             else
             {
-                //if (us.TextFormatter.Size.Width == 0)
+                if (us.TextFormatter.Height is null)
+                {
+                    textSize = us.TextFormatter.FormatAndGetSize (new (us.TextFormatter.Width ?? screen, int.Max (autoMax, superviewContentSize))).Height;
+                    us.TextFormatter.Height = textSize;
+                }
+                else
+                {
+                    textSize = us.TextFormatter.Height.Value;
+                }
+
+                //if (us.Width.Has (typeof(DimAuto), out var widthDim))
                 //{
-                //    us.TextFormatter.Size = us.TextFormatter.GetAutoSize ();
+                //    DimAuto widthDimAuto = (DimAuto)widthDim;
+                //    textSize = us.TextFormatter.FormatAndGetSize (us.GetContentSize ()).Height;
                 //}
-                textSize = us.TextFormatter.FormatAndGetSize ().Height;
+                //else
+                //{
+                //    textSize = us.TextFormatter.FormatAndGetSize ().Height;
+                //}
+
                 //us.TextFormatter.Size = us.TextFormatter.Size with { Height = textSize };
             }
         }

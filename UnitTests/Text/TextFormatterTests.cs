@@ -2216,7 +2216,7 @@ ssb
         Assert.False (tf.AutoSize);
 
         // If autosize is false, no auto sizing!
-        Assert.Equal (Size.Empty, tf.Size);
+        Assert.Null (tf.Size);
 
         tf.Size = new (1, 1); // This should have no impact (autosize overrides)
         tf.AutoSize = true;
@@ -2236,6 +2236,11 @@ ssb
     public void Text_Set_SizeIsCorrect (string text, TextDirection textDirection, bool autoSize, int expectedWidth, int expectedHeight)
     {
         var tf = new TextFormatter { Direction = textDirection, Text = text, AutoSize = autoSize };
+
+        if (!autoSize)
+        {
+            tf.Size = Size.Empty;
+        }
         Assert.Equal (new Size (expectedWidth, expectedHeight), tf.Size);
     }
 
