@@ -306,7 +306,7 @@ public partial class DimAutoTests
     [Theory]
     [InlineData (0, 10, 0, 10, 10, 2)]
     [InlineData (0, 5, 0, 5, 5, 3)] // max width of 5 should cause wordwrap at 5 giving a height of 2 + 1
-    //[InlineData (0, 19, 0, 9, 19, 9)]
+    [InlineData (0, 19, 0, 9, 11, 2)]
     //[InlineData (0, 20, 0, 10, 20, 10)]
     //[InlineData (0, 21, 0, 11, 21, 11)]
     //[InlineData (1, 21, 1, 11, 21, 11)]

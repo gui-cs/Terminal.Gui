@@ -528,6 +528,25 @@ public partial class DimAutoTests (ITestOutputHelper output)
 
     #region DimAutoStyle.Auto tests
 
+    [Theory]
+    [InlineData ("", 0, 0)]
+    [InlineData (" ", 1, 1)]
+    [InlineData ("01234", 5, 1)]
+    [InlineData ("01234\nABCDE", 5, 2)]
+    public void DimAutoStyle_Auto_JustText_Sizes_Correctly (string text, int expectedW, int expectedH)
+    {
+        var view = new View ();
+        view.Width = Auto ();
+        view.Height = Auto ();
+
+        view.Text = text;
+
+        view.SetRelativeLayout (Application.Screen.Size);
+
+        Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
+
+    }
+
     [Fact]
     public void DimAutoStyle_Auto_Text_Size_Is_Used ()
     {
@@ -622,6 +641,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
     [InlineData ("", 0, 0)]
     [InlineData (" ", 1, 1)]
     [InlineData ("01234", 5, 1)]
+    [InlineData ("01234\nABCDE", 5, 2)]
     public void DimAutoStyle_Text_Sizes_Correctly (string text, int expectedW, int expectedH)
     {
         var view = new View ();
@@ -677,7 +697,10 @@ public partial class DimAutoTests (ITestOutputHelper output)
     [InlineData ("", 0, 0)]
     [InlineData (" ", 1, 1)]
     [InlineData ("01234", 5, 1)]
-    public void DimAutoStyle_Text_Ignores_ContentSize (string text, int expectedW, int expectedH)
+    [InlineData ("01234ABCDE", 10, 1)]
+    [InlineData ("01234\nABCDE", 5, 2)]
+
+    public void DimAutoStyle_Text_NoMin_Not_Constrained_By_ContentSize (string text, int expectedW, int expectedH)
     {
         var view = new View ();
         view.Width = Auto (DimAutoStyle.Text);
@@ -685,6 +708,31 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.SetContentSize (new (1, 1));
         view.Text = text;
         view.SetRelativeLayout (Application.Screen.Size);
+        Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
+    }
+
+
+    [Theory]
+    [InlineData ("", 0, 0)]
+    [InlineData (" ", 1, 1)]
+    [InlineData ("01234", 5, 1)]
+    [InlineData ("01234ABCDE", 10, 1)]
+    [InlineData ("01234\nABCDE", 5, 2)]
+    public void DimAutoStyle_Text_NoMin_Not_Constrained_By_SuperView (string text, int expectedW, int expectedH)
+    {
+        var superView = new View ()
+        {
+            Width = 1, Height = 1
+        };
+
+        var view = new View ();
+
+        view.Width = Auto (DimAutoStyle.Text);
+        view.Height = Auto (DimAutoStyle.Text);
+        view.Text = text;
+        superView.Add (view);
+
+        superView.SetRelativeLayout (Application.Screen.Size);
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
 
@@ -902,7 +950,8 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Height = 1,
             Width = Auto ()
         };
-        Assert.Equal (new (expected, 1), view.TextFormatter.Size);
+        Assert.Equal (expected, view.TextFormatter.Width);
+        Assert.Equal (1, view.TextFormatter.Height);
     }
 
     [Theory]
@@ -917,7 +966,8 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = Auto (),
             Height = 1
         };
-        Assert.Equal (new (expected, 1), view.TextFormatter.Size);
+        Assert.Equal (expected, view.TextFormatter.Width);
+        Assert.Equal (1, view.TextFormatter.Height);
 
         view = new ()
         {
@@ -927,7 +977,8 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = 1,
             Height = Auto ()
         };
-        Assert.Equal (new (1, expected), view.TextFormatter.Size);
+        Assert.Equal (1, view.TextFormatter.Width);
+        Assert.Equal (expected, view.TextFormatter.Height);
     }
 
     // Test variations of Frame

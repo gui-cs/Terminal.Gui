@@ -63,8 +63,8 @@ public class DimAuto () : Dim
         var maxCalculatedSize = 0;
 
         int autoMin = MinimumContentDim?.GetAnchor (superviewContentSize) ?? 0;
-        int screen = dimension == Dimension.Width ? Application.Screen.Width * 4 : Application.Screen.Height * 4;
-        int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? screen;
+        int screenX4 = dimension == Dimension.Width ? Application.Screen.Width * 4 : Application.Screen.Height * 4;
+        int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? screenX4;
 
         Debug.Assert (autoMin <= autoMax, "MinimumContentDim must be less than or equal to MaximumContentDim.");
 
@@ -75,7 +75,7 @@ public class DimAuto () : Dim
             {
                 if (us.TextFormatter.Width is null)
                 {
-                    us.TextFormatter.Size = us.TextFormatter.FormatAndGetSize (new (int.Max (autoMax, superviewContentSize), screen));
+                    us.TextFormatter.Size = us.TextFormatter.FormatAndGetSize (new (int.Min (autoMax, screenX4), screenX4));
                 }
 //                else
                 {
@@ -86,7 +86,7 @@ public class DimAuto () : Dim
             {
                 if (us.TextFormatter.Height is null)
                 {
-                    textSize = us.TextFormatter.FormatAndGetSize (new (us.TextFormatter.Width ?? screen, int.Max (autoMax, superviewContentSize))).Height;
+                    textSize = us.TextFormatter.FormatAndGetSize (new (us.TextFormatter.Width ?? screenX4, int.Min (autoMax, screenX4))).Height;
                     us.TextFormatter.Height = textSize;
                 }
                 else
@@ -241,12 +241,12 @@ public class DimAuto () : Dim
 
                     if (dimension == Dimension.Width)
                     {
-                        int width = v.Width!.Calculate (0, screen, v, dimension);
+                        int width = v.Width!.Calculate (0, screenX4, v, dimension);
                         maxCentered = (v.X.GetAnchor (0) + width);
                     }
                     else
                     {
-                        int height = v.Height!.Calculate (0, screen, v, dimension);
+                        int height = v.Height!.Calculate (0, screenX4, v, dimension);
                         maxCentered = (v.Y.GetAnchor (0) + height);
                     }
                 }
@@ -364,11 +364,11 @@ public class DimAuto () : Dim
                     // Need to set the relative layout for PosAnchorEnd subviews to calculate the size
                     if (dimension == Dimension.Width)
                     {
-                        v.SetRelativeLayout (new Size (maxCalculatedSize, screen));
+                        v.SetRelativeLayout (new Size (maxCalculatedSize, screenX4));
                     }
                     else
                     {
-                        v.SetRelativeLayout (new Size (screen, maxCalculatedSize));
+                        v.SetRelativeLayout (new Size (screenX4, maxCalculatedSize));
                     }
                     maxAnchorEnd = dimension == Dimension.Width ? v.X.GetAnchor (maxCalculatedSize + v.Frame.Width) : v.Y.GetAnchor (maxCalculatedSize + v.Frame.Height);
                 }

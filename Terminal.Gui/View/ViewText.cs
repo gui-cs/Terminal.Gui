@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Diagnostics;
 using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
@@ -88,6 +89,7 @@ public partial class View
     /// </summary>
     public event EventHandler? TextChanged;
 
+    // TODO: Make this non-virtual. Nobody overrides it.
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will
     ///     redisplay the <see cref="View"/>.
@@ -107,6 +109,7 @@ public partial class View
         }
     }
 
+    // TODO: Make this non-virtual. Nobody overrides it.
     /// <summary>
     ///     Gets or sets the direction of the View's <see cref="Text"/>. Changing this property will redisplay the
     ///     <see cref="View"/>.
@@ -118,11 +121,7 @@ public partial class View
     public virtual TextDirection TextDirection
     {
         get => TextFormatter.Direction;
-        set
-        {
-            UpdateTextDirection (value);
-            TextFormatter.Direction = value;
-        }
+        set => UpdateTextDirection (value);
     }
 
     /// <summary>
@@ -130,6 +129,7 @@ public partial class View
     /// </summary>
     public TextFormatter TextFormatter { get; init; } = new () { };
 
+    // TODO: Make this non-virtual. Nobody overrides it.
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned vertically when drawn. Changing this property will
     ///     redisplay
@@ -149,6 +149,7 @@ public partial class View
         }
     }
 
+    // TODO: Add a OnUpdateTextFormatterText method that invokes UpdateTextFormatterText so that overrides don't have to call base.
     /// <summary>
     ///     Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has
     ///     different format than the default.
@@ -158,6 +159,8 @@ public partial class View
         if (TextFormatter is { })
         {
             TextFormatter.Text = _text;
+            TextFormatter.Width = null;
+            TextFormatter.Height = null;
         }
     }
 
@@ -178,7 +181,7 @@ public partial class View
         UpdateTextFormatterText ();
 
         // Default is to use GetContentSize ().
-        var size = GetContentSize ();
+        Size? size = _contentSize;
 
         // TODO: This is a hack. Figure out how to move this logic into DimAuto
         // Use _width & _height instead of Width & Height to avoid debug spew
@@ -188,15 +191,24 @@ public partial class View
         {
             TextFormatter.Width = null;
         }
+        else
+        {
+            if (size is { })
+            {
+                TextFormatter.Width = size?.Width;
+            }
+        }
 
         if ((heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text)))
         {
             TextFormatter.Height = null;
         }
-
-        if (TextFormatter.Size is { })
+        else
         {
-            TextFormatter.Size = size;
+            if (size is { })
+            {
+                TextFormatter.Height = size?.Height;
+            }
         }
     }
 
@@ -209,10 +221,11 @@ public partial class View
 
         if (directionChanged)
         {
+            TextFormatter.Width = null;
+            TextFormatter.Height = null;
             OnResizeNeeded ();
         }
 
-        SetTextFormatterSize ();
         SetNeedsDisplay ();
     }
 }

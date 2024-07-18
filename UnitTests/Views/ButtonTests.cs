@@ -76,11 +76,9 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (10, 3, 10, 3)]
     public void Button_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
     {
-        var btn1 = new Button
-        {
-            Width = width,
-            Height = height,
-        };
+        var btn1 = new Button ();
+        btn1.Width = width;
+        btn1.Height = height;
 
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);

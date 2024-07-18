@@ -17,7 +17,7 @@ public class TextFormatter
     private bool _multiLine;
     private bool _preserveTrailingSpaces;
     private int _tabWidth = 4;
-    private string _text;
+    private string? _text;
     private Alignment _textAlignment = Alignment.Start;
     private TextDirection _textDirection;
     private Alignment _textVerticalAlignment = Alignment.Start;
@@ -48,6 +48,11 @@ public class TextFormatter
             if (_autoSize)
             {
                 Size = GetAutoSize ();
+            }
+            else
+            {
+                Height = null;
+                Width = null;
             }
         }
     }
@@ -188,13 +193,18 @@ public class TextFormatter
             {
                 return;
             }
+
+            if (value < 0)
+            {
+                throw  new ArgumentOutOfRangeException (nameof (Width), value, @"Must be greater than or equal to 0.");
+            }
+
             _width = value;
             if (_width is null || _height is null)
             {
                 return;
             }
-            Size size = EnableNeedsFormat (Size!.Value);
-            _width = size.Width;
+            _width = EnableNeedsFormat (value);
         }
     }
 
@@ -209,13 +219,18 @@ public class TextFormatter
             {
                 return;
             }
+
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException (nameof (Width), value, @"Must be greater than or equal to 0.");
+            }
+
             _height = value;
             if (_width is null || _height is null)
             {
                 return;
             }
-            Size size = EnableNeedsFormat (Size!.Value);
-            _height = size.Height;
+            _height = EnableNeedsFormat (value);
         }
     }
 
@@ -273,7 +288,7 @@ public class TextFormatter
     /// <summary>The text to be formatted. This string is never modified.</summary>
     public virtual string Text
     {
-        get => _text;
+        get => _text!;
         set
         {
             _text = EnableNeedsFormat (value);
@@ -316,7 +331,7 @@ public class TextFormatter
         Attribute normalColor,
         Attribute hotColor,
         Rectangle maximum = default,
-        ConsoleDriver driver = null
+        ConsoleDriver? driver = null
     )
     {
         // With this check, we protect against subclasses with overrides of Text (like Button)
@@ -788,7 +803,7 @@ public class TextFormatter
     public List<string> GetLines ()
     {
         // With this check, we protect against subclasses with overrides of Text
-        if (string.IsNullOrEmpty (Text) || Size is null || Size?.Height == 0 || Size?.Width == 0)
+        if (string.IsNullOrEmpty (Text) || Width is null || Width == 0 || Height is null || Height == 0)
         {
             _lines = new List<string> { string.Empty };
             NeedsFormat = false;
@@ -798,9 +813,9 @@ public class TextFormatter
 
         if (NeedsFormat)
         {
-            string text = _text;
+            string text = _text!;
 
-            if (FindHotKey (_text, HotKeySpecifier, out _hotKeyPos, out Key newHotKey))
+            if (FindHotKey (_text!, HotKeySpecifier, out _hotKeyPos, out Key newHotKey))
             {
                 HotKey = newHotKey;
                 text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
@@ -813,9 +828,9 @@ public class TextFormatter
 
                 _lines = Format (
                                  text,
-                                 Size!.Value.Height,
+                                 Height.Value,
                                  VerticalAlignment == Alignment.Fill,
-                                 Size!.Value.Width > colsWidth && WordWrap,
+                                 Width.Value > colsWidth && WordWrap,
                                  PreserveTrailingSpaces,
                                  TabWidth,
                                  Direction,
@@ -825,7 +840,7 @@ public class TextFormatter
 
                 if (!AutoSize)
                 {
-                    colsWidth = GetMaxColsForWidth (_lines, Size!.Value.Width, TabWidth);
+                    colsWidth = GetMaxColsForWidth (_lines, Width.Value, TabWidth);
 
                     if (_lines.Count > colsWidth)
                     {
@@ -837,9 +852,9 @@ public class TextFormatter
             {
                 _lines = Format (
                                  text,
-                                 Size!.Value.Width,
+                                 Width.Value,
                                  Alignment == Alignment.Fill,
-                                 Size!.Value.Height > 1 && WordWrap,
+                                 Height.Value > 1 && WordWrap,
                                  PreserveTrailingSpaces,
                                  TabWidth,
                                  Direction,
@@ -847,9 +862,9 @@ public class TextFormatter
                                  this
                                 );
 
-                if (!AutoSize && _lines.Count > Size!.Value.Height)
+                if (!AutoSize && _lines.Count > Height.Value)
                 {
-                    _lines.RemoveRange (Size!.Value.Height, _lines.Count -  Size!.Value.Height);
+                    _lines.RemoveRange (Height.Value, _lines.Count -  Height.Value);
                 }
             }
 
@@ -860,7 +875,7 @@ public class TextFormatter
     }
 
     /// <summary>Event invoked when the <see cref="HotKey"/> is changed.</summary>
-    public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
+    public event EventHandler<KeyChangedEventArgs>? HotKeyChanged;
 
     /// <summary>Sets <see cref="NeedsFormat"/> to <see langword="true"/> and returns the value.</summary>
     /// <typeparam name="T"></typeparam>
@@ -1128,7 +1143,7 @@ public class TextFormatter
         bool preserveTrailingSpaces = false,
         int tabWidth = 0,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
-        TextFormatter textFormatter = null
+        TextFormatter? textFormatter = null
     )
     {
         if (width < 0)
@@ -1375,7 +1390,7 @@ public class TextFormatter
         Alignment textAlignment,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         int tabWidth = 0,
-        TextFormatter textFormatter = null
+        TextFormatter? textFormatter = null
     )
     {
         return ClipAndJustify (text, width, textAlignment == Alignment.Fill, textDirection, tabWidth, textFormatter);
@@ -1398,7 +1413,7 @@ public class TextFormatter
         bool justify,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         int tabWidth = 0,
-        TextFormatter textFormatter = null
+        TextFormatter? textFormatter = null
     )
     {
         if (width < 0)
@@ -1619,7 +1634,7 @@ public class TextFormatter
         int tabWidth = 0,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         bool multiLine = false,
-        TextFormatter textFormatter = null
+        TextFormatter? textFormatter = null
     )
     {
         return Format (
@@ -1667,7 +1682,7 @@ public class TextFormatter
         int tabWidth = 0,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         bool multiLine = false,
-        TextFormatter textFormatter = null
+        TextFormatter? textFormatter = null
     )
     {
         if (width < 0)

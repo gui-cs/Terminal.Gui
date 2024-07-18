@@ -182,6 +182,7 @@ public class CheckBox : View
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
+        base.UpdateTextFormatterText();
         switch (TextAlignment)
         {
             case Alignment.Start:
