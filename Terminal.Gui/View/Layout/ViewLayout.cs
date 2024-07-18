@@ -689,8 +689,6 @@ public partial class View
 
         LayoutAdornments ();
 
-        //SetTextFormatterSize ();
-
         // Sort out the dependencies of the X, Y, Width, Height properties
         HashSet<View> nodes = new ();
         HashSet<(View, View)> edges = new ();
@@ -719,7 +717,7 @@ public partial class View
 
     private void LayoutSubview (View v, Size contentSize)
     {
-        // BUGBUG: Calling SetRelativeLayout before LayoutSubviews is problematic. Need to resolve.
+        // Note, SetRelativeLayout calls SetTextFormatterSize
         v.SetRelativeLayout (contentSize);
         v.LayoutSubviews ();
         v.LayoutNeeded = false;

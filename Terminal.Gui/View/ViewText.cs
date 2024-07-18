@@ -157,12 +157,9 @@ public partial class View
     /// </remarks>
     protected virtual void UpdateTextFormatterText ()
     {
-        if (TextFormatter is { })
-        {
-            TextFormatter.Text = _text;
-            TextFormatter.Width = null;
-            TextFormatter.Height = null;
-        }
+        TextFormatter.Text = _text;
+        TextFormatter.Width = null;
+        TextFormatter.Height = null;
     }
 
     /// <summary>
