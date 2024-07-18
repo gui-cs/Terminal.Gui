@@ -70,22 +70,23 @@ public class DimAuto () : Dim
 
         if (Style.FastHasFlags (DimAutoStyle.Text))
         {
-
             if (dimension == Dimension.Width)
             {
                 if (us.TextFormatter.Width is null)
                 {
+                    // Set BOTH width and height (by setting Size). We do this because we will be called again, next
+                    // for Dimension.Height. We need to know the width to calculate the height.
                     us.TextFormatter.Size = us.TextFormatter.FormatAndGetSize (new (int.Min (autoMax, screenX4), screenX4));
                 }
-//                else
-                {
-                    textSize = us.TextFormatter.Width.Value;
-                }
+
+                textSize = us.TextFormatter.Width!.Value;
             }
             else
             {
                 if (us.TextFormatter.Height is null)
                 {
+                    // Set just the height. It is assumed that the width has already been set.
+                    // TODO: There may be cases where the width is not set. We may need to set it here.
                     textSize = us.TextFormatter.FormatAndGetSize (new (us.TextFormatter.Width ?? screenX4, int.Min (autoMax, screenX4))).Height;
                     us.TextFormatter.Height = textSize;
                 }
@@ -93,18 +94,6 @@ public class DimAuto () : Dim
                 {
                     textSize = us.TextFormatter.Height.Value;
                 }
-
-                //if (us.Width.Has (typeof(DimAuto), out var widthDim))
-                //{
-                //    DimAuto widthDimAuto = (DimAuto)widthDim;
-                //    textSize = us.TextFormatter.FormatAndGetSize (us.GetContentSize ()).Height;
-                //}
-                //else
-                //{
-                //    textSize = us.TextFormatter.FormatAndGetSize ().Height;
-                //}
-
-                //us.TextFormatter.Size = us.TextFormatter.Size with { Height = textSize };
             }
         }
 
@@ -254,40 +243,9 @@ public class DimAuto () : Dim
                 #endregion Centered
 
                 #region Percent
-                //// [ ] DimPercent   - Dimension is dependent on `us.ContentSize`
-                ////     - DimPercent will always be 0 if there is no other content that makes the superview have a size.
-                //List<View> dimPercentSubViews;
-                //if (dimension == Dimension.Width)
-                //{
-                //    dimPercentSubViews = us.Subviews.Where (v => v.Width.Has (typeof (DimPercent), out _)).ToList ();
-                //}
-                //else
-                //{
-                //    dimPercentSubViews = us.Subviews.Where (v => v.Height.Has (typeof (DimPercent), out _)).ToList ();
-                //}
-
-                //viewsNeedingLayout.AddRange (dimPercentSubViews);
-
-                //int maxDimPercent = 0;
-
-                //for (var i = 0; i < dimPercentSubViews.Count; i++)
-                //{
-                //    View v = dimPercentSubViews [i];
-
-                //    if (dimension == Dimension.Width)
-                //    {
-                //        int width = v.Width!.Calculate (0, superviewContentSize, null, dimension);
-                //        maxDimPercent = (v.X.GetAnchor (0) + width);
-                //    }
-                //    else
-                //    {
-                //        int height = v.Height!.Calculate (0, superviewContentSize, null, dimension);
-                //        maxDimPercent = (v.Y.GetAnchor (0) + height);
-                //    }
-                //}
-                //maxCalculatedSize = int.Max (maxCalculatedSize, maxDimPercent);
+                // [ ] DimPercent   - Dimension is dependent on `us.ContentSize`
+                // No need to do anything.
                 #endregion Percent
-
 
                 #region Aligned
                 // [ ] PosAlign     - Position is dependent on other views with `GroupId` AND `us.ContentSize`
@@ -339,8 +297,6 @@ public class DimAuto () : Dim
 
                 maxCalculatedSize = int.Max (maxCalculatedSize, maxAlign);
                 #endregion Aligned
-
-
 
                 #region Anchored
                 // [x] PosAnchorEnd - Position is dependent on `us.ContentSize` AND `subview.Frame` 
@@ -463,6 +419,7 @@ public class DimAuto () : Dim
 
         int oppositeScreen = dimension == Dimension.Width ? Application.Screen.Height * 4 : Application.Screen.Width * 4;
 
+        // TODO: Double-check that we really do need to SetRelativeLayout on these views!
         foreach (var v in viewsNeedingLayout)
         {
             if (dimension == Dimension.Width)
@@ -488,12 +445,6 @@ public class DimAuto () : Dim
         max += adornmentThickness;
 
         return max;
-    }
-
-    internal override bool ReferencesOtherViews ()
-    {
-        // BUGBUG: This is not correct. _contentSize may be null.
-        return false; //_style.HasFlag (DimAutoStyle.Content);
     }
 
     /// <inheritdoc/>

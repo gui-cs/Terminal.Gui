@@ -61,23 +61,4 @@ public class DimCombine (AddOrSubtract add, Dim left, Dim right) : Dim
 
         return newDimension;
     }
-
-    /// <summary>
-    ///     Diagnostics API to determine if this Dim object references other views.
-    /// </summary>
-    /// <returns></returns>
-    internal override bool ReferencesOtherViews ()
-    {
-        if (Left!.ReferencesOtherViews ())
-        {
-            return true;
-        }
-
-        if (Right!.ReferencesOtherViews ())
-        {
-            return true;
-        }
-
-        return false;
-    }
 }
