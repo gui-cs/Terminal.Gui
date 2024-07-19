@@ -356,6 +356,7 @@ public class DimAuto : Dim
                     View v = anchoredSubViews [i];
 
                     // Need to set the relative layout for PosAnchorEnd subviews to calculate the size
+                    // TODO: Figure out a way to not have Calculate change the state of subviews (calling SRL).
                     if (dimension == Dimension.Width)
                     {
                         v.SetRelativeLayout (new (maxCalculatedSize, screenX4));
@@ -393,6 +394,7 @@ public class DimAuto : Dim
                     View v = posViewSubViews [i];
 
                     // BUGBUG: The order may not be correct. May need to call TopologicalSort?
+                    // TODO: Figure out a way to not have Calculate change the state of subviews (calling SRL).
                     if (dimension == Dimension.Width)
                     {
                         v.SetRelativeLayout (new (maxCalculatedSize, 0));
@@ -433,6 +435,7 @@ public class DimAuto : Dim
                     View v = dimViewSubViews [i];
 
                     // BUGBUG: The order may not be correct. May need to call TopologicalSort?
+                    // TODO: Figure out a way to not have Calculate change the state of subviews (calling SRL).
                     if (dimension == Dimension.Width)
                     {
                         v.SetRelativeLayout (new (maxCalculatedSize, 0));
@@ -464,24 +467,6 @@ public class DimAuto : Dim
         // And, if max: is set, it wins if smaller
         max = int.Min (max, autoMax);
 
-        // ************** We now definitively know `us.ContentSize` ***************
-
-        int oppositeScreen = dimension == Dimension.Width ? Application.Screen.Height * 4 : Application.Screen.Width * 4;
-
-        // TODO: Double-check that we really do need to SetRelativeLayout on these views!
-        foreach (View v in viewsNeedingLayout)
-        {
-            if (dimension == Dimension.Width)
-            {
-                v.SetRelativeLayout (new (max, oppositeScreen));
-            }
-            else
-            {
-                v.SetRelativeLayout (new (oppositeScreen, max));
-            }
-        }
-
-        // Factor in adornments
         Thickness thickness = us.GetAdornmentsThickness ();
 
         int adornmentThickness = dimension switch

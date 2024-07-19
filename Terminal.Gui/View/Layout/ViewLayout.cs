@@ -282,7 +282,6 @@ public partial class View
             _width = _frame.Width;
             _height = _frame.Height;
 
-            // TODO: Figure out if the below can be optimized.
             if (IsInitialized)
             {
                 OnResizeNeeded ();

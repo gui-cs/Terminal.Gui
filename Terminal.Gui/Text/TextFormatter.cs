@@ -516,7 +516,6 @@ public class TextFormatter
             return System.Drawing.Size.Empty;
         }
 
-        // HACK: This is a total hack to work around the fact that TextFormatter.Format does not match TextFormatter.Draw.
         int? prevWidth = _width;
         int? prevHeight = _height;
 
