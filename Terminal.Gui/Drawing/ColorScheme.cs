@@ -77,7 +77,7 @@ public record ColorScheme : IEqualityOperators<ColorScheme, ColorScheme, bool>
         init => _focus = value;
     }
 
-    /// <summary>The foreground and background color for text in a focused view that indicates a <see cref="View.HotKey"/>.</summary>
+    /// <summary>The foreground and background color for for text in a focused view that indicates a <see cref="View.HotKey"/>.</summary>
     public Attribute HotFocus
     {
         get => _hotFocus;

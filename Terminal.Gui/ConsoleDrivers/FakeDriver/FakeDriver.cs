@@ -198,7 +198,7 @@ public class FakeDriver : ConsoleDriver
         FakeConsole.CursorTop = 0;
         FakeConsole.CursorLeft = 0;
 
-        //SetCursorVisibility (savedVisibility);
+        //SetCursorVisibility (savedVisibitity);
 
         void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
         {
@@ -437,7 +437,7 @@ public class FakeDriver : ConsoleDriver
     {
         if (FakeConsole.WindowHeight > 0)
         {
-            // Can raise an exception while it is still resizing.
+            // Can raise an exception while is still resizing.
             try
             {
                 FakeConsole.CursorTop = 0;

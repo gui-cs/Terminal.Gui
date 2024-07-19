@@ -113,7 +113,7 @@ public enum Command
     /// <summary>Move one page down.</summary>
     PageDown,
 
-    /// <summary>Move one page down extending the selection to cover revealed objects/characters.</summary>
+    /// <summary>Move one page page extending the selection to cover revealed objects/characters.</summary>
     PageDownExtend,
 
     /// <summary>Move one page up.</summary>
@@ -137,7 +137,7 @@ public enum Command
     /// <summary>Open the selected item.</summary>
     OpenSelectedItem,
 
-    /// <summary>Toggles the Expanded or collapsed state of a list or item (with subitems).</summary>
+    /// <summary>Toggles the Expanded or collapsed state of a a list or item (with subitems).</summary>
     ToggleExpandCollapse,
 
     /// <summary>Expands a list or item (with subitems).</summary>
@@ -224,13 +224,13 @@ public enum Command
     /// <summary>Quit a <see cref="Toplevel"/>.</summary>
     QuitToplevel,
 
-    /// <summary>Suspend an application (Only implemented in <see cref="CursesDriver"/>).</summary>
+    /// <summary>Suspend a application (Only implemented in <see cref="CursesDriver"/>).</summary>
     Suspend,
 
     /// <summary>Moves focus to the next view.</summary>
     NextView,
 
-    /// <summary>Moves focus to the previous view.</summary>
+    /// <summary>Moves focuss to the previous view.</summary>
     PreviousView,
 
     /// <summary>Moves focus to the next view or Toplevel (case of Overlapped).</summary>

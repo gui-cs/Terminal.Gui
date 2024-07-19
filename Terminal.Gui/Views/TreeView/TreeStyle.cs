@@ -29,7 +29,7 @@ public class TreeStyle
     public bool InvertExpandSymbolColors { get; set; }
 
     /// <summary>
-    ///     <see langword="true"/> to leave the last row of the control free for overwriting (e.g. by a scrollbar) When
+    ///     <see langword="true"/> to leave the last row of the control free for overwritting (e.g. by a scrollbar) When
     ///     <see langword="true"/> scrolling will be triggered on the second last row of the control rather than. the last.
     /// </summary>
     /// <value></value>

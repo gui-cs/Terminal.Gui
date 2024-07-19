@@ -19,7 +19,7 @@ public class DrawTreeViewLineEventArgs<T> where T : class
 
     /// <summary>
     ///     The notional index in <see cref="RuneCells"/> which contains the first character of the
-    ///     <see cref="TreeView{T}.AspectGetter"/> text (i.e. after all branch lines and expansion/collapse symbols).
+    ///     <see cref="TreeView{T}.AspectGetter"/> text (i.e. after all branch lines and expansion/collapse sybmols).
     /// </summary>
     /// <remarks>May be negative or outside of bounds of <see cref="RuneCells"/> if the view has been scrolled horizontally.</remarks>
     public int IndexOfModelText { get; init; }

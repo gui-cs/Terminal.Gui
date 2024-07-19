@@ -282,7 +282,7 @@ internal sealed class Menu : View
             return true;
         }
 
-        // TODO: Determine if there's a cleaner way to handle this.
+        // TODO: Determine if there's a cleaner way to handle this
         // This supports the case where the menu bar is a context menu
         return _host.OnInvokingKeyBindings (keyEvent, scope);
     }

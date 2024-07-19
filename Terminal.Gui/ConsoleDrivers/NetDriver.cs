@@ -1669,7 +1669,7 @@ internal class NetDriver : ConsoleDriver
 
 /// <summary>
 ///     Mainloop intended to be used with the .NET System.Console API, and can be used on Windows and Unix, it is
-///     cross-platform but lacks things like file descriptor monitoring.
+///     cross platform but lacks things like file descriptor monitoring.
 /// </summary>
 /// <remarks>This implementation is used for NetDriver.</remarks>
 internal class NetMainLoop : IMainLoopDriver

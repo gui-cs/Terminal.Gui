@@ -434,7 +434,7 @@ public static class MessageBox
             }
         }
 
-        // Run the modal; do not shut down the mainloop driver when done
+        // Run the modal; do not shutdown the mainloop driver when done
         Application.Run (d);
         d.Dispose ();
 

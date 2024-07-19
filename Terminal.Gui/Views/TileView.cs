@@ -935,7 +935,7 @@ public class TileView : View
             {
                 // Continue Drag
 
-                // how far has user dragged from original location?
+                // how far has user dragged from original location?						
                 if (Orientation == Orientation.Horizontal)
                 {
                     int dy = mouseEvent.Position.Y - dragPosition.Value.Y;

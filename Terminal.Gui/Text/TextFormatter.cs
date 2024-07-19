@@ -1914,7 +1914,7 @@ public class TextFormatter
     ///     (uses <see cref="StringExtensions.GetColumns"/>). <paramref name="text"/> if it contains newlines.
     /// </summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="text">Text, may contain newlines.</param>
@@ -1932,7 +1932,7 @@ public class TextFormatter
     ///     <paramref name="length"/>.
     /// </summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="text">The text.</param>
@@ -1957,7 +1957,7 @@ public class TextFormatter
 
     /// <summary>Gets the number of the Runes in the text that will fit in <paramref name="width"/>.</summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="text">The text.</param>
@@ -1972,7 +1972,7 @@ public class TextFormatter
 
     /// <summary>Gets the number of the Runes in a list of Runes that will fit in <paramref name="width"/>.</summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="runes">The list of runes.</param>
@@ -2034,7 +2034,7 @@ public class TextFormatter
 
     /// <summary>Gets the index position from the list based on the <paramref name="width"/>.</summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="lines">The lines.</param>
@@ -2067,7 +2067,7 @@ public class TextFormatter
 
     /// <summary>Calculates the rectangle required to hold text, assuming no word wrapping or alignment.</summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="x">The x location of the rectangle</param>

@@ -15,6 +15,6 @@ public class ThemeManagerEventArgs : EventArgs
     /// <summary>Initializes a new instance of <see cref="ThemeManagerEventArgs"/></summary>
     public ThemeManagerEventArgs (string newTheme) { NewTheme = newTheme; }
 
-    /// <summary>The name of the new active theme.</summary>
+    /// <summary>The name of the new active theme..</summary>
     public string NewTheme { get; set; } = string.Empty;
 }

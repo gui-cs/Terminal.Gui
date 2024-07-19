@@ -3,7 +3,7 @@
   // ConfigurationManager. It is automatically loaded, and applied, each time Application.Init
   // is run (via the ConfiguraitonManager.Reset method). 
   //
-  // In other words, initial values set in the the codebase are always overwritten by the contents of this 
+  // In otherwords, initial values set in the the codebase are always overwritten by the contents of this 
   // resource embedded in the Terminal.Gui.dll assembly.
   //
   // The Unit Test method "ConfigurationManagerTests.SaveDefaults" can be used to re-create the base of this file, but

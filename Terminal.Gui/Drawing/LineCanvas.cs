@@ -199,7 +199,7 @@ public class LineCanvas : IDisposable
     }
 
     // TODO: Unless there's an obvious use case for this API we should delete it in favor of the
-    // simpler version that doesn't take an area.
+    // simpler version that doensn't take an area.
     /// <summary>
     ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
     ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate

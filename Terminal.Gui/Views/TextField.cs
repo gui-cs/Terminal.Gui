@@ -1105,7 +1105,7 @@ public class TextField : View
     }
 
     /// <summary>Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.</summary>
-    /// <param name="args">The event arguments.</param>
+    /// <param name="args">The event arguments..</param>
     /// <returns><see langword="true"/> if the event was cancelled.</returns>
     public bool OnTextChanging (CancelEventArgs<string> args)
     {

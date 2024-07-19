@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 /// <summary>Contains a dictionary of the <see cref="ThemeManager.Theme"/>s for a Terminal.Gui application.</summary>
 /// <remarks>
 ///     <para>A Theme is a collection of settings that are named. The default theme is named "Default".</para>
-///     <para>The <see cref="ThemeManager.Theme"/> property is used to determine the currently active theme.</para>
+///     <para>The <see cref="ThemeManager.Theme"/> property is used to detemrine the currently active theme.</para>
 /// </remarks>
 /// <para>
 ///     <see cref="ThemeManager"/> is a singleton class. It is created when the first <see cref="ThemeManager"/> property

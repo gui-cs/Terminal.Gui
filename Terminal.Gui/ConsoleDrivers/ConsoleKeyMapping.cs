@@ -1435,7 +1435,7 @@ public static class ConsoleKeyMapping
                              (VK)'2',
                              ConsoleModifiers.Shift,
                              '\"'
-                            ), // BUGBUG: This is true for Portuguese keyboard, but not ENG (@) or DEU (")
+                            ), // BUGBUG: This is true for Portugese keyboard, but not ENG (@) or DEU (")
         new ScanCodeMapping (
                              3,
                              (VK)'2',

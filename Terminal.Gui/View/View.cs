@@ -268,7 +268,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
         EndInitAdornments ();
 
-        // TODO: Move these into ViewText.cs as EndInit_Text() to consolidate.
+        // TODO: Move these into ViewText.cs as EndInit_Text() to consolodate.
         // TODO: Verify UpdateTextDirection really needs to be called here.
         // These calls were moved from BeginInit as they access Viewport which is indeterminate until EndInit is called.
         UpdateTextDirection (TextDirection);

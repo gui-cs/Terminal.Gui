@@ -159,10 +159,10 @@ public static class EscSeqUtils
     ///     Decodes an ANSI escape sequence.
     /// </summary>
     /// <param name="escSeqRequests">The <see cref="EscSeqRequests"/> which may contain a request.</param>
-    /// <param name="newConsoleKeyInfo">The <see cref="ConsoleKeyInfo"/> which may change.</param>
-    /// <param name="key">The <see cref="ConsoleKey"/> which may change.</param>
+    /// <param name="newConsoleKeyInfo">The <see cref="ConsoleKeyInfo"/> which may changes.</param>
+    /// <param name="key">The <see cref="ConsoleKey"/> which may changes.</param>
     /// <param name="cki">The <see cref="ConsoleKeyInfo"/> array.</param>
-    /// <param name="mod">The <see cref="ConsoleModifiers"/> which may change.</param>
+    /// <param name="mod">The <see cref="ConsoleModifiers"/> which may changes.</param>
     /// <param name="c1Control">The control returned by the <see cref="GetC1ControlChar"/> method.</param>
     /// <param name="code">The code returned by the <see cref="GetEscapeResult(char[])"/> method.</param>
     /// <param name="values">The values returned by the <see cref="GetEscapeResult(char[])"/> method.</param>
@@ -426,7 +426,7 @@ public static class EscSeqUtils
     #nullable restore
 
     /// <summary>
-    ///     Gets all the needed information about an escape sequence.
+    ///     Gets all the needed information about a escape sequence.
     /// </summary>
     /// <param name="kChar">The array with all chars.</param>
     /// <returns>

@@ -74,7 +74,7 @@ public class Border : Adornment
     public override void BeginInit ()
     {
 #if HOVER
-        // TOOD: Hack - make Arrangement overridable
+        // TOOD: Hack - make Arragnement overidable
         if ((Parent?.Arrangement & ViewArrangement.Movable) != 0)
         {
             HighlightStyle |= HighlightStyle.Hover;

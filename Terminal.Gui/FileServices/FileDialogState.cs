@@ -54,7 +54,7 @@ internal class FileDialogState
                                    .ToList ();
             }
 
-            // if there's a UI filter in place too
+            // if theres a UI filter in place too
             if (Parent.CurrentFilter is { })
             {
                 children = children.Where (MatchesApiFilter).ToList ();

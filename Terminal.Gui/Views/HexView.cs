@@ -130,7 +130,7 @@ public class HexView : View
     }
 
     /// <summary>
-    ///     Sets or gets the offset into the <see cref="Stream"/> that will be displayed at the top of the
+    ///     Sets or gets the offset into the <see cref="Stream"/> that will displayed at the top of the
     ///     <see cref="HexView"/>
     /// </summary>
     /// <value>The display start.</value>
@@ -557,9 +557,9 @@ public class HexView : View
     }
 
     //
-    // This is used to support editing of the buffer on a peer List<>,
+    // This is used to support editing of the buffer on a peer List<>, 
     // the offset corresponds to an offset relative to DisplayStart, and
-    // the buffer contains the contents of a screenful of data, so the
+    // the buffer contains the contents of a screenful of data, so the 
     // offset is relative to the buffer.
     //
     // 

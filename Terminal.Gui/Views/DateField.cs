@@ -201,10 +201,10 @@ public class DateField : TextField
             }
 
             spaces += FormatLength;
-            string trimmedText = e.NewValue [..spaces];
+            string trimedText = e.NewValue [..spaces];
             spaces -= FormatLength;
-            trimmedText = trimmedText.Replace (new string (' ', spaces), " ");
-            var date = Convert.ToDateTime (trimmedText).ToString (_format.Trim ());
+            trimedText = trimedText.Replace (new string (' ', spaces), " ");
+            var date = Convert.ToDateTime (trimedText).ToString (_format.Trim ());
 
             if ($" {date}" != e.NewValue)
             {
@@ -542,8 +542,8 @@ public class DateField : TextField
         return true;
     }
 
-    // Converts various date formats to a uniform 10-character format.
-    // This aids in simplifying the handling of single-digit months and days,
+    // Converts various date formats to a uniform 10-character format. 
+    // This aids in simplifying the handling of single-digit months and days, 
     // and reduces the number of distinct date formats to maintain.
     private static string StandardizeDateFormat (string format)
     {

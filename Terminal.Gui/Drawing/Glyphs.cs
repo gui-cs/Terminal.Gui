@@ -348,7 +348,7 @@ public class GlyphDefinitions
     /// <summary>Box Drawings Left Tee - Heavy Vertical and Heavy Horizontal (U+2527) - ┣</summary>
     public Rune LeftTeeHvDblH { get; set; } = (Rune)'┣';
 
-    /// <summary>Box Drawings Right Tee - Single Vertical and Single Horizontal (U+2524) - ┤</summary>
+    /// <summary>Box Drawings Righ Tee - Single Vertical and Single Horizontal (U+2524) - ┤</summary>
     public Rune RightTee { get; set; } = (Rune)'┤';
 
     /// <summary>Box Drawings Right Tee - Single Vertical and Double Horizontal (U+2561) - ╡</summary>
