@@ -22,7 +22,7 @@ public class EscSeqReqStatus
     /// <summary>Gets the number of requests.</summary>
     public int NumRequests { get; }
 
-    /// <summary>Gets the Escape Sequence Termintor (e.g. ESC[8t ... t is the terminator).</summary>
+    /// <summary>Gets the Escape Sequence Terminator (e.g. ESC[8t ... t is the terminator).</summary>
     public string Terminator { get; }
 }
 

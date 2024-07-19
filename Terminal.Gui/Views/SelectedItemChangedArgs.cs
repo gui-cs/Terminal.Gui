@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>Event arguments for the SelectedItemChagned event.</summary>
+/// <summary>Event arguments for the SelectedItemChanged event.</summary>
 public class SelectedItemChangedArgs : EventArgs
 {
     /// <summary>Initializes a new <see cref="SelectedItemChangedArgs"/> class.</summary>

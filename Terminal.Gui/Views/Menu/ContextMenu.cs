@@ -18,7 +18,7 @@
 ///         Callers can cause the ContextMenu to be activated on a right-mouse click (or other interaction) by calling
 ///         <see cref="Show()"/>.
 ///     </para>
-///     <para>ContextMenus are located using screen using screen coordinates and appear above all other Views.</para>
+///     <para>ContextMenus are located using screen coordinates and appear above all other Views.</para>
 /// </summary>
 public sealed class ContextMenu : IDisposable
 {

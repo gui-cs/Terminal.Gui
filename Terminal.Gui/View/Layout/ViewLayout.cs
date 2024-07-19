@@ -668,6 +668,7 @@ public partial class View
     ///         behavior of this method is indeterminate if <see cref="IsInitialized"/> is <see langword="false"/>.
     ///     </para>
     ///     <para>Raises the <see cref="LayoutComplete"/> event before it returns.</para>
+    ///     <para>Raises the <see cref="LayoutComplete"/> event before it returns.</para>
     /// </remarks>
     public virtual void LayoutSubviews ()
     {
@@ -755,7 +756,7 @@ public partial class View
         // TODO: Identify a real-world use-case where this API should be virtual. 
         // TODO: Until then leave it `internal` and non-virtual
 
-        // Determine our container's ContentSize - 
+        // Determine our container's ContentSize -
         //  First try SuperView.Viewport, then Application.Top, then Driver.Viewport.
         //  Finally, if none of those are valid, use 2048 (for Unit tests).
         Size superViewContentSize = SuperView is { IsInitialized: true } ? SuperView.GetContentSize () :

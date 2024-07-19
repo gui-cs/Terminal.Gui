@@ -487,7 +487,7 @@ public class Key : EventArgs, IEquatable<Key>
 
     /// <summary>Formats a <see cref="KeyCode"/> as a string.</summary>
     /// <param name="key">The key to format.</param>
-    /// <param name="separator">The character to use as a separator between modifier keys and and the key itself.</param>
+    /// <param name="separator">The character to use as a separator between modifier keys and the key itself.</param>
     /// <returns>
     ///     The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key
     ///     name will be returned.
