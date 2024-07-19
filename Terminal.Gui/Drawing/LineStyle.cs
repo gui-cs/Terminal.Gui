@@ -41,7 +41,7 @@ public enum LineStyle
     RoundedDotted
 
     // TODO: Support Ruler
-    ///// <summary> 
+    ///// <summary>
     ///// The border is drawn as a diagnostic ruler ("|123456789...").
     ///// </summary>
     //Ruler

@@ -157,7 +157,7 @@ public static partial class Application
         Colors.Reset ();
 
         // Reset synchronization context to allow the user to run async/await,
-        // as the main loop has been ended, the synchronization context from 
+        // as the main loop has been ended, the synchronization context from
         // gui.cs does no longer process any callbacks. See #1084 for more details:
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
@@ -203,11 +203,11 @@ public static partial class Application
     // INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
     //
     // Called from:
-    // 
+    //
     // Init() - When the user wants to use the default Toplevel. calledViaRunT will be false, causing all state to be reset.
     // Run<T>() - When the user wants to use a custom Toplevel. calledViaRunT will be true, enabling Run<T>() to be called without calling Init first.
     // Unit Tests - To initialize the app with a custom Toplevel, using the FakeDriver. calledViaRunT will be false, causing all state to be reset.
-    // 
+    //
     // calledViaRunT: If false (default) all state will be reset. If true the state will not be reset.
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
@@ -242,7 +242,7 @@ public static partial class Application
         // Start the process of configuration management.
         // Note that we end up calling LoadConfigurationFromAllSources
         // multiple times. We need to do this because some settings are only
-        // valid after a Driver is loaded. In this cases we need just 
+        // valid after a Driver is loaded. In this case we need just
         // `Settings` so we can determine which driver to use.
         // Don't reset, so we can inherit the theme from the previous run.
         Load ();
@@ -383,7 +383,7 @@ public static partial class Application
     /// </remarks>
     public static event EventHandler<RunStateEventArgs> NotifyNewRunState;
 
-    /// <summary>Notify that a existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).</summary>
+    /// <summary>Notify that an existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).</summary>
     /// <remarks>
     ///     If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to <see cref="Begin(Toplevel)"/>
     ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
@@ -463,7 +463,7 @@ public static partial class Application
                 Top.OnLeave (toplevel);
             }
 
-            // BUGBUG: We should not depend on `Id` internally. 
+            // BUGBUG: We should not depend on `Id` internally.
             // BUGBUG: It is super unclear what this code does anyway.
             if (string.IsNullOrEmpty (toplevel.Id))
             {
@@ -851,7 +851,7 @@ public static partial class Application
     }
 
     // TODO: Determine if this is really needed. The only code that calls WakeUp I can find
-    // is ProgressBarStyles and it's not clear it needs to.
+    // is ProgressBarStyles, and it's not clear it needs to.
     /// <summary>Wakes up the running application that might be waiting on input.</summary>
     public static void Wakeup () { MainLoop?.Wakeup (); }
 
@@ -1160,13 +1160,13 @@ public static partial class Application
             runState.Toplevel.OnUnloaded ();
         }
 
-        // End the RunState.Toplevel 
+        // End the RunState.Toplevel
         // First, take it off the Toplevel Stack
         if (_topLevels.Count > 0)
         {
             if (_topLevels.Peek () != runState.Toplevel)
             {
-                // If there the top of the stack is not the RunState.Toplevel then
+                // If the top of the stack is not the RunState.Toplevel then
                 // this call to End is not balanced with the call to Begin that started the RunState
                 throw new ArgumentException ("End must be balanced with calls to Begin");
             }
@@ -1177,8 +1177,8 @@ public static partial class Application
         // Notify that it is closing
         runState.Toplevel?.OnClosed (runState.Toplevel);
 
-        // If there is a OverlappedTop that is not the RunState.Toplevel then runstate.TopLevel 
-        // is a child of MidTop and we should notify the OverlappedTop that it is closing
+        // If there is a OverlappedTop that is not the RunState.Toplevel then RunState.Toplevel
+        // is a child of MidTop, and we should notify the OverlappedTop that it is closing
         if (OverlappedTop is { } && !runState.Toplevel.Modal && runState.Toplevel != OverlappedTop)
         {
             OverlappedTop.OnChildClosed (runState.Toplevel);
@@ -1234,7 +1234,7 @@ public static partial class Application
 
     /// <summary>Holds the stack of TopLevel views.</summary>
 
-    // BUGBUG: Techncally, this is not the full lst of TopLevels. THere be dragons hwre. E.g. see how Toplevel.Id is used. What
+    // BUGBUG: Technically, this is not the full lst of TopLevels. There be dragons here, e.g. see how Toplevel.Id is used. What
     // about TopLevels that are just a SubView of another View?
     internal static readonly Stack<Toplevel> _topLevels = new ();
 
