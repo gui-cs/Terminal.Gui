@@ -2,7 +2,7 @@
 
 The `Dim.Auto` type is a type of `Dim` that automatically sizes the view based on its content. This is useful when you want to size a view based on the content it contains. That content can either be the `Text`, the `SubViews`, or something else defined by the view.
 
-Like all `Dim` types, `Dim.Auto` is used to set the `Width` or `Height` of a view. 
+Like all `Dim` types, `Dim.Auto` is used to set the `Width` or `Height` of a view and can be combined with other `Dim` types using addition or subtraction (see. `DimCombine`).
 
 The `DimAutoStyle` enum defines the different ways that `Dim.Auto` can be used to size a view. The `DimAutoStyle` enum has the following values:
 
@@ -77,7 +77,7 @@ int GetDynamicMinSize ()
 
 ### Specifying a maximum size
 
-> NOT YET IMPLEMENTED
+It is common to want to constrain how large a View can be sized. The `maximumContentDim` parameter to the `Dim.Auto ()` method enables this. Like `minimumContentDim` it is of type `Dim` and thus can represent a dynamic value. For example, by default `Dialog` specifies `maximumContentDim` as `Dim.Percent (90)` to ensure a Dialog box is never larger than 90% of the screen.
 
 ## Limitations
 
@@ -85,11 +85,28 @@ int GetDynamicMinSize ()
 
 `Dim.Auto` is also not always the most efficient way to size a view. If you know the size of the content ahead of time, you can set the `Width` and `Height` properties to `Dim.Absolute (n)` instead of using `Dim.Auto`.
 
-> TODO: Verify accuracy of the following paragraphs
+## Behavior of other Pos/Dim Types when used within a Dim.Auto-sized View
 
-Some `Pos` and `Dim` types are not compatible with `Dim.Auto`. For example, you cannot use `Dim.Auto (DimAutoStyle.Content)` with Subviews that use `Dim.Fill ()` or `Dim.Percent (n)` because the size of the Subview is not known until the layout is computed.
+The table below descibes the behavior of the various Pos/Dim types when used by subviews of a View that uses `Dim.Auto` for it's `Width` or `Height`:
 
-`Pos` types that are relative to the size of the view, such as `Pos.Percent (n)` are not compatible with `Dim.Auto` because the size of the view is not known until the layout is computed. However, `Pos.Center ()` and `Pos.AnchorEnd ()` are compatible with `Dim.Auto` because they are relative to the size of the view's Superview.
+| Type        | Impacts Dimension | Limitations                                                                                             |
+|-------------|-------------------|---------------------------------------------------------------------------------------------------------|
+| PosAlign    | Yes               | The subviews with the same `GroupId` will be aligned at the maximimum dimension to enable them to not be clipped. This dimension plus the group's position will determine the minimum `Dim.Auto` dimension. |
+| PosView     | Yes               | The position plus the dimension of `subview.Target` will determine the minimum `Dim.Auto` dimension. |
+| PosCombine  | Yes               | <needs clarification> |
+| PosAnchorEnd| Yes               | The `Dim.Auto` dimension will be increased by the dimension of the subview. |
+| PosCenter   | No                |  |
+| PosPercent  | No                |  |
+| PosAbsolute | Yes               |  |
+| PosFunc     | Yes               |  |
+| DimView     | Yes               | The position plus the dimension of `subview.Target` will determine the minimum `Dim.Auto` dimension. |
+| DimCombine  | Yes               | <needs clarification>  |
+| DimFill     | No                |  |
+| DimPercent  | No                |  |
+| DimAuto     | Yes               |  |
+| DimAbsolute | Yes               |  |
+| DimFunc     | Yes               | <needs clarification> |
+
 
 ## Building Dim.Auto friendly View
 
