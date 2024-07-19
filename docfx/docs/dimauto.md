@@ -89,7 +89,7 @@ It is common to want to constrain how large a View can be sized. The `maximumCon
 
 The table below descibes the behavior of the various Pos/Dim types when used by subviews of a View that uses `Dim.Auto` for it's `Width` or `Height`:
 
-| Type        | Impacts Dimension | Limitations                                                                                             |
+| Type        | Impacts Dimension | Notes                                                                                             |
 |-------------|-------------------|---------------------------------------------------------------------------------------------------------|
 | PosAlign    | Yes               | The subviews with the same `GroupId` will be aligned at the maximimum dimension to enable them to not be clipped. This dimension plus the group's position will determine the minimum `Dim.Auto` dimension. |
 | PosView     | Yes               | The position plus the dimension of `subview.Target` will determine the minimum `Dim.Auto` dimension. |
