@@ -89,7 +89,7 @@ internal class CursesClipboard : ClipboardBase
 
 /// <summary>
 ///     A clipboard implementation for MacOSX. This implementation uses the Mac clipboard API (via P/Invoke) to
-///     copy/paste. The existance of the Mac pbcopy and pbpaste commands is used to determine if copy/paste is supported.
+///     copy/paste. The existence of the Mac pbcopy and pbpaste commands is used to determine if copy/paste is supported.
 /// </summary>
 internal class MacOSXClipboard : ClipboardBase
 {
