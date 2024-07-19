@@ -6,8 +6,19 @@ namespace Terminal.Gui;
 /// </summary>
 public enum CheckState
 {
+    /// <summary>
+    ///     Neither checked nor unchecked.
+    /// </summary>
     None,
+
+    /// <summary>
+    ///     Checked.
+    /// </summary>
     Checked,
+
+    /// <summary>
+    ///     Not checked.
+    /// </summary>
     UnChecked
 }
 
