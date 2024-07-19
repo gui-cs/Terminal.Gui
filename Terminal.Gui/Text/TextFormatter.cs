@@ -1967,7 +1967,7 @@ public class TextFormatter
     /// <returns>The index of the text that fit the width.</returns>
     public static int GetLengthThatFits (string text, int width, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
     {
-        return GetLengthThatFits (text.ToRuneList (), width, tabWidth, textDirection);
+        return GetLengthThatFits (text?.ToRuneList () ?? [], width, tabWidth, textDirection);
     }
 
     /// <summary>Gets the number of the Runes in a list of Runes that will fit in <paramref name="width"/>.</summary>
