@@ -715,7 +715,7 @@ public class TextFormatter
 
             if (value < 0)
             {
-                throw new ArgumentOutOfRangeException (nameof (Width), value, @"Must be greater than or equal to 0.");
+                throw new ArgumentOutOfRangeException (nameof (Height), value, @"Must be greater than or equal to 0.");
             }
 
             _height = value;
