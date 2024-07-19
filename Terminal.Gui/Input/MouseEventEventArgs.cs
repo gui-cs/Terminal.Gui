@@ -13,7 +13,7 @@ public class MouseEventEventArgs : EventArgs
 
     /// <summary>
     ///     Indicates if the current mouse event has already been processed and the driver should stop notifying any other
-    ///     event subscriber. Its important to set this value to true specially when updating any View's layout from inside the
+    ///     event subscriber. It's important to set this value to true specially when updating any View's layout from inside the
     ///     subscriber method.
     /// </summary>
     /// <remarks>

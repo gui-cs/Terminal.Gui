@@ -567,7 +567,7 @@ public abstract class ConsoleDriver
 
     /// <summary>Called when a key is released. Fires the <see cref="KeyUp"/> event.</summary>
     /// <remarks>
-    ///     Drivers that do not support key release events will calls this method after <see cref="OnKeyDown"/> processing
+    ///     Drivers that do not support key release events will call this method after <see cref="OnKeyDown"/> processing
     ///     is complete.
     /// </remarks>
     /// <param name="a"></param>
@@ -603,7 +603,7 @@ public enum CursorVisibility
     /// <summary>Cursor caret has default</summary>
     /// <remarks>
     ///     Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/>. This default directly
-    ///     depends of the XTerm user configuration settings so it could be Block, I-Beam, Underline with possible blinking.
+    ///     depends on the XTerm user configuration settings, so it could be Block, I-Beam, Underline with possible blinking.
     /// </remarks>
     Default = 0x00010119,
 
@@ -681,7 +681,7 @@ public enum KeyCode : uint
 
     /// <summary>
     ///     If the <see cref="SpecialMask"/> is set, then the value is that of the special mask, otherwise, the value is
-    ///     in the the lower bits (as extracted by <see cref="CharMask"/>).
+    ///     in the lower bits (as extracted by <see cref="CharMask"/>).
     /// </summary>
     SpecialMask = 0x_fff0_0000,
 
@@ -838,9 +838,9 @@ public enum KeyCode : uint
     //Delete = 127,
 
     // --- Special keys ---
-    // The values below are common non-alphanum keys. Their values are 
+    // The values below are common non-alphanum keys. Their values are
     // based on the .NET ConsoleKey values, which, in-turn are based on the
-    // VK_ values from the Windows API. 
+    // VK_ values from the Windows API.
     // We add MaxCodePoint to avoid conflicts with the Unicode values.
 
     /// <summary>The maximum Unicode codepoint value. Used to encode the non-alphanumeric control keys.</summary>

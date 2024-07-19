@@ -118,10 +118,10 @@ public class ComboBox : View, IDesignable
         set => _hideDropdownListOnClick = _listview.HideDropdownListOnClick = value;
     }
 
-    /// <summary>Gets the drop down list state, expanded or collapsed.</summary>
+    /// <summary>Gets the drop-down list state, expanded or collapsed.</summary>
     public bool IsShow { get; private set; }
 
-    /// <summary>If set to true its not allow any changes in the text.</summary>
+    /// <summary>If set to true, no changes to the text will be allowed.</summary>
     public bool ReadOnly
     {
         get => _search.ReadOnly;
@@ -200,7 +200,7 @@ public class ComboBox : View, IDesignable
     }
 
     /// <summary>
-    ///     Collapses the drop down list.  Returns true if the state chagned or false if it was already collapsed and no
+    ///     Collapses the drop-down list.  Returns true if the state changed or false if it was already collapsed and no
     ///     action was taken
     /// </summary>
     public virtual bool Collapse ()
@@ -220,7 +220,7 @@ public class ComboBox : View, IDesignable
     public event EventHandler Collapsed;
 
     /// <summary>
-    ///     Expands the drop down list.  Returns true if the state chagned or false if it was already expanded and no
+    ///     Expands the drop-down list.  Returns true if the state changed or false if it was already expanded and no
     ///     action was taken
     /// </summary>
     public virtual bool Expand ()
@@ -398,7 +398,7 @@ public class ComboBox : View, IDesignable
 
     /// <summary>Internal height of dynamic search list</summary>
     /// <returns></returns>
-    private int CalculatetHeight ()
+    private int CalculateHeight ()
     {
         if (!IsInitialized || Viewport.Height == 0)
         {
@@ -617,7 +617,7 @@ public class ComboBox : View, IDesignable
             || (_autoHide && Viewport.Width > 0 && _search.Frame.Width != Viewport.Width - 1))
         {
             _search.Width = _listview.Width = _autoHide ? Viewport.Width - 1 : Viewport.Width;
-            _listview.Height = CalculatetHeight ();
+            _listview.Height = CalculateHeight ();
             _search.SetRelativeLayout (GetContentSize ());
             _listview.SetRelativeLayout (GetContentSize ());
         }
@@ -634,7 +634,7 @@ public class ComboBox : View, IDesignable
         ResetSearchSet ();
 
         _listview.SetSource (_searchSet);
-        _listview.Height = CalculatetHeight ();
+        _listview.Height = CalculateHeight ();
 
         if (Subviews.Count > 0 && HasFocus)
         {
@@ -769,7 +769,7 @@ public class ComboBox : View, IDesignable
 
     private void SetValue (object text, bool isFromSelectedItem = false)
     {
-        // TOOD: THe fact we have to suspend events to change the text makes this feel very hacky.
+        // TOOD: The fact we have to suspend events to change the text makes this feel very hacky.
         _search.TextChanged -= Search_Changed;
         // Note we set _text, to avoid set_Text from setting _search.Text again
         _text = _search.Text = text.ToString ();
@@ -792,7 +792,7 @@ public class ComboBox : View, IDesignable
         _listview.ResumeSuspendCollectionChangedEvent ();
 
         _listview.Clear ();
-        _listview.Height = CalculatetHeight ();
+        _listview.Height = CalculateHeight ();
         SuperView?.BringSubviewToFront (this);
     }
 

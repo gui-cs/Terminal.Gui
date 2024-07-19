@@ -396,7 +396,7 @@ public class Slider<T> : View
     /// <summary>Causes the specified option to be set and be focused.</summary>
     public bool SetOption (int optionIndex)
     {
-        // TODO: Handle range type.			
+        // TODO: Handle range type.
         // Note: Maybe return false only when optionIndex doesn't exist, otherwise true.
 
         if (!_setOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < _options.Count)
@@ -1285,9 +1285,9 @@ public class Slider<T> : View
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
         // Note(jmperricone): Maybe we click to focus the cursor, and on next click we set the option.
-        //                    That will makes OptionFocused Event more relevant.
+        //                    That will make OptionFocused Event more relevant.
         // (tig: I don't think so. Maybe an option if someone really wants it, but for now that
-        //       adss to much friction to UI.
+        //       adds too much friction to UI.
         // TODO(jmperricone): Make Range Type work with mouse.
 
         if (!(mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
@@ -1325,7 +1325,7 @@ public class Slider<T> : View
             var success = false;
             var option = 0;
 
-            // how far has user dragged from original location?						
+            // how far has user dragged from original location?
             if (Orientation == Orientation.Horizontal)
             {
                 success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
