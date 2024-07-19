@@ -1,7 +1,7 @@
 {
   // Specifies the "source of truth" for default values for all Terminal.Gui settings managed by
   // ConfigurationManager. It is automatically loaded, and applied, each time Application.Init
-  // is run (via the ConfiguraitonManager.Reset method). 
+  // is run (via the ConfigurationManager.Reset method).
   //
   // In other words, initial values set in the the codebase are always overwritten by the contents of this 
   // resource embedded in the Terminal.Gui.dll assembly.
