@@ -579,6 +579,7 @@ public class TextFormatter
     /// </remarks>
     public List<string> GetLines ()
     {
+        string text = _text!;
         int width = _constrainToWidth.GetValueOrDefault ();
         int height = _constrainToHeight.GetValueOrDefault ();
 
@@ -595,8 +596,6 @@ public class TextFormatter
         {
             return _lines;
         }
-
-        string text = _text!;
 
         if (FindHotKey (_text!, HotKeySpecifier, out _hotKeyPos, out Key newHotKey))
         {

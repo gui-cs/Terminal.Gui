@@ -734,10 +734,11 @@ w ";
         Application.End (rs);
         top.Dispose ();
     }
-
-    [Fact]
+    [Theory]
     [AutoInitShutdown]
-    public void View_Draw_Horizontal_Simple_TextAlignments ()
+    [InlineData (true)]
+    [InlineData (false)]
+    public void View_Draw_Horizontal_Simple_TextAlignments (bool autoSize)
     {
         var text = "Hello World";
         var width = 20;
@@ -749,6 +750,12 @@ w ";
             Height = 1
         };
 
+        if (autoSize)
+        {
+            lblLeft.Width = Dim.Auto ();
+            lblLeft.Height = Dim.Auto ();
+        }
+
         var lblCenter = new View
         {
             Text = text,
@@ -757,6 +764,12 @@ w ";
             Height = 1,
             TextAlignment = Alignment.Center
         };
+
+        if (autoSize)
+        {
+            lblCenter.Width = Dim.Auto ();
+            lblCenter.Height = Dim.Auto ();
+        }
 
         var lblRight = new View
         {
@@ -767,6 +780,12 @@ w ";
             TextAlignment = Alignment.End
         };
 
+        if (autoSize)
+        {
+            lblRight.Width = Dim.Auto ();
+            lblRight.Height = Dim.Auto ();
+        }
+
         var lblJust = new View
         {
             Text = text,
@@ -776,6 +795,12 @@ w ";
             TextAlignment = Alignment.Fill
         };
 
+        if (autoSize)
+        {
+            lblJust.Width = Dim.Auto ();
+            lblJust.Height = Dim.Auto ();
+        }
+
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
         frame.Add (lblLeft, lblCenter, lblRight, lblJust);
         var top = new Toplevel ();
@@ -784,16 +809,41 @@ w ";
         ((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
 
         // frame.Width is width + border wide (20 + 2) and 6 high
-        Size expectedSize = new (width, 1);
-        Assert.Equal (expectedSize, lblLeft.TextFormatter.ConstrainToSize);
-        Assert.Equal (expectedSize, lblCenter.TextFormatter.ConstrainToSize);
-        Assert.Equal (expectedSize, lblRight.TextFormatter.ConstrainToSize);
-        Assert.Equal (expectedSize, lblJust.TextFormatter.ConstrainToSize);
+
+        if (autoSize)
+        {
+            Size expectedSize = new (11, 1);
+            Assert.Equal (expectedSize, lblLeft.TextFormatter.ConstrainToSize);
+            Assert.Equal (expectedSize, lblCenter.TextFormatter.ConstrainToSize);
+            Assert.Equal (expectedSize, lblRight.TextFormatter.ConstrainToSize);
+            Assert.Equal (expectedSize, lblJust.TextFormatter.ConstrainToSize);
+        }
+        else
+        {
+            Size expectedSize = new (width, 1);
+            Assert.Equal (expectedSize, lblLeft.TextFormatter.ConstrainToSize);
+            Assert.Equal (expectedSize, lblCenter.TextFormatter.ConstrainToSize);
+            Assert.Equal (expectedSize, lblRight.TextFormatter.ConstrainToSize);
+            Assert.Equal (expectedSize, lblJust.TextFormatter.ConstrainToSize);
+        }
 
         Assert.Equal (new (0, 0, width + 2, 6), frame.Frame);
 
         string expected;
 
+        if (autoSize)
+        {
+            expected = @"
+┌────────────────────┐
+│Hello World         │
+│Hello World         │
+│Hello World         │
+│Hello World         │
+└────────────────────┘
+";
+        }
+        else
+        {
             expected = @"
 ┌────────────────────┐
 │Hello World         │
@@ -802,6 +852,7 @@ w ";
 │Hello          World│
 └────────────────────┘
 ";
+        }
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, width + 2, 6), pos);
