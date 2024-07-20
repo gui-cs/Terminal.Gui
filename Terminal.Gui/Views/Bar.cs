@@ -153,8 +153,9 @@ public class Bar : View
                     barItem.ColorScheme = ColorScheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     barItem.Y = 0; //Pos.Center ();
+                    // HACK: This should not be needed
+                    barItem.SetRelativeLayout (GetContentSize ());
                 }
-
                 break;
 
             case Orientation.Vertical:
@@ -187,6 +188,8 @@ public class Bar : View
                     if (barItem is Shortcut scBarItem)
                     {
                         scBarItem.MinimumKeyTextSize = minKeyWidth;
+                        // HACK: This should not be needed
+                        scBarItem.SetRelativeLayout (GetContentSize ());
                         maxBarItemWidth = Math.Max (maxBarItemWidth, scBarItem.Frame.Width);
                     }
 
