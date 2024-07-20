@@ -177,7 +177,7 @@ public class DimAuto : Dim
                 {
                     notDependentSubViews = includedSubviews.Where (
                                                                    v => v.Width is { }
-                                                                        && (v.X is PosAbsolute or PosFunc || v.Width is DimAuto or DimAbsolute or DimFunc)
+                                                                        && (v.X is PosAbsolute or PosFunc || v.Width is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.X.Has and v.Width.Has?
                                                                         && !v.X.Has (typeof (PosAnchorEnd), out _)
                                                                         && !v.X.Has (typeof (PosAlign), out _)
                                                                         && !v.X.Has (typeof (PosCenter), out _)
@@ -190,7 +190,7 @@ public class DimAuto : Dim
                 {
                     notDependentSubViews = includedSubviews.Where (
                                                                    v => v.Height is { }
-                                                                        && (v.Y is PosAbsolute or PosFunc || v.Height is DimAuto or DimAbsolute or DimFunc)
+                                                                        && (v.Y is PosAbsolute or PosFunc || v.Height is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.Y.Has and v.Height.Has?
                                                                         && !v.Y.Has (typeof (PosAnchorEnd), out _)
                                                                         && !v.Y.Has (typeof (PosAlign), out _)
                                                                         && !v.Y.Has (typeof (PosCenter), out _)
