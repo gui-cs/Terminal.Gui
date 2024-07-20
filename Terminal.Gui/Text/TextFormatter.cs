@@ -725,6 +725,12 @@ public class TextFormatter
     ///         formatted.
     ///     </para>
     ///     <para>
+    ///         If <see langword="null"/> both the width and height will be unconstrained and text will be formatted to the size of the text.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property is the same as setting <see cref="ConstrainToWidth"/> and <see cref="ConstrainToHeight"/> separately.
+    ///     </para>
+    ///     <para>
     ///         Use <see cref="FormatAndGetSize"/> to get the size of the formatted text.
     ///     </para>
     ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
