@@ -36,18 +36,18 @@ public static class MessageBox
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
     /// <summary>
-    ///     Defines the default minimum MessageBox width, as a percentage of the container width. Can be configured via
+    ///     Defines the default minimum MessageBox width, as a percentage of the screen width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 60;
+    public static int DefaultMinimumWidth { get; set; } = 0;
 
     /// <summary>
-    ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
+    ///     Defines the default minimum Dialog height, as a percentage of the screen width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 5;
+    public static int DefaultMinimumHeight { get; set; } = 0;
     /// <summary>
     ///     The index of the selected button, or -1 if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox. This is useful for web
     ///     based console where there is no SynchronizationContext or TaskScheduler.
@@ -369,9 +369,16 @@ public static class MessageBox
             ButtonAlignment = Alignment.Center,
             ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems,
             BorderStyle = MessageBox.DefaultBorderStyle,
-            Width = Dim.Auto  (DimAutoStyle.Auto, /*minimumContentDim: Dim.Percent (DefaultMinimumWidth), */ maximumContentDim: Dim.Percent (90)),
-            Height = Dim.Auto (DimAutoStyle.Auto, /*minimumContentDim: Dim.Percent (DefaultMinimumHeight),*/ maximumContentDim: Dim.Percent (90)),
         };
+
+        d.Width = Dim.Auto (DimAutoStyle.Auto,
+                            minimumContentDim: Dim.Func (() => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f) )),
+                            maximumContentDim: Dim.Func (() => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * 0.9f)));
+
+        d.Height = Dim.Auto (DimAutoStyle.Auto,
+                             minimumContentDim: Dim.Func (() => (int)((Application.Screen.Height - d.GetAdornmentsThickness ().Vertical) * (DefaultMinimumHeight / 100f))),
+                             maximumContentDim: Dim.Func (() => (int)((Application.Screen.Height - d.GetAdornmentsThickness ().Vertical) * 0.9f)));
+
 
         if (width != 0)
         {

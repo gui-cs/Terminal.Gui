@@ -83,7 +83,7 @@ public class Dialogs : Scenario
                    {
                        X = Pos.Right (widthEdit) + 2,
                        Y = Pos.Top (widthEdit),
-                       Text = $"If width is 0, the dimension will be {Dialog.DefaultMinimumWidth}%."
+                       Text = $"If width is 0, the dimension will be greater than {Dialog.DefaultMinimumWidth}%."
                    }
                   );
 
@@ -92,7 +92,7 @@ public class Dialogs : Scenario
                    {
                        X = Pos.Right (heightEdit) + 2,
                        Y = Pos.Top (heightEdit),
-                       Text = $"If height is 0, the dimension will be {Dialog.DefaultMinimumWidth}%."
+                       Text = $"If height is 0, the dimension will be greater {Dialog.DefaultMinimumHeight}%."
                    }
                   );
 

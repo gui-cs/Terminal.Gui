@@ -15,7 +15,7 @@ public class MessageBoxes : Scenario
 
         Window app = new ()
         {
-            Title = GetQuitKeyAndName ()
+            Title = GetQuitKeyAndName (),
         };
 
         var frame = new FrameView
@@ -69,7 +69,7 @@ public class MessageBoxes : Scenario
                    {
                        X = Pos.Right (widthEdit) + 2,
                        Y = Pos.Top (widthEdit),
-                       Text = $"If width is 0, the dimension will be {MessageBox.DefaultMinimumWidth}%."
+                       Text = $"If width is 0, the dimension will be greater than {MessageBox.DefaultMinimumWidth}%."
                    }
                   );
 
@@ -78,7 +78,7 @@ public class MessageBoxes : Scenario
                    {
                        X = Pos.Right (heightEdit) + 2,
                        Y = Pos.Top (heightEdit),
-                       Text = $"If height is 0, the dimension will be {MessageBox.DefaultMinimumWidth}%."
+                       Text = $"If height is 0, the dimension will be greater than {MessageBox.DefaultMinimumHeight}%."
                    }
                   );
 

@@ -87,6 +87,8 @@ public partial class View
         return null;
     }
 
+    // BUGBUG: This method interferes with Dialog/MessageBox default min/max size.
+
     /// <summary>
     ///     Gets a new location of the <see cref="View"/> that is within the Viewport of the <paramref name="viewToMove"/>'s
     ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.
