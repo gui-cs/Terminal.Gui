@@ -180,9 +180,7 @@ public class DimAuto : Dim
                                                                         && (v.X is PosAbsolute or PosFunc || v.Width is DimAuto or DimAbsolute or DimFunc)
                                                                         && !v.X.Has (typeof (PosAnchorEnd), out _)
                                                                         && !v.X.Has (typeof (PosAlign), out _)
-                                                                        && !v.X.Has (typeof (PosView), out _)
                                                                         && !v.X.Has (typeof (PosCenter), out _)
-                                                                        && !v.Width.Has (typeof (DimView), out _)
                                                                         && !v.Width.Has (typeof (DimFill), out _)
                                                                         && !v.Width.Has (typeof (DimPercent), out _)
                                                                   )
@@ -195,9 +193,7 @@ public class DimAuto : Dim
                                                                         && (v.Y is PosAbsolute or PosFunc || v.Height is DimAuto or DimAbsolute or DimFunc)
                                                                         && !v.Y.Has (typeof (PosAnchorEnd), out _)
                                                                         && !v.Y.Has (typeof (PosAlign), out _)
-                                                                        && !v.Y.Has (typeof (PosView), out _)
                                                                         && !v.Y.Has (typeof (PosCenter), out _)
-                                                                        && !v.Height.Has (typeof (DimView), out _)
                                                                         && !v.Height.Has (typeof (DimFill), out _)
                                                                         && !v.Height.Has (typeof (DimPercent), out _)
                                                                   )
@@ -218,7 +214,7 @@ public class DimAuto : Dim
                     else
                     {
                         int height = v.Height!.Calculate (0, superviewContentSize, v, dimension);
-                        size = v.Y.GetAnchor (0) + height;
+                        size = v.Y!.GetAnchor (0) + height;
                     }
 
                     if (size > maxCalculatedSize)
@@ -310,13 +306,13 @@ public class DimAuto : Dim
                                                                                v =>
                                                                                {
                                                                                    return dimension switch
-                                                                                          {
-                                                                                              Dimension.Width when v.X is PosAlign alignX => alignX.GroupId
-                                                                                                  == groupId,
-                                                                                              Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId
-                                                                                                  == groupId,
-                                                                                              _ => false
-                                                                                          };
+                                                                                   {
+                                                                                       Dimension.Width when v.X is PosAlign alignX => alignX.GroupId
+                                                                                           == groupId,
+                                                                                       Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId
+                                                                                           == groupId,
+                                                                                       _ => false
+                                                                                   };
                                                                                })
                                                                        .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
                                                                        .ToList ();
@@ -470,12 +466,12 @@ public class DimAuto : Dim
         Thickness thickness = us.GetAdornmentsThickness ();
 
         int adornmentThickness = dimension switch
-                                 {
-                                     Dimension.Width => thickness.Horizontal,
-                                     Dimension.Height => thickness.Vertical,
-                                     Dimension.None => 0,
-                                     _ => throw new ArgumentOutOfRangeException (nameof (dimension), dimension, null)
-                                 };
+        {
+            Dimension.Width => thickness.Horizontal,
+            Dimension.Height => thickness.Vertical,
+            Dimension.None => 0,
+            _ => throw new ArgumentOutOfRangeException (nameof (dimension), dimension, null)
+        };
 
         max += adornmentThickness;
 

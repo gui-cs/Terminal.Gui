@@ -303,6 +303,239 @@ public partial class DimAutoTests
         Assert.Equal (view.Viewport.Height - subview.Frame.Height, subview.Frame.Y);
     }
 
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 19, 9)]
+    [InlineData (0, 18, 0, 8, 18, 8)]
+    [InlineData (0, 20, 0, 10, 20, 10)]
+    [InlineData (0, 21, 0, 11, 21, 11)]
+    [InlineData (1, 21, 1, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    [InlineData (0, 30, 0, 20, 25, 15)]
+    public void With_Subview_And_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View
+        {
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+        };
+
+        var otherView = new View
+        {
+            Width = 5,
+            Height = 5
+        };
+        view.Add (otherView);
+
+        var subview = new View
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Width = 20,
+            Height = 10
+        };
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        // subview should be at the end of the view
+        Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
+        Assert.Equal (view.Viewport.Height - subview.Frame.Height, subview.Frame.Y);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 19, 9)]
+    [InlineData (0, 18, 0, 8, 18, 8)]
+    [InlineData (0, 20, 0, 10, 20, 10)]
+    [InlineData (0, 21, 0, 11, 21, 11)]
+    [InlineData (1, 21, 1, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    [InlineData (0, 30, 0, 20, 25, 15)]
+    public void With_DimAutoSubview_And_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View
+        {
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+        };
+
+        var otherView = new View
+        {
+            Text = "01234\n01234\n01234\n01234\n01234",
+            Width = Dim.Auto(),
+            Height = Dim.Auto ()
+        };
+        view.Add (otherView);
+
+        var subview = new View
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Width = 20,
+            Height = 10
+        };
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        // subview should be at the end of the view
+        Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
+        Assert.Equal (view.Viewport.Height - subview.Frame.Height, subview.Frame.Y);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 19, 9)]
+    [InlineData (0, 18, 0, 8, 18, 8)]
+    [InlineData (0, 20, 0, 10, 20, 10)]
+    [InlineData (0, 21, 0, 11, 21, 11)]
+    [InlineData (1, 21, 1, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    [InlineData (0, 30, 0, 20, 26, 16)]
+    public void With_PosViewSubview_And_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View
+        {
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+        };
+
+        var otherView = new View
+        {
+            Width = 1,
+            Height = 1,
+        };
+        view.Add (otherView);
+
+        var posViewView = new View
+        {
+            X = Pos.Bottom(otherView),
+            Y = Pos.Right(otherView),
+            Width = 5,
+            Height = 5,
+        };
+        view.Add (posViewView);
+
+        var subview = new View
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Width = 20,
+            Height = 10
+        };
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        // subview should be at the end of the view
+        Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
+        Assert.Equal (view.Viewport.Height - subview.Frame.Height, subview.Frame.Y);
+    }
+
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 19, 0, 9, 19, 9)]
+    [InlineData (0, 18, 0, 8, 18, 8)]
+    [InlineData (0, 20, 0, 10, 20, 10)]
+    [InlineData (0, 21, 0, 11, 21, 11)]
+    [InlineData (1, 21, 1, 11, 21, 11)]
+    [InlineData (21, 21, 11, 11, 21, 11)]
+    [InlineData (0, 30, 0, 20, 22, 12)]
+    public void With_DimViewSubview_And_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    {
+        var view = new View
+        {
+            Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+            Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+        };
+
+        var otherView = new View
+        {
+            Width = 1,
+            Height = 1,
+        };
+        view.Add (otherView);
+
+        var dimViewView = new View
+        {
+            Id = "dimViewView",
+            X = 1,
+            Y = 1,
+            Width = Dim.Width (otherView),
+            Height = Dim.Height (otherView),
+        };
+        view.Add (dimViewView);
+
+        var subview = new View
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Width = 20,
+            Height = 10
+        };
+        view.Add (subview);
+
+        // Assuming the calculation is done after layout
+        int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+        int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedWidth, calculatedWidth);
+        Assert.Equal (expectedHeight, calculatedHeight);
+
+        Assert.Equal (0, calculatedX);
+        Assert.Equal (0, calculatedY);
+
+        view.BeginInit ();
+        view.EndInit ();
+
+        // subview should be at the end of the view
+        Assert.Equal (view.Viewport.Width - subview.Frame.Width, subview.Frame.X);
+        Assert.Equal (view.Viewport.Height - subview.Frame.Height, subview.Frame.Y);
+    }
     [Theory]
     [InlineData (0, 10, 0, 10, 10, 2)]
     [InlineData (0, 5, 0, 5, 5, 3)] // max width of 5 should cause wordwrap at 5 giving a height of 2 + 1

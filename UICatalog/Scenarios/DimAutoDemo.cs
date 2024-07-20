@@ -163,6 +163,16 @@ public class DimAutoDemo : Scenario
         };
         dimAutoFrameView.Add (resetButton);
 
+
+        var radioGroup = new RadioGroup ()
+        {
+            RadioLabels = ["One", "Two", "Three"],
+            X = 0,
+            Y = Pos.AnchorEnd (),
+            Title = "Radios",
+            BorderStyle = LineStyle.Dotted
+        };
+        dimAutoFrameView.Add (radioGroup);
         return dimAutoFrameView;
     }
 
