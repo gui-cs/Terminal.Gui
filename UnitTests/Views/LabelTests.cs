@@ -86,7 +86,7 @@ public class LabelTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void AutoSize_Stays_True_AnchorEnd ()
+    public void Text_Set_With_AnchorEnd_Works ()
     {
         var label = new Label { Y = Pos.Center (), Text = "Say Hello 你" };
         label.X = Pos.AnchorEnd (0) - Pos.Func (() => label.TextFormatter.Text.GetColumns ());
@@ -127,7 +127,7 @@ public class LabelTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void AutoSize_Stays_True_Center ()
+    public void Set_Text_With_Center ()
     {
         var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
 
@@ -164,35 +164,7 @@ public class LabelTests (ITestOutputHelper output)
         TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         top.Dispose ();
     }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_Stays_True_With_EmptyText ()
-    {
-        var label = new Label { X = Pos.Center (), Y = Pos.Center () };
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (label);
-        var top = new Toplevel ();
-        top.Add (win);
-
-        label.Text = "Say Hello 你";
-
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        var expected = @"
-┌────────────────────────────┐
-│                            │
-│        Say Hello 你        │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        top.Dispose ();
-    }
-
+    
     [Fact]
     public void Constructors_Defaults ()
     {
@@ -206,7 +178,7 @@ public class LabelTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Label_Draw_Fill_Remaining_AutoSize_False ()
+    public void Label_Draw_Fill_Remaining ()
     {
         var tfSize = new Size (80, 1);
 
@@ -222,9 +194,6 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (label);
         Application.Begin (top);
 
-        Assert.False (label.TextFormatter.AutoSize);
-        Assert.False (tf1.AutoSize);
-        Assert.False (tf2.AutoSize);
         Assert.False (label.TextFormatter.FillRemaining);
         Assert.False (tf1.FillRemaining);
         Assert.True (tf2.FillRemaining);
@@ -914,7 +883,6 @@ e
     {
         var win = new Window ();
 
-        // Label is AutoSize == true
         var label = new Label
         {
             Text = "This should be the last line.",
@@ -955,73 +923,6 @@ e
         top.Dispose ();
     }
 
-#if V2_STATUSBAR
-    // TODO: This is a Label test. Move to label tests if there's not already a test for this.
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Bottom_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
-    {
-        var win = new Window ();
-
-        // Label is AutoSize == true
-        var label = new Label
-        {
-            Text = "This should be the last line.",
-            ColorScheme = Colors.ColorSchemes ["Menu"],
-
-            //Width = Dim.Fill (),
-            X = 0,
-            Y = Pos.Bottom (win) - 4 // two lines top and bottom borders more two lines above border
-        };
-
-        win.Add (label);
-
-        var menu = new MenuBar { Menus = new MenuBarItem [] { new ("Menu", "", null) } };
-        var status = new StatusBar (new StatusItem [] { new (KeyCode.F1, "~F1~ Help", null) });
-        Toplevel top = new ();
-        top.Add (win, menu, status);
-        RunState rs = Application.Begin (top);
-
-        Assert.Equal (new (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new (0, 0, 80, 1), menu.Frame);
-        Assert.Equal (new (0, 24, 80, 1), status.Frame);
-        Assert.Equal (new (0, 1, 80, 23), win.Frame);
-        Assert.Equal (new (0, 20, 29, 1), label.Frame);
-
-        var expected = @"
- Menu                                                                           
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│This should be the last line.                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
- F1 Help                                                                        
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Application.End (rs);
-        top.Dispose ();
-    }
-#endif
     // TODO: This is a Dim test. Move to Dim tests.
 
     [Fact]
@@ -1041,7 +942,6 @@ e
         var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
         var count = 20;
 
-        // Label is AutoSize == true
         List<Label> listLabels = new ();
 
         for (var i = 0; i < count; i++)
@@ -1216,7 +1116,6 @@ e
         var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
         var count = 0;
 
-        // Label is AutoSize == true
         List<Label> listLabels = new ();
 
         field.KeyDown += (s, k) =>
@@ -1231,7 +1130,6 @@ e
                                  {
                                      field.Text = $"Label {count}";
 
-                                     // Label is AutoSize = true
                                      var label = new Label { Text = field.Text, X = 0, Y = view.Viewport.Height /*, Width = 10*/ };
                                      view.Add (label);
                                      Assert.Equal ($"Label {count}", label.Text);

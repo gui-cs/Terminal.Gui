@@ -385,23 +385,6 @@ public static class MessageBox
 
         d.ColorScheme = useErrorColors ? Colors.ColorSchemes ["Error"] : Colors.ColorSchemes ["Dialog"];
 
-        //d.LayoutComplete += (s, e) =>
-        //{
-        //    if (wrapMessage)
-        //    {
-        //        int buttonHeight = buttonList.Count > 0 ? buttonList [0].Frame.Height : 0;
-        //        Debug.Assert (d.TextFormatter.WordWrap);
-        //        d.TextFormatter.Size = new Size (d.GetContentSize ().Width, Application.Screen.Height);
-        //        Size textSize = d.TextFormatter.GetAutoSize ();
-        //        textSize.Height += buttonHeight;
-
-        //        if (textSize != d.TextFormatter.Size)
-        //        {
-        //            d.SetNeedsLayout ();
-        //        }
-        //    }
-        //};
-
         d.HotKeySpecifier = new Rune ('\xFFFF');
         d.Text = message;
         d.TextAlignment = Alignment.Center;

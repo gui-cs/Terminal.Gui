@@ -489,7 +489,8 @@ internal sealed class Menu : View
                 {
                     var tf = new TextFormatter
                     {
-                        AutoSize = true,
+                        Width = Frame.Width - 3,
+                        Height = 1,
                         Alignment = Alignment.Center, HotKeySpecifier = MenuBar.HotKeySpecifier, Text = textToDraw
                     };
 

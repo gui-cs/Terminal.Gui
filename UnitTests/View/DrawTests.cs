@@ -293,7 +293,6 @@ public class DrawTests (ITestOutputHelper _output)
         var top = new Toplevel ();
         top.Add (win);
 
-        // Don't use Label. It sets AutoSize = true which is not what we're testing here.
         var view = new View { Text = "ワイドルーン。", Height = Dim.Fill (), Width = Dim.Fill () };
 
         // Don't have unit tests use things that aren't absolutely critical for the test, like Dialog

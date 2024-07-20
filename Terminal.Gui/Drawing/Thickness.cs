@@ -190,12 +190,14 @@ public record struct Thickness
         if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.Padding))
         {
             // Draw the diagnostics label on the bottom
+            string text = label is null ? string.Empty : $"{label} {this}";
             var tf = new TextFormatter
             {
-                Text = label is null ? string.Empty : $"{label} {this}",
+                Text = text,
                 Alignment = Alignment.Center,
                 VerticalAlignment = Alignment.End,
-                AutoSize = true
+                Width = text.GetColumns (),
+                Height = 1
             };
             tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect);
         }

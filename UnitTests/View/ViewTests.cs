@@ -1006,7 +1006,6 @@ At 0,0
     {
         var view = new View { Text = "Testing visibility." }; // use View, not Label to avoid AutoSize == true
 
-        // BUGBUG: AutoSize is false and size wasn't provided so it's 0,0
         Assert.Equal (0, view.Frame.Width);
         Assert.Equal (0, view.Height);
         var win = new Window ();

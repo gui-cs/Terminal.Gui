@@ -5,8 +5,7 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewTests;
 
 /// <summary>
-///     Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties (independent of
-///     AutoSize).
+///     Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties.
 /// </summary>
 public class TextTests (ITestOutputHelper output)
 {
@@ -398,7 +397,7 @@ Y
 
     [Fact]
     [AutoInitShutdown]
-    public void AutoSize_True_View_IsEmpty_False_Minimum_Width ()
+    public void View_IsEmpty_False_Minimum_Width ()
     {
         var text = "Views";
 
@@ -508,7 +507,7 @@ w ";
 
     [Fact]
     [AutoInitShutdown]
-    public void AutoSize_True_Width_Height_SetMinWidthHeight_Narrow_Wide_Runes ()
+    public void Width_Height_SetMinWidthHeight_Narrow_Wide_Runes ()
     {
         var text = $"0123456789{Environment.NewLine}01234567891";
 
@@ -605,7 +604,7 @@ w ";
 
     [Fact]
     [AutoInitShutdown]
-    public void AutoSize_True_Width_Height_Stay_True_If_TextFormatter_Size_Fit ()
+    public void Width_Height_Stay_True_If_TextFormatter_Size_Fit ()
     {
         var text = "Finish 終";
 
@@ -736,11 +735,9 @@ w ";
         top.Dispose ();
     }
 
-    [Theory]
+    [Fact]
     [AutoInitShutdown]
-    [InlineData (true)]
-    [InlineData (false)]
-    public void View_Draw_Horizontal_Simple_TextAlignments (bool autoSize)
+    public void View_Draw_Horizontal_Simple_TextAlignments ()
     {
         var text = "Hello World";
         var width = 20;
@@ -752,12 +749,6 @@ w ";
             Height = 1
         };
 
-        if (autoSize)
-        {
-            lblLeft.Width = Dim.Auto ();
-            lblLeft.Height = Dim.Auto ();
-        }
-
         var lblCenter = new View
         {
             Text = text,
@@ -766,12 +757,6 @@ w ";
             Height = 1,
             TextAlignment = Alignment.Center
         };
-
-        if (autoSize)
-        {
-            lblCenter.Width = Dim.Auto ();
-            lblCenter.Height = Dim.Auto ();
-        }
 
         var lblRight = new View
         {
@@ -782,12 +767,6 @@ w ";
             TextAlignment = Alignment.End
         };
 
-        if (autoSize)
-        {
-            lblRight.Width = Dim.Auto ();
-            lblRight.Height = Dim.Auto ();
-        }
-
         var lblJust = new View
         {
             Text = text,
@@ -797,12 +776,6 @@ w ";
             TextAlignment = Alignment.Fill
         };
 
-        if (autoSize)
-        {
-            lblJust.Width = Dim.Auto ();
-            lblJust.Height = Dim.Auto ();
-        }
-
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
         frame.Add (lblLeft, lblCenter, lblRight, lblJust);
         var top = new Toplevel ();
@@ -811,41 +784,16 @@ w ";
         ((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
 
         // frame.Width is width + border wide (20 + 2) and 6 high
-
-        if (autoSize)
-        {
-            Size expectedSize = new (11, 1);
-            Assert.Equal (expectedSize, lblLeft.TextFormatter.Size);
-            Assert.Equal (expectedSize, lblCenter.TextFormatter.Size);
-            Assert.Equal (expectedSize, lblRight.TextFormatter.Size);
-            Assert.Equal (expectedSize, lblJust.TextFormatter.Size);
-        }
-        else
-        {
-            Size expectedSize = new (width, 1);
-            Assert.Equal (expectedSize, lblLeft.TextFormatter.Size);
-            Assert.Equal (expectedSize, lblCenter.TextFormatter.Size);
-            Assert.Equal (expectedSize, lblRight.TextFormatter.Size);
-            Assert.Equal (expectedSize, lblJust.TextFormatter.Size);
-        }
+        Size expectedSize = new (width, 1);
+        Assert.Equal (expectedSize, lblLeft.TextFormatter.Size);
+        Assert.Equal (expectedSize, lblCenter.TextFormatter.Size);
+        Assert.Equal (expectedSize, lblRight.TextFormatter.Size);
+        Assert.Equal (expectedSize, lblJust.TextFormatter.Size);
 
         Assert.Equal (new (0, 0, width + 2, 6), frame.Frame);
 
         string expected;
 
-        if (autoSize)
-        {
-            expected = @"
-┌────────────────────┐
-│Hello World         │
-│Hello World         │
-│Hello World         │
-│Hello World         │
-└────────────────────┘
-";
-        }
-        else
-        {
             expected = @"
 ┌────────────────────┐
 │Hello World         │
@@ -854,7 +802,6 @@ w ";
 │Hello          World│
 └────────────────────┘
 ";
-        }
 
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, width + 2, 6), pos);
@@ -1300,9 +1247,4 @@ w ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
     }
-
-    // Test behavior of AutoSize property. 
-    // - Default is false
-    // - Setting to true invalidates Height/Width
-    // - Setting to false invalidates Height/Width
 }

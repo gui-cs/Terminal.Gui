@@ -165,7 +165,7 @@ public class Bar : View
                 List<Shortcut> shortcuts = Subviews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
                 foreach (Shortcut shortcut in shortcuts)
                 {
-                    // Let AutoSize do its thing to get the minimum width of each CommandView and HelpView
+                    // Let DimAuto do its thing to get the minimum width of each CommandView and HelpView
                     //shortcut.CommandView.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
                     minKeyWidth = int.Max (minKeyWidth, shortcut.KeyView.Text.GetColumns ());
                 }

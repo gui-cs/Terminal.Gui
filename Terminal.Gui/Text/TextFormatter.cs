@@ -9,7 +9,6 @@ namespace Terminal.Gui;
 /// </summary>
 public class TextFormatter
 {
-    private bool _autoSize;
     private Key _hotKey = new ();
     private int _hotKeyPos = -1;
     private List<string> _lines = new ();
@@ -34,39 +33,6 @@ public class TextFormatter
         set => _textAlignment = EnableNeedsFormat (value);
     }
 
-    /// <summary>Gets or sets whether the <see cref="Size"/> should be automatically changed to fit the <see cref="Text"/>.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Used when <see cref="View"/> is using <see cref="Dim.Auto"/> to resize the view's <see cref="View.Viewport"/>
-    ///         to fit <see cref="Size"/>.
-    ///     </para>
-    ///     <para>
-    ///         AutoSize is ignored if <see cref="Gui.Alignment.Fill"/> is used.
-    ///     </para>
-    /// </remarks>
-    [Obsolete ("AutoSize is deprecated, use Width and Height instead.")]
-    public bool AutoSize
-    {
-        get => _autoSize;
-        set
-        {
-            _autoSize = EnableNeedsFormat (value);
-
-            if (_autoSize)
-            {
-                Size size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
-
-                Width = size.Width - GetHotKeySpecifierLength ();
-                Height = size.Height - GetHotKeySpecifierLength (false);
-            }
-            else
-            {
-                Height = null;
-                Width = null;
-            }
-        }
-    }
-
     /// <summary>
     ///     Gets the cursor position of the <see cref="HotKey"/>. If the <see cref="HotKey"/> is defined, the cursor will
     ///     be positioned over it.
@@ -81,11 +47,6 @@ public class TextFormatter
         set
         {
             _textDirection = EnableNeedsFormat (value);
-
-            if (AutoSize)
-            {
-                Size = GetAutoSize ();
-            }
         }
     }
 
@@ -664,14 +625,11 @@ public class TextFormatter
                              this
                             );
 
-            if (!AutoSize)
-            {
-                colsWidth = GetMaxColsForWidth (_lines, width, TabWidth);
+            colsWidth = GetMaxColsForWidth (_lines, width, TabWidth);
 
-                if (_lines.Count > colsWidth)
-                {
-                    _lines.RemoveRange (colsWidth, _lines.Count - colsWidth);
-                }
+            if (_lines.Count > colsWidth)
+            {
+                _lines.RemoveRange (colsWidth, _lines.Count - colsWidth);
             }
         }
         else
@@ -688,7 +646,7 @@ public class TextFormatter
                              this
                             );
 
-            if (!AutoSize && _lines.Count > height)
+            if (_lines.Count > height)
             {
                 _lines.RemoveRange (height, _lines.Count - height);
             }
@@ -817,26 +775,17 @@ public class TextFormatter
         }
         set
         {
-            if (AutoSize)
+            if (value is null)
             {
-                Size size = EnableNeedsFormat (GetAutoSize ());
-                _width = size.Width;
-                _height = size.Height;
+                _width = null;
+                _height = null;
+                EnableNeedsFormat (true);
             }
             else
             {
-                if (value is null)
-                {
-                    _width = null;
-                    _height = null;
-                    EnableNeedsFormat (true);
-                }
-                else
-                {
-                    Size size = EnableNeedsFormat (value.Value);
-                    _width = size.Width;
-                    _height = size.Height;
-                }
+                Size size = EnableNeedsFormat (value.Value);
+                _width = size.Width;
+                _height = size.Height;
             }
         }
     }
@@ -852,15 +801,7 @@ public class TextFormatter
     public string Text
     {
         get => _text!;
-        set
-        {
-            _text = EnableNeedsFormat (value);
-
-            if (AutoSize)
-            {
-                Size = GetAutoSize ();
-            }
-        }
+        set => _text = EnableNeedsFormat (value);
     }
 
     /// <summary>Gets or sets the vertical text-alignment.</summary>
@@ -910,17 +851,6 @@ public class TextFormatter
     {
         get => _wordWrap;
         set => _wordWrap = EnableNeedsFormat (value);
-    }
-
-    private Size GetAutoSize ()
-    {
-        Size size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
-
-        return size with
-        {
-            Width = size.Width - GetHotKeySpecifierLength (),
-            Height = size.Height - GetHotKeySpecifierLength (false)
-        };
     }
 
     /// <summary>Sets <see cref="NeedsFormat"/> to <see langword="true"/> and returns the value.</summary>

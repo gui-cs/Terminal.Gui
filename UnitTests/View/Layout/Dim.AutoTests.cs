@@ -924,20 +924,6 @@ public partial class DimAutoTests (ITestOutputHelper output)
         Assert.NotEqual (lastSize, view.Frame.Size);
     }
 
-    // Ensure TextFormatter.AutoSize is never used for View.Text
-    [Fact]
-    public void TextFormatter_Is_Not_Auto ()
-    {
-        View view = new ();
-        Assert.False (view.TextFormatter.AutoSize);
-        view.Width = Auto ();
-        Assert.False (view.TextFormatter.AutoSize);
-
-        view = new ();
-        Assert.False (view.TextFormatter.AutoSize);
-        view.Height = Auto ();
-        Assert.False (view.TextFormatter.AutoSize);
-    }
 
     [Theory]
     [InlineData ("1234", 4)]
