@@ -7193,4 +7193,33 @@ B  ")]
     }
 
     #endregion
+
+    [Fact]
+    public void UICatalog_AboutBox_Text ()
+    {
+        StringBuilder _aboutMessage = new ();
+        _aboutMessage.AppendLine ($"UI Catalog: A comprehensive sample library for");
+        _aboutMessage.AppendLine (@"
+ _______                  _             _   _____       _
+|__   __|                (_)           | | / ____|     (_)
+   | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _
+   | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |
+   | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |
+   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|
+");
+        _aboutMessage.AppendLine (@"v2 - Pre-Alpha");
+        _aboutMessage.AppendLine (@"");
+        _aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
+
+        TextFormatter tf = new ()
+        {
+            Text = _aboutMessage.ToString(),
+            WordWrap = false,
+            MultiLine = true,
+            HotKeySpecifier = (Rune)0xFFFF
+        };
+
+        Size tfSize = tf.FormatAndGetSize ();
+        Assert.Equal (new Size (58, 13), tfSize);
+    }
 }

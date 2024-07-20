@@ -580,11 +580,9 @@ public class TextFormatter
     public List<string> GetLines ()
     {
         string text = _text!;
-        int width = _constrainToWidth.GetValueOrDefault ();
-        int height = _constrainToHeight.GetValueOrDefault ();
 
         // With this check, we protect against subclasses with overrides of Text
-        if (string.IsNullOrEmpty (Text) || width == 0 || height == 0)
+        if (string.IsNullOrEmpty (Text) || ConstrainToWidth is 0 || ConstrainToHeight is 0)
         {
             _lines = [string.Empty];
             NeedsFormat = false;
@@ -596,6 +594,9 @@ public class TextFormatter
         {
             return _lines;
         }
+
+        int width = ConstrainToWidth ?? int.MaxValue;
+        int height = ConstrainToHeight ?? int.MaxValue;
 
         if (FindHotKey (_text!, HotKeySpecifier, out _hotKeyPos, out Key newHotKey))
         {
