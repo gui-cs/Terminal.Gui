@@ -50,11 +50,6 @@ public class Slider<T> : View
         SetDefaultStyle ();
         SetCommands ();
 
-        SetContentSize ();
-
-        // BUGBUG: This should not be needed - Need to ensure SetRelativeLayout gets called during EndInit
-        Initialized += (s, e) => { SetContentSize (); };
-
         LayoutStarted += (s, e) => { SetContentSize (); };
     }
 

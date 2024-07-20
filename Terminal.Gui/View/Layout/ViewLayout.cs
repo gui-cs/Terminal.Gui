@@ -733,9 +733,6 @@ public partial class View
     /// </summary>
     internal virtual void OnLayoutComplete (LayoutEventArgs args) { LayoutComplete?.Invoke (this, args); }
 
-    // BUGBUG: We need an API/event that is called from SetRelativeLayout instead of/in addition to 
-    // BUGBUG: OnLayoutStarted which is called from LayoutSubviews.
-
     /// <summary>
     ///     Raises the <see cref="LayoutStarted"/> event. Called from  <see cref="LayoutSubviews"/> before any subviews
     ///     have been laid out.
