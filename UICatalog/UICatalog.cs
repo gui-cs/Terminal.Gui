@@ -45,9 +45,8 @@ namespace UICatalog;
 ///         (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
 ///     </para>
 /// </remarks>
-internal class UICatalogApp
+public class UICatalogApp
 {
-    private static StringBuilder? _aboutMessage;
     private static int _cachedCategoryIndex;
 
     // When a scenario is run, the main app is killed. These items
@@ -73,6 +72,30 @@ internal class UICatalogApp
     [SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true)]
     [JsonPropertyName ("UICatalog.StatusBar")]
     public static bool ShowStatusBar { get; set; } = true;
+
+    /// <summary>
+    /// Gets the message displayed in the About Box. `public` so it can be used from Unit tests.
+    /// </summary>
+    /// <returns></returns>
+    public static string GetAboutBoxMessage ()
+    {
+        StringBuilder msg = new ();
+        msg.AppendLine ($"UI Catalog: A comprehensive sample library for");
+        msg.AppendLine ();
+        msg.AppendLine (
+@" _______                  _             _   _____       _
+|__   __|                (_)           | | / ____|     (_)
+   | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _
+   | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |
+   | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |
+   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|");
+        msg.AppendLine ();
+        msg.AppendLine (@"v2 - Pre-Alpha");
+        msg.AppendLine ();
+        msg.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
+
+        return msg.ToString ();
+    }
 
     private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
     {
@@ -381,20 +404,6 @@ internal class UICatalogApp
             _themeMenuItems = CreateThemeMenuItems ();
             _themeMenuBarItem = new ("_Themes", _themeMenuItems);
 
-            _aboutMessage = new ();
-            _aboutMessage.AppendLine ($"UI Catalog: A comprehensive sample library for");
-            _aboutMessage.AppendLine (@"
- _______                  _             _   _____       _
-|__   __|                (_)           | | / ____|     (_)
-   | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _
-   | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |
-   | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |
-   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|
-");
-            _aboutMessage.AppendLine (@"v2 - Pre-Alpha");
-            _aboutMessage.AppendLine (@"");
-            _aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
-
             MenuBar = new ()
             {
                 Menus =
@@ -437,7 +446,7 @@ internal class UICatalogApp
                                   "About UI Catalog",
                                   () => MessageBox.Query (
                                                           title: "",
-                                                          message: _aboutMessage!.ToString (),
+                                                          message: GetAboutBoxMessage (),
                                                           wrapMessage: false,
                                                           buttons: "_Ok"
                                                          ),
@@ -471,7 +480,7 @@ internal class UICatalogApp
                 };
                 statusBarShortcut.Accept += (sender, args) => { StatusBar.Visible = !StatusBar.Visible; };
 
-                ShForce16Colors = new()
+                ShForce16Colors = new ()
                 {
                     CommandView = new CheckBox
                     {
@@ -846,24 +855,24 @@ internal class UICatalogApp
             string GetDiagnosticsTitle (Enum diag)
             {
                 return Enum.GetName (_diagnosticFlags.GetType (), diag) switch
-                       {
-                           "Off" => OFF,
-                           "Ruler" => RULER,
-                           "Padding" => PADDING,
-                           "MouseEnter" => MOUSEENTER,
-                           _ => ""
-                       };
+                {
+                    "Off" => OFF,
+                    "Ruler" => RULER,
+                    "Padding" => PADDING,
+                    "MouseEnter" => MOUSEENTER,
+                    _ => ""
+                };
             }
 
             Enum GetDiagnosticsEnumValue (string title)
             {
                 return title switch
-                       {
-                           RULER => ViewDiagnosticFlags.Ruler,
-                           PADDING => ViewDiagnosticFlags.Padding,
-                           MOUSEENTER => ViewDiagnosticFlags.MouseEnter,
-                           _ => null!
-                       };
+                {
+                    RULER => ViewDiagnosticFlags.Ruler,
+                    PADDING => ViewDiagnosticFlags.Padding,
+                    MOUSEENTER => ViewDiagnosticFlags.MouseEnter,
+                    _ => null!
+                };
             }
 
             void SetDiagnosticsFlag (Enum diag, bool add)
