@@ -160,10 +160,7 @@ public abstract class Dim
     /// </example>
     public static Dim? Percent (int percent, DimPercentMode mode = DimPercentMode.ContentSize)
     {
-        if (percent is < 0 /*or > 100*/)
-        {
-            throw new ArgumentException ("Percent value must be positive.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (percent, nameof (percent));
 
         return new DimPercent (percent, mode);
     }

@@ -54,7 +54,10 @@ public class TextFormatter
 
             if (_autoSize)
             {
-                Size = GetAutoSize ();
+                Size size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
+
+                Width = size.Width - GetHotKeySpecifierLength ();
+                Height = size.Height - GetHotKeySpecifierLength (false);
             }
             else
             {
@@ -619,74 +622,79 @@ public class TextFormatter
     /// </remarks>
     public List<string> GetLines ()
     {
+        int width = _width.GetValueOrDefault ();
+        int height = _height.GetValueOrDefault ();
+
         // With this check, we protect against subclasses with overrides of Text
-        if (string.IsNullOrEmpty (Text) || Width is null || Width == 0 || Height is null || Height == 0)
+        if (string.IsNullOrEmpty (Text) || width == 0 || height == 0)
         {
-            _lines = new() { string.Empty };
+            _lines = [string.Empty];
             NeedsFormat = false;
 
             return _lines;
         }
 
-        if (NeedsFormat)
+        if (!NeedsFormat)
         {
-            string text = _text!;
-
-            if (FindHotKey (_text!, HotKeySpecifier, out _hotKeyPos, out Key newHotKey))
-            {
-                HotKey = newHotKey;
-                text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
-                text = ReplaceHotKeyWithTag (text, _hotKeyPos);
-            }
-
-            if (IsVerticalDirection (Direction))
-            {
-                int colsWidth = GetSumMaxCharWidth (text, 0, 1, TabWidth);
-
-                _lines = Format (
-                                 text,
-                                 Height.Value,
-                                 VerticalAlignment == Alignment.Fill,
-                                 Width.Value > colsWidth && WordWrap,
-                                 PreserveTrailingSpaces,
-                                 TabWidth,
-                                 Direction,
-                                 MultiLine,
-                                 this
-                                );
-
-                if (!AutoSize)
-                {
-                    colsWidth = GetMaxColsForWidth (_lines, Width.Value, TabWidth);
-
-                    if (_lines.Count > colsWidth)
-                    {
-                        _lines.RemoveRange (colsWidth, _lines.Count - colsWidth);
-                    }
-                }
-            }
-            else
-            {
-                _lines = Format (
-                                 text,
-                                 Width.Value,
-                                 Alignment == Alignment.Fill,
-                                 Height.Value > 1 && WordWrap,
-                                 PreserveTrailingSpaces,
-                                 TabWidth,
-                                 Direction,
-                                 MultiLine,
-                                 this
-                                );
-
-                if (!AutoSize && _lines.Count > Height.Value)
-                {
-                    _lines.RemoveRange (Height.Value, _lines.Count - Height.Value);
-                }
-            }
-
-            NeedsFormat = false;
+            return _lines;
         }
+
+        string text = _text!;
+
+        if (FindHotKey (_text!, HotKeySpecifier, out _hotKeyPos, out Key newHotKey))
+        {
+            HotKey = newHotKey;
+            text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
+            text = ReplaceHotKeyWithTag (text, _hotKeyPos);
+        }
+
+        if (IsVerticalDirection (Direction))
+        {
+            int colsWidth = GetSumMaxCharWidth (text, 0, 1, TabWidth);
+
+            _lines = Format (
+                             text,
+                             height,
+                             VerticalAlignment == Alignment.Fill,
+                             width > colsWidth && WordWrap,
+                             PreserveTrailingSpaces,
+                             TabWidth,
+                             Direction,
+                             MultiLine,
+                             this
+                            );
+
+            if (!AutoSize)
+            {
+                colsWidth = GetMaxColsForWidth (_lines, width, TabWidth);
+
+                if (_lines.Count > colsWidth)
+                {
+                    _lines.RemoveRange (colsWidth, _lines.Count - colsWidth);
+                }
+            }
+        }
+        else
+        {
+            _lines = Format (
+                             text,
+                             width,
+                             Alignment == Alignment.Fill,
+                             height > 1 && WordWrap,
+                             PreserveTrailingSpaces,
+                             TabWidth,
+                             Direction,
+                             MultiLine,
+                             this
+                            );
+
+            if (!AutoSize && _lines.Count > height)
+            {
+                _lines.RemoveRange (height, _lines.Count - height);
+            }
+        }
+
+        NeedsFormat = false;
 
         return _lines;
     }
@@ -713,10 +721,7 @@ public class TextFormatter
                 return;
             }
 
-            if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException (nameof (Height), value, @"Must be greater than or equal to 0.");
-            }
+            ArgumentOutOfRangeException.ThrowIfNegative (value.GetValueOrDefault (), nameof (Height));
 
             _height = value;
 
@@ -854,7 +859,6 @@ public class TextFormatter
             if (AutoSize)
             {
                 Size = GetAutoSize ();
-                ;
             }
         }
     }
@@ -888,10 +892,7 @@ public class TextFormatter
                 return;
             }
 
-            if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException (nameof (Width), value, @"Must be greater than or equal to 0.");
-            }
+            ArgumentOutOfRangeException.ThrowIfNegative (value.GetValueOrDefault (), nameof (Width));
 
             _width = value;
 
@@ -939,48 +940,48 @@ public class TextFormatter
     public static bool IsHorizontalDirection (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.LeftRight_TopBottom => true,
-                   TextDirection.LeftRight_BottomTop => true,
-                   TextDirection.RightLeft_TopBottom => true,
-                   TextDirection.RightLeft_BottomTop => true,
-                   _ => false
-               };
+        {
+            TextDirection.LeftRight_TopBottom => true,
+            TextDirection.LeftRight_BottomTop => true,
+            TextDirection.RightLeft_TopBottom => true,
+            TextDirection.RightLeft_BottomTop => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is a vertical direction</summary>
     public static bool IsVerticalDirection (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.TopBottom_LeftRight => true,
-                   TextDirection.TopBottom_RightLeft => true,
-                   TextDirection.BottomTop_LeftRight => true,
-                   TextDirection.BottomTop_RightLeft => true,
-                   _ => false
-               };
+        {
+            TextDirection.TopBottom_LeftRight => true,
+            TextDirection.TopBottom_RightLeft => true,
+            TextDirection.BottomTop_LeftRight => true,
+            TextDirection.BottomTop_RightLeft => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is Left to Right direction</summary>
     public static bool IsLeftToRight (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.LeftRight_TopBottom => true,
-                   TextDirection.LeftRight_BottomTop => true,
-                   _ => false
-               };
+        {
+            TextDirection.LeftRight_TopBottom => true,
+            TextDirection.LeftRight_BottomTop => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is Top to Bottom direction</summary>
     public static bool IsTopToBottom (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.TopBottom_LeftRight => true,
-                   TextDirection.TopBottom_RightLeft => true,
-                   _ => false
-               };
+        {
+            TextDirection.TopBottom_LeftRight => true,
+            TextDirection.TopBottom_RightLeft => true,
+            _ => false
+        };
     }
 
     // TODO: Move to StringExtensions?
@@ -1191,10 +1192,7 @@ public class TextFormatter
         TextFormatter? textFormatter = null
     )
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException ($"{nameof (width)} cannot be negative.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
 
         List<string> lines = new ();
 
@@ -1372,21 +1370,21 @@ public class TextFormatter
                     case ' ':
                         return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
                     case '\t':
-                    {
-                        length += tabWidth + 1;
-
-                        if (length == tabWidth && tabWidth > cWidth)
                         {
-                            return to + 1;
-                        }
+                            length += tabWidth + 1;
 
-                        if (length > cWidth && tabWidth > cWidth)
-                        {
-                            return to;
-                        }
+                            if (length == tabWidth && tabWidth > cWidth)
+                            {
+                                return to + 1;
+                            }
 
-                        return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
-                    }
+                            if (length > cWidth && tabWidth > cWidth)
+                            {
+                                return to;
+                            }
+
+                            return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
+                        }
                     default:
                         to++;
 
@@ -1395,11 +1393,11 @@ public class TextFormatter
             }
 
             return cLength switch
-                   {
-                       > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
-                       > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
-                       _ => to
-                   };
+            {
+                > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
+                > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
+                _ => to
+            };
         }
 
         if (start < text.GetRuneCount ())
@@ -1461,10 +1459,7 @@ public class TextFormatter
         TextFormatter? textFormatter = null
     )
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException ($"{nameof (width)} cannot be negative.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
 
         if (string.IsNullOrEmpty (text))
         {
@@ -1584,10 +1579,8 @@ public class TextFormatter
         int tabWidth = 0
     )
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException ($"{nameof (width)} cannot be negative.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
+
 
         if (string.IsNullOrEmpty (text))
         {
@@ -1730,10 +1723,8 @@ public class TextFormatter
         TextFormatter? textFormatter = null
     )
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException ($"{nameof (width)} cannot be negative.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
+
 
         List<string> lineResult = new ();
 
@@ -1844,13 +1835,13 @@ public class TextFormatter
     private static string PerformCorrectFormatDirection (TextDirection textDirection, string line)
     {
         return textDirection switch
-               {
-                   TextDirection.RightLeft_BottomTop
-                       or TextDirection.RightLeft_TopBottom
-                       or TextDirection.BottomTop_LeftRight
-                       or TextDirection.BottomTop_RightLeft => StringExtensions.ToString (line.EnumerateRunes ().Reverse ()),
-                   _ => line
-               };
+        {
+            TextDirection.RightLeft_BottomTop
+                or TextDirection.RightLeft_TopBottom
+                or TextDirection.BottomTop_LeftRight
+                or TextDirection.BottomTop_RightLeft => StringExtensions.ToString (line.EnumerateRunes ().Reverse ()),
+            _ => line
+        };
     }
 
     private static List<Rune> PerformCorrectFormatDirection (TextDirection textDirection, List<Rune> runes)
@@ -1861,13 +1852,13 @@ public class TextFormatter
     private static List<string> PerformCorrectFormatDirection (TextDirection textDirection, List<string> lines)
     {
         return textDirection switch
-               {
-                   TextDirection.TopBottom_RightLeft
-                       or TextDirection.LeftRight_BottomTop
-                       or TextDirection.RightLeft_BottomTop
-                       or TextDirection.BottomTop_RightLeft => lines.ToArray ().Reverse ().ToList (),
-                   _ => lines
-               };
+        {
+            TextDirection.TopBottom_RightLeft
+                or TextDirection.LeftRight_BottomTop
+                or TextDirection.RightLeft_BottomTop
+                or TextDirection.BottomTop_RightLeft => lines.ToArray ().Reverse ().ToList (),
+            _ => lines
+        };
     }
 
     /// <summary>

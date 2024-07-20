@@ -78,7 +78,7 @@ public class PosPercentTests (ITestOutputHelper output)
     public void PosPercent_ThrowsOnIvalid ()
     {
         Pos pos = Percent (0);
-        Assert.Throws<ArgumentException> (() => pos = Percent (-1));
+        Assert.Throws<ArgumentOutOfRangeException> (() => pos = Percent (-1));
 
         //Assert.Throws<ArgumentException> (() => pos = Pos.Percent (101));
         //Assert.Throws<ArgumentException> (() => pos = Pos.Percent (1000001));
