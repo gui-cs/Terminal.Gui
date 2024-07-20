@@ -421,7 +421,7 @@ public class Border : Adornment
                                                )
                                      );
 
-        Parent.TitleTextFormatter.Size = new (maxTitleWidth, 1);
+        Parent.TitleTextFormatter.ConstrainToSize = new (maxTitleWidth, 1);
 
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };

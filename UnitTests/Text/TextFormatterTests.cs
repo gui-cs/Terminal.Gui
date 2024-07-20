@@ -383,7 +383,7 @@ ssb
 
         Assert.True (tf.WordWrap);
 
-        tf.Size = new (width, height);
+        tf.ConstrainToSize = new (width, height);
 
         tf.Draw (
                  new (0, 0, width, height),
@@ -408,7 +408,7 @@ ssb
             Attribute.Default, new (ColorName.Green, ColorName.BrightMagenta),
             new (ColorName.Blue, ColorName.Cyan)
         };
-        var tf = new TextFormatter { Size = new (14, 3), Text = "Test\nTest long\nTest long long\n", MultiLine = true };
+        var tf = new TextFormatter { ConstrainToSize = new (14, 3), Text = "Test\nTest long\nTest long long\n", MultiLine = true };
 
         tf.Draw (
                  new (1, 1, 19, 3),
@@ -1164,7 +1164,7 @@ ssb
     {
         var tf = new TextFormatter
         {
-            Text = text, Size = new (maxWidth, maxHeight), WordWrap = false, MultiLine = multiLine
+            Text = text, ConstrainToSize = new (maxWidth, maxHeight), WordWrap = false, MultiLine = multiLine
         };
 
         Assert.False (tf.WordWrap);
@@ -1247,7 +1247,7 @@ ssb
         var tf = new TextFormatter
         {
             Text = text,
-            Size = new (maxWidth, maxHeight),
+            ConstrainToSize = new (maxWidth, maxHeight),
             WordWrap = false,
             MultiLine = multiLine,
             Direction = TextDirection.TopBottom_LeftRight
@@ -1277,7 +1277,7 @@ ssb
         tf.Draw (testBounds, new (), new ());
         Assert.False (tf.NeedsFormat);
 
-        tf.Size = new (1, 1);
+        tf.ConstrainToSize = new (1, 1);
         Assert.True (tf.NeedsFormat);
         Assert.NotEmpty (tf.GetLines ());
         Assert.False (tf.NeedsFormat); // get_Lines causes a Format
@@ -2034,8 +2034,8 @@ ssb
         tf.Direction = textDirection;
         tf.TabWidth = tabWidth;
         tf.Text = text;
-        tf.Width = 20;
-        tf.Height = 20;
+        tf.ConstrainToWidth = 20;
+        tf.ConstrainToHeight = 20;
 
         Assert.True (tf.WordWrap);
         Assert.False (tf.PreserveTrailingSpaces);
@@ -2075,8 +2075,8 @@ ssb
         tf.TabWidth = tabWidth;
         tf.PreserveTrailingSpaces = true;
         tf.Text = text;
-        tf.Width = 20;
-        tf.Height = 20;
+        tf.ConstrainToWidth = 20;
+        tf.ConstrainToHeight = 20;
 
         Assert.True (tf.WordWrap);
 
@@ -2115,8 +2115,8 @@ ssb
         tf.TabWidth = tabWidth;
         tf.WordWrap = true;
         tf.Text = text;
-        tf.Width = 20;
-        tf.Height = 20;
+        tf.ConstrainToWidth = 20;
+        tf.ConstrainToHeight = 20;
 
         Assert.False (tf.PreserveTrailingSpaces);
 
@@ -2158,8 +2158,8 @@ ssb
     public void Text_Set_SizeIsCorrect (string text, TextDirection textDirection, int expectedWidth, int expectedHeight)
     {
         var tf = new TextFormatter { Direction = textDirection, Text = text };
-        tf.Width = 10;
-        tf.Height = 10;
+        tf.ConstrainToWidth = 10;
+        tf.ConstrainToHeight = 10;
 
         Assert.Equal (new (expectedWidth, expectedHeight), tf.FormatAndGetSize ());
     }
@@ -3071,14 +3071,6 @@ ssb
     [InlineData ("ABC", 3, "ABC")]
     [InlineData ("ABC", 4, "ABC")]
     [InlineData ("ABC", 6, "ABC")]
-    [InlineData ("A", 0, "")]
-    [InlineData ("A", 1, "A")]
-    [InlineData ("A", 2, "A")]
-    [InlineData ("AB", 1, "A")]
-    [InlineData ("AB", 2, "AB")]
-    [InlineData ("ABC", 3, "ABC")]
-    [InlineData ("ABC", 4, "ABC")]
-    [InlineData ("ABC", 6, "ABC")]
     public void Draw_Horizontal_Left (string text, int width, string expectedText)
 
     {
@@ -3088,8 +3080,8 @@ ssb
             Alignment = Alignment.Start
         };
 
-        tf.Width = width;
-        tf.Height = 1;
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = 1;
         tf.Draw (new (0, 0, width, 1), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3097,14 +3089,6 @@ ssb
 
     [SetupFakeDriver]
     [Theory]
-    [InlineData ("A", 0, "")]
-    [InlineData ("A", 1, "A")]
-    [InlineData ("A", 2, " A")]
-    [InlineData ("AB", 1, "B")]
-    [InlineData ("AB", 2, "AB")]
-    [InlineData ("ABC", 3, "ABC")]
-    [InlineData ("ABC", 4, " ABC")]
-    [InlineData ("ABC", 6, "   ABC")]
     [InlineData ("A", 0, "")]
     [InlineData ("A", 1, "A")]
     [InlineData ("A", 2, " A")]
@@ -3121,8 +3105,8 @@ ssb
             Alignment = Alignment.End
         };
 
-        tf.Width = width;
-        tf.Height = 1;
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = 1;
 
         tf.Draw (new (Point.Empty, new (width, 1)), Attribute.Default, Attribute.Default);
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3130,17 +3114,6 @@ ssb
 
     [SetupFakeDriver]
     [Theory]
-    [InlineData ("A", 0, "")]
-    [InlineData ("A", 1, "A")]
-    [InlineData ("A", 2, "A")]
-    [InlineData ("A", 3, " A")]
-    [InlineData ("AB", 1, "A")]
-    [InlineData ("AB", 2, "AB")]
-    [InlineData ("ABC", 3, "ABC")]
-    [InlineData ("ABC", 4, "ABC")]
-    [InlineData ("ABC", 5, " ABC")]
-    [InlineData ("ABC", 6, " ABC")]
-    [InlineData ("ABC", 9, "   ABC")]
     [InlineData ("A", 0, "")]
     [InlineData ("A", 1, "A")]
     [InlineData ("A", 2, "A")]
@@ -3160,8 +3133,8 @@ ssb
             Alignment = Alignment.Center
         };
 
-        tf.Width = width;
-        tf.Height = 1;
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = 1;
         tf.Draw (new (0, 0, width, 1), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3188,8 +3161,8 @@ ssb
             Alignment = Alignment.Fill
         };
 
-        tf.Width = width;
-        tf.Height = 1;
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = 1;
         tf.Draw (new (0, 0, width, 1), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3258,8 +3231,8 @@ s")]
             Direction = TextDirection.TopBottom_LeftRight
         };
 
-        tf.Width = width;
-        tf.Height = height;
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = height;
         tf.Draw (new (0, 0, 20, 20), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3289,7 +3262,7 @@ Nice       Work")]
         {
             Text = text,
             Alignment = Alignment.Fill,
-            Size = new Size (width, height),
+            ConstrainToSize = new Size (width, height),
             MultiLine = true
         };
 
@@ -3349,7 +3322,7 @@ ek")]
             Text = text,
             Direction = TextDirection.TopBottom_LeftRight,
             VerticalAlignment = Alignment.Fill,
-            Size = new Size (width, height),
+            ConstrainToSize = new Size (width, height),
             MultiLine = true
         };
 
@@ -3389,8 +3362,8 @@ ek")]
             VerticalAlignment = Alignment.End
         };
 
-        tf.Width = width;
-        tf.Height = height;
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = height;
 
         tf.Draw (new (Point.Empty, new (width, height)), Attribute.Default, Attribute.Default);
         Rectangle rect = TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3449,8 +3422,8 @@ B  ")]
             Direction = TextDirection.TopBottom_LeftRight
         };
 
-        tf.Width = 5;
-        tf.Height = height;
+        tf.ConstrainToWidth = 5;
+        tf.ConstrainToHeight = height;
         tf.Draw (new (0, 0, 5, height), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3498,8 +3471,8 @@ B  ")]
             width++;
         }
 
-        tf.Width = width;
-        tf.Height = height;
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = height;
         tf.Draw (new (0, 0, 5, height), Attribute.Default, Attribute.Default);
 
         Rectangle rect = TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3527,8 +3500,8 @@ B  ")]
             Direction = TextDirection.RightLeft_TopBottom
         };
 
-        tf.Width = width;
-        tf.Height = height;
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = height;
         tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3555,8 +3528,8 @@ B  ")]
             Direction = TextDirection.RightLeft_BottomTop
         };
 
-        tf.Width = width;
-        tf.Height = height;
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = height;
         tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3583,8 +3556,8 @@ B  ")]
             Direction = TextDirection.BottomTop_LeftRight
         };
 
-        tf.Width = width;
-        tf.Height = height;
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = height;
         tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -3611,8 +3584,8 @@ B  ")]
             Direction = TextDirection.BottomTop_RightLeft
         };
 
-        tf.Width = width;
-        tf.Height = height;
+        tf.ConstrainToWidth = width;
+        tf.ConstrainToHeight = height;
         tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
@@ -7063,7 +7036,7 @@ B  ")]
             Alignment = horizontalTextAlignment,
             VerticalAlignment = alignment,
             Direction = textDirection,
-            Size = new (7, 7),
+            ConstrainToSize = new (7, 7),
             Text = text
         };
 
@@ -7217,8 +7190,8 @@ B  ")]
         TextFormatter tf = new ()
         {
             Direction = direction,
-            Width = width,
-            Height = height,
+            ConstrainToWidth = width,
+            ConstrainToHeight = height,
             Text = text
         };
         Assert.True (tf.WordWrap);
@@ -7301,7 +7274,7 @@ B  ")]
         TextFormatter tf = new ()
         {
             Direction = direction,
-            Size = new (width, height),
+            ConstrainToSize = new (width, height),
             Text = text,
             WordWrap = false
         };

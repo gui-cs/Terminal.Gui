@@ -88,27 +88,27 @@ public class DimAuto : Dim
         {
             if (dimension == Dimension.Width)
             {
-                if (us.TextFormatter.Width is null)
+                if (us.TextFormatter.ConstrainToWidth is null)
                 {
                     // Set BOTH width and height (by setting Size). We do this because we will be called again, next
                     // for Dimension.Height. We need to know the width to calculate the height.
-                    us.TextFormatter.Size = us.TextFormatter.FormatAndGetSize (new (int.Min (autoMax, screenX4), screenX4));
+                    us.TextFormatter.ConstrainToSize = us.TextFormatter.FormatAndGetSize (new (int.Min (autoMax, screenX4), screenX4));
                 }
 
-                textSize = us.TextFormatter.Width!.Value;
+                textSize = us.TextFormatter.ConstrainToWidth!.Value;
             }
             else
             {
-                if (us.TextFormatter.Height is null)
+                if (us.TextFormatter.ConstrainToHeight is null)
                 {
                     // Set just the height. It is assumed that the width has already been set.
                     // TODO: There may be cases where the width is not set. We may need to set it here.
-                    textSize = us.TextFormatter.FormatAndGetSize (new (us.TextFormatter.Width ?? screenX4, int.Min (autoMax, screenX4))).Height;
-                    us.TextFormatter.Height = textSize;
+                    textSize = us.TextFormatter.FormatAndGetSize (new (us.TextFormatter.ConstrainToWidth ?? screenX4, int.Min (autoMax, screenX4))).Height;
+                    us.TextFormatter.ConstrainToHeight = textSize;
                 }
                 else
                 {
-                    textSize = us.TextFormatter.Height.Value;
+                    textSize = us.TextFormatter.ConstrainToHeight.Value;
                 }
             }
         }

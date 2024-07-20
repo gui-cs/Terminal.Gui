@@ -479,7 +479,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
     private void SetTitleTextFormatterSize ()
     {
-        TitleTextFormatter.Size = new (
+        TitleTextFormatter.ConstrainToSize = new (
                                        TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
                                        - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
                                               ? Math.Max (HotKeySpecifier.GetColumns (), 0)

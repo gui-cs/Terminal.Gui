@@ -184,10 +184,10 @@ public class LabelTests (ITestOutputHelper output)
 
         var label = new Label { Text = "This label needs to be cleared before rewritten.", Width = tfSize.Width, Height = tfSize.Height };
 
-        var tf1 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, Size = tfSize };
+        var tf1 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, ConstrainToSize = tfSize };
         tf1.Text = "This TextFormatter (tf1) without fill will not be cleared on rewritten.";
 
-        var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, Size = tfSize, FillRemaining = true };
+        var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, ConstrainToSize = tfSize, FillRemaining = true };
         tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
 
         var top = new Toplevel ();
@@ -1201,7 +1201,7 @@ e
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
-        Assert.Equal (new (5, 1), label.TextFormatter.Size);
+        Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
         Assert.Equal (new (0, 0, 10, 4), Application.Top.Frame);
@@ -1223,7 +1223,7 @@ e
         Application.Refresh ();
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
-        Assert.Equal (new (5, 1), label.TextFormatter.Size);
+        Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Exception exception = Record.Exception (() => Assert.Single (label.TextFormatter.GetLines ()));
         Assert.Null (exception);
 
@@ -1260,7 +1260,7 @@ e
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
-        Assert.Equal (new (5, 1), label.TextFormatter.Size);
+        Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
         Assert.Equal (new (0, 0, 10, 4), Application.Top.Frame);
@@ -1282,7 +1282,7 @@ e
         Application.Refresh ();
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
-        Assert.Equal (new (5, 1), label.TextFormatter.Size);
+        Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Single (label.TextFormatter.GetLines ());
 
         expected = @"

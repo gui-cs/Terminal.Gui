@@ -936,8 +936,8 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Height = 1,
             Width = Auto ()
         };
-        Assert.Equal (expected, view.TextFormatter.Width);
-        Assert.Equal (1, view.TextFormatter.Height);
+        Assert.Equal (expected, view.TextFormatter.ConstrainToWidth);
+        Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
     }
 
     [Theory]
@@ -952,8 +952,8 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = Auto (),
             Height = 1
         };
-        Assert.Equal (expected, view.TextFormatter.Width);
-        Assert.Equal (1, view.TextFormatter.Height);
+        Assert.Equal (expected, view.TextFormatter.ConstrainToWidth);
+        Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
 
         view = new ()
         {
@@ -963,8 +963,8 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = 1,
             Height = Auto ()
         };
-        Assert.Equal (1, view.TextFormatter.Width);
-        Assert.Equal (expected, view.TextFormatter.Height);
+        Assert.Equal (1, view.TextFormatter.ConstrainToWidth);
+        Assert.Equal (expected, view.TextFormatter.ConstrainToHeight);
     }
 
     // Test variations of Frame

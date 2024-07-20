@@ -196,8 +196,8 @@ public record struct Thickness
                 Text = text,
                 Alignment = Alignment.Center,
                 VerticalAlignment = Alignment.End,
-                Width = text.GetColumns (),
-                Height = 1
+                ConstrainToWidth = text.GetColumns (),
+                ConstrainToHeight = 1
             };
             tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect);
         }

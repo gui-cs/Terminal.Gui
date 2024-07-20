@@ -165,7 +165,7 @@ public class Adornment : View
         {
             if (TextFormatter is { })
             {
-                TextFormatter.Size = Frame.Size;
+                TextFormatter.ConstrainToSize = Frame.Size;
                 TextFormatter.NeedsFormat = true;
             }
         }

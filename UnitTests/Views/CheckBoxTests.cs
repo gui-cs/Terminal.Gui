@@ -38,7 +38,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Frame.Size);
         Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Viewport.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.ConstrainToSize);
 
         checkBox.Dispose ();
     }
@@ -62,7 +62,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Frame.Size);
         Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Viewport.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.ConstrainToSize);
 
         checkBox.Dispose ();
     }
@@ -258,7 +258,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         Assert.Equal (Alignment.Center, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
-        Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
+        Assert.Equal (_size25x1, checkBox.TextFormatter.ConstrainToSize);
 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
@@ -335,10 +335,10 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         checkBox1.State = CheckState.Checked;
         Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
-        Assert.Equal (_size25x1, checkBox1.TextFormatter.Size);
+        Assert.Equal (_size25x1, checkBox1.TextFormatter.ConstrainToSize);
         checkBox2.State = CheckState.Checked;
         Assert.Equal (new (1, 2, 25, 1), checkBox2.Frame);
-        Assert.Equal (_size25x1, checkBox2.TextFormatter.Size);
+        Assert.Equal (_size25x1, checkBox2.TextFormatter.ConstrainToSize);
         Application.Refresh ();
 
         expected = @$"
@@ -376,7 +376,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         Assert.Equal (Alignment.Start, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
-        Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
+        Assert.Equal (_size25x1, checkBox.TextFormatter.ConstrainToSize);
 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
@@ -427,7 +427,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         Assert.Equal (Alignment.End, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
-        Assert.Equal (_size25x1, checkBox.TextFormatter.Size);
+        Assert.Equal (_size25x1, checkBox.TextFormatter.ConstrainToSize);
 
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐

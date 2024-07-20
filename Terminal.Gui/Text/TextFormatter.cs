@@ -21,10 +21,6 @@ public class TextFormatter
     private Alignment _textVerticalAlignment = Alignment.Start;
     private bool _wordWrap = true;
 
-    private int? _width;
-
-    private int? _height;
-
     /// <summary>Get or sets the horizontal text alignment.</summary>
     /// <value>The text alignment.</value>
     public Alignment Alignment
@@ -44,10 +40,7 @@ public class TextFormatter
     public TextDirection Direction
     {
         get => _textDirection;
-        set
-        {
-            _textDirection = EnableNeedsFormat (value);
-        }
+        set => _textDirection = EnableNeedsFormat (value);
     }
 
     /// <summary>Draws the text held by <see cref="TextFormatter"/> to <see cref="ConsoleDriver"/> using the colors specified.</summary>
@@ -450,7 +443,7 @@ public class TextFormatter
     /// </summary>
     public bool FillRemaining { get; set; }
 
-    /// <summary>Returns the formatted text, constrained to <see cref="Size"/>.</summary>
+    /// <summary>Returns the formatted text, constrained to <see cref="ConstrainToSize"/>.</summary>
     /// <remarks>
     ///     If <see cref="NeedsFormat"/> is <see langword="true"/>, causes a format, resetting <see cref="NeedsFormat"/>
     ///     to <see langword="false"/>.
@@ -469,9 +462,12 @@ public class TextFormatter
         return sb.ToString ().TrimEnd (Environment.NewLine.ToCharArray ());
     }
 
-    /// <summary>Gets the size required to hold the formatted text, given the constraints placed by <see cref="Size"/>.</summary>
+    /// <summary>Gets the size required to hold the formatted text, given the constraints placed by <see cref="ConstrainToSize"/>.</summary>
     /// <remarks>Causes a format, resetting <see cref="NeedsFormat"/> to <see langword="false"/>.</remarks>
-    /// <param name="constrainSize">If provided, will cause the text to be constrained to the provided size instead of <see cref="Width"/> and <see cref="Height"/>.</param>
+    /// <param name="constrainSize">
+    ///     If provided, will cause the text to be constrained to the provided size instead of <see cref="ConstrainToWidth"/> and
+    ///     <see cref="ConstrainToHeight"/>.
+    /// </param>
     /// <returns>The size required to hold the formatted text.</returns>
     public Size FormatAndGetSize (Size? constrainSize = null)
     {
@@ -480,13 +476,13 @@ public class TextFormatter
             return System.Drawing.Size.Empty;
         }
 
-        int? prevWidth = _width;
-        int? prevHeight = _height;
+        int? prevWidth = _constrainToWidth;
+        int? prevHeight = _constrainToHeight;
 
         if (constrainSize is { })
         {
-            _width = constrainSize?.Width;
-            _height = constrainSize?.Height;
+            _constrainToWidth = constrainSize?.Width;
+            _constrainToHeight = constrainSize?.Height;
         }
 
         // HACK: Fill normally will fill the entire constraint size, but we need to know the actual size of the text.
@@ -513,8 +509,8 @@ public class TextFormatter
 
         if (constrainSize is { })
         {
-            _width = prevWidth ?? null;
-            _height = prevHeight ?? null;
+            _constrainToWidth = prevWidth ?? null;
+            _constrainToHeight = prevHeight ?? null;
         }
 
         if (lines.Count == 0)
@@ -569,7 +565,7 @@ public class TextFormatter
                    : 0;
     }
 
-    /// <summary>Gets a list of formatted lines, constrained to <see cref="Size"/>.</summary>
+    /// <summary>Gets a list of formatted lines, constrained to <see cref="ConstrainToSize"/>.</summary>
     /// <remarks>
     ///     <para>
     ///         If the text needs to be formatted (if <see cref="NeedsFormat"/> is <see langword="true"/>)
@@ -577,14 +573,14 @@ public class TextFormatter
     ///         <see cref="NeedsFormat"/> will be <see langword="false"/>.
     ///     </para>
     ///     <para>
-    ///         If either of the dimensions of <see cref="Size"/> are zero, the text will not be formatted and no lines will
+    ///         If either of the dimensions of <see cref="ConstrainToSize"/> are zero, the text will not be formatted and no lines will
     ///         be returned.
     ///     </para>
     /// </remarks>
     public List<string> GetLines ()
     {
-        int width = _width.GetValueOrDefault ();
-        int height = _height.GetValueOrDefault ();
+        int width = _constrainToWidth.GetValueOrDefault ();
+        int height = _constrainToHeight.GetValueOrDefault ();
 
         // With this check, we protect against subclasses with overrides of Text
         if (string.IsNullOrEmpty (Text) || width == 0 || height == 0)
@@ -657,6 +653,40 @@ public class TextFormatter
         return _lines;
     }
 
+    private int? _constrainToWidth;
+
+    /// <summary>Gets or sets the width <see cref="Text"/> will be constrained to when formatted.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Does not return the width of the formatted text but the width that will be used to constrain the text when
+    ///         formatted.
+    ///     </para>
+    ///     <para>
+    ///         If <see langword="null"/> the height will be unconstrained. if both <see cref="ConstrainToWidth"/> and <see cref="ConstrainToHeight"/> are <see langword="null"/> the text will be formatted to the size of the text.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="FormatAndGetSize"/> to get the size of the formatted text.
+    ///     </para>
+    ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
+    /// </remarks>
+    public int? ConstrainToWidth
+    {
+        get => _constrainToWidth;
+        set
+        {
+            if (_constrainToWidth == value)
+            {
+                return;
+            }
+
+            ArgumentOutOfRangeException.ThrowIfNegative (value.GetValueOrDefault (), nameof (ConstrainToWidth));
+
+            _constrainToWidth = EnableNeedsFormat (value);
+        }
+    }
+
+    private int? _constrainToHeight;
+
     /// <summary>Gets or sets the height <see cref="Text"/> will be constrained to when formatted.</summary>
     /// <remarks>
     ///     <para>
@@ -664,31 +694,65 @@ public class TextFormatter
     ///         formatted.
     ///     </para>
     ///     <para>
+    ///         If <see langword="null"/> the height will be unconstrained. if both <see cref="ConstrainToWidth"/> and <see cref="ConstrainToHeight"/> are <see langword="null"/> the text will be formatted to the size of the text.
+    ///     </para>
+    ///     <para>
     ///         Use <see cref="FormatAndGetSize"/> to get the size of the formatted text.
     ///     </para>
     ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
     /// </remarks>
 
-    public int? Height
+    public int? ConstrainToHeight
     {
-        get => _height;
+        get => _constrainToHeight;
         set
         {
-            if (_height == value)
+            if (_constrainToHeight == value)
             {
                 return;
             }
 
-            ArgumentOutOfRangeException.ThrowIfNegative (value.GetValueOrDefault (), nameof (Height));
+            ArgumentOutOfRangeException.ThrowIfNegative (value.GetValueOrDefault (), nameof (ConstrainToHeight));
 
-            _height = value;
+            _constrainToHeight = EnableNeedsFormat (value);
+        }
+    }
 
-            if (_width is null || _height is null)
+    /// <summary>Gets or sets the width and height <see cref="Text"/> will be constrained to when formatted.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Does not return the size of the formatted text but the size that will be used to constrain the text when
+    ///         formatted.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="FormatAndGetSize"/> to get the size of the formatted text.
+    ///     </para>
+    ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
+    /// </remarks>
+    public Size? ConstrainToSize
+    {
+        get
+        {
+            if (_constrainToWidth is null || _constrainToHeight is null)
             {
-                return;
+                return null;
             }
 
-            _height = EnableNeedsFormat (value);
+            return new Size (_constrainToWidth.Value, _constrainToHeight.Value);
+        }
+        set
+        {
+            if (value is null)
+            {
+                _constrainToWidth = null;
+                _constrainToHeight = null;
+                EnableNeedsFormat (true);
+            }
+            else
+            {
+                _constrainToWidth = EnableNeedsFormat (value.Value.Width);
+                _constrainToHeight = EnableNeedsFormat (value.Value.Height);
+            }
         }
     }
 
@@ -751,45 +815,6 @@ public class TextFormatter
         set => _preserveTrailingSpaces = EnableNeedsFormat (value);
     }
 
-    /// <summary>Gets or sets the width and height <see cref="Text"/> will be constrained to when formatted.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Does not return the size of the formatted text but the size that will be used to constrain the text when
-    ///         formatted.
-    ///     </para>
-    ///     <para>
-    ///         Use <see cref="FormatAndGetSize"/> to get the size of the formatted text.
-    ///     </para>
-    ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
-    /// </remarks>
-    public Size? Size
-    {
-        get
-        {
-            if (_width is null || _height is null)
-            {
-                return null;
-            }
-
-            return new Size (_width.Value, _height.Value);
-        }
-        set
-        {
-            if (value is null)
-            {
-                _width = null;
-                _height = null;
-                EnableNeedsFormat (true);
-            }
-            else
-            {
-                Size size = EnableNeedsFormat (value.Value);
-                _width = size.Width;
-                _height = size.Height;
-            }
-        }
-    }
-
     /// <summary>Gets or sets the number of columns used for a tab.</summary>
     public int TabWidth
     {
@@ -812,41 +837,7 @@ public class TextFormatter
         set => _textVerticalAlignment = EnableNeedsFormat (value);
     }
 
-    /// <summary>Gets or sets the width <see cref="Text"/> will be constrained to when formatted.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Does not return the width of the formatted text but the width that will be used to constrain the text when
-    ///         formatted.
-    ///     </para>
-    ///     <para>
-    ///         Use <see cref="FormatAndGetSize"/> to get the size of the formatted text.
-    ///     </para>
-    ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
-    /// </remarks>
-    public int? Width
-    {
-        get => _width;
-        set
-        {
-            if (_width == value)
-            {
-                return;
-            }
-
-            ArgumentOutOfRangeException.ThrowIfNegative (value.GetValueOrDefault (), nameof (Width));
-
-            _width = value;
-
-            if (_width is null || _height is null)
-            {
-                return;
-            }
-
-            _width = EnableNeedsFormat (value);
-        }
-    }
-
-    /// <summary>Gets or sets whether word wrap will be used to fit <see cref="Text"/> to <see cref="Size"/>.</summary>
+    /// <summary>Gets or sets whether word wrap will be used to fit <see cref="Text"/> to <see cref="ConstrainToSize"/>.</summary>
     public bool WordWrap
     {
         get => _wordWrap;
@@ -870,48 +861,48 @@ public class TextFormatter
     public static bool IsHorizontalDirection (TextDirection textDirection)
     {
         return textDirection switch
-        {
-            TextDirection.LeftRight_TopBottom => true,
-            TextDirection.LeftRight_BottomTop => true,
-            TextDirection.RightLeft_TopBottom => true,
-            TextDirection.RightLeft_BottomTop => true,
-            _ => false
-        };
+               {
+                   TextDirection.LeftRight_TopBottom => true,
+                   TextDirection.LeftRight_BottomTop => true,
+                   TextDirection.RightLeft_TopBottom => true,
+                   TextDirection.RightLeft_BottomTop => true,
+                   _ => false
+               };
     }
 
     /// <summary>Check if it is a vertical direction</summary>
     public static bool IsVerticalDirection (TextDirection textDirection)
     {
         return textDirection switch
-        {
-            TextDirection.TopBottom_LeftRight => true,
-            TextDirection.TopBottom_RightLeft => true,
-            TextDirection.BottomTop_LeftRight => true,
-            TextDirection.BottomTop_RightLeft => true,
-            _ => false
-        };
+               {
+                   TextDirection.TopBottom_LeftRight => true,
+                   TextDirection.TopBottom_RightLeft => true,
+                   TextDirection.BottomTop_LeftRight => true,
+                   TextDirection.BottomTop_RightLeft => true,
+                   _ => false
+               };
     }
 
     /// <summary>Check if it is Left to Right direction</summary>
     public static bool IsLeftToRight (TextDirection textDirection)
     {
         return textDirection switch
-        {
-            TextDirection.LeftRight_TopBottom => true,
-            TextDirection.LeftRight_BottomTop => true,
-            _ => false
-        };
+               {
+                   TextDirection.LeftRight_TopBottom => true,
+                   TextDirection.LeftRight_BottomTop => true,
+                   _ => false
+               };
     }
 
     /// <summary>Check if it is Top to Bottom direction</summary>
     public static bool IsTopToBottom (TextDirection textDirection)
     {
         return textDirection switch
-        {
-            TextDirection.TopBottom_LeftRight => true,
-            TextDirection.TopBottom_RightLeft => true,
-            _ => false
-        };
+               {
+                   TextDirection.TopBottom_LeftRight => true,
+                   TextDirection.TopBottom_RightLeft => true,
+                   _ => false
+               };
     }
 
     // TODO: Move to StringExtensions?
@@ -1300,21 +1291,21 @@ public class TextFormatter
                     case ' ':
                         return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
                     case '\t':
+                    {
+                        length += tabWidth + 1;
+
+                        if (length == tabWidth && tabWidth > cWidth)
                         {
-                            length += tabWidth + 1;
-
-                            if (length == tabWidth && tabWidth > cWidth)
-                            {
-                                return to + 1;
-                            }
-
-                            if (length > cWidth && tabWidth > cWidth)
-                            {
-                                return to;
-                            }
-
-                            return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
+                            return to + 1;
                         }
+
+                        if (length > cWidth && tabWidth > cWidth)
+                        {
+                            return to;
+                        }
+
+                        return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
+                    }
                     default:
                         to++;
 
@@ -1323,11 +1314,11 @@ public class TextFormatter
             }
 
             return cLength switch
-            {
-                > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
-                > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
-                _ => to
-            };
+                   {
+                       > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
+                       > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
+                       _ => to
+                   };
         }
 
         if (start < text.GetRuneCount ())
@@ -1511,7 +1502,6 @@ public class TextFormatter
     {
         ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
 
-
         if (string.IsNullOrEmpty (text))
         {
             return text;
@@ -1655,7 +1645,6 @@ public class TextFormatter
     {
         ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
 
-
         List<string> lineResult = new ();
 
         if (string.IsNullOrEmpty (text) || width == 0)
@@ -1765,13 +1754,13 @@ public class TextFormatter
     private static string PerformCorrectFormatDirection (TextDirection textDirection, string line)
     {
         return textDirection switch
-        {
-            TextDirection.RightLeft_BottomTop
-                or TextDirection.RightLeft_TopBottom
-                or TextDirection.BottomTop_LeftRight
-                or TextDirection.BottomTop_RightLeft => StringExtensions.ToString (line.EnumerateRunes ().Reverse ()),
-            _ => line
-        };
+               {
+                   TextDirection.RightLeft_BottomTop
+                       or TextDirection.RightLeft_TopBottom
+                       or TextDirection.BottomTop_LeftRight
+                       or TextDirection.BottomTop_RightLeft => StringExtensions.ToString (line.EnumerateRunes ().Reverse ()),
+                   _ => line
+               };
     }
 
     private static List<Rune> PerformCorrectFormatDirection (TextDirection textDirection, List<Rune> runes)
@@ -1782,13 +1771,13 @@ public class TextFormatter
     private static List<string> PerformCorrectFormatDirection (TextDirection textDirection, List<string> lines)
     {
         return textDirection switch
-        {
-            TextDirection.TopBottom_RightLeft
-                or TextDirection.LeftRight_BottomTop
-                or TextDirection.RightLeft_BottomTop
-                or TextDirection.BottomTop_RightLeft => lines.ToArray ().Reverse ().ToList (),
-            _ => lines
-        };
+               {
+                   TextDirection.TopBottom_RightLeft
+                       or TextDirection.LeftRight_BottomTop
+                       or TextDirection.RightLeft_BottomTop
+                       or TextDirection.BottomTop_RightLeft => lines.ToArray ().Reverse ().ToList (),
+                   _ => lines
+               };
     }
 
     /// <summary>
@@ -1998,7 +1987,6 @@ public class TextFormatter
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <returns></returns>
     [Obsolete ("CalcRect is deprecated, FormatAndGetSize instead.")]
-
     internal static Rectangle CalcRect (
         int x,
         int y,

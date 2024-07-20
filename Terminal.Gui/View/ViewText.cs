@@ -158,15 +158,15 @@ public partial class View
     protected virtual void UpdateTextFormatterText ()
     {
         TextFormatter.Text = _text;
-        TextFormatter.Width = null;
-        TextFormatter.Height = null;
+        TextFormatter.ConstrainToWidth = null;
+        TextFormatter.ConstrainToHeight = null;
     }
 
     /// <summary>
     ///     Internal API. Sets <see cref="TextFormatter"/>.Width/Height.
     /// </summary>
     /// <remarks>
-    ///     Use this API to set <see cref="TextFormatter.Width"/>/Height when the view has changed such that the
+    ///     Use this API to set <see cref="Gui.TextFormatter.ConstrainToWidth"/>/Height when the view has changed such that the
     ///     size required to fit the text has changed.
     ///     changes.
     /// </remarks>
@@ -186,25 +186,25 @@ public partial class View
 
         if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
         {
-            TextFormatter.Width = null;
+            TextFormatter.ConstrainToWidth = null;
         }
         else
         {
             if (size is { })
             {
-                TextFormatter.Width = size?.Width;
+                TextFormatter.ConstrainToWidth = size?.Width;
             }
         }
 
         if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
         {
-            TextFormatter.Height = null;
+            TextFormatter.ConstrainToHeight = null;
         }
         else
         {
             if (size is { })
             {
-                TextFormatter.Height = size?.Height;
+                TextFormatter.ConstrainToHeight = size?.Height;
             }
         }
     }
@@ -227,8 +227,8 @@ public partial class View
 
         if (directionChanged)
         {
-            TextFormatter.Width = null;
-            TextFormatter.Height = null;
+            TextFormatter.ConstrainToWidth = null;
+            TextFormatter.ConstrainToHeight = null;
             OnResizeNeeded ();
         }
 

@@ -481,7 +481,7 @@ public partial class View
             _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
 
             // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
-            TextFormatter.Height = null;
+            TextFormatter.ConstrainToHeight = null;
 
             OnResizeNeeded ();
         }
@@ -530,7 +530,7 @@ public partial class View
             _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
 
             // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
-            TextFormatter.Width = null;
+            TextFormatter.ConstrainToWidth = null;
 
             OnResizeNeeded ();
         }
@@ -647,14 +647,14 @@ public partial class View
             SetNeedsDisplay ();
         }
 
-        if (TextFormatter.Width is null)
+        if (TextFormatter.ConstrainToWidth is null)
         {
-            TextFormatter.Width = GetContentSize ().Width;
+            TextFormatter.ConstrainToWidth = GetContentSize ().Width;
         }
 
-        if (TextFormatter.Height is null)
+        if (TextFormatter.ConstrainToHeight is null)
         {
-            TextFormatter.Height = GetContentSize ().Height;
+            TextFormatter.ConstrainToHeight = GetContentSize ().Height;
         }
     }
 

@@ -18,7 +18,7 @@ public class TextTests (ITestOutputHelper output)
     {
         var view = new View ();
         view.Text = text;
-        Assert.Equal (new (expectedW, expectedH), view.TextFormatter.Size);
+        Assert.Equal (new (expectedW, expectedH), view.TextFormatter.ConstrainToSize);
     }
 
     // TextFormatter.Size should track ContentSize (without DimAuto)
@@ -31,7 +31,7 @@ public class TextTests (ITestOutputHelper output)
         var view = new View ();
         view.SetContentSize (new (1, 1));
         view.Text = text;
-        Assert.Equal (new (expectedW, expectedH), view.TextFormatter.Size);
+        Assert.Equal (new (expectedW, expectedH), view.TextFormatter.ConstrainToSize);
     }
 
     [Fact]
@@ -276,9 +276,9 @@ Y
 
         view.Width = 12;
         view.Height = 1;
-        view.TextFormatter.Size = new (12, 1);
+        view.TextFormatter.ConstrainToSize = new (12, 1);
         win.LayoutSubviews ();
-        Assert.Equal (new (12, 1), view.TextFormatter.Size);
+        Assert.Equal (new (12, 1), view.TextFormatter.ConstrainToSize);
         Assert.Equal (new (0, 0, 12, 1), view.Frame);
         top.Clear ();
         view.Draw ();
@@ -420,7 +420,7 @@ Y
         Assert.Equal (5, text.Length);
 
         Assert.Equal (new (0, 0, 1, 5), view.Frame);
-        Assert.Equal (new (1, 5), view.TextFormatter.Size);
+        Assert.Equal (new (1, 5), view.TextFormatter.ConstrainToSize);
         Assert.Equal (new () { "Views" }, view.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 4, 10), win.Frame);
         Assert.Equal (new (0, 0, 4, 10), Application.Top.Frame);
@@ -448,7 +448,7 @@ Y
         Application.Refresh ();
 
         Assert.Equal (new (0, 0, 1, 5), view.Frame);
-        Assert.Equal (new (1, 5), view.TextFormatter.Size);
+        Assert.Equal (new (1, 5), view.TextFormatter.ConstrainToSize);
         Exception exception = Record.Exception (() => Assert.Single (view.TextFormatter.GetLines ()));
         Assert.Null (exception);
 
@@ -490,7 +490,7 @@ Y
 
         // Vertical text - 2 wide, 5 down
         Assert.Equal (new (0, 0, 2, 5), view.Frame);
-        Assert.Equal (new (2, 5), view.TextFormatter.Size);
+        Assert.Equal (new (2, 5), view.TextFormatter.ConstrainToSize);
         Assert.Equal (new () { "界View" }, view.TextFormatter.GetLines ());
 
         view.Draw ();
@@ -630,8 +630,8 @@ w ";
         RunState rs = Application.Begin (top);
         ((FakeDriver)Application.Driver).SetBufferSize (22, 22);
 
-        Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.Size);
-        Assert.Equal (new (2, 8), verticalView.TextFormatter.Size);
+        Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.ConstrainToSize);
+        Assert.Equal (new (2, 8), verticalView.TextFormatter.ConstrainToSize);
 
         //Assert.Equal (new (0, 0, 10, 1), horizontalView.Frame);
         //Assert.Equal (new (0, 3, 10, 9), verticalView.Frame);
@@ -785,10 +785,10 @@ w ";
 
         // frame.Width is width + border wide (20 + 2) and 6 high
         Size expectedSize = new (width, 1);
-        Assert.Equal (expectedSize, lblLeft.TextFormatter.Size);
-        Assert.Equal (expectedSize, lblCenter.TextFormatter.Size);
-        Assert.Equal (expectedSize, lblRight.TextFormatter.Size);
-        Assert.Equal (expectedSize, lblJust.TextFormatter.Size);
+        Assert.Equal (expectedSize, lblLeft.TextFormatter.ConstrainToSize);
+        Assert.Equal (expectedSize, lblCenter.TextFormatter.ConstrainToSize);
+        Assert.Equal (expectedSize, lblRight.TextFormatter.ConstrainToSize);
+        Assert.Equal (expectedSize, lblJust.TextFormatter.ConstrainToSize);
 
         Assert.Equal (new (0, 0, width + 2, 6), frame.Frame);
 
@@ -889,18 +889,18 @@ w ";
 
         if (autoSize)
         {
-            Assert.Equal (new (1, 11), lblLeft.TextFormatter.Size);
-            Assert.Equal (new (1, 11), lblCenter.TextFormatter.Size);
-            Assert.Equal (new (1, 11), lblRight.TextFormatter.Size);
-            Assert.Equal (new (1, 11), lblJust.TextFormatter.Size);
+            Assert.Equal (new (1, 11), lblLeft.TextFormatter.ConstrainToSize);
+            Assert.Equal (new (1, 11), lblCenter.TextFormatter.ConstrainToSize);
+            Assert.Equal (new (1, 11), lblRight.TextFormatter.ConstrainToSize);
+            Assert.Equal (new (1, 11), lblJust.TextFormatter.ConstrainToSize);
             Assert.Equal (new (0, 0, 9, height + 2), frame.Frame);
         }
         else
         {
-            Assert.Equal (new (1, height), lblLeft.TextFormatter.Size);
-            Assert.Equal (new (1, height), lblCenter.TextFormatter.Size);
-            Assert.Equal (new (1, height), lblRight.TextFormatter.Size);
-            Assert.Equal (new (1, height), lblJust.TextFormatter.Size);
+            Assert.Equal (new (1, height), lblLeft.TextFormatter.ConstrainToSize);
+            Assert.Equal (new (1, height), lblCenter.TextFormatter.ConstrainToSize);
+            Assert.Equal (new (1, height), lblRight.TextFormatter.ConstrainToSize);
+            Assert.Equal (new (1, height), lblJust.TextFormatter.ConstrainToSize);
             Assert.Equal (new (0, 0, 9, height + 2), frame.Frame);
         }
 
@@ -974,7 +974,7 @@ w ";
         Assert.Equal ("Hello World ", view.TextFormatter.Text);
 
         view.TextFormatter.WordWrap = true;
-        view.TextFormatter.Size = new (5, 3);
+        view.TextFormatter.ConstrainToSize = new (5, 3);
 
         view.PreserveTrailingSpaces = false;
         Assert.Equal ($"Hello{Environment.NewLine}World", view.TextFormatter.Format ());
@@ -1101,7 +1101,7 @@ w ";
         Assert.Equal (new (0, 0, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
 
-        Assert.Equal (new (10, 1), view.TextFormatter.Size);
+        Assert.Equal (new (10, 1), view.TextFormatter.ConstrainToSize);
     }
 
     [Fact]
@@ -1136,7 +1136,7 @@ w ";
         var horizontalView = new View { Width = 20, Height = 1, Text = text };
 
         // Autosize is off, so we have to explicitly set TextFormatter.Size
-        horizontalView.TextFormatter.Size = new (20, 1);
+        horizontalView.TextFormatter.ConstrainToSize = new (20, 1);
 
         var verticalView = new View
         {
@@ -1148,7 +1148,7 @@ w ";
         };
 
         // Autosize is off, so we have to explicitly set TextFormatter.Size
-        verticalView.TextFormatter.Size = new (1, 20);
+        verticalView.TextFormatter.ConstrainToSize = new (1, 20);
 
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), Text = "Window" };
         frame.Add (horizontalView, verticalView);
@@ -1204,7 +1204,7 @@ w ";
         // Autosize is off, so we have to explicitly set TextFormatter.Size
         // We know these glpyhs are 2 cols wide, so we need to widen the view
         verticalView.Width = 2;
-        verticalView.TextFormatter.Size = new (2, 20);
+        verticalView.TextFormatter.ConstrainToSize = new (2, 20);
         Assert.True (verticalView.TextFormatter.NeedsFormat);
 
         top.Draw ();
