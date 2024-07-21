@@ -1296,7 +1296,7 @@ public class TabView : View
                 {
                     if (_host.Focused == this)
                     {
-                        // if focus is the tab bar ourself then show that they can switch tabs
+                        // if focus is the tab bar itself then show that they can switch tabs
                         prevAttr = ColorScheme.HotFocus;
                     }
                     else

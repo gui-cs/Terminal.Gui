@@ -195,7 +195,7 @@ public class Wizard : Dialog
     }
 
     /// <summary>
-    ///     Raised when the user has cancelled the <see cref="Wizard"/> by pressin the Esc key. To prevent a modal (
+    ///     Raised when the user has cancelled the <see cref="Wizard"/> by pressing the Esc key. To prevent a modal (
     ///     <see cref="Wizard.Modal"/> is <c>true</c>) Wizard from closing, cancel the event by setting
     ///     <see cref="WizardButtonEventArgs.Cancel"/> to <c>true</c> before returning from the event handler.
     /// </summary>
@@ -302,7 +302,7 @@ public class Wizard : Dialog
     }
 
     /// <summary>
-    ///     Causes the wizad to move to the previous enabled step (or first step if <see cref="CurrentStep"/> is not set).
+    ///     Causes the wizard to move to the previous enabled step (or first step if <see cref="CurrentStep"/> is not set).
     ///     If there is no previous step, does nothing.
     /// </summary>
     public void GoBack ()
@@ -316,7 +316,7 @@ public class Wizard : Dialog
     }
 
     /// <summary>
-    ///     Causes the wizad to move to the next enabled step (or last step if <see cref="CurrentStep"/> is not set). If
+    ///     Causes the wizard to move to the next enabled step (or last step if <see cref="CurrentStep"/> is not set). If
     ///     there is no previous step, does nothing.
     /// </summary>
     public void GoNext ()
@@ -388,7 +388,7 @@ public class Wizard : Dialog
     ///     <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
     ///     <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides
     ///     <see cref="OnProcessKeyDown"/> to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a
-    ///     non-modal (see <see cref="Wizard.Modal"/>.
+    ///     non-modal (see <see cref="Wizard.Modal"/>).
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>

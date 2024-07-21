@@ -15,7 +15,7 @@ public class SliderOption<T>
         Data = data;
     }
 
-    /// <summary>Event fired when the an option has changed.</summary>
+    /// <summary>Event fired when an option has changed.</summary>
     public event EventHandler<SliderOptionEventArgs> Changed;
 
     /// <summary>Custom data of the option.</summary>

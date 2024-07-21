@@ -80,7 +80,7 @@ public abstract class Axis
     private string DefaultLabelGetter (AxisIncrementToRender toRender) { return toRender.Value.ToString ("N0"); }
 }
 
-/// <summary>The horizontal (x axis) of a <see cref="GraphView"/></summary>
+/// <summary>The horizontal (x-axis) of a <see cref="GraphView"/></summary>
 public class HorizontalAxis : Axis
 {
     /// <summary>
@@ -132,7 +132,7 @@ public class HorizontalAxis : Axis
         }
     }
 
-    /// <summary>Draws the horizontal x axis labels and <see cref="Axis.Increment"/> ticks</summary>
+    /// <summary>Draws the horizontal x-axis labels and <see cref="Axis.Increment"/> ticks</summary>
     public override void DrawAxisLabels (GraphView graph)
     {
         if (!Visible || Increment == 0)
@@ -180,10 +180,10 @@ public class HorizontalAxis : Axis
 
         int y = GetAxisYPosition (graph);
 
-        // start the x axis at left of screen (either 0 or margin)
+        // start the x-axis at left of screen (either 0 or margin)
         var xStart = (int)graph.MarginLeft;
 
-        // but if the x axis has a minmum (minimum is in graph space units)
+        // but if the x-axis has a minimum (minimum is in graph space units)
         if (Minimum.HasValue)
         {
             // start at the screen location of the minimum
@@ -257,7 +257,7 @@ public class HorizontalAxis : Axis
             // Not every increment has to have a label
             if (ShowLabelsEvery != 0)
             {
-                // if this increment does also needs a label
+                // if this increment also needs a label
                 if (labels++ % ShowLabelsEvery == 0)
                 {
                     toRender.Text = LabelGetter (toRender);
@@ -403,7 +403,7 @@ public class VerticalAxis : Axis
         // draw down the screen (0 is top of screen)
         // end at the bottom of the screen
 
-        //unless there is a minimum 
+        //unless there is a minimum
         if (Minimum.HasValue)
         {
             return graph.GraphSpaceToScreen (new PointF (0, Minimum.Value)).Y;

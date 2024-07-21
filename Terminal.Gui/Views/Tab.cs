@@ -5,7 +5,7 @@ public class Tab : View
 {
     private string _displayText;
 
-    /// <summary>Creates a new unamed tab with no controls inside.</summary>
+    /// <summary>Creates a new unnamed tab with no controls inside.</summary>
     public Tab ()
     {
         BorderStyle = LineStyle.Rounded;
@@ -16,7 +16,7 @@ public class Tab : View
     /// <value></value>
     public string DisplayText
     {
-        get => _displayText ?? "Unamed";
+        get => _displayText ?? "Unnamed";
         set => _displayText = value;
     }
 

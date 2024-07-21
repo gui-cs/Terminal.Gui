@@ -57,8 +57,7 @@ public partial class View
     ///     Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has focus will
     ///     invoke the <see cref="Command.HotKey"/> and <see cref="Command.Accept"/> commands. <see cref="Command.HotKey"/>
     ///     causes the view to be focused and <see cref="Command.Accept"/> does nothing. By default, the HotKey is
-    ///     automatically set to the first character of <see cref="Text"/> that is prefixed with with
-    ///     <see cref="HotKeySpecifier"/>.
+    ///     automatically set to the first character of <see cref="Text"/> that is prefixed with <see cref="HotKeySpecifier"/>.
     ///     <para>
     ///         A HotKey is a keypress that selects a visible UI item. For selecting items across <see cref="View"/>`s (e.g.a
     ///         <see cref="Button"/> in a <see cref="Dialog"/>) the keypress must include the <see cref="Key.WithAlt"/>
@@ -741,11 +740,11 @@ public partial class View
         return false;
     }
 
-    // TODO: This is a "prototype" debug check. It may be too annyoing vs. useful.
-    // TODO: A better approach would be have Application hold a list of bound Hotkeys, similar to
+    // TODO: This is a "prototype" debug check. It may be too annoying vs. useful.
+    // TODO: A better approach would be to have Application hold a list of bound Hotkeys, similar to
     // TODO: how Application holds a list of Application Scoped key bindings and then check that list.
     /// <summary>
-    /// Returns true if Key is bound in this view heirarchy. For debugging
+    /// Returns true if Key is bound in this view hierarchy. For debugging
     /// </summary>
     /// <param name="key">The key to test.</param>
     /// <param name="boundView">Returns the view the key is bound to.</param>
@@ -808,8 +807,8 @@ public partial class View
             Debug.WriteLine ($"WARNING: InvokeKeyBindings ({key}) - An Application scope binding exists for this key. The registered view will not invoke Command.{commandBinding.Commands [0]}: {boundView}.");
         }
 
-        // TODO: This is a "prototype" debug check. It may be too annyoing vs. useful.
-        // Scour the bindings up our View heirarchy
+        // TODO: This is a "prototype" debug check. It may be too annoying vs. useful.
+        // Scour the bindings up our View hierarchy
         // to ensure that the key is not already bound to a different set of commands.
         if (SuperView?.IsHotKeyKeyBound (key, out View previouslyBoundView) ?? false)
         {

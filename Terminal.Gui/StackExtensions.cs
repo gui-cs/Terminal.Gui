@@ -160,7 +160,7 @@ public static class StackExtensions
         }
     }
 
-    /// <summary>Replaces an stack object values that match with the value to replace.</summary>
+    /// <summary>Replaces a stack object values that match with the value to replace.</summary>
     /// <typeparam name="T">The stack object type.</typeparam>
     /// <param name="stack">The stack object.</param>
     /// <param name="valueToReplace">Value to replace.</param>
