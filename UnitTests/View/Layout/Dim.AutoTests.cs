@@ -926,9 +926,8 @@ public partial class DimAutoTests (ITestOutputHelper output)
 
 
     [Theory]
-    [InlineData ("1234", 4)]
-    [InlineData ("_1234", 4)]
-    public void HotKey_TextFormatter_Width_Correct (string text, int expected)
+    [CombinatorialData]
+    public void HotKey_TextFormatter_Width_Correct ([CombinatorialValues ("1234", "_1234", "1_234", "____")] string text)
     {
         View view = new ()
         {
@@ -936,14 +935,13 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Height = 1,
             Width = Auto ()
         };
-        Assert.Equal (expected, view.TextFormatter.ConstrainToWidth);
+        Assert.Equal (4, view.TextFormatter.ConstrainToWidth);
         Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
     }
 
     [Theory]
-    [InlineData ("1234", 4)]
-    [InlineData ("_1234", 4)]
-    public void HotKey_TextFormatter_Height_Correct (string text, int expected)
+    [CombinatorialData]
+    public void HotKey_TextFormatter_Height_Correct ([CombinatorialValues ("1234", "_1234", "1_234", "____")] string text)
     {
         View view = new ()
         {
@@ -952,7 +950,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = Auto (),
             Height = 1
         };
-        Assert.Equal (expected, view.TextFormatter.ConstrainToWidth);
+        Assert.Equal (4, view.TextFormatter.ConstrainToWidth);
         Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
 
         view = new ()
@@ -964,7 +962,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Height = Auto ()
         };
         Assert.Equal (1, view.TextFormatter.ConstrainToWidth);
-        Assert.Equal (expected, view.TextFormatter.ConstrainToHeight);
+        Assert.Equal (4, view.TextFormatter.ConstrainToHeight);
     }
 
     // Test variations of Frame
