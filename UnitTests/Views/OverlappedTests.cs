@@ -1015,4 +1015,191 @@ public class OverlappedTests
     {
         public Overlapped () { IsOverlappedContainer = true; }
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBindings_Command_With_OverlappedTop ()
+    {
+        Toplevel top = new ();
+        Assert.Null (Application.OverlappedTop);
+        top.IsOverlappedContainer = true;
+        Application.Begin (top);
+        Assert.Equal (Application.Top, Application.OverlappedTop);
+
+        var isRunning = true;
+
+        var win1 = new Window { Id = "win1", Width = Dim.Percent (50), Height = Dim.Fill () };
+        var lblTf1W1 = new Label { Text = "Enter text in TextField on Win1:" };
+        var tf1W1 = new TextField { X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill (), Text = "Text1 on Win1" };
+        var lblTvW1 = new Label { Y = Pos.Bottom (lblTf1W1) + 1, Text = "Enter text in TextView on Win1:" };
+
+        var tvW1 = new TextView
+        {
+            X = Pos.Left (tf1W1), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win1"
+        };
+        var lblTf2W1 = new Label { Y = Pos.Bottom (lblTvW1) + 1, Text = "Enter text in TextField on Win1:" };
+        var tf2W1 = new TextField { X = Pos.Left (tf1W1), Width = Dim.Fill (), Text = "Text2 on Win1" };
+        win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
+
+        var win2 = new Window { Id = "win2", Width = Dim.Percent (50), Height = Dim.Fill () };
+        var lblTf1W2 = new Label { Text = "Enter text in TextField on Win2:" };
+        var tf1W2 = new TextField { X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill (), Text = "Text1 on Win2" };
+        var lblTvW2 = new Label { Y = Pos.Bottom (lblTf1W2) + 1, Text = "Enter text in TextView on Win2:" };
+
+        var tvW2 = new TextView
+        {
+            X = Pos.Left (tf1W2), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win2"
+        };
+        var lblTf2W2 = new Label { Y = Pos.Bottom (lblTvW2) + 1, Text = "Enter text in TextField on Win2:" };
+        var tf2W2 = new TextField { X = Pos.Left (tf1W2), Width = Dim.Fill (), Text = "Text2 on Win2" };
+        win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
+
+        win1.Closing += (s, e) => isRunning = false;
+        Assert.Null (top.Focused);
+        Assert.Equal (top, Application.Current);
+        Assert.True (top.IsCurrentTop);
+        Assert.Equal (top, Application.OverlappedTop);
+        Application.Begin (win1);
+        Assert.Equal (new (0, 0, 40, 25), win1.Frame);
+        Assert.NotEqual (top, Application.Current);
+        Assert.False (top.IsCurrentTop);
+        Assert.Equal (win1, Application.Current);
+        Assert.True (win1.IsCurrentTop);
+        Assert.True (win1.IsOverlapped);
+        Assert.Null (top.Focused);
+        Assert.Null (top.MostFocused);
+        Assert.Equal (tf1W1, win1.MostFocused);
+        Assert.True (win1.IsOverlapped);
+        Assert.Single (Application.OverlappedChildren);
+        Application.Begin (win2);
+        Assert.Equal (new (0, 0, 40, 25), win2.Frame);
+        Assert.NotEqual (top, Application.Current);
+        Assert.False (top.IsCurrentTop);
+        Assert.Equal (win2, Application.Current);
+        Assert.True (win2.IsCurrentTop);
+        Assert.True (win2.IsOverlapped);
+        Assert.Null (top.Focused);
+        Assert.Null (top.MostFocused);
+        Assert.Equal (tf1W2, win2.MostFocused);
+        Assert.Equal (2, Application.OverlappedChildren.Count);
+
+        Application.MoveToOverlappedChild (win1);
+        Assert.Equal (win1, Application.Current);
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        win1.Running = true;
+        Assert.True (Application.OnKeyDown (Application.QuitKey));
+        Assert.False (isRunning);
+        Assert.False (win1.Running);
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+
+        Assert.True (
+                     Application.OnKeyDown (Key.Z.WithCtrl)
+                    );
+
+        Assert.True (Application.OnKeyDown (Key.F5)); // refresh
+
+        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.True (win1.IsCurrentTop);
+        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
+
+        Assert.True (
+                     Application.OnKeyDown (Key.Tab.WithShift)
+                    );
+        Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
+
+        Assert.True (
+                     Application.OnKeyDown (Key.Tab.WithCtrl)
+                    );
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf2W1, win1.MostFocused);
+        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf1W1, win1.MostFocused);
+        Assert.True (Application.OnKeyDown (Key.CursorRight));
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf1W1, win1.MostFocused);
+        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tvW1, win1.MostFocused);
+#if UNIX_KEY_BINDINGS
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.I.WithCtrl)));
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf2W1, win1.MostFocused);
+#endif
+        Assert.True (
+                     Application.OverlappedChildren [0]
+                                .NewKeyDownEvent (Key.Tab.WithShift)
+                    );
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.True (Application.OnKeyDown (Key.CursorLeft));
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf1W1, win1.MostFocused);
+        Assert.True (Application.OnKeyDown (Key.CursorUp));
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf2W1, win1.MostFocused);
+        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf1W1, win1.MostFocused);
+
+        Assert.True (
+                     Application.OverlappedChildren [0]
+                                .NewKeyDownEvent (Key.Tab.WithCtrl)
+                    );
+        Assert.Equal (win2, Application.OverlappedChildren [0]);
+        Assert.Equal (tf1W2, win2.MostFocused);
+        tf2W2.SetFocus ();
+        Assert.True (tf2W2.HasFocus);
+
+        Assert.True (
+                     Application.OverlappedChildren [0]
+                                .NewKeyDownEvent (Key.Tab.WithCtrl.WithShift)
+                    );
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf1W1, win1.MostFocused);
+        Assert.True (Application.OnKeyDown (Application.AlternateForwardKey));
+        Assert.Equal (win2, Application.OverlappedChildren [0]);
+        Assert.Equal (tf2W2, win2.MostFocused);
+        Assert.True (Application.OnKeyDown (Application.AlternateBackwardKey));
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf1W1, win1.MostFocused);
+        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tvW1, win1.MostFocused);
+#if UNIX_KEY_BINDINGS
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.B.WithCtrl)));
+#else
+        Assert.True (Application.OnKeyDown (Key.CursorLeft));
+#endif
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf1W1, win1.MostFocused);
+        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.Equal (Point.Empty, tvW1.CursorPosition);
+
+        Assert.True (
+                     Application.OverlappedChildren [0]
+                                .NewKeyDownEvent (Key.End.WithCtrl)
+                    );
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.Equal (new (16, 1), tvW1.CursorPosition);
+#if UNIX_KEY_BINDINGS
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.F.WithCtrl)));
+#else
+        Assert.True (Application.OnKeyDown (Key.CursorRight));
+#endif
+        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (tf2W1, win1.MostFocused);
+
+#if UNIX_KEY_BINDINGS
+        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.L.WithCtrl)));
+#endif
+        win2.Dispose ();
+        win1.Dispose ();
+        top.Dispose ();
+    }
 }
