@@ -579,7 +579,7 @@ public class TextFormatter
     /// </remarks>
     public List<string> GetLines ()
     {
-        string text = _text!;
+        string text = _text!.ReplaceLineEndings ();
 
         // With this check, we protect against subclasses with overrides of Text
         if (string.IsNullOrEmpty (Text) || ConstrainToWidth is 0 || ConstrainToHeight is 0)

@@ -79,21 +79,24 @@ public class UICatalogApp
     /// <returns></returns>
     public static string GetAboutBoxMessage ()
     {
-        // NOTE: Do not use verbatim string here.
+        // NOTE: Do not use multiline verbatim strings here.
         // WSL gets all confused.
         StringBuilder msg = new ();
         msg.AppendLine ("UI Catalog: A comprehensive sample library for");
         msg.AppendLine ();
-        msg.AppendLine (@" _______                  _             _   _____       _");
-        msg.AppendLine (@"|__   __|                (_)           | | / ____|     (_)");
-        msg.AppendLine (@"   | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _");
-        msg.AppendLine (@"   | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |");
-        msg.AppendLine (@"   | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |");
-        msg.AppendLine (@"   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|");
+
+        msg.AppendLine ("""
+                         _______                  _             _   _____       _ 
+                        |__   __|                (_)           | | / ____|     (_)
+                           | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ 
+                           | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |
+                           | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |
+                           |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|
+                        """);
         msg.AppendLine ();
-        msg.AppendLine (@"v2 - Pre-Alpha");
+        msg.AppendLine ("v2 - Pre-Alpha");
         msg.AppendLine ();
-        msg.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
+        msg.AppendLine ("https://github.com/gui-cs/Terminal.Gui");
 
         return msg.ToString ();
     }
