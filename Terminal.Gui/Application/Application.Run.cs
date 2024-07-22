@@ -5,6 +5,8 @@ namespace Terminal.Gui;
 
 public static partial class Application // Run (Begin, Run, End, Stop)
 {
+    // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
+    // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
     private static Toplevel _cachedRunStateToplevel;
 
     /// <summary>
@@ -484,6 +486,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                            }
                           );
     }
+
+    // TODO: Determine if this is really needed. The only code that calls WakeUp I can find
+    // is ProgressBarStyles, and it's not clear it needs to.
 
     /// <summary>Wakes up the running application that might be waiting on input.</summary>
     public static void Wakeup () { MainLoop?.Wakeup (); }

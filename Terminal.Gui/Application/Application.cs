@@ -9,13 +9,16 @@ namespace Terminal.Gui;
 /// <example>
 ///     <code>
 ///     Application.Init();
-///     var win = new Window ($"Example App ({Application.QuitKey} to quit)");
+///     var win = new Window()
+///     {
+///         Title = $"Example App ({Application.QuitKey} to quit)"
+///     };
 ///     Application.Run(win);
 ///     win.Dispose();
 ///     Application.Shutdown();
 ///     </code>
 /// </example>
-/// <remarks>TODO: Flush this out.</remarks>
+/// <remarks></remarks>
 public static partial class Application
 {
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
