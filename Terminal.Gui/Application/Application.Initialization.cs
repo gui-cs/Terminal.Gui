@@ -40,7 +40,6 @@ public static partial class Application // Initialization (Init/Shutdown)
     internal static bool _initialized;
     internal static int _mainThreadId = -1;
 
-
     // INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
     //
     // Called from:

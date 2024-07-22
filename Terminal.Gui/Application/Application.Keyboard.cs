@@ -25,6 +25,7 @@ public static partial class Application // Keyboard handling
 
     private static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
     {
+        // TODO: The fact Top has it's own AlternateForwardKey and events is needlessly complex. Remove it.
         foreach (Toplevel top in _topLevels.ToArray ())
         {
             top.OnAlternateForwardKeyChanged (e);
@@ -52,6 +53,7 @@ public static partial class Application // Keyboard handling
 
     private static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey)
     {
+        // TODO: The fact Top has it's own AlternateBackwardKey and events is needlessly complex. Remove it.
         foreach (Toplevel top in _topLevels.ToArray ())
         {
             top.OnAlternateBackwardKeyChanged (oldKey);
@@ -79,6 +81,7 @@ public static partial class Application // Keyboard handling
 
     private static void OnQuitKeyChanged (KeyChangedEventArgs e)
     {
+        // TODO: The fact Top has it's own QuitKey and events is needlessly complex. Remove it.
         // Duplicate the list so if it changes during enumeration we're safe
         foreach (Toplevel top in _topLevels.ToArray ())
         {

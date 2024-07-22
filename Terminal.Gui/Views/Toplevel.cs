@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Toplevels can run as modal (popup) views, started by calling
+///         Toplevel views can run as modal (popup) views, started by calling
 ///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. They return control to the caller when
 ///         <see cref="Application.RequestStop(Toplevel)"/> has been called (which sets the <see cref="Toplevel.Running"/>
 ///         property to <c>false</c>).
@@ -14,7 +14,7 @@ namespace Terminal.Gui;
 ///     <para>
 ///         A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init"/>.
 ///         The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created
-///         and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and call
+///         and run (e.g. <see cref="Dialog"/>s). To run a Toplevel, create the <see cref="Toplevel"/> and call
 ///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
 ///     </para>
 /// </remarks>
@@ -259,32 +259,30 @@ public partial class Toplevel : View
             return;
         }
 
-        if (NeedsDisplay || SubViewNeedsDisplay || LayoutNeeded)
+        if (NeedsDisplay || SubViewNeedsDisplay /*|| LayoutNeeded*/)
         {
-            //Driver.SetAttribute (GetNormalColor ());
-            // TODO: It's bad practice for views to always clear. Defeats the purpose of clipping etc...
             Clear ();
-            LayoutSubviews ();
-            PositionToplevels ();
+            //LayoutSubviews ();
+            //PositionToplevels ();
 
-            if (this == Application.OverlappedTop)
-            {
-                foreach (Toplevel top in Application.OverlappedChildren.AsEnumerable ().Reverse ())
-                {
-                    if (top.Frame.IntersectsWith (Viewport))
-                    {
-                        if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible)
-                        {
-                            top.SetNeedsLayout ();
-                            top.SetNeedsDisplay (top.Viewport);
-                            top.Draw ();
-                            top.OnRenderLineCanvas ();
-                        }
-                    }
-                }
-            }
+            //if (this == Application.OverlappedTop)
+            //{
+            //    foreach (Toplevel top in Application.OverlappedChildren.AsEnumerable ().Reverse ())
+            //    {
+            //        if (top.Frame.IntersectsWith (Viewport))
+            //        {
+            //            if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible)
+            //            {
+            //                top.SetNeedsLayout ();
+            //                top.SetNeedsDisplay (top.Viewport);
+            //                top.Draw ();
+            //                top.OnRenderLineCanvas ();
+            //            }
+            //        }
+            //    }
+            //}
 
-            // This should not be here, but in base
+            // BUGBUG: This appears to be a hack to get ScrollBarViews to render correctly.
             foreach (View view in Subviews)
             {
                 if (view.Frame.IntersectsWith (Viewport) && !OutsideTopFrame (this))
@@ -296,12 +294,6 @@ public partial class Toplevel : View
             }
 
             base.OnDrawContent (viewport);
-
-            // This is causing the menus drawn incorrectly if UseSubMenusSingleFrame is true
-            //if (this.MenuBar is { } && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu is { }) {
-            //	// TODO: Hack until we can get compositing working right.
-            //	this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Viewport);
-            //}
         }
     }
 
@@ -315,6 +307,9 @@ public partial class Toplevel : View
     ///     Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first
     ///     time.
     /// </summary>
+    /// <remarks>
+    ///     Overrides must call base.OnLoaded() to ensure any Toplevel subviews are initialized properly and the <see cref="Loaded"/> event is raised.
+    /// </remarks>
     public virtual void OnLoaded ()
     {
         IsLoaded = true;
