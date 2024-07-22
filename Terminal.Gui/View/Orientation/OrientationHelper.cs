@@ -7,10 +7,43 @@
 ///     <para>
 ///     Implements the standard pattern for changing/changed events.
 ///     </para>
-///     <para>
-///         Views that implement <see cref="IOrientation"/> should add a OrientationHelper property. See <see cref="RadioGroup"/> as an example.
-///     </para>
 /// </remarks>
+/// <example>
+/// <code>
+/// private class OrientedView : View, IOrientation
+/// {
+///     private readonly OrientationHelper _orientationHelper;
+/// 
+///     public OrientedView ()
+///     {
+///         _orientationHelper = new (this);
+///         Orientation = Orientation.Vertical;
+///         _orientationHelper.OrientationChanging += (sender, e) =&gt; OrientationChanging?.Invoke (this, e);
+///         _orientationHelper.OrientationChanged += (sender, e) =&gt; OrientationChanged?.Invoke (this, e);
+///     }
+/// 
+///     public Orientation Orientation
+///     {
+///         get =&gt; _orientationHelper.Orientation;
+///         set =&gt; _orientationHelper.Orientation = value;
+///     }
+/// 
+///     public event EventHandler&lt;CancelEventArgs&lt;Orientation&gt;&gt; OrientationChanging;
+///     public event EventHandler&lt;CancelEventArgs&lt;Orientation&gt;&gt; OrientationChanged;
+/// 
+///     public bool OnOrientationChanging (Orientation currentOrientation, Orientation newOrientation)
+///     {
+///        // Custom logic before orientation changes
+///        return false; // Return true to cancel the change
+///     }
+/// 
+///     public void OnOrientationChanged (Orientation oldOrientation, Orientation newOrientation)
+///     {
+///         // Custom logic after orientation has changed
+///     }
+/// }
+/// </code>
+/// </example>
 public class OrientationHelper
 {
     private Orientation _orientation = Orientation.Vertical;
