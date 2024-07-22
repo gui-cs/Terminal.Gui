@@ -380,8 +380,10 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                 break;
             case Orientation.Horizontal:
-                x = _horizontal [_cursor].pos;
-
+                if (_horizontal.Count > 0)
+                {
+                    x = _horizontal [_cursor].pos;
+                }
                 break;
 
             default:

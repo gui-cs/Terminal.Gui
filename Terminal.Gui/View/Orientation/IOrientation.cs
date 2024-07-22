@@ -20,8 +20,8 @@ public interface IOrientation
     /// <summary>
     ///     Called when <see cref="Orientation"/> is changing.
     /// </summary>
-    /// <param name="currentOrientation">The current orienation.</param>
-    /// <param name="newOrientation">The new orienation.</param>
+    /// <param name="currentOrientation">The current orientation.</param>
+    /// <param name="newOrientation">The new orientation.</param>
     /// <returns><see langword="true"/> to cancel the change.</returns>
     public bool OnOrientationChanging (Orientation currentOrientation, Orientation newOrientation) { return false; }
 
@@ -65,6 +65,11 @@ public class OrientationHelper
         get => _orientation;
         set
         {
+            if (_orientation == value)
+            {
+                return;
+            }
+
             var args = new CancelEventArgs<Orientation> (in _orientation, ref value);
             OrientationChanging?.Invoke (_owner, args);
             if (args.Cancel)
@@ -81,7 +86,11 @@ public class OrientationHelper
             if (_orientation != value)
             {
                 _orientation = value;
-                _owner.Orientation = value;
+
+                if (_owner is { })
+                {
+                    _owner.Orientation = value;
+                }
             }
 
             args = new CancelEventArgs<Orientation> (in old, ref _orientation);
