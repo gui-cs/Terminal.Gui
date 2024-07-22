@@ -44,7 +44,7 @@ public class ApplicationTests
         Toplevel top = new ();
         Application.Begin (top);
         Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
-        ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
         Assert.Equal (new (0, 0, 5, 5), Application.Top.Frame);
         top.Dispose ();
     }
@@ -134,7 +134,7 @@ public class ApplicationTests
         Application.Init (driverName: driverType.Name);
         Assert.NotNull (Application.Driver);
         Assert.NotEqual (driver, Application.Driver);
-        Assert.Equal (driverType, Application.Driver.GetType ());
+        Assert.Equal (driverType, Application.Driver?.GetType ());
         Shutdown ();
     }
 
@@ -565,8 +565,8 @@ public class ApplicationTests
         Assert.NotNull (Application.MainLoop);
 
         // FakeDriver is always 80x25
-        Assert.Equal (80, Application.Driver.Cols);
-        Assert.Equal (25, Application.Driver.Rows);
+        Assert.Equal (80, Application.Driver!.Cols);
+        Assert.Equal (25, Application.Driver!.Rows);
     }
 
     private void Pre_Init_State ()
@@ -695,7 +695,7 @@ public class ApplicationTests
         Application.ForceDriver = "FakeDriver";
 
         Application.Init ();
-        Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
+        Assert.Equal (typeof (FakeDriver), Application.Driver?.GetType ());
 
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
@@ -737,7 +737,7 @@ public class ApplicationTests
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         Application.Run<TestToplevel> ();
-        Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
+        Assert.Equal (typeof (FakeDriver), Application.Driver?.GetType ());
 
         Application.Top.Dispose ();
         Shutdown ();
@@ -888,7 +888,7 @@ public class ApplicationTests
             Width = 5, Height = 5,
             Arrangement = ViewArrangement.Movable
         };
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
         RunState rs = Application.Begin (w);
 
         // Don't use visuals to test as style of border can change over time.

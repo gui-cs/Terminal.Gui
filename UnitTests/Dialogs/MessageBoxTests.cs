@@ -125,7 +125,7 @@ public class MessageBoxTests
     public void Location_Default ()
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -243,7 +243,7 @@ public class MessageBoxTests
         int iterations = -1;
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.None;
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var btn =
             $"{
@@ -319,7 +319,7 @@ public class MessageBoxTests
         int iterations = -1;
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.None;
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var btn =
             $"{
@@ -396,7 +396,7 @@ ffffffffffffffffffff
         int iterations = -1;
         var top = new Toplevel();
         top.BorderStyle = LineStyle.None;
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var btn =
             $"{
@@ -477,7 +477,7 @@ ffffffffffffffffffff
         int iterations = -1;
         var top = new Toplevel();
         top.BorderStyle = LineStyle.None;
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var btn =
             $"{
@@ -547,7 +547,7 @@ ffffffffffffffffffff
     public void Size_Default ()
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -650,7 +650,7 @@ ffffffffffffffffffff
                 CM.Glyphs.RightBracket
             }";
 
-        ((FakeDriver)Application.Driver).SetBufferSize (40 + 4, 8);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40 + 4, 8);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -737,7 +737,7 @@ ffffffffffffffffffff
     public void Size_Not_Default_Message (int height, int width, string message)
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -774,7 +774,7 @@ ffffffffffffffffffff
     public void Size_Not_Default_Message_Button (int height, int width, string message)
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -807,7 +807,7 @@ ffffffffffffffffffff
     public void Size_Not_Default_No_Message (int height, int width)
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
                                  {

@@ -881,7 +881,7 @@ public class OverlappedTests
         var overlapped = new Overlapped ();
         var win1 = new Window { Width = 5, Height = 5, Visible = false };
         var win2 = new Window { X = 1, Y = 1, Width = 5, Height = 5 };
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
         RunState rsOverlapped = Application.Begin (overlapped);
 
         // Need to fool MainLoop into thinking it's running

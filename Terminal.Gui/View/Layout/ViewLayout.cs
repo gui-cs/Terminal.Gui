@@ -398,7 +398,7 @@ public partial class View
     ///     Either <see cref="Application.Top"/> (if <paramref name="viewToMove"/> does not have a Super View) or
     ///     <paramref name="viewToMove"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.
     /// </returns>
-    internal static View GetLocationEnsuringFullVisibility (
+    internal static View? GetLocationEnsuringFullVisibility (
         View viewToMove,
         int targetX,
         int targetY,
@@ -408,7 +408,7 @@ public partial class View
     )
     {
         int maxDimension;
-        View superView;
+        View? superView;
         statusBar = null!;
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)

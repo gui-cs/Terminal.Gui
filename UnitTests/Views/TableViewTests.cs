@@ -2196,7 +2196,7 @@ public class TableViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void TestEnumerableDataSource_BasicTypes ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize(100,100);
+        ((FakeDriver)Application.Driver!).SetBufferSize(100,100);
         var tv = new TableView ();
         tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         tv.Viewport = new (0, 0, 50, 6);

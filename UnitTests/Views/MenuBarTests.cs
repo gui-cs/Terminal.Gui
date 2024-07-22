@@ -366,7 +366,7 @@ public class MenuBarTests (ITestOutputHelper output)
         var win = new Window ();
         top.Add (win);
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 15);
 
         Assert.Equal (new (0, 0, 40, 15), win.Frame);
 
@@ -556,7 +556,7 @@ public class MenuBarTests (ITestOutputHelper output)
             Assert.Equal (items [i], menu.Menus [0].Title);
         }
 
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
         menu.OpenMenu ();
         firstIteration = false;
         Application.RunIteration (ref rsDialog, ref firstIteration);
@@ -590,9 +590,9 @@ public class MenuBarTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_A_Menu_Over_A_Top_Dialog ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 15);
 
-        Assert.Equal (new (0, 0, 40, 15), Application.Driver.Clip);
+        Assert.Equal (new (0, 0, 40, 15), Application.Driver?.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
 
         List<string> items = new ()
@@ -734,7 +734,7 @@ public class MenuBarTests (ITestOutputHelper output)
             Assert.Equal (items [i], menu.Menus [0].Title);
         }
 
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
         menu.OpenMenu ();
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -805,7 +805,7 @@ public class MenuBarTests (ITestOutputHelper output)
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver).SetBufferSize (7, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (7, 5);
         menu.OpenMenu ();
         Application.Refresh ();
 
@@ -821,7 +821,7 @@ public class MenuBarTests (ITestOutputHelper output)
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver).SetBufferSize (7, 3);
+        ((FakeDriver)Application.Driver!).SetBufferSize (7, 3);
         menu.OpenMenu ();
         Application.Refresh ();
 
@@ -878,7 +878,7 @@ wo
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver).SetBufferSize (3, 2);
+        ((FakeDriver)Application.Driver!).SetBufferSize (3, 2);
         menu.OpenMenu ();
         Application.Refresh ();
 
@@ -891,7 +891,7 @@ wo
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
-        ((FakeDriver)Application.Driver).SetBufferSize (3, 1);
+        ((FakeDriver)Application.Driver!).SetBufferSize (3, 1);
         menu.OpenMenu ();
         Application.Refresh ();
 
@@ -1519,7 +1519,7 @@ wo
         Toplevel top = new ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 8);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1630,7 +1630,7 @@ wo
 
         Application.Iteration += (s, a) =>
                                  {
-                                     ((FakeDriver)Application.Driver).SetBufferSize (40, 8);
+                                     ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
 
                                      TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                    @"
@@ -1741,7 +1741,7 @@ wo
             ]
         };
         win.Add (menu);
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 8);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
         Application.Begin (win);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1827,7 +1827,7 @@ wo
     [AutoInitShutdown]
     public void MenuBar_In_Window_Without_Other_Views_Without_Top_Init_With_Run_T ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 8);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -2758,7 +2758,7 @@ Edit
                                                       output
                                                      );
 
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
 

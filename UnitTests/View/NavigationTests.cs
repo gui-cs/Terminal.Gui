@@ -669,7 +669,7 @@ public class NavigationTests (ITestOutputHelper output)
 //        Assert.False (tfQuiting);
 //        Assert.False (topQuiting);
 
-//        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+//        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 //        Assert.False (sbQuiting);
 //        Assert.True (tfQuiting);
 //        Assert.False (topQuiting);
@@ -677,7 +677,7 @@ public class NavigationTests (ITestOutputHelper output)
 //#if BROKE_WITH_2927
 //        tf.KeyPressed -= Tf_KeyPress;
 //        tfQuiting = false;
-//        Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+//        Application.Driver?.SendKeys ('q', ConsoleKey.Q, false, false, true);
 //        Application.MainLoop.RunIteration ();
 //        Assert.True (sbQuiting);
 //        Assert.False (tfQuiting);
@@ -685,7 +685,7 @@ public class NavigationTests (ITestOutputHelper output)
 
 //        sb.RemoveItem (0);
 //        sbQuiting = false;
-//        Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+//        Application.Driver?.SendKeys ('q', ConsoleKey.Q, false, false, true);
 //        Application.MainLoop.RunIteration ();
 //        Assert.False (sbQuiting);
 //        Assert.False (tfQuiting);
@@ -733,13 +733,13 @@ public class NavigationTests (ITestOutputHelper output)
 //        Assert.False (sbQuiting);
 //        Assert.False (tfQuiting);
 
-//        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+//        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 //        Assert.False (sbQuiting);
 //        Assert.True (tfQuiting);
 
 //        tf.KeyDown -= Tf_KeyPressed;
 //        tfQuiting = false;
-//        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+//        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 //        Application.MainLoop.RunIteration ();
 //#if BROKE_WITH_2927
 //        Assert.True (sbQuiting);
@@ -834,7 +834,7 @@ public class NavigationTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
 
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
         Assert.Equal (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rectangle (0, 0, 20, 10), top.Frame);
 
@@ -984,7 +984,7 @@ public class NavigationTests (ITestOutputHelper output)
         Assert.NotEqual (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rectangle (3, 2, 20, 10), top.Frame);
 
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 20);
         Assert.Equal (new Rectangle (0, 0, 30, 20), new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows));
         Assert.NotEqual (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rectangle (3, 2, 20, 10), top.Frame);

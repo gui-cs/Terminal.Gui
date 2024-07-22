@@ -44,8 +44,8 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                              Assert.Equal ("Top1", Application.Top.Text);
                                              Assert.Equal (0, Application.Top.Frame.X);
                                              Assert.Equal (0, Application.Top.Frame.Y);
-                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Assert.Equal (Application.Driver!.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver!.Rows, Application.Top.Frame.Height);
 
                                              Application.OnKeyPressed (new (Key.CtrlMask | Key.R));
 
@@ -54,8 +54,8 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                              Assert.Equal ("Top2", Application.Top.Text);
                                              Assert.Equal (0, Application.Top.Frame.X);
                                              Assert.Equal (0, Application.Top.Frame.Y);
-                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Assert.Equal (Application.Driver!.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver!.Rows, Application.Top.Frame.Height);
 
                                              Application.OnKeyPressed (new (Key.CtrlMask | Key.C));
 
@@ -64,8 +64,8 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                              Assert.Equal ("Top1", Application.Top.Text);
                                              Assert.Equal (0, Application.Top.Frame.X);
                                              Assert.Equal (0, Application.Top.Frame.Y);
-                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Assert.Equal (Application.Driver!.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver!.Rows, Application.Top.Frame.Height);
 
                                              Application.OnKeyPressed (new (Key.CtrlMask | Key.R));
 
@@ -74,8 +74,8 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                              Assert.Equal ("Top2", Application.Top.Text);
                                              Assert.Equal (0, Application.Top.Frame.X);
                                              Assert.Equal (0, Application.Top.Frame.Y);
-                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Assert.Equal (Application.Driver!.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver!.Rows, Application.Top.Frame.Height);
 
                                              Application.OnKeyPressed (new (Key.CtrlMask | Key.C));
 
@@ -84,8 +84,8 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                              Assert.Equal ("Top1", Application.Top.Text);
                                              Assert.Equal (0, Application.Top.Frame.X);
                                              Assert.Equal (0, Application.Top.Frame.Y);
-                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Assert.Equal (Application.Driver!.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver!.Rows, Application.Top.Frame.Height);
 
                                              Application.OnKeyPressed (new (Key.CtrlMask | Key.Q));
 
@@ -675,7 +675,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
                                      if (iterations == 0)
                                      {
-                                         ((FakeDriver)Application.Driver).SetBufferSize (15, 7);
+                                         ((FakeDriver)Application.Driver!).SetBufferSize (15, 7);
 
                                          // Don't use MessageBox here; it's too complicated for this unit test; just use Window
                                          testWindow = new ()
@@ -794,7 +794,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
                                      if (iterations == 0)
                                      {
-                                         ((FakeDriver)Application.Driver).SetBufferSize (30, 10);
+                                         ((FakeDriver)Application.Driver!).SetBufferSize (30, 10);
                                      }
                                      else if (iterations == 1)
                                      {
@@ -896,10 +896,10 @@ public partial class ToplevelTests (ITestOutputHelper output)
         top.BeginInit ();
         top.EndInit ();
 
-        Exception exception = Record.Exception (() => ((FakeDriver)Application.Driver).SetBufferSize (0, 10));
+        Exception exception = Record.Exception (() => ((FakeDriver)Application.Driver!).SetBufferSize (0, 10));
         Assert.Null (exception);
 
-        exception = Record.Exception (() => ((FakeDriver)Application.Driver).SetBufferSize (10, 0));
+        exception = Record.Exception (() => ((FakeDriver)Application.Driver!).SetBufferSize (10, 0));
         Assert.Null (exception);
     }
 
@@ -1085,13 +1085,13 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Assert.True (tf.HasFocus);
         Application.PositionCursor (top);
-        Application.Driver.GetCursorVisibility (out CursorVisibility cursor);
+        Application.Driver!.GetCursorVisibility (out CursorVisibility cursor);
         Assert.Equal (CursorVisibility.Default, cursor);
 
         view.Enabled = false;
         Assert.False (tf.HasFocus);
         Application.PositionCursor (top);
-        Application.Driver.GetCursorVisibility (out cursor);
+        Application.Driver!.GetCursorVisibility (out cursor);
         Assert.Equal (CursorVisibility.Invisible, cursor);
         top.Dispose ();
     }
@@ -1209,7 +1209,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Toplevel top = new ();
         var window = new Window { Width = 20, Height = 3, Arrangement = ViewArrangement.Movable };
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 10);
         RunState rsWindow = Application.Begin (window);
         Application.Refresh ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
@@ -1232,7 +1232,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 20, 3), window.Frame);
 
         // Changes Top size to same size as Dialog more menu and scroll bar
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 3);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 3);
 
         Application.OnMouseEvent (
                                   new ()
@@ -1245,7 +1245,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 20, 3), window.Frame);
 
         // Changes Top size smaller than Dialog size
-        ((FakeDriver)Application.Driver).SetBufferSize (19, 2);
+        ((FakeDriver)Application.Driver!).SetBufferSize (19, 2);
 
         Application.OnMouseEvent (
                                   new ()
@@ -1338,7 +1338,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
     {
         Toplevel top = new ();
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 20);
 
         var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
         Assert.Equal (new (2, 1, 15, 10), testWindow.Frame);
@@ -1360,7 +1360,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         var win = new Window ();
         top.Add (win);
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 20);
 
         Assert.Equal (new (0, 0, 20, 20), win.Frame);
 
@@ -1389,8 +1389,8 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                {
                                    Assert.Equal (new (1, 3, 18, 16), viewAddedToTop.Frame);
 
-                                   Rectangle savedClip = Application.Driver.Clip;
-                                   Application.Driver.Clip = top.Frame;
+                                   Rectangle savedClip = Application.Driver!.Clip;
+                                   Application.Driver!.Clip = top.Frame;
                                    viewAddedToTop.Draw ();
                                    top.Move (2, 15);
                                    View.Driver.AddStr ("One");
@@ -1398,7 +1398,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                    View.Driver.AddStr ("Two");
                                    top.Move (2, 17);
                                    View.Driver.AddStr ("Three");
-                                   Application.Driver.Clip = savedClip;
+                                   Application.Driver!.Clip = savedClip;
 
                                    Application.Current.DrawContentComplete -= OnDrawContentComplete;
                                }

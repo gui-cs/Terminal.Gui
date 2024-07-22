@@ -97,7 +97,7 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -137,7 +137,7 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -179,7 +179,7 @@ public class LabelTests (ITestOutputHelper output)
         label.Text = "Say Hello 你";
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -414,7 +414,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -446,7 +446,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -473,7 +473,7 @@ e
         var label = new Label { BorderStyle = LineStyle.Single, Text = "Test" };
         label.BeginInit ();
         label.EndInit ();
-        label.SetRelativeLayout (Application.Driver.Screen.Size);
+        label.SetRelativeLayout (Application.Driver!.Screen.Size);
 
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
         Assert.Equal (new (0, 0, 6, 3), label.Frame);
@@ -881,7 +881,7 @@ e
         Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 10);
 
         Assert.Equal (29, label.Text.Length);
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
@@ -931,7 +931,7 @@ e
         Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 10);
 
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 40, 10), win.Frame);
@@ -1071,7 +1071,7 @@ e
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 ((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
+                                 ((FakeDriver)Application.Driver!).SetBufferSize (22, count + 4);
                                  Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1135,7 +1135,7 @@ e
     [SetupFakeDriver]
     public void Label_Height_Zero_Stays_Zero ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
         var text = "Label";
 
         var label = new Label
@@ -1223,7 +1223,7 @@ e
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 ((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
+                                 ((FakeDriver)Application.Driver!).SetBufferSize (22, count + 4);
                                  Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1299,7 +1299,7 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
@@ -1358,7 +1358,7 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);

@@ -33,7 +33,7 @@ public class ScatterSeries : ISeries
     {
         if (Fill.Color.HasValue)
         {
-            Application.Driver.SetAttribute (Fill.Color.Value);
+            Application.Driver?.SetAttribute (Fill.Color.Value);
         }
 
         foreach (PointF p in Points.Where (p => graphBounds.Contains (p)))
@@ -261,7 +261,7 @@ public class BarSeries : ISeries
 
         if (adjusted.Color.HasValue)
         {
-            Application.Driver.SetAttribute (adjusted.Color.Value);
+            Application.Driver?.SetAttribute (adjusted.Color.Value);
         }
 
         graph.DrawLine (start, end, adjusted.Rune);

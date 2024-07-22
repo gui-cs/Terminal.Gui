@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-partial class Application
+public static partial class Application // Keyboard handling
 {
     private static Key _alternateForwardKey = Key.Empty; // Defined in config.json
 

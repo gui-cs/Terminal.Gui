@@ -701,14 +701,14 @@ public class FileDialogTests (ITestOutputHelper output)
 
     private void Send (char ch, ConsoleKey ck, bool shift = false, bool alt = false, bool control = false)
     {
-        Application.Driver.SendKeys (ch, ck, shift, alt, control);
+        Application.Driver?.SendKeys (ch, ck, shift, alt, control);
     }
 
     private void Send (string chars)
     {
         foreach (char ch in chars)
         {
-            Application.Driver.SendKeys (ch, ConsoleKey.NoName, false, false, false);
+            Application.Driver?.SendKeys (ch, ConsoleKey.NoName, false, false, false);
         }
     }
 

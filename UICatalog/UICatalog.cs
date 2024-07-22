@@ -369,7 +369,7 @@ internal class UICatalogApp
     /// </summary>
     public class UICatalogTopLevel : Toplevel
     {
-        public ListView CategoryList;
+        public ListView? CategoryList;
         public MenuItem? MiForce16Colors;
         public MenuItem? MiIsMenuBorderDisabled;
         public MenuItem? MiIsMouseDisabled;
@@ -999,7 +999,7 @@ internal class UICatalogApp
                 Title = "Force _16 Colors",
                 Shortcut = (KeyCode)Key.F6,
                 Checked = Application.Force16Colors,
-                CanExecute = () => Application.Driver.SupportsTrueColor
+                CanExecute = () => Application.Driver?.SupportsTrueColor ?? false
             };
             MiForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
 

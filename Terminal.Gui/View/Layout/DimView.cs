@@ -15,7 +15,7 @@ public class DimView : Dim
     /// </summary>
     /// <param name="view">The view the dimension is anchored to.</param>
     /// <param name="dimension">Indicates which dimension is tracked.</param>
-    public DimView (View view, Dimension dimension)
+    public DimView (View? view, Dimension dimension)
     {
         Target = view;
         Dimension = dimension;
@@ -35,7 +35,7 @@ public class DimView : Dim
     /// <summary>
     ///     Gets the View the dimension is anchored to.
     /// </summary>
-    public View Target { get; init; }
+    public View? Target { get; init; }
 
     /// <inheritdoc/>
     public override string ToString ()

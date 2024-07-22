@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-partial class Application
+public static partial class Application // Mouse handling
 {
     #region Mouse handling
 
@@ -272,7 +272,7 @@ partial class Application
 
             if (view is Adornment adornmentView)
             {
-                view = adornmentView.Parent.SuperView;
+                view = adornmentView.Parent!.SuperView;
             }
             else
             {

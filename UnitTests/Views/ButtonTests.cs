@@ -224,7 +224,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
 
-        Application.Driver.ClearContents ();
+        Application.Driver?.ClearContents ();
         btn.Draw ();
 
         expected = @$"
@@ -563,7 +563,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.False (btn.IsInitialized);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
@@ -597,7 +597,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.False (btn.IsInitialized);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);

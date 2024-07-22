@@ -12,12 +12,12 @@ namespace Terminal.Gui;
 /// </remarks>
 /// <param name="view">The View the position is anchored to.</param>
 /// <param name="side">The side of the View the position is anchored to.</param>
-public class PosView (View view, Side side) : Pos
+public class PosView (View? view, Side side) : Pos
 {
     /// <summary>
     ///     Gets the View the position is anchored to.
     /// </summary>
-    public View Target { get; } = view;
+    public View? Target { get; } = view;
 
     /// <summary>
     ///     Gets the side of the View the position is anchored to.

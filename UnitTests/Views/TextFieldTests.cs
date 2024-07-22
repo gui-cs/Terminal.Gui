@@ -67,7 +67,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
             for (var i = 0; i < 16; i++)
             {
-                item += Application.Driver.Contents [0, i].Rune;
+                item += Application.Driver?.Contents [0, i].Rune;
             }
 
             return item;
@@ -164,7 +164,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         // Caption has no effect when focused
         tf.Caption = caption;
-        Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+        Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
@@ -184,7 +184,7 @@ public class TextFieldTests (ITestOutputHelper output)
         TextField tf = GetTextFieldsInView ();
 
         tf.Caption = caption;
-        Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+        Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
@@ -205,7 +205,7 @@ public class TextFieldTests (ITestOutputHelper output)
         TestHelpers.AssertDriverContentsAre ("", output);
 
         tf.Caption = "Enter txt";
-        Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+        Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
 
         // Caption should appear when not focused and no text
         Assert.False (tf.HasFocus);
@@ -234,7 +234,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.Draw ();
         TestHelpers.AssertDriverContentsAre ("", output);
 
-        Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+        Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
 
         Assert.False (tf.HasFocus);
         tf.Draw ();
@@ -347,7 +347,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         Assert.Equal (
                       "TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!",
-                      Application.Driver.Clipboard.GetClipboardData ()
+                      Application.Driver?.Clipboard.GetClipboardData ()
                      );
         Assert.Equal (string.Empty, _textField.Text);
         _textField.Paste ();
@@ -374,7 +374,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.Equal (32, _textField.CursorPosition);
         _textField.SelectAll ();
         _textField.Cut ();
-        Assert.Equal ("TAB to jump between text fields.", Application.Driver.Clipboard.GetClipboardData ());
+        Assert.Equal ("TAB to jump between text fields.", Application.Driver?.Clipboard.GetClipboardData ());
         Assert.Equal (string.Empty, _textField.Text);
         Assert.Equal (0, _textField.CursorPosition);
         _textField.Paste ();
