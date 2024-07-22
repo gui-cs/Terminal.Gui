@@ -5,11 +5,11 @@
 /// </summary>
 /// <remarks>
 ///     <para>
-///     Implements the standard pattern for changing/changed events.
+///         Implements the standard pattern for changing/changed events.
 ///     </para>
 /// </remarks>
 /// <example>
-/// <code>
+///     <code>
 /// private class OrientedView : View, IOrientation
 /// {
 ///     private readonly OrientationHelper _orientationHelper;
@@ -52,7 +52,7 @@ public class OrientationHelper
     /// <summary>
     ///     Initializes a new instance of the <see cref="OrientationHelper"/> class.
     /// </summary>
-    /// <param name="owner">Specifies the object that owns this helper instance.</param>
+    /// <param name="owner">Specifies the object that owns this helper instance and implements <see cref="IOrientation"/>.</param>
     public OrientationHelper (IOrientation owner) { _owner = owner; }
 
     /// <summary>
@@ -111,11 +111,13 @@ public class OrientationHelper
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Views that implement <see cref="IOrientation"/> should raise <see cref="IOrientation.OrientationChanging"/> after the orientation has changed
+    ///         Views that implement <see cref="IOrientation"/> should raise <see cref="IOrientation.OrientationChanging"/>
+    ///         after the orientation has changed
     ///         (<code>_orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);</code>).
     ///     </para>
     ///     <para>
-    ///         This event will be raised after the <see cref="IOrientation.OnOrientationChanging"/> method is called (assuming it was not canceled).
+    ///         This event will be raised after the <see cref="IOrientation.OnOrientationChanging"/> method is called (assuming
+    ///         it was not canceled).
     ///     </para>
     /// </remarks>
     public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
@@ -125,7 +127,8 @@ public class OrientationHelper
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Views that implement <see cref="IOrientation"/> should raise <see cref="IOrientation.OrientationChanged"/> after the orientation has changed
+    ///         Views that implement <see cref="IOrientation"/> should raise <see cref="IOrientation.OrientationChanged"/>
+    ///         after the orientation has changed
     ///         (<code>_orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);</code>).
     ///     </para>
     ///     <para>
