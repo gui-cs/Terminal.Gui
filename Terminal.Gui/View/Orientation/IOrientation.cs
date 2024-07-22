@@ -5,6 +5,9 @@ using System;
 /// <summary>
 ///     Implement this interface to provide orientation support.
 /// </summary>
+/// <remarks>
+///     See <see cref="OrientationHelper"/> for a helper class that implements this interface.
+/// </remarks>
 public interface IOrientation
 {
     /// <summary>
