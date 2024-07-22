@@ -29,7 +29,7 @@
 ///     }
 /// 
 ///     public event EventHandler&lt;CancelEventArgs&lt;Orientation&gt;&gt; OrientationChanging;
-///     public event EventHandler&lt;CancelEventArgs&lt;Orientation&gt;&gt; OrientationChanged;
+///     public event EventHandler&lt;EventArgs&lt;Orientation&gt;&gt; OrientationChanged;
 /// 
 ///     public bool OnOrientationChanging (Orientation currentOrientation, Orientation newOrientation)
 ///     {
@@ -37,7 +37,7 @@
 ///        return false; // Return true to cancel the change
 ///     }
 /// 
-///     public void OnOrientationChanged (Orientation oldOrientation, Orientation newOrientation)
+///     public void OnOrientationChanged (Orientation newOrientation)
 ///     {
 ///         // Custom logic after orientation has changed
 ///     }
@@ -98,11 +98,10 @@ public class OrientationHelper
             }
 
             // Best practice is to invoke the virtual method first.
-            _owner?.OnOrientationChanged (old, _orientation);
+            _owner?.OnOrientationChanged (_orientation);
 
             // Even though Changed is not cancelable, it is still a good practice to raise the event after.
-            args = new (in old, ref _orientation);
-            OrientationChanged?.Invoke (_owner, args);
+            OrientationChanged?.Invoke (_owner, new (in _orientation));
         }
     }
 
@@ -135,5 +134,5 @@ public class OrientationHelper
     ///         This event will be raised after the <see cref="IOrientation.OnOrientationChanged"/> method is called.
     ///     </para>
     /// </remarks>
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanged;
+    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
 }

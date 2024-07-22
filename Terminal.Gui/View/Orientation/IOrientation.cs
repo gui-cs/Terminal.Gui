@@ -29,15 +29,14 @@ public interface IOrientation
     public bool OnOrientationChanging (Orientation currentOrientation, Orientation newOrientation) { return false; }
 
     /// <summary>
-    /// 
+    ///     Raised when <see cref="Orientation"/> has changed.
     /// </summary>
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanged;
+    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
 
     /// <summary>
     ///     Called when <see cref="Orientation"/> has been changed.
     /// </summary>
-    /// <param name="oldOrientation"></param>
     /// <param name="newOrientation"></param>
     /// <returns></returns>
-    public void OnOrientationChanged (Orientation oldOrientation, Orientation newOrientation) { return; }
+    public void OnOrientationChanged (Orientation newOrientation) { return; }
 }

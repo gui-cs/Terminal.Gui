@@ -242,10 +242,10 @@ public class Slider<T> : View, IOrientation
     public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
 
     /// <inheritdoc />
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanged;
+    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
 
     /// <inheritdoc />
-    public void OnOrientationChanged (Orientation oldOrientation, Orientation newOrientation)
+    public void OnOrientationChanged (Orientation newOrientation)
     {
         _config._sliderOrientation = newOrientation;
 

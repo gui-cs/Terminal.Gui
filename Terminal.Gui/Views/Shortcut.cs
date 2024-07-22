@@ -167,12 +167,11 @@ public class Shortcut : View, IOrientation, IDesignable
     public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
 
     /// <inheritdoc/>
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanged;
+    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
-    /// <param name="oldOrientation"></param>
     /// <param name="newOrientation"></param>
-    public void OnOrientationChanged (Orientation oldOrientation, Orientation newOrientation)
+    public void OnOrientationChanged (Orientation newOrientation)
     {
         // TODO: Determine what, if anything, is opinionated about the orientation.
         SetNeedsLayout ();

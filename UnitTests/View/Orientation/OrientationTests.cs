@@ -21,7 +21,7 @@ public class OrientationTests
         }
 
         public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
-        public event EventHandler<CancelEventArgs<Orientation>> OrientationChanged;
+        public event EventHandler<EventArgs<Orientation>> OrientationChanged;
 
         public bool CancelOnOrientationChanging { get; set; }
 
@@ -35,7 +35,7 @@ public class OrientationTests
             return CancelOnOrientationChanging; // Return true to cancel the change
         }
 
-        public void OnOrientationChanged (Orientation oldOrientation, Orientation newOrientation)
+        public void OnOrientationChanged (Orientation newOrientation)
         {
             OnOrientationChangedCalled = true;
             // Custom logic after orientation has changed

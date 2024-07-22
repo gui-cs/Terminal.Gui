@@ -36,7 +36,7 @@ public class OrientationHelperTests
                         .Callback (() => onChangingOverrideCalled = true)
                         .Returns (false); // Ensure it doesn't cancel the change
 
-        mockIOrientation.Setup (x => x.OnOrientationChanged (It.IsAny<Orientation> (), It.IsAny<Orientation> ()))
+        mockIOrientation.Setup (x => x.OnOrientationChanged (It.IsAny<Orientation> ()))
                         .Callback (() => onChangedOverrideCalled = true);
 
         var orientationHelper = new OrientationHelper (mockIOrientation.Object);
