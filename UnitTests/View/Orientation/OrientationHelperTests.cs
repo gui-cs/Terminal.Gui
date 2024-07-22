@@ -17,7 +17,7 @@ public class OrientationHelperTests
         orientationHelper.OrientationChanged += (sender, e) => { changedEventInvoked = true; };
 
         // Act
-        orientationHelper.Orientation = Orientation.Horizontal;
+        orientationHelper.Orientation = Orientation.Vertical;
 
         // Assert
         Assert.True (changingEventInvoked, "OrientationChanging event was not invoked.");
@@ -42,7 +42,7 @@ public class OrientationHelperTests
         var orientationHelper = new OrientationHelper (mockIOrientation.Object);
 
         // Act
-        orientationHelper.Orientation = Orientation.Horizontal;
+        orientationHelper.Orientation = Orientation.Vertical;
 
         // Assert
         Assert.True (onChangingOverrideCalled, "OnOrientationChanging override was not called.");
@@ -55,7 +55,7 @@ public class OrientationHelperTests
         // Arrange
         Mock<IOrientation> mockIOrientation = new Mock<IOrientation> ();
         var orientationHelper = new OrientationHelper (mockIOrientation.Object);
-        orientationHelper.Orientation = Orientation.Vertical; // Set initial orientation
+        orientationHelper.Orientation = Orientation.Horizontal; // Set initial orientation
         var changingEventInvoked = false;
         var changedEventInvoked = false;
 
@@ -63,7 +63,7 @@ public class OrientationHelperTests
         orientationHelper.OrientationChanged += (sender, e) => { changedEventInvoked = true; };
 
         // Act
-        orientationHelper.Orientation = Orientation.Vertical; // Set to the same value
+        orientationHelper.Orientation = Orientation.Horizontal; // Set to the same value
 
         // Assert
         Assert.False (changingEventInvoked, "OrientationChanging event was invoked.");
@@ -79,10 +79,10 @@ public class OrientationHelperTests
         orientationHelper.OrientationChanging += (sender, e) => { e.Cancel = true; }; // Cancel the change
 
         // Act
-        orientationHelper.Orientation = Orientation.Horizontal;
+        orientationHelper.Orientation = Orientation.Vertical;
 
         // Assert
-        Assert.Equal (Orientation.Vertical, orientationHelper.Orientation); // Initial orientation is Vertical
+        Assert.Equal (Orientation.Horizontal, orientationHelper.Orientation); // Initial orientation is Horizontal
     }
 
     [Fact]
@@ -97,11 +97,11 @@ public class OrientationHelperTests
         var orientationHelper = new OrientationHelper (mockIOrientation.Object);
 
         // Act
-        orientationHelper.Orientation = Orientation.Horizontal;
+        orientationHelper.Orientation = Orientation.Vertical;
 
         // Assert
         Assert.Equal (
-                      Orientation.Vertical,
-                      orientationHelper.Orientation); // Initial orientation is Vertical, and it should remain unchanged due to cancellation
+                      Orientation.Horizontal,
+                      orientationHelper.Orientation); // Initial orientation is Horizontal, and it should remain unchanged due to cancellation
     }
 }

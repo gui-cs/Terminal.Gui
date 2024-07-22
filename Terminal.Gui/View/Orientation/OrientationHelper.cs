@@ -46,7 +46,7 @@
 /// </example>
 public class OrientationHelper
 {
-    private Orientation _orientation = Orientation.Vertical;
+    private Orientation _orientation;
     private readonly IOrientation _owner;
 
     /// <summary>
