@@ -195,7 +195,7 @@ public static partial class Application // Mouse handling
             {
                 // This occurs when there are multiple overlapped "tops"
                 // E.g. "Mdi" - in the Background Worker Scenario
-                View? top = FindDeepestTop (Top, mouseEvent.Position);
+                View? top = FindDeepestTop (Top!, mouseEvent.Position);
                 view = View.FindDeepestView (top, mouseEvent.Position);
 
                 if (view is { } && view != OverlappedTop && top != Current && top is { })

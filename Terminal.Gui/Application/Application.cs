@@ -19,7 +19,7 @@ namespace Terminal.Gui;
 public static partial class Application
 {
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
-    public static List<CultureInfo> SupportedCultures { get; private set; }
+    public static List<CultureInfo>? SupportedCultures { get; private set; }
 
     internal static List<CultureInfo> GetSupportedCultures ()
     {
@@ -257,7 +257,7 @@ public static partial class Application
 
             foreach (Toplevel? t in savedToplevels)
             {
-                if (!t.Modal && t != Current && t != top && t != savedToplevels [index])
+                if (!t!.Modal && t != Current && t != top && t != savedToplevels [index])
                 {
                     lock (_topLevels)
                     {

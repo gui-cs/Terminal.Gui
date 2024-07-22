@@ -666,7 +666,7 @@ internal class UICatalogApp
 
             MiIsMouseDisabled!.Checked = Application.IsMouseDisabled;
 
-            Application.Top.SetNeedsDisplay ();
+            Application.Top!.SetNeedsDisplay ();
         }
 
         public MenuItem []? CreateThemeMenuItems ()
@@ -835,7 +835,7 @@ internal class UICatalogApp
                                    }
 
                                    Diagnostics = _diagnosticFlags;
-                                   Application.Top.SetNeedsDisplay ();
+                                   Application.Top!.SetNeedsDisplay ();
                                };
                 menuItems.Add (item);
             }
@@ -1061,7 +1061,7 @@ internal class UICatalogApp
                                                 ShowStatusBar = StatusBar.Visible;
 
                                                 int height = StatusBar.Visible ? 1 : 0;
-                                                CategoryList.Height = Dim.Fill (height);
+                                                CategoryList!.Height = Dim.Fill (height);
                                                 ScenarioList.Height = Dim.Fill (height);
 
                                                 // ContentPane.Height = Dim.Fill (height);
@@ -1071,7 +1071,7 @@ internal class UICatalogApp
             }
 
             Loaded -= LoadedHandler;
-            CategoryList.EnsureSelectedItemVisible ();
+            CategoryList!.EnsureSelectedItemVisible ();
             ScenarioList.EnsureSelectedCellIsVisible ();
         }
 
@@ -1082,7 +1082,7 @@ internal class UICatalogApp
             if (_selectedScenario is null)
             {
                 // Save selected item state
-                _cachedCategoryIndex = CategoryList.SelectedItem;
+                _cachedCategoryIndex = CategoryList!.SelectedItem;
                 _cachedScenarioIndex = ScenarioList.SelectedRow;
 
                 // Create new instance of scenario (even though Scenarios contains instances)

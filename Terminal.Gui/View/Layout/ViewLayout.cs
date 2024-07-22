@@ -344,7 +344,7 @@ public partial class View
             if (found is { })
             {
                 start = found;
-                viewportOffset = found.Parent.Frame.Location;
+                viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
             }
 
             int startOffsetX = currentLocation.X - (start.Frame.X + viewportOffset.X);
@@ -796,7 +796,7 @@ public partial class View
                 //}
                 if (dv.Target != this)
                 {
-                    nEdges.Add ((dv.Target, from));
+                    nEdges.Add ((dv.Target!, from));
                 }
 
                 return;
@@ -819,7 +819,7 @@ public partial class View
                 //}
                 if (pv.Target != this)
                 {
-                    nEdges.Add ((pv.Target, from));
+                    nEdges.Add ((pv.Target!, from));
                 }
 
                 return;

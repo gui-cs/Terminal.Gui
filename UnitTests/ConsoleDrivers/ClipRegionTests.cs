@@ -7,12 +7,12 @@ namespace Terminal.Gui.DriverTests;
 
 public class ClipRegionTests
 {
-    private readonly ITestOutputHelper output;
+    private readonly ITestOutputHelper _output;
 
     public ClipRegionTests (ITestOutputHelper output)
     {
         ConsoleDriver.RunningUnitTests = true;
-        this.output = output;
+        this._output = output;
     }
 
     [Theory]
