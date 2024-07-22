@@ -310,17 +310,16 @@ public class Slider<T> : View
     #region Events
 
     /// <summary>
-    ///     Fired when the slider orientation has changed. Can be cancelled by setting
-    ///     <see cref="OrientationEventArgs.Cancel"/> to true.
+    ///     Fired when the slider orientation has changed. Can be cancelled.
     /// </summary>
-    public event EventHandler<OrientationEventArgs> OrientationChanged;
+    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanged;
 
     /// <summary>Called when the slider orientation has changed. Invokes the <see cref="OrientationChanged"/> event.</summary>
     /// <param name="newOrientation"></param>
     /// <returns>True of the event was cancelled.</returns>
     public virtual bool OnOrientationChanged (Orientation newOrientation)
     {
-        var args = new OrientationEventArgs (newOrientation);
+        var args = new CancelEventArgs<Orientation> (in _config._sliderOrientation, ref newOrientation);
         OrientationChanged?.Invoke (this, args);
 
         if (!args.Cancel)
