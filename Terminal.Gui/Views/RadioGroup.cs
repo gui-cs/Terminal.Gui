@@ -337,9 +337,6 @@ public class RadioGroup : View, IDesignable, IOrientation
     public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
 
     /// <inheritdoc/>
-    public bool OnOrientationChanging (Orientation currentOrientation, Orientation newOrientation) { return false; }
-
-    /// <inheritdoc/>
     public event EventHandler<CancelEventArgs<Orientation>> OrientationChanged;
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>

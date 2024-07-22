@@ -11,8 +11,10 @@ namespace Terminal.Gui;
 ///         align them in a specific order.
 ///     </para>
 /// </remarks>
-public class Bar : View
+public class Bar : View, IOrientation, IDesignable
 {
+    private readonly OrientationHelper _orientationHelper;
+
     /// <inheritdoc/>
     public Bar () : this ([]) { }
 
@@ -23,6 +25,10 @@ public class Bar : View
 
         Width = Dim.Auto ();
         Height = Dim.Auto ();
+
+        _orientationHelper = new (this);
+        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
+        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
         Initialized += Bar_Initialized;
 
@@ -46,7 +52,7 @@ public class Bar : View
         Border.LineStyle = value;
     }
 
-    private Orientation _orientation = Orientation.Horizontal;
+    #region IOrientation members
 
     /// <summary>
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Bar"/>. The default is
@@ -58,15 +64,27 @@ public class Bar : View
     ///         Vertical orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from left to right.
     ///     </para>
     /// </remarks>
+
     public Orientation Orientation
     {
-        get => _orientation;
-        set
-        {
-            _orientation = value;
-            SetNeedsLayout ();
-        }
+        get => _orientationHelper.Orientation;
+        set => _orientationHelper.Orientation = value;
     }
+
+    /// <inheritdoc/>
+    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanged;
+
+    /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
+    /// <param name="oldOrientation"></param>
+    /// <param name="newOrientation"></param>
+    public void OnOrientationChanged (Orientation oldOrientation, Orientation newOrientation)
+    {
+        SetNeedsLayout ();
+    }
+    #endregion
 
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd;
 
@@ -225,5 +243,29 @@ public class Bar : View
 
                 break;
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        var shortcut = new Shortcut
+        {
+            Text = "Quit",
+            Title = "Q_uit",
+            Key = Key.Z.WithCtrl,
+        };
+
+        Add (shortcut);
+
+        shortcut = new Shortcut
+        {
+            Text = "Help Text",
+            Title = "Help",
+            Key = Key.F1,
+        };
+
+        Add (shortcut);
+
+        return true;
     }
 }
