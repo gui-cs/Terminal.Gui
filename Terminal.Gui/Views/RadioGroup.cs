@@ -44,6 +44,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                         {
                             return false;
                         }
+
                         MoveDownRight ();
 
                         return true;
@@ -58,6 +59,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                         {
                             return false;
                         }
+
                         MoveHome ();
 
                         return true;
@@ -72,6 +74,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                         {
                             return false;
                         }
+
                         MoveEnd ();
 
                         return true;
@@ -93,6 +96,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                     ctx =>
                     {
                         SetFocus ();
+
                         if (ctx.KeyBinding?.Context is { } && (int)ctx.KeyBinding?.Context! < _radioLabels.Count)
                         {
                             SelectedItem = (int)ctx.KeyBinding?.Context!;
@@ -103,12 +107,9 @@ public class RadioGroup : View, IDesignable, IOrientation
                         return true;
                     });
 
-        _orientationHelper = new OrientationHelper (this);
+        _orientationHelper = new (this);
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
-
-        //OrientationChanging += (sender, e) => OnOrientationChanging (e.CurrentValue, e.NewValue);
-        //OrientationChanged += (sender, e) => OnOrientationChanged (e.CurrentValue, e.NewValue);
 
         SetupKeyBindings ();
 
@@ -331,16 +332,14 @@ public class RadioGroup : View, IDesignable, IOrientation
     }
 
     #region IOrientation
-    /// <inheritdoc />
+
+    /// <inheritdoc/>
     public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
 
-    /// <inheritdoc />
-    public bool OnOrientationChanging (Orientation currentOrientation, Orientation newOrientation)
-    {
-        return false;
-    }
+    /// <inheritdoc/>
+    public bool OnOrientationChanging (Orientation currentOrientation, Orientation newOrientation) { return false; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<CancelEventArgs<Orientation>> OrientationChanged;
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
@@ -351,6 +350,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         SetupKeyBindings ();
         SetContentSize ();
     }
+
     #endregion IOrientation
 
     // TODO: This should be cancelable
@@ -363,6 +363,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         {
             return;
         }
+
         _selected = selectedItem;
         SelectedItemChanged?.Invoke (this, new (selectedItem, previousSelectedItem));
     }
@@ -384,6 +385,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                 {
                     x = _horizontal [_cursor].pos;
                 }
+
                 break;
 
             default:
@@ -470,34 +472,11 @@ public class RadioGroup : View, IDesignable, IOrientation
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         RadioLabels = new [] { "Option _1", "Option _2", "Option _3" };
+
         return true;
     }
-}
-
-public class RadioGroupHorizontal : RadioGroup, IOrientation
-{
-    private bool _preventOrientationChange = false;
-    public RadioGroupHorizontal () : base ()
-    {
-        Orientation = Orientation.Horizontal;
-        _preventOrientationChange = true;
-
-        OrientationChanging += RadioGroupHorizontal_OrientationChanging;
-    }
-
-    private void RadioGroupHorizontal_OrientationChanging (object sender, CancelEventArgs<Orientation> e)
-    {
-        //e.Cancel = _preventOrientationChange;
-    }
-
-    /// <inheritdoc />
-    bool IOrientation.OnOrientationChanging (Orientation currrentOrientation, Orientation newOrientation)
-    {
-        return _preventOrientationChange;
-    }
-
 }

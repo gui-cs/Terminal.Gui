@@ -3,6 +3,14 @@
 /// <summary>
 ///     Helper class for implementing <see cref="IOrientation"/>.
 /// </summary>
+/// <remarks>
+///     <para>
+///     Implements the standard pattern for changing/changed events.
+///     </para>
+///     <para>
+///         Views that implement <see cref="IOrientation"/> should add a OrientationHelper property. See <see cref="RadioGroup"/> as an example.
+///     </para>
+/// </remarks>
 public class OrientationHelper
 {
     private Orientation _orientation = Orientation.Vertical;
@@ -11,11 +19,8 @@ public class OrientationHelper
     /// <summary>
     ///     Initializes a new instance of the <see cref="OrientationHelper"/> class.
     /// </summary>
-    /// <param name="owner"></param>
-    public OrientationHelper (IOrientation owner)
-    {
-        _owner = owner;
-    }
+    /// <param name="owner">Specifies the object that owns this helper instance.</param>
+    public OrientationHelper (IOrientation owner) { _owner = owner; }
 
     /// <summary>
     ///     Gets or sets the orientation of the View.
@@ -30,19 +35,25 @@ public class OrientationHelper
                 return;
             }
 
-            var args = new CancelEventArgs<Orientation> (in _orientation, ref value);
-            OrientationChanging?.Invoke (_owner, args);
-            if (args.Cancel)
-            {
-                return;
-            }
-
+            // Best practice is to invoke the virtual method first.
+            // This allows derived classes to handle the event and potentially cancel it.
             if (_owner?.OnOrientationChanging (value, _orientation) ?? false)
             {
                 return;
             }
 
+            // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+            CancelEventArgs<Orientation> args = new (in _orientation, ref value);
+            OrientationChanging?.Invoke (_owner, args);
+
+            if (args.Cancel)
+            {
+                return;
+            }
+
+            // If the event is not canceled, update the value.
             Orientation old = _orientation;
+
             if (_orientation != value)
             {
                 _orientation = value;
@@ -53,42 +64,40 @@ public class OrientationHelper
                 }
             }
 
-            args = new CancelEventArgs<Orientation> (in old, ref _orientation);
-            OrientationChanged?.Invoke (_owner, args);
-
+            // Best practice is to invoke the virtual method first.
             _owner?.OnOrientationChanged (old, _orientation);
+
+            // Even though Changed is not cancelable, it is still a good practice to raise the event after.
+            args = new (in old, ref _orientation);
+            OrientationChanged?.Invoke (_owner, args);
         }
     }
 
     /// <summary>
-    /// 
+    ///     Raised when the orientation is changing. This is cancelable.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Views that implement <see cref="IOrientation"/> should raise <see cref="IOrientation.OrientationChanging"/> after the orientation has changed
+    ///         (<code>_orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);</code>).
+    ///     </para>
+    ///     <para>
+    ///         This event will be raised after the <see cref="IOrientation.OnOrientationChanging"/> method is called (assuming it was not canceled).
+    ///     </para>
+    /// </remarks>
     public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
 
     /// <summary>
-    /// 
+    ///     Raised when the orientation has changed.
     /// </summary>
-    /// <param name="currentOrientation"></param>
-    /// <param name="newOrientation"></param>
-    /// <returns></returns>
-    protected bool OnOrientationChanging (Orientation currentOrientation, Orientation newOrientation)
-    {
-        return _owner?.OnOrientationChanging (currentOrientation, newOrientation) ?? false;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Views that implement <see cref="IOrientation"/> should raise <see cref="IOrientation.OrientationChanged"/> after the orientation has changed
+    ///         (<code>_orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);</code>).
+    ///     </para>
+    ///     <para>
+    ///         This event will be raised after the <see cref="IOrientation.OnOrientationChanged"/> method is called.
+    ///     </para>
+    /// </remarks>
     public event EventHandler<CancelEventArgs<Orientation>> OrientationChanged;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="oldOrientation"></param>
-    /// <param name="newOrientation"></param>
-    /// <returns></returns>
-    protected void OnOrientationChanged (Orientation oldOrientation, Orientation newOrientation)
-    {
-        _owner?.OnOrientationChanged (oldOrientation, newOrientation);
-    }
 }
