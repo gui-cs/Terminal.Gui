@@ -230,9 +230,14 @@ public static partial class Application // Keyboard handling
     ///     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
     /// </remarks>
     /// <param name="key">The key being bound.</param>
-    /// <param name="view">The view that is bound to the key.</param>
-    internal static void AddKeyBinding (Key key, View view)
+    /// <param name="view">The view that is bound to the key. If <see langword="null"/>, <see cref="Application.Current"/> will be used.</param>
+    internal static void AddKeyBinding (Key key, [CanBeNull] View view)
     {
+        if (view is null)
+        {
+            view = Current;
+        }
+
         if (!_keyBindings.ContainsKey (key))
         {
             _keyBindings [key] = [];

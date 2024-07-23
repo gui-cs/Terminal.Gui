@@ -18,7 +18,7 @@ public static partial class Application // Toplevel handling
     ///     <see cref="Toplevel"/> .
     /// </summary>
     /// <remarks>
-    ///     Only relevant in scenarios where <see cref="Toplevel.IsOverlappedContainer"/> is <see langword="true"/>.
+    ///     This will only be distinct from <see cref="Application.Top"/> in scenarios where <see cref="Toplevel.IsOverlappedContainer"/> is <see langword="true"/>.
     /// </remarks>
     /// <value>The current.</value>
     public static Toplevel Current { get; private set; }

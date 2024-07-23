@@ -577,6 +577,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             Iteration?.Invoke (null, new ());
             EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
 
+            // TODO: Overlapped - Move elsewhere
             if (state.Toplevel != Current)
             {
                 OverlappedTop?.OnDeactivate (state.Toplevel);
