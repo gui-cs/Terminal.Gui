@@ -221,6 +221,7 @@ public enum Command
     /// <summary>Pastes the current selection.</summary>
     Paste,
 
+    // TODO: IRunnable - Should be renamed QuitRunnable
     /// <summary>Quit a <see cref="Toplevel"/>.</summary>
     QuitToplevel,
 

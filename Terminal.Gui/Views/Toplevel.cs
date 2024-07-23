@@ -39,7 +39,10 @@ public partial class Toplevel : View
         MouseClick += Toplevel_MouseClick;
     }
 
-    // TODO: IRunnable: Re-implement - Modal means IRunnable, ViewArrangement.Overlapped where modalView.Z > allOtherViews.Max (v = v.Z).
+
+    #region Keyboard & Mouse
+
+    // TODO: IRunnable: Re-implement - Modal means IRunnable, ViewArrangement.Overlapped where modalView.Z > allOtherViews.Max (v = v.Z), and exclusive key/mouse input.
     /// <summary>
     ///     Determines whether the <see cref="Toplevel"/> is modal or not. If set to <c>false</c> (the default):
     ///     <list type="bullet">
@@ -62,13 +65,12 @@ public partial class Toplevel : View
     /// </summary>
     public bool Modal { get; set; }
 
-    #region Keyboard & Mouse
-
+    // TODO: Overlapped: Figure out how these keybindings should work.
     private void ConfigureKeyBindings ()
     {
         // Things this view knows how to do
         AddCommand (
-                    Command.QuitToplevel,
+                    Command.QuitToplevel,  // TODO: IRunnable: Rename to Command.Quit to make more generic.
                     () =>
                     {
                         QuitToplevel ();
@@ -77,8 +79,10 @@ public partial class Toplevel : View
                     }
                    );
 
+        /// TODO: Overlapped: Add Command.ShowHide
+        
         AddCommand (
-                    Command.Suspend,
+                    Command.Suspend,    // TODO: Move to Application
                     () =>
                     {
                         Driver.Suspend ();
@@ -89,7 +93,7 @@ public partial class Toplevel : View
                    );
 
         AddCommand (
-                    Command.NextView,
+                    Command.NextView,    // TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
                     () =>
                     {
                         MoveNextView ();
@@ -99,7 +103,7 @@ public partial class Toplevel : View
                    );
 
         AddCommand (
-                    Command.PreviousView,
+                    Command.PreviousView,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
                     () =>
                     {
                         MovePreviousView ();
@@ -109,7 +113,7 @@ public partial class Toplevel : View
                    );
 
         AddCommand (
-                    Command.NextViewOrTop,
+                    Command.NextViewOrTop,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
                     () =>
                     {
                         MoveNextViewOrTop ();
@@ -119,7 +123,7 @@ public partial class Toplevel : View
                    );
 
         AddCommand (
-                    Command.PreviousViewOrTop,
+                    Command.PreviousViewOrTop,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
                     () =>
                     {
                         MovePreviousViewOrTop ();
@@ -132,7 +136,7 @@ public partial class Toplevel : View
                     Command.Refresh,
                     () =>
                     {
-                        Application.Refresh ();
+                        Application.Refresh (); // TODO: Move to Application
 
                         return true;
                     }
@@ -525,24 +529,25 @@ public partial class Toplevel : View
             Clear ();
 
             //LayoutSubviews ();
-            //PositionToplevels ();
+            PositionToplevels ();
 
-            //if (this == Application.OverlappedTop)
-            //{
-            //    foreach (Toplevel top in Application.OverlappedChildren.AsEnumerable ().Reverse ())
-            //    {
-            //        if (top.Frame.IntersectsWith (Viewport))
-            //        {
-            //            if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible)
-            //            {
-            //                top.SetNeedsLayout ();
-            //                top.SetNeedsDisplay (top.Viewport);
-            //                top.Draw ();
-            //                top.OnRenderLineCanvas ();
-            //            }
-            //        }
-            //    }
-            //}
+            if (this == Application.OverlappedTop)
+            {
+                // This enables correct draw behavior when switching between overlapped subviews
+                foreach (Toplevel top in Application.OverlappedChildren.AsEnumerable ().Reverse ())
+                {
+                    if (top.Frame.IntersectsWith (Viewport))
+                    {
+                        if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible)
+                        {
+                            top.SetNeedsLayout ();
+                            top.SetNeedsDisplay (top.Viewport);
+                            top.Draw ();
+                            top.OnRenderLineCanvas ();
+                        }
+                    }
+                }
+            }
 
             // BUGBUG: This appears to be a hack to get ScrollBarViews to render correctly.
             foreach (View view in Subviews)
