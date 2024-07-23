@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿#nullable enable
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
@@ -140,7 +141,7 @@ public static partial class Application // Keyboard handling
 
         // Invoke any global (Application-scoped) KeyBindings.
         // The first view that handles the key will stop the loop.
-        foreach (KeyValuePair<Key, List<View>> binding in _keyBindings.Where (b => b.Key == keyEvent.KeyCode))
+        foreach (KeyValuePair<Key, List<View?>> binding in _keyBindings.Where (b => b.Key == keyEvent.KeyCode))
         {
             foreach (View view in binding.Value)
             {
@@ -154,7 +155,6 @@ public static partial class Application // Keyboard handling
                     {
                         return true;
                     }
-
                 }
             }
         }
@@ -216,12 +216,12 @@ public static partial class Application // Keyboard handling
     /// <summary>
     ///     The <see cref="KeyBindingScope.Application"/> key bindings.
     /// </summary>
-    private static readonly Dictionary<Key, List<View>> _keyBindings = new ();
+    private static readonly Dictionary<Key, List<View?>> _keyBindings = new ();
 
     /// <summary>
     /// Gets the list of <see cref="KeyBindingScope.Application"/> key bindings.
     /// </summary>
-    public static Dictionary<Key, List<View>> GetKeyBindings () { return _keyBindings; }
+    public static Dictionary<Key, List<View?>> GetKeyBindings () { return _keyBindings; }
 
     /// <summary>
     ///     Adds an  <see cref="KeyBindingScope.Application"/> scoped key binding.
@@ -231,19 +231,43 @@ public static partial class Application // Keyboard handling
     /// </remarks>
     /// <param name="key">The key being bound.</param>
     /// <param name="view">The view that is bound to the key. If <see langword="null"/>, <see cref="Application.Current"/> will be used.</param>
-    internal static void AddKeyBinding (Key key, [CanBeNull] View view)
+    internal static void AddKeyBinding (Key key, View? view)
     {
-        if (view is null)
-        {
-            view = Current;
-        }
-
         if (!_keyBindings.ContainsKey (key))
         {
             _keyBindings [key] = [];
         }
 
         _keyBindings [key].Add (view);
+    }
+
+    internal static void AddToplevelKeyBindings ()
+    {
+//        // Default keybindings for this view
+//        AddKeyBinding (Application.QuitKey, null);
+//        AddKeyBinding (Key.CursorRight, null);
+//        AddKeyBinding (Key.CursorDown, null);
+//        AddKeyBinding (Key.CursorLeft, null);
+//        AddKeyBinding (Key.CursorUp, null);
+//        AddKeyBinding (Key.Tab, null);
+//        AddKeyBinding (Key.Tab.WithShift, null);
+//        AddKeyBinding (Key.Tab.WithCtrl, null);
+//        AddKeyBinding (Key.Tab.WithShift.WithCtrl, null);
+//        AddKeyBinding (Key.F5, null);
+//        AddKeyBinding (Application.AlternateForwardKey, null); // Needed on Unix
+//        AddKeyBinding (Application.AlternateBackwardKey, null); // Needed on Unix
+
+//        if (Environment.OSVersion.Platform == PlatformID.Unix)
+//        {
+//            AddKeyBinding (Key.Z.WithCtrl, null);
+//        }
+
+//#if UNIX_KEY_BINDINGS
+//        KeyBindings.Add (Key.L.WithCtrl, Command.Refresh); // Unix
+//        KeyBindings.Add (Key.F.WithCtrl, Command.NextView); // Unix
+//        KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
+//        KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView); // Unix
+//#endif
     }
 
     /// <summary>

@@ -80,7 +80,7 @@ public partial class Toplevel : View
                    );
 
         /// TODO: Overlapped: Add Command.ShowHide
-        
+
         AddCommand (
                     Command.Suspend,    // TODO: Move to Application
                     () =>
@@ -566,7 +566,7 @@ public partial class Toplevel : View
 
     #endregion
 
-    #region Focus
+    #region Navigation
 
     /// <inheritdoc/>
     public override bool OnEnter (View view) { return MostFocused?.OnEnter (view) ?? base.OnEnter (view); }
@@ -574,9 +574,14 @@ public partial class Toplevel : View
     /// <inheritdoc/>
     public override bool OnLeave (View view) { return MostFocused?.OnLeave (view) ?? base.OnLeave (view); }
 
-    private void FocusNearestView (IEnumerable<View> views, NavigationDirection direction)
+    /// <summary>
+    ///    Sets the focus to the next view in the <see cref="TabIndexes"/> list. If the last view is focused, the first view is focused.
+    /// </summary>
+    /// <param name="viewsInTabIndexes"></param>
+    /// <param name="direction"></param>
+    private void FocusNearestView (IEnumerable<View> viewsInTabIndexes, NavigationDirection direction)
     {
-        if (views is null)
+        if (viewsInTabIndexes is null)
         {
             return;
         }
@@ -585,7 +590,7 @@ public partial class Toplevel : View
         var focusProcessed = false;
         var idx = 0;
 
-        foreach (View v in views)
+        foreach (View v in viewsInTabIndexes)
         {
             if (v == this)
             {
@@ -610,15 +615,20 @@ public partial class Toplevel : View
                     return;
                 }
             }
-            else if (found && !focusProcessed && idx == views.Count () - 1)
+            else if (found && !focusProcessed && idx == viewsInTabIndexes.Count () - 1)
             {
-                views.ToList () [0].SetFocus ();
+                viewsInTabIndexes.ToList () [0].SetFocus ();
             }
 
             idx++;
         }
     }
 
+    /// <summary>
+    ///    Gets the deepest focused subview of the specified <paramref name="view"/>.
+    /// </summary>
+    /// <param name="view"></param>
+    /// <returns></returns>
     private View GetDeepestFocusedSubview (View view)
     {
         if (view is null)
@@ -637,6 +647,9 @@ public partial class Toplevel : View
         return view;
     }
 
+    /// <summary>
+    ///     Moves the focus to 
+    /// </summary>
     private void MoveNextView ()
     {
         View old = GetDeepestFocusedSubview (Focused);

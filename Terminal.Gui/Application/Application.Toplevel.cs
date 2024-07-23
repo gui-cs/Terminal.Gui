@@ -1,10 +1,10 @@
+#nullable enable
 namespace Terminal.Gui;
 
 public static partial class Application // Toplevel handling
 {
-    /// <summary>Holds the stack of TopLevel views.</summary>
-
     // BUGBUG: Technically, this is not the full lst of TopLevels. There be dragons here, e.g. see how Toplevel.Id is used. What
+    /// <summary>Holds the stack of TopLevel views.</summary>
     // about TopLevels that are just a SubView of another View?
     internal static readonly Stack<Toplevel> _topLevels = new ();
 
@@ -12,6 +12,7 @@ public static partial class Application // Toplevel handling
     /// <value>The top.</value>
     public static Toplevel Top { get; private set; }
 
+    // TODO: Determine why this can't just return _topLevels.Peek()?
     /// <summary>
     ///     The current <see cref="Toplevel"/> object. This is updated in <see cref="Application.Begin"/> enters and leaves to
     ///     point to the current
@@ -23,6 +24,9 @@ public static partial class Application // Toplevel handling
     /// <value>The current.</value>
     public static Toplevel Current { get; private set; }
 
+    /// <summary>
+    ///     If <paramref name="topLevel"/> is not already Current and visible, finds the last Modal Toplevel in the stack and makes it Current.
+    /// </summary>
     private static void EnsureModalOrVisibleAlwaysOnTop (Toplevel topLevel)
     {
         if (!topLevel.Running
@@ -49,6 +53,12 @@ public static partial class Application // Toplevel handling
         }
     }
 
+    /// <summary>
+    ///    Finds the first Toplevel in the stack that is Visible and who's Frame contains the <paramref name="location"/>.
+    /// </summary>
+    /// <param name="start"></param>
+    /// <param name="location"></param>
+    /// <returns></returns>
     private static Toplevel FindDeepestTop (Toplevel start, in Point location)
     {
         if (!start.Frame.Contains (location))
@@ -78,6 +88,9 @@ public static partial class Application // Toplevel handling
         return start;
     }
 
+    /// <summary>
+    /// Given <paramref name="view"/>, returns the first Superview up the chain that is <see cref="Top"/>.
+    /// </summary>
     private static View FindTopFromView (View view)
     {
         View top = view?.SuperView is { } && view?.SuperView != Top
@@ -92,6 +105,11 @@ public static partial class Application // Toplevel handling
         return top;
     }
 
+    /// <summary>
+    ///    If the <see cref="Current"/> is not the <paramref name="top"/> then <paramref name="top"/> is moved to the top of the Toplevel stack and made Current.
+    /// </summary>
+    /// <param name="top"></param>
+    /// <returns></returns>
     private static bool MoveCurrent (Toplevel top)
     {
         // The Current is modal and the top is not modal Toplevel then

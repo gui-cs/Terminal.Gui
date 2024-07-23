@@ -627,7 +627,7 @@ public partial class View
         }
     }
 
-    /// <summary>Causes the specified view and the entire parent hierarchy to have the focused order updated.</summary>
+    /// <summary>Causes this view to be focused and entire Superview hierarchy to have the focused order updated.</summary>
     public void SetFocus ()
     {
         if (!CanBeVisible (this) || !Enabled)
@@ -651,7 +651,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Finds the first view in the hierarchy that wants to get the focus if nothing is currently focused, otherwise,
+    ///     If there is no focused subview, calls <see cref="FocusFirst"/> or <see cref="FocusLast"/> based on <see cref="FocusDirection"/>. 
     ///     does nothing.
     /// </summary>
     public void EnsureFocus ()
@@ -669,7 +669,9 @@ public partial class View
         }
     }
 
-    /// <summary>Focuses the first focusable subview if one exists.</summary>
+    /// <summary>
+    ///     Focuses the last focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in <see cref="View.TabIndexes"/> then the focus is set to the view itself.
+    /// </summary>
     public void FocusFirst ()
     {
         if (!CanBeVisible (this))
@@ -695,7 +697,9 @@ public partial class View
         }
     }
 
-    /// <summary>Focuses the last focusable subview if one exists.</summary>
+    /// <summary>
+    ///     Focuses the last focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in <see cref="View.TabIndexes"/> then the focus is set to the view itself.
+    /// </summary>
     public void FocusLast ()
     {
         if (!CanBeVisible (this))
@@ -725,7 +729,9 @@ public partial class View
         }
     }
 
-    /// <summary>Focuses the previous view.</summary>
+    /// <summary>
+    ///     Focuses the previous view in <see cref="View.TabIndexes"/>. If there is no previous view, the focus is set to the view itself.
+    /// </summary>
     /// <returns><see langword="true"/> if previous was focused, <see langword="false"/> otherwise.</returns>
     public bool FocusPrev ()
     {
@@ -736,7 +742,7 @@ public partial class View
 
         FocusDirection = NavigationDirection.Backward;
 
-        if (_tabIndexes is null || _tabIndexes.Count == 0)
+        if (TabIndexes is null || TabIndexes.Count == 0)
         {
             return false;
         }
@@ -750,10 +756,10 @@ public partial class View
 
         int focusedIdx = -1;
 
-        for (int i = _tabIndexes.Count; i > 0;)
+        for (int i = TabIndexes.Count; i > 0;)
         {
             i--;
-            View w = _tabIndexes [i];
+            View w = TabIndexes [i];
 
             if (w.HasFocus)
             {
@@ -791,7 +797,9 @@ public partial class View
         return false;
     }
 
-    /// <summary>Focuses the next view.</summary>
+    /// <summary>
+    ///     Focuses the previous view in <see cref="View.TabIndexes"/>. If there is no previous view, the focus is set to the view itself.
+    /// </summary>
     /// <returns><see langword="true"/> if next was focused, <see langword="false"/> otherwise.</returns>
     public bool FocusNext ()
     {
@@ -802,7 +810,7 @@ public partial class View
 
         FocusDirection = NavigationDirection.Forward;
 
-        if (_tabIndexes is null || _tabIndexes.Count == 0)
+        if (TabIndexes is null || TabIndexes.Count == 0)
         {
             return false;
         }
@@ -816,9 +824,9 @@ public partial class View
 
         int focusedIdx = -1;
 
-        for (var i = 0; i < _tabIndexes.Count; i++)
+        for (var i = 0; i < TabIndexes.Count; i++)
         {
-            View w = _tabIndexes [i];
+            View w = TabIndexes [i];
 
             if (w.HasFocus)
             {

@@ -1,5 +1,5 @@
-﻿namespace Terminal.Gui;
-
+﻿#nullable enable
+namespace Terminal.Gui;
 public static partial class Application // Mouse handling
 {
     #region Mouse handling

@@ -1,3 +1,4 @@
+#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -87,6 +88,8 @@ public static partial class Application // Initialization (Init/Shutdown)
         // Don't reset, so we can inherit the theme from the previous run.
         Load ();
         Apply ();
+
+        AddToplevelKeyBindings ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
         if (!string.IsNullOrEmpty (driverName))
