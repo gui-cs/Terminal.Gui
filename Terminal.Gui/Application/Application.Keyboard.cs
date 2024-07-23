@@ -144,7 +144,8 @@ public static partial class Application // Keyboard handling
         {
             foreach (View view in binding.Value)
             {
-                if (view is {} && view.KeyBindings.TryGet (binding.Key, (KeyBindingScope)0xFFFF, out KeyBinding kb))
+                if (view is { }
+                    && view.KeyBindings.TryGet (binding.Key, KeyBindingScope.Focused | KeyBindingScope.HotKey | KeyBindingScope.Application, out KeyBinding kb))
                 {
                     //bool? handled = view.InvokeCommands (kb.Commands, binding.Key, kb);
                     bool? handled = view?.OnInvokingKeyBindings (keyEvent, kb.Scope);
