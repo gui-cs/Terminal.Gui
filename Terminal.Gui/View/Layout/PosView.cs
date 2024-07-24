@@ -47,10 +47,10 @@ public class PosView (View? view, Side side) : Pos
     {
         return Side switch
                {
-                   Side.Left => Target.Frame.X,
-                   Side.Top => Target.Frame.Y,
-                   Side.Right => Target.Frame.Right,
-                   Side.Bottom => Target.Frame.Bottom,
+                   Side.Left => Target!.Frame.X,
+                   Side.Top => Target!.Frame.Y,
+                   Side.Right => Target!.Frame.Right,
+                   Side.Bottom => Target!.Frame.Bottom,
                    _ => 0
                };
     }

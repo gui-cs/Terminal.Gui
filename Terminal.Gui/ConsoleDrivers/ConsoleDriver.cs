@@ -351,7 +351,7 @@ public abstract class ConsoleDriver
                 {
                     Contents [row, c].IsDirty = true;
                 }
-                _dirtyLines [row] = true;
+                _dirtyLines! [row] = true;
             }
         }
     }
@@ -380,7 +380,7 @@ public abstract class ConsoleDriver
                         Rune = (rune != default ? rune : (Rune)' '),
                         Attribute = CurrentAttribute, IsDirty = true
                     };
-                    _dirtyLines [r] = true;
+                    _dirtyLines! [r] = true;
                 }
             }
         }
@@ -561,7 +561,7 @@ public abstract class ConsoleDriver
     #region Mouse and Keyboard
 
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.</summary>
-    public event EventHandler<Key> KeyDown;
+    public event EventHandler<Key>? KeyDown;
 
     /// <summary>
     ///     Called when a key is pressed down. Fires the <see cref="KeyDown"/> event. This is a precursor to
@@ -575,7 +575,7 @@ public abstract class ConsoleDriver
     ///     Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is
     ///     complete.
     /// </remarks>
-    public event EventHandler<Key> KeyUp;
+    public event EventHandler<Key>? KeyUp;
 
     /// <summary>Called when a key is released. Fires the <see cref="KeyUp"/> event.</summary>
     /// <remarks>
@@ -586,7 +586,7 @@ public abstract class ConsoleDriver
     public void OnKeyUp (Key a) { KeyUp?.Invoke (this, a); }
 
     /// <summary>Event fired when a mouse event occurs.</summary>
-    public event EventHandler<MouseEvent> MouseEvent;
+    public event EventHandler<MouseEvent>? MouseEvent;
 
     /// <summary>Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.</summary>
     /// <param name="a"></param>

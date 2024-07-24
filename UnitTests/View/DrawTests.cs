@@ -48,16 +48,16 @@ public class DrawTests (ITestOutputHelper _output)
         view.Draw ();
 
         // Only valid location w/in Viewport is 0, 0 (view) - 2, 2 (screen)
-        Assert.Equal ((Rune)' ', Application.Driver?.Contents [2, 2].Rune);
+        Assert.Equal ((Rune)' ', Application.Driver?.Contents! [2, 2].Rune);
 
         view.AddRune (0, 0, Rune.ReplacementChar);
-        Assert.Equal (Rune.ReplacementChar, Application.Driver?.Contents [2, 2].Rune);
+        Assert.Equal (Rune.ReplacementChar, Application.Driver?.Contents! [2, 2].Rune);
 
         view.AddRune (-1, -1, Rune.ReplacementChar);
-        Assert.Equal ((Rune)'M', Application.Driver?.Contents [1, 1].Rune);
+        Assert.Equal ((Rune)'M', Application.Driver?.Contents! [1, 1].Rune);
 
         view.AddRune (1, 1, Rune.ReplacementChar);
-        Assert.Equal ((Rune)'M', Application.Driver?.Contents [3, 3].Rune);
+        Assert.Equal ((Rune)'M', Application.Driver?.Contents! [3, 3].Rune);
 
         View.Diagnostics = ViewDiagnosticFlags.Off;
     }

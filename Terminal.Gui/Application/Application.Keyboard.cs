@@ -110,7 +110,7 @@ public static partial class Application // Keyboard handling
     /// <returns><see langword="true"/> if the key was handled.</returns>
     public static bool OnKeyDown (Key keyEvent)
     {
-        if (!_initialized)
+        if (!IsInitialized)
         {
             return true;
         }
@@ -210,7 +210,7 @@ public static partial class Application // Keyboard handling
     /// <returns><see langword="true"/> if the key was handled.</returns>
     public static bool OnKeyUp (Key a)
     {
-        if (!_initialized)
+        if (!IsInitialized)
         {
             return true;
         }

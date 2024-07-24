@@ -257,7 +257,7 @@ public abstract class Dim
         }
 
         var newDim = new DimCombine (AddOrSubtract.Subtract, left, right);
-        (left as DimView)?.Target.SetNeedsLayout ();
+        (left as DimView)?.Target?.SetNeedsLayout ();
 
         return newDim;
     }

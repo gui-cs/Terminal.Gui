@@ -162,7 +162,7 @@ public class ApplicationTests
         // Set some values
 
         Application.Init (driverName: driverType.Name);
-        Application._initialized = true;
+        Application.IsInitialized = true;
 
         // Reset
         Application.ResetState ();
@@ -191,12 +191,12 @@ public class ApplicationTests
             Assert.Null (Application.OverlappedTop);
 
             // Internal properties
-            Assert.False (Application._initialized);
+            Assert.False (Application.IsInitialized);
             Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
             Assert.False (Application._forceFakeConsole);
-            Assert.Equal (-1, Application._mainThreadId);
+            Assert.Equal (-1, Application.MainThreadId);
             Assert.Empty (Application._topLevels);
-            Assert.Null (Application._mouseEnteredView);
+            Assert.Null (Application.MouseEnteredView);
 
             // Keyboard
             Assert.Empty (Application.GetViewKeyBindings ());
@@ -218,12 +218,12 @@ public class ApplicationTests
         CheckReset ();
 
         // Set the values that can be set
-        Application._initialized = true;
+        Application.IsInitialized = true;
         Application._forceFakeConsole = true;
-        Application._mainThreadId = 1;
+        Application.MainThreadId = 1;
 
         //Application._topLevels = new List<Toplevel> ();
-        Application._mouseEnteredView = new ();
+        Application.MouseEnteredView = new ();
 
         //Application.SupportedCultures = new List<CultureInfo> ();
         Application.Force16Colors = true;
@@ -237,7 +237,7 @@ public class ApplicationTests
 
         //Application.OverlappedChildren = new List<View> ();
         //Application.OverlappedTop = 
-        Application._mouseEnteredView = new ();
+        Application.MouseEnteredView = new ();
 
         //Application.WantContinuousButtonPressedView = new View ();
 
@@ -413,7 +413,7 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void Internal_Properties_Correct ()
     {
-        Assert.True (Application._initialized);
+        Assert.True (Application.IsInitialized);
         Assert.Null (Application.Top);
         RunState rs = Application.Begin (new ());
         Assert.Equal (Application.Top, rs.Toplevel);
@@ -1206,7 +1206,7 @@ public class ApplicationTests
             Thread.Sleep ((int)timeoutTime / 10);
 
             // Worst case scenario - something went wrong
-            if (Application._initialized && iteration > 25)
+            if (Application.IsInitialized && iteration > 25)
             {
                 _output.WriteLine ($"Too many iterations ({iteration}): Calling Application.RequestStop.");
                 Application.RequestStop ();

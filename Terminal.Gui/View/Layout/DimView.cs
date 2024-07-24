@@ -52,8 +52,8 @@ public class DimView : Dim
     {
         return Dimension switch
                {
-                   Dimension.Height => Target.Frame.Height,
-                   Dimension.Width => Target.Frame.Width,
+                   Dimension.Height => Target!.Frame.Height,
+                   Dimension.Width => Target!.Frame.Width,
                    _ => 0
                };
     }

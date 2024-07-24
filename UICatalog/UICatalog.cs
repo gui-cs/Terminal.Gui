@@ -104,7 +104,7 @@ internal class UICatalogApp
         // If no driver is provided, the default driver is used.
         Option<string> driverOption = new Option<string> ("--driver", "The ConsoleDriver to use.").FromAmong (
              Application.GetDriverTypes ()
-                        .Select (d => d.Name)
+                        .Select (d => d!.Name)
                         .ToArray ()
             );
 

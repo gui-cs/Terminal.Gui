@@ -169,7 +169,7 @@ public class KeyboardTests
             _output.WriteLine ("Iteration: {0}", iteration);
             iteration++;
             Assert.True (iteration < 2, "Too many iterations, something is wrong.");
-            if (Application._initialized)
+            if (Application.IsInitialized)
             {
                 _output.WriteLine ("  Pressing QuitKey");
                 Application.OnKeyDown (Application.QuitKey);

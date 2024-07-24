@@ -527,8 +527,8 @@ public class Buttons : Scenario
                 }
 
                 _value = value;
-                _number.Text = _value.ToString ();
-                ValueChanged?.Invoke (this, new (ref _value));
+                _number.Text = _value.ToString ()!;
+                ValueChanged?.Invoke (this, new (in _value));
             }
         }
 

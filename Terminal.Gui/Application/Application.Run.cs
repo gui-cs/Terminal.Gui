@@ -333,7 +333,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     public static T Run<T> (Func<Exception, bool>? errorHandler = null, ConsoleDriver? driver = null)
         where T : Toplevel, new ()
     {
-        if (!_initialized)
+        if (!IsInitialized)
         {
             // Init() has NOT been called.
             InternalInit (driver, null, true);
@@ -388,7 +388,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (view);
 
-        if (_initialized)
+        if (IsInitialized)
         {
             if (Driver is null)
             {
@@ -824,7 +824,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         }
         else
         {
-            if (_topLevels.Count > 1 && _topLevels.Peek () == OverlappedTop && OverlappedChildren.Any (t => t.Visible) is { })
+            if (_topLevels.Count > 1 && _topLevels.Peek () == OverlappedTop && OverlappedChildren?.Any (t => t.Visible) != null)
             {
                 OverlappedMoveNext ();
             }

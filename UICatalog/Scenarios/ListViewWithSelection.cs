@@ -205,7 +205,7 @@ public class ListViewWithSelection : Scenario
 
         /// <inheritdoc />
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-        public int Count => Scenarios != null ? Scenarios.Count : 0;
+        public int Count => Scenarios?.Count ?? 0;
         public int Length { get; private set; }
         public bool SuspendCollectionChangedEvent { get => throw new System.NotImplementedException (); set => throw new System.NotImplementedException (); }
 

@@ -38,8 +38,8 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     public static void Init (ConsoleDriver? driver = null, string? driverName = null) { InternalInit (driver, driverName); }
 
-    internal static bool _initialized;
-    internal static int _mainThreadId = -1;
+    internal static bool IsInitialized { get; set; }
+    internal static int MainThreadId { get; set; } = -1;
 
     // INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
     //
@@ -58,12 +58,12 @@ public static partial class Application // Initialization (Init/Shutdown)
         bool calledViaRunT = false
     )
     {
-        if (_initialized && driver is null)
+        if (IsInitialized && driver is null)
         {
             return;
         }
 
-        if (_initialized)
+        if (IsInitialized)
         {
             throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
         }
@@ -154,9 +154,9 @@ public static partial class Application // Initialization (Init/Shutdown)
         SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
         SupportedCultures = GetSupportedCultures ();
-        _mainThreadId = Thread.CurrentThread.ManagedThreadId;
-        _initialized = true;
-        InitializedChanged?.Invoke (null, new (in _initialized));
+        MainThreadId = Thread.CurrentThread.ManagedThreadId;
+        bool init = IsInitialized = true;
+        InitializedChanged?.Invoke (null, new (init));
     }
 
     private static void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
@@ -198,7 +198,8 @@ public static partial class Application // Initialization (Init/Shutdown)
         // TODO: Throw an exception if Init hasn't been called.
         ResetState ();
         PrintJsonErrors ();
-        InitializedChanged?.Invoke (null, new (in _initialized));
+        bool init = IsInitialized;
+        InitializedChanged?.Invoke (null, new (in init));
     }
 
     /// <summary>

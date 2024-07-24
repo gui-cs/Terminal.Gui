@@ -64,7 +64,7 @@ public static partial class Application // Mouse handling
         }
     }
 
-    private static bool OnGrabbingMouse (View view)
+    private static bool OnGrabbingMouse (View? view)
     {
         if (view is null)
         {
@@ -77,7 +77,7 @@ public static partial class Application // Mouse handling
         return evArgs.Cancel;
     }
 
-    private static bool OnUnGrabbingMouse (View view)
+    private static bool OnUnGrabbingMouse (View? view)
     {
         if (view is null)
         {
@@ -90,7 +90,7 @@ public static partial class Application // Mouse handling
         return evArgs.Cancel;
     }
 
-    private static void OnGrabbedMouse (View view)
+    private static void OnGrabbedMouse (View? view)
     {
         if (view is null)
         {
@@ -100,7 +100,7 @@ public static partial class Application // Mouse handling
         GrabbedMouse?.Invoke (view, new (view));
     }
 
-    private static void OnUnGrabbedMouse (View view)
+    private static void OnUnGrabbedMouse (View? view)
     {
         if (view is null)
         {
@@ -113,7 +113,7 @@ public static partial class Application // Mouse handling
 #nullable enable
 
     // Used by OnMouseEvent to track the last view that was clicked on.
-    internal static View? _mouseEnteredView;
+    internal static View? MouseEnteredView { get; set; }
 
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
@@ -166,7 +166,7 @@ public static partial class Application // Mouse handling
             if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
-                _mouseEnteredView?.NewMouseLeaveEvent (mouseEvent);
+                MouseEnteredView?.NewMouseLeaveEvent (mouseEvent);
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
@@ -242,16 +242,16 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        if (_mouseEnteredView is null)
+        if (MouseEnteredView is null)
         {
-            _mouseEnteredView = view;
+            MouseEnteredView = view;
             view.NewMouseEnterEvent (me);
         }
-        else if (_mouseEnteredView != view)
+        else if (MouseEnteredView != view)
         {
-            _mouseEnteredView.NewMouseLeaveEvent (me);
+            MouseEnteredView.NewMouseLeaveEvent (me);
             view.NewMouseEnterEvent (me);
-            _mouseEnteredView = view;
+            MouseEnteredView = view;
         }
 
         if (!view.WantMousePositionReports && mouseEvent.Flags == MouseFlags.ReportMousePosition)

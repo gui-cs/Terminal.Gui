@@ -206,7 +206,7 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new EventArgs<string> (ref oldValue));
+                    OnTextChanged (new EventArgs<string> (in oldValue));
                 }
 
                 return result;
@@ -220,7 +220,7 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new EventArgs<string> (ref oldValue));
+                    OnTextChanged (new EventArgs<string> (in oldValue));
                 }
 
                 return result;
@@ -333,7 +333,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.RemoveAt (pos);
-                    OnTextChanged (new EventArgs<string> (ref oldValue));
+                    OnTextChanged (new EventArgs<string> (in oldValue));
                 }
 
                 return true;
@@ -349,7 +349,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.Insert (pos, (Rune)ch);
-                    OnTextChanged (new EventArgs<string> (ref oldValue));
+                    OnTextChanged (new EventArgs<string> (in oldValue));
 
                     return true;
                 }

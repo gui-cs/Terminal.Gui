@@ -1301,15 +1301,16 @@ wo
 
         var menu = new MenuBar ();
 
-        menu.EnableForDesign (
-                              new Func<object, bool> (
-                                                      s =>
-                                                      {
-                                                          miAction = s as string;
+        bool FnAction (string s)
+        {
+            miAction = s;
 
-                                                          return true;
-                                                      })
-                             );
+            return true;
+        }
+        // Declare a variable for the function
+        Func<string, bool> fnActionVariable = FnAction;
+
+        menu.EnableForDesign (ref fnActionVariable);
 
         menu.Key = KeyCode.F9;
         menu.MenuOpening += (s, e) => mbiCurrent = e.CurrentMenu;
@@ -1329,7 +1330,7 @@ wo
         foreach (KeyCode key in keys)
         {
             Assert.True (top.NewKeyDownEvent (new (key)));
-            Application.MainLoop.RunIteration ();
+            Application.MainLoop!.RunIteration ();
         }
 
         Assert.Equal (expectedAction, miAction);

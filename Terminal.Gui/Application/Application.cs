@@ -84,7 +84,7 @@ public static partial class Application
         // MainLoop stuff
         MainLoop?.Dispose ();
         MainLoop = null;
-        _mainThreadId = -1;
+        MainThreadId = -1;
         Iteration = null;
         EndAfterFirstIteration = false;
 
@@ -108,10 +108,10 @@ public static partial class Application
         NotifyNewRunState = null;
         NotifyStopRunState = null;
         MouseGrabView = null;
-        _initialized = false;
+        IsInitialized = false;
 
         // Mouse
-        _mouseEnteredView = null;
+        MouseEnteredView = null;
         WantContinuousButtonPressedView = null;
         MouseEvent = null;
         GrabbedMouse = null;
