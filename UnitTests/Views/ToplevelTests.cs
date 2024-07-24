@@ -1049,12 +1049,12 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.False (subTop.IsLoaded);
         Assert.Equal (new (0, 0, 20, 10), view.Frame);
 
-        view.LayoutStarted += view_LayoutStarted;
+        view.LayoutStarted += ViewLayoutStarted;
 
-        void view_LayoutStarted (object sender, LayoutEventArgs e)
+        void ViewLayoutStarted (object sender, LayoutEventArgs e)
         {
             Assert.Equal (new (0, 0, 20, 10), view._needsDisplayRect);
-            view.LayoutStarted -= view_LayoutStarted;
+            view.LayoutStarted -= ViewLayoutStarted;
         }
 
         Application.Begin (top);
