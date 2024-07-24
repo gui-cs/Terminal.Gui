@@ -213,61 +213,172 @@ public static partial class Application // Keyboard handling
         return false;
     }
 
-    /// <summary>
-    ///     The <see cref="KeyBindingScope.Application"/> key bindings.
-    /// </summary>
-    private static readonly Dictionary<Key, List<View?>> _keyBindings = new ();
+    /// <summary>Gets the key bindings for this view.</summary>
+    public static KeyBindings KeyBindings { get; internal set; } = new ();
 
     /// <summary>
-    /// Gets the list of <see cref="KeyBindingScope.Application"/> key bindings.
+    /// Commands for Application.
     /// </summary>
-    public static Dictionary<Key, List<View?>> GetKeyBindings () { return _keyBindings; }
+    private static Dictionary<Command, Func<CommandContext, bool?>> CommandImplementations { get; } = new ();
 
     /// <summary>
-    ///     Adds an  <see cref="KeyBindingScope.Application"/> scoped key binding.
+    ///     <para>
+    ///         Sets the function that will be invoked for a <see cref="Command"/>. 
+    ///     </para>
+    ///     <para>
+    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
+    ///         replace the old one.
+    ///     </para>
     /// </summary>
     /// <remarks>
-    ///     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
+    /// <para>
+    ///     This version of AddCommand is for commands that do not require a <see cref="CommandContext"/>.
+    /// </para>
     /// </remarks>
-    /// <param name="key">The key being bound.</param>
-    /// <param name="view">The view that is bound to the key. If <see langword="null"/>, <see cref="Application.Current"/> will be used.</param>
-    internal static void AddKeyBinding (Key key, View? view)
+    /// <param name="command">The command.</param>
+    /// <param name="f">The function.</param>
+    private static void AddCommand (Command command, Func<bool?> f)
     {
-        if (!_keyBindings.ContainsKey (key))
-        {
-            _keyBindings [key] = [];
-        }
-
-        _keyBindings [key].Add (view);
+        CommandImplementations [command] = ctx => f ();
     }
 
-    internal static void AddToplevelKeyBindings ()
+    ///// <summary>
+    /////     The <see cref="KeyBindingScope.Application"/> key bindings.
+    ///// </summary>
+    //private static readonly Dictionary<Key, List<View?>> _keyBindings = new ();
+
+    ///// <summary>
+    ///// Gets the list of <see cref="KeyBindingScope.Application"/> key bindings.
+    ///// </summary>
+    //public static Dictionary<Key, List<View?>> GetKeyBindings () { return _keyBindings; }
+
+    ///// <summary>
+    /////     Adds an  <see cref="KeyBindingScope.Application"/> scoped key binding.
+    ///// </summary>
+    ///// <remarks>
+    /////     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
+    ///// </remarks>
+    ///// <param name="key">The key being bound.</param>
+    ///// <param name="view">The view that is bound to the key. If <see langword="null"/>, <see cref="Application.Current"/> will be used.</param>
+    //internal static void AddKeyBinding (Key key, View? view)
+    //{
+    //    if (!_keyBindings.ContainsKey (key))
+    //    {
+    //        _keyBindings [key] = [];
+    //    }
+
+    //    _keyBindings [key].Add (view);
+    //}
+
+    internal static void AddApplicationKeyBindings ()
     {
-//        // Default keybindings for this view
-//        AddKeyBinding (Application.QuitKey, null);
-//        AddKeyBinding (Key.CursorRight, null);
-//        AddKeyBinding (Key.CursorDown, null);
-//        AddKeyBinding (Key.CursorLeft, null);
-//        AddKeyBinding (Key.CursorUp, null);
-//        AddKeyBinding (Key.Tab, null);
-//        AddKeyBinding (Key.Tab.WithShift, null);
-//        AddKeyBinding (Key.Tab.WithCtrl, null);
-//        AddKeyBinding (Key.Tab.WithShift.WithCtrl, null);
-//        AddKeyBinding (Key.F5, null);
-//        AddKeyBinding (Application.AlternateForwardKey, null); // Needed on Unix
-//        AddKeyBinding (Application.AlternateBackwardKey, null); // Needed on Unix
+        // Things this view knows how to do
+        AddCommand (
+                    Command.QuitToplevel,  // TODO: IRunnable: Rename to Command.Quit to make more generic.
+                    () =>
+                    {
+                        if (OverlappedTop is { })
+                        {
+                            RequestStop (Current);
+                        }
+                        else
+                        {
+                            Application.RequestStop ();
+                        }
 
-//        if (Environment.OSVersion.Platform == PlatformID.Unix)
-//        {
-//            AddKeyBinding (Key.Z.WithCtrl, null);
-//        }
+                        return true;
+                    }
+                   );
 
-//#if UNIX_KEY_BINDINGS
-//        KeyBindings.Add (Key.L.WithCtrl, Command.Refresh); // Unix
-//        KeyBindings.Add (Key.F.WithCtrl, Command.NextView); // Unix
-//        KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
-//        KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView); // Unix
-//#endif
+        AddCommand (
+                    Command.Suspend,
+                    () =>
+                    {
+                        Driver?.Suspend ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.NextView,    // TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
+                    () =>
+                    {
+                        Current.MoveNextView ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.PreviousView,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
+                    () =>
+                    {
+                        Current.MovePreviousView ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.NextViewOrTop,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
+                    () =>
+                    {
+                        Current.MoveNextViewOrTop ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.PreviousViewOrTop,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
+                    () =>
+                    {
+                        Current.MovePreviousViewOrTop ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.Refresh,
+                    () =>
+                    {
+                        Refresh (); 
+
+                        return true;
+                    }
+                   );
+
+
+        KeyBindings.Add (Application.QuitKey, KeyBindingScope.Application, Command.QuitToplevel);
+
+        KeyBindings.Add (Key.CursorRight, KeyBindingScope.Application, Command.NextView);
+        KeyBindings.Add (Key.CursorDown, KeyBindingScope.Application, Command.NextView);
+        KeyBindings.Add (Key.CursorLeft, KeyBindingScope.Application, Command.PreviousView);
+        KeyBindings.Add (Key.CursorUp, KeyBindingScope.Application, Command.PreviousView);
+
+        KeyBindings.Add (Key.Tab, KeyBindingScope.Application, Command.NextView);
+        KeyBindings.Add (Key.Tab.WithShift, KeyBindingScope.Application, Command.PreviousView);
+        KeyBindings.Add (Key.Tab.WithCtrl, KeyBindingScope.Application, Command.NextViewOrTop);
+        KeyBindings.Add (Key.Tab.WithShift.WithCtrl, KeyBindingScope.Application, Command.PreviousViewOrTop);
+
+        // TODO: Refresh Key should be configurable
+        KeyBindings.Add (Key.F5, KeyBindingScope.Application, Command.Refresh);
+        KeyBindings.Add (Application.AlternateForwardKey, KeyBindingScope.Application, Command.NextViewOrTop); // Needed on Unix
+        KeyBindings.Add (Application.AlternateBackwardKey, KeyBindingScope.Application, Command.PreviousViewOrTop); // Needed on Unix
+
+        if (Environment.OSVersion.Platform == PlatformID.Unix)
+        {
+            KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
+        }
+
+#if UNIX_KEY_BINDINGS
+        KeyBindings.Add (Key.L.WithCtrl, Command.Refresh); // Unix
+        KeyBindings.Add (Key.F.WithCtrl, Command.NextView); // Unix
+        KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
+        KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView); // Unix
+#endif
     }
 
     /// <summary>
@@ -277,7 +388,15 @@ public static partial class Application // Keyboard handling
     ///     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
     /// </remarks>
     /// <returns>The list of Views that have Application-scoped key bindings.</returns>
-    internal static List<View> GetViewsWithKeyBindings () { return _keyBindings.Values.SelectMany (v => v).ToList (); }
+    internal static List<KeyBinding> GetViewKeyBindings ()
+    {
+        // Get the list of views that do not have Application-scoped key bindings
+        return KeyBindings.Bindings
+                          .Where (kv => kv.Value.Scope != KeyBindingScope.Application)
+                          .Select (kv => kv.Value)
+                          .Distinct ()
+                          .ToList ();
+    }
 
     /// <summary>
     ///     Gets the list of Views that have <see cref="KeyBindingScope.Application"/> key bindings for the specified key.

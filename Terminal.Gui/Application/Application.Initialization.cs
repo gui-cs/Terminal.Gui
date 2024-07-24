@@ -89,7 +89,7 @@ public static partial class Application // Initialization (Init/Shutdown)
         Load ();
         Apply ();
 
-        AddToplevelKeyBindings ();
+        AddApplicationKeyBindings ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
         if (!string.IsNullOrEmpty (driverName))

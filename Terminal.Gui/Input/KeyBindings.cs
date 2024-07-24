@@ -11,7 +11,7 @@ public class KeyBindings
 {
     /// <summary>
     ///     Initializes a new instance. This constructor is used when the <see cref="KeyBindings"/> are not bound to a
-    ///     <see cref="View"/>, such as in unit tests.
+    ///     <see cref="View"/>. This is used for Application.KeyBindings and unit tests.
     /// </summary>
     public KeyBindings () { }
 
@@ -21,6 +21,9 @@ public class KeyBindings
     /// <summary>
     ///     The view that the <see cref="KeyBindings"/> are bound to.
     /// </summary>
+    /// <remarks>
+    ///     If <see langword="null"/>, the <see cref="KeyBindings"/> are not bound to a <see cref="View"/>. This is used for Application.KeyBindings.
+    /// </remarks>
     public View? BoundView { get; }
 
     // TODO: Add a dictionary comparer that ignores Scope
@@ -33,6 +36,11 @@ public class KeyBindings
     /// <param name="binding"></param>
     public void Add (Key key, KeyBinding binding)
     {
+        if (BoundView is { } && binding.Scope.FastHasFlags (KeyBindingScope.Application))
+        {
+            throw new ArgumentException ("Application scoped KeyBindings must be added via Application.KeyBindings.Add");
+        }
+
         if (TryGet (key, out KeyBinding _))
         {
             Bindings [key] = binding;
@@ -40,10 +48,6 @@ public class KeyBindings
         else
         {
             Bindings.Add (key, binding);
-            if (binding.Scope.HasFlag (KeyBindingScope.Application))
-            {
-                Application.AddKeyBinding (key, BoundView);
-            }
         }
     }
 
@@ -67,6 +71,11 @@ public class KeyBindings
     /// </param>
     public void Add (Key key, KeyBindingScope scope, params Command [] commands)
     {
+        if (BoundView is { } && scope.FastHasFlags (KeyBindingScope.Application))
+        {
+            throw new ArgumentException ("Application scoped KeyBindings must be added via Application.KeyBindings.Add");
+        }
+
         if (key is null || !key.IsValid)
         {
             //throw new ArgumentException ("Invalid Key", nameof (commands));

@@ -641,7 +641,7 @@ public partial class View
     /// </returns>
     public virtual bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
     {
-        // fire event only if there's an hotkey binding for the key
+        // fire event only if there's a hotkey binding for the key
         if (KeyBindings.TryGet (keyEvent, scope, out KeyBinding kb))
         {
             InvokingKeyBindings?.Invoke (this, keyEvent);
