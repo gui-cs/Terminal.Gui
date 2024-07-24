@@ -59,7 +59,7 @@ public static partial class Application // Toplevel handling
     /// <param name="start"></param>
     /// <param name="location"></param>
     /// <returns></returns>
-    private static Toplevel FindDeepestTop (Toplevel start, in Point location)
+    private static Toplevel? FindDeepestTop (Toplevel start, in Point location)
     {
         if (!start.Frame.Contains (location))
         {
@@ -91,15 +91,20 @@ public static partial class Application // Toplevel handling
     /// <summary>
     /// Given <paramref name="view"/>, returns the first Superview up the chain that is <see cref="Top"/>.
     /// </summary>
-    private static View FindTopFromView (View view)
+    private static View? FindTopFromView (View? view)
     {
-        View top = view?.SuperView is { } && view?.SuperView != Top
+        if (view is null)
+        {
+            return null;
+        }
+
+        View top = view.SuperView is { } && view.SuperView != Top
                        ? view.SuperView
                        : view;
 
         while (top?.SuperView is { } && top?.SuperView != Top)
         {
-            top = top.SuperView;
+            top = top!.SuperView;
         }
 
         return top;
@@ -221,7 +226,7 @@ public static partial class Application // Toplevel handling
 
             if (PositionCursor (t))
             {
-                Driver.UpdateCursor ();
+                Driver?.UpdateCursor ();
             }
         }
 

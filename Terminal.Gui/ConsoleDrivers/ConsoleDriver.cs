@@ -46,7 +46,7 @@ public abstract class ConsoleDriver
     }
 
     /// <summary>Get the operating system clipboard.</summary>
-    public IClipboard Clipboard { get; internal set; }
+    public IClipboard? Clipboard { get; internal set; }
 
     /// <summary>
     ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
@@ -70,7 +70,7 @@ public abstract class ConsoleDriver
     ///     <see cref="UpdateScreen"/> is called.
     ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
-    public Cell [,] Contents { get; internal set; }
+    public Cell [,]? Contents { get; internal set; }
 
     /// <summary>The leftmost column in the terminal.</summary>
     public virtual int Left { get; internal set; } = 0;
@@ -125,125 +125,133 @@ public abstract class ConsoleDriver
         int runeWidth = -1;
         bool validLocation = IsValidLocation (Col, Row);
 
+        if (Contents is null)
+        {
+            return;
+        }
+
         if (validLocation)
         {
             rune = rune.MakePrintable ();
             runeWidth = rune.GetColumns ();
 
-            if (runeWidth == 0 && rune.IsCombiningMark ())
+            lock (Contents)
             {
-                // AtlasEngine does not support NON-NORMALIZED combining marks in a way
-                // compatible with the driver architecture. Any CMs (except in the first col)
-                // are correctly combined with the base char, but are ALSO treated as 1 column
-                // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
-                // 
-                // Until this is addressed (see Issue #), we do our best by 
-                // a) Attempting to normalize any CM with the base char to it's left
-                // b) Ignoring any CMs that don't normalize
-                if (Col > 0)
+                if (runeWidth == 0 && rune.IsCombiningMark ())
                 {
-                    if (Contents [Row, Col - 1].CombiningMarks.Count > 0)
+                    // AtlasEngine does not support NON-NORMALIZED combining marks in a way
+                    // compatible with the driver architecture. Any CMs (except in the first col)
+                    // are correctly combined with the base char, but are ALSO treated as 1 column
+                    // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
+                    // 
+                    // Until this is addressed (see Issue #), we do our best by 
+                    // a) Attempting to normalize any CM with the base char to it's left
+                    // b) Ignoring any CMs that don't normalize
+                    if (Col > 0)
                     {
-                        // Just add this mark to the list
-                        Contents [Row, Col - 1].CombiningMarks.Add (rune);
-
-                        // Ignore. Don't move to next column (let the driver figure out what to do).
-                    }
-                    else
-                    {
-                        // Attempt to normalize the cell to our left combined with this mark
-                        string combined = Contents [Row, Col - 1].Rune + rune.ToString ();
-
-                        // Normalize to Form C (Canonical Composition)
-                        string normalized = combined.Normalize (NormalizationForm.FormC);
-
-                        if (normalized.Length == 1)
+                        if (Contents [Row, Col - 1].CombiningMarks.Count > 0)
                         {
-                            // It normalized! We can just set the Cell to the left with the
-                            // normalized codepoint 
-                            Contents [Row, Col - 1].Rune = (Rune)normalized [0];
-
-                            // Ignore. Don't move to next column because we're already there
-                        }
-                        else
-                        {
-                            // It didn't normalize. Add it to the Cell to left's CM list
+                            // Just add this mark to the list
                             Contents [Row, Col - 1].CombiningMarks.Add (rune);
 
                             // Ignore. Don't move to next column (let the driver figure out what to do).
                         }
-                    }
+                        else
+                        {
+                            // Attempt to normalize the cell to our left combined with this mark
+                            string combined = Contents [Row, Col - 1].Rune + rune.ToString ();
 
-                    Contents [Row, Col - 1].Attribute = CurrentAttribute;
-                    Contents [Row, Col - 1].IsDirty = true;
+                            // Normalize to Form C (Canonical Composition)
+                            string normalized = combined.Normalize (NormalizationForm.FormC);
+
+                            if (normalized.Length == 1)
+                            {
+                                // It normalized! We can just set the Cell to the left with the
+                                // normalized codepoint 
+                                Contents [Row, Col - 1].Rune = (Rune)normalized [0];
+
+                                // Ignore. Don't move to next column because we're already there
+                            }
+                            else
+                            {
+                                // It didn't normalize. Add it to the Cell to left's CM list
+                                Contents [Row, Col - 1].CombiningMarks.Add (rune);
+
+                                // Ignore. Don't move to next column (let the driver figure out what to do).
+                            }
+                        }
+
+                        Contents [Row, Col - 1].Attribute = CurrentAttribute;
+                        Contents [Row, Col - 1].IsDirty = true;
+                    }
+                    else
+                    {
+                        // Most drivers will render a combining mark at col 0 as the mark
+                        Contents [Row, Col].Rune = rune;
+                        Contents [Row, Col].Attribute = CurrentAttribute;
+                        Contents [Row, Col].IsDirty = true;
+                        Col++;
+                    }
                 }
                 else
                 {
-                    // Most drivers will render a combining mark at col 0 as the mark
-                    Contents [Row, Col].Rune = rune;
                     Contents [Row, Col].Attribute = CurrentAttribute;
                     Contents [Row, Col].IsDirty = true;
-                    Col++;
-                }
-            }
-            else
-            {
-                Contents [Row, Col].Attribute = CurrentAttribute;
-                Contents [Row, Col].IsDirty = true;
 
-                if (Col > 0)
-                {
-                    // Check if cell to left has a wide glyph
-                    if (Contents [Row, Col - 1].Rune.GetColumns () > 1)
+                    if (Col > 0)
                     {
-                        // Invalidate cell to left
-                        Contents [Row, Col - 1].Rune = Rune.ReplacementChar;
-                        Contents [Row, Col - 1].IsDirty = true;
+                        // Check if cell to left has a wide glyph
+                        if (Contents [Row, Col - 1].Rune.GetColumns () > 1)
+                        {
+                            // Invalidate cell to left
+                            Contents [Row, Col - 1].Rune = Rune.ReplacementChar;
+                            Contents [Row, Col - 1].IsDirty = true;
+                        }
                     }
-                }
 
-                if (runeWidth < 1)
-                {
-                    Contents [Row, Col].Rune = Rune.ReplacementChar;
-                }
-                else if (runeWidth == 1)
-                {
-                    Contents [Row, Col].Rune = rune;
-
-                    if (Col < Clip.Right - 1)
+                    if (runeWidth < 1)
                     {
-                        Contents [Row, Col + 1].IsDirty = true;
-                    }
-                }
-                else if (runeWidth == 2)
-                {
-                    if (Col == Clip.Right - 1)
-                    {
-                        // We're at the right edge of the clip, so we can't display a wide character.
-                        // TODO: Figure out if it is better to show a replacement character or ' '
                         Contents [Row, Col].Rune = Rune.ReplacementChar;
                     }
-                    else
+                    else if (runeWidth == 1)
                     {
                         Contents [Row, Col].Rune = rune;
 
                         if (Col < Clip.Right - 1)
                         {
-                            // Invalidate cell to right so that it doesn't get drawn
-                            // TODO: Figure out if it is better to show a replacement character or ' '
-                            Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
                             Contents [Row, Col + 1].IsDirty = true;
                         }
                     }
-                }
-                else
-                {
-                    // This is a non-spacing character, so we don't need to do anything
-                    Contents [Row, Col].Rune = (Rune)' ';
-                    Contents [Row, Col].IsDirty = false;
-                }
+                    else if (runeWidth == 2)
+                    {
+                        if (Col == Clip.Right - 1)
+                        {
+                            // We're at the right edge of the clip, so we can't display a wide character.
+                            // TODO: Figure out if it is better to show a replacement character or ' '
+                            Contents [Row, Col].Rune = Rune.ReplacementChar;
+                        }
+                        else
+                        {
+                            Contents [Row, Col].Rune = rune;
 
-                _dirtyLines [Row] = true;
+                            if (Col < Clip.Right - 1)
+                            {
+                                // Invalidate cell to right so that it doesn't get drawn
+                                // TODO: Figure out if it is better to show a replacement character or ' '
+                                Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
+                                Contents [Row, Col + 1].IsDirty = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // This is a non-spacing character, so we don't need to do anything
+                        Contents [Row, Col].Rune = (Rune)' ';
+                        Contents [Row, Col].IsDirty = false;
+                    }
+
+                    _dirtyLines! [Row] = true;
+                }
             }
         }
 
@@ -258,14 +266,17 @@ public abstract class ConsoleDriver
 
             if (validLocation && Col < Clip.Right)
             {
-                // This is a double-width character, and we are not at the end of the line.
-                // Col now points to the second column of the character. Ensure it doesn't
-                // Get rendered.
-                Contents [Row, Col].IsDirty = false;
-                Contents [Row, Col].Attribute = CurrentAttribute;
+                lock (Contents!)
+                {
+                    // This is a double-width character, and we are not at the end of the line.
+                    // Col now points to the second column of the character. Ensure it doesn't
+                    // Get rendered.
+                    Contents [Row, Col].IsDirty = false;
+                    Contents [Row, Col].Attribute = CurrentAttribute;
 
-                // TODO: Determine if we should wipe this out (for now now)
-                //Contents [Row, Col].Rune = (Rune)' ';
+                    // TODO: Determine if we should wipe this out (for now now)
+                    //Contents [Row, Col].Rune = (Rune)' ';
+                }
             }
 
             Col++;
@@ -332,7 +343,7 @@ public abstract class ConsoleDriver
     /// </summary>
     public void SetContentsAsDirty ()
     {
-        lock (Contents)
+        lock (Contents!)
         {
             for (var row = 0; row < Rows; row++)
             {
@@ -358,7 +369,7 @@ public abstract class ConsoleDriver
     public void FillRect (Rectangle rect, Rune rune = default)
     {
         rect = Rectangle.Intersect (rect, Clip);
-        lock (Contents)
+        lock (Contents!)
         {
             for (int r = rect.Y; r < rect.Y + rect.Height; r++)
             {
