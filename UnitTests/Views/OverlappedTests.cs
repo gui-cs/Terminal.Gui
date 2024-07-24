@@ -527,7 +527,7 @@ public class OverlappedTests
     [Fact]
     public void MoveToOverlappedChild_Throw_NullReferenceException_Passing_Null_Parameter ()
     {
-        Assert.Throws<NullReferenceException> (delegate { ApplicationOverlapped.MoveToOverlappedChild (null); });
+        Assert.Throws<ArgumentNullException> (delegate { ApplicationOverlapped.MoveToOverlappedChild (null); });
     }
 
     [Fact]

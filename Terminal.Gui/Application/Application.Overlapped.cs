@@ -106,10 +106,8 @@ public static class ApplicationOverlapped
     /// <returns></returns>
     public static bool MoveToOverlappedChild (Toplevel? top)
     {
-        if (top is null)
-        {
-            return false;
-        }
+        ArgumentNullException.ThrowIfNull (top);
+
         if (top.Visible && OverlappedTop is { } && Application.Current?.Modal == false)
         {
             lock (Application.TopLevels)
