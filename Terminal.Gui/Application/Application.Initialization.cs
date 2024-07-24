@@ -146,10 +146,10 @@ public static partial class Application // Initialization (Init/Shutdown)
                                                 );
         }
 
-        Driver.SizeChanged += (s, args) => OnSizeChanging (args);
-        Driver.KeyDown += (s, args) => OnKeyDown (args);
-        Driver.KeyUp += (s, args) => OnKeyUp (args);
-        Driver.MouseEvent += (s, args) => OnMouseEvent (args);
+        Driver.SizeChanged += Driver_SizeChanged;
+        Driver.KeyDown += Driver_KeyDown;
+        Driver.KeyUp += Driver_KeyUp;
+        Driver.MouseEvent += Driver_MouseEvent;
 
         SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 

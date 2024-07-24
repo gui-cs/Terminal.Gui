@@ -122,7 +122,7 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
-        foreach (Toplevel topLevel in _topLevels.ToList ())
+        foreach (Toplevel topLevel in TopLevels.ToList ())
         {
             if (topLevel.NewKeyDownEvent (keyEvent))
             {
@@ -222,7 +222,7 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
-        foreach (Toplevel topLevel in _topLevels.ToList ())
+        foreach (Toplevel topLevel in TopLevels.ToList ())
         {
             if (topLevel.NewKeyUpEvent (a))
             {
@@ -302,7 +302,7 @@ public static partial class Application // Keyboard handling
                     Command.QuitToplevel,  // TODO: IRunnable: Rename to Command.Quit to make more generic.
                     () =>
                     {
-                        if (OverlappedTop is { })
+                        if (ApplicationOverlapped.OverlappedTop is { })
                         {
                             RequestStop (Current!);
                         }
@@ -330,7 +330,7 @@ public static partial class Application // Keyboard handling
                     () =>
                     {
                         // TODO: Move this method to Application.Navigation.cs
-                        ViewNavigation.MoveNextView ();
+                        ApplicationNavigation.MoveNextView ();
 
                         return true;
                     }
@@ -341,7 +341,7 @@ public static partial class Application // Keyboard handling
                     () =>
                     {
                         // TODO: Move this method to Application.Navigation.cs
-                        ViewNavigation.MovePreviousView ();
+                        ApplicationNavigation.MovePreviousView ();
 
                         return true;
                     }
@@ -352,7 +352,7 @@ public static partial class Application // Keyboard handling
                     () =>
                     {
                         // TODO: Move this method to Application.Navigation.cs
-                        ViewNavigation.MoveNextViewOrTop ();
+                        ApplicationNavigation.MoveNextViewOrTop ();
 
                         return true;
                     }
@@ -363,7 +363,7 @@ public static partial class Application // Keyboard handling
                     () =>
                     {
                         // TODO: Move this method to Application.Navigation.cs
-                        ViewNavigation.MovePreviousViewOrTop ();
+                        ApplicationNavigation.MovePreviousViewOrTop ();
 
                         return true;
                     }

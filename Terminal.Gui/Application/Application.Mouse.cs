@@ -187,20 +187,20 @@ public static partial class Application // Mouse handling
 
         if (view is not Adornment)
         {
-            if ((view is null || view == OverlappedTop)
+            if ((view is null || view == ApplicationOverlapped.OverlappedTop)
                 && Current is { Modal: false }
-                && OverlappedTop != null
+                && ApplicationOverlapped.OverlappedTop != null
                 && mouseEvent.Flags != MouseFlags.ReportMousePosition
                 && mouseEvent.Flags != 0)
             {
                 // This occurs when there are multiple overlapped "tops"
                 // E.g. "Mdi" - in the Background Worker Scenario
-                View? top = FindDeepestTop (Top!, mouseEvent.Position);
+                View? top = ApplicationOverlapped.FindDeepestTop (Top!, mouseEvent.Position);
                 view = View.FindDeepestView (top, mouseEvent.Position);
 
-                if (view is { } && view != OverlappedTop && top != Current && top is { })
+                if (view is { } && view != ApplicationOverlapped.OverlappedTop && top != Current && top is { })
                 {
-                    MoveCurrent ((Toplevel)top);
+                    ApplicationOverlapped.MoveCurrent ((Toplevel)top);
                 }
             }
         }
@@ -295,7 +295,7 @@ public static partial class Application // Mouse handling
             };
         }
 
-        BringOverlappedTopToFront ();
+        ApplicationOverlapped.BringOverlappedTopToFront ();
     }
 
     #endregion Mouse handling

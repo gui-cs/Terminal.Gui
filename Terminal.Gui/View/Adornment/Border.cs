@@ -293,7 +293,7 @@ public class Border : Adornment
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             Parent.SetFocus ();
-            Application.BringOverlappedTopToFront ();
+            ApplicationOverlapped.BringOverlappedTopToFront ();
 
             // Only start grabbing if the user clicks in the Thickness area
             // Adornment.Contains takes Parent SuperView=relative coords.

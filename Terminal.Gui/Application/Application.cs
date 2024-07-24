@@ -56,12 +56,12 @@ public static partial class Application
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
-        foreach (Toplevel? t in _topLevels)
+        foreach (Toplevel? t in TopLevels)
         {
             t!.Running = false;
         }
 
-        _topLevels.Clear ();
+        TopLevels.Clear ();
         Current = null;
 #if DEBUG_IDISPOSABLE
 

@@ -908,7 +908,7 @@ public class TileView : View
             {
                 // Start a Drag
                 SetFocus ();
-                Application.BringOverlappedTopToFront ();
+                ApplicationOverlapped.BringOverlappedTopToFront ();
 
                 if (mouseEvent.Flags == MouseFlags.Button1Pressed)
                 {

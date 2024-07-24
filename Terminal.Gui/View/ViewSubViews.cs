@@ -456,7 +456,7 @@ public partial class View
                         Application.Current.FocusNext ();
                     }
 
-                    Application.BringOverlappedTopToFront ();
+                    ApplicationOverlapped.BringOverlappedTopToFront ();
                 }
             }
 
@@ -489,7 +489,7 @@ public partial class View
 
                 if (this is Toplevel && Application.Current.Focused != this)
                 {
-                    Application.BringOverlappedTopToFront ();
+                    ApplicationOverlapped.BringOverlappedTopToFront ();
                 }
             }
 

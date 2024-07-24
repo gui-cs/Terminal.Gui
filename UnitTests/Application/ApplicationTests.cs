@@ -89,12 +89,12 @@ public class ApplicationTests
 
         RunState runstate = null;
 
-        EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) =>
+        EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
                                                         {
                                                             Assert.NotNull (e.State);
                                                             runstate = e.State;
                                                         };
-        Application.NotifyNewRunState += NewRunStateFn;
+        Application.NotifyNewRunState += newRunStateFn;
 
         var topLevel = new Toplevel ();
         RunState rs = Application.Begin (topLevel);
@@ -105,7 +105,7 @@ public class ApplicationTests
         Assert.Equal (topLevel, Application.Top);
         Assert.Equal (topLevel, Application.Current);
 
-        Application.NotifyNewRunState -= NewRunStateFn;
+        Application.NotifyNewRunState -= newRunStateFn;
         Application.End (runstate);
 
         Assert.Null (Application.Current);
@@ -187,15 +187,15 @@ public class ApplicationTests
             Assert.Equal (Key.Empty, Application.AlternateBackwardKey);
             Assert.Equal (Key.Empty, Application.AlternateForwardKey);
             Assert.Equal (Key.Empty, Application.QuitKey);
-            Assert.Null (Application.OverlappedChildren);
-            Assert.Null (Application.OverlappedTop);
+            Assert.Null (ApplicationOverlapped.OverlappedChildren);
+            Assert.Null (ApplicationOverlapped.OverlappedTop);
 
             // Internal properties
             Assert.False (Application.IsInitialized);
             Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
             Assert.False (Application._forceFakeConsole);
             Assert.Equal (-1, Application.MainThreadId);
-            Assert.Empty (Application._topLevels);
+            Assert.Empty (Application.TopLevels);
             Assert.Null (Application.MouseEnteredView);
 
             // Keyboard
@@ -235,8 +235,8 @@ public class ApplicationTests
         Application.QuitKey = Key.C;
         Application.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Cancel);
 
-        //Application.OverlappedChildren = new List<View> ();
-        //Application.OverlappedTop = 
+        //ApplicationOverlapped.OverlappedChildren = new List<View> ();
+        //ApplicationOverlapped.OverlappedTop = 
         Application.MouseEnteredView = new ();
 
         //Application.WantContinuousButtonPressedView = new View ();
@@ -378,12 +378,12 @@ public class ApplicationTests
 
         RunState runstate = null;
 
-        EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) =>
+        EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
                                                         {
                                                             Assert.NotNull (e.State);
                                                             runstate = e.State;
                                                         };
-        Application.NotifyNewRunState += NewRunStateFn;
+        Application.NotifyNewRunState += newRunStateFn;
 
         RunState rs = Application.Begin (topLevel);
         Assert.NotNull (rs);
@@ -393,7 +393,7 @@ public class ApplicationTests
         Assert.Equal (topLevel, Application.Top);
         Assert.Equal (topLevel, Application.Current);
 
-        Application.NotifyNewRunState -= NewRunStateFn;
+        Application.NotifyNewRunState -= newRunStateFn;
         Application.End (runstate);
 
         Assert.Null (Application.Current);
@@ -419,7 +419,7 @@ public class ApplicationTests
         Assert.Equal (Application.Top, rs.Toplevel);
         Assert.Null (Application.MouseGrabView); // public
         Assert.Null (Application.WantContinuousButtonPressedView); // public
-        Assert.False (Application.MoveToOverlappedChild (Application.Top));
+        Assert.False (ApplicationOverlapped.MoveToOverlappedChild (Application.Top!));
         Application.Top.Dispose ();
     }
 

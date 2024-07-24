@@ -54,7 +54,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         }
 #endif
 
-        if (toplevel.IsOverlappedContainer && OverlappedTop != toplevel && OverlappedTop is { })
+        if (toplevel.IsOverlappedContainer && ApplicationOverlapped.OverlappedTop != toplevel && ApplicationOverlapped.OverlappedTop is { })
         {
             throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
         }
@@ -72,7 +72,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         }
 
 #if DEBUG_IDISPOSABLE
-        if (Top is { } && toplevel != Top && !_topLevels.Contains (Top))
+        if (Top is { } && toplevel != Top && !TopLevels.Contains (Top))
         {
             // This assertion confirm if the Top was already disposed
             Debug.Assert (Top.WasDisposed);
@@ -80,9 +80,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         }
 #endif
 
-        lock (_topLevels)
+        lock (TopLevels)
         {
-            if (Top is { } && toplevel != Top && !_topLevels.Contains (Top))
+            if (Top is { } && toplevel != Top && !TopLevels.Contains (Top))
             {
                 // If Top was already disposed and isn't on the Toplevels Stack,
                 // clean it up here if is the same as _cachedRunStateToplevel
@@ -96,7 +96,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                     throw new ObjectDisposedException (Top.GetType ().FullName);
                 }
             }
-            else if (OverlappedTop is { } && toplevel != Top && _topLevels.Contains (Top!))
+            else if (ApplicationOverlapped.OverlappedTop is { } && toplevel != Top && TopLevels.Contains (Top!))
             {
                 Top!.OnLeave (toplevel);
             }
@@ -106,29 +106,29 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             if (string.IsNullOrEmpty (toplevel.Id))
             {
                 var count = 1;
-                var id = (_topLevels.Count + count).ToString ();
+                var id = (TopLevels.Count + count).ToString ();
 
-                while (_topLevels.Count > 0 && _topLevels.FirstOrDefault (x => x.Id == id) is { })
+                while (TopLevels.Count > 0 && TopLevels.FirstOrDefault (x => x.Id == id) is { })
                 {
                     count++;
-                    id = (_topLevels.Count + count).ToString ();
+                    id = (TopLevels.Count + count).ToString ();
                 }
 
-                toplevel.Id = (_topLevels.Count + count).ToString ();
+                toplevel.Id = (TopLevels.Count + count).ToString ();
 
-                _topLevels.Push (toplevel);
+                TopLevels.Push (toplevel);
             }
             else
             {
-                Toplevel? dup = _topLevels.FirstOrDefault (x => x.Id == toplevel.Id);
+                Toplevel? dup = TopLevels.FirstOrDefault (x => x.Id == toplevel.Id);
 
                 if (dup is null)
                 {
-                    _topLevels.Push (toplevel);
+                    TopLevels.Push (toplevel);
                 }
             }
 
-            if (_topLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0)
+            if (TopLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0)
             {
                 throw new ArgumentException ("There are duplicates Toplevel IDs");
             }
@@ -141,7 +141,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         var refreshDriver = true;
 
-        if (OverlappedTop is null
+        if (ApplicationOverlapped.OverlappedTop is null
             || toplevel.IsOverlappedContainer
             || (Current?.Modal == false && toplevel.Modal)
             || (Current?.Modal == false && !toplevel.Modal)
@@ -154,25 +154,25 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 Current = toplevel;
                 Current.OnActivate (previousCurrent);
 
-                SetCurrentOverlappedAsTop ();
+                ApplicationOverlapped.SetCurrentOverlappedAsTop ();
             }
             else
             {
                 refreshDriver = false;
             }
         }
-        else if ((toplevel != OverlappedTop
+        else if ((toplevel != ApplicationOverlapped.OverlappedTop
                   && Current?.Modal == true
-                  && !_topLevels.Peek ().Modal)
-                 || (toplevel != OverlappedTop && Current?.Running == false))
+                  && !TopLevels.Peek ().Modal)
+                 || (toplevel != ApplicationOverlapped.OverlappedTop && Current?.Running == false))
         {
             refreshDriver = false;
-            MoveCurrent (toplevel);
+            ApplicationOverlapped.MoveCurrent (toplevel);
         }
         else
         {
             refreshDriver = false;
-            MoveCurrent (Current!);
+            ApplicationOverlapped.MoveCurrent (Current!);
         }
 
         toplevel.SetRelativeLayout (Driver!.Screen.Size);
@@ -180,11 +180,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
         toplevel.FocusFirst ();
-        BringOverlappedTopToFront ();
+        ApplicationOverlapped.BringOverlappedTopToFront ();
 
         if (refreshDriver)
         {
-            OverlappedTop?.OnChildLoaded (toplevel);
+            ApplicationOverlapped.OverlappedTop?.OnChildLoaded (toplevel);
             toplevel.OnLoaded ();
             toplevel.SetNeedsDisplay ();
             toplevel.Draw ();
@@ -427,7 +427,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             if (runState.Toplevel is null)
             {
 #if DEBUG_IDISPOSABLE
-                Debug.Assert (_topLevels.Count == 0);
+                Debug.Assert (TopLevels.Count == 0);
 #endif
                 runState.Dispose ();
 
@@ -499,7 +499,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         // TODO: Figure out how to remove this call to ClearContents. Refresh should just repaint damaged areas, not clear
         Driver!.ClearContents ();
 
-        foreach (Toplevel v in _topLevels.Reverse ())
+        foreach (Toplevel v in TopLevels.Reverse ())
         {
             if (v.Visible)
             {
@@ -577,9 +577,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             // TODO: Overlapped - Move elsewhere
             if (state.Toplevel != Current)
             {
-                OverlappedTop?.OnDeactivate (state.Toplevel);
+                ApplicationOverlapped.OverlappedTop?.OnDeactivate (state.Toplevel);
                 state.Toplevel = Current;
-                OverlappedTop?.OnActivate (state.Toplevel);
+                ApplicationOverlapped.OverlappedTop?.OnActivate (state.Toplevel);
                 Top!.SetSubViewNeedsDisplay ();
                 Refresh ();
             }
@@ -597,7 +597,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             state.Toplevel!.SetNeedsDisplay (state.Toplevel.Frame);
             Top.Draw ();
 
-            foreach (Toplevel top in _topLevels.Reverse ())
+            foreach (Toplevel top in TopLevels.Reverse ())
             {
                 if (top != Top && top != state.Toplevel)
                 {
@@ -608,7 +608,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             }
         }
 
-        if (_topLevels.Count == 1
+        if (TopLevels.Count == 1
             && state.Toplevel == Top
             && (Driver!.Cols != state.Toplevel!.Frame.Width
                 || Driver!.Rows != state.Toplevel.Frame.Height)
@@ -619,7 +619,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             Driver.ClearContents ();
         }
 
-        if (state.Toplevel!.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || OverlappedChildNeedsDisplay ())
+        if (state.Toplevel!.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || ApplicationOverlapped.OverlappedChildNeedsDisplay ())
         {
             state.Toplevel.SetNeedsDisplay ();
             state.Toplevel.Draw ();
@@ -659,19 +659,19 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// </remarks>
     public static void RequestStop (Toplevel? top = null)
     {
-        if (OverlappedTop is null || top is null)
+        if (ApplicationOverlapped.OverlappedTop is null || top is null)
         {
             top = Current;
         }
 
-        if (OverlappedTop != null
+        if (ApplicationOverlapped.OverlappedTop != null
             && top!.IsOverlappedContainer
             && top?.Running == true
             && (Current?.Modal == false || Current is { Modal: true, Running: false }))
         {
-            OverlappedTop.RequestStop ();
+            ApplicationOverlapped.OverlappedTop.RequestStop ();
         }
-        else if (OverlappedTop != null
+        else if (ApplicationOverlapped.OverlappedTop != null
                  && top != Current
                  && Current is { Running: true, Modal: true }
                  && top!.Modal
@@ -698,21 +698,21 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             top.Running = false;
             OnNotifyStopRunState (top);
         }
-        else if ((OverlappedTop != null
-                  && top != OverlappedTop
+        else if ((ApplicationOverlapped.OverlappedTop != null
+                  && top != ApplicationOverlapped.OverlappedTop
                   && top != Current
                   && Current is { Modal: false, Running: true }
                   && !top!.Running)
-                 || (OverlappedTop != null
-                     && top != OverlappedTop
+                 || (ApplicationOverlapped.OverlappedTop != null
+                     && top != ApplicationOverlapped.OverlappedTop
                      && top != Current
                      && Current is { Modal: false, Running: false }
                      && !top!.Running
-                     && _topLevels.ToArray () [1].Running))
+                     && TopLevels.ToArray () [1].Running))
         {
-            MoveCurrent (top);
+            ApplicationOverlapped.MoveCurrent (top);
         }
-        else if (OverlappedTop != null
+        else if (ApplicationOverlapped.OverlappedTop != null
                  && Current != top
                  && Current?.Running == true
                  && !top!.Running
@@ -723,9 +723,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             Current.Running = false;
             OnNotifyStopRunState (Current);
         }
-        else if (OverlappedTop != null
+        else if (ApplicationOverlapped.OverlappedTop != null
                  && Current == top
-                 && OverlappedTop?.Running == true
+                 && ApplicationOverlapped.OverlappedTop?.Running == true
                  && Current?.Running == true
                  && top!.Running
                  && Current?.Modal == true
@@ -784,9 +784,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (runState);
 
-        if (OverlappedTop is { })
+        if (ApplicationOverlapped.OverlappedTop is { })
         {
-            OverlappedTop.OnChildUnloaded (runState.Toplevel);
+            ApplicationOverlapped.OverlappedTop.OnChildUnloaded (runState.Toplevel);
         }
         else
         {
@@ -795,16 +795,16 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         // End the RunState.Toplevel
         // First, take it off the Toplevel Stack
-        if (_topLevels.Count > 0)
+        if (TopLevels.Count > 0)
         {
-            if (_topLevels.Peek () != runState.Toplevel)
+            if (TopLevels.Peek () != runState.Toplevel)
             {
                 // If the top of the stack is not the RunState.Toplevel then
                 // this call to End is not balanced with the call to Begin that started the RunState
                 throw new ArgumentException ("End must be balanced with calls to Begin");
             }
 
-            _topLevels.Pop ();
+            TopLevels.Pop ();
         }
 
         // Notify that it is closing
@@ -812,32 +812,32 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         // If there is a OverlappedTop that is not the RunState.Toplevel then RunState.Toplevel
         // is a child of MidTop, and we should notify the OverlappedTop that it is closing
-        if (OverlappedTop is { } && !runState.Toplevel!.Modal && runState.Toplevel != OverlappedTop)
+        if (ApplicationOverlapped.OverlappedTop is { } && !runState.Toplevel!.Modal && runState.Toplevel != ApplicationOverlapped.OverlappedTop)
         {
-            OverlappedTop.OnChildClosed (runState.Toplevel);
+            ApplicationOverlapped.OverlappedTop.OnChildClosed (runState.Toplevel);
         }
 
         // Set Current and Top to the next TopLevel on the stack
-        if (_topLevels.Count == 0)
+        if (TopLevels.Count == 0)
         {
             Current = null;
         }
         else
         {
-            if (_topLevels.Count > 1 && _topLevels.Peek () == OverlappedTop && OverlappedChildren?.Any (t => t.Visible) != null)
+            if (TopLevels.Count > 1 && TopLevels.Peek () == ApplicationOverlapped.OverlappedTop && ApplicationOverlapped.OverlappedChildren?.Any (t => t.Visible) != null)
             {
-                OverlappedMoveNext ();
+                ApplicationOverlapped.OverlappedMoveNext ();
             }
 
-            Current = _topLevels.Peek ();
+            Current = TopLevels.Peek ();
 
-            if (_topLevels.Count == 1 && Current == OverlappedTop)
+            if (TopLevels.Count == 1 && Current == ApplicationOverlapped.OverlappedTop)
             {
-                OverlappedTop.OnAllChildClosed ();
+                ApplicationOverlapped.OverlappedTop.OnAllChildClosed ();
             }
             else
             {
-                SetCurrentOverlappedAsTop ();
+                ApplicationOverlapped.SetCurrentOverlappedAsTop ();
                 runState.Toplevel!.OnLeave (Current);
                 Current.OnEnter (runState.Toplevel);
             }
@@ -848,9 +848,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         // Don't dispose runState.Toplevel. It's up to caller dispose it
         // If it's not the same as the current in the RunIteration,
         // it will be fixed later in the next RunIteration.
-        if (OverlappedTop is { } && !_topLevels.Contains (OverlappedTop))
+        if (ApplicationOverlapped.OverlappedTop is { } && !TopLevels.Contains (ApplicationOverlapped.OverlappedTop))
         {
-            _cachedRunStateToplevel = OverlappedTop;
+            _cachedRunStateToplevel = ApplicationOverlapped.OverlappedTop;
         }
         else
         {

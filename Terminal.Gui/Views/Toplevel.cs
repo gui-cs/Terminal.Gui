@@ -239,7 +239,7 @@ public partial class Toplevel : View
                 || Application.Current?.Modal == false
                 || (Application.Current?.Modal == true && Application.Current?.Running == false)))
         {
-            foreach (Toplevel child in Application.OverlappedChildren)
+            foreach (Toplevel child in ApplicationOverlapped.OverlappedChildren!)
             {
                 var ev = new ToplevelClosingEventArgs (this);
 
@@ -369,10 +369,10 @@ public partial class Toplevel : View
             //LayoutSubviews ();
             PositionToplevels ();
 
-            if (this == Application.OverlappedTop)
+            if (this == ApplicationOverlapped.OverlappedTop)
             {
                 // This enables correct draw behavior when switching between overlapped subviews
-                foreach (Toplevel top in Application.OverlappedChildren.AsEnumerable ().Reverse ())
+                foreach (Toplevel top in ApplicationOverlapped.OverlappedChildren!.AsEnumerable ().Reverse ())
                 {
                     if (top.Frame.IntersectsWith (Viewport))
                     {
@@ -437,7 +437,7 @@ public partial class Toplevel : View
         if (Focused is null)
         {
             // TODO: this is an Overlapped hack
-            foreach (Toplevel top in Application.OverlappedChildren)
+            foreach (Toplevel top in ApplicationOverlapped.OverlappedChildren!)
             {
                 if (top != this && top.Visible)
                 {
@@ -607,7 +607,7 @@ public class ToplevelEqualityComparer : IEqualityComparer<Toplevel>
 
 /// <summary>
 ///     Implements the <see cref="IComparer{T}"/> to sort the <see cref="Toplevel"/> from the
-///     <see cref="Application.OverlappedChildren"/> if needed.
+///     <see cref="ApplicationOverlapped.OverlappedChildren"/> if needed.
 /// </summary>
 public sealed class ToplevelComparer : IComparer<Toplevel>
 {

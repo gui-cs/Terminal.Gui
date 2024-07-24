@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿#nullable enable
+using System.Threading;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -30,25 +31,25 @@ public class OverlappedTests
 
         overlapped.Ready += (s, e) =>
                             {
-                                Assert.Empty (Application.OverlappedChildren);
+                                Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
                                 Application.Run (c1);
                             };
 
         c1.Ready += (s, e) =>
                     {
-                        Assert.Single (Application.OverlappedChildren);
+                        Assert.Single (ApplicationOverlapped.OverlappedChildren!);
                         Application.Run (c2);
                     };
 
         c2.Ready += (s, e) =>
                     {
-                        Assert.Equal (2, Application.OverlappedChildren.Count);
+                        Assert.Equal (2, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (c3);
                     };
 
         c3.Ready += (s, e) =>
                     {
-                        Assert.Equal (3, Application.OverlappedChildren.Count);
+                        Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
                         c3.RequestStop ();
                         c2.RequestStop ();
                         c1.RequestStop ();
@@ -66,31 +67,31 @@ public class OverlappedTests
                                          Assert.False (Application.Current.Running);
 
                                          // But the Children order were reorder by Running = false
-                                         Assert.True (Application.OverlappedChildren [0] == c3);
-                                         Assert.True (Application.OverlappedChildren [1] == c2);
-                                         Assert.True (Application.OverlappedChildren [^1] == c1);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren! [0] == c3);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren [1] == c2);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren [^1] == c1);
                                      }
                                      else if (iterations == 2)
                                      {
                                          // The Current is c2 and Current.Running is false.
                                          Assert.True (Application.Current == c2);
                                          Assert.False (Application.Current.Running);
-                                         Assert.True (Application.OverlappedChildren [0] == c2);
-                                         Assert.True (Application.OverlappedChildren [^1] == c1);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren ![0] == c2);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren [^1] == c1);
                                      }
                                      else if (iterations == 1)
                                      {
                                          // The Current is c1 and Current.Running is false.
                                          Assert.True (Application.Current == c1);
                                          Assert.False (Application.Current.Running);
-                                         Assert.True (Application.OverlappedChildren [^1] == c1);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren! [^1] == c1);
                                      }
                                      else
                                      {
                                          // The Current is overlapped.
                                          Assert.True (Application.Current == overlapped);
                                          Assert.False (Application.Current.Running);
-                                         Assert.Empty (Application.OverlappedChildren);
+                                         Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
                                      }
 
                                      iterations--;
@@ -98,8 +99,8 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
-        Assert.NotNull (Application.OverlappedTop);
+        Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
+        Assert.NotNull (ApplicationOverlapped.OverlappedTop);
         Assert.NotNull (Application.Top);
         overlapped.Dispose ();
     }
@@ -119,31 +120,31 @@ public class OverlappedTests
 
         top1.Ready += (s, e) =>
                       {
-                          Assert.Null (Application.OverlappedChildren);
+                          Assert.Null (ApplicationOverlapped.OverlappedChildren);
                           Application.Run (top2);
                       };
 
         top2.Ready += (s, e) =>
                       {
-                          Assert.Null (Application.OverlappedChildren);
+                          Assert.Null (ApplicationOverlapped.OverlappedChildren);
                           Application.Run (top3);
                       };
 
         top3.Ready += (s, e) =>
                       {
-                          Assert.Null (Application.OverlappedChildren);
+                          Assert.Null (ApplicationOverlapped.OverlappedChildren);
                           Application.Run (top4);
                       };
 
         top4.Ready += (s, e) =>
                       {
-                          Assert.Null (Application.OverlappedChildren);
+                          Assert.Null (ApplicationOverlapped.OverlappedChildren);
                           Application.Run (d);
                       };
 
         d.Ready += (s, e) =>
                    {
-                       Assert.Null (Application.OverlappedChildren);
+                       Assert.Null (ApplicationOverlapped.OverlappedChildren);
 
                        // This will close the d because on a not OverlappedContainer the Application.Current it always used.
                        Application.RequestStop (top1);
@@ -154,7 +155,7 @@ public class OverlappedTests
 
         Application.Iteration += (s, a) =>
                                  {
-                                     Assert.Null (Application.OverlappedChildren);
+                                     Assert.Null (ApplicationOverlapped.OverlappedChildren);
 
                                      if (iterations == 4)
                                      {
@@ -183,7 +184,7 @@ public class OverlappedTests
 
         Application.Run (top1);
 
-        Assert.Null (Application.OverlappedChildren);
+        Assert.Null (ApplicationOverlapped.OverlappedChildren);
         top1.Dispose ();
     }
 
@@ -261,37 +262,37 @@ public class OverlappedTests
 
         overlapped.Ready += (s, e) =>
                             {
-                                Assert.Empty (Application.OverlappedChildren);
+                                Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
                                 Application.Run (c1);
                             };
 
         c1.Ready += (s, e) =>
                     {
-                        Assert.Single (Application.OverlappedChildren);
+                        Assert.Single (ApplicationOverlapped.OverlappedChildren!);
                         Application.Run (c2);
                     };
 
         c2.Ready += (s, e) =>
                     {
-                        Assert.Equal (2, Application.OverlappedChildren.Count);
+                        Assert.Equal (2, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (c3);
                     };
 
         c3.Ready += (s, e) =>
                     {
-                        Assert.Equal (3, Application.OverlappedChildren.Count);
+                        Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (d1);
                     };
 
         d1.Ready += (s, e) =>
                     {
-                        Assert.Equal (3, Application.OverlappedChildren.Count);
+                        Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (d2);
                     };
 
         d2.Ready += (s, e) =>
                     {
-                        Assert.Equal (3, Application.OverlappedChildren.Count);
+                        Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
                         Assert.True (Application.Current == d2);
                         Assert.True (Application.Current.Running);
 
@@ -326,11 +327,11 @@ public class OverlappedTests
                                      }
                                      else
                                      {
-                                         Assert.Equal (iterations, Application.OverlappedChildren.Count);
+                                         Assert.Equal (iterations, ApplicationOverlapped.OverlappedChildren!.Count);
 
                                          for (var i = 0; i < iterations; i++)
                                          {
-                                             Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
+                                             Assert.Equal ((iterations - i + 1).ToString (), ApplicationOverlapped.OverlappedChildren [i].Id);
                                          }
                                      }
 
@@ -339,8 +340,8 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
-        Assert.NotNull (Application.OverlappedTop);
+        Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
+        Assert.NotNull (ApplicationOverlapped.OverlappedTop);
         Assert.NotNull (Application.Top);
         overlapped.Dispose ();
     }
@@ -363,37 +364,37 @@ public class OverlappedTests
 
         overlapped.Ready += (s, e) =>
                             {
-                                Assert.Empty (Application.OverlappedChildren);
+                                Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
                                 Application.Run (c1);
                             };
 
         c1.Ready += (s, e) =>
                     {
-                        Assert.Single (Application.OverlappedChildren);
+                        Assert.Single (ApplicationOverlapped.OverlappedChildren!);
                         Application.Run (c2);
                     };
 
         c2.Ready += (s, e) =>
                     {
-                        Assert.Equal (2, Application.OverlappedChildren.Count);
+                        Assert.Equal (2, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (c3);
                     };
 
         c3.Ready += (s, e) =>
                     {
-                        Assert.Equal (3, Application.OverlappedChildren.Count);
+                        Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (d1);
                     };
 
         d1.Ready += (s, e) =>
                     {
-                        Assert.Equal (3, Application.OverlappedChildren.Count);
+                        Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (c4);
                     };
 
         c4.Ready += (s, e) =>
                     {
-                        Assert.Equal (4, Application.OverlappedChildren.Count);
+                        Assert.Equal (4, ApplicationOverlapped.OverlappedChildren!.Count);
 
                         // Trying to close the Dialog1
                         d1.RequestStop ();
@@ -415,13 +416,13 @@ public class OverlappedTests
                                      }
                                      else
                                      {
-                                         Assert.Equal (iterations, Application.OverlappedChildren.Count);
+                                         Assert.Equal (iterations, ApplicationOverlapped.OverlappedChildren!.Count);
 
                                          for (var i = 0; i < iterations; i++)
                                          {
                                              Assert.Equal (
                                                            (iterations - i + (iterations == 4 && i == 0 ? 2 : 1)).ToString (),
-                                                           Application.OverlappedChildren [i].Id
+                                                           ApplicationOverlapped.OverlappedChildren [i].Id
                                                           );
                                          }
                                      }
@@ -431,8 +432,8 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
-        Assert.NotNull (Application.OverlappedTop);
+        Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
+        Assert.NotNull (ApplicationOverlapped.OverlappedTop);
         Assert.NotNull (Application.Top);
         overlapped.Dispose ();
     }
@@ -441,7 +442,7 @@ public class OverlappedTests
     [AutoInitShutdown]
     public void MoveCurrent_Returns_False_If_The_Current_And_Top_Parameter_Are_Both_With_Running_Set_To_False ()
     {
-        var overlapped = new Overlapped ();
+        Overlapped? overlapped = new Overlapped ();
         var c1 = new Toplevel ();
         var c2 = new Window ();
         var c3 = new Window ();
@@ -451,25 +452,25 @@ public class OverlappedTests
 
         overlapped.Ready += (s, e) =>
                             {
-                                Assert.Empty (Application.OverlappedChildren);
+                                Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
                                 Application.Run (c1);
                             };
 
         c1.Ready += (s, e) =>
                     {
-                        Assert.Single (Application.OverlappedChildren);
+                        Assert.Single (ApplicationOverlapped.OverlappedChildren!);
                         Application.Run (c2);
                     };
 
         c2.Ready += (s, e) =>
                     {
-                        Assert.Equal (2, Application.OverlappedChildren.Count);
+                        Assert.Equal (2, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (c3);
                     };
 
         c3.Ready += (s, e) =>
                     {
-                        Assert.Equal (3, Application.OverlappedChildren.Count);
+                        Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
                         c3.RequestStop ();
                         c1.RequestStop ();
                     };
@@ -486,30 +487,30 @@ public class OverlappedTests
                                          Assert.False (Application.Current.Running);
 
                                          // But the Children order were reorder by Running = false
-                                         Assert.True (Application.OverlappedChildren [0] == c3);
-                                         Assert.True (Application.OverlappedChildren [1] == c1);
-                                         Assert.True (Application.OverlappedChildren [^1] == c2);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren! [0] == c3);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren [1] == c1);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren [^1] == c2);
                                      }
                                      else if (iterations == 2)
                                      {
                                          // The Current is c1 and Current.Running is false.
                                          Assert.True (Application.Current == c1);
                                          Assert.False (Application.Current.Running);
-                                         Assert.True (Application.OverlappedChildren [0] == c1);
-                                         Assert.True (Application.OverlappedChildren [^1] == c2);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren! [0] == c1);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren [^1] == c2);
                                      }
                                      else if (iterations == 1)
                                      {
                                          // The Current is c2 and Current.Running is false.
                                          Assert.True (Application.Current == c2);
                                          Assert.False (Application.Current.Running);
-                                         Assert.True (Application.OverlappedChildren [^1] == c2);
+                                         Assert.True (ApplicationOverlapped.OverlappedChildren! [^1] == c2);
                                      }
                                      else
                                      {
                                          // The Current is overlapped.
                                          Assert.True (Application.Current == overlapped);
-                                         Assert.Empty (Application.OverlappedChildren);
+                                         Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
                                      }
 
                                      iterations--;
@@ -517,8 +518,8 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
-        Assert.NotNull (Application.OverlappedTop);
+        Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
+        Assert.NotNull (ApplicationOverlapped.OverlappedTop);
         Assert.NotNull (Application.Top);
         overlapped.Dispose ();
     }
@@ -526,7 +527,7 @@ public class OverlappedTests
     [Fact]
     public void MoveToOverlappedChild_Throw_NullReferenceException_Passing_Null_Parameter ()
     {
-        Assert.Throws<NullReferenceException> (delegate { Application.MoveToOverlappedChild (null); });
+        Assert.Throws<NullReferenceException> (delegate { ApplicationOverlapped.MoveToOverlappedChild (null); });
     }
 
     [Fact]
@@ -544,11 +545,11 @@ public class OverlappedTests
 
         overlapped.Ready += (s, e) =>
                             {
-                                Assert.Empty (Application.OverlappedChildren);
+                                Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
                                 Application.Run (logger);
                             };
 
-        logger.Ready += (s, e) => Assert.Single (Application.OverlappedChildren);
+        logger.Ready += (s, e) => Assert.Single (ApplicationOverlapped.OverlappedChildren!);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -559,7 +560,7 @@ public class OverlappedTests
 
                                          stage.Ready += (s, e) =>
                                                         {
-                                                            Assert.Equal (iterations, Application.OverlappedChildren.Count);
+                                                            Assert.Equal (iterations, ApplicationOverlapped.OverlappedChildren!.Count);
                                                             stage.RequestStop ();
                                                         };
 
@@ -570,7 +571,7 @@ public class OverlappedTests
                                                                  allStageClosed = true;
                                                              }
 
-                                                             Assert.Equal (iterations, Application.OverlappedChildren.Count);
+                                                             Assert.Equal (iterations, ApplicationOverlapped.OverlappedChildren!.Count);
 
                                                              if (running)
                                                              {
@@ -581,7 +582,7 @@ public class OverlappedTests
                                                                  rpt.Ready += (s, e) =>
                                                                               {
                                                                                   iterations++;
-                                                                                  Assert.Equal (iterations, Application.OverlappedChildren.Count);
+                                                                                  Assert.Equal (iterations, ApplicationOverlapped.OverlappedChildren.Count);
                                                                               };
 
                                                                  Application.Run (rpt);
@@ -593,28 +594,28 @@ public class OverlappedTests
                                      else if (iterations == 11 && running)
                                      {
                                          running = false;
-                                         Assert.Equal (iterations, Application.OverlappedChildren.Count);
+                                         Assert.Equal (iterations, ApplicationOverlapped.OverlappedChildren!.Count);
                                      }
                                      else if (!overlappedRequestStop && running && !allStageClosed)
                                      {
-                                         Assert.Equal (iterations, Application.OverlappedChildren.Count);
+                                         Assert.Equal (iterations, ApplicationOverlapped.OverlappedChildren!.Count);
                                      }
                                      else if (!overlappedRequestStop && !running && allStageClosed)
                                      {
-                                         Assert.Equal (iterations, Application.OverlappedChildren.Count);
+                                         Assert.Equal (iterations, ApplicationOverlapped.OverlappedChildren!.Count);
                                          overlappedRequestStop = true;
-                                         overlapped.RequestStop ();
+                                         overlapped?.RequestStop ();
                                      }
                                      else
                                      {
-                                         Assert.Empty (Application.OverlappedChildren);
+                                         Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
                                      }
                                  };
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
-        Assert.NotNull (Application.OverlappedTop);
+        Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
+        Assert.NotNull (ApplicationOverlapped.OverlappedTop);
         Assert.NotNull (Application.Top);
         overlapped.Dispose ();
     }
@@ -652,32 +653,32 @@ public class OverlappedTests
 
         overlapped.Ready += (s, e) =>
                             {
-                                Assert.Empty (Application.OverlappedChildren);
+                                Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
                                 Application.Run (c1);
                             };
 
         c1.Ready += (s, e) =>
                     {
-                        Assert.Single (Application.OverlappedChildren);
+                        Assert.Single (ApplicationOverlapped.OverlappedChildren!);
                         Application.Run (c2);
                     };
 
         c2.Ready += (s, e) =>
                     {
-                        Assert.Equal (2, Application.OverlappedChildren.Count);
+                        Assert.Equal (2, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (c3);
                     };
 
         c3.Ready += (s, e) =>
                     {
-                        Assert.Equal (3, Application.OverlappedChildren.Count);
+                        Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (d);
                     };
 
         // Also easy because the Overlapped Container handles all at once
         d.Ready += (s, e) =>
                    {
-                       Assert.Equal (3, Application.OverlappedChildren.Count);
+                       Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
 
                        // This will not close the OverlappedContainer because d is a modal Toplevel
                        Application.RequestStop (overlapped);
@@ -696,11 +697,11 @@ public class OverlappedTests
                                      }
                                      else
                                      {
-                                         Assert.Equal (iterations, Application.OverlappedChildren.Count);
+                                         Assert.Equal (iterations, ApplicationOverlapped.OverlappedChildren!.Count);
 
                                          for (var i = 0; i < iterations; i++)
                                          {
-                                             Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
+                                             Assert.Equal ((iterations - i + 1).ToString (), ApplicationOverlapped.OverlappedChildren [i].Id);
                                          }
                                      }
 
@@ -709,8 +710,8 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
-        Assert.NotNull (Application.OverlappedTop);
+        Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
+        Assert.NotNull (ApplicationOverlapped.OverlappedTop);
         Assert.NotNull (Application.Top);
         overlapped.Dispose ();
     }
@@ -731,32 +732,32 @@ public class OverlappedTests
 
         overlapped.Ready += (s, e) =>
                             {
-                                Assert.Empty (Application.OverlappedChildren);
+                                Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
                                 Application.Run (c1);
                             };
 
         c1.Ready += (s, e) =>
                     {
-                        Assert.Single (Application.OverlappedChildren);
+                        Assert.Single (ApplicationOverlapped.OverlappedChildren!);
                         Application.Run (c2);
                     };
 
         c2.Ready += (s, e) =>
                     {
-                        Assert.Equal (2, Application.OverlappedChildren.Count);
+                        Assert.Equal (2, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (c3);
                     };
 
         c3.Ready += (s, e) =>
                     {
-                        Assert.Equal (3, Application.OverlappedChildren.Count);
+                        Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (d);
                     };
 
         //More harder because it's sequential.
         d.Ready += (s, e) =>
                    {
-                       Assert.Equal (3, Application.OverlappedChildren.Count);
+                       Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
 
                        // Close the Dialog
                        Application.RequestStop ();
@@ -776,11 +777,11 @@ public class OverlappedTests
                                      }
                                      else
                                      {
-                                         Assert.Equal (iterations, Application.OverlappedChildren.Count);
+                                         Assert.Equal (iterations, ApplicationOverlapped.OverlappedChildren!.Count);
 
                                          for (var i = 0; i < iterations; i++)
                                          {
-                                             Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
+                                             Assert.Equal ((iterations - i + 1).ToString (), ApplicationOverlapped.OverlappedChildren [i].Id);
                                          }
                                      }
 
@@ -789,8 +790,8 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
-        Assert.NotNull (Application.OverlappedTop);
+        Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
+        Assert.NotNull (ApplicationOverlapped.OverlappedTop);
         Assert.NotNull (Application.Top);
         overlapped.Dispose ();
     }
@@ -811,32 +812,32 @@ public class OverlappedTests
 
         overlapped.Ready += (s, e) =>
                             {
-                                Assert.Empty (Application.OverlappedChildren);
+                                Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
                                 Application.Run (c1);
                             };
 
         c1.Ready += (s, e) =>
                     {
-                        Assert.Single (Application.OverlappedChildren);
+                        Assert.Single (ApplicationOverlapped.OverlappedChildren!);
                         Application.Run (c2);
                     };
 
         c2.Ready += (s, e) =>
                     {
-                        Assert.Equal (2, Application.OverlappedChildren.Count);
+                        Assert.Equal (2, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (c3);
                     };
 
         c3.Ready += (s, e) =>
                     {
-                        Assert.Equal (3, Application.OverlappedChildren.Count);
+                        Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
                         Application.Run (d);
                     };
 
         // More easy because the Overlapped Container handles all at once
         d.Ready += (s, e) =>
                    {
-                       Assert.Equal (3, Application.OverlappedChildren.Count);
+                       Assert.Equal (3, ApplicationOverlapped.OverlappedChildren!.Count);
 
                        // This will not close the OverlappedContainer because d is a modal Toplevel and will be closed.
                        overlapped.RequestStop ();
@@ -855,11 +856,11 @@ public class OverlappedTests
                                      }
                                      else
                                      {
-                                         Assert.Equal (iterations, Application.OverlappedChildren.Count);
+                                         Assert.Equal (iterations, ApplicationOverlapped.OverlappedChildren!.Count);
 
                                          for (var i = 0; i < iterations; i++)
                                          {
-                                             Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
+                                             Assert.Equal ((iterations - i + 1).ToString (), ApplicationOverlapped.OverlappedChildren [i].Id);
                                          }
                                      }
 
@@ -868,8 +869,8 @@ public class OverlappedTests
 
         Application.Run (overlapped);
 
-        Assert.Empty (Application.OverlappedChildren);
-        Assert.NotNull (Application.OverlappedTop);
+        Assert.Empty (ApplicationOverlapped.OverlappedChildren!);
+        Assert.NotNull (ApplicationOverlapped.OverlappedTop);
         Assert.NotNull (Application.Top);
         overlapped.Dispose ();
     }
@@ -885,7 +886,7 @@ public class OverlappedTests
         RunState rsOverlapped = Application.Begin (overlapped);
 
         // Need to fool MainLoop into thinking it's running
-        Application.MainLoop.Running = true;
+        Application.MainLoop!.Running = true;
 
         // RunIteration must be call on each iteration because
         // it's using the Begin and not the Run method
@@ -894,7 +895,7 @@ public class OverlappedTests
 
         Assert.Equal (overlapped, rsOverlapped.Toplevel);
         Assert.Equal (Application.Top, rsOverlapped.Toplevel);
-        Assert.Equal (Application.OverlappedTop, rsOverlapped.Toplevel);
+        Assert.Equal (ApplicationOverlapped.OverlappedTop, rsOverlapped.Toplevel);
         Assert.Equal (Application.Current, rsOverlapped.Toplevel);
         Assert.Equal (overlapped, Application.Current);
 
@@ -903,7 +904,7 @@ public class OverlappedTests
 
         Assert.Equal (overlapped, rsOverlapped.Toplevel);
         Assert.Equal (Application.Top, rsOverlapped.Toplevel);
-        Assert.Equal (Application.OverlappedTop, rsOverlapped.Toplevel);
+        Assert.Equal (ApplicationOverlapped.OverlappedTop, rsOverlapped.Toplevel);
         // The win1 Visible is false and cannot be set as the Current
         Assert.Equal (Application.Current, rsOverlapped.Toplevel);
         Assert.Equal (overlapped, Application.Current);
@@ -916,7 +917,7 @@ public class OverlappedTests
         // and not the original overlapped
         Assert.Equal (win2, rsOverlapped.Toplevel);
         Assert.Equal (Application.Top, overlapped);
-        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Equal (ApplicationOverlapped.OverlappedTop, overlapped);
         Assert.Equal (Application.Current, rsWin2.Toplevel);
         Assert.Equal (win2, Application.Current);
         Assert.Equal (win1, rsWin1.Toplevel);
@@ -931,7 +932,7 @@ public class OverlappedTests
 
         Assert.Equal (win2, rsOverlapped.Toplevel);
         Assert.Equal (Application.Top, overlapped);
-        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Equal (ApplicationOverlapped.OverlappedTop, overlapped);
         Assert.Equal (Application.Current, rsWin2.Toplevel);
         Assert.Equal (win2, Application.Current);
         Assert.Equal (win1, rsWin1.Toplevel);
@@ -945,7 +946,7 @@ public class OverlappedTests
 
         Assert.Equal (win2, rsOverlapped.Toplevel);
         Assert.Equal (Application.Top, overlapped);
-        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Equal (ApplicationOverlapped.OverlappedTop, overlapped);
         Assert.Equal (Application.Current, rsWin2.Toplevel);
         Assert.Equal (win2, Application.Current);
         Assert.Equal (win1, rsWin1.Toplevel);
@@ -963,7 +964,7 @@ public class OverlappedTests
 #endif
         Assert.Null (rsOverlapped.Toplevel);
         Assert.Equal (Application.Top, overlapped);
-        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Equal (ApplicationOverlapped.OverlappedTop, overlapped);
         Assert.Equal (Application.Current, rsWin1.Toplevel);
         Assert.Equal (win1, Application.Current);
         Assert.Equal (win1, rsWin1.Toplevel);
@@ -978,7 +979,7 @@ public class OverlappedTests
 #endif
         Assert.Null (rsOverlapped.Toplevel);
         Assert.Equal (Application.Top, overlapped);
-        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Equal (ApplicationOverlapped.OverlappedTop, overlapped);
         Assert.Equal (Application.Current, overlapped);
         Assert.Null (rsWin1.Toplevel);
         // See here that the only Toplevel that needs to End is the overlapped
@@ -994,7 +995,7 @@ public class OverlappedTests
 #endif
         Assert.Null (rsOverlapped.Toplevel);
         Assert.Equal (Application.Top, overlapped);
-        Assert.Equal (Application.OverlappedTop, overlapped);
+        Assert.Equal (ApplicationOverlapped.OverlappedTop, overlapped);
         Assert.Null (Application.Current);
         Assert.Null (rsWin1.Toplevel);
         Assert.Null (rsWin2.Toplevel);
@@ -1021,10 +1022,10 @@ public class OverlappedTests
     public void KeyBindings_Command_With_OverlappedTop ()
     {
         Toplevel top = new ();
-        Assert.Null (Application.OverlappedTop);
+        Assert.Null (ApplicationOverlapped.OverlappedTop);
         top.IsOverlappedContainer = true;
         Application.Begin (top);
-        Assert.Equal (Application.Top, Application.OverlappedTop);
+        Assert.Equal (Application.Top, ApplicationOverlapped.OverlappedTop);
 
         var isRunning = true;
 
@@ -1060,7 +1061,7 @@ public class OverlappedTests
         Assert.Null (top.Focused);
         Assert.Equal (top, Application.Current);
         Assert.True (top.IsCurrentTop);
-        Assert.Equal (top, Application.OverlappedTop);
+        Assert.Equal (top, ApplicationOverlapped.OverlappedTop);
         Application.Begin (win1);
         Assert.Equal (new (0, 0, 40, 25), win1.Frame);
         Assert.NotEqual (top, Application.Current);
@@ -1072,7 +1073,7 @@ public class OverlappedTests
         Assert.Null (top.MostFocused);
         Assert.Equal (tf1W1, win1.MostFocused);
         Assert.True (win1.IsOverlapped);
-        Assert.Single (Application.OverlappedChildren);
+        Assert.Single (ApplicationOverlapped.OverlappedChildren!);
         Application.Begin (win2);
         Assert.Equal (new (0, 0, 40, 25), win2.Frame);
         Assert.NotEqual (top, Application.Current);
@@ -1083,16 +1084,16 @@ public class OverlappedTests
         Assert.Null (top.Focused);
         Assert.Null (top.MostFocused);
         Assert.Equal (tf1W2, win2.MostFocused);
-        Assert.Equal (2, Application.OverlappedChildren.Count);
+        Assert.Equal (2, ApplicationOverlapped.OverlappedChildren!.Count);
 
-        Application.MoveToOverlappedChild (win1);
+        ApplicationOverlapped.MoveToOverlappedChild (win1);
         Assert.Equal (win1, Application.Current);
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         win1.Running = true;
         Assert.True (Application.OnKeyDown (Application.QuitKey));
         Assert.False (isRunning);
         Assert.False (win1.Running);
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
 
         Assert.True (
                      Application.OnKeyDown (Key.Z.WithCtrl)
@@ -1110,77 +1111,77 @@ public class OverlappedTests
         Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
 
         Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));    // move to win2
-        Assert.Equal (win2, Application.OverlappedChildren [0]);
+        Assert.Equal (win2, ApplicationOverlapped.OverlappedChildren [0]);
 
         Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl.WithShift));    // move back to win1
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
 
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.True (Application.OnKeyDown (Key.Tab));    // text view eats tab
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
 
         tvW1.AllowsTab = false;
         Assert.True (Application.OnKeyDown (Key.Tab));    // text view eats tab
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
 
         Assert.True (Application.OnKeyDown (Key.CursorRight));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorDown));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
 #if UNIX_KEY_BINDINGS
-        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.I.WithCtrl)));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.True (ApplicationOverlapped.OverlappedChildren [0].ProcessKeyDown (new (Key.I.WithCtrl)));
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
 #endif
         Assert.True (Application.OnKeyDown (Key.Tab));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorLeft));  // The view to the left of tvW1 is tf2W1, but tvW1 is still focused and eats cursor keys
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorUp));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.True (Application.OnKeyDown (Key.Tab));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
 
         Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl)); // Move to win2
-        Assert.Equal (win2, Application.OverlappedChildren [0]);
+        Assert.Equal (win2, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf1W2, win2.MostFocused);
         tf2W2.SetFocus ();
         Assert.True (tf2W2.HasFocus);
 
         Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl.WithShift));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
         Assert.True (Application.OnKeyDown (Application.AlternateForwardKey));
-        Assert.Equal (win2, Application.OverlappedChildren [0]);
+        Assert.Equal (win2, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf2W2, win2.MostFocused);
         Assert.True (Application.OnKeyDown (Application.AlternateBackwardKey));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorDown));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
 #if UNIX_KEY_BINDINGS
         Assert.True (Application.OnKeyDown (new (Key.B.WithCtrl)));
 #else
         Assert.True (Application.OnKeyDown (Key.CursorLeft));
 #endif
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf1W1, win1.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorDown));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.Equal (Point.Empty, tvW1.CursorPosition);
 
         Assert.True (Application.OnKeyDown (Key.End.WithCtrl));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.Equal (new (16, 1), tvW1.CursorPosition);
 #if UNIX_KEY_BINDINGS
@@ -1188,11 +1189,11 @@ public class OverlappedTests
 #else
         Assert.True (Application.OnKeyDown (Key.CursorRight));
 #endif
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
+        Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
 
 #if UNIX_KEY_BINDINGS
-        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.L.WithCtrl)));
+        Assert.True (ApplicationOverlapped.OverlappedChildren [0].ProcessKeyDown (new (Key.L.WithCtrl)));
 #endif
         win2.Dispose ();
         win1.Dispose ();
