@@ -1,6 +1,9 @@
 #nullable enable
 namespace Terminal.Gui;
 
+/// <summary>
+///     Helper class for <see cref="Application"/> navigation.
+/// </summary>
 internal static class ApplicationNavigation
 {
     /// <summary>
