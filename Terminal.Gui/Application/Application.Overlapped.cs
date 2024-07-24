@@ -11,7 +11,7 @@ internal static class ViewNavigation
     /// </summary>
     /// <param name="view"></param>
     /// <returns></returns>
-    internal static View GetDeepestFocusedSubview (View view)
+    internal static View? GetDeepestFocusedSubview (View? view)
     {
         if (view is null)
         {
@@ -30,7 +30,7 @@ internal static class ViewNavigation
     }
 
     /// <summary>
-    ///    Sets the focus to the next view in the <see cref="TabIndexes"/> list. If the last view is focused, the first view is focused.
+    ///    Sets the focus to the next view in the <see cref="View.TabIndexes"/> list. If the last view is focused, the first view is focused.
     /// </summary>
     /// <param name="viewsInTabIndexes"></param>
     /// <param name="direction"></param>
@@ -56,11 +56,11 @@ internal static class ViewNavigation
             {
                 if (direction == NavigationDirection.Forward)
                 {
-                    Application.Current.SuperView?.FocusNext ();
+                    Application.Current!.SuperView?.FocusNext ();
                 }
                 else
                 {
-                    Application.Current.SuperView?.FocusPrev ();
+                    Application.Current!.SuperView?.FocusPrev ();
                 }
 
                 focusProcessed = true;
@@ -83,7 +83,7 @@ internal static class ViewNavigation
     /// </summary>
     internal static void MoveNextView ()
     {
-        View old = GetDeepestFocusedSubview (Application.Current.Focused);
+        View? old = GetDeepestFocusedSubview (Application.Current!.Focused);
 
         if (!Application.Current.FocusNext ())
         {
@@ -105,8 +105,8 @@ internal static class ViewNavigation
     {
         if (Application.OverlappedTop is null)
         {
-            Toplevel top = Application.Current.Modal ? Application.Current : Application.Top;
-            top.FocusNext ();
+            Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
+            top!.FocusNext ();
 
             if (top.Focused is null)
             {
@@ -124,7 +124,7 @@ internal static class ViewNavigation
 
     internal static void MovePreviousView ()
     {
-        View old = GetDeepestFocusedSubview (Application.Current.Focused);
+        View? old = GetDeepestFocusedSubview (Application.Current!.Focused);
 
         if (!Application.Current.FocusPrev ())
         {
@@ -146,8 +146,8 @@ internal static class ViewNavigation
     {
         if (Application.OverlappedTop is null)
         {
-            Toplevel top = Application.Current.Modal ? Application.Current : Application.Top;
-            top.FocusPrev ();
+            Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
+            top!.FocusPrev ();
 
             if (top.Focused is null)
             {

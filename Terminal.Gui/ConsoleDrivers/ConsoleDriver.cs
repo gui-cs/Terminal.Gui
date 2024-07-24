@@ -1,3 +1,4 @@
+#nullable enable
 //
 // ConsoleDriver.cs: Base class for Terminal.Gui ConsoleDriver implementations.
 //
@@ -16,7 +17,7 @@ public abstract class ConsoleDriver
 {
     // As performance is a concern, we keep track of the dirty lines and only refresh those.
     // This is in addition to the dirty flag on each cell.
-    internal bool [] _dirtyLines;
+    internal bool []? _dirtyLines;
 
     // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
     /// <summary>Gets the location and size of the terminal screen.</summary>
@@ -443,7 +444,7 @@ public abstract class ConsoleDriver
     public abstract bool SetCursorVisibility (CursorVisibility visibility);
 
     /// <summary>The event fired when the terminal is resized.</summary>
-    public event EventHandler<SizeChangedEventArgs> SizeChanged;
+    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
     /// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>

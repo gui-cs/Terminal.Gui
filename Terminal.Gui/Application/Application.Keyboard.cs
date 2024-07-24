@@ -98,7 +98,7 @@ public static partial class Application // Keyboard handling
     ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
     ///     <para>Fired after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.</para>
     /// </remarks>
-    public static event EventHandler<Key> KeyDown;
+    public static event EventHandler<Key>? KeyDown;
 
     /// <summary>
     ///     Called by the <see cref="ConsoleDriver"/> when the user presses a key. Fires the <see cref="KeyDown"/> event
@@ -199,7 +199,7 @@ public static partial class Application // Keyboard handling
     ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
     ///     <para>Fired after <see cref="KeyDown"/>.</para>
     /// </remarks>
-    public static event EventHandler<Key> KeyUp;
+    public static event EventHandler<Key>? KeyUp;
 
     /// <summary>
     ///     Called by the <see cref="ConsoleDriver"/> when the user releases a key. Fires the <see cref="KeyUp"/> event
@@ -304,7 +304,7 @@ public static partial class Application // Keyboard handling
                     {
                         if (OverlappedTop is { })
                         {
-                            RequestStop (Current);
+                            RequestStop (Current!);
                         }
                         else
                         {

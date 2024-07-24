@@ -9,32 +9,32 @@ public static partial class Application // Mouse handling
     public static bool IsMouseDisabled { get; set; }
 
     /// <summary>The current <see cref="View"/> object that wants continuous mouse button pressed events.</summary>
-    public static View WantContinuousButtonPressedView { get; private set; }
+    public static View? WantContinuousButtonPressedView { get; private set; }
 
     /// <summary>
     ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to
     ///     this view until the view calls <see cref="UngrabMouse"/> or the mouse is released.
     /// </summary>
-    public static View MouseGrabView { get; private set; }
+    public static View? MouseGrabView { get; private set; }
 
     /// <summary>Invoked when a view wants to grab the mouse; can be canceled.</summary>
-    public static event EventHandler<GrabMouseEventArgs> GrabbingMouse;
+    public static event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
 
     /// <summary>Invoked when a view wants un-grab the mouse; can be canceled.</summary>
-    public static event EventHandler<GrabMouseEventArgs> UnGrabbingMouse;
+    public static event EventHandler<GrabMouseEventArgs>? UnGrabbingMouse;
 
     /// <summary>Invoked after a view has grabbed the mouse.</summary>
-    public static event EventHandler<ViewEventArgs> GrabbedMouse;
+    public static event EventHandler<ViewEventArgs>? GrabbedMouse;
 
     /// <summary>Invoked after a view has un-grabbed the mouse.</summary>
-    public static event EventHandler<ViewEventArgs> UnGrabbedMouse;
+    public static event EventHandler<ViewEventArgs>? UnGrabbedMouse;
 
     /// <summary>
     ///     Grabs the mouse, forcing all mouse events to be routed to the specified view until <see cref="UngrabMouse"/>
     ///     is called.
     /// </summary>
     /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
-    public static void GrabMouse (View view)
+    public static void GrabMouse (View? view)
     {
         if (view is null)
         {

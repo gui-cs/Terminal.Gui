@@ -491,7 +491,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (tf1W2, top.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorRight)); // move char to right in tf1W2
         Assert.Equal (win2, top.Focused);
-        Assert.Equal (tf1W2, top.MostFocused);   
+        Assert.Equal (tf1W2, top.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorDown)); // move down to next view (tvW2)
         Assert.Equal (win2, top.Focused);
         Assert.Equal (tvW2, top.MostFocused);
@@ -504,7 +504,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (win2, top.Focused);
         Assert.Equal (tvW2, top.MostFocused);
         tvW2.AllowsTab = false;
-        Assert.True (Application.OnKeyDown (Key.Tab.WithShift)); 
+        Assert.True (Application.OnKeyDown (Key.Tab.WithShift));
         Assert.Equal (win2, top.Focused);
         Assert.Equal (tf1W2, top.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorLeft));
@@ -563,9 +563,6 @@ public partial class ToplevelTests (ITestOutputHelper output)
     [Fact]
     public void Added_Event_Should_Not_Be_Used_To_Initialize_Toplevel_Events ()
     {
-        Key alternateForwardKey = default;
-        Key alternateBackwardKey = default;
-        Key quitKey = default;
         var wasAdded = false;
 
         var view = new View ();
@@ -588,7 +585,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Application.Shutdown ();
     }
-    
+
     [Fact]
     [AutoInitShutdown]
     public void Mouse_Drag_On_Top_With_Superview_Null ()

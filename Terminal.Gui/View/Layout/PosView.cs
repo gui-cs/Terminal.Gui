@@ -28,7 +28,7 @@ public class PosView (View? view, Side side) : Pos
     public override bool Equals (object? other) { return other is PosView abs && abs.Target == Target && abs.Side == Side; }
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return Target.GetHashCode (); }
+    public override int GetHashCode () { return Target!.GetHashCode (); }
 
     /// <inheritdoc/>
     public override string ToString ()

@@ -8,7 +8,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 {
     // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
     // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
-    private static Toplevel _cachedRunStateToplevel;
+    private static Toplevel? _cachedRunStateToplevel;
 
     /// <summary>
     ///     Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is
@@ -19,7 +19,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
     ///     when the application is done.
     /// </remarks>
-    public static event EventHandler<RunStateEventArgs> NotifyNewRunState;
+    public static event EventHandler<RunStateEventArgs>? NotifyNewRunState;
 
     /// <summary>Notify that an existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).</summary>
     /// <remarks>
@@ -27,7 +27,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     must also subscribe to <see cref="NotifyStopRunState"/> and manually dispose of the <see cref="RunState"/> token
     ///     when the application is done.
     /// </remarks>
-    public static event EventHandler<ToplevelEventArgs> NotifyStopRunState;
+    public static event EventHandler<ToplevelEventArgs>? NotifyStopRunState;
 
     /// <summary>Building block API: Prepares the provided <see cref="Toplevel"/> for execution.</summary>
     /// <returns>
@@ -96,9 +96,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                     throw new ObjectDisposedException (Top.GetType ().FullName);
                 }
             }
-            else if (OverlappedTop is { } && toplevel != Top && _topLevels.Contains (Top))
+            else if (OverlappedTop is { } && toplevel != Top && _topLevels.Contains (Top!))
             {
-                Top.OnLeave (toplevel);
+                Top!.OnLeave (toplevel);
             }
 
             // BUGBUG: We should not depend on `Id` internally.
@@ -120,7 +120,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             }
             else
             {
-                Toplevel dup = _topLevels.FirstOrDefault (x => x.Id == toplevel.Id);
+                Toplevel? dup = _topLevels.FirstOrDefault (x => x.Id == toplevel.Id);
 
                 if (dup is null)
                 {
@@ -150,7 +150,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             if (toplevel.Visible)
             {
                 Current?.OnDeactivate (toplevel);
-                Toplevel previousCurrent = Current;
+                Toplevel previousCurrent = Current!;
                 Current = toplevel;
                 Current.OnActivate (previousCurrent);
 
@@ -161,11 +161,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 refreshDriver = false;
             }
         }
-        else if ((OverlappedTop != null
-                  && toplevel != OverlappedTop
+        else if ((toplevel != OverlappedTop
                   && Current?.Modal == true
                   && !_topLevels.Peek ().Modal)
-                 || (OverlappedTop is { } && toplevel != OverlappedTop && Current?.Running == false))
+                 || (toplevel != OverlappedTop && Current?.Running == false))
         {
             refreshDriver = false;
             MoveCurrent (toplevel);
@@ -173,10 +172,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         else
         {
             refreshDriver = false;
-            MoveCurrent (Current);
+            MoveCurrent (Current!);
         }
 
-        toplevel.SetRelativeLayout (Driver.Screen.Size);
+        toplevel.SetRelativeLayout (Driver!.Screen.Size);
 
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
@@ -216,7 +215,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     internal static bool PositionCursor (View view)
     {
         // Find the most focused view and position the cursor there.
-        View mostFocused = view?.MostFocused;
+        View? mostFocused = view?.MostFocused;
 
         if (mostFocused is null)
         {
@@ -233,7 +232,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         // If the view is not visible or enabled, don't position the cursor
         if (!mostFocused.Visible || !mostFocused.Enabled)
         {
-            Driver.GetCursorVisibility (out CursorVisibility current);
+            Driver!.GetCursorVisibility (out CursorVisibility current);
 
             if (current != CursorVisibility.Invisible)
             {
@@ -245,7 +244,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         // If the view is not visible within it's superview, don't position the cursor
         Rectangle mostFocusedViewport = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = Point.Empty });
-        Rectangle superViewViewport = mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver.Screen;
+        Rectangle superViewViewport = mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver!.Screen;
 
         if (!superViewViewport.IntersectsWith (mostFocusedViewport))
         {
@@ -254,7 +253,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         Point? cursor = mostFocused.PositionCursor ();
 
-        Driver.GetCursorVisibility (out CursorVisibility currentCursorVisibility);
+        Driver!.GetCursorVisibility (out CursorVisibility currentCursorVisibility);
 
         if (cursor is { })
         {
@@ -306,7 +305,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static Toplevel Run (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) { return Run<Toplevel> (errorHandler, driver); }
+    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, ConsoleDriver? driver = null) { return Run<Toplevel> (errorHandler, driver); }
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
@@ -331,7 +330,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static T Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null)
+    public static T Run<T> (Func<Exception, bool>? errorHandler = null, ConsoleDriver? driver = null)
         where T : Toplevel, new ()
     {
         if (!_initialized)
@@ -385,7 +384,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true,
     ///     rethrows when null).
     /// </param>
-    public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
+    public static void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
     {
         ArgumentNullException.ThrowIfNull (view);
 
@@ -460,7 +459,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
     ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
     /// </remarks>
-    public static object AddTimeout (TimeSpan time, Func<bool> callback) { return MainLoop?.AddTimeout (time, callback); }
+    public static object AddTimeout (TimeSpan time, Func<bool> callback) { return MainLoop!.AddTimeout (time, callback); }
 
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
@@ -498,8 +497,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     public static void Refresh ()
     {
         // TODO: Figure out how to remove this call to ClearContents. Refresh should just repaint damaged areas, not clear
-        Driver.ClearContents ();
-        View last = null;
+        Driver!.ClearContents ();
 
         foreach (Toplevel v in _topLevels.Reverse ())
         {
@@ -509,8 +507,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 v.SetSubViewNeedsDisplay ();
                 v.Draw ();
             }
-
-            last = v;
         }
 
         Driver.Refresh ();
@@ -518,11 +514,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
     /// <summary>This event is raised on each iteration of the main loop.</summary>
     /// <remarks>See also <see cref="Timeout"/></remarks>
-    public static event EventHandler<IterationEventArgs> Iteration;
+    public static event EventHandler<IterationEventArgs>? Iteration;
 
     /// <summary>The <see cref="MainLoop"/> driver for the application</summary>
     /// <value>The main loop.</value>
-    internal static MainLoop MainLoop { get; private set; }
+    internal static MainLoop? MainLoop { get; private set; }
 
     /// <summary>
     ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to
@@ -661,17 +657,17 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///         property on the currently running <see cref="Toplevel"/> to false.
     ///     </para>
     /// </remarks>
-    public static void RequestStop (Toplevel top = null)
+    public static void RequestStop (Toplevel? top = null)
     {
-        if (OverlappedTop is null || top is null || (OverlappedTop is null && top is { }))
+        if (OverlappedTop is null || top is null)
         {
             top = Current;
         }
 
         if (OverlappedTop != null
-            && top.IsOverlappedContainer
+            && top!.IsOverlappedContainer
             && top?.Running == true
-            && (Current?.Modal == false || (Current?.Modal == true && Current?.Running == false)))
+            && (Current?.Modal == false || Current is { Modal: true, Running: false }))
         {
             OverlappedTop.RequestStop ();
         }
@@ -679,7 +675,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                  && top != Current
                  && Current?.Running == true
                  && Current?.Modal == true
-                 && top.Modal
+                 && top!.Modal
                  && top.Running)
         {
             var ev = new ToplevelClosingEventArgs (Current);
@@ -708,13 +704,13 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                   && top != Current
                   && Current?.Modal == false
                   && Current?.Running == true
-                  && !top.Running)
+                  && !top!.Running)
                  || (OverlappedTop != null
                      && top != OverlappedTop
                      && top != Current
                      && Current?.Modal == false
                      && Current?.Running == false
-                     && !top.Running
+                     && !top!.Running
                      && _topLevels.ToArray () [1].Running))
         {
             MoveCurrent (top);
@@ -722,7 +718,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         else if (OverlappedTop != null
                  && Current != top
                  && Current?.Running == true
-                 && !top.Running
+                 && !top!.Running
                  && Current?.Modal == true
                  && top.Modal)
         {
@@ -734,9 +730,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                  && Current == top
                  && OverlappedTop?.Running == true
                  && Current?.Running == true
-                 && top.Running
+                 && top!.Running
                  && Current?.Modal == true
-                 && top.Modal)
+                 && top!.Modal)
         {
             // The OverlappedTop was requested to stop inside a modal Toplevel which is the Current and top,
             // both are the same, so needed to set the Current.Running to false too.
@@ -747,13 +743,13 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         {
             Toplevel currentTop;
 
-            if (top == Current || (Current?.Modal == true && !top.Modal))
+            if (top == Current || (Current?.Modal == true && !top!.Modal))
             {
-                currentTop = Current;
+                currentTop = Current!;
             }
             else
             {
-                currentTop = top;
+                currentTop = top!;
             }
 
             if (!currentTop.Running)

@@ -30,7 +30,7 @@ public class DimView : Dim
     public override bool Equals (object? other) { return other is DimView abs && abs.Target == Target && abs.Dimension == Dimension; }
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return Target.GetHashCode (); }
+    public override int GetHashCode () { return Target!.GetHashCode (); }
 
     /// <summary>
     ///     Gets the View the dimension is anchored to.

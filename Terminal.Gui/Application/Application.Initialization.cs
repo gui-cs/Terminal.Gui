@@ -36,7 +36,7 @@ public static partial class Application // Initialization (Init/Shutdown)
     /// </param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static void Init (ConsoleDriver driver = null, string driverName = null) { InternalInit (driver, driverName); }
+    public static void Init (ConsoleDriver? driver = null, string? driverName = null) { InternalInit (driver, driverName); }
 
     internal static bool _initialized;
     internal static int _mainThreadId = -1;
@@ -53,8 +53,8 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     internal static void InternalInit (
-        ConsoleDriver driver = null,
-        string driverName = null,
+        ConsoleDriver? driver = null,
+        string? driverName = null,
         bool calledViaRunT = false
     )
     {
@@ -114,17 +114,17 @@ public static partial class Application // Initialization (Init/Shutdown)
             }
             else
             {
-                List<Type> drivers = GetDriverTypes ();
-                Type driverType = drivers.FirstOrDefault (t => t.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
+                List<Type?> drivers = GetDriverTypes ();
+                Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
 
                 if (driverType is { })
                 {
-                    Driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+                    Driver = (ConsoleDriver)Activator.CreateInstance (driverType)!;
                 }
                 else
                 {
                     throw new ArgumentException (
-                                                 $"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t.Name))}"
+                                                 $"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t!.Name))}"
                                                 );
                 }
             }
@@ -132,7 +132,7 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         try
         {
-            MainLoop = Driver.Init ();
+            MainLoop = Driver!.Init ();
         }
         catch (InvalidOperationException ex)
         {
@@ -159,22 +159,22 @@ public static partial class Application // Initialization (Init/Shutdown)
         InitializedChanged?.Invoke (null, new (in _initialized));
     }
 
-    private static void Driver_SizeChanged (object sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
-    private static void Driver_KeyDown (object sender, Key e) { OnKeyDown (e); }
-    private static void Driver_KeyUp (object sender, Key e) { OnKeyUp (e); }
-    private static void Driver_MouseEvent (object sender, MouseEvent e) { OnMouseEvent (e); }
+    private static void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
+    private static void Driver_KeyDown (object? sender, Key e) { OnKeyDown (e); }
+    private static void Driver_KeyUp (object? sender, Key e) { OnKeyUp (e); }
+    private static void Driver_MouseEvent (object? sender, MouseEvent e) { OnMouseEvent (e); }
 
     /// <summary>Gets of list of <see cref="ConsoleDriver"/> types that are available.</summary>
     /// <returns></returns>
     [RequiresUnreferencedCode ("AOT")]
-    public static List<Type> GetDriverTypes ()
+    public static List<Type?> GetDriverTypes ()
     {
         // use reflection to get the list of drivers
-        List<Type> driverTypes = new ();
+        List<Type?> driverTypes = new ();
 
         foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies ())
         {
-            foreach (Type type in asm.GetTypes ())
+            foreach (Type? type in asm.GetTypes ())
             {
                 if (type.IsSubclassOf (typeof (ConsoleDriver)) && !type.IsAbstract)
                 {
@@ -207,5 +207,5 @@ public static partial class Application // Initialization (Init/Shutdown)
     /// <remarks>
     ///     Intended to support unit tests that need to know when the application has been initialized.
     /// </remarks>
-    public static event EventHandler<EventArgs<bool>> InitializedChanged;
+    public static event EventHandler<EventArgs<bool>>? InitializedChanged;
 }

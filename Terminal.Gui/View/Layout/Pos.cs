@@ -379,7 +379,7 @@ public abstract class Pos
 
         if (left is PosView view)
         {
-            view.Target.SetNeedsLayout ();
+            view.Target?.SetNeedsLayout ();
         }
 
         return newPos;
@@ -408,7 +408,7 @@ public abstract class Pos
 
         if (left is PosView view)
         {
-            view.Target.SetNeedsLayout ();
+            view.Target?.SetNeedsLayout ();
         }
 
         return newPos;

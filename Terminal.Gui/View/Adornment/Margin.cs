@@ -222,10 +222,10 @@ public class Margin : Adornment
         // Adjust the shadow such that it is drawn aligned with the Border
         if (ShadowStyle != ShadowStyle.None && _rightShadow is { } && _bottomShadow is { })
         {
-            _rightShadow.Y = Parent.Border.Thickness.Top > 0
+            _rightShadow.Y = Parent is { } && Parent.Border.Thickness.Top > 0
                                  ? Parent.Border.Thickness.Top - (Parent.Border.Thickness.Top > 2 && Parent.Border.Settings.FastHasFlags (BorderSettings.Title) ? 1 : 0)
                                  : 1;
-            _bottomShadow.X = Parent.Border.Thickness.Left > 0 ? Parent.Border.Thickness.Left : 1;
+            _bottomShadow.X = Parent is { } && Parent.Border.Thickness.Left > 0 ? Parent.Border.Thickness.Left : 1;
         }
     }
 }

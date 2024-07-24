@@ -232,7 +232,7 @@ public abstract class Dim
         }
 
         var newDim = new DimCombine (AddOrSubtract.Add, left, right);
-        (left as DimView)?.Target.SetNeedsLayout ();
+        (left as DimView)?.Target?.SetNeedsLayout ();
 
         return newDim;
     }

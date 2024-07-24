@@ -10,7 +10,7 @@ public static partial class Application // Toplevel handling
 
     /// <summary>The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Top"/>)</summary>
     /// <value>The top.</value>
-    public static Toplevel Top { get; private set; }
+    public static Toplevel? Top { get; private set; }
 
     // TODO: Determine why this can't just return _topLevels.Peek()?
     /// <summary>
@@ -22,7 +22,7 @@ public static partial class Application // Toplevel handling
     ///     This will only be distinct from <see cref="Application.Top"/> in scenarios where <see cref="Toplevel.IsOverlappedContainer"/> is <see langword="true"/>.
     /// </remarks>
     /// <value>The current.</value>
-    public static Toplevel Current { get; private set; }
+    public static Toplevel? Current { get; private set; }
 
     /// <summary>
     ///     If <paramref name="topLevel"/> is not already Current and visible, finds the last Modal Toplevel in the stack and makes it Current.
@@ -195,7 +195,7 @@ public static partial class Application // Toplevel handling
     ///     Event handlers can set <see cref="SizeChangedEventArgs.Cancel"/> to <see langword="true"/> to prevent
     ///     <see cref="Application"/> from changing it's size to match the new terminal size.
     /// </remarks>
-    public static event EventHandler<SizeChangedEventArgs> SizeChanging;
+    public static event EventHandler<SizeChangedEventArgs>? SizeChanging;
 
     /// <summary>
     ///     Called when the application's size changes. Sets the size of all <see cref="Toplevel"/>s and fires the

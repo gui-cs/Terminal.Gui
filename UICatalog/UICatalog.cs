@@ -715,7 +715,7 @@ internal class UICatalogApp
                                    }
 
                                    ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
-                                   Application.Top.SetNeedsDisplay ();
+                                   Application.Top!.SetNeedsDisplay ();
                                };
                 schemeMenuItems.Add (item);
             }
