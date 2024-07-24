@@ -62,43 +62,6 @@ public partial class Toplevel : View
 
     private void Toplevel_MouseClick (object sender, MouseEventEventArgs e) { e.Handled = InvokeCommand (Command.HotKey) == true; }
 
-    // TODO: Deprecate - No need for this at View level; having at Application is sufficient.
-    /// <summary>Invoked when the <see cref="Application.AlternateBackwardKey"/> is changed.</summary>
-    public event EventHandler<KeyChangedEventArgs> AlternateBackwardKeyChanged;
-
-    // TODO: Deprecate - No need for this at View level; having at Application is sufficient.
-    /// <summary>Invoked when the <see cref="Application.AlternateForwardKey"/> is changed.</summary>
-    public event EventHandler<KeyChangedEventArgs> AlternateForwardKeyChanged;
-
-    // TODO: Deprecate - No need for this at View level; having at Application is sufficient.
-    /// <summary>Virtual method to invoke the <see cref="AlternateBackwardKeyChanged"/> event.</summary>
-    /// <param name="e"></param>
-    public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e)
-    {
-        KeyBindings.ReplaceKey (e.OldKey, e.NewKey);
-        AlternateBackwardKeyChanged?.Invoke (this, e);
-    }
-
-    // TODO: Deprecate - No need for this at View level; having at Application is sufficient.
-    /// <summary>Virtual method to invoke the <see cref="AlternateForwardKeyChanged"/> event.</summary>
-    /// <param name="e"></param>
-    public virtual void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
-    {
-        KeyBindings.ReplaceKey (e.OldKey, e.NewKey);
-        AlternateForwardKeyChanged?.Invoke (this, e);
-    }
-
-    /// <summary>Virtual method to invoke the <see cref="QuitKeyChanged"/> event.</summary>
-    /// <param name="e"></param>
-    public virtual void OnQuitKeyChanged (KeyChangedEventArgs e)
-    {
-        KeyBindings.ReplaceKey (e.OldKey, e.NewKey);
-        QuitKeyChanged?.Invoke (this, e);
-    }
-
-    /// <summary>Invoked when the <see cref="Application.QuitKey"/> is changed.</summary>
-    public event EventHandler<KeyChangedEventArgs> QuitKeyChanged;
-
     #endregion
 
     #region Subviews

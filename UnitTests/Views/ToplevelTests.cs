@@ -573,23 +573,6 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         void View_Added (object sender, SuperViewChangedEventArgs e)
         {
-            Assert.Throws<NullReferenceException> (
-                                                   () =>
-                                                       Application.Top.AlternateForwardKeyChanged +=
-                                                           (s, e) => alternateForwardKey = (KeyCode)e.OldKey
-                                                  );
-
-            Assert.Throws<NullReferenceException> (
-                                                   () =>
-                                                       Application.Top.AlternateBackwardKeyChanged +=
-                                                           (s, e) => alternateBackwardKey = (KeyCode)e.OldKey
-                                                  );
-
-            Assert.Throws<NullReferenceException> (
-                                                   () =>
-                                                       Application.Top.QuitKeyChanged += (s, e) =>
-                                                                                             quitKey = (KeyCode)e.OldKey
-                                                  );
             Assert.False (wasAdded);
             wasAdded = true;
             view.Added -= View_Added;
@@ -605,64 +588,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Application.Shutdown ();
     }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void AlternateForwardKeyChanged_AlternateBackwardKeyChanged_QuitKeyChanged_Events ()
-    {
-        Key alternateForwardKey = KeyCode.Null;
-        Key alternateBackwardKey = KeyCode.Null;
-        Key quitKey = KeyCode.Null;
-
-        Key previousQuitKey = Application.QuitKey;
-
-        Toplevel top = new ();
-        var view = new View ();
-        view.Initialized += View_Initialized;
-
-        void View_Initialized (object sender, EventArgs e)
-        {
-            top.AlternateForwardKeyChanged += (s, e) => alternateForwardKey = e.OldKey;
-            top.AlternateBackwardKeyChanged += (s, e) => alternateBackwardKey = e.OldKey;
-            top.QuitKeyChanged += (s, e) => quitKey = e.OldKey;
-        }
-
-        var win = new Window ();
-        win.Add (view);
-        top.Add (win);
-        Application.Begin (top);
-
-        Assert.Equal (KeyCode.Null, alternateForwardKey);
-        Assert.Equal (KeyCode.Null, alternateBackwardKey);
-        Assert.Equal (KeyCode.Null, quitKey);
-
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey);
-        Assert.Equal (Key.Esc, Application.QuitKey);
-
-        Application.AlternateForwardKey = KeyCode.A;
-        Application.AlternateBackwardKey = KeyCode.B;
-        Application.QuitKey = KeyCode.C;
-
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, alternateForwardKey);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, alternateBackwardKey);
-        Assert.Equal (previousQuitKey, quitKey);
-
-        Assert.Equal (KeyCode.A, Application.AlternateForwardKey);
-        Assert.Equal (KeyCode.B, Application.AlternateBackwardKey);
-        Assert.Equal (KeyCode.C, Application.QuitKey);
-
-        // Replacing the defaults keys to avoid errors on others unit tests that are using it.
-        Application.AlternateForwardKey = Key.PageDown.WithCtrl;
-        Application.AlternateBackwardKey = Key.PageUp.WithCtrl;
-        Application.QuitKey = previousQuitKey;
-
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey);
-        Assert.Equal (previousQuitKey, Application.QuitKey);
-        top.Dispose ();
-    }
-
+    
     [Fact]
     [AutoInitShutdown]
     public void Mouse_Drag_On_Top_With_Superview_Null ()
