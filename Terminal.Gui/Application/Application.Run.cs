@@ -537,7 +537,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         for (state.Toplevel.Running = true; state.Toplevel?.Running == true;)
         {
-            MainLoop.Running = true;
+            MainLoop!.Running = true;
 
             if (EndAfterFirstIteration && !firstIteration)
             {
@@ -547,7 +547,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             RunIteration (ref state, ref firstIteration);
         }
 
-        MainLoop.Running = false;
+        MainLoop!.Running = false;
 
         // Run one last iteration to consume any outstanding input events from Driver
         // This is important for remaining OnKeyUp events.
@@ -562,7 +562,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// </param>
     public static void RunIteration (ref RunState state, ref bool firstIteration)
     {
-        if (MainLoop.Running && MainLoop.EventsPending ())
+        if (MainLoop!.Running && MainLoop.EventsPending ())
         {
             // Notify Toplevel it's ready
             if (firstIteration)
@@ -580,7 +580,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 OverlappedTop?.OnDeactivate (state.Toplevel);
                 state.Toplevel = Current;
                 OverlappedTop?.OnActivate (state.Toplevel);
-                Top.SetSubViewNeedsDisplay ();
+                Top!.SetSubViewNeedsDisplay ();
                 Refresh ();
             }
         }
@@ -592,9 +592,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             return;
         }
 
-        if (state.Toplevel != Top && (Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded))
+        if (state.Toplevel != Top && (Top!.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded))
         {
-            state.Toplevel.SetNeedsDisplay (state.Toplevel.Frame);
+            state.Toplevel!.SetNeedsDisplay (state.Toplevel.Frame);
             Top.Draw ();
 
             foreach (Toplevel top in _topLevels.Reverse ())
@@ -610,8 +610,8 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         if (_topLevels.Count == 1
             && state.Toplevel == Top
-            && (Driver.Cols != state.Toplevel.Frame.Width
-                || Driver.Rows != state.Toplevel.Frame.Height)
+            && (Driver!.Cols != state.Toplevel!.Frame.Width
+                || Driver!.Rows != state.Toplevel.Frame.Height)
             && (state.Toplevel.NeedsDisplay
                 || state.Toplevel.SubViewNeedsDisplay
                 || state.Toplevel.LayoutNeeded))
@@ -619,18 +619,18 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             Driver.ClearContents ();
         }
 
-        if (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || OverlappedChildNeedsDisplay ())
+        if (state.Toplevel!.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || OverlappedChildNeedsDisplay ())
         {
             state.Toplevel.SetNeedsDisplay ();
             state.Toplevel.Draw ();
-            Driver.UpdateScreen ();
+            Driver!.UpdateScreen ();
 
             //Driver.UpdateCursor ();
         }
 
         if (PositionCursor (state.Toplevel))
         {
-            Driver.UpdateCursor ();
+            Driver!.UpdateCursor ();
         }
 
         //        else
@@ -642,7 +642,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             //Driver.UpdateCursor ();
         }
 
-        if (state.Toplevel != Top && !state.Toplevel.Modal && (Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded))
+        if (state.Toplevel != Top && !state.Toplevel.Modal && (Top!.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded))
         {
             Top.Draw ();
         }
@@ -673,8 +673,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         }
         else if (OverlappedTop != null
                  && top != Current
-                 && Current?.Running == true
-                 && Current?.Modal == true
+                 && Current is { Running: true, Modal: true }
                  && top!.Modal
                  && top.Running)
         {
@@ -702,14 +701,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         else if ((OverlappedTop != null
                   && top != OverlappedTop
                   && top != Current
-                  && Current?.Modal == false
-                  && Current?.Running == true
+                  && Current is { Modal: false, Running: true }
                   && !top!.Running)
                  || (OverlappedTop != null
                      && top != OverlappedTop
                      && top != Current
-                     && Current?.Modal == false
-                     && Current?.Running == false
+                     && Current is { Modal: false, Running: false }
                      && !top!.Running
                      && _topLevels.ToArray () [1].Running))
         {
@@ -815,7 +812,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         // If there is a OverlappedTop that is not the RunState.Toplevel then RunState.Toplevel
         // is a child of MidTop, and we should notify the OverlappedTop that it is closing
-        if (OverlappedTop is { } && !runState.Toplevel.Modal && runState.Toplevel != OverlappedTop)
+        if (OverlappedTop is { } && !runState.Toplevel!.Modal && runState.Toplevel != OverlappedTop)
         {
             OverlappedTop.OnChildClosed (runState.Toplevel);
         }
@@ -841,7 +838,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             else
             {
                 SetCurrentOverlappedAsTop ();
-                runState.Toplevel.OnLeave (Current);
+                runState.Toplevel!.OnLeave (Current);
                 Current.OnEnter (runState.Toplevel);
             }
 
