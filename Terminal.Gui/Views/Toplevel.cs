@@ -31,14 +31,9 @@ public partial class Toplevel : View
         Arrangement = ViewArrangement.Fixed;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-
         ColorScheme = Colors.ColorSchemes ["TopLevel"];
-
-        //ConfigureKeyBindings ();
-
         MouseClick += Toplevel_MouseClick;
     }
-
 
     #region Keyboard & Mouse
 
@@ -64,114 +59,6 @@ public partial class Toplevel : View
     ///     </list>
     /// </summary>
     public bool Modal { get; set; }
-
-    // TODO: Overlapped: Figure out how these keybindings should work.
-    private void ConfigureKeyBindings ()
-    {
-        // Things this view knows how to do
-        AddCommand (
-                    Command.QuitToplevel,  // TODO: IRunnable: Rename to Command.Quit to make more generic.
-                    () =>
-                    {
-                        QuitToplevel ();
-
-                        return true;
-                    }
-                   );
-
-        /// TODO: Overlapped: Add Command.ShowHide
-
-        AddCommand (
-                    Command.Suspend,    // TODO: Move to Application
-                    () =>
-                    {
-                        Driver.Suspend ();
-                        ;
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.NextView,    // TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
-                    () =>
-                    {
-                        MoveNextView ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.PreviousView,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
-                    () =>
-                    {
-                        MovePreviousView ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.NextViewOrTop,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
-                    () =>
-                    {
-                        MoveNextViewOrTop ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.PreviousViewOrTop,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
-                    () =>
-                    {
-                        MovePreviousViewOrTop ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Refresh,
-                    () =>
-                    {
-                        Application.Refresh (); // TODO: Move to Application
-
-                        return true;
-                    }
-                   );
-
-        // Default keybindings for this view
-        KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
-
-        KeyBindings.Add (Key.CursorRight, Command.NextView);
-        KeyBindings.Add (Key.CursorDown, Command.NextView);
-        KeyBindings.Add (Key.CursorLeft, Command.PreviousView);
-        KeyBindings.Add (Key.CursorUp, Command.PreviousView);
-
-        KeyBindings.Add (Key.Tab, Command.NextView);
-        KeyBindings.Add (Key.Tab.WithShift, Command.PreviousView);
-        KeyBindings.Add (Key.Tab.WithCtrl, Command.NextViewOrTop);
-        KeyBindings.Add (Key.Tab.WithShift.WithCtrl, Command.PreviousViewOrTop);
-
-        // TODO: Refresh Key should be configurable
-        KeyBindings.Add (Key.F5, KeyBindingScope.Application, Command.Refresh);
-        KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
-        KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
-
-        if (Environment.OSVersion.Platform == PlatformID.Unix)
-        {
-            KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
-        }
-
-#if UNIX_KEY_BINDINGS
-        KeyBindings.Add (Key.L.WithCtrl, Command.Refresh); // Unix
-        KeyBindings.Add (Key.F.WithCtrl, Command.NextView); // Unix
-        KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
-        KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView); // Unix
-#endif
-    }
 
     private void Toplevel_MouseClick (object sender, MouseEventEventArgs e) { e.Handled = InvokeCommand (Command.HotKey) == true; }
 
@@ -498,18 +385,6 @@ public partial class Toplevel : View
         }
 
         Unloaded?.Invoke (this, EventArgs.Empty);
-    }
-
-    private void QuitToplevel ()
-    {
-        if (Application.OverlappedTop is { })
-        {
-            RequestStop (this);
-        }
-        else
-        {
-            Application.RequestStop ();
-        }
     }
 
     #endregion
