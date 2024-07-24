@@ -1266,18 +1266,18 @@ internal class WindowsDriver : ConsoleDriver
             return WinConsole?.WriteANSI (sb.ToString ()) ?? false;
         }
 
-        if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))
-        {
-            GetCursorVisibility (out CursorVisibility cursorVisibility);
-            _cachedCursorVisibility = cursorVisibility;
-            SetCursorVisibility (CursorVisibility.Invisible);
+        //if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))
+        //{
+        //    GetCursorVisibility (out CursorVisibility cursorVisibility);
+        //    _cachedCursorVisibility = cursorVisibility;
+        //    SetCursorVisibility (CursorVisibility.Invisible);
 
-            return false;
-        }
+        //    return false;
+        //}
 
-        SetCursorVisibility (_cachedCursorVisibility ?? CursorVisibility.Default);
+        //SetCursorVisibility (_cachedCursorVisibility ?? CursorVisibility.Default);
 
-        return _cachedCursorVisibility == CursorVisibility.Default;
+        //return _cachedCursorVisibility == CursorVisibility.Default;
     }
 
     #endregion Cursor Handling
