@@ -358,9 +358,10 @@ public static partial class Application // Keyboard handling
                    );
 
         AddCommand (
-                    Command.NextView,    // TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
+                    Command.NextView,    
                     () =>
                     {
+                        // TODO: Move this method to Application.Navigation.cs
                         Current.MoveNextView ();
 
                         return true;
@@ -368,9 +369,10 @@ public static partial class Application // Keyboard handling
                    );
 
         AddCommand (
-                    Command.PreviousView,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
+                    Command.PreviousView,
                     () =>
                     {
+                        // TODO: Move this method to Application.Navigation.cs
                         Current.MovePreviousView ();
 
                         return true;
@@ -378,9 +380,10 @@ public static partial class Application // Keyboard handling
                    );
 
         AddCommand (
-                    Command.NextViewOrTop,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
+                    Command.NextViewOrTop,
                     () =>
                     {
+                        // TODO: Move this method to Application.Navigation.cs
                         Current.MoveNextViewOrTop ();
 
                         return true;
@@ -388,9 +391,10 @@ public static partial class Application // Keyboard handling
                    );
 
         AddCommand (
-                    Command.PreviousViewOrTop,// TODO: Figure out how to move this to the View that is at the root of the view hierarchy (currently Application.Top)
+                    Command.PreviousViewOrTop,
                     () =>
                     {
+                        // TODO: Move this method to Application.Navigation.cs
                         Current.MovePreviousViewOrTop ();
 
                         return true;
