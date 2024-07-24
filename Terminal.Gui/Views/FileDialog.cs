@@ -134,7 +134,7 @@ public class FileDialog : Dialog
             FullRowSelect = true,
             CollectionNavigator = new FileDialogCollectionNavigator (this)
         };
-        _tableView.KeyBindings.Add (Key.Space, Command.Select);
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
         _tableView.MouseClick += OnTableViewMouseClick;
         _tableView.Style.InvertSelectedCellFirstCharacter = true;
         Style.TableStyle = _tableView.Style;
@@ -254,10 +254,10 @@ public class FileDialog : Dialog
         _tableView.KeyUp += (s, k) => k.Handled = TableView_KeyUp (k);
         _tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 
-        _tableView.KeyBindings.Add (Key.Home, Command.TopHome);
-        _tableView.KeyBindings.Add (Key.End, Command.BottomEnd);
-        _tableView.KeyBindings.Add (Key.Home.WithShift, Command.TopHomeExtend);
-        _tableView.KeyBindings.Add (Key.End.WithShift, Command.BottomEndExtend);
+        _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.TopHome);
+        _tableView.KeyBindings.ReplaceCommands (Key.End, Command.BottomEnd);
+        _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.TopHomeExtend);
+        _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.BottomEndExtend);
 
         _treeView.KeyDown += (s, k) =>
                              {

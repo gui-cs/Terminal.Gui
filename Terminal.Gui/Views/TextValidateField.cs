@@ -465,7 +465,6 @@ namespace Terminal.Gui
             KeyBindings.Add (Key.End, Command.RightEnd);
 
             KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-            KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
 
             KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
             KeyBindings.Add (Key.CursorLeft, Command.Left);

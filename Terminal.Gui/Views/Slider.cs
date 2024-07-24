@@ -1454,9 +1454,13 @@ public class Slider<T> : View
             KeyBindings.Add (Key.CursorUp.WithCtrl, Command.LeftExtend);
         }
 
+        KeyBindings.Remove (Key.Home);
         KeyBindings.Add (Key.Home, Command.LeftHome);
+        KeyBindings.Remove (Key.End);
         KeyBindings.Add (Key.End, Command.RightEnd);
+        KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.Accept);
+        KeyBindings.Remove (Key.Space);
         KeyBindings.Add (Key.Space, Command.Select);
     }
 

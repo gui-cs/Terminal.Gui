@@ -34,7 +34,7 @@ public partial class Toplevel : View
 
         ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
-        ConfigureKeyBindings ();
+        //ConfigureKeyBindings ();
 
         MouseClick += Toplevel_MouseClick;
     }
@@ -188,7 +188,7 @@ public partial class Toplevel : View
     /// <param name="e"></param>
     public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e)
     {
-        KeyBindings.Replace (e.OldKey, e.NewKey);
+        KeyBindings.ReplaceKey (e.OldKey, e.NewKey);
         AlternateBackwardKeyChanged?.Invoke (this, e);
     }
 
@@ -197,7 +197,7 @@ public partial class Toplevel : View
     /// <param name="e"></param>
     public virtual void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
     {
-        KeyBindings.Replace (e.OldKey, e.NewKey);
+        KeyBindings.ReplaceKey (e.OldKey, e.NewKey);
         AlternateForwardKeyChanged?.Invoke (this, e);
     }
 
@@ -205,7 +205,7 @@ public partial class Toplevel : View
     /// <param name="e"></param>
     public virtual void OnQuitKeyChanged (KeyChangedEventArgs e)
     {
-        KeyBindings.Replace (e.OldKey, e.NewKey);
+        KeyBindings.ReplaceKey (e.OldKey, e.NewKey);
         QuitKeyChanged?.Invoke (this, e);
     }
 
@@ -650,7 +650,7 @@ public partial class Toplevel : View
     /// <summary>
     ///     Moves the focus to 
     /// </summary>
-    private void MoveNextView ()
+    internal void MoveNextView ()
     {
         View old = GetDeepestFocusedSubview (Focused);
 
@@ -670,7 +670,7 @@ public partial class Toplevel : View
         }
     }
 
-    private void MoveNextViewOrTop ()
+    internal void MoveNextViewOrTop ()
     {
         if (Application.OverlappedTop is null)
         {
@@ -691,7 +691,7 @@ public partial class Toplevel : View
         }
     }
 
-    private void MovePreviousView ()
+    internal void MovePreviousView ()
     {
         View old = GetDeepestFocusedSubview (Focused);
 
@@ -711,7 +711,7 @@ public partial class Toplevel : View
         }
     }
 
-    private void MovePreviousViewOrTop ()
+    internal void MovePreviousViewOrTop ()
     {
         if (Application.OverlappedTop is null)
         {

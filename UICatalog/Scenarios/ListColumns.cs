@@ -254,7 +254,7 @@ public class ListColumns : Scenario
         // if user clicks the mouse in TableView
         _listColView.MouseClick += (s, e) => { _listColView.ScreenToCell (e.MouseEvent.Position, out int? clickedCol); };
 
-        _listColView.KeyBindings.Add (Key.Space, Command.Accept);
+        _listColView.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
         top.Add (appWindow);
 

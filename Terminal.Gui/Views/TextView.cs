@@ -2369,8 +2369,8 @@ public class TextView : View
                    );
         AddCommand (Command.Tab, () => ProcessTab ());
         AddCommand (Command.BackTab, () => ProcessBackTab ());
-        AddCommand (Command.NextView, () => ProcessMoveNextView ());
-        AddCommand (Command.PreviousView, () => ProcessMovePreviousView ());
+        //AddCommand (Command.NextView, () => ProcessMoveNextView ());
+        //AddCommand (Command.PreviousView, () => ProcessMovePreviousView ());
 
         AddCommand (
                     Command.Undo,
@@ -2503,11 +2503,11 @@ public class TextView : View
         KeyBindings.Add (Key.Tab, Command.Tab);
         KeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
 
-        KeyBindings.Add (Key.Tab.WithCtrl, Command.NextView);
-        KeyBindings.Add (Application.AlternateForwardKey, Command.NextView);
+        //KeyBindings.Add (Key.Tab.WithCtrl, Command.NextView);
+        //KeyBindings.Add (Application.AlternateForwardKey, Command.NextView);
 
-        KeyBindings.Add (Key.Tab.WithCtrl.WithShift, Command.PreviousView);
-        KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousView);
+        //KeyBindings.Add (Key.Tab.WithCtrl.WithShift, Command.PreviousView);
+        //KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousView);
 
         KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
         KeyBindings.Add (Key.R.WithCtrl, Command.Redo);
@@ -4318,7 +4318,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.ReplaceKey (e.OldKey, e.NewKey); }
 
     private bool DeleteTextBackwards ()
     {
@@ -6393,8 +6393,8 @@ public class TextView : View
         _selectionStartRow = CurrentRow;
     }
 
-    private void Top_AlternateBackwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
-    private void Top_AlternateForwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
+    private void Top_AlternateBackwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.ReplaceKey (e.OldKey, e.NewKey); }
+    private void Top_AlternateForwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.ReplaceKey (e.OldKey, e.NewKey); }
 
     // Tries to snap the cursor to the tracking column
     private void TrackColumn ()

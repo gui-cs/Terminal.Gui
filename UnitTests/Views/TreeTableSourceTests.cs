@@ -187,7 +187,7 @@ public class TreeTableSourceTests : IDisposable
         Assert.Equal (0, tv.SelectedRow);
         Assert.Equal (1, tv.SelectedColumn);
 
-        top.NewKeyDownEvent (Key.CursorRight);
+        Application.OnKeyDown (Key.CursorRight);
 
         tv.Draw ();
 

@@ -2993,7 +2993,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
 
         Point selectedCell = tableView.GetAllSelectedCells ().Single ();
         Assert.Equal (0, selectedCell.X);
@@ -3065,7 +3065,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.FullRowSelect = true;
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
 
         // Toggle Select Cell 0,0
         tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
@@ -3101,7 +3101,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
 
         // Make a square selection
         tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
@@ -3142,7 +3142,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
 
         // Make first square selection (0,0 to 1,1)
         tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });

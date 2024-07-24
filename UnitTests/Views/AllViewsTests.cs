@@ -108,21 +108,21 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
         if (vType is TextView)
         {
-            top.NewKeyDownEvent (Key.Tab.WithCtrl);
+            Application.OnKeyDown (Key.Tab.WithCtrl);
         }
         else if (vType is DatePicker)
         {
             for (var i = 0; i < 4; i++)
             {
-                top.NewKeyDownEvent (Key.Tab.WithCtrl);
+                Application.OnKeyDown (Key.Tab.WithCtrl);
             }
         }
         else
         {
-            top.NewKeyDownEvent (Key.Tab);
+            Application.OnKeyDown (Key.Tab);
         }
 
-        top.NewKeyDownEvent (Key.Tab);
+        Application.OnKeyDown (Key.Tab);
 
         Assert.Equal (2, vTypeEnter);
         Assert.Equal (1, vTypeLeave);

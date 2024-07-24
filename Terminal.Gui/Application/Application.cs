@@ -126,7 +126,7 @@ public static partial class Application
         KeyDown = null;
         KeyUp = null;
         SizeChanging = null;
-        ClearKeyBindings ();
+        KeyBindings.Clear ();
 
         Colors.Reset ();
 

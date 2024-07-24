@@ -605,7 +605,9 @@ internal class UICatalogApp
             ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
             // TableView typically is a grid where nav keys are biased for moving left/right.
+            ScenarioList.KeyBindings.Remove (Key.Home);
             ScenarioList.KeyBindings.Add (Key.Home, Command.TopHome);
+            ScenarioList.KeyBindings.Remove (Key.End);
             ScenarioList.KeyBindings.Add (Key.End, Command.BottomEnd);
 
             // Ideally, TableView.MultiSelect = false would turn off any keybindings for

@@ -769,7 +769,7 @@ public class TableEditor : Scenario
                                      }
                                  };
 
-        _tableView.KeyBindings.Add (Key.Space, Command.Accept);
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
         // Run - Start the application.
         Application.Run (appWindow);

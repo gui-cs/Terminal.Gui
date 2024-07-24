@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Text.Json.Serialization;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Terminal.Gui;
 
@@ -19,6 +20,15 @@ public static partial class Application // Keyboard handling
             {
                 Key oldKey = _alternateForwardKey;
                 _alternateForwardKey = value;
+
+                if (_alternateForwardKey == Key.Empty)
+                {
+                    KeyBindings.Remove (_alternateForwardKey);
+                }
+                else
+                {
+                    KeyBindings.ReplaceKey (oldKey, _alternateForwardKey);
+                }
                 OnAlternateForwardKeyChanged (new (oldKey, value));
             }
         }
@@ -47,6 +57,16 @@ public static partial class Application // Keyboard handling
             {
                 Key oldKey = _alternateBackwardKey;
                 _alternateBackwardKey = value;
+
+                if (_alternateBackwardKey == Key.Empty)
+                {
+                    KeyBindings.Remove (_alternateBackwardKey);
+                }
+                else
+                {
+                    KeyBindings.ReplaceKey (oldKey, _alternateBackwardKey);
+                }
+
                 OnAlternateBackwardKeyChanged (new (oldKey, value));
             }
         }
@@ -75,6 +95,14 @@ public static partial class Application // Keyboard handling
             {
                 Key oldKey = _quitKey;
                 _quitKey = value;
+                if (_quitKey == Key.Empty)
+                {
+                    KeyBindings.Remove (_quitKey);
+                }
+                else
+                {
+                    KeyBindings.ReplaceKey (oldKey, _quitKey);
+                }
                 OnQuitKeyChanged (new (oldKey, value));
             }
         }
@@ -139,25 +167,54 @@ public static partial class Application // Keyboard handling
             }
         }
 
-        // Invoke any global (Application-scoped) KeyBindings.
+        // Invoke any Application-scoped KeyBindings.
         // The first view that handles the key will stop the loop.
-        foreach (KeyValuePair<Key, List<View?>> binding in _keyBindings.Where (b => b.Key == keyEvent.KeyCode))
+        foreach (var binding in KeyBindings.Bindings.Where (b => b.Key == keyEvent.KeyCode))
         {
-            foreach (View view in binding.Value)
+            if (binding.Value.BoundView is { })
             {
-                if (view is { }
-                    && view.KeyBindings.TryGet (binding.Key, KeyBindingScope.Focused | KeyBindingScope.HotKey | KeyBindingScope.Application, out KeyBinding kb))
-                {
-                    //bool? handled = view.InvokeCommands (kb.Commands, binding.Key, kb);
-                    bool? handled = view?.OnInvokingKeyBindings (keyEvent, kb.Scope);
+                bool? handled = binding.Value.BoundView?.InvokeCommands (binding.Value.Commands, binding.Key, binding.Value);
 
-                    if (handled != null && (bool)handled)
-                    {
-                        return true;
-                    }
+                if (handled != null && (bool)handled)
+                {
+                    return true;
                 }
             }
+            else
+            {
+                if (!KeyBindings.TryGet (keyEvent, KeyBindingScope.Application, out KeyBinding appBinding))
+                {
+                    continue;
+                }
+
+                bool? toReturn = null;
+
+                foreach (Command command in appBinding.Commands)
+                {
+                    if (!CommandImplementations.ContainsKey (command))
+                    {
+                        throw new NotSupportedException (
+                                                         @$"A KeyBinding was set up for the command {command} ({keyEvent}) but that command is not supported by Application."
+                                                        );
+                    }
+
+                    if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))
+                    {
+                        var context = new CommandContext (command, keyEvent, appBinding); // Create the context here
+                        toReturn = implementation (context);
+                    }
+
+                    // if ever see a true then that's what we will return
+                    if (toReturn ?? false)
+                    {
+                        toReturn = true;
+                    }
+                }
+
+                return toReturn ?? true;
+            }
         }
+
 
         return false;
     }
@@ -344,7 +401,7 @@ public static partial class Application // Keyboard handling
                     Command.Refresh,
                     () =>
                     {
-                        Refresh (); 
+                        Refresh ();
 
                         return true;
                     }
@@ -370,7 +427,7 @@ public static partial class Application // Keyboard handling
 
         if (Environment.OSVersion.Platform == PlatformID.Unix)
         {
-            KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
+            KeyBindings.Add (Key.Z.WithCtrl, KeyBindingScope.Application, Command.Suspend);
         }
 
 #if UNIX_KEY_BINDINGS
@@ -398,37 +455,16 @@ public static partial class Application // Keyboard handling
                           .ToList ();
     }
 
-    /// <summary>
-    ///     Gets the list of Views that have <see cref="KeyBindingScope.Application"/> key bindings for the specified key.
-    /// </summary>
-    /// <remarks>
-    ///     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
-    /// </remarks>
-    /// <param name="key">The key to check.</param>
-    /// <param name="views">Outputs the list of views bound to <paramref name="key"/></param>
-    /// <returns><see langword="True"/> if successful.</returns>
-    internal static bool TryGetKeyBindings (Key key, out List<View> views) { return _keyBindings.TryGetValue (key, out views); }
-
-    /// <summary>
-    ///     Removes an <see cref="KeyBindingScope.Application"/> scoped key binding.
-    /// </summary>
-    /// <remarks>
-    ///     This is an internal method used by the <see cref="View"/> class to remove Application key bindings.
-    /// </remarks>
-    /// <param name="key">The key that was bound.</param>
-    /// <param name="view">The view that is bound to the key.</param>
-    internal static void RemoveKeyBinding (Key key, View view)
-    {
-        if (_keyBindings.TryGetValue (key, out List<View> views))
-        {
-            views.Remove (view);
-
-            if (views.Count == 0)
-            {
-                _keyBindings.Remove (key);
-            }
-        }
-    }
+    ///// <summary>
+    /////     Gets the list of Views that have <see cref="KeyBindingScope.Application"/> key bindings for the specified key.
+    ///// </summary>
+    ///// <remarks>
+    /////     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
+    ///// </remarks>
+    ///// <param name="key">The key to check.</param>
+    ///// <param name="views">Outputs the list of views bound to <paramref name="key"/></param>
+    ///// <returns><see langword="True"/> if successful.</returns>
+    //internal static bool TryGetKeyBindings (Key key, out List<View> views) { return _keyBindings.TryGetValue (key, out views); }
 
     /// <summary>
     ///     Removes all <see cref="KeyBindingScope.Application"/> scoped key bindings for the specified view.
@@ -437,19 +473,12 @@ public static partial class Application // Keyboard handling
     ///     This is an internal method used by the <see cref="View"/> class to remove Application key bindings.
     /// </remarks>
     /// <param name="view">The view that is bound to the key.</param>
-    internal static void ClearKeyBindings (View view)
+    internal static void RemoveKeyBindings (View view)
     {
-        foreach (Key key in _keyBindings.Keys)
-        {
-            _keyBindings [key].Remove (view);
-        }
+        var list = KeyBindings.Bindings
+                          .Where (kv => kv.Value.Scope != KeyBindingScope.Application)
+                          .Select (kv => kv.Value)
+                          .Distinct ()
+                          .ToList ();
     }
-
-    /// <summary>
-    ///     Removes all <see cref="KeyBindingScope.Application"/> scoped key bindings for the specified view.
-    /// </summary>
-    /// <remarks>
-    ///     This is an internal method used by the <see cref="View"/> class to remove Application key bindings.
-    /// </remarks>
-    internal static void ClearKeyBindings () { _keyBindings.Clear (); }
 }

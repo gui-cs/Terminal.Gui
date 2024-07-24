@@ -199,7 +199,7 @@ public class ApplicationTests
             Assert.Null (Application._mouseEnteredView);
 
             // Keyboard
-            Assert.Empty (Application.GetViewsWithKeyBindings ());
+            Assert.Empty (Application.GetViewKeyBindings ());
 
             // Events - Can't check
             //Assert.Null (Application.NotifyNewRunState);
@@ -233,7 +233,7 @@ public class ApplicationTests
         Application.AlternateBackwardKey = Key.A;
         Application.AlternateForwardKey = Key.B;
         Application.QuitKey = Key.C;
-        Application.AddKeyBinding (Key.A, new View ());
+        Application.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Cancel);
 
         //Application.OverlappedChildren = new List<View> ();
         //Application.OverlappedTop = 

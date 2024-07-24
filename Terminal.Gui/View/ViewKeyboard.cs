@@ -27,7 +27,7 @@ public partial class View
     private void DisposeKeyboard ()
     {
         TitleTextFormatter.HotKeyChanged -= TitleTextFormatter_HotKeyChanged;
-        KeyBindings.Clear ();
+        Application.RemoveKeyBindings (this);
     }
 
     #region HotKey Support
@@ -197,13 +197,17 @@ public partial class View
         {
             KeyBinding keyBinding = new ([Command.HotKey], KeyBindingScope.HotKey, context);
             // Add the base and Alt key
+            KeyBindings.Remove (newKey);
             KeyBindings.Add (newKey, keyBinding);
+            KeyBindings.Remove (newKey.WithAlt);
             KeyBindings.Add (newKey.WithAlt, keyBinding);
 
             // If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
             if (newKey.IsKeyCodeAtoZ)
             {
+                KeyBindings.Remove (newKey.WithShift);
                 KeyBindings.Add (newKey.WithShift, keyBinding);
+                KeyBindings.Remove (newKey.WithShift.WithAlt);
                 KeyBindings.Add (newKey.WithShift.WithAlt, keyBinding);
             }
         }
@@ -800,11 +804,12 @@ public partial class View
 #if DEBUG
 
         // TODO: Determine if App scope bindings should be fired first or last (currently last).
-        if (Application.TryGetKeyBindings (key, out List<View> views))
+        if (Application.KeyBindings.TryGet (key, KeyBindingScope.Focused | KeyBindingScope.HotKey, out KeyBinding b))
         {
-            var boundView = views [0];
-            var commandBinding = boundView.KeyBindings.Get (key);
-            Debug.WriteLine ($"WARNING: InvokeKeyBindings ({key}) - An Application scope binding exists for this key. The registered view will not invoke Command.{commandBinding.Commands [0]}: {boundView}.");
+            //var boundView = views [0];
+            //var commandBinding = boundView.KeyBindings.Get (key);
+            Debug.WriteLine (
+                             $"WARNING: InvokeKeyBindings ({key}) - An Application scope binding exists for this key. The registered view will not invoke Command.");//{commandBinding.Commands [0]}: {boundView}.");
         }
 
         // TODO: This is a "prototype" debug check. It may be too annoying vs. useful.

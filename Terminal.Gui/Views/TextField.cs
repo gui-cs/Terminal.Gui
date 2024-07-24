@@ -1332,7 +1332,10 @@ public class TextField : View
                                );
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
+    {
+        KeyBindings.ReplaceKey (e.OldKey.KeyCode, e.NewKey.KeyCode);
+    }
 
     private List<Rune> DeleteSelectedText ()
     {
