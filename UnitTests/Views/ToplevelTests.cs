@@ -17,7 +17,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Null (top.MenuBar);
         Assert.Null (top.StatusBar);
         Assert.False (top.IsOverlappedContainer);
-        Assert.False (top.IsOverlapped);
+        Assert.False (ApplicationOverlapped.IsOverlapped(top));
     }
 
     [Fact]

@@ -404,7 +404,7 @@ public partial class View
         int targetY,
         out int nx,
         out int ny,
-        out StatusBar statusBar
+        out StatusBar? statusBar
     )
     {
         int maxDimension;

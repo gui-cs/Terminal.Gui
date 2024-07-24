@@ -658,7 +658,7 @@ internal class UICatalogApp
 
             ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
-            MenuBar.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
+            MenuBar!.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
 
             if (StatusBar is { })
             {
@@ -942,7 +942,7 @@ internal class UICatalogApp
                                              {
                                                  MiIsMenuBorderDisabled.Checked = (bool)!MiIsMenuBorderDisabled.Checked!;
 
-                                                 MenuBar.MenusBorderStyle = !(bool)MiIsMenuBorderDisabled.Checked
+                                                 MenuBar!.MenusBorderStyle = !(bool)MiIsMenuBorderDisabled.Checked
                                                                                 ? LineStyle.Single
                                                                                 : LineStyle.None;
                                              };
@@ -985,7 +985,7 @@ internal class UICatalogApp
             MiUseSubMenusSingleFrame.Action += () =>
                                                {
                                                    MiUseSubMenusSingleFrame.Checked = (bool)!MiUseSubMenusSingleFrame.Checked!;
-                                                   MenuBar.UseSubMenusSingleFrame = (bool)MiUseSubMenusSingleFrame.Checked;
+                                                   MenuBar!.UseSubMenusSingleFrame = (bool)MiUseSubMenusSingleFrame.Checked;
                                                };
             menuItems.Add (MiUseSubMenusSingleFrame);
 

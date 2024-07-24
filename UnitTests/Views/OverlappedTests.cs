@@ -231,11 +231,11 @@ public class OverlappedTests
 
         Application.Iteration += (s, a) =>
                                  {
-                                     Assert.False (overlapped.IsOverlapped);
-                                     Assert.True (c1.IsOverlapped);
-                                     Assert.True (c2.IsOverlapped);
-                                     Assert.True (c3.IsOverlapped);
-                                     Assert.False (d.IsOverlapped);
+                                     Assert.False (ApplicationOverlapped.IsOverlapped(overlapped));
+                                     Assert.True (ApplicationOverlapped.IsOverlapped(c1));
+                                     Assert.True (ApplicationOverlapped.IsOverlapped(c2));
+                                     Assert.True (ApplicationOverlapped.IsOverlapped(c3));
+                                     Assert.False (ApplicationOverlapped.IsOverlapped(d));
 
                                      overlapped.RequestStop ();
                                  };
@@ -1068,11 +1068,11 @@ public class OverlappedTests
         Assert.False (top.IsCurrentTop);
         Assert.Equal (win1, Application.Current);
         Assert.True (win1.IsCurrentTop);
-        Assert.True (win1.IsOverlapped);
+        Assert.True (ApplicationOverlapped.IsOverlapped(win1));
         Assert.Null (top.Focused);
         Assert.Null (top.MostFocused);
         Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (win1.IsOverlapped);
+        Assert.True (ApplicationOverlapped.IsOverlapped(win1));
         Assert.Single (ApplicationOverlapped.OverlappedChildren!);
         Application.Begin (win2);
         Assert.Equal (new (0, 0, 40, 25), win2.Frame);
@@ -1080,7 +1080,7 @@ public class OverlappedTests
         Assert.False (top.IsCurrentTop);
         Assert.Equal (win2, Application.Current);
         Assert.True (win2.IsCurrentTop);
-        Assert.True (win2.IsOverlapped);
+        Assert.True (ApplicationOverlapped.IsOverlapped(win2));
         Assert.Null (top.Focused);
         Assert.Null (top.MostFocused);
         Assert.Equal (tf1W2, win2.MostFocused);

@@ -1,4 +1,6 @@
 #nullable enable
+using System.Reflection;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -6,6 +8,17 @@ namespace Terminal.Gui;
 /// </summary>
 public static class ApplicationOverlapped
 {
+
+    /// <summary>
+    ///     Gets or sets if <paramref name="top"/> is in overlapped mode within a Toplevel container.
+    /// </summary>
+    /// <param name="top"></param>
+    /// <returns></returns>
+    public static bool IsOverlapped (Toplevel? top)
+    {
+        return ApplicationOverlapped.OverlappedTop is { } && ApplicationOverlapped.OverlappedTop != top && !top!.Modal;
+    }
+
     /// <summary>
     ///     Gets the list of the Overlapped children which are not modal <see cref="Toplevel"/> from the
     ///     <see cref="OverlappedTop"/>.
@@ -99,7 +112,7 @@ public static class ApplicationOverlapped
     }
 
     /// <summary>
-    ///     Move to the next Overlapped child from the <see cref="OverlappedTop"/> and set it as the <see cref="Top"/> if
+    ///     Move to the next Overlapped child from the <see cref="OverlappedTop"/> and set it as the <see cref="Application.Top"/> if
     ///     it is not already.
     /// </summary>
     /// <param name="top"></param>
@@ -262,7 +275,7 @@ public static class ApplicationOverlapped
     }
 
     /// <summary>
-    ///     Given <paramref name="view"/>, returns the first Superview up the chain that is <see cref="Top"/>.
+    ///     Given <paramref name="view"/>, returns the first Superview up the chain that is <see cref="Application.Top"/>.
     /// </summary>
     internal static View? FindTopFromView (View? view)
     {
@@ -284,7 +297,7 @@ public static class ApplicationOverlapped
     }
 
     /// <summary>
-    ///     If the <see cref="Current"/> is not the <paramref name="top"/> then <paramref name="top"/> is moved to the top of
+    ///     If the <see cref="Application.Current"/> is not the <paramref name="top"/> then <paramref name="top"/> is moved to the top of
     ///     the Toplevel stack and made Current.
     /// </summary>
     /// <param name="top"></param>
@@ -361,7 +374,7 @@ public static class ApplicationOverlapped
         {
             lock (Application.TopLevels)
             {
-                Application.TopLevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
+                Application.TopLevels.MoveTo (top!, 0, new ToplevelEqualityComparer ());
                 Application.Current = top;
             }
         }

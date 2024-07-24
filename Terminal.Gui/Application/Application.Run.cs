@@ -579,7 +579,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             {
                 ApplicationOverlapped.OverlappedTop?.OnDeactivate (state.Toplevel);
                 state.Toplevel = Current;
-                ApplicationOverlapped.OverlappedTop?.OnActivate (state.Toplevel);
+                ApplicationOverlapped.OverlappedTop?.OnActivate (state.Toplevel!);
                 Top!.SetSubViewNeedsDisplay ();
                 Refresh ();
             }
