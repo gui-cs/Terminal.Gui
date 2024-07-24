@@ -110,6 +110,25 @@ public class KeyBindings
         }
     }
 
+
+    /// <summary>
+    ///     <para>Adds a new key combination that will trigger the commands in <paramref name="commands"/>.</para>
+    ///     <para>
+    ///         If the key is already bound to a different array of <see cref="Command"/>s it will be rebound
+    ///         <paramref name="commands"/>.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     Commands are only ever applied to the current <see cref="View"/> (i.e. this feature cannot be used to switch
+    ///     focus to another view and perform multiple commands there).
+    /// </remarks>
+    /// <param name="key">The key to check.</param>
+    /// <param name="scope">The scope for the command.</param>
+    /// <param name="commands">
+    ///     The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed. When
+    ///     multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike will be
+    ///     consumed if any took effect.
+    /// </param>
     public void Add (Key key, KeyBindingScope scope,  params Command [] commands)
     {
         if (BoundView is { } && scope.FastHasFlags (KeyBindingScope.Application))

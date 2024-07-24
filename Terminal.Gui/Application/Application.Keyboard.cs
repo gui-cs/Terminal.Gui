@@ -330,7 +330,7 @@ public static partial class Application // Keyboard handling
                     () =>
                     {
                         // TODO: Move this method to Application.Navigation.cs
-                        Current.MoveNextView ();
+                        ViewNavigation.MoveNextView ();
 
                         return true;
                     }
@@ -341,7 +341,7 @@ public static partial class Application // Keyboard handling
                     () =>
                     {
                         // TODO: Move this method to Application.Navigation.cs
-                        Current.MovePreviousView ();
+                        ViewNavigation.MovePreviousView ();
 
                         return true;
                     }
@@ -352,7 +352,7 @@ public static partial class Application // Keyboard handling
                     () =>
                     {
                         // TODO: Move this method to Application.Navigation.cs
-                        Current.MoveNextViewOrTop ();
+                        ViewNavigation.MoveNextViewOrTop ();
 
                         return true;
                     }
@@ -363,7 +363,7 @@ public static partial class Application // Keyboard handling
                     () =>
                     {
                         // TODO: Move this method to Application.Navigation.cs
-                        Current.MovePreviousViewOrTop ();
+                        ViewNavigation.MovePreviousViewOrTop ();
 
                         return true;
                     }
