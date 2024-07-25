@@ -53,7 +53,18 @@ public enum ViewArrangement
     /// <remarks>
     ///     If <see cref="Movable"/> is also set, the top will not be resizable.
     /// </remarks>
-    Resizable = LeftResizable | RightResizable | TopResizable | BottomResizable
+    Resizable = LeftResizable | RightResizable | TopResizable | BottomResizable,
+
+    /// <summary>
+    ///    The view overlap other views.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When set, Tab and Shift-Tab will be constrained to the subviews of the view (normally, they will navigate to the next/prev view in the next/prev Tabindex).
+    ///         Use Ctrl-Tab (Ctrl-PageDown) / Ctrl-Shift-Tab (Ctrl-PageUp) to move between overlapped views.
+    ///     </para>
+    /// </remarks>
+    Overlapped = 32
 }
 public partial class View
 {

@@ -279,10 +279,11 @@ public class Border : Adornment
             return true;
         }
 
-        if (!Parent.CanFocus)
-        {
-            return false;
-        }
+        // BUGBUG: Shouldn't non-focusable views be draggable??
+        //if (!Parent.CanFocus)
+        //{
+        //    return false;
+        //}
 
         if (!Parent.Arrangement.HasFlag (ViewArrangement.Movable))
         {

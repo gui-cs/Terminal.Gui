@@ -672,7 +672,7 @@ public partial class View
     /// <summary>
     ///     Focuses the last focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
-    public void FocusFirst ()
+    public void FocusFirst (bool overlapped = false)
     {
         if (!CanBeVisible (this))
         {
@@ -686,7 +686,7 @@ public partial class View
             return;
         }
 
-        foreach (View view in _tabIndexes)
+        foreach (View view in _tabIndexes.Where (v => !overlapped || v.Arrangement.HasFlag (ViewArrangement.Overlapped)))
         {
             if (view.CanFocus && view._tabStop && view.Visible && view.Enabled)
             {
@@ -700,7 +700,7 @@ public partial class View
     /// <summary>
     ///     Focuses the last focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
-    public void FocusLast ()
+    public void FocusLast (bool overlapped = false)
     {
         if (!CanBeVisible (this))
         {
@@ -714,15 +714,11 @@ public partial class View
             return;
         }
 
-        for (int i = _tabIndexes.Count; i > 0;)
+        foreach (View view in _tabIndexes.Where (v => !overlapped || v.Arrangement.HasFlag (ViewArrangement.Overlapped)).Reverse ())
         {
-            i--;
-
-            View v = _tabIndexes [i];
-
-            if (v.CanFocus && v._tabStop && v.Visible && v.Enabled)
+            if (view.CanFocus && view._tabStop && view.Visible && view.Enabled)
             {
-                SetFocus (v);
+                SetFocus (view);
 
                 return;
             }
@@ -777,6 +773,18 @@ public partial class View
             {
                 Focused.SetHasFocus (false, w);
 
+                // If the focused view is overlapped don't focus on the next if it's not overlapped.
+                if (Focused.Arrangement.HasFlag (ViewArrangement.Overlapped) && !w.Arrangement.HasFlag (ViewArrangement.Overlapped))
+                {
+                    return false;
+                }
+
+                // If the focused view is not overlapped and the next is, skip it
+                if (!Focused.Arrangement.HasFlag (ViewArrangement.Overlapped) && w.Arrangement.HasFlag (ViewArrangement.Overlapped))
+                {
+                   continue;
+                }
+
                 if (w.CanFocus && w._tabStop && w.Visible && w.Enabled)
                 {
                     w.FocusLast ();
@@ -788,9 +796,19 @@ public partial class View
             }
         }
 
+        // There's no prev view in tab indexes.
         if (Focused is { })
         {
+            // Leave Focused
             Focused.SetHasFocus (false, this);
+
+            if (Focused.Arrangement.HasFlag (ViewArrangement.Overlapped))
+            {
+                FocusLast (true);
+                return true;
+            }
+
+            // Signal to caller no next view was found
             Focused = null;
         }
 
@@ -798,7 +816,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Focuses the previous view in <see cref="View.TabIndexes"/>. If there is no previous view, the focus is set to the view itself.
+    ///     Focuses the next view in <see cref="View.TabIndexes"/>. If there is no next view, the focus is set to the view itself.
     /// </summary>
     /// <returns><see langword="true"/> if next was focused, <see langword="false"/> otherwise.</returns>
     public bool FocusNext ()
@@ -844,6 +862,18 @@ public partial class View
             {
                 Focused.SetHasFocus (false, w);
 
+                // If the focused view is overlapped don't focus on the next if it's not overlapped.
+                if (Focused.Arrangement.HasFlag (ViewArrangement.Overlapped) && !w.Arrangement.HasFlag (ViewArrangement.Overlapped))
+                {
+                    return false;
+                }
+
+                // If the focused view is not overlapped and the next is, skip it
+                if (!Focused.Arrangement.HasFlag (ViewArrangement.Overlapped) && w.Arrangement.HasFlag (ViewArrangement.Overlapped))
+                {
+                    continue;
+                }
+
                 if (w.CanFocus && w._tabStop && w.Visible && w.Enabled)
                 {
                     w.FocusFirst ();
@@ -855,9 +885,19 @@ public partial class View
             }
         }
 
+        // There's no next view in tab indexes.
         if (Focused is { })
         {
+            // Leave Focused
             Focused.SetHasFocus (false, this);
+
+            if (Focused.Arrangement.HasFlag (ViewArrangement.Overlapped))
+            {
+                FocusFirst (true);
+                return true;
+            }
+
+            // Signal to caller no next view was found
             Focused = null;
         }
 
