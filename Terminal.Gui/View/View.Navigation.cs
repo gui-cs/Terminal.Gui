@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 public partial class View // Focus and cross-view navigation management (TabStop, TabIndex, etc...)
@@ -603,7 +605,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Focuses the next view in <see cref="View.TabIndexes"/>. If there is no next view, the focus is set to the view
     ///     itself.
     /// </summary>
-    /// <returns><see langword="true"/> if next was focused, <see langword="false"/> otherwise.</returns>
+    /// <returns><see langword="true"/> if focus was changed to another subview (or stayed on this one), <see langword="false"/> otherwise.</returns>
     public bool FocusNext ()
     {
         if (!CanBeVisible (this))
@@ -622,7 +624,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         {
             FocusFirst ();
 
-            return Focused != null;
+            return Focused is { };
         }
 
         int focusedIdx = -1;
@@ -633,18 +635,25 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             if (w.HasFocus)
             {
+                // A subview has focus, tell *it* to FocusNext
                 if (w.FocusNext ())
                 {
+                    // The subview changed which of it's subviews had focus
                     return true;
                 }
 
+                Debug.Assert (w.HasFocus);
+
+                // The subview has no subviews that can be next. Cache that we found a focused subview.
                 focusedIdx = i;
 
                 continue;
             }
 
-            if (w.CanFocus && focusedIdx != -1 && w._tabStop && w.Visible && w.Enabled)
+            // The subview does not have focus, but at least one other that can. Can this one be focused?
+            if (focusedIdx != -1 && w.CanFocus && w._tabStop && w.Visible && w.Enabled)
             {
+                // Make w Leave
                 Focused.SetHasFocus (false, w);
 
                 //// If the focused view is overlapped don't focus on the next if it's not overlapped.
@@ -659,6 +668,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 //    continue;
                 //}
 
+                // QUESTION: Why do we check these again here?
                 if (w.CanFocus && w._tabStop && w.Visible && w.Enabled)
                 {
                     w.FocusFirst ();
@@ -673,7 +683,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // There's no next view in tab indexes.
         if (Focused is { })
         {
-            // Leave Focused
+            // Leave
             Focused.SetHasFocus (false, this);
 
             //if (Focused.Arrangement.HasFlag (ViewArrangement.Overlapped))
@@ -682,7 +692,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
             //    return true;
             //}
 
-            // Signal to caller no next view was found
+            // Signal to caller no next view was found; this will enable it to make a peer
+            // or view up the superview hierarchy have focus.
             Focused = null;
         }
 

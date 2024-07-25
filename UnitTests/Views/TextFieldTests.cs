@@ -78,7 +78,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Cancel_TextChanging_ThenBackspace ()
     {
         var tf = new TextField ();
-        tf.EnsureFocus ();
+        tf.FocusFirstOrLast ();
         tf.NewKeyDownEvent (Key.A.WithShift);
         Assert.Equal ("A", tf.Text);
 
@@ -929,7 +929,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Backspace_From_End ()
     {
         var tf = new TextField { Text = "ABC" };
-        tf.EnsureFocus ();
+        tf.FocusFirstOrLast ();
         Assert.Equal ("ABC", tf.Text);
         tf.BeginInit ();
         tf.EndInit ();
@@ -956,7 +956,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Backspace_From_Middle ()
     {
         var tf = new TextField { Text = "ABC" };
-        tf.EnsureFocus ();
+        tf.FocusFirstOrLast ();
         tf.CursorPosition = 2;
         Assert.Equal ("ABC", tf.Text);
 

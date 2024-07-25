@@ -289,7 +289,7 @@ public class TreeTableSourceTests : IDisposable
 
         var top = new Toplevel ();
         top.Add (tableView);
-        top.EnsureFocus ();
+        top.FocusFirstOrLast ();
         Assert.Equal (tableView, top.MostFocused);
 
         return tableView;

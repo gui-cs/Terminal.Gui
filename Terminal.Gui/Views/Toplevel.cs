@@ -430,7 +430,7 @@ public partial class Toplevel : View
         {
             if (Focused is null)
             {
-                EnsureFocus ();
+                FocusFirstOrLast ();
             }
 
             return null;
