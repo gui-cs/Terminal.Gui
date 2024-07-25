@@ -653,7 +653,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // The subview does not have focus, but at least one other that can. Can this one be focused?
             if (focusedIdx != -1 && w.CanFocus && w._tabStop && w.Visible && w.Enabled)
             {
-                // Make w Leave
+                // Make Focused Leave
                 Focused.SetHasFocus (false, w);
 
                 //// If the focused view is overlapped don't focus on the next if it's not overlapped.
