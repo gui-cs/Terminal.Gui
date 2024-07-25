@@ -520,7 +520,7 @@ public class ComboBox : View, IDesignable
             else
             {
                 _listview.TabStop = false;
-                SuperView?.FocusNext ();
+                SuperView?.AdvanceFocus (NavigationDirection.Forward);
             }
 
             return true;

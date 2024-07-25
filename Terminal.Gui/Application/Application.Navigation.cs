@@ -36,7 +36,7 @@ internal static class ApplicationNavigation
     /// </summary>
     /// <param name="viewsInTabIndexes"></param>
     /// <param name="direction"></param>
-    internal static void FocusNearestView (IEnumerable<View>? viewsInTabIndexes, View.NavigationDirection direction)
+    internal static void FocusNearestView (IEnumerable<View>? viewsInTabIndexes, NavigationDirection direction)
     {
         if (viewsInTabIndexes is null)
         {
@@ -56,14 +56,7 @@ internal static class ApplicationNavigation
 
             if (found && v != Application.Current)
             {
-                if (direction == View.NavigationDirection.Forward)
-                {
-                    Application.Current!.SuperView?.FocusNext ();
-                }
-                else
-                {
-                    Application.Current!.SuperView?.FocusPrev ();
-                }
+                Application.Current!.SuperView?.AdvanceFocus (direction);
 
                 focusProcessed = true;
 
@@ -89,9 +82,9 @@ internal static class ApplicationNavigation
     {
         View? old = GetDeepestFocusedSubview (Application.Current!.Focused);
 
-        if (!Application.Current.FocusNext ())
+        if (!Application.Current.AdvanceFocus (NavigationDirection.Forward))
         {
-            Application.Current.FocusNext ();
+            Application.Current.AdvanceFocus (NavigationDirection.Forward);
         }
 
         if (old != Application.Current.Focused && old != Application.Current.Focused?.Focused)
@@ -101,7 +94,7 @@ internal static class ApplicationNavigation
         }
         else
         {
-            FocusNearestView (Application.Current.SuperView?.TabIndexes, View.NavigationDirection.Forward);
+            FocusNearestView (Application.Current.SuperView?.TabIndexes, NavigationDirection.Forward);
         }
     }
 
@@ -114,9 +107,9 @@ internal static class ApplicationNavigation
         {
             Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
 
-            if (!Application.Current.FocusNext ())
+            if (!Application.Current.AdvanceFocus (NavigationDirection.Forward))
             {
-                Application.Current.FocusNext ();
+                Application.Current.AdvanceFocus (NavigationDirection.Forward);
             }
 
             if (top != Application.Current.Focused && top != Application.Current.Focused?.Focused)
@@ -126,16 +119,16 @@ internal static class ApplicationNavigation
             }
             else
             {
-                FocusNearestView (Application.Current.SuperView?.TabIndexes, View.NavigationDirection.Forward);
+                FocusNearestView (Application.Current.SuperView?.TabIndexes, NavigationDirection.Forward);
             }
 
 
 
-            //top!.FocusNext ();
+            //top!.AdvanceFocus (NavigationDirection.Forward);
 
             //if (top.Focused is null)
             //{
-            //    top.FocusNext ();
+            //    top.AdvanceFocus (NavigationDirection.Forward);
             //}
 
             //top.SetNeedsDisplay ();
@@ -155,9 +148,9 @@ internal static class ApplicationNavigation
     {
         View? old = GetDeepestFocusedSubview (Application.Current!.Focused);
 
-        if (!Application.Current.FocusPrev ())
+        if (!Application.Current.AdvanceFocus (NavigationDirection.Backward))
         {
-            Application.Current.FocusPrev ();
+            Application.Current.AdvanceFocus (NavigationDirection.Backward);
         }
 
         if (old != Application.Current.Focused && old != Application.Current.Focused?.Focused)
@@ -167,7 +160,7 @@ internal static class ApplicationNavigation
         }
         else
         {
-            FocusNearestView (Application.Current.SuperView?.TabIndexes?.Reverse (), View.NavigationDirection.Backward);
+            FocusNearestView (Application.Current.SuperView?.TabIndexes?.Reverse (), NavigationDirection.Backward);
         }
     }
 
@@ -176,11 +169,11 @@ internal static class ApplicationNavigation
         if (ApplicationOverlapped.OverlappedTop is null)
         {
             Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
-            top!.FocusPrev ();
+            top!.AdvanceFocus (NavigationDirection.Backward);
 
             if (top.Focused is null)
             {
-                top.FocusPrev ();
+                top.AdvanceFocus (NavigationDirection.Backward);
             }
 
             top.SetNeedsDisplay ();

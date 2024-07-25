@@ -614,8 +614,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (removed);
         Assert.NotNull (view3);
 
-        Exception exception =
-            Record.Exception (() => Application.OnKeyDown (Key.Tab.WithCtrl));
+        Exception exception = Record.Exception (() => Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.Null (exception);
         Assert.True (removed);
         Assert.Null (view3);
@@ -1380,23 +1379,23 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
 
         v1.TabStop = true;
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.True (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
         v2.TabStop = true;
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.True (v2.HasFocus);
         Assert.False (v3.HasFocus);
         v3.TabStop = true;
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.True (v3.HasFocus);
@@ -1413,23 +1412,23 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
 
         v1.CanFocus = true;
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.True (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
         v2.CanFocus = true;
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.True (v2.HasFocus);
         Assert.False (v3.HasFocus);
         v3.CanFocus = true;
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.True (v3.HasFocus);
@@ -1446,15 +1445,15 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.True (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.True (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.True (v3.HasFocus);
@@ -1471,15 +1470,15 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
@@ -1496,15 +1495,15 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
@@ -1521,15 +1520,15 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.FocusNext ();
+        r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);

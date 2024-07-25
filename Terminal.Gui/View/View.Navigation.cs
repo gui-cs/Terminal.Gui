@@ -7,16 +7,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <summary>Returns a value indicating if this View is currently on Top (Active)</summary>
     public bool IsCurrentTop => Application.Current == this;
 
-    /// <summary>Exposed as `internal` for unit tests. Indicates focus navigation direction.</summary>
-    public enum NavigationDirection
-    {
-        /// <summary>Navigate forward.</summary>
-        Forward,
-
-        /// <summary>Navigate backwards.</summary>
-        Backward
-    }
-
     // BUGBUG: The focus API is poorly defined and implemented. It deeply intertwines the view hierarchy with the tab order.
 
     /// <summary>Invoked when this view is gaining focus (entering).</summary>
@@ -240,11 +230,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 // If EnsureFocus () didn't set focus to a view, focus the next focusable view in the application
                 if (SuperView is { Focused: null })
                 {
-                    SuperView.FocusNext ();
+                    SuperView.AdvanceFocus (NavigationDirection.Forward);
 
                     if (SuperView.Focused is null && Application.Current is { })
                     {
-                        Application.Current.FocusNext ();
+                        Application.Current.AdvanceFocus (NavigationDirection.Forward);
                     }
 
                     ApplicationOverlapped.BringOverlappedTopToFront ();
@@ -460,7 +450,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
     /// <param name="overlappedOnly">
-    ///     If <see langword="true"/>, only subviews where <see cref="Arrangement"/> has <see cref="ViewArrangement.Overlapped"/> set
+    ///     If <see langword="true"/>, only subviews where <see cref="Arrangement"/> has
+    ///     <see cref="ViewArrangement.Overlapped"/> set
     ///     will be considered.
     /// </param>
     public void FocusFirst (bool overlappedOnly = false)
@@ -493,7 +484,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
     /// <param name="overlappedOnly">
-    ///     If <see langword="true"/>, only subviews where <see cref="Arrangement"/> has <see cref="ViewArrangement.Overlapped"/> set
+    ///     If <see langword="true"/>, only subviews where <see cref="Arrangement"/> has
+    ///     <see cref="ViewArrangement.Overlapped"/> set
     ///     will be considered.
     /// </param>
     public void FocusLast (bool overlappedOnly = false)
@@ -522,39 +514,28 @@ public partial class View // Focus and cross-view navigation management (TabStop
     }
 
     /// <summary>
-    ///     Advances the focus to the next or previous view in <see cref="View.TabIndexes"/>, based on <paramref name="direction"/>.
+    ///     Advances the focus to the next or previous view in <see cref="View.TabIndexes"/>, based on
+    ///     <paramref name="direction"/>.
     ///     itself.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///          If there is no next/previous view, the focus is set to the view itself.
+    ///         If there is no next/previous view, the focus is set to the view itself.
     ///     </para>
     /// </remarks>
     /// <param name="direction"></param>
-    /// <returns><see langword="true"/> if focus was changed to another subview (or stayed on this one), <see langword="false"/> otherwise.</returns>
+    /// <returns>
+    ///     <see langword="true"/> if focus was changed to another subview (or stayed on this one), <see langword="false"/>
+    ///     otherwise.
+    /// </returns>
     public bool AdvanceFocus (NavigationDirection direction)
-    {
-        return direction switch
-        {
-            NavigationDirection.Forward => FocusNext (),
-            NavigationDirection.Backward => FocusPrev (),
-            _ => false
-        };
-    }
-
-    /// <summary>
-    ///     Focuses the next view in <see cref="View.TabIndexes"/>. If there is no next view, the focus is set to the view
-    ///     itself.
-    /// </summary>
-    /// <returns><see langword="true"/> if focus was changed to another subview (or stayed on this one), <see langword="false"/> otherwise.</returns>
-    public bool FocusNext ()
     {
         if (!CanBeVisible (this))
         {
             return false;
         }
 
-        FocusDirection = NavigationDirection.Forward;
+        FocusDirection = direction;
 
         if (TabIndexes is null || TabIndexes.Count == 0)
         {
@@ -563,21 +544,33 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (Focused is null)
         {
-            FocusFirst ();
+            switch (direction)
+            {
+                case NavigationDirection.Forward:
+                    FocusFirst ();
+
+                    break;
+                case NavigationDirection.Backward:
+                    FocusLast ();
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException (nameof (direction), direction, null);
+            }
 
             return Focused is { };
         }
 
-        int focusedIdx = -1;
+        var focusedFound = false;
 
-        for (var i = 0; i < TabIndexes.Count; i++)
+        foreach (View w in direction == NavigationDirection.Forward
+                               ? TabIndexes.ToArray ()
+                               : TabIndexes.ToArray ().Reverse ())
         {
-            View w = TabIndexes [i];
-
             if (w.HasFocus)
             {
                 // A subview has focus, tell *it* to FocusNext
-                if (w.FocusNext ())
+                if (w.AdvanceFocus (direction))
                 {
                     // The subview changed which of it's subviews had focus
                     return true;
@@ -586,13 +579,13 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 Debug.Assert (w.HasFocus);
 
                 // The subview has no subviews that can be next. Cache that we found a focused subview.
-                focusedIdx = i;
+                focusedFound = true;
 
                 continue;
             }
 
             // The subview does not have focus, but at least one other that can. Can this one be focused?
-            if (focusedIdx != -1 && w.CanFocus && w._tabStop && w.Visible && w.Enabled)
+            if (focusedFound && w.CanFocus && w._tabStop && w.Visible && w.Enabled)
             {
                 // Make Focused Leave
                 Focused.SetHasFocus (false, w);
@@ -609,10 +602,16 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 //    continue;
                 //}
 
-                // QUESTION: Why do we check these again here?
-                if (w.CanFocus && w._tabStop && w.Visible && w.Enabled)
+                switch (direction)
                 {
-                    w.FocusFirst ();
+                    case NavigationDirection.Forward:
+                        w.FocusFirst ();
+
+                        break;
+                    case NavigationDirection.Backward:
+                        w.FocusLast ();
+
+                        break;
                 }
 
                 SetFocus (w);
@@ -621,114 +620,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
         }
 
-        // There's no next view in tab indexes.
         if (Focused is { })
         {
-            // Leave
             Focused.SetHasFocus (false, this);
-
-            //if (Focused.Arrangement.HasFlag (ViewArrangement.Overlapped))
-            //{
-            //    FocusFirst (true);
-            //    return true;
-            //}
-
-            // Signal to caller no next view was found; this will enable it to make a peer
-            // or view up the superview hierarchy have focus.
-            Focused = null;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    ///     Focuses the previous view in <see cref="View.TabIndexes"/>. If there is no previous view, the focus is set to the
-    ///     view itself.
-    /// </summary>
-    /// <returns><see langword="true"/> if previous was focused, <see langword="false"/> otherwise.</returns>
-    public bool FocusPrev ()
-    {
-        if (!CanBeVisible (this))
-        {
-            return false;
-        }
-
-        FocusDirection = NavigationDirection.Backward;
-
-        if (TabIndexes is null || TabIndexes.Count == 0)
-        {
-            return false;
-        }
-
-        if (Focused is null)
-        {
-            FocusLast ();
-
-            return Focused != null;
-        }
-
-        int focusedIdx = -1;
-
-        for (int i = TabIndexes.Count; i > 0;)
-        {
-            i--;
-            View w = TabIndexes [i];
-
-            if (w.HasFocus)
-            {
-                if (w.FocusPrev ())
-                {
-                    return true;
-                }
-
-                focusedIdx = i;
-
-                continue;
-            }
-
-            if (w.CanFocus && focusedIdx != -1 && w._tabStop && w.Visible && w.Enabled)
-            {
-                Focused.SetHasFocus (false, w);
-
-                // If the focused view is overlapped don't focus on the next if it's not overlapped.
-                if (Focused.Arrangement.HasFlag (ViewArrangement.Overlapped) && !w.Arrangement.HasFlag (ViewArrangement.Overlapped))
-                {
-                    FocusLast (true);
-
-                    return true;
-                }
-
-                // If the focused view is not overlapped and the next is, skip it
-                if (!Focused.Arrangement.HasFlag (ViewArrangement.Overlapped) && w.Arrangement.HasFlag (ViewArrangement.Overlapped))
-                {
-                    continue;
-                }
-
-                if (w.CanFocus && w._tabStop && w.Visible && w.Enabled)
-                {
-                    w.FocusLast ();
-                }
-
-                SetFocus (w);
-
-                return true;
-            }
-        }
-
-        // There's no prev view in tab indexes.
-        if (Focused is { })
-        {
-            // Leave Focused
-            Focused.SetHasFocus (false, this);
-
-            if (Focused.Arrangement.HasFlag (ViewArrangement.Overlapped))
-            {
-                FocusLast (true);
-
-                return true;
-            }
-
-            // Signal to caller no next view was found
             Focused = null;
         }
 

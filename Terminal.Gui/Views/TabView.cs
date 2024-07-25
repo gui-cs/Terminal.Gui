@@ -95,7 +95,7 @@ public class TabView : View
                     Command.PreviousView,
                     () =>
                     {
-                        SuperView?.FocusPrev ();
+                        SuperView?.AdvanceFocus (NavigationDirection.Backward);
 
                         return true;
                     }
