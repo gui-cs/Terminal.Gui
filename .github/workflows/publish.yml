@@ -19,13 +19,13 @@ jobs:
         fetch-depth: 0 # fetch-depth is needed for GitVersion
 
     - name: Install GitVersion 
-      uses: gittools/actions/gitversion/setup@v1
+      uses: gittools/actions/gitversion/setup@v2
       with:
           versionSpec: '5.x'
           includePrerelease: true
 
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v1
+      uses: gittools/actions/gitversion/execute@v2
       with:
         useConfigFile: true
         #additionalArguments: /b develop
