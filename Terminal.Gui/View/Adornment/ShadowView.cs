@@ -18,7 +18,7 @@ internal class ShadowView : View
         {
             var attr = Attribute.Default;
 
-            if (adornment.Parent.SuperView is { })
+            if (adornment.Parent?.SuperView is { })
             {
                 attr = adornment.Parent.SuperView.GetNormalColor ();
             }

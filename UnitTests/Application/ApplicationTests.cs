@@ -44,7 +44,7 @@ public class ApplicationTests
         Toplevel top = new ();
         Application.Begin (top);
         Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
-        ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
         Assert.Equal (new (0, 0, 5, 5), Application.Top.Frame);
         top.Dispose ();
     }
@@ -89,12 +89,12 @@ public class ApplicationTests
 
         RunState runstate = null;
 
-        EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) =>
+        EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
                                                         {
                                                             Assert.NotNull (e.State);
                                                             runstate = e.State;
                                                         };
-        Application.NotifyNewRunState += NewRunStateFn;
+        Application.NotifyNewRunState += newRunStateFn;
 
         var topLevel = new Toplevel ();
         RunState rs = Application.Begin (topLevel);
@@ -105,7 +105,7 @@ public class ApplicationTests
         Assert.Equal (topLevel, Application.Top);
         Assert.Equal (topLevel, Application.Current);
 
-        Application.NotifyNewRunState -= NewRunStateFn;
+        Application.NotifyNewRunState -= newRunStateFn;
         Application.End (runstate);
 
         Assert.Null (Application.Current);
@@ -134,7 +134,7 @@ public class ApplicationTests
         Application.Init (driverName: driverType.Name);
         Assert.NotNull (Application.Driver);
         Assert.NotEqual (driver, Application.Driver);
-        Assert.Equal (driverType, Application.Driver.GetType ());
+        Assert.Equal (driverType, Application.Driver?.GetType ());
         Shutdown ();
     }
 
@@ -162,7 +162,7 @@ public class ApplicationTests
         // Set some values
 
         Application.Init (driverName: driverType.Name);
-        Application._initialized = true;
+        Application.IsInitialized = true;
 
         // Reset
         Application.ResetState ();
@@ -187,19 +187,19 @@ public class ApplicationTests
             Assert.Equal (Key.Empty, Application.AlternateBackwardKey);
             Assert.Equal (Key.Empty, Application.AlternateForwardKey);
             Assert.Equal (Key.Empty, Application.QuitKey);
-            Assert.Null (Application.OverlappedChildren);
-            Assert.Null (Application.OverlappedTop);
+            Assert.Null (ApplicationOverlapped.OverlappedChildren);
+            Assert.Null (ApplicationOverlapped.OverlappedTop);
 
             // Internal properties
-            Assert.False (Application._initialized);
+            Assert.False (Application.IsInitialized);
             Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
             Assert.False (Application._forceFakeConsole);
-            Assert.Equal (-1, Application._mainThreadId);
-            Assert.Empty (Application._topLevels);
-            Assert.Null (Application._mouseEnteredView);
+            Assert.Equal (-1, Application.MainThreadId);
+            Assert.Empty (Application.TopLevels);
+            Assert.Null (Application.MouseEnteredView);
 
             // Keyboard
-            Assert.Empty (Application.GetViewsWithKeyBindings ());
+            Assert.Empty (Application.GetViewKeyBindings ());
 
             // Events - Can't check
             //Assert.Null (Application.NotifyNewRunState);
@@ -218,12 +218,12 @@ public class ApplicationTests
         CheckReset ();
 
         // Set the values that can be set
-        Application._initialized = true;
+        Application.IsInitialized = true;
         Application._forceFakeConsole = true;
-        Application._mainThreadId = 1;
+        Application.MainThreadId = 1;
 
         //Application._topLevels = new List<Toplevel> ();
-        Application._mouseEnteredView = new ();
+        Application.MouseEnteredView = new ();
 
         //Application.SupportedCultures = new List<CultureInfo> ();
         Application.Force16Colors = true;
@@ -233,11 +233,11 @@ public class ApplicationTests
         Application.AlternateBackwardKey = Key.A;
         Application.AlternateForwardKey = Key.B;
         Application.QuitKey = Key.C;
-        Application.AddKeyBinding (Key.A, new View ());
+        Application.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Cancel);
 
-        //Application.OverlappedChildren = new List<View> ();
-        //Application.OverlappedTop = 
-        Application._mouseEnteredView = new ();
+        //ApplicationOverlapped.OverlappedChildren = new List<View> ();
+        //ApplicationOverlapped.OverlappedTop = 
+        Application.MouseEnteredView = new ();
 
         //Application.WantContinuousButtonPressedView = new View ();
 
@@ -378,12 +378,12 @@ public class ApplicationTests
 
         RunState runstate = null;
 
-        EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) =>
+        EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
                                                         {
                                                             Assert.NotNull (e.State);
                                                             runstate = e.State;
                                                         };
-        Application.NotifyNewRunState += NewRunStateFn;
+        Application.NotifyNewRunState += newRunStateFn;
 
         RunState rs = Application.Begin (topLevel);
         Assert.NotNull (rs);
@@ -393,7 +393,7 @@ public class ApplicationTests
         Assert.Equal (topLevel, Application.Top);
         Assert.Equal (topLevel, Application.Current);
 
-        Application.NotifyNewRunState -= NewRunStateFn;
+        Application.NotifyNewRunState -= newRunStateFn;
         Application.End (runstate);
 
         Assert.Null (Application.Current);
@@ -413,13 +413,13 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void Internal_Properties_Correct ()
     {
-        Assert.True (Application._initialized);
+        Assert.True (Application.IsInitialized);
         Assert.Null (Application.Top);
         RunState rs = Application.Begin (new ());
         Assert.Equal (Application.Top, rs.Toplevel);
         Assert.Null (Application.MouseGrabView); // public
         Assert.Null (Application.WantContinuousButtonPressedView); // public
-        Assert.False (Application.MoveToOverlappedChild (Application.Top));
+        Assert.False (ApplicationOverlapped.MoveToOverlappedChild (Application.Top!));
         Application.Top.Dispose ();
     }
 
@@ -565,8 +565,8 @@ public class ApplicationTests
         Assert.NotNull (Application.MainLoop);
 
         // FakeDriver is always 80x25
-        Assert.Equal (80, Application.Driver.Cols);
-        Assert.Equal (25, Application.Driver.Rows);
+        Assert.Equal (80, Application.Driver!.Cols);
+        Assert.Equal (25, Application.Driver!.Rows);
     }
 
     private void Pre_Init_State ()
@@ -695,7 +695,7 @@ public class ApplicationTests
         Application.ForceDriver = "FakeDriver";
 
         Application.Init ();
-        Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
+        Assert.Equal (typeof (FakeDriver), Application.Driver?.GetType ());
 
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
@@ -737,7 +737,7 @@ public class ApplicationTests
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         Application.Run<TestToplevel> ();
-        Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
+        Assert.Equal (typeof (FakeDriver), Application.Driver?.GetType ());
 
         Application.Top.Dispose ();
         Shutdown ();
@@ -888,7 +888,7 @@ public class ApplicationTests
             Width = 5, Height = 5,
             Arrangement = ViewArrangement.Movable
         };
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
         RunState rs = Application.Begin (w);
 
         // Don't use visuals to test as style of border can change over time.
@@ -1206,7 +1206,7 @@ public class ApplicationTests
             Thread.Sleep ((int)timeoutTime / 10);
 
             // Worst case scenario - something went wrong
-            if (Application._initialized && iteration > 25)
+            if (Application.IsInitialized && iteration > 25)
             {
                 _output.WriteLine ($"Too many iterations ({iteration}): Calling Application.RequestStop.");
                 Application.RequestStop ();

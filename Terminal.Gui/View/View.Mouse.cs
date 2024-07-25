@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-public partial class View
+public partial class View // Mouse APIs
 {
     [CanBeNull]
     private ColorScheme _savedHighlightColorScheme;

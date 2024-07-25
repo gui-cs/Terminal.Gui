@@ -440,40 +440,40 @@ public class Shortcut : View
     }
 
     private void SetCommandViewDefaultLayout ()
-{
-    CommandView.Margin.Thickness = GetMarginThickness ();
-    CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
-    CommandView.Y = 0; //Pos.Center ();
-}
+    {
+        CommandView.Margin.Thickness = GetMarginThickness ();
+        CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
+        CommandView.Y = 0; //Pos.Center ();
+    }
 
-private void Shortcut_TitleChanged (object sender, EventArgs<string> e)
-{
-    // If the Title changes, update the CommandView text.
-    // This is a helper to make it easier to set the CommandView text.
-    // CommandView is public and replaceable, but this is a convenience.
-    _commandView.Text = Title;
-}
+    private void Shortcut_TitleChanged (object sender, EventArgs<string> e)
+    {
+        // If the Title changes, update the CommandView text.
+        // This is a helper to make it easier to set the CommandView text.
+        // CommandView is public and replaceable, but this is a convenience.
+        _commandView.Text = Title;
+    }
 
-#endregion Command
+    #endregion Command
 
-#region Help
+    #region Help
 
-/// <summary>
-///     The subview that displays the help text for the command. Internal for unit testing.
-/// </summary>
-internal View HelpView { get; } = new ();
+    /// <summary>
+    ///     The subview that displays the help text for the command. Internal for unit testing.
+    /// </summary>
+    internal View HelpView { get; } = new ();
 
-private void SetHelpViewDefaultLayout ()
-{
-    HelpView.Margin.Thickness = GetMarginThickness ();
-    HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
-    HelpView.Y = 0; //Pos.Center ();
-    HelpView.Width = Dim.Auto (DimAutoStyle.Text);
-    HelpView.Height = CommandView?.Visible == true ? Dim.Height (CommandView) : 1;
+    private void SetHelpViewDefaultLayout ()
+    {
+        HelpView.Margin.Thickness = GetMarginThickness ();
+        HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
+        HelpView.Y = 0; //Pos.Center ();
+        HelpView.Width = Dim.Auto (DimAutoStyle.Text);
+        HelpView.Height = CommandView?.Visible == true ? Dim.Height (CommandView) : 1;
 
-    HelpView.Visible = true;
-    HelpView.VerticalTextAlignment = Alignment.Center;
-}
+        HelpView.Visible = true;
+        HelpView.VerticalTextAlignment = Alignment.Center;
+    }
 
 /// <summary>
 ///     Gets or sets the help text displayed in the middle of the Shortcut. Identical in function to <see cref="HelpText"/>
@@ -508,285 +508,293 @@ public string HelpText
     }
 }
 
-#endregion Help
+    #endregion Help
 
-#region Key
+    #region Key
 
-private Key _key = Key.Empty;
+    private Key _key = Key.Empty;
 
-/// <summary>
-///     Gets or sets the <see cref="Key"/> that will be bound to the <see cref="Command.Accept"/> command.
-/// </summary>
-public Key Key
-{
-    get => _key;
-    set
+    /// <summary>
+    ///     Gets or sets the <see cref="Key"/> that will be bound to the <see cref="Command.Accept"/> command.
+    /// </summary>
+    public Key Key
     {
-        if (value == null)
+        get => _key;
+        set
         {
-            throw new ArgumentNullException ();
-        }
-
-        _key = value;
-
-        UpdateKeyBinding ();
-
-        KeyView.Text = Key == Key.Empty ? string.Empty : $"{Key}";
-        ShowHide ();
-    }
-}
-
-private KeyBindingScope _keyBindingScope = KeyBindingScope.HotKey;
-
-/// <summary>
-///     Gets or sets the scope for the key binding for how <see cref="Key"/> is bound to <see cref="Command"/>.
-/// </summary>
-public KeyBindingScope KeyBindingScope
-{
-    get => _keyBindingScope;
-    set
-    {
-        _keyBindingScope = value;
-
-        UpdateKeyBinding ();
-    }
-}
-
-/// <summary>
-///     Gets the subview that displays the key. Internal for unit testing.
-/// </summary>
-
-internal View KeyView { get; } = new ();
-
-private int _minimumKeyTextSize;
-
-/// <summary>
-/// Gets or sets the minimum size of the key text. Useful for aligning the key text with other <see cref="Shortcut"/>s.
-/// </summary>
-public int MinimumKeyTextSize
-{
-    get => _minimumKeyTextSize;
-    set
-    {
-        if (value == _minimumKeyTextSize)
-        {
-            //return;
-        }
-
-        _minimumKeyTextSize = value;
-        SetKeyViewDefaultLayout ();
-        CommandView.SetNeedsLayout ();
-        HelpView.SetNeedsLayout ();
-        KeyView.SetNeedsLayout ();
-        SetSubViewNeedsDisplay ();
-    }
-}
-
-private int GetMinimumKeyViewSize () { return MinimumKeyTextSize; }
-
-private void SetKeyViewDefaultLayout ()
-{
-    KeyView.Margin.Thickness = GetMarginThickness ();
-    KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
-    KeyView.Y = 0; //Pos.Center ();
-    KeyView.Width = Dim.Auto (DimAutoStyle.Text, Dim.Func (GetMinimumKeyViewSize));
-    KeyView.Height = CommandView?.Visible == true ? Dim.Height (CommandView) : 1;
-
-    KeyView.Visible = true;
-
-    // Right align the text in the keyview
-    KeyView.TextAlignment = Alignment.End;
-    KeyView.VerticalTextAlignment = Alignment.Center;
-    KeyView.KeyBindings.Clear ();
-}
-
-private void UpdateKeyBinding ()
-{
-    if (Key != null)
-    {
-        // Disable the command view key bindings
-        CommandView.KeyBindings.Remove (Key);
-        CommandView.KeyBindings.Remove (CommandView.HotKey);
-        KeyBindings.Remove (Key);
-        KeyBindings.Add (Key, KeyBindingScope | KeyBindingScope.HotKey, Command.Accept);
-        //KeyBindings.Add (Key, KeyBindingScope.HotKey, Command.Accept);
-    }
-}
-
-#endregion Key
-
-#region Accept Handling
-
-/// <summary>
-///     Called when the <see cref="Command.Accept"/> command is received. This
-///     occurs
-///     - if the user clicks anywhere on the shortcut with the mouse
-///     - if the user presses Key
-///     - if the user presses the HotKey specified by CommandView
-///     - if HasFocus and the user presses Space or Enter (or any other key bound to Command.Accept).
-/// </summary>
-protected bool? OnAccept (CommandContext ctx)
-{
-    var cancel = false;
-
-    switch (ctx.KeyBinding?.Scope)
-    {
-        case KeyBindingScope.Application:
-            cancel = base.OnAccept () == true;
-
-            break;
-
-        case KeyBindingScope.Focused:
-            base.OnAccept ();
-
-            // cancel if we're focused
-            cancel = true;
-
-            break;
-
-        case KeyBindingScope.HotKey:
-            cancel = base.OnAccept () == true;
-
-            if (CanFocus)
+            if (value == null)
             {
-                SetFocus ();
-                cancel = true;
+                throw new ArgumentNullException ();
             }
 
-            break;
+            _key = value;
 
-        default:
-            // Mouse
-            cancel = base.OnAccept () == true;
+            UpdateKeyBinding ();
 
-            break;
+            KeyView.Text = Key == Key.Empty ? string.Empty : $"{Key}";
+            ShowHide ();
+        }
     }
 
-    CommandView.InvokeCommand (Command.Accept, ctx.Key, ctx.KeyBinding);
+    private KeyBindingScope _keyBindingScope = KeyBindingScope.HotKey;
 
-    if (Action is { })
+    /// <summary>
+    ///     Gets or sets the scope for the key binding for how <see cref="Key"/> is bound to <see cref="Command"/>.
+    /// </summary>
+    public KeyBindingScope KeyBindingScope
     {
-        Action.Invoke ();
-        // Assume if there's a subscriber to Action, it's handled.
-        cancel = true;
+        get => _keyBindingScope;
+        set
+        {
+            _keyBindingScope = value;
+
+            UpdateKeyBinding ();
+        }
     }
 
-    return cancel;
-}
+    /// <summary>
+    ///     Gets the subview that displays the key. Internal for unit testing.
+    /// </summary>
 
-/// <summary>
-///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the
-///     mouse.
-/// </summary>
-/// <remarks>
-///     Note, the <see cref="View.Accept"/> event is fired first, and if cancelled, the event will not be invoked.
-/// </remarks>
-[CanBeNull]
-public Action Action { get; set; }
+    internal View KeyView { get; } = new ();
 
-#endregion Accept Handling
+    private int _minimumKeyTextSize;
 
-private bool? OnSelect (CommandContext ctx)
-{
-    if (CommandView.GetSupportedCommands ().Contains (Command.Select))
+    /// <summary>
+    /// Gets or sets the minimum size of the key text. Useful for aligning the key text with other <see cref="Shortcut"/>s.
+    /// </summary>
+    public int MinimumKeyTextSize
     {
-        return CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
+        get => _minimumKeyTextSize;
+        set
+        {
+            if (value == _minimumKeyTextSize)
+            {
+                //return;
+            }
+
+            _minimumKeyTextSize = value;
+            SetKeyViewDefaultLayout ();
+            CommandView.SetNeedsLayout ();
+            HelpView.SetNeedsLayout ();
+            KeyView.SetNeedsLayout ();
+            SetSubViewNeedsDisplay ();
+        }
     }
-    return false;
 
-}
+    private int GetMinimumKeyViewSize () { return MinimumKeyTextSize; }
 
-
-#region Focus
-
-/// <inheritdoc/>
-public override ColorScheme ColorScheme
-{
-    get => base.ColorScheme;
-    set
+    private void SetKeyViewDefaultLayout ()
     {
-        base.ColorScheme = value;
+        KeyView.Margin.Thickness = GetMarginThickness ();
+        KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
+        KeyView.Y = 0; //Pos.Center ();
+        KeyView.Width = Dim.Auto (DimAutoStyle.Text, Dim.Func (GetMinimumKeyViewSize));
+        KeyView.Height = CommandView?.Visible == true ? Dim.Height (CommandView) : 1;
+
+        KeyView.Visible = true;
+
+        // Right align the text in the keyview
+        KeyView.TextAlignment = Alignment.End;
+        KeyView.VerticalTextAlignment = Alignment.Center;
+        KeyView.KeyBindings.Clear ();
+    }
+
+    private void UpdateKeyBinding ()
+    {
+        if (Key != null)
+        {
+            // Disable the command view key bindings
+            CommandView.KeyBindings.Remove (Key);
+            CommandView.KeyBindings.Remove (CommandView.HotKey);
+
+            if (KeyBindingScope.FastHasFlags (KeyBindingScope.Application))
+            {
+                Application.KeyBindings.Remove (Key);
+                Application.KeyBindings.Add (Key, this, Command.Accept);
+            }
+            else
+            {
+                KeyBindings.Remove (Key);
+                KeyBindings.Add (Key, KeyBindingScope | KeyBindingScope.HotKey, Command.Accept);
+            }
+        }
+    }
+
+    #endregion Key
+
+    #region Accept Handling
+
+    /// <summary>
+    ///     Called when the <see cref="Command.Accept"/> command is received. This
+    ///     occurs
+    ///     - if the user clicks anywhere on the shortcut with the mouse
+    ///     - if the user presses Key
+    ///     - if the user presses the HotKey specified by CommandView
+    ///     - if HasFocus and the user presses Space or Enter (or any other key bound to Command.Accept).
+    /// </summary>
+    protected bool? OnAccept (CommandContext ctx)
+    {
+        var cancel = false;
+
+        switch (ctx.KeyBinding?.Scope)
+        {
+            case KeyBindingScope.Application:
+                cancel = base.OnAccept () == true;
+
+                break;
+
+            case KeyBindingScope.Focused:
+                base.OnAccept ();
+
+                // cancel if we're focused
+                cancel = true;
+
+                break;
+
+            case KeyBindingScope.HotKey:
+                cancel = base.OnAccept () == true;
+
+                if (CanFocus)
+                {
+                    SetFocus ();
+                    cancel = true;
+                }
+
+                break;
+
+            default:
+                // Mouse
+                cancel = base.OnAccept () == true;
+
+                break;
+        }
+
+        CommandView.InvokeCommand (Command.Accept, ctx.Key, ctx.KeyBinding);
+
+        if (Action is { })
+        {
+            Action.Invoke ();
+            // Assume if there's a subscriber to Action, it's handled.
+            cancel = true;
+        }
+
+        return cancel;
+    }
+
+    /// <summary>
+    ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the
+    ///     mouse.
+    /// </summary>
+    /// <remarks>
+    ///     Note, the <see cref="View.Accept"/> event is fired first, and if cancelled, the event will not be invoked.
+    /// </remarks>
+    [CanBeNull]
+    public Action Action { get; set; }
+
+    #endregion Accept Handling
+
+    private bool? OnSelect (CommandContext ctx)
+    {
+        if (CommandView.GetSupportedCommands ().Contains (Command.Select))
+        {
+            return CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
+        }
+        return false;
+
+    }
+
+
+    #region Focus
+
+    /// <inheritdoc/>
+    public override ColorScheme ColorScheme
+    {
+        get => base.ColorScheme;
+        set
+        {
+            base.ColorScheme = value;
+            SetColors ();
+        }
+    }
+
+    /// <summary>
+    /// </summary>
+    internal void SetColors ()
+    {
+        // Border should match superview.
+        Border.ColorScheme = SuperView?.ColorScheme;
+
+        if (HasFocus)
+        {
+            // When we have focus, we invert the colors
+            base.ColorScheme = new (base.ColorScheme)
+            {
+                Normal = base.ColorScheme.Focus,
+                HotNormal = base.ColorScheme.HotFocus,
+                HotFocus = base.ColorScheme.HotNormal,
+                Focus = base.ColorScheme.Normal
+            };
+        }
+        else
+        {
+            base.ColorScheme = SuperView?.ColorScheme ?? base.ColorScheme;
+        }
+
+        // Set KeyView's colors to show "hot"
+        if (IsInitialized && base.ColorScheme is { })
+        {
+            var cs = new ColorScheme (base.ColorScheme)
+            {
+                Normal = base.ColorScheme.HotNormal,
+                HotNormal = base.ColorScheme.Normal
+            };
+            KeyView.ColorScheme = cs;
+        }
+    }
+
+    View _lastFocusedView;
+    /// <inheritdoc/>
+    public override bool OnEnter (View view)
+    {
         SetColors ();
+        _lastFocusedView = view;
+
+        return base.OnEnter (view);
     }
-}
 
-/// <summary>
-/// </summary>
-internal void SetColors ()
-{
-    // Border should match superview.
-    Border.ColorScheme = SuperView?.ColorScheme;
-
-    if (HasFocus)
+    /// <inheritdoc/>
+    public override bool OnLeave (View view)
     {
-        // When we have focus, we invert the colors
-        base.ColorScheme = new (base.ColorScheme)
+        SetColors ();
+        _lastFocusedView = this;
+
+        return base.OnLeave (view);
+    }
+
+    #endregion Focus
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
         {
-            Normal = base.ColorScheme.Focus,
-            HotNormal = base.ColorScheme.HotFocus,
-            HotFocus = base.ColorScheme.HotNormal,
-            Focus = base.ColorScheme.Normal
-        };
-    }
-    else
-    {
-        base.ColorScheme = SuperView?.ColorScheme ?? base.ColorScheme;
-    }
+            if (CommandView?.IsAdded == false)
+            {
+                CommandView.Dispose ();
+            }
 
-    // Set KeyView's colors to show "hot"
-    if (IsInitialized && base.ColorScheme is { })
-    {
-        var cs = new ColorScheme (base.ColorScheme)
-        {
-            Normal = base.ColorScheme.HotNormal,
-            HotNormal = base.ColorScheme.Normal
-        };
-        KeyView.ColorScheme = cs;
-    }
-}
+            if (HelpView?.IsAdded == false)
+            {
+                HelpView.Dispose ();
+            }
 
-View _lastFocusedView;
-/// <inheritdoc/>
-public override bool OnEnter (View view)
-{
-    SetColors ();
-    _lastFocusedView = view;
-
-    return base.OnEnter (view);
-}
-
-/// <inheritdoc/>
-public override bool OnLeave (View view)
-{
-    SetColors ();
-    _lastFocusedView = this;
-
-    return base.OnLeave (view);
-}
-
-#endregion Focus
-
-/// <inheritdoc/>
-protected override void Dispose (bool disposing)
-{
-    if (disposing)
-    {
-        if (CommandView?.IsAdded == false)
-        {
-            CommandView.Dispose ();
+            if (KeyView?.IsAdded == false)
+            {
+                KeyView.Dispose ();
+            }
         }
 
-        if (HelpView?.IsAdded == false)
-        {
-            HelpView.Dispose ();
-        }
-
-        if (KeyView?.IsAdded == false)
-        {
-            KeyView.Dispose ();
-        }
+        base.Dispose (disposing);
     }
-
-    base.Dispose (disposing);
-}
 }

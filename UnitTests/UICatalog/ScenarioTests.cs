@@ -115,7 +115,7 @@ public class ScenarioTests : TestsAllViews
 
         void OnApplicationOnIteration (object s, IterationEventArgs a)
         {
-            if (Application._initialized)
+            if (Application.IsInitialized)
             {
                 // Press QuitKey 
                 //_output.WriteLine ($"Forcing Quit with {Application.QuitKey}");

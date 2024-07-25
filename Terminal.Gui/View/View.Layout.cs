@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Terminal.Gui;
 
-public partial class View
+public partial class View // Layout APIs
 {
     /// <summary>
     ///     Indicates whether the specified SuperView-relative coordinates are within the View's <see cref="Frame"/>.
@@ -52,7 +52,7 @@ public partial class View
             if (found is { })
             {
                 start = found;
-                viewportOffset = found.Parent.Frame.Location;
+                viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
             }
 
             int startOffsetX = currentLocation.X - (start.Frame.X + viewportOffset.X);
@@ -108,17 +108,17 @@ public partial class View
     ///     Either <see cref="Application.Top"/> (if <paramref name="viewToMove"/> does not have a Super View) or
     ///     <paramref name="viewToMove"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.
     /// </returns>
-    internal static View GetLocationEnsuringFullVisibility (
+    internal static View? GetLocationEnsuringFullVisibility (
         View viewToMove,
         int targetX,
         int targetY,
         out int nx,
         out int ny,
-        out StatusBar statusBar
+        out StatusBar? statusBar
     )
     {
         int maxDimension;
-        View superView;
+        View? superView;
         statusBar = null!;
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
@@ -839,7 +839,7 @@ public partial class View
                 //}
                 if (dv.Target != this)
                 {
-                    nEdges.Add ((dv.Target, from));
+                    nEdges.Add ((dv.Target!, from));
                 }
 
                 return;
@@ -872,7 +872,7 @@ public partial class View
                 //}
                 if (pv.Target != this)
                 {
-                    nEdges.Add ((pv.Target, from));
+                    nEdges.Add ((pv.Target!, from));
                 }
 
                 return;

@@ -319,7 +319,7 @@ public class TableView : View
         {
             if (cellActivationKey != value)
             {
-                KeyBindings.Replace (cellActivationKey, value);
+                KeyBindings.ReplaceKey (cellActivationKey, value);
 
                 // of API user is mixing and matching old and new methods of keybinding then they may have lost
                 // the old binding (e.g. with ClearKeybindings) so KeyBindings.Replace alone will fail

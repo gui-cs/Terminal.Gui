@@ -26,7 +26,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
         Wrapping = toWrap;
         this.tableView = tableView;
 
-        tableView.KeyBindings.Add (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
 
         tableView.MouseClick += TableView_MouseClick;
         tableView.CellToggled += TableView_CellToggled;

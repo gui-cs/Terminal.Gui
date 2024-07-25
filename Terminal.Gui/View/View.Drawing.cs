@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-public partial class View
+public partial class View // Drawing APIs
 {
     private ColorScheme _colorScheme;
 
@@ -288,19 +288,19 @@ public partial class View
     public void DrawHotString (string text, Attribute hotColor, Attribute normalColor)
     {
         Rune hotkeySpec = HotKeySpecifier == (Rune)0xffff ? (Rune)'_' : HotKeySpecifier;
-        Application.Driver.SetAttribute (normalColor);
+        Application.Driver?.SetAttribute (normalColor);
 
         foreach (Rune rune in text.EnumerateRunes ())
         {
             if (rune == new Rune (hotkeySpec.Value))
             {
-                Application.Driver.SetAttribute (hotColor);
+                Application.Driver?.SetAttribute (hotColor);
 
                 continue;
             }
 
-            Application.Driver.AddRune (rune);
-            Application.Driver.SetAttribute (normalColor);
+            Application.Driver?.AddRune (rune);
+            Application.Driver?.SetAttribute (normalColor);
         }
     }
 

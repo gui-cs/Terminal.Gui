@@ -62,7 +62,7 @@ public class Tile
     /// <param name="newTitle">The new <see cref="Title"/> to be replaced.</param>
     public virtual void OnTitleChanged (string oldTitle, string newTitle)
     {
-        var args = new EventArgs<string> (ref newTitle);
+        var args = new EventArgs<string> (in newTitle);
         TitleChanged?.Invoke (this, args);
     }
 

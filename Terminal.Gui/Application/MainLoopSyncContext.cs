@@ -23,7 +23,7 @@ internal sealed class MainLoopSyncContext : SynchronizationContext
     //_mainLoop.Driver.Wakeup ();
     public override void Send (SendOrPostCallback d, object state)
     {
-        if (Thread.CurrentThread.ManagedThreadId == Application._mainThreadId)
+        if (Thread.CurrentThread.ManagedThreadId == Application.MainThreadId)
         {
             d (state);
         }

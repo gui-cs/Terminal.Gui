@@ -119,20 +119,20 @@ public record struct Thickness
         // Draw the Top side
         if (Top > 0)
         {
-            Application.Driver.FillRect (rect with { Height = Math.Min (rect.Height, Top) }, topChar);
+            Application.Driver?.FillRect (rect with { Height = Math.Min (rect.Height, Top) }, topChar);
         }
 
         // Draw the Left side
         // Draw the Left side
         if (Left > 0)
         {
-            Application.Driver.FillRect (rect with { Width = Math.Min (rect.Width, Left) }, leftChar);
+            Application.Driver?.FillRect (rect with { Width = Math.Min (rect.Width, Left) }, leftChar);
         }
 
         // Draw the Right side
         if (Right > 0)
         {
-            Application.Driver.FillRect (
+            Application.Driver?.FillRect (
                                          rect with
                                          {
                                              X = Math.Max (0, rect.X + rect.Width - Right),
@@ -145,7 +145,7 @@ public record struct Thickness
         // Draw the Bottom side
         if (Bottom > 0)
         {
-            Application.Driver.FillRect (
+            Application.Driver?.FillRect (
                                          rect with
                                          {
                                              Y = rect.Y + Math.Max (0, rect.Height - Bottom),
@@ -199,7 +199,11 @@ public record struct Thickness
                 ConstrainToWidth = text.GetColumns (),
                 ConstrainToHeight = 1
             };
-            tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect);
+
+            if (Application.Driver?.CurrentAttribute is { })
+            {
+                tf.Draw (rect, Application.Driver!.CurrentAttribute, Application.Driver!.CurrentAttribute, rect);
+            }
         }
 
         return GetInside (rect);

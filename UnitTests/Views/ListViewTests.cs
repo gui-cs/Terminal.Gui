@@ -55,7 +55,7 @@ public class ListViewTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (12, 12);
+        ((FakeDriver)Application.Driver!).SetBufferSize (12, 12);
         Application.Refresh ();
 
         Assert.Equal (-1, lv.SelectedItem);
@@ -357,7 +357,7 @@ Item 6",
 
             for (var i = 0; i < 7; i++)
             {
-                item += Application.Driver.Contents [line, i].Rune;
+                item += Application.Driver?.Contents [line, i].Rune;
             }
 
             return item;
