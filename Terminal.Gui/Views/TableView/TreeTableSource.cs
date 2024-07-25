@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 /// <typeparam name="T"></typeparam>
 public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T : class
 {
-    private readonly Dictionary<string, Func<T, object>> _lamdas;
+    private readonly Dictionary<string, Func<T, object>> _lambdas;
     private readonly TableView _tableView;
     private readonly TreeView<T> _tree;
 
@@ -47,7 +47,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
         ColumnNames = colList.ToArray ();
 
-        _lamdas = subsequentColumns;
+        _lambdas = subsequentColumns;
     }
 
     /// <inheritdoc/>
@@ -60,13 +60,13 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
     /// <inheritdoc/>
     public object this [int row, int col] =>
-        col == 0 ? GetColumnZeroRepresentationFromTree (row) : _lamdas [ColumnNames [col]] (RowToObject (row));
+        col == 0 ? GetColumnZeroRepresentationFromTree (row) : _lambdas [ColumnNames [col]] (RowToObject (row));
 
     /// <inheritdoc/>
     public int Rows => _tree.BuildLineMap ().Count;
 
     /// <inheritdoc/>
-    public int Columns => _lamdas.Count + 1;
+    public int Columns => _lambdas.Count + 1;
 
     /// <inheritdoc/>
     public string [] ColumnNames { get; }

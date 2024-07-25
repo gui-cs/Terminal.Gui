@@ -1438,13 +1438,13 @@ public class TableView : View
                     // is there enough space to meet the MinAcceptableWidth
                     availableHorizontalSpace - usedSpace >= colStyle.MinAcceptableWidth)
                 {
-                    // show column and use use whatever space is 
+                    // show column and use whatever space is
                     // left for rendering it
                     showColumn = true;
                     colWidth = availableHorizontalSpace - usedSpace;
                 }
 
-                // If its the only column we are able to render then
+                // If it's the only column we are able to render then
                 // accept it anyway (that must be one massively wide column!)
                 if (first)
                 {
@@ -1674,7 +1674,7 @@ public class TableView : View
                 }
                 else if (Style.ExpandLastColumn == false && columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c))
                 {
-                    // if the next console column is the lastcolumns end
+                    // if the next console column is the last column's end
                     rune = Glyphs.BottomTee;
                 }
             }
@@ -1748,7 +1748,7 @@ public class TableView : View
                     rune = Glyphs.URCorner;
                 }
 
-                // if the next console column is the lastcolumns end
+                // if the next console column is the last column's end
                 else if (Style.ExpandLastColumn == false && columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c))
                 {
                     rune = Glyphs.TopTee;
@@ -1841,7 +1841,7 @@ public class TableView : View
                     }
                 }
 
-                // if the next console column is the lastcolumns end
+                // if the next console column is the last column's end
                 else if (Style.ExpandLastColumn == false && columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c))
                 {
                     rune = Style.ShowVerticalCellLines ? Glyphs.Cross : Glyphs.BottomTee;

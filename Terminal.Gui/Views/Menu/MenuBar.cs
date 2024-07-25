@@ -317,7 +317,7 @@ public class MenuBar : View, IDesignable
 
     /// <summary>Virtual method that will invoke the <see cref="MenuClosing"/>.</summary>
     /// <param name="currentMenu">The current menu to be closed.</param>
-    /// <param name="reopen">Whether the current menu will be reopen.</param>
+    /// <param name="reopen">Whether the current menu will be reopened.</param>
     /// <param name="isSubMenu">Whether is a sub-menu or not.</param>
     public virtual MenuClosingEventArgs OnMenuClosing (MenuBarItem currentMenu, bool reopen, bool isSubMenu)
     {

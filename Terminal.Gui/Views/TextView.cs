@@ -334,7 +334,7 @@ internal class TextModel
                         {
                             lastValidCol = nCol;
 
-                            if (runeType == RuneType.IsWhiteSpace || runeType == RuneType.IsUnknow)
+                            if (runeType == RuneType.IsWhiteSpace || runeType == RuneType.IsUnknown)
                             {
                                 runeType = GetRuneType (nRune);
                             }
@@ -1063,7 +1063,7 @@ internal class TextModel
             return RuneType.IsPunctuation;
         }
 
-        return RuneType.IsUnknow;
+        return RuneType.IsUnknown;
     }
 
     private bool IsSameRuneType (Rune newRune, RuneType runeType)
@@ -1255,7 +1255,7 @@ internal class TextModel
         IsWhiteSpace,
         IsLetterOrDigit,
         IsPunctuation,
-        IsUnknow
+        IsUnknown
     }
 }
 
@@ -1772,8 +1772,8 @@ internal class WordWrapManager
         nCol = 0;
         nStartRow = 0;
         nStartCol = 0;
-        bool isRowAndColSetted = row == 0 && col == 0;
-        bool isStartRowAndColSetted = startRow == 0 && startCol == 0;
+        bool isRowAndColSet = row == 0 && col == 0;
+        bool isStartRowAndColSet = startRow == 0 && startCol == 0;
         List<WrappedLine> wModelLines = new ();
 
         for (var i = 0; i < Model.Count; i++)
@@ -1796,7 +1796,7 @@ internal class WordWrapManager
             {
                 List<RuneCell> wrapLine = wrappedLines [j];
 
-                if (!isRowAndColSetted && modelRow == i)
+                if (!isRowAndColSet && modelRow == i)
                 {
                     if (nCol + wrapLine.Count <= modelCol)
                     {
@@ -1806,12 +1806,12 @@ internal class WordWrapManager
                         if (nCol == modelCol)
                         {
                             nCol = wrapLine.Count;
-                            isRowAndColSetted = true;
+                            isRowAndColSet = true;
                         }
                         else if (j == wrappedLines.Count - 1)
                         {
                             nCol = wrapLine.Count - j + modelCol - nCol;
-                            isRowAndColSetted = true;
+                            isRowAndColSet = true;
                         }
                     }
                     else
@@ -1819,11 +1819,11 @@ internal class WordWrapManager
                         int offset = nCol + wrapLine.Count - modelCol;
                         nCol = wrapLine.Count - offset;
                         nRow = lines;
-                        isRowAndColSetted = true;
+                        isRowAndColSet = true;
                     }
                 }
 
-                if (!isStartRowAndColSetted && modelStartRow == i)
+                if (!isStartRowAndColSet && modelStartRow == i)
                 {
                     if (nStartCol + wrapLine.Count <= modelStartCol)
                     {
@@ -1833,12 +1833,12 @@ internal class WordWrapManager
                         if (nStartCol == modelStartCol)
                         {
                             nStartCol = wrapLine.Count;
-                            isStartRowAndColSetted = true;
+                            isStartRowAndColSet = true;
                         }
                         else if (j == wrappedLines.Count - 1)
                         {
                             nStartCol = wrapLine.Count - j + modelStartCol - nStartCol;
-                            isStartRowAndColSetted = true;
+                            isStartRowAndColSet = true;
                         }
                     }
                     else
@@ -1846,7 +1846,7 @@ internal class WordWrapManager
                         int offset = nStartCol + wrapLine.Count - modelStartCol;
                         nStartCol = wrapLine.Count - offset;
                         nStartRow = lines;
-                        isStartRowAndColSetted = true;
+                        isStartRowAndColSet = true;
                     }
                 }
 
@@ -2547,14 +2547,14 @@ public class TextView : View
 
             if (_allowsReturn && !_multiline)
             {
-                // BUGBUG: Seting properties should not have side-effects like this. Multiline and AllowsReturn should be independent.
+                // BUGBUG: Setting properties should not have side-effects like this. Multiline and AllowsReturn should be independent.
                 Multiline = true;
             }
 
             if (!_allowsReturn && _multiline)
             {
                 Multiline = false;
-                // BUGBUG: Seting properties should not have side-effects like this. Multiline and AlowsTab should be independent.
+                // BUGBUG: Setting properties should not have side-effects like this. Multiline and AllowsTab should be independent.
                 AllowsTab = false;
             }
 
