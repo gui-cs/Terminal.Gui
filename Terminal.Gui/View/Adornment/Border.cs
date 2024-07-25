@@ -149,8 +149,9 @@ public class Border : Adornment
         }
     }
 
-    private Rectangle GetBorderRectangle (Rectangle screenRect)
+    internal Rectangle GetBorderRectangle ()
     {
+        Rectangle screenRect = ViewportToScreen (Viewport);
         return new (
                     screenRect.X + Math.Max (0, Thickness.Left - 1),
                     screenRect.Y + Math.Max (0, Thickness.Top - 1),
@@ -407,7 +408,7 @@ public class Border : Adornment
         // ...thickness extends outward (border/title is always as far in as possible)
         // PERF: How about a call to Rectangle.Offset?
 
-        Rectangle borderBounds = GetBorderRectangle (screenBounds);
+        Rectangle borderBounds = GetBorderRectangle ();
         int topTitleLineY = borderBounds.Y;
         int titleY = borderBounds.Y;
         var titleBarsLength = 0; // the little vertical thingies
@@ -420,7 +421,7 @@ public class Border : Adornment
                                                )
                                      );
 
-        Parent.TitleTextFormatter.Size = new (maxTitleWidth, 1);
+        Parent.TitleTextFormatter.ConstrainToSize = new (maxTitleWidth, 1);
 
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };

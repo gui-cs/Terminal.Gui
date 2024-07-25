@@ -293,7 +293,6 @@ public class DrawTests (ITestOutputHelper _output)
         var top = new Toplevel ();
         top.Add (win);
 
-        // Don't use Label. It sets AutoSize = true which is not what we're testing here.
         var view = new View { Text = "ワイドルーン。", Height = Dim.Fill (), Width = Dim.Fill () };
 
         // Don't have unit tests use things that aren't absolutely critical for the test, like Dialog
@@ -394,7 +393,7 @@ public class DrawTests (ITestOutputHelper _output)
         var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Screen.Size);
+        view.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (new (0, 0, 2, 2), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -419,7 +418,7 @@ public class DrawTests (ITestOutputHelper _output)
         view.Border.Thickness = new Thickness (1, 1, 1, 0);
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Screen.Size);
+        view.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (new (0, 0, 2, 1), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -437,7 +436,7 @@ public class DrawTests (ITestOutputHelper _output)
         view.Border.Thickness = new Thickness (0, 1, 1, 1);
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Screen.Size);
+        view.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (new (0, 0, 1, 2), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -462,7 +461,7 @@ public class DrawTests (ITestOutputHelper _output)
         view.Border.Thickness = new Thickness (1, 1, 0, 1);
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Screen.Size);
+        view.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (new (0, 0, 1, 2), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
@@ -488,7 +487,7 @@ public class DrawTests (ITestOutputHelper _output)
 
         view.BeginInit ();
         view.EndInit ();
-        view.SetRelativeLayout (Application.Driver.Screen.Size);
+        view.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (new (0, 0, 2, 1), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
