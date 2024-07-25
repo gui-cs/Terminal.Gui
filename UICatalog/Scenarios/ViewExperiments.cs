@@ -27,6 +27,8 @@ public class ViewExperiments : Scenario
             Title = "View1",
             ColorScheme = Colors.ColorSchemes ["Base"],
             Id = "View1",
+            ShadowStyle = ShadowStyle.Transparent,
+            BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
         };
@@ -46,16 +48,7 @@ public class ViewExperiments : Scenario
 
         //app.Add (view);
 
-        view.Margin.Thickness = new (0);
-        view.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
-        view.Margin.Data = "Margin";
-        view.Border.Thickness = new (1);
-        view.Border.LineStyle = LineStyle.Double;
-        view.Border.ColorScheme = view.ColorScheme;
-        view.Border.Data = "Border";
-        view.Padding.Thickness = new (0);
-        view.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
-        view.Padding.Data = "Padding";
+        view.BorderStyle = LineStyle.Double;
 
         var view2 = new View
         {
@@ -66,6 +59,8 @@ public class ViewExperiments : Scenario
             Title = "View2",
             ColorScheme = Colors.ColorSchemes ["Base"],
             Id = "View2",
+            ShadowStyle = ShadowStyle.Transparent,
+            BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
         };
@@ -85,16 +80,6 @@ public class ViewExperiments : Scenario
         view2.Add (button);
 
         view2.Add (button);
-        view2.Margin.Thickness = new (0);
-        view2.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
-        view2.Margin.Data = "Margin";
-        view2.Border.Thickness = new (1);
-        view2.Border.LineStyle = LineStyle.Double;
-        view2.Border.ColorScheme = view2.ColorScheme;
-        view2.Border.Data = "Border";
-        view2.Padding.Thickness = new (0);
-        view2.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
-        view2.Padding.Data = "Padding";
 
         button = new ()
         {

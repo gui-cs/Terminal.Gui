@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-public partial class View
+public partial class View // Text Property APIs
 {
     /// <summary>
     ///    Initializes the Text of the View. Called by the constructor.

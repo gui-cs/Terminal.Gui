@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-public partial class View
+public partial class View // Drawing APIs
 {
     private ColorScheme _colorScheme;
 

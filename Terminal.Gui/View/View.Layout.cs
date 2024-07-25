@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Terminal.Gui;
 
-public partial class View
+public partial class View // Layout APIs
 {
     #region Frame
 

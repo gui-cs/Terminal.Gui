@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Terminal.Gui;
 
-public partial class View
+public partial class View  // Keyboard APIs
 {
     /// <summary>
     ///  Helper to configure all things keyboard related for a View. Called from the View constructor.
@@ -253,119 +253,6 @@ public partial class View
     }
 
     #endregion HotKey Support
-
-    #region Tab/Focus Handling
-
-    // This is null, and allocated on demand.
-    private List<View> _tabIndexes;
-
-    /// <summary>Gets a list of the subviews that are <see cref="TabStop"/>s.</summary>
-    /// <value>The tabIndexes.</value>
-    public IList<View> TabIndexes => _tabIndexes?.AsReadOnly () ?? _empty;
-
-    private int _tabIndex = -1;
-    private int _oldTabIndex;
-
-    /// <summary>
-    ///     Indicates the index of the current <see cref="View"/> from the <see cref="TabIndexes"/> list. See also:
-    ///     <seealso cref="TabStop"/>.
-    /// </summary>
-    public int TabIndex
-    {
-        get => _tabIndex;
-        set
-        {
-            if (!CanFocus)
-            {
-                _tabIndex = -1;
-
-                return;
-            }
-
-            if (SuperView?._tabIndexes is null || SuperView?._tabIndexes.Count == 1)
-            {
-                _tabIndex = 0;
-
-                return;
-            }
-
-            if (_tabIndex == value && TabIndexes.IndexOf (this) == value)
-            {
-                return;
-            }
-
-            _tabIndex = value > SuperView._tabIndexes.Count - 1 ? SuperView._tabIndexes.Count - 1 :
-                        value < 0 ? 0 : value;
-            _tabIndex = GetTabIndex (_tabIndex);
-
-            if (SuperView._tabIndexes.IndexOf (this) != _tabIndex)
-            {
-                SuperView._tabIndexes.Remove (this);
-                SuperView._tabIndexes.Insert (_tabIndex, this);
-                SetTabIndex ();
-            }
-        }
-    }
-
-    private int GetTabIndex (int idx)
-    {
-        var i = 0;
-
-        foreach (View v in SuperView._tabIndexes)
-        {
-            if (v._tabIndex == -1 || v == this)
-            {
-                continue;
-            }
-
-            i++;
-        }
-
-        return Math.Min (i, idx);
-    }
-
-    private void SetTabIndex ()
-    {
-        var i = 0;
-
-        foreach (View v in SuperView._tabIndexes)
-        {
-            if (v._tabIndex == -1)
-            {
-                continue;
-            }
-
-            v._tabIndex = i;
-            i++;
-        }
-    }
-
-    private bool _tabStop = true;
-
-    /// <summary>
-    ///     Gets or sets whether the view is a stop-point for keyboard navigation of focus. Will be <see langword="true"/>
-    ///     only if the <see cref="CanFocus"/> is also <see langword="true"/>. Set to <see langword="false"/> to prevent the
-    ///     view from being a stop-point for keyboard navigation.
-    /// </summary>
-    /// <remarks>
-    ///     The default keyboard navigation keys are <c>Key.Tab</c> and <c>Key>Tab.WithShift</c>. These can be changed by
-    ///     modifying the key bindings (see <see cref="KeyBindings.Add(Key, Command[])"/>) of the SuperView.
-    /// </remarks>
-    public bool TabStop
-    {
-        get => _tabStop;
-        set
-        {
-            if (_tabStop == value)
-            {
-                return;
-            }
-
-            _tabStop = CanFocus && value;
-        }
-    }
-
-    #endregion Tab/Focus Handling
 
     #region Low-level Key handling
 

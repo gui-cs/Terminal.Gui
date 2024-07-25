@@ -267,34 +267,6 @@ public static partial class Application // Keyboard handling
         CommandImplementations [command] = ctx => f ();
     }
 
-    ///// <summary>
-    /////     The <see cref="KeyBindingScope.Application"/> key bindings.
-    ///// </summary>
-    //private static readonly Dictionary<Key, List<View?>> _keyBindings = new ();
-
-    ///// <summary>
-    ///// Gets the list of <see cref="KeyBindingScope.Application"/> key bindings.
-    ///// </summary>
-    //public static Dictionary<Key, List<View?>> GetKeyBindings () { return _keyBindings; }
-
-    ///// <summary>
-    /////     Adds an  <see cref="KeyBindingScope.Application"/> scoped key binding.
-    ///// </summary>
-    ///// <remarks>
-    /////     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
-    ///// </remarks>
-    ///// <param name="key">The key being bound.</param>
-    ///// <param name="view">The view that is bound to the key. If <see langword="null"/>, <see cref="Application.Current"/> will be used.</param>
-    //internal static void AddKeyBinding (Key key, View? view)
-    //{
-    //    if (!_keyBindings.ContainsKey (key))
-    //    {
-    //        _keyBindings [key] = [];
-    //    }
-
-    //    _keyBindings [key].Add (view);
-    //}
-
     internal static void AddApplicationKeyBindings ()
     {
         // Things this view knows how to do
@@ -326,7 +298,7 @@ public static partial class Application // Keyboard handling
                    );
 
         AddCommand (
-                    Command.NextView,    
+                    Command.NextView,
                     () =>
                     {
                         // TODO: Move this method to Application.Navigation.cs
