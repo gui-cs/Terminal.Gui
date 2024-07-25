@@ -3,7 +3,6 @@ namespace Terminal.Gui;
 public partial class View // SuperView/SubView hierarchy management (SuperView, SubViews, Add, Remove, etc.)
 {
     private static readonly IList<View> _empty = new List<View> (0).AsReadOnly ();
-    internal bool _addingView;
     private List<View> _subviews; // This is null, and allocated on demand.
     private View _superView;
 
@@ -62,19 +61,20 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         if (view.CanFocus)
         {
-            _addingView = true;
+            // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Instead, callers to Add should be explicit about what they want.
+            _addingViewSoCanFocusAlsoUpdatesSuperView = true;
 
             if (SuperView?.CanFocus == false)
             {
-                SuperView._addingView = true;
+                SuperView._addingViewSoCanFocusAlsoUpdatesSuperView = true;
                 SuperView.CanFocus = true;
-                SuperView._addingView = false;
+                SuperView._addingViewSoCanFocusAlsoUpdatesSuperView = false;
             }
 
             // QUESTION: This automatic behavior of setting CanFocus to true on the SuperView is not documented, and is annoying.
             CanFocus = true;
             view._tabIndex = _tabIndexes.IndexOf (view);
-            _addingView = false;
+            _addingViewSoCanFocusAlsoUpdatesSuperView = false;
         }
 
         if (view.Enabled && !Enabled)

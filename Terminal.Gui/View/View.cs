@@ -332,7 +332,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 else
                 {
                     view.Enabled = view._oldEnabled;
-                    view._addingView = _enabled;
+                    view._addingViewSoCanFocusAlsoUpdatesSuperView = _enabled;
                 }
             }
         }

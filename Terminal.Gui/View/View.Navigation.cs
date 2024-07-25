@@ -75,7 +75,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     private NavigationDirection _focusDirection;
 
     /// <summary>
-    ///     Gets or sets the focus direction for this view and all subviews.
+    ///     INTERNAL API that gets or sets the focus direction for this view and all subviews.
     ///     Setting this property will set the focus direction for all views up the SuperView hierarchy.
     /// </summary>
     internal NavigationDirection FocusDirection
@@ -160,19 +160,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
     }
 
-    /// <summary>Raised when <see cref="CanFocus"/> has been changed.</summary>
-    /// <remarks>
-    ///     Raised by the <see cref="OnCanFocusChanged"/> virtual method.
-    /// </remarks>
-    public event EventHandler CanFocusChanged;
+    // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Instead, callers to Add should be explicit about what they want.
+    // Set to true in Add() to indicate that the view being added to a SuperView has CanFocus=true.
+    // Makes it so CanFocus will update the SuperView's CanFocus property.
+    internal bool _addingViewSoCanFocusAlsoUpdatesSuperView;
 
-    /// <summary>Invoked when the <see cref="CanFocus"/> property from a view is changed.</summary>
-    /// <remarks>
-    ///     Raises the <see cref="CanFocusChanged"/> event.
-    /// </remarks>
-    public virtual void OnCanFocusChanged () { CanFocusChanged?.Invoke (this, EventArgs.Empty); }
-
+    // Used to cache CanFocus on subviews when CanFocus is set to false so that it can be restored when CanFocus is changed back to true
     private bool _oldCanFocus;
+
     private bool _canFocus;
 
     /// <summary>Gets or sets a value indicating whether this <see cref="View"/> can be focused.</summary>
@@ -180,13 +175,24 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     <para>
     ///         <see cref="SuperView"/> must also have <see cref="CanFocus"/> set to <see langword="true"/>.
     ///     </para>
+    ///     <para>
+    ///         When set to <see langword="false"/>, if this view is focused, the focus will be set to the next focusable view.
+    ///     </para>
+    ///     <para>
+    ///         When set to <see langword="false"/>, the <see cref="TabIndex"/> will be set to -1.
+    ///     </para>
+    ///     <para>
+    ///         When set to <see langword="false"/>, the values of <see cref="CanFocus"/> and <see cref="TabIndex"/> for all
+    ///         subviews will be cached so that when <see cref="CanFocus"/> is set back to <see langword="true"/>, the subviews
+    ///         will be restored to their previous values.
+    ///     </para>
     /// </remarks>
     public bool CanFocus
     {
         get => _canFocus;
         set
         {
-            if (!_addingView && IsInitialized && SuperView?.CanFocus == false && value)
+            if (!_addingViewSoCanFocusAlsoUpdatesSuperView && IsInitialized && SuperView?.CanFocus == false && value)
             {
                 throw new InvalidOperationException ("Cannot set CanFocus to true if the SuperView CanFocus is false!");
             }
@@ -204,7 +210,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
                     TabIndex = -1;
 
                     break;
-                case true when SuperView?.CanFocus == false && _addingView:
+
+                case true when SuperView?.CanFocus == false && _addingViewSoCanFocusAlsoUpdatesSuperView:
                     SuperView.CanFocus = true;
 
                     break;
@@ -225,8 +232,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
             if (!_canFocus && HasFocus)
             {
                 SetHasFocus (false, this);
-                SuperView?.EnsureFocus ();
+                SuperView?.FocusFirstOrLast ();
 
+                // If EnsureFocus () didn't set focus to a view, focus the next focusable view in the application
                 if (SuperView is { Focused: null })
                 {
                     SuperView.FocusNext ();
@@ -248,6 +256,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                     {
                         if (!value)
                         {
+                            // Cache the old CanFocus and TabIndex so that they can be restored when CanFocus is changed back to true
                             view._oldCanFocus = view.CanFocus;
                             view._oldTabIndex = view._tabIndex;
                             view.CanFocus = false;
@@ -255,19 +264,20 @@ public partial class View // Focus and cross-view navigation management (TabStop
                         }
                         else
                         {
-                            if (_addingView)
+                            if (_addingViewSoCanFocusAlsoUpdatesSuperView)
                             {
-                                view._addingView = true;
+                                view._addingViewSoCanFocusAlsoUpdatesSuperView = true;
                             }
 
+                            // Restore the old CanFocus and TabIndex to the values they held before CanFocus was set to false
                             view.CanFocus = view._oldCanFocus;
                             view._tabIndex = view._oldTabIndex;
-                            view._addingView = false;
+                            view._addingViewSoCanFocusAlsoUpdatesSuperView = false;
                         }
                     }
                 }
 
-                if (this is Toplevel && Application.Current.Focused != this)
+                if (this is Toplevel && Application.Current!.Focused != this)
                 {
                     ApplicationOverlapped.BringOverlappedTopToFront ();
                 }
@@ -277,6 +287,18 @@ public partial class View // Focus and cross-view navigation management (TabStop
             SetNeedsDisplay ();
         }
     }
+
+    /// <summary>Raised when <see cref="CanFocus"/> has been changed.</summary>
+    /// <remarks>
+    ///     Raised by the <see cref="OnCanFocusChanged"/> virtual method.
+    /// </remarks>
+    public event EventHandler CanFocusChanged;
+
+    /// <summary>Invoked when the <see cref="CanFocus"/> property from a view is changed.</summary>
+    /// <remarks>
+    ///     Raises the <see cref="CanFocusChanged"/> event.
+    /// </remarks>
+    public virtual void OnCanFocusChanged () { CanFocusChanged?.Invoke (this, EventArgs.Empty); }
 
     /// <summary>Returns the currently focused Subview inside this view, or <see langword="null"/> if nothing is focused.</summary>
     /// <value>The currently focused Subview.</value>
@@ -361,7 +383,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         View f = Focused;
         Focused = view;
         Focused.SetHasFocus (true, f);
-        Focused.EnsureFocus ();
+        Focused.FocusFirstOrLast ();
 
         // Send focus upwards
         if (SuperView is { })
@@ -398,11 +420,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
     }
 
     /// <summary>
-    ///     If there is no focused subview, calls <see cref="FocusFirst"/> or <see cref="FocusLast"/> based on
+    ///     INTERNAL helper for calling <see cref="FocusFirst"/> or <see cref="FocusLast"/> based on
     ///     <see cref="FocusDirection"/>.
-    ///     does nothing.
+    ///     FocusDirection is not public. This API is thus non-deterministic from a public API perspective.
     /// </summary>
-    public void EnsureFocus ()
+    internal void FocusFirstOrLast ()
     {
         if (Focused is null && _subviews?.Count > 0)
         {
@@ -418,10 +440,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
     }
 
     /// <summary>
-    ///     Focuses the last focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
+    ///     Focuses the first focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
     ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
-    public void FocusFirst (bool overlapped = false)
+    /// <param name="overlappedOnly">
+    ///     If <see langword="true"/>, only subviews where <see cref="Arrangement"/> has <see cref="ViewArrangement.Overlapped"/> set
+    ///     will be considered.
+    /// </param>
+    public void FocusFirst (bool overlappedOnly = false)
     {
         if (!CanBeVisible (this))
         {
@@ -435,7 +461,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return;
         }
 
-        foreach (View view in _tabIndexes.Where (v => !overlapped || v.Arrangement.HasFlag (ViewArrangement.Overlapped)))
+        foreach (View view in _tabIndexes.Where (v => !overlappedOnly || v.Arrangement.HasFlag (ViewArrangement.Overlapped)))
         {
             if (view.CanFocus && view._tabStop && view.Visible && view.Enabled)
             {
@@ -450,7 +476,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Focuses the last focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
     ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
-    public void FocusLast (bool overlapped = false)
+    /// <param name="overlappedOnly">
+    ///     If <see langword="true"/>, only subviews where <see cref="Arrangement"/> has <see cref="ViewArrangement.Overlapped"/> set
+    ///     will be considered.
+    /// </param>
+    public void FocusLast (bool overlappedOnly = false)
     {
         if (!CanBeVisible (this))
         {
@@ -464,7 +494,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return;
         }
 
-        foreach (View view in _tabIndexes.Where (v => !overlapped || v.Arrangement.HasFlag (ViewArrangement.Overlapped)).Reverse ())
+        foreach (View view in _tabIndexes.Where (v => !overlappedOnly || v.Arrangement.HasFlag (ViewArrangement.Overlapped)).Reverse ())
         {
             if (view.CanFocus && view._tabStop && view.Visible && view.Enabled)
             {
