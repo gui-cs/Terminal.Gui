@@ -1,4 +1,6 @@
 #nullable enable
+using System.Security.Cryptography;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -78,8 +80,10 @@ internal static class ApplicationNavigation
             idx++;
         }
     }
+
     /// <summary>
-    ///     Moves the focus to 
+    ///     Moves the focus to the next view. Honors <see cref="ViewArrangement.Overlapped"/> and will only move to the next subview
+    ///     if the current and next subviews are not overlapped.
     /// </summary>
     internal static void MoveNextView ()
     {
@@ -101,19 +105,40 @@ internal static class ApplicationNavigation
         }
     }
 
+    /// <summary>
+    ///     Moves the focus to the next <see cref="Toplevel"/> subview or the next subview that has <see cref="ApplicationOverlapped.OverlappedTop"/> set.
+    /// </summary>
     internal static void MoveNextViewOrTop ()
     {
         if (ApplicationOverlapped.OverlappedTop is null)
         {
             Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
-            top!.FocusNext ();
 
-            if (top.Focused is null)
+            if (!Application.Current.FocusNext ())
             {
-                top.FocusNext ();
+                Application.Current.FocusNext ();
             }
 
-            top.SetNeedsDisplay ();
+            if (top != Application.Current.Focused && top != Application.Current.Focused?.Focused)
+            {
+                top?.SetNeedsDisplay ();
+                Application.Current.Focused?.SetNeedsDisplay ();
+            }
+            else
+            {
+                FocusNearestView (Application.Current.SuperView?.TabIndexes, View.NavigationDirection.Forward);
+            }
+
+
+
+            //top!.FocusNext ();
+
+            //if (top.Focused is null)
+            //{
+            //    top.FocusNext ();
+            //}
+
+            //top.SetNeedsDisplay ();
             ApplicationOverlapped.BringOverlappedTopToFront ();
         }
         else
@@ -122,6 +147,10 @@ internal static class ApplicationNavigation
         }
     }
 
+    /// <summary>
+    ///     Moves the focus to the next view. Honors <see cref="ViewArrangement.Overlapped"/> and will only move to the next subview
+    ///     if the current and next subviews are not overlapped.
+    /// </summary>
     internal static void MovePreviousView ()
     {
         View? old = GetDeepestFocusedSubview (Application.Current!.Focused);
