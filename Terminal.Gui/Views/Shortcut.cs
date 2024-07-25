@@ -76,7 +76,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView = new ()
         {
             Width = Dim.Auto (),
-            Height = Dim.Auto ()
+            Height = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: 1)
         };
 
         HelpView.Id = "_helpView";
@@ -503,7 +503,7 @@ public class Shortcut : View, IOrientation, IDesignable
         get => HelpView?.Text;
         set
         {
-            if (HelpView != null)
+            if (HelpView is {})
             {
                 HelpView.Text = value;
                 ShowHide ();
@@ -519,7 +519,7 @@ public class Shortcut : View, IOrientation, IDesignable
         get => HelpView?.Text;
         set
         {
-            if (HelpView != null)
+            if (HelpView is {})
             {
                 HelpView.Text = value;
                 ShowHide ();

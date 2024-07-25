@@ -67,7 +67,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     {
         Pos pos;
         int n = -1;
-        Assert.Throws<ArgumentException> (() => pos = Pos.AnchorEnd (n));
+        Assert.Throws<ArgumentOutOfRangeException> (() => pos = Pos.AnchorEnd (n));
     }
 
     [Theory]

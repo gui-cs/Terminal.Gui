@@ -7,8 +7,7 @@ using static Terminal.Gui.Dialog;
 namespace UICatalog.Scenarios;
 
 /// <summary>
-///     This Scenario demonstrates how to use Termina.gui's Dim and Pos Layout System. [x] - Using Dim.Fill to fill a
-///     window [x] - Using Dim.Fill and Dim.Pos to automatically align controls based on an initial control [ ] - ...
+///     This Scenario demonstrates how to use Terminal.Gui's Dim and Pos Layout System. 
 /// </summary>
 [ScenarioMetadata ("Computed Layout", "Demonstrates the Computed (Dim and Pos) Layout System.")]
 [ScenarioCategory ("Layout")]
@@ -216,6 +215,58 @@ public class ComputedLayout : Scenario
                                      fv.Title =
                                          $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
                                  };
+
+        labelList = new List<Label> ();
+        labelList.Add (new Label { Text = "The lines below show different alignment" });
+
+        labelList.Add (
+                       new Label
+                       {
+                           TextAlignment = Alignment.Start,
+                           Width = Dim.Fill (),
+                           X = 0,
+                           Y = Pos.Bottom (labelList.LastOrDefault ()),
+                           ColorScheme = Colors.ColorSchemes ["Dialog"],
+                           Text = $"{i++}-{txt}"
+                       }
+                      );
+
+        labelList.Add (
+                       new Label
+                       {
+                           TextAlignment = Alignment.End,
+                           Width = Dim.Fill (),
+                           X = 0,
+                           Y = Pos.Bottom (labelList.LastOrDefault ()),
+                           ColorScheme = Colors.ColorSchemes ["Dialog"],
+                           Text = $"{i++}-{txt}"
+                       }
+                      );
+
+        labelList.Add (
+                       new Label
+                       {
+                           TextAlignment = Alignment.Center,
+                           Width = Dim.Fill (),
+                           X = 0,
+                           Y = Pos.Bottom (labelList.LastOrDefault ()),
+                           ColorScheme = Colors.ColorSchemes ["Dialog"],
+                           Text = $"{i++}-{txt}"
+                       }
+                      );
+
+        labelList.Add (
+                       new Label
+                       {
+                           TextAlignment = Alignment.Fill,
+                           Width = Dim.Fill (),
+                           X = 0,
+                           Y = Pos.Bottom (labelList.LastOrDefault ()),
+                           ColorScheme = Colors.ColorSchemes ["Dialog"],
+                           Text = $"{i++}-{txt}"
+                       }
+                      );
+        frameView.Add (labelList.ToArray ());
         app.Add (frameView);
 
         // Demonstrate Dim & Pos using percentages - a TextField that is 30% height and 80% wide

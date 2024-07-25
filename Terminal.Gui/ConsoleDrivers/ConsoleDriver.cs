@@ -20,7 +20,7 @@ public abstract class ConsoleDriver
 
     // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
     /// <summary>Gets the location and size of the terminal screen.</summary>
-    public Rectangle Screen => new (0, 0, Cols, Rows);
+    internal Rectangle Screen => new (0, 0, Cols, Rows);
 
     private Rectangle _clip;
 
@@ -426,6 +426,7 @@ public abstract class ConsoleDriver
     /// <param name="row">Row to move to.</param>
     public virtual void Move (int col, int row)
     {
+        //Debug.Assert (col >= 0 && row >= 0 && col < Contents.GetLength(1) && row < Contents.GetLength(0));
         Col = col;
         Row = row;
     }

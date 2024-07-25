@@ -619,7 +619,7 @@ public class MenuBar : View, IDesignable
             return Point.Empty;
         }
 
-        Rectangle superViewFrame = SuperView is null ? Driver.Screen : SuperView.Frame;
+        Rectangle superViewFrame = SuperView is null ? Application.Screen : SuperView.Frame;
         View sv = SuperView is null ? Application.Current : SuperView;
 
         if (sv is null)

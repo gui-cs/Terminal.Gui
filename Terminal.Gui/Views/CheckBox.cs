@@ -1,16 +1,6 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
 
-/// <summary>
-///     Represents the state of a <see cref="CheckBox"/>.
-/// </summary>
-public enum CheckState
-{
-    None,
-    Checked,
-    UnChecked
-}
-
 /// <summary>Shows a check box that can be toggled.</summary>
 public class CheckBox : View
 {
@@ -182,6 +172,7 @@ public class CheckBox : View
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
+        base.UpdateTextFormatterText();
         switch (TextAlignment)
         {
             case Alignment.Start:

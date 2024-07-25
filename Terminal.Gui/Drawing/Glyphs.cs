@@ -442,13 +442,13 @@ public class GlyphDefinitions
 
 
     /// <summary>Shadow - Vertical Start - Left Half Block - ▌ U+0258c</summary>
-    public Rune ShadowVerticalStart { get; set; } =  (Rune)'▌'; // Half: '\u2596'  ▖;
+    public Rune ShadowVerticalStart { get; set; } =  (Rune)'▖'; // Half: '\u2596'  ▖;
 
     /// <summary>Shadow - Vertical - Left Half Block - ▌ U+0258c</summary>
     public Rune ShadowVertical { get; set; } = (Rune)'▌';
 
     /// <summary>Shadow - Horizontal Start - Upper Half Block - ▀ U+02580</summary>
-    public Rune ShadowHorizontalStart { get; set; } = (Rune)'▀'; // Half: ▝ U+0259d;
+    public Rune ShadowHorizontalStart { get; set; } = (Rune)'▝'; // Half: ▝ U+0259d;
 
     /// <summary>Shadow - Horizontal - Upper Half Block - ▀ U+02580</summary>
     public Rune ShadowHorizontal { get; set; } = (Rune)'▀';
