@@ -278,7 +278,7 @@ public class RadioGroup : View, IDesignable
 
                     if (j == hotPos && i == _cursor)
                     {
-                        Application.Driver.SetAttribute (
+                        Application.Driver?.SetAttribute (
                                                          HasFocus
                                                              ? ColorScheme.HotFocus
                                                              : GetHotNormalColor ()
@@ -286,11 +286,11 @@ public class RadioGroup : View, IDesignable
                     }
                     else if (j == hotPos && i != _cursor)
                     {
-                        Application.Driver.SetAttribute (GetHotNormalColor ());
+                        Application.Driver?.SetAttribute (GetHotNormalColor ());
                     }
                     else if (HasFocus && i == _cursor)
                     {
-                        Application.Driver.SetAttribute (ColorScheme.Focus);
+                        Application.Driver?.SetAttribute (ColorScheme.Focus);
                     }
 
                     if (rune == HotKeySpecifier && j + 1 < rlRunes.Length)
@@ -300,7 +300,7 @@ public class RadioGroup : View, IDesignable
 
                         if (i == _cursor)
                         {
-                            Application.Driver.SetAttribute (
+                            Application.Driver?.SetAttribute (
                                                              HasFocus
                                                                  ? ColorScheme.HotFocus
                                                                  : GetHotNormalColor ()
@@ -308,11 +308,11 @@ public class RadioGroup : View, IDesignable
                         }
                         else if (i != _cursor)
                         {
-                            Application.Driver.SetAttribute (GetHotNormalColor ());
+                            Application.Driver?.SetAttribute (GetHotNormalColor ());
                         }
                     }
 
-                    Application.Driver.AddRune (rune);
+                    Application.Driver?.AddRune (rune);
                     Driver.SetAttribute (GetNormalColor ());
                 }
             }

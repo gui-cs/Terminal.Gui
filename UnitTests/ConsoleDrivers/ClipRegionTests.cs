@@ -7,12 +7,12 @@ namespace Terminal.Gui.DriverTests;
 
 public class ClipRegionTests
 {
-    private readonly ITestOutputHelper output;
+    private readonly ITestOutputHelper _output;
 
     public ClipRegionTests (ITestOutputHelper output)
     {
         ConsoleDriver.RunningUnitTests = true;
-        this.output = output;
+        this._output = output;
     }
 
     [Theory]
@@ -26,8 +26,8 @@ public class ClipRegionTests
     {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
-        Application.Driver.Rows = 25;
-        Application.Driver.Cols = 80;
+        Application.Driver!.Rows = 25;
+        Application.Driver!.Cols = 80;
 
         driver.Move (0, 0);
         driver.AddRune ('x');
@@ -94,8 +94,8 @@ public class ClipRegionTests
     {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
-        Application.Driver.Rows = 10;
-        Application.Driver.Cols = 10;
+        Application.Driver!.Rows = 10;
+        Application.Driver!.Cols = 10;
 
         // positive
         Assert.True (driver.IsValidLocation (0, 0));

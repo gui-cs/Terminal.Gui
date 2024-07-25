@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewsTests;
 
-public class ToplevelTests (ITestOutputHelper output)
+public partial class ToplevelTests (ITestOutputHelper output)
 {
     [Fact]
     public void Constructor_Default ()
@@ -17,7 +17,7 @@ public class ToplevelTests (ITestOutputHelper output)
         Assert.Null (top.MenuBar);
         Assert.Null (top.StatusBar);
         Assert.False (top.IsOverlappedContainer);
-        Assert.False (top.IsOverlapped);
+        Assert.False (ApplicationOverlapped.IsOverlapped(top));
     }
 
     [Fact]
@@ -44,8 +44,8 @@ public class ToplevelTests (ITestOutputHelper output)
                                              Assert.Equal ("Top1", Application.Top.Text);
                                              Assert.Equal (0, Application.Top.Frame.X);
                                              Assert.Equal (0, Application.Top.Frame.Y);
-                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Assert.Equal (Application.Driver!.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver!.Rows, Application.Top.Frame.Height);
 
                                              Application.OnKeyPressed (new (Key.CtrlMask | Key.R));
 
@@ -54,8 +54,8 @@ public class ToplevelTests (ITestOutputHelper output)
                                              Assert.Equal ("Top2", Application.Top.Text);
                                              Assert.Equal (0, Application.Top.Frame.X);
                                              Assert.Equal (0, Application.Top.Frame.Y);
-                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Assert.Equal (Application.Driver!.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver!.Rows, Application.Top.Frame.Height);
 
                                              Application.OnKeyPressed (new (Key.CtrlMask | Key.C));
 
@@ -64,8 +64,8 @@ public class ToplevelTests (ITestOutputHelper output)
                                              Assert.Equal ("Top1", Application.Top.Text);
                                              Assert.Equal (0, Application.Top.Frame.X);
                                              Assert.Equal (0, Application.Top.Frame.Y);
-                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Assert.Equal (Application.Driver!.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver!.Rows, Application.Top.Frame.Height);
 
                                              Application.OnKeyPressed (new (Key.CtrlMask | Key.R));
 
@@ -74,8 +74,8 @@ public class ToplevelTests (ITestOutputHelper output)
                                              Assert.Equal ("Top2", Application.Top.Text);
                                              Assert.Equal (0, Application.Top.Frame.X);
                                              Assert.Equal (0, Application.Top.Frame.Y);
-                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Assert.Equal (Application.Driver!.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver!.Rows, Application.Top.Frame.Height);
 
                                              Application.OnKeyPressed (new (Key.CtrlMask | Key.C));
 
@@ -84,8 +84,8 @@ public class ToplevelTests (ITestOutputHelper output)
                                              Assert.Equal ("Top1", Application.Top.Text);
                                              Assert.Equal (0, Application.Top.Frame.X);
                                              Assert.Equal (0, Application.Top.Frame.Y);
-                                             Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
-                                             Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+                                             Assert.Equal (Application.Driver!.Cols, Application.Top.Frame.Width);
+                                             Assert.Equal (Application.Driver!.Rows, Application.Top.Frame.Height);
 
                                              Application.OnKeyPressed (new (Key.CtrlMask | Key.Q));
 
@@ -485,27 +485,31 @@ public class ToplevelTests (ITestOutputHelper output)
         Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
         Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.Equal (win1, top.Focused);
-        Assert.Equal (tf2W1, top.MostFocused);
+        Assert.Equal (tf2W1, top.MostFocused); // tf2W1 is last subview in win1 - tabbing should take us to first subview of win2
         Assert.True (Application.OnKeyDown (Key.Tab));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tf1W1, top.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.CursorRight));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tf1W1, top.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.CursorDown));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tvW1, top.MostFocused);
+        Assert.Equal (win2, top.Focused);
+        Assert.Equal (tf1W2, top.MostFocused);
+        Assert.True (Application.OnKeyDown (Key.CursorRight)); // move char to right in tf1W2
+        Assert.Equal (win2, top.Focused);
+        Assert.Equal (tf1W2, top.MostFocused);
+        Assert.True (Application.OnKeyDown (Key.CursorDown)); // move down to next view (tvW2)
+        Assert.Equal (win2, top.Focused);
+        Assert.Equal (tvW2, top.MostFocused);
 #if UNIX_KEY_BINDINGS
         Assert.True (Application.OnKeyDown (new (Key.I.WithCtrl)));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.MostFocused);
 #endif
+        Assert.True (Application.OnKeyDown (Key.Tab.WithShift)); // Ignored. TextView eats shift-tab by default
+        Assert.Equal (win2, top.Focused);
+        Assert.Equal (tvW2, top.MostFocused);
+        tvW2.AllowsTab = false;
         Assert.True (Application.OnKeyDown (Key.Tab.WithShift));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tvW1, top.MostFocused);
+        Assert.Equal (win2, top.Focused);
+        Assert.Equal (tf1W2, top.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorLeft));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tf1W1, top.MostFocused);
+        Assert.Equal (win2, top.Focused);
+        Assert.Equal (tf1W2, top.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorUp));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.MostFocused);
@@ -557,198 +561,8 @@ public class ToplevelTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void KeyBindings_Command_With_OverlappedTop ()
-    {
-        Toplevel top = new ();
-        Assert.Null (Application.OverlappedTop);
-        top.IsOverlappedContainer = true;
-        Application.Begin (top);
-        Assert.Equal (Application.Top, Application.OverlappedTop);
-
-        var isRunning = true;
-
-        var win1 = new Window { Id = "win1", Width = Dim.Percent (50), Height = Dim.Fill () };
-        var lblTf1W1 = new Label { Text = "Enter text in TextField on Win1:" };
-        var tf1W1 = new TextField { X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill (), Text = "Text1 on Win1" };
-        var lblTvW1 = new Label { Y = Pos.Bottom (lblTf1W1) + 1, Text = "Enter text in TextView on Win1:" };
-
-        var tvW1 = new TextView
-        {
-            X = Pos.Left (tf1W1), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win1"
-        };
-        var lblTf2W1 = new Label { Y = Pos.Bottom (lblTvW1) + 1, Text = "Enter text in TextField on Win1:" };
-        var tf2W1 = new TextField { X = Pos.Left (tf1W1), Width = Dim.Fill (), Text = "Text2 on Win1" };
-        win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
-
-        var win2 = new Window { Id = "win2", Width = Dim.Percent (50), Height = Dim.Fill () };
-        var lblTf1W2 = new Label { Text = "Enter text in TextField on Win2:" };
-        var tf1W2 = new TextField { X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill (), Text = "Text1 on Win2" };
-        var lblTvW2 = new Label { Y = Pos.Bottom (lblTf1W2) + 1, Text = "Enter text in TextView on Win2:" };
-
-        var tvW2 = new TextView
-        {
-            X = Pos.Left (tf1W2), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win2"
-        };
-        var lblTf2W2 = new Label { Y = Pos.Bottom (lblTvW2) + 1, Text = "Enter text in TextField on Win2:" };
-        var tf2W2 = new TextField { X = Pos.Left (tf1W2), Width = Dim.Fill (), Text = "Text2 on Win2" };
-        win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
-
-        win1.Closing += (s, e) => isRunning = false;
-        Assert.Null (top.Focused);
-        Assert.Equal (top, Application.Current);
-        Assert.True (top.IsCurrentTop);
-        Assert.Equal (top, Application.OverlappedTop);
-        Application.Begin (win1);
-        Assert.Equal (new (0, 0, 40, 25), win1.Frame);
-        Assert.NotEqual (top, Application.Current);
-        Assert.False (top.IsCurrentTop);
-        Assert.Equal (win1, Application.Current);
-        Assert.True (win1.IsCurrentTop);
-        Assert.True (win1.IsOverlapped);
-        Assert.Null (top.Focused);
-        Assert.Null (top.MostFocused);
-        Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (win1.IsOverlapped);
-        Assert.Single (Application.OverlappedChildren);
-        Application.Begin (win2);
-        Assert.Equal (new (0, 0, 40, 25), win2.Frame);
-        Assert.NotEqual (top, Application.Current);
-        Assert.False (top.IsCurrentTop);
-        Assert.Equal (win2, Application.Current);
-        Assert.True (win2.IsCurrentTop);
-        Assert.True (win2.IsOverlapped);
-        Assert.Null (top.Focused);
-        Assert.Null (top.MostFocused);
-        Assert.Equal (tf1W2, win2.MostFocused);
-        Assert.Equal (2, Application.OverlappedChildren.Count);
-
-        Application.MoveToOverlappedChild (win1);
-        Assert.Equal (win1, Application.Current);
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        win1.Running = true;
-        Assert.True (Application.OnKeyDown (Application.QuitKey));
-        Assert.False (isRunning);
-        Assert.False (win1.Running);
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-
-        Assert.True (
-                     Application.OnKeyDown (Key.Z.WithCtrl)
-                    );
-
-        Assert.True (Application.OnKeyDown (Key.F5)); // refresh
-
-        Assert.True (Application.OnKeyDown (Key.Tab));
-        Assert.True (win1.IsCurrentTop);
-        Assert.Equal (tvW1, win1.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.Tab));
-        Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-
-        Assert.True (
-                     Application.OnKeyDown (Key.Tab.WithShift)
-                    );
-        Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-
-        Assert.True (
-                     Application.OnKeyDown (Key.Tab.WithCtrl)
-                    );
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tf2W1, win1.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.Tab));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.CursorRight));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.CursorDown));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
-#if UNIX_KEY_BINDINGS
-        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.I.WithCtrl)));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tf2W1, win1.MostFocused);
-#endif
-        Assert.True (
-                     Application.OverlappedChildren [0]
-                                .NewKeyDownEvent (Key.Tab.WithShift)
-                    );
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.CursorLeft));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.CursorUp));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tf2W1, win1.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.Tab));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tf1W1, win1.MostFocused);
-
-        Assert.True (
-                     Application.OverlappedChildren [0]
-                                .NewKeyDownEvent (Key.Tab.WithCtrl)
-                    );
-        Assert.Equal (win2, Application.OverlappedChildren [0]);
-        Assert.Equal (tf1W2, win2.MostFocused);
-        tf2W2.SetFocus ();
-        Assert.True (tf2W2.HasFocus);
-
-        Assert.True (
-                     Application.OverlappedChildren [0]
-                                .NewKeyDownEvent (Key.Tab.WithCtrl.WithShift)
-                    );
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OnKeyDown (Application.AlternateForwardKey));
-        Assert.Equal (win2, Application.OverlappedChildren [0]);
-        Assert.Equal (tf2W2, win2.MostFocused);
-        Assert.True (Application.OnKeyDown (Application.AlternateBackwardKey));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.CursorDown));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
-#if UNIX_KEY_BINDINGS
-        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.B.WithCtrl)));
-#else
-        Assert.True (Application.OnKeyDown (Key.CursorLeft));
-#endif
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tf1W1, win1.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.CursorDown));
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
-        Assert.Equal (Point.Empty, tvW1.CursorPosition);
-
-        Assert.True (
-                     Application.OverlappedChildren [0]
-                                .NewKeyDownEvent (Key.End.WithCtrl)
-                    );
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
-        Assert.Equal (new (16, 1), tvW1.CursorPosition);
-#if UNIX_KEY_BINDINGS
-        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.F.WithCtrl)));
-#else
-        Assert.True (Application.OnKeyDown (Key.CursorRight));
-#endif
-        Assert.Equal (win1, Application.OverlappedChildren [0]);
-        Assert.Equal (tf2W1, win1.MostFocused);
-
-#if UNIX_KEY_BINDINGS
-        Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.L.WithCtrl)));
-#endif
-        win2.Dispose ();
-        win1.Dispose ();
-        top.Dispose ();
-    }
-
-    [Fact]
     public void Added_Event_Should_Not_Be_Used_To_Initialize_Toplevel_Events ()
     {
-        Key alternateForwardKey = default;
-        Key alternateBackwardKey = default;
-        Key quitKey = default;
         var wasAdded = false;
 
         var view = new View ();
@@ -756,23 +570,6 @@ public class ToplevelTests (ITestOutputHelper output)
 
         void View_Added (object sender, SuperViewChangedEventArgs e)
         {
-            Assert.Throws<NullReferenceException> (
-                                                   () =>
-                                                       Application.Top.AlternateForwardKeyChanged +=
-                                                           (s, e) => alternateForwardKey = (KeyCode)e.OldKey
-                                                  );
-
-            Assert.Throws<NullReferenceException> (
-                                                   () =>
-                                                       Application.Top.AlternateBackwardKeyChanged +=
-                                                           (s, e) => alternateBackwardKey = (KeyCode)e.OldKey
-                                                  );
-
-            Assert.Throws<NullReferenceException> (
-                                                   () =>
-                                                       Application.Top.QuitKeyChanged += (s, e) =>
-                                                                                             quitKey = (KeyCode)e.OldKey
-                                                  );
             Assert.False (wasAdded);
             wasAdded = true;
             view.Added -= View_Added;
@@ -791,63 +588,6 @@ public class ToplevelTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void AlternateForwardKeyChanged_AlternateBackwardKeyChanged_QuitKeyChanged_Events ()
-    {
-        Key alternateForwardKey = KeyCode.Null;
-        Key alternateBackwardKey = KeyCode.Null;
-        Key quitKey = KeyCode.Null;
-
-        Key previousQuitKey = Application.QuitKey;
-
-        Toplevel top = new ();
-        var view = new View ();
-        view.Initialized += View_Initialized;
-
-        void View_Initialized (object sender, EventArgs e)
-        {
-            top.AlternateForwardKeyChanged += (s, e) => alternateForwardKey = e.OldKey;
-            top.AlternateBackwardKeyChanged += (s, e) => alternateBackwardKey = e.OldKey;
-            top.QuitKeyChanged += (s, e) => quitKey = e.OldKey;
-        }
-
-        var win = new Window ();
-        win.Add (view);
-        top.Add (win);
-        Application.Begin (top);
-
-        Assert.Equal (KeyCode.Null, alternateForwardKey);
-        Assert.Equal (KeyCode.Null, alternateBackwardKey);
-        Assert.Equal (KeyCode.Null, quitKey);
-
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey);
-        Assert.Equal (Key.Esc, Application.QuitKey);
-
-        Application.AlternateForwardKey = KeyCode.A;
-        Application.AlternateBackwardKey = KeyCode.B;
-        Application.QuitKey = KeyCode.C;
-
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, alternateForwardKey);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, alternateBackwardKey);
-        Assert.Equal (previousQuitKey, quitKey);
-
-        Assert.Equal (KeyCode.A, Application.AlternateForwardKey);
-        Assert.Equal (KeyCode.B, Application.AlternateBackwardKey);
-        Assert.Equal (KeyCode.C, Application.QuitKey);
-
-        // Replacing the defaults keys to avoid errors on others unit tests that are using it.
-        Application.AlternateForwardKey = Key.PageDown.WithCtrl;
-        Application.AlternateBackwardKey = Key.PageUp.WithCtrl;
-        Application.QuitKey = previousQuitKey;
-
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey);
-        Assert.Equal (previousQuitKey, Application.QuitKey);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
     public void Mouse_Drag_On_Top_With_Superview_Null ()
     {
         var win = new Window ();
@@ -862,7 +602,7 @@ public class ToplevelTests (ITestOutputHelper output)
 
                                      if (iterations == 0)
                                      {
-                                         ((FakeDriver)Application.Driver).SetBufferSize (15, 7);
+                                         ((FakeDriver)Application.Driver!).SetBufferSize (15, 7);
 
                                          // Don't use MessageBox here; it's too complicated for this unit test; just use Window
                                          testWindow = new ()
@@ -981,7 +721,7 @@ public class ToplevelTests (ITestOutputHelper output)
 
                                      if (iterations == 0)
                                      {
-                                         ((FakeDriver)Application.Driver).SetBufferSize (30, 10);
+                                         ((FakeDriver)Application.Driver!).SetBufferSize (30, 10);
                                      }
                                      else if (iterations == 1)
                                      {
@@ -1083,10 +823,10 @@ public class ToplevelTests (ITestOutputHelper output)
         top.BeginInit ();
         top.EndInit ();
 
-        Exception exception = Record.Exception (() => ((FakeDriver)Application.Driver).SetBufferSize (0, 10));
+        Exception exception = Record.Exception (() => ((FakeDriver)Application.Driver!).SetBufferSize (0, 10));
         Assert.Null (exception);
 
-        exception = Record.Exception (() => ((FakeDriver)Application.Driver).SetBufferSize (10, 0));
+        exception = Record.Exception (() => ((FakeDriver)Application.Driver!).SetBufferSize (10, 0));
         Assert.Null (exception);
     }
 
@@ -1272,13 +1012,13 @@ public class ToplevelTests (ITestOutputHelper output)
 
         Assert.True (tf.HasFocus);
         Application.PositionCursor (top);
-        Application.Driver.GetCursorVisibility (out CursorVisibility cursor);
+        Application.Driver!.GetCursorVisibility (out CursorVisibility cursor);
         Assert.Equal (CursorVisibility.Default, cursor);
 
         view.Enabled = false;
         Assert.False (tf.HasFocus);
         Application.PositionCursor (top);
-        Application.Driver.GetCursorVisibility (out cursor);
+        Application.Driver!.GetCursorVisibility (out cursor);
         Assert.Equal (CursorVisibility.Invisible, cursor);
         top.Dispose ();
     }
@@ -1309,12 +1049,12 @@ public class ToplevelTests (ITestOutputHelper output)
         Assert.False (subTop.IsLoaded);
         Assert.Equal (new (0, 0, 20, 10), view.Frame);
 
-        view.LayoutStarted += view_LayoutStarted;
+        view.LayoutStarted += ViewLayoutStarted;
 
-        void view_LayoutStarted (object sender, LayoutEventArgs e)
+        void ViewLayoutStarted (object sender, LayoutEventArgs e)
         {
             Assert.Equal (new (0, 0, 20, 10), view._needsDisplayRect);
-            view.LayoutStarted -= view_LayoutStarted;
+            view.LayoutStarted -= ViewLayoutStarted;
         }
 
         Application.Begin (top);
@@ -1396,7 +1136,7 @@ public class ToplevelTests (ITestOutputHelper output)
         Toplevel top = new ();
         var window = new Window { Width = 20, Height = 3, Arrangement = ViewArrangement.Movable };
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 10);
         RunState rsWindow = Application.Begin (window);
         Application.Refresh ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
@@ -1419,7 +1159,7 @@ public class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 20, 3), window.Frame);
 
         // Changes Top size to same size as Dialog more menu and scroll bar
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 3);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 3);
 
         Application.OnMouseEvent (
                                   new ()
@@ -1432,7 +1172,7 @@ public class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 20, 3), window.Frame);
 
         // Changes Top size smaller than Dialog size
-        ((FakeDriver)Application.Driver).SetBufferSize (19, 2);
+        ((FakeDriver)Application.Driver!).SetBufferSize (19, 2);
 
         Application.OnMouseEvent (
                                   new ()
@@ -1525,7 +1265,7 @@ public class ToplevelTests (ITestOutputHelper output)
     {
         Toplevel top = new ();
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 20);
 
         var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
         Assert.Equal (new (2, 1, 15, 10), testWindow.Frame);
@@ -1547,7 +1287,7 @@ public class ToplevelTests (ITestOutputHelper output)
         var win = new Window ();
         top.Add (win);
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 20);
 
         Assert.Equal (new (0, 0, 20, 20), win.Frame);
 
@@ -1576,8 +1316,8 @@ public class ToplevelTests (ITestOutputHelper output)
                                {
                                    Assert.Equal (new (1, 3, 18, 16), viewAddedToTop.Frame);
 
-                                   Rectangle savedClip = Application.Driver.Clip;
-                                   Application.Driver.Clip = top.Frame;
+                                   Rectangle savedClip = Application.Driver!.Clip;
+                                   Application.Driver!.Clip = top.Frame;
                                    viewAddedToTop.Draw ();
                                    top.Move (2, 15);
                                    View.Driver.AddStr ("One");
@@ -1585,7 +1325,7 @@ public class ToplevelTests (ITestOutputHelper output)
                                    View.Driver.AddStr ("Two");
                                    top.Move (2, 17);
                                    View.Driver.AddStr ("Three");
-                                   Application.Driver.Clip = savedClip;
+                                   Application.Driver!.Clip = savedClip;
 
                                    Application.Current.DrawContentComplete -= OnDrawContentComplete;
                                }

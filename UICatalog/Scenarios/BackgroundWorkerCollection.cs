@@ -20,10 +20,10 @@ public class BackgroundWorkerCollection : Scenario
         Application.Run<OverlappedMain> ().Dispose ();
 
 #if DEBUG_IDISPOSABLE
-        if (Application.OverlappedChildren is { })
+        if (ApplicationOverlapped.OverlappedChildren is { })
         {
-            Debug.Assert (Application.OverlappedChildren?.Count == 0);
-            Debug.Assert (Application.Top == Application.OverlappedTop);
+            Debug.Assert (ApplicationOverlapped.OverlappedChildren?.Count == 0);
+            Debug.Assert (Application.Top == ApplicationOverlapped.OverlappedTop);
         }
 #endif
 
@@ -134,7 +134,7 @@ public class BackgroundWorkerCollection : Scenario
         {
             var index = 1;
             List<MenuItem> menuItems = new ();
-            List<Toplevel> sortedChildren = Application.OverlappedChildren;
+            List<Toplevel> sortedChildren = ApplicationOverlapped.OverlappedChildren;
             sortedChildren.Sort (new ToplevelComparer ());
 
             foreach (Toplevel top in sortedChildren)
@@ -151,7 +151,7 @@ public class BackgroundWorkerCollection : Scenario
                 string topTitle = top is Window ? ((Window)top).Title : top.Data.ToString ();
                 string itemTitle = item.Title.Substring (index.ToString ().Length + 1);
 
-                if (top == Application.GetTopOverlappedChild () && topTitle == itemTitle)
+                if (top == ApplicationOverlapped.GetTopOverlappedChild () && topTitle == itemTitle)
                 {
                     item.Checked = true;
                 }
@@ -160,7 +160,7 @@ public class BackgroundWorkerCollection : Scenario
                     item.Checked = false;
                 }
 
-                item.Action += () => { Application.MoveToOverlappedChild (top); };
+                item.Action += () => { ApplicationOverlapped.MoveToOverlappedChild (top); };
                 menuItems.Add (item);
             }
 
@@ -188,7 +188,7 @@ public class BackgroundWorkerCollection : Scenario
         {
             List<MenuItem> menuItems = new ();
             var item = new MenuItem { Title = "WorkerApp", CheckType = MenuItemCheckStyle.Checked };
-            Toplevel top = Application.OverlappedChildren?.Find (x => x.Data.ToString () == "WorkerApp");
+            Toplevel top = ApplicationOverlapped.OverlappedChildren?.Find (x => x.Data.ToString () == "WorkerApp");
 
             if (top != null)
             {
@@ -197,16 +197,16 @@ public class BackgroundWorkerCollection : Scenario
 
             item.Action += () =>
                            {
-                               Toplevel top = Application.OverlappedChildren.Find (x => x.Data.ToString () == "WorkerApp");
+                               Toplevel top = ApplicationOverlapped.OverlappedChildren.Find (x => x.Data.ToString () == "WorkerApp");
                                item.Checked = top.Visible = (bool)!item.Checked;
 
                                if (top.Visible)
                                {
-                                   Application.MoveToOverlappedChild (top);
+                                   ApplicationOverlapped.MoveToOverlappedChild (top);
                                }
                                else
                                {
-                                   Application.OverlappedTop.SetNeedsDisplay ();
+                                   ApplicationOverlapped.OverlappedTop!.SetNeedsDisplay ();
                                }
                            };
             menuItems.Add (item);
@@ -373,14 +373,14 @@ public class BackgroundWorkerCollection : Scenario
         }
         private void WorkerApp_Closing (object sender, ToplevelClosingEventArgs e)
         {
-            Toplevel top = Application.OverlappedChildren.Find (x => x.Data.ToString () == "WorkerApp");
+            Toplevel top = ApplicationOverlapped.OverlappedChildren!.Find (x => x.Data.ToString () == "WorkerApp");
 
             if (Visible && top == this)
             {
                 Visible = false;
                 e.Cancel = true;
 
-                Application.OverlappedMoveNext ();
+                ApplicationOverlapped.OverlappedMoveNext ();
             }
         }
 
@@ -481,7 +481,7 @@ public class BackgroundWorkerCollection : Scenario
                                                  _stagingsUi.Add (stagingUI);
                                                  _stagingWorkers.Remove (staging);
 #if DEBUG_IDISPOSABLE
-                                                 if (Application.OverlappedTop is null)
+                                                 if (ApplicationOverlapped.OverlappedTop is null)
                                                  {
                                                      stagingUI.Dispose ();
                                                      return;

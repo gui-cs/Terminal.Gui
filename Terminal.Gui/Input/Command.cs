@@ -221,8 +221,11 @@ public enum Command
     /// <summary>Pastes the current selection.</summary>
     Paste,
 
+    /// TODO: IRunnable: Rename to Command.Quit to make more generic.
     /// <summary>Quit a <see cref="Toplevel"/>.</summary>
     QuitToplevel,
+
+    /// TODO: Overlapped: Add Command.ShowHide
 
     /// <summary>Suspend an application (Only implemented in <see cref="CursesDriver"/>).</summary>
     Suspend,

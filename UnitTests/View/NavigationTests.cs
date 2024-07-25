@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class NavigationTests (ITestOutputHelper output)
+public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 {
     [Fact]
     public void BringSubviewForward_Subviews_vs_TabIndexes ()
@@ -324,13 +324,13 @@ public class NavigationTests (ITestOutputHelper output)
         Assert.True (view2.CanFocus);
         Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-        Assert.True (top.NewKeyDownEvent (Key.Tab));
+        Assert.True (Application.OnKeyDown (Key.Tab));
         Assert.True (view1.CanFocus);
         Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
         Assert.True (view2.CanFocus);
         Assert.True (view2.HasFocus);
 
-        Assert.True (top.NewKeyDownEvent (Key.Tab));
+        Assert.True (Application.OnKeyDown (Key.Tab));
         Assert.True (view1.CanFocus);
         Assert.True (view1.HasFocus);
         Assert.True (view2.CanFocus);
@@ -365,13 +365,13 @@ public class NavigationTests (ITestOutputHelper output)
         Assert.True (view2.CanFocus);
         Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-        Assert.True (top.NewKeyDownEvent (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.True (view1.CanFocus);
         Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
         Assert.True (view2.CanFocus);
         Assert.True (view2.HasFocus);
 
-        Assert.True (top.NewKeyDownEvent (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.True (view1.CanFocus);
         Assert.True (view1.HasFocus);
         Assert.True (view2.CanFocus);
@@ -417,14 +417,14 @@ public class NavigationTests (ITestOutputHelper output)
         Assert.True (view2.CanFocus);
         Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-        Assert.True (top.NewKeyDownEvent (Key.Tab.WithCtrl));
-        Assert.True (top.NewKeyDownEvent (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.True (view1.CanFocus);
         Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
         Assert.True (view2.CanFocus);
         Assert.True (view2.HasFocus);
 
-        Assert.True (top.NewKeyDownEvent (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.True (view1.CanFocus);
         Assert.True (view1.HasFocus);
         Assert.True (view2.CanFocus);
@@ -530,6 +530,7 @@ public class NavigationTests (ITestOutputHelper output)
     }
 
     [Fact]
+    [AutoInitShutdown]
     public void FocusNearestView_Ensure_Focus_Ordered ()
     {
         var top = new Toplevel ();
@@ -544,16 +545,17 @@ public class NavigationTests (ITestOutputHelper output)
         frm.Add (frmSubview);
         top.Add (frm);
 
-        top.NewKeyDownEvent (Key.Tab);
-        Assert.Equal ("WindowSubview", top.MostFocused.Text);
-        top.NewKeyDownEvent (Key.Tab);
-        Assert.Equal ("FrameSubview", top.MostFocused.Text);
-        top.NewKeyDownEvent (Key.Tab);
+        Application.Begin (top);
         Assert.Equal ("WindowSubview", top.MostFocused.Text);
 
-        top.NewKeyDownEvent (Key.Tab.WithShift);
+        Application.OnKeyDown (Key.Tab);
         Assert.Equal ("FrameSubview", top.MostFocused.Text);
-        top.NewKeyDownEvent (Key.Tab.WithShift);
+        Application.OnKeyDown (Key.Tab);
+        Assert.Equal ("WindowSubview", top.MostFocused.Text);
+
+        Application.OnKeyDown (Key.Tab.WithShift);
+        Assert.Equal ("FrameSubview", top.MostFocused.Text);
+        Application.OnKeyDown (Key.Tab.WithShift);
         Assert.Equal ("WindowSubview", top.MostFocused.Text);
         top.Dispose ();
     }
@@ -605,7 +607,7 @@ public class NavigationTests (ITestOutputHelper output)
         Assert.False (removed);
         Assert.Null (view3);
 
-        Assert.True (top1.NewKeyDownEvent (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.True (top1.HasFocus);
         Assert.False (view1.HasFocus);
         Assert.True (view2.HasFocus);
@@ -613,7 +615,7 @@ public class NavigationTests (ITestOutputHelper output)
         Assert.NotNull (view3);
 
         Exception exception =
-            Record.Exception (() => top1.NewKeyDownEvent (Key.Tab.WithCtrl));
+            Record.Exception (() => Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.Null (exception);
         Assert.True (removed);
         Assert.Null (view3);
@@ -669,7 +671,7 @@ public class NavigationTests (ITestOutputHelper output)
 //        Assert.False (tfQuiting);
 //        Assert.False (topQuiting);
 
-//        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+//        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 //        Assert.False (sbQuiting);
 //        Assert.True (tfQuiting);
 //        Assert.False (topQuiting);
@@ -677,7 +679,7 @@ public class NavigationTests (ITestOutputHelper output)
 //#if BROKE_WITH_2927
 //        tf.KeyPressed -= Tf_KeyPress;
 //        tfQuiting = false;
-//        Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+//        Application.Driver?.SendKeys ('q', ConsoleKey.Q, false, false, true);
 //        Application.MainLoop.RunIteration ();
 //        Assert.True (sbQuiting);
 //        Assert.False (tfQuiting);
@@ -685,7 +687,7 @@ public class NavigationTests (ITestOutputHelper output)
 
 //        sb.RemoveItem (0);
 //        sbQuiting = false;
-//        Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+//        Application.Driver?.SendKeys ('q', ConsoleKey.Q, false, false, true);
 //        Application.MainLoop.RunIteration ();
 //        Assert.False (sbQuiting);
 //        Assert.False (tfQuiting);
@@ -733,13 +735,13 @@ public class NavigationTests (ITestOutputHelper output)
 //        Assert.False (sbQuiting);
 //        Assert.False (tfQuiting);
 
-//        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+//        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 //        Assert.False (sbQuiting);
 //        Assert.True (tfQuiting);
 
 //        tf.KeyDown -= Tf_KeyPressed;
 //        tfQuiting = false;
-//        Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+//        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 //        Application.MainLoop.RunIteration ();
 //#if BROKE_WITH_2927
 //        Assert.True (sbQuiting);
@@ -834,7 +836,7 @@ public class NavigationTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
 
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
         Assert.Equal (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rectangle (0, 0, 20, 10), top.Frame);
 
@@ -984,7 +986,7 @@ public class NavigationTests (ITestOutputHelper output)
         Assert.NotEqual (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rectangle (3, 2, 20, 10), top.Frame);
 
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 20);
         Assert.Equal (new Rectangle (0, 0, 30, 20), new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows));
         Assert.NotEqual (new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new Rectangle (3, 2, 20, 10), top.Frame);
@@ -1581,5 +1583,192 @@ public class NavigationTests (ITestOutputHelper output)
         view.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.Null (view.MostFocused); // BUGBUG: Should be view
+    }
+
+
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+
+    public void AllViews_Enter_Leave_Events (Type viewType)
+    {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
+        if (view == null)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            return;
+        }
+
+        if (!view.CanFocus)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
+
+            return;
+        }
+
+        if (view is Toplevel && ((Toplevel)view).Modal)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
+
+            return;
+        }
+
+        Application.Init (new FakeDriver ());
+
+        Toplevel top = new ()
+        {
+            Height = 10,
+            Width = 10
+        };
+
+        View otherView = new ()
+        {
+            X = 0, Y = 0,
+            Height = 1,
+            Width = 1,
+            CanFocus = true,
+        };
+
+        view.X = Pos.Right (otherView);
+        view.Y = 0;
+        view.Width = 10;
+        view.Height = 1;
+
+        var nEnter = 0;
+        var nLeave = 0;
+
+        view.Enter += (s, e) => nEnter++;
+        view.Leave += (s, e) => nLeave++;
+
+        top.Add (view, otherView);
+        Application.Begin (top);
+
+        // Start with the focus on our test view
+        view.SetFocus ();
+
+        Assert.Equal (1, nEnter);
+        Assert.Equal (0, nLeave);
+
+        // Use keyboard to navigate to next view (otherView). 
+        if (view is TextView)
+        {
+            Application.OnKeyDown (Key.Tab.WithCtrl);
+        }
+        else if (view is DatePicker)
+        {
+            for (var i = 0; i < 4; i++)
+            {
+                Application.OnKeyDown (Key.Tab.WithCtrl);
+            }
+        }
+        else
+        {
+            Application.OnKeyDown (Key.Tab);
+        }
+
+        Assert.Equal (1, nEnter);
+        Assert.Equal (1, nLeave);
+
+        Application.OnKeyDown (Key.Tab);
+
+        Assert.Equal (2, nEnter);
+        Assert.Equal (1, nLeave);
+
+        top.Dispose ();
+        Application.Shutdown ();
+    }
+
+
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+
+    public void AllViews_Enter_Leave_Events_Visible_False (Type viewType)
+    {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
+        if (view == null)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            return;
+        }
+
+        if (!view.CanFocus)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
+
+            return;
+        }
+
+        if (view is Toplevel && ((Toplevel)view).Modal)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
+
+            return;
+        }
+
+        Application.Init (new FakeDriver ());
+
+        Toplevel top = new ()
+        {
+            Height = 10,
+            Width = 10
+        };
+
+        View otherView = new ()
+        {
+            X = 0, Y = 0,
+            Height = 1,
+            Width = 1,
+            CanFocus = true,
+        };
+
+        view.Visible = false;
+        view.X = Pos.Right (otherView);
+        view.Y = 0;
+        view.Width = 10;
+        view.Height = 1;
+
+        var nEnter = 0;
+        var nLeave = 0;
+
+        view.Enter += (s, e) => nEnter++;
+        view.Leave += (s, e) => nLeave++;
+
+        top.Add (view, otherView);
+        Application.Begin (top);
+
+        // Start with the focus on our test view
+        view.SetFocus ();
+
+        Assert.Equal (0, nEnter);
+        Assert.Equal (0, nLeave);
+
+        // Use keyboard to navigate to next view (otherView). 
+        if (view is TextView)
+        {
+            Application.OnKeyDown (Key.Tab.WithCtrl);
+        }
+        else if (view is DatePicker)
+        {
+            for (var i = 0; i < 4; i++)
+            {
+                Application.OnKeyDown (Key.Tab.WithCtrl);
+            }
+        }
+        else
+        {
+            Application.OnKeyDown (Key.Tab);
+        }
+
+        Assert.Equal (0, nEnter);
+        Assert.Equal (0, nLeave);
+
+        top.NewKeyDownEvent (Key.Tab);
+
+        Assert.Equal (0, nEnter);
+        Assert.Equal (0, nLeave);
+
+        top.Dispose ();
+        Application.Shutdown ();
     }
 }

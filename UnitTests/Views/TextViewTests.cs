@@ -609,7 +609,7 @@ public class TextViewTests
 
         Assert.Equal (
                       "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!",
-                      Application.Driver.Clipboard.GetClipboardData ()
+                      Application.Driver?.Clipboard.GetClipboardData ()
                      );
         Assert.Equal (string.Empty, _textView.Text);
         _textView.Paste ();
@@ -1018,7 +1018,7 @@ This is the second line.
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledRight });
             Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
             Application.PositionCursor (top);
-            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
+            Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
             Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
         }
 
@@ -1028,7 +1028,7 @@ This is the second line.
             Assert.Equal (i - 1, tv.LeftColumn);
 
             Application.PositionCursor (top);
-            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
+            Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
 
             if (i - 1 == 0)
             {
@@ -1070,7 +1070,7 @@ This is the second line.
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledDown });
             Application.PositionCursor (top);
             Assert.Equal (i + 1, tv.TopRow);
-            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
+            Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
             Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
         }
 
@@ -1081,7 +1081,7 @@ This is the second line.
             Assert.Equal (i - 1, tv.TopRow);
 
             Application.PositionCursor (top);
-            Application.Driver.GetCursorVisibility (out CursorVisibility cursorVisibility);
+            Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
 
             if (i - 1 == 0)
             {
@@ -6697,7 +6697,7 @@ TAB to jump between text field",
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (15, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (15, 15);
         Application.Refresh ();
 
         //this passes
@@ -6774,7 +6774,7 @@ TAB to jump between text field",
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (15, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (15, 15);
         Application.Refresh ();
 
         //this passes
