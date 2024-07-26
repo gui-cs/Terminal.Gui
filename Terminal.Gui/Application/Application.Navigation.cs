@@ -32,11 +32,15 @@ internal static class ApplicationNavigation
     }
 
     /// <summary>
-    ///    INTERNAL API that sets the focus to the next view in <paramref name="viewsInTabIndexes"/>. If the last view is focused, the first view is focused.
+    /// Sets the focus to the next view in the specified direction within the provided list of views.
+    /// If the end of the list is reached, the focus wraps around to the first view in the list.
+    /// The method considers the current focused view (`Application.Current`) and attempts to move the focus
+    /// to the next view in the specified direction. If the focus cannot be set to the next view, it wraps around
+    /// to the first view in the list.
     /// </summary>
     /// <param name="viewsInTabIndexes"></param>
     /// <param name="direction"></param>
-    internal static void FocusNearestView (IEnumerable<View>? viewsInTabIndexes, NavigationDirection direction)
+    internal static void SetFocusToNextViewWithWrap (IEnumerable<View>? viewsInTabIndexes, NavigationDirection direction)
     {
         if (viewsInTabIndexes is null)
         {
@@ -57,19 +61,26 @@ internal static class ApplicationNavigation
             }
             else if (foundCurrentView && !focusSet)
             {
+                // One of the views is Current, but view is not. Attempt to Advance...
                 Application.Current!.SuperView?.AdvanceFocus (direction);
+                // QUESTION: AdvanceFocus returns false AND sets Focused to null if no view was found to advance to. Should't we only set focusProcessed if it returned true?
                 focusSet = true;
 
                 if (Application.Current.SuperView?.Focused != Application.Current)
                 {
                     return;
                 }
+
+                // Either AdvanceFocus didn't set focus or the view it set focus to is not current...
+                // continue...
             }
 
             currentIndex++;
 
             if (foundCurrentView && !focusSet && currentIndex == viewCount)
             {
+                // One of the views is Current AND AdvanceFocus didn't set focus AND we are at the last view in the list...
+                // This means we should wrap around to the first view in the list.
                 indexes.First ().SetFocus ();
             }
         }
@@ -96,7 +107,7 @@ internal static class ApplicationNavigation
         }
         else
         {
-            FocusNearestView (Application.Current.SuperView?.TabIndexes, NavigationDirection.Forward);
+            SetFocusToNextViewWithWrap (Application.Current.SuperView?.TabIndexes, NavigationDirection.Forward);
         }
     }
 
@@ -121,7 +132,7 @@ internal static class ApplicationNavigation
             }
             else
             {
-                FocusNearestView (Application.Current.SuperView?.TabIndexes, NavigationDirection.Forward);
+                SetFocusToNextViewWithWrap (Application.Current.SuperView?.TabIndexes, NavigationDirection.Forward);
             }
 
 
@@ -162,7 +173,7 @@ internal static class ApplicationNavigation
         }
         else
         {
-            FocusNearestView (Application.Current.SuperView?.TabIndexes?.Reverse (), NavigationDirection.Backward);
+            SetFocusToNextViewWithWrap (Application.Current.SuperView?.TabIndexes?.Reverse (), NavigationDirection.Backward);
         }
     }
 
