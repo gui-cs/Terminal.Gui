@@ -170,6 +170,7 @@ public class Button : View, IDesignable
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
+        base.UpdateTextFormatterText();
         if (NoDecorations)
         {
             TextFormatter.Text = Text;

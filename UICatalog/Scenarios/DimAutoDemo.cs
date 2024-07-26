@@ -23,21 +23,21 @@ public class DimAutoDemo : Scenario
 
         FrameView dimAutoFrameView = CreateDimAutoContentFrameView ();
 
-        FrameView sliderFrameView = CreateSliderFrameView ();
-        sliderFrameView.X = Pos.Right(dimAutoFrameView) + 1;
-        sliderFrameView.Width = Dim.Fill ();
-        sliderFrameView.Height = Dim.Fill ();
+        //FrameView sliderFrameView = CreateSliderFrameView ();
+        //sliderFrameView.X = Pos.Right(dimAutoFrameView) + 1;
+        //sliderFrameView.Width = Dim.Fill ();
+        //sliderFrameView.Height = Dim.Fill ();
 
 
-        //var dlgButton = new Button
-        //{
-        //    Text = "Open Test _Dialog",
-        //    X = Pos.Right (dimAutoFrameView),
-        //    Y = Pos.Top (dimAutoFrameView)
-        //};
-        //dlgButton.Accept += DlgButton_Clicked;
+        ////var dlgButton = new Button
+        ////{
+        ////    Text = "Open Test _Dialog",
+        ////    X = Pos.Right (dimAutoFrameView),
+        ////    Y = Pos.Top (dimAutoFrameView)
+        ////};
+        ////dlgButton.Accept += DlgButton_Clicked;
 
-        appWindow.Add (dimAutoFrameView, sliderFrameView /*dlgButton*/);
+        appWindow.Add (dimAutoFrameView/*, sliderFrameView dlgButton*/);
 
         // Run - Start the application.
         Application.Run (appWindow);
@@ -140,25 +140,39 @@ public class DimAutoDemo : Scenario
                                         bothAuto.Text = textEdit.Text;
                                     };
 
-        var movingButton = new Button
-        {
-            Text = "_Click\nTo Move\nDown",
-            X = Pos.Right (vlabel),
-            Y = Pos.Bottom (vlabel)
-        };
-        movingButton.Accept += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
-        dimAutoFrameView.Add (movingButton);
+        //var movingButton = new Button
+        //{
+        //    Text = "_Click\nTo Move\nDown",
+        //    X = Pos.Right (vlabel),
+        //    Y = Pos.Bottom (vlabel)
+        //};
+        //movingButton.Accept += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
+        //dimAutoFrameView.Add (movingButton);
 
         var resetButton = new Button
         {
             Text = "_Reset Button (AnchorEnd)",
             X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd (1)
+            Y = Pos.AnchorEnd ()
         };
 
-        resetButton.Accept += (s, e) => { movingButton.Y = Pos.Bottom (hlabel); };
+        resetButton.Accept += (s, e) =>
+        {
+            //movingButton.Y = Pos.Bottom (hlabel);
+            //movingButton.X = 0;
+        };
         dimAutoFrameView.Add (resetButton);
 
+
+        var radioGroup = new RadioGroup ()
+        {
+            RadioLabels = ["One", "Two", "Three"],
+            X = 0,
+            Y = Pos.AnchorEnd (),
+            Title = "Radios",
+            BorderStyle = LineStyle.Dotted
+        };
+        dimAutoFrameView.Add (radioGroup);
         return dimAutoFrameView;
     }
 

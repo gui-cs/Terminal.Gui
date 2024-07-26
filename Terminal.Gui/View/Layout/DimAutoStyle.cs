@@ -33,6 +33,10 @@ public enum DimAutoStyle
     ///     <para>
     ///         The corresponding dimensions of <see cref="View.GetContentSize ()"/> and/or <see cref="View.Subviews"/> will be ignored.
     ///     </para>
+    ///     <para>
+    ///         If <see cref="DimAuto.MaximumContentDim"/> is set, the dimension will be the maximum of the formatted text and the
+    ///         demension provided by <see cref="DimAuto.MaximumContentDim"/>. Otherwise, the dimension will be that of the formatted text.
+    ///     </para>
     /// </summary>
     Text = 2,
 

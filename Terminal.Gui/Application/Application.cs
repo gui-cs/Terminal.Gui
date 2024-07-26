@@ -90,6 +90,14 @@ public static partial class Application
         }
     }
 
+    /// <summary>
+    ///     Gets the size of the screen. This is the size of the screen as reported by the <see cref="ConsoleDriver"/>.
+    /// </summary>
+    /// <remarks>
+    ///     If the <see cref="ConsoleDriver"/> has not been initialized, this will return a default size of 2048x2048; useful for unit tests.
+    /// </remarks>
+    public static Rectangle Screen => Driver?.Screen ?? new (0, 0, 2048, 2048);
+
     // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
     // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
     private static Toplevel _cachedRunStateToplevel;
@@ -560,7 +568,7 @@ public static partial class Application
             MoveCurrent (Current);
         }
 
-        toplevel.SetRelativeLayout (Driver.Screen.Size);
+        toplevel.SetRelativeLayout (Screen.Size);
 
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
@@ -629,7 +637,7 @@ public static partial class Application
 
         // If the view is not visible within it's superview, don't position the cursor
         Rectangle mostFocusedViewport = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = Point.Empty });
-        Rectangle superViewViewport = mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver.Screen;
+        Rectangle superViewViewport = mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Application.Screen;
 
         if (!superViewViewport.IntersectsWith (mostFocusedViewport))
         {

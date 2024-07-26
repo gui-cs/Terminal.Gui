@@ -341,12 +341,6 @@ public class Bars : Scenario
     //    Application.MouseEvent -= Application_MouseEvent;
     //}
 
-    private void Menu_Initialized (object sender, EventArgs e)
-    {
-        // BUGBUG: this should not be needed    
-
-        ((View)(sender)).LayoutSubviews ();
-    }
 
     private void ConfigMenuBar (Bar bar)
     {

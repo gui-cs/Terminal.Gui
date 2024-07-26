@@ -153,11 +153,9 @@ public class Bar : View
                     barItem.ColorScheme = ColorScheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     barItem.Y = 0; //Pos.Center ();
-
                     // HACK: This should not be needed
                     barItem.SetRelativeLayout (GetContentSize ());
                 }
-
                 break;
 
             case Orientation.Vertical:
@@ -168,7 +166,7 @@ public class Bar : View
                 List<Shortcut> shortcuts = Subviews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
                 foreach (Shortcut shortcut in shortcuts)
                 {
-                    // Let AutoSize do its thing to get the minimum width of each CommandView and HelpView
+                    // Let DimAuto do its thing to get the minimum width of each CommandView and HelpView
                     //shortcut.CommandView.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
                     minKeyWidth = int.Max (minKeyWidth, shortcut.KeyView.Text.GetColumns ());
                 }

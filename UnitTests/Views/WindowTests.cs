@@ -130,8 +130,8 @@ public class WindowTests
         Assert.Equal ($"Window(){defaultWindow.Frame}", defaultWindow.ToString ());
         Assert.True (defaultWindow.CanFocus);
         Assert.False (defaultWindow.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 2147483645, 2147483645), defaultWindow.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 2147483647, 2147483647), defaultWindow.Frame);
+        Assert.Equal (new Rectangle (0, 0, Application.Screen.Width - 2, Application.Screen.Height - 2), defaultWindow.Viewport);
+        Assert.Equal (new Rectangle (0, 0, Application.Screen.Width, Application.Screen.Height), defaultWindow.Frame);
         Assert.Null (defaultWindow.Focused);
         Assert.NotNull (defaultWindow.ColorScheme);
         Assert.Equal (0, defaultWindow.X);

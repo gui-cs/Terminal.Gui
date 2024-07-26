@@ -4,17 +4,14 @@ namespace Terminal.Gui;
 
 public partial class View
 {
-    /// <summary>
-    ///    Initializes the Text of the View. Called by the constructor.
-    /// </summary>
-    private void SetupText ()
-    {
-        Text = string.Empty;
-        TextDirection = TextDirection.LeftRight_TopBottom;
-    }
-
     private string _text;
 
+    /// <summary>
+    ///     Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
+    /// </summary>
+    public void OnTextChanged () { TextChanged?.Invoke (this, EventArgs.Empty); }
+
+    // TODO: Make this non-virtual. Nobody overrides it.
     /// <summary>
     ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
     ///     or not when <see cref="TextFormatter.WordWrap"/> is enabled.
@@ -46,11 +43,14 @@ public partial class View
     ///         to <see cref="TextAlignment"/> and <see cref="TextDirection"/>.
     ///     </para>
     ///     <para>
-    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="GetContentSize ()"/>'s height
+    ///         The text will word-wrap to additional lines if it does not fit horizontally. If <see cref="GetContentSize ()"/>
+    ///         's height
     ///         is 1, the text will be clipped.
     ///     </para>
-    ///     <para>If <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>,
-    ///     the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
+    ///     <para>
+    ///         If <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>,
+    ///         the <see cref="GetContentSize ()"/> will be adjusted to fit the text.
+    ///     </para>
     ///     <para>When the text changes, the <see cref="TextChanged"/> is fired.</para>
     /// </remarks>
     public virtual string Text
@@ -73,25 +73,16 @@ public partial class View
         }
     }
 
-    /// <summary>
-    /// Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
-    /// </summary>
-    public void OnTextChanged ()
-    {
-        TextChanged?.Invoke (this, EventArgs.Empty);
-    }
-
-    /// <summary>
-    ///     Text changed event, raised when the text has changed.
-    /// </summary>
-    public event EventHandler? TextChanged;
-
+    // TODO: Make this non-virtual. Nobody overrides it.
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will
     ///     redisplay the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
+    ///     <para>
+    ///         <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the
+    ///         <see cref="GetContentSize ()"/> will be adjusted to fit the text.
+    ///     </para>
     /// </remarks>
     /// <value>The text alignment.</value>
     public virtual Alignment TextAlignment
@@ -106,35 +97,44 @@ public partial class View
     }
 
     /// <summary>
+    ///     Text changed event, raised when the text has changed.
+    /// </summary>
+    public event EventHandler? TextChanged;
+
+    // TODO: Make this non-virtual. Nobody overrides it.
+    /// <summary>
     ///     Gets or sets the direction of the View's <see cref="Text"/>. Changing this property will redisplay the
     ///     <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
+    ///     <para>
+    ///         <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the
+    ///         <see cref="GetContentSize ()"/> will be adjusted to fit the text.
+    ///     </para>
     /// </remarks>
     /// <value>The text direction.</value>
     public virtual TextDirection TextDirection
     {
         get => TextFormatter.Direction;
-        set
-        {
-            UpdateTextDirection (value);
-            TextFormatter.Direction = value;
-        }
+        set => UpdateTextDirection (value);
     }
 
     /// <summary>
     ///     Gets or sets the <see cref="Gui.TextFormatter"/> used to format <see cref="Text"/>.
     /// </summary>
-    public TextFormatter TextFormatter { get; init; } = new () { };
+    public TextFormatter TextFormatter { get; init; } = new ();
 
+    // TODO: Make this non-virtual. Nobody overrides it.
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned vertically when drawn. Changing this property will
     ///     redisplay
     ///     the <see cref="View"/>.
     /// </summary>
     /// <remarks>
-    ///     <para> <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the <see cref="GetContentSize ()"/> will be adjusted to fit the text.</para>
+    ///     <para>
+    ///         <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>, the
+    ///         <see cref="GetContentSize ()"/> will be adjusted to fit the text.
+    ///     </para>
     /// </remarks>
     /// <value>The vertical text alignment.</value>
     public virtual Alignment VerticalTextAlignment
@@ -147,35 +147,26 @@ public partial class View
         }
     }
 
+    // TODO: Add a OnUpdateTextFormatterText method that invokes UpdateTextFormatterText so that overrides don't have to call base.
     /// <summary>
-    ///     Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has
+    ///     Can be overridden if the <see cref="TextFormatter.Text"/> has
     ///     different format than the default.
     /// </summary>
+    /// <remarks>
+    ///     Overrides must call <c>base.UpdateTextFormatterText</c> before updating <see cref="TextFormatter.Text"/>.
+    /// </remarks>
     protected virtual void UpdateTextFormatterText ()
     {
-        if (TextFormatter is { })
-        {
-            TextFormatter.Text = _text;
-        }
+        TextFormatter.Text = _text;
+        TextFormatter.ConstrainToWidth = null;
+        TextFormatter.ConstrainToHeight = null;
     }
 
     /// <summary>
-    ///     Gets the dimensions required for <see cref="Text"/> ignoring a <see cref="TextFormatter.HotKeySpecifier"/>.
-    /// </summary>
-    /// <returns></returns>
-    internal Size GetSizeNeededForTextWithoutHotKey ()
-    {
-        return new Size (
-                         TextFormatter.Size.Width - TextFormatter.GetHotKeySpecifierLength (),
-                         TextFormatter.Size.Height - TextFormatter.GetHotKeySpecifierLength (false));
-    }
-
-    /// <summary>
-    ///     Internal API. Sets <see cref="TextFormatter"/>.Size to the current <see cref="Viewport"/> size, adjusted for
-    ///     <see cref="TextFormatter.HotKeySpecifier"/>.
+    ///     Internal API. Sets <see cref="TextFormatter"/>.Width/Height.
     /// </summary>
     /// <remarks>
-    ///     Use this API to set <see cref="TextFormatter.Size"/> when the view has changed such that the
+    ///     Use this API to set <see cref="Gui.TextFormatter.ConstrainToWidth"/>/Height when the view has changed such that the
     ///     size required to fit the text has changed.
     ///     changes.
     /// </remarks>
@@ -187,29 +178,44 @@ public partial class View
         UpdateTextFormatterText ();
 
         // Default is to use GetContentSize ().
-        var size = GetContentSize ();
+        Size? size = _contentSize;
 
-        // TODO: This is a hack. Figure out how to move this into DimDimAuto
         // Use _width & _height instead of Width & Height to avoid debug spew
-        DimAuto? widthAuto = _width as DimAuto;
-        DimAuto? heightAuto = _height as DimAuto;
-        if ((widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
-            || (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text)))
+        var widthAuto = _width as DimAuto;
+        var heightAuto = _height as DimAuto;
+
+        if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
         {
-            size = TextFormatter.GetAutoSize ();
-
-            if (widthAuto is null || !widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
+            TextFormatter.ConstrainToWidth = null;
+        }
+        else
+        {
+            if (size is { })
             {
-                size.Width = GetContentSize ().Width;
-            }
-
-            if (heightAuto is null || !heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
-            {
-                size.Height = GetContentSize ().Height;
+                TextFormatter.ConstrainToWidth = size?.Width;
             }
         }
 
-        TextFormatter.Size = size;
+        if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
+        {
+            TextFormatter.ConstrainToHeight = null;
+        }
+        else
+        {
+            if (size is { })
+            {
+                TextFormatter.ConstrainToHeight = size?.Height;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Initializes the Text of the View. Called by the constructor.
+    /// </summary>
+    private void SetupText ()
+    {
+        Text = string.Empty;
+        TextDirection = TextDirection.LeftRight_TopBottom;
     }
 
     private void UpdateTextDirection (TextDirection newDirection)
@@ -221,10 +227,11 @@ public partial class View
 
         if (directionChanged)
         {
+            TextFormatter.ConstrainToWidth = null;
+            TextFormatter.ConstrainToHeight = null;
             OnResizeNeeded ();
         }
 
-        SetTextFormatterSize ();
         SetNeedsDisplay ();
     }
 }
