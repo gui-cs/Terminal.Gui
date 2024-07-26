@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- In the source tree the version will always be 2.0 for all projects. -->
@@ -31,8 +31,9 @@
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="[17.10,18)" />
-    <PackageReference Include="ReportGenerator" Version="[5.3.7,6)" />
-    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="[21.0.22,22)" />
+    <PackageReference Include="Moq" Version="4.20.70" />
+    <PackageReference Include="ReportGenerator" Version="5.3.8" />
+    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.0.29" />
     <PackageReference Include="xunit" Version="[2.9.0,3)" />
     <PackageReference Include="Xunit.Combinatorial" Version="[1.6.24,2)" />
     <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2,3)">

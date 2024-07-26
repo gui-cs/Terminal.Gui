@@ -1199,4 +1199,109 @@ public class OverlappedTests
         win1.Dispose ();
         top.Dispose ();
     }
+
+
+    [Fact]
+    public void SetFocusToNextViewWithWrap_ShouldFocusNextView ()
+    {
+        // Arrange
+        var superView = new TestToplevel () { Id = "superView", IsOverlappedContainer = true };
+
+        var view1 = new TestView () { Id = "view1" };
+        var view2 = new TestView () { Id = "view2" };
+        var view3 = new TestView () { Id = "view3" }; ;
+        superView.Add (view1, view2, view3);
+
+        var current = new TestToplevel () { Id = "current", IsOverlappedContainer = true };
+
+        superView.Add (current);
+        superView.BeginInit ();
+        superView.EndInit ();
+        current.SetFocus ();
+
+        Application.Current = current;
+        Assert.True (current.HasFocus);
+        Assert.Equal (superView.Focused, current);
+        Assert.Equal (superView.MostFocused, current);
+
+        // Act
+        ApplicationOverlapped.SetFocusToNextViewWithWrap (Application.Current.SuperView.TabIndexes, NavigationDirection.Forward);
+
+        // Assert
+        Assert.True (view1.HasFocus);
+    }
+
+    [Fact]
+    public void SetFocusToNextViewWithWrap_ShouldNotChangeFocusIfViewsIsNull ()
+    {
+        // Arrange
+        var currentView = new TestToplevel ();
+        Application.Current = currentView;
+
+        // Act
+        ApplicationOverlapped.SetFocusToNextViewWithWrap (null, NavigationDirection.Forward);
+
+        // Assert
+        Assert.Equal (currentView, Application.Current);
+    }
+
+    [Fact]
+    public void SetFocusToNextViewWithWrap_ShouldNotChangeFocusIfCurrentViewNotFound ()
+    {
+        // Arrange
+        var view1 = new TestToplevel ();
+        var view2 = new TestToplevel ();
+        var view3 = new TestToplevel ();
+
+        var views = new List<View> { view1, view2, view3 };
+
+        var currentView = new TestToplevel () { IsOverlappedContainer = true }; // Current view is not in the list
+        Application.Current = currentView;
+
+        // Act
+        ApplicationOverlapped.SetFocusToNextViewWithWrap (views, NavigationDirection.Forward);
+
+        // Assert
+        Assert.False (view1.IsFocused);
+        Assert.False (view2.IsFocused);
+        Assert.False (view3.IsFocused);
+    }
+
+    private class TestToplevel : Toplevel
+    {
+        public bool IsFocused { get; private set; }
+
+        public override bool OnEnter (View view)
+        {
+            IsFocused = true;
+            return base.OnEnter (view);
+        }
+
+        public override bool OnLeave (View view)
+        {
+            IsFocused = false;
+            return base.OnLeave (view);
+        }
+    }
+
+    private class TestView : View
+    {
+        public TestView ()
+        {
+            CanFocus = true;
+        }
+        public bool IsFocused { get; private set; }
+
+        public override bool OnEnter (View view)
+        {
+            IsFocused = true;
+            return base.OnEnter (view);
+        }
+
+        public override bool OnLeave (View view)
+        {
+            IsFocused = false;
+            return base.OnLeave (view);
+        }
+    }
 }
