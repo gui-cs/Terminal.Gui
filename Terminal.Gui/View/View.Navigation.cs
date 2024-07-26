@@ -444,7 +444,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
     }
 
-    // TODO: Combine FocusFirst and FocusLast into a single method that takes a direction parameter for less code duplication and easier testing.
     /// <summary>
     ///     Focuses the first focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
     ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
@@ -622,7 +621,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (Focused is { })
         {
+            // Leave
             Focused.SetHasFocus (false, this);
+
+            // Signal that nothing is focused, and callers should try a peer-subview
             Focused = null;
         }
 

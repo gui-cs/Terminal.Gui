@@ -32,7 +32,7 @@ internal static class ApplicationNavigation
     }
 
     /// <summary>
-    ///    Sets the focus to the next view in the <see cref="View.TabIndexes"/> list. If the last view is focused, the first view is focused.
+    ///    INTERNAL API that sets the focus to the next view in <paramref name="viewsInTabIndexes"/>. If the last view is focused, the first view is focused.
     /// </summary>
     /// <param name="viewsInTabIndexes"></param>
     /// <param name="direction"></param>
@@ -43,39 +43,41 @@ internal static class ApplicationNavigation
             return;
         }
 
-        var found = false;
-        var focusProcessed = false;
-        var idx = 0;
+        bool foundCurrentView = false;
+        bool focusSet = false;
+        IEnumerable<View> indexes = viewsInTabIndexes as View [] ?? viewsInTabIndexes.ToArray ();
+        int viewCount = indexes.Count ();
+        int currentIndex = 0;
 
-        foreach (View v in viewsInTabIndexes)
+        foreach (View view in indexes)
         {
-            if (v == Application.Current)
+            if (view == Application.Current)
             {
-                found = true;
+                foundCurrentView = true;
             }
-
-            if (found && v != Application.Current)
+            else if (foundCurrentView && !focusSet)
             {
                 Application.Current!.SuperView?.AdvanceFocus (direction);
+                focusSet = true;
 
-                focusProcessed = true;
-
-                if (Application.Current.SuperView?.Focused is { } && Application.Current.SuperView.Focused != Application.Current)
+                if (Application.Current.SuperView?.Focused != Application.Current)
                 {
                     return;
                 }
             }
-            else if (found && !focusProcessed && idx == viewsInTabIndexes.Count () - 1)
-            {
-                viewsInTabIndexes.ToList () [0].SetFocus ();
-            }
 
-            idx++;
+            currentIndex++;
+
+            if (foundCurrentView && !focusSet && currentIndex == viewCount)
+            {
+                indexes.First ().SetFocus ();
+            }
         }
     }
 
     /// <summary>
-    ///     Moves the focus to the next view. Honors <see cref="ViewArrangement.Overlapped"/> and will only move to the next subview
+    ///     Moves the focus to the next focusable view.
+    ///     Honors <see cref="ViewArrangement.Overlapped"/> and will only move to the next subview
     ///     if the current and next subviews are not overlapped.
     /// </summary>
     internal static void MoveNextView ()
