@@ -469,7 +469,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         foreach (View view in _tabIndexes.Where (v => !overlappedOnly || v.Arrangement.HasFlag (ViewArrangement.Overlapped)))
         {
-            if (view.CanFocus && view._tabStop && view.Visible && view.Enabled)
+            if (view.CanFocus && view.TabStop && view.Visible && view.Enabled)
             {
                 SetFocus (view);
 
@@ -503,7 +503,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         foreach (View view in _tabIndexes.Where (v => !overlappedOnly || v.Arrangement.HasFlag (ViewArrangement.Overlapped)).Reverse ())
         {
-            if (view.CanFocus && view._tabStop && view.Visible && view.Enabled)
+            if (view.CanFocus && view.TabStop && view.Visible && view.Enabled)
             {
                 SetFocus (view);
 
@@ -601,7 +601,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
 
             // The subview does not have focus, but at least one other that can. Can this one be focused?
-            if (focusedFound && w.CanFocus && w._tabStop && w.Visible && w.Enabled)
+            if (focusedFound && w.CanFocus && w.TabStop && w.Visible && w.Enabled)
             {
                 // Make Focused Leave
                 Focused.SetHasFocus (false, w);
@@ -763,8 +763,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
     }
 
-    private bool _tabStop = true;
-
     /// <summary>
     ///     Gets or sets whether the view is a stop-point for keyboard navigation.
     /// </summary>
@@ -778,11 +776,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     modifying the key bindings (see <see cref="KeyBindings.Add(Key, Command[])"/>) of the SuperView.
     /// </para>
     /// </remarks>
-    public bool TabStop
-    {
-        get => _tabStop;
-        set => _tabStop = value;
-    }
+    public bool TabStop { get; set; } = true;
 
     #endregion Tab/Focus Handling
 }
