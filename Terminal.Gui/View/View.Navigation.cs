@@ -169,7 +169,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         <see cref="SuperView"/> must also have <see cref="CanFocus"/> set to <see langword="true"/>.
     ///     </para>
     ///     <para>
-    ///         When set to <see langword="false"/>, if this view is focused, the focus will be set to the next focusable view.
+    ///         When set to <see langword="false"/>, if an attempt is made to make this view focused, the focus will be set to the next focusable view.
     ///     </para>
     ///     <para>
     ///         When set to <see langword="false"/>, the <see cref="TabIndex"/> will be set to -1.
@@ -178,6 +178,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         When set to <see langword="false"/>, the values of <see cref="CanFocus"/> and <see cref="TabIndex"/> for all
     ///         subviews will be cached so that when <see cref="CanFocus"/> is set back to <see langword="true"/>, the subviews
     ///         will be restored to their previous values.
+    ///     </para>
+    ///     <para>
+    ///         Changing this peroperty to <see langword="true"/> will cause <see cref="TabStop"/> to be set to <see cref="TabStop.TabStop"/>
+    ///         as a convenience. Changing this peroperty to <see langword="false"/> will have no effect on <see cref="TabStop"/>.
     ///     </para>
     /// </remarks>
     public bool CanFocus
@@ -200,6 +204,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             switch (_canFocus)
             {
                 case false when _tabIndex > -1:
+                    // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Callers should adjust TabIndex explicitly.
                     TabIndex = -1;
 
                     break;
@@ -212,10 +217,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             if (_canFocus && _tabIndex == -1)
             {
+                // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Callers should adjust TabIndex explicitly.
                 TabIndex = SuperView is { } ? SuperView._tabIndexes.IndexOf (this) : -1;
             }
 
-            TabStop = _canFocus;
+            if (TabStop == TabStop.None && _canFocus)
+            {
+                TabStop = TabStop.TabStop;
+            }
 
             if (!_canFocus && SuperView?.Focused == this)
             {
@@ -469,7 +478,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         foreach (View view in _tabIndexes.Where (v => !overlappedOnly || v.Arrangement.HasFlag (ViewArrangement.Overlapped)))
         {
-            if (view.CanFocus && view.TabStop && view.Visible && view.Enabled)
+            if (view.CanFocus && view.TabStop.HasFlag (TabStop.TabStop) && view.Visible && view.Enabled)
             {
                 SetFocus (view);
 
@@ -503,7 +512,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         foreach (View view in _tabIndexes.Where (v => !overlappedOnly || v.Arrangement.HasFlag (ViewArrangement.Overlapped)).Reverse ())
         {
-            if (view.CanFocus && view.TabStop && view.Visible && view.Enabled)
+            if (view.CanFocus && view.TabStop.HasFlag (TabStop.TabStop) && view.Visible && view.Enabled)
             {
                 SetFocus (view);
 
@@ -601,7 +610,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
 
             // The subview does not have focus, but at least one other that can. Can this one be focused?
-            if (focusedFound && w.CanFocus && w.TabStop && w.Visible && w.Enabled)
+            if (focusedFound && w.CanFocus && w.TabStop.HasFlag (TabStop.TabStop) && w.Visible && w.Enabled)
             {
                 // Make Focused Leave
                 Focused.SetHasFocus (false, w);
@@ -769,14 +778,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <remarks>
     /// <para>
     ///     TabStop is independent of <see cref="CanFocus"/>. If <see cref="CanFocus"/> is <see langword="false"/>, the view will not gain
-    ///     focus even if this property is <see langword="true"/> and vice-versa.
+    ///     focus even if this property is set and vice-versa.
     /// </para>
     /// <para>
     ///     The default keyboard navigation keys are <c>Key.Tab</c> and <c>Key>Tab.WithShift</c>. These can be changed by
     ///     modifying the key bindings (see <see cref="KeyBindings.Add(Key, Command[])"/>) of the SuperView.
     /// </para>
     /// </remarks>
-    public bool TabStop { get; set; } = true;
+    public TabStop TabStop { get; set; } = TabStop.None;
 
     #endregion Tab/Focus Handling
 }

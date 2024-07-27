@@ -187,7 +187,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
         CanFocus = false;
         TabIndex = -1;
-        TabStop = false;
+        TabStop = TabStop.None;
     }
 
     /// <summary>

@@ -253,12 +253,12 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         v2.CanFocus = true;
         Assert.Equal (r.TabIndexes.IndexOf (v2), v2.TabIndex);
         Assert.Equal (0, v2.TabIndex);
-        Assert.True (v2.TabStop);
+        Assert.Equal (TabStop.TabStop, v2.TabStop);
 
         v1.CanFocus = true;
         Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
         Assert.Equal (1, v1.TabIndex);
-        Assert.True (v1.TabStop);
+        Assert.Equal (TabStop.TabStop, v1.TabStop);
 
         v1.TabIndex = 2;
         Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
@@ -268,18 +268,18 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.Equal (1, v1.TabIndex);
         Assert.Equal (r.TabIndexes.IndexOf (v3), v3.TabIndex);
         Assert.Equal (2, v3.TabIndex);
-        Assert.True (v3.TabStop);
+        Assert.Equal (TabStop.TabStop, v3.TabStop);
 
         v2.CanFocus = false;
         Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
         Assert.Equal (1, v1.TabIndex);
-        Assert.True (v1.TabStop);
+        Assert.Equal (TabStop.TabStop, v1.TabStop);
         Assert.NotEqual (r.TabIndexes.IndexOf (v2), v2.TabIndex);
         Assert.Equal (-1, v2.TabIndex);
-        Assert.False (v2.TabStop);
+        Assert.Equal (TabStop.TabStop, v2.TabStop); // TabStop is not changed
         Assert.Equal (r.TabIndexes.IndexOf (v3), v3.TabIndex);
         Assert.Equal (2, v3.TabIndex);
-        Assert.True (v3.TabStop);
+        Assert.Equal (TabStop.TabStop, v3.TabStop);
         r.Dispose ();
     }
 
@@ -1373,9 +1373,9 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
     public void TabStop_All_False_And_All_True_And_Changing_TabStop_Later ()
     {
         var r = new View ();
-        var v1 = new View { CanFocus = true, TabStop = false };
-        var v2 = new View { CanFocus = true, TabStop = false };
-        var v3 = new View { CanFocus = true, TabStop = false };
+        var v1 = new View { CanFocus = true, TabStop = TabStop.None };
+        var v2 = new View { CanFocus = true, TabStop = TabStop.None };
+        var v3 = new View { CanFocus = true, TabStop = TabStop.None };
 
         r.Add (v1, v2, v3);
 
@@ -1384,17 +1384,17 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
 
-        v1.TabStop = true;
+        v1.TabStop = TabStop.TabStop;
         r.AdvanceFocus (NavigationDirection.Forward);
         Assert.True (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        v2.TabStop = true;
+        v2.TabStop = TabStop.TabStop;
         r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.True (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        v3.TabStop = true;
+        v3.TabStop = TabStop.TabStop;
         r.AdvanceFocus (NavigationDirection.Forward);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
@@ -1464,9 +1464,9 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
     public void TabStop_And_CanFocus_Mixed_And_BothFalse ()
     {
         var r = new View ();
-        var v1 = new View { CanFocus = true, TabStop = false };
-        var v2 = new View { CanFocus = false, TabStop = true };
-        var v3 = new View { CanFocus = false, TabStop = false };
+        var v1 = new View { CanFocus = true, TabStop = TabStop.None };
+        var v2 = new View { CanFocus = false, TabStop = TabStop.TabStop };
+        var v3 = new View { CanFocus = false, TabStop = TabStop.None };
 
         r.Add (v1, v2, v3);
 
@@ -1489,9 +1489,9 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
     public void TabStop_Are_All_False_And_CanFocus_Are_All_True ()
     {
         var r = new View ();
-        var v1 = new View { CanFocus = true, TabStop = false };
-        var v2 = new View { CanFocus = true, TabStop = false };
-        var v3 = new View { CanFocus = true, TabStop = false };
+        var v1 = new View { CanFocus = true, TabStop = TabStop.None };
+        var v2 = new View { CanFocus = true, TabStop = TabStop.None };
+        var v3 = new View { CanFocus = true, TabStop = TabStop.None };
 
         r.Add (v1, v2, v3);
 
@@ -1537,7 +1537,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [CombinatorialData]
-    public void TabStop_And_CanFocus_Are_Decoupled (bool canFocus, bool tabStop)
+    public void TabStop_And_CanFocus_Are_Decoupled (bool canFocus, TabStop tabStop)
     {
         var view = new View { CanFocus = canFocus, TabStop = tabStop };
 

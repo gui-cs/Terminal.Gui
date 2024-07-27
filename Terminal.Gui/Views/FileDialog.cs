@@ -513,7 +513,7 @@ public class FileDialog : Dialog
                 // TODO: Does not work, if this worked then we could tab to it instead
                 // of having to hit F9
                 CanFocus = true,
-                TabStop = true,
+                TabStop = TabStop.TabStop,
                 Menus = [_allowedTypeMenu]
             };
             AllowedTypeMenuClicked (0);
