@@ -668,12 +668,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
     public IList<View> TabIndexes => _tabIndexes?.AsReadOnly () ?? _empty;
 
     // TODO: Change this to int? and use null to indicate the view is not in the tab order.
+    // BUGBUG: It is confused to have both TabStop and TabIndex = -1.
     private int _tabIndex = -1;
     private int _oldTabIndex;
 
     /// <summary>
-    ///     Indicates the index of the current <see cref="View"/> from the <see cref="TabIndexes"/> list. See also:
-    ///     <seealso cref="TabStop"/>.
+    ///     Indicates the order of the current <see cref="View"/> in <see cref="TabIndexes"/> list.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -689,20 +689,28 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     <para>
     ///         On set, if <see cref="SuperView"/> has only one TabStop, <see cref="TabIndex"/> will be set to 0.
     ///     </para>
+    ///     <para>
+    ///          See also <seealso cref="TabStop"/>.
+    ///     </para>
     /// </remarks>
     public int TabIndex
     {
         get => _tabIndex;
+
+        // TOOD: This should be a get-only property. Introduce SetTabIndex (int value) (or similar).
         set
         {
+            // BUGBUG: Property setters should set the property to the value passed in and not have side effects.
             if (!CanFocus)
             {
                 // BUGBUG: Property setters should set the property to the value passed in and not have side effects.
+                // BUGBUG: TabIndex = -1 should not be used to indicate that the view is not in the tab order. That's what TabStop is for.
                 _tabIndex = -1;
 
                 return;
             }
 
+            // BUGBUG: Property setters should set the property to the value passed in and not have side effects.
             if (SuperView?._tabIndexes is null || SuperView?._tabIndexes.Count == 1)
             {
                 // BUGBUG: Property setters should set the property to the value passed in and not have side effects.
