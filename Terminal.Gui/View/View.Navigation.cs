@@ -766,27 +766,22 @@ public partial class View // Focus and cross-view navigation management (TabStop
     private bool _tabStop = true;
 
     /// <summary>
-    ///     Gets or sets whether the view is a stop-point for keyboard navigation between Views. Will be <see langword="true"/>
-    ///     only if <see cref="CanFocus"/> is <see langword="true"/>. Set to <see langword="false"/> to prevent the
-    ///     view from being a stop-point for keyboard navigation.
+    ///     Gets or sets whether the view is a stop-point for keyboard navigation.
     /// </summary>
     /// <remarks>
+    /// <para>
+    ///     TabStop is independent of <see cref="CanFocus"/>. If <see cref="CanFocus"/> is <see langword="false"/>, the view will not gain
+    ///     focus even if this property is <see langword="true"/> and vice-versa.
+    /// </para>
+    /// <para>
     ///     The default keyboard navigation keys are <c>Key.Tab</c> and <c>Key>Tab.WithShift</c>. These can be changed by
     ///     modifying the key bindings (see <see cref="KeyBindings.Add(Key, Command[])"/>) of the SuperView.
+    /// </para>
     /// </remarks>
     public bool TabStop
     {
         get => _tabStop;
-        set
-        {
-            if (_tabStop == value)
-            {
-                return;
-            }
-
-            // BUGBUG: TabStop and CanFocus should be decoupled.
-            _tabStop = CanFocus && value;
-        }
+        set => _tabStop = value;
     }
 
     #endregion Tab/Focus Handling

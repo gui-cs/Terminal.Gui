@@ -1535,6 +1535,16 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         r.Dispose ();
     }
 
+    [Theory]
+    [CombinatorialData]
+    public void TabStop_And_CanFocus_Are_Decoupled (bool canFocus, bool tabStop)
+    {
+        var view = new View { CanFocus = canFocus, TabStop = tabStop };
+
+        Assert.Equal(canFocus, view.CanFocus);
+        Assert.Equal (tabStop, view.TabStop);
+    }
+
     [Fact (Skip="Causes crash on Ubuntu in Github Action. Bogus test anyway.")]
     public void WindowDispose_CanFocusProblem ()
     {
