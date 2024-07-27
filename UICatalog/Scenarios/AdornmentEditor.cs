@@ -90,6 +90,9 @@ public class AdornmentEditor : View
 
         BorderStyle = LineStyle.Dashed;
         Initialized += AdornmentEditor_Initialized;
+
+        //Arrangement = ViewArrangement.Group;
+
     }
 
     private void AdornmentEditor_Initialized (object sender, EventArgs e)

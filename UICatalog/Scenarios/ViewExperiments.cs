@@ -18,6 +18,7 @@ public class ViewExperiments : Scenario
             Title = GetQuitKeyAndName ()
         };
 
+
         var view = new View
         {
             X = 2,
@@ -81,6 +82,22 @@ public class ViewExperiments : Scenario
 
         view2.Add (button);
 
+        var editor = new AdornmentsEditor
+        {
+            X = 0,
+            Y = 0,
+            AutoSelectViewToEdit = true
+        };
+        app.Add (editor);
+
+        button = new ()
+        {
+            Y = 0,
+            X = Pos.X (view),
+            Title = "Button_0",
+        };
+        app.Add (button);
+
         button = new ()
         {
             X = Pos.AnchorEnd (),
@@ -88,14 +105,6 @@ public class ViewExperiments : Scenario
             Title = "Button_5",
         };
 
-        var editor = new AdornmentsEditor
-        {
-            X = 0,
-            Y = 0,
-            AutoSelectViewToEdit = true
-        };
-
-        app.Add (editor);
         view.X = 34;
         view.Y = 4;
         app.Add (view);

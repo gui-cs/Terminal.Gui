@@ -523,11 +523,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     </para>
     /// </remarks>
     /// <param name="direction"></param>
+    /// <param name="acrossGroupOrOverlapped">If <see langword="true"/> will advance into ...</param>
     /// <returns>
     ///     <see langword="true"/> if focus was changed to another subview (or stayed on this one), <see langword="false"/>
     ///     otherwise.
     /// </returns>
-    public bool AdvanceFocus (NavigationDirection direction)
+    public bool AdvanceFocus (NavigationDirection direction, bool acrossGroupOrOverlapped = false)
     {
         if (!CanBeVisible (this))
         {
@@ -569,14 +570,30 @@ public partial class View // Focus and cross-view navigation management (TabStop
             if (w.HasFocus)
             {
                 // A subview has focus, tell *it* to FocusNext
-                if (w.AdvanceFocus (direction))
+                if (w.AdvanceFocus (direction, acrossGroupOrOverlapped))
                 {
                     // The subview changed which of it's subviews had focus
                     return true;
                 }
+                else
+                {
+                    if (acrossGroupOrOverlapped && Arrangement.HasFlag (ViewArrangement.Overlapped))
+                    {
+                        return false;
+                    }
+                }
 
                 Debug.Assert (w.HasFocus);
 
+                if (w.Focused is null)
+                {
+                    // No next focusable view was found. 
+                    if (w.Arrangement.HasFlag (ViewArrangement.Overlapped))
+                    {
+                        // Keep focus w/in w
+                        return false;
+                    }
+                }
                 // The subview has no subviews that can be next. Cache that we found a focused subview.
                 focusedFound = true;
 
@@ -589,17 +606,17 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 // Make Focused Leave
                 Focused.SetHasFocus (false, w);
 
-                //// If the focused view is overlapped don't focus on the next if it's not overlapped.
-                //if (Focused.Arrangement.HasFlag (ViewArrangement.Overlapped)/* && !w.Arrangement.HasFlag (ViewArrangement.Overlapped)*/)
+                // If the focused view is overlapped don't focus on the next if it's not overlapped.
+                //if (acrossGroupOrOverlapped && Focused.Arrangement.HasFlag (ViewArrangement.Overlapped)/* && !w.Arrangement.HasFlag (ViewArrangement.Overlapped)*/)
                 //{
                 //    return false;
                 //}
 
-                //// If the focused view is not overlapped and the next is, skip it
-                //if (!Focused.Arrangement.HasFlag (ViewArrangement.Overlapped) && w.Arrangement.HasFlag (ViewArrangement.Overlapped))
-                //{
-                //    continue;
-                //}
+                // If the focused view is not overlapped and the next is, skip it
+                if (!acrossGroupOrOverlapped && !Focused.Arrangement.HasFlag (ViewArrangement.Overlapped) && w.Arrangement.HasFlag (ViewArrangement.Overlapped))
+                {
+                    continue;
+                }
 
                 switch (direction)
                 {
@@ -766,7 +783,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
             {
                 return;
             }
-
+            
+            // BUGBUG: TabStop and CanFocus should be decoupled.
             _tabStop = CanFocus && value;
         }
     }

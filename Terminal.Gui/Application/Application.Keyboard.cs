@@ -301,7 +301,6 @@ public static partial class Application // Keyboard handling
                     Command.NextView,
                     () =>
                     {
-                        // TODO: Move this method to Application.Navigation.cs
                         ApplicationNavigation.MoveNextView ();
 
                         return true;
@@ -312,7 +311,6 @@ public static partial class Application // Keyboard handling
                     Command.PreviousView,
                     () =>
                     {
-                        // TODO: Move this method to Application.Navigation.cs
                         ApplicationNavigation.MovePreviousView ();
 
                         return true;
@@ -323,7 +321,6 @@ public static partial class Application // Keyboard handling
                     Command.NextViewOrTop,
                     () =>
                     {
-                        // TODO: Move this method to Application.Navigation.cs
                         ApplicationNavigation.MoveNextViewOrTop ();
 
                         return true;
@@ -334,7 +331,6 @@ public static partial class Application // Keyboard handling
                     Command.PreviousViewOrTop,
                     () =>
                     {
-                        // TODO: Move this method to Application.Navigation.cs
                         ApplicationNavigation.MovePreviousViewOrTop ();
 
                         return true;

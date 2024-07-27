@@ -67,9 +67,9 @@ internal static class ApplicationNavigation
         {
             Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
 
-            if (!Application.Current.AdvanceFocus (NavigationDirection.Forward))
+            if (!Application.Current.AdvanceFocus (NavigationDirection.Forward, true))
             {
-                Application.Current.AdvanceFocus (NavigationDirection.Forward);
+                Application.Current.AdvanceFocus (NavigationDirection.Forward, true);
             }
 
             if (top != Application.Current.Focused && top != Application.Current.Focused?.Focused)
@@ -129,11 +129,11 @@ internal static class ApplicationNavigation
         if (ApplicationOverlapped.OverlappedTop is null)
         {
             Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
-            top!.AdvanceFocus (NavigationDirection.Backward);
+            top!.AdvanceFocus (NavigationDirection.Backward, true);
 
             if (top.Focused is null)
             {
-                top.AdvanceFocus (NavigationDirection.Backward);
+                top.AdvanceFocus (NavigationDirection.Backward, true);
             }
 
             top.SetNeedsDisplay ();
