@@ -184,10 +184,6 @@ public partial class View : Responder, ISupportInitializeNotification
 
         //SetupMouse ();
         SetupText ();
-
-        CanFocus = false;
-        //TabIndex = -1;
-        TabStop = TabStop.None;
     }
 
     /// <summary>

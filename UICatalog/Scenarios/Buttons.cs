@@ -22,7 +22,7 @@ public class Buttons : Scenario
         };
 
         // Add a label & text field so we can demo IsDefault
-        var editLabel = new Label { X = 0, Y = 0, TabStop = TabStop.TabStop, Text = "TextField (to demo IsDefault):" };
+        var editLabel = new Label { X = 0, Y = 0, Text = "TextField (to demo IsDefault):" };
         main.Add (editLabel);
 
         // Add a TextField using Absolute layout. 

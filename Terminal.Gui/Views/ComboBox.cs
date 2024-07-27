@@ -29,7 +29,7 @@ public class ComboBox : View, IDesignable
     public ComboBox ()
     {
         _search = new TextField ();
-        _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = TabStop.None };
+        _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true };
 
         _search.TextChanged += Search_Changed;
         _search.Accept += Search_Accept;
@@ -329,9 +329,9 @@ public class ComboBox : View, IDesignable
             IsShow = false;
             HideList ();
         }
-        else if (_listview.TabStop.HasFlag (TabStop))
+        else if (_listview.TabStop?.HasFlag (TabBehavior.TabStop) ?? false)
         {
-            _listview.TabStop = TabStop.None;
+            _listview.TabStop = TabBehavior.NoStop;
         }
 
         return base.OnLeave (view);
@@ -455,7 +455,7 @@ public class ComboBox : View, IDesignable
     private void FocusSelectedItem ()
     {
         _listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
-        _listview.TabStop = TabStop.TabStop;
+        _listview.TabStop = TabBehavior.TabStop;
         _listview.SetFocus ();
         OnExpanded ();
     }
@@ -491,7 +491,7 @@ public class ComboBox : View, IDesignable
 
         Reset (true);
         _listview.Clear ();
-        _listview.TabStop = TabStop.None;
+        _listview.TabStop = TabBehavior.NoStop;
         SuperView?.SendSubviewToBack (this);
         Rectangle rect = _listview.ViewportToScreen (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
         SuperView?.SetNeedsDisplay (rect);
@@ -505,7 +505,7 @@ public class ComboBox : View, IDesignable
             // jump to list
             if (_searchSet?.Count > 0)
             {
-                _listview.TabStop = TabStop.TabStop;
+                _listview.TabStop = TabBehavior.TabStop;
                 _listview.SetFocus ();
 
                 if (_listview.SelectedItem > -1)
@@ -519,7 +519,7 @@ public class ComboBox : View, IDesignable
             }
             else
             {
-                _listview.TabStop = TabStop.None;
+                _listview.TabStop = TabBehavior.NoStop;
                 SuperView?.AdvanceFocus (NavigationDirection.Forward);
             }
 
@@ -721,7 +721,7 @@ public class ComboBox : View, IDesignable
     private void Selected ()
     {
         IsShow = false;
-        _listview.TabStop = TabStop.None;
+        _listview.TabStop = TabBehavior.NoStop;
 
         if (_listview.Source.Count == 0 || (_searchSet?.Count ?? 0) == 0)
         {

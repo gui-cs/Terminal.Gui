@@ -871,7 +871,7 @@ public class TileView : View
         public TileViewLineView (TileView parent, int idx)
         {
             CanFocus = false;
-            TabStop = TabStop.TabStop;
+            TabStop = TabBehavior.TabStop;
 
             Parent = parent;
             Idx = idx;

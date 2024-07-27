@@ -464,8 +464,8 @@ public class FileDialog : Dialog
             _btnOk.X = Pos.Right (_btnCancel) + 1;
 
             // Flip tab order too for consistency
-            int p1 = _btnOk.TabIndex;
-            int p2 = _btnCancel.TabIndex;
+            int? p1 = _btnOk.TabIndex;
+            int? p2 = _btnCancel.TabIndex;
 
             _btnOk.TabIndex = p2;
             _btnCancel.TabIndex = p1;
@@ -513,7 +513,7 @@ public class FileDialog : Dialog
                 // TODO: Does not work, if this worked then we could tab to it instead
                 // of having to hit F9
                 CanFocus = true,
-                TabStop = TabStop.TabStop,
+                TabStop = TabBehavior.TabStop,
                 Menus = [_allowedTypeMenu]
             };
             AllowedTypeMenuClicked (0);
