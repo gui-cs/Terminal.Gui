@@ -205,7 +205,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             {
                 case false when _tabIndex > -1:
                     // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Callers should adjust TabIndex explicitly.
-                    TabIndex = -1;
+                    //TabIndex = -1;
 
                     break;
 
@@ -215,11 +215,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
                     break;
             }
 
-            if (_canFocus && _tabIndex == -1)
-            {
-                // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Callers should adjust TabIndex explicitly.
-                TabIndex = SuperView is { } ? SuperView._tabIndexes.IndexOf (this) : -1;
-            }
+            //if (_canFocus && _tabIndex == -1)
+            //{
+            //    // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Callers should adjust TabIndex explicitly.
+            //    TabIndex = SuperView is { } ? SuperView._tabIndexes.IndexOf (this) : -1;
+            //}
 
             if (TabStop == TabStop.None && _canFocus)
             {
@@ -262,7 +262,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                             view._oldCanFocus = view.CanFocus;
                             view._oldTabIndex = view._tabIndex;
                             view.CanFocus = false;
-                            view._tabIndex = -1;
+                            //view._tabIndex = -1;
                         }
                         else
                         {
@@ -667,9 +667,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <value>The tabIndexes.</value>
     public IList<View> TabIndexes => _tabIndexes?.AsReadOnly () ?? _empty;
 
-    // TODO: Change this to int? and use null to indicate the view is not in the tab order.
-    // BUGBUG: It is confused to have both TabStop and TabIndex = -1.
-    private int _tabIndex = -1;
+    // TODO: Change this to int? and use null to indicate the view has not yet been added to the tab order.
+    private int _tabIndex = -1; // -1 indicates the view has not yet been added to TabIndexes
     private int _oldTabIndex;
 
     /// <summary>
@@ -700,15 +699,18 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // TOOD: This should be a get-only property. Introduce SetTabIndex (int value) (or similar).
         set
         {
-            // BUGBUG: Property setters should set the property to the value passed in and not have side effects.
-            if (!CanFocus)
-            {
-                // BUGBUG: Property setters should set the property to the value passed in and not have side effects.
-                // BUGBUG: TabIndex = -1 should not be used to indicate that the view is not in the tab order. That's what TabStop is for.
-                _tabIndex = -1;
+            //// BUGBUG: Property setters should set the property to the value passed in and not have side effects.
+            //if (!CanFocus)
+            //{
+            //    // BUGBUG: Property setters should set the property to the value passed in and not have side effects.
+            //    // BUGBUG: TabIndex = -1 should not be used to indicate that the view is not in the tab order. That's what TabStop is for.
+            //    _tabIndex = -1;
 
-                return;
-            }
+            //    return;
+            //}
+
+            // Once a view is in the tab order, it should not be removed from the tab order; set TabStop to None instead.
+            Debug.Assert (value >= 0);
 
             // BUGBUG: Property setters should set the property to the value passed in and not have side effects.
             if (SuperView?._tabIndexes is null || SuperView?._tabIndexes.Count == 1)
@@ -746,6 +748,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <returns>The minimum of <paramref name="idx"/> and the <see cref="SuperView"/>'s <see cref="TabIndexes"/>.</returns>
     private int GetGreatestTabIndexInSuperView (int idx)
     {
+        if (SuperView is null)
+        {
+            return 0;
+        }
+
         var i = 0;
 
         foreach (View superViewTabStop in SuperView._tabIndexes)
@@ -766,6 +773,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </summary>
     private void ReorderSuperViewTabIndexes ()
     {
+        if (SuperView is null)
+        {
+            return;
+        }
+
         var i = 0;
 
         foreach (View superViewTabStop in SuperView._tabIndexes)
@@ -780,6 +792,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
     }
 
+    private TabStop _tabStop = TabStop.None;
+
     /// <summary>
     ///     Gets or sets whether the view is a stop-point for keyboard navigation.
     /// </summary>
@@ -793,7 +807,25 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     modifying the key bindings (see <see cref="KeyBindings.Add(Key, Command[])"/>) of the SuperView.
     /// </para>
     /// </remarks>
-    public TabStop TabStop { get; set; } = TabStop.None;
+    public TabStop TabStop
+    {
+        get => _tabStop;
+        set
+        {
+            if (_tabStop == value)
+            {
+                return;
+            }
+            _tabStop = value;
+
+            // If TabIndex is -1 it means this view has not yet been added to TabIndexes (TabStop has not been set previously).
+            if (TabIndex == -1)
+            {
+                TabIndex = SuperView is { } ? SuperView._tabIndexes.Count : 0;
+            }
+            ReorderSuperViewTabIndexes();
+        }
+    }
 
     #endregion Tab/Focus Handling
 }

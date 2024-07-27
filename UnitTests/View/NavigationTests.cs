@@ -274,8 +274,8 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
         Assert.Equal (1, v1.TabIndex);
         Assert.Equal (TabStop.TabStop, v1.TabStop);
-        Assert.NotEqual (r.TabIndexes.IndexOf (v2), v2.TabIndex);
-        Assert.Equal (-1, v2.TabIndex);
+        Assert.Equal (r.TabIndexes.IndexOf (v2), v2.TabIndex); // TabIndex is not changed
+        Assert.NotEqual (-1, v2.TabIndex);
         Assert.Equal (TabStop.TabStop, v2.TabStop); // TabStop is not changed
         Assert.Equal (r.TabIndexes.IndexOf (v3), v3.TabIndex);
         Assert.Equal (2, v3.TabIndex);
@@ -621,133 +621,133 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         top1.Dispose ();
     }
 
-//    [Fact]
-//    [AutoInitShutdown]
-//    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
-//    {
-//        var sbQuiting = false;
-//        var tfQuiting = false;
-//        var topQuiting = false;
+    //    [Fact]
+    //    [AutoInitShutdown]
+    //    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
+    //    {
+    //        var sbQuiting = false;
+    //        var tfQuiting = false;
+    //        var topQuiting = false;
 
-//        var sb = new StatusBar (
-//                                new Shortcut []
-//                                {
-//                                    new (
-//                                         KeyCode.CtrlMask | KeyCode.Q,
-//                                         "Quit",
-//                                         () => sbQuiting = true
-//                                        )
-//                                }
-//                               );
-//        var tf = new TextField ();
-//        tf.KeyDown += Tf_KeyPressed;
+    //        var sb = new StatusBar (
+    //                                new Shortcut []
+    //                                {
+    //                                    new (
+    //                                         KeyCode.CtrlMask | KeyCode.Q,
+    //                                         "Quit",
+    //                                         () => sbQuiting = true
+    //                                        )
+    //                                }
+    //                               );
+    //        var tf = new TextField ();
+    //        tf.KeyDown += Tf_KeyPressed;
 
-//        void Tf_KeyPressed (object sender, Key obj)
-//        {
-//            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
-//            {
-//                obj.Handled = tfQuiting = true;
-//            }
-//        }
+    //        void Tf_KeyPressed (object sender, Key obj)
+    //        {
+    //            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
+    //            {
+    //                obj.Handled = tfQuiting = true;
+    //            }
+    //        }
 
-//        var win = new Window ();
-//        win.Add (sb, tf);
-//        Toplevel top = new ();
-//        top.KeyDown += Top_KeyPress;
+    //        var win = new Window ();
+    //        win.Add (sb, tf);
+    //        Toplevel top = new ();
+    //        top.KeyDown += Top_KeyPress;
 
-//        void Top_KeyPress (object sender, Key obj)
-//        {
-//            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
-//            {
-//                obj.Handled = topQuiting = true;
-//            }
-//        }
+    //        void Top_KeyPress (object sender, Key obj)
+    //        {
+    //            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
+    //            {
+    //                obj.Handled = topQuiting = true;
+    //            }
+    //        }
 
-//        top.Add (win);
-//        Application.Begin (top);
+    //        top.Add (win);
+    //        Application.Begin (top);
 
-//        Assert.False (sbQuiting);
-//        Assert.False (tfQuiting);
-//        Assert.False (topQuiting);
+    //        Assert.False (sbQuiting);
+    //        Assert.False (tfQuiting);
+    //        Assert.False (topQuiting);
 
-//        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
-//        Assert.False (sbQuiting);
-//        Assert.True (tfQuiting);
-//        Assert.False (topQuiting);
+    //        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+    //        Assert.False (sbQuiting);
+    //        Assert.True (tfQuiting);
+    //        Assert.False (topQuiting);
 
-//#if BROKE_WITH_2927
-//        tf.KeyPressed -= Tf_KeyPress;
-//        tfQuiting = false;
-//        Application.Driver?.SendKeys ('q', ConsoleKey.Q, false, false, true);
-//        Application.MainLoop.RunIteration ();
-//        Assert.True (sbQuiting);
-//        Assert.False (tfQuiting);
-//        Assert.False (topQuiting);
+    //#if BROKE_WITH_2927
+    //        tf.KeyPressed -= Tf_KeyPress;
+    //        tfQuiting = false;
+    //        Application.Driver?.SendKeys ('q', ConsoleKey.Q, false, false, true);
+    //        Application.MainLoop.RunIteration ();
+    //        Assert.True (sbQuiting);
+    //        Assert.False (tfQuiting);
+    //        Assert.False (topQuiting);
 
-//        sb.RemoveItem (0);
-//        sbQuiting = false;
-//        Application.Driver?.SendKeys ('q', ConsoleKey.Q, false, false, true);
-//        Application.MainLoop.RunIteration ();
-//        Assert.False (sbQuiting);
-//        Assert.False (tfQuiting);
+    //        sb.RemoveItem (0);
+    //        sbQuiting = false;
+    //        Application.Driver?.SendKeys ('q', ConsoleKey.Q, false, false, true);
+    //        Application.MainLoop.RunIteration ();
+    //        Assert.False (sbQuiting);
+    //        Assert.False (tfQuiting);
 
-//// This test is now invalid because `win` is focused, so it will receive the keypress
-//        Assert.True (topQuiting);
-//#endif
-//        top.Dispose ();
-//    }
+    //// This test is now invalid because `win` is focused, so it will receive the keypress
+    //        Assert.True (topQuiting);
+    //#endif
+    //        top.Dispose ();
+    //    }
 
-//    [Fact]
-//    [AutoInitShutdown]
-//    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
-//    {
-//        var sbQuiting = false;
-//        var tfQuiting = false;
+    //    [Fact]
+    //    [AutoInitShutdown]
+    //    public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
+    //    {
+    //        var sbQuiting = false;
+    //        var tfQuiting = false;
 
-//        var sb = new StatusBar (
-//                                new Shortcut []
-//                                {
-//                                    new (
-//                                         KeyCode.CtrlMask | KeyCode.Q,
-//                                         "~^Q~ Quit",
-//                                         () => sbQuiting = true
-//                                        )
-//                                }
-//                               );
-//        var tf = new TextField ();
-//        tf.KeyDown += Tf_KeyPressed;
+    //        var sb = new StatusBar (
+    //                                new Shortcut []
+    //                                {
+    //                                    new (
+    //                                         KeyCode.CtrlMask | KeyCode.Q,
+    //                                         "~^Q~ Quit",
+    //                                         () => sbQuiting = true
+    //                                        )
+    //                                }
+    //                               );
+    //        var tf = new TextField ();
+    //        tf.KeyDown += Tf_KeyPressed;
 
-//        void Tf_KeyPressed (object sender, Key obj)
-//        {
-//            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
-//            {
-//                obj.Handled = tfQuiting = true;
-//            }
-//        }
+    //        void Tf_KeyPressed (object sender, Key obj)
+    //        {
+    //            if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask))
+    //            {
+    //                obj.Handled = tfQuiting = true;
+    //            }
+    //        }
 
-//        var win = new Window ();
-//        win.Add (sb, tf);
-//        Toplevel top = new ();
-//        top.Add (win);
-//        Application.Begin (top);
+    //        var win = new Window ();
+    //        win.Add (sb, tf);
+    //        Toplevel top = new ();
+    //        top.Add (win);
+    //        Application.Begin (top);
 
-//        Assert.False (sbQuiting);
-//        Assert.False (tfQuiting);
+    //        Assert.False (sbQuiting);
+    //        Assert.False (tfQuiting);
 
-//        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
-//        Assert.False (sbQuiting);
-//        Assert.True (tfQuiting);
+    //        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+    //        Assert.False (sbQuiting);
+    //        Assert.True (tfQuiting);
 
-//        tf.KeyDown -= Tf_KeyPressed;
-//        tfQuiting = false;
-//        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
-//        Application.MainLoop.RunIteration ();
-//#if BROKE_WITH_2927
-//        Assert.True (sbQuiting);
-//        Assert.False (tfQuiting);
-//#endif
-//        top.Dispose ();
-//    }
+    //        tf.KeyDown -= Tf_KeyPressed;
+    //        tfQuiting = false;
+    //        Application.Driver?.SendKeys ('Q', ConsoleKey.Q, false, false, true);
+    //        Application.MainLoop.RunIteration ();
+    //#if BROKE_WITH_2927
+    //        Assert.True (sbQuiting);
+    //        Assert.False (tfQuiting);
+    //#endif
+    //        top.Dispose ();
+    //    }
 
     [Fact]
     [SetupFakeDriver]
@@ -1011,7 +1011,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         // top
         Assert.Equal (new Point (-3, -2), top.ScreenToFrame (new (0, 0)));
-        var  screen = top.Margin.ViewportToScreen (new Point (-3, -2));
+        var screen = top.Margin.ViewportToScreen (new Point (-3, -2));
         Assert.Equal (0, screen.X);
         Assert.Equal (0, screen.Y);
         screen = top.Border.ViewportToScreen (new Point (-3, -2));
@@ -1223,7 +1223,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         v1.TabIndex = 0;
         Assert.True (r.Subviews.IndexOf (v1) == 0);
         Assert.True (r.TabIndexes.IndexOf (v1) == 0);
-        Assert.Equal (-1, v1.TabIndex);
+        Assert.NotEqual (-1, v1.TabIndex);
         r.Dispose ();
     }
 
@@ -1270,7 +1270,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        v1.TabIndex = -1;
+        //v1.TabIndex = -1;
         Assert.True (r.Subviews.IndexOf (v1) == 0);
         Assert.True (r.TabIndexes.IndexOf (v1) == 0);
         r.Dispose ();
@@ -1541,11 +1541,11 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
     {
         var view = new View { CanFocus = canFocus, TabStop = tabStop };
 
-        Assert.Equal(canFocus, view.CanFocus);
+        Assert.Equal (canFocus, view.CanFocus);
         Assert.Equal (tabStop, view.TabStop);
     }
 
-    [Fact (Skip="Causes crash on Ubuntu in Github Action. Bogus test anyway.")]
+    [Fact (Skip = "Causes crash on Ubuntu in Github Action. Bogus test anyway.")]
     public void WindowDispose_CanFocusProblem ()
     {
         // Arrange
@@ -1569,7 +1569,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
     // View.Focused & View.MostFocused tests
 
     // View.Focused - No subviews
-    [Fact, Trait("BUGBUG", "Fix in Issue #3444")]
+    [Fact, Trait ("BUGBUG", "Fix in Issue #3444")]
     public void Focused_NoSubviews ()
     {
         var view = new View ();

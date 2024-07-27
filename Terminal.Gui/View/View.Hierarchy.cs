@@ -183,7 +183,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         _subviews.Remove (view);
         _tabIndexes.Remove (view);
         view._superView = null;
-        view._tabIndex = -1;
+        //view._tabIndex = -1;
         SetNeedsLayout ();
         SetNeedsDisplay ();
 
