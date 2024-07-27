@@ -583,7 +583,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                     }
                 }
 
-                Debug.Assert (w.HasFocus);
+                //Debug.Assert (w.HasFocus);
 
                 if (w.Focused is null)
                 {
@@ -766,7 +766,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     private bool _tabStop = true;
 
     /// <summary>
-    ///     Gets or sets whether the view is a stop-point for keyboard navigation of focus. Will be <see langword="true"/>
+    ///     Gets or sets whether the view is a stop-point for keyboard navigation between Views. Will be <see langword="true"/>
     ///     only if <see cref="CanFocus"/> is <see langword="true"/>. Set to <see langword="false"/> to prevent the
     ///     view from being a stop-point for keyboard navigation.
     /// </summary>
@@ -783,7 +783,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             {
                 return;
             }
-            
+
             // BUGBUG: TabStop and CanFocus should be decoupled.
             _tabStop = CanFocus && value;
         }

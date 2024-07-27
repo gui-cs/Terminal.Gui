@@ -101,6 +101,8 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
 
         // Assert
         Assert.True (view2.HasFocus);
+
+        top.Dispose ();
     }
 
     [Fact]
@@ -120,6 +122,8 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
 
         // Assert
         Assert.True (view2.HasFocus);
+
+        top.Dispose ();
     }
 
     [Fact]
@@ -139,6 +143,8 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
 
         // Assert
         Assert.True (view1.HasFocus);
+
+        top.Dispose ();
     }
 
     [Fact]
@@ -158,5 +164,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
 
         // Assert
         Assert.True (view1.HasFocus);
+
+        top.Dispose ();
     }
 }
