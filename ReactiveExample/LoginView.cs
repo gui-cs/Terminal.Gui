@@ -64,8 +64,8 @@ public class LoginView : Window, IViewFor<LoginViewModel>
             })
             .AddControlAfter<TextField> ((previous, pwInput) =>
             {
-                pwInput.X = Pos.Right (previous) + 1; 
-                pwInput.Y = Pos.Top (previous); 
+                pwInput.X = Pos.Right (previous) + 1;
+                pwInput.Y = Pos.Top (previous);
                 pwInput.Width = 40;
                 pwInput.Text = ViewModel.Password;
 
