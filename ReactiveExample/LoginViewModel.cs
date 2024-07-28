@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 
 namespace ReactiveExample;
 
@@ -21,41 +21,53 @@ namespace ReactiveExample;
 // See also: https://www.reactiveui.net../docs/handbook/data-persistence/
 //
 [DataContract]
-public class LoginViewModel : ReactiveObject
+public partial class LoginViewModel : ReactiveObject
 {
-    private readonly ObservableAsPropertyHelper<bool> _isValid;
-    private readonly ObservableAsPropertyHelper<int> _passwordLength;
-    private readonly ObservableAsPropertyHelper<int> _usernameLength;
+    [IgnoreDataMember]
+    [ObservableAsProperty] private bool _isValid;
+
+    [IgnoreDataMember]
+    [ObservableAsProperty] private int _passwordLength;
+
+    [IgnoreDataMember]
+    [ObservableAsProperty] private int _usernameLength;
+
+    [DataMember]
+    [Reactive] private string _password = string.Empty;
+
+    [DataMember]
+    [Reactive] private string _username = string.Empty;
 
     public LoginViewModel ()
     {
-        IObservable<bool> canLogin = this.WhenAnyValue (
-                                                        x => x.Username,
-                                                        x => x.Password,
-                                                        (username, password) =>
-                                                            !string.IsNullOrEmpty (username) && !string.IsNullOrEmpty (password)
-                                                       );
+        InitializeCommands ();
+        IObservable<bool> canLogin = this.WhenAnyValue 
+            (
+                x => x.Username,
+                x => x.Password,
+                (username, password) =>
+                    !string.IsNullOrEmpty (username) && !string.IsNullOrEmpty (password)
+            );
 
-        _isValid = canLogin.ToProperty (this, x => x.IsValid);
+        _isValidHelper = canLogin.ToProperty (this, x => x.IsValid);
 
-        Login = ReactiveCommand.CreateFromTask<CancelEventArgs> (
-                                                                 e => Task.Delay (TimeSpan.FromSeconds (1)),
-                                                                 canLogin
-                                                                );
+        Login = ReactiveCommand.CreateFromTask<HandledEventArgs>
+            (
+                e => Task.Delay (TimeSpan.FromSeconds (1)),
+                canLogin
+            );
 
-        _usernameLength = this
+        _usernameLengthHelper = this
                           .WhenAnyValue (x => x.Username)
                           .Select (name => name.Length)
                           .ToProperty (this, x => x.UsernameLength);
 
-        _passwordLength = this
+        _passwordLengthHelper = this
                           .WhenAnyValue (x => x.Password)
                           .Select (password => password.Length)
                           .ToProperty (this, x => x.PasswordLength);
 
-        Clear = ReactiveCommand.Create<CancelEventArgs> (e => { });
-
-        Clear.Subscribe (
+        ClearCommand.Subscribe (
                          unit =>
                          {
                              Username = string.Empty;
@@ -64,26 +76,9 @@ public class LoginViewModel : ReactiveObject
                         );
     }
 
-    [IgnoreDataMember]
-    public ReactiveCommand<CancelEventArgs, Unit> Clear { get; }
+    [ReactiveCommand]
+    public void Clear (HandledEventArgs args) { }
 
     [IgnoreDataMember]
-    public bool IsValid => _isValid.Value;
-
-    [IgnoreDataMember]
-    public ReactiveCommand<CancelEventArgs, Unit> Login { get; }
-
-    [Reactive]
-    [DataMember]
-    public string Password { get; set; } = string.Empty;
-
-    [IgnoreDataMember]
-    public int PasswordLength => _passwordLength.Value;
-
-    [Reactive]
-    [DataMember]
-    public string Username { get; set; } = string.Empty;
-
-    [IgnoreDataMember]
-    public int UsernameLength => _usernameLength.Value;
+    public ReactiveCommand<HandledEventArgs, Unit> Login { get; }
 }
