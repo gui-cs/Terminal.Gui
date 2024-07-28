@@ -31,6 +31,7 @@ public class ViewExperiments : Scenario
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
+            TabStop = TabBehavior.TabGroup,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
         };
 
@@ -63,6 +64,7 @@ public class ViewExperiments : Scenario
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
+            TabStop = TabBehavior.TabGroup,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
         };
 

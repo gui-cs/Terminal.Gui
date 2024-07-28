@@ -466,7 +466,8 @@ public class UICatalogApp
             StatusBar = new ()
             {
                 Visible = ShowStatusBar,
-                AlignmentModes = AlignmentModes.IgnoreFirstOrLast
+                AlignmentModes = AlignmentModes.IgnoreFirstOrLast,
+                CanFocus = false
             };
 
             if (StatusBar is { })
@@ -480,12 +481,14 @@ public class UICatalogApp
                 var statusBarShortcut = new Shortcut
                 {
                     Key = Key.F10,
-                    Title = "Show/Hide Status Bar"
+                    Title = "Show/Hide Status Bar",
+                    CanFocus = false,
                 };
                 statusBarShortcut.Accept += (sender, args) => { StatusBar.Visible = !StatusBar.Visible; };
 
                 ShForce16Colors = new ()
                 {
+                    CanFocus = false,
                     CommandView = new CheckBox
                     {
                         Title = "16 color mode",
@@ -518,6 +521,7 @@ public class UICatalogApp
                 StatusBar.Add (
                                new Shortcut
                                {
+                                   CanFocus = false,
                                    Title = "Quit",
                                    Key = Application.QuitKey
                                },

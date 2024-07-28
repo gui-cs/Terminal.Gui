@@ -29,12 +29,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     </para>
     /// </remarks>
     /// <param name="direction"></param>
-    /// <param name="acrossGroupOrOverlapped">If <see langword="true"/> will advance into ...</param>
+    /// <param name="groupOnly">If <see langword="true"/> will advance into ...</param>
     /// <returns>
     ///     <see langword="true"/> if focus was changed to another subview (or stayed on this one), <see langword="false"/>
     ///     otherwise.
     /// </returns>
-    public bool AdvanceFocus (NavigationDirection direction, bool acrossGroupOrOverlapped = false)
+    public bool AdvanceFocus (NavigationDirection direction, bool groupOnly = false)
     {
         if (!CanBeVisible (this))
         {
@@ -53,11 +53,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
             switch (direction)
             {
                 case NavigationDirection.Forward:
-                    FocusFirst ();
+                    FocusFirst (groupOnly);
 
                     break;
                 case NavigationDirection.Backward:
-                    FocusLast ();
+                    FocusLast (groupOnly);
 
                     break;
                 default:
@@ -67,78 +67,71 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return Focused is { };
         }
 
-        var focusedFound = false;
-
-        foreach (View w in direction == NavigationDirection.Forward
-                               ? TabIndexes.ToArray ()
-                               : TabIndexes.ToArray ().Reverse ())
+        if (Focused is { })
         {
-            if (w.HasFocus)
+            if (Focused.AdvanceFocus (direction, groupOnly))
             {
-                // A subview has focus, tell *it* to FocusNext
-                if (w.AdvanceFocus (direction, acrossGroupOrOverlapped))
-                {
-                    // The subview changed which of it's subviews had focus
-                    return true;
-                }
+                return true;
+            }
+        }
 
-                if (acrossGroupOrOverlapped && Arrangement.HasFlag (ViewArrangement.Overlapped))
+        var index = GetScopedTabIndexes (groupOnly ? TabBehavior.TabGroup : TabBehavior.TabStop, direction);
+        if (index.Length == 0)
+        {
+            return false;
+        }
+        var focusedIndex = index.IndexOf (Focused);
+        int next = 0;
+
+        if (focusedIndex < index.Length - 1)
+        {
+            next = focusedIndex + 1;
+        }
+        else
+        {
+            // Wrap around
+            if (SuperView is {})
+            {
+                if (direction == NavigationDirection.Forward)
                 {
                     return false;
                 }
-
-                //Debug.Assert (w.HasFocus);
-
-                if (w.Focused is null)
+                else
                 {
-                    // No next focusable view was found. 
-                    if (w.Arrangement.HasFlag (ViewArrangement.Overlapped))
-                    {
-                        // Keep focus w/in w
-                        return false;
-                    }
+                    return false;
+
+                    //SuperView.FocusFirst (groupOnly);
                 }
-
-                // The subview has no subviews that can be next. Cache that we found a focused subview.
-                focusedFound = true;
-
-                continue;
-            }
-
-            // The subview does not have focus, but at least one other that can. Can this one be focused?
-            if (focusedFound && w.CanFocus && w.TabStop == TabBehavior.TabStop && w.Visible && w.Enabled)
-            {
-                // Make Focused Leave
-                Focused.SetHasFocus (false, w);
-
-                // If the focused view is overlapped don't focus on the next if it's not overlapped.
-                //if (acrossGroupOrOverlapped && Focused.Arrangement.HasFlag (ViewArrangement.Overlapped)/* && !w.Arrangement.HasFlag (ViewArrangement.Overlapped)*/)
-                //{
-                //    return false;
-                //}
-
-                // If the focused view is not overlapped and the next is, skip it
-                if (!acrossGroupOrOverlapped && !Focused.Arrangement.HasFlag (ViewArrangement.Overlapped) && w.Arrangement.HasFlag (ViewArrangement.Overlapped))
-                {
-                    continue;
-                }
-
-                switch (direction)
-                {
-                    case NavigationDirection.Forward:
-                        w.FocusFirst ();
-
-                        break;
-                    case NavigationDirection.Backward:
-                        w.FocusLast ();
-
-                        break;
-                }
-
-                SetFocus (w);
-
                 return true;
             }
+            //next = index.Length - 1;
+
+        }
+
+        View view = index [next];
+
+
+        // The subview does not have focus, but at least one other that can. Can this one be focused?
+        if (view.CanFocus && view.Visible && view.Enabled)
+        {
+            // Make Focused Leave
+            Focused.SetHasFocus (false, view);
+
+            switch (direction)
+            {
+                case NavigationDirection.Forward:
+                    view.FocusFirst (false);
+
+                    break;
+                case NavigationDirection.Backward:
+                    view.FocusLast (false);
+
+                    break;
+            }
+
+            SetFocus (view);
+
+            return true;
         }
 
         if (Focused is { })
@@ -297,12 +290,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Focuses the first focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
     ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
-    /// <param name="overlappedOnly">
-    ///     If <see langword="true"/>, only subviews where <see cref="Arrangement"/> has
-    ///     <see cref="ViewArrangement.Overlapped"/> set
+    /// <param name="groupOnly">
+    ///     If <see langword="true"/>, only subviews where <see cref="TabStop"/> is
+    ///     <see cref="TabBehavior.TabGroup"/> set
     ///     will be considered.
     /// </param>
-    public void FocusFirst (bool overlappedOnly = false)
+    public void FocusFirst (bool groupOnly = false)
     {
         if (!CanBeVisible (this))
         {
@@ -316,14 +309,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return;
         }
 
-        foreach (View view in _tabIndexes.Where (v => !overlappedOnly || v.Arrangement.HasFlag (ViewArrangement.Overlapped)))
+        var indicies = GetScopedTabIndexes (groupOnly ? TabBehavior.TabGroup : TabBehavior.TabStop, NavigationDirection.Forward);
+        if (indicies.Length > 0)
         {
-            if (view.CanFocus && view.TabStop == TabBehavior.TabStop && view.Visible && view.Enabled)
-            {
-                SetFocus (view);
-
-                return;
-            }
+            SetFocus (indicies [0]);
         }
     }
 
@@ -331,12 +320,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Focuses the last focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
     ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
-    /// <param name="overlappedOnly">
-    ///     If <see langword="true"/>, only subviews where <see cref="Arrangement"/> has
-    ///     <see cref="ViewArrangement.Overlapped"/> set
+    /// <param name="groupOnly">
+    ///     If <see langword="true"/>, only subviews where <see cref="TabStop"/> is
+    ///     <see cref="TabBehavior.TabGroup"/> set
     ///     will be considered.
     /// </param>
-    public void FocusLast (bool overlappedOnly = false)
+    public void FocusLast (bool groupOnly = false)
     {
         if (!CanBeVisible (this))
         {
@@ -350,14 +339,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return;
         }
 
-        foreach (View view in _tabIndexes.Where (v => !overlappedOnly || v.Arrangement.HasFlag (ViewArrangement.Overlapped)).Reverse ())
+        var indicies = GetScopedTabIndexes (groupOnly ? TabBehavior.TabGroup : TabBehavior.TabStop, NavigationDirection.Forward);
+        if (indicies.Length > 0)
         {
-            if (view.CanFocus && view.TabStop == TabBehavior.TabStop && view.Visible && view.Enabled)
-            {
-                SetFocus (view);
-
-                return;
-            }
+            SetFocus (indicies [^1]);
         }
     }
 
@@ -596,6 +581,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         Focused.SetHasFocus (true, f);
 
         // Ensure on either the first or last focusable subview of Focused
+        // BUGBUG: With Groups, this means the previous focus is lost
         Focused.FocusFirstOrLast ();
 
         // Recursively set focus upwards in the view hierarchy
@@ -665,6 +651,19 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <value>The tabIndexes.</value>
     public IList<View> TabIndexes => _tabIndexes?.AsReadOnly () ?? _empty;
 
+    private View [] GetScopedTabIndexes (TabBehavior behavior, NavigationDirection direction)
+    {
+        var indicies = _tabIndexes.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+
+        if (direction == NavigationDirection.Backward)
+        {
+            indicies = indicies.Reverse ();
+        }
+
+        return indicies.ToArray ();
+
+    }
+
     private int? _tabIndex; // null indicates the view has not yet been added to TabIndexes
     private int? _oldTabIndex;
 
@@ -695,7 +694,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         {
             // Once a view is in the tab order, it should not be removed from the tab order; set TabStop to NoStop instead.
             Debug.Assert (value >= 0);
-            Debug.Assert (value is {});
+            Debug.Assert (value is { });
 
             if (SuperView?._tabIndexes is null || SuperView?._tabIndexes.Count == 1)
             {
@@ -814,7 +813,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             if (_tabStop is null && TabIndex is null)
             {
                 // This view has not yet been added to TabIndexes (TabStop has not been set previously).
-                TabIndex = GetGreatestTabIndexInSuperView(SuperView is { } ? SuperView._tabIndexes.Count : 0);
+                TabIndex = GetGreatestTabIndexInSuperView (SuperView is { } ? SuperView._tabIndexes.Count : 0);
             }
 
             _tabStop = value;

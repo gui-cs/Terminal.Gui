@@ -32,6 +32,8 @@ public class AdornmentsEditor : View
 
         //SuperViewRendersLineCanvas = true;
 
+        TabStop = TabBehavior.TabGroup;
+
         Application.MouseEvent += Application_MouseEvent;
         Initialized += AdornmentsEditor_Initialized;
     }
