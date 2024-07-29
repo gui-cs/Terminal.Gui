@@ -147,7 +147,7 @@ public static class ApplicationOverlapped
             else if (foundCurrentView && !focusSet)
             {
                 // One of the views is Current, but view is not. Attempt to Advance...
-                Application.Current!.SuperView?.AdvanceFocus (direction);
+                Application.Current!.SuperView?.AdvanceFocus (direction, null);
                 // QUESTION: AdvanceFocus returns false AND sets Focused to null if no view was found to advance to. Should't we only set focusProcessed if it returned true?
                 focusSet = true;
 

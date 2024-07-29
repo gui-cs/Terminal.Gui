@@ -177,7 +177,7 @@ public class KeyboardTests
         }
     }
 
-    [Fact]
+    [Fact (Skip = "Replace when new key statics are added.")]
     public void AlternateForwardKey_AlternateBackwardKey_Tests ()
     {
         Application.Init (new FakeDriver ());

@@ -583,13 +583,23 @@ public partial class View  // Keyboard APIs
 
     private bool ProcessAdornmentKeyBindings (Adornment adornment, Key keyEvent, KeyBindingScope scope, ref bool? handled)
     {
-        foreach (View subview in adornment?.Subviews)
+        if (adornment?.Subviews is null)
         {
-            handled = subview.OnInvokingKeyBindings (keyEvent, scope);
+            return false;
+        }
 
-            if (handled is { } && (bool)handled)
+        foreach (View subview in adornment.Subviews)
+        {
+            bool? subViewHandled = subview.OnInvokingKeyBindings (keyEvent, scope);
+
+            if (subViewHandled is { })
             {
-                return true;
+                handled = subViewHandled;
+
+                if ((bool)subViewHandled)
+                {
+                    return true;
+                }
             }
         }
 
@@ -601,6 +611,10 @@ public partial class View  // Keyboard APIs
         // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
         foreach (View subview in Subviews)
         {
+            if (subview == Focused)
+            {
+                continue;
+            }
             if (subview.KeyBindings.TryGet (keyEvent, scope, out KeyBinding binding))
             {
                 if (binding.Scope == KeyBindingScope.Focused && !subview.HasFocus)
@@ -613,11 +627,15 @@ public partial class View  // Keyboard APIs
                     return true;
                 }
 
-                handled = subview.OnInvokingKeyBindings (keyEvent, scope);
+                bool? subViewHandled = subview.OnInvokingKeyBindings (keyEvent, scope);
 
-                if (handled is { } && (bool)handled)
+                if (subViewHandled is { })
                 {
-                    return true;
+                    handled = subViewHandled;
+                    if ((bool)subViewHandled)
+                    {
+                        return true;
+                    }
                 }
             }
 

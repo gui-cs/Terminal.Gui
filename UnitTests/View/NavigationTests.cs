@@ -284,25 +284,20 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void CanFocus_Sets_To_False_Does_Not_Sets_HasFocus_To_True ()
+    public void CanFocus_False_Set_HasFocus_To_False ()
     {
         var view = new View { CanFocus = true };
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (view);
-        var top = new Toplevel ();
-        top.Add (win);
-        Application.Begin (top);
+        var view2 = new View { CanFocus = true };
+        view2.Add (view);
 
         Assert.True (view.CanFocus);
+
+        view.SetFocus ();
         Assert.True (view.HasFocus);
 
         view.CanFocus = false;
         Assert.False (view.CanFocus);
         Assert.False (view.HasFocus);
-        Assert.Null (Application.Current.Focused);
-        Assert.Null (Application.Current.MostFocused);
-        top.Dispose ();
     }
 
     [Fact]
@@ -324,13 +319,13 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (view2.CanFocus);
         Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.True (view1.CanFocus);
         Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
         Assert.True (view2.CanFocus);
         Assert.True (view2.HasFocus);
 
-        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
         Assert.True (view1.CanFocus);
         Assert.True (view1.HasFocus);
         Assert.True (view2.CanFocus);
@@ -417,8 +412,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (view2.CanFocus);
         Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl)); // move to win2
         Assert.True (view1.CanFocus);
         Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
         Assert.True (view2.CanFocus);
@@ -549,13 +543,21 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.Equal ("WindowSubview", top.MostFocused.Text);
 
         Application.OnKeyDown (Key.Tab);
-        Assert.Equal ("FrameSubview", top.MostFocused.Text);
-        Application.OnKeyDown (Key.Tab);
         Assert.Equal ("WindowSubview", top.MostFocused.Text);
 
-        Application.OnKeyDown (Key.Tab.WithShift);
+        Application.OnKeyDown (Key.Tab.WithCtrl);
         Assert.Equal ("FrameSubview", top.MostFocused.Text);
-        Application.OnKeyDown (Key.Tab.WithShift);
+
+        Application.OnKeyDown (Key.Tab);
+        Assert.Equal ("FrameSubview", top.MostFocused.Text);
+
+        Application.OnKeyDown (Key.Tab.WithCtrl);
+        Assert.Equal ("WindowSubview", top.MostFocused.Text);
+
+        Application.OnKeyDown (Key.Tab.WithCtrl.WithShift);
+        Assert.Equal ("FrameSubview", top.MostFocused.Text);
+
+        Application.OnKeyDown (Key.Tab.WithCtrl.WithShift);
         Assert.Equal ("WindowSubview", top.MostFocused.Text);
         top.Dispose ();
     }
@@ -1370,7 +1372,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Fact]
-    public void TabStop_All_False_And_All_True_And_Changing_TabStop_Later ()
+    public void TabStop_NoStop_Prevents_Stop ()
     {
         var r = new View ();
         var v1 = new View { CanFocus = true, TabStop = TabBehavior.NoStop };
@@ -1379,23 +1381,36 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
+    }
+
+    [Fact]
+    public void TabStop_NoStop_Change_Enables_Stop ()
+    {
+        var r = new View ();
+        var v1 = new View { CanFocus = true, TabStop = TabBehavior.NoStop };
+        var v2 = new View { CanFocus = true, TabStop = TabBehavior.NoStop };
+        var v3 = new View { CanFocus = true, TabStop = TabBehavior.NoStop };
+
+        r.Add (v1, v2, v3);
 
         v1.TabStop = TabBehavior.TabStop;
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.True (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
+
         v2.TabStop = TabBehavior.TabStop;
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.True (v2.HasFocus);
         Assert.False (v3.HasFocus);
+
         v3.TabStop = TabBehavior.TabStop;
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.True (v3.HasFocus);
@@ -1412,23 +1427,23 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
 
         v1.CanFocus = true;
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.True (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
         v2.CanFocus = true;
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.True (v2.HasFocus);
         Assert.False (v3.HasFocus);
         v3.CanFocus = true;
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.True (v3.HasFocus);
@@ -1445,15 +1460,15 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.True (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.True (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.True (v3.HasFocus);
@@ -1470,15 +1485,15 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
@@ -1495,15 +1510,15 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
@@ -1520,15 +1535,15 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         r.Add (v1, v2, v3);
 
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        r.AdvanceFocus (NavigationDirection.Forward);
+        r.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);

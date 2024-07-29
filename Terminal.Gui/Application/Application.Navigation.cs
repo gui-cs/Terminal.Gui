@@ -42,9 +42,9 @@ internal static class ApplicationNavigation
     {
         View? old = GetDeepestFocusedSubview (Application.Current!.Focused);
 
-        if (!Application.Current.AdvanceFocus (NavigationDirection.Forward))
+        if (!Application.Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop))
         {
-            Application.Current.AdvanceFocus (NavigationDirection.Forward);
+            Application.Current.AdvanceFocus (NavigationDirection.Forward, null);
         }
 
         if (old != Application.Current.Focused && old != Application.Current.Focused?.Focused)
@@ -67,9 +67,9 @@ internal static class ApplicationNavigation
         {
             Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
 
-            if (!Application.Current.AdvanceFocus (NavigationDirection.Forward, true))
+            if (!Application.Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup))
             {
-                Application.Current.AdvanceFocus (NavigationDirection.Forward, false);
+                Application.Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
 
                 if (Application.Current.Focused is null)
                 {
@@ -105,6 +105,8 @@ internal static class ApplicationNavigation
         }
     }
 
+    // TODO: These methods should return bool to indicate if the focus was moved or not.
+
     /// <summary>
     ///     Moves the focus to the next view. Honors <see cref="ViewArrangement.Overlapped"/> and will only move to the next subview
     ///     if the current and next subviews are not overlapped.
@@ -113,9 +115,9 @@ internal static class ApplicationNavigation
     {
         View? old = GetDeepestFocusedSubview (Application.Current!.Focused);
 
-        if (!Application.Current.AdvanceFocus (NavigationDirection.Backward))
+        if (!Application.Current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop))
         {
-            Application.Current.AdvanceFocus (NavigationDirection.Backward);
+            Application.Current.AdvanceFocus (NavigationDirection.Backward, null);
         }
 
         if (old != Application.Current.Focused && old != Application.Current.Focused?.Focused)
@@ -134,11 +136,11 @@ internal static class ApplicationNavigation
         if (ApplicationOverlapped.OverlappedTop is null)
         {
             Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
-            top!.AdvanceFocus (NavigationDirection.Backward, true);
+            top!.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
 
             if (top.Focused is null)
             {
-                top.AdvanceFocus (NavigationDirection.Backward, false);
+                top.AdvanceFocus (NavigationDirection.Backward, null);
             }
 
             top.SetNeedsDisplay ();

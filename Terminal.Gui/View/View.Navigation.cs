@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using static Terminal.Gui.FakeDriver;
 
 namespace Terminal.Gui;
 
@@ -34,7 +35,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     <see langword="true"/> if focus was changed to another subview (or stayed on this one), <see langword="false"/>
     ///     otherwise.
     /// </returns>
-    public bool AdvanceFocus (NavigationDirection direction, bool groupOnly = false)
+    public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
         if (!CanBeVisible (this))
         {
@@ -53,11 +54,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
             switch (direction)
             {
                 case NavigationDirection.Forward:
-                    FocusFirst (TabBehavior.TabGroup);
+                    FocusFirst (behavior);
 
                     break;
                 case NavigationDirection.Backward:
-                    FocusLast (TabBehavior.TabGroup);
+                    FocusLast (behavior);
 
                     break;
                 default:
@@ -69,13 +70,13 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (Focused is { })
         {
-            if (Focused.AdvanceFocus (direction, groupOnly))
+            if (Focused.AdvanceFocus (direction, behavior))
             {
                 return true;
             }
         }
 
-        var index = GetScopedTabIndexes (groupOnly ? TabBehavior.TabGroup : TabBehavior.TabStop, direction);
+        var index = GetScopedTabIndexes (behavior, direction);
         if (index.Length == 0)
         {
             return false;
@@ -90,7 +91,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         else
         {
             // focusedIndex is at end of list. If we are going backwards,...
-            if (groupOnly)
+            if (behavior == TabStop)
             {
                 // Go up the hierarchy
                 // Leave
@@ -230,11 +231,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 // If EnsureFocus () didn't set focus to a view, focus the next focusable view in the application
                 if (SuperView is { Focused: null })
                 {
-                    SuperView.AdvanceFocus (NavigationDirection.Forward);
+                    SuperView.AdvanceFocus (NavigationDirection.Forward, null);
 
                     if (SuperView.Focused is null && Application.Current is { })
                     {
-                        Application.Current.AdvanceFocus (NavigationDirection.Forward);
+                        Application.Current.AdvanceFocus (NavigationDirection.Forward, null);
                     }
 
                     ApplicationOverlapped.BringOverlappedTopToFront ();
@@ -446,6 +447,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </remarks>
     public virtual bool OnLeave (View enteringView)
     {
+        // BUGBUG: _hasFocus should ALWAYS be false when this method is called. 
+        if (_hasFocus)
+        {
+            Debug.WriteLine ($"BUGBUG: HasFocus should ALWAYS be false when OnLeave is called.");
+            return true;
+        }
         var args = new FocusEventArgs (this, enteringView);
         Leave?.Invoke (this, args);
 

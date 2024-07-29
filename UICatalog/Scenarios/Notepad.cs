@@ -310,7 +310,7 @@ public class Notepad : Scenario
         newTile.ContentView.Add (newTabView);
 
         newTabView.FocusFirst (null);
-        newTabView.AdvanceFocus (NavigationDirection.Forward);
+        newTabView.AdvanceFocus (NavigationDirection.Forward, null);
     }
 
     private void SplitDown (TabView sender, OpenedFile tab) { Split (1, Orientation.Horizontal, sender, tab); }

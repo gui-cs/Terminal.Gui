@@ -110,10 +110,10 @@ public static partial class Application // Keyboard handling
     /// <returns><see langword="true"/> if the key was handled.</returns>
     public static bool OnKeyDown (Key keyEvent)
     {
-        if (!IsInitialized)
-        {
-            return true;
-        }
+        //if (!IsInitialized)
+        //{
+        //    return true;
+        //}
 
         KeyDown?.Invoke (null, keyEvent);
 
@@ -122,16 +122,26 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
-        foreach (Toplevel topLevel in TopLevels.ToList ())
+        if (Current is null)
         {
-            if (topLevel.NewKeyDownEvent (keyEvent))
+            foreach (Toplevel topLevel in TopLevels.ToList ())
+            {
+                if (topLevel.NewKeyDownEvent (keyEvent))
+                {
+                    return true;
+                }
+
+                if (topLevel.Modal)
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if (Application.Current.NewKeyDownEvent (keyEvent))
             {
                 return true;
-            }
-
-            if (topLevel.Modal)
-            {
-                break;
             }
         }
 
@@ -244,7 +254,7 @@ public static partial class Application // Keyboard handling
     /// <summary>
     /// Commands for Application.
     /// </summary>
-    private static Dictionary<Command, Func<CommandContext, bool?>> CommandImplementations { get; } = new ();
+    private static Dictionary<Command, Func<CommandContext, bool?>> CommandImplementations { get; set; }
 
     /// <summary>
     ///     <para>
@@ -267,8 +277,14 @@ public static partial class Application // Keyboard handling
         CommandImplementations [command] = ctx => f ();
     }
 
+    static Application ()
+    {
+        AddApplicationKeyBindings();
+    }
+
     internal static void AddApplicationKeyBindings ()
     {
+        CommandImplementations = new Dictionary<Command, Func<CommandContext, bool?>> ();
         // Things this view knows how to do
         AddCommand (
                     Command.QuitToplevel,  // TODO: IRunnable: Rename to Command.Quit to make more generic.
@@ -347,6 +363,8 @@ public static partial class Application // Keyboard handling
                     }
                    );
 
+
+        KeyBindings.Clear ();
 
         KeyBindings.Add (Application.QuitKey, KeyBindingScope.Application, Command.QuitToplevel);
 
