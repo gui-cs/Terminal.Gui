@@ -179,7 +179,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
-        toplevel.FocusFirst ();
+        toplevel.FocusFirst (null);
         ApplicationOverlapped.BringOverlappedTopToFront ();
 
         if (refreshDriver)

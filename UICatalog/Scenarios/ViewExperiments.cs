@@ -15,7 +15,8 @@ public class ViewExperiments : Scenario
 
         Window app = new ()
         {
-            Title = GetQuitKeyAndName ()
+            Title = GetQuitKeyAndName (),
+            TabStop = TabBehavior.TabGroup
         };
 
 
@@ -80,8 +81,6 @@ public class ViewExperiments : Scenario
             Y = Pos.Bottom (button),
             Title = "Button_4",
         };
-        view2.Add (button);
-
         view2.Add (button);
 
         var editor = new AdornmentsEditor

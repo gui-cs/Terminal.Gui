@@ -53,11 +53,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
             switch (direction)
             {
                 case NavigationDirection.Forward:
-                    FocusFirst (groupOnly);
+                    FocusFirst (TabBehavior.TabGroup);
 
                     break;
                 case NavigationDirection.Backward:
-                    FocusLast (groupOnly);
+                    FocusLast (TabBehavior.TabGroup);
 
                     break;
                 default:
@@ -89,21 +89,33 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
         else
         {
-            // Wrap around
-            if (SuperView is {})
+            // focusedIndex is at end of list. If we are going backwards,...
+            if (groupOnly)
             {
-                if (direction == NavigationDirection.Forward)
-                {
-                    return false;
-                }
-                else
-                {
-                    return false;
+                // Go up the hierarchy
+                // Leave
+                Focused.SetHasFocus (false, this);
 
-                    //SuperView.FocusFirst (groupOnly);
-                }
-                return true;
+                // Signal that nothing is focused, and callers should try a peer-subview
+                Focused = null;
+
+                return false;
             }
+            // Wrap around
+            //if (SuperView is {})
+            //{
+            //    if (direction == NavigationDirection.Forward)
+            //    {
+            //        return false;
+            //    }
+            //    else
+            //    {
+            //        return false;
+
+            //        //SuperView.FocusFirst (groupOnly);
+            //    }
+            //    return true;
+            //}
             //next = index.Length - 1;
 
         }
@@ -120,11 +132,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
             switch (direction)
             {
                 case NavigationDirection.Forward:
-                    view.FocusFirst (false);
+                    view.FocusFirst (TabBehavior.TabStop);
 
                     break;
                 case NavigationDirection.Backward:
-                    view.FocusLast (false);
+                    view.FocusLast (TabBehavior.TabStop);
 
                     break;
             }
@@ -213,7 +225,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             if (!_canFocus && HasFocus)
             {
                 SetHasFocus (false, this);
-                SuperView?.FocusFirstOrLast ();
+                SuperView?.RestoreFocus ();
 
                 // If EnsureFocus () didn't set focus to a view, focus the next focusable view in the application
                 if (SuperView is { Focused: null })
@@ -290,12 +302,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Focuses the first focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
     ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
-    /// <param name="groupOnly">
-    ///     If <see langword="true"/>, only subviews where <see cref="TabStop"/> is
-    ///     <see cref="TabBehavior.TabGroup"/> set
-    ///     will be considered.
-    /// </param>
-    public void FocusFirst (bool groupOnly = false)
+    /// <param name="behavior"></param>
+    public void FocusFirst (TabBehavior? behavior)
     {
         if (!CanBeVisible (this))
         {
@@ -309,7 +317,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return;
         }
 
-        var indicies = GetScopedTabIndexes (groupOnly ? TabBehavior.TabGroup : TabBehavior.TabStop, NavigationDirection.Forward);
+        var indicies = GetScopedTabIndexes (behavior, NavigationDirection.Forward);
         if (indicies.Length > 0)
         {
             SetFocus (indicies [0]);
@@ -320,12 +328,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Focuses the last focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
     ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
-    /// <param name="groupOnly">
-    ///     If <see langword="true"/>, only subviews where <see cref="TabStop"/> is
-    ///     <see cref="TabBehavior.TabGroup"/> set
-    ///     will be considered.
-    /// </param>
-    public void FocusLast (bool groupOnly = false)
+    /// <param name="behavior"></param>
+    public void FocusLast (TabBehavior? behavior)
     {
         if (!CanBeVisible (this))
         {
@@ -339,7 +343,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return;
         }
 
-        var indicies = GetScopedTabIndexes (groupOnly ? TabBehavior.TabGroup : TabBehavior.TabStop, NavigationDirection.Forward);
+        var indicies = GetScopedTabIndexes (behavior, NavigationDirection.Forward);
         if (indicies.Length > 0)
         {
             SetFocus (indicies [^1]);
@@ -505,17 +509,17 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     <see cref="FocusDirection"/>.
     ///     FocusDirection is not public. This API is thus non-deterministic from a public API perspective.
     /// </summary>
-    internal void FocusFirstOrLast ()
+    internal void RestoreFocus ()
     {
         if (Focused is null && _subviews?.Count > 0)
         {
             if (FocusDirection == NavigationDirection.Forward)
             {
-                FocusFirst ();
+                FocusFirst (null);
             }
             else
             {
-                FocusLast ();
+                FocusLast (null);
             }
         }
     }
@@ -582,7 +586,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         // Ensure on either the first or last focusable subview of Focused
         // BUGBUG: With Groups, this means the previous focus is lost
-        Focused.FocusFirstOrLast ();
+        Focused.RestoreFocus ();
 
         // Recursively set focus upwards in the view hierarchy
         if (SuperView is { })
@@ -651,9 +655,24 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <value>The tabIndexes.</value>
     public IList<View> TabIndexes => _tabIndexes?.AsReadOnly () ?? _empty;
 
-    private View [] GetScopedTabIndexes (TabBehavior behavior, NavigationDirection direction)
+    /// <summary>
+    /// Gets TabIndexes that are scoped to the specified behavior and direction. If behavior is null, all TabIndexes are returned.
+    /// </summary>
+    /// <param name="behavior"></param>
+    /// <param name="direction"></param>
+    /// <returns></returns>GetScopedTabIndexes
+    private View [] GetScopedTabIndexes (TabBehavior? behavior, NavigationDirection direction)
     {
-        var indicies = _tabIndexes.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+        IEnumerable<View> indicies;
+
+        if (behavior.HasValue)
+        {
+            indicies = _tabIndexes.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+        }
+        else
+        {
+            indicies = _tabIndexes.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
+        }
 
         if (direction == NavigationDirection.Backward)
         {

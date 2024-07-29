@@ -29,6 +29,7 @@ public partial class Toplevel : View
     public Toplevel ()
     {
         CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
         Arrangement = ViewArrangement.Fixed;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
@@ -430,7 +431,7 @@ public partial class Toplevel : View
         {
             if (Focused is null)
             {
-                FocusFirstOrLast ();
+                RestoreFocus ();
             }
 
             return null;

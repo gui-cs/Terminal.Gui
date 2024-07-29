@@ -28,6 +28,7 @@ public class Window : Toplevel
     public Window ()
     {
         CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
         ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
         BorderStyle = DefaultBorderStyle;
         ShadowStyle = DefaultShadow;

@@ -28,8 +28,9 @@ public class ComboBox : View, IDesignable
     /// <summary>Public constructor</summary>
     public ComboBox ()
     {
-        _search = new TextField ();
-        _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true };
+        _search = new TextField () { CanFocus = true, TabStop = TabBehavior.NoStop };
+
+        _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = TabBehavior.NoStop};
 
         _search.TextChanged += Search_Changed;
         _search.Accept += Search_Accept;

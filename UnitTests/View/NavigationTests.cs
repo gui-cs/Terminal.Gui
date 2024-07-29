@@ -516,7 +516,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
                                      Assert.False (win.HasFocus);
 
                                      win.Enabled = true;
-                                     win.FocusFirst ();
+                                     win.FocusFirst (null);
                                      Assert.True (button.HasFocus);
                                      Assert.True (win.HasFocus);
 
@@ -1632,10 +1632,12 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         View otherView = new ()
         {
+            Id = "otherView",
             X = 0, Y = 0,
             Height = 1,
             Width = 1,
             CanFocus = true,
+            TabStop = view.TabStop
         };
 
         view.X = Pos.Right (otherView);
@@ -1658,27 +1660,42 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.Equal (1, nEnter);
         Assert.Equal (0, nLeave);
 
-        // Use keyboard to navigate to next view (otherView). 
+        // Use keyboard to navigate to next view (otherView).
         if (view is TextView)
         {
             Application.OnKeyDown (Key.Tab.WithCtrl);
         }
-        else if (view is DatePicker)
-        {
-            for (var i = 0; i < 4; i++)
-            {
-                Application.OnKeyDown (Key.Tab.WithCtrl);
-            }
-        }
+        //else if (view is DatePicker)
+        //{
+        //    for (var i = 0; i < 4; i++)
+        //    {
+        //        Application.OnKeyDown (Key.Tab.WithCtrl);
+        //    }
+        //}
         else
         {
-            Application.OnKeyDown (Key.Tab);
+            int tries = 0;
+            while (view.HasFocus)
+            {
+                if (++tries > 10)
+                {
+                    Assert.Fail ($"{view} is not leaving.");
+                }
+                Application.OnKeyDown (view.TabStop == TabBehavior.TabStop ? Key.Tab : Key.Tab.WithCtrl);
+            }
         }
 
         Assert.Equal (1, nEnter);
         Assert.Equal (1, nLeave);
 
-        Application.OnKeyDown (Key.Tab);
+        Assert.False (view.HasFocus);
+        Assert.True (otherView.HasFocus);
+
+        // Now navigate back to our test view
+        Application.OnKeyDown (view.TabStop == TabBehavior.TabStop ? Key.Tab : Key.Tab.WithCtrl);
+
+        Assert.False (otherView.HasFocus);
+        Assert.True (view.HasFocus);
 
         Assert.Equal (2, nEnter);
         Assert.Equal (1, nLeave);

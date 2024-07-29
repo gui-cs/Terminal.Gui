@@ -815,7 +815,7 @@ Three ",
         cb.SetSource (source);
         var top = new Toplevel ();
         top.Add (cb);
-        top.FocusFirst ();
+        top.FocusFirst (null);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal (string.Empty, cb.Text);
         var opened = false;
@@ -845,7 +845,7 @@ Three ",
         Assert.True (cb.NewKeyDownEvent (Key.CursorDown)); // losing focus
         Assert.False (cb.IsShow);
         Assert.False (cb.HasFocus);
-        top.FocusFirst (); // Gets focus again
+        top.FocusFirst (null); // Gets focus again
         Assert.False (cb.IsShow);
         Assert.True (cb.HasFocus);
         cb.Expand ();
@@ -954,7 +954,7 @@ Three
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        top.FocusFirst (); // Gets focus again
+        top.FocusFirst (null); // Gets focus again
         Assert.True (cb.HasFocus);
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
@@ -974,7 +974,7 @@ Three
         var cb = new ComboBox ();
         var top = new Toplevel ();
         top.Add (cb);
-        top.FocusFirst ();
+        top.FocusFirst (null);
         Assert.Null (cb.Source);
         Assert.Equal (-1, cb.SelectedItem);
         ObservableCollection<string> source = [];

@@ -69,7 +69,12 @@ internal static class ApplicationNavigation
 
             if (!Application.Current.AdvanceFocus (NavigationDirection.Forward, true))
             {
-                Application.Current.AdvanceFocus (NavigationDirection.Forward, true);
+                Application.Current.AdvanceFocus (NavigationDirection.Forward, false);
+
+                if (Application.Current.Focused is null)
+                {
+                    Application.Current.RestoreFocus ();
+                }
             }
 
             if (top != Application.Current.Focused && top != Application.Current.Focused?.Focused)
@@ -133,7 +138,7 @@ internal static class ApplicationNavigation
 
             if (top.Focused is null)
             {
-                top.AdvanceFocus (NavigationDirection.Backward, true);
+                top.AdvanceFocus (NavigationDirection.Backward, false);
             }
 
             top.SetNeedsDisplay ();

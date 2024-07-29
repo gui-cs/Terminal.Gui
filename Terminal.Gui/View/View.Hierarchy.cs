@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 public partial class View // SuperView/SubView hierarchy management (SuperView, SubViews, Add, Remove, etc.)
@@ -55,6 +57,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             _tabIndexes = new ();
         }
 
+        Debug.Assert (!_subviews.Contains (view));
         _subviews.Add (view);
         _tabIndexes.Add (view);
         view._superView = this;

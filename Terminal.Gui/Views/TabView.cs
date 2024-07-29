@@ -25,6 +25,7 @@ public class TabView : View
     public TabView ()
     {
         CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
         _tabsBar = new TabRowView (this);
         _contentView = new View ();
 
@@ -564,6 +565,7 @@ public class TabView : View
             _host = host;
 
             CanFocus = true;
+            TabStop = TabBehavior.TabGroup;
             Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == GetContentSize ().
             Width = Dim.Fill ();
 
@@ -590,7 +592,7 @@ public class TabView : View
             Add (_rightScrollIndicator, _leftScrollIndicator);
         }
 
-        protected internal override bool OnMouseEvent  (MouseEvent me)
+        protected internal override bool OnMouseEvent (MouseEvent me)
         {
             Tab hit = me.View is Tab ? (Tab)me.View : null;
 
@@ -667,7 +669,7 @@ public class TabView : View
             RenderTabLine ();
 
             RenderUnderline ();
-            Driver.SetAttribute (GetNormalColor ());
+            Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
         }
 
         public override void OnDrawContentComplete (Rectangle viewport)
