@@ -1849,7 +1849,6 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-
     public void AllViews_AtLeastOneNavKey_Leaves (Type viewType)
     {
         var view = CreateInstanceIfNotGeneric (viewType);
