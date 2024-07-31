@@ -363,6 +363,7 @@ public class FileDialogTests (ITestOutputHelper output)
 
         // whe first opening the text field will have select all on
         // so to add to current path user must press End or right
+        Send ('>', ConsoleKey.LeftArrow);
         Send ('>', ConsoleKey.RightArrow);
 
         Send ("SUBFOLDER");
