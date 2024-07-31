@@ -19,16 +19,66 @@ public class ViewExperiments : Scenario
             TabStop = TabBehavior.TabGroup
         };
 
-
-        var view = new View
+        var editor = new AdornmentsEditor
         {
-            X = 2,
-            Y = 2,
+            X = 0,
+            Y = 0,
+            AutoSelectViewToEdit = true,
+            TabStop = TabBehavior.NoStop
+        };
+        app.Add (editor);
+
+        FrameView testFrame = new ()
+        {
+            Title = "Test Frame",
+            X = Pos.Right (editor),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+        };
+
+        app.Add (testFrame);
+
+        Button button = new ()
+        {
+            X = 0,
+            Y = 0,
+            Title = "TopButton_1",
+        };
+
+        testFrame.Add (button);
+
+        var overlappedView1 = CreateOverlappedView (3, 2, 2);
+        var overlappedView2 = CreateOverlappedView (4, 34, 4);
+
+
+        testFrame.Add (overlappedView1);
+        testFrame.Add (overlappedView2);
+
+        button = new ()
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Title = "TopButton_2",
+        };
+
+        testFrame.Add (button);
+
+        Application.Run (app);
+        app.Dispose ();
+        Application.Shutdown ();
+    }
+
+    private View CreateOverlappedView (int id, int x, int y)
+    {
+        View overlapped = new View
+        {
+            X = x,
+            Y = y,
             Height = Dim.Auto (),
             Width = Dim.Auto (),
-            Title = "View1",
-            ColorScheme = Colors.ColorSchemes ["Base"],
-            Id = "View1",
+            Title = $"Overlapped_{id}",
+            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
@@ -38,82 +88,17 @@ public class ViewExperiments : Scenario
 
         Button button = new ()
         {
-            Title = "Button_1",
+            Title = $"Button{id} _{id * 2}"
         };
-        view.Add (button);
+        overlapped.Add (button);
 
         button = new ()
         {
             Y = Pos.Bottom (button),
-            Title = "Button_2",
+            Title = $"Button{id} _{id * 2 + 1}"
         };
-        view.Add (button);
+        overlapped.Add (button);
 
-        //app.Add (view);
-
-        view.BorderStyle = LineStyle.Double;
-
-        var view2 = new View
-        {
-            X = Pos.Right (view),
-            Y = Pos.Bottom (view),
-            Height = Dim.Auto (),
-            Width = Dim.Auto (),
-            Title = "View2",
-            ColorScheme = Colors.ColorSchemes ["Base"],
-            Id = "View2",
-            ShadowStyle = ShadowStyle.Transparent,
-            BorderStyle = LineStyle.Double,
-            CanFocus = true, // Can't drag without this? BUGBUG
-            TabStop = TabBehavior.TabGroup,
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
-        };
-
-
-        button = new ()
-        {
-            Title = "Button_3",
-        };
-        view2.Add (button);
-
-        button = new ()
-        {
-            Y = Pos.Bottom (button),
-            Title = "Button_4",
-        };
-        view2.Add (button);
-
-        var editor = new AdornmentsEditor
-        {
-            X = 0,
-            Y = 0,
-            AutoSelectViewToEdit = true
-        };
-        app.Add (editor);
-
-        button = new ()
-        {
-            Y = 0,
-            X = Pos.X (view),
-            Title = "Button_0",
-        };
-        app.Add (button);
-
-        button = new ()
-        {
-            X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd (),
-            Title = "Button_5",
-        };
-
-        view.X = 34;
-        view.Y = 4;
-        app.Add (view);
-        app.Add (view2);
-        app.Add (button);
-
-        Application.Run (app);
-        app.Dispose ();
-        Application.Shutdown ();
+        return overlapped;
     }
 }

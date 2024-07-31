@@ -1417,8 +1417,9 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         r.Dispose ();
     }
 
-    [Theory, CombinatorialData]
-    public void TabStop_All_True_And_Changing_CanFocus_Later ([CombinatorialValues (TabBehavior.NoStop, TabBehavior.TabStop, TabBehavior.TabGroup)] TabBehavior behavior)
+    [Theory]
+    [CombinatorialData]
+    public void TabStop_Change_CanFocus_Works ([CombinatorialValues (TabBehavior.NoStop, TabBehavior.TabStop, TabBehavior.TabGroup)] TabBehavior behavior)
     {
         var r = new View ();
         var v1 = new View ();
