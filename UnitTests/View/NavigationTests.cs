@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class NavigationTests (ITestOutputHelper output) : TestsAllViews
+public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 {
     [Fact]
     public void BringSubviewForward_Subviews_vs_TabIndexes ()
@@ -853,7 +853,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 │                  │
 │                  │
 └──────────────────┘",
-                                                          output
+                                                          _output
                                                          );
 
         // top
@@ -1004,7 +1004,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
    │                  │
    │                  │
    └──────────────────┘",
-                                                                   output
+                                                                   _output
                                                                   );
 
         // mean the output started at col 3 and line 2
@@ -1619,20 +1619,20 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         if (view == null)
         {
-            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            _output.WriteLine ($"Ignoring {viewType} - It's a Generic");
             return;
         }
 
         if (!view.CanFocus)
         {
-            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
+            _output.WriteLine ($"Ignoring {viewType} - It can't focus.");
 
             return;
         }
 
         if (view is Toplevel && ((Toplevel)view).Modal)
         {
-            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
+            _output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
 
             return;
         }
@@ -1727,7 +1727,7 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         switch (view.TabStop)
         {
             case TabBehavior.NoStop:
-                view.SetFocus();
+                view.SetFocus ();
                 break;
             case TabBehavior.TabStop:
                 Application.OnKeyDown (Key.Tab);
@@ -1762,20 +1762,20 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         if (view == null)
         {
-            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            _output.WriteLine ($"Ignoring {viewType} - It's a Generic");
             return;
         }
 
         if (!view.CanFocus)
         {
-            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
+            _output.WriteLine ($"Ignoring {viewType} - It can't focus.");
 
             return;
         }
 
         if (view is Toplevel && ((Toplevel)view).Modal)
         {
-            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
+            _output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
 
             return;
         }
@@ -1844,5 +1844,86 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 
         top.Dispose ();
         Application.Shutdown ();
+    }
+
+
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+
+    public void AllViews_AtLeastOneNavKey_Leaves (Type viewType)
+    {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
+        if (view == null)
+        {
+            _output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            return;
+        }
+
+        if (!view.CanFocus)
+        {
+            _output.WriteLine ($"Ignoring {viewType} - It can't focus.");
+
+            return;
+        }
+
+        Application.Init (new FakeDriver ());
+
+        Toplevel top = new ();
+
+        View otherView = new ()
+        {
+            Id = "otherView",
+            CanFocus = true,
+            TabStop = view.TabStop
+        };
+
+        top.Add (view, otherView);
+        Application.Begin (top);
+
+        // Start with the focus on our test view
+        view.SetFocus ();
+
+        int tries = 0;
+
+        Key [] navKeys = new Key [] { Key.Tab, Key.Tab.WithShift, Key.CursorUp, Key.CursorDown, Key.CursorLeft, Key.CursorRight };
+
+        if (view.TabStop == TabBehavior.TabGroup)
+        {
+            navKeys = new Key [] { Key.Tab.WithCtrl, Key.Tab.WithCtrl.WithShift };
+        }
+
+        bool left = false;
+
+        foreach (Key key in navKeys)
+        {
+            switch (view.TabStop)
+            {
+                case TabBehavior.TabStop:
+                case TabBehavior.NoStop:
+                case TabBehavior.TabGroup:
+                    Application.OnKeyDown (key);
+                    break;
+                default:
+                    Application.OnKeyDown (Key.Tab);
+
+                    break;
+            }
+
+            if (!view.HasFocus)
+            {
+                left = true;
+                _output.WriteLine ($"{view.GetType ().Name} - {key} Left.");
+                view.SetFocus();
+            }
+            else
+            {
+                _output.WriteLine ($"{view.GetType ().Name} - {key} did not Leave.");
+            }
+        }
+        top.Dispose ();
+        Application.Shutdown ();
+
+        Assert.True (left);
     }
 }

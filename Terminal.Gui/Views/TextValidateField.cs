@@ -664,6 +664,11 @@ namespace Terminal.Gui
         /// <returns>True if moved.</returns>
         private bool CursorLeft ()
         {
+            if (_provider is null)
+            {
+                return false;
+            }
+
             int current = _cursorPosition;
             _cursorPosition = _provider.CursorLeft (_cursorPosition);
             SetNeedsDisplay ();
@@ -675,6 +680,11 @@ namespace Terminal.Gui
         /// <returns>True if moved.</returns>
         private bool CursorRight ()
         {
+            if (_provider is null)
+            {
+                return false;
+            }
+
             int current = _cursorPosition;
             _cursorPosition = _provider.CursorRight (_cursorPosition);
             SetNeedsDisplay ();
