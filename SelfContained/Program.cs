@@ -18,12 +18,8 @@ public static class Program
 
         if (Equals (Thread.CurrentThread.CurrentUICulture, CultureInfo.InvariantCulture) && Application.SupportedCultures.Count == 0)
         {
+            // Only happens if the project has <InvariantGlobalization>true</InvariantGlobalization>
             Debug.Assert (Application.SupportedCultures.Count == 0);
-        }
-        else
-        {
-            Debug.Assert (Application.SupportedCultures.Count == 4);
-            Debug.Assert (Equals (CultureInfo.CurrentCulture, Thread.CurrentThread.CurrentUICulture));
         }
 
         #endregion
