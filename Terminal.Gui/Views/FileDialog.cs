@@ -811,6 +811,11 @@ public class FileDialog : Dialog
         {
             PushState (d, true);
 
+            //if (d == State?.Directory || d.FullName == State?.Directory.FullName)
+            //{
+            //    FinishAccept ();
+            //}
+
             return;
         }
 

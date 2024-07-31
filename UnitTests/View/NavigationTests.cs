@@ -1696,7 +1696,24 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
                 {
                     Assert.Fail ($"{view} is not leaving.");
                 }
-                Application.OnKeyDown (view.TabStop == TabBehavior.TabStop ? Key.Tab : Key.Tab.WithCtrl);
+
+                switch (view.TabStop)
+                {
+                    case TabBehavior.NoStop:
+                        Application.OnKeyDown (Key.Tab);
+                        break;
+                    case TabBehavior.TabStop:
+                        Application.OnKeyDown (Key.Tab);
+                        break;
+                    case TabBehavior.TabGroup:
+                        Application.OnKeyDown (Key.Tab.WithCtrl);
+                        break;
+                    case null:
+                        Application.OnKeyDown (Key.Tab);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException ();
+                }
             }
         }
 
@@ -1707,7 +1724,23 @@ public class NavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (otherView.HasFocus);
 
         // Now navigate back to our test view
-        Application.OnKeyDown (view.TabStop == TabBehavior.TabStop ? Key.Tab : Key.Tab.WithCtrl);
+        switch (view.TabStop)
+        {
+            case TabBehavior.NoStop:
+                view.SetFocus();
+                break;
+            case TabBehavior.TabStop:
+                Application.OnKeyDown (Key.Tab);
+                break;
+            case TabBehavior.TabGroup:
+                Application.OnKeyDown (Key.Tab.WithCtrl);
+                break;
+            case null:
+                Application.OnKeyDown (Key.Tab);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
+        }
 
         Assert.False (otherView.HasFocus);
         Assert.True (view.HasFocus);

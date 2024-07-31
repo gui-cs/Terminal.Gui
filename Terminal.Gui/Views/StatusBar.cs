@@ -18,6 +18,7 @@ public class StatusBar : Bar
     /// <inheritdoc/>
     public StatusBar (IEnumerable<Shortcut> shortcuts) : base (shortcuts)
     {
+        TabStop = TabBehavior.NoStop;
         Orientation = Orientation.Horizontal;
         Y = Pos.AnchorEnd ();
         Width = Dim.Fill ();

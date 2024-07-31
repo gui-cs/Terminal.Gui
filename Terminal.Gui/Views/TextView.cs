@@ -2045,15 +2045,7 @@ public class TextView : View
                     }
                    );
 
-        AddCommand (
-                    Command.LineDown,
-                    () =>
-                    {
-                        ProcessMoveDown ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.LineDown, () => ProcessMoveDown ());
 
         AddCommand (
                     Command.LineDownExtend,
@@ -2065,15 +2057,7 @@ public class TextView : View
                     }
                    );
 
-        AddCommand (
-                    Command.LineUp,
-                    () =>
-                    {
-                        ProcessMoveUp ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.LineUp, () => ProcessMoveUp ());
 
         AddCommand (
                     Command.LineUpExtend,
@@ -5294,7 +5278,7 @@ public class TextView : View
         MoveEnd ();
     }
 
-    private void MoveDown ()
+    private bool MoveDown ()
     {
         if (CurrentRow + 1 < _model.Count)
         {
@@ -5318,8 +5302,14 @@ public class TextView : View
         {
             Adjust ();
         }
+        else
+        {
+            return false;
+        }
 
         DoNeededAction ();
+
+        return true;
     }
 
     private void MoveEndOfLine ()
@@ -5330,7 +5320,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void MoveLeft ()
+    private bool MoveLeft ()
     {
         if (CurrentColumn > 0)
         {
@@ -5351,10 +5341,16 @@ public class TextView : View
                 List<RuneCell> currentLine = GetCurrentLine ();
                 CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
             }
+            else
+            {
+                return false;
+            }
         }
 
         Adjust ();
         DoNeededAction ();
+
+        return true;
     }
 
     private void MovePageDown ()
@@ -5413,7 +5409,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void MoveRight ()
+    private bool MoveRight ()
     {
         List<RuneCell> currentLine = GetCurrentLine ();
 
@@ -5433,11 +5429,21 @@ public class TextView : View
                     _topRow++;
                     SetNeedsDisplay ();
                 }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
 
         Adjust ();
         DoNeededAction ();
+
+        return true;
     }
 
     private void MoveStartOfLine ()
@@ -5472,7 +5478,7 @@ public class TextView : View
         MoveHome ();
     }
 
-    private void MoveUp ()
+    private bool MoveUp ()
     {
         if (CurrentRow > 0)
         {
@@ -5492,8 +5498,13 @@ public class TextView : View
             TrackColumn ();
             PositionCursor ();
         }
+        else
+        {
+            return false;
+        }
 
         DoNeededAction ();
+        return true;
     }
 
     private void MoveWordBackward ()
@@ -5796,16 +5807,15 @@ public class TextView : View
         line = r!;
     }
 
-    private void ProcessMoveDown ()
+    private bool ProcessMoveDown ()
     {
         ResetContinuousFindTrack ();
-
         if (_shiftSelecting && Selecting)
         {
             StopSelecting ();
         }
 
-        MoveDown ();
+        return MoveDown ();
     }
 
     private void ProcessMoveDownExtend ()
@@ -5861,7 +5871,7 @@ public class TextView : View
         StartSelecting ();
         MoveLeft ();
     }
-    
+
     private bool ProcessMoveRight ()
     {
         // if the user presses Right (without any control keys)
@@ -5913,7 +5923,7 @@ public class TextView : View
         MoveStartOfLine ();
     }
 
-    private void ProcessMoveUp ()
+    private bool ProcessMoveUp ()
     {
         ResetContinuousFindTrack ();
 
@@ -5922,7 +5932,7 @@ public class TextView : View
             StopSelecting ();
         }
 
-        MoveUp ();
+        return MoveUp ();
     }
 
     private void ProcessMoveUpExtend ()
@@ -6020,7 +6030,7 @@ public class TextView : View
         Paste ();
     }
 
-    private bool? ProcessReturn ()
+    private bool ProcessReturn ()
     {
         ResetColumnTrack ();
 

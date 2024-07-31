@@ -32,8 +32,8 @@ public class TabViewTests (ITestOutputHelper output)
         var tv = new TabView ();
         Tab tab1;
         Tab tab2;
-        tv.AddTab (tab1 = new() { DisplayText = "Tab1", View = new TextField { Text = "hi" } }, false);
-        tv.AddTab (tab2 = new() { DisplayText = "Tab1", View = new Label { Text = "hi2" } }, true);
+        tv.AddTab (tab1 = new () { DisplayText = "Tab1", View = new TextField { Text = "hi" } }, false);
+        tv.AddTab (tab2 = new () { DisplayText = "Tab1", View = new Label { Text = "hi2" } }, true);
 
         Assert.Equal (2, tv.Tabs.Count);
         Assert.Equal (tab2, tv.SelectedTab);
@@ -143,21 +143,21 @@ public class TabViewTests (ITestOutputHelper output)
         // Waving mouse around does not trigger click
         for (var i = 0; i < 100; i++)
         {
-            args = new() { Position = new (i, 1), Flags = MouseFlags.ReportMousePosition };
+            args = new () { Position = new (i, 1), Flags = MouseFlags.ReportMousePosition };
             Application.OnMouseEvent (args);
             Application.Refresh ();
             Assert.Null (clicked);
             Assert.Equal (tab1, tv.SelectedTab);
         }
 
-        args = new() { Position = new (3, 1), Flags = MouseFlags.Button1Clicked };
+        args = new () { Position = new (3, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Equal (tab1, clicked);
         Assert.Equal (tab1, tv.SelectedTab);
 
         // Click to tab2
-        args = new() { Position = new (6, 1), Flags = MouseFlags.Button1Clicked };
+        args = new () { Position = new (6, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Equal (tab2, clicked);
@@ -170,7 +170,7 @@ public class TabViewTests (ITestOutputHelper output)
                              e.MouseEvent.Handled = true;
                          };
 
-        args = new() { Position = new (3, 1), Flags = MouseFlags.Button1Clicked };
+        args = new () { Position = new (3, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
 
@@ -178,7 +178,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab1, clicked);
         Assert.Equal (tab2, tv.SelectedTab);
 
-        args = new() { Position = new (12, 1), Flags = MouseFlags.Button1Clicked };
+        args = new () { Position = new (12, 1), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
 
@@ -253,7 +253,7 @@ public class TabViewTests (ITestOutputHelper output)
                                             );
 
         // Click the left arrow
-        args = new() { Position = new (0, 2), Flags = MouseFlags.Button1Clicked };
+        args = new () { Position = new (0, 2), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -346,7 +346,7 @@ public class TabViewTests (ITestOutputHelper output)
                                             );
 
         // Click the left arrow
-        args = new() { Position = new (1, 3), Flags = MouseFlags.Button1Clicked };
+        args = new () { Position = new (1, 3), Flags = MouseFlags.Button1Clicked };
         Application.OnMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -380,6 +380,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         var btn = new Button
         {
+            Id = "btn",
             Y = Pos.Bottom (tv) + 1,
             Height = 1,
             Width = 7,
@@ -397,8 +398,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.SelectedTab.View, top.Focused.MostFocused);
 
         // Press the cursor up key to focus the selected tab
-        var args = new Key (Key.CursorUp);
-        Application.OnKeyDown (args);
+        Application.OnKeyDown (Key.CursorUp);
         Application.Refresh ();
 
         // Is the selected tab focused
@@ -416,8 +416,7 @@ public class TabViewTests (ITestOutputHelper output)
                                  };
 
         // Press the cursor right key to select the next tab
-        args = new (Key.CursorRight);
-        Application.OnKeyDown (args);
+        Application.OnKeyDown (Key.CursorRight);
         Application.Refresh ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
@@ -425,37 +424,46 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv, top.Focused);
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
-        // Press the cursor down key to focus the selected tab view hosting
-        args = new (Key.CursorDown);
-        Application.OnKeyDown (args);
-        Application.Refresh ();
+        // Press the cursor down key. Since the selected tab has no focusable views, the focus should move to the next view in the toplevel
+        Application.OnKeyDown (Key.CursorDown);
+        Assert.Equal (tab2, tv.SelectedTab);
+        Assert.Equal (btn, top.MostFocused);
+
+        // Add a focusable subview to Selected Tab
+        var btnSubView = new View ()
+        {
+            Id = "btnSubView",
+            Title = "_Subview",
+            CanFocus = true
+        };
+        tv.SelectedTab.View.Add (btnSubView);
+
+        // Press cursor up. Should focus the subview in the selected tab.
+        Application.OnKeyDown (Key.CursorUp);
+        Assert.Equal (tab2, tv.SelectedTab);
+        Assert.Equal (btnSubView, top.MostFocused);
+
+        Application.OnKeyDown (Key.CursorUp);
+        Assert.Equal (tab2, top.MostFocused);
+
+        // Press the cursor down key twice.
+        Application.OnKeyDown (Key.CursorDown);
+        Application.OnKeyDown (Key.CursorDown);
+        Assert.Equal (btn, top.MostFocused);
+
+        // Press the cursor down key again will focus next view in the toplevel, whic is the TabView
+        Application.OnKeyDown (Key.CursorDown);
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
-        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+        Assert.Equal (tab1, tv.MostFocused);
 
-        // The tab view hosting is a label which can't be focused
-        // and the View container is the focused one
-        Assert.Equal (tv.Subviews [1], top.Focused.MostFocused);
-
-        // Press the cursor down key again will focus next view in the toplevel
-        Application.OnKeyDown (args);
-        Application.Refresh ();
+        // Press the cursor down key to focus the selected tab view hosting again
+        Application.OnKeyDown (Key.CursorDown);
         Assert.Equal (tab2, tv.SelectedTab);
-        Assert.Equal (btn, top.Focused);
-        Assert.Null (tv.MostFocused);
-        Assert.Null (top.Focused.MostFocused);
-
-        // Press the cursor up key to focus the selected tab view hosting again
-        args = new (Key.CursorUp);
-        Application.OnKeyDown (args);
-        Application.Refresh ();
-        Assert.Equal (tab2, tv.SelectedTab);
-        Assert.Equal (tv, top.Focused);
-        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+        Assert.Equal (btnSubView, top.MostFocused);
 
         // Press the cursor up key to focus the selected tab
-        args = new (Key.CursorUp);
-        Application.OnKeyDown (args);
+        Application.OnKeyDown (Key.CursorUp);
         Application.Refresh ();
 
         // Is the selected tab focused
@@ -464,8 +472,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor left key to select the previous tab
-        args = new (Key.CursorLeft);
-        Application.OnKeyDown (args);
+        Application.OnKeyDown (Key.CursorLeft);
         Application.Refresh ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
@@ -474,8 +481,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the end key to select the last tab
-        args = new (Key.End);
-        Application.OnKeyDown (args);
+        Application.OnKeyDown (Key.End);
         Application.Refresh ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
@@ -484,8 +490,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the home key to select the first tab
-        args = new (Key.Home);
-        Application.OnKeyDown (args);
+        Application.OnKeyDown (Key.Home);
         Application.Refresh ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
@@ -494,8 +499,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the page down key to select the next set of tabs
-        args = new (Key.PageDown);
-        Application.OnKeyDown (args);
+        Application.OnKeyDown (Key.PageDown);
         Application.Refresh ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
@@ -504,8 +508,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the page up key to select the previous set of tabs
-        args = new (Key.PageUp);
-        Application.OnKeyDown (args);
+        Application.OnKeyDown (Key.PageUp);
         Application.Refresh ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
@@ -599,7 +602,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new() { ShowTopLine = false };
+        tv.Style = new () { ShowTopLine = false };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -623,7 +626,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new() { ShowTopLine = false };
+        tv.Style = new () { ShowTopLine = false };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -647,7 +650,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new() { ShowTopLine = false };
+        tv.Style = new () { ShowTopLine = false };
         tv.ApplyStyleChanges ();
 
         // Ensures that the tab bar subview gets the bounds of the parent TabView
@@ -739,7 +742,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new() { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -763,7 +766,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new() { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -787,7 +790,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new() { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
         tv.ApplyStyleChanges ();
 
         // Ensures that the tab bar subview gets the bounds of the parent TabView
@@ -1054,7 +1057,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new() { TabsOnBottom = true };
+        tv.Style = new () { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -1078,7 +1081,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _, false);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new() { TabsOnBottom = true };
+        tv.Style = new () { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
         tv.LayoutSubviews ();
 
@@ -1102,7 +1105,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new() { TabsOnBottom = true };
+        tv.Style = new () { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
 
         // Ensures that the tab bar subview gets the bounds of the parent TabView
@@ -1178,7 +1181,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
         tv.Width = 20;
         tv.Height = 5;
-        tv.Style = new() { TabsOnBottom = true };
+        tv.Style = new () { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
 
         tv.LayoutSubviews ();
@@ -1299,16 +1302,16 @@ public class TabViewTests (ITestOutputHelper output)
             InitFakeDriver ();
         }
 
-        var tv = new TabView ();
+        var tv = new TabView () { Id = "tv " };
         tv.BeginInit ();
         tv.EndInit ();
         tv.ColorScheme = new ();
 
         tv.AddTab (
-                   tab1 = new() { DisplayText = "Tab1", View = new TextField { Width = 2, Text = "hi" } },
+                   tab1 = new () { Id = "tab1", DisplayText = "Tab1", View = new TextField { Id = "tab1.TextField", Width = 2, Text = "hi" } },
                    false
                   );
-        tv.AddTab (tab2 = new() { DisplayText = "Tab2", View = new Label { Text = "hi2" } }, false);
+        tv.AddTab (tab2 = new () { Id = "tab2", DisplayText = "Tab2", View = new Label { Id = "tab1.Label", Text = "hi2" } }, false);
 
         return tv;
     }

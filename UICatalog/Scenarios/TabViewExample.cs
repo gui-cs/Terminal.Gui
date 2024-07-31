@@ -132,42 +132,48 @@ public class TabViewExample : Scenario
 
         appWindow.Add (_tabView);
 
-        var frameRight = new FrameView
+        var frameRight = new View
         {
             X = Pos.Right (_tabView),
             Y = 1,
             Width = Dim.Fill (),
             Height = Dim.Fill (1),
-            Title = "About"
+            Title = "About",
+            BorderStyle = LineStyle.Single,
+            TabStop = TabBehavior.TabStop
         };
 
         frameRight.Add (
                         new TextView
                         {
-                            Text = "This demos the tabs control\nSwitch between tabs using cursor keys",
+                            Text = "This demos the tabs control\nSwitch between tabs using cursor keys.\nThis TextView has AllowsTab = false, so tab should nav too.",
                             Width = Dim.Fill (),
-                            Height = Dim.Fill ()
+                            Height = Dim.Fill (),
+                            AllowsTab = false,
                         }
                        );
 
         appWindow.Add (frameRight);
 
-        var frameBelow = new FrameView
+        var frameBelow = new View
         {
             X = 0,
             Y = Pos.Bottom (_tabView),
             Width = _tabView.Width,
             Height = Dim.Fill (1),
-            Title = "Bottom Frame"
+            Title = "Bottom Frame",
+            BorderStyle = LineStyle.Single,
+            TabStop = TabBehavior.TabStop
+
         };
 
         frameBelow.Add (
                         new TextView
                         {
                             Text =
-                                "This frame exists to check you can still tab here\nand that the tab control doesn't overspill it's bounds",
+                                "This frame exists to check that you can still tab here\nand that the tab control doesn't overspill it's bounds\nAllowsTab is true.",
                             Width = Dim.Fill (),
-                            Height = Dim.Fill ()
+                            Height = Dim.Fill (),
                         }
                        );
 

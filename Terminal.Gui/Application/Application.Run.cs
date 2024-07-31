@@ -98,6 +98,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             }
             else if (ApplicationOverlapped.OverlappedTop is { } && toplevel != Top && TopLevels.Contains (Top!))
             {
+                // BUGBUG: Don't call OnLeave/OnEnter directly! Set HasFocus to false and let the system handle it.
                 Top!.OnLeave (toplevel);
             }
 
@@ -149,8 +150,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         {
             if (toplevel.Visible)
             {
+                if (Current is { HasFocus: true })
+                {
+                    Current.HasFocus = false;
+                }
+
                 Current?.OnDeactivate (toplevel);
                 Toplevel previousCurrent = Current!;
+
                 Current = toplevel;
                 Current.OnActivate (previousCurrent);
 
@@ -331,7 +338,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public static T Run<T> (Func<Exception, bool>? errorHandler = null, ConsoleDriver? driver = null)
-        where T : Toplevel, new ()
+        where T : Toplevel, new()
     {
         if (!IsInitialized)
         {
@@ -820,6 +827,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         // Set Current and Top to the next TopLevel on the stack
         if (TopLevels.Count == 0)
         {
+            if (Current is { HasFocus: true })
+            {
+                Current.HasFocus = false;
+            }
             Current = null;
         }
         else
@@ -838,8 +849,17 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             else
             {
                 ApplicationOverlapped.SetCurrentOverlappedAsTop ();
-                runState.Toplevel!.OnLeave (Current);
-                Current.OnEnter (runState.Toplevel);
+                // BUGBUG: We should not call OnEnter/OnLeave directly; they should only be called by SetHasFocus
+                if (runState.Toplevel is { HasFocus: true })
+                {
+                    runState.Toplevel.HasFocus = false;
+                }
+
+                if (Current is { HasFocus: false })
+                {
+                    Current.SetFocus ();
+                    Current.RestoreFocus ();
+                }
             }
 
             Refresh ();

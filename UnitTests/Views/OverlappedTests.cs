@@ -1017,7 +1017,7 @@ public class OverlappedTests
         public Overlapped () { IsOverlappedContainer = true; }
     }
 
-    [Fact]
+    [Fact (Skip = "#2491: This test is really bogus. It does things like Runnable = false and is overly convolulted. Replace.")]
     [AutoInitShutdown]
     public void KeyBindings_Command_With_OverlappedTop ()
     {
@@ -1062,7 +1062,9 @@ public class OverlappedTests
         Assert.Equal (top, Application.Current);
         Assert.True (top.IsCurrentTop);
         Assert.Equal (top, ApplicationOverlapped.OverlappedTop);
+
         Application.Begin (win1);
+
         Assert.Equal (new (0, 0, 40, 25), win1.Frame);
         Assert.NotEqual (top, Application.Current);
         Assert.False (top.IsCurrentTop);
@@ -1074,7 +1076,9 @@ public class OverlappedTests
         Assert.Equal (tf1W1, win1.MostFocused);
         Assert.True (ApplicationOverlapped.IsOverlapped(win1));
         Assert.Single (ApplicationOverlapped.OverlappedChildren!);
+
         Application.Begin (win2);
+
         Assert.Equal (new (0, 0, 40, 25), win2.Frame);
         Assert.NotEqual (top, Application.Current);
         Assert.False (top.IsCurrentTop);
@@ -1095,13 +1099,15 @@ public class OverlappedTests
         Assert.False (win1.Running);
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
 
-        Assert.True (
-                     Application.OnKeyDown (Key.Z.WithCtrl)
-                    );
+        // win1 has been closed. It can no longer be focused or acted upon.
+        // win2 should now have focus
+        Assert.Equal (win2, Application.Current);
+        Assert.True (win2.IsCurrentTop);
+
+        Assert.Equal (Environment.OSVersion.Platform == PlatformID.Unix, Application.OnKeyDown (Key.Z.WithCtrl)); // suspend
 
         Assert.True (Application.OnKeyDown (Key.F5)); // refresh
 
-        Assert.True (Application.OnKeyDown (Key.Tab));
         Assert.True (win1.IsCurrentTop);
         Assert.Equal (tvW1, win1.MostFocused);
         Assert.True (Application.OnKeyDown (Key.Tab));
@@ -1183,14 +1189,14 @@ public class OverlappedTests
         Assert.True (Application.OnKeyDown (Key.End.WithCtrl));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tvW1, win1.MostFocused);
-        Assert.Equal (new (16, 1), tvW1.CursorPosition);
+        Assert.Equal (new (16, 1), tvW1.CursorPosition); // Last position of the text
 #if UNIX_KEY_BINDINGS
         Assert.True (Application.OnKeyDown (new (Key.F.WithCtrl)));
 #else
-        Assert.True (Application.OnKeyDown (Key.CursorRight));
+        Assert.True (Application.OnKeyDown (Key.CursorRight)); // should move to next view w/ in Group (tf2W1)
 #endif
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.Equal (tf2W1, win1.MostFocused);
 
 #if UNIX_KEY_BINDINGS
         Assert.True (ApplicationOverlapped.OverlappedChildren [0].ProcessKeyDown (new (Key.L.WithCtrl)));

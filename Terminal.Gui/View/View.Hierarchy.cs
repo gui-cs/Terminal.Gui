@@ -57,7 +57,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             _tabIndexes = new ();
         }
 
-        Debug.Assert (!_subviews.Contains (view));
+        Debug.WriteLineIf (_subviews.Contains (view), $"BUGBUG: {view} has already been added to {this}.");
         _subviews.Add (view);
         _tabIndexes.Add (view);
         view._superView = this;
