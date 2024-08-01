@@ -133,8 +133,8 @@ Setting this property to `true` has the same effect as calling `View.SetFocus ()
 
 If `v.HasFocus == true` then
 
-- All views down `v`'s view-hierarchy must be focusable.
-- All views down `v`'s view-hierarchy will also have `HasFocus == true`.
+- All views up `v`'s superview-hierarchy must be focusable.
+- All views up `v`'s superview-hierarchy will also have `HasFocus == true`.
 - The deepest-subview of `v` that is focusable will also have `HasFocus == true`
 
 In other words, `v.HasFocus == true` does not necessarily mean `v` is the most-focused view, receiving input. If it has focusable sub-views, one of those (or a further subview) will be the most-focused (`Application.Navigation.Focused`).
