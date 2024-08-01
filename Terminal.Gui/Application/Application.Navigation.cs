@@ -13,26 +13,31 @@ public static class ApplicationNavigation
     private static View? _focused = null;
 
     /// <summary>
-    ///     Gets or sets the most focused <see cref="View"/> in the application.
+    ///     Gets the most focused <see cref="View"/> in the application, if there is one.
+    /// </summary>
+    public static View? GetFocused () { return _focused; }
+
+    /// <summary>
+    ///     INTERNAL method to record the most focused <see cref="View"/> in the application.
     /// </summary>
     /// <remarks>
-    ///     When set, raises <see cref="FocusedChanged"/>.
+    ///     Raises <see cref="FocusedChanged"/>.
     /// </remarks>
-    public static View? Focused
+    internal static void SetFocused (View? value)
     {
-        get => _focused;
-        set
+        if (_focused == value)
         {
-            if (_focused == value)
-            {
-                return;
-            }
-
-            _focused = value;
-
-            FocusedChanged?.Invoke (null, EventArgs.Empty);
+            return;
         }
+
+        _focused = value;
+
+        FocusedChanged?.Invoke (null, EventArgs.Empty);
+
+        return;
     }
+
+    // TODO: Support Application canceling the HasFocus change
 
     /// <summary>
     ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
