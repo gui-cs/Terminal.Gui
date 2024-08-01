@@ -37,8 +37,6 @@ public static class ApplicationNavigation
         return;
     }
 
-    // TODO: Support Application canceling the HasFocus change
-
     /// <summary>
     ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
     /// </summary>
