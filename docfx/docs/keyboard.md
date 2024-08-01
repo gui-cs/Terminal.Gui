@@ -12,6 +12,9 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 * **The Source of Truth is Wikipedia** - We use this [Wikipedia article](https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts) as our guide for default key bindings.
 
+* **If It's Hot, It Works** - If a View with a [HotKey](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_HotKey) is visible, and the HotKey is visible, the user should be able to press that HotKey and whatever behavior is defined for it should work. For example, in v1, when a Modal view was active, the HotKeys on MenuBar continued to show "hot". In v2 we strive to ensure this doesn't happen.
+
+
 ## Keyboard APIs
 
 *Terminal.Gui* provides the following APIs for handling keyboard input:

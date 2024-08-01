@@ -10,6 +10,8 @@ See end for list of issues this design addresses.
 
 ## Lexicon & Taxonomy
 
+- Navigation - Refers to the user-experience for moving Focus between views in the application view-hierarchy. See [Navigation](navigation.md) for a deep-dive.
+- Focus - Indicates which View in the view-hierarchy is currently the one receiving keyboard input. Only one view-heirachy in an applicstion can have focus (`view.HasFocus == true`), and there is only one View in a focused heirarchy that is the most-focused; the one recieving keyboard input. See [Navigation](navigation.md) for a deep-dive.
 - Cursor - A visual indicator to the user where keyboard input will have an impact. There is one Cursor per terminal sesssion.
 - Cursor Location - The top-left corner of the Cursor. In text entry scenarios, new text will be inserted to the left/top of the Cursor Location. 
 - Cursor Size - The width and height of the cursor. Currently the size is limited to 1x1.
