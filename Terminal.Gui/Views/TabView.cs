@@ -25,7 +25,7 @@ public class TabView : View
     public TabView ()
     {
         CanFocus = true;
-        TabStop = TabBehavior.TabStop;
+        TabStop = TabBehavior.TabGroup; // Because TabView has focusable subviews, it must be a TabGroup
         _tabsBar = new TabRowView (this);
         _contentView = new View ()
         {
@@ -570,7 +570,6 @@ public class TabView : View
             _host = host;
 
             CanFocus = true;
-            TabStop = TabBehavior.TabStop;
             Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == GetContentSize ().
             Width = Dim.Fill ();
 

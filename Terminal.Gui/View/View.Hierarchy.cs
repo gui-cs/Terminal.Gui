@@ -64,6 +64,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         if (view.CanFocus)
         {
+#if AUTO_CANFOCUS
             // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Instead, callers to Add should be explicit about what they want.
             _addingViewSoCanFocusAlsoUpdatesSuperView = true;
 
@@ -76,8 +77,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
             // QUESTION: This automatic behavior of setting CanFocus to true on the SuperView is not documented, and is annoying.
             CanFocus = true;
-            view._tabIndex = _tabIndexes.IndexOf (view);
             _addingViewSoCanFocusAlsoUpdatesSuperView = false;
+#endif
+            view._tabIndex = _tabIndexes.IndexOf (view);
         }
 
         if (view.Enabled && !Enabled)
@@ -184,7 +186,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         Rectangle touched = view.Frame;
         _subviews.Remove (view);
-        _tabIndexes.Remove (view);
+        _tabIndexes!.Remove (view);
         view._superView = null;
         //view._tabIndex = -1;
         SetNeedsLayout ();

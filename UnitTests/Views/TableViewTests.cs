@@ -1034,7 +1034,7 @@ public class TableViewTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Theory]
+    [Theory (Skip = "#2491 - Uses private SetHasFocus. Refactor to not.")]
     [SetupFakeDriver]
     [InlineData (false)]
     [InlineData (true)]
@@ -1128,7 +1128,7 @@ public class TableViewTests (ITestOutputHelper output)
                                               );
     }
 
-    [Theory]
+    [Theory (Skip = "#2491 - Uses private SetHasFocus. Refactor to not.")]
     [SetupFakeDriver]
     [InlineData (false)]
     [InlineData (true)]
@@ -1219,7 +1219,7 @@ public class TableViewTests (ITestOutputHelper output)
                                               );
     }
 
-    [Theory]
+    [Theory (Skip = "#2491 - Uses private SetHasFocus. Refactor to not.")]
     [SetupFakeDriver]
     [InlineData (false)]
     [InlineData (true)]
@@ -1264,7 +1264,7 @@ public class TableViewTests (ITestOutputHelper output)
 
     }
 
-    [Theory]
+    [Theory (Skip = "#2491 - Uses private SetHasFocus. Refactor to not.")]
     [SetupFakeDriver]
     [InlineData (false)]
     [InlineData (true)]

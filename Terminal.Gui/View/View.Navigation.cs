@@ -5,19 +5,8 @@ namespace Terminal.Gui;
 
 public partial class View // Focus and cross-view navigation management (TabStop, TabIndex, etc...)
 {
-    // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Instead, callers to Add should be explicit about what they want.
-    // Set to true in Add() to indicate that the view being added to a SuperView has CanFocus=true.
-    // Makes it so CanFocus will update the SuperView's CanFocus property.
-    internal bool _addingViewSoCanFocusAlsoUpdatesSuperView;
 
     private NavigationDirection _focusDirection;
-
-    private bool _hasFocus;
-
-    // Used to cache CanFocus on subviews when CanFocus is set to false so that it can be restored when CanFocus is changed back to true
-    private bool _oldCanFocus;
-
-    private bool _canFocus;
 
     /// <summary>
     ///     Advances the focus to the next or previous view in <see cref="View.TabIndexes"/>, based on
@@ -65,10 +54,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         var index = GetScopedTabIndexes (behavior, direction);
+
         if (index.Length == 0)
         {
             return false;
         }
+
         var focusedIndex = index.IndexOf (Focused);
         int next = 0;
 
@@ -117,6 +108,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         View view = index [next];
+
         if (view.HasFocus)
         {
             return true;
@@ -129,6 +121,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             Focused.SetHasFocus (false, view);
 
             view.FocusDeepest (TabBehavior.TabStop, direction);
+
             return true;
         }
 
@@ -143,6 +136,18 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         return false;
     }
+
+#if AUTO_CANFOCUS
+    // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Instead, callers to Add should be explicit about what they want.
+    // Set to true in Add() to indicate that the view being added to a SuperView has CanFocus=true.
+    // Makes it so CanFocus will update the SuperView's CanFocus property.
+    internal bool _addingViewSoCanFocusAlsoUpdatesSuperView;
+
+    // Used to cache CanFocus on subviews when CanFocus is set to false so that it can be restored when CanFocus is changed back to true
+    private bool _oldCanFocus;
+#endif
+
+    private bool _canFocus;
 
     /// <summary>Gets or sets a value indicating whether this <see cref="View"/> can be focused.</summary>
     /// <remarks>
@@ -162,8 +167,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         will be restored to their previous values.
     ///     </para>
     ///     <para>
-    ///         Changing this peroperty to <see langword="true"/> will cause <see cref="TabStop"/> to be set to
-    ///         <see cref="TabBehavior.TabStop"/>" as a convenience. Changing this peroperty to
+    ///         Changing this property to <see langword="true"/> will cause <see cref="TabStop"/> to be set to
+    ///         <see cref="TabBehavior.TabStop"/>" as a convenience. Changing this property to
     ///         <see langword="false"/> will have no effect on <see cref="TabStop"/>.
     ///     </para>
     /// </remarks>
@@ -172,10 +177,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
         get => _canFocus;
         set
         {
+#if AUTO_CANFOCUS
             if (!_addingViewSoCanFocusAlsoUpdatesSuperView && IsInitialized && SuperView?.CanFocus == false && value)
             {
                 throw new InvalidOperationException ("Cannot set CanFocus to true if the SuperView CanFocus is false!");
             }
+#endif
 
             if (_canFocus == value)
             {
@@ -184,6 +191,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             _canFocus = value;
 
+#if AUTO_CANFOCUS
             switch (_canFocus)
             {
                 case false when _tabIndex > -1:
@@ -197,6 +205,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
                     break;
             }
+#endif
 
             if (TabStop is null && _canFocus)
             {
@@ -229,6 +238,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             if (_subviews is { } && IsInitialized)
             {
+#if AUTO_CANFOCUS
+                // Change the CanFocus of all subviews to the same value as this view
+                // if the CanFocus of the subview is different from the value being set
                 foreach (View view in _subviews)
                 {
                     if (view.CanFocus != value)
@@ -256,7 +268,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                         }
                     }
                 }
-
+#endif
                 if (this is Toplevel && Application.Current!.Focused != this)
                 {
                     ApplicationOverlapped.BringOverlappedTopToFront ();
@@ -304,8 +316,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
         //    deepest.SetFocus ();
         //}
 
-        //SetFocus ();
-
         if (_tabIndexes is null)
         {
             SuperView?.SetFocus (this);
@@ -313,9 +323,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return;
         }
 
+        SetFocus ();
+
         foreach (View view in _tabIndexes)
         {
-            if (view.CanFocus && view.TabStop == behavior && view.Visible && view.Enabled)
+            if (view.CanFocus && (behavior is null || view.TabStop == behavior) && view.Visible && view.Enabled)
             {
                 SetFocus (view);
 
@@ -335,11 +347,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
             {
                 return v;
             }
+
             return v.FindDeepestFocusableView (behavior, direction);
         }
 
         return null;
     }
+
+    private bool _hasFocus;
 
     /// <summary>
     ///     Gets or sets whether this view has focus.
@@ -419,6 +434,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (_hasFocus)
         {
             Debug.WriteLine ($"BUGBUG: HasFocus should be false when OnEnter is called - Leaving: {leavingView} Entering: {this}");
+
             // return true;
         }
 
@@ -448,8 +464,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (!_hasFocus)
         {
             Debug.WriteLine ($"BUGBUG: HasFocus should be true when OnLeave is called - Leaving: {this} Entering: {enteringView}");
+
             //return true;
         }
+
         var args = new FocusEventArgs (this, enteringView);
         Leave?.Invoke (this, args);
 
@@ -617,14 +635,16 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             if (newHasFocus)
             {
-                Debug.Assert (view is null || ApplicationNavigation.IsInHierarchy (SuperView, view));
+                Debug.Assert (view is null || SuperView is null || ApplicationNavigation.IsInHierarchy (SuperView, view));
                 OnEnter (view);
                 ApplicationNavigation.Focused = this;
+
                 //_hasFocus = true;
             }
             else
             {
                 OnLeave (view);
+
                 //_hasFocus = false;
             }
 
@@ -735,10 +755,34 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 // BUGBUG: we have to use _tabIndexes and not TabIndexes because TabIndexes returns is a read-only version of _tabIndexes
                 SuperView._tabIndexes.Remove (this);
                 SuperView._tabIndexes.Insert ((int)_tabIndex, this);
-                ReorderSuperViewTabIndexes ();
+                UpdatePeerTabIndexes ();
+            }
+            return;
+
+            // Updates the <see cref="TabIndex"/>s of the views in the <see cref="SuperView"/>'s to match their order in <see cref="TabIndexes"/>.
+            void UpdatePeerTabIndexes ()
+            {
+                if (SuperView is null)
+                {
+                    return;
+                }
+
+                var i = 0;
+
+                foreach (View superViewTabStop in SuperView._tabIndexes)
+                {
+                    if (superViewTabStop._tabIndex is null)
+                    {
+                        continue;
+                    }
+
+                    superViewTabStop._tabIndex = i;
+                    i++;
+                }
             }
         }
     }
+
 
     /// <summary>
     ///     Gets the greatest <see cref="TabIndex"/> of the <see cref="SuperView"/>'s <see cref="TabIndexes"/> that is less
@@ -768,29 +812,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         return Math.Min (i, idx);
     }
 
-    /// <summary>
-    ///     Re-orders the <see cref="TabIndex"/>s of the views in the <see cref="SuperView"/>'s <see cref="TabIndexes"/>.
-    /// </summary>
-    private void ReorderSuperViewTabIndexes ()
-    {
-        if (SuperView is null)
-        {
-            return;
-        }
 
-        var i = 0;
-
-        foreach (View superViewTabStop in SuperView._tabIndexes)
-        {
-            if (superViewTabStop._tabIndex is null)
-            {
-                continue;
-            }
-
-            superViewTabStop._tabIndex = i;
-            i++;
-        }
-    }
 
     private TabBehavior? _tabStop;
 

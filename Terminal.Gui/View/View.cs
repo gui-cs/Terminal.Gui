@@ -228,9 +228,10 @@ public partial class View : Responder, ISupportInitializeNotification
         {
             throw new InvalidOperationException ("The view is already initialized.");
         }
-
+#if AUTO_CANFOCUS
         _oldCanFocus = CanFocus;
         _oldTabIndex = _tabIndex;
+#endif
 
         BeginInitAdornments ();
 
@@ -285,11 +286,13 @@ public partial class View : Responder, ISupportInitializeNotification
         Initialized?.Invoke (this, EventArgs.Empty);
     }
 
-    #endregion Constructors and Initialization
+#endregion Constructors and Initialization
 
     #region Visibility
 
     private bool _enabled = true;
+
+    // This is a cache of the Enabled property so that we can restore it when the superview is re-enabled.
     private bool _oldEnabled;
 
     /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> can respond to user interaction.</summary>
@@ -328,7 +331,9 @@ public partial class View : Responder, ISupportInitializeNotification
                 else
                 {
                     view.Enabled = view._oldEnabled;
+#if AUTO_CANFOCUS
                     view._addingViewSoCanFocusAlsoUpdatesSuperView = _enabled;
+#endif
                 }
             }
         }
@@ -400,7 +405,7 @@ public partial class View : Responder, ISupportInitializeNotification
         return true;
     }
 
-    #endregion Visibility
+#endregion Visibility
 
     #region Title
 

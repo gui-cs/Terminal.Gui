@@ -186,7 +186,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
-        toplevel.FocusDeepest (null, NavigationDirection.Forward);
+        toplevel.AdvanceFocus (NavigationDirection.Forward, null);//.FocusDeepest (null, NavigationDirection.Forward);
         ApplicationOverlapped.BringOverlappedTopToFront ();
 
         if (refreshDriver)

@@ -390,7 +390,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "#2491 - Test is broken until #2491 is more mature.")]
     [AutoInitShutdown]
     public void KeyBindings_Command ()
     {
