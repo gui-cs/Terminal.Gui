@@ -90,9 +90,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 return false;
             }
 
-            Focused.RestoreFocus (TabBehavior.TabStop);
+            //Focused.RestoreFocus (TabBehavior.TabStop);
 
-            return true;
+            //if (Focused is { })
+            //{
+            //    return true;
+            //}
 
             // Wrap around
             //if (SuperView is {})
@@ -294,14 +297,31 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return;
         }
 
-        View deepest = FindDeepestFocusableView (behavior, direction);
+        //View deepest = FindDeepestFocusableView (behavior, direction);
 
-        if (deepest is { })
+        //if (deepest is { })
+        //{
+        //    deepest.SetFocus ();
+        //}
+
+        //SetFocus ();
+
+        if (_tabIndexes is null)
         {
-            deepest.SetFocus ();
+            SuperView?.SetFocus (this);
+
+            return;
         }
 
-        SetFocus ();
+        foreach (View view in _tabIndexes)
+        {
+            if (view.CanFocus && view.TabStop == behavior && view.Visible && view.Enabled)
+            {
+                SetFocus (view);
+
+                return;
+            }
+        }
     }
 
     [CanBeNull]
@@ -560,6 +580,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         View f = Focused;
         Focused = viewToEnterFocus;
         Focused?.SetHasFocus (true, f, true);
+        Focused?.FocusDeepest (null, NavigationDirection.Forward);
 
         // Recursively set focus down the view hierarchy
         if (SuperView is { })
@@ -592,17 +613,19 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         if (HasFocus != newHasFocus || force)
         {
+            _hasFocus = newHasFocus;
+
             if (newHasFocus)
             {
                 Debug.Assert (view is null || ApplicationNavigation.IsInHierarchy (SuperView, view));
                 OnEnter (view);
                 ApplicationNavigation.Focused = this;
-                _hasFocus = true;
+                //_hasFocus = true;
             }
             else
             {
                 OnLeave (view);
-                _hasFocus = false;
+                //_hasFocus = false;
             }
 
             SetNeedsDisplay ();
@@ -612,7 +635,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (!newHasFocus && Focused is { })
         {
             View f = Focused;
-            //f.OnLeave (view);
+            f.OnLeave (view);
             f.SetHasFocus (false, view, true);
             Focused = null;
         }
