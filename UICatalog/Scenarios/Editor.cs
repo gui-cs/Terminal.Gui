@@ -722,7 +722,7 @@ public class Editor : Scenario
             }
             else
             {
-                FocusFirst (null);
+                FocusDeepest (null, NavigationDirection.Forward);
             }
         }
 
@@ -739,7 +739,7 @@ public class Editor : Scenario
         _findReplaceWindow.SuperView.BringSubviewToFront (_findReplaceWindow);
         _tabView.SetFocus ();
         _tabView.SelectedTab = isFind ? _tabView.Tabs.ToArray () [0] : _tabView.Tabs.ToArray () [1];
-        _tabView.SelectedTab.View.FocusFirst (null);
+        _tabView.SelectedTab.View.FocusDeepest (null, NavigationDirection.Forward);
     }
 
     private void CreateFindReplace ()
@@ -753,10 +753,10 @@ public class Editor : Scenario
 
         _tabView.AddTab (new () { DisplayText = "Find", View = CreateFindTab () }, true);
         _tabView.AddTab (new () { DisplayText = "Replace", View = CreateReplaceTab () }, false);
-        _tabView.SelectedTabChanged += (s, e) => _tabView.SelectedTab.View.FocusFirst (null);
+        _tabView.SelectedTabChanged += (s, e) => _tabView.SelectedTab.View.FocusDeepest (null, NavigationDirection.Forward);
         _findReplaceWindow.Add (_tabView);
 
-        _tabView.SelectedTab.View.FocusLast (null); // Hack to get the first tab to be focused
+//        _tabView.SelectedTab.View.FocusLast (null); // Hack to get the first tab to be focused
         _findReplaceWindow.Visible = false;
         _appWindow.Add (_findReplaceWindow);
     }

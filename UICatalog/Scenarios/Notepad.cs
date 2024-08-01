@@ -309,7 +309,7 @@ public class Notepad : Scenario
         tab.CloneTo (newTabView);
         newTile.ContentView.Add (newTabView);
 
-        newTabView.FocusFirst (null);
+        newTabView.FocusDeepest (null, NavigationDirection.Forward);
         newTabView.AdvanceFocus (NavigationDirection.Forward, null);
     }
 

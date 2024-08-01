@@ -431,7 +431,7 @@ public partial class Toplevel : View
         {
             if (Focused is null)
             {
-                RestoreFocus ();
+                RestoreFocus (null);
             }
 
             return null;

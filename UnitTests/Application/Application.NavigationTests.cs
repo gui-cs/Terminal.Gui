@@ -1,11 +1,36 @@
 ﻿using Moq;
 using Xunit.Abstractions;
+using Terminal.Gui;
 
-namespace Terminal.Gui.ApplicationTests;
+namespace Terminal.Gui.ApplicationTests.NavigationTests;
 
 public class ApplicationNavigationTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
+
+    [Fact]
+    public void Focused_Change_Raises_FocusedChanged ()
+    {
+        bool raised = false;
+
+        ApplicationNavigation.FocusedChanged += ApplicationNavigationOnFocusedChanged;
+
+        ApplicationNavigation.Focused = new View();
+
+        Assert.True (raised);
+
+        ApplicationNavigation.Focused.Dispose ();
+        ApplicationNavigation.Focused = null;
+
+        ApplicationNavigation.FocusedChanged -= ApplicationNavigationOnFocusedChanged;
+
+        return;
+
+        void ApplicationNavigationOnFocusedChanged (object sender, EventArgs e)
+        {
+            raised = true;
+        }
+    }
 
     [Fact]
     public void GetDeepestFocusedSubview_ShouldReturnNull_WhenViewIsNull ()

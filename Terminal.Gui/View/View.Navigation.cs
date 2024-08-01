@@ -51,19 +51,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (Focused is null)
         {
-            switch (direction)
-            {
-                case NavigationDirection.Forward:
-                    FocusFirst (behavior);
-
-                    break;
-                case NavigationDirection.Backward:
-                    FocusLast (behavior);
-
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException (nameof (direction), direction, null);
-            }
+            FocusDeepest (behavior, direction);
 
             return Focused is { };
         }
@@ -90,8 +78,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
         else
         {
-            // focusedIndex is at end of list. If we are going backwards,...
-            if (behavior == TabStop)
+            if (behavior == TabBehavior.TabGroup && behavior == TabStop && SuperView?.TabStop == TabBehavior.TabGroup)
             {
                 // Go up the hierarchy
                 // Leave
@@ -102,6 +89,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
                 return false;
             }
+
+            Focused.RestoreFocus (TabBehavior.TabStop);
+
+            return true;
+
             // Wrap around
             //if (SuperView is {})
             //{
@@ -122,7 +114,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         View view = index [next];
-
+        if (view.HasFocus)
+        {
+            return true;
+        }
 
         // The subview does not have focus, but at least one other that can. Can this one be focused?
         if (view.CanFocus && view.Visible && view.Enabled)
@@ -130,20 +125,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // Make Focused Leave
             Focused.SetHasFocus (false, view);
 
-            switch (direction)
-            {
-                case NavigationDirection.Forward:
-                    view.FocusFirst (TabBehavior.TabStop);
-
-                    break;
-                case NavigationDirection.Backward:
-                    view.FocusLast (TabBehavior.TabStop);
-
-                    break;
-            }
-
-            SetFocus (view);
-
+            view.FocusDeepest (TabBehavior.TabStop, direction);
             return true;
         }
 
@@ -226,7 +208,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             if (!_canFocus && HasFocus)
             {
                 SetHasFocus (false, this);
-                SuperView?.RestoreFocus ();
+                SuperView?.RestoreFocus (null);
 
                 // If EnsureFocus () didn't set focus to a view, focus the next focusable view in the application
                 if (SuperView is { Focused: null })
@@ -300,55 +282,43 @@ public partial class View // Focus and cross-view navigation management (TabStop
     public View Focused { get; private set; }
 
     /// <summary>
-    ///     Focuses the first focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
+    ///     Focuses the deepest focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
     ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
     /// <param name="behavior"></param>
-    public void FocusFirst (TabBehavior? behavior)
+    /// <param name="direction"></param>
+    public void FocusDeepest (TabBehavior? behavior, NavigationDirection direction)
     {
         if (!CanBeVisible (this))
         {
             return;
         }
 
-        if (_tabIndexes is null)
-        {
-            SuperView?.SetFocus (this);
+        View deepest = FindDeepestFocusableView (behavior, direction);
 
-            return;
+        if (deepest is { })
+        {
+            deepest.SetFocus ();
         }
 
-        var indicies = GetScopedTabIndexes (behavior, NavigationDirection.Forward);
-        if (indicies.Length > 0)
-        {
-            SetFocus (indicies [0]);
-        }
+        SetFocus ();
     }
 
-    /// <summary>
-    ///     Focuses the last focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
-    ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
-    /// </summary>
-    /// <param name="behavior"></param>
-    public void FocusLast (TabBehavior? behavior)
+    [CanBeNull]
+    private View FindDeepestFocusableView (TabBehavior? behavior, NavigationDirection direction)
     {
-        if (!CanBeVisible (this))
+        var indicies = GetScopedTabIndexes (behavior, direction);
+
+        foreach (View v in indicies)
         {
-            return;
+            if (v.TabIndexes.Count == 0)
+            {
+                return v;
+            }
+            return v.FindDeepestFocusableView (behavior, direction);
         }
 
-        if (_tabIndexes is null)
-        {
-            SuperView?.SetFocus (this);
-
-            return;
-        }
-
-        var indicies = GetScopedTabIndexes (behavior, NavigationDirection.Forward);
-        if (indicies.Length > 0)
-        {
-            SetFocus (indicies [^1]);
-        }
+        return null;
     }
 
     /// <summary>
@@ -425,6 +395,13 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </remarks>
     public virtual bool OnEnter (View leavingView)
     {
+        // BUGBUG: _hasFocus should ALWAYS be false when this method is called. 
+        if (_hasFocus)
+        {
+            Debug.WriteLine ($"BUGBUG: HasFocus should be false when OnEnter is called - Leaving: {leavingView} Entering: {this}");
+            // return true;
+        }
+
         var args = new FocusEventArgs (leavingView, this);
         Enter?.Invoke (this, args);
 
@@ -447,11 +424,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </remarks>
     public virtual bool OnLeave (View enteringView)
     {
-        // BUGBUG: _hasFocus should ALWAYS be false when this method is called. 
-        if (_hasFocus)
+        // BUGBUG: _hasFocus should ALWAYS be true when this method is called. 
+        if (!_hasFocus)
         {
-            Debug.WriteLine ($"BUGBUG: HasFocus should ALWAYS be false when OnLeave is called.");
-            return true;
+            Debug.WriteLine ($"BUGBUG: HasFocus should be true when OnLeave is called - Leaving: {this} Entering: {enteringView}");
+            //return true;
         }
         var args = new FocusEventArgs (this, enteringView);
         Leave?.Invoke (this, args);
@@ -512,29 +489,22 @@ public partial class View // Focus and cross-view navigation management (TabStop
     }
 
     /// <summary>
-    ///     INTERNAL helper for calling <see cref="FocusFirst"/> or <see cref="FocusLast"/> based on
+    ///     INTERNAL helper for calling <see cref="FocusDeepest"/> or <see cref="FocusLast"/> based on
     ///     <see cref="FocusDirection"/>.
     ///     FocusDirection is not public. This API is thus non-deterministic from a public API perspective.
     /// </summary>
-    internal void RestoreFocus ()
+    internal void RestoreFocus (TabBehavior? behavior)
     {
         if (Focused is null && _subviews?.Count > 0)
         {
-            if (FocusDirection == NavigationDirection.Forward)
-            {
-                FocusFirst (null);
-            }
-            else
-            {
-                FocusLast (null);
-            }
+            FocusDeepest (behavior, FocusDirection);
         }
     }
 
     /// <summary>
     ///     Internal API that causes <paramref name="viewToEnterFocus"/> to enter focus.
     ///     <paramref name="viewToEnterFocus"/> does not need to be a subview.
-    ///     Recursively sets focus upwards in the view hierarchy.
+    ///     Recursively sets focus DOWN in the view hierarchy.
     /// </summary>
     /// <param name="viewToEnterFocus"></param>
     private void SetFocus (View viewToEnterFocus)
@@ -583,19 +553,15 @@ public partial class View // Focus and cross-view navigation management (TabStop
             throw new ArgumentException (@$"The specified view {viewToEnterFocus} is not part of the hierarchy of {this}.");
         }
 
-        // If a subview has focus, make it leave focus
+        // If a subview has focus, make it leave focus. This will leave focus up the hierarchy.
         Focused?.SetHasFocus (false, viewToEnterFocus);
 
         // make viewToEnterFocus Focused and enter focus
         View f = Focused;
         Focused = viewToEnterFocus;
-        Focused.SetHasFocus (true, f);
+        Focused?.SetHasFocus (true, f, true);
 
-        // Ensure on either the first or last focusable subview of Focused
-        // BUGBUG: With Groups, this means the previous focus is lost
-        Focused.RestoreFocus ();
-
-        // Recursively set focus upwards in the view hierarchy
+        // Recursively set focus down the view hierarchy
         if (SuperView is { })
         {
             SuperView.SetFocus (this);
@@ -626,15 +592,17 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         if (HasFocus != newHasFocus || force)
         {
-            _hasFocus = newHasFocus;
-
             if (newHasFocus)
             {
+                Debug.Assert (view is null || ApplicationNavigation.IsInHierarchy (SuperView, view));
                 OnEnter (view);
+                ApplicationNavigation.Focused = this;
+                _hasFocus = true;
             }
             else
             {
                 OnLeave (view);
+                _hasFocus = false;
             }
 
             SetNeedsDisplay ();
@@ -644,8 +612,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (!newHasFocus && Focused is { })
         {
             View f = Focused;
-            f.OnLeave (view);
-            f.SetHasFocus (false, view);
+            //f.OnLeave (view);
+            f.SetHasFocus (false, view, true);
             Focused = null;
         }
     }
@@ -654,7 +622,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
 #nullable enable
 
-    private List<View> _tabIndexes;
+    private List<View>? _tabIndexes;
 
     // TODO: This should be a get-only property?
     // BUGBUG: This returns an AsReadOnly list, but isn't declared as such.
@@ -670,23 +638,23 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <returns></returns>GetScopedTabIndexes
     private View [] GetScopedTabIndexes (TabBehavior? behavior, NavigationDirection direction)
     {
-        IEnumerable<View> indicies;
+        IEnumerable<View>? indicies;
 
         if (behavior.HasValue)
         {
-            indicies = _tabIndexes.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+            indicies = _tabIndexes?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
         }
         else
         {
-            indicies = _tabIndexes.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
+            indicies = _tabIndexes?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
         if (direction == NavigationDirection.Backward)
         {
-            indicies = indicies.Reverse ();
+            indicies = indicies?.Reverse ();
         }
 
-        return indicies.ToArray ();
+        return indicies?.ToArray () ?? Array.Empty<View> ();
 
     }
 

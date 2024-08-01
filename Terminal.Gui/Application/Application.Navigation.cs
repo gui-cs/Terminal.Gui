@@ -6,10 +6,75 @@ using System.Security.Cryptography;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Helper class for <see cref="Application"/> navigation.
+///     Static helper class for <see cref="Application"/> navigation.
 /// </summary>
-internal static class ApplicationNavigation
+public static class ApplicationNavigation
 {
+    private static View? _focused = null;
+
+    /// <summary>
+    ///     Gets or sets the most focused <see cref="View"/> in the application.
+    /// </summary>
+    /// <remarks>
+    ///     When set, raises <see cref="FocusedChanged"/>.
+    /// </remarks>
+    public static View? Focused
+    {
+        get => _focused;
+        set
+        {
+            if (_focused == value)
+            {
+                return;
+            }
+
+            _focused = value;
+
+            FocusedChanged?.Invoke (null, EventArgs.Empty);
+        }
+    }
+
+    /// <summary>
+    ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
+    /// </summary>
+    /// <param name="start"></param>
+    /// <param name="view"></param>
+    /// <returns></returns>
+    public static bool IsInHierarchy (View start, View? view)
+    {
+        if (view is null)
+        {
+            return false;
+        }
+
+        if (view == start)
+        {
+            return true;
+        }
+
+        foreach (View subView in start.Subviews)
+        {
+            if (view == subView)
+            {
+                return true;
+            }
+
+            var found = IsInHierarchy (subView, view);
+            if (found)
+            {
+                return found;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Raised when the most focused <see cref="View"/> in the application has changed.
+    /// </summary>
+    public static event EventHandler<EventArgs>? FocusedChanged;
+
+
     /// <summary>
     ///    Gets the deepest focused subview of the specified <paramref name="view"/>.
     /// </summary>
@@ -73,7 +138,7 @@ internal static class ApplicationNavigation
 
                 if (Application.Current.Focused is null)
                 {
-                    Application.Current.RestoreFocus ();
+                    Application.Current.RestoreFocus (TabBehavior.TabGroup);
                 }
             }
 
@@ -150,5 +215,13 @@ internal static class ApplicationNavigation
         {
             ApplicationOverlapped.OverlappedMovePrevious ();
         }
+    }
+
+    public static void ResetState ()
+    {
+        _focused?.Dispose ();
+        _focused = null;
+
+        FocusedChanged = null;
     }
 }

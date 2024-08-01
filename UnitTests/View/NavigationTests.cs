@@ -510,7 +510,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                                      Assert.False (win.HasFocus);
 
                                      win.Enabled = true;
-                                     win.FocusFirst (null);
+                                     win.FocusDeepest (null, NavigationDirection.Forward);
                                      Assert.True (button.HasFocus);
                                      Assert.True (win.HasFocus);
 

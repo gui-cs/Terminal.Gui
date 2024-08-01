@@ -186,7 +186,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
-        toplevel.FocusFirst (null);
+        toplevel.FocusDeepest (null, NavigationDirection.Forward);
         ApplicationOverlapped.BringOverlappedTopToFront ();
 
         if (refreshDriver)
@@ -858,7 +858,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 if (Current is { HasFocus: false })
                 {
                     Current.SetFocus ();
-                    Current.RestoreFocus ();
+                    Current.RestoreFocus (null);
                 }
             }
 

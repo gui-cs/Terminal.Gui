@@ -538,7 +538,7 @@ public class FileDialog : Dialog
         // to streamline user experience and allow direct typing of paths
         // with zero navigation we start with focus in the text box and any
         // default/current path fully selected and ready to be overwritten
-        _tbPath.FocusFirst (null);
+        _tbPath.FocusDeepest (null, NavigationDirection.Forward);
         _tbPath.SelectAll ();
 
         if (string.IsNullOrEmpty (Title))
@@ -1050,7 +1050,7 @@ public class FileDialog : Dialog
     {
         if (keyEvent.KeyCode == isKey)
         {
-            to.FocusFirst (null);
+            to.FocusDeepest (null, NavigationDirection.Forward);
 
             if (to == _tbPath)
             {
@@ -1439,7 +1439,7 @@ public class FileDialog : Dialog
     {
         if (_treeView.HasFocus && Separators.Contains ((char)keyEvent))
         {
-            _tbPath.FocusFirst (null);
+            _tbPath.FocusDeepest (null, NavigationDirection.Forward);
 
             // let that keystroke go through on the tbPath instead
             return true;

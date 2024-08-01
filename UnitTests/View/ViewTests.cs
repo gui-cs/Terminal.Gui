@@ -1091,7 +1091,7 @@ At 0,0
                                      Assert.True (RunesCount () == 0);
 
                                      win.Visible = true;
-                                     win.FocusFirst (null);
+                                     win.FocusDeepest (null, NavigationDirection.Forward);
                                      Assert.True (button.HasFocus);
                                      Assert.True (win.HasFocus);
                                      top.Draw ();

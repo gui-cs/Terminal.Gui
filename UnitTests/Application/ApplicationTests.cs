@@ -201,6 +201,8 @@ public class ApplicationTests
             // Keyboard
             Assert.Empty (Application.GetViewKeyBindings ());
 
+            Assert.Null (ApplicationNavigation.Focused);
+
             // Events - Can't check
             //Assert.Null (Application.NotifyNewRunState);
             //Assert.Null (Application.NotifyNewRunState);

@@ -121,7 +121,7 @@ public partial class View // Layout APIs
         View? superView;
         statusBar = null!;
 
-        if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
+        if (viewToMove is not Toplevel || viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
             maxDimension = Driver.Cols;
             superView = Application.Top;
