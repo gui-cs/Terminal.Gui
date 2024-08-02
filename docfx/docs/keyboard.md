@@ -37,6 +37,8 @@ The [Command](~/api/Terminal.Gui.Command.yml) enum lists generic operations that
 firing while in `TableView` it is bound to `CellActivated`. Not all commands
 are implemented by all views (e.g. you cannot scroll in a `Button`). Use the `GetSupportedCommands()` method to determine which commands are implemented by a `View`. 
 
+Key Bindings can be added at the Application or View level. For Application-scoped Key Bindings see [ApplicationNavigation](~/api/Terminal.Gui.ApplicationNavigation.yml). For View-scoped Key Bindings see [Key Bindings](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_KeyBinings).
+
 ### **[HotKey](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_HotKey)** 
 
 A **HotKey** is a keypress that selects a visible UI item. For selecting items across `View`s (e.g. a `Button` in a `Dialog`) the keypress must have the `Alt` modifier. For selecting items within a `View` that are not `View`s themselves, the keypress can be key without the `Alt` modifier.  For example, in a `Dialog`, a `Button` with the text of "_Text" can be selected with `Alt-T`. Or, in a `Menu` with "_File _Edit", `Alt-F` will select (show) the "_File" menu. If the "_File" menu has a sub-menu of "_New" `Alt-N` or `N` will ONLY select the "_New" sub-menu if the "_File" menu is already opened.

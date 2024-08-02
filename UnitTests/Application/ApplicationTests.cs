@@ -183,8 +183,8 @@ public class ApplicationTests
             Assert.Null (Application.Driver);
             Assert.Null (Application.MainLoop);
             Assert.False (Application.EndAfterFirstIteration);
-            Assert.Equal (Key.Empty, Application.AlternateBackwardKey);
-            Assert.Equal (Key.Empty, Application.AlternateForwardKey);
+            Assert.Equal (Key.Empty, Application.PrevTabGroupKey);
+            Assert.Equal (Key.Empty, Application.NextTabGroupKey);
             Assert.Equal (Key.Empty, Application.QuitKey);
             Assert.Null (ApplicationOverlapped.OverlappedChildren);
             Assert.Null (ApplicationOverlapped.OverlappedTop);
@@ -230,8 +230,8 @@ public class ApplicationTests
 
         //Application.ForceDriver = "driver";
         Application.EndAfterFirstIteration = true;
-        Application.AlternateBackwardKey = Key.A;
-        Application.AlternateForwardKey = Key.B;
+        Application.PrevTabGroupKey = Key.A;
+        Application.NextTabGroupKey = Key.B;
         Application.QuitKey = Key.C;
         Application.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Cancel);
 

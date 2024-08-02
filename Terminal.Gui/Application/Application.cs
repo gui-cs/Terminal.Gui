@@ -142,8 +142,8 @@ public static partial class Application
         UnGrabbedMouse = null;
 
         // Keyboard
-        AlternateBackwardKey = Key.Empty;
-        AlternateForwardKey = Key.Empty;
+        PrevTabGroupKey = Key.Empty;
+        NextTabGroupKey = Key.Empty;
         QuitKey = Key.Empty;
         KeyDown = null;
         KeyUp = null;

@@ -6,55 +6,55 @@ namespace Terminal.Gui;
 
 public static partial class Application // Keyboard handling
 {
-    private static Key _alternateForwardKey = Key.Empty; // Defined in config.json
+    private static Key _nextTabGroupKey = Key.Empty; // Defined in config.json
 
     /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key AlternateForwardKey
+    public static Key NextTabGroupKey
     {
-        get => _alternateForwardKey;
+        get => _nextTabGroupKey;
         set
         {
-            if (_alternateForwardKey != value)
+            if (_nextTabGroupKey != value)
             {
-                Key oldKey = _alternateForwardKey;
-                _alternateForwardKey = value;
+                Key oldKey = _nextTabGroupKey;
+                _nextTabGroupKey = value;
 
-                if (_alternateForwardKey == Key.Empty)
+                if (_nextTabGroupKey == Key.Empty)
                 {
-                    KeyBindings.Remove (_alternateForwardKey);
+                    KeyBindings.Remove (_nextTabGroupKey);
                 }
                 else
                 {
-                    KeyBindings.ReplaceKey (oldKey, _alternateForwardKey);
+                    KeyBindings.ReplaceKey (oldKey, _nextTabGroupKey);
                 }
             }
         }
     }
 
-    private static Key _alternateBackwardKey = Key.Empty; // Defined in config.json
+    private static Key _prevTabGroupKey = Key.Empty; // Defined in config.json
 
     /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key AlternateBackwardKey
+    public static Key PrevTabGroupKey
     {
-        get => _alternateBackwardKey;
+        get => _prevTabGroupKey;
         set
         {
-            if (_alternateBackwardKey != value)
+            if (_prevTabGroupKey != value)
             {
-                Key oldKey = _alternateBackwardKey;
-                _alternateBackwardKey = value;
+                Key oldKey = _prevTabGroupKey;
+                _prevTabGroupKey = value;
 
-                if (_alternateBackwardKey == Key.Empty)
+                if (_prevTabGroupKey == Key.Empty)
                 {
-                    KeyBindings.Remove (_alternateBackwardKey);
+                    KeyBindings.Remove (_prevTabGroupKey);
                 }
                 else
                 {
-                    KeyBindings.ReplaceKey (oldKey, _alternateBackwardKey);
+                    KeyBindings.ReplaceKey (oldKey, _prevTabGroupKey);
                 }
             }
         }
@@ -372,16 +372,14 @@ public static partial class Application // Keyboard handling
         KeyBindings.Add (Key.CursorDown, KeyBindingScope.Application, Command.NextView);
         KeyBindings.Add (Key.CursorLeft, KeyBindingScope.Application, Command.PreviousView);
         KeyBindings.Add (Key.CursorUp, KeyBindingScope.Application, Command.PreviousView);
-
         KeyBindings.Add (Key.Tab, KeyBindingScope.Application, Command.NextView);
         KeyBindings.Add (Key.Tab.WithShift, KeyBindingScope.Application, Command.PreviousView);
-        KeyBindings.Add (Key.Tab.WithCtrl, KeyBindingScope.Application, Command.NextViewOrTop);
-        KeyBindings.Add (Key.Tab.WithShift.WithCtrl, KeyBindingScope.Application, Command.PreviousViewOrTop);
+
+        KeyBindings.Add (Application.NextTabGroupKey, KeyBindingScope.Application, Command.NextViewOrTop); // Needed on Unix
+        KeyBindings.Add (Application.PrevTabGroupKey, KeyBindingScope.Application, Command.PreviousViewOrTop); // Needed on Unix
 
         // TODO: Refresh Key should be configurable
         KeyBindings.Add (Key.F5, KeyBindingScope.Application, Command.Refresh);
-        KeyBindings.Add (Application.AlternateForwardKey, KeyBindingScope.Application, Command.NextViewOrTop); // Needed on Unix
-        KeyBindings.Add (Application.AlternateBackwardKey, KeyBindingScope.Application, Command.PreviousViewOrTop); // Needed on Unix
 
         if (Environment.OSVersion.Platform == PlatformID.Unix)
         {

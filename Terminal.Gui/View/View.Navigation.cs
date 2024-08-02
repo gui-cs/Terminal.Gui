@@ -818,10 +818,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         focus even if this property is set and vice-versa.
     ///     </para>
     ///     <para>
-    ///         The default <see cref="TabBehavior.TabStop"/> keys are <c>Key.Tab</c> and <c>Key>Tab.WithShift</c>.
+    ///         The default <see cref="TabBehavior.TabStop"/> keys are <see cref="Application.NextTabKey"/> (<c>Key.Tab</c>) and <see cref="Application.PrevTabKey"/> (<c>Key>Tab.WithShift</c>).
     ///     </para>
     ///     <para>
-    ///         The default <see cref="TabBehavior.TabGroup"/> keys are <c>Key.Tab.WithCtrl</c> and <c>Key>Key.Tab.WithCtrl.WithShift</c>.
+    ///         The default <see cref="TabBehavior.TabGroup"/> keys are <see cref="Application.NextTabGroupKey"/> (<c>Key.F6</c>) and <see cref="Application.PrevTabGroupKey"/> (<c>Key>Key.F6.WithShift</c>).
     ///     </para>
     /// </remarks>
     public TabBehavior? TabStop

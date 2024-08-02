@@ -319,13 +319,13 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Assert.True (view2.CanFocus);
         Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.F6));
         Assert.True (view1.CanFocus);
         Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
         Assert.True (view2.CanFocus);
         Assert.True (view2.HasFocus);
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.F6));
         Assert.True (view1.CanFocus);
         Assert.True (view1.HasFocus);
         Assert.True (view2.CanFocus);
@@ -360,13 +360,13 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Assert.True (view2.CanFocus);
         Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.F6));
         Assert.True (view1.CanFocus);
         Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
         Assert.True (view2.CanFocus);
         Assert.True (view2.HasFocus);
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.F6));
         Assert.True (view1.CanFocus);
         Assert.True (view1.HasFocus);
         Assert.True (view2.CanFocus);
@@ -412,13 +412,13 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Assert.True (view2.CanFocus);
         Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl)); // move to win2
+        Assert.True (Application.OnKeyDown (Key.F6)); // move to win2
         Assert.True (view1.CanFocus);
         Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
         Assert.True (view2.CanFocus);
         Assert.True (view2.HasFocus);
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.F6));
         Assert.True (view1.CanFocus);
         Assert.True (view1.HasFocus);
         Assert.True (view2.CanFocus);
@@ -545,19 +545,19 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Application.OnKeyDown (Key.Tab);
         Assert.Equal ("WindowSubview", top.MostFocused.Text);
 
-        Application.OnKeyDown (Key.Tab.WithCtrl);
+        Application.OnKeyDown (Key.F6);
         Assert.Equal ("FrameSubview", top.MostFocused.Text);
 
         Application.OnKeyDown (Key.Tab);
         Assert.Equal ("FrameSubview", top.MostFocused.Text);
 
-        Application.OnKeyDown (Key.Tab.WithCtrl);
+        Application.OnKeyDown (Key.F6);
         Assert.Equal ("WindowSubview", top.MostFocused.Text);
 
-        Application.OnKeyDown (Key.Tab.WithCtrl.WithShift);
+        Application.OnKeyDown (Key.F6.WithShift);
         Assert.Equal ("FrameSubview", top.MostFocused.Text);
 
-        Application.OnKeyDown (Key.Tab.WithCtrl.WithShift);
+        Application.OnKeyDown (Key.F6.WithShift);
         Assert.Equal ("WindowSubview", top.MostFocused.Text);
         top.Dispose ();
     }
@@ -609,14 +609,14 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Assert.False (removed);
         Assert.Null (view3);
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.F6));
         Assert.True (top1.HasFocus);
         Assert.False (view1.HasFocus);
         Assert.True (view2.HasFocus);
         Assert.True (removed);
         Assert.NotNull (view3);
 
-        Exception exception = Record.Exception (() => Application.OnKeyDown (Key.Tab.WithCtrl));
+        Exception exception = Record.Exception (() => Application.OnKeyDown (Key.F6));
         Assert.Null (exception);
         Assert.True (removed);
         Assert.Null (view3);
@@ -1689,7 +1689,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         // Use keyboard to navigate to next view (otherView).
         if (view is TextView)
         {
-            Application.OnKeyDown (Key.Tab.WithCtrl);
+            Application.OnKeyDown (Key.F6);
         }
         else
         {
@@ -1710,7 +1710,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                         Application.OnKeyDown (Key.Tab);
                         break;
                     case TabBehavior.TabGroup:
-                        Application.OnKeyDown (Key.Tab.WithCtrl);
+                        Application.OnKeyDown (Key.F6);
                         break;
                     case null:
                         Application.OnKeyDown (Key.Tab);
@@ -1737,7 +1737,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                 Application.OnKeyDown (Key.Tab);
                 break;
             case TabBehavior.TabGroup:
-                Application.OnKeyDown (Key.Tab.WithCtrl);
+                Application.OnKeyDown (Key.F6);
                 break;
             case null:
                 Application.OnKeyDown (Key.Tab);
@@ -1832,13 +1832,13 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         // Use keyboard to navigate to next view (otherView). 
         if (view is TextView)
         {
-            Application.OnKeyDown (Key.Tab.WithCtrl);
+            Application.OnKeyDown (Key.F6);
         }
         else if (view is DatePicker)
         {
             for (var i = 0; i < 4; i++)
             {
-                Application.OnKeyDown (Key.Tab.WithCtrl);
+                Application.OnKeyDown (Key.F6);
             }
         }
         else
@@ -1899,7 +1899,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
         if (view.TabStop == TabBehavior.TabGroup)
         {
-            navKeys = new Key [] { Key.Tab.WithCtrl, Key.Tab.WithCtrl.WithShift };
+            navKeys = new Key [] { Key.F6, Key.F6.WithShift };
         }
 
         bool left = false;

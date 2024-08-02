@@ -17,8 +17,8 @@
   // to throw exceptions. 
   "ConfigurationManager.ThrowOnJsonErrors": false,
 
-  "Application.AlternateBackwardKey": "Ctrl+PageUp",
-  "Application.AlternateForwardKey": "Ctrl+PageDown",
+  "Application.NextTabGroupKey": "F6",
+  "Application.PrevTabGroupKey": "Shift+F6",
   "Application.QuitKey": "Esc",
 
   "Theme": "Default",

@@ -12,26 +12,26 @@ public class SettingsScopeTests
         Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
 
         Assert.Equal (
-                      KeyCode.PageDown | KeyCode.CtrlMask,
-                      ((Key)Settings ["Application.AlternateForwardKey"].PropertyValue).KeyCode
+                      Key.F6,
+                      (Key)Settings ["Application.NextTabGroupKey"].PropertyValue
                      );
 
         Assert.Equal (
-                      KeyCode.PageUp | KeyCode.CtrlMask,
-                      ((Key)Settings ["Application.AlternateBackwardKey"].PropertyValue).KeyCode
+                      Key.F6.WithShift,
+                      (Key)Settings["Application.PrevTabGroupKey"].PropertyValue
                      );
 
         // act
         Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 
         Settings.Apply ();
 
         // assert
         Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
-        Assert.Equal (KeyCode.F, Application.AlternateForwardKey.KeyCode);
-        Assert.Equal (KeyCode.B, Application.AlternateBackwardKey.KeyCode);
+        Assert.Equal (KeyCode.F, Application.NextTabGroupKey.KeyCode);
+        Assert.Equal (KeyCode.B, Application.PrevTabGroupKey.KeyCode);
     }
 
     [Fact]
@@ -39,18 +39,17 @@ public class SettingsScopeTests
     public void CopyUpdatedPropertiesFrom_ShouldCopyChangedPropertiesOnly ()
     {
         Settings ["Application.QuitKey"].PropertyValue = Key.End;
-        ;
 
         var updatedSettings = new SettingsScope ();
 
         ///Don't set Quitkey
-        updatedSettings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-        updatedSettings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+        updatedSettings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+        updatedSettings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 
         Settings.Update (updatedSettings);
         Assert.Equal (KeyCode.End, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
-        Assert.Equal (KeyCode.F, ((Key)updatedSettings ["Application.AlternateForwardKey"].PropertyValue).KeyCode);
-        Assert.Equal (KeyCode.B, ((Key)updatedSettings ["Application.AlternateBackwardKey"].PropertyValue).KeyCode);
+        Assert.Equal (KeyCode.F, ((Key)updatedSettings ["Application.NextTabGroupKey"].PropertyValue).KeyCode);
+        Assert.Equal (KeyCode.B, ((Key)updatedSettings ["Application.PrevTabGroupKey"].PropertyValue).KeyCode);
     }
 
     [Fact]
@@ -65,8 +64,8 @@ public class SettingsScopeTests
         Assert.Equal ("Default", Themes.Theme);
 
         Assert.True (Settings ["Application.QuitKey"].PropertyValue is Key);
-        Assert.True (Settings ["Application.AlternateForwardKey"].PropertyValue is Key);
-        Assert.True (Settings ["Application.AlternateBackwardKey"].PropertyValue is Key);
+        Assert.True (Settings ["Application.NextTabGroupKey"].PropertyValue is Key);
+        Assert.True (Settings ["Application.PrevTabGroupKey"].PropertyValue is Key);
 
         Assert.True (Settings ["Theme"].PropertyValue is string);
         Assert.Equal ("Default", Settings ["Theme"].PropertyValue as string);

@@ -178,7 +178,7 @@ public class KeyboardTests
     }
 
     [Fact (Skip = "Replace when new key statics are added.")]
-    public void AlternateForwardKey_AlternateBackwardKey_Tests ()
+    public void NextTabGroupKey_PrevTabGroupKey_Tests ()
     {
         Application.Init (new FakeDriver ());
 
@@ -200,45 +200,27 @@ public class KeyboardTests
                                      Assert.True (v1.HasFocus);
 
                                      // Using default keys.
-                                     Application.OnKeyDown (Key.Tab.WithCtrl);
+                                     Application.OnKeyDown (Key.F6);
                                      Assert.True (v2.HasFocus);
-                                     Application.OnKeyDown (Key.Tab.WithCtrl);
+                                     Application.OnKeyDown (Key.F6);
                                      Assert.True (v3.HasFocus);
-                                     Application.OnKeyDown (Key.Tab.WithCtrl);
+                                     Application.OnKeyDown (Key.F6);
                                      Assert.True (v4.HasFocus);
-                                     Application.OnKeyDown (Key.Tab.WithCtrl);
+                                     Application.OnKeyDown (Key.F6);
                                      Assert.True (v1.HasFocus);
 
-                                     Application.OnKeyDown (Key.Tab.WithShift.WithCtrl);
+                                     Application.OnKeyDown (Key.F6.WithShift);
                                      Assert.True (v4.HasFocus);
-                                     Application.OnKeyDown (Key.Tab.WithShift.WithCtrl);
+                                     Application.OnKeyDown (Key.F6.WithShift);
                                      Assert.True (v3.HasFocus);
-                                     Application.OnKeyDown (Key.Tab.WithShift.WithCtrl);
+                                     Application.OnKeyDown (Key.F6.WithShift);
                                      Assert.True (v2.HasFocus);
-                                     Application.OnKeyDown (Key.Tab.WithShift.WithCtrl);
+                                     Application.OnKeyDown (Key.F6.WithShift);
                                      Assert.True (v1.HasFocus);
-
-                                     Application.OnKeyDown (Key.PageDown.WithCtrl);
-                                     Assert.True (v2.HasFocus);
-                                     Application.OnKeyDown (Key.PageDown.WithCtrl);
-                                     Assert.True (v3.HasFocus);
-                                     Application.OnKeyDown (Key.PageDown.WithCtrl);
-                                     Assert.True (v4.HasFocus);
-                                     Application.OnKeyDown (Key.PageDown.WithCtrl);
-                                     Assert.True (v1.HasFocus);
-
-                                     Application.OnKeyDown (Key.PageUp.WithCtrl);
-                                     Assert.True (v4.HasFocus);
-                                     Application.OnKeyDown (Key.PageUp.WithCtrl);
-                                     Assert.True (v3.HasFocus);
-                                     Application.OnKeyDown (Key.PageUp.WithCtrl);
-                                     Assert.True (v2.HasFocus);
-                                     Application.OnKeyDown (Key.PageUp.WithCtrl);
-                                     Assert.True (v1.HasFocus);
-
-                                     // Using another's alternate keys.
-                                     Application.AlternateForwardKey = Key.F7;
-                                     Application.AlternateBackwardKey = Key.F6;
+                                     
+                                     // Using alternate keys.
+                                     Application.NextTabGroupKey = Key.F7;
+                                     Application.PrevTabGroupKey = Key.F8;
 
                                      Application.OnKeyDown (Key.F7);
                                      Assert.True (v2.HasFocus);
@@ -249,13 +231,13 @@ public class KeyboardTests
                                      Application.OnKeyDown (Key.F7);
                                      Assert.True (v1.HasFocus);
 
-                                     Application.OnKeyDown (Key.F6);
+                                     Application.OnKeyDown (Key.F8);
                                      Assert.True (v4.HasFocus);
-                                     Application.OnKeyDown (Key.F6);
+                                     Application.OnKeyDown (Key.F8);
                                      Assert.True (v3.HasFocus);
-                                     Application.OnKeyDown (Key.F6);
+                                     Application.OnKeyDown (Key.F8);
                                      Assert.True (v2.HasFocus);
-                                     Application.OnKeyDown (Key.F6);
+                                     Application.OnKeyDown (Key.F8);
                                      Assert.True (v1.HasFocus);
 
                                      Application.RequestStop ();
@@ -264,12 +246,12 @@ public class KeyboardTests
         Application.Run (top);
 
         // Replacing the defaults keys to avoid errors on others unit tests that are using it.
-        Application.AlternateForwardKey = Key.PageDown.WithCtrl;
-        Application.AlternateBackwardKey = Key.PageUp.WithCtrl;
+        Application.NextTabGroupKey = Key.PageDown.WithCtrl;
+        Application.PrevTabGroupKey = Key.PageUp.WithCtrl;
         Application.QuitKey = Key.Q.WithCtrl;
 
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
+        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.NextTabGroupKey.KeyCode);
+        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.PrevTabGroupKey.KeyCode);
         Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
 
         top.Dispose ();
@@ -321,14 +303,14 @@ public class KeyboardTests
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        Application.OnKeyDown (Key.Tab.WithCtrl);
+        Application.OnKeyDown (Key.F6);
         Assert.True (win2.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        Application.OnKeyDown (Key.Tab.WithCtrl);
+        Application.OnKeyDown (Key.F6);
         Assert.False (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
@@ -374,14 +356,14 @@ public class KeyboardTests
         Assert.False (win2.HasFocus);
         Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
 
-        Application.OnKeyDown (Key.Tab.WithCtrl);
+        Application.OnKeyDown (Key.F6);
         Assert.True (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        Application.OnKeyDown (Key.Tab.WithCtrl);
+        Application.OnKeyDown (Key.F6);
         Assert.True (win.CanFocus);
         Assert.True (win.HasFocus);
         Assert.True (win2.CanFocus);

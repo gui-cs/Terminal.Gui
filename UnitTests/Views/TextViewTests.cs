@@ -5407,10 +5407,10 @@ This is the second line.
                       tv.Text
                      );
         Assert.True (tv.AllowsTab);
-        Assert.False (tv.NewKeyDownEvent (Key.Tab.WithCtrl));
-        Assert.False (tv.NewKeyDownEvent (Application.AlternateForwardKey));
-        Assert.False (tv.NewKeyDownEvent (Key.Tab.WithCtrl.WithShift));
-        Assert.False (tv.NewKeyDownEvent (Application.AlternateBackwardKey));
+        Assert.False (tv.NewKeyDownEvent (Key.F6));
+        Assert.False (tv.NewKeyDownEvent (Application.NextTabGroupKey));
+        Assert.False (tv.NewKeyDownEvent (Key.F6.WithShift));
+        Assert.False (tv.NewKeyDownEvent (Application.PrevTabGroupKey));
 
         Assert.True (tv.NewKeyDownEvent (ContextMenu.DefaultKey));
         Assert.True (tv.ContextMenu != null && tv.ContextMenu.MenuBar.Visible);
