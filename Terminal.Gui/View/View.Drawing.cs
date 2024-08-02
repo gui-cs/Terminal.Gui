@@ -501,16 +501,31 @@ public partial class View // Drawing APIs
         // TODO: Implement OnDrawSubviews (cancelable);
         if (_subviews is { } && SubViewNeedsDisplay)
         {
-            IEnumerable<View> subviewsNeedingDraw = _subviews.Where (
-                                                                     view => view.Visible
-                                                                             && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
-                                                                    );
+            IEnumerable<View> subviewsNeedingDraw;
+            if (TabStop == TabBehavior.TabGroup && _subviews.Count(v => v.Arrangement.HasFlag (ViewArrangement.Overlapped)) > 0)
+            {
+                // TODO: This is a temporary hack to make overlapped non-Toplevels have a zorder. See also View.SetFocus
+                subviewsNeedingDraw = _tabIndexes.Where (
+                                                       view => view.Visible
+                                                               && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
+                                                      ).Reverse ();
+
+            }
+            else
+            {
+                subviewsNeedingDraw = _subviews.Where (
+                                                                         view => view.Visible
+                                                                                 && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
+                                                                        );
+
+            }
             foreach (View view in subviewsNeedingDraw)
             {
                 if (view.LayoutNeeded)
                 {
                     view.LayoutSubviews ();
                 }
+
                 view.Draw ();
             }
         }

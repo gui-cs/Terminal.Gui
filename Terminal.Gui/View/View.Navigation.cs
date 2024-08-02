@@ -605,6 +605,13 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // If there is no SuperView, then this is a top-level view
             SetFocus (this);
         }
+
+        // TODO: This is a temporary hack to make overlapped non-Toplevels have a zorder. See also: View.OnDrawContent.
+        if (viewToEnterFocus is { } && (viewToEnterFocus.TabStop == TabBehavior.TabGroup && viewToEnterFocus.Arrangement.HasFlag (ViewArrangement.Overlapped)))
+        {
+            viewToEnterFocus.TabIndex = 0;
+        }
+
     }
 
     /// <summary>
