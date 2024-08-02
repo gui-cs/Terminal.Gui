@@ -201,6 +201,9 @@ public class ApplicationTests
             // Keyboard
             Assert.Empty (Application.GetViewKeyBindings ());
 
+            // Navigation
+            Assert.Null (Application.Navigation);
+
             // Events - Can't check
             //Assert.Null (Application.NotifyNewRunState);
             //Assert.Null (Application.NotifyNewRunState);
@@ -240,6 +243,8 @@ public class ApplicationTests
         Application.MouseEnteredView = new ();
 
         //Application.WantContinuousButtonPressedView = new View ();
+
+        Application.Navigation = new ();
 
         Application.ResetState ();
         CheckReset ();

@@ -148,6 +148,8 @@ public static partial class Application
         KeyDown = null;
         KeyUp = null;
         SizeChanging = null;
+
+        Navigation = null;
         AddApplicationKeyBindings ();
 
         Colors.Reset ();
