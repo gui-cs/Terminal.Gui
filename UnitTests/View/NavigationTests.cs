@@ -1895,8 +1895,6 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         // Start with the focus on our test view
         view.SetFocus ();
 
-        int tries = 0;
-
         Key [] navKeys = new Key [] { Key.Tab, Key.Tab.WithShift, Key.CursorUp, Key.CursorDown, Key.CursorLeft, Key.CursorRight };
 
         if (view.TabStop == TabBehavior.TabGroup)

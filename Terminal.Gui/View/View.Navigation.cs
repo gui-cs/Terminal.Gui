@@ -30,7 +30,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     </para>
     /// </remarks>
     /// <param name="direction"></param>
-    /// <param name="groupOnly">If <see langword="true"/> will advance into ...</param>
+    /// <param name="behavior"></param>
     /// <returns>
     ///     <see langword="true"/> if focus was changed to another subview (or stayed on this one), <see langword="false"/>
     ///     otherwise.
