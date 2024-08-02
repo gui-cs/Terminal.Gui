@@ -21,7 +21,7 @@ public class Slider : Slider<object>
 ///     keyboard or mouse.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class Slider<T> : View
+public class Slider<T> : View, IOrientation
 {
     private readonly SliderConfiguration _config = new ();
 
@@ -30,6 +30,8 @@ public class Slider<T> : View
 
     // Options
     private List<SliderOption<T>> _options;
+
+    private OrientationHelper _orientationHelper;
 
     #region Initialize
 
@@ -45,11 +47,13 @@ public class Slider<T> : View
 
         _options = options ?? new List<SliderOption<T>> ();
 
-        _config._sliderOrientation = orientation;
+        _orientationHelper = new (this);
+        _orientationHelper.Orientation = _config._sliderOrientation = orientation;
+        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
+        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
         SetDefaultStyle ();
         SetCommands ();
-
         SetContentSize ();
 
         // BUGBUG: This should not be needed - Need to ensure SetRelativeLayout gets called during EndInit
@@ -222,12 +226,45 @@ public class Slider<T> : View
         }
     }
 
-    /// <summary>Slider Orientation. <see cref="Gui.Orientation"></see></summary>
+
+    /// <summary>
+    ///     Gets or sets the <see cref="Orientation"/>. The default is <see cref="Orientation.Horizontal"/>.
+    /// </summary>
     public Orientation Orientation
     {
-        get => _config._sliderOrientation;
-        set => OnOrientationChanged (value);
+        get => _orientationHelper.Orientation;
+        set => _orientationHelper.Orientation = value;
     }
+
+    #region IOrientation members
+
+    /// <inheritdoc />
+    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+
+    /// <inheritdoc />
+    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+
+    /// <inheritdoc />
+    public void OnOrientationChanged (Orientation newOrientation)
+    {
+        _config._sliderOrientation = newOrientation;
+
+        switch (_config._sliderOrientation)
+        {
+            case Orientation.Horizontal:
+                Style.SpaceChar = new () { Rune = Glyphs.HLine }; // '─'
+
+                break;
+            case Orientation.Vertical:
+                Style.SpaceChar = new () { Rune = Glyphs.VLine };
+
+                break;
+        }
+
+        SetKeyBindings ();
+        SetContentSize ();
+    }
+    #endregion
 
     /// <summary>Legends Orientation. <see cref="Gui.Orientation"></see></summary>
     public Orientation LegendsOrientation
@@ -308,43 +345,6 @@ public class Slider<T> : View
     #endregion
 
     #region Events
-
-    /// <summary>
-    ///     Fired when the slider orientation has changed. Can be cancelled by setting
-    ///     <see cref="OrientationEventArgs.Cancel"/> to true.
-    /// </summary>
-    public event EventHandler<OrientationEventArgs> OrientationChanged;
-
-    /// <summary>Called when the slider orientation has changed. Invokes the <see cref="OrientationChanged"/> event.</summary>
-    /// <param name="newOrientation"></param>
-    /// <returns>True of the event was cancelled.</returns>
-    public virtual bool OnOrientationChanged (Orientation newOrientation)
-    {
-        var args = new OrientationEventArgs (newOrientation);
-        OrientationChanged?.Invoke (this, args);
-
-        if (!args.Cancel)
-        {
-            _config._sliderOrientation = newOrientation;
-
-            switch (_config._sliderOrientation)
-            {
-                case Orientation.Horizontal:
-                    Style.SpaceChar = new () { Rune = Glyphs.HLine }; // '─'
-
-                    break;
-                case Orientation.Vertical:
-                    Style.SpaceChar = new () { Rune = Glyphs.VLine };
-
-                    break;
-            }
-
-            SetKeyBindings ();
-            SetContentSize ();
-        }
-
-        return args.Cancel;
-    }
 
     /// <summary>Event raised when the slider option/s changed. The dictionary contains: key = option index, value = T</summary>
     public event EventHandler<SliderEventArgs<T>> OptionsChanged;
@@ -1742,7 +1742,7 @@ public class Slider<T> : View
 
     internal bool Select ()
     {
-        SetFocusedOption();
+        SetFocusedOption ();
 
         return true;
     }
