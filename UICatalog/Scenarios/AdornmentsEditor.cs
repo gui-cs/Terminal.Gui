@@ -35,8 +35,26 @@ public class AdornmentsEditor : View
         TabStop = TabBehavior.TabGroup;
 
         Application.MouseEvent += Application_MouseEvent;
+        //ApplicationNavigation.FocusedChanged += ApplicationNavigationOnFocusedChanged;
         Initialized += AdornmentsEditor_Initialized;
     }
+
+    //private void ApplicationNavigationOnFocusedChanged (object sender, EventArgs e)
+    //{
+    //    if (ApplicationNavigation.IsInHierarchy (this, ApplicationNavigation.Focused))
+    //    {
+    //        return;
+    //    }
+
+    //    if (ApplicationNavigation.Focused is Adornment adornment)
+    //    {
+    //        ViewToEdit = adornment.Parent;
+    //    }
+    //    else
+    //    {
+    //        ViewToEdit = ApplicationNavigation.Focused;
+    //    }
+    //}
 
     /// <summary>
     /// Gets or sets whether the AdornmentsEditor should automatically select the View to edit when the mouse is clicked
@@ -170,11 +188,11 @@ public class AdornmentsEditor : View
             _viewToEdit = value;
 
 
-            _marginEditor.AdornmentToEdit = _viewToEdit.Margin ?? null;
-            _borderEditor.AdornmentToEdit = _viewToEdit.Border ?? null;
-            _paddingEditor.AdornmentToEdit = _viewToEdit.Padding ?? null;
+            _marginEditor.AdornmentToEdit = _viewToEdit?.Margin ?? null;
+            _borderEditor.AdornmentToEdit = _viewToEdit?.Border ?? null;
+            _paddingEditor.AdornmentToEdit = _viewToEdit?.Padding ?? null;
 
-            _lblView.Text = _viewToEdit.ToString ();
+            _lblView.Text = $"{_viewToEdit?.GetType ().Name}: {_viewToEdit?.Id}"  ?? string.Empty;
 
             return;
         }
