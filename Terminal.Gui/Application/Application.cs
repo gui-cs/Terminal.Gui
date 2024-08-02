@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
+using System.Resources;
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
 
@@ -48,7 +50,7 @@ public static partial class Application
 
     internal static List<CultureInfo> GetSupportedCultures ()
     {
-        CultureInfo [] culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
+        CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
 
         // Get the assembly
         var assembly = Assembly.GetExecutingAssembly ();
@@ -57,15 +59,35 @@ public static partial class Application
         string assemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
 
         // Find the resource file name of the assembly
-        var resourceFilename = $"{Path.GetFileNameWithoutExtension (AppContext.BaseDirectory)}.resources.dll";
+        var resourceFilename = $"{assembly.GetName ().Name}.resources.dll";
 
-        // Return all culture for which satellite folder found with culture code.
-        return culture.Where (
-                              cultureInfo =>
-                                  Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name))
-                                  && File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
-                             )
-                      .ToList ();
+        if (cultures.Length > 1 && Directory.Exists (Path.Combine (assemblyLocation, "pt-PT")))
+        {
+            // Return all culture for which satellite folder found with culture code.
+            return cultures.Where (
+                                   cultureInfo =>
+                                       Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name))
+                                       && File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
+                                  )
+                           .ToList ();
+        }
+
+        // It's called from a self-contained single-file and get available cultures from the embedded resources strings.
+        return GetAvailableCulturesFromEmbeddedResources ();
+    }
+
+    internal static List<CultureInfo> GetAvailableCulturesFromEmbeddedResources ()
+    {
+        ResourceManager rm = new (typeof (Strings));
+
+        CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
+
+        return cultures.Where (
+                               cultureInfo =>
+                                   !cultureInfo.Equals (CultureInfo.InvariantCulture)
+                                   && rm.GetResourceSet (cultureInfo, true, false) is { }
+                              )
+                       .ToList ();
     }
 
     /// <summary>

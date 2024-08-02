@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -193,6 +192,7 @@ public class ApplicationTests
             // Internal properties
             Assert.False (Application._initialized);
             Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
+            Assert.Equal (Application.GetAvailableCulturesFromEmbeddedResources(), Application.SupportedCultures);
             Assert.False (Application._forceFakeConsole);
             Assert.Equal (-1, Application._mainThreadId);
             Assert.Empty (Application._topLevels);
