@@ -30,7 +30,7 @@ public class ViewExperiments : Scenario
 
         FrameView testFrame = new ()
         {
-            Title = "Test Frame",
+            Title = "_1 Test Frame",
             X = Pos.Right (editor),
             Width = Dim.Fill (),
             Height = Dim.Fill (),
@@ -42,14 +42,27 @@ public class ViewExperiments : Scenario
         {
             X = 0,
             Y = 0,
-            Title = "TopButton_1",
+            Title = $"TopButton _{GetNextHotKey()}",
         };
 
         testFrame.Add (button);
 
-        var overlappedView1 = CreateOverlappedView (3, 2, 2);
-        var overlappedView2 = CreateOverlappedView (4, 34, 4);
+        var tiledView1 = CreateTiledView (0, 2, 2);
+        var tiledView2 = CreateTiledView (1, Pos.Right (tiledView1), Pos.Top (tiledView1));
 
+        testFrame.Add (tiledView1);
+        testFrame.Add (tiledView2);
+
+        var overlappedView1 = CreateOverlappedView (2, Pos.Center(), Pos.Center());
+        var tiledSubView = CreateTiledView (4, 0, 2);
+        overlappedView1.Add (tiledSubView);
+        
+        var overlappedView2 = CreateOverlappedView (3, Pos.Center() + 5, Pos.Center() + 5);
+        tiledSubView = CreateTiledView (4, 0, 2);
+        overlappedView2.Add (tiledSubView);
+
+        tiledSubView = CreateTiledView (5, 0, Pos.Bottom(tiledSubView));
+        overlappedView2.Add (tiledSubView);
 
         testFrame.Add (overlappedView1);
         testFrame.Add (overlappedView2);
@@ -58,7 +71,7 @@ public class ViewExperiments : Scenario
         {
             X = Pos.AnchorEnd (),
             Y = Pos.AnchorEnd (),
-            Title = "TopButton_2",
+            Title = $"TopButton _{GetNextHotKey ()}",
         };
 
         testFrame.Add (button);
@@ -68,7 +81,14 @@ public class ViewExperiments : Scenario
         Application.Shutdown ();
     }
 
-    private View CreateOverlappedView (int id, int x, int y)
+    private int _hotkeyCount;
+
+    private char GetNextHotKey ()
+    {
+        return (char)((int)'A' + _hotkeyCount++);
+    }
+
+    private View CreateTiledView (int id, Pos x, Pos y)
     {
         View overlapped = new View
         {
@@ -76,7 +96,40 @@ public class ViewExperiments : Scenario
             Y = y,
             Height = Dim.Auto (),
             Width = Dim.Auto (),
-            Title = $"Overlapped_{id}",
+            Title = $"Tiled{id} _{GetNextHotKey ()}",
+            Id = $"Tiled{id}",
+            BorderStyle = LineStyle.Single,
+            CanFocus = true, // Can't drag without this? BUGBUG
+            TabStop = TabBehavior.TabGroup,
+            Arrangement = ViewArrangement.Fixed
+        };
+
+        Button button = new ()
+        {
+            Title = $"Tiled Button{id} _{GetNextHotKey ()}"
+        };
+        overlapped.Add (button);
+
+        button = new ()
+        {
+            Y = Pos.Bottom (button),
+            Title = $"Tiled Button{id} _{GetNextHotKey ()}"
+        };
+        overlapped.Add (button);
+
+        return overlapped;
+    }
+
+
+    private View CreateOverlappedView (int id, Pos x, Pos y)
+    {
+        View overlapped = new View
+        {
+            X = x,
+            Y = y,
+            Height = Dim.Auto (),
+            Width = Dim.Auto (),
+            Title = $"Overlapped{id} _{GetNextHotKey ()}",
             ColorScheme = Colors.ColorSchemes ["Toplevel"],
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
@@ -88,14 +141,14 @@ public class ViewExperiments : Scenario
 
         Button button = new ()
         {
-            Title = $"Button{id} _{id * 2}"
+            Title = $"Button{id} _{GetNextHotKey ()}"
         };
         overlapped.Add (button);
 
         button = new ()
         {
             Y = Pos.Bottom (button),
-            Title = $"Button{id} _{id * 2 + 1}"
+            Title = $"Button{id} _{GetNextHotKey ()}"
         };
         overlapped.Add (button);
 
