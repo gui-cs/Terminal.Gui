@@ -401,5 +401,118 @@ public class MouseTests
         Assert.Equal (0, count);
         top.Dispose ();
     }
+    [Fact]
+    [AutoInitShutdown]
+    public void Clicked_Event_Only_Occurs_In_The_Same_View_That_Pressed_The_Mouse ()
+    {
+        var view1Clicked = false;
+        var view2Clicked = false;
+        var view1 = new View { Id = "view1", CanFocus = true, Width = 10, Height = 1 };
+        view1.MouseClick += (s, e) => view1Clicked = true;
+        var view2 = new View { Id = "view1", CanFocus = true, Y = 2, Width = 10, Height = 1 };
+        view2.MouseClick += (s, e) => view2Clicked = true;
+        var top = new Toplevel ();
+        top.Add (view1, view2);
+        Application.Begin (top);
+
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Pressed });
+        Assert.Equal (Application._mouseEnteredView, view1);
+        Assert.Equal (Application._lastViewButtonPressed, view1);
+        Assert.True (Application._canProcessClickedEvent);
+        Assert.True (Application._isMouseDown);
+        Assert.False (view1Clicked);
+        Assert.False (view2Clicked);
+
+        Application.OnMouseEvent (new () { Position = new (0, 2), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Assert.Equal (Application._mouseEnteredView, view2);
+        Assert.Equal (Application._lastViewButtonPressed, view1);
+        Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
+        Assert.False (view1Clicked);
+        Assert.False (view2Clicked);
+
+        Application.OnMouseEvent (new () { Position = new (0, 2), Flags = MouseFlags.Button1Released });
+        Assert.Equal (Application._mouseEnteredView, view2);
+        Assert.Null (Application._lastViewButtonPressed);
+        Assert.False (Application._canProcessClickedEvent);
+        Assert.False (Application._isMouseDown);
+        Assert.False (view1Clicked);
+        Assert.False (view2Clicked);
+
+        Application.OnMouseEvent (new () { Position = new (0, 2), Flags = MouseFlags.Button1Clicked });
+        Assert.Equal (Application._mouseEnteredView, view2);
+        Assert.Null (Application._lastViewButtonPressed);
+        Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
+        Assert.False (view1Clicked);
+        Assert.False (view2Clicked);
+
+        Application.OnMouseEvent (new () { Position = new (0, 2), Flags = MouseFlags.Button1Pressed });
+        Assert.Equal (Application._mouseEnteredView, view2);
+        Assert.Equal (Application._lastViewButtonPressed, view2);
+        Assert.True (Application._canProcessClickedEvent);
+        Assert.True (Application._isMouseDown);
+        Assert.False (view1Clicked);
+        Assert.False (view2Clicked);
+
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Assert.Equal (Application._mouseEnteredView, view1);
+        Assert.Equal (Application._lastViewButtonPressed, view2);
+        Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
+        Assert.False (view1Clicked);
+        Assert.False (view2Clicked);
+
+        Application.OnMouseEvent (new () { Position = new (0, 2), Flags = MouseFlags.Button1Released });
+        Assert.Equal (Application._mouseEnteredView, view2);
+        Assert.Null (Application._lastViewButtonPressed);
+        Assert.True (Application._canProcessClickedEvent);
+        Assert.False (Application._isMouseDown);
+        Assert.False (view1Clicked);
+        Assert.False (view2Clicked);
+
+        Application.OnMouseEvent (new () { Position = new (0, 2), Flags = MouseFlags.Button1Clicked });
+        Assert.Equal (Application._mouseEnteredView, view2);
+        Assert.Null (Application._lastViewButtonPressed);
+        Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
+        Assert.False (view1Clicked);
+        Assert.True (view2Clicked);
+
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Pressed });
+        Assert.Equal (Application._mouseEnteredView, view1);
+        Assert.Equal (Application._lastViewButtonPressed, view1);
+        Assert.True (Application._canProcessClickedEvent);
+        Assert.True (Application._isMouseDown);
+        Assert.False (view1Clicked);
+        Assert.True (view2Clicked);
+
+        Application.OnMouseEvent (new () { Position = new (0, 2), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Assert.Equal (Application._mouseEnteredView, view2);
+        Assert.Equal (Application._lastViewButtonPressed, view1);
+        Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
+        Assert.False (view1Clicked);
+        Assert.True (view2Clicked);
+
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Released });
+        Assert.Equal (Application._mouseEnteredView, view1);
+        Assert.Null (Application._lastViewButtonPressed);
+        Assert.True (Application._canProcessClickedEvent);
+        Assert.False (Application._isMouseDown);
+        Assert.False (view1Clicked);
+        Assert.True (view2Clicked);
+
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Assert.Equal (Application._mouseEnteredView, view1);
+        Assert.Null (Application._lastViewButtonPressed);
+        Assert.True (Application._canProcessClickedEvent);
+        Assert.Null (Application._isMouseDown);
+        Assert.True (view1Clicked);
+        Assert.True (view2Clicked);
+
+        top.Dispose ();
+    }
+
     #endregion
 }

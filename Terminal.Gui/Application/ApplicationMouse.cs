@@ -114,6 +114,9 @@ partial class Application
 
     // Used by OnMouseEvent to track the last view that was clicked on.
     internal static View? _mouseEnteredView;
+    internal static View? _lastViewButtonPressed;
+    internal static bool _canProcessClickedEvent = true;
+    internal static bool? _isMouseDown;
 
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
@@ -142,6 +145,38 @@ partial class Application
             mouseEvent.View = view;
         }
 
+        if (_lastViewButtonPressed is null && mouseEvent.Flags is MouseFlags.Button1Pressed or MouseFlags.Button2Pressed or MouseFlags.Button3Pressed or MouseFlags.Button4Pressed)
+        {
+            _lastViewButtonPressed = view;
+            _isMouseDown = true;
+        }
+        else if (_lastViewButtonPressed is { } && mouseEvent.Flags is MouseFlags.Button1Released or MouseFlags.Button2Released or MouseFlags.Button3Released or MouseFlags.Button4Released)
+        {
+            if (_lastViewButtonPressed != view)
+            {
+                _canProcessClickedEvent = false;
+            }
+
+            _lastViewButtonPressed = null;
+            _isMouseDown = false;
+        }
+        else if (!_canProcessClickedEvent && mouseEvent.Flags is MouseFlags.Button1Clicked or MouseFlags.Button2Clicked or MouseFlags.Button3Clicked or MouseFlags.Button4Clicked)
+        {
+            _canProcessClickedEvent = true;
+            _isMouseDown = null;
+
+            return;
+        }
+        else if (!mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition))
+        {
+            _lastViewButtonPressed = null;
+            _isMouseDown = null;
+        }
+        else
+        {
+            _isMouseDown = null;
+        }
+
         MouseEvent?.Invoke (null, mouseEvent);
 
         if (mouseEvent.Handled)
@@ -160,7 +195,8 @@ partial class Application
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.Position,
-                View = MouseGrabView
+                View = MouseGrabView,
+                IsMouseDown = _isMouseDown
             };
 
             if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
@@ -170,7 +206,8 @@ partial class Application
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) == true)
+            if ((MouseGrabView?.WantMousePositionReports == true || MouseGrabView?.WantContinuousButtonPressed == true)
+                && MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) == true)
             {
                 return;
             }
@@ -221,7 +258,8 @@ partial class Application
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.Position,
-                View = view
+                View = view,
+                IsMouseDown = _isMouseDown
             };
         }
         else if (view.ViewportToScreen (Rectangle.Empty with { Size = view.Viewport.Size }).Contains (mouseEvent.Position))
@@ -233,7 +271,8 @@ partial class Application
                 Position = viewportLocation,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.Position,
-                View = view
+                View = view,
+                IsMouseDown = _isMouseDown
             };
         }
 

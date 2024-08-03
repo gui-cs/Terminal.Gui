@@ -59,6 +59,7 @@ public class Border : Adornment
 
         HighlightStyle |= HighlightStyle.Pressed;
         Highlight += Border_Highlight;
+        WantMousePositionReports = true;
     }
 
 #if SUBVIEW_BASED_BORDER

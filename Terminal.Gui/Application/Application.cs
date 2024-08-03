@@ -168,6 +168,9 @@ public static partial class Application
 
         // Mouse
         _mouseEnteredView = null;
+        _lastViewButtonPressed = null;
+        _canProcessClickedEvent = true;
+        _isMouseDown = false;
         WantContinuousButtonPressedView = null;
         MouseEvent = null;
         GrabbedMouse = null;

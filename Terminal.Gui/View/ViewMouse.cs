@@ -31,6 +31,25 @@ public partial class View
     /// </remarks>
     public event EventHandler<MouseEventEventArgs> MouseClick;
 
+    /// <summary>
+    ///     Event fired when the user presses and releases the mouse button twice in quick succession without
+    ///     moving the mouse outside the view.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<MouseEventEventArgs> MouseDoubleClick;
+
+    /// <summary>Event fired when the user first presses the button down over a view.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<MouseEventEventArgs> MouseDown;
+
     /// <summary>Event fired when the mouse moves into the View's <see cref="Viewport"/>.</summary>
     public event EventHandler<MouseEventEventArgs> MouseEnter;
 
@@ -44,6 +63,39 @@ public partial class View
 
     /// <summary>Event fired when the mouse leaves the View's <see cref="Viewport"/>.</summary>
     public event EventHandler<MouseEventEventArgs> MouseLeave;
+
+    /// <summary>
+    ///     Event fired when the user moves the mouse over a view, or if mouse was grabbed by the view.
+    ///     Flags will indicate if a button is down.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<MouseEventEventArgs> MouseMove;
+
+    /// <summary>
+    ///     Event fired when the user presses and releases the mouse button thrice in quick succession without
+    ///     moving the mouse outside the view.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<MouseEventEventArgs> MouseTripleClick;
+
+    /// <summary>
+    ///     Event fired when the user lets go of the mouse button. Only received if the mouse is over the view,
+    ///     or it was grabbed by the view.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<MouseEventEventArgs> MouseUp;
 
     /// <summary>
     ///     Processes a <see cref="MouseEvent"/>. This method is called by <see cref="Application.OnMouseEvent"/> when a mouse
@@ -87,6 +139,30 @@ public partial class View
             return mouseEvent.Handled = true;
         }
 
+        if (mouseEvent.IsMouseDown == true)
+        {
+            if (OnMouseDown (new (mouseEvent)))
+            {
+                return true;
+            }
+        }
+
+        if (mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition))
+        {
+            if (OnMouseMove (new (mouseEvent)))
+            {
+                return true;
+            }
+        }
+
+        if (mouseEvent.IsMouseDown == false)
+        {
+            if (OnMouseUp (new (mouseEvent)))
+            {
+                return true;
+            }
+        }
+
         if (HighlightStyle != HighlightStyle.None || WantContinuousButtonPressed)
         {
             if (HandlePressed (mouseEvent))
@@ -109,20 +185,30 @@ public partial class View
             || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button1TripleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2TripleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3TripleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4TripleClicked)
            )
         {
             // If it's a click, and we didn't handle it, then we'll call OnMouseClick
             // We get here if the view did not handle the mouse event via OnMouseEvent/MouseEvent and
             // it did not handle the press/release/clicked events via HandlePress/HandleRelease/HandleClicked
             return OnMouseClick (new (mouseEvent));
+        }
+
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button2DoubleClicked)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button3DoubleClicked)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button4DoubleClicked)
+           )
+        {
+            return OnMouseDoubleClick (new (mouseEvent));
+        }
+
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1TripleClicked)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button2TripleClicked)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button3TripleClicked)
+            || mouseEvent.Flags.HasFlag (MouseFlags.Button4TripleClicked)
+           )
+        {
+            return OnMouseTripleClick (new (mouseEvent));
         }
 
         return false;
@@ -134,6 +220,39 @@ public partial class View
     /// <summary>Gets or sets whether the <see cref="View"/> wants mouse position reports.</summary>
     /// <value><see langword="true"/> if mouse position reports are wanted; otherwise, <see langword="false"/>.</value>
     public virtual bool WantMousePositionReports { get; set; }
+
+    /// <summary>
+    ///     Called when the user presses and releases the mouse button twice in quick succession without
+    ///     moving the mouse outside the view.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    protected internal virtual bool OnMouseDoubleClick (MouseEventEventArgs args)
+    {
+        MouseDoubleClick?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>Called when the user first presses the button down over a view's <see cref="Viewport"/>.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    protected internal virtual bool OnMouseDown (MouseEventEventArgs args)
+    {
+        MouseDown?.Invoke (this, args);
+
+        return args.Handled;
+    }
 
     /// <summary>
     ///     Called by <see cref="NewMouseEvent"/> when the mouse enters <see cref="Viewport"/>. The view will
@@ -208,6 +327,60 @@ public partial class View
     }
 
     /// <summary>
+    ///     Called when the user moves the mouse over a view, or if mouse was grabbed by the view.
+    ///     Flags will indicate if a button is down.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    protected internal virtual bool OnMouseMove (MouseEventEventArgs args)
+    {
+        MouseMove?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>
+    ///     Called when the user presses and releases the mouse button thrice in quick succession without
+    ///     moving the mouse outside the view.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    protected internal virtual bool OnMouseTripleClick (MouseEventEventArgs args)
+    {
+        MouseTripleClick?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>
+    ///     Called when the user lets go of the mouse button. Only received if the mouse is over the view,
+    ///     or it was grabbed by the view.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    protected internal virtual bool OnMouseUp (MouseEventEventArgs args)
+    {
+        MouseUp?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>
     ///     Called when the view is to be highlighted.
     /// </summary>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -231,11 +404,13 @@ public partial class View
         return args.Cancel;
     }
 
-    /// <summary>Invokes the MouseClick event.</summary>
+    /// <summary>
+    ///     Called when the user presses down and then releases the mouse over a view (they could move off in between).
+    ///     If they press and release multiple times in quick succession this event will be called for each up action.
+    /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Called when the mouse is either clicked or double-clicked. Check
-    ///         <see cref="MouseEvent.Flags"/> to see which button was clicked.
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     /// </remarks>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -442,7 +617,7 @@ public partial class View
 
         // Enable override via virtual method and/or event
         HighlightStyle copy = HighlightStyle;
-        var args = new CancelEventArgs<HighlightStyle> (ref copy, ref newHighlightStyle);
+        CancelEventArgs<HighlightStyle> args = new CancelEventArgs<HighlightStyle> (ref copy, ref newHighlightStyle);
 
         if (OnHighlight (args) == true)
         {
@@ -477,7 +652,8 @@ public partial class View
                     var cs = new ColorScheme (ColorScheme)
                     {
                         // Highlight the foreground focus color
-                        Focus = new (ColorScheme.Focus.Foreground.GetHighlightColor (), ColorScheme.Focus.Background.GetHighlightColor ())
+                        Focus = new (ColorScheme.Focus.Foreground.GetHighlightColor (), ColorScheme.Focus.Background.GetHighlightColor ()),
+                        HotFocus = new (ColorScheme.HotFocus.Foreground.GetHighlightColor (), ColorScheme.HotFocus.Background.GetHighlightColor ())
                     };
                     ColorScheme = cs;
                 }
@@ -486,7 +662,8 @@ public partial class View
                     var cs = new ColorScheme (ColorScheme)
                     {
                         // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
-                        Normal = new (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground)
+                        Normal = new (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground),
+                        HotNormal = new (ColorScheme.HotFocus.Background, ColorScheme.HotNormal.Foreground)
                     };
                     ColorScheme = cs;
                 }

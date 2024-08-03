@@ -135,6 +135,11 @@ public class MouseEvent
     public Point ScreenPosition { get; set; }
 
     /// <summary>
+    ///     Indicates if the current mouse event has first pressed <see langword="true"/>, latest released <see langword="false"/> or none <see langword="null"/>.
+    /// </summary>
+    public bool? IsMouseDown { get; set; }
+
+    /// <summary>
     ///     Indicates if the current mouse event has been processed. Set this value to <see langword="true"/> to indicate the mouse
     ///     event was handled.
     /// </summary>
