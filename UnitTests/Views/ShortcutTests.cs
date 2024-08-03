@@ -570,4 +570,26 @@ public class ShortcutTests
 
         current.Dispose ();
     }
+
+    [Fact]
+    public void Changing_Key_Removes_Previous ()
+    {
+        var newActionCount = 0;
+
+        Shortcut shortcut = new Shortcut (Key.N.WithCtrl, "New", () => newActionCount++);
+        Application.Current = new Toplevel ();
+        Application.Current.Add (shortcut);
+
+        Assert.Equal (0, newActionCount);
+        Assert.True (Application.OnKeyDown (Key.N.WithCtrl));
+        Assert.False (Application.OnKeyDown (Key.W.WithCtrl));
+        Assert.Equal (1, newActionCount);
+
+        shortcut.Key = Key.W.WithCtrl;
+        Assert.False (Application.OnKeyDown (Key.N.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.W.WithCtrl));
+        Assert.Equal (2, newActionCount);
+
+        Application.Current.Dispose ();
+    }
 }

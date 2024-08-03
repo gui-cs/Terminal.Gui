@@ -454,7 +454,7 @@ public class Shortcut : View, IOrientation, IDesignable
             SetHelpViewDefaultLayout ();
             SetKeyViewDefaultLayout ();
             ShowHide ();
-            UpdateKeyBinding ();
+            UpdateKeyBinding (Key.Empty);
         }
     }
 
@@ -546,9 +546,10 @@ public class Shortcut : View, IOrientation, IDesignable
                 throw new ArgumentNullException ();
             }
 
+            Key oldKey = _key;
             _key = value;
 
-            UpdateKeyBinding ();
+            UpdateKeyBinding (oldKey);
 
             KeyView.Text = Key == Key.Empty ? string.Empty : $"{Key}";
             ShowHide ();
@@ -567,7 +568,7 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             _keyBindingScope = value;
 
-            UpdateKeyBinding ();
+            UpdateKeyBinding (Key.Empty);
         }
     }
 
@@ -619,7 +620,7 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.KeyBindings.Clear ();
     }
 
-    private void UpdateKeyBinding ()
+    private void UpdateKeyBinding (Key oldKey)
     {
         if (Key != null)
         {
@@ -629,11 +630,20 @@ public class Shortcut : View, IOrientation, IDesignable
 
             if (KeyBindingScope.FastHasFlags (KeyBindingScope.Application))
             {
+                if (oldKey != Key.Empty)
+                {
+                    Application.KeyBindings.Remove (oldKey);
+                }
+
                 Application.KeyBindings.Remove (Key);
                 Application.KeyBindings.Add (Key, this, Command.Accept);
             }
             else
             {
+                if (oldKey != Key.Empty)
+                {
+                    KeyBindings.Remove (oldKey);
+                }
                 KeyBindings.Remove (Key);
                 KeyBindings.Add (Key, KeyBindingScope | KeyBindingScope.HotKey, Command.Accept);
             }
