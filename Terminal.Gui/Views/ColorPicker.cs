@@ -78,8 +78,8 @@ public class ColorPicker : View
     public ColorPicker ()
     {
         CanFocus = true;
-        Height = 4;
-        Width = Dim.Fill ();
+        Height = Dim.Auto ();
+        Width = Dim.Auto ();
         ApplyStyleChanges ();
     }
 
