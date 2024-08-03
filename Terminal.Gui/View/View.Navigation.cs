@@ -72,6 +72,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
         {
             if (Focused.AdvanceFocus (direction, behavior))
             {
+                // TODO: Temporary hack to make Application.Navigation.FocusChanged work
+                if (Focused.Focused is null)
+                {
+                    Application.Navigation!.SetFocused (Focused);
+                }
                 return true;
             }
         }
@@ -143,6 +148,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
 
             SetFocus (view);
+
+            // TODO: Temporary hack to make Application.Navigation.FocusChanged work
+            if (view.Focused is null)
+            {
+                Application.Navigation!.SetFocused (view);
+            }
 
             return true;
         }
@@ -604,6 +615,13 @@ public partial class View // Focus and cross-view navigation management (TabStop
         {
             // If there is no SuperView, then this is a top-level view
             SetFocus (this);
+
+        }
+
+        // TODO: Temporary hack to make Application.Navigation.FocusChanged work
+        if (HasFocus && Focused.Focused is null)
+        {
+            Application.Navigation!.SetFocused (Focused);
         }
 
         // TODO: This is a temporary hack to make overlapped non-Toplevels have a zorder. See also: View.OnDrawContent.

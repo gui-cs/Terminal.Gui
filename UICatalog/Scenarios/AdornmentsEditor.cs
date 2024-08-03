@@ -34,27 +34,27 @@ public class AdornmentsEditor : View
 
         TabStop = TabBehavior.TabGroup;
 
-        Application.MouseEvent += Application_MouseEvent;
-        //ApplicationNavigation.FocusedChanged += ApplicationNavigationOnFocusedChanged;
+        //Application.MouseEvent += Application_MouseEvent;
+        Application.Navigation!.FocusedChanged += ApplicationNavigationOnFocusedChanged;
         Initialized += AdornmentsEditor_Initialized;
     }
 
-    //private void ApplicationNavigationOnFocusedChanged (object sender, EventArgs e)
-    //{
-    //    if (ApplicationNavigation.IsInHierarchy (this, ApplicationNavigation.Focused))
-    //    {
-    //        return;
-    //    }
+    private void ApplicationNavigationOnFocusedChanged (object sender, EventArgs e)
+    {
+        if (ApplicationNavigation.IsInHierarchy (this, Application.Navigation!.GetFocused ()))
+        {
+            return;
+        }
 
-    //    if (ApplicationNavigation.Focused is Adornment adornment)
-    //    {
-    //        ViewToEdit = adornment.Parent;
-    //    }
-    //    else
-    //    {
-    //        ViewToEdit = ApplicationNavigation.Focused;
-    //    }
-    //}
+        if (Application.Navigation!.GetFocused () is Adornment adornment)
+        {
+            ViewToEdit = adornment.Parent;
+        }
+        else
+        {
+            ViewToEdit = Application.Navigation.GetFocused ();
+        }
+    }
 
     /// <summary>
     /// Gets or sets whether the AdornmentsEditor should automatically select the View to edit when the mouse is clicked
@@ -128,7 +128,7 @@ public class AdornmentsEditor : View
         _diagPaddingCheckBox.Y = Pos.Bottom (_paddingEditor);
 
         _diagRulerCheckBox = new () { Text = "_Diagnostic Ruler" };
-        _diagRulerCheckBox.State = Diagnostics.FastHasFlags(ViewDiagnosticFlags.Ruler) ? CheckState.Checked : CheckState.UnChecked;
+        _diagRulerCheckBox.State = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Ruler) ? CheckState.Checked : CheckState.UnChecked;
 
         _diagRulerCheckBox.Toggle += (s, e) =>
                                       {
@@ -192,7 +192,7 @@ public class AdornmentsEditor : View
             _borderEditor.AdornmentToEdit = _viewToEdit?.Border ?? null;
             _paddingEditor.AdornmentToEdit = _viewToEdit?.Padding ?? null;
 
-            _lblView.Text = $"{_viewToEdit?.GetType ().Name}: {_viewToEdit?.Id}"  ?? string.Empty;
+            _lblView.Text = $"{_viewToEdit?.GetType ().Name}: {_viewToEdit?.Id}" ?? string.Empty;
 
             return;
         }
