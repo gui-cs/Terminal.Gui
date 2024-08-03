@@ -197,10 +197,7 @@ public abstract class Pos
     /// </example>
     public static Pos AnchorEnd (int offset)
     {
-        if (offset < 0)
-        {
-            throw new ArgumentException (@"Must be positive", nameof (offset));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (offset, nameof (offset));
 
         return new PosAnchorEnd (offset);
     }
@@ -246,10 +243,7 @@ public abstract class Pos
     /// </example>
     public static Pos Percent (int percent)
     {
-        if (percent is < 0)
-        {
-            throw new ArgumentException ("Percent value must be positive.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (percent, nameof (percent));
 
         return new PosPercent (percent);
     }

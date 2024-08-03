@@ -282,7 +282,7 @@ internal sealed class Menu : View
             return true;
         }
 
-        // TODO: Determine if there's a cleaner way to handle this
+        // TODO: Determine if there's a cleaner way to handle this.
         // This supports the case where the menu bar is a context menu
         return _host.OnInvokingKeyBindings (keyEvent, scope);
     }
@@ -489,7 +489,8 @@ internal sealed class Menu : View
                 {
                     var tf = new TextFormatter
                     {
-                        AutoSize = true,
+                        ConstrainToWidth = Frame.Width - 3,
+                        ConstrainToHeight = 1,
                         Alignment = Alignment.Center, HotKeySpecifier = MenuBar.HotKeySpecifier, Text = textToDraw
                     };
 

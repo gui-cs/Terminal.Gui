@@ -1,4 +1,4 @@
-global using Attribute = Terminal.Gui.Attribute;
+﻿global using Attribute = Terminal.Gui.Attribute;
 global using CM = Terminal.Gui.ConfigurationManager;
 using System;
 using System.Collections.Generic;
@@ -45,9 +45,8 @@ namespace UICatalog;
 ///         (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
 ///     </para>
 /// </remarks>
-internal class UICatalogApp
+public class UICatalogApp
 {
-    private static StringBuilder? _aboutMessage;
     private static int _cachedCategoryIndex;
 
     // When a scenario is run, the main app is killed. These items
@@ -73,6 +72,34 @@ internal class UICatalogApp
     [SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true)]
     [JsonPropertyName ("UICatalog.StatusBar")]
     public static bool ShowStatusBar { get; set; } = true;
+
+    /// <summary>
+    /// Gets the message displayed in the About Box. `public` so it can be used from Unit tests.
+    /// </summary>
+    /// <returns></returns>
+    public static string GetAboutBoxMessage ()
+    {
+        // NOTE: Do not use multiline verbatim strings here.
+        // WSL gets all confused.
+        StringBuilder msg = new ();
+        msg.AppendLine ("UI Catalog: A comprehensive sample library for");
+        msg.AppendLine ();
+
+        msg.AppendLine ("""
+                         _______                  _             _   _____       _ 
+                        |__   __|                (_)           | | / ____|     (_)
+                           | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ 
+                           | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |
+                           | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |
+                           |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|
+                        """);
+        msg.AppendLine ();
+        msg.AppendLine ("v2 - Pre-Alpha");
+        msg.AppendLine ();
+        msg.AppendLine ("https://github.com/gui-cs/Terminal.Gui");
+
+        return msg.ToString ();
+    }
 
     private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
     {
@@ -295,26 +322,13 @@ internal class UICatalogApp
             _selectedScenario.Main ();
             _selectedScenario.Dispose ();
             _selectedScenario = null;
+
             // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
             VerifyObjectsWereDisposed ();
 
             return;
         }
-
-        _aboutMessage = new ();
-        _aboutMessage.AppendLine (@"A comprehensive sample library for");
-        _aboutMessage.AppendLine (@"");
-        _aboutMessage.AppendLine (@"  _______                  _             _   _____       _  ");
-        _aboutMessage.AppendLine (@" |__   __|                (_)           | | / ____|     (_) ");
-        _aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ");
-        _aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ");
-        _aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ");
-        _aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ");
-        _aboutMessage.AppendLine (@"");
-        _aboutMessage.AppendLine (@"v2 - Work in Progress");
-        _aboutMessage.AppendLine (@"");
-        _aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
 
         while (RunUICatalogTopLevel () is { } scenario)
         {
@@ -374,7 +388,9 @@ internal class UICatalogApp
         public MenuItem? MiIsMenuBorderDisabled;
         public MenuItem? MiIsMouseDisabled;
         public MenuItem? MiUseSubMenusSingleFrame;
+
         public Shortcut? ShForce16Colors;
+
         //public Shortcut? ShDiagnostics;
         public Shortcut? ShVersion;
 
@@ -387,7 +403,7 @@ internal class UICatalogApp
 
         public UICatalogTopLevel ()
         {
-            _diagnosticFlags = View.Diagnostics;
+            _diagnosticFlags = Diagnostics;
 
             _themeMenuItems = CreateThemeMenuItems ();
             _themeMenuBarItem = new ("_Themes", _themeMenuItems);
@@ -433,11 +449,10 @@ internal class UICatalogApp
                                   "_About...",
                                   "About UI Catalog",
                                   () => MessageBox.Query (
-                                                          "About UI Catalog",
-                                                          _aboutMessage!.ToString (),
-                                                          0,
-                                                          false,
-                                                          "_Ok"
+                                                          title: "",
+                                                          message: GetAboutBoxMessage (),
+                                                          wrapMessage: false,
+                                                          buttons: "_Ok"
                                                          ),
                                   null,
                                   null,
@@ -459,35 +474,34 @@ internal class UICatalogApp
                 ShVersion = new ()
                 {
                     Title = "Version Info",
-                    CanFocus = false,
-
+                    CanFocus = false
                 };
 
-                Shortcut statusBarShortcut = new Shortcut ()
+                var statusBarShortcut = new Shortcut
                 {
                     Key = Key.F10,
-                    Title = "Show/Hide Status Bar",
+                    Title = "Show/Hide Status Bar"
                 };
                 statusBarShortcut.Accept += (sender, args) => { StatusBar.Visible = !StatusBar.Visible; };
 
-                ShForce16Colors = new Shortcut ()
+                ShForce16Colors = new ()
                 {
-                    CommandView = new CheckBox ()
+                    CommandView = new CheckBox
                     {
                         Title = "16 color mode",
                         State = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
-                        CanFocus = false,
+                        CanFocus = false
                     },
                     HelpText = "",
-                    Key = Key.F6,
+                    Key = Key.F6
                 };
 
                 ((CheckBox)ShForce16Colors.CommandView).Toggle += (sender, args) =>
-                                          {
-                                              Application.Force16Colors = args.NewValue == CheckState.Checked;
-                                              MiForce16Colors!.Checked = Application.Force16Colors;
-                                              Application.Refresh ();
-                                          };
+                                                                  {
+                                                                      Application.Force16Colors = args.NewValue == CheckState.Checked;
+                                                                      MiForce16Colors!.Checked = Application.Force16Colors;
+                                                                      Application.Refresh ();
+                                                                  };
 
                 //ShDiagnostics = new Shortcut ()
                 //{
@@ -502,10 +516,10 @@ internal class UICatalogApp
                 //};
 
                 StatusBar.Add (
-                               new Shortcut ()
+                               new Shortcut
                                {
                                    Title = "Quit",
-                                   Key = Application.QuitKey,
+                                   Key = Application.QuitKey
                                },
                                statusBarShortcut,
                                ShForce16Colors,
@@ -1006,7 +1020,9 @@ internal class UICatalogApp
             MiForce16Colors.Action += () =>
                                       {
                                           MiForce16Colors.Checked = Application.Force16Colors = (bool)!MiForce16Colors.Checked!;
-                                          ((CheckBox)ShForce16Colors!.CommandView!).State = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+
+                                          ((CheckBox)ShForce16Colors!.CommandView!).State =
+                                              Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                                           Application.Refresh ();
                                       };
             menuItems.Add (MiForce16Colors);

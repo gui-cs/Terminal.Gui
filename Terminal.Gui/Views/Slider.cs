@@ -21,7 +21,7 @@ public class Slider : Slider<object>
 ///     keyboard or mouse.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class Slider<T> : View
+public class Slider<T> : View, IOrientation
 {
     private readonly SliderConfiguration _config = new ();
 
@@ -30,6 +30,8 @@ public class Slider<T> : View
 
     // Options
     private List<SliderOption<T>> _options;
+
+    private OrientationHelper _orientationHelper;
 
     #region Initialize
 
@@ -45,11 +47,13 @@ public class Slider<T> : View
 
         _options = options ?? new List<SliderOption<T>> ();
 
-        _config._sliderOrientation = orientation;
+        _orientationHelper = new (this);
+        _orientationHelper.Orientation = _config._sliderOrientation = orientation;
+        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
+        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
         SetDefaultStyle ();
         SetCommands ();
-
         SetContentSize ();
 
         // BUGBUG: This should not be needed - Need to ensure SetRelativeLayout gets called during EndInit
@@ -222,12 +226,45 @@ public class Slider<T> : View
         }
     }
 
-    /// <summary>Slider Orientation. <see cref="Gui.Orientation"></see></summary>
+
+    /// <summary>
+    ///     Gets or sets the <see cref="Orientation"/>. The default is <see cref="Orientation.Horizontal"/>.
+    /// </summary>
     public Orientation Orientation
     {
-        get => _config._sliderOrientation;
-        set => OnOrientationChanged (value);
+        get => _orientationHelper.Orientation;
+        set => _orientationHelper.Orientation = value;
     }
+
+    #region IOrientation members
+
+    /// <inheritdoc />
+    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+
+    /// <inheritdoc />
+    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+
+    /// <inheritdoc />
+    public void OnOrientationChanged (Orientation newOrientation)
+    {
+        _config._sliderOrientation = newOrientation;
+
+        switch (_config._sliderOrientation)
+        {
+            case Orientation.Horizontal:
+                Style.SpaceChar = new () { Rune = Glyphs.HLine }; // '─'
+
+                break;
+            case Orientation.Vertical:
+                Style.SpaceChar = new () { Rune = Glyphs.VLine };
+
+                break;
+        }
+
+        SetKeyBindings ();
+        SetContentSize ();
+    }
+    #endregion
 
     /// <summary>Legends Orientation. <see cref="Gui.Orientation"></see></summary>
     public Orientation LegendsOrientation
@@ -309,43 +346,6 @@ public class Slider<T> : View
 
     #region Events
 
-    /// <summary>
-    ///     Fired when the slider orientation has changed. Can be cancelled by setting
-    ///     <see cref="OrientationEventArgs.Cancel"/> to true.
-    /// </summary>
-    public event EventHandler<OrientationEventArgs> OrientationChanged;
-
-    /// <summary>Called when the slider orientation has changed. Invokes the <see cref="OrientationChanged"/> event.</summary>
-    /// <param name="newOrientation"></param>
-    /// <returns>True of the event was cancelled.</returns>
-    public virtual bool OnOrientationChanged (Orientation newOrientation)
-    {
-        var args = new OrientationEventArgs (newOrientation);
-        OrientationChanged?.Invoke (this, args);
-
-        if (!args.Cancel)
-        {
-            _config._sliderOrientation = newOrientation;
-
-            switch (_config._sliderOrientation)
-            {
-                case Orientation.Horizontal:
-                    Style.SpaceChar = new () { Rune = Glyphs.HLine }; // '─'
-
-                    break;
-                case Orientation.Vertical:
-                    Style.SpaceChar = new () { Rune = Glyphs.VLine };
-
-                    break;
-            }
-
-            SetKeyBindings ();
-            SetContentSize ();
-        }
-
-        return args.Cancel;
-    }
-
     /// <summary>Event raised when the slider option/s changed. The dictionary contains: key = option index, value = T</summary>
     public event EventHandler<SliderEventArgs<T>> OptionsChanged;
 
@@ -396,7 +396,7 @@ public class Slider<T> : View
     /// <summary>Causes the specified option to be set and be focused.</summary>
     public bool SetOption (int optionIndex)
     {
-        // TODO: Handle range type.			
+        // TODO: Handle range type.
         // Note: Maybe return false only when optionIndex doesn't exist, otherwise true.
 
         if (!_setOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < _options.Count)
@@ -1285,9 +1285,9 @@ public class Slider<T> : View
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
         // Note(jmperricone): Maybe we click to focus the cursor, and on next click we set the option.
-        //                    That will makes OptionFocused Event more relevant.
+        //                    That will make OptionFocused Event more relevant.
         // (tig: I don't think so. Maybe an option if someone really wants it, but for now that
-        //       adss to much friction to UI.
+        //       adds too much friction to UI.
         // TODO(jmperricone): Make Range Type work with mouse.
 
         if (!(mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
@@ -1325,7 +1325,7 @@ public class Slider<T> : View
             var success = false;
             var option = 0;
 
-            // how far has user dragged from original location?						
+            // how far has user dragged from original location?
             if (Orientation == Orientation.Horizontal)
             {
                 success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
@@ -1738,7 +1738,7 @@ public class Slider<T> : View
 
     internal bool Select ()
     {
-        SetFocusedOption();
+        SetFocusedOption ();
 
         return true;
     }

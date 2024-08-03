@@ -659,7 +659,7 @@ internal class WindowsConsole
     {
         public char Char { get; set; }
         public Attribute Attribute { get; set; }
-        public bool Empty { get; set; } // TODO: Temp hack until virutal terminal sequences
+        public bool Empty { get; set; } // TODO: Temp hack until virtual terminal sequences
 
         public ExtendedCharInfo (char character, Attribute attribute)
         {
@@ -901,7 +901,7 @@ internal class WindowsConsole
         }
     }
 
-#if false // Not needed on the constructor. Perhaps could be used on resizing. To study.                                                                                     
+#if false // Not needed on the constructor. Perhaps could be used on resizing. To study.
 		[DllImport ("kernel32.dll", ExactSpelling = true)]
 		static extern IntPtr GetConsoleWindow ();
 
@@ -1397,7 +1397,7 @@ internal class WindowsDriver : ConsoleDriver
             {
                 if (WinConsole is { })
                 {
-                    // BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init. 
+                    // BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init.
                     // Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
                     Size winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
                     Cols = winSize.Width;
@@ -1642,7 +1642,7 @@ internal class WindowsDriver : ConsoleDriver
 
                     if (keyInfo.Modifiers != 0)
                     {
-                        // These Oem keys have well defined chars. We ensure the representative char is used.
+                        // These Oem keys have well-defined chars. We ensure the representative char is used.
                         // If we don't do this, then on some keyboard layouts the wrong char is 
                         // returned (e.g. on ENG OemPlus un-shifted is =, not +). This is important
                         // for key persistence ("Ctrl++" vs. "Ctrl+=").
@@ -1656,7 +1656,7 @@ internal class WindowsDriver : ConsoleDriver
                         };
                     }
 
-                    // Return the mappedChar with they modifiers. Because mappedChar is un-shifted, if Shift was down
+                    // Return the mappedChar with modifiers. Because mappedChar is un-shifted, if Shift was down
                     // we should keep it
                     return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)mappedChar);
                 }
@@ -1901,8 +1901,8 @@ internal class WindowsDriver : ConsoleDriver
 
         // The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
         // This will tell when a mouse button is pressed. When the button is released this event will
-        // be fired with it's bit set to 0. So when the button is up ButtonState will be 0.
-        // To map to the correct driver events we save the last pressed mouse button so we can
+        // be fired with its bit set to 0. So when the button is up ButtonState will be 0.
+        // To map to the correct driver events we save the last pressed mouse button, so we can
         // map to the correct clicked event.
         if ((_lastMouseButtonPressed is { } || _isButtonReleased) && mouseEvent.ButtonState != 0)
         {

@@ -33,14 +33,14 @@ public class Dialog : Window
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 25;
+    public static int DefaultMinimumWidth { get; set; } = 80;
 
     /// <summary>
     ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 25;
+    public static int DefaultMinimumHeight { get; set; } = 80;
 
 
     /// <summary>
@@ -78,9 +78,9 @@ public class Dialog : Window
 
         X = Pos.Center ();
         Y = Pos.Center ();
+        Width = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
+        Height = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
 
-        Width = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
-        Height = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;

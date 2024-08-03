@@ -33,7 +33,7 @@ public class AllowedTypeAny : IAllowedType
 public class AllowedType : IAllowedType
 {
     /// <summary>Initializes a new instance of the <see cref="AllowedType"/> class.</summary>
-    /// <param name="description">The human readable text to display.</param>
+    /// <param name="description">The human-readable text to display.</param>
     /// <param name="extensions">Extension(s) to match e.g. .csv.</param>
     public AllowedType (string description, params string [] extensions)
     {
@@ -46,7 +46,7 @@ public class AllowedType : IAllowedType
         Extensions = extensions;
     }
 
-    /// <summary>Gets or Sets the human readable description for the file type e.g. "Comma Separated Values".</summary>
+    /// <summary>Gets or Sets the human-readable description for the file type e.g. "Comma Separated Values".</summary>
     public string Description { get; set; }
 
     /// <summary>Gets or Sets the permitted file extension(s) (e.g. ".csv").</summary>

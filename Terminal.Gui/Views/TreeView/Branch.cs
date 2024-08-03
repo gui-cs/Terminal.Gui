@@ -93,7 +93,7 @@ internal class Branch<T> where T : class
 
         tree.Move (0, y);
 
-        // if we have scrolled to the right then bits of the prefix will have dispeared off the screen
+        // if we have scrolled to the right then bits of the prefix will have disappeared off the screen
         int toSkip = tree.ScrollOffsetHorizontal;
         Attribute attr = symbolColor;
 
@@ -329,7 +329,7 @@ internal class Branch<T> where T : class
             Parent?.Refresh (true);
         }
 
-        // we don't want to loose the state of our children so lets be selective about how we refresh
+        // we don't want to lose the state of our children so lets be selective about how we refresh
         //if we don't know about any children yet just use the normal method
         if (ChildBranches is null)
         {
@@ -347,7 +347,7 @@ internal class Branch<T> where T : class
             {
                 ChildBranches.Remove (toRemove);
 
-                //also if the user has this node selected (its disapearing) so lets change selection to us (the parent object) to be helpful
+                //also if the user has this node selected (its disappearing) so lets change selection to us (the parent object) to be helpful
                 if (Equals (tree.SelectedObject, toRemove))
                 {
                     tree.SelectedObject = Model;
@@ -357,14 +357,14 @@ internal class Branch<T> where T : class
             // New children need to be added
             foreach (T newChild in newChildren)
             {
-                // If we don't know about the child yet we need a new branch
+                // If we don't know about the child, yet we need a new branch
                 if (!ChildBranches.ContainsKey (newChild))
                 {
                     ChildBranches.Add (newChild, new Branch<T> (tree, this, newChild));
                 }
                 else
                 {
-                    //we already have this object but update the reference anyway incase Equality match but the references are new
+                    //we already have this object but update the reference anyway in case Equality match but the references are new
                     ChildBranches [newChild].Model = newChild;
                 }
             }
@@ -486,7 +486,7 @@ internal class Branch<T> where T : class
         {
             if (IsExpanded)
             {
-                //if we are expanded we need to updatethe visible children
+                // if we are expanded we need to update the visible children
                 foreach (KeyValuePair<T, Branch<T>> child in ChildBranches)
                 {
                     child.Value.Rebuild ();
@@ -515,7 +515,7 @@ internal class Branch<T> where T : class
     }
 
     /// <summary>
-    ///     Returns true if this branch has parents and it is the last node of it's parents branches (or last root of the
+    ///     Returns true if this branch has parents, and it is the last node of its parents branches (or last root of the
     ///     tree).
     /// </summary>
     /// <returns></returns>

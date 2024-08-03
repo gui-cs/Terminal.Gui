@@ -317,7 +317,7 @@ public class MenuBar : View, IDesignable
 
     /// <summary>Virtual method that will invoke the <see cref="MenuClosing"/>.</summary>
     /// <param name="currentMenu">The current menu to be closed.</param>
-    /// <param name="reopen">Whether the current menu will be reopen.</param>
+    /// <param name="reopen">Whether the current menu will be reopened.</param>
     /// <param name="isSubMenu">Whether is a sub-menu or not.</param>
     public virtual MenuClosingEventArgs OnMenuClosing (MenuBarItem currentMenu, bool reopen, bool isSubMenu)
     {
@@ -619,7 +619,7 @@ public class MenuBar : View, IDesignable
             return Point.Empty;
         }
 
-        Rectangle superViewFrame = SuperView is null ? Driver.Screen : SuperView.Frame;
+        Rectangle superViewFrame = SuperView is null ? Application.Screen : SuperView.Frame;
         View sv = SuperView is null ? Application.Current : SuperView;
 
         if (sv is null)

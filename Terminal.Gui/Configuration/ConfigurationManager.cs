@@ -125,7 +125,7 @@ public static class ConfigurationManager
     /// </remarks>
     private static SettingsScope? _settings;
 
-    /// <summary>Name of the running application. By default this property is set to the application's assembly name.</summary>
+    /// <summary>Name of the running application. By default, this property is set to the application's assembly name.</summary>
     public static string AppName { get; set; } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0]?.Trim ()!;
 
     /// <summary>Application-specific configuration settings scope.</summary>

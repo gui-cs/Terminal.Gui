@@ -449,13 +449,13 @@ public class TimeField : TextField
             }
 
             spaces += FieldLength;
-            string trimedText = e.NewValue [..spaces];
+            string trimmedText = e.NewValue [..spaces];
             spaces -= FieldLength;
-            trimedText = trimedText.Replace (new string (' ', spaces), " ");
+            trimmedText = trimmedText.Replace (new string (' ', spaces), " ");
 
-            if (trimedText != e.NewValue)
+            if (trimmedText != e.NewValue)
             {
-                e.NewValue = trimedText;
+                e.NewValue = trimmedText;
             }
 
             if (!TimeSpan.TryParseExact (

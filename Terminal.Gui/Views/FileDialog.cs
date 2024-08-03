@@ -60,6 +60,9 @@ public class FileDialog : Dialog
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem fileSystem)
     {
+        Height = Dim.Percent (80);
+        Width = Dim.Percent (80);
+
         // Assume canceled
         Canceled = true;
 
@@ -587,7 +590,7 @@ public class FileDialog : Dialog
     {
         FileSystemInfoStats [] stats = State?.Children ?? new FileSystemInfoStats[0];
 
-        // This portion is never reordered (aways .. at top then folders)
+        // This portion is never reordered (always .. at top then folders)
         IOrderedEnumerable<FileSystemInfoStats> forcedOrder = stats
                                                               .OrderByDescending (f => f.IsParent)
                                                               .ThenBy (f => f.IsDir ? -1 : 100);
@@ -667,7 +670,7 @@ public class FileDialog : Dialog
             return;
         }
 
-        // Don't include ".." (IsParent) in multiselections
+        // Don't include ".." (IsParent) in multi-selections
         MultiSelected = toMultiAccept
                         .Where (s => !s.IsParent)
                         .Select (s => s.FileSystemInfo.FullName)

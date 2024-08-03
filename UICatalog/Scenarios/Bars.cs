@@ -341,12 +341,6 @@ public class Bars : Scenario
     //    Application.MouseEvent -= Application_MouseEvent;
     //}
 
-    private void Menu_Initialized (object sender, EventArgs e)
-    {
-        // BUGBUG: this should not be needed    
-
-        ((View)(sender)).LayoutSubviews ();
-    }
 
     private void ConfigMenuBar (Bar bar)
     {
@@ -408,7 +402,7 @@ public class Bars : Scenario
         bar.Add (shortcut1, shortcut2, line, shortcut3);
     }
 
-    private void ConfigStatusBar (Bar bar)
+    public void ConfigStatusBar (Bar bar)
     {
         var shortcut = new Shortcut
         {
