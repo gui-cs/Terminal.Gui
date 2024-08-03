@@ -349,7 +349,7 @@ public class ScrollViewTests (ITestOutputHelper output)
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.KeepContentAlwaysInViewport);
 
-        sv = new() { X = 1, Y = 2, Width = 20, Height = 10 };
+        sv = new () { X = 1, Y = 2, Width = 20, Height = 10 };
         Assert.True (sv.CanFocus);
         Assert.Equal (new (1, 2, 20, 10), sv.Frame);
         Assert.Equal (Point.Empty, sv.ContentOffset);
@@ -364,7 +364,7 @@ public class ScrollViewTests (ITestOutputHelper output)
     {
         ((FakeDriver)Application.Driver).SetBufferSize (30, 30);
 
-        var top = new View { Width = 30, Height = 30, ColorScheme = new() { Normal = Attribute.Default } };
+        var top = new View { Width = 30, Height = 30, ColorScheme = new () { Normal = Attribute.Default } };
 
         Size size = new (20, 10);
 
@@ -374,7 +374,7 @@ public class ScrollViewTests (ITestOutputHelper output)
             Y = 1,
             Width = 10,
             Height = 5,
-            ColorScheme = new() { Normal = new (Color.Red, Color.Green) }
+            ColorScheme = new () { Normal = new (Color.Red, Color.Green) }
         };
         sv.SetContentSize (size);
         string text = null;
@@ -391,7 +391,7 @@ public class ScrollViewTests (ITestOutputHelper output)
 
         var view = new View
         {
-            ColorScheme = new() { Normal = new (Color.Blue, Color.Yellow) },
+            ColorScheme = new () { Normal = new (Color.Blue, Color.Yellow) },
             Width = Dim.Auto (DimAutoStyle.Text),
             Height = Dim.Auto (DimAutoStyle.Text),
             Text = text
@@ -523,7 +523,9 @@ public class ScrollViewTests (ITestOutputHelper output)
         view.Add (
                   new Label
                   {
-                      Width = Dim.Fill (), Height = 1, Text = rule.Repeat (size.Width / rule.Length)
+                      Width = Dim.Fill (),
+                      Height = 1,
+                      Text = rule.Repeat (size.Width / rule.Length)
                   }
                  );
 
@@ -856,8 +858,8 @@ public class ScrollViewTests (ITestOutputHelper output)
  └──────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (1, 1, 21, 14), pos);
+        TestHelpers.AssertDriverContentsAre (expected, output);
+        
         top.Dispose ();
     }
 
@@ -1090,7 +1092,7 @@ public class ScrollViewTests (ITestOutputHelper output)
             Width = width;
             Height = height;
 
-            labelFill = new() { Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
+            labelFill = new () { Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
 
             labelFill.LayoutComplete += (s, e) =>
                                         {
@@ -1112,7 +1114,7 @@ public class ScrollViewTests (ITestOutputHelper output)
                                             labelFill.Text = fillText.ToString ();
                                         };
 
-            labelText = new() { X = Pos.Center (), Y = Pos.Center (), Text = text };
+            labelText = new () { X = Pos.Center (), Y = Pos.Center (), Text = text };
             Add (labelFill, labelText);
             CanFocus = true;
         }

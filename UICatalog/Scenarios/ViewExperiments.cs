@@ -151,13 +151,10 @@ public class ViewExperiments : Scenario
 
         view.Add (view5);
 
-        var label = new Label { Text = "AutoSize true; 1;1:", X = 1, Y = 1 };
-        view.Add (label);
-
         var edit = new TextField
         {
-            Text = "Right (label)",
-            X = Pos.Right (label),
+            Text = "Right (view5)",
+            X = Pos.Right (view5),
             Y = 1,
             Width = 15,
             Height = 1

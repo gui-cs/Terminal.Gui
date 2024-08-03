@@ -623,7 +623,6 @@ public class ScrollView : View
         {
             _horizontal.Position = Math.Max (0, -_contentOffset.X);
         }
-
         SetNeedsDisplay ();
     }
 

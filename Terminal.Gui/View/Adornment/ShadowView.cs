@@ -1,4 +1,7 @@
 ﻿#nullable enable
+using Microsoft.VisualBasic;
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -109,7 +112,11 @@ internal class ShadowView : View
         for (int i = screen.X; i < screen.X + screen.Width - 1; i++)
         {
             Driver.Move (i, screen.Y);
-            Driver.AddRune (Driver.Contents [screen.Y, i].Rune);
+
+            if (i < Driver.Contents.GetLength (1) && screen.Y < Driver.Contents.GetLength (0))
+            {
+                Driver.AddRune (Driver.Contents [screen.Y, i].Rune);
+            }
         }
     }
 
@@ -133,7 +140,11 @@ internal class ShadowView : View
         for (int i = screen.Y; i < screen.Y + viewport.Height; i++)
         {
             Driver.Move (screen.X, i);
-            Driver.AddRune (Driver.Contents [i, screen.X].Rune);
+
+            if (screen.X < Driver.Contents.GetLength (1) && i < Driver.Contents.GetLength (0))
+            {
+                Driver.AddRune (Driver.Contents [i, screen.X].Rune);
+            }
         }
     }
 }

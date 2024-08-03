@@ -175,7 +175,7 @@ public class ProgressBar : View, IDesignable
 
         if (ProgressBarFormat != ProgressBarFormat.Simple && !_isActivity)
         {
-            var tf = new TextFormatter { Alignment = Alignment.Center, Text = Text, AutoSize = true };
+            var tf = new TextFormatter { Alignment = Alignment.Center, Text = Text };
             var attr = new Attribute (ColorScheme.HotNormal.Foreground, ColorScheme.HotNormal.Background);
 
             if (_fraction > .5)

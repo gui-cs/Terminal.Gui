@@ -448,6 +448,13 @@ internal partial class TestHelpers
             expectedLook = expectedLook [..^Environment.NewLine.Length];
         }
 
+        // If test is about to fail show user what things looked like
+        if (!string.Equals (expectedLook, actualLook))
+        {
+            output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+            output?.WriteLine (" But Was:" + Environment.NewLine + actualLook);
+        }
+
         Assert.Equal (expectedLook, actualLook);
 
         return new (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
