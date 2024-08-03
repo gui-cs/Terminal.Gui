@@ -38,8 +38,6 @@
 /// </remarks>
 public class Shortcut : View, IOrientation, IDesignable
 {
-    private readonly OrientationHelper _orientationHelper;
-
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
     /// </summary>
@@ -76,7 +74,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView = new ()
         {
             Width = Dim.Auto (),
-            Height = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: 1)
+            Height = Dim.Auto (1)
         };
 
         HelpView.Id = "_helpView";
@@ -142,44 +140,24 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </summary>
     public Shortcut () : this (Key.Empty, string.Empty, null) { }
 
-    #region IOrientation members
-
-    /// <summary>
-    ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Bar"/>. The default is
-    ///     <see cref="Orientation.Horizontal"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Horizontal orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from right to
-    ///         left
-    ///         Vertical orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from left to
-    ///         right.
-    ///     </para>
-    /// </remarks>
-
-    public Orientation Orientation
-    {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
-    }
-
-    /// <inheritdoc/>
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
-
-    /// <inheritdoc/>
-    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
-
-    /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
-    /// <param name="newOrientation"></param>
-    public void OnOrientationChanged (Orientation newOrientation)
-    {
-        // TODO: Determine what, if anything, is opinionated about the orientation.
-        SetNeedsLayout ();
-    }
-
-    #endregion
+    private readonly OrientationHelper _orientationHelper;
 
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
+
+    // This is used to calculate the minimum width of the Shortcut when the width is NOT Dim.Auto
+    private int? _minimumDimAutoWidth;
+
+    private Color? _savedForeColor;
+
+    /// <inheritdoc/>
+    public bool EnableForDesign ()
+    {
+        Title = "_Shortcut";
+        HelpText = "Shortcut help";
+        Key = Key.F1;
+
+        return true;
+    }
 
     /// <summary>
     ///     Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Shortcut"/>.
@@ -200,6 +178,30 @@ public class Shortcut : View, IOrientation, IDesignable
             SetHelpViewDefaultLayout ();
             SetKeyViewDefaultLayout ();
         }
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            if (CommandView?.IsAdded == false)
+            {
+                CommandView.Dispose ();
+            }
+
+            if (HelpView?.IsAdded == false)
+            {
+                HelpView.Dispose ();
+            }
+
+            if (KeyView?.IsAdded == false)
+            {
+                KeyView.Dispose ();
+            }
+        }
+
+        base.Dispose (disposing);
     }
 
     // When one of the subviews is "empty" we don't want to show it. So we
@@ -225,8 +227,15 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
-    // This is used to calculate the minimum width of the Shortcut when the width is NOT Dim.Auto
-    private int? _minimumDimAutoWidth;
+    private Thickness GetMarginThickness ()
+    {
+        if (Orientation == Orientation.Vertical)
+        {
+            return new (1, 0, 1, 0);
+        }
+
+        return new (1, 0, 1, 0);
+    }
 
     // When layout starts, we need to adjust the layout of the HelpView and KeyView
     private void OnLayoutStarted (object sender, LayoutEventArgs e)
@@ -305,17 +314,15 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
-    private Thickness GetMarginThickness ()
+    private bool? OnSelect (CommandContext ctx)
     {
-        if (Orientation == Orientation.Vertical)
+        if (CommandView.GetSupportedCommands ().Contains (Command.Select))
         {
-            return new (1, 0, 1, 0);
+            return CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
         }
 
-        return new (1, 0, 1, 0);
+        return false;
     }
-
-    private Color? _savedForeColor;
 
     private void Shortcut_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
     {
@@ -367,6 +374,43 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         // TODO: Remove. This does nothing.
     }
+
+    #region IOrientation members
+
+    /// <summary>
+    ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Bar"/>. The default is
+    ///     <see cref="Orientation.Horizontal"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Horizontal orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from right to
+    ///         left
+    ///         Vertical orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from left to
+    ///         right.
+    ///     </para>
+    /// </remarks>
+
+    public Orientation Orientation
+    {
+        get => _orientationHelper.Orientation;
+        set => _orientationHelper.Orientation = value;
+    }
+
+    /// <inheritdoc/>
+    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+
+    /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
+    /// <param name="newOrientation"></param>
+    public void OnOrientationChanged (Orientation newOrientation)
+    {
+        // TODO: Determine what, if anything, is opinionated about the orientation.
+        SetNeedsLayout ();
+    }
+
+    #endregion
 
     #region Command
 
@@ -644,6 +688,7 @@ public class Shortcut : View, IOrientation, IDesignable
                 {
                     KeyBindings.Remove (oldKey);
                 }
+
                 KeyBindings.Remove (Key);
                 KeyBindings.Add (Key, KeyBindingScope | KeyBindingScope.HotKey, Command.Accept);
             }
@@ -724,16 +769,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #endregion Accept Handling
 
-    private bool? OnSelect (CommandContext ctx)
-    {
-        if (CommandView.GetSupportedCommands ().Contains (Command.Select))
-        {
-            return CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
-        }
-
-        return false;
-    }
-
     #region Focus
 
     /// <inheritdoc/>
@@ -803,38 +838,4 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     #endregion Focus
-
-    /// <inheritdoc/>
-    public bool EnableForDesign ()
-    {
-        Title = "_Shortcut";
-        HelpText = "Shortcut help";
-        Key = Key.F1;
-
-        return true;
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            if (CommandView?.IsAdded == false)
-            {
-                CommandView.Dispose ();
-            }
-
-            if (HelpView?.IsAdded == false)
-            {
-                HelpView.Dispose ();
-            }
-
-            if (KeyView?.IsAdded == false)
-            {
-                KeyView.Dispose ();
-            }
-        }
-
-        base.Dispose (disposing);
-    }
 }
