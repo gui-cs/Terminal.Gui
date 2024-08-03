@@ -17,11 +17,11 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
+      #if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
       uses: actions/checkout@v4
 
     - name: DocFX Build
-      if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
+      #if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
       working-directory: docfx
       run: |
         dotnet tool install -g docfx
@@ -31,11 +31,11 @@ jobs:
       continue-on-error: false
 
     - name: Setup Pages
-      if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
+      #if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
       uses: actions/configure-pages@v5
       
     - name: Upload artifact
-      if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
+      #if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
       uses: actions/upload-pages-artifact@v3
       with:
         path: docfx/_site
