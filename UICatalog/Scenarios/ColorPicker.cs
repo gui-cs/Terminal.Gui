@@ -37,8 +37,7 @@ public class ColorPickers : Scenario
         foregroundColorPicker = new ColorPicker {
             Title = "Foreground Color",
             BorderStyle = LineStyle.Single,
-            Width = Dim.Percent (50),
-            Height = 6
+            Width = Dim.Percent (50)
         };
         foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
         app.Add (foregroundColorPicker);

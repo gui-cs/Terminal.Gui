@@ -9,7 +9,7 @@ public class ColorPickerTests
     [AutoInitShutdown]
     public void ColorPicker_Construct_DefaultValue ()
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = new (0, 0) };
+        var cp = new ColorPicker { Width = 20, SelectedColor = new (0, 0) };
 
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -49,7 +49,7 @@ public class ColorPickerTests
     [AutoInitShutdown]
     public void ColorPicker_RGB_KeyboardNavigation ()
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = new (0, 0) };
+        var cp = new ColorPicker { Width = 20, SelectedColor = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -98,7 +98,7 @@ public class ColorPickerTests
     [AutoInitShutdown]
     public void ColorPicker_RGB_MouseNavigation ()
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = new (0, 0) };
+        var cp = new ColorPicker { Width = 20,SelectedColor = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -186,7 +186,7 @@ public class ColorPickerTests
     [MemberData (nameof (ColorPickerTestData))]
     public void ColorPicker_RGB_NoText (Color c, string expectedR, int expectedRTriangle, string expectedG, int expectedGTriangle, string expectedB, int expectedBTriangle, string expectedHex)
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = c };
+        var cp = new ColorPicker { Width = 20,  SelectedColor = c };
 
         cp.Style.ShowTextFields = false;
         cp.Style.ColorModel = ColorModel.RGB;
@@ -246,7 +246,7 @@ public class ColorPickerTests
     [MemberData (nameof (ColorPickerTestData_WithTextFields))]
     public void ColorPicker_RGB_NoText_WithTextFields (Color c, string expectedR, int expectedRTriangle, int expectedRValue, string expectedG, int expectedGTriangle, int expectedGValue, string expectedB, int expectedBTriangle, int expectedBValue, string expectedHex)
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = c };
+        var cp = new ColorPicker { Width = 20,  SelectedColor = c };
 
         cp.Style.ShowTextFields = true;
         cp.Style.ColorModel = ColorModel.RGB;
@@ -284,7 +284,7 @@ public class ColorPickerTests
     [AutoInitShutdown]
     public void ColorPicker_ClickingAtEndOfBar_SetsMaxValue ()
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = new (0, 0) };
+        var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -325,7 +325,7 @@ public class ColorPickerTests
     [AutoInitShutdown]
     public void ColorPicker_ClickingBeyondBar_ChangesToMaxValue ()
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = new (0, 0) };
+        var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -366,7 +366,7 @@ public class ColorPickerTests
     [AutoInitShutdown]
     public void ColorPicker_ChangeValueOnUI_UpdatesAllUIElements ()
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = new (0, 0) };
+        var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = true;
         cp.ApplyStyleChanges ();
@@ -411,7 +411,7 @@ public class ColorPickerTests
     [AutoInitShutdown]
     public void ColorPicker_InvalidHexInput_DoesNotChangeColor ()
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = new (0, 0) };
+        var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = true;
         cp.ApplyStyleChanges ();
@@ -449,7 +449,7 @@ public class ColorPickerTests
     [AutoInitShutdown]
     public void ColorPicker_ClickingDifferentBars_ChangesFocus ()
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = new (0, 0) };
+        var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -495,7 +495,7 @@ public class ColorPickerTests
     [AutoInitShutdown]
     public void ColorPicker_SwitchingColorModels_ResetsBars ()
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = new (255, 0) };
+        var cp = new ColorPicker { Width = 20,  SelectedColor = new (255, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
@@ -543,7 +543,7 @@ public class ColorPickerTests
     [AutoInitShutdown]
     public void ColorPicker_SyncBetweenTextFieldAndBars ()
     {
-        var cp = new ColorPicker { Width = 20, Height = 4, SelectedColor = new (0, 0) };
+        var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = true;
         cp.ApplyStyleChanges ();
