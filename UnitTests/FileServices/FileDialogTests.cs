@@ -622,6 +622,11 @@ public class FileDialogTests (ITestOutputHelper output)
 
     private FileDialog GetWindowsDialog ()
     {
+        // Override CM
+        Window.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+
         // Arrange
         var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), @"c:\");
         fileSystem.MockTime (() => new (2010, 01, 01, 11, 12, 43));
