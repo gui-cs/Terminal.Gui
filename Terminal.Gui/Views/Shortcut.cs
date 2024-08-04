@@ -610,6 +610,21 @@ public class Shortcut : View, IOrientation, IDesignable
         get => _keyBindingScope;
         set
         {
+            if (value == _keyBindingScope)
+            {
+                return;
+            }
+
+            if (_keyBindingScope == KeyBindingScope.Application)
+            {
+                Application.KeyBindings.Remove (Key);
+            }
+
+            if (_keyBindingScope is KeyBindingScope.HotKey or KeyBindingScope.Focused)
+            {
+                KeyBindings.Remove (Key);
+            }
+
             _keyBindingScope = value;
 
             UpdateKeyBinding (Key.Empty);
