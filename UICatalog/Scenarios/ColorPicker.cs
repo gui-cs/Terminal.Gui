@@ -55,8 +55,7 @@ public class ColorPickers : Scenario
             Title = "Background Color",
             X = Pos.AnchorEnd (),
             Width = Dim.Percent (50),
-            BorderStyle = LineStyle.Single,
-            Height = 6
+            BorderStyle = LineStyle.Single
         };
 
         backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;

@@ -177,7 +177,8 @@ public class LineDrawing : Scenario
         */
         var cp = new ColorPicker
         {
-            SelectedColor = current
+            SelectedColor = current,
+            Width = Dim.Fill ()
         };
 
         d.Add (cp);
