@@ -73,6 +73,5 @@ public class Window : Toplevel
     ///     s.
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 }

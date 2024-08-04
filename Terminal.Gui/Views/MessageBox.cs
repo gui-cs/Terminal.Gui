@@ -32,7 +32,6 @@ public static class MessageBox
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
     /// <summary>
