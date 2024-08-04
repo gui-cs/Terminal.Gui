@@ -78,10 +78,10 @@ public class AdornmentEditor : View
         AdornmentChanged?.Invoke (this, EventArgs.Empty);
     }
 
-    private Buttons.NumericUpDown<int> _topEdit;
-    private Buttons.NumericUpDown<int> _leftEdit;
-    private Buttons.NumericUpDown<int> _bottomEdit;
-    private Buttons.NumericUpDown<int> _rightEdit;
+    private NumericUpDown<int> _topEdit;
+    private NumericUpDown<int> _leftEdit;
+    private NumericUpDown<int> _bottomEdit;
+    private NumericUpDown<int> _rightEdit;
 
     public AdornmentEditor ()
     {
