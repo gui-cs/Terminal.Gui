@@ -4,24 +4,28 @@
   href: getting-started.md
 - name: What's new in v2
   href: newinv2.md
-- name: v1 To v2 Migration Guide
+- name: v1 To v2 Migration
   href: migratingfromv1.md  
 - name: List of Views
   href: views.md
+- name: Layout Engine
+  href: layout.md
+- name: Navigation
+  href: navigation.md
+- name: Keyboard
+  href: keyboard.md
+- name: Mouse
+  href: mouse.md
 - name: Configuration
   href: config.md
-- name: Drawing (Text, Lines, and Color)
+- name: Drawing
   href: drawing.md
-- name: Cross-platform Driver Model
+- name: Drivers
   href: drivers.md
-- name: Keyboard Event Processing
-  href: keyboard.md
-- name: Mouse Event Processing
-  href: mouse.md
-- name: The View Layout Engine
-  href: layout.md
-- name: Mutli-Tasking and Application Main Loop
+- name: Multi-Tasking
   href: mainloop.md
+- name: Dim.Auto Deep Dive
+  href: dimauto.md
 - name: TableView Deep Dive
   href: tableview.md
 - name: TreeView Deep Dive
