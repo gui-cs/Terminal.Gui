@@ -251,22 +251,22 @@ public abstract class Pos
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Top (View view) { return new PosView (view, Side.Top); }
+    public static Pos Top (View? view) { return new PosView (view, Side.Top); }
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Y (View view) { return new PosView (view, Side.Top); }
+    public static Pos Y (View? view) { return new PosView (view, Side.Top); }
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Left (View view) { return new PosView (view, Side.Left); }
+    public static Pos Left (View? view) { return new PosView (view, Side.Left); }
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos X (View view) { return new PosView (view, Side.Left); }
+    public static Pos X (View? view) { return new PosView (view, Side.Left); }
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified
@@ -274,7 +274,7 @@ public abstract class Pos
     /// </summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Bottom (View view) { return new PosView (view, Side.Bottom); }
+    public static Pos Bottom (View? view) { return new PosView (view, Side.Bottom); }
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that tracks the Right (X+Width) coordinate of the specified
@@ -282,7 +282,7 @@ public abstract class Pos
     /// </summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Right (View view) { return new PosView (view, Side.Right); }
+    public static Pos Right (View? view) { return new PosView (view, Side.Right); }
 
     #endregion static Pos creation methods
 
@@ -373,7 +373,7 @@ public abstract class Pos
 
         if (left is PosView view)
         {
-            view.Target.SetNeedsLayout ();
+            view.Target?.SetNeedsLayout ();
         }
 
         return newPos;
@@ -402,7 +402,7 @@ public abstract class Pos
 
         if (left is PosView view)
         {
-            view.Target.SetNeedsLayout ();
+            view.Target?.SetNeedsLayout ();
         }
 
         return newPos;

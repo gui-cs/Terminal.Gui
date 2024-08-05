@@ -184,10 +184,6 @@ public partial class View : Responder, ISupportInitializeNotification
 
         //SetupMouse ();
         SetupText ();
-
-        CanFocus = false;
-        TabIndex = -1;
-        TabStop = false;
     }
 
     /// <summary>
@@ -332,7 +328,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 else
                 {
                     view.Enabled = view._oldEnabled;
-                    view._addingView = _enabled;
+                    view._addingViewSoCanFocusAlsoUpdatesSuperView = _enabled;
                 }
             }
         }
@@ -490,7 +486,7 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
     protected void OnTitleChanged ()
     {
-        TitleChanged?.Invoke (this, new (ref _title));
+        TitleChanged?.Invoke (this, new (in _title));
     }
 
     /// <summary>

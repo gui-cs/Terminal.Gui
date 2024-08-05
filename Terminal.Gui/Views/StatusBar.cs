@@ -18,6 +18,7 @@ public class StatusBar : Bar, IDesignable
     /// <inheritdoc/>
     public StatusBar (IEnumerable<Shortcut> shortcuts) : base (shortcuts)
     {
+        TabStop = TabBehavior.NoStop;
         Orientation = Orientation.Horizontal;
         Y = Pos.AnchorEnd ();
         Width = Dim.Fill ();
@@ -65,8 +66,6 @@ public class StatusBar : Bar, IDesignable
 
         if (view is Shortcut shortcut)
         {
-            shortcut.KeyBindingScope = KeyBindingScope.Application;
-
             // TODO: not happy about using AlignmentModes for this. Too implied.
             // TODO: instead, add a property (a style enum?) to Shortcut to control this
             shortcut.AlignmentModes = AlignmentModes.EndToStart;

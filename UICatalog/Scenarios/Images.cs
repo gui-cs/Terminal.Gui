@@ -20,9 +20,9 @@ public class Images : Scenario
         Application.Init ();
         var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName()}" };
 
-        bool canTrueColor = Application.Driver.SupportsTrueColor;
+        bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
 
-        var lblDriverName = new Label { X = 0, Y = 0, Text = $"Driver is {Application.Driver.GetType ().Name}" };
+        var lblDriverName = new Label { X = 0, Y = 0, Text = $"Driver is {Application.Driver?.GetType ().Name}" };
         win.Add (lblDriverName);
 
         var cbSupportsTrueColor = new CheckBox

@@ -187,6 +187,7 @@ public class DatePicker : View
         BorderStyle = LineStyle.Single;
         Date = date;
         _dateLabel = new Label { X = 0, Y = 0, Text = "Date: " };
+        TabStop = TabBehavior.TabGroup;
 
         _calendar = new TableView
         {

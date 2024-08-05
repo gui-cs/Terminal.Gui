@@ -19,11 +19,11 @@ public class TrueColors : Scenario
         var x = 2;
         var y = 1;
 
-        bool canTrueColor = Application.Driver.SupportsTrueColor;
+        bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
 
         var lblDriverName = new Label
         {
-            X = x, Y = y++, Text = $"Current driver is {Application.Driver.GetType ().Name}"
+            X = x, Y = y++, Text = $"Current driver is {Application.Driver?.GetType ().Name}"
         };
         app.Add (lblDriverName);
         y++;

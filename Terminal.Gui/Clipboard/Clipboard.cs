@@ -31,11 +31,11 @@ public static class Clipboard
             {
                 if (IsSupported)
                 {
-                    string clipData = Application.Driver.Clipboard.GetClipboardData ();
+                    string clipData = Application.Driver?.Clipboard.GetClipboardData ();
 
                     if (clipData is null)
                     {
-                        // throw new InvalidOperationException ($"{Application.Driver.GetType ().Name}.GetClipboardData returned null instead of string.Empty");
+                        // throw new InvalidOperationException ($"{Application.Driver?.GetType ().Name}.GetClipboardData returned null instead of string.Empty");
                         clipData = string.Empty;
                     }
 
@@ -60,7 +60,7 @@ public static class Clipboard
                         value = string.Empty;
                     }
 
-                    Application.Driver.Clipboard.SetClipboardData (value);
+                    Application.Driver?.Clipboard.SetClipboardData (value);
                 }
 
                 _contents = value;
@@ -74,19 +74,16 @@ public static class Clipboard
 
     /// <summary>Returns true if the environmental dependencies are in place to interact with the OS clipboard.</summary>
     /// <remarks></remarks>
-    public static bool IsSupported => Application.Driver.Clipboard.IsSupported;
+    public static bool IsSupported => Application.Driver?.Clipboard.IsSupported ?? false;
 
     /// <summary>Copies the _contents of the OS clipboard to <paramref name="result"/> if possible.</summary>
     /// <param name="result">The _contents of the OS clipboard if successful, <see cref="string.Empty"/> if not.</param>
     /// <returns><see langword="true"/> the OS clipboard was retrieved, <see langword="false"/> otherwise.</returns>
     public static bool TryGetClipboardData (out string result)
     {
-        if (IsSupported && Application.Driver.Clipboard.TryGetClipboardData (out result))
+        if (IsSupported && Application.Driver!.Clipboard.TryGetClipboardData (out result))
         {
-            if (_contents != result)
-            {
-                _contents = result;
-            }
+            _contents = result;
 
             return true;
         }
@@ -101,7 +98,7 @@ public static class Clipboard
     /// <returns><see langword="true"/> the OS clipboard was set, <see langword="false"/> otherwise.</returns>
     public static bool TrySetClipboardData (string text)
     {
-        if (IsSupported && Application.Driver.Clipboard.TrySetClipboardData (text))
+        if (IsSupported && Application.Driver!.Clipboard.TrySetClipboardData (text))
         {
             _contents = text;
 
@@ -155,7 +152,7 @@ internal static class ClipboardProcessRunner
 
         using (var process = new Process
                {
-                   StartInfo = new ProcessStartInfo
+                   StartInfo = new()
                    {
                        FileName = cmd,
                        Arguments = arguments,
@@ -191,17 +188,9 @@ internal static class ClipboardProcessRunner
 
             if (process.ExitCode > 0)
             {
-                output = $@"Process failed to run. Command line: {
-                    cmd
-                } {
-                    arguments
-                }.
-										Output: {
-                                            output
-                                        }
-										Error: {
-                                            process.StandardError.ReadToEnd ()
-                                        }";
+                output = $@"Process failed to run. Command line: {cmd} {arguments}.
+										Output: {output}
+										Error: {process.StandardError.ReadToEnd ()}";
             }
 
             return (process.ExitCode, output);

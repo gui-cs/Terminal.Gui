@@ -14,7 +14,7 @@ public class DimFillTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (view);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (32, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (32, 5);
 
         //view.SetNeedsLayout ();
         top.LayoutSubviews ();

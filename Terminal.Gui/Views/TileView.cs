@@ -871,7 +871,7 @@ public class TileView : View
         public TileViewLineView (TileView parent, int idx)
         {
             CanFocus = false;
-            TabStop = true;
+            TabStop = TabBehavior.TabStop;
 
             Parent = parent;
             Idx = idx;
@@ -908,7 +908,7 @@ public class TileView : View
             {
                 // Start a Drag
                 SetFocus ();
-                Application.BringOverlappedTopToFront ();
+                ApplicationOverlapped.BringOverlappedTopToFront ();
 
                 if (mouseEvent.Flags == MouseFlags.Button1Pressed)
                 {

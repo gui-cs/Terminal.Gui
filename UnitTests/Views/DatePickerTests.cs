@@ -54,9 +54,9 @@ public class DatePickerTests
         Application.Begin (top);
 
         // Set focus to next month button
-        datePicker.FocusNext ();
-        datePicker.FocusNext ();
-        datePicker.FocusNext ();
+        datePicker.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        datePicker.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        datePicker.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
 
         // Change month to December
         Assert.True (datePicker.NewKeyDownEvent (Key.Enter));
@@ -81,8 +81,8 @@ public class DatePickerTests
         Application.Begin (top);
 
         // set focus to the previous month button
-        datePicker.FocusNext ();
-        datePicker.FocusNext ();
+        datePicker.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        datePicker.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
 
         // Change month to January 
         Assert.True (datePicker.NewKeyDownEvent (Key.Enter));

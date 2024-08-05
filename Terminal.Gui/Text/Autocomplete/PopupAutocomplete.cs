@@ -376,18 +376,18 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             if (i == SelectedIdx - ScrollOffset)
             {
-                Application.Driver.SetAttribute (ColorScheme.Focus);
+                Application.Driver?.SetAttribute (ColorScheme.Focus);
             }
             else
             {
-                Application.Driver.SetAttribute (ColorScheme.Normal);
+                Application.Driver?.SetAttribute (ColorScheme.Normal);
             }
 
             popup.Move (0, i);
 
             string text = TextFormatter.ClipOrPad (toRender [i].Title, width);
 
-            Application.Driver.AddStr (text);
+            Application.Driver?.AddStr (text);
         }
     }
 

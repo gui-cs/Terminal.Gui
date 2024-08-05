@@ -39,8 +39,8 @@ public class Ruler
                 _hTemplate.Repeat ((int)Math.Ceiling (Length + 2 / (double)_hTemplate.Length)) [start..(Length + start)];
 
             // Top
-            Application.Driver.Move (location.X, location.Y);
-            Application.Driver.AddStr (hrule);
+            Application.Driver?.Move (location.X, location.Y);
+            Application.Driver?.AddStr (hrule);
         }
         else
         {
@@ -50,8 +50,8 @@ public class Ruler
 
             for (int r = location.Y; r < location.Y + Length; r++)
             {
-                Application.Driver.Move (location.X, r);
-                Application.Driver.AddRune ((Rune)vrule [r - location.Y]);
+                Application.Driver?.Move (location.X, r);
+                Application.Driver?.AddRune ((Rune)vrule [r - location.Y]);
             }
         }
     }

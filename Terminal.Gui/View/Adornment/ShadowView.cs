@@ -18,7 +18,7 @@ internal class ShadowView : View
         {
             var attr = Attribute.Default;
 
-            if (adornment.Parent.SuperView is { })
+            if (adornment.Parent?.SuperView is { })
             {
                 attr = adornment.Parent.SuperView.GetNormalColor ();
             }
@@ -113,7 +113,7 @@ internal class ShadowView : View
         {
             Driver.Move (i, screen.Y);
 
-            if (i < Driver.Contents.GetLength (1) && screen.Y < Driver.Contents.GetLength (0))
+            if (i < Driver.Contents!.GetLength (1) && screen.Y < Driver.Contents.GetLength (0))
             {
                 Driver.AddRune (Driver.Contents [screen.Y, i].Rune);
             }
@@ -141,7 +141,7 @@ internal class ShadowView : View
         {
             Driver.Move (screen.X, i);
 
-            if (screen.X < Driver.Contents.GetLength (1) && i < Driver.Contents.GetLength (0))
+            if (Driver.Contents is { } && screen.X < Driver.Contents.GetLength (1) && i < Driver.Contents.GetLength (0))
             {
                 Driver.AddRune (Driver.Contents [i, screen.X].Rune);
             }
