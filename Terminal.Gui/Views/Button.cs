@@ -5,8 +5,6 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
-using System.Text.Json.Serialization;
-
 namespace Terminal.Gui;
 
 /// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="View.Accept"/> event.</summary>
