@@ -33,7 +33,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0-release-24352-06" />
     <PackageReference Include="Moq" Version="4.20.70" />
     <PackageReference Include="ReportGenerator" Version="5.3.8" />
-    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.0.26" />
+    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.0.29" />
     <PackageReference Include="xunit" Version="[2.9.0,3)" />
     <PackageReference Include="Xunit.Combinatorial" Version="[1.6.24,2)" />
     <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2,3)">
