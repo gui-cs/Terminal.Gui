@@ -121,6 +121,7 @@ public static class EscSeqUtils
     /// </remarks>
     public static readonly string CSI_SaveCursorAndActivateAltBufferNoBackscroll = CSI + "?1049h";
 
+
     //private static bool isButtonReleased;
     private static bool isButtonClicked;
 
@@ -1372,6 +1373,23 @@ public static class EscSeqUtils
     ///     size in chars.
     /// </summary>
     public const string CSI_ReportTerminalSizeInChars_ResponseValue = "8";
+
+    public static readonly string CSI_StatusLine_Disable = CSI + "0$~";
+
+    public static readonly string CSI_StatusLine_Enable_Indicator = CSI + "1$~";
+
+    public static readonly string CSI_StatusLine_Enable_Host_Writable = CSI + "2$~";
+
+    /// <summary>
+    ///     ESC [ 2$~;N$~ - enable host-writable status area, N lines
+    /// </summary>
+    /// <param name="lines">The number of lines</param>
+    /// <returns></returns>
+    public static string CSI_StatusLine_Enable_Host_Writable_N_Lines (int lines) { return $"{CSI}{CSI_StatusLine_Enable_Host_Writable};{lines}$~"; }
+
+    public static string CSI_StatusLine_Select_Normal_Display = CSI + "0$}";
+
+    public static string CSI_StatusLine_Select_Status_Line = CSI + "1$}";
 
     #endregion
 }
