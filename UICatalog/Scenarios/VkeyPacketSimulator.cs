@@ -198,7 +198,7 @@ public class VkeyPacketSimulator : Scenario
                                                            char keyChar =
                                                                ConsoleKeyMapping.EncodeKeyCharForVKPacket (consoleKeyInfo);
 
-                                                           Application.Driver.SendKeys (
+                                                           Application.Driver?.SendKeys (
                                                                                         keyChar,
                                                                                         ConsoleKey.Packet,
                                                                                         consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift),

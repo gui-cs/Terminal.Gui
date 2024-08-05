@@ -70,6 +70,7 @@ public class ScrollView : View
         _horizontal.OtherScrollBarView = _vertical;
         base.Add (_contentView);
         CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
 
         MouseEnter += View_MouseEnter;
         MouseLeave += View_MouseLeave;

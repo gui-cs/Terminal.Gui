@@ -1,6 +1,6 @@
-﻿namespace Terminal.Gui;
-
-partial class Application
+﻿#nullable enable
+namespace Terminal.Gui;
+public static partial class Application // Mouse handling
 {
     #region Mouse handling
 
@@ -9,32 +9,32 @@ partial class Application
     public static bool IsMouseDisabled { get; set; }
 
     /// <summary>The current <see cref="View"/> object that wants continuous mouse button pressed events.</summary>
-    public static View WantContinuousButtonPressedView { get; private set; }
+    public static View? WantContinuousButtonPressedView { get; private set; }
 
     /// <summary>
     ///     Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be routed to
     ///     this view until the view calls <see cref="UngrabMouse"/> or the mouse is released.
     /// </summary>
-    public static View MouseGrabView { get; private set; }
+    public static View? MouseGrabView { get; private set; }
 
     /// <summary>Invoked when a view wants to grab the mouse; can be canceled.</summary>
-    public static event EventHandler<GrabMouseEventArgs> GrabbingMouse;
+    public static event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
 
     /// <summary>Invoked when a view wants un-grab the mouse; can be canceled.</summary>
-    public static event EventHandler<GrabMouseEventArgs> UnGrabbingMouse;
+    public static event EventHandler<GrabMouseEventArgs>? UnGrabbingMouse;
 
     /// <summary>Invoked after a view has grabbed the mouse.</summary>
-    public static event EventHandler<ViewEventArgs> GrabbedMouse;
+    public static event EventHandler<ViewEventArgs>? GrabbedMouse;
 
     /// <summary>Invoked after a view has un-grabbed the mouse.</summary>
-    public static event EventHandler<ViewEventArgs> UnGrabbedMouse;
+    public static event EventHandler<ViewEventArgs>? UnGrabbedMouse;
 
     /// <summary>
     ///     Grabs the mouse, forcing all mouse events to be routed to the specified view until <see cref="UngrabMouse"/>
     ///     is called.
     /// </summary>
     /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
-    public static void GrabMouse (View view)
+    public static void GrabMouse (View? view)
     {
         if (view is null)
         {
@@ -64,7 +64,7 @@ partial class Application
         }
     }
 
-    private static bool OnGrabbingMouse (View view)
+    private static bool OnGrabbingMouse (View? view)
     {
         if (view is null)
         {
@@ -77,7 +77,7 @@ partial class Application
         return evArgs.Cancel;
     }
 
-    private static bool OnUnGrabbingMouse (View view)
+    private static bool OnUnGrabbingMouse (View? view)
     {
         if (view is null)
         {
@@ -90,7 +90,7 @@ partial class Application
         return evArgs.Cancel;
     }
 
-    private static void OnGrabbedMouse (View view)
+    private static void OnGrabbedMouse (View? view)
     {
         if (view is null)
         {
@@ -100,7 +100,7 @@ partial class Application
         GrabbedMouse?.Invoke (view, new (view));
     }
 
-    private static void OnUnGrabbedMouse (View view)
+    private static void OnUnGrabbedMouse (View? view)
     {
         if (view is null)
         {
@@ -113,7 +113,7 @@ partial class Application
 #nullable enable
 
     // Used by OnMouseEvent to track the last view that was clicked on.
-    internal static View? _mouseEnteredView;
+    internal static View? MouseEnteredView { get; set; }
 
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
@@ -166,7 +166,7 @@ partial class Application
             if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
-                _mouseEnteredView?.NewMouseLeaveEvent (mouseEvent);
+                MouseEnteredView?.NewMouseLeaveEvent (mouseEvent);
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
@@ -187,20 +187,20 @@ partial class Application
 
         if (view is not Adornment)
         {
-            if ((view is null || view == OverlappedTop)
+            if ((view is null || view == ApplicationOverlapped.OverlappedTop)
                 && Current is { Modal: false }
-                && OverlappedTop != null
+                && ApplicationOverlapped.OverlappedTop != null
                 && mouseEvent.Flags != MouseFlags.ReportMousePosition
                 && mouseEvent.Flags != 0)
             {
                 // This occurs when there are multiple overlapped "tops"
                 // E.g. "Mdi" - in the Background Worker Scenario
-                View? top = FindDeepestTop (Top, mouseEvent.Position);
+                View? top = ApplicationOverlapped.FindDeepestTop (Top!, mouseEvent.Position);
                 view = View.FindDeepestView (top, mouseEvent.Position);
 
-                if (view is { } && view != OverlappedTop && top != Current && top is { })
+                if (view is { } && view != ApplicationOverlapped.OverlappedTop && top != Current && top is { })
                 {
-                    MoveCurrent ((Toplevel)top);
+                    ApplicationOverlapped.MoveCurrent ((Toplevel)top);
                 }
             }
         }
@@ -242,16 +242,16 @@ partial class Application
             return;
         }
 
-        if (_mouseEnteredView is null)
+        if (MouseEnteredView is null)
         {
-            _mouseEnteredView = view;
+            MouseEnteredView = view;
             view.NewMouseEnterEvent (me);
         }
-        else if (_mouseEnteredView != view)
+        else if (MouseEnteredView != view)
         {
-            _mouseEnteredView.NewMouseLeaveEvent (me);
+            MouseEnteredView.NewMouseLeaveEvent (me);
             view.NewMouseEnterEvent (me);
-            _mouseEnteredView = view;
+            MouseEnteredView = view;
         }
 
         if (!view.WantMousePositionReports && mouseEvent.Flags == MouseFlags.ReportMousePosition)
@@ -272,7 +272,7 @@ partial class Application
 
             if (view is Adornment adornmentView)
             {
-                view = adornmentView.Parent.SuperView;
+                view = adornmentView.Parent!.SuperView;
             }
             else
             {
@@ -295,7 +295,7 @@ partial class Application
             };
         }
 
-        BringOverlappedTopToFront ();
+        ApplicationOverlapped.BringOverlappedTopToFront ();
     }
 
     #endregion Mouse handling

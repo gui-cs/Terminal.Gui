@@ -22,13 +22,13 @@ public class DrawTests (ITestOutputHelper _output)
         // Only valid location w/in Viewport is 0, 0 (view) - 2, 2 (screen)
 
         view.Move (0, 0);
-        Assert.Equal (new Point (2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
+        Assert.Equal (new Point (2, 2), new Point (Application.Driver!.Col, Application.Driver!.Row));
 
         view.Move (-1, -1);
-        Assert.Equal (new Point (2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
+        Assert.Equal (new Point (2, 2), new Point (Application.Driver!.Col, Application.Driver!.Row));
 
         view.Move (1, 1);
-        Assert.Equal (new Point (2, 2), new Point (Application.Driver.Col, Application.Driver.Row));
+        Assert.Equal (new Point (2, 2), new Point (Application.Driver!.Col, Application.Driver!.Row));
     }
 
     [Fact]
@@ -48,16 +48,16 @@ public class DrawTests (ITestOutputHelper _output)
         view.Draw ();
 
         // Only valid location w/in Viewport is 0, 0 (view) - 2, 2 (screen)
-        Assert.Equal ((Rune)' ', Application.Driver.Contents [2, 2].Rune);
+        Assert.Equal ((Rune)' ', Application.Driver?.Contents! [2, 2].Rune);
 
         view.AddRune (0, 0, Rune.ReplacementChar);
-        Assert.Equal (Rune.ReplacementChar, Application.Driver.Contents [2, 2].Rune);
+        Assert.Equal (Rune.ReplacementChar, Application.Driver?.Contents! [2, 2].Rune);
 
         view.AddRune (-1, -1, Rune.ReplacementChar);
-        Assert.Equal ((Rune)'M', Application.Driver.Contents [1, 1].Rune);
+        Assert.Equal ((Rune)'M', Application.Driver?.Contents! [1, 1].Rune);
 
         view.AddRune (1, 1, Rune.ReplacementChar);
-        Assert.Equal ((Rune)'M', Application.Driver.Contents [3, 3].Rune);
+        Assert.Equal ((Rune)'M', Application.Driver?.Contents! [3, 3].Rune);
 
         View.Diagnostics = ViewDiagnosticFlags.Off;
     }
@@ -250,7 +250,7 @@ public class DrawTests (ITestOutputHelper _output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
 
         const string expectedOutput = """
 
@@ -300,7 +300,7 @@ public class DrawTests (ITestOutputHelper _output)
         dg.Add (view);
         RunState rsTop = Application.Begin (top);
         RunState rsDiag = Application.Begin (dg);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 10);
 
         const string expectedOutput = """
 
@@ -353,7 +353,7 @@ public class DrawTests (ITestOutputHelper _output)
         top.Add (viewRight, viewBottom);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (7, 7);
+        ((FakeDriver)Application.Driver!).SetBufferSize (7, 7);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       """
@@ -560,7 +560,7 @@ public class DrawTests (ITestOutputHelper _output)
         container.Add (content);
         Toplevel top = new ();
         top.Add (container);
-        Application.Driver.Clip = container.Frame;
+        Application.Driver!.Clip = container.Frame;
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -726,7 +726,7 @@ public class DrawTests (ITestOutputHelper _output)
 
         return;
 
-        void Top_LayoutComplete (object? sender, LayoutEventArgs e) { Application.Driver.Clip = container.Frame; }
+        void Top_LayoutComplete (object? sender, LayoutEventArgs e) { Application.Driver!.Clip = container.Frame; }
     }
 
     [Fact]
@@ -766,7 +766,7 @@ public class DrawTests (ITestOutputHelper _output)
         container.Add (content);
         Toplevel top = new ();
         top.Add (container);
-        Application.Driver.Clip = container.Frame;
+        Application.Driver!.Clip = container.Frame;
         Application.Begin (top);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -888,7 +888,7 @@ public class DrawTests (ITestOutputHelper _output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
 
         var expected = """
 
@@ -927,13 +927,13 @@ public class DrawTests (ITestOutputHelper _output)
         view.Border.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (view.Frame, Application.Driver.Clip);
+        Assert.Equal (view.Frame, Application.Driver?.Clip);
 
         // Act
         view.SetClip ();
 
         // Assert
-        Assert.Equal (expectedClip, Application.Driver.Clip);
+        Assert.Equal (expectedClip, Application.Driver?.Clip);
         view.Dispose ();
     }
 
@@ -959,14 +959,14 @@ public class DrawTests (ITestOutputHelper _output)
         view.Border.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (view.Frame, Application.Driver.Clip);
+        Assert.Equal (view.Frame, Application.Driver?.Clip);
         view.Viewport = view.Viewport with { X = 1, Y = 1 };
 
         // Act
         view.SetClip ();
 
         // Assert
-        Assert.Equal (expectedClip, Application.Driver.Clip);
+        Assert.Equal (expectedClip, Application.Driver?.Clip);
         view.Dispose ();
     }
 

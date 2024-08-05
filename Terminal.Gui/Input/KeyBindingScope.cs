@@ -45,5 +45,5 @@ public enum KeyBindingScope
     ///         any of its subviews, and if the key was not bound to a <see cref="View.HotKey"/>.
     ///     </para>
     /// </remarks>
-    Application = 4
+    Application = 4,
 }

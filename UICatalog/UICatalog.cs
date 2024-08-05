@@ -131,7 +131,7 @@ public class UICatalogApp
         // If no driver is provided, the default driver is used.
         Option<string> driverOption = new Option<string> ("--driver", "The ConsoleDriver to use.").FromAmong (
              Application.GetDriverTypes ()
-                        .Select (d => d.Name)
+                        .Select (d => d!.Name)
                         .ToArray ()
             );
 
@@ -383,7 +383,7 @@ public class UICatalogApp
     /// </summary>
     public class UICatalogTopLevel : Toplevel
     {
-        public ListView CategoryList;
+        public ListView? CategoryList;
         public MenuItem? MiForce16Colors;
         public MenuItem? MiIsMenuBorderDisabled;
         public MenuItem? MiIsMouseDisabled;
@@ -466,7 +466,8 @@ public class UICatalogApp
             StatusBar = new ()
             {
                 Visible = ShowStatusBar,
-                AlignmentModes = AlignmentModes.IgnoreFirstOrLast
+                AlignmentModes = AlignmentModes.IgnoreFirstOrLast,
+                CanFocus = false
             };
 
             if (StatusBar is { })
@@ -480,12 +481,14 @@ public class UICatalogApp
                 var statusBarShortcut = new Shortcut
                 {
                     Key = Key.F10,
-                    Title = "Show/Hide Status Bar"
+                    Title = "Show/Hide Status Bar",
+                    CanFocus = false,
                 };
                 statusBarShortcut.Accept += (sender, args) => { StatusBar.Visible = !StatusBar.Visible; };
 
                 ShForce16Colors = new ()
                 {
+                    CanFocus = false,
                     CommandView = new CheckBox
                     {
                         Title = "16 color mode",
@@ -518,6 +521,7 @@ public class UICatalogApp
                 StatusBar.Add (
                                new Shortcut
                                {
+                                   CanFocus = false,
                                    Title = "Quit",
                                    Key = Application.QuitKey
                                },
@@ -619,7 +623,9 @@ public class UICatalogApp
             ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
             // TableView typically is a grid where nav keys are biased for moving left/right.
+            ScenarioList.KeyBindings.Remove (Key.Home);
             ScenarioList.KeyBindings.Add (Key.Home, Command.TopHome);
+            ScenarioList.KeyBindings.Remove (Key.End);
             ScenarioList.KeyBindings.Add (Key.End, Command.BottomEnd);
 
             // Ideally, TableView.MultiSelect = false would turn off any keybindings for
@@ -670,7 +676,7 @@ public class UICatalogApp
 
             ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
-            MenuBar.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
+            MenuBar!.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
 
             if (StatusBar is { })
             {
@@ -680,7 +686,7 @@ public class UICatalogApp
 
             MiIsMouseDisabled!.Checked = Application.IsMouseDisabled;
 
-            Application.Top.SetNeedsDisplay ();
+            Application.Top!.SetNeedsDisplay ();
         }
 
         public MenuItem []? CreateThemeMenuItems ()
@@ -727,7 +733,7 @@ public class UICatalogApp
                                    }
 
                                    ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
-                                   Application.Top.SetNeedsDisplay ();
+                                   Application.Top!.SetNeedsDisplay ();
                                };
                 schemeMenuItems.Add (item);
             }
@@ -849,7 +855,7 @@ public class UICatalogApp
                                    }
 
                                    Diagnostics = _diagnosticFlags;
-                                   Application.Top.SetNeedsDisplay ();
+                                   Application.Top!.SetNeedsDisplay ();
                                };
                 menuItems.Add (item);
             }
@@ -954,7 +960,7 @@ public class UICatalogApp
                                              {
                                                  MiIsMenuBorderDisabled.Checked = (bool)!MiIsMenuBorderDisabled.Checked!;
 
-                                                 MenuBar.MenusBorderStyle = !(bool)MiIsMenuBorderDisabled.Checked
+                                                 MenuBar!.MenusBorderStyle = !(bool)MiIsMenuBorderDisabled.Checked
                                                                                 ? LineStyle.Single
                                                                                 : LineStyle.None;
                                              };
@@ -997,7 +1003,7 @@ public class UICatalogApp
             MiUseSubMenusSingleFrame.Action += () =>
                                                {
                                                    MiUseSubMenusSingleFrame.Checked = (bool)!MiUseSubMenusSingleFrame.Checked!;
-                                                   MenuBar.UseSubMenusSingleFrame = (bool)MiUseSubMenusSingleFrame.Checked;
+                                                   MenuBar!.UseSubMenusSingleFrame = (bool)MiUseSubMenusSingleFrame.Checked;
                                                };
             menuItems.Add (MiUseSubMenusSingleFrame);
 
@@ -1013,7 +1019,7 @@ public class UICatalogApp
                 Title = "Force _16 Colors",
                 Shortcut = (KeyCode)Key.F6,
                 Checked = Application.Force16Colors,
-                CanExecute = () => Application.Driver.SupportsTrueColor
+                CanExecute = () => Application.Driver?.SupportsTrueColor ?? false
             };
             MiForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
 
@@ -1077,7 +1083,7 @@ public class UICatalogApp
                                                 ShowStatusBar = StatusBar.Visible;
 
                                                 int height = StatusBar.Visible ? 1 : 0;
-                                                CategoryList.Height = Dim.Fill (height);
+                                                CategoryList!.Height = Dim.Fill (height);
                                                 ScenarioList.Height = Dim.Fill (height);
 
                                                 // ContentPane.Height = Dim.Fill (height);
@@ -1087,7 +1093,7 @@ public class UICatalogApp
             }
 
             Loaded -= LoadedHandler;
-            CategoryList.EnsureSelectedItemVisible ();
+            CategoryList!.EnsureSelectedItemVisible ();
             ScenarioList.EnsureSelectedCellIsVisible ();
         }
 
@@ -1098,7 +1104,7 @@ public class UICatalogApp
             if (_selectedScenario is null)
             {
                 // Save selected item state
-                _cachedCategoryIndex = CategoryList.SelectedItem;
+                _cachedCategoryIndex = CategoryList!.SelectedItem;
                 _cachedScenarioIndex = ScenarioList.SelectedRow;
 
                 // Create new instance of scenario (even though Scenarios contains instances)

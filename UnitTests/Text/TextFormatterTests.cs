@@ -306,7 +306,7 @@ ssb
     [SetupFakeDriver]
     public void FillRemaining_True_False ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (22, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (22, 5);
 
         Attribute [] attrs =
         {
@@ -6945,7 +6945,7 @@ B  ")]
             Text = text
         };
 
-        Application.Driver.FillRect (new (0, 0, 7, 7), (Rune)'*');
+        Application.Driver?.FillRect (new (0, 0, 7, 7), (Rune)'*');
         tf.Draw (new (0, 0, 7, 7), Attribute.Default, Attribute.Default);
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
     }

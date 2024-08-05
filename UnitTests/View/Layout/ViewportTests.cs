@@ -466,7 +466,7 @@ public class ViewportTests (ITestOutputHelper output)
     //[InlineData (5, 5, false)]
     //public void IsVisibleInSuperView_With_Driver (int x, int y, bool expected)
     //{
-    //    ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+    //    ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
 
     //    var view = new View { X = 1, Y = 1, Width = 5, Height = 5 };
     //    var top = new Toplevel ();

@@ -58,26 +58,26 @@ public class TimeField : TextField
         AddCommand (Command.RightEnd, () => MoveEnd ());
         AddCommand (Command.Right, () => MoveRight ());
 
-        // Default keybindings for this view
-        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
+        // Replace the key bindings defined in TextField
+        KeyBindings.ReplaceCommands (Key.Delete, Command.DeleteCharRight);
+        KeyBindings.ReplaceCommands (Key.D.WithCtrl, Command.DeleteCharRight);
 
-        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
+        KeyBindings.ReplaceCommands (Key.Backspace, Command.DeleteCharLeft);
 
-        KeyBindings.Add (Key.Home, Command.LeftHome);
-        KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
+        KeyBindings.ReplaceCommands (Key.Home, Command.LeftHome);
+        KeyBindings.ReplaceCommands (Key.A.WithCtrl, Command.LeftHome);
 
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.B.WithCtrl, Command.Left);
+        KeyBindings.ReplaceCommands (Key.CursorLeft, Command.Left);
+        KeyBindings.ReplaceCommands (Key.B.WithCtrl, Command.Left);
 
-        KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.E.WithCtrl, Command.RightEnd);
+        KeyBindings.ReplaceCommands (Key.End, Command.RightEnd);
+        KeyBindings.ReplaceCommands (Key.E.WithCtrl, Command.RightEnd);
 
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.F.WithCtrl, Command.Right);
+        KeyBindings.ReplaceCommands (Key.CursorRight, Command.Right);
+        KeyBindings.ReplaceCommands (Key.F.WithCtrl, Command.Right);
 
 #if UNIX_KEY_BINDINGS
-        KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
+        KeyBindings.ReplaceCommands (Key.D.WithAlt, Command.DeleteCharLeft);
 #endif
     }
 

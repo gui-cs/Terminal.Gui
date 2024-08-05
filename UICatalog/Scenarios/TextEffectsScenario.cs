@@ -260,5 +260,5 @@ internal class GradientsView : View
         }
     }
 
-    private static void SetColor (Color color) { Application.Driver.SetAttribute (new (color, color)); }
+    private static void SetColor (Color color) { Application.Driver?.SetAttribute (new (color, color)); }
 }

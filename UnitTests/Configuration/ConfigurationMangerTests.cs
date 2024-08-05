@@ -33,14 +33,14 @@ public class ConfigurationManagerTests
 
             // assert
             Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
-            Assert.Equal (KeyCode.F, Application.AlternateForwardKey.KeyCode);
-            Assert.Equal (KeyCode.B, Application.AlternateBackwardKey.KeyCode);
+            Assert.Equal (KeyCode.F, Application.NextTabGroupKey.KeyCode);
+            Assert.Equal (KeyCode.B, Application.PrevTabGroupKey.KeyCode);
         }
 
         // act
         Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 
         Apply ();
 
@@ -152,8 +152,8 @@ public class ConfigurationManagerTests
         Reset ();
 
         Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 
         Updated += ConfigurationManager_Updated;
         var fired = false;
@@ -166,13 +166,13 @@ public class ConfigurationManagerTests
             Assert.Equal (Key.Esc, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
 
             Assert.Equal (
-                          KeyCode.PageDown | KeyCode.CtrlMask,
-                          ((Key)Settings ["Application.AlternateForwardKey"].PropertyValue).KeyCode
+                          KeyCode.F6,
+                          ((Key)Settings ["Application.NextTabGroupKey"].PropertyValue).KeyCode
                          );
 
             Assert.Equal (
-                          KeyCode.PageUp | KeyCode.CtrlMask,
-                          ((Key)Settings ["Application.AlternateBackwardKey"].PropertyValue).KeyCode
+                          KeyCode.F6 | KeyCode.ShiftMask,
+                          ((Key)Settings ["Application.PrevTabGroupKey"].PropertyValue).KeyCode
                          );
         }
 
@@ -229,14 +229,14 @@ public class ConfigurationManagerTests
         // arrange
         Reset ();
         Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
         Settings.Apply ();
 
         // assert apply worked
         Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
-        Assert.Equal (KeyCode.F, Application.AlternateForwardKey.KeyCode);
-        Assert.Equal (KeyCode.B, Application.AlternateBackwardKey.KeyCode);
+        Assert.Equal (KeyCode.F, Application.NextTabGroupKey.KeyCode);
+        Assert.Equal (KeyCode.B, Application.PrevTabGroupKey.KeyCode);
 
         //act
         Reset ();
@@ -245,13 +245,13 @@ public class ConfigurationManagerTests
         Assert.NotEmpty (Themes);
         Assert.Equal ("Default", Themes.Theme);
         Assert.Equal (Key.Esc, Application.QuitKey);
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
+        Assert.Equal (Key.F6, Application.NextTabGroupKey);
+        Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
 
         // arrange
         Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
         Settings.Apply ();
 
         Locations = ConfigLocations.DefaultOnly;
@@ -264,8 +264,8 @@ public class ConfigurationManagerTests
         Assert.NotEmpty (Themes);
         Assert.Equal ("Default", Themes.Theme);
         Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
+        Assert.Equal (Key.F6, Application.NextTabGroupKey);
+        Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
         Reset ();
     }
 

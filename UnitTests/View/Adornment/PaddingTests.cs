@@ -8,7 +8,7 @@ public class PaddingTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Padding_Uses_Parent_ColorScheme ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
         var view = new View { Height = 3, Width = 3 };
         view.Padding.Thickness = new (1);
 

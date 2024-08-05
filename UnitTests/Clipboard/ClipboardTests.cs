@@ -9,14 +9,14 @@ public class ClipboardTests
     [Fact, AutoInitShutdown (useFakeClipboard: true, fakeClipboardAlwaysThrowsNotSupportedException: true)]
     public void IClipboard_GetClipBoardData_Throws_NotSupportedException ()
     {
-        var iclip = Application.Driver.Clipboard;
+        var iclip = Application.Driver?.Clipboard;
         Assert.Throws<NotSupportedException> (() => iclip.GetClipboardData ());
     }
 
     [Fact, AutoInitShutdown (useFakeClipboard: true, fakeClipboardAlwaysThrowsNotSupportedException: true)]
     public void IClipboard_SetClipBoardData_Throws_NotSupportedException ()
     {
-        var iclip = Application.Driver.Clipboard;
+        var iclip = Application.Driver?.Clipboard;
         Assert.Throws<NotSupportedException> (() => iclip.SetClipboardData ("foo"));
     }
 

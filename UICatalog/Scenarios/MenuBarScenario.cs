@@ -1,5 +1,6 @@
 ﻿using System;
 using Terminal.Gui;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace UICatalog.Scenarios;
 
@@ -64,14 +65,17 @@ public class MenuBarScenario : Scenario
         menuBar.Key = KeyCode.F9;
         menuBar.Title = "TestMenuBar";
 
-        bool fnAction (string s)
+        bool FnAction (string s)
         {
             _lastAction.Text = s;
 
             return true;
         }
+        
+        // Declare a variable for the function
+        Func<string, bool> fnActionVariable = FnAction;
 
-        menuBar.EnableForDesign ((Func<string, bool>)fnAction);
+        menuBar.EnableForDesign (ref fnActionVariable);
 
         menuBar.MenuOpening += (s, e) =>
                                {

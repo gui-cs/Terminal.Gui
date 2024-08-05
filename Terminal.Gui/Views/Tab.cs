@@ -10,6 +10,7 @@ public class Tab : View
     {
         BorderStyle = LineStyle.Rounded;
         CanFocus = true;
+        TabStop = TabBehavior.NoStop;
     }
 
     /// <summary>The text to display in a <see cref="TabView"/>.</summary>

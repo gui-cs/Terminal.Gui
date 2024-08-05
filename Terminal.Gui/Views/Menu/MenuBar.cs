@@ -66,6 +66,7 @@ public class MenuBar : View, IDesignable
     /// <summary>Initializes a new instance of the <see cref="MenuBar"/>.</summary>
     public MenuBar ()
     {
+        TabStop = TabBehavior.NoStop;
         X = 0;
         Y = 0;
         Width = Dim.Fill ();
@@ -173,8 +174,9 @@ public class MenuBar : View, IDesignable
 
                 if (menuBarItem?.HotKey != default (Rune))
                 {
-                    KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, i);
+                    KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.Focused, i);
                     KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value, keyBinding);
+                    keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, i);
                     KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value | KeyCode.AltMask, keyBinding);
                 }
 
@@ -1594,7 +1596,7 @@ public class MenuBar : View, IDesignable
 
 
     /// <inheritdoc />
-    public bool EnableForDesign<TContext> (in TContext context) where TContext : notnull
+    public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
     {
         if (context is not Func<string, bool> actionFn)
         {

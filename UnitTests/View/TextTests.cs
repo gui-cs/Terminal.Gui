@@ -147,7 +147,7 @@ Y
         top.Add (win);
 
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (15, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (15, 15);
 
         Assert.Equal (new (0, 0, 15, 15), win.Frame);
         Assert.Equal (new (0, 0, 15, 15), win.Margin.Frame);
@@ -415,7 +415,7 @@ Y
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (4, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (4, 10);
 
         Assert.Equal (5, text.Length);
 
@@ -540,7 +540,7 @@ w ";
         var top = new Toplevel ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 20);
 
         Assert.Equal (new (0, 0, 11, 2), horizontalView.Frame);
         Assert.Equal (new (0, 3, 2, 11), verticalView.Frame);
@@ -628,7 +628,7 @@ w ";
         var top = new Toplevel ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (22, 22);
+        ((FakeDriver)Application.Driver!).SetBufferSize (22, 22);
 
         Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.ConstrainToSize);
         Assert.Equal (new (2, 8), verticalView.TextFormatter.ConstrainToSize);
@@ -725,7 +725,7 @@ w ";
 
             for (var i = 0; i < 4; i++)
             {
-                text += Application.Driver.Contents [0, i].Rune;
+                text += Application.Driver?.Contents [0, i].Rune;
             }
 
             return text;
@@ -936,7 +936,7 @@ w ";
         var top = new Toplevel ();
         top.Add (frame);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (9, height + 2);
+        ((FakeDriver)Application.Driver!).SetBufferSize (9, height + 2);
 
         if (autoSize)
         {
@@ -1180,7 +1180,7 @@ w ";
     [SetupFakeDriver]
     public void Narrow_Wide_Runes ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (32, 32);
+        ((FakeDriver)Application.Driver!).SetBufferSize (32, 32);
         var top = new View { Width = 32, Height = 32 };
 
         var text = $"First line{Environment.NewLine}Second line";

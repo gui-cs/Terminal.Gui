@@ -103,7 +103,7 @@ public class HorizontalAxis : Axis
         graph.Move (screenPosition, y);
 
         // draw the tick on the axis
-        Application.Driver.AddRune (Glyphs.TopTee);
+        Application.Driver?.AddRune (Glyphs.TopTee);
 
         // and the label text
         if (!string.IsNullOrWhiteSpace (text))
@@ -161,7 +161,7 @@ public class HorizontalAxis : Axis
             }
 
             graph.Move (graph.Viewport.Width / 2 - toRender.Length / 2, graph.Viewport.Height - 1);
-            Application.Driver.AddStr (toRender);
+            Application.Driver?.AddStr (toRender);
         }
     }
 
@@ -222,7 +222,7 @@ public class HorizontalAxis : Axis
     protected override void DrawAxisLine (GraphView graph, int x, int y)
     {
         graph.Move (x, y);
-        Application.Driver.AddRune (Glyphs.HLine);
+        Application.Driver?.AddRune (Glyphs.HLine);
     }
 
     private IEnumerable<AxisIncrementToRender> GetLabels (GraphView graph, Rectangle viewport)
@@ -298,13 +298,13 @@ public class VerticalAxis : Axis
         graph.Move (x, screenPosition);
 
         // draw the tick on the axis
-        Application.Driver.AddRune (Glyphs.RightTee);
+        Application.Driver?.AddRune (Glyphs.RightTee);
 
         // and the label text
         if (!string.IsNullOrWhiteSpace (text))
         {
             graph.Move (Math.Max (0, x - labelThickness), screenPosition);
-            Application.Driver.AddStr (text);
+            Application.Driver?.AddStr (text);
         }
     }
 
@@ -342,7 +342,7 @@ public class VerticalAxis : Axis
             for (var i = 0; i < toRender.Length; i++)
             {
                 graph.Move (0, startDrawingAtY + i);
-                Application.Driver.AddRune ((Rune)toRender [i]);
+                Application.Driver?.AddRune ((Rune)toRender [i]);
             }
         }
     }
@@ -395,7 +395,7 @@ public class VerticalAxis : Axis
     protected override void DrawAxisLine (GraphView graph, int x, int y)
     {
         graph.Move (x, y);
-        Application.Driver.AddRune (Glyphs.VLine);
+        Application.Driver?.AddRune (Glyphs.VLine);
     }
 
     private int GetAxisYEnd (GraphView graph)

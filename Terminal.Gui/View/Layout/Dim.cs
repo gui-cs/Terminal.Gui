@@ -139,7 +139,7 @@ public abstract class Dim
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Height of the specified <see cref="View"/>.</summary>
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Height (View view) { return new DimView (view, Dimension.Height); }
+    public static Dim Height (View? view) { return new DimView (view, Dimension.Height); }
 
     /// <summary>Creates a percentage <see cref="Dim"/> object that is a percentage of the width or height of the SuperView.</summary>
     /// <returns>The percent <see cref="Dim"/> object.</returns>
@@ -168,7 +168,7 @@ public abstract class Dim
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.</summary>
     /// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Width (View view) { return new DimView (view, Dimension.Width); }
+    public static Dim Width (View? view) { return new DimView (view, Dimension.Width); }
 
     #endregion static Dim creation methods
 
@@ -253,7 +253,7 @@ public abstract class Dim
         }
 
         var newDim = new DimCombine (AddOrSubtract.Add, left, right);
-        (left as DimView)?.Target.SetNeedsLayout ();
+        (left as DimView)?.Target?.SetNeedsLayout ();
 
         return newDim;
     }
@@ -278,7 +278,7 @@ public abstract class Dim
         }
 
         var newDim = new DimCombine (AddOrSubtract.Subtract, left, right);
-        (left as DimView)?.Target.SetNeedsLayout ();
+        (left as DimView)?.Target?.SetNeedsLayout ();
 
         return newDim;
     }

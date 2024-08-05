@@ -33,12 +33,14 @@ The `UI Catalog` application provides an example of how to use the [`Configurati
 (Note, this list may not be complete; search the source code for `SerializableConfigurationProperty` to find all settings that can be configured.)
 
   * [Application.QuitKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_QuitKey)
-  * [Application.AlternateForwardKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_AlternateForwardKey)
-  * [Application.AlternateBackwardKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_AlternateBackwardKey)
-  * [Application.UseSystemConsole](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_UseSystemConsole)
+  * [Application.NextTabKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_NextTabKey)
+  * [Application.PrevTabKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_PrevTabKey)
+  * [Application.NextTabGroupKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_NextTabGroupKey)
+  * [Application.PrevTabGroupKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_PrevTabGroupKey)
+  * [Application.ForceDriver](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_ForceDriver)
+  * [Application.Force16Colors](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_Force16Colors)
   * [Application.IsMouseDisabled](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_IsMouseDisabled)
-  * [Application.EnableConsoleScrolling](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_EnableConsoleScrolling)
-
+  
 ## Glyphs
 
 The standard set of glyphs used for standard views (e.g. the default indicator for [Button](~/api/Terminal.Gui.Button.yml)) and line drawing (e.g. [LineCanvas](~/api/Terminal.Gui.LineCanvas.yml)) can be configured.

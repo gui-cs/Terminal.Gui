@@ -137,7 +137,7 @@ public class MessageBoxTests
     {
         int iterations = -1;
 
-        ((FakeDriver)Application.Driver).SetBufferSize (15, 15); // 15 x 15 gives us enough room for a button with one char (9x1)
+        ((FakeDriver)Application.Driver!).SetBufferSize (15, 15); // 15 x 15 gives us enough room for a button with one char (9x1)
 
         Rectangle mbFrame = Rectangle.Empty;
 
@@ -169,10 +169,14 @@ public class MessageBoxTests
         int iterations = -1;
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.None;
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var btn =
             $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+
+        // Override CM
+        MessageBox.DefaultButtonAlignment = Alignment.End;
+        MessageBox.DefaultBorderStyle = LineStyle.Double;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -234,10 +238,14 @@ public class MessageBoxTests
         int iterations = -1;
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.None;
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var btn =
             $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+
+        // Override CM
+        MessageBox.DefaultButtonAlignment = Alignment.End;
+        MessageBox.DefaultBorderStyle = LineStyle.Double;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -314,7 +322,7 @@ public class MessageBoxTests
     public void Size_Not_Default_Message (int height, int width, string message)
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -351,7 +359,7 @@ public class MessageBoxTests
     public void Size_Not_Default_Message_Button (int height, int width, string message)
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -384,7 +392,7 @@ public class MessageBoxTests
     public void Size_Not_Default_No_Message (int height, int width)
     {
         int iterations = -1;
-        ((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -414,6 +422,10 @@ public class MessageBoxTests
     {
         int iterations = -1;
         ((FakeDriver)Application.Driver).SetBufferSize (70, 15);
+
+        // Override CM
+        MessageBox.DefaultButtonAlignment = Alignment.End;
+        MessageBox.DefaultBorderStyle = LineStyle.Double;
 
         Application.Iteration += (s, a) =>
                                  {
