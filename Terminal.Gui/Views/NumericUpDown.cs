@@ -37,11 +37,10 @@ public class NumericUpDown<T> : View where T : notnull
             throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
         }
 
-        Increment = (dynamic)1;
-
         // `object` is supported only for AllViewsTester
         if (type != typeof (object))
         {
+            Increment = (dynamic)1;
             Value = (dynamic)0;
         }
 
