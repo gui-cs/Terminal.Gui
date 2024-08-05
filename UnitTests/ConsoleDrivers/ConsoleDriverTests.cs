@@ -234,7 +234,7 @@ public class ConsoleDriverTests
     //		{
     //			var win = new Window ();
     //			Application.Begin (win);
-    //			((FakeDriver)Application.Driver).SetBufferSize (20, 8);
+    //			((FakeDriver)Application.Driver!).SetBufferSize (20, 8);
 
     //			System.Threading.Tasks.Task.Run (() => {
     //				System.Threading.Tasks.Task.Delay (500).Wait ();

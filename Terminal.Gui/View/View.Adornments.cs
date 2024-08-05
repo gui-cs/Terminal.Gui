@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-public partial class View
+public partial class View // Adornments
 {
     /// <summary>
     ///    Initializes the Adornments of the View. Called by the constructor.

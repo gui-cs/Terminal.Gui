@@ -206,7 +206,7 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new EventArgs<string> (ref oldValue));
+                    OnTextChanged (new EventArgs<string> (in oldValue));
                 }
 
                 return result;
@@ -220,7 +220,7 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new EventArgs<string> (ref oldValue));
+                    OnTextChanged (new EventArgs<string> (in oldValue));
                 }
 
                 return result;
@@ -333,7 +333,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.RemoveAt (pos);
-                    OnTextChanged (new EventArgs<string> (ref oldValue));
+                    OnTextChanged (new EventArgs<string> (in oldValue));
                 }
 
                 return true;
@@ -349,7 +349,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.Insert (pos, (Rune)ch);
-                    OnTextChanged (new EventArgs<string> (ref oldValue));
+                    OnTextChanged (new EventArgs<string> (in oldValue));
 
                     return true;
                 }
@@ -464,7 +464,6 @@ namespace Terminal.Gui
             KeyBindings.Add (Key.Home, Command.LeftHome);
             KeyBindings.Add (Key.End, Command.RightEnd);
 
-            KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
             KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
 
             KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
@@ -665,6 +664,11 @@ namespace Terminal.Gui
         /// <returns>True if moved.</returns>
         private bool CursorLeft ()
         {
+            if (_provider is null)
+            {
+                return false;
+            }
+
             int current = _cursorPosition;
             _cursorPosition = _provider.CursorLeft (_cursorPosition);
             SetNeedsDisplay ();
@@ -676,6 +680,11 @@ namespace Terminal.Gui
         /// <returns>True if moved.</returns>
         private bool CursorRight ()
         {
+            if (_provider is null)
+            {
+                return false;
+            }
+
             int current = _cursorPosition;
             _cursorPosition = _provider.CursorRight (_cursorPosition);
             SetNeedsDisplay ();

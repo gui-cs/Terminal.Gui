@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-public partial class View
+public partial class View // Drawing APIs
 {
     private ColorScheme _colorScheme;
 
@@ -288,19 +288,19 @@ public partial class View
     public void DrawHotString (string text, Attribute hotColor, Attribute normalColor)
     {
         Rune hotkeySpec = HotKeySpecifier == (Rune)0xffff ? (Rune)'_' : HotKeySpecifier;
-        Application.Driver.SetAttribute (normalColor);
+        Application.Driver?.SetAttribute (normalColor);
 
         foreach (Rune rune in text.EnumerateRunes ())
         {
             if (rune == new Rune (hotkeySpec.Value))
             {
-                Application.Driver.SetAttribute (hotColor);
+                Application.Driver?.SetAttribute (hotColor);
 
                 continue;
             }
 
-            Application.Driver.AddRune (rune);
-            Application.Driver.SetAttribute (normalColor);
+            Application.Driver?.AddRune (rune);
+            Application.Driver?.SetAttribute (normalColor);
         }
     }
 
@@ -501,16 +501,31 @@ public partial class View
         // TODO: Implement OnDrawSubviews (cancelable);
         if (_subviews is { } && SubViewNeedsDisplay)
         {
-            IEnumerable<View> subviewsNeedingDraw = _subviews.Where (
-                                                                     view => view.Visible
-                                                                             && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
-                                                                    );
+            IEnumerable<View> subviewsNeedingDraw;
+            if (TabStop == TabBehavior.TabGroup && _subviews.Count(v => v.Arrangement.HasFlag (ViewArrangement.Overlapped)) > 0)
+            {
+                // TODO: This is a temporary hack to make overlapped non-Toplevels have a zorder. See also View.SetFocus
+                subviewsNeedingDraw = _tabIndexes.Where (
+                                                       view => view.Visible
+                                                               && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
+                                                      ).Reverse ();
+
+            }
+            else
+            {
+                subviewsNeedingDraw = _subviews.Where (
+                                                                         view => view.Visible
+                                                                                 && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
+                                                                        );
+
+            }
             foreach (View view in subviewsNeedingDraw)
             {
                 if (view.LayoutNeeded)
                 {
                     view.LayoutSubviews ();
                 }
+
                 view.Draw ();
             }
         }

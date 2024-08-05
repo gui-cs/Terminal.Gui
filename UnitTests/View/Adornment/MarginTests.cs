@@ -8,7 +8,7 @@ public class MarginTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Margin_Uses_SuperView_ColorScheme ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
         var view = new View { Height = 3, Width = 3 };
         view.Margin.Thickness = new (1);
 

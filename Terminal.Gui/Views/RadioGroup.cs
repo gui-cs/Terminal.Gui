@@ -30,9 +30,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                             return false;
                         }
 
-                        MoveUpLeft ();
-
-                        return true;
+                        return MoveUpLeft ();
                     }
                    );
 
@@ -44,10 +42,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                         {
                             return false;
                         }
-
-                        MoveDownRight ();
-
-                        return true;
+                        return MoveDownRight ();
                     }
                    );
 
@@ -277,7 +272,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                     if (j == hotPos && i == _cursor)
                     {
-                        Application.Driver.SetAttribute (
+                        Application.Driver?.SetAttribute (
                                                          HasFocus
                                                              ? ColorScheme.HotFocus
                                                              : GetHotNormalColor ()
@@ -285,11 +280,11 @@ public class RadioGroup : View, IDesignable, IOrientation
                     }
                     else if (j == hotPos && i != _cursor)
                     {
-                        Application.Driver.SetAttribute (GetHotNormalColor ());
+                        Application.Driver?.SetAttribute (GetHotNormalColor ());
                     }
                     else if (HasFocus && i == _cursor)
                     {
-                        Application.Driver.SetAttribute (ColorScheme.Focus);
+                        Application.Driver?.SetAttribute (ColorScheme.Focus);
                     }
 
                     if (rune == HotKeySpecifier && j + 1 < rlRunes.Length)
@@ -299,7 +294,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                         if (i == _cursor)
                         {
-                            Application.Driver.SetAttribute (
+                            Application.Driver?.SetAttribute (
                                                              HasFocus
                                                                  ? ColorScheme.HotFocus
                                                                  : GetHotNormalColor ()
@@ -307,11 +302,11 @@ public class RadioGroup : View, IDesignable, IOrientation
                         }
                         else if (i != _cursor)
                         {
-                            Application.Driver.SetAttribute (GetHotNormalColor ());
+                            Application.Driver?.SetAttribute (GetHotNormalColor ());
                         }
                     }
 
-                    Application.Driver.AddRune (rune);
+                    Application.Driver?.AddRune (rune);
                     Driver.SetAttribute (GetNormalColor ());
                 }
             }
@@ -401,35 +396,34 @@ public class RadioGroup : View, IDesignable, IOrientation
     /// <summary>Invoked when the selected radio label has changed.</summary>
     public event EventHandler<SelectedItemChangedArgs> SelectedItemChanged;
 
-    private void MoveDownRight ()
+    private bool MoveDownRight ()
     {
         if (_cursor + 1 < _radioLabels.Count)
         {
             _cursor++;
             SetNeedsDisplay ();
+
+            return true;
         }
-        else if (_cursor > 0)
-        {
-            _cursor = 0;
-            SetNeedsDisplay ();
-        }
+
+        // Moving past should move focus to next view, not wrap
+        return false;
     }
 
     private void MoveEnd () { _cursor = Math.Max (_radioLabels.Count - 1, 0); }
     private void MoveHome () { _cursor = 0; }
 
-    private void MoveUpLeft ()
+    private bool MoveUpLeft ()
     {
         if (_cursor > 0)
         {
             _cursor--;
             SetNeedsDisplay ();
+
+            return true;
         }
-        else if (_radioLabels.Count - 1 > 0)
-        {
-            _cursor = _radioLabels.Count - 1;
-            SetNeedsDisplay ();
-        }
+        // Moving past should move focus to next view, not wrap
+        return false;
     }
 
     private void RadioGroup_LayoutStarted (object sender, EventArgs e) { SetContentSize (); }

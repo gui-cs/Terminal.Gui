@@ -173,7 +173,7 @@ public class ScrollBarViewTests
         super.Add (vert);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (width, height);
+        ((FakeDriver)Application.Driver!).SetBufferSize (width, height);
 
         var expected = @"
 ┌─┐
@@ -703,7 +703,7 @@ This is a test
         var sbv = new ScrollBarView { Id = "sbv", Size = width * 2, ShowScrollIndicator = true };
         super.Add (sbv);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (width, height);
+        ((FakeDriver)Application.Driver!).SetBufferSize (width, height);
 
         var expected = @"
 ┌──────────────────────────────────────┐
@@ -829,7 +829,7 @@ This is a test
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (45, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (45, 20);
 
         Assert.True (scrollBar.AutoHideScrollBars);
         Assert.False (scrollBar.ShowScrollIndicator);
@@ -867,7 +867,7 @@ This is a test
         Assert.Equal (new Rectangle (0, 0, 45, 20), pos);
 
         textView.WordWrap = true;
-        ((FakeDriver)Application.Driver).SetBufferSize (26, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (26, 20);
         Application.Refresh ();
 
         Assert.True (textView.WordWrap);
@@ -904,7 +904,7 @@ This is a test
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rectangle (0, 0, 26, 20), pos);
 
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
         Application.Refresh ();
 
         Assert.True (textView.WordWrap);
@@ -1229,7 +1229,7 @@ This is a test             ",
 
         super.Add (sbv);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (width, height);
+        ((FakeDriver)Application.Driver!).SetBufferSize (width, height);
 
         var expected = @"
 ┌─┐

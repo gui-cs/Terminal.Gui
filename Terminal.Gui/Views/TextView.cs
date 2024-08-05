@@ -2045,15 +2045,7 @@ public class TextView : View
                     }
                    );
 
-        AddCommand (
-                    Command.LineDown,
-                    () =>
-                    {
-                        ProcessMoveDown ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.LineDown, () => ProcessMoveDown ());
 
         AddCommand (
                     Command.LineDownExtend,
@@ -2065,15 +2057,7 @@ public class TextView : View
                     }
                    );
 
-        AddCommand (
-                    Command.LineUp,
-                    () =>
-                    {
-                        ProcessMoveUp ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.LineUp, () => ProcessMoveUp ());
 
         AddCommand (
                     Command.LineUpExtend,
@@ -2369,8 +2353,6 @@ public class TextView : View
                    );
         AddCommand (Command.Tab, () => ProcessTab ());
         AddCommand (Command.BackTab, () => ProcessBackTab ());
-        AddCommand (Command.NextView, () => ProcessMoveNextView ());
-        AddCommand (Command.PreviousView, () => ProcessMovePreviousView ());
 
         AddCommand (
                     Command.Undo,
@@ -2502,12 +2484,6 @@ public class TextView : View
         KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
         KeyBindings.Add (Key.Tab, Command.Tab);
         KeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
-
-        KeyBindings.Add (Key.Tab.WithCtrl, Command.NextView);
-        KeyBindings.Add (Application.AlternateForwardKey, Command.NextView);
-
-        KeyBindings.Add (Key.Tab.WithCtrl.WithShift, Command.PreviousView);
-        KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousView);
 
         KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
         KeyBindings.Add (Key.R.WithCtrl, Command.Redo);
@@ -4318,7 +4294,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.ReplaceKey (e.OldKey, e.NewKey); }
 
     private bool DeleteTextBackwards ()
     {
@@ -5302,7 +5278,7 @@ public class TextView : View
         MoveEnd ();
     }
 
-    private void MoveDown ()
+    private bool MoveDown ()
     {
         if (CurrentRow + 1 < _model.Count)
         {
@@ -5326,8 +5302,14 @@ public class TextView : View
         {
             Adjust ();
         }
+        else
+        {
+            return false;
+        }
 
         DoNeededAction ();
+
+        return true;
     }
 
     private void MoveEndOfLine ()
@@ -5338,7 +5320,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void MoveLeft ()
+    private bool MoveLeft ()
     {
         if (CurrentColumn > 0)
         {
@@ -5359,20 +5341,16 @@ public class TextView : View
                 List<RuneCell> currentLine = GetCurrentLine ();
                 CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
             }
+            else
+            {
+                return false;
+            }
         }
 
         Adjust ();
         DoNeededAction ();
-    }
 
-    private bool MoveNextView ()
-    {
-        if (Application.OverlappedTop is { })
-        {
-            return SuperView?.FocusNext () == true;
-        }
-
-        return false;
+        return true;
     }
 
     private void MovePageDown ()
@@ -5431,17 +5409,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private bool MovePreviousView ()
-    {
-        if (Application.OverlappedTop is { })
-        {
-            return SuperView?.FocusPrev () == true;
-        }
-
-        return false;
-    }
-
-    private void MoveRight ()
+    private bool MoveRight ()
     {
         List<RuneCell> currentLine = GetCurrentLine ();
 
@@ -5461,11 +5429,21 @@ public class TextView : View
                     _topRow++;
                     SetNeedsDisplay ();
                 }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
 
         Adjust ();
         DoNeededAction ();
+
+        return true;
     }
 
     private void MoveStartOfLine ()
@@ -5500,7 +5478,7 @@ public class TextView : View
         MoveHome ();
     }
 
-    private void MoveUp ()
+    private bool MoveUp ()
     {
         if (CurrentRow > 0)
         {
@@ -5520,8 +5498,13 @@ public class TextView : View
             TrackColumn ();
             PositionCursor ();
         }
+        else
+        {
+            return false;
+        }
 
         DoNeededAction ();
+        return true;
     }
 
     private void MoveWordBackward ()
@@ -5617,7 +5600,7 @@ public class TextView : View
 
         if (!AllowsTab || _isReadOnly)
         {
-            return ProcessMovePreviousView ();
+            return false;
         }
 
         if (CurrentColumn > 0)
@@ -5824,16 +5807,15 @@ public class TextView : View
         line = r!;
     }
 
-    private void ProcessMoveDown ()
+    private bool ProcessMoveDown ()
     {
         ResetContinuousFindTrack ();
-
         if (_shiftSelecting && Selecting)
         {
             StopSelecting ();
         }
 
-        MoveDown ();
+        return MoveDown ();
     }
 
     private void ProcessMoveDownExtend ()
@@ -5890,20 +5872,6 @@ public class TextView : View
         MoveLeft ();
     }
 
-    private bool ProcessMoveNextView ()
-    {
-        ResetColumnTrack ();
-
-        return MoveNextView ();
-    }
-
-    private bool ProcessMovePreviousView ()
-    {
-        ResetColumnTrack ();
-
-        return MovePreviousView ();
-    }
-
     private bool ProcessMoveRight ()
     {
         // if the user presses Right (without any control keys)
@@ -5955,7 +5923,7 @@ public class TextView : View
         MoveStartOfLine ();
     }
 
-    private void ProcessMoveUp ()
+    private bool ProcessMoveUp ()
     {
         ResetContinuousFindTrack ();
 
@@ -5964,7 +5932,7 @@ public class TextView : View
             StopSelecting ();
         }
 
-        MoveUp ();
+        return MoveUp ();
     }
 
     private void ProcessMoveUpExtend ()
@@ -6062,7 +6030,7 @@ public class TextView : View
         Paste ();
     }
 
-    private bool? ProcessReturn ()
+    private bool ProcessReturn ()
     {
         ResetColumnTrack ();
 
@@ -6163,7 +6131,7 @@ public class TextView : View
 
         if (!AllowsTab || _isReadOnly)
         {
-            return ProcessMoveNextView ();
+            return false;
         }
 
         InsertText (new Key ((KeyCode)'\t'));
@@ -6369,13 +6337,6 @@ public class TextView : View
     private void TextView_Initialized (object sender, EventArgs e)
     {
         Autocomplete.HostControl = this;
-
-        if (Application.Top is { })
-        {
-            Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged!;
-            Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged!;
-        }
-
         OnContentsChanged ();
     }
 
@@ -6392,9 +6353,6 @@ public class TextView : View
         _selectionStartColumn = CurrentColumn;
         _selectionStartRow = CurrentRow;
     }
-
-    private void Top_AlternateBackwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
-    private void Top_AlternateForwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
 
     // Tries to snap the cursor to the tracking column
     private void TrackColumn ()

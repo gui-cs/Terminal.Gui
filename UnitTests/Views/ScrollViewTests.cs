@@ -362,7 +362,7 @@ public class ScrollViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ContentBottomRightCorner_Draw ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 30);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 30);
 
         var top = new View { Width = 30, Height = 30, ColorScheme = new () { Normal = Attribute.Default } };
 

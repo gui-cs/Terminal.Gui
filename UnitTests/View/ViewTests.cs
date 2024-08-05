@@ -14,26 +14,26 @@ public class ViewTests (ITestOutputHelper output)
 
         view.DrawContent += (s, e) =>
                             {
-                                Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
+                                Rectangle savedClip = Application.Driver!.Clip;
+                                Application.Driver!.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
 
                                 for (var row = 0; row < view.Viewport.Height; row++)
                                 {
-                                    Application.Driver.Move (1, row + 1);
+                                    Application.Driver?.Move (1, row + 1);
 
                                     for (var col = 0; col < view.Viewport.Width; col++)
                                     {
-                                        Application.Driver.AddStr ($"{col}");
+                                        Application.Driver?.AddStr ($"{col}");
                                     }
                                 }
 
-                                Application.Driver.Clip = savedClip;
+                                Application.Driver!.Clip = savedClip;
                                 e.Cancel = true;
                             };
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var expected = @"
 ┌──────────────────┐
@@ -78,26 +78,26 @@ public class ViewTests (ITestOutputHelper output)
 
         view.DrawContent += (s, e) =>
                             {
-                                Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
+                                Rectangle savedClip = Application.Driver!.Clip;
+                                Application.Driver!.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
 
                                 for (var row = 0; row < view.Viewport.Height; row++)
                                 {
-                                    Application.Driver.Move (1, row + 1);
+                                    Application.Driver?.Move (1, row + 1);
 
                                     for (var col = 0; col < view.Viewport.Width; col++)
                                     {
-                                        Application.Driver.AddStr ($"{col}");
+                                        Application.Driver?.AddStr ($"{col}");
                                     }
                                 }
 
-                                Application.Driver.Clip = savedClip;
+                                Application.Driver!.Clip = savedClip;
                                 e.Cancel = true;
                             };
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var expected = @"
 ┌──────────────────┐
@@ -1018,7 +1018,7 @@ At 0,0
         view.Height = Dim.Auto ();
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1091,7 +1091,7 @@ At 0,0
                                      Assert.True (RunesCount () == 0);
 
                                      win.Visible = true;
-                                     win.FocusFirst ();
+                                     win.FocusFirst (null);
                                      Assert.True (button.HasFocus);
                                      Assert.True (win.HasFocus);
                                      top.Draw ();
@@ -1109,9 +1109,9 @@ At 0,0
             Cell [,] contents = ((FakeDriver)Application.Driver).Contents;
             var runesCount = 0;
 
-            for (var i = 0; i < Application.Driver.Rows; i++)
+            for (var i = 0; i < Application.Driver!.Rows; i++)
             {
-                for (var j = 0; j < Application.Driver.Cols; j++)
+                for (var j = 0; j < Application.Driver!.Cols; j++)
                 {
                     if (contents [i, j].Rune != (Rune)' ')
                     {

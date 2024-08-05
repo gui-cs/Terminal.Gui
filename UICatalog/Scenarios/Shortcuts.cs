@@ -30,7 +30,7 @@ public class Shortcuts : Scenario
     // QuitKey and it only sticks if changed after init
     private void App_Loaded (object sender, EventArgs e)
     {
-        Application.QuitKey = Key.Z.WithCtrl;
+        Application.QuitKey = Key.F4.WithCtrl;
         Application.Top.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();

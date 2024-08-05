@@ -20,7 +20,7 @@ public class Dialog : Window
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter<Alignment>))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End; // Default is set in config.json
 
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
@@ -48,7 +48,7 @@ public class Dialog : Window
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter<ShadowStyle>))]
-    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None; // Default is set in config.json
 
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
@@ -57,7 +57,7 @@ public class Dialog : Window
 
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
-    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single; // Default is set in config.json
 
     private readonly List<Button> _buttons = new ();
 
