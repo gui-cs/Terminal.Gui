@@ -29,9 +29,9 @@ public class SettingsScopeTests
         Settings.Apply ();
 
         // assert
-        Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
-        Assert.Equal (KeyCode.F, Application.NextTabGroupKey.KeyCode);
-        Assert.Equal (KeyCode.B, Application.PrevTabGroupKey.KeyCode);
+        Assert.Equal (Key.Q, Application.QuitKey);
+        Assert.Equal (Key.F, Application.NextTabGroupKey);
+        Assert.Equal (Key.B, Application.PrevTabGroupKey);
     }
 
     [Fact]

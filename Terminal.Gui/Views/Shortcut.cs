@@ -681,7 +681,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private void UpdateKeyBinding (Key oldKey)
     {
-        if (Key != null)
+        if (Key != null && Key.IsValid)
         {
             // Disable the command view key bindings
             CommandView.KeyBindings.Remove (Key);

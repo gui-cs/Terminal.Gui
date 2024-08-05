@@ -183,9 +183,11 @@ public class ApplicationTests
             Assert.Null (Application.Driver);
             Assert.Null (Application.MainLoop);
             Assert.False (Application.EndAfterFirstIteration);
-            Assert.Equal (Key.Empty, Application.PrevTabGroupKey);
-            Assert.Equal (Key.Empty, Application.NextTabGroupKey);
-            Assert.Equal (Key.Empty, Application.QuitKey);
+            Assert.Equal (Key.Tab.WithShift, Application.PrevTabKey);
+            Assert.Equal (Key.Tab, Application.NextTabKey);
+            Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
+            Assert.Equal (Key.F6, Application.NextTabGroupKey);
+            Assert.Equal (Key.Esc, Application.QuitKey);
             Assert.Null (ApplicationOverlapped.OverlappedChildren);
             Assert.Null (ApplicationOverlapped.OverlappedTop);
 
@@ -236,7 +238,7 @@ public class ApplicationTests
         Application.PrevTabGroupKey = Key.A;
         Application.NextTabGroupKey = Key.B;
         Application.QuitKey = Key.C;
-        Application.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Cancel);
+        Application.KeyBindings.Add (Key.D, KeyBindingScope.Application, Command.Cancel);
 
         //ApplicationOverlapped.OverlappedChildren = new List<View> ();
         //ApplicationOverlapped.OverlappedTop = 

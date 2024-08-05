@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 
 public static partial class Application // Keyboard handling
 {
-    private static Key _nextTabKey = Key.Empty; // Defined in config.json
+    private static Key _nextTabKey = Key.Tab; // Resources/config.json overrrides
 
     /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
@@ -17,22 +17,13 @@ public static partial class Application // Keyboard handling
         {
             if (_nextTabKey != value)
             {
-                Key oldKey = _nextTabKey;
+                ReplaceKey (_nextTabKey, value);
                 _nextTabKey = value;
-
-                if (_nextTabKey == Key.Empty)
-                {
-                    KeyBindings.Remove (_nextTabKey);
-                }
-                else
-                {
-                    KeyBindings.ReplaceKey (oldKey, _nextTabKey);
-                }
             }
         }
     }
 
-    private static Key _prevTabKey = Key.Empty; // Defined in config.json
+    private static Key _prevTabKey = Key.Tab.WithShift; // Resources/config.json overrrides
 
     /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
@@ -44,22 +35,13 @@ public static partial class Application // Keyboard handling
         {
             if (_prevTabKey != value)
             {
-                Key oldKey = _prevTabKey;
+                ReplaceKey (_prevTabKey, value);
                 _prevTabKey = value;
-
-                if (_prevTabKey == Key.Empty)
-                {
-                    KeyBindings.Remove (_prevTabKey);
-                }
-                else
-                {
-                    KeyBindings.ReplaceKey (oldKey, _prevTabKey);
-                }
             }
         }
     }
 
-    private static Key _nextTabGroupKey = Key.Empty; // Defined in config.json
+    private static Key _nextTabGroupKey = Key.F6; // Resources/config.json overrrides
 
     /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
@@ -71,22 +53,13 @@ public static partial class Application // Keyboard handling
         {
             if (_nextTabGroupKey != value)
             {
-                Key oldKey = _nextTabGroupKey;
+                ReplaceKey (_nextTabGroupKey, value);
                 _nextTabGroupKey = value;
-
-                if (_nextTabGroupKey == Key.Empty)
-                {
-                    KeyBindings.Remove (_nextTabGroupKey);
-                }
-                else
-                {
-                    KeyBindings.ReplaceKey (oldKey, _nextTabGroupKey);
-                }
             }
         }
     }
 
-    private static Key _prevTabGroupKey = Key.Empty; // Defined in config.json
+    private static Key _prevTabGroupKey = Key.F6.WithShift; // Resources/config.json overrrides
 
     /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
@@ -98,22 +71,13 @@ public static partial class Application // Keyboard handling
         {
             if (_prevTabGroupKey != value)
             {
-                Key oldKey = _prevTabGroupKey;
+                ReplaceKey (_prevTabGroupKey, value);
                 _prevTabGroupKey = value;
-
-                if (_prevTabGroupKey == Key.Empty)
-                {
-                    KeyBindings.Remove (_prevTabGroupKey);
-                }
-                else
-                {
-                    KeyBindings.ReplaceKey (oldKey, _prevTabGroupKey);
-                }
             }
         }
     }
 
-    private static Key _quitKey = Key.Empty; // Defined in config.json
+    private static Key _quitKey = Key.Esc; // Resources/config.json overrrides
 
     /// <summary>Gets or sets the key to quit the application.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
@@ -125,18 +89,26 @@ public static partial class Application // Keyboard handling
         {
             if (_quitKey != value)
             {
-                Key oldKey = _quitKey;
+                ReplaceKey (_quitKey, value);
                 _quitKey = value;
-
-                if (_quitKey == Key.Empty)
-                {
-                    KeyBindings.Remove (_quitKey);
-                }
-                else
-                {
-                    KeyBindings.ReplaceKey (oldKey, _quitKey);
-                }
             }
+        }
+    }
+
+    private static void ReplaceKey (Key oldKey, Key newKey)
+    {
+        if (KeyBindings.Bindings.Count == 0)
+        {
+            return;
+        }
+
+        if (newKey == Key.Empty)
+        {
+            KeyBindings.Remove (oldKey);
+        }
+        else
+        {
+            KeyBindings.ReplaceKey (oldKey, newKey);
         }
     }
 
@@ -412,6 +384,13 @@ public static partial class Application // Keyboard handling
                    );
 
         KeyBindings.Clear ();
+
+        // Resources/config.json overrrides
+        NextTabKey = Key.Tab;
+        PrevTabKey = Key.Tab.WithShift;
+        NextTabGroupKey = Key.F6;
+        PrevTabGroupKey = Key.F6.WithShift;
+        QuitKey = Key.Esc;
 
         KeyBindings.Add (QuitKey, KeyBindingScope.Application, Command.QuitToplevel);
 

@@ -136,10 +136,9 @@ public class KeyBindings
             throw new ArgumentException ("Application scoped KeyBindings must be added via Application.KeyBindings.Add");
         }
 
-        if (key is null || !key.IsValid)
+        if (key == Key.Empty || !key.IsValid)
         {
-            //throw new ArgumentException ("Invalid Key", nameof (commands));
-            return;
+            throw new ArgumentException (@"Invalid Key", nameof (commands));
         }
 
         if (commands.Length == 0)
@@ -150,7 +149,6 @@ public class KeyBindings
         if (TryGet (key, out KeyBinding binding))
         {
             throw new InvalidOperationException (@$"A key binding for {key} exists ({binding}).");
-            //Bindings [key] = new (commands, scope, BoundView);
         }
         else
         {
@@ -313,12 +311,17 @@ public class KeyBindings
     /// <summary>Replaces a key combination already bound to a set of <see cref="Command"/>s.</summary>
     /// <remarks></remarks>
     /// <param name="oldKey">The key to be replaced.</param>
-    /// <param name="newKey">The new key to be used.</param>
+    /// <param name="newKey">The new key to be used. If <see cref="Key.Empty"/> no action will be taken.</param>
     public void ReplaceKey (Key oldKey, Key newKey)
     {
         if (!TryGet (oldKey, out KeyBinding _))
         {
-            return;
+            throw new InvalidOperationException ($"Key {oldKey} is not bound.");
+        }
+
+        if (!newKey.IsValid)
+        {
+            throw new InvalidOperationException ($"Key {newKey} is is not valid.");
         }
 
         KeyBinding value = Bindings [oldKey];

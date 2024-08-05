@@ -8,11 +8,20 @@ public class KeyBindingTests
     public KeyBindingTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void Add_Empty_Throws ()
+    public void Add_No_Commands_Throws ()
     {
         var keyBindings = new KeyBindings ();
         List<Command> commands = new ();
         Assert.Throws<ArgumentException> (() => keyBindings.Add (Key.A, commands.ToArray ()));
+
+    }
+
+    [Fact]
+    public void Add_Invalid_Key_Throws ()
+    {
+        var keyBindings = new KeyBindings ();
+        List<Command> commands = new ();
+        Assert.Throws<ArgumentException> (() => keyBindings.Add (Key.Empty, KeyBindingScope.HotKey, Command.Accept));
     }
 
     [Fact]
@@ -193,7 +202,7 @@ public class KeyBindingTests
     }
 
     [Fact]
-    public void Replace_Key ()
+    public void ReplaceKey_Replaces ()
     {
         var keyBindings = new KeyBindings ();
         keyBindings.Add (Key.A, KeyBindingScope.Application, Command.HotKey);
@@ -216,6 +225,21 @@ public class KeyBindingTests
         keyBindings.ReplaceKey (Key.D, Key.H);
         Assert.Empty (keyBindings.GetCommands (Key.D));
         Assert.Contains (Command.HotKey, keyBindings.GetCommands (Key.H));
+    }
+
+    [Fact]
+    public void ReplaceKey_Throws_If_DoesNotContain_Old ()
+    {
+        var keyBindings = new KeyBindings ();
+        Assert.Throws<InvalidOperationException> (() => keyBindings.ReplaceKey (Key.A, Key.B));
+    }
+
+    [Fact]
+    public void ReplaceKey_Throws_If_New_Is_Empty ()
+    {
+        var keyBindings = new KeyBindings ();
+        keyBindings.Add (Key.A, KeyBindingScope.Application, Command.HotKey);
+        Assert.Throws<InvalidOperationException> (() => keyBindings.ReplaceKey (Key.A, Key.Empty));
     }
 
     // Add with scope does the right things

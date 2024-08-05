@@ -65,7 +65,7 @@ public class KeyboardTests
     {
         Application.ResetState (true);
         // Before Init
-        Assert.Equal (Key.Empty, Application.QuitKey);
+        Assert.Equal (Key.Esc, Application.QuitKey);
 
         Application.Init (new FakeDriver ());
         // After Init

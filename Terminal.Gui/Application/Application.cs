@@ -142,14 +142,12 @@ public static partial class Application
         UnGrabbedMouse = null;
 
         // Keyboard
-        PrevTabGroupKey = Key.Empty;
-        NextTabGroupKey = Key.Empty;
-        QuitKey = Key.Empty;
         KeyDown = null;
         KeyUp = null;
         SizeChanging = null;
 
         Navigation = null;
+
         AddApplicationKeyBindings ();
 
         Colors.Reset ();
