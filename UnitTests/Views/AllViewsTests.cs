@@ -54,6 +54,8 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     }
 
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
     public void AllViews_Tests_All_Constructors (Type viewType)
     {
         Assert.True (Test_All_Constructors_Of_Type (viewType));
