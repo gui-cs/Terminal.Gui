@@ -358,6 +358,11 @@ public class MenuBarTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_A_Menu_Over_A_Dialog ()
     {
+        // Override CM
+        Window.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+
         Toplevel top = new ();
         var win = new Window ();
         top.Add (win);
@@ -586,7 +591,12 @@ public class MenuBarTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_A_Menu_Over_A_Top_Dialog ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (40, 15);
+        // Override CM
+        Window.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+
+        ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
 
         Assert.Equal (new (0, 0, 40, 15), Application.Driver?.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", output);

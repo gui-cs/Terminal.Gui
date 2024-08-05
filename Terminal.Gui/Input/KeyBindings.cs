@@ -1,12 +1,9 @@
 ﻿#nullable enable
 
-using System.Diagnostics;
-using Microsoft.CodeAnalysis;
-
 namespace Terminal.Gui;
 
 /// <summary>
-/// Provides a collection of <see cref="KeyBinding"/> objects bound to a <see cref="Key"/>.
+///     Provides a collection of <see cref="KeyBinding"/> objects bound to a <see cref="Key"/>.
 /// </summary>
 public class KeyBindings
 {
@@ -18,19 +15,6 @@ public class KeyBindings
 
     /// <summary>Initializes a new instance bound to <paramref name="boundView"/>.</summary>
     public KeyBindings (View boundView) { BoundView = boundView; }
-
-    /// <summary>
-    ///     The view that the <see cref="KeyBindings"/> are bound to.
-    /// </summary>
-    /// <remarks>
-    ///     If <see langword="null"/>, the <see cref="KeyBindings"/> are not bound to a <see cref="View"/>. This is used for Application.KeyBindings.
-    /// </remarks>
-    public View? BoundView { get; }
-
-    // TODO: Add a dictionary comparer that ignores Scope
-    // TODO: This should not be public!
-    /// <summary>The collection of <see cref="KeyBinding"/> objects.</summary>
-    public Dictionary<Key, KeyBinding> Bindings { get; } = new ();
 
     /// <summary>Adds a <see cref="KeyBinding"/> to the collection.</summary>
     /// <param name="key"></param>
@@ -45,21 +29,21 @@ public class KeyBindings
 
         if (TryGet (key, out KeyBinding _))
         {
-            throw new InvalidOperationException(@$"A key binding for {key} exists ({binding}).");
+            throw new InvalidOperationException (@$"A key binding for {key} exists ({binding}).");
+
             //Bindings [key] = binding;
+        }
+
+        if (BoundView is { })
+        {
+            binding.BoundView = BoundView;
         }
         else
         {
-            if (BoundView is { })
-            {
-                binding.BoundView = BoundView;
-            }
-            else
-            {
-                binding.BoundView = boundViewForAppScope;
-            }
-            Bindings.Add (key, binding);
+            binding.BoundView = boundViewForAppScope;
         }
+
+        Bindings.Add (key, binding);
     }
 
     /// <summary>
@@ -102,14 +86,12 @@ public class KeyBindings
         if (TryGet (key, out KeyBinding binding))
         {
             throw new InvalidOperationException (@$"A key binding for {key} exists ({binding}).");
+
             //Bindings [key] = new (commands, scope, BoundView);
         }
-        else
-        {
-            Add (key, new KeyBinding (commands, scope, BoundView), boundViewForAppScope);
-        }
-    }
 
+        Add (key, new KeyBinding (commands, scope, BoundView), boundViewForAppScope);
+    }
 
     /// <summary>
     ///     <para>Adds a new key combination that will trigger the commands in <paramref name="commands"/>.</para>
@@ -129,7 +111,7 @@ public class KeyBindings
     ///     multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike will be
     ///     consumed if any took effect.
     /// </param>
-    public void Add (Key key, KeyBindingScope scope,  params Command [] commands)
+    public void Add (Key key, KeyBindingScope scope, params Command [] commands)
     {
         if (BoundView is { } && scope.FastHasFlags (KeyBindingScope.Application))
         {
@@ -150,10 +132,8 @@ public class KeyBindings
         {
             throw new InvalidOperationException (@$"A key binding for {key} exists ({binding}).");
         }
-        else
-        {
-            Add (key, new KeyBinding (commands, scope, BoundView), null);
-        }
+
+        Add (key, new KeyBinding (commands, scope, BoundView));
     }
 
     /// <summary>
@@ -162,7 +142,8 @@ public class KeyBindings
     ///         View - see <see cref="View.GetSupportedCommands"/>).
     ///     </para>
     ///     <para>
-    ///         This is a helper function for <see cref="Add(Key,KeyBinding,View?)"/>. If used for a View (<see cref="BoundView"/> is set), the scope will be set to <see cref="KeyBindingScope.Focused"/>.
+    ///         This is a helper function for <see cref="Add(Key,KeyBinding,View?)"/>. If used for a View (
+    ///         <see cref="BoundView"/> is set), the scope will be set to <see cref="KeyBindingScope.Focused"/>.
     ///         Otherwise, it will be set to <see cref="KeyBindingScope.Application"/>.
     ///     </para>
     ///     <para>
@@ -185,8 +166,9 @@ public class KeyBindings
     {
         if (BoundView is null && boundViewForAppScope is null)
         {
-            throw new ArgumentException (@"Application scoped KeyBindings must provide a bound view to Add.", nameof(boundViewForAppScope));
+            throw new ArgumentException (@"Application scoped KeyBindings must provide a bound view to Add.", nameof (boundViewForAppScope));
         }
+
         Add (key, BoundView is { } ? KeyBindingScope.Focused : KeyBindingScope.Application, boundViewForAppScope, commands);
     }
 
@@ -196,7 +178,8 @@ public class KeyBindings
     ///         View - see <see cref="View.GetSupportedCommands"/>).
     ///     </para>
     ///     <para>
-    ///         This is a helper function for <see cref="Add(Key,KeyBinding,View?)"/>. If used for a View (<see cref="BoundView"/> is set), the scope will be set to <see cref="KeyBindingScope.Focused"/>.
+    ///         This is a helper function for <see cref="Add(Key,KeyBinding,View?)"/>. If used for a View (
+    ///         <see cref="BoundView"/> is set), the scope will be set to <see cref="KeyBindingScope.Focused"/>.
     ///         Otherwise, it will be set to <see cref="KeyBindingScope.Application"/>.
     ///     </para>
     ///     <para>
@@ -220,14 +203,26 @@ public class KeyBindings
         {
             throw new ArgumentException (@"Application scoped KeyBindings must provide a boundViewForAppScope to Add.");
         }
+
         Add (key, BoundView is { } ? KeyBindingScope.Focused : KeyBindingScope.Application, null, commands);
     }
 
+    // TODO: Add a dictionary comparer that ignores Scope
+    // TODO: This should not be public!
+    /// <summary>The collection of <see cref="KeyBinding"/> objects.</summary>
+    public Dictionary<Key, KeyBinding> Bindings { get; } = new ();
+
+    /// <summary>
+    ///     The view that the <see cref="KeyBindings"/> are bound to.
+    /// </summary>
+    /// <remarks>
+    ///     If <see langword="null"/>, the <see cref="KeyBindings"/> are not bound to a <see cref="View"/>. This is used for
+    ///     Application.KeyBindings.
+    /// </remarks>
+    public View? BoundView { get; }
+
     /// <summary>Removes all <see cref="KeyBinding"/> objects from the collection.</summary>
-    public void Clear ()
-    {
-        Bindings.Clear ();
-    }
+    public void Clear () { Bindings.Clear (); }
 
     /// <summary>
     ///     Removes all key bindings that trigger the given command set. Views can have multiple different keys bound to
@@ -255,6 +250,7 @@ public class KeyBindings
         {
             return binding;
         }
+
         throw new InvalidOperationException ($"Key {key} is not bound.");
     }
 
@@ -268,6 +264,7 @@ public class KeyBindings
         {
             return binding;
         }
+
         throw new InvalidOperationException ($"Key {key}/{scope} is not bound.");
     }
 
@@ -299,13 +296,32 @@ public class KeyBindings
     /// <param name="boundViewForAppScope">Optional View for <see cref="KeyBindingScope.Application"/> bindings.</param>
     public void Remove (Key key, View? boundViewForAppScope = null)
     {
-
         if (!TryGet (key, out KeyBinding binding))
         {
             return;
         }
 
         Bindings.Remove (key);
+    }
+
+    /// <summary>Replaces the commands already bound to a key.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the key is not already bound, it will be added.
+    ///     </para>
+    /// </remarks>
+    /// <param name="key">The key bound to the command to be replaced.</param>
+    /// <param name="commands">The set of commands to replace the old ones with.</param>
+    public void ReplaceCommands (Key key, params Command [] commands)
+    {
+        if (TryGet (key, out KeyBinding binding))
+        {
+            binding.Commands = commands;
+        }
+        else
+        {
+            Add (key, commands);
+        }
     }
 
     /// <summary>Replaces a key combination already bound to a set of <see cref="Command"/>s.</summary>
@@ -329,26 +345,6 @@ public class KeyBindings
         Add (newKey, value);
     }
 
-    /// <summary>Replaces the commands already bound to a key.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         If the key is not already bound, it will be added.
-    ///     </para>
-    /// </remarks>
-    /// <param name="key">The key bound to the command to be replaced.</param>
-    /// <param name="commands">The set of commands to replace the old ones with.</param>
-    public void ReplaceCommands (Key key, params Command [] commands)
-    {
-        if (TryGet (key, out KeyBinding binding))
-        {
-            binding.Commands = commands;
-        }
-        else
-        {
-            Add (key, commands);
-        }
-    }
-
     /// <summary>Gets the commands bound with the specified Key.</summary>
     /// <remarks></remarks>
     /// <param name="key">The key to check.</param>
@@ -360,6 +356,7 @@ public class KeyBindings
     public bool TryGet (Key key, out KeyBinding binding)
     {
         binding = new (Array.Empty<Command> (), KeyBindingScope.Disabled, null);
+
         if (key.IsValid)
         {
             return Bindings.TryGetValue (key, out binding);
@@ -380,6 +377,7 @@ public class KeyBindings
     public bool TryGet (Key key, KeyBindingScope scope, out KeyBinding binding)
     {
         binding = new (Array.Empty<Command> (), KeyBindingScope.Disabled, null);
+
         if (key.IsValid && Bindings.TryGetValue (key, out binding))
         {
             if (scope.HasFlag (binding.Scope))

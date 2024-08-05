@@ -31,8 +31,9 @@
         "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
         "FrameView.DefaultBorderStyle": "Single",
         "Window.DefaultBorderStyle": "Single",
-        "Dialog.DefaultBorderStyle": "Single",
-        "MessageBox.DefaultBorderStyle": "Double",
+        "Dialog.DefaultBorderStyle": "Heavy",
+        "MessageBox.DefaultButtonAlignment": "Center",
+        "MessageBox.DefaultBorderStyle": "Heavy",
         "Button.DefaultShadow": "None",
         "ColorSchemes": [
           {

@@ -174,6 +174,10 @@ public class MessageBoxTests
         var btn =
             $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
+        // Override CM
+        MessageBox.DefaultButtonAlignment = Alignment.End;
+        MessageBox.DefaultBorderStyle = LineStyle.Double;
+
         Application.Iteration += (s, a) =>
                                  {
                                      iterations++;
@@ -238,6 +242,10 @@ public class MessageBoxTests
 
         var btn =
             $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+
+        // Override CM
+        MessageBox.DefaultButtonAlignment = Alignment.End;
+        MessageBox.DefaultBorderStyle = LineStyle.Double;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -414,6 +422,10 @@ public class MessageBoxTests
     {
         int iterations = -1;
         ((FakeDriver)Application.Driver).SetBufferSize (70, 15);
+
+        // Override CM
+        MessageBox.DefaultButtonAlignment = Alignment.End;
+        MessageBox.DefaultBorderStyle = LineStyle.Double;
 
         Application.Iteration += (s, a) =>
                                  {

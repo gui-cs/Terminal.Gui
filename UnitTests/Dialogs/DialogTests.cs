@@ -26,6 +26,10 @@ public class DialogTests
         int width = $@"{CM.Glyphs.VLine} {btn1} {btn2} {CM.Glyphs.VLine}".Length;
         d.SetBufferSize (width, 1);
 
+        // Override CM
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+
         // Default (center)
         var dlg = new Dialog
         {
@@ -150,6 +154,7 @@ public class DialogTests
         var buttonRow = $"{CM.Glyphs.VLine} {btn1} {btn2} {btn3} {btn4} {CM.Glyphs.VLine}";
         int width = buttonRow.Length;
         d.SetBufferSize (buttonRow.Length, 3);
+
 
         // Default - Center
         (runstate, Dialog dlg) = RunButtonTestDialog (
@@ -874,6 +879,11 @@ public class DialogTests
     {
         ((FakeDriver)Driver).SetBufferSize (20, 5);
 
+        // Override CM
+        Window.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+
         var win = new Window ();
 
         var iterations = 0;
@@ -889,7 +899,6 @@ public class DialogTests
 
         win.Loaded += (s, a) =>
                       {
-                          Dialog.DefaultButtonAlignment = Alignment.Center;
                           var dlg = new Dialog { Width = 18, Height = 3, Buttons = [new () { Text = "Ok" }] };
 
                           dlg.Loaded += (s, a) =>
@@ -975,7 +984,10 @@ public class DialogTests
         var win = new Window ();
 
         int iterations = -1;
+
+        // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
 
         Iteration += (s, a) =>
                      {
@@ -1012,7 +1024,10 @@ public class DialogTests
     public void Dialog_Opened_From_Another_Dialog ()
     {
         ((FakeDriver)Driver).SetBufferSize (30, 10);
+
+        // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
 
         var btn1 = new Button { Text = "press me 1" };
         Button btn2 = null;
@@ -1159,6 +1174,11 @@ public class DialogTests
     [AutoInitShutdown]
     public void Location_When_Application_Top_Not_Default ()
     {
+        // Override CM
+        Window.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+
         var expected = 5;
         var d = new Dialog { X = expected, Y = expected, Height = 5, Width = 5 };
         Begin (d);
@@ -1187,6 +1207,11 @@ public class DialogTests
         top.BorderStyle = LineStyle.Double;
 
         int iterations = -1;
+
+        // Override CM
+        Window.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
 
         Iteration += (s, a) =>
                      {
@@ -1361,6 +1386,10 @@ public class DialogTests
         params Button [] btns
     )
     {
+        // Override CM
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+
         var dlg = new Dialog
         {
             Title = title,
