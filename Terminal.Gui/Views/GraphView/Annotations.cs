@@ -133,7 +133,7 @@ public class LegendAnnotation : View, IAnnotation
     {
         if (!IsInitialized)
         {
-            ColorScheme = new ColorScheme { Normal = Application.Driver.GetAttribute () };
+            ColorScheme = new ColorScheme { Normal = Application.Driver?.GetAttribute () ?? Attribute.Default};
             graph.Add (this);
         }
 
@@ -149,7 +149,7 @@ public class LegendAnnotation : View, IAnnotation
         {
             if (entry.Item1.Color.HasValue)
             {
-                Application.Driver.SetAttribute (entry.Item1.Color.Value);
+                Application.Driver?.SetAttribute (entry.Item1.Color.Value);
             }
             else
             {
@@ -166,7 +166,7 @@ public class LegendAnnotation : View, IAnnotation
             Move (1, linesDrawn);
 
             string str = TextFormatter.ClipOrPad (entry.Item2, Viewport.Width - 1);
-            Application.Driver.AddStr (str);
+            Application.Driver?.AddStr (str);
 
             linesDrawn++;
 

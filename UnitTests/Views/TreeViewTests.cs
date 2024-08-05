@@ -114,7 +114,7 @@ public class TreeViewTests
         tv.SelectAll ();
         tv.CursorVisibility = CursorVisibility.Default;
         Application.PositionCursor (top);
-        Application.Driver.GetCursorVisibility (out CursorVisibility visibility);
+        Application.Driver!.GetCursorVisibility (out CursorVisibility visibility);
         Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
         Assert.Equal (CursorVisibility.Default, visibility);
         top.Dispose ();

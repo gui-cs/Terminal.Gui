@@ -22,7 +22,7 @@ public class Buttons : Scenario
         };
 
         // Add a label & text field so we can demo IsDefault
-        var editLabel = new Label { X = 0, Y = 0, TabStop = true, Text = "TextField (to demo IsDefault):" };
+        var editLabel = new Label { X = 0, Y = 0, Text = "TextField (to demo IsDefault):" };
         main.Add (editLabel);
 
         // Add a TextField using Absolute layout. 
@@ -336,8 +336,6 @@ public class Buttons : Scenario
             Value = 69,
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Width = 5,
-            Height = 1
         };
         numericUpDown.ValueChanged += NumericUpDown_ValueChanged;
 
@@ -390,7 +388,21 @@ public class Buttons : Scenario
         enableCB.Toggle += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
         main.Add (label, repeatButton, enableCB);
 
-        main.Ready += (s, e) => radioGroup.Refresh ();
+        //var decNumericUpDown = new NumericUpDown<decimal>
+        //{
+        //    Value = 42.11m,
+        //    Increment = 11.31m,
+        //    Format = "{0:0%}",
+        //    X = 0,
+        //    Y = Pos.Bottom (enableCB) + 1,
+        //};
+
+        //main.Add (decNumericUpDown);
+
+        main.Ready += (s, e) =>
+                      {
+                          radioGroup.Refresh ();
+                      };
         Application.Run (main);
         main.Dispose ();
         Application.Shutdown ();

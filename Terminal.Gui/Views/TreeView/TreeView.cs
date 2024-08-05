@@ -352,7 +352,7 @@ public class TreeView<T> : View, ITreeView where T : class
         {
             if (objectActivationKey != value)
             {
-                KeyBindings.Replace (ObjectActivationKey, value);
+                KeyBindings.ReplaceKey (ObjectActivationKey, value);
                 objectActivationKey = value;
             }
         }

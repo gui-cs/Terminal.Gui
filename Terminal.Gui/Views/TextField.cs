@@ -134,15 +134,7 @@ public class TextField : View
                     }
                    );
 
-        AddCommand (
-                    Command.Left,
-                    () =>
-                    {
-                        MoveLeft ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.Left,  () => MoveLeft ());
 
         AddCommand (
                     Command.RightEnd,
@@ -154,15 +146,7 @@ public class TextField : View
                     }
                    );
 
-        AddCommand (
-                    Command.Right,
-                    () =>
-                    {
-                        MoveRight ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.Right, () => MoveRight ());
 
         AddCommand (
                     Command.CutToEndLine,
@@ -1332,7 +1316,10 @@ public class TextField : View
                                );
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
+    {
+        KeyBindings.ReplaceKey (e.OldKey.KeyCode, e.NewKey.KeyCode);
+    }
 
     private List<Rune> DeleteSelectedText ()
     {
@@ -1544,15 +1531,19 @@ public class TextField : View
         }
     }
 
-    private void MoveLeft ()
+    private bool MoveLeft ()
     {
-        ClearAllSelection ();
 
         if (_cursorPosition > 0)
         {
+            ClearAllSelection ();
             _cursorPosition--;
             Adjust ();
+
+            return true;
         }
+
+        return false;
     }
 
     private void MoveLeftExtend ()
@@ -1563,17 +1554,19 @@ public class TextField : View
         }
     }
 
-    private void MoveRight ()
+    private bool MoveRight ()
     {
-        ClearAllSelection ();
-
         if (_cursorPosition == _text.Count)
         {
-            return;
+            return false;
         }
+
+        ClearAllSelection ();
 
         _cursorPosition++;
         Adjust ();
+
+        return true;
     }
 
     private void MoveRightExtend ()

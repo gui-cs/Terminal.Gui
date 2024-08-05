@@ -1,14 +1,16 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Describes what user actions are enabled for arranging a <see cref="View"/> within it's <see cref="View.SuperView"/>.
+///     Describes what user actions are enabled for arranging a <see cref="View"/> within it's <see cref="View.SuperView"/>
+///     .
 ///     See <see cref="View.Arrangement"/>.
 /// </summary>
 /// <remarks>
-/// <para>
-///     Sizing or moving a view is only possible if the <see cref="View"/> is part of a <see cref="View.SuperView"/> and
-///     the relevant position and dimensions of the <see cref="View"/> are independent of other SubViews
-/// </para>
+///     <para>
+///         Sizing or moving a view is only possible if the <see cref="View"/> is part of a <see cref="View.SuperView"/>
+///         and
+///         the relevant position and dimensions of the <see cref="View"/> are independent of other SubViews
+///     </para>
 /// </remarks>
 [Flags]
 public enum ViewArrangement
@@ -53,18 +55,17 @@ public enum ViewArrangement
     /// <remarks>
     ///     If <see cref="Movable"/> is also set, the top will not be resizable.
     /// </remarks>
-    Resizable = LeftResizable | RightResizable | TopResizable | BottomResizable
-}
-public partial class View
-{
+    Resizable = LeftResizable | RightResizable | TopResizable | BottomResizable,
+
     /// <summary>
-    ///    Gets or sets the user actions that are enabled for the view within it's <see cref="SuperView"/>.
+    ///     The view overlap other views.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     Sizing or moving a view is only possible if the <see cref="View"/> is part of a <see cref="SuperView"/> and
-    ///     the relevant position and dimensions of the <see cref="View"/> are independent of other SubViews
-    /// </para>
+    ///     <para>
+    ///         When set, Tab and Shift-Tab will be constrained to the subviews of the view (normally, they will navigate to
+    ///         the next/prev view in the next/prev Tabindex).
+    ///         Use Ctrl-Tab (Ctrl-PageDown) / Ctrl-Shift-Tab (Ctrl-PageUp) to move between overlapped views.
+    ///     </para>
     /// </remarks>
-    public ViewArrangement Arrangement { get; set; }
+    Overlapped = 32,
 }

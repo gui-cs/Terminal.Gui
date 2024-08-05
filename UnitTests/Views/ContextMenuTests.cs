@@ -117,9 +117,9 @@ public class ContextMenuTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_A_ContextMenu_Over_A_Borderless_Top ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
 
-        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver.Clip);
+        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver?.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 
         var top = new Toplevel { X = 2, Y = 2, Width = 15, Height = 4 };
@@ -167,7 +167,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         var win = new Window ();
         top.Add (win);
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
 
         Assert.Equal (new Rectangle (0, 0, 20, 15), win.Frame);
 
@@ -252,9 +252,9 @@ public class ContextMenuTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_A_ContextMenu_Over_A_Top_Dialog ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
 
-        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver.Clip);
+        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver?.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
@@ -542,7 +542,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 20);
         cm.Position = new Point (41, -2);
         cm.Show ();
         Application.Refresh ();
@@ -677,7 +677,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        ((FakeDriver)Application.Driver).SetBufferSize (18, 8);
+        ((FakeDriver)Application.Driver!).SetBufferSize (18, 8);
         cm.Position = new Point (19, 10);
         cm.Show ();
         Application.Refresh ();
@@ -891,7 +891,7 @@ public class ContextMenuTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Show_Display_At_Zero_If_The_Toplevel_Height_Is_Less_Than_The_Menu_Height ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (80, 3);
+        ((FakeDriver)Application.Driver!).SetBufferSize (80, 3);
 
         var cm = new ContextMenu
         {
@@ -929,7 +929,7 @@ public class ContextMenuTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Show_Display_At_Zero_If_The_Toplevel_Width_Is_Less_Than_The_Menu_Width ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (5, 25);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 25);
 
         var cm = new ContextMenu
         {

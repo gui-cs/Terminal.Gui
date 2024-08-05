@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios;
 public class Notepad : Scenario
 {
     private TabView _focusedTabView;
-    public Shortcut LenShortcut { get; private set; } 
+    public Shortcut LenShortcut { get; private set; }
     private int _numNewTabs = 1;
     private TabView _tabView;
 
@@ -309,9 +309,8 @@ public class Notepad : Scenario
         tab.CloneTo (newTabView);
         newTile.ContentView.Add (newTabView);
 
-        newTabView.EnsureFocus ();
-        newTabView.FocusFirst ();
-        newTabView.FocusNext ();
+        newTabView.FocusFirst (null);
+        newTabView.AdvanceFocus (NavigationDirection.Forward, null);
     }
 
     private void SplitDown (TabView sender, OpenedFile tab) { Split (1, Orientation.Horizontal, sender, tab); }

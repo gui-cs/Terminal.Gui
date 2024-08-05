@@ -86,7 +86,7 @@ public class SendKeys : Scenario
                                     ? (ConsoleKey)char.ToUpper (r)
                                     : (ConsoleKey)r;
 
-                Application.Driver.SendKeys (
+                Application.Driver?.SendKeys (
                                              r,
                                              ck,
                                              ckbShift.State == CheckState.Checked,

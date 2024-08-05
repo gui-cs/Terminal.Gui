@@ -192,13 +192,16 @@ internal sealed class Menu : View
 
             if ((KeyCode)menuItem.HotKey.Value != KeyCode.Null)
             {
+                KeyBindings.Remove ((KeyCode)menuItem.HotKey.Value);
                 KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, keyBinding);
+                KeyBindings.Remove ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask);
                 KeyBindings.Add ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask, keyBinding);
             }
 
             if (menuItem.Shortcut != KeyCode.Null)
             {
                 keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuItem);
+                KeyBindings.Remove (menuItem.Shortcut);
                 KeyBindings.Add (menuItem.Shortcut, keyBinding);
             }
 

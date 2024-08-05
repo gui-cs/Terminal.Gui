@@ -609,7 +609,7 @@ public class Sliders : Scenario
                              };
         }
 
-        app.FocusFirst ();
+        app.FocusFirst (null);
 
         Application.Run (app);
         app.Dispose ();

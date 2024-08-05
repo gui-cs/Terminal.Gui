@@ -29,7 +29,7 @@ public class RulerTests
     [AutoInitShutdown]
     public void Draw_Default ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (25, 25);
+        ((FakeDriver)Application.Driver!).SetBufferSize (25, 25);
 
         var r = new Ruler ();
         r.Draw (Point.Empty);
@@ -47,7 +47,7 @@ public class RulerTests
         var top = new Toplevel ();
         top.Add (f);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (len + 5, 5);
         Assert.Equal (new (0, 0, len + 5, 5), f.Frame);
 
         var r = new Ruler ();
@@ -121,7 +121,7 @@ public class RulerTests
         var top = new Toplevel ();
         top.Add (f);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (len + 5, 5);
         Assert.Equal (new (0, 0, len + 5, 5), f.Frame);
 
         var r = new Ruler ();
@@ -168,7 +168,7 @@ public class RulerTests
         var top = new Toplevel ();
         top.Add (f);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, len + 5);
         Assert.Equal (new (0, 0, 5, len + 5), f.Frame);
 
         var r = new Ruler ();
@@ -302,7 +302,7 @@ public class RulerTests
         var top = new Toplevel ();
         top.Add (f);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, len + 5);
         Assert.Equal (new (0, 0, 5, len + 5), f.Frame);
 
         var r = new Ruler ();

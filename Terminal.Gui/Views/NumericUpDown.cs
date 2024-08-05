@@ -1,6 +1,8 @@
 #nullable enable
 using System.ComponentModel;
-using Terminal.Gui;
+using Microsoft.CodeAnalysis.Operations;
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Enables the user to increase or decrease a value by clicking on the up or down buttons.
@@ -10,7 +12,7 @@ using Terminal.Gui;
 ///     <see cref="decimal"/>.
 ///     Supports only one digit of precision.
 /// </remarks>
-public class NumericUpDown<T> : View
+public class NumericUpDown<T> : View where T : notnull
 {
     private readonly Button _down;
 
@@ -18,56 +20,24 @@ public class NumericUpDown<T> : View
     private readonly View _number;
     private readonly Button _up;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NumericUpDown{T}"/> class.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
     public NumericUpDown ()
     {
         Type type = typeof (T);
 
-        if (!(type == typeof (int) || type == typeof (long) || type == typeof (double) || type == typeof (float) || type == typeof (double) || type == typeof (decimal)))
+        if (!(type == typeof (object) || type == typeof (int) || type == typeof (long) || type == typeof (double) || type == typeof (float) || type == typeof (double) || type == typeof (decimal)))
         {
-            // Support object for AllViewsTester
-            if (type != typeof (object))
-            {
-                throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
-            }
+            throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
         }
 
-        switch (typeof (T))
+        Increment = (dynamic)1;
+        // `object` is supported only for AllViewsTester
+        if (type != typeof (object))
         {
-            case { } i when i == typeof (int):
-                Minimum = (dynamic)int.MinValue;
-                Maximum = (dynamic)int.MaxValue;
-                Increment = (dynamic)1;
-
-                break;
-
-            case { } i when i == typeof (long):
-                Minimum = (dynamic)long.MinValue;
-                Maximum = (dynamic)long.MaxValue;
-                Increment = (dynamic)1;
-
-                break;
-
-            case { } i when i == typeof (double):
-                Minimum = (dynamic)double.MinValue;
-                Maximum = (dynamic)double.MaxValue;
-                Increment = (dynamic)1;
-
-                break;
-
-            case { } i when i == typeof (float):
-                Minimum = (dynamic)float.MinValue;
-                Maximum = (dynamic)float.MaxValue;
-                Increment = (dynamic)1;
-
-                break;
-
-
-            case { } i when i == typeof (decimal):
-                Minimum = (dynamic)decimal.MinValue;
-                Maximum = (dynamic)decimal.MaxValue;
-                Increment = (dynamic)1;
-
-                break;
+            Value = (dynamic)0;
         }
 
         Width = Dim.Auto (DimAutoStyle.Content); //Dim.Function (() => Digits + 2); // button + 3 for number + button
@@ -90,7 +60,7 @@ public class NumericUpDown<T> : View
             Text = Value?.ToString () ?? "Err",
             X = Pos.Right (_down),
             Y = Pos.Top (_down),
-            Width = Dim.Func (() => Digits),
+            Width = Dim.Auto (minimumContentDim: Dim.Func (() => string.Format (Format, Value).Length)),
             Height = 1,
             TextAlignment = Alignment.Center,
             CanFocus = true
@@ -98,7 +68,7 @@ public class NumericUpDown<T> : View
 
         _up = new ()
         {
-            X = Pos.AnchorEnd (),
+            X = Pos.Right (_number),
             Y = Pos.Top (_number),
             Height = 1,
             Width = 1,
@@ -128,8 +98,7 @@ public class NumericUpDown<T> : View
 
                         if (Value is { })
                         {
-                            Value = (dynamic)Value + Increment;
-                            _number.Text = Value?.ToString () ?? string.Empty;
+                            Value = (dynamic)Value + (dynamic)Increment;
                         }
 
                         return true;
@@ -146,8 +115,7 @@ public class NumericUpDown<T> : View
 
                         if (Value is { })
                         {
-                            Value = (dynamic)Value - Increment;
-                            _number.Text = Value.ToString () ?? string.Empty;
+                            Value = (dynamic)Value - (dynamic)Increment;
                         }
 
                         return true;
@@ -156,22 +124,22 @@ public class NumericUpDown<T> : View
         KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
         KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
 
+        SetText ();
+
         return;
 
-        void OnDownButtonOnAccept (object s, HandledEventArgs e)
+        void OnDownButtonOnAccept (object? s, HandledEventArgs e)
         {
             InvokeCommand (Command.ScrollDown);
         }
 
-        void OnUpButtonOnAccept (object s, HandledEventArgs e)
+        void OnUpButtonOnAccept (object? s, HandledEventArgs e)
         {
             InvokeCommand (Command.ScrollUp);
         }
     }
 
-    private void _up_Enter (object sender, FocusEventArgs e) { throw new NotImplementedException (); }
-
-    private T _value;
+    private T _value = default!;
 
     /// <summary>
     ///     The value that will be incremented or decremented.
@@ -187,7 +155,7 @@ public class NumericUpDown<T> : View
             }
 
             T oldValue = value;
-            CancelEventArgs<T> args = new (ref _value, ref value);
+            CancelEventArgs<T> args = new (in _value, ref value);
             ValueChanging?.Invoke (this, args);
 
             if (args.Cancel)
@@ -195,72 +163,52 @@ public class NumericUpDown<T> : View
                 return;
             }
 
-            if (Comparer<T>.Default.Compare (value, Minimum) < 0)
-            {
-                value = Minimum;
-            }
-
-            if (Comparer<T>.Default.Compare (value, Maximum) > 0)
-            {
-                value = Maximum;
-            }
-
             _value = value;
-            _number.Text = _value?.ToString () ?? string.Empty;
-            ValueChanged?.Invoke (this, new (ref _value));
+            SetText ();
+            ValueChanged?.Invoke (this, new (in value));
         }
     }
 
-    /// <summary>
-    ///     Fired when the value is about to change. Set <see cref="CancelEventArgs{T}.Cancel"/> to true to prevent the change.
-    /// </summary>
-    [CanBeNull]
-    public event EventHandler<CancelEventArgs<T>> ValueChanging;
+    private string _format = "{0}";
 
     /// <summary>
-    ///     Fired when the value has changed.
+    ///     Gets or sets the format string used to display the value. The default is "{0}".
     /// </summary>
-    [CanBeNull]
-    public event EventHandler<EventArgs<T>> ValueChanged;
+    public string Format
+    {
+        get => _format;
+        set
+        {
+            if (_format == value)
+            {
+                return;
+            }
+
+            _format = value;
+            SetText ();
+        }
+    }
+
+    private void SetText ()
+    {
+        _number.Text = string.Format (Format, _value);
+        Text = _number.Text;
+    }
 
     /// <summary>
-    ///     The number of digits to display. The <see cref="View.Viewport"/> will be resized to fit this number of characters
-    ///     plus the buttons. The default is 3.
+    ///     Raised when the value is about to change. Set <see cref="CancelEventArgs{T}.Cancel"/> to true to prevent the change.
     /// </summary>
-    public int Digits { get; set; } = 3;
+    public event EventHandler<CancelEventArgs<T>>? ValueChanging;
 
-    private T _minimum;
+    /// <summary>
+    ///     Raised when the value has changed.
+    /// </summary>
+    public event EventHandler<EventArgs<T>>? ValueChanged;
 
     /// <summary>
     /// 
     /// </summary>
-    public T Minimum
-    {
-        get { return _minimum; }
-        set { _minimum = value; }
-    }
-
-    private T _maximum;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public T Maximum
-    {
-        get { return _maximum; }
-        set { _maximum = value; }
-    }
-
-    private T _increment;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public T Increment
-    {
-        get { return _increment; }
-        set { _increment = value; }
-    }
+    public T Increment { get; set; }
 }
 
 

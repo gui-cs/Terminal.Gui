@@ -9,6 +9,24 @@ namespace UICatalog.Scenarios;
 /// </summary>
 public class AdornmentsEditor : View
 {
+    public AdornmentsEditor ()
+    {
+        //ColorScheme = Colors.ColorSchemes ["Dialog"];
+        Title = "AdornmentsEditor";
+
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content);
+
+        //SuperViewRendersLineCanvas = true;
+
+        TabStop = TabBehavior.TabGroup;
+
+        //Application.MouseEvent += Application_MouseEvent;
+        Application.Navigation!.FocusedChanged += ApplicationNavigationOnFocusedChanged;
+        Initialized += AdornmentsEditor_Initialized;
+    }
+
+    private readonly ViewDiagnosticFlags _savedDiagnosticFlags = Diagnostics;
     private View _viewToEdit;
 
     private Label _lblView; // Text describing the vi
@@ -20,33 +38,45 @@ public class AdornmentsEditor : View
     // TODO: Move Diagnostics to a separate Editor class (DiagnosticsEditor?).
     private CheckBox _diagPaddingCheckBox;
     private CheckBox _diagRulerCheckBox;
-    private readonly ViewDiagnosticFlags _savedDiagnosticFlags = Diagnostics;
-
-    public AdornmentsEditor ()
-    {
-        //ColorScheme = Colors.ColorSchemes ["Dialog"];
-        Title = $"AdornmentsEditor";
-
-        Width = Dim.Auto (DimAutoStyle.Content);
-        Height = Dim.Auto (DimAutoStyle.Content);
-
-        //SuperViewRendersLineCanvas = true;
-
-        Application.MouseEvent += Application_MouseEvent;
-        Initialized += AdornmentsEditor_Initialized;
-    }
 
     /// <summary>
-    /// Gets or sets whether the AdornmentsEditor should automatically select the View to edit when the mouse is clicked
-    /// anywhere outside the editor.
+    ///     Gets or sets whether the AdornmentsEditor should automatically select the View to edit when the mouse is clicked
+    ///     anywhere outside the editor.
     /// </summary>
     public bool AutoSelectViewToEdit { get; set; }
+
+    public View ViewToEdit
+    {
+        get => _viewToEdit;
+        set
+        {
+            if (_viewToEdit == value)
+            {
+                return;
+            }
+
+            _viewToEdit = value;
+
+            _marginEditor.AdornmentToEdit = _viewToEdit?.Margin ?? null;
+            _borderEditor.AdornmentToEdit = _viewToEdit?.Border ?? null;
+            _paddingEditor.AdornmentToEdit = _viewToEdit?.Padding ?? null;
+
+            _lblView.Text = $"{_viewToEdit?.GetType ().Name}: {_viewToEdit?.Id}" ?? string.Empty;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        Diagnostics = _savedDiagnosticFlags;
+        base.Dispose (disposing);
+    }
 
     private void AdornmentsEditor_Initialized (object sender, EventArgs e)
     {
         BorderStyle = LineStyle.Dotted;
 
-        ExpanderButton expandButton = new ExpanderButton ()
+        var expandButton = new ExpanderButton
         {
             Orientation = Orientation.Horizontal
         };
@@ -56,7 +86,7 @@ public class AdornmentsEditor : View
         {
             X = 0,
             Y = 0,
-            Height = 2,
+            Height = 2
         };
         _lblView.TextFormatter.WordWrap = true;
         _lblView.TextFormatter.MultiLine = true;
@@ -93,34 +123,34 @@ public class AdornmentsEditor : View
         _diagPaddingCheckBox.State = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Padding) ? CheckState.Checked : CheckState.UnChecked;
 
         _diagPaddingCheckBox.Toggle += (s, e) =>
-                                        {
-                                            if (e.NewValue == CheckState.Checked)
-                                            {
-                                                Diagnostics |= ViewDiagnosticFlags.Padding;
-                                            }
-                                            else
-                                            {
-                                                Diagnostics &= ~ViewDiagnosticFlags.Padding;
-                                            }
-                                        };
+                                       {
+                                           if (e.NewValue == CheckState.Checked)
+                                           {
+                                               Diagnostics |= ViewDiagnosticFlags.Padding;
+                                           }
+                                           else
+                                           {
+                                               Diagnostics &= ~ViewDiagnosticFlags.Padding;
+                                           }
+                                       };
 
         Add (_diagPaddingCheckBox);
         _diagPaddingCheckBox.Y = Pos.Bottom (_paddingEditor);
 
         _diagRulerCheckBox = new () { Text = "_Diagnostic Ruler" };
-        _diagRulerCheckBox.State = Diagnostics.FastHasFlags(ViewDiagnosticFlags.Ruler) ? CheckState.Checked : CheckState.UnChecked;
+        _diagRulerCheckBox.State = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Ruler) ? CheckState.Checked : CheckState.UnChecked;
 
         _diagRulerCheckBox.Toggle += (s, e) =>
-                                      {
-                                          if (e.NewValue == CheckState.Checked)
-                                          {
-                                              Diagnostics |= ViewDiagnosticFlags.Ruler;
-                                          }
-                                          else
-                                          {
-                                              Diagnostics &= ~ViewDiagnosticFlags.Ruler;
-                                          }
-                                      };
+                                     {
+                                         if (e.NewValue == CheckState.Checked)
+                                         {
+                                             Diagnostics |= ViewDiagnosticFlags.Ruler;
+                                         }
+                                         else
+                                         {
+                                             Diagnostics &= ~ViewDiagnosticFlags.Ruler;
+                                         }
+                                     };
 
         Add (_diagRulerCheckBox);
         _diagRulerCheckBox.Y = Pos.Bottom (_diagPaddingCheckBox);
@@ -134,7 +164,8 @@ public class AdornmentsEditor : View
         }
 
         // TODO: Add a setting (property) so only subviews of a specified view are considered.
-        var view = e.View;
+        View view = e.View;
+
         if (view is { } && e.Flags == MouseFlags.Button1Clicked)
         {
             if (view is Adornment adornment)
@@ -148,33 +179,20 @@ public class AdornmentsEditor : View
         }
     }
 
-    /// <inheritdoc />
-    protected override void Dispose (bool disposing)
+    private void ApplicationNavigationOnFocusedChanged (object sender, EventArgs e)
     {
-        View.Diagnostics = _savedDiagnosticFlags;
-        base.Dispose (disposing);
-    }
-
-    public View ViewToEdit
-    {
-        get => _viewToEdit;
-        set
+        if (ApplicationNavigation.IsInHierarchy (this, Application.Navigation!.GetFocused ()))
         {
-            if (_viewToEdit == value)
-            {
-                return;
-            }
-
-            _viewToEdit = value;
-
-
-            _marginEditor.AdornmentToEdit = _viewToEdit.Margin ?? null;
-            _borderEditor.AdornmentToEdit = _viewToEdit.Border ?? null;
-            _paddingEditor.AdornmentToEdit = _viewToEdit.Padding ?? null;
-
-            _lblView.Text = _viewToEdit.ToString ();
-
             return;
+        }
+
+        if (Application.Navigation!.GetFocused () is Adornment adornment)
+        {
+            ViewToEdit = adornment.Parent;
+        }
+        else
+        {
+            ViewToEdit = Application.Navigation.GetFocused ();
         }
     }
 }

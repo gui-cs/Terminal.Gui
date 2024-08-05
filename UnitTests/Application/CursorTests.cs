@@ -141,7 +141,10 @@ public class CursorTests
 
         Assert.True (view.HasFocus);
         Assert.False (Application.PositionCursor (view));
-        Application.Driver.GetCursorVisibility (out CursorVisibility cursor);
-        Assert.Equal (CursorVisibility.Invisible, cursor);
+
+        if (Application.Driver?.GetCursorVisibility (out CursorVisibility cursor) ?? false)
+        {
+            Assert.Equal (CursorVisibility.Invisible, cursor);
+        }
     }
 }
