@@ -1,16 +1,14 @@
 #nullable enable
 using System.ComponentModel;
-using Microsoft.CodeAnalysis.Operations;
 
 namespace Terminal.Gui;
 
 /// <summary>
-///     Enables the user to increase or decrease a value by clicking on the up or down buttons.
+///     Enables the user to increase or decrease a value with the mouse or keyboard.
 /// </summary>
 /// <remarks>
 ///     Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>,
-///     <see cref="decimal"/>.
-///     Supports only one digit of precision.
+///     <see cref="decimal"/>. Attempting to use any other type will result in an <see cref="InvalidOperationException"/>.
 /// </remarks>
 public class NumericUpDown<T> : View where T : notnull
 {
@@ -28,19 +26,26 @@ public class NumericUpDown<T> : View where T : notnull
     {
         Type type = typeof (T);
 
-        if (!(type == typeof (object) || type == typeof (int) || type == typeof (long) || type == typeof (double) || type == typeof (float) || type == typeof (double) || type == typeof (decimal)))
+        if (!(type == typeof (object)
+              || type == typeof (int)
+              || type == typeof (long)
+              || type == typeof (double)
+              || type == typeof (float)
+              || type == typeof (double)
+              || type == typeof (decimal)))
         {
             throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
         }
 
         Increment = (dynamic)1;
+
         // `object` is supported only for AllViewsTester
         if (type != typeof (object))
         {
             Value = (dynamic)0;
         }
 
-        Width = Dim.Auto (DimAutoStyle.Content); //Dim.Function (() => Digits + 2); // button + 3 for number + button
+        Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
         _down = new ()
@@ -128,22 +133,23 @@ public class NumericUpDown<T> : View where T : notnull
 
         return;
 
-        void OnDownButtonOnAccept (object? s, HandledEventArgs e)
-        {
-            InvokeCommand (Command.ScrollDown);
-        }
+        void OnDownButtonOnAccept (object? s, HandledEventArgs e) { InvokeCommand (Command.ScrollDown); }
 
-        void OnUpButtonOnAccept (object? s, HandledEventArgs e)
-        {
-            InvokeCommand (Command.ScrollUp);
-        }
+        void OnUpButtonOnAccept (object? s, HandledEventArgs e) { InvokeCommand (Command.ScrollUp); }
     }
 
     private T _value = default!;
 
     /// <summary>
-    ///     The value that will be incremented or decremented.
+    ///     Gets or sets the value that will be incremented or decremented.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         <see cref="ValueChanging"/> and <see cref="ValueChanged"/> events are raised when the value changes.
+    ///         The <see cref="ValueChanging"/> event can be canceled the change setting <see cref="CancelEventArgs{T}.Cancel"/> to
+    ///         <see langword="true"/>.
+    ///     </para>
+    /// </remarks>
     public T Value
     {
         get => _value;
@@ -196,7 +202,8 @@ public class NumericUpDown<T> : View where T : notnull
     }
 
     /// <summary>
-    ///     Raised when the value is about to change. Set <see cref="CancelEventArgs{T}.Cancel"/> to true to prevent the change.
+    ///     Raised when the value is about to change. Set <see cref="CancelEventArgs{T}.Cancel"/> to true to prevent the
+    ///     change.
     /// </summary>
     public event EventHandler<CancelEventArgs<T>>? ValueChanging;
 
@@ -206,16 +213,12 @@ public class NumericUpDown<T> : View where T : notnull
     public event EventHandler<EventArgs<T>>? ValueChanged;
 
     /// <summary>
-    /// 
     /// </summary>
     public T Increment { get; set; }
 }
-
 
 /// <summary>
 ///     Enables the user to increase or decrease an <see langword="int"/> by clicking on the up or down buttons.
 /// </summary>
 public class NumericUpDown : NumericUpDown<int>
-{
-
-}
+{ }
