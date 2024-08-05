@@ -147,8 +147,7 @@ public class NumericUpDown<T> : View where T : notnull
     ///     <para>
     ///         <see cref="ValueChanging"/> and <see cref="ValueChanged"/> events are raised when the value changes.
     ///         The <see cref="ValueChanging"/> event can be canceled the change setting
-    ///         <see cref="CancelEventArgs{T}.Cancel"/> to
-    ///         <see langword="true"/>.
+    ///         <see cref="CancelEventArgs{T}"/><c>.Cancel</c> to <see langword="true"/>.
     ///     </para>
     /// </remarks>
     public T Value
@@ -177,7 +176,7 @@ public class NumericUpDown<T> : View where T : notnull
     }
 
     /// <summary>
-    ///     Raised when the value is about to change. Set <see cref="CancelEventArgs{T}.Cancel"/> to true to prevent the
+    ///     Raised when the value is about to change. Set <see cref="CancelEventArgs{T}"/><c>.Cancel</c> to true to prevent the
     ///     change.
     /// </summary>
     public event EventHandler<CancelEventArgs<T>>? ValueChanging;
@@ -229,7 +228,7 @@ public class NumericUpDown<T> : View where T : notnull
         get => _increment;
         set
         {
-            if (_increment == (dynamic)value)
+            if ((dynamic)_increment == (dynamic)value)
             {
                 return;
             }
