@@ -242,6 +242,20 @@ public class KeyBindingTests
         Assert.Throws<InvalidOperationException> (() => keyBindings.ReplaceKey (Key.A, Key.Empty));
     }
 
+    [Fact]
+    public void ReplaceKey_Replaces_Leaves_Old_Binding ()
+    {
+        var keyBindings = new KeyBindings ();
+        keyBindings.Add (Key.A, KeyBindingScope.Application, Command.Accept);
+        keyBindings.Add (Key.B, KeyBindingScope.Application, Command.HotKey);
+
+        keyBindings.ReplaceKey (keyBindings.GetKeyFromCommands(Command.Accept), Key.C);
+        Assert.Empty (keyBindings.GetCommands (Key.A));
+        Assert.Contains (Command.Accept, keyBindings.GetCommands (Key.C));
+
+    }
+
+
     // Add with scope does the right things
     [Theory]
     [InlineData (KeyBindingScope.Focused)]
@@ -341,4 +355,6 @@ public class KeyBindingTests
         Assert.True (result);
         Assert.Contains (Command.HotKey, bindings.Commands);
     }
+
+
 }
