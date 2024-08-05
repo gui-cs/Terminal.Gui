@@ -16,7 +16,7 @@ public enum TabBehavior
     TabStop = 1,
 
     /// <summary>
-    ///     The View will be a stop-point for keyboard-based navigation across groups (e.g. if the user preesses <see cref="Application.NextTabGroupKey"/> (`Ctrl-PageDown`).
+    ///     The View will be a stop-point for keyboard-based navigation across groups (e.g. if the user presses <see cref="Application.NextTabGroupKey"/> (`Ctrl-PageDown`).
     /// </summary>
     TabGroup = 2,
 }

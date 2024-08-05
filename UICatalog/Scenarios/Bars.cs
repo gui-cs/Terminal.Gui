@@ -402,7 +402,7 @@ public class Bars : Scenario
         bar.Add (shortcut1, shortcut2, line, shortcut3);
     }
 
-    private void ConfigStatusBar (Bar bar)
+    public void ConfigStatusBar (Bar bar)
     {
         var shortcut = new Shortcut
         {

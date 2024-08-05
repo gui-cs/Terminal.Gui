@@ -486,10 +486,10 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         var prevMostFocusedSubview = top.MostFocused;
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl)); // move to next TabGroup (win2)
+        Assert.True (Application.OnKeyDown (Key.F6)); // move to next TabGroup (win2)
         Assert.Equal (win2, top.Focused);
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl.WithShift)); // move to prev TabGroup (win1)
+        Assert.True (Application.OnKeyDown (Key.F6.WithShift)); // move to prev TabGroup (win1)
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.MostFocused);  // BUGBUG: Should be prevMostFocusedSubview - We need to cache the last focused view in the TabGroup somehow
 
@@ -527,16 +527,16 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (tvW1, top.MostFocused);
 
         // nav to win2
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));
+        Assert.True (Application.OnKeyDown (Key.F6));
         Assert.Equal (win2, top.Focused);
         Assert.Equal (tf1W2, top.MostFocused);
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl.WithShift));
+        Assert.True (Application.OnKeyDown (Key.F6.WithShift));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.MostFocused);
-        Assert.True (Application.OnKeyDown (Application.AlternateForwardKey));
+        Assert.True (Application.OnKeyDown (Application.NextTabGroupKey));
         Assert.Equal (win2, top.Focused);
         Assert.Equal (tf1W2, top.MostFocused);
-        Assert.True (Application.OnKeyDown (Application.AlternateBackwardKey));
+        Assert.True (Application.OnKeyDown (Application.PrevTabGroupKey));
         Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorUp));

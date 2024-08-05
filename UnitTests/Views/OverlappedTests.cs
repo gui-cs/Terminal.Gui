@@ -1116,10 +1116,10 @@ public class OverlappedTests
         Assert.True (Application.OnKeyDown (Key.Tab.WithShift));
         Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl));    // move to win2
+        Assert.True (Application.OnKeyDown (Key.F6));    // move to win2
         Assert.Equal (win2, ApplicationOverlapped.OverlappedChildren [0]);
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl.WithShift));    // move back to win1
+        Assert.True (Application.OnKeyDown (Key.F6.WithShift));    // move back to win1
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
 
         Assert.Equal (tvW1, win1.MostFocused);
@@ -1156,19 +1156,19 @@ public class OverlappedTests
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl)); // Move to win2
+        Assert.True (Application.OnKeyDown (Key.F6)); // Move to win2
         Assert.Equal (win2, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf1W2, win2.MostFocused);
         tf2W2.SetFocus ();
         Assert.True (tf2W2.HasFocus);
 
-        Assert.True (Application.OnKeyDown (Key.Tab.WithCtrl.WithShift));
+        Assert.True (Application.OnKeyDown (Key.F6.WithShift));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
-        Assert.True (Application.OnKeyDown (Application.AlternateForwardKey));
+        Assert.True (Application.OnKeyDown (Application.NextTabGroupKey));
         Assert.Equal (win2, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf2W2, win2.MostFocused);
-        Assert.True (Application.OnKeyDown (Application.AlternateBackwardKey));
+        Assert.True (Application.OnKeyDown (Application.PrevTabGroupKey));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
         Assert.Equal (tf2W1, win1.MostFocused);
         Assert.True (Application.OnKeyDown (Key.CursorDown));

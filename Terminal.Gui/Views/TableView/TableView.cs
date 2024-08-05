@@ -324,11 +324,15 @@ public class TableView : View
         {
             if (cellActivationKey != value)
             {
-                KeyBindings.ReplaceKey (cellActivationKey, value);
+                if (KeyBindings.TryGet (cellActivationKey, out _))
+                {
+                    KeyBindings.ReplaceKey (cellActivationKey, value);
+                }
+                else
+                {
+                    KeyBindings.Add (value, Command.Accept);
+                }
 
-                // of API user is mixing and matching old and new methods of keybinding then they may have lost
-                // the old binding (e.g. with ClearKeybindings) so KeyBindings.Replace alone will fail
-                KeyBindings.Add (value, Command.Accept);
                 cellActivationKey = value;
             }
         }
@@ -792,7 +796,7 @@ public class TableView : View
     }
 
     ///<inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)

@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Resources;
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
 
@@ -24,9 +26,82 @@ public static partial class Application
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
     public static List<CultureInfo>? SupportedCultures { get; private set; }
 
+    /// <summary>
+    ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
+    /// </summary>
+    /// <returns>A string representation of the Application </returns>
+    public new static string ToString ()
+    {
+        ConsoleDriver driver = Driver;
+
+        if (driver is null)
+        {
+            return string.Empty;
+        }
+
+        return ToString (driver);
+    }
+
+    /// <summary>
+    ///     Gets a string representation of the Application rendered by the provided <see cref="ConsoleDriver"/>.
+    /// </summary>
+    /// <param name="driver">The driver to use to render the contents.</param>
+    /// <returns>A string representation of the Application </returns>
+    public static string ToString (ConsoleDriver driver)
+    {
+        var sb = new StringBuilder ();
+
+        Cell [,] contents = driver.Contents;
+
+        for (var r = 0; r < driver.Rows; r++)
+        {
+            for (var c = 0; c < driver.Cols; c++)
+            {
+                Rune rune = contents [r, c].Rune;
+
+                if (rune.DecodeSurrogatePair (out char [] sp))
+                {
+                    sb.Append (sp);
+                }
+                else
+                {
+                    sb.Append ((char)rune.Value);
+                }
+
+                if (rune.GetColumns () > 1)
+                {
+                    c++;
+                }
+
+                // See Issue #2616
+                //foreach (var combMark in contents [r, c].CombiningMarks) {
+                //	sb.Append ((char)combMark.Value);
+                //}
+            }
+
+            sb.AppendLine ();
+        }
+
+        return sb.ToString ();
+    }
+
+    internal static List<CultureInfo> GetAvailableCulturesFromEmbeddedResources ()
+    {
+        ResourceManager rm = new (typeof (Strings));
+
+        CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
+
+        return cultures.Where (
+                               cultureInfo =>
+                                   !cultureInfo.Equals (CultureInfo.InvariantCulture)
+                                   && rm.GetResourceSet (cultureInfo, true, false) is { }
+                              )
+                       .ToList ();
+    }
+
     internal static List<CultureInfo> GetSupportedCultures ()
     {
-        CultureInfo [] culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
+        CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
 
         // Get the assembly
         var assembly = Assembly.GetExecutingAssembly ();
@@ -35,15 +110,21 @@ public static partial class Application
         string assemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
 
         // Find the resource file name of the assembly
-        var resourceFilename = $"{Path.GetFileNameWithoutExtension (AppContext.BaseDirectory)}.resources.dll";
+        var resourceFilename = $"{assembly.GetName ().Name}.resources.dll";
 
-        // Return all culture for which satellite folder found with culture code.
-        return culture.Where (
-                              cultureInfo =>
-                                  Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name))
-                                  && File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
-                             )
-                      .ToList ();
+        if (cultures.Length > 1 && Directory.Exists (Path.Combine (assemblyLocation, "pt-PT")))
+        {
+            // Return all culture for which satellite folder found with culture code.
+            return cultures.Where (
+                                   cultureInfo =>
+                                       Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name))
+                                       && File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
+                                  )
+                           .ToList ();
+        }
+
+        // It's called from a self-contained single-file and get available cultures from the embedded resources strings.
+        return GetAvailableCulturesFromEmbeddedResources ();
     }
 
     // IMPORTANT: Ensure all property/fields are reset here. See Init_ResetState_Resets_Properties unit test.
@@ -122,12 +203,12 @@ public static partial class Application
         UnGrabbedMouse = null;
 
         // Keyboard
-        AlternateBackwardKey = Key.Empty;
-        AlternateForwardKey = Key.Empty;
-        QuitKey = Key.Empty;
         KeyDown = null;
         KeyUp = null;
         SizeChanging = null;
+
+        Navigation = null;
+
         AddApplicationKeyBindings ();
 
         Colors.Reset ();
@@ -139,70 +220,5 @@ public static partial class Application
         SynchronizationContext.SetSynchronizationContext (null);
     }
 
-#nullable enable
-#nullable restore
-
-#nullable enable
-
     // Only return true if the Current has changed.
-#nullable restore
-
-    /// <summary>
-    ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
-    /// </summary>
-    /// <returns>A string representation of the Application </returns>
-    public new static string ToString ()
-    {
-        ConsoleDriver driver = Driver;
-
-        if (driver is null)
-        {
-            return string.Empty;
-        }
-
-        return ToString (driver);
-    }
-
-    /// <summary>
-    ///     Gets a string representation of the Application rendered by the provided <see cref="ConsoleDriver"/>.
-    /// </summary>
-    /// <param name="driver">The driver to use to render the contents.</param>
-    /// <returns>A string representation of the Application </returns>
-    public static string ToString (ConsoleDriver driver)
-    {
-        var sb = new StringBuilder ();
-
-        Cell [,] contents = driver.Contents;
-
-        for (var r = 0; r < driver.Rows; r++)
-        {
-            for (var c = 0; c < driver.Cols; c++)
-            {
-                Rune rune = contents [r, c].Rune;
-
-                if (rune.DecodeSurrogatePair (out char [] sp))
-                {
-                    sb.Append (sp);
-                }
-                else
-                {
-                    sb.Append ((char)rune.Value);
-                }
-
-                if (rune.GetColumns () > 1)
-                {
-                    c++;
-                }
-
-                // See Issue #2616
-                //foreach (var combMark in contents [r, c].CombiningMarks) {
-                //	sb.Append ((char)combMark.Value);
-                //}
-            }
-
-            sb.AppendLine ();
-        }
-
-        return sb.ToString ();
-    }
 }

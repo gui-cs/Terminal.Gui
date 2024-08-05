@@ -352,6 +352,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
         {
             if (Focused.AdvanceFocus (direction, behavior))
             {
+                // TODO: Temporary hack to make Application.Navigation.FocusChanged work
+                if (Focused.Focused is null)
+                {
+                    Application.Navigation?.SetFocused (Focused);
+                }
                 return true;
             }
         }
@@ -397,6 +402,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
             Focused.SetHasFocus (false, view);
 
             view.FocusDeepest (TabBehavior.TabStop, direction);
+
+            // TODO: Temporary hack to make Application.Navigation.FocusChanged work
+            if (view.Focused is null)
+            {
+                Application.Navigation?.SetFocused (view);
+            }
 
             return true;
         }
@@ -507,7 +518,21 @@ public partial class View // Focus and cross-view navigation management (TabStop
         {
             // If there is no SuperView, then this is a top-level view
             SetFocus (this);
+
         }
+
+        // TODO: Temporary hack to make Application.Navigation.FocusChanged work
+        if (HasFocus && Focused.Focused is null)
+        {
+            Application.Navigation?.SetFocused (Focused);
+        }
+
+        // TODO: This is a temporary hack to make overlapped non-Toplevels have a zorder. See also: View.OnDrawContent.
+        if (viewToEnterFocus is { } && (viewToEnterFocus.TabStop == TabBehavior.TabGroup && viewToEnterFocus.Arrangement.HasFlag (ViewArrangement.Overlapped)))
+        {
+            viewToEnterFocus.TabIndex = 0;
+        }
+
     }
 
 
@@ -927,10 +952,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         focus even if this property is set and vice-versa.
     ///     </para>
     ///     <para>
-    ///         The default <see cref="TabBehavior.TabStop"/> keys are <c>Key.Tab</c> and <c>Key>Tab.WithShift</c>.
+    ///         The default <see cref="TabBehavior.TabStop"/> keys are <see cref="Application.NextTabKey"/> (<c>Key.Tab</c>) and <see cref="Application.PrevTabKey"/> (<c>Key>Tab.WithShift</c>).
     ///     </para>
     ///     <para>
-    ///         The default <see cref="TabBehavior.TabGroup"/> keys are <c>Key.Tab.WithCtrl</c> and <c>Key>Key.Tab.WithCtrl.WithShift</c>.
+    ///         The default <see cref="TabBehavior.TabGroup"/> keys are <see cref="Application.NextTabGroupKey"/> (<c>Key.F6</c>) and <see cref="Application.PrevTabGroupKey"/> (<c>Key>Key.F6.WithShift</c>).
     ///     </para>
     /// </remarks>
     public TabBehavior? TabStop

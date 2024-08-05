@@ -29,6 +29,7 @@ public class Window : Toplevel
     {
         CanFocus = true;
         TabStop = TabBehavior.TabGroup;
+        Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped;
         ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
         BorderStyle = DefaultBorderStyle;
         ShadowStyle = DefaultShadow;

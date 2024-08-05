@@ -74,6 +74,8 @@ public static partial class Application // Initialization (Init/Shutdown)
             ResetState ();
         }
 
+        Navigation = new ();
+
         // For UnitTests
         if (driver is { })
         {

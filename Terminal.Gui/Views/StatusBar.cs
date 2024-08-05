@@ -10,7 +10,7 @@ namespace Terminal.Gui;
 ///     to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a
 ///     new instance of a status bar.
 /// </summary>
-public class StatusBar : Bar
+public class StatusBar : Bar, IDesignable
 {
     /// <inheritdoc/>
     public StatusBar () : this ([]) { }
@@ -73,4 +73,74 @@ public class StatusBar : Bar
 
         return view;
     }
+
+    /// <inheritdoc />
+    bool IDesignable.EnableForDesign ()
+    {
+        var shortcut = new Shortcut
+        {
+            Text = "Quit",
+            Title = "Q_uit",
+            Key = Key.Z.WithCtrl,
+        };
+
+        Add (shortcut);
+
+        shortcut = new Shortcut
+        {
+            Text = "Help Text",
+            Title = "Help",
+            Key = Key.F1,
+        };
+
+        Add (shortcut);
+
+        shortcut = new Shortcut
+        {
+            Title = "_Show/Hide",
+            Key = Key.F10,
+            CommandView = new CheckBox
+            {
+                CanFocus = false,
+                Text = "_Show/Hide"
+            },
+        };
+
+        Add (shortcut);
+
+        var button1 = new Button
+        {
+            Text = "I'll Hide",
+            // Visible = false
+        };
+        button1.Accept += Button_Clicked;
+        Add (button1);
+
+        shortcut.Accept += (s, e) =>
+                           {
+                               button1.Visible = !button1.Visible;
+                               button1.Enabled = button1.Visible;
+                               e.Handled = false;
+                           };
+
+        Add (new Label
+        {
+            HotKeySpecifier = new Rune ('_'),
+            Text = "Fo_cusLabel",
+            CanFocus = true
+        });
+
+        var button2 = new Button
+        {
+            Text = "Or me!",
+        };
+        button2.Accept += (s, e) => Application.RequestStop ();
+
+        Add (button2);
+
+        return true;
+
+        void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
+    }
+
 }

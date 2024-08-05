@@ -33,7 +33,13 @@ public static class MessageBox
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single; // Default is set in config.json
+
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [JsonConverter (typeof (JsonStringEnumConverter<Alignment>))]
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Center; // Default is set in config.json
 
     /// <summary>
     ///     Defines the default minimum MessageBox width, as a percentage of the screen width. Can be configured via
@@ -365,10 +371,10 @@ public static class MessageBox
         var d = new Dialog
         {
             Title = title,
-            Buttons = buttonList.ToArray (),
-            ButtonAlignment = Alignment.Center,
+            ButtonAlignment = MessageBox.DefaultButtonAlignment,
             ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems,
             BorderStyle = MessageBox.DefaultBorderStyle,
+            Buttons = buttonList.ToArray (),
         };
 
         d.Width = Dim.Auto (DimAutoStyle.Auto,

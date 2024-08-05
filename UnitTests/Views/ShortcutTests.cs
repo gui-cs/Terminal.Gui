@@ -155,7 +155,29 @@ public class ShortcutTests
         Assert.Equal (Key.Empty, shortcut.Key);
     }
 
-    // Test KeyBindingScope
+
+    [Fact]
+    public void Key_Set_Binds_Key_To_CommandView_Accept ()
+    {
+        var shortcut = new Shortcut ();
+
+        shortcut.Key = Key.F1;
+
+        // TODO:
+    }
+
+    [Fact]
+    public void Key_Changing_Removes_Previous_Binding ()
+    {
+        Shortcut shortcut = new Shortcut ();
+
+        shortcut.Key = Key.A;
+        Assert.Contains (Key.A, shortcut.KeyBindings.Bindings.Keys);
+
+        shortcut.Key = Key.B;
+        Assert.DoesNotContain (Key.A, shortcut.KeyBindings.Bindings.Keys);
+        Assert.Contains (Key.B, shortcut.KeyBindings.Bindings.Keys);
+    }
 
     // Test Key gets bound correctly
     [Fact]
@@ -177,15 +199,22 @@ public class ShortcutTests
     }
 
     [Fact]
-    public void Setting_Key_Binds_Key_To_CommandView_Accept ()
+    public void KeyBindingScope_Changing_Adjusts_KeyBindings ()
     {
-        var shortcut = new Shortcut ();
+        Shortcut shortcut = new Shortcut ();
 
-        shortcut.Key = Key.F1;
+        shortcut.Key = Key.A;
+        Assert.Contains (Key.A, shortcut.KeyBindings.Bindings.Keys);
 
-        // TODO:
+        shortcut.KeyBindingScope = KeyBindingScope.Application;
+        Assert.DoesNotContain (Key.A, shortcut.KeyBindings.Bindings.Keys);
+        Assert.Contains (Key.A, Application.KeyBindings.Bindings.Keys);
+
+        shortcut.KeyBindingScope = KeyBindingScope.HotKey;
+        Assert.Contains (Key.A, shortcut.KeyBindings.Bindings.Keys);
+        Assert.DoesNotContain (Key.A, Application.KeyBindings.Bindings.Keys);
     }
-
+    
     [Theory]
     [InlineData (Orientation.Horizontal)]
     [InlineData (Orientation.Vertical)]
@@ -567,7 +596,9 @@ public class ShortcutTests
         Application.OnKeyDown (key);
 
         Assert.Equal (expectedAction, action);
-
         current.Dispose ();
     }
+
+
+
 }
