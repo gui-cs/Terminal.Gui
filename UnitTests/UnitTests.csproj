@@ -30,7 +30,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0-release-24352-06" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0-release-24373-02" />
     <PackageReference Include="Moq" Version="4.20.70" />
     <PackageReference Include="ReportGenerator" Version="5.3.8" />
     <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.0.26" />
