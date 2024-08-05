@@ -1,22 +1,18 @@
 ﻿using Xunit.Abstractions;
 using Color = Terminal.Gui.Color;
 
-namespace UnitTests.Views;
+namespace Terminal.Gui.ViewsTests;
 
 public class ColorPickerTests
 {
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ColorPicker_Construct_DefaultValue ()
     {
         var cp = new ColorPicker { Width = 20, SelectedColor = new (0, 0) };
 
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
-
-        var top = new Toplevel ();
-        top.Add (cp);
-        Application.Begin (top);
 
         // Should be only a single text field (Hex) because ShowTextFields is false
         Assert.Single (cp.Subviews.OfType<TextField> ());
@@ -41,8 +37,6 @@ public class ColorPickerTests
 
         var hex = GetTextField (cp, ColorPickerPart.Hex);
         Assert.Equal ("#000000", hex.Text);
-
-        top.Dispose ();
     }
 
     [Fact]
@@ -371,8 +365,11 @@ public class ColorPickerTests
         cp.Style.ShowTextFields = true;
         cp.ApplyStyleChanges ();
 
+        View otherView = new View () { CanFocus = true };
+
         var top = new Toplevel ();
         top.Add (cp);
+        top.Add (otherView);
         Application.Begin (top);
 
         cp.Draw ();
@@ -381,7 +378,8 @@ public class ColorPickerTests
         TextField rBarTextField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "0");
 
         rBarTextField.Text = "128";
-        rBarTextField.OnLeave (cp);
+        //rBarTextField.OnLeave (cp); // OnLeave should be protected virtual. Don't call it.
+        otherView.SetFocus (); // Remove focus from the color picker
 
         cp.Draw ();
 
