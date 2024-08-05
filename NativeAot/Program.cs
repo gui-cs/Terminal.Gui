@@ -13,6 +13,8 @@ public static class Program
     [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init(ConsoleDriver, String)")]
     private static void Main (string [] args)
     {
+        ConfigurationManager.ThrowOnJsonErrors = true;
+
         Application.Init ();
 
         #region The code in this region is not intended for use in a native Aot self-contained. It's just here to make sure there is no functionality break with localization in Terminal.Gui using self-contained
