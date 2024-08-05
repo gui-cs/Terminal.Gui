@@ -388,16 +388,16 @@ public class Buttons : Scenario
         enableCB.Toggle += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
         main.Add (label, repeatButton, enableCB);
 
-        //var decNumericUpDown = new NumericUpDown<decimal>
-        //{
-        //    Value = 42.11m,
-        //    Increment = 11.31m,
-        //    Format = "{0:0%}",
-        //    X = 0,
-        //    Y = Pos.Bottom (enableCB) + 1,
-        //};
+        var decNumericUpDown = new NumericUpDown<int>
+        {
+            Value = 911,
+            Increment = 1,
+            Format = "{0:X}",
+            X = 0,
+            Y = Pos.Bottom (enableCB) + 1,
+        };
 
-        //main.Add (decNumericUpDown);
+        main.Add (decNumericUpDown);
 
         main.Ready += (s, e) =>
                       {

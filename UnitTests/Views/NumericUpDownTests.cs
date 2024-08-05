@@ -1,3 +1,4 @@
+using System.Globalization;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -184,12 +185,39 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [InlineData (.75F, "{0:0%}", "75%")]
     public void Format_decimal (float value, string format, string expectedText)
     {
+        CultureInfo currentCulture = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
         NumericUpDown<float> numericUpDown = new NumericUpDown<float> ();
 
         numericUpDown.Format = format;
         numericUpDown.Value = value;
 
         Assert.Equal (expectedText, numericUpDown.Text);
+
+        CultureInfo.CurrentCulture = currentCulture;
+    }
+
+    [Theory]
+    [InlineData (0, "{0}", "0")]
+    [InlineData (11, "{0}", "11")]
+    [InlineData (-1, "{0}", "-1")]
+    [InlineData (911, "{0:X}", "38F")]
+    [InlineData (911, "0x{0:X04}", "0x038F")]
+
+    public void Format_int (int value, string format, string expectedText)
+    {
+        CultureInfo currentCulture = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
+        NumericUpDown<int> numericUpDown = new NumericUpDown<int> ();
+
+        numericUpDown.Format = format;
+        numericUpDown.Value = value;
+
+        Assert.Equal (expectedText, numericUpDown.Text);
+
+        CultureInfo.CurrentCulture = currentCulture;
     }
 
     [Fact]
@@ -211,4 +239,5 @@ public class NumericUpDownTests (ITestOutputHelper _output)
 
         Assert.Equal (-1, numericUpDown.Value);
     }
+
 }

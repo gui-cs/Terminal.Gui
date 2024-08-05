@@ -146,7 +146,8 @@ public class NumericUpDown<T> : View where T : notnull
     /// <remarks>
     ///     <para>
     ///         <see cref="ValueChanging"/> and <see cref="ValueChanged"/> events are raised when the value changes.
-    ///         The <see cref="ValueChanging"/> event can be canceled the change setting <see cref="CancelEventArgs{T}.Cancel"/> to
+    ///         The <see cref="ValueChanging"/> event can be canceled the change setting
+    ///         <see cref="CancelEventArgs{T}.Cancel"/> to
     ///         <see langword="true"/>.
     ///     </para>
     /// </remarks>
@@ -175,6 +176,17 @@ public class NumericUpDown<T> : View where T : notnull
         }
     }
 
+    /// <summary>
+    ///     Raised when the value is about to change. Set <see cref="CancelEventArgs{T}.Cancel"/> to true to prevent the
+    ///     change.
+    /// </summary>
+    public event EventHandler<CancelEventArgs<T>>? ValueChanging;
+
+    /// <summary>
+    ///     Raised when the value has changed.
+    /// </summary>
+    public event EventHandler<EventArgs<T>>? ValueChanged;
+
     private string _format = "{0}";
 
     /// <summary>
@@ -191,9 +203,16 @@ public class NumericUpDown<T> : View where T : notnull
             }
 
             _format = value;
+
+            FormatChanged?.Invoke (this, new (value));
             SetText ();
         }
     }
+
+    /// <summary>
+    ///     Raised when <see cref="Format"/> has changed.
+    /// </summary>
+    public event EventHandler<EventArgs<string>>? FormatChanged;
 
     private void SetText ()
     {
@@ -201,20 +220,30 @@ public class NumericUpDown<T> : View where T : notnull
         Text = _number.Text;
     }
 
-    /// <summary>
-    ///     Raised when the value is about to change. Set <see cref="CancelEventArgs{T}.Cancel"/> to true to prevent the
-    ///     change.
-    /// </summary>
-    public event EventHandler<CancelEventArgs<T>>? ValueChanging;
-
-    /// <summary>
-    ///     Raised when the value has changed.
-    /// </summary>
-    public event EventHandler<EventArgs<T>>? ValueChanged;
+    private T _increment;
 
     /// <summary>
     /// </summary>
-    public T Increment { get; set; }
+    public T Increment
+    {
+        get => _increment;
+        set
+        {
+            if (_increment == (dynamic)value)
+            {
+                return;
+            }
+
+            _increment = value;
+
+            IncrementChanged?.Invoke (this, new (value));
+        }
+    }
+
+    /// <summary>
+    ///     Raised when <see cref="Increment"/> has changed.
+    /// </summary>
+    public event EventHandler<EventArgs<T>>? IncrementChanged;
 }
 
 /// <summary>
