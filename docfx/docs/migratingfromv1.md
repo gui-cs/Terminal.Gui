@@ -301,7 +301,7 @@ The [Aligner](~/api/Terminal.Gui.Aligner.yml) class makes it easy to align eleme
 
 In v1 `CheckBox` used `bool?` to represent the 3 states. To support consistent behavior for the `Accept` event, `CheckBox` was refactored to use the new `CheckState` enum instead of `bool?`.
 
-Additionally the `Toggle` method was renamed to `AdvanceCheckState`.
+Additionally the `Toggle` event was renamed `CheckStateChanging` and made cancelable. The `Toggle` method was renamed to `AdvanceCheckState`.
 
 ### How to Fix
 
