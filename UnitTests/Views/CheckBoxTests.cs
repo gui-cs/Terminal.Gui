@@ -485,7 +485,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         ckb.CheckedState = initialState;
         Assert.Equal (initialState, ckb.CheckedState);
-        bool? ret = ckb.OnCheckedStateChanging ();
+        bool? ret = ckb.AdvanceCheckState ();
         Assert.True (ret);
         Assert.True (checkedInvoked);
         Assert.Equal (initialState, ckb.CheckedState);

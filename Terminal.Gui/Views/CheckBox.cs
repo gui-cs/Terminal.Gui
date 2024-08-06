@@ -1,12 +1,9 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
 
-/// <summary>Shows a check box that can be toggled.</summary>
+/// <summary>Shows a check box that can be cycled between three states.</summary>
 public class CheckBox : View
 {
-    private bool _allowNone;
-    private CheckState _checkedState = CheckState.UnChecked;
-
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/>.
     /// </summary>
@@ -18,8 +15,8 @@ public class CheckBox : View
         CanFocus = true;
 
         // Things this view knows how to do
-        AddCommand (Command.Accept, OnCheckedStateChanging);
-        AddCommand (Command.HotKey, OnCheckedStateChanging);
+        AddCommand (Command.Accept, AdvanceCheckState);
+        AddCommand (Command.HotKey, AdvanceCheckState);
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.Accept);
@@ -32,7 +29,7 @@ public class CheckBox : View
 
     private void CheckBox_MouseClick (object? sender, MouseEventEventArgs e)
     {
-        e.Handled = OnCheckedStateChanging () == true;
+        e.Handled = AdvanceCheckState () == true;
     }
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
@@ -55,8 +52,10 @@ public class CheckBox : View
         set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
     }
 
+    private bool _allowNone = false;
+
     /// <summary>
-    ///     If <see langword="true"/> allows <see cref="CheckedState"/> to be <see cref="CheckState.None"/>.
+    ///     If <see langword="true"/> allows <see cref="CheckedState"/> to be <see cref="CheckState.None"/>. The default is <see langword="false"/>.
     /// </summary>
     public bool AllowCheckStateNone
     {
@@ -75,6 +74,8 @@ public class CheckBox : View
             }
         }
     }
+
+    private CheckState _checkedState = CheckState.UnChecked;
 
     /// <summary>
     ///     The state of the <see cref="CheckBox"/>.
@@ -109,17 +110,24 @@ public class CheckBox : View
         }
     }
 
-    /// <summary>Called when the <see cref="CheckedState"/> property changes. Invokes the cancelable <see cref="CheckedStateChanging"/> event.</summary>
+    /// <summary>
+    ///     Advances <see cref="CheckedState"/> to the next value. Invokes the cancelable <see cref="CheckedStateChanging"/> event.
+    /// </summary>
     /// <remarks>
     /// </remarks>
     /// <returns>If <see langword="true"/> the <see cref="CheckedStateChanging"/> event was canceled.</returns>
     /// <remarks>
-    ///     Toggling cycles through the states <see cref="CheckState.None"/>, <see cref="CheckState.Checked"/>, and <see cref="CheckState.UnChecked"/>.
+    /// <para>
+    ///     Cycles through the states <see cref="CheckState.None"/>, <see cref="CheckState.Checked"/>, and <see cref="CheckState.UnChecked"/>.
+    /// </para>
+    /// <para>
+    ///     If the <see cref="CheckedStateChanging"/> event is not canceled, the <see cref="CheckedState"/> will be updated and the <see cref="Command.Accept"/> event will be raised.
+    /// </para>
     /// </remarks>
-    public bool? OnCheckedStateChanging ()
+    public bool? AdvanceCheckState ()
     {
         CheckState oldValue = CheckedState;
-        CancelEventArgs<CheckState> e = new (ref _checkedState, ref oldValue);
+        CancelEventArgs<CheckState> e = new (in _checkedState, ref oldValue);
 
         switch (CheckedState)
         {
@@ -150,7 +158,7 @@ public class CheckBox : View
             return e.Cancel;
         }
 
-        // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
+        // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the Accept event is fired.
         if (OnAccept () == true)
         {
             return true;
@@ -161,7 +169,7 @@ public class CheckBox : View
         return true;
     }
 
-    /// <summary>Toggle event, raised when the <see cref="CheckBox"/> is toggled.</summary>
+    /// <summary>Raised when the <see cref="CheckBox"/> state is changing.</summary>
     /// <remarks>
     /// <para>
     ///    This event can be cancelled. If cancelled, the <see cref="CheckBox"/> will not change its state.
@@ -172,7 +180,7 @@ public class CheckBox : View
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
-        base.UpdateTextFormatterText();
+        base.UpdateTextFormatterText ();
         switch (TextAlignment)
         {
             case Alignment.Start:
