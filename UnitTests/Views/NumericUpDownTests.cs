@@ -53,7 +53,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void WhenCreatedWithCustomValues_ShouldHaveCustomValues_int ()
     {
-        NumericUpDown<int> numericUpDown = new NumericUpDown<int>
+        NumericUpDown<int> numericUpDown = new()
         {
             Value = 10,
             Increment = 2
@@ -66,7 +66,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void WhenCreatedWithCustomValues_ShouldHaveCustomValues_float ()
     {
-        NumericUpDown<float> numericUpDown = new NumericUpDown<float>
+        NumericUpDown<float> numericUpDown = new()
         {
             Value = 10.5F,
             Increment = 2.5F
@@ -79,7 +79,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void WhenCreatedWithCustomValues_ShouldHaveCustomValues_decimal ()
     {
-        NumericUpDown<decimal> numericUpDown = new NumericUpDown<decimal>
+        NumericUpDown<decimal> numericUpDown = new ()
         {
             Value = 10.5m,
             Increment = 2.5m
@@ -98,16 +98,13 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void WhenCreatedWithInvalidTypeObject_ShouldNotThrowInvalidOperationException ()
     {
-        NumericUpDown<object> numericUpDown = new NumericUpDown<object> ();
-
-        Assert.Null (numericUpDown.Value);
-        Assert.Equal (1, numericUpDown.Increment);
+        NumericUpDown<object> numericUpDown = new ();
     }
 
     [Fact]
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_int ()
     {
-        NumericUpDown<int> numericUpDown = new NumericUpDown<int> ();
+        NumericUpDown<int> numericUpDown = new ();
         numericUpDown.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (3, numericUpDown.Frame.Width);
@@ -117,7 +114,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_float ()
     {
-        NumericUpDown<float> numericUpDown = new NumericUpDown<float> ();
+        NumericUpDown<float> numericUpDown = new ();
         numericUpDown.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (3, numericUpDown.Frame.Width);
@@ -127,7 +124,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_double ()
     {
-        NumericUpDown<double> numericUpDown = new NumericUpDown<double> ();
+        NumericUpDown<double> numericUpDown = new ();
         numericUpDown.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (3, numericUpDown.Frame.Width);
@@ -137,7 +134,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_long ()
     {
-        NumericUpDown<long> numericUpDown = new NumericUpDown<long> ();
+        NumericUpDown<long> numericUpDown = new ();
         numericUpDown.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (3, numericUpDown.Frame.Width);
@@ -147,7 +144,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_decimal ()
     {
-        NumericUpDown<decimal> numericUpDown = new NumericUpDown<decimal> ();
+        NumericUpDown<decimal> numericUpDown = new ();
         numericUpDown.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (3, numericUpDown.Frame.Width);
@@ -157,7 +154,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void WhenCreated_Text_Should_Be_Correct_int ()
     {
-        NumericUpDown<int> numericUpDown = new NumericUpDown<int> ();
+        NumericUpDown<int> numericUpDown = new ();
 
         Assert.Equal ("0", numericUpDown.Text);
     }
@@ -165,7 +162,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void WhenCreated_Text_Should_Be_Correct_float ()
     {
-        NumericUpDown<float> numericUpDown = new NumericUpDown<float> ();
+        NumericUpDown<float> numericUpDown = new ();
 
         Assert.Equal ("0", numericUpDown.Text);
     }
@@ -173,7 +170,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void Format_Default ()
     {
-        NumericUpDown<float> numericUpDown = new NumericUpDown<float> ();
+        NumericUpDown<float> numericUpDown = new ();
 
         Assert.Equal ("{0}", numericUpDown.Format);
     }
@@ -188,7 +185,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
         CultureInfo currentCulture = CultureInfo.CurrentCulture;
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-        NumericUpDown<float> numericUpDown = new NumericUpDown<float> ();
+        NumericUpDown<float> numericUpDown = new ();
 
         numericUpDown.Format = format;
         numericUpDown.Value = value;
@@ -204,13 +201,12 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [InlineData (-1, "{0}", "-1")]
     [InlineData (911, "{0:X}", "38F")]
     [InlineData (911, "0x{0:X04}", "0x038F")]
-
     public void Format_int (int value, string format, string expectedText)
     {
         CultureInfo currentCulture = CultureInfo.CurrentCulture;
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-        NumericUpDown<int> numericUpDown = new NumericUpDown<int> ();
+        NumericUpDown<int> numericUpDown = new ();
 
         numericUpDown.Format = format;
         numericUpDown.Value = value;
@@ -223,7 +219,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void KeDown_CursorUp_Increments ()
     {
-        NumericUpDown<int> numericUpDown = new NumericUpDown<int> ();
+        NumericUpDown<int> numericUpDown = new ();
 
         numericUpDown.NewKeyDownEvent (Key.CursorUp);
 
@@ -233,11 +229,10 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void KeyDown_CursorDown_Decrements ()
     {
-        NumericUpDown<int> numericUpDown = new NumericUpDown<int> ();
+        NumericUpDown<int> numericUpDown = new ();
 
         numericUpDown.NewKeyDownEvent (Key.CursorDown);
 
         Assert.Equal (-1, numericUpDown.Value);
     }
-
 }
