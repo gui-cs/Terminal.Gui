@@ -202,7 +202,7 @@ public class GraphViewExample : Scenario
 
         if (sender is Shortcut shortcut && shortcut.CommandView is CheckBox checkBox)
         {
-            checkBox.State = _miDiags.Checked ?? false ? CheckState.Checked : CheckState.UnChecked;
+            checkBox.CheckedState = _miDiags.Checked ?? false ? CheckState.Checked : CheckState.UnChecked;
         }
     }
 

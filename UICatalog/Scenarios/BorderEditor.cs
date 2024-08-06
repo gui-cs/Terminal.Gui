@@ -20,9 +20,9 @@ public class BorderEditor : AdornmentEditor
 
     private void BorderEditor_AdornmentChanged (object sender, EventArgs e)
     {
-        _ckbTitle.State = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Title) ? CheckState.Checked : CheckState.UnChecked;
+        _ckbTitle.CheckedState = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Title) ? CheckState.Checked : CheckState.UnChecked;
         _rbBorderStyle.SelectedItem = (int)((Border)AdornmentToEdit).LineStyle;
-        _ckbGradient.State = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Gradient) ? CheckState.Checked : CheckState.UnChecked;
+        _ckbGradient.CheckedState = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Gradient) ? CheckState.Checked : CheckState.UnChecked;
     }
 
     private void BorderEditor_Initialized (object sender, EventArgs e)
@@ -51,13 +51,13 @@ public class BorderEditor : AdornmentEditor
             X = 0,
             Y = Pos.Bottom (_rbBorderStyle),
 
-            State = CheckState.Checked,
+            CheckedState = CheckState.Checked,
             SuperViewRendersLineCanvas = true,
             Text = "Title",
             Enabled = AdornmentToEdit is { }
         };
 
-        _ckbTitle.Toggle += OnCkbTitleOnToggle;
+        _ckbTitle.CheckedStateChanging += OnCkbTitleOnToggle;
         Add (_ckbTitle);
 
         _ckbGradient = new ()
@@ -65,13 +65,13 @@ public class BorderEditor : AdornmentEditor
             X = 0,
             Y = Pos.Bottom (_ckbTitle),
 
-            State = CheckState.Checked,
+            CheckedState = CheckState.Checked,
             SuperViewRendersLineCanvas = true,
             Text = "Gradient",
             Enabled = AdornmentToEdit is { }
         };
 
-        _ckbGradient.Toggle += OnCkbGradientOnToggle;
+        _ckbGradient.CheckedStateChanging += OnCkbGradientOnToggle;
         Add (_ckbGradient);
 
         return;

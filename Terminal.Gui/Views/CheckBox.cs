@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 public class CheckBox : View
 {
     private bool _allowNone;
-    private CheckState _checked = CheckState.UnChecked;
+    private CheckState _checkedState = CheckState.UnChecked;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/>.
@@ -18,8 +18,8 @@ public class CheckBox : View
         CanFocus = true;
 
         // Things this view knows how to do
-        AddCommand (Command.Accept, OnToggle);
-        AddCommand (Command.HotKey, OnToggle);
+        AddCommand (Command.Accept, OnCheckedStateChanging);
+        AddCommand (Command.HotKey, OnCheckedStateChanging);
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Space, Command.Accept);
@@ -32,7 +32,7 @@ public class CheckBox : View
 
     private void CheckBox_MouseClick (object? sender, MouseEventEventArgs e)
     {
-        e.Handled = OnToggle () == true;
+        e.Handled = OnCheckedStateChanging () == true;
     }
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
@@ -56,7 +56,7 @@ public class CheckBox : View
     }
 
     /// <summary>
-    ///     If <see langword="true"/> allows <see cref="State"/> to be <see cref="CheckState.None"/>.
+    ///     If <see langword="true"/> allows <see cref="CheckedState"/> to be <see cref="CheckState.None"/>.
     /// </summary>
     public bool AllowCheckStateNone
     {
@@ -69,9 +69,9 @@ public class CheckBox : View
             }
             _allowNone = value;
 
-            if (State == CheckState.None)
+            if (CheckedState == CheckState.None)
             {
-                State = CheckState.UnChecked;
+                CheckedState = CheckState.UnChecked;
             }
         }
     }
@@ -93,35 +93,35 @@ public class CheckBox : View
     ///        will display the <c>ConfigurationManager.Glyphs.CheckStateChecked</c> character (☑).
     ///     </para>
     /// </remarks>
-    public CheckState State
+    public CheckState CheckedState
     {
-        get => _checked;
+        get => _checkedState;
         set
         {
-            if (_checked == value || (value is CheckState.None && !AllowCheckStateNone))
+            if (_checkedState == value || (value is CheckState.None && !AllowCheckStateNone))
             {
                 return;
             }
 
-            _checked = value;
+            _checkedState = value;
             UpdateTextFormatterText ();
             OnResizeNeeded ();
         }
     }
 
-    /// <summary>Called when the <see cref="State"/> property changes. Invokes the cancelable <see cref="Toggle"/> event.</summary>
+    /// <summary>Called when the <see cref="CheckedState"/> property changes. Invokes the cancelable <see cref="CheckedStateChanging"/> event.</summary>
     /// <remarks>
     /// </remarks>
-    /// <returns>If <see langword="true"/> the <see cref="Toggle"/> event was canceled.</returns>
+    /// <returns>If <see langword="true"/> the <see cref="CheckedStateChanging"/> event was canceled.</returns>
     /// <remarks>
     ///     Toggling cycles through the states <see cref="CheckState.None"/>, <see cref="CheckState.Checked"/>, and <see cref="CheckState.UnChecked"/>.
     /// </remarks>
-    public bool? OnToggle ()
+    public bool? OnCheckedStateChanging ()
     {
-        CheckState oldValue = State;
-        CancelEventArgs<CheckState> e = new (ref _checked, ref oldValue);
+        CheckState oldValue = CheckedState;
+        CancelEventArgs<CheckState> e = new (ref _checkedState, ref oldValue);
 
-        switch (State)
+        switch (CheckedState)
         {
             case CheckState.None:
                 e.NewValue = CheckState.Checked;
@@ -144,7 +144,7 @@ public class CheckBox : View
                 break;
         }
 
-        Toggle?.Invoke (this, e);
+        CheckedStateChanging?.Invoke (this, e);
         if (e.Cancel)
         {
             return e.Cancel;
@@ -156,7 +156,7 @@ public class CheckBox : View
             return true;
         }
 
-        State = e.NewValue;
+        CheckedState = e.NewValue;
 
         return true;
     }
@@ -167,7 +167,7 @@ public class CheckBox : View
     ///    This event can be cancelled. If cancelled, the <see cref="CheckBox"/> will not change its state.
     /// </para>
     /// </remarks>
-    public event EventHandler<CancelEventArgs<CheckState>>? Toggle;
+    public event EventHandler<CancelEventArgs<CheckState>>? CheckedStateChanging;
 
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
@@ -190,7 +190,7 @@ public class CheckBox : View
 
     private Rune GetCheckedGlyph ()
     {
-        return State switch
+        return CheckedState switch
         {
             CheckState.Checked => Glyphs.CheckStateChecked,
             CheckState.UnChecked => Glyphs.CheckStateUnChecked,

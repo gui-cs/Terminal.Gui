@@ -190,7 +190,7 @@ public class MessageBoxes : Scenario
 
         var ckbWrapMessage = new CheckBox
         {
-            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", State = CheckState.Checked
+            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", CheckedState = CheckState.Checked
         };
         frame.Add (ckbWrapMessage);
 
@@ -241,7 +241,7 @@ public class MessageBoxes : Scenario
                                                                              titleEdit.Text,
                                                                              messageEdit.Text,
                                                                              defaultButton,
-                                                                             ckbWrapMessage.State == CheckState.Checked,
+                                                                             ckbWrapMessage.CheckedState == CheckState.Checked,
                                                                              btns.ToArray ()
                                                                             )}";
                                                }
@@ -254,7 +254,7 @@ public class MessageBoxes : Scenario
                                                                                   titleEdit.Text,
                                                                                   messageEdit.Text,
                                                                                   defaultButton,
-                                                                                  ckbWrapMessage.State == CheckState.Checked,
+                                                                                  ckbWrapMessage.CheckedState == CheckState.Checked,
                                                                                   btns.ToArray ()
                                                                                  )}";
                                                }
