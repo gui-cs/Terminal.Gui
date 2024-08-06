@@ -33,25 +33,25 @@ public class FileDialogExamples : Scenario
         var x = 1;
         var win = new Window { Title = GetQuitKeyAndName () };
 
-        _cbMustExist = new CheckBox { State = CheckState.Checked, Y = y++, X = x, Text = "Must Exist" };
+        _cbMustExist = new CheckBox { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Must Exist" };
         win.Add (_cbMustExist);
 
-        _cbUseColors = new CheckBox { State = FileDialogStyle.DefaultUseColors ? CheckState.Checked : CheckState.UnChecked, Y = y++, X = x, Text = "Use Colors" };
+        _cbUseColors = new CheckBox { CheckedState = FileDialogStyle.DefaultUseColors ? CheckState.Checked : CheckState.UnChecked, Y = y++, X = x, Text = "Use Colors" };
         win.Add (_cbUseColors);
 
-        _cbCaseSensitive = new CheckBox { State = CheckState.UnChecked, Y = y++, X = x, Text = "Case Sensitive Search" };
+        _cbCaseSensitive = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Case Sensitive Search" };
         win.Add (_cbCaseSensitive);
 
-        _cbAllowMultipleSelection = new CheckBox { State = CheckState.UnChecked, Y = y++, X = x, Text = "Multiple" };
+        _cbAllowMultipleSelection = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Multiple" };
         win.Add (_cbAllowMultipleSelection);
 
-        _cbShowTreeBranchLines = new CheckBox { State = CheckState.Checked, Y = y++, X = x, Text = "Tree Branch Lines" };
+        _cbShowTreeBranchLines = new CheckBox { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Tree Branch Lines" };
         win.Add (_cbShowTreeBranchLines);
 
-        _cbAlwaysTableShowHeaders = new CheckBox { State = CheckState.Checked, Y = y++, X = x, Text = "Always Show Headers" };
+        _cbAlwaysTableShowHeaders = new CheckBox { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Always Show Headers" };
         win.Add (_cbAlwaysTableShowHeaders);
 
-        _cbDrivesOnlyInTree = new CheckBox { State = CheckState.UnChecked, Y = y++, X = x, Text = "Only Show Drives" };
+        _cbDrivesOnlyInTree = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Only Show Drives" };
         win.Add (_cbDrivesOnlyInTree);
 
         y = 0;
@@ -151,8 +151,8 @@ public class FileDialogExamples : Scenario
             OpenMode = Enum.Parse<OpenMode> (
                                              _rgOpenMode.RadioLabels [_rgOpenMode.SelectedItem]
                                             ),
-            MustExist = _cbMustExist.State == CheckState.Checked,
-            AllowsMultipleSelection = _cbAllowMultipleSelection.State == CheckState.Checked
+            MustExist = _cbMustExist.CheckedState == CheckState.Checked,
+            AllowsMultipleSelection = _cbAllowMultipleSelection.CheckedState == CheckState.Checked
         };
 
         fd.Style.OkButtonText = _rgCaption.RadioLabels [_rgCaption.SelectedItem];
@@ -166,19 +166,19 @@ public class FileDialogExamples : Scenario
         fd.Style.IconProvider.UseUnicodeCharacters = _rgIcons.SelectedItem == 1;
         fd.Style.IconProvider.UseNerdIcons = _rgIcons.SelectedItem == 2;
 
-        if (_cbCaseSensitive.State == CheckState.Checked)
+        if (_cbCaseSensitive.CheckedState == CheckState.Checked)
         {
             fd.SearchMatcher = new CaseSensitiveSearchMatcher ();
         }
 
-        fd.Style.UseColors = _cbUseColors.State == CheckState.Checked;
+        fd.Style.UseColors = _cbUseColors.CheckedState == CheckState.Checked;
 
-        fd.Style.TreeStyle.ShowBranchLines = _cbShowTreeBranchLines.State == CheckState.Checked;
-        fd.Style.TableStyle.AlwaysShowHeaders = _cbAlwaysTableShowHeaders.State == CheckState.Checked;
+        fd.Style.TreeStyle.ShowBranchLines = _cbShowTreeBranchLines.CheckedState == CheckState.Checked;
+        fd.Style.TableStyle.AlwaysShowHeaders = _cbAlwaysTableShowHeaders.CheckedState == CheckState.Checked;
 
         IDirectoryInfoFactory dirInfoFactory = new FileSystem ().DirectoryInfo;
 
-        if (_cbDrivesOnlyInTree.State == CheckState.Checked)
+        if (_cbDrivesOnlyInTree.CheckedState == CheckState.Checked)
         {
             fd.Style.TreeRootGetter = () => { return Environment.GetLogicalDrives ().ToDictionary (dirInfoFactory.New, k => k); };
         }
@@ -203,7 +203,7 @@ public class FileDialogExamples : Scenario
             fd.Style.CancelButtonText = _tbCancelButton.Text;
         }
 
-        if (_cbFlipButtonOrder.State == CheckState.Checked)
+        if (_cbFlipButtonOrder.CheckedState == CheckState.Checked)
         {
             fd.Style.FlipOkCancelButtonLayoutOrder = true;
         }
@@ -225,7 +225,7 @@ public class FileDialogExamples : Scenario
                               "Ok"
                              );
         }
-        else if (_cbAllowMultipleSelection.State == CheckState.Checked)
+        else if (_cbAllowMultipleSelection.CheckedState == CheckState.Checked)
         {
             MessageBox.Query (
                               "Chosen!",

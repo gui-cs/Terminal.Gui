@@ -383,9 +383,9 @@ public class Buttons : Scenario
             X = Pos.Right (repeatButton) + 1,
             Y = Pos.Top (repeatButton),
             Title = "Enabled",
-            State = CheckState.Checked
+            CheckedState = CheckState.Checked
         };
-        enableCB.Toggle += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
+        enableCB.CheckedStateChanging += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
         main.Add (label, repeatButton, enableCB);
 
         var decNumericUpDown = new NumericUpDown<int>

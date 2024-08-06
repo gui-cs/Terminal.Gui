@@ -236,7 +236,7 @@ public class Sliders : Scenario
             Y = Pos.Bottom (optionsSlider)
         };
 
-        dimAutoUsesMin.Toggle += (sender, e) =>
+        dimAutoUsesMin.CheckedStateChanging += (sender, e) =>
                                   {
                                       foreach (Slider s in app.Subviews.OfType<Slider> ())
                                       {

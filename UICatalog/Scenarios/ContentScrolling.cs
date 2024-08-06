@@ -135,8 +135,8 @@ public class ContentScrolling : Scenario
             Y = 0,
             CanFocus = false
         };
-        cbAllowNegativeX.State = view.ViewportSettings.HasFlag(ViewportSettings.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
-        cbAllowNegativeX.Toggle += AllowNegativeX_Toggle;
+        cbAllowNegativeX.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
+        cbAllowNegativeX.CheckedStateChanging += AllowNegativeX_Toggle;
 
         void AllowNegativeX_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
@@ -159,8 +159,8 @@ public class ContentScrolling : Scenario
             Y = 0,
             CanFocus = false
         };
-        cbAllowNegativeY.State = view.ViewportSettings.HasFlag(ViewportSettings.AllowNegativeY) ? CheckState.Checked : CheckState.UnChecked;
-        cbAllowNegativeY.Toggle += AllowNegativeY_Toggle;
+        cbAllowNegativeY.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.AllowNegativeY) ? CheckState.Checked : CheckState.UnChecked;
+        cbAllowNegativeY.CheckedStateChanging += AllowNegativeY_Toggle;
 
         void AllowNegativeY_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
@@ -182,8 +182,8 @@ public class ContentScrolling : Scenario
             Y = Pos.Bottom (cbAllowNegativeX),
             CanFocus = false
         };
-        cbAllowXGreaterThanContentWidth.State = view.ViewportSettings.HasFlag(ViewportSettings.AllowXGreaterThanContentWidth) ? CheckState.Checked : CheckState.UnChecked;
-        cbAllowXGreaterThanContentWidth.Toggle += AllowXGreaterThanContentWidth_Toggle;
+        cbAllowXGreaterThanContentWidth.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.AllowXGreaterThanContentWidth) ? CheckState.Checked : CheckState.UnChecked;
+        cbAllowXGreaterThanContentWidth.CheckedStateChanging += AllowXGreaterThanContentWidth_Toggle;
 
         void AllowXGreaterThanContentWidth_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
@@ -206,8 +206,8 @@ public class ContentScrolling : Scenario
             Y = Pos.Bottom (cbAllowNegativeX),
             CanFocus = false
         };
-        cbAllowYGreaterThanContentHeight.State = view.ViewportSettings.HasFlag(ViewportSettings.AllowYGreaterThanContentHeight) ? CheckState.Checked : CheckState.UnChecked;
-        cbAllowYGreaterThanContentHeight.Toggle += AllowYGreaterThanContentHeight_Toggle;
+        cbAllowYGreaterThanContentHeight.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.AllowYGreaterThanContentHeight) ? CheckState.Checked : CheckState.UnChecked;
+        cbAllowYGreaterThanContentHeight.CheckedStateChanging += AllowYGreaterThanContentHeight_Toggle;
 
         void AllowYGreaterThanContentHeight_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
@@ -284,8 +284,8 @@ public class ContentScrolling : Scenario
             Y = Pos.Top (labelContentSize),
             CanFocus = false
         };
-        cbClearOnlyVisible.State = view.ViewportSettings.HasFlag(ViewportSettings.ClearContentOnly) ? CheckState.Checked : CheckState.UnChecked;
-        cbClearOnlyVisible.Toggle += ClearVisibleContentOnly_Toggle;
+        cbClearOnlyVisible.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.ClearContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+        cbClearOnlyVisible.CheckedStateChanging += ClearVisibleContentOnly_Toggle;
 
         void ClearVisibleContentOnly_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
@@ -306,8 +306,8 @@ public class ContentScrolling : Scenario
             Y = Pos.Top (labelContentSize),
             CanFocus = false
         };
-        cbDoNotClipContent.State = view.ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly) ? CheckState.Checked : CheckState.UnChecked;
-        cbDoNotClipContent.Toggle += ClipVisibleContentOnly_Toggle;
+        cbDoNotClipContent.CheckedState = view.ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+        cbDoNotClipContent.CheckedStateChanging += ClipVisibleContentOnly_Toggle;
 
         void ClipVisibleContentOnly_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
