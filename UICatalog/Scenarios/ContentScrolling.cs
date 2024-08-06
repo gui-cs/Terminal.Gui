@@ -229,7 +229,7 @@ public class ContentScrolling : Scenario
             Y = Pos.Bottom (cbAllowYGreaterThanContentHeight)
         };
 
-        Buttons.NumericUpDown<int> contentSizeWidth = new Buttons.NumericUpDown<int>
+        NumericUpDown<int> contentSizeWidth = new NumericUpDown<int>
         {
             Value = view.GetContentSize ().Width,
             X = Pos.Right (labelContentSize) + 1,
@@ -256,7 +256,7 @@ public class ContentScrolling : Scenario
             Y = Pos.Top (labelContentSize)
         };
 
-        Buttons.NumericUpDown<int> contentSizeHeight = new Buttons.NumericUpDown<int>
+        NumericUpDown<int> contentSizeHeight = new NumericUpDown<int>
         {
             Value = view.GetContentSize ().Height,
             X = Pos.Right (labelComma) + 1,

@@ -236,7 +236,7 @@ public sealed class PosAlignDemo : Scenario
             }
         ];
 
-        Buttons.NumericUpDown<int> addedViewsUpDown = new()
+        NumericUpDown<int> addedViewsUpDown = new()
         {
             Width = 9,
             Title = "Added",
