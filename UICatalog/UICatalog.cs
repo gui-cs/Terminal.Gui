@@ -492,14 +492,14 @@ public class UICatalogApp
                     CommandView = new CheckBox
                     {
                         Title = "16 color mode",
-                        State = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+                        CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
                         CanFocus = false
                     },
                     HelpText = "",
                     Key = Key.F6
                 };
 
-                ((CheckBox)ShForce16Colors.CommandView).Toggle += (sender, args) =>
+                ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
                                                                   {
                                                                       Application.Force16Colors = args.NewValue == CheckState.Checked;
                                                                       MiForce16Colors!.Checked = Application.Force16Colors;
@@ -1027,7 +1027,7 @@ public class UICatalogApp
                                       {
                                           MiForce16Colors.Checked = Application.Force16Colors = (bool)!MiForce16Colors.Checked!;
 
-                                          ((CheckBox)ShForce16Colors!.CommandView!).State =
+                                          ((CheckBox)ShForce16Colors!.CommandView!).CheckedState =
                                               Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                                           Application.Refresh ();
                                       };

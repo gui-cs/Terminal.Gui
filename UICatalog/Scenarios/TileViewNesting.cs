@@ -35,16 +35,16 @@ public class TileViewNesting : Scenario
         _textField.TextChanged += (s, e) => SetupTileView ();
 
         _cbHorizontal = new() { X = Pos.Right (_textField) + 1, Text = "Horizontal" };
-        _cbHorizontal.Toggle += (s, e) => SetupTileView ();
+        _cbHorizontal.CheckedStateChanging += (s, e) => SetupTileView ();
 
         _cbBorder = new() { X = Pos.Right (_cbHorizontal) + 1, Text = "Border" };
-        _cbBorder.Toggle += (s, e) => SetupTileView ();
+        _cbBorder.CheckedStateChanging += (s, e) => SetupTileView ();
 
         _cbTitles = new() { X = Pos.Right (_cbBorder) + 1, Text = "Titles" };
-        _cbTitles.Toggle += (s, e) => SetupTileView ();
+        _cbTitles.CheckedStateChanging += (s, e) => SetupTileView ();
 
         _cbUseLabels = new() { X = Pos.Right (_cbTitles) + 1, Text = "Use Labels" };
-        _cbUseLabels.Toggle += (s, e) => SetupTileView ();
+        _cbUseLabels.CheckedStateChanging += (s, e) => SetupTileView ();
 
         _workArea = new() { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -101,7 +101,7 @@ public class TileViewNesting : Scenario
         }
     }
 
-    private View CreateContentControl (int number) { return _cbUseLabels.State == CheckState.Checked ? CreateLabelView (number) : CreateTextView (number); }
+    private View CreateContentControl (int number) { return _cbUseLabels.CheckedState == CheckState.Checked ? CreateLabelView (number) : CreateTextView (number); }
 
     private View CreateLabelView (int number)
     {
@@ -136,8 +136,8 @@ public class TileViewNesting : Scenario
             Orientation = orientation
         };
 
-        toReturn.Tiles.ElementAt (0).Title = _cbTitles.State == CheckState.Checked ? $"View {titleNumber}" : string.Empty;
-        toReturn.Tiles.ElementAt (1).Title = _cbTitles.State == CheckState.Checked ? $"View {titleNumber + 1}" : string.Empty;
+        toReturn.Tiles.ElementAt (0).Title = _cbTitles.CheckedState == CheckState.Checked ? $"View {titleNumber}" : string.Empty;
+        toReturn.Tiles.ElementAt (1).Title = _cbTitles.CheckedState == CheckState.Checked ? $"View {titleNumber + 1}" : string.Empty;
 
         return toReturn;
     }
@@ -158,9 +158,9 @@ public class TileViewNesting : Scenario
     {
         int numberOfViews = GetNumberOfViews ();
 
-        CheckState titles = _cbTitles.State;
-        CheckState border = _cbBorder.State;
-        CheckState startHorizontal = _cbHorizontal.State;
+        CheckState titles = _cbTitles.CheckedState;
+        CheckState border = _cbBorder.CheckedState;
+        CheckState startHorizontal = _cbHorizontal.CheckedState;
 
         foreach (View sub in _workArea.Subviews)
         {
@@ -177,9 +177,9 @@ public class TileViewNesting : Scenario
         TileView root = CreateTileView (1, startHorizontal == CheckState.Checked ? Orientation.Horizontal : Orientation.Vertical);
 
         root.Tiles.ElementAt (0).ContentView.Add (CreateContentControl (1));
-        root.Tiles.ElementAt (0).Title = _cbTitles.State == CheckState.Checked ? "View 1" : string.Empty;
+        root.Tiles.ElementAt (0).Title = _cbTitles.CheckedState == CheckState.Checked ? "View 1" : string.Empty;
         root.Tiles.ElementAt (1).ContentView.Add (CreateContentControl (2));
-        root.Tiles.ElementAt (1).Title = _cbTitles.State == CheckState.Checked ? "View 2" : string.Empty;
+        root.Tiles.ElementAt (1).Title = _cbTitles.CheckedState == CheckState.Checked ? "View 2" : string.Empty;
 
         root.LineStyle = border  == CheckState.Checked? LineStyle.Rounded : LineStyle.None;
 
@@ -225,7 +225,7 @@ public class TileViewNesting : Scenario
 
         // During splitting the old Title will have been migrated to View1 so we only need
         // to set the Title on View2 (the one that gets our new TextView)
-        newView.Tiles.ElementAt (1).Title = _cbTitles.State == CheckState.Checked ? $"View {_viewsCreated}" : string.Empty;
+        newView.Tiles.ElementAt (1).Title = _cbTitles.CheckedState == CheckState.Checked ? $"View {_viewsCreated}" : string.Empty;
 
         // Flip orientation
         newView.Orientation = to.Orientation == Orientation.Vertical
