@@ -1,8 +1,11 @@
-﻿namespace Terminal.Gui;
+﻿using System.Text.Json.Serialization;
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Defines the style of shadow to be drawn on the right and bottom sides of the <see cref="View"/>.
 /// </summary>
+[JsonConverter (typeof (JsonStringEnumConverter<ShadowStyle>))]
 public enum ShadowStyle
 {
     /// <summary>

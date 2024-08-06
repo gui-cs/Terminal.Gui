@@ -7,17 +7,17 @@ namespace Terminal.Gui;
 /// </summary>
 [JsonSerializable (typeof (Attribute))]
 [JsonSerializable (typeof (Color))]
-[JsonSerializable (typeof (ThemeScope))]
-[JsonSerializable (typeof (ColorScheme))]
-[JsonSerializable (typeof (SettingsScope))]
 [JsonSerializable (typeof (AppScope))]
+[JsonSerializable (typeof (SettingsScope))]
 [JsonSerializable (typeof (Key))]
 [JsonSerializable (typeof (GlyphDefinitions))]
-[JsonSerializable (typeof (ConfigProperty))]
+[JsonSerializable (typeof (Alignment))]
+[JsonSerializable (typeof (AlignmentModes))]
+[JsonSerializable (typeof (LineStyle))]
 [JsonSerializable (typeof (ShadowStyle))]
-[JsonSerializable (typeof (string))]
-[JsonSerializable (typeof (bool))]
 [JsonSerializable (typeof (bool?))]
 [JsonSerializable (typeof (Dictionary<ColorName, string>))]
+[JsonSerializable (typeof (Dictionary<string, ThemeScope>))]
+[JsonSerializable (typeof (Dictionary<string, ColorScheme>))]
 internal partial class SourceGenerationContext : JsonSerializerContext
 { }
