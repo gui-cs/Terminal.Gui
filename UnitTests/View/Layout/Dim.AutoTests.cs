@@ -8,29 +8,31 @@ public partial class DimAutoTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
-    private class DimAutoTestView : View
+    [SetupFakeDriver]
+    [Fact]
+    public void Change_To_Non_Auto_Resets_ContentSize ()
     {
-        public DimAutoTestView ()
+        View view = new ()
         {
-            ValidatePosDim = true;
-            Width = Auto ();
-            Height = Auto ();
-        }
+            Width = Auto (),
+            Height = Auto (),
+            Text = "01234"
+        };
+        view.SetRelativeLayout (new (100, 100));
+        Assert.Equal (new (0, 0, 5, 1), view.Frame);
+        Assert.Equal (new (5, 1), view.GetContentSize ());
 
-        public DimAutoTestView (Dim width, Dim height)
-        {
-            ValidatePosDim = true;
-            Width = width;
-            Height = height;
-        }
+        // Change text to a longer string
+        view.Text = "0123456789";
 
-        public DimAutoTestView (string text, Dim width, Dim height)
-        {
-            ValidatePosDim = true;
-            Text = text;
-            Width = width;
-            Height = height;
-        }
+        Assert.Equal (new (0, 0, 10, 1), view.Frame);
+        Assert.Equal (new (10, 1), view.GetContentSize ());
+
+        // If ContentSize was reset, these should cause it to update
+        view.Width = 5;
+        view.Height = 1;
+
+        Assert.Equal (new (5, 1), view.GetContentSize ());
     }
 
     [Theory]
@@ -72,6 +74,46 @@ public partial class DimAutoTests (ITestOutputHelper output)
         superView.EndInit ();
         superView.SetRelativeLayout (new (10, 10));
         Assert.Equal (new (0, 0, 10, expectedHeight), superView.Frame);
+    }
+
+    [Theory]
+    [CombinatorialData]
+    public void HotKey_TextFormatter_Height_Correct ([CombinatorialValues ("1234", "_1234", "1_234", "____")] string text)
+    {
+        View view = new ()
+        {
+            HotKeySpecifier = (Rune)'_',
+            Text = text,
+            Width = Auto (),
+            Height = 1
+        };
+        Assert.Equal (4, view.TextFormatter.ConstrainToWidth);
+        Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
+
+        view = new ()
+        {
+            HotKeySpecifier = (Rune)'_',
+            TextDirection = TextDirection.TopBottom_LeftRight,
+            Text = text,
+            Width = 1,
+            Height = Auto ()
+        };
+        Assert.Equal (1, view.TextFormatter.ConstrainToWidth);
+        Assert.Equal (4, view.TextFormatter.ConstrainToHeight);
+    }
+
+    [Theory]
+    [CombinatorialData]
+    public void HotKey_TextFormatter_Width_Correct ([CombinatorialValues ("1234", "_1234", "1_234", "____")] string text)
+    {
+        View view = new ()
+        {
+            Text = text,
+            Height = 1,
+            Width = Auto ()
+        };
+        Assert.Equal (4, view.TextFormatter.ConstrainToWidth);
+        Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
     }
 
     [Fact]
@@ -156,6 +198,89 @@ public partial class DimAutoTests (ITestOutputHelper output)
         superView.EndInit ();
         superView.SetRelativeLayout (new (10, 10));
         Assert.Equal (new (0, 0, expectedWidth, expectedHeight), superView.Frame);
+    }
+
+    [Fact]
+    public void TestEquality ()
+    {
+        var a = new DimAuto
+        {
+            MaximumContentDim = null,
+            MinimumContentDim = 1,
+            Style = DimAutoStyle.Auto
+        };
+
+        var b = new DimAuto
+        {
+            MaximumContentDim = null,
+            MinimumContentDim = 1,
+            Style = DimAutoStyle.Auto
+        };
+        Assert.True (a.Equals (b));
+        Assert.True (a.GetHashCode () == b.GetHashCode ());
+    }
+
+    [Fact]
+    public void TestEquality_Simple ()
+    {
+        Dim a = Auto ();
+        Dim b = Auto ();
+        Assert.True (a.Equals (b));
+        Assert.True (a.GetHashCode () == b.GetHashCode ());
+    }
+
+    [Fact]
+    public void TextFormatter_Settings_Change_View_Size ()
+    {
+        View view = new ()
+        {
+            Text = "_1234",
+            Width = Auto ()
+        };
+        Assert.Equal (new (4, 0), view.Frame.Size);
+
+        view.Height = 1;
+        view.SetRelativeLayout (Application.Screen.Size);
+        Assert.Equal (new (4, 1), view.Frame.Size);
+        Size lastSize = view.Frame.Size;
+
+        view.TextAlignment = Alignment.Fill;
+        Assert.Equal (lastSize, view.Frame.Size);
+
+        view = new ()
+        {
+            Text = "_1234",
+            Width = Auto (),
+            Height = 1
+        };
+        view.SetRelativeLayout (Application.Screen.Size);
+
+        lastSize = view.Frame.Size;
+        view.VerticalTextAlignment = Alignment.Center;
+        Assert.Equal (lastSize, view.Frame.Size);
+
+        view = new ()
+        {
+            Text = "_1234",
+            Width = Auto (),
+            Height = 1
+        };
+        view.SetRelativeLayout (Application.Screen.Size);
+        lastSize = view.Frame.Size;
+        view.HotKeySpecifier = (Rune)'*';
+        view.SetRelativeLayout (Application.Screen.Size);
+        Assert.NotEqual (lastSize, view.Frame.Size);
+
+        view = new ()
+        {
+            Text = "_1234",
+            Width = Auto (),
+            Height = 1
+        };
+        view.SetRelativeLayout (Application.Screen.Size);
+        lastSize = view.Frame.Size;
+        view.Text = "*ABCD";
+        Assert.NotEqual (lastSize, view.Frame.Size);
     }
 
     // Test validation
@@ -419,46 +544,6 @@ public partial class DimAutoTests (ITestOutputHelper output)
     [InlineData (1, 10, 10)]
     [InlineData (9, 10, 10)]
     [InlineData (10, 10, 10)]
-    public void Width_Auto_Text_Does_Not_Constrain_To_SuperView (int subX, int textLen, int expectedSubWidth)
-    {
-        var superView = new View
-        {
-            X = 0,
-            Y = 0,
-            Width = 10,
-            Height = 1,
-            ValidatePosDim = true
-        };
-
-        var subView = new View
-        {
-            Text = new ('*', textLen),
-            X = subX,
-            Y = 0,
-            Width = Auto (DimAutoStyle.Text),
-            Height = 1,
-            ValidatePosDim = true
-        };
-
-        superView.Add (subView);
-
-        superView.BeginInit ();
-        superView.EndInit ();
-        superView.SetRelativeLayout (superView.GetContentSize ());
-
-        superView.LayoutSubviews ();
-        Assert.Equal (expectedSubWidth, subView.Frame.Width);
-    }
-
-    [Theory]
-    [InlineData (0, 1, 1)]
-    [InlineData (1, 1, 1)]
-    [InlineData (9, 1, 1)]
-    [InlineData (10, 1, 1)]
-    [InlineData (0, 10, 10)]
-    [InlineData (1, 10, 10)]
-    [InlineData (9, 10, 10)]
-    [InlineData (10, 10, 10)]
     public void Width_Auto_Subviews_Does_Not_Constrain_To_SuperView (int subX, int subSubViewWidth, int expectedSubWidth)
     {
         var superView = new View
@@ -499,31 +584,69 @@ public partial class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (expectedSubWidth, subView.Frame.Width);
     }
 
-    [SetupFakeDriver]
-    [Fact]
-    public void Change_To_Non_Auto_Resets_ContentSize ()
+    [Theory]
+    [InlineData (0, 1, 1)]
+    [InlineData (1, 1, 1)]
+    [InlineData (9, 1, 1)]
+    [InlineData (10, 1, 1)]
+    [InlineData (0, 10, 10)]
+    [InlineData (1, 10, 10)]
+    [InlineData (9, 10, 10)]
+    [InlineData (10, 10, 10)]
+    public void Width_Auto_Text_Does_Not_Constrain_To_SuperView (int subX, int textLen, int expectedSubWidth)
     {
-        View view = new ()
+        var superView = new View
         {
-            Width = Auto (),
-            Height = Auto (),
-            Text = "01234"
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 1,
+            ValidatePosDim = true
         };
-        view.SetRelativeLayout (new (100, 100));
-        Assert.Equal (new (0, 0, 5, 1), view.Frame);
-        Assert.Equal (new (5, 1), view.GetContentSize ());
 
-        // Change text to a longer string
-        view.Text = "0123456789";
+        var subView = new View
+        {
+            Text = new ('*', textLen),
+            X = subX,
+            Y = 0,
+            Width = Auto (DimAutoStyle.Text),
+            Height = 1,
+            ValidatePosDim = true
+        };
 
-        Assert.Equal (new (0, 0, 10, 1), view.Frame);
-        Assert.Equal (new (10, 1), view.GetContentSize ());
+        superView.Add (subView);
 
-        // If ContentSize was reset, these should cause it to update
-        view.Width = 5;
-        view.Height = 1;
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.SetRelativeLayout (superView.GetContentSize ());
 
-        Assert.Equal (new (5, 1), view.GetContentSize ());
+        superView.LayoutSubviews ();
+        Assert.Equal (expectedSubWidth, subView.Frame.Width);
+    }
+
+    private class DimAutoTestView : View
+    {
+        public DimAutoTestView ()
+        {
+            ValidatePosDim = true;
+            Width = Auto ();
+            Height = Auto ();
+        }
+
+        public DimAutoTestView (Dim width, Dim height)
+        {
+            ValidatePosDim = true;
+            Width = width;
+            Height = height;
+        }
+
+        public DimAutoTestView (string text, Dim width, Dim height)
+        {
+            ValidatePosDim = true;
+            Text = text;
+            Width = width;
+            Height = height;
+        }
     }
 
     #region DimAutoStyle.Auto tests
@@ -544,7 +667,6 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
-
     }
 
     [Fact]
@@ -653,7 +775,6 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
-
     }
 
     [Theory]
@@ -665,15 +786,14 @@ public partial class DimAutoTests (ITestOutputHelper output)
     public void DimAutoStyle_Text_Sizes_Correctly_With_Min (string text, int minWidth, int minHeight, int expectedW, int expectedH)
     {
         var view = new View ();
-        view.Width = Auto (DimAutoStyle.Text, minimumContentDim: minWidth);
-        view.Height = Auto (DimAutoStyle.Text, minimumContentDim: minHeight);
+        view.Width = Auto (DimAutoStyle.Text, minWidth);
+        view.Height = Auto (DimAutoStyle.Text, minHeight);
 
         view.Text = text;
 
         view.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
-
     }
 
     [Theory]
@@ -699,7 +819,6 @@ public partial class DimAutoTests (ITestOutputHelper output)
     [InlineData ("01234", 5, 1)]
     [InlineData ("01234ABCDE", 10, 1)]
     [InlineData ("01234\nABCDE", 5, 2)]
-
     public void DimAutoStyle_Text_NoMin_Not_Constrained_By_ContentSize (string text, int expectedW, int expectedH)
     {
         var view = new View ();
@@ -711,7 +830,6 @@ public partial class DimAutoTests (ITestOutputHelper output)
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
 
-
     [Theory]
     [InlineData ("", 0, 0)]
     [InlineData (" ", 1, 1)]
@@ -720,7 +838,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
     [InlineData ("01234\nABCDE", 5, 2)]
     public void DimAutoStyle_Text_NoMin_Not_Constrained_By_SuperView (string text, int expectedW, int expectedH)
     {
-        var superView = new View ()
+        var superView = new View
         {
             Width = 1, Height = 1
         };
@@ -869,101 +987,6 @@ public partial class DimAutoTests (ITestOutputHelper output)
     }
 
     #endregion DimAutoStyle.Content tests
-
-    [Fact]
-    public void TextFormatter_Settings_Change_View_Size ()
-    {
-        View view = new ()
-        {
-            Text = "_1234",
-            Width = Auto ()
-        };
-        Assert.Equal (new (4, 0), view.Frame.Size);
-
-        view.Height = 1;
-        view.SetRelativeLayout (Application.Screen.Size);
-        Assert.Equal (new (4, 1), view.Frame.Size);
-        Size lastSize = view.Frame.Size;
-
-        view.TextAlignment = Alignment.Fill;
-        Assert.Equal (lastSize, view.Frame.Size);
-
-        view = new ()
-        {
-            Text = "_1234",
-            Width = Auto (),
-            Height = 1
-        };
-        view.SetRelativeLayout (Application.Screen.Size);
-
-        lastSize = view.Frame.Size;
-        view.VerticalTextAlignment = Alignment.Center;
-        Assert.Equal (lastSize, view.Frame.Size);
-
-        view = new ()
-        {
-            Text = "_1234",
-            Width = Auto (),
-            Height = 1
-        };
-        view.SetRelativeLayout (Application.Screen.Size);
-        lastSize = view.Frame.Size;
-        view.HotKeySpecifier = (Rune)'*';
-        view.SetRelativeLayout (Application.Screen.Size);
-        Assert.NotEqual (lastSize, view.Frame.Size);
-
-        view = new ()
-        {
-            Text = "_1234",
-            Width = Auto (),
-            Height = 1
-        };
-        view.SetRelativeLayout (Application.Screen.Size);
-        lastSize = view.Frame.Size;
-        view.Text = "*ABCD";
-        Assert.NotEqual (lastSize, view.Frame.Size);
-    }
-
-
-    [Theory]
-    [CombinatorialData]
-    public void HotKey_TextFormatter_Width_Correct ([CombinatorialValues ("1234", "_1234", "1_234", "____")] string text)
-    {
-        View view = new ()
-        {
-            Text = text,
-            Height = 1,
-            Width = Auto ()
-        };
-        Assert.Equal (4, view.TextFormatter.ConstrainToWidth);
-        Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
-    }
-
-    [Theory]
-    [CombinatorialData]
-    public void HotKey_TextFormatter_Height_Correct ([CombinatorialValues ("1234", "_1234", "1_234", "____")] string text)
-    {
-        View view = new ()
-        {
-            HotKeySpecifier = (Rune)'_',
-            Text = text,
-            Width = Auto (),
-            Height = 1
-        };
-        Assert.Equal (4, view.TextFormatter.ConstrainToWidth);
-        Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
-
-        view = new ()
-        {
-            HotKeySpecifier = (Rune)'_',
-            TextDirection = TextDirection.TopBottom_LeftRight,
-            Text = text,
-            Width = 1,
-            Height = Auto ()
-        };
-        Assert.Equal (1, view.TextFormatter.ConstrainToWidth);
-        Assert.Equal (4, view.TextFormatter.ConstrainToHeight);
-    }
 
     // Test variations of Frame
 }
