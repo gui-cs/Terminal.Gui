@@ -34,24 +34,24 @@ public class ListViewWithSelection : Scenario
 
         _customRenderCB = new CheckBox { X = 0, Y = 0, Text = "Use custom rendering" };
         _appWindow.Add (_customRenderCB);
-        _customRenderCB.Toggle += _customRenderCB_Toggle;
+        _customRenderCB.CheckedStateChanging += _customRenderCB_Toggle;
 
         _allowMarkingCB = new CheckBox
         {
             X = Pos.Right (_customRenderCB) + 1, Y = 0, Text = "Allow Marking", AllowCheckStateNone = false
         };
         _appWindow.Add (_allowMarkingCB);
-        _allowMarkingCB.Toggle += AllowMarkingCB_Toggle;
+        _allowMarkingCB.CheckedStateChanging += AllowMarkingCB_Toggle;
 
         _allowMultipleCB = new CheckBox
         {
             X = Pos.Right (_allowMarkingCB) + 1,
             Y = 0,
-            Visible = _allowMarkingCB.State == CheckState.Checked,
+            Visible = _allowMarkingCB.CheckedState == CheckState.Checked,
             Text = "Allow Multi-Select"
         };
         _appWindow.Add (_allowMultipleCB);
-        _allowMultipleCB.Toggle += AllowMultipleCB_Toggle;
+        _allowMultipleCB.CheckedStateChanging += AllowMultipleCB_Toggle;
 
         _listView = new ListView
         {
@@ -108,9 +108,9 @@ public class ListViewWithSelection : Scenario
 
         var keepCheckBox = new CheckBox
         {
-            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, State = scrollBar.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
+            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, CheckedState = scrollBar.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
-        keepCheckBox.Toggle += (s, e) => scrollBar.KeepContentAlwaysInViewport = e.NewValue == CheckState.Checked;
+        keepCheckBox.CheckedStateChanging += (s, e) => scrollBar.KeepContentAlwaysInViewport = e.NewValue == CheckState.Checked;
         _appWindow.Add (keepCheckBox);
 
         Application.Run (_appWindow);
@@ -205,7 +205,7 @@ public class ListViewWithSelection : Scenario
 
         /// <inheritdoc />
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-        public int Count => Scenarios != null ? Scenarios.Count : 0;
+        public int Count => Scenarios?.Count ?? 0;
         public int Length { get; private set; }
         public bool SuspendCollectionChangedEvent { get => throw new System.NotImplementedException (); set => throw new System.NotImplementedException (); }
 

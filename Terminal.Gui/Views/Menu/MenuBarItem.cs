@@ -103,6 +103,7 @@ public class MenuBarItem : MenuItem
             if (menuItem.Shortcut != KeyCode.Null)
             {
                 KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuItem);
+                menuBar.KeyBindings.Remove (menuItem.Shortcut);
                 menuBar.KeyBindings.Add (menuItem.Shortcut, keyBinding);
             }
 

@@ -199,7 +199,7 @@ public class LineCanvas : IDisposable
     }
 
     // TODO: Unless there's an obvious use case for this API we should delete it in favor of the
-    // simpler version that doensn't take an area.
+    // simpler version that doesn't take an area.
     /// <summary>
     ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
     ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate
@@ -336,7 +336,7 @@ public class LineCanvas : IDisposable
         return Fill != null ? Fill.GetAttribute (intersects [0]!.Point) : intersects [0]!.Line.Attribute;
     }
 
-    private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
+    private Cell? GetCellForIntersects (ConsoleDriver? driver, IntersectionDefinition? [] intersects)
     {
         if (!intersects.Any ())
         {
@@ -356,7 +356,7 @@ public class LineCanvas : IDisposable
         return cell;
     }
 
-    private Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
+    private Rune? GetRuneForIntersects (ConsoleDriver? driver, IntersectionDefinition? [] intersects)
     {
         if (!intersects.Any ())
         {
@@ -679,7 +679,7 @@ public class LineCanvas : IDisposable
         internal Rune _thickV;
         public IntersectionRuneResolver () { SetGlyphs (); }
 
-        public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
+        public Rune? GetRuneForIntersects (ConsoleDriver? driver, IntersectionDefinition? [] intersects)
         {
             bool useRounded = intersects.Any (
                                               i => i?.Line.Length != 0

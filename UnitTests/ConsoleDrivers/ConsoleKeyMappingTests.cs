@@ -123,7 +123,7 @@ public class ConsoleKeyMappingTests
                                          if (iterations == 0)
                                          {
                                              var keyChar = ConsoleKeyMapping.EncodeKeyCharForVKPacket (consoleKeyInfo);
-                                             Application.Driver.SendKeys (keyChar, ConsoleKey.Packet, shift, alt, control);
+                                             Application.Driver?.SendKeys (keyChar, ConsoleKey.Packet, shift, alt, control);
                                          }
                                      };
             Application.Run ();

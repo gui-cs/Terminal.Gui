@@ -79,7 +79,12 @@ public class Dialogs : Scenario
         frame.Add (heightEdit);
 
         frame.Add (
-                   new Label { X = Pos.Right (widthEdit) + 2, Y = Pos.Top (widthEdit), Text = "If height & width are both 0," }
+                   new Label
+                   {
+                       X = Pos.Right (widthEdit) + 2,
+                       Y = Pos.Top (widthEdit),
+                       Text = $"If width is 0, the dimension will be greater than {Dialog.DefaultMinimumWidth}%."
+                   }
                   );
 
         frame.Add (
@@ -87,7 +92,7 @@ public class Dialogs : Scenario
                    {
                        X = Pos.Right (heightEdit) + 2,
                        Y = Pos.Top (heightEdit),
-                       Text = "the Dialog will size to 80% of container."
+                       Text = $"If height is 0, the dimension will be greater {Dialog.DefaultMinimumHeight}%."
                    }
                   );
 
@@ -131,7 +136,7 @@ public class Dialogs : Scenario
             Y = Pos.Bottom (numButtonsLabel),
             TextAlignment = Alignment.End,
             Text = $"_Add {char.ConvertFromUtf32 (CODE_POINT)} to button text to stress wide char support",
-            State = CheckState.UnChecked
+            CheckedState = CheckState.UnChecked
         };
         frame.Add (glyphsNotWords);
 
@@ -230,7 +235,7 @@ public class Dialogs : Scenario
                 int buttonId = i;
                 Button button = null;
 
-                if (glyphsNotWords.State == CheckState.Checked)
+                if (glyphsNotWords.CheckedState == CheckState.Checked)
                 {
                     buttonId = i;
 
@@ -263,16 +268,19 @@ public class Dialogs : Scenario
                 Buttons = buttons.ToArray ()
             };
 
-            if (height != 0 || width != 0)
+            if (width != 0)
+            {
+                dialog.Width = width;
+            }
+            if (height != 0)
             {
                 dialog.Height = height;
-                dialog.Width = width;
             }
 
             var add = new Button
             {
                 X = Pos.Center (),
-                Y = Pos.Center (),
+                Y = Pos.Center () - 1,
                 Text = "_Add a button"
             };
 
@@ -281,7 +289,7 @@ public class Dialogs : Scenario
                               int buttonId = buttons.Count;
                               Button button;
 
-                              if (glyphsNotWords.State == CheckState.Checked)
+                              if (glyphsNotWords.CheckedState == CheckState.Checked)
                               {
                                   button = new ()
                                   {
@@ -325,8 +333,9 @@ public class Dialogs : Scenario
 
                                   dialog.LayoutSubviews ();
                               };
-            dialog.Closed += (s, e) => { buttonPressedLabel.Text = $"{clicked}"; };
             dialog.Add (addChar);
+
+            dialog.Closed += (s, e) => { buttonPressedLabel.Text = $"{clicked}"; };
         }
         catch (FormatException)
         {

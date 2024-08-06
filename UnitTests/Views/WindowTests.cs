@@ -53,7 +53,7 @@ public class WindowTests
         Toplevel top = new ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -70,7 +70,7 @@ public class WindowTests
                                                       _output
                                                      );
 
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 20);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -97,7 +97,7 @@ public class WindowTests
                                                       _output
                                                      );
 
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -130,8 +130,8 @@ public class WindowTests
         Assert.Equal ($"Window(){defaultWindow.Frame}", defaultWindow.ToString ());
         Assert.True (defaultWindow.CanFocus);
         Assert.False (defaultWindow.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 2147483645, 2147483645), defaultWindow.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 2147483647, 2147483647), defaultWindow.Frame);
+        Assert.Equal (new Rectangle (0, 0, Application.Screen.Width - 2, Application.Screen.Height - 2), defaultWindow.Viewport);
+        Assert.Equal (new Rectangle (0, 0, Application.Screen.Width, Application.Screen.Height), defaultWindow.Frame);
         Assert.Null (defaultWindow.Focused);
         Assert.NotNull (defaultWindow.ColorScheme);
         Assert.Equal (0, defaultWindow.X);

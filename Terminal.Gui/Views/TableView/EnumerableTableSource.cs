@@ -5,7 +5,7 @@
 public class EnumerableTableSource<T> : IEnumerableTableSource<T>
 {
     private readonly T [] data;
-    private readonly Dictionary<string, Func<T, object>> lamdas;
+    private readonly Dictionary<string, Func<T, object>> lambdas;
 
     /// <summary>Creates a new instance of the class that presents <paramref name="data"/> collection as a table.</summary>
     /// <remarks>
@@ -29,14 +29,14 @@ public class EnumerableTableSource<T> : IEnumerableTableSource<T>
     {
         this.data = data.ToArray ();
         ColumnNames = columnDefinitions.Keys.ToArray ();
-        lamdas = columnDefinitions;
+        lambdas = columnDefinitions;
     }
 
     /// <summary>Gets the object collection hosted by this wrapper.</summary>
     public IReadOnlyCollection<T> Data => data.AsReadOnly ();
 
     /// <inheritdoc/>
-    public object this [int row, int col] => lamdas [ColumnNames [col]] (data [row]);
+    public object this [int row, int col] => lambdas [ColumnNames [col]] (data [row]);
 
     /// <inheritdoc/>
     public int Rows => data.Length;

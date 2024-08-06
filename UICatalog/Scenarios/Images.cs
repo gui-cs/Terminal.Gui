@@ -20,16 +20,16 @@ public class Images : Scenario
         Application.Init ();
         var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName()}" };
 
-        bool canTrueColor = Application.Driver.SupportsTrueColor;
+        bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
 
-        var lblDriverName = new Label { X = 0, Y = 0, Text = $"Driver is {Application.Driver.GetType ().Name}" };
+        var lblDriverName = new Label { X = 0, Y = 0, Text = $"Driver is {Application.Driver?.GetType ().Name}" };
         win.Add (lblDriverName);
 
         var cbSupportsTrueColor = new CheckBox
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 0,
-            State = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
             CanFocus = false,
             Text = "supports true color "
         };
@@ -39,11 +39,11 @@ public class Images : Scenario
         {
             X = Pos.Right (cbSupportsTrueColor) + 2,
             Y = 0,
-            State = !Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = !Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Use true color"
         };
-        cbUseTrueColor.Toggle += (_, evt) => Application.Force16Colors = evt.NewValue == CheckState.UnChecked;
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => Application.Force16Colors = evt.NewValue == CheckState.UnChecked;
         win.Add (cbUseTrueColor);
 
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };

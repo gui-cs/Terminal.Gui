@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -7,8 +6,6 @@ namespace Terminal.Gui.ApplicationTests;
 
 public class ApplicationTests
 {
-    private readonly ITestOutputHelper _output;
-
     public ApplicationTests (ITestOutputHelper output)
     {
         _output = output;
@@ -18,6 +15,127 @@ public class ApplicationTests
         Responder.Instances.Clear ();
         RunState.Instances.Clear ();
 #endif
+    }
+
+    private readonly ITestOutputHelper _output;
+
+    private object _timeoutLock;
+
+    [Fact]
+    public void AddTimeout_Fires ()
+    {
+        Assert.Null (_timeoutLock);
+        _timeoutLock = new ();
+
+        uint timeoutTime = 250;
+        var initialized = false;
+        var iteration = 0;
+        var shutdown = false;
+        object timeout = null;
+        var timeoutCount = 0;
+
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+
+        Application.Init (new FakeDriver ());
+        Assert.True (initialized);
+        Assert.False (shutdown);
+
+        _output.WriteLine ("Application.Run<Toplevel> ().Dispose ()..");
+        Application.Run<Toplevel> ().Dispose ();
+        _output.WriteLine ("Back from Application.Run<Toplevel> ().Dispose ()");
+
+        Assert.True (initialized);
+        Assert.False (shutdown);
+
+        Assert.Equal (1, timeoutCount);
+        Application.Shutdown ();
+
+        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+
+        lock (_timeoutLock)
+        {
+            if (timeout is { })
+            {
+                Application.RemoveTimeout (timeout);
+                timeout = null;
+            }
+        }
+
+        Assert.True (initialized);
+        Assert.True (shutdown);
+
+#if DEBUG_IDISPOSABLE
+        Assert.Empty (Responder.Instances);
+#endif
+        lock (_timeoutLock)
+        {
+            _timeoutLock = null;
+        }
+
+        return;
+
+        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
+        {
+            if (a.CurrentValue)
+            {
+                Application.Iteration += OnApplicationOnIteration;
+                initialized = true;
+
+                lock (_timeoutLock)
+                {
+                    _output.WriteLine ($"Setting timeout for {timeoutTime}ms");
+                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (timeoutTime), TimeoutCallback);
+                }
+            }
+            else
+            {
+                Application.Iteration -= OnApplicationOnIteration;
+                shutdown = true;
+            }
+        }
+
+        bool TimeoutCallback ()
+        {
+            lock (_timeoutLock)
+            {
+                _output.WriteLine ($"TimeoutCallback. Count: {++timeoutCount}. Application Iteration: {iteration}");
+
+                if (timeout is { })
+                {
+                    _output.WriteLine ("  Nulling timeout.");
+                    timeout = null;
+                }
+            }
+
+            // False means "don't re-do timer and remove it"
+            return false;
+        }
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            lock (_timeoutLock)
+            {
+                if (timeoutCount > 0)
+                {
+                    _output.WriteLine ($"Iteration #{iteration} - Timeout fired. Calling Application.RequestStop.");
+                    Application.RequestStop ();
+
+                    return;
+                }
+            }
+
+            iteration++;
+
+            // Simulate a delay
+            Thread.Sleep ((int)timeoutTime / 10);
+
+            // Worst case scenario - something went wrong
+            if (Application.IsInitialized && iteration > 25)
+            {
+                _output.WriteLine ($"Too many iterations ({iteration}): Calling Application.RequestStop.");
+                Application.RequestStop ();
+            }
+        }
     }
 
     [Fact]
@@ -44,7 +162,7 @@ public class ApplicationTests
         Toplevel top = new ();
         Application.Begin (top);
         Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
-        ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
         Assert.Equal (new (0, 0, 5, 5), Application.Top.Frame);
         top.Dispose ();
     }
@@ -89,12 +207,12 @@ public class ApplicationTests
 
         RunState runstate = null;
 
-        EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) =>
+        EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
                                                         {
                                                             Assert.NotNull (e.State);
                                                             runstate = e.State;
                                                         };
-        Application.NotifyNewRunState += NewRunStateFn;
+        Application.NotifyNewRunState += newRunStateFn;
 
         var topLevel = new Toplevel ();
         RunState rs = Application.Begin (topLevel);
@@ -105,7 +223,7 @@ public class ApplicationTests
         Assert.Equal (topLevel, Application.Top);
         Assert.Equal (topLevel, Application.Current);
 
-        Application.NotifyNewRunState -= NewRunStateFn;
+        Application.NotifyNewRunState -= newRunStateFn;
         Application.End (runstate);
 
         Assert.Null (Application.Current);
@@ -134,7 +252,7 @@ public class ApplicationTests
         Application.Init (driverName: driverType.Name);
         Assert.NotNull (Application.Driver);
         Assert.NotEqual (driver, Application.Driver);
-        Assert.Equal (driverType, Application.Driver.GetType ());
+        Assert.Equal (driverType, Application.Driver?.GetType ());
         Shutdown ();
     }
 
@@ -162,7 +280,7 @@ public class ApplicationTests
         // Set some values
 
         Application.Init (driverName: driverType.Name);
-        Application._initialized = true;
+        Application.IsInitialized = true;
 
         // Reset
         Application.ResetState ();
@@ -184,22 +302,28 @@ public class ApplicationTests
             Assert.Null (Application.Driver);
             Assert.Null (Application.MainLoop);
             Assert.False (Application.EndAfterFirstIteration);
-            Assert.Equal (Key.Empty, Application.AlternateBackwardKey);
-            Assert.Equal (Key.Empty, Application.AlternateForwardKey);
-            Assert.Equal (Key.Empty, Application.QuitKey);
-            Assert.Null (Application.OverlappedChildren);
-            Assert.Null (Application.OverlappedTop);
+            Assert.Equal (Key.Tab.WithShift, Application.PrevTabKey);
+            Assert.Equal (Key.Tab, Application.NextTabKey);
+            Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
+            Assert.Equal (Key.F6, Application.NextTabGroupKey);
+            Assert.Equal (Key.Esc, Application.QuitKey);
+            Assert.Null (ApplicationOverlapped.OverlappedChildren);
+            Assert.Null (ApplicationOverlapped.OverlappedTop);
 
             // Internal properties
-            Assert.False (Application._initialized);
+            Assert.False (Application.IsInitialized);
             Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
+            Assert.Equal (Application.GetAvailableCulturesFromEmbeddedResources (), Application.SupportedCultures);
             Assert.False (Application._forceFakeConsole);
-            Assert.Equal (-1, Application._mainThreadId);
-            Assert.Empty (Application._topLevels);
-            Assert.Null (Application._mouseEnteredView);
+            Assert.Equal (-1, Application.MainThreadId);
+            Assert.Empty (Application.TopLevels);
+            Assert.Null (Application.MouseEnteredView);
 
             // Keyboard
-            Assert.Empty (Application.GetViewsWithKeyBindings ());
+            Assert.Empty (Application.GetViewKeyBindings ());
+
+            // Navigation
+            Assert.Null (Application.Navigation);
 
             // Events - Can't check
             //Assert.Null (Application.NotifyNewRunState);
@@ -218,28 +342,30 @@ public class ApplicationTests
         CheckReset ();
 
         // Set the values that can be set
-        Application._initialized = true;
+        Application.IsInitialized = true;
         Application._forceFakeConsole = true;
-        Application._mainThreadId = 1;
+        Application.MainThreadId = 1;
 
         //Application._topLevels = new List<Toplevel> ();
-        Application._mouseEnteredView = new ();
+        Application.MouseEnteredView = new ();
 
         //Application.SupportedCultures = new List<CultureInfo> ();
         Application.Force16Colors = true;
 
         //Application.ForceDriver = "driver";
         Application.EndAfterFirstIteration = true;
-        Application.AlternateBackwardKey = Key.A;
-        Application.AlternateForwardKey = Key.B;
+        Application.PrevTabGroupKey = Key.A;
+        Application.NextTabGroupKey = Key.B;
         Application.QuitKey = Key.C;
-        Application.AddKeyBinding (Key.A, new View ());
+        Application.KeyBindings.Add (Key.D, KeyBindingScope.Application, Command.Cancel);
 
-        //Application.OverlappedChildren = new List<View> ();
-        //Application.OverlappedTop = 
-        Application._mouseEnteredView = new ();
+        //ApplicationOverlapped.OverlappedChildren = new List<View> ();
+        //ApplicationOverlapped.OverlappedTop = 
+        Application.MouseEnteredView = new ();
 
         //Application.WantContinuousButtonPressedView = new View ();
+
+        Application.Navigation = new ();
 
         Application.ResetState ();
         CheckReset ();
@@ -278,8 +404,8 @@ public class ApplicationTests
     [InlineData (typeof (CursesDriver))]
     public void Init_Shutdown_Fire_InitializedChanged (Type driverType)
     {
-        bool initialized = false;
-        bool shutdown = false;
+        var initialized = false;
+        var shutdown = false;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
@@ -307,34 +433,6 @@ public class ApplicationTests
             }
         }
     }
-
-
-    [Fact]
-    public void Run_Iteration_Fires ()
-    {
-        int iteration = 0;
-
-        Application.Init (new FakeDriver ());
-
-        Application.Iteration += Application_Iteration;
-        Application.Run<Toplevel> ().Dispose ();
-
-        Assert.Equal (1, iteration);
-        Application.Shutdown ();
-
-        return;
-
-        void Application_Iteration (object sender, IterationEventArgs e)
-        {
-            if (iteration > 0)
-            {
-                Assert.Fail ();
-            }
-            iteration++;
-            Application.RequestStop ();
-        }
-    }
-
 
     [Fact]
     public void Init_Unbalanced_Throws ()
@@ -378,12 +476,12 @@ public class ApplicationTests
 
         RunState runstate = null;
 
-        EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) =>
+        EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
                                                         {
                                                             Assert.NotNull (e.State);
                                                             runstate = e.State;
                                                         };
-        Application.NotifyNewRunState += NewRunStateFn;
+        Application.NotifyNewRunState += newRunStateFn;
 
         RunState rs = Application.Begin (topLevel);
         Assert.NotNull (rs);
@@ -393,7 +491,7 @@ public class ApplicationTests
         Assert.Equal (topLevel, Application.Top);
         Assert.Equal (topLevel, Application.Current);
 
-        Application.NotifyNewRunState -= NewRunStateFn;
+        Application.NotifyNewRunState -= newRunStateFn;
         Application.End (runstate);
 
         Assert.Null (Application.Current);
@@ -413,13 +511,13 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void Internal_Properties_Correct ()
     {
-        Assert.True (Application._initialized);
+        Assert.True (Application.IsInitialized);
         Assert.Null (Application.Top);
         RunState rs = Application.Begin (new ());
         Assert.Equal (Application.Top, rs.Toplevel);
         Assert.Null (Application.MouseGrabView); // public
         Assert.Null (Application.WantContinuousButtonPressedView); // public
-        Assert.False (Application.MoveToOverlappedChild (Application.Top));
+        Assert.False (ApplicationOverlapped.MoveToOverlappedChild (Application.Top!));
         Application.Top.Dispose ();
     }
 
@@ -440,6 +538,33 @@ public class ApplicationTests
         Assert.Equal (1, actionCalled);
         top.Dispose ();
         Application.Shutdown ();
+    }
+
+    [Fact]
+    public void Run_Iteration_Fires ()
+    {
+        var iteration = 0;
+
+        Application.Init (new FakeDriver ());
+
+        Application.Iteration += Application_Iteration;
+        Application.Run<Toplevel> ().Dispose ();
+
+        Assert.Equal (1, iteration);
+        Application.Shutdown ();
+
+        return;
+
+        void Application_Iteration (object sender, IterationEventArgs e)
+        {
+            if (iteration > 0)
+            {
+                Assert.Fail ();
+            }
+
+            iteration++;
+            Application.RequestStop ();
+        }
     }
 
     [Fact]
@@ -565,8 +690,8 @@ public class ApplicationTests
         Assert.NotNull (Application.MainLoop);
 
         // FakeDriver is always 80x25
-        Assert.Equal (80, Application.Driver.Cols);
-        Assert.Equal (25, Application.Driver.Rows);
+        Assert.Equal (80, Application.Driver!.Cols);
+        Assert.Equal (25, Application.Driver!.Rows);
     }
 
     private void Pre_Init_State ()
@@ -695,7 +820,7 @@ public class ApplicationTests
         Application.ForceDriver = "FakeDriver";
 
         Application.Init ();
-        Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
+        Assert.Equal (typeof (FakeDriver), Application.Driver?.GetType ());
 
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
@@ -737,7 +862,7 @@ public class ApplicationTests
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         Application.Run<TestToplevel> ();
-        Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
+        Assert.Equal (typeof (FakeDriver), Application.Driver?.GetType ());
 
         Application.Top.Dispose ();
         Shutdown ();
@@ -888,19 +1013,19 @@ public class ApplicationTests
             Width = 5, Height = 5,
             Arrangement = ViewArrangement.Movable
         };
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
         RunState rs = Application.Begin (w);
 
         // Don't use visuals to test as style of border can change over time.
-        Assert.Equal (new Point (0, 0), w.Frame.Location);
+        Assert.Equal (new (0, 0), w.Frame.Location);
 
         Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
         Assert.Equal (w.Border, Application.MouseGrabView);
-        Assert.Equal (new Point (0, 0), w.Frame.Location);
+        Assert.Equal (new (0, 0), w.Frame.Location);
 
         // Move down and to the right.
         Application.OnMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
-        Assert.Equal (new Point (1, 1), w.Frame.Location);
+        Assert.Equal (new (1, 1), w.Frame.Location);
 
         Application.End (rs);
         w.Dispose ();
@@ -1035,6 +1160,7 @@ public class ApplicationTests
         Assert.Throws<InvalidOperationException> (() => Application.Run (new Toplevel ()));
 
         Application.Init (driver);
+
         Application.Iteration += (s, e) =>
                                  {
                                      Assert.NotNull (Application.Top);
@@ -1094,123 +1220,4 @@ public class ApplicationTests
     }
 
     #endregion
-
-
-    private object _timeoutLock;
-
-    [Fact]
-    public void AddTimeout_Fires ()
-    {
-        Assert.Null (_timeoutLock);
-        _timeoutLock = new object ();
-
-        uint timeoutTime = 250;
-        bool initialized = false;
-        int iteration = 0;
-        bool shutdown = false;
-        object timeout = null;
-        int timeoutCount = 0;
-
-        Application.InitializedChanged += OnApplicationOnInitializedChanged;
-
-        Application.Init (new FakeDriver ());
-        Assert.True (initialized);
-        Assert.False (shutdown);
-
-        _output.WriteLine ("Application.Run<Toplevel> ().Dispose ()..");
-        Application.Run<Toplevel> ().Dispose ();
-        _output.WriteLine ("Back from Application.Run<Toplevel> ().Dispose ()");
-
-        Assert.True (initialized);
-        Assert.False (shutdown);
-
-        Assert.Equal (1, timeoutCount);
-        Application.Shutdown ();
-
-        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
-
-        lock (_timeoutLock)
-        {
-            if (timeout is { })
-            {
-                Application.RemoveTimeout (timeout);
-                timeout = null;
-            }
-        }
-
-        Assert.True (initialized);
-        Assert.True (shutdown);
-
-#if DEBUG_IDISPOSABLE
-        Assert.Empty (Responder.Instances);
-#endif
-        lock (_timeoutLock)
-        {
-            _timeoutLock = null;
-        }
-
-        return;
-
-        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
-        {
-            if (a.CurrentValue)
-            {
-                Application.Iteration += OnApplicationOnIteration;
-                initialized = true;
-
-                lock (_timeoutLock)
-                {
-                    _output.WriteLine ($"Setting timeout for {timeoutTime}ms");
-                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (timeoutTime), TimeoutCallback);
-                }
-
-            }
-            else
-            {
-                Application.Iteration -= OnApplicationOnIteration;
-                shutdown = true;
-            }
-        }
-
-        bool TimeoutCallback ()
-        {
-            lock (_timeoutLock)
-            {
-                _output.WriteLine ($"TimeoutCallback. Count: {++timeoutCount}. Application Iteration: {iteration}");
-                if (timeout is { })
-                {
-                    _output.WriteLine ($"  Nulling timeout.");
-                    timeout = null;
-                }
-            }
-
-            // False means "don't re-do timer and remove it"
-            return false;
-        }
-
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
-        {
-            lock (_timeoutLock)
-            {
-                if (timeoutCount > 0)
-                {
-                    _output.WriteLine ($"Iteration #{iteration} - Timeout fired. Calling Application.RequestStop.");
-                    Application.RequestStop ();
-
-                    return;
-                }
-            }
-            iteration++;
-
-            // Simulate a delay
-            Thread.Sleep ((int)timeoutTime / 10);
-
-            // Worst case scenario - something went wrong
-            if (Application._initialized && iteration > 25)
-            {
-                _output.WriteLine ($"Too many iterations ({iteration}): Calling Application.RequestStop.");
-                Application.RequestStop ();
-            }
-        }
-    }
 }

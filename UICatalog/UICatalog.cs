@@ -1,4 +1,4 @@
-global using Attribute = Terminal.Gui.Attribute;
+﻿global using Attribute = Terminal.Gui.Attribute;
 global using CM = Terminal.Gui.ConfigurationManager;
 using System;
 using System.Collections.Generic;
@@ -45,9 +45,8 @@ namespace UICatalog;
 ///         (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
 ///     </para>
 /// </remarks>
-internal class UICatalogApp
+public class UICatalogApp
 {
-    private static StringBuilder? _aboutMessage;
     private static int _cachedCategoryIndex;
 
     // When a scenario is run, the main app is killed. These items
@@ -73,6 +72,34 @@ internal class UICatalogApp
     [SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true)]
     [JsonPropertyName ("UICatalog.StatusBar")]
     public static bool ShowStatusBar { get; set; } = true;
+
+    /// <summary>
+    /// Gets the message displayed in the About Box. `public` so it can be used from Unit tests.
+    /// </summary>
+    /// <returns></returns>
+    public static string GetAboutBoxMessage ()
+    {
+        // NOTE: Do not use multiline verbatim strings here.
+        // WSL gets all confused.
+        StringBuilder msg = new ();
+        msg.AppendLine ("UI Catalog: A comprehensive sample library for");
+        msg.AppendLine ();
+
+        msg.AppendLine ("""
+                         _______                  _             _   _____       _ 
+                        |__   __|                (_)           | | / ____|     (_)
+                           | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ 
+                           | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |
+                           | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |
+                           |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|
+                        """);
+        msg.AppendLine ();
+        msg.AppendLine ("v2 - Pre-Alpha");
+        msg.AppendLine ();
+        msg.AppendLine ("https://github.com/gui-cs/Terminal.Gui");
+
+        return msg.ToString ();
+    }
 
     private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
     {
@@ -104,7 +131,7 @@ internal class UICatalogApp
         // If no driver is provided, the default driver is used.
         Option<string> driverOption = new Option<string> ("--driver", "The ConsoleDriver to use.").FromAmong (
              Application.GetDriverTypes ()
-                        .Select (d => d.Name)
+                        .Select (d => d!.Name)
                         .ToArray ()
             );
 
@@ -295,26 +322,13 @@ internal class UICatalogApp
             _selectedScenario.Main ();
             _selectedScenario.Dispose ();
             _selectedScenario = null;
+
             // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
             VerifyObjectsWereDisposed ();
 
             return;
         }
-
-        _aboutMessage = new ();
-        _aboutMessage.AppendLine (@"A comprehensive sample library for");
-        _aboutMessage.AppendLine (@"");
-        _aboutMessage.AppendLine (@"  _______                  _             _   _____       _  ");
-        _aboutMessage.AppendLine (@" |__   __|                (_)           | | / ____|     (_) ");
-        _aboutMessage.AppendLine (@"    | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ");
-        _aboutMessage.AppendLine (@"    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ");
-        _aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ");
-        _aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ");
-        _aboutMessage.AppendLine (@"");
-        _aboutMessage.AppendLine (@"v2 - Work in Progress");
-        _aboutMessage.AppendLine (@"");
-        _aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
 
         while (RunUICatalogTopLevel () is { } scenario)
         {
@@ -369,12 +383,14 @@ internal class UICatalogApp
     /// </summary>
     public class UICatalogTopLevel : Toplevel
     {
-        public ListView CategoryList;
+        public ListView? CategoryList;
         public MenuItem? MiForce16Colors;
         public MenuItem? MiIsMenuBorderDisabled;
         public MenuItem? MiIsMouseDisabled;
         public MenuItem? MiUseSubMenusSingleFrame;
+
         public Shortcut? ShForce16Colors;
+
         //public Shortcut? ShDiagnostics;
         public Shortcut? ShVersion;
 
@@ -387,7 +403,7 @@ internal class UICatalogApp
 
         public UICatalogTopLevel ()
         {
-            _diagnosticFlags = View.Diagnostics;
+            _diagnosticFlags = Diagnostics;
 
             _themeMenuItems = CreateThemeMenuItems ();
             _themeMenuBarItem = new ("_Themes", _themeMenuItems);
@@ -433,11 +449,10 @@ internal class UICatalogApp
                                   "_About...",
                                   "About UI Catalog",
                                   () => MessageBox.Query (
-                                                          "About UI Catalog",
-                                                          _aboutMessage!.ToString (),
-                                                          0,
-                                                          false,
-                                                          "_Ok"
+                                                          title: "",
+                                                          message: GetAboutBoxMessage (),
+                                                          wrapMessage: false,
+                                                          buttons: "_Ok"
                                                          ),
                                   null,
                                   null,
@@ -451,7 +466,8 @@ internal class UICatalogApp
             StatusBar = new ()
             {
                 Visible = ShowStatusBar,
-                AlignmentModes = AlignmentModes.IgnoreFirstOrLast
+                AlignmentModes = AlignmentModes.IgnoreFirstOrLast,
+                CanFocus = false
             };
 
             if (StatusBar is { })
@@ -459,35 +475,36 @@ internal class UICatalogApp
                 ShVersion = new ()
                 {
                     Title = "Version Info",
-                    CanFocus = false,
-
+                    CanFocus = false
                 };
 
-                Shortcut statusBarShortcut = new Shortcut ()
+                var statusBarShortcut = new Shortcut
                 {
                     Key = Key.F10,
                     Title = "Show/Hide Status Bar",
+                    CanFocus = false,
                 };
                 statusBarShortcut.Accept += (sender, args) => { StatusBar.Visible = !StatusBar.Visible; };
 
-                ShForce16Colors = new Shortcut ()
+                ShForce16Colors = new ()
                 {
-                    CommandView = new CheckBox ()
+                    CanFocus = false,
+                    CommandView = new CheckBox
                     {
                         Title = "16 color mode",
-                        State = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
-                        CanFocus = false,
+                        CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+                        CanFocus = false
                     },
                     HelpText = "",
-                    Key = Key.F6,
+                    Key = Key.F6
                 };
 
-                ((CheckBox)ShForce16Colors.CommandView).Toggle += (sender, args) =>
-                                          {
-                                              Application.Force16Colors = args.NewValue == CheckState.Checked;
-                                              MiForce16Colors!.Checked = Application.Force16Colors;
-                                              Application.Refresh ();
-                                          };
+                ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
+                                                                  {
+                                                                      Application.Force16Colors = args.NewValue == CheckState.Checked;
+                                                                      MiForce16Colors!.Checked = Application.Force16Colors;
+                                                                      Application.Refresh ();
+                                                                  };
 
                 //ShDiagnostics = new Shortcut ()
                 //{
@@ -502,10 +519,11 @@ internal class UICatalogApp
                 //};
 
                 StatusBar.Add (
-                               new Shortcut ()
+                               new Shortcut
                                {
+                                   CanFocus = false,
                                    Title = "Quit",
-                                   Key = Application.QuitKey,
+                                   Key = Application.QuitKey
                                },
                                statusBarShortcut,
                                ShForce16Colors,
@@ -605,7 +623,9 @@ internal class UICatalogApp
             ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
             // TableView typically is a grid where nav keys are biased for moving left/right.
+            ScenarioList.KeyBindings.Remove (Key.Home);
             ScenarioList.KeyBindings.Add (Key.Home, Command.TopHome);
+            ScenarioList.KeyBindings.Remove (Key.End);
             ScenarioList.KeyBindings.Add (Key.End, Command.BottomEnd);
 
             // Ideally, TableView.MultiSelect = false would turn off any keybindings for
@@ -656,7 +676,7 @@ internal class UICatalogApp
 
             ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
-            MenuBar.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
+            MenuBar!.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
 
             if (StatusBar is { })
             {
@@ -666,7 +686,7 @@ internal class UICatalogApp
 
             MiIsMouseDisabled!.Checked = Application.IsMouseDisabled;
 
-            Application.Top.SetNeedsDisplay ();
+            Application.Top!.SetNeedsDisplay ();
         }
 
         public MenuItem []? CreateThemeMenuItems ()
@@ -713,7 +733,7 @@ internal class UICatalogApp
                                    }
 
                                    ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
-                                   Application.Top.SetNeedsDisplay ();
+                                   Application.Top!.SetNeedsDisplay ();
                                };
                 schemeMenuItems.Add (item);
             }
@@ -835,7 +855,7 @@ internal class UICatalogApp
                                    }
 
                                    Diagnostics = _diagnosticFlags;
-                                   Application.Top.SetNeedsDisplay ();
+                                   Application.Top!.SetNeedsDisplay ();
                                };
                 menuItems.Add (item);
             }
@@ -940,7 +960,7 @@ internal class UICatalogApp
                                              {
                                                  MiIsMenuBorderDisabled.Checked = (bool)!MiIsMenuBorderDisabled.Checked!;
 
-                                                 MenuBar.MenusBorderStyle = !(bool)MiIsMenuBorderDisabled.Checked
+                                                 MenuBar!.MenusBorderStyle = !(bool)MiIsMenuBorderDisabled.Checked
                                                                                 ? LineStyle.Single
                                                                                 : LineStyle.None;
                                              };
@@ -983,7 +1003,7 @@ internal class UICatalogApp
             MiUseSubMenusSingleFrame.Action += () =>
                                                {
                                                    MiUseSubMenusSingleFrame.Checked = (bool)!MiUseSubMenusSingleFrame.Checked!;
-                                                   MenuBar.UseSubMenusSingleFrame = (bool)MiUseSubMenusSingleFrame.Checked;
+                                                   MenuBar!.UseSubMenusSingleFrame = (bool)MiUseSubMenusSingleFrame.Checked;
                                                };
             menuItems.Add (MiUseSubMenusSingleFrame);
 
@@ -999,14 +1019,16 @@ internal class UICatalogApp
                 Title = "Force _16 Colors",
                 Shortcut = (KeyCode)Key.F6,
                 Checked = Application.Force16Colors,
-                CanExecute = () => Application.Driver.SupportsTrueColor
+                CanExecute = () => Application.Driver?.SupportsTrueColor ?? false
             };
             MiForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
 
             MiForce16Colors.Action += () =>
                                       {
                                           MiForce16Colors.Checked = Application.Force16Colors = (bool)!MiForce16Colors.Checked!;
-                                          ((CheckBox)ShForce16Colors!.CommandView!).State = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+
+                                          ((CheckBox)ShForce16Colors!.CommandView!).CheckedState =
+                                              Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                                           Application.Refresh ();
                                       };
             menuItems.Add (MiForce16Colors);
@@ -1061,7 +1083,7 @@ internal class UICatalogApp
                                                 ShowStatusBar = StatusBar.Visible;
 
                                                 int height = StatusBar.Visible ? 1 : 0;
-                                                CategoryList.Height = Dim.Fill (height);
+                                                CategoryList!.Height = Dim.Fill (height);
                                                 ScenarioList.Height = Dim.Fill (height);
 
                                                 // ContentPane.Height = Dim.Fill (height);
@@ -1071,7 +1093,7 @@ internal class UICatalogApp
             }
 
             Loaded -= LoadedHandler;
-            CategoryList.EnsureSelectedItemVisible ();
+            CategoryList!.EnsureSelectedItemVisible ();
             ScenarioList.EnsureSelectedCellIsVisible ();
         }
 
@@ -1082,7 +1104,7 @@ internal class UICatalogApp
             if (_selectedScenario is null)
             {
                 // Save selected item state
-                _cachedCategoryIndex = CategoryList.SelectedItem;
+                _cachedCategoryIndex = CategoryList!.SelectedItem;
                 _cachedScenarioIndex = ScenarioList.SelectedRow;
 
                 // Create new instance of scenario (even though Scenarios contains instances)

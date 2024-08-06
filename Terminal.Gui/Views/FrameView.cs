@@ -13,6 +13,8 @@ public class FrameView : View
     /// </summary>
     public FrameView ()
     {
+        CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
         Border.Thickness = new Thickness (1);
         Border.LineStyle = DefaultBorderStyle;
 

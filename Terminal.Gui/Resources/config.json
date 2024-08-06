@@ -1,9 +1,9 @@
 {
   // Specifies the "source of truth" for default values for all Terminal.Gui settings managed by
   // ConfigurationManager. It is automatically loaded, and applied, each time Application.Init
-  // is run (via the ConfiguraitonManager.Reset method). 
+  // is run (via the ConfigurationManager.Reset method).
   //
-  // In otherwords, initial values set in the the codebase are always overwritten by the contents of this 
+  // In other words, initial values set in the the codebase are always overwritten by the contents of this 
   // resource embedded in the Terminal.Gui.dll assembly.
   //
   // The Unit Test method "ConfigurationManagerTests.SaveDefaults" can be used to re-create the base of this file, but
@@ -17,8 +17,10 @@
   // to throw exceptions. 
   "ConfigurationManager.ThrowOnJsonErrors": false,
 
-  "Application.AlternateBackwardKey": "Ctrl+PageUp",
-  "Application.AlternateForwardKey": "Ctrl+PageDown",
+  "Application.NextTabKey": "Tab",
+  "Application.PrevTabKey": "Shift+Tab",
+  "Application.NextTabGroupKey": "F6",
+  "Application.PrevTabGroupKey": "Shift+F6",
   "Application.QuitKey": "Esc",
 
   "Theme": "Default",
@@ -29,8 +31,9 @@
         "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
         "FrameView.DefaultBorderStyle": "Single",
         "Window.DefaultBorderStyle": "Single",
-        "Dialog.DefaultBorderStyle": "Single",
-        "MessageBox.DefaultBorderStyle": "Double",
+        "Dialog.DefaultBorderStyle": "Heavy",
+        "MessageBox.DefaultButtonAlignment": "Center",
+        "MessageBox.DefaultBorderStyle": "Heavy",
         "Button.DefaultShadow": "None",
         "ColorSchemes": [
           {

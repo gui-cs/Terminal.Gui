@@ -484,7 +484,7 @@ public class TextAlignmentAndDirection : Scenario
             Enabled = false
         };
 
-        justifyCheckbox.Toggle += (s, e) => ToggleJustify (e.NewValue != CheckState.Checked);
+        justifyCheckbox.CheckedStateChanging += (s, e) => ToggleJustify (e.NewValue != CheckState.Checked);
 
         justifyOptions.SelectedItemChanged += (s, e) => { ToggleJustify (false, true); };
 
@@ -500,9 +500,9 @@ public class TextAlignmentAndDirection : Scenario
             Height = 1,
             Text = "Word Wrap"
         };
-        wrapCheckbox.State = wrapCheckbox.TextFormatter.WordWrap ? CheckState.Checked : CheckState.UnChecked;
+        wrapCheckbox.CheckedState = wrapCheckbox.TextFormatter.WordWrap ? CheckState.Checked : CheckState.UnChecked;
 
-        wrapCheckbox.Toggle += (s, e) =>
+        wrapCheckbox.CheckedStateChanging += (s, e) =>
                                 {
                                     if (e.CurrentValue == CheckState.Checked)
                                     {
@@ -522,46 +522,12 @@ public class TextAlignmentAndDirection : Scenario
 
         app.Add (wrapCheckbox);
 
-        // AUTOSIZE CHECKBOX
-
-        var autoSizeCheckbox = new CheckBox
-        {
-            X = Pos.Right (container) + 1,
-            Y = Pos.Y (wrapCheckbox) + 1,
-            Width = Dim.Fill (10),
-            Height = 1,
-            Text = "AutoSize"
-        };
-        autoSizeCheckbox.State = autoSizeCheckbox.TextFormatter.AutoSize ? CheckState.Checked : CheckState.UnChecked;
-
-        autoSizeCheckbox.Toggle += (s, e) =>
-                                    {
-                                        if (e.CurrentValue == CheckState.Checked)
-                                        {
-                                            foreach (Label t in multiLineLabels)
-                                            {
-                                                t.TextFormatter.AutoSize = false;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            foreach (Label t in multiLineLabels)
-                                            {
-                                                t.TextFormatter.AutoSize = true;
-                                            }
-                                        }
-                                    };
-
-        app.Add (autoSizeCheckbox);
-
-        // Direction Options
-
         List<TextDirection> directionsEnum = Enum.GetValues (typeof (TextDirection)).Cast<TextDirection> ().ToList ();
 
         var directionOptions = new RadioGroup
         {
             X = Pos.Right (container) + 1,
-            Y = Pos.Bottom (autoSizeCheckbox) + 1,
+            Y = Pos.Bottom (wrapCheckbox) + 1,
             Width = Dim.Fill (10),
             Height = Dim.Fill (1),
             HotKeySpecifier = (Rune)'\xffff',
@@ -570,7 +536,7 @@ public class TextAlignmentAndDirection : Scenario
 
         directionOptions.SelectedItemChanged += (s, ev) =>
                                                 {
-                                                    bool justChecked = justifyCheckbox.State == CheckState.Checked;
+                                                    bool justChecked = justifyCheckbox.CheckedState == CheckState.Checked;
 
                                                     if (justChecked)
                                                     {

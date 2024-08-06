@@ -37,7 +37,7 @@ public class FrameViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_Defaults ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
         var fv = new FrameView ();
         Assert.Equal (string.Empty, fv.Title);
         Assert.Equal (string.Empty, fv.Text);

@@ -236,7 +236,7 @@ public class Sliders : Scenario
             Y = Pos.Bottom (optionsSlider)
         };
 
-        dimAutoUsesMin.Toggle += (sender, e) =>
+        dimAutoUsesMin.CheckedStateChanging += (sender, e) =>
                                   {
                                       foreach (Slider s in app.Subviews.OfType<Slider> ())
                                       {
@@ -407,7 +407,7 @@ public class Sliders : Scenario
             Text = "Min _Inner Spacing:",
         };
 
-        Buttons.NumericUpDown<int> innerSpacingUpDown = new ()
+        NumericUpDown<int> innerSpacingUpDown = new ()
         {
             X = Pos.Right (label) + 1
         };
@@ -609,7 +609,7 @@ public class Sliders : Scenario
                              };
         }
 
-        app.FocusFirst ();
+        app.FocusFirst (null);
 
         Application.Run (app);
         app.Dispose ();

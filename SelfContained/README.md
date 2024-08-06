@@ -1,6 +1,6 @@
 # Terminal.Gui C# SelfContained
 
-This example shows how to use the `Terminal.Gui` library to create a simple `self-contained` `single file` GUI application in C#.
+This project aims to test the `Terminal.Gui` library to create a simple `self-contained` `single-file` GUI application in C#, ensuring that all its features are available.
 
 With `Debug` the `.csproj` is used and with `Release` the latest `nuget package` is used, either in `Solution Configurations` or in `Profile Publish`.
 

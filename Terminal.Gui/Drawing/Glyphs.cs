@@ -348,7 +348,7 @@ public class GlyphDefinitions
     /// <summary>Box Drawings Left Tee - Heavy Vertical and Heavy Horizontal (U+2527) - ┣</summary>
     public Rune LeftTeeHvDblH { get; set; } = (Rune)'┣';
 
-    /// <summary>Box Drawings Righ Tee - Single Vertical and Single Horizontal (U+2524) - ┤</summary>
+    /// <summary>Box Drawings Right Tee - Single Vertical and Single Horizontal (U+2524) - ┤</summary>
     public Rune RightTee { get; set; } = (Rune)'┤';
 
     /// <summary>Box Drawings Right Tee - Single Vertical and Double Horizontal (U+2561) - ╡</summary>
@@ -442,13 +442,13 @@ public class GlyphDefinitions
 
 
     /// <summary>Shadow - Vertical Start - Left Half Block - ▌ U+0258c</summary>
-    public Rune ShadowVerticalStart { get; set; } =  (Rune)'▌'; // Half: '\u2596'  ▖;
+    public Rune ShadowVerticalStart { get; set; } =  (Rune)'▖'; // Half: '\u2596'  ▖;
 
     /// <summary>Shadow - Vertical - Left Half Block - ▌ U+0258c</summary>
     public Rune ShadowVertical { get; set; } = (Rune)'▌';
 
     /// <summary>Shadow - Horizontal Start - Upper Half Block - ▀ U+02580</summary>
-    public Rune ShadowHorizontalStart { get; set; } = (Rune)'▀'; // Half: ▝ U+0259d;
+    public Rune ShadowHorizontalStart { get; set; } = (Rune)'▝'; // Half: ▝ U+0259d;
 
     /// <summary>Shadow - Horizontal - Upper Half Block - ▀ U+02580</summary>
     public Rune ShadowHorizontal { get; set; } = (Rune)'▀';

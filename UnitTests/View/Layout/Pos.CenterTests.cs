@@ -51,12 +51,31 @@ public class PosCenterTests (ITestOutputHelper output)
         Assert.IsType<PosCenter> (pos);
     }
 
-    [Fact]
-    public void PosCenter_Calculate_ReturnsExpectedValue ()
+    [Theory]
+    [InlineData (10, 2, 4)]
+    [InlineData (10, 10, 0)]
+    [InlineData (10, 11, 0)]
+    [InlineData (10, 12, -1)]
+    [InlineData (19, 20, 0)]
+    public void PosCenter_Calculate_ReturnsExpectedValue (int superviewDimension, int width, int expectedX)
     {
         var posCenter = new PosCenter ();
-        int result = posCenter.Calculate (10, new DimAbsolute (2), null, Dimension.None);
-        Assert.Equal (4, result);
+        int result = posCenter.Calculate (superviewDimension, new DimAbsolute (width), null!, Dimension.Width);
+        Assert.Equal (expectedX, result);
+    }
+
+
+    [Fact]
+    public void PosCenter_Bigger_Than_SuperView ()
+    {
+        var superView = new View { Width = 10, Height = 10 };
+        var view = new View { X = Center (), Y = Center (), Width = 20, Height = 20 };
+        superView.Add (view);
+        superView.BeginInit();
+        superView.EndInit();
+
+        Assert.Equal (-5, view.Frame.Left);
+        Assert.Equal (-5, view.Frame.Top);
     }
 
     [Theory]
@@ -85,7 +104,7 @@ public class PosCenterTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver).SetBufferSize (20, height);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, height);
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
@@ -232,7 +251,7 @@ public class PosCenterTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver).SetBufferSize (width, 7);
+        ((FakeDriver)Application.Driver!).SetBufferSize (width, 7);
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 

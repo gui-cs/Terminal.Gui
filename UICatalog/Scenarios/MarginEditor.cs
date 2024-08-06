@@ -28,9 +28,7 @@ public class MarginEditor : AdornmentEditor
         _rgShadow = new RadioGroup
         {
             X = 0,
-            //Y = Pos.AnchorEnd(),
-            // BUGBUG: Hack until dimauto is working properly
-            Y = Pos.Bottom (Subviews [^1]),
+            Y = Pos.AnchorEnd (),
 
             SuperViewRendersLineCanvas = true,
             Title = "_Shadow",

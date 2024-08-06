@@ -192,13 +192,16 @@ internal sealed class Menu : View
 
             if ((KeyCode)menuItem.HotKey.Value != KeyCode.Null)
             {
+                KeyBindings.Remove ((KeyCode)menuItem.HotKey.Value);
                 KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, keyBinding);
+                KeyBindings.Remove ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask);
                 KeyBindings.Add ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask, keyBinding);
             }
 
             if (menuItem.Shortcut != KeyCode.Null)
             {
                 keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuItem);
+                KeyBindings.Remove (menuItem.Shortcut);
                 KeyBindings.Add (menuItem.Shortcut, keyBinding);
             }
 
@@ -282,7 +285,7 @@ internal sealed class Menu : View
             return true;
         }
 
-        // TODO: Determine if there's a cleaner way to handle this
+        // TODO: Determine if there's a cleaner way to handle this.
         // This supports the case where the menu bar is a context menu
         return _host.OnInvokingKeyBindings (keyEvent, scope);
     }
@@ -489,7 +492,8 @@ internal sealed class Menu : View
                 {
                     var tf = new TextFormatter
                     {
-                        AutoSize = true,
+                        ConstrainToWidth = Frame.Width - 3,
+                        ConstrainToHeight = 1,
                         Alignment = Alignment.Center, HotKeySpecifier = MenuBar.HotKeySpecifier, Text = textToDraw
                     };
 

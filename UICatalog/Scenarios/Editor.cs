@@ -238,7 +238,7 @@ public class Editor : Scenario
 
         _appWindow.Add (menu);
 
-        var siCursorPosition = new Shortcut(KeyCode.Null, "", null);
+        var siCursorPosition = new Shortcut (KeyCode.Null, "", null);
 
         var statusBar = new StatusBar (
                                        new []
@@ -722,7 +722,7 @@ public class Editor : Scenario
             }
             else
             {
-                FocusFirst();
+                FocusFirst (null);
             }
         }
 
@@ -737,9 +737,9 @@ public class Editor : Scenario
     {
         _findReplaceWindow.Visible = true;
         _findReplaceWindow.SuperView.BringSubviewToFront (_findReplaceWindow);
-        _tabView.SetFocus();
+        _tabView.SetFocus ();
         _tabView.SelectedTab = isFind ? _tabView.Tabs.ToArray () [0] : _tabView.Tabs.ToArray () [1];
-        _tabView.SelectedTab.View.FocusFirst ();
+        _tabView.SelectedTab.View.FocusFirst (null);
     }
 
     private void CreateFindReplace ()
@@ -753,10 +753,10 @@ public class Editor : Scenario
 
         _tabView.AddTab (new () { DisplayText = "Find", View = CreateFindTab () }, true);
         _tabView.AddTab (new () { DisplayText = "Replace", View = CreateReplaceTab () }, false);
-        _tabView.SelectedTabChanged += (s, e) => _tabView.SelectedTab.View.FocusFirst ();
+        _tabView.SelectedTabChanged += (s, e) => _tabView.SelectedTab.View.FocusFirst (null);
         _findReplaceWindow.Add (_tabView);
 
-        _tabView.SelectedTab.View.FocusLast (); // Hack to get the first tab to be focused
+        _tabView.SelectedTab.View.FocusLast (null); // Hack to get the first tab to be focused
         _findReplaceWindow.Visible = false;
         _appWindow.Add (_findReplaceWindow);
     }
@@ -828,7 +828,7 @@ public class Editor : Scenario
         }
     }
 
-    private void Find () { ShowFindReplace(true); }
+    private void Find () { ShowFindReplace (true); }
     private void FindNext () { ContinueFind (); }
     private void FindPrevious () { ContinueFind (false); }
 
@@ -895,16 +895,16 @@ public class Editor : Scenario
 
         var ckbMatchCase = new CheckBox
         {
-            X = 0, Y = Pos.Top (txtToFind) + 2, State = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
+            X = 0, Y = Pos.Top (txtToFind) + 2, CheckedState = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
         };
-        ckbMatchCase.Toggle += (s, e) => _matchCase = e.NewValue == CheckState.Checked;
+        ckbMatchCase.CheckedStateChanging += (s, e) => _matchCase = e.NewValue == CheckState.Checked;
         d.Add (ckbMatchCase);
 
         var ckbMatchWholeWord = new CheckBox
         {
-            X = 0, Y = Pos.Top (ckbMatchCase) + 1, State = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
+            X = 0, Y = Pos.Top (ckbMatchCase) + 1, CheckedState = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
         };
-        ckbMatchWholeWord.Toggle += (s, e) => _matchWholeWord = e.NewValue == CheckState.Checked;
+        ckbMatchWholeWord.CheckedStateChanging += (s, e) => _matchWholeWord = e.NewValue == CheckState.Checked;
         d.Add (ckbMatchWholeWord);
         return d;
     }
@@ -1153,16 +1153,16 @@ public class Editor : Scenario
 
         var ckbMatchCase = new CheckBox
         {
-            X = 0, Y = Pos.Top (txtToFind) + 2, State = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
+            X = 0, Y = Pos.Top (txtToFind) + 2, CheckedState = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
         };
-        ckbMatchCase.Toggle += (s, e) => _matchCase = e.NewValue == CheckState.Checked;
+        ckbMatchCase.CheckedStateChanging += (s, e) => _matchCase = e.NewValue == CheckState.Checked;
         d.Add (ckbMatchCase);
 
         var ckbMatchWholeWord = new CheckBox
         {
-            X = 0, Y = Pos.Top (ckbMatchCase) + 1, State = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
+            X = 0, Y = Pos.Top (ckbMatchCase) + 1, CheckedState = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
         };
-        ckbMatchWholeWord.Toggle += (s, e) => _matchWholeWord = e.NewValue == CheckState.Checked;
+        ckbMatchWholeWord.CheckedStateChanging += (s, e) => _matchWholeWord = e.NewValue == CheckState.Checked;
         d.Add (ckbMatchWholeWord);
 
         return d;

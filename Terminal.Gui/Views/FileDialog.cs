@@ -60,6 +60,9 @@ public class FileDialog : Dialog
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem fileSystem)
     {
+        Height = Dim.Percent (80);
+        Width = Dim.Percent (80);
+
         // Assume canceled
         Canceled = true;
 
@@ -134,7 +137,7 @@ public class FileDialog : Dialog
             FullRowSelect = true,
             CollectionNavigator = new FileDialogCollectionNavigator (this)
         };
-        _tableView.KeyBindings.Add (Key.Space, Command.Select);
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
         _tableView.MouseClick += OnTableViewMouseClick;
         _tableView.Style.InvertSelectedCellFirstCharacter = true;
         Style.TableStyle = _tableView.Style;
@@ -254,10 +257,10 @@ public class FileDialog : Dialog
         _tableView.KeyUp += (s, k) => k.Handled = TableView_KeyUp (k);
         _tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 
-        _tableView.KeyBindings.Add (Key.Home, Command.TopHome);
-        _tableView.KeyBindings.Add (Key.End, Command.BottomEnd);
-        _tableView.KeyBindings.Add (Key.Home.WithShift, Command.TopHomeExtend);
-        _tableView.KeyBindings.Add (Key.End.WithShift, Command.BottomEndExtend);
+        _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.TopHome);
+        _tableView.KeyBindings.ReplaceCommands (Key.End, Command.BottomEnd);
+        _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.TopHomeExtend);
+        _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.BottomEndExtend);
 
         _treeView.KeyDown += (s, k) =>
                              {
@@ -461,8 +464,8 @@ public class FileDialog : Dialog
             _btnOk.X = Pos.Right (_btnCancel) + 1;
 
             // Flip tab order too for consistency
-            int p1 = _btnOk.TabIndex;
-            int p2 = _btnCancel.TabIndex;
+            int? p1 = _btnOk.TabIndex;
+            int? p2 = _btnCancel.TabIndex;
 
             _btnOk.TabIndex = p2;
             _btnCancel.TabIndex = p1;
@@ -510,7 +513,7 @@ public class FileDialog : Dialog
                 // TODO: Does not work, if this worked then we could tab to it instead
                 // of having to hit F9
                 CanFocus = true,
-                TabStop = true,
+                TabStop = TabBehavior.TabStop,
                 Menus = [_allowedTypeMenu]
             };
             AllowedTypeMenuClicked (0);
@@ -535,7 +538,7 @@ public class FileDialog : Dialog
         // to streamline user experience and allow direct typing of paths
         // with zero navigation we start with focus in the text box and any
         // default/current path fully selected and ready to be overwritten
-        _tbPath.FocusFirst ();
+        _tbPath.FocusFirst (null);
         _tbPath.SelectAll ();
 
         if (string.IsNullOrEmpty (Title))
@@ -587,7 +590,7 @@ public class FileDialog : Dialog
     {
         FileSystemInfoStats [] stats = State?.Children ?? new FileSystemInfoStats[0];
 
-        // This portion is never reordered (aways .. at top then folders)
+        // This portion is never reordered (always .. at top then folders)
         IOrderedEnumerable<FileSystemInfoStats> forcedOrder = stats
                                                               .OrderByDescending (f => f.IsParent)
                                                               .ThenBy (f => f.IsDir ? -1 : 100);
@@ -667,7 +670,7 @@ public class FileDialog : Dialog
             return;
         }
 
-        // Don't include ".." (IsParent) in multiselections
+        // Don't include ".." (IsParent) in multi-selections
         MultiSelected = toMultiAccept
                         .Where (s => !s.IsParent)
                         .Select (s => s.FileSystemInfo.FullName)
@@ -807,6 +810,11 @@ public class FileDialog : Dialog
         if (stats.FileSystemInfo is IDirectoryInfo d)
         {
             PushState (d, true);
+
+            //if (d == State?.Directory || d.FullName == State?.Directory.FullName)
+            //{
+            //    FinishAccept ();
+            //}
 
             return;
         }
@@ -1042,7 +1050,7 @@ public class FileDialog : Dialog
     {
         if (keyEvent.KeyCode == isKey)
         {
-            to.FocusFirst ();
+            to.FocusFirst (null);
 
             if (to == _tbPath)
             {
@@ -1431,7 +1439,7 @@ public class FileDialog : Dialog
     {
         if (_treeView.HasFocus && Separators.Contains ((char)keyEvent))
         {
-            _tbPath.FocusFirst ();
+            _tbPath.FocusFirst (null);
 
             // let that keystroke go through on the tbPath instead
             return true;

@@ -2,14 +2,6 @@ mode: ContinuousDeployment
 tag-prefix: '[vV]'
 continuous-delivery-fallback-tag: dev
 branches:
-  develop:
-    mode: ContinuousDeployment
-    tag: dev
-    regex: develop
-    source-branches:
-    - main
-    pre-release-weight: 100
-
   v2_develop:
     mode: ContinuousDeployment
     tag: dev
@@ -25,6 +17,20 @@ branches:
     is-release-branch: true
     source-branches: ['v2_develop']
 
+  v1_develop:
+    mode: ContinuousDeployment
+    tag: dev
+    regex: v1_develop
+    source-branches:
+    - v1_release
+    pre-release-weight: 100
+
+  v1_release:
+    mode: ContinuousDeployment
+    regex: v1_release
+    is-release-branch: true
+    source-branches: ['v1_develop']
+
   pull-request:
     mode: ContinuousDeployment
     tag: PullRequest.{BranchName}
@@ -32,9 +38,6 @@ branches:
     tag-number-pattern: '[/-](?<number>\d+)'
     regex: ^(pull|pull\-requests|pr)[/-]
     source-branches:
-    - develop
-    - main
-    - release
     - v2_develop
     - v2_release
     - feature

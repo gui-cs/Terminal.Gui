@@ -30,7 +30,7 @@ public class Shortcuts : Scenario
     // QuitKey and it only sticks if changed after init
     private void App_Loaded (object sender, EventArgs e)
     {
-        Application.QuitKey = Key.Z.WithCtrl;
+        Application.QuitKey = Key.F4.WithCtrl;
         Application.Top.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
@@ -107,7 +107,7 @@ public class Shortcuts : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
         };
 
-        ((CheckBox)vShortcut3.CommandView).Toggle += (s, e) =>
+        ((CheckBox)vShortcut3.CommandView).CheckedStateChanging += (s, e) =>
                                                       {
                                                           if (vShortcut3.CommandView is CheckBox cb)
                                                           {
@@ -166,7 +166,7 @@ public class Shortcuts : Scenario
             CommandView = new CheckBox { Text = "_CanFocus" },
         };
 
-        ((CheckBox)vShortcut5.CommandView).Toggle += (s, e) =>
+        ((CheckBox)vShortcut5.CommandView).CheckedStateChanging += (s, e) =>
                                                      {
                                                          if (vShortcut5.CommandView is CheckBox cb)
                                                          {

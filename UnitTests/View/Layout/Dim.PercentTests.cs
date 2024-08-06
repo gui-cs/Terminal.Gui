@@ -67,9 +67,9 @@ public class DimPercentTests
     public void DimPercent_Invalid_Throws ()
     {
         Dim dim = Dim.Percent (0);
-        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (-1));
+        Assert.Throws<ArgumentOutOfRangeException> (() => dim = Dim.Percent (-1));
         //Assert.Throws<ArgumentException> (() => dim = Dim.Percent (101));
-        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (-1000001));
+        Assert.Throws<ArgumentOutOfRangeException> (() => dim = Dim.Percent (-1000001));
         //Assert.Throws<ArgumentException> (() => dim = Dim.Percent (1000001));
     }
 

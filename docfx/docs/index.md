@@ -6,21 +6,28 @@
 
 * **[Cross Platform](drivers.md)** - Windows, Mac, and Linux. Terminal drivers for Curses, Windows, and the .NET Console mean apps will work well on both color and monochrome terminals. Apps also work over SSH.
 * **[Templates](getting-started.md)** - The `dotnet new` command can be used to create a new Terminal.Gui app.
+* **[Extensible UI](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views. Dozens of [Built-in Views](views.md) are provided.
 * **[Keyboard](keyboard.md) and [Mouse](mouse.md) Input** - The library handles all the details of input processing and provides a simple event-based API for applications to consume.
-* **[Extensible Widgets](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.View.html)** - All visible UI elements are subclasses of the `View` class, and these in turn can contain an arbitrary number of sub-views. Dozens of [Built-in Views](views.md) are provided.
 * **[Powerful Layout Engine](layout.md)** - The layout engine makes it easy to lay out controls relative to each other and enables dynamic terminal UIs. 
+* **[Machine, User, and App-Level Configuration](configuration.md)** - Persistent configuration settings, including overriding default look & feel with Themes, keyboard bindings, and more via the [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) class.
 * **[Clipboard support](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.Clipboard.html)** - Cut, Copy, and Paste is provided through the [`Clipboard`] class.
 * **Multi-tasking** - The [Mainloop](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.MainLoop.html) supports processing events, idle handlers, and timers. Most classes are safe for threading.
 * **[Reactive Extensions](https://github.com/dotnet/reactive)** - Use reactive extensions and benefit from increased code readability, and the ability to apply the MVVM pattern and [ReactiveUI](https://www.reactiveui.net/) data bindings. See the [source code](https://github.com/gui-cs/Terminal.GuiV2Docs/tree/master/ReactiveExample) of a sample app.
 
+See [What's New in V2 For more](newinv2.md).
+
 ## Conceptual Documentation
 
+* [Guide to Migrating from Terminal.Gui v1](migratingfromv1.md)
 * [List of Views](views.md)
+* [Layout Engine](layout.md)
+* [Navigation](navigation.md)
 * [Keyboard API](keyboard.md)
 * [Mouse API](mouse.md)
+* [Configuration and Theme Manager](config.md)
 * [Multi-tasking and the Application Main Loop](mainloop.md)
 * [Cross-platform Driver Model](drivers.md)
-* [Configuration and Theme Manager](config.md)
+* [Dim.Auto Deep Dive](dimauto.md)
 * [TableView Deep Dive](tableview.md)
 * [TreeView Deep Dive](treeview.md)
 

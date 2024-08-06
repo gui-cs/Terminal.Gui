@@ -322,7 +322,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
         if (PopupInsideContainer)
         {
-            // don't overspill horizontally, let's see if can be displayed on the left
+            // don't overspill horizontally, let's see if it can be displayed on the left
             if (width > HostControl.Viewport.Width - renderAt.X)
             {
                 // Verifies that the left limit available is greater than the right limit
@@ -339,7 +339,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         }
         else
         {
-            // don't overspill horizontally, let's see if can be displayed on the left
+            // don't overspill horizontally, let's see if it can be displayed on the left
             if (width > top.Viewport.Width - (renderAt.X + HostControl.Frame.X))
             {
                 // Verifies that the left limit available is greater than the right limit
@@ -376,18 +376,18 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             if (i == SelectedIdx - ScrollOffset)
             {
-                Application.Driver.SetAttribute (ColorScheme.Focus);
+                Application.Driver?.SetAttribute (ColorScheme.Focus);
             }
             else
             {
-                Application.Driver.SetAttribute (ColorScheme.Normal);
+                Application.Driver?.SetAttribute (ColorScheme.Normal);
             }
 
             popup.Move (0, i);
 
             string text = TextFormatter.ClipOrPad (toRender [i].Title, width);
 
-            Application.Driver.AddStr (text);
+            Application.Driver?.AddStr (text);
         }
     }
 
@@ -408,7 +408,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
     /// <summary>
     ///     Called when the user confirms a selection at the current cursor location in the <see cref="HostControl"/>. The
-    ///     <paramref name="accepted"/> string is the full autocomplete word to be inserted. Typically a host will have to
+    ///     <paramref name="accepted"/> string is the full autocomplete word to be inserted. Typically, a host will have to
     ///     remove some characters such that the <paramref name="accepted"/> string completes the word instead of simply being
     ///     appended.
     /// </summary>

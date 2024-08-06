@@ -20,7 +20,7 @@ public class Dialog : Window
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter<Alignment>))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End; // Default is set in config.json
 
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
@@ -33,14 +33,14 @@ public class Dialog : Window
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 25;
+    public static int DefaultMinimumWidth { get; set; } = 80;
 
     /// <summary>
     ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 25;
+    public static int DefaultMinimumHeight { get; set; } = 80;
 
 
     /// <summary>
@@ -48,7 +48,7 @@ public class Dialog : Window
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter<ShadowStyle>))]
-    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None; // Default is set in config.json
 
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
@@ -57,7 +57,7 @@ public class Dialog : Window
 
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
-    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single; // Default is set in config.json
 
     private readonly List<Button> _buttons = new ();
 
@@ -78,9 +78,9 @@ public class Dialog : Window
 
         X = Pos.Center ();
         Y = Pos.Center ();
+        Width = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
+        Height = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
 
-        Width = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
-        Height = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;

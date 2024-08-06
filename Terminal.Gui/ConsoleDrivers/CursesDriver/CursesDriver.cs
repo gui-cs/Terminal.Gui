@@ -317,7 +317,7 @@ internal class CursesDriver : ConsoleDriver
             Curses.doupdate ();
 
             // 
-            // We are setting Invisible as default so we could ignore XTerm DECSUSR setting
+            // We are setting Invisible as default, so we could ignore XTerm DECSUSR setting
             //
             switch (Curses.curs_set (0))
             {
@@ -977,7 +977,7 @@ internal static class Platform
     private static int _suspendSignal;
 
     /// <summary>Suspends the process by sending SIGTSTP to itself</summary>
-    /// <returns>The suspend.</returns>
+    /// <returns>True if the suspension was successful.</returns>
     public static bool Suspend ()
     {
         int signal = GetSuspendSignal ();

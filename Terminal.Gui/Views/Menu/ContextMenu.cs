@@ -18,7 +18,7 @@
 ///         Callers can cause the ContextMenu to be activated on a right-mouse click (or other interaction) by calling
 ///         <see cref="Show()"/>.
 ///     </para>
-///     <para>ContextMenus are located using screen using screen coordinates and appear above all other Views.</para>
+///     <para>ContextMenus are located using screen coordinates and appear above all other Views.</para>
 /// </summary>
 public sealed class ContextMenu : IDisposable
 {
@@ -144,7 +144,7 @@ public sealed class ContextMenu : IDisposable
         _container = Application.Current;
         _container.Closing += Container_Closing;
         _container.Deactivate += Container_Deactivate;
-        Rectangle frame = Application.Driver.Screen;
+        Rectangle frame = Application.Screen;
         Point position = Position;
 
         if (Host is { })
