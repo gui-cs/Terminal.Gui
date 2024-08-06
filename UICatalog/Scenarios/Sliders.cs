@@ -407,7 +407,7 @@ public class Sliders : Scenario
             Text = "Min _Inner Spacing:",
         };
 
-        Buttons.NumericUpDown<int> innerSpacingUpDown = new ()
+        NumericUpDown<int> innerSpacingUpDown = new ()
         {
             X = Pos.Right (label) + 1
         };
