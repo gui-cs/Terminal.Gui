@@ -296,3 +296,33 @@ The [Aligner](~/api/Terminal.Gui.Aligner.yml) class makes it easy to align eleme
 -                                      );
 + var statusBar = new StatusBar (new Shortcut [] { new (Application.QuitKey, "Quit", Quit) });
 ```
+
+## `CheckBox` - API renamed and simplified
+
+In v1 `CheckBox` used `bool?` to represent the 3 states. To support consistent behavior for the `Accept` event, `CheckBox` was refactored to use the new `CheckState` enum instead of `bool?`.
+
+Additionally the `Toggle` method was renamed to `AdvanceCheckState`.
+
+### How to Fix
+
+```diff
+-var cb = new CheckBox ("_Checkbox", true); {
+-				X = Pos.Right (label) + 1,
+-				Y = Pos.Top (label) + 2
+-			};
+-			cb.Toggled += (e) => {
+-			};
+-           cb.Toggle ();
++
++var cb = new CheckBox ()
++{ 
++	Title = "_Checkbox",
++	CheckState = CheckState.Checked
++}
++cb.CheckStateChanging += (s, e) =>
++{	
++	e.Cancel = preventChange;
++}
++preventChange = false;
++cb.AdvanceCheckState ();
+```
