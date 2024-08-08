@@ -94,7 +94,8 @@ public class ColorPickers : Scenario
                 "RGB",
                 "HSV",
                 "HSL"
-            }
+            },
+            SelectedItem = (int)foregroundColorPicker.Style.ColorModel,
         };
 
         rgColorModel.SelectedItemChanged += (_, e) =>
@@ -113,10 +114,10 @@ public class ColorPickers : Scenario
             Y = Pos.Bottom (rgColorModel)+1,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            State = CheckState.Checked,
+            CheckedState = foregroundColorPicker.Style.ShowTextFields ? CheckState.Checked: CheckState.UnChecked,
         };
 
-        cbShowTextFields.Toggle += (_, e) =>
+        cbShowTextFields.CheckedStateChanging += (_, e) =>
                                                 {
                                                     foregroundColorPicker.Style.ShowTextFields = e.NewValue == CheckState.Checked;
                                                     foregroundColorPicker.ApplyStyleChanges ();

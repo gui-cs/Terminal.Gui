@@ -180,7 +180,15 @@ internal abstract class ColorBar : View, IColorBar
             Color color = GetColor (fraction);
 
             // Adjusted isSelectedCell calculation
-            bool isSelectedCell = Value > (x - 1) * _cellValue && Value <= x * _cellValue;
+            var cellBottomThreshold = (x - 1) * _cellValue;
+            var cellTopThreshold = x * _cellValue;
+
+            if (x == width - 1)
+            {
+                cellTopThreshold = MaxValue;
+            }
+
+            bool isSelectedCell = Value > cellBottomThreshold && Value <= cellTopThreshold;
 
             // Check the brightness of the background color
             double brightness = (0.299 * color.R + 0.587 * color.G + 0.114 * color.B) / 255;
