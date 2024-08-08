@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+
+namespace Terminal.Gui;
 
 /// <summary>
 /// Describes away of modelling color e.g. Hue

@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     True color picker using HSL

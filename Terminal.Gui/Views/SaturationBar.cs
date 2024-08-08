@@ -1,15 +1,17 @@
-﻿using ColorHelper;
+﻿#nullable enable
+
+using ColorHelper;
 using ColorConverter = ColorHelper.ColorConverter;
 
 namespace Terminal.Gui;
 
 internal class SaturationBar : ColorBar
 {
-    public HueBar HBar { get; set; }
+    public HueBar? HBar { get; set; }
 
     // Should only have either LBar or VBar not both
-    public LightnessBar LBar { get; set; }
-    public ValueBar VBar { get; set; }
+    public LightnessBar? LBar { get; set; }
+    public ValueBar? VBar { get; set; }
 
     /// <inheritdoc/>
     protected override int MaxValue => 100;
@@ -33,6 +35,6 @@ internal class SaturationBar : ColorBar
             return new (rgb.R, rgb.G, rgb.B);
         }
 
-        throw new ("SaturationBar requires either Lightness or Value to render");
+        throw new ($"{nameof(SaturationBar)} requires either Lightness or Value to render");
     }
 }

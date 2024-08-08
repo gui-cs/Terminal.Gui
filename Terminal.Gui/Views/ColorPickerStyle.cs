@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+
+namespace Terminal.Gui;
 
 /// <summary>
 /// Contains style settings for <see cref="ColorPicker"/> e.g. which <see cref="ColorModel"/>

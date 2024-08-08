@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+
+namespace Terminal.Gui;
 
 /// <summary>Event arguments for the <see cref="Color"/> events.</summary>
 public class ColorEventArgs : EventArgs

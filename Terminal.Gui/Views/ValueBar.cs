@@ -1,12 +1,14 @@
-﻿using ColorHelper;
+﻿#nullable enable
+
+using ColorHelper;
 using ColorConverter = ColorHelper.ColorConverter;
 
 namespace Terminal.Gui;
 
 internal class ValueBar : ColorBar
 {
-    public HueBar HBar { get; set; }
-    public SaturationBar SBar { get; set; }
+    public HueBar? HBar { get; set; }
+    public SaturationBar? SBar { get; set; }
 
     /// <inheritdoc/>
     protected override int MaxValue => 100;
@@ -14,6 +16,11 @@ internal class ValueBar : ColorBar
     /// <inheritdoc/>
     protected override Color GetColor (double fraction)
     {
+        if (HBar == null || SBar == null)
+        {
+            throw new Exception ($"{nameof (ValueBar)} has not been set up correctly before drawing");
+        }
+
         var hsv = new HSV (HBar.Value, (byte)SBar.Value, (byte)(MaxValue * fraction));
         RGB rgb = ColorConverter.HsvToRgb (hsv);
 
