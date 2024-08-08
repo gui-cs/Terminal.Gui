@@ -591,11 +591,22 @@ public class DynamicMenuBar : Scenario
 
             var _txtDelimiter = new TextField
             {
-                X = Pos.Center (), Width = 2, Text = MenuBar.ShortcutDelimiter.ToString ()
+                X = Pos.Center (), Width = 2, Text = Key.ShortcutDelimiter.ToString ()
             };
 
-            _txtDelimiter.TextChanged += (s, _) =>
-                                             MenuBar.ShortcutDelimiter = _txtDelimiter.Text.ToRunes () [0];
+            _txtDelimiter.TextChanging += (s, e) =>
+                                          {
+                                              if (!string.IsNullOrEmpty (e.NewValue))
+                                              {
+                                                  Key.ShortcutDelimiter = e.NewValue.ToRunes () [0];
+                                              }
+                                              else
+                                              {
+                                                  e.Cancel = true;
+                                                  _txtDelimiter.SelectAll ();
+                                              }
+                                          };
+            _txtDelimiter.TextChanged += (s, _) => _txtDelimiter.SelectAll ();
             _frmDelimiter.Add (_txtDelimiter);
 
             Add (_frmDelimiter);

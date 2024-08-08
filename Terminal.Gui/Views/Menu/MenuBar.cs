@@ -1255,21 +1255,6 @@ public class MenuBar : View, IDesignable
         }
     }
 
-    private static Rune _shortcutDelimiter = new ('+');
-
-    /// <summary>Sets or gets the shortcut delimiter separator. The default is "+".</summary>
-    public static Rune ShortcutDelimiter
-    {
-        get => _shortcutDelimiter;
-        set
-        {
-            if (_shortcutDelimiter != value)
-            {
-                _shortcutDelimiter = value == default (Rune) ? new ('+') : value;
-            }
-        }
-    }
-
     /// <summary>The specifier character for the hot keys.</summary>
     public new static Rune HotKeySpecifier => (Rune)'_';
 

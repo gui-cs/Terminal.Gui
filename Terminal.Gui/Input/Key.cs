@@ -450,7 +450,7 @@ public class Key : EventArgs, IEquatable<Key>
 
     /// <summary>Pretty prints the KeyEvent</summary>
     /// <returns></returns>
-    public override string ToString () { return ToString (KeyCode, (Rune)'+'); }
+    public override string ToString () { return ToString (KeyCode, ShortcutDelimiter); }
 
     private static string GetKeyString (KeyCode key)
     {
@@ -483,7 +483,7 @@ public class Key : EventArgs, IEquatable<Key>
     ///     The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key
     ///     name will be returned.
     /// </returns>
-    public static string ToString (KeyCode key) { return ToString (key, (Rune)'+'); }
+    public static string ToString (KeyCode key) { return ToString (key, ShortcutDelimiter); }
 
     /// <summary>Formats a <see cref="KeyCode"/> as a string.</summary>
     /// <param name="key">The key to format.</param>
@@ -584,7 +584,7 @@ public class Key : EventArgs, IEquatable<Key>
         key = null;
 
         // Split the string into parts
-        string [] parts = text.Split ('+', '-');
+        string [] parts = text.Split ('+', '-', (char)ShortcutDelimiter.Value);
 
         if (parts.Length is 0 or > 4 || parts.Any (string.IsNullOrEmpty))
         {
@@ -971,4 +971,19 @@ public class Key : EventArgs, IEquatable<Key>
     public static Key F24 => new (KeyCode.F24);
 
     #endregion
+
+    private static Rune _shortcutDelimiter = new ('+');
+
+    /// <summary>Sets or gets the shortcut delimiter separator. The default is "+".</summary>
+    public static Rune ShortcutDelimiter
+    {
+        get => _shortcutDelimiter;
+        set
+        {
+            if (_shortcutDelimiter != value)
+            {
+                _shortcutDelimiter = value == default (Rune) ? new ('+') : value;
+            }
+        }
+    }
 }
