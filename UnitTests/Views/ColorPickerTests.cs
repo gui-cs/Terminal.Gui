@@ -40,7 +40,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ColorPicker_RGB_KeyboardNavigation ()
     {
         var cp = new ColorPicker { Width = 20, SelectedColor = new (0, 0) };
@@ -48,9 +48,11 @@ public class ColorPickerTests
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
 
-        var top = new Toplevel ();
-        top.Add (cp);
-        Application.Begin (top);
+        Application.Current = new Toplevel (){Width = 20};
+        Application.Current.Add (cp);
+        Application.Current.FocusFirst (null);
+
+        Application.Current.LayoutSubviews ();
 
         cp.Draw ();
 
@@ -71,35 +73,44 @@ public class ColorPickerTests
         Assert.Equal ("#000000", hex.Text);
 
         Assert.IsAssignableFrom<IColorBar> (cp.Focused);
-        cp.NewKeyDownEvent (Key.CursorRight);
+
+        cp.Draw ();
+
+        Application.OnKeyDown (Key.CursorRight);
 
         cp.Draw ();
 
         Assert.Equal (3, r.TrianglePosition);
         Assert.Equal ("#0F0000", hex.Text);
 
-        cp.NewKeyDownEvent (Key.CursorRight);
+        Application.OnKeyDown (Key.CursorRight);
 
         cp.Draw ();
 
         Assert.Equal (4, r.TrianglePosition);
         Assert.Equal ("#1E0000", hex.Text);
 
-        top.Dispose ();
+        for (int i = 0; i < 1000; i++)
+        {
+            Application.OnKeyDown (Key.CursorRight);
+        }
+
+        cp.Draw ();
+
+        Assert.Equal (20, r.TrianglePosition);
+        Assert.Equal ("#FF0000", hex.Text);
+
+        Application.Current.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ColorPicker_RGB_MouseNavigation ()
     {
         var cp = new ColorPicker { Width = 20,SelectedColor = new (0, 0) };
         cp.Style.ColorModel = ColorModel.RGB;
         cp.Style.ShowTextFields = false;
         cp.ApplyStyleChanges ();
-
-        var top = new Toplevel ();
-        top.Add (cp);
-        Application.Begin (top);
 
         cp.Draw ();
 
@@ -145,7 +156,7 @@ public class ColorPickerTests
         Assert.Equal (4, r.TrianglePosition);
         Assert.Equal ("#1E0000", hex.Text);
 
-        top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     public static IEnumerable<object []> ColorPickerTestData ()
@@ -176,7 +187,7 @@ public class ColorPickerTests
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [MemberData (nameof (ColorPickerTestData))]
     public void ColorPicker_RGB_NoText (Color c, string expectedR, int expectedRTriangle, string expectedG, int expectedGTriangle, string expectedB, int expectedBTriangle, string expectedHex)
     {
@@ -185,11 +196,7 @@ public class ColorPickerTests
         cp.Style.ShowTextFields = false;
         cp.Style.ColorModel = ColorModel.RGB;
         cp.ApplyStyleChanges ();
-
-        var top = new Toplevel ();
-        top.Add (cp);
-        Application.Begin (top);
-
+        
         cp.Draw ();
 
         var r = GetColorBar (cp, ColorPickerPart.Bar1);
@@ -205,7 +212,7 @@ public class ColorPickerTests
         Assert.Equal (expectedBTriangle, b.TrianglePosition);
         Assert.Equal (expectedHex, hex.Text);
 
-        top.Dispose ();
+        Application.Current.Dispose ();
     }
 
     public static IEnumerable<object []> ColorPickerTestData_WithTextFields ()
@@ -236,7 +243,7 @@ public class ColorPickerTests
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     [MemberData (nameof (ColorPickerTestData_WithTextFields))]
     public void ColorPicker_RGB_NoText_WithTextFields (Color c, string expectedR, int expectedRTriangle, int expectedRValue, string expectedG, int expectedGTriangle, int expectedGValue, string expectedB, int expectedBTriangle, int expectedBValue, string expectedHex)
     {
@@ -275,7 +282,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ColorPicker_ClickingAtEndOfBar_SetsMaxValue ()
     {
         var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
@@ -316,7 +323,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ColorPicker_ClickingBeyondBar_ChangesToMaxValue ()
     {
         var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
@@ -357,7 +364,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ColorPicker_ChangeValueOnUI_UpdatesAllUIElements ()
     {
         var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
@@ -406,7 +413,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ColorPicker_InvalidHexInput_DoesNotChangeColor ()
     {
         var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
@@ -444,7 +451,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ColorPicker_ClickingDifferentBars_ChangesFocus ()
     {
         var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
@@ -490,7 +497,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ColorPicker_SwitchingColorModels_ResetsBars ()
     {
         var cp = new ColorPicker { Width = 20,  SelectedColor = new (255, 0) };
@@ -538,7 +545,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ColorPicker_SyncBetweenTextFieldAndBars ()
     {
         var cp = new ColorPicker { Width = 20,  SelectedColor = new (0, 0) };
@@ -613,7 +620,7 @@ public class ColorPickerTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [SetupFakeDriver]
     public void ColorPicker_ChangedEvent_Fires ()
     {
         Color oldColor = default;

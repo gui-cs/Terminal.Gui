@@ -82,6 +82,49 @@ public class ColorPickers : Scenario
         };
         app.Add (_demoView);
 
+
+        // Radio for switching color models
+        var rgColorModel = new RadioGroup ()
+        {
+            Y = Pos.Bottom (_demoView),
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            RadioLabels = new []
+            {
+                "RGB",
+                "HSV",
+                "HSL"
+            }
+        };
+
+        rgColorModel.SelectedItemChanged += (_, e) =>
+                                            {
+                                                foregroundColorPicker.Style.ColorModel = (ColorModel)e.SelectedItem;
+                                                foregroundColorPicker.ApplyStyleChanges ();
+                                                backgroundColorPicker.Style.ColorModel = (ColorModel)e.SelectedItem;
+                                                backgroundColorPicker.ApplyStyleChanges ();
+                                            };
+        app.Add (rgColorModel);
+
+        // Checkbox for switching show text fields on and off
+        var cbShowTextFields = new CheckBox ()
+        {
+            Text = "Show Text Fields",
+            Y = Pos.Bottom (rgColorModel)+1,
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            State = CheckState.Checked,
+        };
+
+        cbShowTextFields.Toggle += (_, e) =>
+                                                {
+                                                    foregroundColorPicker.Style.ShowTextFields = e.NewValue == CheckState.Checked;
+                                                    foregroundColorPicker.ApplyStyleChanges ();
+                                                    backgroundColorPicker.Style.ShowTextFields = e.NewValue == CheckState.Checked;
+                                                    backgroundColorPicker.ApplyStyleChanges ();
+                                                };
+        app.Add (cbShowTextFields);
+
         // Set default colors.
         foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground.GetClosestNamedColor ();
         backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background.GetClosestNamedColor ();
