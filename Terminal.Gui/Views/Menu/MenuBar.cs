@@ -180,11 +180,12 @@ public class MenuBar : View, IDesignable
                     KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value | KeyCode.AltMask, keyBinding);
                 }
 
-                if (menuBarItem?.Shortcut != KeyCode.Null)
+                if (menuBarItem?.ShortcutKey != Key.Empty)
                 {
                     // Technically this will never run because MenuBarItems don't have shortcuts
                     KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, i);
-                    KeyBindings.Add (menuBarItem.Shortcut, keyBinding);
+                    KeyBindings.Remove (menuBarItem.ShortcutKey);
+                    KeyBindings.Add (menuBarItem.ShortcutKey, keyBinding);
                 }
 
                 menuBarItem?.AddShortcutKeyBindings (this);

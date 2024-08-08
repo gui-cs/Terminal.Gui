@@ -471,7 +471,7 @@ public class DynamicMenuBar : Scenario
                     CheckStyle = RbChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck :
                                  RbChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked :
                                  MenuItemCheckStyle.Radio,
-                    Shortcut = TextShortcut.Text,
+                    ShortcutKey = TextShortcutKey.Text,
                     AllowNullChecked = CkbNullCheck?.CheckedState == CheckState.Checked,
                 };
             }
@@ -853,7 +853,7 @@ public class DynamicMenuBar : Scenario
                                                           : _frmMenuDetails.RbChkStyle.SelectedItem == 1
                                                               ? MenuItemCheckStyle.Checked
                                                               : MenuItemCheckStyle.Radio,
-                                         Shortcut = _frmMenuDetails.TextShortcut.Text
+                                         ShortcutKey = _frmMenuDetails.TextShortcutKey.Text
                                      };
                                      UpdateMenuItem (_currentEditMenuBarItem, menuItem, _lstMenus.SelectedItem);
                                  }
@@ -1065,7 +1065,13 @@ public class DynamicMenuBar : Scenario
                                          _menuBar.Menus = menus;
                                          _currentMenuBarItem = newMenu;
                                          _currentMenuBarItem.CheckType = item.CheckStyle;
-                                         _currentSelectedMenuBar = menus.Length - 1;
+
+                                         if (Key.TryParse (item.ShortcutKey, out Key key))
+                                         {
+                                             _currentMenuBarItem.ShortcutKey = key;
+                                         }
+
+                                         _currentSelectedMenuBar = _menuBar.Menus.Length - 1;
                                          _menuBar.Menus [_currentSelectedMenuBar] = newMenu;
                                          _lblMenuBar.Text = newMenu.Title;
                                          SetListViewSource (_currentMenuBarItem, true);
@@ -1217,12 +1223,22 @@ public class DynamicMenuBar : Scenario
                     newMenu.CheckType = item.CheckStyle;
                     newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
                     newMenu.Shortcut = ShortcutHelper.GetShortcutFromTag (item.Shortcut);
+
+                    if (Key.TryParse (item.ShortcutKey, out Key key))
+                    {
+                        newMenu.ShortcutKey = key;
+                    }
                     newMenu.AllowNullChecked = item.AllowNullChecked;
                 }
                 else if (item.IsTopLevel)
                 {
                     newMenu = new MenuBarItem (item.Title, item.Help, null);
                     newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
+
+                    if (Key.TryParse (item.ShortcutKey, out Key key))
+                    {
+                        newMenu.ShortcutKey = key;
+                    }
                 }
                 else
                 {
@@ -1231,8 +1247,10 @@ public class DynamicMenuBar : Scenario
                     ((MenuBarItem)newMenu).Children [0].Action =
                         _frmMenuDetails.CreateAction (newMenu, item);
 
-                    ((MenuBarItem)newMenu).Children [0].Shortcut =
-                        ShortcutHelper.GetShortcutFromTag (item.Shortcut);
+                    if (Key.TryParse (item.ShortcutKey, out Key key))
+                    {
+                        ((MenuBarItem)newMenu).Children [0].ShortcutKey = key;
+                    }
                 }
 
                 return newMenu;
@@ -1256,6 +1274,12 @@ public class DynamicMenuBar : Scenario
 
                     _currentEditMenuBarItem.Action =
                         _frmMenuDetails.CreateAction (_currentEditMenuBarItem, menuItem);
+
+                    if (Key.TryParse (menuItem.ShortcutKey, out Key key))
+                    {
+                        _currentEditMenuBarItem.ShortcutKey = key;
+                    }
+
                     SetListViewSource (_currentEditMenuBarItem, true);
                 }
                 else if (menuItem.HasSubMenu)
@@ -1305,8 +1329,10 @@ public class DynamicMenuBar : Scenario
                     _currentEditMenuBarItem.Action =
                         _frmMenuDetails.CreateAction (_currentEditMenuBarItem, menuItem);
 
-                    _currentEditMenuBarItem.Shortcut =
-                        ShortcutHelper.GetShortcutFromTag (menuItem.Shortcut);
+                    if (Key.TryParse (menuItem.ShortcutKey, out Key key))
+                    {
+                        _currentEditMenuBarItem.ShortcutKey = key;
+                    }
                 }
 
                 if (_currentEditMenuBarItem.Parent == null)
@@ -1350,7 +1376,8 @@ public class DynamicMenuBar : Scenario
         public bool HasSubMenu { get; set; }
         public string Help { get; set; } = string.Empty;
         public bool IsTopLevel { get; set; }
-        public string Shortcut { get; set; }
+        public string HotKey { get; set; }
+        public string ShortcutKey { get; set; }
         public string Title { get; set; } = "_New";
     }
 
@@ -1358,7 +1385,7 @@ public class DynamicMenuBar : Scenario
     {
         public MenuItem MenuItem { get; set; }
         public string Title { get; set; }
-        public override string ToString () { return $"{Title}, {MenuItem}"; }
+        public override string ToString () { return $"{Title}, {(Key)MenuItem.ShortcutKey}"; }
     }
 
     public class DynamicMenuItemModel : INotifyPropertyChanged

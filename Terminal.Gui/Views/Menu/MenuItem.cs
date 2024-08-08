@@ -10,27 +10,23 @@ public class MenuItem
     private bool _allowNullChecked;
     private MenuItemCheckStyle _checkType;
 
-    private string _title;
-
-    // TODO: Update to use Key instead of KeyCode
     /// <summary>Initializes a new instance of <see cref="MenuItem"/></summary>
-    public MenuItem (KeyCode shortcut = KeyCode.Null) : this ("", "", null, null, null, shortcut) { }
+    public MenuItem (Key shortcutKey = null) : this ("", "", null, null, null, shortcutKey) { }
 
-    // TODO: Update to use Key instead of KeyCode
     /// <summary>Initializes a new instance of <see cref="MenuItem"/>.</summary>
     /// <param name="title">Title for the menu item.</param>
     /// <param name="help">Help text to display.</param>
     /// <param name="action">Action to invoke when the menu item is activated.</param>
     /// <param name="canExecute">Function to determine if the action can currently be executed.</param>
     /// <param name="parent">The <see cref="Parent"/> of this menu item.</param>
-    /// <param name="shortcut">The <see cref="Shortcut"/> keystroke combination.</param>
+    /// <param name="shortcutKey">The <see cref="ShortcutKey"/> keystroke combination.</param>
     public MenuItem (
         string title,
         string help,
         Action action,
         Func<bool> canExecute = null,
         MenuItem parent = null,
-        KeyCode shortcut = KeyCode.Null
+        Key shortcutKey = null
     )
     {
         Title = title ?? "";
@@ -38,12 +34,13 @@ public class MenuItem
         Action = action;
         CanExecute = canExecute;
         Parent = parent;
-        _shortcutHelper = new ();
 
-        if (shortcut != KeyCode.Null)
+        if (Parent is { } && Parent.ShortcutKey != Key.Empty)
         {
-            Shortcut = shortcut;
+            Parent.ShortcutKey = Key.Empty;
         }
+        // Setter will ensure Key.Empty if it's null
+        ShortcutKey = shortcutKey;
     }
 
     /// <summary>Gets or sets the action to be invoked when the menu item is triggered.</summary>
@@ -208,15 +205,16 @@ public class MenuItem
     ///     <see cref="Title"/> of a MenuItem with an underscore ('_').
     ///     <para>
     ///         Pressing Alt-Hotkey for a <see cref="MenuBarItem"/> (menu items on the menu bar) works even if the menu is
-    ///         not active). Once a menu has focus and is active, pressing just the HotKey will activate the MenuItem.
+    ///         not active. Once a menu has focus and is active, pressing just the HotKey will activate the MenuItem.
     ///     </para>
     ///     <para>
     ///         For example for a MenuBar with a "_File" MenuBarItem that contains a "_New" MenuItem, Alt-F will open the
     ///         File menu. Pressing the N key will then activate the New MenuItem.
     ///     </para>
-    ///     <para>See also <see cref="Shortcut"/> which enable global key-bindings to menu items.</para>
+    ///     <para>See also <see cref="ShortcutKey"/> which enable global key-bindings to menu items.</para>
     /// </summary>
     public Rune HotKey { get; set; }
+
     private void GetHotKey ()
     {
         var nextIsHot = false;
@@ -242,32 +240,51 @@ public class MenuItem
         }
     }
 
-    // TODO: Update to use Key instead of KeyCode
+    private Key _shortcutKey = Key.Empty;
+
     /// <summary>
     ///     Shortcut defines a key binding to the MenuItem that will invoke the MenuItem's action globally for the
     ///     <see cref="View"/> that is the parent of the <see cref="MenuBar"/> or <see cref="ContextMenu"/> this
     ///     <see cref="MenuItem"/>.
     ///     <para>
-    ///         The <see cref="KeyCode"/> will be drawn on the MenuItem to the right of the <see cref="Title"/> and
+    ///         The <see cref="Key"/> will be drawn on the MenuItem to the right of the <see cref="Title"/> and
     ///         <see cref="Help"/> text. See <see cref="ShortcutTag"/>.
     ///     </para>
     /// </summary>
-    public KeyCode Shortcut
+    public Key ShortcutKey
     {
-        get => _shortcutHelper.Shortcut;
+        get => _shortcutKey;
         set
         {
-            if (_shortcutHelper.Shortcut != value && (ShortcutHelper.PostShortcutValidation (value) || value == KeyCode.Null))
-            {
-                _shortcutHelper.Shortcut = value;
-            }
+            var oldKey = _shortcutKey ?? Key.Empty;
+            _shortcutKey = value ?? Key.Empty;
+            UpdateShortcutKeyBinding (oldKey);
         }
     }
 
-    /// <summary>Gets the text describing the keystroke combination defined by <see cref="Shortcut"/>.</summary>
-    public string ShortcutTag => _shortcutHelper.Shortcut == KeyCode.Null
-                                     ? string.Empty
-                                     : Key.ToString (_shortcutHelper.Shortcut, MenuBar.ShortcutDelimiter);
+    /// <summary>Gets the text describing the keystroke combination defined by <see cref="ShortcutKey"/>.</summary>
+    public string ShortcutTag => ShortcutKey != Key.Empty ? ShortcutKey.ToString () : string.Empty;
+
+    internal void UpdateShortcutKeyBinding (Key oldKey)
+    {
+        if (_menuBar is null)
+        {
+            return;
+        }
+
+        if (oldKey != Key.Empty)
+        {
+            _menuBar.KeyBindings.Remove (oldKey);
+        }
+
+        if (ShortcutKey != Key.Empty)
+        {
+            KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, this);
+            // Remove an existent ShortcutKey
+            _menuBar?.KeyBindings.Remove (ShortcutKey);
+            _menuBar?.KeyBindings.Add (ShortcutKey, keyBinding);
+        }
+    }
 
     #endregion Keyboard Handling
 }

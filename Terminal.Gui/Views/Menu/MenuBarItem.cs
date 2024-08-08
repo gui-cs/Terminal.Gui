@@ -2,7 +2,7 @@ namespace Terminal.Gui;
 
 /// <summary>
 ///     <see cref="MenuBarItem"/> is a menu item on  <see cref="MenuBar"/>. MenuBarItems do not support
-///     <see cref="MenuItem.Shortcut"/>.
+///     <see cref="MenuItem.ShortcutKey"/>.
 /// </summary>
 public class MenuBarItem : MenuItem
 {
@@ -100,7 +100,7 @@ public class MenuBarItem : MenuItem
         {
             // For MenuBar only add shortcuts for submenus
 
-            if (menuItem.Shortcut != KeyCode.Null)
+            if (menuItem.ShortcutKey != Key.Empty)
             {
                 KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuItem);
                 menuBar.KeyBindings.Remove (menuItem.Shortcut);

@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.Text;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -217,7 +218,7 @@ public class MenuBarTests (ITestOutputHelper output)
         Assert.Null (menuBarItem.Action);
         Assert.Null (menuBarItem.CanExecute);
         Assert.Null (menuBarItem.Parent);
-        Assert.Equal (KeyCode.Null, menuBarItem.Shortcut);
+        Assert.Equal (Key.Empty, menuBarItem.ShortcutKey);
     }
 
     [Fact]
