@@ -107,7 +107,7 @@ public class Shortcuts : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
         };
 
-        ((CheckBox)vShortcut3.CommandView).Toggle += (s, e) =>
+        ((CheckBox)vShortcut3.CommandView).CheckedStateChanging += (s, e) =>
                                                       {
                                                           if (vShortcut3.CommandView is CheckBox cb)
                                                           {
@@ -166,7 +166,7 @@ public class Shortcuts : Scenario
             CommandView = new CheckBox { Text = "_CanFocus" },
         };
 
-        ((CheckBox)vShortcut5.CommandView).Toggle += (s, e) =>
+        ((CheckBox)vShortcut5.CommandView).CheckedStateChanging += (s, e) =>
                                                      {
                                                          if (vShortcut5.CommandView is CheckBox cb)
                                                          {

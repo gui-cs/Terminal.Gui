@@ -143,7 +143,7 @@ public class Localization : Scenario
         {
             X = Pos.Right (textField) + 1,
             Y = Pos.Bottom (textAndFileDialogLabel) + 1,
-            State = CheckState.UnChecked,
+            CheckedState = CheckState.UnChecked,
             Text = "Allow any"
         };
         win.Add (_allowAnyCheckBox);
@@ -190,7 +190,7 @@ public class Localization : Scenario
 
         dialog.AllowedTypes =
         [
-            _allowAnyCheckBox.State == CheckState.Checked
+            _allowAnyCheckBox.CheckedState == CheckState.Checked
                 ? new AllowedTypeAny ()
                 : new AllowedType ("Dynamic link library", ".dll"),
             new AllowedType ("Json", ".json"),

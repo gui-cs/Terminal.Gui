@@ -74,10 +74,10 @@ public class AdornmentEditor : View
         AdornmentChanged?.Invoke (this, EventArgs.Empty);
     }
 
-    private Buttons.NumericUpDown<int> _topEdit;
-    private Buttons.NumericUpDown<int> _leftEdit;
-    private Buttons.NumericUpDown<int> _bottomEdit;
-    private Buttons.NumericUpDown<int> _rightEdit;
+    private NumericUpDown<int> _topEdit;
+    private NumericUpDown<int> _leftEdit;
+    private NumericUpDown<int> _bottomEdit;
+    private NumericUpDown<int> _rightEdit;
 
     public AdornmentEditor ()
     {
@@ -98,6 +98,7 @@ public class AdornmentEditor : View
         _topEdit = new ()
         {
             X = Pos.Center (), Y = 0,
+            Format = "{0, 2}",
             Enabled = false
         };
 
@@ -106,7 +107,8 @@ public class AdornmentEditor : View
 
         _leftEdit = new ()
         {
-            X = Pos.Left (_topEdit) - Pos.Func (() => _topEdit.Digits) - 2, Y = Pos.Bottom (_topEdit),
+            X = Pos.Left (_topEdit) - Pos.Func (() => _topEdit.Text.Length) - 2, Y = Pos.Bottom (_topEdit),
+            Format = _topEdit.Format,
             Enabled = false
         };
 
@@ -116,6 +118,7 @@ public class AdornmentEditor : View
         _rightEdit = new ()
         {
             X = Pos.Right (_leftEdit) + 5, Y = Pos.Bottom (_topEdit),
+            Format = _topEdit.Format,
             Enabled = false
         };
 
@@ -125,6 +128,7 @@ public class AdornmentEditor : View
         _bottomEdit = new ()
         {
             X = Pos.Center (), Y = Pos.Bottom (_leftEdit),
+            Format = _topEdit.Format,
             Enabled = false
         };
 

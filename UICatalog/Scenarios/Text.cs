@@ -107,7 +107,7 @@ public class Text : Scenario
         // single-line mode.
         var chxMultiline = new CheckBox
         {
-            X = Pos.Left (textView), Y = Pos.Bottom (textView), State = textView.Multiline ? CheckState.Checked : CheckState.UnChecked, Text = "_Multiline"
+            X = Pos.Left (textView), Y = Pos.Bottom (textView), CheckedState = textView.Multiline ? CheckState.Checked : CheckState.UnChecked, Text = "_Multiline"
         };
         win.Add (chxMultiline);
 
@@ -115,10 +115,10 @@ public class Text : Scenario
         {
             X = Pos.Right (chxMultiline) + 2,
             Y = Pos.Top (chxMultiline),
-            State = textView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = textView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Word Wrap"
         };
-        chxWordWrap.Toggle += (s, e) => textView.WordWrap = e.NewValue == CheckState.Checked;
+        chxWordWrap.CheckedStateChanging += (s, e) => textView.WordWrap = e.NewValue == CheckState.Checked;
         win.Add (chxWordWrap);
 
         // TextView captures Tabs (so users can enter /t into text) by default;
@@ -128,29 +128,29 @@ public class Text : Scenario
         {
             X = Pos.Right (chxWordWrap) + 2,
             Y = Pos.Top (chxWordWrap),
-            State = textView.AllowsTab ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = textView.AllowsTab ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Capture Tabs"
         };
 
-        chxMultiline.Toggle += (s, e) =>
+        chxMultiline.CheckedStateChanging += (s, e) =>
                                 {
                                     textView.Multiline = e.NewValue == CheckState.Checked;
 
-                                    if (!textView.Multiline && chxWordWrap.State == CheckState.Checked)
+                                    if (!textView.Multiline && chxWordWrap.CheckedState == CheckState.Checked)
                                     {
-                                        chxWordWrap.State = CheckState.UnChecked;
+                                        chxWordWrap.CheckedState = CheckState.UnChecked;
                                     }
 
-                                    if (!textView.Multiline && chxCaptureTabs.State == CheckState.Checked)
+                                    if (!textView.Multiline && chxCaptureTabs.CheckedState == CheckState.Checked)
                                     {
-                                        chxCaptureTabs.State = CheckState.UnChecked;
+                                        chxCaptureTabs.CheckedState = CheckState.UnChecked;
                                     }
                                 };
 
         Key keyTab = textView.KeyBindings.GetKeyFromCommands (Command.Tab);
         Key keyBackTab = textView.KeyBindings.GetKeyFromCommands (Command.BackTab);
 
-        chxCaptureTabs.Toggle += (s, e) =>
+        chxCaptureTabs.CheckedStateChanging += (s, e) =>
                                   {
                                       if (e.NewValue == CheckState.Checked)
                                       {
