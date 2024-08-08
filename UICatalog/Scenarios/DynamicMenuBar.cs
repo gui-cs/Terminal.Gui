@@ -1095,7 +1095,6 @@ public class DynamicMenuBar : Scenario
                     newMenu = new (item.Title, item.Help, null, null, parent);
                     newMenu.CheckType = item.CheckStyle;
                     newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
-                    newMenu.Shortcut = ShortcutHelper.GetShortcutFromTag (item.Shortcut);
 
                     if (Key.TryParse (item.ShortcutKey, out Key key))
                     {
