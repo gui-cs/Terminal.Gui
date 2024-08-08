@@ -7,8 +7,6 @@ namespace Terminal.Gui;
 public class MenuItem
 {
     internal static MenuBar _menuBar;
-    private bool _allowNullChecked;
-    private MenuItemCheckStyle _checkType;
 
     /// <summary>Initializes a new instance of <see cref="MenuItem"/></summary>
     public MenuItem (Key shortcutKey = null) : this ("", "", null, null, null, shortcutKey) { }
@@ -42,6 +40,11 @@ public class MenuItem
         // Setter will ensure Key.Empty if it's null
         ShortcutKey = shortcutKey;
     }
+
+    private bool _allowNullChecked;
+    private MenuItemCheckStyle _checkType;
+
+    private string _title;
 
     /// <summary>Gets or sets the action to be invoked when the menu item is triggered.</summary>
     /// <value>Method to invoke.</value>
@@ -101,6 +104,12 @@ public class MenuItem
     /// <value>The help text.</value>
     public string Help { get; set; }
 
+    /// <summary>
+    ///     Returns <see langword="true"/> if the menu item is enabled. This method is a wrapper around
+    ///     <see cref="CanExecute"/>.
+    /// </summary>
+    public bool IsEnabled () { return CanExecute?.Invoke () ?? true; }
+
     /// <summary>Gets the parent for this <see cref="MenuItem"/>.</summary>
     /// <value>The parent.</value>
     public MenuItem Parent { get; set; }
@@ -121,46 +130,6 @@ public class MenuItem
             GetHotKey ();
         }
     }
-
-    /// <summary>Gets if this <see cref="MenuItem"/> is from a sub-menu.</summary>
-    internal bool IsFromSubMenu => Parent != null;
-
-    internal int TitleLength => GetMenuBarItemLength (Title);
-
-    // 
-    // ┌─────────────────────────────┐
-    // │ Quit  Quit UI Catalog  Ctrl+Q │
-    // └─────────────────────────────┘
-    // ┌─────────────────┐
-    // │ ◌ TopLevel Alt+T │
-    // └─────────────────┘
-    // TODO: Replace the `2` literals with named constants 
-    internal int Width => 1
-                          + // space before Title
-                          TitleLength
-                          + 2
-                          + // space after Title - BUGBUG: This should be 1 
-                          (Checked == true || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio)
-                               ? 2
-                               : 0)
-                          + // check glyph + space 
-                          (Help.GetColumns () > 0 ? 2 + Help.GetColumns () : 0)
-                          + // Two spaces before Help
-                          (ShortcutTag.GetColumns () > 0
-                               ? 2 + ShortcutTag.GetColumns ()
-                               : 0); // Pad two spaces before shortcut tag (which are also aligned right)
-
-    /// <summary>Merely a debugging aid to see the interaction with main.</summary>
-    internal bool GetMenuBarItem () { return IsFromSubMenu; }
-
-    /// <summary>Merely a debugging aid to see the interaction with main.</summary>
-    internal MenuItem GetMenuItem () { return this; }
-
-    /// <summary>
-    ///     Returns <see langword="true"/> if the menu item is enabled. This method is a wrapper around
-    ///     <see cref="CanExecute"/>.
-    /// </summary>
-    public bool IsEnabled () { return CanExecute?.Invoke () ?? true; }
 
     /// <summary>
     ///     Toggle the <see cref="Checked"/> between three states if <see cref="AllowNullChecked"/> is
@@ -189,6 +158,40 @@ public class MenuItem
             Checked = !Checked;
         }
     }
+
+    /// <summary>Merely a debugging aid to see the interaction with main.</summary>
+    internal bool GetMenuBarItem () { return IsFromSubMenu; }
+
+    /// <summary>Merely a debugging aid to see the interaction with main.</summary>
+    internal MenuItem GetMenuItem () { return this; }
+
+    /// <summary>Gets if this <see cref="MenuItem"/> is from a sub-menu.</summary>
+    internal bool IsFromSubMenu => Parent != null;
+
+    internal int TitleLength => GetMenuBarItemLength (Title);
+
+    // 
+    // ┌─────────────────────────────┐
+    // │ Quit  Quit UI Catalog  Ctrl+Q │
+    // └─────────────────────────────┘
+    // ┌─────────────────┐
+    // │ ◌ TopLevel Alt+T │
+    // └─────────────────┘
+    // TODO: Replace the `2` literals with named constants
+    internal int Width => 1
+                          + // space before Title
+                          TitleLength
+                          + 2
+                          + // space after Title - BUGBUG: This should be 1
+                          (Checked == true || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio)
+                               ? 2
+                               : 0)
+                          + // check glyph + space 
+                          (Help.GetColumns () > 0 ? 2 + Help.GetColumns () : 0)
+                          + // Two spaces before Help
+                          (ShortcutTag.GetColumns () > 0
+                               ? 2 + ShortcutTag.GetColumns ()
+                               : 0); // Pad two spaces before shortcut tag (which are also aligned right)
 
     private static int GetMenuBarItemLength (string title)
     {
