@@ -162,6 +162,8 @@ public class MenuBar : View, IDesignable
         {
             _menus = value;
 
+            MenuItem._menuBar = this;
+
             if (Menus is null)
             {
                 return;
@@ -174,8 +176,10 @@ public class MenuBar : View, IDesignable
 
                 if (menuBarItem?.HotKey != default (Rune))
                 {
+                    KeyBindings.Remove ((KeyCode)menuBarItem!.HotKey.Value);
                     KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.Focused, i);
-                    KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value, keyBinding);
+                    KeyBindings.Add ((KeyCode)menuBarItem!.HotKey.Value, keyBinding);
+                    KeyBindings.Remove ((KeyCode)menuBarItem.HotKey.Value | KeyCode.AltMask);
                     keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, i);
                     KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value | KeyCode.AltMask, keyBinding);
                 }
@@ -183,8 +187,9 @@ public class MenuBar : View, IDesignable
                 if (menuBarItem?.ShortcutKey != Key.Empty)
                 {
                     // Technically this will never run because MenuBarItems don't have shortcuts
-                    KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, i);
+                    // unless the IsTopLevel is true
                     KeyBindings.Remove (menuBarItem.ShortcutKey);
+                    KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuBarItem);
                     KeyBindings.Add (menuBarItem.ShortcutKey, keyBinding);
                 }
 
@@ -1751,5 +1756,13 @@ public class MenuBar : View, IDesignable
             new MenuBarItem ("_About", "Top-Level", () => actionFn ("About"))
         ];
         return true;
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        MenuItem._menuBar = null;
+
+        base.Dispose (disposing);
     }
 }

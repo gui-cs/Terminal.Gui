@@ -167,112 +167,48 @@ public class DynamicMenuBar : Scenario
             };
             Add (_lblShortcut);
 
-            TextShortcut = new ()
+            TextShortcutKey = new ()
             {
                 X = Pos.X (_lblShortcut), Y = Pos.Bottom (_lblShortcut), Width = Dim.Fill (), ReadOnly = true
             };
 
-            TextShortcut.KeyDown += (s, e) =>
+            TextShortcutKey.KeyDown += (s, e) =>
                                     {
-                                        if (!ProcessKey (e))
-                                        {
-                                            return;
-                                        }
+                                        TextShortcutKey.Text = e.ToString ();
 
-                                        if (CheckShortcut (e.KeyCode, true))
-                                        {
-                                            e.Handled = true;
-                                        }
                                     };
 
-            bool ProcessKey (Key ev)
-            {
-                switch (ev.KeyCode)
-                {
-                    case KeyCode.CursorUp:
-                    case KeyCode.CursorDown:
-                    case KeyCode.Tab:
-                    case KeyCode.Tab | KeyCode.ShiftMask:
-                        return false;
-                }
-
-                return true;
-            }
-
-            bool CheckShortcut (KeyCode k, bool pre)
-            {
-                MenuItem m = _menuItem != null ? _menuItem : new ();
-
-                if (pre && !ShortcutHelper.PreShortcutValidation (k))
-                {
-                    TextShortcut.Text = "";
-
-                    return false;
-                }
-
-                if (!pre)
-                {
-                    if (!ShortcutHelper.PostShortcutValidation (
-                                                                ShortcutHelper.GetShortcutFromTag (TextShortcut.Text)
-                                                               ))
-                    {
-                        TextShortcut.Text = "";
-
-                        return false;
-                    }
-
-                    return true;
-                }
-
-                TextShortcut.Text =
-                    Key.ToString (
-                                  k,
-                                  MenuBar.ShortcutDelimiter
-                                 ); // ShortcutHelper.GetShortcutTag (k);
-
-                return true;
-            }
-
-            TextShortcut.KeyUp += (s, e) =>
-                                  {
-                                      if (CheckShortcut (e.KeyCode, false))
-                                      {
-                                          e.Handled = true;
-                                      }
-                                  };
-            Add (TextShortcut);
+            Add (TextShortcutKey);
 
             var _btnShortcut = new Button
             {
-                X = Pos.X (_lblShortcut), Y = Pos.Bottom (TextShortcut) + 1, Text = "Clear Shortcut"
+                X = Pos.X (_lblShortcut), Y = Pos.Bottom (TextShortcutKey) + 1, Text = "Clear Shortcut"
             };
-            _btnShortcut.Accept += (s, e) => { TextShortcut.Text = ""; };
+            _btnShortcut.Accept += (s, e) => { TextShortcutKey.Text = ""; };
             Add (_btnShortcut);
 
             CkbIsTopLevel.CheckedStateChanging += (s, e) =>
                                      {
-                                         if ((_menuItem != null && _menuItem.Parent != null && CkbIsTopLevel.CheckedState == CheckState.Checked)
-                                             || (_menuItem == null && _hasParent && CkbIsTopLevel.CheckedState == CheckState.Checked))
+                                         if ((_menuItem != null && _menuItem.Parent != null && e.NewValue == CheckState.Checked)
+                                             || (_menuItem == null && _hasParent && e.NewValue == CheckState.Checked))
                                          {
                                              MessageBox.ErrorQuery (
                                                                     "Invalid IsTopLevel",
                                                                     "Only menu bar can have top level menu item!",
                                                                     "Ok"
                                                                    );
-                                             CkbIsTopLevel.CheckedState = CheckState.UnChecked;
+                                             e.Cancel = true;
 
                                              return;
                                          }
 
-                                         if (CkbIsTopLevel.CheckedState == CheckState.Checked)
+                                         if (e.NewValue == CheckState.Checked)
                                          {
                                              CkbSubMenu.CheckedState = CheckState.UnChecked;
                                              CkbSubMenu.SetNeedsDisplay ();
                                              TextHelp.Enabled = true;
                                              TextAction.Enabled = true;
-
-                                             TextShortcut.Enabled =
-                                                 CkbIsTopLevel.CheckedState == CheckState.UnChecked && CkbSubMenu.CheckedState == CheckState.UnChecked;
+                                             TextShortcutKey.Enabled = true;
                                          }
                                          else
                                          {
@@ -280,13 +216,15 @@ public class DynamicMenuBar : Scenario
                                              {
                                                  CkbSubMenu.CheckedState = CheckState.Checked;
                                                  CkbSubMenu.SetNeedsDisplay ();
-                                                 TextShortcut.Enabled = false;
+                                                 TextShortcutKey.Enabled = false;
                                              }
 
                                              TextHelp.Text = "";
                                              TextHelp.Enabled = false;
                                              TextAction.Text = "";
-                                             TextAction.Enabled = false;
+
+                                             TextShortcutKey.Enabled =
+                                                 e.NewValue == CheckState.Checked && CkbSubMenu.CheckedState == CheckState.UnChecked;
                                          }
                                      };
 
@@ -300,8 +238,8 @@ public class DynamicMenuBar : Scenario
                                           TextHelp.Enabled = false;
                                           TextAction.Text = "";
                                           TextAction.Enabled = false;
-                                          TextShortcut.Text = "";
-                                          TextShortcut.Enabled = false;
+                                          TextShortcutKey.Text = "";
+                                          TextShortcutKey.Enabled = false;
                                       }
                                       else
                                       {
@@ -309,14 +247,17 @@ public class DynamicMenuBar : Scenario
                                           {
                                               CkbIsTopLevel.CheckedState = CheckState.Checked;
                                               CkbIsTopLevel.SetNeedsDisplay ();
-                                              TextShortcut.Enabled = false;
+                                              TextShortcutKey.Enabled = true;
                                           }
 
                                           TextHelp.Enabled = true;
                                           TextAction.Enabled = true;
 
-                                          TextShortcut.Enabled =
-                                              CkbIsTopLevel.CheckedState == CheckState.UnChecked && CkbSubMenu.CheckedState == CheckState.UnChecked;
+                                          if (_hasParent)
+                                          {
+                                              TextShortcutKey.Enabled = CkbIsTopLevel.CheckedState == CheckState.UnChecked
+                                                                     && e.NewValue == CheckState.UnChecked;
+                                          }
                                       }
                                   };
 
@@ -337,7 +278,8 @@ public class DynamicMenuBar : Scenario
         public RadioGroup RbChkStyle { get; }
         public TextView TextAction { get; }
         public TextField TextHelp { get; }
-        public TextField TextShortcut { get; }
+        public TextField TextHotKey { get; }
+        public TextField TextShortcutKey { get; }
         public TextField TextTitle { get; }
 
         public Action CreateAction (MenuItem menuItem, DynamicMenuItem item)
@@ -397,11 +339,13 @@ public class DynamicMenuBar : Scenario
             CkbIsTopLevel.CheckedState = IsTopLevel (menuItem) ? CheckState.Checked : CheckState.UnChecked;
             CkbSubMenu.CheckedState = HasSubMenus (menuItem) ? CheckState.Checked : CheckState.UnChecked;
             CkbNullCheck.CheckedState = menuItem.AllowNullChecked ? CheckState.Checked : CheckState.UnChecked;
-            TextHelp.Enabled = CkbSubMenu.CheckedState == CheckState.Checked;
-            TextAction.Enabled = CkbSubMenu.CheckedState == CheckState.Checked;
+            TextHelp.Enabled = CkbSubMenu.CheckedState == CheckState.UnChecked;
+            TextAction.Enabled = CkbSubMenu.CheckedState == CheckState.UnChecked;
             RbChkStyle.SelectedItem = (int)(menuItem?.CheckType ?? MenuItemCheckStyle.NoCheck);
-            TextShortcut.Text = menuItem?.ShortcutTag ?? "";
-            TextShortcut.Enabled = CkbIsTopLevel.CheckedState == CheckState.UnChecked && CkbSubMenu.CheckedState == CheckState.UnChecked;
+            TextShortcutKey.Text = menuItem?.ShortcutTag ?? "";
+
+            TextShortcutKey.Enabled = CkbIsTopLevel.CheckedState == CheckState.Checked && CkbSubMenu.CheckedState == CheckState.UnChecked
+                                   || CkbIsTopLevel.CheckedState == CheckState.UnChecked && CkbSubMenu.CheckedState == CheckState.UnChecked;
         }
 
         public DynamicMenuItem EnterMenuItem ()
@@ -419,7 +363,7 @@ public class DynamicMenuBar : Scenario
                 CkbNullCheck.CheckedState = CheckState.UnChecked;
                 TextHelp.Enabled = _hasParent;
                 TextAction.Enabled = _hasParent;
-                TextShortcut.Enabled = _hasParent;
+                TextShortcutKey.Enabled = _hasParent;
             }
             else
             {
@@ -467,7 +411,7 @@ public class DynamicMenuBar : Scenario
                     Help = TextHelp.Text,
                     Action = TextAction.Text,
                     IsTopLevel = CkbIsTopLevel?.CheckedState == CheckState.Checked,
-                    HasSubMenu = CkbSubMenu?.CheckedState == CheckState.UnChecked,
+                    HasSubMenu = CkbSubMenu?.CheckedState == CheckState.Checked,
                     CheckStyle = RbChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck :
                                  RbChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked :
                                  MenuItemCheckStyle.Radio,
@@ -518,7 +462,7 @@ public class DynamicMenuBar : Scenario
             CkbIsTopLevel.CheckedState = CheckState.UnChecked;
             CkbSubMenu.CheckedState = CheckState.UnChecked;
             RbChkStyle.SelectedItem = (int)MenuItemCheckStyle.NoCheck;
-            TextShortcut.Text = "";
+            TextShortcutKey.Text = "";
         }
 
         private string GetTargetAction (Action action)
@@ -608,7 +552,7 @@ public class DynamicMenuBar : Scenario
                                           };
             _txtDelimiter.TextChanged += (s, _) => _txtDelimiter.SelectAll ();
             _frmDelimiter.Add (_txtDelimiter);
-
+            _txtDelimiter.SelectAll ();
             Add (_frmDelimiter);
 
             var _frmMenu = new FrameView { Y = 7, Width = Dim.Percent (50), Height = Dim.Fill (), Title = "Menus:" };
@@ -846,8 +790,9 @@ public class DynamicMenuBar : Scenario
                                          Title = _frmMenuDetails.TextTitle.Text,
                                          Help = _frmMenuDetails.TextHelp.Text,
                                          Action = _frmMenuDetails.TextAction.Text,
-                                         IsTopLevel = _frmMenuDetails.CkbIsTopLevel?.CheckedState == CheckState.UnChecked,
-                                         HasSubMenu = _frmMenuDetails.CkbSubMenu?.CheckedState == CheckState.UnChecked,
+                                         HotKey = _frmMenuDetails.TextHotKey.Text,
+                                         IsTopLevel = _frmMenuDetails.CkbIsTopLevel?.CheckedState == CheckState.Checked,
+                                         HasSubMenu = _frmMenuDetails.CkbSubMenu?.CheckedState == CheckState.Checked,
                                          CheckStyle = _frmMenuDetails.RbChkStyle.SelectedItem == 0
                                                           ? MenuItemCheckStyle.NoCheck
                                                           : _frmMenuDetails.RbChkStyle.SelectedItem == 1
@@ -894,26 +839,8 @@ public class DynamicMenuBar : Scenario
                                   {
                                       MenuItem newMenu = CreateNewMenu (item, _currentMenuBarItem);
                                       var menuBarItem = _currentMenuBarItem as MenuBarItem;
+                                      menuBarItem.AddMenuBarItem (newMenu);
 
-                                      if (menuBarItem == null)
-                                      {
-                                          menuBarItem = new (
-                                                             _currentMenuBarItem.Title,
-                                                             new [] { newMenu },
-                                                             _currentMenuBarItem.Parent
-                                                            );
-                                      }
-                                      else if (menuBarItem.Children == null)
-                                      {
-                                          menuBarItem.Children = new [] { newMenu };
-                                      }
-                                      else
-                                      {
-                                          MenuItem [] childrens = menuBarItem.Children;
-                                          Array.Resize (ref childrens, childrens.Length + 1);
-                                          childrens [childrens.Length - 1] = newMenu;
-                                          menuBarItem.Children = childrens;
-                                      }
 
                                       DataContext.Menus.Add (new () { Title = newMenu.Title, MenuItem = newMenu });
                                       _lstMenus.MoveDown ();
@@ -922,59 +849,19 @@ public class DynamicMenuBar : Scenario
 
             _btnRemove.Accept += (s, e) =>
                                  {
-                                     MenuItem menuItem = DataContext.Menus.Count > 0
-                                                             ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem
-                                                             : null;
+                                     MenuItem menuItem = (DataContext.Menus.Count > 0
+                                                              ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem
+                                                              : null)
+                                                         ?? _currentEditMenuBarItem;
 
                                      if (menuItem != null)
                                      {
-                                         MenuItem [] childrens = ((MenuBarItem)_currentMenuBarItem).Children;
-                                         childrens [_lstMenus.SelectedItem] = null;
-                                         var i = 0;
+                                         menuItem.RemoveMenuItem ();
 
-                                         foreach (MenuItem c in childrens)
+                                         if (_lstMenus.SelectedItem > -1)
                                          {
-                                             if (c != null)
-                                             {
-                                                 childrens [i] = c;
-                                                 i++;
-                                             }
+                                             DataContext.Menus?.RemoveAt (_lstMenus.SelectedItem);
                                          }
-
-                                         Array.Resize (ref childrens, childrens.Length - 1);
-
-                                         if (childrens.Length == 0)
-                                         {
-                                             if (_currentMenuBarItem.Parent == null)
-                                             {
-                                                 ((MenuBarItem)_currentMenuBarItem).Children = null;
-
-                                                 //_currentMenuBarItem.Action = _frmMenuDetails.CreateAction (_currentEditMenuBarItem, new DynamicMenuItem (_currentMenuBarItem.Title));
-                                             }
-                                             else
-                                             {
-                                                 _currentMenuBarItem = new (
-                                                                            _currentMenuBarItem.Title,
-                                                                            _currentMenuBarItem.Help,
-                                                                            _frmMenuDetails.CreateAction (
-                                                                                                          _currentEditMenuBarItem,
-                                                                                                          new ()
-                                                                                                          {
-                                                                                                              Title = _currentEditMenuBarItem
-                                                                                                                  .Title
-                                                                                                          }
-                                                                                                         ),
-                                                                            null,
-                                                                            _currentMenuBarItem.Parent
-                                                                           );
-                                             }
-                                         }
-                                         else
-                                         {
-                                             ((MenuBarItem)_currentMenuBarItem).Children = childrens;
-                                         }
-
-                                         DataContext.Menus.RemoveAt (_lstMenus.SelectedItem);
 
                                          if (_lstMenus.Source.Count > 0 && _lstMenus.SelectedItem > _lstMenus.Source.Count - 1)
                                          {
@@ -1058,11 +945,8 @@ public class DynamicMenuBar : Scenario
                                          }
 
                                          var newMenu = CreateNewMenu (item) as MenuBarItem;
+                                         newMenu.AddMenuBarItem ();
 
-                                         MenuBarItem [] menus = _menuBar.Menus;
-                                         Array.Resize (ref menus, menus.Length + 1);
-                                         menus [^1] = newMenu;
-                                         _menuBar.Menus = menus;
                                          _currentMenuBarItem = newMenu;
                                          _currentMenuBarItem.CheckType = item.CheckStyle;
 
@@ -1088,21 +972,9 @@ public class DynamicMenuBar : Scenario
 
                                             if (_menuBar != null && _menuBar.Menus.Length > 0)
                                             {
-                                                _menuBar.Menus [_currentSelectedMenuBar] = null;
-                                                var i = 0;
+                                                _currentMenuBarItem.RemoveMenuItem ();
 
-                                                foreach (MenuBarItem m in _menuBar.Menus)
-                                                {
-                                                    if (m != null)
-                                                    {
-                                                        _menuBar.Menus [i] = m;
-                                                        i++;
-                                                    }
-                                                }
 
-                                                MenuBarItem [] menus = _menuBar.Menus;
-                                                Array.Resize (ref menus, menus.Length - 1);
-                                                _menuBar.Menus = menus;
 
                                                 if (_currentSelectedMenuBar - 1 >= 0 && _menuBar.Menus.Length > 0)
                                                 {
@@ -1117,6 +989,7 @@ public class DynamicMenuBar : Scenario
                                             if (MenuBar != null && _currentMenuBarItem == null && _menuBar.Menus.Length == 0)
                                             {
                                                 Remove (_menuBar);
+                                                _menuBar.Dispose ();
                                                 _menuBar = null;
                                                 DataContext.Menus = new ();
                                                 _currentMenuBarItem = null;

@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 /// </summary>
 public class MenuItem
 {
-    private readonly ShortcutHelper _shortcutHelper;
+    internal static MenuBar _menuBar;
     private bool _allowNullChecked;
     private MenuItemCheckStyle _checkType;
 
@@ -287,4 +287,42 @@ public class MenuItem
     }
 
     #endregion Keyboard Handling
+
+    /// <summary>
+    /// Removes a <see cref="MenuItem"/> dynamically from the <see cref="Parent"/>.
+    /// </summary>
+    public virtual void RemoveMenuItem ()
+    {
+        if (Parent is { })
+        {
+            MenuItem [] childrens = ((MenuBarItem)Parent).Children;
+            var i = 0;
+
+            foreach (MenuItem c in childrens)
+            {
+                if (c != this)
+                {
+                    childrens [i] = c;
+                    i++;
+                }
+            }
+
+            Array.Resize (ref childrens, childrens.Length - 1);
+
+            if (childrens.Length == 0)
+            {
+                ((MenuBarItem)Parent).Children = null;
+            }
+            else
+            {
+                ((MenuBarItem)Parent).Children = childrens;
+            }
+        }
+
+        if (ShortcutKey is { })
+        {
+            // Remove an existent ShortcutKey
+            _menuBar?.KeyBindings.Remove (ShortcutKey);
+        }
+    }
 }
