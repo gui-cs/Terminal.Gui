@@ -125,6 +125,8 @@ public class ColorPicker : View
 
         CreateTextField ();
         SelectedColor = oldValue;
+
+        LayoutSubviews ();
     }
 
     private void CreateTextField ()
