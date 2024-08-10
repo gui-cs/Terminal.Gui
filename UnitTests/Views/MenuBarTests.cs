@@ -1230,7 +1230,7 @@ wo
                 )]
     [InlineData ("Closed", "None", "About", KeyCode.F9, KeyCode.CursorRight, KeyCode.CursorRight, KeyCode.Enter)]
 
-    // Hotkeys
+    //// Hotkeys
     [InlineData ("_File", "_New", "", KeyCode.AltMask | KeyCode.F)]
     [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.ShiftMask | KeyCode.F)]
     [InlineData ("Closed", "None", "", KeyCode.AltMask | KeyCode.F, KeyCode.Esc)]
@@ -1246,9 +1246,10 @@ wo
     [InlineData ("_Edit", "_1st", "", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3)]
     [InlineData ("Closed", "None", "1", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.D1)]
     [InlineData ("Closed", "None", "1", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.Enter)]
-    [InlineData ("_Edit", "_3rd Level", "", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.D4)]
+    [InlineData ("Closed", "None", "2", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.D2)]
+    [InlineData ("_Edit", "_5th", "", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D3, KeyCode.D4)]
     [InlineData ("Closed", "None", "5", KeyCode.AltMask | KeyCode.E, KeyCode.F, KeyCode.D4, KeyCode.D5)]
-    [InlineData ("_About", "_About", "", KeyCode.AltMask | KeyCode.A)]
+    [InlineData ("Closed", "None", "About", KeyCode.AltMask | KeyCode.A)]
     public void KeyBindings_Navigation_Commands (
         string expectedBarTitle,
         string expectedItemTitle,
@@ -1284,7 +1285,7 @@ wo
         top.Add (menu);
         Application.Begin (top);
 
-        foreach (KeyCode key in keys)
+        foreach (Key key in keys)
         {
             top.NewKeyDownEvent (new (key));
             Application.MainLoop.RunIteration ();
@@ -3724,6 +3725,89 @@ Edit
 
         Application.OnMouseEvent (new () { Position = new (0, 4), Flags = MouseFlags.Button1Clicked });
         Assert.True (btnClicked);
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void Update_ShortcutKey_KeyBindings_Old_ShortcutKey_Is_Removed ()
+    {
+        var menuBar = new MenuBar ()
+        {
+            Menus =
+            [
+                new MenuBarItem (
+                                 "_File",
+                                 new MenuItem []
+                                 {
+                                     new MenuItem ("New", "Create New", null, null, null, Key.A.WithCtrl)
+                                 }
+                                )
+            ]
+        };
+
+        Assert.Contains (Key.A.WithCtrl, menuBar.KeyBindings.Bindings);
+
+        menuBar.Menus [0].Children [0].ShortcutKey = Key.B.WithCtrl;
+
+        Assert.DoesNotContain (Key.A.WithCtrl, menuBar.KeyBindings.Bindings);
+        Assert.Contains (Key.B.WithCtrl, menuBar.KeyBindings.Bindings);
+    }
+
+    [Fact]
+    public void SetMenus_With_Same_HotKey_Does_Not_Throws ()
+    {
+        var mb = new MenuBar ();
+
+        var i1 = new MenuBarItem ("_heey", "fff", () => { }, () => true);
+
+        mb.Menus = new MenuBarItem [] { i1 };
+        mb.Menus = new MenuBarItem [] { i1 };
+
+        Assert.Equal (Key.H, mb.Menus [0].HotKey);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void AddMenuBarItem_RemoveMenuItem_Dynamically ()
+    {
+        var menuBar = new MenuBar ();
+        var menuBarItem = new MenuBarItem { Title = "_New" };
+        var action = "";
+        var menuItem = new MenuItem { Title = "_Item", Action = () => action = "I", Parent = menuBarItem };
+        Assert.Equal ("n", menuBarItem.HotKey);
+        Assert.Equal ("i", menuItem.HotKey);
+        Assert.Empty (menuBar.Menus);
+        menuBarItem.AddMenuBarItem (menuItem);
+        menuBar.Menus = [menuBarItem];
+        Assert.Single (menuBar.Menus);
+        Assert.Single (menuBar.Menus [0].Children);
+        Assert.Contains (Key.N.WithAlt, menuBar.KeyBindings.Bindings);
+        Assert.DoesNotContain (Key.I, menuBar.KeyBindings.Bindings);
+
+        var top = new Toplevel ();
+        top.Add (menuBar);
+        Application.Begin (top);
+
+        top.NewKeyDownEvent (Key.N.WithAlt);
+        Application.MainLoop.RunIteration ();
+        Assert.True (menuBar.IsMenuOpen);
+        Assert.Equal ("", action);
+
+        top.NewKeyDownEvent (Key.I);
+        Application.MainLoop.RunIteration ();
+        Assert.False (menuBar.IsMenuOpen);
+        Assert.Equal ("I", action);
+
+        menuItem.RemoveMenuItem ();
+        Assert.Single (menuBar.Menus);
+        Assert.Equal (null, menuBar.Menus [0].Children);
+        Assert.Contains (Key.N.WithAlt, menuBar.KeyBindings.Bindings);
+        Assert.DoesNotContain (Key.I, menuBar.KeyBindings.Bindings);
+
+        menuBarItem.RemoveMenuItem ();
+        Assert.Empty (menuBar.Menus);
+        Assert.DoesNotContain (Key.N.WithAlt, menuBar.KeyBindings.Bindings);
+
         top.Dispose ();
     }
 }

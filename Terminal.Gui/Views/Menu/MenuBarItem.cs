@@ -204,7 +204,7 @@ public class MenuBarItem : MenuItem
         {
             foreach (MenuItem menuItem in Children)
             {
-                if (menuItem.ShortcutKey is { })
+                if (menuItem.ShortcutKey != Key.Empty)
                 {
                     // Remove an existent ShortcutKey
                     _menuBar?.KeyBindings.Remove (menuItem.ShortcutKey);
@@ -212,7 +212,7 @@ public class MenuBarItem : MenuItem
             }
         }
 
-        if (ShortcutKey is { })
+        if (ShortcutKey != Key.Empty)
         {
             // Remove an existent ShortcutKey
             _menuBar?.KeyBindings.Remove (ShortcutKey);
@@ -221,6 +221,12 @@ public class MenuBarItem : MenuItem
         var index = _menuBar!.Menus.IndexOf (this);
         if (index > -1)
         {
+            if (_menuBar!.Menus [index].HotKey != Key.Empty)
+            {
+                // Remove an existent HotKey
+                _menuBar?.KeyBindings.Remove (HotKey.WithAlt);
+            }
+
             _menuBar!.Menus [index] = null;
         }
 

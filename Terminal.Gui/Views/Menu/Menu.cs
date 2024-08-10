@@ -120,7 +120,7 @@ internal sealed class Menu : View
                     }
                    );
 
-        AddKeyBindings (_barItems);
+        AddKeyBindingsHotKey (_barItems);
     }
 
     public Menu ()
@@ -179,7 +179,7 @@ internal sealed class Menu : View
         KeyBindings.Add (Key.Enter, Command.Accept);
     }
 
-    private void AddKeyBindings (MenuBarItem menuBarItem)
+    private void AddKeyBindingsHotKey (MenuBarItem menuBarItem)
     {
         if (menuBarItem is null || menuBarItem.Children is null)
         {
@@ -190,23 +190,30 @@ internal sealed class Menu : View
         {
             KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, menuItem);
 
-            if ((KeyCode)menuItem.HotKey.Value != KeyCode.Null)
+            if (menuItem.HotKey != Key.Empty)
             {
-                KeyBindings.Remove ((KeyCode)menuItem.HotKey.Value);
-                KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, keyBinding);
-                KeyBindings.Remove ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask);
-                KeyBindings.Add ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask, keyBinding);
+                KeyBindings.Remove (menuItem.HotKey);
+                KeyBindings.Add (menuItem.HotKey, keyBinding);
+                KeyBindings.Remove (menuItem.HotKey.WithAlt);
+                KeyBindings.Add (menuItem.HotKey.WithAlt, keyBinding);
             }
+        }
+    }
 
-            if (menuItem.ShortcutKey != Key.Empty)
+    private void RemoveKeyBindingsHotKey (MenuBarItem menuBarItem)
+    {
+        if (menuBarItem is null || menuBarItem.Children is null)
+        {
+            return;
+        }
+
+        foreach (MenuItem menuItem in menuBarItem.Children.Where (m => m is { }))
+        {
+            if (menuItem.HotKey != Key.Empty)
             {
-                keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuItem);
-                KeyBindings.Remove (menuItem.ShortcutKey);
-                KeyBindings.Add (menuItem.ShortcutKey, keyBinding);
+                KeyBindings.Remove (menuItem.HotKey);
+                KeyBindings.Remove (menuItem.HotKey.WithAlt);
             }
-
-            MenuBarItem subMenu = menuBarItem.SubMenu (menuItem);
-            AddKeyBindings (subMenu);
         }
     }
 
@@ -910,6 +917,8 @@ internal sealed class Menu : View
 
     protected override void Dispose (bool disposing)
     {
+        RemoveKeyBindingsHotKey (_barItems);
+
         if (Application.Current is { })
         {
             Application.Current.DrawContentComplete -= Current_DrawContentComplete;

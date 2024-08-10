@@ -202,7 +202,8 @@ public class MenuItem
 
     #region Keyboard Handling
 
-    // TODO: Update to use Key instead of Rune
+    private Key _hotKey = Key.Empty;
+
     /// <summary>
     ///     The HotKey is used to activate a <see cref="MenuItem"/> with the keyboard. HotKeys are defined by prefixing the
     ///     <see cref="Title"/> of a MenuItem with an underscore ('_').
@@ -216,7 +217,16 @@ public class MenuItem
     ///     </para>
     ///     <para>See also <see cref="ShortcutKey"/> which enable global key-bindings to menu items.</para>
     /// </summary>
-    public Rune HotKey { get; set; }
+    public Key HotKey
+    {
+        get => _hotKey;
+        set
+        {
+            var oldKey = _hotKey ?? Key.Empty;
+            _hotKey = value ?? Key.Empty;
+            UpdateHotKeyBinding (oldKey);
+        }
+    }
 
     private void GetHotKey ()
     {
@@ -228,19 +238,15 @@ public class MenuItem
             {
                 nextIsHot = true;
             }
-            else
+            else if (nextIsHot)
             {
-                if (nextIsHot)
-                {
-                    HotKey = (Rune)char.ToUpper (x);
+                    HotKey = char.ToLower (x);
 
-                    break;
-                }
-
-                nextIsHot = false;
-                HotKey = default (Rune);
+                    return;
             }
         }
+
+        HotKey = Key.Empty;
     }
 
     private Key _shortcutKey = Key.Empty;
@@ -267,6 +273,36 @@ public class MenuItem
 
     /// <summary>Gets the text describing the keystroke combination defined by <see cref="ShortcutKey"/>.</summary>
     public string ShortcutTag => ShortcutKey != Key.Empty ? ShortcutKey.ToString () : string.Empty;
+
+    private void UpdateHotKeyBinding (Key oldKey)
+    {
+        if (_menuBar is null || _menuBar?.IsInitialized == false)
+        {
+            return;
+        }
+
+        if (oldKey != Key.Empty)
+        {
+            var index = _menuBar.Menus?.IndexOf (this);
+
+            if (index > -1)
+            {
+                _menuBar.KeyBindings.Remove (oldKey.WithAlt);
+            }
+        }
+
+        if (HotKey != Key.Empty)
+        {
+            var index = _menuBar.Menus?.IndexOf (this);
+
+            if (index > -1)
+            {
+                _menuBar.KeyBindings.Remove (HotKey.WithAlt);
+                KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, this);
+                _menuBar.KeyBindings.Add (HotKey.WithAlt, keyBinding);
+            }
+        }
+    }
 
     internal void UpdateShortcutKeyBinding (Key oldKey)
     {
@@ -322,7 +358,7 @@ public class MenuItem
             }
         }
 
-        if (ShortcutKey is { })
+        if (ShortcutKey != Key.Empty)
         {
             // Remove an existent ShortcutKey
             _menuBar?.KeyBindings.Remove (ShortcutKey);

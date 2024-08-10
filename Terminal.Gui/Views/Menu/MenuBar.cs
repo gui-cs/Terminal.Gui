@@ -66,6 +66,8 @@ public class MenuBar : View, IDesignable
     /// <summary>Initializes a new instance of the <see cref="MenuBar"/>.</summary>
     public MenuBar ()
     {
+        MenuItem._menuBar = this;
+
         TabStop = TabBehavior.NoStop;
         X = 0;
         Y = 0;
@@ -122,7 +124,7 @@ public class MenuBar : View, IDesignable
                         return true;
                     }
                    );
-        AddCommand (Command.ToggleExpandCollapse, ctx => Select ((int)ctx.KeyBinding?.Context!));
+        AddCommand (Command.ToggleExpandCollapse, ctx => Select (Menus.IndexOf (ctx.KeyBinding?.Context)));
         AddCommand (Command.Select, ctx => Run ((ctx.KeyBinding?.Context as MenuItem)?.Action));
 
         // Default key bindings for this view
@@ -162,8 +164,6 @@ public class MenuBar : View, IDesignable
         {
             _menus = value;
 
-            MenuItem._menuBar = this;
-
             if (Menus is null)
             {
                 return;
@@ -174,14 +174,14 @@ public class MenuBar : View, IDesignable
             {
                 MenuBarItem menuBarItem = Menus [i];
 
-                if (menuBarItem?.HotKey != default (Rune))
+                if (menuBarItem?.HotKey != Key.Empty)
                 {
-                    KeyBindings.Remove ((KeyCode)menuBarItem!.HotKey.Value);
-                    KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.Focused, i);
-                    KeyBindings.Add ((KeyCode)menuBarItem!.HotKey.Value, keyBinding);
-                    KeyBindings.Remove ((KeyCode)menuBarItem.HotKey.Value | KeyCode.AltMask);
-                    keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, i);
-                    KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value | KeyCode.AltMask, keyBinding);
+                    KeyBindings.Remove (menuBarItem!.HotKey);
+                    KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.Focused, menuBarItem);
+                    KeyBindings.Add (menuBarItem!.HotKey, keyBinding);
+                    KeyBindings.Remove (menuBarItem.HotKey.WithAlt);
+                    keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, menuBarItem);
+                    KeyBindings.Add (menuBarItem.HotKey.WithAlt, keyBinding);
                 }
 
                 if (menuBarItem?.ShortcutKey != Key.Empty)
@@ -1311,6 +1311,10 @@ public class MenuBar : View, IDesignable
         if (index == -1)
         {
             OpenMenu ();
+        }
+        else if (Menus [index].IsTopLevel)
+        {
+            Run (Menus [index].Action);
         }
         else
         {

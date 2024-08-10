@@ -700,7 +700,7 @@ public class UICatalogApp
             {
                 var item = new MenuItem
                 {
-                    Title = $"_{theme.Key}",
+                    Title = theme.Key == "Dark" ? $"{theme.Key.Substring (0, 3)}_{theme.Key.Substring (3, 1)}" : $"_{theme.Key}",
                     ShortcutKey = new Key ((KeyCode)((uint)KeyCode.D1 + schemeCount++))
                         .WithCtrl
                 };
