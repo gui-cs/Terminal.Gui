@@ -137,7 +137,7 @@ public class DynamicMenuBar : Scenario
 
             TextHotKey = new ()
             {
-                X = Pos.Left (TextTitle), Y = Pos.Bottom (_lblAction) + 5, Width = 2
+                X = Pos.Left (TextTitle), Y = Pos.Bottom (_lblAction) + 5, Width = 2, ReadOnly = true
             };
 
             TextHotKey.TextChanging += (s, e) =>
@@ -1225,10 +1225,7 @@ public class DynamicMenuBar : Scenario
                                                    _frmMenuDetails.CreateAction (_currentEditMenuBarItem, menuItem),
                                                    null,
                                                    _currentEditMenuBarItem.Parent
-                                                  )
-                    {
-                        HotKey = string.IsNullOrEmpty (menuItem.HotKey) ? new () : menuItem.HotKey [0]
-                    };
+                                                  );
                 }
                 else
                 {

@@ -220,7 +220,7 @@ public class MenuItem
     public Key HotKey
     {
         get => _hotKey;
-        set
+        private set
         {
             var oldKey = _hotKey ?? Key.Empty;
             _hotKey = value ?? Key.Empty;
