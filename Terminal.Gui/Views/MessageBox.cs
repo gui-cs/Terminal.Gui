@@ -400,10 +400,10 @@ public static class MessageBox
         d.TextFormatter.WordWrap = wrapMessage;
         d.TextFormatter.MultiLine = !wrapMessage;
 
-        d.ColorScheme = new ColorScheme (d.ColorScheme)
-        {
-            Focus = d.ColorScheme.Normal
-        };
+        //d.ColorScheme = new (d.ColorScheme)
+        //{
+        //   // Focus = d.ColorScheme.Normal
+        //};
 
         // Setup actions
         Clicked = -1;
@@ -421,7 +421,7 @@ public static class MessageBox
 
             if (b.IsDefault)
             {
-                b.SetFocus ();
+               // b.SetFocus ();
             }
         }
 

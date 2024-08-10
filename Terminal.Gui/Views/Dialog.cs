@@ -93,6 +93,22 @@ public class Dialog : Window
         KeyBindings.Add (Key.Esc, Command.QuitToplevel);
     }
 
+    // BUGBUG: We override GetNormal/FocusColor because "Dialog" ColorScheme is goofy.
+    // BUGBUG: By defn, a Dialog is Modal, and thus HasFocus is always true. OnDrawContent
+    // BUGBUG: Calls these methods.
+    // TODO: Fix this in https://github.com/gui-cs/Terminal.Gui/issues/2381
+    /// <inheritdoc />
+    public override Attribute GetNormalColor ()
+    {
+        return ColorScheme.Normal;
+    }
+
+    /// <inheritdoc />
+    public override Attribute GetFocusColor ()
+    {
+        return ColorScheme.Normal;
+    }
+
     private bool _canceled;
 
     /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
@@ -167,11 +183,11 @@ public class Dialog : Window
         _buttons.Add (button);
         Add (button);
 
-        SetNeedsDisplay ();
+        //SetNeedsDisplay ();
 
-        if (IsInitialized)
-        {
-            LayoutSubviews ();
-        }
+        //if (IsInitialized)
+        //{
+        //    LayoutSubviews ();
+        //}
     }
 }

@@ -263,6 +263,7 @@ public class Dialogs : Scenario
             dialog = new ()
             {
                 Title = titleEdit.Text,
+                Text = "Dialog Text",
                 ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem]),
 
                 Buttons = buttons.ToArray ()
