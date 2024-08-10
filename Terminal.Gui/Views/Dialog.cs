@@ -182,12 +182,5 @@ public class Dialog : Window
 
         _buttons.Add (button);
         Add (button);
-
-        //SetNeedsDisplay ();
-
-        //if (IsInitialized)
-        //{
-        //    LayoutSubviews ();
-        //}
     }
 }
