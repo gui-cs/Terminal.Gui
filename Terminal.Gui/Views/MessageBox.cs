@@ -413,11 +413,6 @@ public static class MessageBox
                              Clicked = buttonId;
                              Application.RequestStop ();
                          };
-
-            if (b.IsDefault)
-            {
-               // b.SetFocus ();
-            }
         }
 
         // Run the modal; do not shut down the mainloop driver when done
