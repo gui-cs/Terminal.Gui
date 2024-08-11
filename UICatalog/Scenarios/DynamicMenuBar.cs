@@ -884,30 +884,41 @@ public class DynamicMenuBar : Scenario
                               };
 
             btnRemove.Accept += (s, e) =>
-                                 {
-                                     MenuItem menuItem = (DataContext.Menus.Count > 0
-                                                              ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem
-                                                              : null)
-                                                         ?? _currentEditMenuBarItem;
+                                {
+                                    MenuItem menuItem = (DataContext.Menus.Count > 0 && _lstMenus.SelectedItem > -1
+                                                             ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem
+                                                             : _currentEditMenuBarItem);
 
-                                     if (menuItem != null)
-                                     {
-                                         menuItem.RemoveMenuItem ();
+                                    if (menuItem != null)
+                                    {
+                                        menuItem.RemoveMenuItem ();
 
-                                         if (_lstMenus.SelectedItem > -1)
-                                         {
-                                             DataContext.Menus?.RemoveAt (_lstMenus.SelectedItem);
-                                         }
+                                        if (_currentEditMenuBarItem == menuItem)
+                                        {
+                                            _currentEditMenuBarItem = null;
 
-                                         if (_lstMenus.Source.Count > 0 && _lstMenus.SelectedItem > _lstMenus.Source.Count - 1)
-                                         {
-                                             _lstMenus.SelectedItem = _lstMenus.Source.Count - 1;
-                                         }
+                                            if (menuItem.Parent is null)
+                                            {
+                                                _currentSelectedMenuBar = Math.Max (Math.Min (_currentSelectedMenuBar, _menuBar.Menus.Length - 1), 0);
+                                            }
 
-                                         _lstMenus.SetNeedsDisplay ();
-                                         SetFrameDetails ();
-                                     }
-                                 };
+                                            SelectCurrentMenuBarItem ();
+                                        }
+
+                                        if (_lstMenus.SelectedItem > -1)
+                                        {
+                                            DataContext.Menus?.RemoveAt (_lstMenus.SelectedItem);
+                                        }
+
+                                        if (_lstMenus.Source.Count > 0 && _lstMenus.SelectedItem > _lstMenus.Source.Count - 1)
+                                        {
+                                            _lstMenus.SelectedItem = _lstMenus.Source.Count - 1;
+                                        }
+
+                                        _lstMenus.SetNeedsDisplay ();
+                                        SetFrameDetails ();
+                                    }
+                                };
 
             _lstMenus.OpenSelectedItem += (s, e) =>
                                           {
@@ -1058,7 +1069,7 @@ public class DynamicMenuBar : Scenario
                 {
                     menuItem = _lstMenus.SelectedItem > -1 && DataContext.Menus.Count > 0
                                    ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem
-                                   : null;
+                                   : _currentEditMenuBarItem;
                 }
                 else
                 {
@@ -1080,7 +1091,7 @@ public class DynamicMenuBar : Scenario
             {
                 MenuBarItem menuBarItem = null;
 
-                if (_menuBar?.Menus != null)
+                if (_menuBar?.Menus is { Length: > 0 })
                 {
                     menuBarItem = _menuBar.Menus [_currentSelectedMenuBar];
                     lblMenuBar.Text = menuBarItem.Title;
@@ -1091,6 +1102,11 @@ public class DynamicMenuBar : Scenario
                 DataContext.Menus = new ();
                 SetListViewSource (_currentMenuBarItem, true);
                 lblParent.Text = string.Empty;
+
+                if (_currentMenuBarItem is null)
+                {
+                    lblMenuBar.Text = string.Empty;
+                }
             }
 
             void SetListViewSource (MenuItem currentMenuBarItem, bool fill = false)
