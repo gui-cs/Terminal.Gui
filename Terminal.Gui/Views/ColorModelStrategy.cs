@@ -160,4 +160,5 @@ internal class ColorModelStrategy
                 throw new ArgumentOutOfRangeException (nameof (model), model, null);
         }
     }
+
 }

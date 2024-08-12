@@ -17,4 +17,9 @@ public class ColorPickerStyle
     ///     True to put the numerical value of bars on the right of the color bar
     /// </summary>
     public bool ShowTextFields { get; set; } = true;
+
+    /// <summary>
+    ///     True to show an editable text field indicating the w3c/console color name of selected color.
+    /// </summary>
+    public bool ShowName { get; set; } = false;
 }

@@ -10,7 +10,13 @@ public class ColorPicker : View
     private TextField _tfHex;
     private Label _lbHex;
 
+    private TextField? _tfName;
+    private Label? _lbName;
+
     private Color _selectedColor = Color.Black;
+
+    // TODO: Add interface
+    private IColorNameResolver _colorNameResolver = new W3CColors ();
 
     private List<IColorBar> _bars = new ();
     private readonly Dictionary<IColorBar, TextField> _textFields = new ();
@@ -119,24 +125,58 @@ public class ColorPicker : View
             Add (bar);
         }
 
+        if (Style.ShowName)
+        {
+            CreateNameField ();
+        }
+
+
         CreateTextField ();
         SelectedColor = oldValue;
 
         LayoutSubviews ();
     }
-
-    private void CreateTextField ()
+    private void CreateNameField ()
     {
-        _lbHex = new()
+        _lbName = new ()
         {
-            Text = "Hex:",
+            Text = "Name:",
             X = 0,
             Y = 3
         };
 
-        _tfHex = new()
+        _tfName = new ()
         {
             Y = 3,
+            X = 6,
+            Width = 20 // width of "LightGoldenRodYellow" - the longest w3c color name
+        };
+
+        Add (_lbName);
+        Add (_tfName);
+
+        _tfName.Leave += UpdateValueFromName;
+    }
+
+    private void CreateTextField ()
+    {
+        int y = _bars.Count;
+
+        if (Style.ShowName)
+        {
+            y++;
+        }
+
+        _lbHex = new()
+        {
+            Text = "Hex:",
+            X = 0,
+            Y = y
+        };
+
+        _tfHex = new()
+        {
+            Y = y,
             X = 4,
             Width = 8
         };
@@ -195,6 +235,21 @@ public class ColorPicker : View
             _tfHex.Dispose ();
             _tfHex = null;
         }
+
+        if (_lbName!= null)
+        {
+            Remove (_lbName);
+            _lbName.Dispose ();
+            _lbName = null;
+        }
+
+        if (_tfName != null)
+        {
+            Remove (_tfName);
+            _tfName.Leave -= UpdateValueFromName;
+            _tfName.Dispose ();
+            _tfName = null;
+        }
     }
 
     private void UpdateValueFromTextField (object sender, FocusEventArgs e)
@@ -209,6 +264,23 @@ public class ColorPicker : View
             SyncSubViewValues (false);
         }
     }
+    private void UpdateValueFromName (object sender, FocusEventArgs e)
+    {
+        if (_tfName == null)
+        {
+            return;
+        }
+
+        if (_colorNameResolver.TryParseColor (_tfName.Text, out Color newColor))
+        {
+            SelectedColor = newColor;
+        }
+        else
+        {
+            // value is invalid, revert the value in the text field back to current state
+            SyncSubViewValues (false);
+        }
+    }
 
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
@@ -216,7 +288,8 @@ public class ColorPicker : View
         base.OnDrawContent (viewport);
         Attribute normal = GetNormalColor ();
         Driver.SetAttribute (new (SelectedColor, normal.Background));
-        AddRune (13, 3, (Rune)'■');
+        int y = _bars.Count + (Style.ShowName ? 1 : 0);
+        AddRune (13, y, (Rune)'■');
     }
 
     private void RebuildColorFromBar (object sender, EventArgs<int> e)

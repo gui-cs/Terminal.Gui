@@ -105,6 +105,7 @@ public class ColorPickers : Scenario
                                                 backgroundColorPicker.Style.ColorModel = (ColorModel)e.SelectedItem;
                                                 backgroundColorPicker.ApplyStyleChanges ();
                                             };
+
         app.Add (rgColorModel);
 
         // Checkbox for switching show text fields on and off
@@ -125,6 +126,25 @@ public class ColorPickers : Scenario
                                                     backgroundColorPicker.ApplyStyleChanges ();
                                                 };
         app.Add (cbShowTextFields);
+
+        // Checkbox for switching show text fields on and off
+        var cbShowName = new CheckBox ()
+        {
+            Text = "Show Color Name",
+            Y = Pos.Bottom (cbShowTextFields) + 1,
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            CheckedState = foregroundColorPicker.Style.ShowName ? CheckState.Checked : CheckState.UnChecked,
+        };
+
+        cbShowName.CheckedStateChanging += (_, e) =>
+                                           {
+                                               foregroundColorPicker.Style.ShowName = e.NewValue == CheckState.Checked;
+                                               foregroundColorPicker.ApplyStyleChanges ();
+                                               backgroundColorPicker.Style.ShowName = e.NewValue == CheckState.Checked;
+                                               backgroundColorPicker.ApplyStyleChanges ();
+                                           };
+        app.Add (cbShowName);
 
         // Set default colors.
         foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground.GetClosestNamedColor ();
