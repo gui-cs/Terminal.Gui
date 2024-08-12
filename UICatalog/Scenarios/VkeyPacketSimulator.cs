@@ -119,7 +119,7 @@ public class VkeyPacketSimulator : Scenario
                                                                                         "Keys",
                                                                                         $"'{Key.ToString (
                                                                                                           e.KeyCode,
-                                                                                                          Key.ShortcutDelimiter
+                                                                                                          Key.Separator
                                                                                                          )}' pressed!",
                                                                                         "Ok"
                                                                                        )

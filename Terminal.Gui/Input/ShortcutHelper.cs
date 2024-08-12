@@ -23,7 +23,7 @@ public class ShortcutHelper
     }
 
     /// <summary>The keystroke combination used in the <see cref="Shortcut"/> as string.</summary>
-    public virtual string ShortcutTag => Key.ToString (shortcut, Key.ShortcutDelimiter);
+    public virtual string ShortcutTag => Key.ToString (shortcut, Key.Separator);
 
     /// <summary>Lookup for a <see cref="KeyCode"/> on range of keys.</summary>
     /// <param name="key">The source key.</param>
@@ -59,7 +59,7 @@ public class ShortcutHelper
         //var hasCtrl = false;
         if (delimiter == default (Rune))
         {
-            delimiter = Key.ShortcutDelimiter;
+            delimiter = Key.Separator;
         }
 
         string [] keys = sCut.Split (delimiter.ToString ());

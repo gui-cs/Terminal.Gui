@@ -558,7 +558,7 @@ public class DynamicMenuBar : Scenario
 
             var txtDelimiter = new TextField
             {
-                X = Pos.Center (), Width = 2, Text = Key.ShortcutDelimiter.ToString ()
+                X = Pos.Center (), Width = 2, Text = Key.Separator.ToString ()
             };
 
 
@@ -794,7 +794,7 @@ public class DynamicMenuBar : Scenario
                                           {
                                               if (!string.IsNullOrEmpty (e.NewValue))
                                               {
-                                                  Key.ShortcutDelimiter = e.NewValue.ToRunes () [0];
+                                                  Key.Separator = e.NewValue.ToRunes () [0];
                                               }
                                               else
                                               {
