@@ -1970,7 +1970,21 @@ namespace Terminal.Gui {
 	class WindowsClipboard : ClipboardBase {
 		public WindowsClipboard ()
 		{
-			IsSupported = IsClipboardFormatAvailable (cfUnicodeText);
+			IsSupported = CheckClipboardIsAvailable ();
+		}
+
+		private static bool CheckClipboardIsAvailable ()
+		{
+			// Attempt to open the clipboard
+			if (OpenClipboard (IntPtr.Zero)) {
+				// Clipboard is available
+				// Close the clipboard after use
+				CloseClipboard ();
+
+				return true;
+			}
+			// Clipboard is not available
+			return false;
 		}
 
 		public override bool IsSupported { get; }
