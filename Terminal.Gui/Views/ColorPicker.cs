@@ -175,6 +175,7 @@ public class ColorPicker : View
             }
 
             Remove (bar);
+            bar.Dispose ();
         }
 
         _bars = new ();

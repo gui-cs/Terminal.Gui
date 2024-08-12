@@ -586,6 +586,50 @@ public class ColorPickerTests
         Assert.Equal (2, count);
     }
 
+    [Fact]
+    [SetupFakeDriver]
+    public void ColorPicker_DisposesOldViews_OnModelChange ()
+    {
+        var cp = GetColorPicker (ColorModel.HSL,true);
+
+        var b1 = GetColorBar (cp, ColorPickerPart.Bar1);
+        var b2 = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b3 = GetColorBar (cp, ColorPickerPart.Bar3);
+
+        var tf1 = GetTextField (cp, ColorPickerPart.Bar1);
+        var tf2 = GetTextField (cp, ColorPickerPart.Bar2);
+        var tf3 = GetTextField (cp, ColorPickerPart.Bar3);
+
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        Assert.All (new View [] { b1, b2, b3, tf1, tf2, tf3,hex }, b => Assert.False (b.WasDisposed));
+
+        cp.Style.ColorModel = ColorModel.RGB;
+        cp.ApplyStyleChanges ();
+
+        var b1After = GetColorBar (cp, ColorPickerPart.Bar1);
+        var b2After = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b3After = GetColorBar (cp, ColorPickerPart.Bar3);
+
+        var tf1After = GetTextField (cp, ColorPickerPart.Bar1);
+        var tf2After = GetTextField (cp, ColorPickerPart.Bar2);
+        var tf3After = GetTextField (cp, ColorPickerPart.Bar3);
+
+        var hexAfter = GetTextField (cp, ColorPickerPart.Hex);
+
+        // Old bars should be disposed
+        Assert.All (new View [] { b1, b2, b3, tf1, tf2, tf3,hex }, b => Assert.True (b.WasDisposed));
+        Assert.NotSame (hex,hexAfter);
+
+        Assert.NotSame (b1,b1After);
+        Assert.NotSame (b2, b2After);
+        Assert.NotSame (b3, b3After);
+
+        Assert.NotSame (tf1, tf1After);
+        Assert.NotSame (tf2, tf2After);
+        Assert.NotSame (tf3, tf3After);
+
+    }
     private ColorPicker GetColorPicker (ColorModel colorModel, bool showTextFields)
     {
         var cp = new ColorPicker { Width = 20, SelectedColor = new (0, 0) };
