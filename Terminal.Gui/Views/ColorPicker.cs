@@ -47,11 +47,7 @@ public class ColorPicker : View
 
             ColorChanged?.Invoke (
                                   this,
-                                  new ()
-                                  {
-                                      Color = value,
-                                      PreviousColor = old
-                                  });
+                                  new (value));
         }
 
         SyncSubViewValues (syncBars);

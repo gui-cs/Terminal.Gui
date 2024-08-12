@@ -3,14 +3,9 @@
 namespace Terminal.Gui;
 
 /// <summary>Event arguments for the <see cref="Color"/> events.</summary>
-public class ColorEventArgs : EventArgs
+public class ColorEventArgs : EventArgs<Color>
 {
-    /// <summary>Initializes a new instance of <see cref="ColorEventArgs"/></summary>
-    public ColorEventArgs () { }
-
-    /// <summary>The new Color.</summary>
-    public Color Color { get; set; }
-
-    /// <summary>The previous Color.</summary>
-    public Color PreviousColor { get; set; }
+    /// <summary>Initializes a new instance of <see cref="ColorEventArgs"/>
+    /// <paramref name="newColor"/>The value that is being changed to.</summary>
+    public ColorEventArgs (Color newColor) :base(newColor) { }
 }

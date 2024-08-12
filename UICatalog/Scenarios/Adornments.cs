@@ -47,7 +47,7 @@ public class Adornments : Scenario
                                   {
                                       Normal = new (
                                                     color.SuperView.ColorScheme.Normal.Foreground,
-                                                    e.Color
+                                                    e.CurrentValue
                                                    )
                                   };
                               };

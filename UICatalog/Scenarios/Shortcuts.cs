@@ -326,7 +326,7 @@ public class Shortcuts : Scenario
                                 {
                                     Application.Top.ColorScheme = new ColorScheme (Application.Top.ColorScheme)
                                     {
-                                        Normal = new Attribute (Application.Top.ColorScheme.Normal.Foreground, args.Color),
+                                        Normal = new Attribute (Application.Top.ColorScheme.Normal.Foreground, args.CurrentValue),
                                     };
                                 };
         hShortcutBG.CommandView = bgColor;

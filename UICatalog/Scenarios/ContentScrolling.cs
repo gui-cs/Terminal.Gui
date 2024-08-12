@@ -335,7 +335,7 @@ public class ContentScrolling : Scenario
                                         {
                                             Normal = new (
                                                           colorPicker.SuperView.ColorScheme.Normal.Foreground,
-                                                          e.Color
+                                                          e.CurrentValue
                                                          )
                                         };
                                     };
