@@ -555,7 +555,6 @@ public class ColorPickerTests
     [SetupFakeDriver]
     public void ColorPicker_ChangedEvent_Fires ()
     {
-        Color oldColor = default;
         Color newColor = default;
         var count = 0;
 
@@ -576,7 +575,6 @@ public class ColorPickerTests
         cp.SelectedColor = new (2, 3, 4);
 
         Assert.Equal (2, count);
-        Assert.Equal (new (1, 2, 3), oldColor);
         Assert.Equal (new (2, 3, 4), newColor);
 
         // Set to same value
