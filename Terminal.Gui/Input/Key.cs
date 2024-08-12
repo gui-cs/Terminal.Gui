@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
@@ -975,6 +976,7 @@ public class Key : EventArgs, IEquatable<Key>
     private static Rune _separator = new ('+');
 
     /// <summary>Sets or gets the shortcut delimiter separator. The default is "+".</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Rune Separator
     {
         get => _separator;
