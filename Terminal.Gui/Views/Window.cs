@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     A <see cref="Toplevel"/> <see cref="View"/> with <see cref="View.BorderStyle"/> set to
@@ -75,6 +73,5 @@ public class Window : Toplevel
     ///     s.
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 }

@@ -148,7 +148,7 @@ public class Scrolling : Scenario
             X = Pos.X (scrollView),
             Y = Pos.Bottom (scrollView),
             Text = "Horizontal Scrollbar",
-            State = scrollView.ShowHorizontalScrollIndicator ? CheckState.Checked : CheckState.UnChecked
+            CheckedState = scrollView.ShowHorizontalScrollIndicator ? CheckState.Checked : CheckState.UnChecked
         };
         app.Add (hCheckBox);
 
@@ -157,7 +157,7 @@ public class Scrolling : Scenario
             X = Pos.Right (hCheckBox) + 3,
             Y = Pos.Bottom (scrollView),
             Text = "Vertical Scrollbar",
-            State = scrollView.ShowVerticalScrollIndicator ? CheckState.Checked : CheckState.UnChecked
+            CheckedState = scrollView.ShowVerticalScrollIndicator ? CheckState.Checked : CheckState.UnChecked
         };
         app.Add (vCheckBox);
 
@@ -165,50 +165,50 @@ public class Scrolling : Scenario
 
         var ahCheckBox = new CheckBox
         {
-            X = Pos.Left (scrollView), Y = Pos.Bottom (hCheckBox), Text = t, State = scrollView.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
+            X = Pos.Left (scrollView), Y = Pos.Bottom (hCheckBox), Text = t, CheckedState = scrollView.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
         var k = "Keep Content Always In Viewport";
 
         var keepCheckBox = new CheckBox
         {
-            X = Pos.Left (scrollView), Y = Pos.Bottom (ahCheckBox), Text = k, State = scrollView.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
+            X = Pos.Left (scrollView), Y = Pos.Bottom (ahCheckBox), Text = k, CheckedState = scrollView.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
 
-        hCheckBox.Toggle += (s, e) =>
+        hCheckBox.CheckedStateChanging += (s, e) =>
                              {
-                                 if (ahCheckBox.State == CheckState.UnChecked)
+                                 if (ahCheckBox.CheckedState == CheckState.UnChecked)
                                  {
                                      scrollView.ShowHorizontalScrollIndicator = e.NewValue == CheckState.Checked;
                                  }
                                  else
                                  {
-                                     hCheckBox.State = CheckState.Checked;
+                                     hCheckBox.CheckedState = CheckState.Checked;
                                      MessageBox.Query ("Message", "Disable Auto Hide Scrollbars first.", "Ok");
                                  }
                              };
 
-        vCheckBox.Toggle += (s, e) =>
+        vCheckBox.CheckedStateChanging += (s, e) =>
                              {
-                                 if (ahCheckBox.State == CheckState.UnChecked)
+                                 if (ahCheckBox.CheckedState == CheckState.UnChecked)
                                  {
                                      scrollView.ShowVerticalScrollIndicator = e.NewValue == CheckState.Checked;
                                  }
                                  else
                                  {
-                                     vCheckBox.State = CheckState.Checked;
+                                     vCheckBox.CheckedState = CheckState.Checked;
                                      MessageBox.Query ("Message", "Disable Auto Hide Scrollbars first.", "Ok");
                                  }
                              };
 
-        ahCheckBox.Toggle += (s, e) =>
+        ahCheckBox.CheckedStateChanging += (s, e) =>
                               {
                                   scrollView.AutoHideScrollBars = e.NewValue == CheckState.Checked;
-                                  hCheckBox.State = CheckState.Checked;
-                                  vCheckBox.State = CheckState.Checked;
+                                  hCheckBox.CheckedState = CheckState.Checked;
+                                  vCheckBox.CheckedState = CheckState.Checked;
                               };
         app.Add (ahCheckBox);
 
-        keepCheckBox.Toggle += (s, e) => scrollView.KeepContentAlwaysInViewport = e.NewValue == CheckState.Checked;
+        keepCheckBox.CheckedStateChanging += (s, e) => scrollView.KeepContentAlwaysInViewport = e.NewValue == CheckState.Checked;
         app.Add (keepCheckBox);
 
         var count = 0;

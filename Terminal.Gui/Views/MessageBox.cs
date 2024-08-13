@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.Json.Serialization;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     MessageBox displays a modal message to the user, with a title, a message and a series of options that the user
@@ -32,13 +29,11 @@ public static class MessageBox
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single; // Default is set in config.json
 
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter<Alignment>))]
     public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Center; // Default is set in config.json
 
     /// <summary>
@@ -405,11 +400,6 @@ public static class MessageBox
         d.TextFormatter.WordWrap = wrapMessage;
         d.TextFormatter.MultiLine = !wrapMessage;
 
-        d.ColorScheme = new ColorScheme (d.ColorScheme)
-        {
-            Focus = d.ColorScheme.Normal
-        };
-
         // Setup actions
         Clicked = -1;
 
@@ -423,11 +413,6 @@ public static class MessageBox
                              Clicked = buttonId;
                              Application.RequestStop ();
                          };
-
-            if (b.IsDefault)
-            {
-                b.SetFocus ();
-            }
         }
 
         // Run the modal; do not shut down the mainloop driver when done
