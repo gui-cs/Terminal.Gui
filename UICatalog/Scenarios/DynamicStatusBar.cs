@@ -15,7 +15,7 @@ public class DynamicStatusBar : Scenario
 {
     public override void Main ()
     {
-
+        Application.Init ();
         Application.Run<DynamicStatusBarSample> ().Dispose ();
         Application.Shutdown ();
     }
@@ -125,58 +125,9 @@ public class DynamicStatusBar : Scenario
 
             TextShortcut.KeyDown += (s, e) =>
                                     {
-                                        if (!ProcessKey (e))
-                                        {
-                                            return;
-                                        }
+                                        TextShortcut.Text = e.ToString ();
 
-                                        if (CheckShortcut (e.KeyCode, true))
-                                        {
-                                            e.Handled = true;
-                                        }
                                     };
-
-            bool ProcessKey (Key ev)
-            {
-                switch (ev.KeyCode)
-                {
-                    case KeyCode.CursorUp:
-                    case KeyCode.CursorDown:
-                    case KeyCode.Tab:
-                    case KeyCode.Tab | KeyCode.ShiftMask:
-                        return false;
-                }
-
-                return true;
-            }
-
-            bool CheckShortcut (KeyCode k, bool pre)
-            {
-                Shortcut m = _statusItem != null ? _statusItem : new Shortcut (k, "", null);
-
-                if (pre && !ShortcutHelper.PreShortcutValidation (k))
-                {
-                    TextShortcut.Text = "";
-
-                    return false;
-                }
-
-                if (!pre)
-                {
-                    return true;
-                }
-
-                TextShortcut.Text = k.ToString ();
-                return true;
-            }
-
-            TextShortcut.KeyUp += (s, e) =>
-                                  {
-                                      if (CheckShortcut (e.KeyCode, true))
-                                      {
-                                          e.Handled = true;
-                                      }
-                                  };
             Add (TextShortcut);
 
             var _btnShortcut = new Button
@@ -210,7 +161,7 @@ public class DynamicStatusBar : Scenario
                                   ? GetTargetAction (statusItem.Action)
                                   : string.Empty;
 
-            TextShortcut.Text = statusItem.CommandView.Text;
+            TextShortcut.Text = statusItem.Key;
         }
 
         public DynamicStatusItem EnterStatusItem ()
@@ -238,13 +189,6 @@ public class DynamicStatusBar : Scenario
                                   }
                                   else
                                   {
-                                      if (!string.IsNullOrEmpty (TextShortcut.Text))
-                                      {
-                                          TextTitle.Text = DynamicStatusBarSample.SetTitleText (
-                                                                                                TextTitle.Text,
-                                                                                                TextShortcut.Text
-                                                                                               );
-                                      }
 
                                       valid = true;
                                       Application.RequestStop ();
@@ -433,10 +377,6 @@ public class DynamicStatusBar : Scenario
                                   }
                                   else if (_currentEditStatusItem != null)
                                   {
-                                      _frmStatusBarDetails.TextTitle.Text = SetTitleText (
-                                                                                          _frmStatusBarDetails.TextTitle.Text,
-                                                                                          _frmStatusBarDetails.TextShortcut.Text
-                                                                                         );
 
                                       var statusItem = new DynamicStatusItem
                                       {
@@ -487,6 +427,7 @@ public class DynamicStatusBar : Scenario
                                       if (statusItem != null)
                                       {
                                           _statusBar.RemoveShortcut (_currentSelectedStatusBar);
+                                          statusItem.Dispose ();
                                           DataContext.Items.RemoveAt (_lstItems.SelectedItem);
 
                                           if (_lstItems.Source.Count > 0 && _lstItems.SelectedItem > _lstItems.Source.Count - 1)
@@ -526,6 +467,7 @@ public class DynamicStatusBar : Scenario
                                                }
 
                                                Remove (_statusBar);
+                                               _statusBar.Dispose ();
                                                _statusBar = null;
                                                DataContext.Items = [];
                                                _currentStatusItem = null;
@@ -588,7 +530,7 @@ public class DynamicStatusBar : Scenario
 
             Shortcut CreateNewStatusBar (DynamicStatusItem item)
             {
-                var newStatusItem = new Shortcut (Key.Empty, item.Title, null);
+                var newStatusItem = new Shortcut (item.Shortcut, item.Title, _frmStatusBarDetails.CreateAction (item));
 
                 return newStatusItem;
             }
@@ -599,8 +541,9 @@ public class DynamicStatusBar : Scenario
                 int index
             )
             {
-                _currentEditStatusItem = CreateNewStatusBar (statusItem);
-                //_statusBar.Items [index] = _currentEditStatusItem;
+                _statusBar.Subviews [index].Title = statusItem.Title;
+                ((Shortcut)_statusBar.Subviews [index]).Action = _frmStatusBarDetails.CreateAction (statusItem);
+                ((Shortcut)_statusBar.Subviews [index]).Key = statusItem.Shortcut;
 
                 if (DataContext.Items.Count == 0)
                 {
@@ -624,23 +567,9 @@ public class DynamicStatusBar : Scenario
 
         public DynamicStatusItemModel DataContext { get; set; }
 
-        public static string SetTitleText (string title, string shortcut)
-        {
-            string txt = title;
-            string [] split = title.Split ('~');
 
-            if (split.Length > 1)
-            {
-                txt = split [2].Trim ();
-            }
 
-            if (string.IsNullOrEmpty (shortcut) || shortcut == "Null")
-            {
-                return txt;
-            }
 
-            return $"~{shortcut}~ {txt}";
-        }
     }
 
     public class DynamicStatusItem
@@ -662,7 +591,7 @@ public class DynamicStatusBar : Scenario
 
         public Shortcut Shortcut { get; set; }
         public string Title { get; set; }
-        public override string ToString () { return $"{Title}, {Shortcut}"; }
+        public override string ToString () { return $"{Title}, {Shortcut.Key}"; }
     }
 
     public class DynamicStatusItemModel : INotifyPropertyChanged

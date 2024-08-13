@@ -22,6 +22,7 @@
   "Application.NextTabGroupKey": "F6",
   "Application.PrevTabGroupKey": "Shift+F6",
   "Application.QuitKey": "Esc",
+  "Key.Separator": "+",
 
   "Theme": "Default",
   "Themes": [

@@ -179,7 +179,7 @@ public class ContextMenus : Scenario
                                                                        "This would open setup dialog",
                                                                        "Ok"
                                                                       ),
-                                                           shortcut: KeyCode.T
+                                                           shortcutKey: KeyCode.T
                                                                      | KeyCode
                                                                          .CtrlMask
                                                           ),
