@@ -216,8 +216,50 @@ public partial class DimAutoTests (ITestOutputHelper output)
             MinimumContentDim = 1,
             Style = DimAutoStyle.Auto
         };
+
+        var c = new DimAuto
+        {
+            MaximumContentDim = 2,
+            MinimumContentDim = 1,
+            Style = DimAutoStyle.Auto
+        };
+
+        var d = new DimAuto
+        {
+            MaximumContentDim = null,
+            MinimumContentDim = 1,
+            Style = DimAutoStyle.Content
+        };
+
+        var e = new DimAuto
+        {
+            MaximumContentDim = null,
+            MinimumContentDim = 2,
+            Style = DimAutoStyle.Auto
+        };
+
+        // Test equality with same values
         Assert.True (a.Equals (b));
         Assert.True (a.GetHashCode () == b.GetHashCode ());
+
+        // Test inequality with different MaximumContentDim
+        Assert.False (a.Equals (c));
+        Assert.False (a.GetHashCode () == c.GetHashCode ());
+
+        // Test inequality with different Style
+        Assert.False (a.Equals (d));
+        Assert.False (a.GetHashCode () == d.GetHashCode ());
+
+        // Test inequality with different MinimumContentDim
+        Assert.False (a.Equals (e));
+        Assert.False (a.GetHashCode () == e.GetHashCode ());
+
+        // Test equality with self
+        Assert.True (a.Equals (a));
+        Assert.True (a.GetHashCode () == a.GetHashCode ());
+
+        // Test inequality with null
+        Assert.False (a.Equals (null));
     }
 
     [Fact]

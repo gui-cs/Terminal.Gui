@@ -17,25 +17,30 @@ namespace Terminal.Gui;
 /// </remarks>
 public class DimAuto : Dim
 {
-    private readonly Dim? _maximumContentDim;
-
-    private readonly Dim? _minimumContentDim;
-
-    private readonly DimAutoStyle _style;
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override bool Equals (object? other)
     {
+        if (ReferenceEquals (this, other))
+        {
+            return true;
+        }
+
         if (other is not DimAuto auto)
         {
             return false;
         }
 
-        return auto.MinimumContentDim == MinimumContentDim && auto.MaximumContentDim == MaximumContentDim && auto.Style == Style;
+        return EqualityComparer<Dim?>.Default.Equals (MinimumContentDim, auto.MinimumContentDim) &&
+               EqualityComparer<Dim?>.Default.Equals (MaximumContentDim, auto.MaximumContentDim) &&
+               Style == auto.Style;
     }
 
-    /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (MinimumContentDim, MaximumContentDim, Style); }
+    /// <inheritdoc />
+    public override int GetHashCode ()
+    {
+        return HashCode.Combine (MinimumContentDim, MaximumContentDim, Style);
+    }
+    private readonly Dim? _maximumContentDim;
 
     /// <summary>
     ///     Gets the maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.
@@ -48,6 +53,8 @@ public class DimAuto : Dim
         init => _maximumContentDim = value;
     }
 
+    private readonly Dim? _minimumContentDim;
+
     /// <summary>
     ///     Gets the minimum dimension the View's ContentSize will be constrained to.
     /// </summary>
@@ -58,6 +65,8 @@ public class DimAuto : Dim
         get => _minimumContentDim;
         init => _minimumContentDim = value;
     }
+
+    private readonly DimAutoStyle _style;
 
     /// <summary>
     ///     Gets the style of the DimAuto.
