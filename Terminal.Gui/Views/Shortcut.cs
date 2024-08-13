@@ -835,21 +835,21 @@ public class Shortcut : View, IOrientation, IDesignable
     private View _lastFocusedView;
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
+    protected override bool OnEnter (View view)
     {
         SetColors ();
         _lastFocusedView = view;
 
-        return base.OnEnter (view);
+        return false; // Don't cancel the focus switch
     }
 
     /// <inheritdoc/>
-    public override bool OnLeave (View view)
+    protected override bool OnLeave (View view)
     {
         SetColors ();
         _lastFocusedView = this;
 
-        return base.OnLeave (view);
+        return false; // Don't cancel the focus switch
     }
 
     #endregion Focus

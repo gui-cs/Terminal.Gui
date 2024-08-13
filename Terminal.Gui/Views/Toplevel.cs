@@ -411,11 +411,14 @@ public partial class Toplevel : View
 
     #region Navigation
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view) { return MostFocused?.OnEnter (view) ?? base.OnEnter (view); }
+    ///// <inheritdoc/>
+    //protected override bool OnEnter (View view)
+    //{
+    //    return MostFocused?.OnEnter (view) ?? false;
+    //}
 
-    /// <inheritdoc/>
-    public override bool OnLeave (View view) { return MostFocused?.OnLeave (view) ?? base.OnLeave (view); }
+    ///// <inheritdoc/>
+    //protected override bool OnLeave (View view) { return MostFocused?.OnLeave (view) ?? false; }
 
     #endregion
 

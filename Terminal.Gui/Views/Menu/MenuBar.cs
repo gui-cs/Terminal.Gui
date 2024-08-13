@@ -1329,14 +1329,14 @@ public class MenuBar : View, IDesignable
     #region Mouse Handling
 
     /// <inheritdoc/>
-    public override bool OnLeave (View view)
+    internal void LostFocus (View view)
     {
         if (((!(view is MenuBar) && !(view is Menu)) || (!(view is MenuBar) && !(view is Menu) && _openMenu is { })) && !_isCleaning && !_reopen)
         {
             CleanUp ();
         }
 
-        return base.OnLeave (view);
+        return;
     }
 
     /// <inheritdoc/>

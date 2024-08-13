@@ -299,7 +299,7 @@ public class ComboBox : View, IDesignable
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
+    protected override bool OnEnter (View view)
     {
         if (!_search.HasFocus && !_listview.HasFocus)
         {
@@ -308,14 +308,14 @@ public class ComboBox : View, IDesignable
 
         _search.CursorPosition = _search.Text.GetRuneCount ();
 
-        return base.OnEnter (view);
+        return false; // Don't cancel the focus switch
     }
 
     /// <summary>Virtual method which invokes the <see cref="Expanded"/> event.</summary>
     public virtual void OnExpanded () { Expanded?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    public override bool OnLeave (View view)
+    protected override bool OnLeave (View view)
     {
         if (_source?.Count > 0
             && _selectedItem > -1
@@ -335,7 +335,7 @@ public class ComboBox : View, IDesignable
             _listview.TabStop = TabBehavior.NoStop;
         }
 
-        return base.OnLeave (view);
+        return false; // Don't cancel the focus switch
     }
 
     /// <summary>Invokes the OnOpenSelectedItem event if it is defined.</summary>
@@ -940,7 +940,7 @@ public class ComboBox : View, IDesignable
             }
         }
 
-        public override bool OnEnter (View view)
+        protected override bool OnEnter (View view)
         {
             if (_hideDropdownListOnClick)
             {
@@ -949,10 +949,10 @@ public class ComboBox : View, IDesignable
                 Application.GrabMouse (this);
             }
 
-            return base.OnEnter (view);
+            return false; // Don't cancel the focus switch
         }
 
-        public override bool OnLeave (View view)
+        protected override bool OnLeave (View view)
         {
             if (_hideDropdownListOnClick)
             {
@@ -961,7 +961,7 @@ public class ComboBox : View, IDesignable
                 Application.UngrabMouse ();
             }
 
-            return base.OnLeave (view);
+            return false; // Don't cancel the focus switch
         }
 
         public override bool OnSelectedChanged ()

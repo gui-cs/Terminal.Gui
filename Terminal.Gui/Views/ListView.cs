@@ -739,14 +739,14 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
+    protected override bool OnEnter (View view)
     {
         if (_lastSelectedItem != _selected)
         {
             EnsureSelectedItemVisible ();
         }
 
-        return base.OnEnter (view);
+        return false; // Don't cancel the focus switch
     }
 
     // TODO: This should be cancelable

@@ -587,7 +587,12 @@ internal sealed class Menu : View
         _host.Run (action);
     }
 
-    public override bool OnLeave (View view) { return _host.OnLeave (view); }
+    protected override bool OnLeave (View view)
+    {
+        _host.LostFocus (view);
+
+        return false;
+    }
 
     private void RunSelected ()
     {

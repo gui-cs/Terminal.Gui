@@ -877,14 +877,6 @@ At 0,0
         Assert.False (r.NewMouseEnterEvent (new() { Flags = MouseFlags.AllEvents }));
         Assert.False (r.NewMouseLeaveEvent (new() { Flags = MouseFlags.AllEvents }));
 
-        var v1 = new View ();
-        Assert.False (r.OnEnter (v1));
-        v1.Dispose ();
-
-        var v2 = new View ();
-        Assert.False (r.OnLeave (v2));
-        v2.Dispose ();
-
         r.Dispose ();
 
         // TODO: Add more

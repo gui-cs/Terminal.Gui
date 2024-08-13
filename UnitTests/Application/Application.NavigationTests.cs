@@ -13,16 +13,16 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     {
         bool raised = false;
 
-        ApplicationNavigation.FocusedChanged += ApplicationNavigationOnFocusedChanged;
+        Application.Navigation.FocusedChanged += ApplicationNavigationOnFocusedChanged;
 
-        ApplicationNavigation.Focused = new View();
+        Application.Navigation.SetFocused(new View ());
 
         Assert.True (raised);
 
-        ApplicationNavigation.Focused.Dispose ();
-        ApplicationNavigation.Focused = null;
+        Application.Navigation.GetFocused().Dispose ();
+        Application.Navigation.SetFocused(null);
 
-        ApplicationNavigation.FocusedChanged -= ApplicationNavigationOnFocusedChanged;
+        Application.Navigation.FocusedChanged -= ApplicationNavigationOnFocusedChanged;
 
         return;
 

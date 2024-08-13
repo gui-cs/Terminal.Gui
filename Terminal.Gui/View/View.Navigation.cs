@@ -69,7 +69,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             {
                 Debug.Assert (view is null || SuperView is null || ApplicationNavigation.IsInHierarchy (SuperView, view));
 
-                if (OnEnter (view))
+                if (EnterFocus (view))
                 {
                     // The change happened
                     // HasFocus is now true
@@ -82,7 +82,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
             else
             {
-                if (OnLeave (view))
+                if (LeaveFocus (view))
                 {
                     // The change happened
                     // HasFocus is now false
@@ -163,30 +163,56 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return false;
         }
 
+        // If we're here, we can be focused. But we may have subviews.
+
+        // Restore focus to the most focused subview in the subview-hierarchy
+        if (!RestoreFocus (TabStop))
+        {
+            // Couldn't restore focus, so use Advance to navigate to the next focusable subview
+            if (!AdvanceFocus (NavigationDirection.Forward, TabStop))
+            {
+                // Couldn't advance, so we're the most-focusable view in the application
+                // We now need to ensure all views up the superview hierarchy have focus.
+                // Any of them may cancel gaining focus. In which case we need to back out.
+
+                // All views down the superview-hierarchy need to have HasFocus == true
+
+                // PLACEHOLDER:But just using SetHasFocus on them will infinitely recurse. So we need to do it manually.
+
+                
+
+
+                if (SuperView is { HasFocus: false } super)
+                {
+                    if (!super.SetHasFocus (true, this))
+                    {
+                        // The change was cancelled
+                        return false;
+                    }
+
+                    SuperView.Focused = this;
+                }
+
+                Application.Navigation?.SetFocused (this);
+            }
+        }
+
+
+
         // Now, these things need to be true for us to set _hasFocus to true:
         //   All views down v's view-hierarchy need to gain focus, if they don't already have it.
         //       Any of them may cancel gaining focus, so we need to do that first.
 
         _hasFocus = true;
 
-        // By setting _hasFocus to true we've definitively changed HasFocus for this view
+        // By setting _hasFocus to true we've definitively changed HasFocus for this view.
+        // But we can back out below if a subview or superview cancels gaining focus.
 
+        // All views down the superview-hierarchy need to have HasFocus == true
         if (SuperView is { })
         {
             SuperView.Focused = this;
         }
-
-        if (!RestoreFocus (TabStop))
-        {
-            // Couldn't restore focus, so use Advance to navigate
-            if (!AdvanceFocus (NavigationDirection.Forward, TabStop))
-            {
-                // Couldn't advance, so we're the most-focusable view in the application
-                ApplicationNavigation.SetFocused (this);
-            }
-        }
-
-        // All views down the superview-hierarchy need to have HasFocus == true
 
         // Post-conditions - prove correctness
         if (HasFocus == previousValue)
@@ -210,6 +236,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </remarks>
     public event EventHandler<FocusEventArgs> Enter;
 
+    // TODO: Leave does not need to be cancelable. That's overkill. Just make it so that it can't be canceled.
+
     /// <summary>
     ///     Called when view is entering focus. This method is called by <see cref="SetHasFocus"/> and other methods that
     ///     set or remove focus from a view.
@@ -227,10 +255,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         // Before we can leave focus, we need to make sure that all views down the subview-hierarchy have left focus.
         //    Any of them may cancel losing focus, so we need to do that first.
-        if (ApplicationNavigation.GetFocused () != this)
+        if (Application.Navigation?.GetFocused () != this)
         {
             // Save the most focused view in the subview-hierarchy
-            View originalBottom = ApplicationNavigation.GetFocused ();
+            View originalBottom = Application.Navigation?.GetFocused ();
             // Start at the bottom and work our way up to us
             View bottom = originalBottom;
 
@@ -273,7 +301,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         _hasFocus = false;
 
-        if (ApplicationNavigation.GetFocused () != this)
+        if (Application.Navigation?.GetFocused () != this)
         {
             PreviouslyMostFocused = null;
 
@@ -450,26 +478,27 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
     /// <summary>
     ///     Internal API that causes <paramref name="viewToEnterFocus"/> to enter focus.
-    ///     <paramref name="viewToEnterFocus"/> does not need to be a subview.
-    ///     Recursively sets focus DOWN in the view hierarchy.
+    ///     <paramref name="viewToEnterFocus"/> must be a subview.
+    ///     Recursively sets focus up the superview hierarchy.
     /// </summary>
     /// <param name="viewToEnterFocus"></param>
-    private void SetFocus (View viewToEnterFocus)
+    /// <returns><see langword="true"/> if <paramref name="viewToEnterFocus"/> got focus.</returns>
+    private bool SetFocus (View viewToEnterFocus)
     {
         if (viewToEnterFocus is null)
         {
-            return;
+            return false;
         }
 
         if (!viewToEnterFocus.CanFocus || !viewToEnterFocus.Visible || !viewToEnterFocus.Enabled)
         {
-            return;
+            return false;
         }
 
         // If viewToEnterFocus is already the focused view, don't do anything
         if (Focused?._hasFocus == true && Focused == viewToEnterFocus)
         {
-            return;
+            return false;
         }
 
         // If a subview has focus and viewToEnterFocus is the focused view's superview OR viewToEnterFocus is this view,
@@ -481,7 +510,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 viewToEnterFocus._hasFocus = true;
             }
 
-            return;
+            // viewToEnterFocus is already focused
+            return true;
         }
 
         // Make sure that viewToEnterFocus is a subview of this view
@@ -509,13 +539,15 @@ public partial class View // Focus and cross-view navigation management (TabStop
         Focused?.SetHasFocus (true, f, true);
         Focused?.FocusDeepest (null, NavigationDirection.Forward);
 
-        // Recursively set focus down the view hierarchy
+        // Recursively set focus up the superview hierarchy
         if (SuperView is { })
         {
+            // BUGBUG: If focus is cancelled at any point, we should stop and restore focus to the previous focused view
             SuperView.SetFocus (this);
         }
         else
         {
+            // BUGBUG: this makes no sense in the new design
             // If there is no SuperView, then this is a top-level view
             SetFocus (this);
 
@@ -533,6 +565,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             viewToEnterFocus.TabIndex = 0;
         }
 
+        return true;
     }
 
 
@@ -781,7 +814,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Raises the <see cref="CanFocusChanged"/> event.
     /// </remarks>
     public virtual void OnCanFocusChanged () { CanFocusChanged?.Invoke (this, EventArgs.Empty); }
-    
+
     #region Tab/Focus Handling
 
 #nullable enable

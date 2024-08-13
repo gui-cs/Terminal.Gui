@@ -1155,14 +1155,14 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     ///<inheritdoc/>
-    public override bool OnEnter (View view)
+    protected override bool OnEnter (View view)
     {
         if (SelectedObject is null && Objects.Any ())
         {
             SelectedObject = Objects.First ();
         }
 
-        return base.OnEnter (view);
+        return false; // Don't cancel the focus switch
     }
 
     /// <inheritdoc/>

@@ -185,17 +185,5 @@ public class AdornmentsEditor : View
         {
             return;
         }
-
-            _viewToEdit = value;
-
-
-            _marginEditor.AdornmentToEdit = _viewToEdit?.Margin ?? null;
-            _borderEditor.AdornmentToEdit = _viewToEdit?.Border ?? null;
-            _paddingEditor.AdornmentToEdit = _viewToEdit?.Padding ?? null;
-
-            _lblView.Text = $"{_viewToEdit?.GetType ().Name}: {_viewToEdit?.Id}"  ?? string.Empty;
-
-            return;
-        }
     }
 }
