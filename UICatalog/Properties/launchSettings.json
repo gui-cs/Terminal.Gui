@@ -7,6 +7,10 @@
       "commandName": "Project",
       "commandLineArgs": "--driver NetDriver"
     },
+    "UICatalog --driver ANSIDriver": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver ANSIDriver"
+    },
     "UICatalog --driver WindowsDriver": {
       "commandName": "Project",
       "commandLineArgs": "--driver WindowsDriver"
