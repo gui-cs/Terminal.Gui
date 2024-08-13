@@ -449,7 +449,7 @@ public class Key : EventArgs, IEquatable<Key>
 
     #region String conversion
 
-    /// <summary>Pretty prints the KeyEvent</summary>
+    /// <summary>Pretty prints the Key.</summary>
     /// <returns></returns>
     public override string ToString () { return ToString (KeyCode, Separator); }
 
