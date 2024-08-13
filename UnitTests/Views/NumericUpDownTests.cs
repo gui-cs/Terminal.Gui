@@ -98,7 +98,8 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     [Fact]
     public void WhenCreatedWithInvalidTypeObject_ShouldNotThrowInvalidOperationException ()
     {
-        NumericUpDown<object> numericUpDown = new ();
+        Exception exception = Record.Exception (() => new NumericUpDown<object> ());
+        Assert.Null (exception);
     }
 
     [Fact]
@@ -217,7 +218,7 @@ public class NumericUpDownTests (ITestOutputHelper _output)
     }
 
     [Fact]
-    public void KeDown_CursorUp_Increments ()
+    public void KeyDown_CursorUp_Increments ()
     {
         NumericUpDown<int> numericUpDown = new ();
 

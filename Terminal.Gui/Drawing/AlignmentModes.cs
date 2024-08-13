@@ -1,10 +1,11 @@
-
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
 /// <summary>
 ///     Determines alignment modes for <see cref="Alignment"/>.
 /// </summary>
+[JsonConverter (typeof (JsonStringEnumConverter<AlignmentModes>))]
 [Flags]
 public enum AlignmentModes
 {

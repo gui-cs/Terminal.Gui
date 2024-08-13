@@ -2343,7 +2343,22 @@ internal class WindowsClipboard : ClipboardBase
 {
     private const uint CF_UNICODE_TEXT = 13;
 
-    public override bool IsSupported { get; } = IsClipboardFormatAvailable (CF_UNICODE_TEXT);
+    public override bool IsSupported { get; } = CheckClipboardIsAvailable ();
+
+    private static bool CheckClipboardIsAvailable ()
+    {
+        // Attempt to open the clipboard
+        if (OpenClipboard (nint.Zero))
+        {
+            // Clipboard is available
+            // Close the clipboard after use
+            CloseClipboard ();
+
+            return true;
+        }
+        // Clipboard is not available
+        return false;
+    }
 
     protected override string GetClipboardDataImpl ()
     {

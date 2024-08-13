@@ -1,10 +1,11 @@
-
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
 /// <summary>
 ///     Determines the position of items when arranged in a container.
 /// </summary>
+[JsonConverter (typeof (JsonStringEnumConverter<Alignment>))]
 public enum Alignment
 {
     /// <summary>
