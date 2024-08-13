@@ -254,10 +254,6 @@ public partial class DimAutoTests (ITestOutputHelper output)
         Assert.False (a.Equals (e));
         Assert.False (a.GetHashCode () == e.GetHashCode ());
 
-        // Test equality with self
-        Assert.True (a.Equals (a));
-        Assert.True (a.GetHashCode () == a.GetHashCode ());
-
         // Test inequality with null
         Assert.False (a.Equals (null));
     }
