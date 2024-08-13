@@ -975,7 +975,7 @@ public class Key : EventArgs, IEquatable<Key>
 
     private static Rune _separator = new ('+');
 
-    /// <summary>Sets or gets the shortcut delimiter separator. The default is "+".</summary>
+    /// <summary>Gets or sets the separator character used when parsing and printing Keys. E.g. Ctrl+A. The default is '+'.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Rune Separator
     {
