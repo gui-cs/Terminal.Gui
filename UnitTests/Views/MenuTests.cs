@@ -31,7 +31,7 @@ public class MenuTests
         Assert.Null (menuItem.Action);
         Assert.Null (menuItem.CanExecute);
         Assert.Null (menuItem.Parent);
-        Assert.Equal (KeyCode.Null, menuItem.Shortcut);
+        Assert.Equal (Key.Empty, menuItem.ShortcutKey);
 
         menuItem = new MenuItem ("Test", "Help", Run, () => { return true; }, new MenuItem (), KeyCode.F1);
         Assert.Equal ("Test", menuItem.Title);
@@ -39,7 +39,7 @@ public class MenuTests
         Assert.Equal (Run, menuItem.Action);
         Assert.NotNull (menuItem.CanExecute);
         Assert.NotNull (menuItem.Parent);
-        Assert.Equal (KeyCode.F1, menuItem.Shortcut);
+        Assert.Equal (KeyCode.F1, menuItem.ShortcutKey);
 
         void Run () { }
     }

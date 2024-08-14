@@ -66,6 +66,8 @@ public class MenuBar : View, IDesignable
     /// <summary>Initializes a new instance of the <see cref="MenuBar"/>.</summary>
     public MenuBar ()
     {
+        MenuItem._menuBar = this;
+
         TabStop = TabBehavior.NoStop;
         X = 0;
         Y = 0;
@@ -122,7 +124,7 @@ public class MenuBar : View, IDesignable
                         return true;
                     }
                    );
-        AddCommand (Command.ToggleExpandCollapse, ctx => Select ((int)ctx.KeyBinding?.Context!));
+        AddCommand (Command.ToggleExpandCollapse, ctx => Select (Menus.IndexOf (ctx.KeyBinding?.Context)));
         AddCommand (Command.Select, ctx => Run ((ctx.KeyBinding?.Context as MenuItem)?.Action));
 
         // Default key bindings for this view
@@ -172,19 +174,23 @@ public class MenuBar : View, IDesignable
             {
                 MenuBarItem menuBarItem = Menus [i];
 
-                if (menuBarItem?.HotKey != default (Rune))
+                if (menuBarItem?.HotKey != Key.Empty)
                 {
-                    KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.Focused, i);
-                    KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value, keyBinding);
-                    keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, i);
-                    KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value | KeyCode.AltMask, keyBinding);
+                    KeyBindings.Remove (menuBarItem!.HotKey);
+                    KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.Focused, menuBarItem);
+                    KeyBindings.Add (menuBarItem!.HotKey, keyBinding);
+                    KeyBindings.Remove (menuBarItem.HotKey.WithAlt);
+                    keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, menuBarItem);
+                    KeyBindings.Add (menuBarItem.HotKey.WithAlt, keyBinding);
                 }
 
-                if (menuBarItem?.Shortcut != KeyCode.Null)
+                if (menuBarItem?.ShortcutKey != Key.Empty)
                 {
                     // Technically this will never run because MenuBarItems don't have shortcuts
-                    KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, i);
-                    KeyBindings.Add (menuBarItem.Shortcut, keyBinding);
+                    // unless the IsTopLevel is true
+                    KeyBindings.Remove (menuBarItem.ShortcutKey);
+                    KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuBarItem);
+                    KeyBindings.Add (menuBarItem.ShortcutKey, keyBinding);
                 }
 
                 menuBarItem?.AddShortcutKeyBindings (this);
@@ -1255,21 +1261,6 @@ public class MenuBar : View, IDesignable
         }
     }
 
-    private static Rune _shortcutDelimiter = new ('+');
-
-    /// <summary>Sets or gets the shortcut delimiter separator. The default is "+".</summary>
-    public static Rune ShortcutDelimiter
-    {
-        get => _shortcutDelimiter;
-        set
-        {
-            if (_shortcutDelimiter != value)
-            {
-                _shortcutDelimiter = value == default (Rune) ? new ('+') : value;
-            }
-        }
-    }
-
     /// <summary>The specifier character for the hot keys.</summary>
     public new static Rune HotKeySpecifier => (Rune)'_';
 
@@ -1320,6 +1311,10 @@ public class MenuBar : View, IDesignable
         if (index == -1)
         {
             OpenMenu ();
+        }
+        else if (Menus [index].IsTopLevel)
+        {
+            Run (Menus [index].Action);
         }
         else
         {
@@ -1765,5 +1760,13 @@ public class MenuBar : View, IDesignable
             new MenuBarItem ("_About", "Top-Level", () => actionFn ("About"))
         ];
         return true;
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        MenuItem._menuBar = null;
+
+        base.Dispose (disposing);
     }
 }

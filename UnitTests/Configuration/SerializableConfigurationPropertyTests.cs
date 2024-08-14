@@ -41,17 +41,11 @@ public class SerializableConfigurationPropertyTests
         }
 
         // Ensure no property has the generic JsonStringEnumConverter<>
-        foreach (var property in properties)
-        {
-            var jsonConverterAttributes = property.GetCustomAttributes (typeof (JsonConverterAttribute), false)
-                .Cast<JsonConverterAttribute> ();
-
-            foreach (var attribute in jsonConverterAttributes)
-            {
-                Assert.False (attribute.ConverterType!.IsGenericType &&
-                             attribute.ConverterType.GetGenericTypeDefinition () == typeof (JsonStringEnumConverter<>));
-            }
-        }
+        EnsureNoSpecifiedConverters (properties, new [] { typeof (JsonStringEnumConverter<>) });
+        // Ensure no property has the type RuneJsonConverter
+        EnsureNoSpecifiedConverters (properties, new [] { typeof (RuneJsonConverter) });
+        // Ensure no property has the type KeyJsonConverter
+        EnsureNoSpecifiedConverters (properties, new [] { typeof (KeyJsonConverter) });
 
         // Find all classes with the JsonConverter attribute of type ScopeJsonConverter<>
         var classesWithScopeJsonConverter = types.Where (t =>
@@ -66,7 +60,7 @@ public class SerializableConfigurationPropertyTests
         }
     }
 
-    private IEnumerable<Type> GetRegisteredTypes (Type contextType)
+    private static IEnumerable<Type> GetRegisteredTypes (Type contextType)
     {
         // Use reflection to find which types are registered in the JsonSerializerContext
         var registeredTypes = new List<Type> ();
@@ -82,5 +76,33 @@ public class SerializableConfigurationPropertyTests
         }
 
         return registeredTypes.Distinct ();
+    }
+
+    private static void EnsureNoSpecifiedConverters (List<PropertyInfo> properties, IEnumerable<Type> converterTypes)
+    {
+        // Ensure no property has any of the specified converter types
+        foreach (var property in properties)
+        {
+            var jsonConverterAttributes = property.GetCustomAttributes (typeof (JsonConverterAttribute), false)
+                                                  .Cast<JsonConverterAttribute> ();
+
+            foreach (var attribute in jsonConverterAttributes)
+            {
+                foreach (var converterType in converterTypes)
+                {
+                    if (attribute.ConverterType!.IsGenericType &&
+                        attribute.ConverterType.GetGenericTypeDefinition () == converterType)
+                    {
+                        Assert.Fail ($"Property '{property.Name}' should not use the converter '{converterType.Name}'.");
+                    }
+
+                    if (!attribute.ConverterType!.IsGenericType &&
+                        attribute.ConverterType == converterType)
+                    {
+                        Assert.Fail ($"Property '{property.Name}' should not use the converter '{converterType.Name}'.");
+                    }
+                }
+            }
+        }
     }
 }
