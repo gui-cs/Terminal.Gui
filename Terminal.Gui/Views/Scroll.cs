@@ -52,7 +52,7 @@ public class Scroll : View
         set
         {
             _orientation = value;
-            AdjustSlider();
+            AdjustSlider ();
         }
     }
 
@@ -84,12 +84,13 @@ public class Scroll : View
                 return;
             }
 
+            _position = value;
+
             if (!_wasSliderMouse)
             {
                 AdjustSlider ();
             }
 
-            _position = value;
             OnPositionChanged (_position);
         }
     }
@@ -150,7 +151,7 @@ public class Scroll : View
             return Size - scrollSize;
         }
 
-        return Math.Min (location * Size / scrollSize, Size - scrollSize);
+        return Math.Min ((location * Size + location) / scrollSize, Size - scrollSize);
     }
 
     // QUESTION: This method is only called from one place. Should it be inlined? Or, should it be made internal and unit tests be provided?
@@ -175,7 +176,7 @@ public class Scroll : View
                 Position = Size - scrollSize;
             }
 
-            location = Math.Min (Position * scrollSize / Size, scrollSize - dimension);
+            location = Math.Min ((Position * scrollSize + Position) / Size, scrollSize - dimension);
 
             if (Position == Size - scrollSize && location + dimension < scrollSize)
             {
