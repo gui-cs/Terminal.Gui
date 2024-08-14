@@ -51,13 +51,13 @@ public class ThicknessTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void DrawTests ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (60, 60);
+        ((FakeDriver)Application.Driver!).SetBufferSize (60, 60);
         var t = new Thickness (0, 0, 0, 0);
         var r = new Rectangle (5, 5, 40, 15);
         View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
-        Application.Driver.FillRect (
-                                     new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+        Application.Driver?.FillRect (
+                                     new Rectangle (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
@@ -73,8 +73,8 @@ public class ThicknessTests (ITestOutputHelper output)
         r = new Rectangle (5, 5, 40, 15);
         View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
-        Application.Driver.FillRect (
-                                     new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+        Application.Driver?.FillRect (
+                                     new Rectangle (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
@@ -104,8 +104,8 @@ public class ThicknessTests (ITestOutputHelper output)
         r = new Rectangle (5, 5, 40, 15);
         View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
-        Application.Driver.FillRect (
-                                     new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+        Application.Driver?.FillRect (
+                                     new Rectangle (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
@@ -135,8 +135,8 @@ public class ThicknessTests (ITestOutputHelper output)
         r = new Rectangle (5, 5, 40, 15);
         View.Diagnostics |= ViewDiagnosticFlags.Padding;
 
-        Application.Driver.FillRect (
-                                     new Rectangle (0, 0, Application.Driver.Cols, Application.Driver.Rows),
+        Application.Driver?.FillRect (
+                                     new Rectangle (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
                                      (Rune)' '
                                     );
         t.Draw (r, "Test");
@@ -174,7 +174,7 @@ public class ThicknessTests (ITestOutputHelper output)
         top.Add (f);
         Application.Begin (top);
 
-        ((FakeDriver)Application.Driver).SetBufferSize (45, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (45, 20);
         var t = new Thickness (0, 0, 0, 0);
         var r = new Rectangle (2, 2, 40, 15);
         Application.Refresh ();

@@ -187,6 +187,7 @@ public class DatePicker : View
         BorderStyle = LineStyle.Single;
         Date = date;
         _dateLabel = new Label { X = 0, Y = 0, Text = "Date: " };
+        TabStop = TabBehavior.TabGroup;
 
         _calendar = new TableView
         {
@@ -275,9 +276,6 @@ public class DatePicker : View
 
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
-
-        // BUGBUG: Remove when Dim.Auto(subviews) fully works
-        SetContentSize (new (_calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7, _calendar.Frame.Height + 1));
 
         _dateField.DateChanged += DateField_DateChanged;
 

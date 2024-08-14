@@ -122,7 +122,10 @@ public class ListView : View, IDesignable
         CanFocus = true;
 
         // Things this view knows how to do
+        // 
+        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
         AddCommand (Command.LineUp, () => MoveUp ());
+        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
         AddCommand (Command.LineDown, () => MoveDown ());
         AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));

@@ -76,6 +76,9 @@ public class ThemeTests
     [Fact]
     public void TestSerialize_RoundTrip ()
     {
+        // This is needed to test only this alone
+        Reset ();
+
         var theme = new ThemeScope ();
         theme ["Dialog.DefaultButtonAlignment"].PropertyValue = Alignment.End;
 

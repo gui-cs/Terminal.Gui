@@ -139,7 +139,7 @@ public abstract class Dim
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Height of the specified <see cref="View"/>.</summary>
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Height (View view) { return new DimView (view, Dimension.Height); }
+    public static Dim Height (View? view) { return new DimView (view, Dimension.Height); }
 
     /// <summary>Creates a percentage <see cref="Dim"/> object that is a percentage of the width or height of the SuperView.</summary>
     /// <returns>The percent <see cref="Dim"/> object.</returns>
@@ -160,10 +160,7 @@ public abstract class Dim
     /// </example>
     public static Dim? Percent (int percent, DimPercentMode mode = DimPercentMode.ContentSize)
     {
-        if (percent is < 0 /*or > 100*/)
-        {
-            throw new ArgumentException ("Percent value must be positive.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (percent, nameof (percent));
 
         return new DimPercent (percent, mode);
     }
@@ -171,9 +168,33 @@ public abstract class Dim
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.</summary>
     /// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Width (View view) { return new DimView (view, Dimension.Width); }
+    public static Dim Width (View? view) { return new DimView (view, Dimension.Width); }
 
     #endregion static Dim creation methods
+
+    /// <summary>
+    ///     Indicates whether the specified type is in the hierarchy of this Dim object.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="dim"></param>
+    /// <returns></returns>
+    public bool Has (Type type, out Dim dim)
+    {
+        dim = this;
+        if (type == GetType ())
+        {
+            return true;
+        }
+
+        // If we are a PosCombine, we have to check the left and right
+        // to see if they are of the type we are looking for.
+        if (this is DimCombine { } combine && (combine.Left.Has (type, out dim) || combine.Right.Has (type, out dim)))
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     #region virtual methods
 
@@ -224,7 +245,7 @@ public abstract class Dim
     /// <param name="left">The first <see cref="Dim"/> to add.</param>
     /// <param name="right">The second <see cref="Dim"/> to add.</param>
     /// <returns>The <see cref="Dim"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
-    public static Dim operator + (Dim? left, Dim? right)
+    public static Dim operator + (Dim left, Dim right)
     {
         if (left is DimAbsolute && right is DimAbsolute)
         {
@@ -232,7 +253,7 @@ public abstract class Dim
         }
 
         var newDim = new DimCombine (AddOrSubtract.Add, left, right);
-        (left as DimView)?.Target.SetNeedsLayout ();
+        (left as DimView)?.Target?.SetNeedsLayout ();
 
         return newDim;
     }
@@ -249,7 +270,7 @@ public abstract class Dim
     /// <param name="left">The <see cref="Dim"/> to subtract from (the minuend).</param>
     /// <param name="right">The <see cref="Dim"/> to subtract (the subtrahend).</param>
     /// <returns>The <see cref="Dim"/> that is the <c>left</c> minus <c>right</c>.</returns>
-    public static Dim operator - (Dim? left, Dim? right)
+    public static Dim operator - (Dim left, Dim right)
     {
         if (left is DimAbsolute && right is DimAbsolute)
         {
@@ -257,7 +278,7 @@ public abstract class Dim
         }
 
         var newDim = new DimCombine (AddOrSubtract.Subtract, left, right);
-        (left as DimView)?.Target.SetNeedsLayout ();
+        (left as DimView)?.Target?.SetNeedsLayout ();
 
         return newDim;
     }

@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Terminal.Gui;
 
-public partial class View
+public partial class View  // Keyboard APIs
 {
     /// <summary>
     ///  Helper to configure all things keyboard related for a View. Called from the View constructor.
@@ -27,7 +27,7 @@ public partial class View
     private void DisposeKeyboard ()
     {
         TitleTextFormatter.HotKeyChanged -= TitleTextFormatter_HotKeyChanged;
-        KeyBindings.Clear ();
+        Application.RemoveKeyBindings (this);
     }
 
     #region HotKey Support
@@ -57,8 +57,7 @@ public partial class View
     ///     Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has focus will
     ///     invoke the <see cref="Command.HotKey"/> and <see cref="Command.Accept"/> commands. <see cref="Command.HotKey"/>
     ///     causes the view to be focused and <see cref="Command.Accept"/> does nothing. By default, the HotKey is
-    ///     automatically set to the first character of <see cref="Text"/> that is prefixed with with
-    ///     <see cref="HotKeySpecifier"/>.
+    ///     automatically set to the first character of <see cref="Text"/> that is prefixed with <see cref="HotKeySpecifier"/>.
     ///     <para>
     ///         A HotKey is a keypress that selects a visible UI item. For selecting items across <see cref="View"/>`s (e.g.a
     ///         <see cref="Button"/> in a <see cref="Dialog"/>) the keypress must include the <see cref="Key.WithAlt"/>
@@ -198,13 +197,17 @@ public partial class View
         {
             KeyBinding keyBinding = new ([Command.HotKey], KeyBindingScope.HotKey, context);
             // Add the base and Alt key
+            KeyBindings.Remove (newKey);
             KeyBindings.Add (newKey, keyBinding);
+            KeyBindings.Remove (newKey.WithAlt);
             KeyBindings.Add (newKey.WithAlt, keyBinding);
 
             // If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
             if (newKey.IsKeyCodeAtoZ)
             {
+                KeyBindings.Remove (newKey.WithShift);
                 KeyBindings.Add (newKey.WithShift, keyBinding);
+                KeyBindings.Remove (newKey.WithShift.WithAlt);
                 KeyBindings.Add (newKey.WithShift.WithAlt, keyBinding);
             }
         }
@@ -250,119 +253,6 @@ public partial class View
     }
 
     #endregion HotKey Support
-
-    #region Tab/Focus Handling
-
-    // This is null, and allocated on demand.
-    private List<View> _tabIndexes;
-
-    /// <summary>Gets a list of the subviews that are <see cref="TabStop"/>s.</summary>
-    /// <value>The tabIndexes.</value>
-    public IList<View> TabIndexes => _tabIndexes?.AsReadOnly () ?? _empty;
-
-    private int _tabIndex = -1;
-    private int _oldTabIndex;
-
-    /// <summary>
-    ///     Indicates the index of the current <see cref="View"/> from the <see cref="TabIndexes"/> list. See also:
-    ///     <seealso cref="TabStop"/>.
-    /// </summary>
-    public int TabIndex
-    {
-        get => _tabIndex;
-        set
-        {
-            if (!CanFocus)
-            {
-                _tabIndex = -1;
-
-                return;
-            }
-
-            if (SuperView?._tabIndexes is null || SuperView?._tabIndexes.Count == 1)
-            {
-                _tabIndex = 0;
-
-                return;
-            }
-
-            if (_tabIndex == value && TabIndexes.IndexOf (this) == value)
-            {
-                return;
-            }
-
-            _tabIndex = value > SuperView._tabIndexes.Count - 1 ? SuperView._tabIndexes.Count - 1 :
-                        value < 0 ? 0 : value;
-            _tabIndex = GetTabIndex (_tabIndex);
-
-            if (SuperView._tabIndexes.IndexOf (this) != _tabIndex)
-            {
-                SuperView._tabIndexes.Remove (this);
-                SuperView._tabIndexes.Insert (_tabIndex, this);
-                SetTabIndex ();
-            }
-        }
-    }
-
-    private int GetTabIndex (int idx)
-    {
-        var i = 0;
-
-        foreach (View v in SuperView._tabIndexes)
-        {
-            if (v._tabIndex == -1 || v == this)
-            {
-                continue;
-            }
-
-            i++;
-        }
-
-        return Math.Min (i, idx);
-    }
-
-    private void SetTabIndex ()
-    {
-        var i = 0;
-
-        foreach (View v in SuperView._tabIndexes)
-        {
-            if (v._tabIndex == -1)
-            {
-                continue;
-            }
-
-            v._tabIndex = i;
-            i++;
-        }
-    }
-
-    private bool _tabStop = true;
-
-    /// <summary>
-    ///     Gets or sets whether the view is a stop-point for keyboard navigation of focus. Will be <see langword="true"/>
-    ///     only if the <see cref="CanFocus"/> is also <see langword="true"/>. Set to <see langword="false"/> to prevent the
-    ///     view from being a stop-point for keyboard navigation.
-    /// </summary>
-    /// <remarks>
-    ///     The default keyboard navigation keys are <c>Key.Tab</c> and <c>Key>Tab.WithShift</c>. These can be changed by
-    ///     modifying the key bindings (see <see cref="KeyBindings.Add(Key, Command[])"/>) of the SuperView.
-    /// </remarks>
-    public bool TabStop
-    {
-        get => _tabStop;
-        set
-        {
-            if (_tabStop == value)
-            {
-                return;
-            }
-
-            _tabStop = CanFocus && value;
-        }
-    }
-
-    #endregion Tab/Focus Handling
 
     #region Low-level Key handling
 
@@ -642,7 +532,7 @@ public partial class View
     /// </returns>
     public virtual bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
     {
-        // fire event only if there's an hotkey binding for the key
+        // fire event only if there's a hotkey binding for the key
         if (KeyBindings.TryGet (keyEvent, scope, out KeyBinding kb))
         {
             InvokingKeyBindings?.Invoke (this, keyEvent);
@@ -693,13 +583,23 @@ public partial class View
 
     private bool ProcessAdornmentKeyBindings (Adornment adornment, Key keyEvent, KeyBindingScope scope, ref bool? handled)
     {
-        foreach (View subview in adornment?.Subviews)
+        if (adornment?.Subviews is null)
         {
-            handled = subview.OnInvokingKeyBindings (keyEvent, scope);
+            return false;
+        }
 
-            if (handled is { } && (bool)handled)
+        foreach (View subview in adornment.Subviews)
+        {
+            bool? subViewHandled = subview.OnInvokingKeyBindings (keyEvent, scope);
+
+            if (subViewHandled is { })
             {
-                return true;
+                handled = subViewHandled;
+
+                if ((bool)subViewHandled)
+                {
+                    return true;
+                }
             }
         }
 
@@ -711,6 +611,10 @@ public partial class View
         // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
         foreach (View subview in Subviews)
         {
+            if (subview == Focused)
+            {
+                continue;
+            }
             if (subview.KeyBindings.TryGet (keyEvent, scope, out KeyBinding binding))
             {
                 if (binding.Scope == KeyBindingScope.Focused && !subview.HasFocus)
@@ -723,11 +627,15 @@ public partial class View
                     return true;
                 }
 
-                handled = subview.OnInvokingKeyBindings (keyEvent, scope);
+                bool? subViewHandled = subview.OnInvokingKeyBindings (keyEvent, scope);
 
-                if (handled is { } && (bool)handled)
+                if (subViewHandled is { })
                 {
-                    return true;
+                    handled = subViewHandled;
+                    if ((bool)subViewHandled)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -741,11 +649,11 @@ public partial class View
         return false;
     }
 
-    // TODO: This is a "prototype" debug check. It may be too annyoing vs. useful.
-    // TODO: A better approach would be have Application hold a list of bound Hotkeys, similar to
+    // TODO: This is a "prototype" debug check. It may be too annoying vs. useful.
+    // TODO: A better approach would be to have Application hold a list of bound Hotkeys, similar to
     // TODO: how Application holds a list of Application Scoped key bindings and then check that list.
     /// <summary>
-    /// Returns true if Key is bound in this view heirarchy. For debugging
+    /// Returns true if Key is bound in this view hierarchy. For debugging
     /// </summary>
     /// <param name="key">The key to test.</param>
     /// <param name="boundView">Returns the view the key is bound to.</param>
@@ -801,15 +709,16 @@ public partial class View
 #if DEBUG
 
         // TODO: Determine if App scope bindings should be fired first or last (currently last).
-        if (Application.TryGetKeyBindings (key, out List<View> views))
+        if (Application.KeyBindings.TryGet (key, KeyBindingScope.Focused | KeyBindingScope.HotKey, out KeyBinding b))
         {
-            var boundView = views [0];
-            var commandBinding = boundView.KeyBindings.Get (key);
-            Debug.WriteLine ($"WARNING: InvokeKeyBindings ({key}) - An Application scope binding exists for this key. The registered view will not invoke Command.{commandBinding.Commands [0]}: {boundView}.");
+            //var boundView = views [0];
+            //var commandBinding = boundView.KeyBindings.Get (key);
+            Debug.WriteLine (
+                             $"WARNING: InvokeKeyBindings ({key}) - An Application scope binding exists for this key. The registered view will not invoke Command.");//{commandBinding.Commands [0]}: {boundView}.");
         }
 
-        // TODO: This is a "prototype" debug check. It may be too annyoing vs. useful.
-        // Scour the bindings up our View heirarchy
+        // TODO: This is a "prototype" debug check. It may be too annoying vs. useful.
+        // Scour the bindings up our View hierarchy
         // to ensure that the key is not already bound to a different set of commands.
         if (SuperView?.IsHotKeyKeyBound (key, out View previouslyBoundView) ?? false)
         {

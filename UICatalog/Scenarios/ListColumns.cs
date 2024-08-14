@@ -53,17 +53,16 @@ public class ListColumns : Scenario
         Application.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        Toplevel appWindow = new ()
+        Toplevel top = new ();
+        Window appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         _listColView = new ()
         {
-            X = 0,
-            Y = 1,
             Width = Dim.Fill (),
-            Height = Dim.Fill (1),
+            Height = Dim.Fill (),
             Style = new ()
             {
                 ShowHeaders = false,
@@ -212,7 +211,7 @@ public class ListColumns : Scenario
             ]
         };
 
-        appWindow.Add (menu);
+        top.Add (menu);
 
         var statusBar = new StatusBar (
                                        new Shortcut []
@@ -223,7 +222,7 @@ public class ListColumns : Scenario
                                            new (Application.QuitKey, "Quit", Quit)
                                        }
                                       );
-        appWindow.Add (statusBar);
+        top.Add (statusBar);
 
         appWindow.Add (_listColView);
 
@@ -255,11 +254,13 @@ public class ListColumns : Scenario
         // if user clicks the mouse in TableView
         _listColView.MouseClick += (s, e) => { _listColView.ScreenToCell (e.MouseEvent.Position, out int? clickedCol); };
 
-        _listColView.KeyBindings.Add (Key.Space, Command.Accept);
+        _listColView.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
+
+        top.Add (appWindow);
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
+        Application.Run (top);
+        top.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
@@ -283,7 +284,7 @@ public class ListColumns : Scenario
         cancel.Accept += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = prompt, Buttons = [ok, cancel] };
 
-        var tf = new TextField { Text = getter (_listColView).ToString (), X = 0, Y = 1, Width = Dim.Fill () };
+        var tf = new TextField { Text = getter (_listColView).ToString (), X = 0, Y = 0, Width = Dim.Fill () };
 
         d.Add (tf);
         tf.SetFocus ();

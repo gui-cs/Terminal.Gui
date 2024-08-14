@@ -99,15 +99,15 @@ public class ShadowStyleTests (ITestOutputHelper _output)
     [InlineData (
                     ShadowStyle.Transparent,
                     """
-                    011
-                    131
+                    031
+                    331
                     111
                     """)]
     [InlineData (
                     ShadowStyle.Opaque,
                     """
-                    011
-                    121
+                    021
+                    221
                     111
                     """)]
     [SetupFakeDriver]
@@ -182,9 +182,9 @@ public class ShadowStyleTests (ITestOutputHelper _output)
     [InlineData (
                     ShadowStyle.Opaque,
                     """
-                    01#$
+                    01▖$
                     AB▌$
-                    !▀▘$
+                    ▝▀▘$
                     !@#$
                     """)]
     [InlineData (

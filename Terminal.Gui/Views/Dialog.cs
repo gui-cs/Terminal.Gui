@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains
@@ -19,13 +17,11 @@ public class Dialog : Window
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End; // Default is set in config.json
 
-    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <summary>The default <see cref="AlignmentModes"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
     public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
 
     /// <summary>
@@ -33,22 +29,21 @@ public class Dialog : Window
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 25;
+    public static int DefaultMinimumWidth { get; set; } = 80;
 
     /// <summary>
     ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 25;
+    public static int DefaultMinimumHeight { get; set; } = 80;
 
 
     /// <summary>
     /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None; // Default is set in config.json
 
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
@@ -56,8 +51,7 @@ public class Dialog : Window
     /// </summary>
 
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single; // Default is set in config.json
 
     private readonly List<Button> _buttons = new ();
 
@@ -78,9 +72,9 @@ public class Dialog : Window
 
         X = Pos.Center ();
         Y = Pos.Center ();
+        Width = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
+        Height = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
 
-        Width = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
-        Height = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
         ColorScheme = Colors.ColorSchemes ["Dialog"];
 
         Modal = true;
@@ -97,6 +91,22 @@ public class Dialog : Window
                         return true;
                     });
         KeyBindings.Add (Key.Esc, Command.QuitToplevel);
+    }
+
+    // BUGBUG: We override GetNormal/FocusColor because "Dialog" ColorScheme is goofy.
+    // BUGBUG: By defn, a Dialog is Modal, and thus HasFocus is always true. OnDrawContent
+    // BUGBUG: Calls these methods.
+    // TODO: Fix this in https://github.com/gui-cs/Terminal.Gui/issues/2381
+    /// <inheritdoc />
+    public override Attribute GetNormalColor ()
+    {
+        return ColorScheme.Normal;
+    }
+
+    /// <inheritdoc />
+    public override Attribute GetFocusColor ()
+    {
+        return ColorScheme.Normal;
     }
 
     private bool _canceled;
@@ -172,12 +182,5 @@ public class Dialog : Window
 
         _buttons.Add (button);
         Add (button);
-
-        SetNeedsDisplay ();
-
-        if (IsInitialized)
-        {
-            LayoutSubviews ();
-        }
     }
 }

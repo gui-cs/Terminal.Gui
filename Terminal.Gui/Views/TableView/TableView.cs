@@ -56,6 +56,7 @@ public class TableView : View
                     Command.Right,
                     () =>
                     {
+                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
                         ChangeSelectionByOffset (1, 0, false);
 
                         return true;
@@ -66,6 +67,7 @@ public class TableView : View
                     Command.Left,
                     () =>
                     {
+                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
                         ChangeSelectionByOffset (-1, 0, false);
 
                         return true;
@@ -76,6 +78,7 @@ public class TableView : View
                     Command.LineUp,
                     () =>
                     {
+                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
                         ChangeSelectionByOffset (0, -1, false);
 
                         return true;
@@ -86,6 +89,7 @@ public class TableView : View
                     Command.LineDown,
                     () =>
                     {
+                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
                         ChangeSelectionByOffset (0, 1, false);
 
                         return true;
@@ -266,6 +270,7 @@ public class TableView : View
                     Command.Accept,
                     () =>
                     {
+                        // BUGBUG: This should return false if the event is not handled
                         OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow));
 
                         return true;
@@ -319,11 +324,15 @@ public class TableView : View
         {
             if (cellActivationKey != value)
             {
-                KeyBindings.Replace (cellActivationKey, value);
+                if (KeyBindings.TryGet (cellActivationKey, out _))
+                {
+                    KeyBindings.ReplaceKey (cellActivationKey, value);
+                }
+                else
+                {
+                    KeyBindings.Add (value, Command.Accept);
+                }
 
-                // of API user is mixing and matching old and new methods of keybinding then they may have lost
-                // the old binding (e.g. with ClearKeybindings) so KeyBindings.Replace alone will fail
-                KeyBindings.Add (value, Command.Accept);
                 cellActivationKey = value;
             }
         }
@@ -787,7 +796,7 @@ public class TableView : View
     }
 
     ///<inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
@@ -1438,13 +1447,13 @@ public class TableView : View
                     // is there enough space to meet the MinAcceptableWidth
                     availableHorizontalSpace - usedSpace >= colStyle.MinAcceptableWidth)
                 {
-                    // show column and use use whatever space is 
+                    // show column and use whatever space is
                     // left for rendering it
                     showColumn = true;
                     colWidth = availableHorizontalSpace - usedSpace;
                 }
 
-                // If its the only column we are able to render then
+                // If it's the only column we are able to render then
                 // accept it anyway (that must be one massively wide column!)
                 if (first)
                 {
@@ -1674,7 +1683,7 @@ public class TableView : View
                 }
                 else if (Style.ExpandLastColumn == false && columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c))
                 {
-                    // if the next console column is the lastcolumns end
+                    // if the next console column is the last column's end
                     rune = Glyphs.BottomTee;
                 }
             }
@@ -1748,7 +1757,7 @@ public class TableView : View
                     rune = Glyphs.URCorner;
                 }
 
-                // if the next console column is the lastcolumns end
+                // if the next console column is the last column's end
                 else if (Style.ExpandLastColumn == false && columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c))
                 {
                     rune = Glyphs.TopTee;
@@ -1841,7 +1850,7 @@ public class TableView : View
                     }
                 }
 
-                // if the next console column is the lastcolumns end
+                // if the next console column is the last column's end
                 else if (Style.ExpandLastColumn == false && columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c))
                 {
                     rune = Style.ShowVerticalCellLines ? Glyphs.Cross : Glyphs.BottomTee;

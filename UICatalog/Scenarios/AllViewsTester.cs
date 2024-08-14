@@ -53,7 +53,7 @@ public class AllViewsTester : Scenario
 
         var app = new Window
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
             ColorScheme = Colors.ColorSchemes ["TopLevel"]
         };
 
@@ -272,9 +272,9 @@ public class AllViewsTester : Scenario
 
         _orientation.SelectedItemChanged += (s, selected) =>
                                             {
-                                                if (_curView?.GetType ().GetProperty ("Orientation") is { } prop)
+                                                if (_curView is IOrientation orientatedView)
                                                 {
-                                                    prop.GetSetMethod ()?.Invoke (_curView, new object [] { _orientation.SelectedItem });
+                                                    orientatedView.Orientation = (Orientation)_orientation.SelectedItem;
                                                 }
                                             };
         _settingsPane.Add (label, _orientation);
@@ -358,11 +358,9 @@ public class AllViewsTester : Scenario
             view.Title = "_Test Title";
         }
 
-        // TODO: Add IOrientation so this doesn't require reflection
-        // If the view supports a Title property, set it so we have something to look at
-        if (view?.GetType ().GetProperty ("Orientation") is { } prop)
+        if (view is IOrientation orientatedView)
         {
-            _orientation.SelectedItem = (int)prop.GetGetMethod ()!.Invoke (view, null)!;
+            _orientation.SelectedItem = (int)orientatedView.Orientation;
             _orientation.Enabled = true;
         }
         else

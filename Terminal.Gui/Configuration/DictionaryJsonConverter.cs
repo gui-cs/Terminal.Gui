@@ -28,8 +28,8 @@ internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
                 {
                     string key = reader.GetString ();
                     reader.Read ();
-                    var value = JsonSerializer.Deserialize<T> (ref reader, options);
-                    dictionary.Add (key, value);
+                    var value = JsonSerializer.Deserialize (ref reader, typeof (T), _serializerContext);
+                    dictionary.Add (key, (T)value);
                 }
             }
             else if (reader.TokenType == JsonTokenType.EndArray)
@@ -51,7 +51,7 @@ internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
 
             //writer.WriteString (item.Key, item.Key);
             writer.WritePropertyName (item.Key);
-            JsonSerializer.Serialize (writer, item.Value, options);
+            JsonSerializer.Serialize (writer, item.Value, typeof (T), _serializerContext);
             writer.WriteEndObject ();
         }
 

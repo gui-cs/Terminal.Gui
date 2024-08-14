@@ -44,7 +44,7 @@ public class Margin : Adornment
         ShadowStyle = base.ShadowStyle;
 
         Add (
-             _rightShadow = new()
+             _rightShadow = new ()
              {
                  X = Pos.AnchorEnd (1),
                  Y = 0,
@@ -53,7 +53,7 @@ public class Margin : Adornment
                  ShadowStyle = ShadowStyle,
                  Orientation = Orientation.Vertical
              },
-             _bottomShadow = new()
+             _bottomShadow = new ()
              {
                  X = 0,
                  Y = Pos.AnchorEnd (1),
@@ -220,12 +220,27 @@ public class Margin : Adornment
     private void Margin_LayoutStarted (object? sender, LayoutEventArgs e)
     {
         // Adjust the shadow such that it is drawn aligned with the Border
-        if (ShadowStyle != ShadowStyle.None && _rightShadow is { } && _bottomShadow is { })
+        if (_rightShadow is { } && _bottomShadow is { })
         {
-            _rightShadow.Y = Parent.Border.Thickness.Top > 0
-                                 ? Parent.Border.Thickness.Top - (Parent.Border.Thickness.Top > 2 && Parent.Border.Settings.FastHasFlags (BorderSettings.Title) ? 1 : 0)
-                                 : 1;
-            _bottomShadow.X = Parent.Border.Thickness.Left > 0 ? Parent.Border.Thickness.Left : 1;
+            switch (ShadowStyle)
+            {
+                case ShadowStyle.Transparent:
+                    // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
+                    _rightShadow.Y = Parent!.Border.Thickness.Top > 0 ? ScreenToViewport (Parent.Border.GetBorderRectangle ().Location).Y + 1 : 0;
+                    break;
+
+                case ShadowStyle.Opaque:
+                    // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
+                    _rightShadow.Y = Parent!.Border.Thickness.Top > 0 ? ScreenToViewport (Parent.Border.GetBorderRectangle ().Location).Y + 1 : 0;
+                    _bottomShadow.X = Parent.Border.Thickness.Left > 0 ? ScreenToViewport (Parent.Border.GetBorderRectangle ().Location).X + 1 : 0;
+                    break;
+
+                case ShadowStyle.None:
+                default:
+                    _rightShadow.Y = 0;
+                    _bottomShadow.X = 0;
+                    break;
+            }
         }
     }
 }

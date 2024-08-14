@@ -871,7 +871,7 @@ public class TileView : View
         public TileViewLineView (TileView parent, int idx)
         {
             CanFocus = false;
-            TabStop = true;
+            TabStop = TabBehavior.TabStop;
 
             Parent = parent;
             Idx = idx;
@@ -908,7 +908,7 @@ public class TileView : View
             {
                 // Start a Drag
                 SetFocus ();
-                Application.BringOverlappedTopToFront ();
+                ApplicationOverlapped.BringOverlappedTopToFront ();
 
                 if (mouseEvent.Flags == MouseFlags.Button1Pressed)
                 {
@@ -935,7 +935,7 @@ public class TileView : View
             {
                 // Continue Drag
 
-                // how far has user dragged from original location?						
+                // how far has user dragged from original location?
                 if (Orientation == Orientation.Horizontal)
                 {
                     int dy = mouseEvent.Position.Y - dragPosition.Value.Y;

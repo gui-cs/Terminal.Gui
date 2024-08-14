@@ -105,8 +105,8 @@ public class AppendAutocomplete : AutocompleteBase
             return;
         }
 
-        // draw it like its selected even though its not
-        Application.Driver.SetAttribute (
+        // draw it like it's selected, even though it's not
+        Application.Driver?.SetAttribute (
                                          new Attribute (
                                                         ColorScheme.Normal.Foreground,
                                                         textField.ColorScheme.Focus.Background
@@ -128,7 +128,7 @@ public class AppendAutocomplete : AutocompleteBase
                                   );
         }
 
-        Application.Driver.AddStr (fragment);
+        Application.Driver?.AddStr (fragment);
     }
 
     /// <summary>

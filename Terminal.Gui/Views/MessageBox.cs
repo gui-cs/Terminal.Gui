@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     MessageBox displays a modal message to the user, with a title, a message and a series of options that the user
@@ -31,22 +29,26 @@ public static class MessageBox
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single; // Default is set in config.json
+
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Center; // Default is set in config.json
 
     /// <summary>
-    ///     Defines the default minimum MessageBox width, as a percentage of the container width. Can be configured via
+    ///     Defines the default minimum MessageBox width, as a percentage of the screen width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 60;
+    public static int DefaultMinimumWidth { get; set; } = 0;
 
     /// <summary>
-    ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
+    ///     Defines the default minimum Dialog height, as a percentage of the screen width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 5;
+    public static int DefaultMinimumHeight { get; set; } = 0;
     /// <summary>
     ///     The index of the selected button, or -1 if the user pressed <see cref="Application.QuitKey"/> to close the MessageBox. This is useful for web
     ///     based console where there is no SynchronizationContext or TaskScheduler.
@@ -364,13 +366,20 @@ public static class MessageBox
         var d = new Dialog
         {
             Title = title,
-            Buttons = buttonList.ToArray (),
-            ButtonAlignment = Alignment.Center,
+            ButtonAlignment = MessageBox.DefaultButtonAlignment,
             ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems,
             BorderStyle = MessageBox.DefaultBorderStyle,
-            Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1, Dim.Percent (90)),
-            Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1, Dim.Percent (90)),
+            Buttons = buttonList.ToArray (),
         };
+
+        d.Width = Dim.Auto (DimAutoStyle.Auto,
+                            minimumContentDim: Dim.Func (() => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f) )),
+                            maximumContentDim: Dim.Func (() => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * 0.9f)));
+
+        d.Height = Dim.Auto (DimAutoStyle.Auto,
+                             minimumContentDim: Dim.Func (() => (int)((Application.Screen.Height - d.GetAdornmentsThickness ().Vertical) * (DefaultMinimumHeight / 100f))),
+                             maximumContentDim: Dim.Func (() => (int)((Application.Screen.Height - d.GetAdornmentsThickness ().Vertical) * 0.9f)));
+
 
         if (width != 0)
         {
@@ -384,36 +393,12 @@ public static class MessageBox
 
         d.ColorScheme = useErrorColors ? Colors.ColorSchemes ["Error"] : Colors.ColorSchemes ["Dialog"];
 
-        var messageLabel = new Label
-        {
-            HotKeySpecifier = new Rune ('\xFFFF'),
-            Width = Dim.Auto (DimAutoStyle.Text),
-            Height = Dim.Auto (DimAutoStyle.Text),
-            Text = message,
-            TextAlignment = Alignment.Center,
-            X = Pos.Center (),
-            Y = 0,
-            //ColorScheme = Colors.ColorSchemes ["Error"],
-        };
-
-        messageLabel.TextFormatter.WordWrap = wrapMessage;
-        messageLabel.TextFormatter.MultiLine = !wrapMessage;
-
-        if (wrapMessage)
-        {
-            int buttonHeight = buttonList.Count > 0 ? buttonList [0].Frame.Height : 0;
-
-            messageLabel.Width = Dim.Fill ();
-            messageLabel.Height = Dim.Func (() => GetWrapSize ().Height);
-            Size GetWrapSize ()
-            {
-                // A bit of a hack to get the height of the wrapped text.
-                messageLabel.TextFormatter.Size = d.GetContentSize () with { Height = 1000 };
-                return messageLabel.TextFormatter.FormatAndGetSize ();
-            }
-        }
-
-        d.Add (messageLabel);
+        d.HotKeySpecifier = new Rune ('\xFFFF');
+        d.Text = message;
+        d.TextAlignment = Alignment.Center;
+        d.VerticalTextAlignment = Alignment.Start;
+        d.TextFormatter.WordWrap = wrapMessage;
+        d.TextFormatter.MultiLine = !wrapMessage;
 
         // Setup actions
         Clicked = -1;
@@ -428,14 +413,9 @@ public static class MessageBox
                              Clicked = buttonId;
                              Application.RequestStop ();
                          };
-
-            if (b.IsDefault)
-            {
-                b.SetFocus ();
-            }
         }
 
-        // Run the modal; do not shutdown the mainloop driver when done
+        // Run the modal; do not shut down the mainloop driver when done
         Application.Run (d);
         d.Dispose ();
 

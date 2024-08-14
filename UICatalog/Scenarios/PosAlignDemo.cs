@@ -87,18 +87,18 @@ public sealed class PosAlignDemo : Scenario
 
         if (dimension == Dimension.Width)
         {
-            endToStartCheckBox.State = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.Checked : CheckState.UnChecked;
+            endToStartCheckBox.CheckedState = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.Checked : CheckState.UnChecked;
             endToStartCheckBox.X = Pos.Align (_horizAligner.Alignment);
             endToStartCheckBox.Y = Pos.Top (alignRadioGroup);
         }
         else
         {
-            endToStartCheckBox.State = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.Checked : CheckState.UnChecked;
+            endToStartCheckBox.CheckedState = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.Checked : CheckState.UnChecked;
             endToStartCheckBox.X = Pos.Left (alignRadioGroup);
             endToStartCheckBox.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        endToStartCheckBox.Toggle += (s, e) =>
+        endToStartCheckBox.CheckedStateChanging += (s, e) =>
                                       {
                                           if (dimension == Dimension.Width)
                                           {
@@ -125,18 +125,18 @@ public sealed class PosAlignDemo : Scenario
 
         if (dimension == Dimension.Width)
         {
-            ignoreFirstOrLast.State = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.IgnoreFirstOrLast) ? CheckState.Checked : CheckState.UnChecked;
+            ignoreFirstOrLast.CheckedState = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.IgnoreFirstOrLast) ? CheckState.Checked : CheckState.UnChecked;
             ignoreFirstOrLast.X = Pos.Align (_horizAligner.Alignment);
             ignoreFirstOrLast.Y = Pos.Top (alignRadioGroup);
         }
         else
         {
-            ignoreFirstOrLast.State = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.IgnoreFirstOrLast) ? CheckState.Checked : CheckState.UnChecked;
+            ignoreFirstOrLast.CheckedState = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.IgnoreFirstOrLast) ? CheckState.Checked : CheckState.UnChecked;
             ignoreFirstOrLast.X = Pos.Left (alignRadioGroup);
             ignoreFirstOrLast.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        ignoreFirstOrLast.Toggle += (s, e) =>
+        ignoreFirstOrLast.CheckedStateChanging += (s, e) =>
                                      {
                                          if (dimension == Dimension.Width)
                                          {
@@ -163,18 +163,18 @@ public sealed class PosAlignDemo : Scenario
 
         if (dimension == Dimension.Width)
         {
-            addSpacesBetweenItems.State = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? CheckState.Checked : CheckState.UnChecked;
+            addSpacesBetweenItems.CheckedState = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? CheckState.Checked : CheckState.UnChecked;
             addSpacesBetweenItems.X = Pos.Align (_horizAligner.Alignment);
             addSpacesBetweenItems.Y = Pos.Top (alignRadioGroup);
         }
         else
         {
-            addSpacesBetweenItems.State = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? CheckState.Checked : CheckState.UnChecked;
+            addSpacesBetweenItems.CheckedState = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? CheckState.Checked : CheckState.UnChecked;
             addSpacesBetweenItems.X = Pos.Left (alignRadioGroup);
             addSpacesBetweenItems.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        addSpacesBetweenItems.Toggle += (s, e) =>
+        addSpacesBetweenItems.CheckedStateChanging += (s, e) =>
                                          {
                                              if (dimension == Dimension.Width)
                                              {
@@ -211,7 +211,7 @@ public sealed class PosAlignDemo : Scenario
             margin.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        margin.Toggle += (s, e) =>
+        margin.CheckedStateChanging += (s, e) =>
                           {
                               if (dimension == Dimension.Width)
                               {
@@ -236,7 +236,7 @@ public sealed class PosAlignDemo : Scenario
             }
         ];
 
-        Buttons.NumericUpDown<int> addedViewsUpDown = new()
+        NumericUpDown<int> addedViewsUpDown = new()
         {
             Width = 9,
             Title = "Added",

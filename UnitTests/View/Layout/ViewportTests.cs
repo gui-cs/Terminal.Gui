@@ -12,11 +12,8 @@ public class ViewportTests (ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Theory]
-    [InlineData (0, 10)]
-    [InlineData (1, 10)]
-    [InlineData (-1, 10)]
-    [InlineData (11, 10)]
-    public void Get_Viewport_NoSuperView_WithoutAdornments (int x, int expectedW)
+    [CombinatorialData]
+    public void Get_Viewport_NoSuperView_WithoutAdornments ([CombinatorialRange (-11, 11)] int x)
     {
         // We test with only X because Y is equivalent. Height/Width are irrelevant.
         // Arrange
@@ -31,7 +28,7 @@ public class ViewportTests (ITestOutputHelper output)
         var bounds = view.Viewport;
 
         // Assert
-        Assert.Equal (expectedW, bounds.Width);
+        Assert.Equal (10, bounds.Width);
     }
 
     [Theory]
@@ -250,11 +247,8 @@ public class ViewportTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (0, 0, 10, 10, 10, 10)]
-    [InlineData (10, 0, 10, 10, 10, 10)]
-    [InlineData (0, 10, 10, 10, 10, 10)]
-    [InlineData (10, 10, 10, 10, 10, 10)]
-    public void Set_Viewport_ValidValue_UpdatesViewport_AllowLocationGreaterThanContentSize (int viewWidth, int viewHeight, int viewportX, int viewportY, int expectedX, int expectedY)
+    [CombinatorialData]
+    public void Set_Viewport_ValidValue_UpdatesViewport_AllowLocationGreaterThanContentSize ([CombinatorialRange (0, 5)] int viewWidth, [CombinatorialRange (0, 5)] int viewHeight)
     {
         // Arrange
         var view = new View ()
@@ -263,13 +257,13 @@ public class ViewportTests (ITestOutputHelper output)
             Height = viewHeight,
             ViewportSettings = ViewportSettings.AllowLocationGreaterThanContentSize
         };
-        var newViewport = new Rectangle (viewportX, viewportY, viewWidth, viewHeight);
+        var newViewport = new Rectangle (10, 10, viewWidth, viewHeight);
 
         // Act
         view.Viewport = newViewport;
 
         // Assert
-        Assert.Equal (new Rectangle (expectedX, expectedY, viewWidth, viewHeight), view.Viewport);
+        Assert.Equal (new Rectangle (10, 10, viewWidth, viewHeight), view.Viewport);
     }
 
     [Fact]
@@ -472,7 +466,7 @@ public class ViewportTests (ITestOutputHelper output)
     //[InlineData (5, 5, false)]
     //public void IsVisibleInSuperView_With_Driver (int x, int y, bool expected)
     //{
-    //    ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+    //    ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
 
     //    var view = new View { X = 1, Y = 1, Width = 5, Height = 5 };
     //    var top = new Toplevel ();

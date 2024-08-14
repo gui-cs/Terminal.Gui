@@ -50,9 +50,15 @@ public class RadioGroupTests (ITestOutputHelper output)
     public void Initialize_SelectedItem_With_Minus_One ()
     {
         var rg = new RadioGroup { RadioLabels = new [] { "Test" }, SelectedItem = -1 };
+        Application.Current = new Toplevel ();
+        Application.Current.Add (rg);
+        rg.SetFocus ();
+
         Assert.Equal (-1, rg.SelectedItem);
-        Assert.True (rg.NewKeyDownEvent (Key.Space));
+        Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (0, rg.SelectedItem);
+
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -73,41 +79,59 @@ public class RadioGroupTests (ITestOutputHelper output)
     public void KeyBindings_Command ()
     {
         var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
+        Application.Current = new Toplevel ();
+        Application.Current.Add (rg);
         rg.SetFocus();
-
-        Assert.True (rg.NewKeyDownEvent (Key.CursorUp));
-        Assert.True (rg.NewKeyDownEvent (Key.CursorDown));
-        Assert.True (rg.NewKeyDownEvent (Key.Home));
-        Assert.True (rg.NewKeyDownEvent (Key.End));
-        Assert.True (rg.NewKeyDownEvent (Key.Space));
+        Assert.Equal(Orientation.Vertical, rg.Orientation);
+        Assert.Equal(0, rg.SelectedItem);
+        Assert.True (Application.OnKeyDown (Key.CursorUp)); // Should not change (should focus prev if there was one)
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
+        Assert.True (Application.OnKeyDown (Key.CursorDown)); // Should not change (should focus prev if there was one)
+        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.Equal (1, rg.SelectedItem);
+        Assert.True (Application.OnKeyDown (Key.Home));
+        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.True (Application.OnKeyDown (Key.End));
+        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.Equal (1, rg.SelectedItem);
+        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.Equal (1, rg.SelectedItem);
+        Application.Current.Dispose ();
     }
 
     [Fact]
     public void HotKeys_Select_RadioLabels ()
     {
         var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+        Application.Current = new Toplevel ();
+        Application.Current.Add (rg);
+        rg.SetFocus ();
+
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));
 
         // BUGBUG: These tests only test that RG works on it's own, not if it's a subview
-        Assert.True (rg.NewKeyDownEvent (Key.T));
+        Assert.True (Application.OnKeyDown (Key.T));
         Assert.Equal (2, rg.SelectedItem);
-        Assert.True (rg.NewKeyDownEvent (Key.L));
+        Assert.True (Application.OnKeyDown (Key.L));
         Assert.Equal (0, rg.SelectedItem);
-        Assert.True (rg.NewKeyDownEvent (Key.J));
+        Assert.True (Application.OnKeyDown (Key.J));
         Assert.Equal (3, rg.SelectedItem);
-        Assert.True (rg.NewKeyDownEvent (Key.R));
+        Assert.True (Application.OnKeyDown (Key.R));
         Assert.Equal (1, rg.SelectedItem);
 
-        Assert.True (rg.NewKeyDownEvent (Key.T.WithAlt));
+        Assert.True (Application.OnKeyDown (Key.T.WithAlt));
         Assert.Equal (2, rg.SelectedItem);
-        Assert.True (rg.NewKeyDownEvent (Key.L.WithAlt));
+        Assert.True (Application.OnKeyDown (Key.L.WithAlt));
         Assert.Equal (0, rg.SelectedItem);
-        Assert.True (rg.NewKeyDownEvent (Key.J.WithAlt));
+        Assert.True (Application.OnKeyDown (Key.J.WithAlt));
         Assert.Equal (3, rg.SelectedItem);
-        Assert.True (rg.NewKeyDownEvent (Key.R.WithAlt));
+        Assert.True (Application.OnKeyDown (Key.R.WithAlt));
         Assert.Equal (1, rg.SelectedItem);
 
         var superView = new View ();
@@ -129,6 +153,8 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (3, rg.SelectedItem);
         Assert.True (superView.NewKeyDownEvent (Key.R.WithAlt));
         Assert.Equal (1, rg.SelectedItem);
+
+        Application.Current.Dispose ();
     }
 
     [Fact]
@@ -219,7 +245,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         Assert.Equal (Orientation.Vertical, rg.Orientation);
         Assert.Equal (2, rg.RadioLabels.Length);

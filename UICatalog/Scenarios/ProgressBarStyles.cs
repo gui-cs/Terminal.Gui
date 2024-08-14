@@ -30,7 +30,7 @@ public class ProgressBarStyles : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}", BorderStyle = LineStyle.Single,
+            Title = GetQuitKeyAndName (), BorderStyle = LineStyle.Single,
         };
 
         var editor = new AdornmentsEditor ()
@@ -236,7 +236,7 @@ public class ProgressBarStyles : Scenario
             X = Pos.Center (),
             Y = Pos.Bottom (continuousPB),
             Text = "BidirectionalMarquee", 
-            State = CheckState.Checked
+            CheckedState = CheckState.Checked
         };
         container.Add (ckbBidirectional);
 
@@ -289,9 +289,9 @@ public class ProgressBarStyles : Scenario
                                               marqueesContinuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
                                           };
 
-        ckbBidirectional.Toggle += (s, e) =>
+        ckbBidirectional.CheckedStateChanging += (s, e) =>
                                    {
-                                       ckbBidirectional.State = e.NewValue;
+                                       ckbBidirectional.CheckedState = e.NewValue;
                                        marqueesBlocksPB.BidirectionalMarquee =
                                                                   marqueesContinuousPB.BidirectionalMarquee = e.NewValue == CheckState.Checked;
                                    };

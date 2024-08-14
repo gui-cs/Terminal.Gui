@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{B8
 		.editorconfig = .editorconfig
 		.filenesting.json = .filenesting.json
 		.gitignore = .gitignore
+		GitVersion.yml = GitVersion.yml
 		global.json = global.json
 		nuget.config = nuget.config
 		Terminal.sln.DotSettings = Terminal.sln.DotSettings
@@ -42,6 +43,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5
 		CONTRIBUTING.md = CONTRIBUTING.md
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelfContained", "SelfContained\SelfContained.csproj", "{524DEA78-7E7C-474D-B42D-52ED4C04FF14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeAot", "NativeAot\NativeAot.csproj", "{E6D716C6-AC94-4150-B10A-44AE13F79344}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +78,14 @@ Global
 		{58FDCA8F-08F7-4D80-9DA3-6A9AED01E163}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58FDCA8F-08F7-4D80-9DA3-6A9AED01E163}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58FDCA8F-08F7-4D80-9DA3-6A9AED01E163}.Release|Any CPU.Build.0 = Release|Any CPU
+		{524DEA78-7E7C-474D-B42D-52ED4C04FF14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{524DEA78-7E7C-474D-B42D-52ED4C04FF14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{524DEA78-7E7C-474D-B42D-52ED4C04FF14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{524DEA78-7E7C-474D-B42D-52ED4C04FF14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6D716C6-AC94-4150-B10A-44AE13F79344}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6D716C6-AC94-4150-B10A-44AE13F79344}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6D716C6-AC94-4150-B10A-44AE13F79344}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6D716C6-AC94-4150-B10A-44AE13F79344}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

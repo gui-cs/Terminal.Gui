@@ -7,28 +7,30 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Mouse and Keyboard")]
 public class SendKeys : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+        var win = new Window { Title = GetQuitKeyAndName () };
         var label = new Label { X = Pos.Center (), Y = Pos.Center () - 6, Text = "Insert the text to send:" };
-        Win.Add (label);
+        win.Add (label);
 
         var txtInput = new TextField { X = Pos.Center (), Y = Pos.Center () - 5, Width = 20, Text = "MockKeyPresses" };
-        Win.Add (txtInput);
+        win.Add (txtInput);
 
         var ckbShift = new CheckBox { X = Pos.Center (), Y = Pos.Center () - 4, Text = "Shift" };
-        Win.Add (ckbShift);
+        win.Add (ckbShift);
 
         var ckbAlt = new CheckBox { X = Pos.Center (), Y = Pos.Center () - 3, Text = "Alt" };
-        Win.Add (ckbAlt);
+        win.Add (ckbAlt);
 
         var ckbControl = new CheckBox { X = Pos.Center (), Y = Pos.Center () - 2, Text = "Control" };
-        Win.Add (ckbControl);
+        win.Add (ckbControl);
 
         label = new Label { X = Pos.Center (), Y = Pos.Center () + 1, Text = "Result keys:" };
-        Win.Add (label);
+        win.Add (label);
 
         var txtResult = new TextField { X = Pos.Center (), Y = Pos.Center () + 2, Width = 20 };
-        Win.Add (txtResult);
+        win.Add (txtResult);
 
         var rKeys = "";
         var rControlKeys = "";
@@ -60,13 +62,13 @@ public class SendKeys : Scenario
                              };
 
         var lblShippedKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 3 };
-        Win.Add (lblShippedKeys);
+        win.Add (lblShippedKeys);
 
         var lblShippedControlKeys = new Label { X = Pos.Center (), Y = Pos.Center () + 5 };
-        Win.Add (lblShippedControlKeys);
+        win.Add (lblShippedControlKeys);
 
         var button = new Button { X = Pos.Center (), Y = Pos.Center () + 7, IsDefault = true, Text = "Process keys" };
-        Win.Add (button);
+        win.Add (button);
 
         void ProcessInput ()
         {
@@ -84,12 +86,12 @@ public class SendKeys : Scenario
                                     ? (ConsoleKey)char.ToUpper (r)
                                     : (ConsoleKey)r;
 
-                Application.Driver.SendKeys (
+                Application.Driver?.SendKeys (
                                              r,
                                              ck,
-                                             ckbShift.State == CheckState.Checked,
-                                             ckbAlt.State == CheckState.Checked,
-                                             ckbControl.State == CheckState.Checked
+                                             ckbShift.CheckedState == CheckState.Checked,
+                                             ckbAlt.CheckedState == CheckState.Checked,
+                                             ckbControl.CheckedState == CheckState.Checked
                                             );
             }
 
@@ -100,7 +102,7 @@ public class SendKeys : Scenario
 
         button.Accept += (s, e) => ProcessInput ();
 
-        Win.KeyDown += (s, e) =>
+        win.KeyDown += (s, e) =>
                        {
                            if (e.KeyCode == KeyCode.Enter)
                            {
@@ -108,5 +110,9 @@ public class SendKeys : Scenario
                                e.Handled = true;
                            }
                        };
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 }

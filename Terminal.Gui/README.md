@@ -6,9 +6,7 @@ All files required to build the **Terminal.Gui** library (and NuGet package).
 
 - `\` - The root folder contains the source code for the library.
 	- `Terminal.Gui.sln` - The Visual Studio solution
-	- `Application.cs` - A `static` class that provides the base 'application driver'. Given it defines a **Terminal.Gui** application it is both logically and literally (because `static`) a singleton. It has direct dependencies on `MainLoop`, `Events.cs` `NetDriver`, `CursesDriver`, `WindowsDriver`, `Responder`, `View`, and `TopLevel` (and nothing else).
-	- `MainLoop.cs` - Defines `IMainLoopDriver` and implements the `MainLoop` class.
-	- A few supporting class files
+	- `Application\` - The core `Application` logic, including `Application.cs`, which is is a `static` class that provides the base 'application engine', `RunState`, and `MainLoop`.
 
 - `ConsoleDrivers\`
 	- `ConsoleDriver.cs` - Definition for the Console Driver API.
@@ -38,7 +36,7 @@ All files required to build the **Terminal.Gui** library (and NuGet package).
 	- `Dialog` -
 	- etc...
 
-- `Types/` - A folder (not namespace) containing implementations of `Point`, `Rect`, and `Size` which are ancient versions of the modern `System.Drawing.Point`, `System.Drawing.Size`, and `System.Drawning.Rectangle`.
+- `FileServcies/` - File services classes.
 
 ## Version numbers
 

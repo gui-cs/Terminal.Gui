@@ -15,7 +15,7 @@ public class MessageBoxes : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName (),
         };
 
         var frame = new FrameView
@@ -47,7 +47,6 @@ public class MessageBoxes : Scenario
         {
             X = 0,
             Y = Pos.Bottom (label),
-
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
@@ -66,7 +65,12 @@ public class MessageBoxes : Scenario
         frame.Add (heightEdit);
 
         frame.Add (
-                   new Label { X = Pos.Right (widthEdit) + 2, Y = Pos.Top (widthEdit), Text = "If height & width are both 0," }
+                   new Label
+                   {
+                       X = Pos.Right (widthEdit) + 2,
+                       Y = Pos.Top (widthEdit),
+                       Text = $"If width is 0, the dimension will be greater than {MessageBox.DefaultMinimumWidth}%."
+                   }
                   );
 
         frame.Add (
@@ -74,7 +78,7 @@ public class MessageBoxes : Scenario
                    {
                        X = Pos.Right (heightEdit) + 2,
                        Y = Pos.Top (heightEdit),
-                       Text = "the MessageBox will be sized automatically."
+                       Text = $"If height is 0, the dimension will be greater than {MessageBox.DefaultMinimumHeight}%."
                    }
                   );
 
@@ -186,7 +190,7 @@ public class MessageBoxes : Scenario
 
         var ckbWrapMessage = new CheckBox
         {
-            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", State = CheckState.Checked
+            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", CheckedState = CheckState.Checked
         };
         frame.Add (ckbWrapMessage);
 
@@ -237,7 +241,7 @@ public class MessageBoxes : Scenario
                                                                              titleEdit.Text,
                                                                              messageEdit.Text,
                                                                              defaultButton,
-                                                                             ckbWrapMessage.State == CheckState.Checked,
+                                                                             ckbWrapMessage.CheckedState == CheckState.Checked,
                                                                              btns.ToArray ()
                                                                             )}";
                                                }
@@ -250,7 +254,7 @@ public class MessageBoxes : Scenario
                                                                                   titleEdit.Text,
                                                                                   messageEdit.Text,
                                                                                   defaultButton,
-                                                                                  ckbWrapMessage.State == CheckState.Checked,
+                                                                                  ckbWrapMessage.CheckedState == CheckState.Checked,
                                                                                   btns.ToArray ()
                                                                                  )}";
                                                }

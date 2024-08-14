@@ -1,43 +1,60 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Draws a single line using the <see cref="LineStyle"/> specified by <see cref="View.BorderStyle"/>.</summary>
-public class Line : View
+public class Line : View, IOrientation
 {
+    private readonly OrientationHelper _orientationHelper;
+
     /// <summary>Constructs a Line object.</summary>
     public Line ()
     {
         BorderStyle = LineStyle.Single;
         Border.Thickness = new Thickness (0);
         SuperViewRendersLineCanvas = true;
+
+        _orientationHelper = new (this);
+        _orientationHelper.Orientation = Orientation.Horizontal;
+        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
+        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
     }
 
-    private Orientation _orientation;
 
+    #region IOrientation members
     /// <summary>
     ///     The direction of the line.  If you change this you will need to manually update the Width/Height of the
     ///     control to cover a relevant area based on the new direction.
     /// </summary>
     public Orientation Orientation
     {
-        get => _orientation;
-        set
+        get => _orientationHelper.Orientation;
+        set => _orientationHelper.Orientation = value;
+    }
+
+    /// <inheritdoc/>
+    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+
+    /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
+    /// <param name="newOrientation"></param>
+    public void OnOrientationChanged (Orientation newOrientation)
+    {
+
+        switch (newOrientation)
         {
-            _orientation = value;
+            case Orientation.Horizontal:
+                Height = 1;
 
-            switch (Orientation)
-            {
-                case Orientation.Horizontal:
-                    Height = 1;
+                break;
+            case Orientation.Vertical:
+                Width = 1;
 
-                    break;
-                case Orientation.Vertical:
-                    Width = 1;
+                break;
 
-                    break;
-
-            }
         }
     }
+    #endregion
 
     /// <inheritdoc/>
     public override void SetBorderStyle (LineStyle value)

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO.Abstractions;
 using Terminal.Gui.Resources;
 using static System.Environment;
@@ -23,7 +24,7 @@ public class FileDialogStyle
     public string CancelButtonText { get; set; } = Strings.btnCancel;
 
     /// <summary>
-    ///     Gets or sets the class thatis responsible for determining which color to use to represent files and
+    ///     Gets or sets the class that is responsible for determining which color to use to represent files and
     ///     directories when <see cref="UseColors"/> is <see langword="true"/>.
     /// </summary>
     public FileSystemColorProvider ColorProvider { get; set; } = new ();
@@ -99,7 +100,7 @@ public class FileDialogStyle
     /// <summary>Gets or sets the header text displayed in the Modified column of the files table.</summary>
     public string ModifiedColumnName { get; set; } = Strings.fdModified;
 
-    /// <summary>Gets or sets the text on the 'Ok' button.  Typically you may want to change this to "Open" or "Save" etc.</summary>
+    /// <summary>Gets or sets the text on the 'Ok' button.  Typically, you may want to change this to "Open" or "Save" etc.</summary>
     public string OkButtonText { get; set; } = Strings.btnOk;
 
     /// <summary>Gets or sets the text displayed in the 'Path' text box when user has not supplied any input yet.</summary>
@@ -143,6 +144,7 @@ public class FileDialogStyle
     /// </summary>
     public string WrongFileTypeFeedback { get; set; } = Strings.fdWrongFileTypeFeedback;
 
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
     private Dictionary<IDirectoryInfo, string> DefaultTreeRootGetter ()
     {
         Dictionary<IDirectoryInfo, string> roots = new ();
@@ -161,7 +163,7 @@ public class FileDialogStyle
         }
         catch (Exception)
         {
-            // Cannot get the system disks thats fine
+            // Cannot get the system disks, that's fine
         }
 
         try
@@ -193,7 +195,7 @@ public class FileDialogStyle
         }
         catch (Exception)
         {
-            // Cannot get the special files for this OS oh well
+            // Cannot get the special files for this OS, oh well
         }
 
         return roots;

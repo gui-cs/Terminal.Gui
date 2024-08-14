@@ -5,8 +5,6 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
-using System.Text.Json.Serialization;
-
 namespace Terminal.Gui;
 
 /// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="View.Accept"/> event.</summary>
@@ -39,8 +37,6 @@ public class Button : View, IDesignable
     /// Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-
     public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
@@ -170,6 +166,7 @@ public class Button : View, IDesignable
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
+        base.UpdateTextFormatterText();
         if (NoDecorations)
         {
             TextFormatter.Text = Text;

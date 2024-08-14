@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     A <see cref="Toplevel"/> <see cref="View"/> with <see cref="View.BorderStyle"/> set to
@@ -28,6 +26,8 @@ public class Window : Toplevel
     public Window ()
     {
         CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
+        Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped;
         ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
         BorderStyle = DefaultBorderStyle;
         ShadowStyle = DefaultShadow;
@@ -73,6 +73,5 @@ public class Window : Toplevel
     ///     s.
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 }

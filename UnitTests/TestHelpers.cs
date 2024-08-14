@@ -86,6 +86,11 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             }
 #endif
             ConfigurationManager.Reset ();
+
+            if (CM.Locations != CM.ConfigLocations.None)
+            {
+                SetCurrentConfig (_savedValues);
+            }
         }
     }
 
@@ -110,10 +115,77 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             }
 #endif
             Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
+
+            if (CM.Locations != CM.ConfigLocations.None)
+            {
+                _savedValues = GetCurrentConfig ();
+            }
         }
     }
 
     private bool AutoInit { get; }
+
+    private List<object> _savedValues;
+
+    private List<object> GetCurrentConfig ()
+    {
+        CM.Reset ();
+
+        List<object> savedValues =
+        [
+            Dialog.DefaultButtonAlignment,
+            Dialog.DefaultButtonAlignmentModes,
+            MessageBox.DefaultBorderStyle
+        ];
+        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = Alignment.End;
+        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignmentModes"].PropertyValue = AlignmentModes.AddSpaceBetweenItems;
+        CM.Themes! ["Default"] ["MessageBox.DefaultBorderStyle"].PropertyValue = LineStyle.Double;
+        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+
+        return savedValues;
+    }
+
+    private void SetCurrentConfig (List<object> values)
+    {
+        CM.Reset ();
+        bool needApply = false;
+
+        foreach (object value in values)
+        {
+            switch (value)
+            {
+                case Alignment alignment:
+                    if ((Alignment)CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue! != alignment)
+                    {
+                        needApply = true;
+                        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = alignment;
+                    }
+
+                    break;
+                case AlignmentModes alignmentModes:
+                    if ((AlignmentModes)CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignmentModes"].PropertyValue! != alignmentModes)
+                    {
+                        needApply = true;
+                        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignmentModes"].PropertyValue = alignmentModes;
+                    }
+
+                    break;
+                case LineStyle lineStyle:
+                    if ((LineStyle)CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue! != lineStyle)
+                    {
+                        needApply = true;
+                        CM.Themes! ["Default"] ["MessageBox.DefaultBorderStyle"].PropertyValue = lineStyle;
+                    }
+
+                    break;
+            }
+        }
+
+        if (needApply)
+        {
+            ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        }
+    }
 }
 
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
@@ -446,6 +518,13 @@ internal partial class TestHelpers
         if (expectedLook.EndsWith (Environment.NewLine))
         {
             expectedLook = expectedLook [..^Environment.NewLine.Length];
+        }
+
+        // If test is about to fail show user what things looked like
+        if (!string.Equals (expectedLook, actualLook))
+        {
+            output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+            output?.WriteLine (" But Was:" + Environment.NewLine + actualLook);
         }
 
         Assert.Equal (expectedLook, actualLook);

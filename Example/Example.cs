@@ -6,19 +6,19 @@
 using System;
 using Terminal.Gui;
 
-var app = Application.Run<ExampleWindow> ();
-
-Console.WriteLine ($"Username: {app.UserNameText.Text}");
-
-app.Dispose ();
+Application.Run<ExampleWindow> ().Dispose ();
 
 // Before the application exits, reset Terminal.Gui for clean shutdown
 Application.Shutdown ();
 
+// To see this output on the screen it must be done after shutdown,
+// which restores the previous screen.
+Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
+
 // Defines a top-level window with border and title
 public class ExampleWindow : Window
 {
-    public TextField UserNameText;
+    public static string UserName;
 
     public ExampleWindow ()
     {
@@ -27,7 +27,7 @@ public class ExampleWindow : Window
         // Create input components and labels
         var usernameLabel = new Label { Text = "Username:" };
 
-        UserNameText = new TextField
+        var userNameText = new TextField
         {
             // Position text field adjacent to the label
             X = Pos.Right (usernameLabel) + 1,
@@ -46,7 +46,7 @@ public class ExampleWindow : Window
             Secret = true,
 
             // align with the text box above
-            X = Pos.Left (UserNameText),
+            X = Pos.Left (userNameText),
             Y = Pos.Top (passwordLabel),
             Width = Dim.Fill ()
         };
@@ -64,19 +64,20 @@ public class ExampleWindow : Window
 
         // When login button is clicked display a message popup
         btnLogin.Accept += (s, e) =>
-                            {
-                                if (UserNameText.Text == "admin" && passwordText.Text == "password")
-                                {
-                                    MessageBox.Query ("Logging In", "Login Successful", "Ok");
-                                    Application.RequestStop ();
-                                }
-                                else
-                                {
-                                    MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
-                                }
-                            };
+                           {
+                               if (userNameText.Text == "admin" && passwordText.Text == "password")
+                               {
+                                   MessageBox.Query ("Logging In", "Login Successful", "Ok");
+                                   UserName = userNameText.Text;
+                                   Application.RequestStop ();
+                               }
+                               else
+                               {
+                                   MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
+                               }
+                           };
 
         // Add the views to the Window
-        Add (usernameLabel, UserNameText, passwordLabel, passwordText, btnLogin);
+        Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin);
     }
 }

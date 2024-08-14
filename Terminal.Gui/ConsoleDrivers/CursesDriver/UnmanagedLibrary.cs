@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #define GUICS
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace Unix.Terminal;
@@ -69,6 +70,7 @@ internal class UnmanagedLibrary
         }
     }
 
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
     static UnmanagedLibrary ()
     {
         PlatformID platform = Environment.OSVersion.Platform;
@@ -289,7 +291,7 @@ internal class UnmanagedLibrary
     }
 
     /// <summary>
-    ///     On Linux systems, using using dlopen and dlsym results in DllNotFoundException("libdl.so not found") if
+    ///     On Linux systems, using dlopen and dlsym results in DllNotFoundException("libdl.so not found") if
     ///     libc6-dev is not installed. As a workaround, we load symbols for dlopen and dlsym from the current process as on
     ///     Linux Mono sure is linked against these symbols.
     /// </summary>

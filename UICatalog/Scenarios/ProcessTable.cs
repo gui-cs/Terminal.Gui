@@ -11,11 +11,15 @@ public class ProcessTable : Scenario
 {
     private TableView tableView;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
-        Win.Y = 1; // menu
-        Win.Height = Dim.Fill (1); // status bar
+        Application.Init ();
+        var win = new Window
+        {
+            Title = GetName (),
+            Y = 1, // menu
+            Height = Dim.Fill (1) // status bar
+        };
 
         tableView = new TableView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
@@ -33,7 +37,11 @@ public class ProcessTable : Scenario
                                 }
                                );
 
-        Win.Add (tableView);
+        win.Add (tableView);
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     private void CreateProcessTable ()

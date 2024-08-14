@@ -14,26 +14,26 @@ public class ViewTests (ITestOutputHelper output)
 
         view.DrawContent += (s, e) =>
                             {
-                                Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
+                                Rectangle savedClip = Application.Driver!.Clip;
+                                Application.Driver!.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
 
                                 for (var row = 0; row < view.Viewport.Height; row++)
                                 {
-                                    Application.Driver.Move (1, row + 1);
+                                    Application.Driver?.Move (1, row + 1);
 
                                     for (var col = 0; col < view.Viewport.Width; col++)
                                     {
-                                        Application.Driver.AddStr ($"{col}");
+                                        Application.Driver?.AddStr ($"{col}");
                                     }
                                 }
 
-                                Application.Driver.Clip = savedClip;
+                                Application.Driver!.Clip = savedClip;
                                 e.Cancel = true;
                             };
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var expected = @"
 ┌──────────────────┐
@@ -78,26 +78,26 @@ public class ViewTests (ITestOutputHelper output)
 
         view.DrawContent += (s, e) =>
                             {
-                                Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
+                                Rectangle savedClip = Application.Driver!.Clip;
+                                Application.Driver!.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
 
                                 for (var row = 0; row < view.Viewport.Height; row++)
                                 {
-                                    Application.Driver.Move (1, row + 1);
+                                    Application.Driver?.Move (1, row + 1);
 
                                     for (var col = 0; col < view.Viewport.Width; col++)
                                     {
-                                        Application.Driver.AddStr ($"{col}");
+                                        Application.Driver?.AddStr ($"{col}");
                                     }
                                 }
 
-                                Application.Driver.Clip = savedClip;
+                                Application.Driver!.Clip = savedClip;
                                 e.Cancel = true;
                             };
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var expected = @"
 ┌──────────────────┐
@@ -143,9 +143,13 @@ public class ViewTests (ITestOutputHelper output)
     {
         var root = new View { Width = 20, Height = 10, ColorScheme = Colors.ColorSchemes ["Base"] };
 
+        string text = new ('c', 100);
+
         View v = label
-                     ? new Label { Text = new ('c', 100) }
-                     : new TextView { Height = 1, Text = new ('c', 100), Width = Dim.Fill () };
+                     // Label has Width/Height == AutoSize, so Frame.Size will be (100, 1)
+                     ? new Label { Text = text }
+                     // TextView has Width/Height == (Dim.Fill, 1), so Frame.Size will be 20 (width of root), 1
+                     : new TextView { Width = Dim.Fill (), Height = 1, Text = text };
 
         root.Add (v);
 
@@ -156,8 +160,7 @@ public class ViewTests (ITestOutputHelper output)
         if (label)
         {
             Assert.False (v.CanFocus);
-
-            //Assert.Equal (new Rectangle (0, 0, 20, 1), v.Frame);
+            Assert.Equal (new  (0, 0, text.Length, 1), v.Frame);
         }
         else
         {
@@ -833,10 +836,10 @@ At 0,0
             TextDirection = TextDirection.TopBottom_LeftRight,
             Width = Dim.Auto (),
             Height = Dim.Auto ()
-        }; // BUGBUG: AutoSize or Height need be set
+        };
+        r.TextFormatter.WordWrap = false;
         Assert.NotNull (r);
 
-        // BUGBUG: IsInitialized must be true to process calculation
         r.BeginInit ();
         r.EndInit ();
         Assert.False (r.CanFocus);
@@ -1003,7 +1006,6 @@ At 0,0
     {
         var view = new View { Text = "Testing visibility." }; // use View, not Label to avoid AutoSize == true
 
-        // BUGBUG: AutoSize is false and size wasn't provided so it's 0,0
         Assert.Equal (0, view.Frame.Width);
         Assert.Equal (0, view.Height);
         var win = new Window ();
@@ -1016,7 +1018,7 @@ At 0,0
         view.Height = Dim.Auto ();
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1089,7 +1091,7 @@ At 0,0
                                      Assert.True (RunesCount () == 0);
 
                                      win.Visible = true;
-                                     win.FocusFirst ();
+                                     win.FocusFirst (null);
                                      Assert.True (button.HasFocus);
                                      Assert.True (win.HasFocus);
                                      top.Draw ();
@@ -1107,9 +1109,9 @@ At 0,0
             Cell [,] contents = ((FakeDriver)Application.Driver).Contents;
             var runesCount = 0;
 
-            for (var i = 0; i < Application.Driver.Rows; i++)
+            for (var i = 0; i < Application.Driver!.Rows; i++)
             {
-                for (var j = 0; j < Application.Driver.Cols; j++)
+                for (var j = 0; j < Application.Driver!.Cols; j++)
                 {
                     if (contents [i, j].Rune != (Rune)' ')
                     {

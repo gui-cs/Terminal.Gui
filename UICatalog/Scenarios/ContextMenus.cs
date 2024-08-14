@@ -25,7 +25,7 @@ public class ContextMenus : Scenario
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         var text = "Context Menu";
@@ -179,7 +179,7 @@ public class ContextMenus : Scenario
                                                                        "This would open setup dialog",
                                                                        "Ok"
                                                                       ),
-                                                           shortcut: KeyCode.T
+                                                           shortcutKey: KeyCode.T
                                                                      | KeyCode
                                                                          .CtrlMask
                                                           ),

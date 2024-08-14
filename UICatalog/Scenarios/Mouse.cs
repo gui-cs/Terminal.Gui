@@ -15,7 +15,7 @@ public class Mouse : Scenario
 
         Window win = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         Slider<MouseFlags> filterSlider = new ()
@@ -67,7 +67,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (ml),
             Title = "_Want Continuous Button Pressed"
         };
-        cbWantContinuousPresses.Toggle += (s, e) => { win.WantContinuousButtonPressed = !win.WantContinuousButtonPressed; };
+        cbWantContinuousPresses.CheckedStateChanging += (s, e) => { win.WantContinuousButtonPressed = !win.WantContinuousButtonPressed; };
 
         win.Add (cbWantContinuousPresses);
 
@@ -77,9 +77,9 @@ public class Mouse : Scenario
             Y = Pos.Bottom (cbWantContinuousPresses),
             Title = "_Highlight on Press"
         };
-        cbHighlightOnPress.State = win.HighlightStyle == (HighlightStyle.Pressed | HighlightStyle.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
+        cbHighlightOnPress.CheckedState = win.HighlightStyle == (HighlightStyle.Pressed | HighlightStyle.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
 
-        cbHighlightOnPress.Toggle += (s, e) =>
+        cbHighlightOnPress.CheckedStateChanging += (s, e) =>
                                       {
                                           if (e.NewValue == CheckState.Checked)
                                           {

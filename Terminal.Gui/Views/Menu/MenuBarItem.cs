@@ -2,7 +2,7 @@ namespace Terminal.Gui;
 
 /// <summary>
 ///     <see cref="MenuBarItem"/> is a menu item on  <see cref="MenuBar"/>. MenuBarItems do not support
-///     <see cref="MenuItem.Shortcut"/>.
+///     <see cref="MenuItem.ShortcutKey"/>.
 /// </summary>
 public class MenuBarItem : MenuItem
 {
@@ -100,10 +100,9 @@ public class MenuBarItem : MenuItem
         {
             // For MenuBar only add shortcuts for submenus
 
-            if (menuItem.Shortcut != KeyCode.Null)
+            if (menuItem.ShortcutKey != Key.Empty)
             {
-                KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuItem);
-                menuBar.KeyBindings.Add (menuItem.Shortcut, keyBinding);
+                menuItem.UpdateShortcutKeyBinding (Key.Empty);
             }
 
             SubMenu (menuItem)?.AddShortcutKeyBindings (menuBar);
@@ -174,5 +173,76 @@ public class MenuBarItem : MenuItem
     {
         title ??= string.Empty;
         Title = title;
+    }
+
+    /// <summary>
+    /// Add a <see cref="MenuBarItem"/> dynamically into the <see cref="MenuBar"/><c>.Menus</c>.
+    /// </summary>
+    /// <param name="menuItem"></param>
+    public void AddMenuBarItem (MenuItem menuItem = null)
+    {
+        if (menuItem is null)
+        {
+            MenuBarItem [] menus = _menuBar.Menus;
+            Array.Resize (ref menus, menus.Length + 1);
+            menus [^1] = this;
+            _menuBar.Menus = menus;
+        }
+        else
+        {
+            MenuItem [] childrens = Children ?? [];
+            Array.Resize (ref childrens, childrens.Length + 1);
+            childrens [^1] = menuItem;
+            Children = childrens;
+        }
+    }
+
+    /// <inheritdoc />
+    public override void RemoveMenuItem ()
+    {
+        if (Children is { })
+        {
+            foreach (MenuItem menuItem in Children)
+            {
+                if (menuItem.ShortcutKey != Key.Empty)
+                {
+                    // Remove an existent ShortcutKey
+                    _menuBar?.KeyBindings.Remove (menuItem.ShortcutKey);
+                }
+            }
+        }
+
+        if (ShortcutKey != Key.Empty)
+        {
+            // Remove an existent ShortcutKey
+            _menuBar?.KeyBindings.Remove (ShortcutKey);
+        }
+
+        var index = _menuBar!.Menus.IndexOf (this);
+        if (index > -1)
+        {
+            if (_menuBar!.Menus [index].HotKey != Key.Empty)
+            {
+                // Remove an existent HotKey
+                _menuBar?.KeyBindings.Remove (HotKey.WithAlt);
+            }
+
+            _menuBar!.Menus [index] = null;
+        }
+
+        var i = 0;
+
+        foreach (MenuBarItem m in _menuBar.Menus)
+        {
+            if (m != null)
+            {
+                _menuBar.Menus [i] = m;
+                i++;
+            }
+        }
+
+        MenuBarItem [] menus = _menuBar.Menus;
+        Array.Resize (ref menus, menus.Length - 1);
+        _menuBar.Menus = menus;
     }
 }
