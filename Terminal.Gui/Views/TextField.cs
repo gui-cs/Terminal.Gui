@@ -1033,7 +1033,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnLeave (View view)
+    protected override void OnLeave (View view)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
@@ -1043,7 +1043,7 @@ public class TextField : View
         //if (SelectedLength != 0 && !(Application.MouseGrabView is MenuBar))
         //	ClearAllSelection ();
 
-        return false; // Don't cancel the focus switch
+        return;
     }
 
     /// TODO: Flush out these docs

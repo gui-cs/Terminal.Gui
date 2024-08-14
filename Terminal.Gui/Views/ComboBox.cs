@@ -315,7 +315,7 @@ public class ComboBox : View, IDesignable
     public virtual void OnExpanded () { Expanded?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    protected override bool OnLeave (View view)
+    protected override void OnLeave (View view)
     {
         if (_source?.Count > 0
             && _selectedItem > -1
@@ -335,7 +335,7 @@ public class ComboBox : View, IDesignable
             _listview.TabStop = TabBehavior.NoStop;
         }
 
-        return false; // Don't cancel the focus switch
+        return;
     }
 
     /// <summary>Invokes the OnOpenSelectedItem event if it is defined.</summary>
@@ -952,7 +952,7 @@ public class ComboBox : View, IDesignable
             return false; // Don't cancel the focus switch
         }
 
-        protected override bool OnLeave (View view)
+        protected override void OnLeave (View view)
         {
             if (_hideDropdownListOnClick)
             {
@@ -961,7 +961,7 @@ public class ComboBox : View, IDesignable
                 Application.UngrabMouse ();
             }
 
-            return false; // Don't cancel the focus switch
+            return;
         }
 
         public override bool OnSelectedChanged ()

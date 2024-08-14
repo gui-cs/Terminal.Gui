@@ -844,12 +844,10 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnLeave (View view)
+    protected override void OnLeave (View view)
     {
         SetColors ();
         _lastFocusedView = this;
-
-        return false; // Don't cancel the focus switch
     }
 
     #endregion Focus

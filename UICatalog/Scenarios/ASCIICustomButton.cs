@@ -110,17 +110,16 @@ public class ASCIICustomButtonTest : Scenario
             Add (_border, _fill, title);
         }
 
-        public override bool OnEnter (View view)
+        protected override bool OnEnter (View view)
         {
             _border.Visible = false;
             _fill.Visible = true;
-            PointerEnter.Invoke (this);
-            view = this;
+            PointerEnter?.Invoke (this);
 
-            return base.OnEnter (view);
+            return false; // don't cancel
         }
 
-        public override bool OnLeave (View view)
+        protected override void OnLeave (View view)
         {
             _border.Visible = true;
             _fill.Visible = false;
@@ -129,8 +128,6 @@ public class ASCIICustomButtonTest : Scenario
             {
                 view = this;
             }
-
-            return base.OnLeave (view);
         }
 
         public event Action<ASCIICustomButton> PointerEnter;

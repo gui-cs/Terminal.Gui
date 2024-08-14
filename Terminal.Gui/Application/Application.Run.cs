@@ -99,7 +99,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             else if (ApplicationOverlapped.OverlappedTop is { } && toplevel != Top && TopLevels.Contains (Top!))
             {
                 // BUGBUG: Don't call OnLeave/OnEnter directly! Set HasFocus to false and let the system handle it.
-                Top!.OnLeave (toplevel);
+                //Top!.OnLeave (toplevel);
             }
 
             // BUGBUG: We should not depend on `Id` internally.

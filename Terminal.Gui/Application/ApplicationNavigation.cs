@@ -55,14 +55,14 @@ public class ApplicationNavigation
     /// <param name="start"></param>
     /// <param name="view"></param>
     /// <returns></returns>
-    public static bool IsInHierarchy (View start, View? view)
+    public static bool IsInHierarchy (View? start, View? view)
     {
         if (view is null)
         {
             return false;
         }
 
-        if (view == start)
+        if (view == start || start is null)
         {
             return true;
         }
@@ -149,7 +149,7 @@ public class ApplicationNavigation
 
                 if (Application.Current.Focused is null)
                 {
-                    Application.Current.RestoreFocus ();
+                    Application.Current.RestoreFocus (TabBehavior.TabGroup);
                 }
             }
 

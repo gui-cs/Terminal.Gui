@@ -3650,14 +3650,14 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnLeave (View view)
+    protected override void OnLeave (View view)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
             Application.UngrabMouse ();
         }
 
-        return false; // Don't cancel the focus switch
+        return;
     }
 
     /// <inheritdoc/>

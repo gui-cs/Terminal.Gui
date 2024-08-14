@@ -1119,17 +1119,17 @@ public class ScrollViewTests (ITestOutputHelper output)
             CanFocus = true;
         }
 
-        public override bool OnEnter (View view)
+        protected override bool OnEnter (View view)
         {
             Border.LineStyle = LineStyle.None;
             Border.Thickness = new (0);
             labelFill.Visible = true;
             view = this;
 
-            return base.OnEnter (view);
+            return false; // don't cancel
         }
 
-        public override bool OnLeave (View view)
+        protected override void OnLeave (View view)
         {
             Border.LineStyle = LineStyle.Single;
             Border.Thickness = new (1);
@@ -1139,8 +1139,6 @@ public class ScrollViewTests (ITestOutputHelper output)
             {
                 view = this;
             }
-
-            return base.OnLeave (view);
         }
     }
 }

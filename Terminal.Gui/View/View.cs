@@ -310,7 +310,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
             if (!_enabled && HasFocus)
             {
-                SetHasFocus (false, this);
+                HasFocus = false;
             }
 
             OnEnabledChanged ();
@@ -364,7 +364,7 @@ public partial class View : Responder, ISupportInitializeNotification
             {
                 if (HasFocus)
                 {
-                    SetHasFocus (false, this);
+                    HasFocus = false;
                 }
 
                 if (IsInitialized && ClearOnVisibleFalse)

@@ -418,7 +418,7 @@ public partial class Toplevel : View
     //}
 
     ///// <inheritdoc/>
-    //protected override bool OnLeave (View view) { return MostFocused?.OnLeave (view) ?? false; }
+    //protected override void OnLeave (View view) { return MostFocused?.OnLeave (view) ?? false; }
 
     #endregion
 

@@ -1277,17 +1277,14 @@ public class OverlappedTests
     {
         public bool IsFocused { get; private set; }
 
-        public override bool OnEnter (View view)
+        protected override bool OnEnter (View view)
         {
             IsFocused = true;
-            return base.OnEnter (view);
+
+            return false;
         }
 
-        public override bool OnLeave (View view)
-        {
-            IsFocused = false;
-            return base.OnLeave (view);
-        }
+        protected override void OnLeave (View view) { IsFocused = false; }
     }
 
     private class TestView : View
@@ -1298,16 +1295,16 @@ public class OverlappedTests
         }
         public bool IsFocused { get; private set; }
 
-        public override bool OnEnter (View view)
+        protected override bool OnEnter (View view)
         {
             IsFocused = true;
-            return base.OnEnter (view);
+
+            return false; // don't cancel
         }
 
-        public override bool OnLeave (View view)
+        protected override void OnLeave (View view)
         {
             IsFocused = false;
-            return base.OnLeave (view);
         }
     }
 }
