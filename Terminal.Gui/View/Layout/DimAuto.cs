@@ -15,31 +15,8 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 ///     </para>
 /// </remarks>
-public class DimAuto : Dim
+public record DimAuto : Dim
 {
-    /// <inheritdoc />
-    public override bool Equals (object? other)
-    {
-        if (ReferenceEquals (this, other))
-        {
-            return true;
-        }
-
-        if (other is not DimAuto auto)
-        {
-            return false;
-        }
-
-        return EqualityComparer<Dim?>.Default.Equals (MinimumContentDim, auto.MinimumContentDim) &&
-               EqualityComparer<Dim?>.Default.Equals (MaximumContentDim, auto.MaximumContentDim) &&
-               Style == auto.Style;
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode ()
-    {
-        return HashCode.Combine (MinimumContentDim, MaximumContentDim, Style);
-    }
     private readonly Dim? _maximumContentDim;
 
     /// <summary>

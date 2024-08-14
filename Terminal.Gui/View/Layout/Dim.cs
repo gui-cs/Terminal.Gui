@@ -78,7 +78,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para></para>
 /// </remarks>
-public abstract class Dim
+public abstract record Dim
 {
     #region static Dim creation methods
 

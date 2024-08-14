@@ -9,11 +9,8 @@ namespace Terminal.Gui;
 ///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 /// </remarks>
 /// <param name="dim"></param>
-public class DimFunc (Func<int> dim) : Dim
+public record DimFunc (Func<int> dim) : Dim
 {
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is DimFunc f && f.Func () == Func (); }
-
     /// <summary>
     ///     Gets the function that computes the dimension.
     /// </summary>

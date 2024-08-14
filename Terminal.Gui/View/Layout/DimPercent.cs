@@ -13,14 +13,8 @@ namespace Terminal.Gui;
 ///     If <see cref="DimPercentMode.Position"/> the dimension is computed using the View's position (<see cref="View.X"/> or
 ///     <see cref="View.Y"/>); otherwise, the dimension is computed using the View's <see cref="View.GetContentSize ()"/>.
 /// </param>
-public class DimPercent (int percent, DimPercentMode mode = DimPercentMode.ContentSize) : Dim
+public record DimPercent (int percent, DimPercentMode mode = DimPercentMode.ContentSize) : Dim
 {
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is DimPercent f && f.Percent == Percent && f.Mode == Mode; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Percent.GetHashCode (); }
-
     /// <summary>
     ///     Gets the percentage.
     /// </summary>

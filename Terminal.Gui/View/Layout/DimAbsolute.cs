@@ -11,14 +11,8 @@ namespace Terminal.Gui;
 ///     </para>
 /// </remarks>
 /// <param name="size"></param>
-public class DimAbsolute (int size) : Dim
+public record DimAbsolute (int size) : Dim
 {
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is DimAbsolute abs && abs.Size == Size; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Size.GetHashCode (); }
-
     /// <summary>
     ///     Gets the size of the dimension.
     /// </summary>

@@ -9,14 +9,8 @@ namespace Terminal.Gui;
 ///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 /// </remarks>
 /// <param name="margin">The margin to not fill.</param>
-public class DimFill (int margin) : Dim
+public record DimFill (int margin) : Dim
 {
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is DimFill fill && fill.Margin == Margin; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Margin.GetHashCode (); }
-
     /// <summary>
     ///     Gets the margin to not fill.
     /// </summary>

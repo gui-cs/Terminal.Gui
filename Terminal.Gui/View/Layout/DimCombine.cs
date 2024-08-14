@@ -13,7 +13,7 @@ namespace Terminal.Gui;
 /// </remarks>
 /// <param name="left">The left dimension.</param>
 /// <param name="right">The right dimension.</param>
-public class DimCombine (AddOrSubtract add, Dim left, Dim right) : Dim
+public record DimCombine (AddOrSubtract add, Dim left, Dim right) : Dim
 {
     /// <summary>
     ///     Gets whether the two dimensions are added or subtracted.
