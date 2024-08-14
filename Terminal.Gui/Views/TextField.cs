@@ -1016,8 +1016,7 @@ public class TextField : View
 
         RenderCaption ();
 
-        ProcessAutocomplete ();
-
+        DrawAutocomplete ();
         _isDrawing = false;
     }
 
@@ -1767,8 +1766,21 @@ public class TextField : View
             return;
         }
 
-        // draw autocomplete
         GenerateSuggestions ();
+    }
+
+    private void DrawAutocomplete ()
+    {
+
+        if (SelectedLength > 0)
+        {
+            return;
+        }
+
+        if (Autocomplete?.Context == null)
+        {
+            return;
+        }
 
         var renderAt = new Point (
                                   Autocomplete.Context.CursorPosition,
