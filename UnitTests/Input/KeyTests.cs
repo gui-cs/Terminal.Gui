@@ -533,7 +533,7 @@ public class KeyTests
         var b = Key.A;
         Assert.True (a.Equals (b));
     }
-    
+
     [Fact]
     public void Equals_Handled_Changed_ShouldReturnTrue_WhenEqual ()
     {
@@ -551,5 +551,21 @@ public class KeyTests
         a.Handled = true;
         var b = Key.A;
         Assert.False (a.Equals (b));
+    }
+
+    [Fact]
+    public void Set_Key_Separator_With_Rune_Default_Ensure_Using_The_Default_Plus ()
+    {
+        Key key = new (Key.A.WithCtrl);
+        Assert.Equal ((Rune)'+', Key.Separator);
+        Assert.Equal ("Ctrl+A", key.ToString ());
+
+        Key.Separator = new ('-');
+        Assert.Equal ((Rune)'-', Key.Separator);
+        Assert.Equal ("Ctrl-A", key.ToString ());
+
+        Key.Separator = new ();
+        Assert.Equal ((Rune)'+', Key.Separator);
+        Assert.Equal ("Ctrl+A", key.ToString ());
     }
 }
