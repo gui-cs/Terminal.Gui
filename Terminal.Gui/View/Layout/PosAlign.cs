@@ -24,7 +24,7 @@ namespace Terminal.Gui;
 ///         The alignment is applied to all views with the same <see cref="GroupId"/>.
 ///     </para>
 /// </remarks>
-public class PosAlign : Pos
+public record PosAlign : Pos
 {
     /// <summary>
     ///     The cached location. Used to store the calculated location to minimize recalculating it.
@@ -136,18 +136,6 @@ public class PosAlign : Pos
     }
 
     private void Aligner_PropertyChanged (object? sender, PropertyChangedEventArgs e) { _cachedLocation = null; }
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other)
-    {
-        return other is PosAlign align
-               && GroupId == align.GroupId
-               && align.Aligner.Alignment == Aligner.Alignment
-               && align.Aligner.AlignmentModes == Aligner.AlignmentModes;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (Aligner, GroupId); }
 
     /// <inheritdoc/>
     public override string ToString () { return $"Align(alignment={Aligner.Alignment},modes={Aligner.AlignmentModes},groupId={GroupId})"; }

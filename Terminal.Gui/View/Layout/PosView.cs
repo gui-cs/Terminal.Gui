@@ -12,7 +12,7 @@ namespace Terminal.Gui;
 /// </remarks>
 /// <param name="view">The View the position is anchored to.</param>
 /// <param name="side">The side of the View the position is anchored to.</param>
-public class PosView (View? view, Side side) : Pos
+public record PosView (View? view, Side side) : Pos
 {
     /// <summary>
     ///     Gets the View the position is anchored to.
@@ -23,12 +23,6 @@ public class PosView (View? view, Side side) : Pos
     ///     Gets the side of the View the position is anchored to.
     /// </summary>
     public Side Side { get; } = side;
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is PosView abs && abs.Target == Target && abs.Side == Side; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Target!.GetHashCode (); }
 
     /// <inheritdoc/>
     public override string ToString ()

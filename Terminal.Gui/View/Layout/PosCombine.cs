@@ -15,7 +15,7 @@ namespace Terminal.Gui;
 /// </param>
 /// <param name="left">The left position.</param>
 /// <param name="right">The right position.</param>
-public class PosCombine (AddOrSubtract add, Pos left, Pos right) : Pos
+public record PosCombine (AddOrSubtract add, Pos left, Pos right) : Pos
 {
     /// <summary>
     ///     Gets whether the two positions are added or subtracted.

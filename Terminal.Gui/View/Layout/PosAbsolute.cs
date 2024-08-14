@@ -11,18 +11,12 @@ namespace Terminal.Gui;
 ///     </para>
 /// </remarks>
 /// <param name="position"></param>
-public class PosAbsolute (int position) : Pos
+public record PosAbsolute (int position) : Pos
 {
     /// <summary>
     ///     The position of the <see cref="View"/> in the layout.
     /// </summary>
     public int Position { get; } = position;
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is PosAbsolute abs && abs.Position == Position; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Position.GetHashCode (); }
 
     /// <inheritdoc/>
     public override string ToString () { return $"Absolute({Position})"; }

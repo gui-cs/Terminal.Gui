@@ -11,18 +11,12 @@ namespace Terminal.Gui;
 ///     </para>
 /// </remarks>
 /// <param name="pos">The position.</param>
-public class PosFunc (Func<int> pos) : Pos
+public record PosFunc (Func<int> pos) : Pos
 {
     /// <summary>
     ///     Gets the function that computes the position.
     /// </summary>
     public new Func<int> Func { get; } = pos;
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is PosFunc f && f.Func () == Func (); }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Func.GetHashCode (); }
 
     /// <inheritdoc/>
     public override string ToString () { return $"PosFunc({Func ()})"; }

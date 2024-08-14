@@ -11,18 +11,12 @@ namespace Terminal.Gui;
 ///     </para>
 /// </remarks>
 /// <param name="percent"></param>
-public class PosPercent (int percent) : Pos
+public record PosPercent (int percent) : Pos
 {
     /// <summary>
     ///     Gets the percentage of the width or height of the SuperView.
     /// </summary>
     public new int Percent { get; } = percent;
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is PosPercent i && i.Percent == Percent; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Percent.GetHashCode (); }
 
     /// <inheritdoc/>
     public override string ToString () { return $"Percent({Percent})"; }
