@@ -7,16 +7,16 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         This is a low-level API that is typically used internally by the layout system. Use the various static
-///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
+///         methods on the <see cref="Gui.Pos"/> class to create <see cref="Gui.Pos"/> objects instead.
 ///     </para>
 /// </remarks>
-/// <param name="pos">The position.</param>
-public record PosFunc (Func<int> pos) : Pos
+/// <param name="Pos">The position.</param>
+public record PosFunc (Func<int> Pos) : Pos
 {
     /// <summary>
     ///     Gets the function that computes the position.
     /// </summary>
-    public new Func<int> Func { get; } = pos;
+    public new Func<int> Func { get; } = Pos;
 
     /// <inheritdoc/>
     public override string ToString () { return $"PosFunc({Func ()})"; }

@@ -10,13 +10,13 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
 ///     </para>
 /// </remarks>
-/// <param name="position"></param>
-public record PosAbsolute (int position) : Pos
+/// <param name="Position"></param>
+public record PosAbsolute (int Position) : Pos
 {
     /// <summary>
     ///     The position of the <see cref="View"/> in the layout.
     /// </summary>
-    public int Position { get; } = position;
+    public int Position { get; } = Position;
 
     /// <inheritdoc/>
     public override string ToString () { return $"Absolute({Position})"; }

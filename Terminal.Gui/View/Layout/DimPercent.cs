@@ -8,17 +8,17 @@ namespace Terminal.Gui;
 ///     This is a low-level API that is typically used internally by the layout system. Use the various static
 ///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 /// </remarks>
-/// <param name="percent">The percentage.</param>
-/// <param name="mode">
+/// <param name="Percent">The percentage.</param>
+/// <param name="Mode">
 ///     If <see cref="DimPercentMode.Position"/> the dimension is computed using the View's position (<see cref="View.X"/> or
 ///     <see cref="View.Y"/>); otherwise, the dimension is computed using the View's <see cref="View.GetContentSize ()"/>.
 /// </param>
-public record DimPercent (int percent, DimPercentMode mode = DimPercentMode.ContentSize) : Dim
+public record DimPercent (int Percent, DimPercentMode Mode = DimPercentMode.ContentSize) : Dim
 {
     /// <summary>
     ///     Gets the percentage.
     /// </summary>
-    public new int Percent { get; } = percent;
+    public new int Percent { get; } = Percent;
 
     /// <summary>
     /// </summary>
@@ -28,7 +28,7 @@ public record DimPercent (int percent, DimPercentMode mode = DimPercentMode.Cont
     /// <summary>
     ///     Gets whether the dimension is computed using the View's position or GetContentSize ().
     /// </summary>
-    public DimPercentMode Mode { get; } = mode;
+    public DimPercentMode Mode { get; } = Mode;
 
     internal override int GetAnchor (int size) { return (int)(size * (Percent / 100f)); }
 

@@ -10,19 +10,19 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
 ///     </para>
 /// </remarks>
-/// <param name="view">The View the position is anchored to.</param>
-/// <param name="side">The side of the View the position is anchored to.</param>
-public record PosView (View? view, Side side) : Pos
+/// <param name="View">The View the position is anchored to.</param>
+/// <param name="Side">The side of the View the position is anchored to.</param>
+public record PosView (View? View, Side Side) : Pos
 {
     /// <summary>
     ///     Gets the View the position is anchored to.
     /// </summary>
-    public View? Target { get; } = view;
+    public View? Target { get; } = View;
 
     /// <summary>
     ///     Gets the side of the View the position is anchored to.
     /// </summary>
-    public Side Side { get; } = side;
+    public Side Side { get; } = Side;
 
     /// <inheritdoc/>
     public override string ToString ()

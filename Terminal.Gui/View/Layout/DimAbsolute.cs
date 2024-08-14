@@ -10,13 +10,13 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 ///     </para>
 /// </remarks>
-/// <param name="size"></param>
-public record DimAbsolute (int size) : Dim
+/// <param name="Size"></param>
+public record DimAbsolute (int Size) : Dim
 {
     /// <summary>
     ///     Gets the size of the dimension.
     /// </summary>
-    public int Size { get; } = size;
+    public int Size { get; } = Size;
 
     /// <inheritdoc/>
     public override string ToString () { return $"Absolute({Size})"; }
