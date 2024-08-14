@@ -155,6 +155,13 @@ public class ColorPicker : View
         Add (_lbName);
         Add (_tfName);
 
+        var auto = new AppendAutocomplete (_tfName);
+        auto.SuggestionGenerator = new SingleWordSuggestionGenerator ()
+        {
+            AllSuggestions = _colorNameResolver.GetColorNames ().ToList ()
+        };
+        _tfName.Autocomplete = auto;
+
         _tfName.Leave += UpdateValueFromName;
     }
 
