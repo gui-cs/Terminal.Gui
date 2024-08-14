@@ -46,7 +46,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblWidthHeight);
 
-        Buttons.NumericUpDown<int> scrollWidthHeight = new ()
+        NumericUpDown<int> scrollWidthHeight = new ()
         {
             Value = scroll.Frame.Width,
             X = Pos.Right (lblWidthHeight) + 1,
@@ -115,7 +115,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblSize);
 
-        Buttons.NumericUpDown<int> scrollSize = new ()
+        NumericUpDown<int> scrollSize = new ()
         {
             Value = scroll.Size,
             X = Pos.Right (lblSize) + 1,
@@ -145,7 +145,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblPosition);
 
-        Buttons.NumericUpDown<int> scrollPosition = new ()
+        NumericUpDown<int> scrollPosition = new ()
         {
             Value = scroll.Position,
             X = Pos.Right (lblPosition) + 1,

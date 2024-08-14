@@ -40,7 +40,7 @@ public class ScrollBarView : View
         WantContinuousButtonPressed = true;
         ClearOnVisibleFalse = false;
 
-        Added += (s, e) => CreateBottomRightCorner (e.SuperView);
+        Added += (s, e) => CreateBottomRightCorner (e.Parent);
         Initialized += ScrollBarView_Initialized;
     }
 

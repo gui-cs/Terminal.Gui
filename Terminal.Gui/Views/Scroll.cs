@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿#nullable enable
+
+using System.ComponentModel;
 
 namespace Terminal.Gui;
 
@@ -206,7 +208,7 @@ public class Scroll : View
 
     private void Scroll_Added (object sender, SuperViewChangedEventArgs e)
     {
-        View parent = e.SuperView is Adornment adornment ? adornment.Parent : e.SuperView;
+        View parent = e.Parent is Adornment adornment ? adornment.Parent : e.Parent;
 
         parent.LayoutComplete += SuperView_LayoutComplete;
     }
@@ -274,9 +276,9 @@ public class Scroll : View
 
     private void Scroll_Removed (object sender, SuperViewChangedEventArgs e)
     {
-        if (e.SuperView is { })
+        if (e.Parent is { })
         {
-            View parent = e.SuperView is Adornment adornment ? adornment.Parent : e.SuperView;
+            View parent = e.Parent is Adornment adornment ? adornment.Parent : e.Parent;
 
             parent.LayoutComplete -= SuperView_LayoutComplete;
         }
