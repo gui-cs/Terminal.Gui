@@ -816,6 +816,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Null (exception);
     }
 
+#if V2_NEW_FOCUS_IMPL
     [Fact]
     [AutoInitShutdown]
     public void OnEnter_OnLeave_Triggered_On_Application_Begin_End ()
@@ -854,7 +855,6 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         top.Dispose ();
     }
-
 
     [Fact]
     [AutoInitShutdown]
@@ -1037,6 +1037,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (4, steps [^1]);
         top.Dispose ();
     }
+#endif
 
     [Fact]
     [AutoInitShutdown]

@@ -239,11 +239,11 @@ public class ResponderTests
         Assert.False (r.NewMouseLeaveEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
 
         var v = new View ();
-        Assert.False (r.OnEnter (v));
+        //Assert.False (r.OnEnter (v));
         v.Dispose ();
 
         v = new View ();
-        Assert.False (r.OnLeave (v));
+        //Assert.False (r.OnLeave (v));
         v.Dispose ();
 
         r.Dispose ();

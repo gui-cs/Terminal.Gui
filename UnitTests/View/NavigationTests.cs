@@ -1498,16 +1498,20 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
     }
 
     [Fact]
-    public void SetFocus_View_With_Null_Superview_Does_Not_Throw_Exception ()
+    public void SetFocus_With_Null_Superview_Does_Not_Throw_Exception ()
     {
-        var top = new Toplevel ();
-        Assert.True (top.CanFocus);
-        Assert.False (top.HasFocus);
+        var view = new View ()
+        {
+            CanFocus = true
+        };
+        Assert.True (view.CanFocus);
+        Assert.False (view.HasFocus);
 
-        Exception exception = Record.Exception (top.SetFocus);
+        Exception exception = Record.Exception (() => view.SetFocus());
         Assert.Null (exception);
-        Assert.True (top.CanFocus);
-        Assert.True (top.HasFocus);
+
+        Assert.True (view.CanFocus);
+        Assert.True (view.HasFocus);
     }
 
     [Fact]
