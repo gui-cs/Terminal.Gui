@@ -176,7 +176,7 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 * Use [View.Keybindings](~/api/Terminal.Gui.View.Keybindings.yml) to configure key bindings to `Command`s.
 * It should be very uncommon for v2 code to override `OnKeyPressed` etc... 
 * Anywhere `Ctrl+Q` was hard-coded as the "quit key", replace with `Application.QuitKey`.
-* Replace `Application.RootKeyEvent` with `Application.KeyDown`.  
+* Replace `Application.RootKeyEvent` with `Application.KeyDown`.  If the reason for subscribing to RootKeyEvent was to enable an application-wide action based on a key-press, consider using Application.KeyBindings instead.
 
 ```diff
 - Application.RootKeyEvent(KeyEvent arg)
@@ -220,15 +220,15 @@ The cursor and focus system has been redesigned in v2 to be more consistent and 
 
 ## Button.Clicked Event Renamed
 
-The `Button.Clicked` event has been renamed `Button.MouseClick`
+The `Button.Clicked` event has been renamed `Button.Accept`
 
 ## How to Fix
 
-Rename all instances of `Button.Clicked` to `Button.MouseClick`.  Note the signature change to mouse events below.
+Rename all instances of `Button.Clicked` to `Button.Accept`.  Note the signature change to mouse events below.
 
 ```diff
 - btnLogin.Clicked 
-+ btnLogin.MouseClick
++ btnLogin.Accept
 ```
 
 Alternatively, if you want to have key events as well as mouse events to fire an event, use `Button.Accept`.
@@ -265,7 +265,7 @@ If you previously had a lamda expression, you can simply add the extra arguments
 
 ```diff
 - btnLogin.Clicked += () => { /*do something*/ };
-+ btnLogin.MouseClick += (s,e) => { /*do something*/ };
++ btnLogin.Accept += (s,e) => { /*do something*/ };
 ```
 Note that the event name has also changed as noted above.
 
