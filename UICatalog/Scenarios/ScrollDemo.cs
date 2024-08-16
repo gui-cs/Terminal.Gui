@@ -1,4 +1,5 @@
-﻿using Terminal.Gui;
+﻿using System;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -56,8 +57,13 @@ public class ScrollDemo : Scenario
 
         scrollWidthHeight.ValueChanging += (s, e) =>
                                            {
-                                               if (e.NewValue < 1)
+                                               if (e.NewValue < 1
+                                                   || (e.NewValue
+                                                       > (scroll.Orientation == Orientation.Vertical
+                                                              ? scroll.SuperView?.GetContentSize ().Width
+                                                              : scroll.SuperView?.GetContentSize ().Height)))
                                                {
+                                                   // TODO: This must be handled in the ScrollSlider if Width and Height being virtual
                                                    e.Cancel = true;
 
                                                    return;
@@ -93,6 +99,7 @@ public class ScrollDemo : Scenario
                                                      scroll.Orientation = Orientation.Vertical;
                                                      scroll.X = Pos.AnchorEnd ();
                                                      scroll.Y = 0;
+                                                     scrollWidthHeight.Value = Math.Min (scrollWidthHeight.Value, scroll.SuperView.GetContentSize ().Width);
                                                      scroll.Width = scrollWidthHeight.Value;
                                                      scroll.Height = Dim.Fill ();
                                                      scroll.Size /= 3;
@@ -103,6 +110,8 @@ public class ScrollDemo : Scenario
                                                      scroll.X = 0;
                                                      scroll.Y = Pos.AnchorEnd ();
                                                      scroll.Width = Dim.Fill ();
+
+                                                     scrollWidthHeight.Value = Math.Min (scrollWidthHeight.Value, scroll.SuperView.GetContentSize ().Height);
                                                      scroll.Height = scrollWidthHeight.Value;
                                                      scroll.Size *= 3;
                                                  }
