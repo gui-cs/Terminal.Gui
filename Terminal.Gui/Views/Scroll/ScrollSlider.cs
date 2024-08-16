@@ -7,7 +7,7 @@ internal class ScrollSlider : View
     public ScrollSlider (Scroll host)
     {
         _host = host;
-        Id = "slider";
+        Id = "scrollSlider";
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
         WantMousePositionReports = true;

@@ -692,7 +692,7 @@ public class ScrollTests
                                       });
         }
 
-        Assert.Equal ("slider", Application.MouseGrabView?.Id);
+        Assert.Equal ("scrollSlider", Application.MouseGrabView?.Id);
         Assert.Equal (expectedPos, scroll.Position);
 
         Application.Refresh ();
