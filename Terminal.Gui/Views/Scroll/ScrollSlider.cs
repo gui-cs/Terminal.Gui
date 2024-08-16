@@ -87,23 +87,21 @@ internal class ScrollSlider : View
         }
         else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
         {
+            _wasSliderMouse = true;
+
             if (_host.Orientation == Orientation.Vertical)
             {
-                if (Frame.Y + offset >= 0 && Frame.Y + offset + Frame.Height <= barSize)
-                {
-                    _wasSliderMouse = true;
-                    Y = Frame.Y + offset;
-                    _host.Position = GetPositionFromSliderLocation (Frame.Y);
-                }
+                Y = Frame.Y + offset < 0 ? 0 :
+                    Frame.Y + offset + Frame.Height > barSize ? Math.Max (barSize - Frame.Height, 0) : Frame.Y + offset;
+
+                _host.Position = GetPositionFromSliderLocation (Frame.Y);
             }
             else
             {
-                if (Frame.X + offset >= 0 && Frame.X + offset + Frame.Width <= barSize)
-                {
-                    _wasSliderMouse = true;
-                    X = Frame.X + offset;
-                    _host.Position = GetPositionFromSliderLocation (Frame.X);
-                }
+                X = Frame.X + offset < 0 ? 0 :
+                    Frame.X + offset + Frame.Width > barSize ? Math.Max (barSize - Frame.Width, 0) : Frame.X + offset;
+
+                _host.Position = GetPositionFromSliderLocation (Frame.X);
             }
         }
         else if (mouseEvent.Flags == MouseFlags.Button1Released)

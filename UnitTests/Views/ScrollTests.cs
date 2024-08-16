@@ -708,6 +708,45 @@ public class ScrollTests
     }
 
     [Theory]
+    [AutoInitShutdown]
+    [InlineData (Orientation.Vertical)]
+    public void Moving_Mouse_Outside_Host_Ensures_Correct_Location (Orientation orientation)
+    {
+        var scroll = new Scroll
+        {
+            X = 10, Y = 10, Width = orientation == Orientation.Vertical ? 1 : 10, Height = orientation == Orientation.Vertical ? 10 : 1, Size = 20,
+            Position = 5, Orientation = orientation
+        };
+        var top = new Toplevel ();
+        top.Add (scroll);
+        Application.Begin (top);
+
+        Rectangle scrollSliderFrame = scroll.Subviews.FirstOrDefault (x => x.Id == "scrollSlider")!.Frame;
+        Assert.Equal (scrollSliderFrame, orientation == Orientation.Vertical ? new (0, 2, 1, 5) : new (2, 0, 5, 1));
+
+        Application.OnMouseEvent (new () { Position = orientation == Orientation.Vertical ? new (10, 12) : new (12, 10), Flags = MouseFlags.Button1Pressed });
+
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = orientation == Orientation.Vertical ? new (10, 0) : new (0, 10),
+                                      Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+                                  });
+        Assert.Equal (new (0, 0), scroll.Subviews.FirstOrDefault (x => x.Id == "scrollSlider")!.Frame.Location);
+
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = orientation == Orientation.Vertical ? new (0, 25) : new (80, 0),
+                                      Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+                                  });
+
+        Assert.Equal (
+                      orientation == Orientation.Vertical ? new (0, 5) : new (5, 0),
+                      scroll.Subviews.FirstOrDefault (x => x.Id == "scrollSlider")!.Frame.Location);
+    }
+
+    [Theory]
     [InlineData (Orientation.Vertical, 20, 10)]
     [InlineData (Orientation.Vertical, 40, 30)]
     public void Position_Cannot_Be_Negative_Nor_Greater_Than_Size_Minus_Frame_Length (Orientation orientation, int size, int expectedPos)
@@ -752,6 +791,76 @@ public class ScrollTests
         Assert.Equal (1, scroll.Position);
         Assert.Equal (2, changingCount);
         Assert.Equal (1, changedCount);
+    }
+
+    [Fact]
+    public void PositionChanging_PositionChanged_Events_Only_Raises_Once_If_Position_Was_Really_Changed ()
+    {
+        var changing = 0;
+        var cancel = false;
+        var changed = 0;
+        var scroll = new Scroll { Height = 10, Size = 20 };
+        scroll.PositionChanging += Scroll_PositionChanging;
+        scroll.PositionChanged += Scroll_PositionChanged;
+
+        Assert.Equal (Orientation.Vertical, scroll.Orientation);
+        Assert.Equal (new (0, 0, 1, 10), scroll.Viewport);
+        Assert.Equal (0, scroll.Position);
+        Assert.Equal (0, changing);
+        Assert.Equal (0, changed);
+
+        scroll.Position = 0;
+        Assert.Equal (0, scroll.Position);
+        Assert.Equal (0, changing);
+        Assert.Equal (0, changed);
+
+        scroll.Position = 1;
+        Assert.Equal (1, scroll.Position);
+        Assert.Equal (1, changing);
+        Assert.Equal (1, changed);
+
+        Reset ();
+        cancel = true;
+        scroll.Position = 2;
+        Assert.Equal (1, scroll.Position);
+        Assert.Equal (1, changing);
+        Assert.Equal (0, changed);
+
+        Reset ();
+        scroll.Position = 10;
+        Assert.Equal (10, scroll.Position);
+        Assert.Equal (1, changing);
+        Assert.Equal (1, changed);
+
+        Reset ();
+        scroll.Position = 11;
+        Assert.Equal (10, scroll.Position);
+        Assert.Equal (0, changing);
+        Assert.Equal (0, changed);
+
+        Reset ();
+        scroll.Position = 0;
+        Assert.Equal (0, scroll.Position);
+        Assert.Equal (1, changing);
+        Assert.Equal (1, changed);
+
+        scroll.PositionChanging -= Scroll_PositionChanging;
+        scroll.PositionChanged -= Scroll_PositionChanged;
+
+        void Scroll_PositionChanging (object sender, CancelEventArgs<int> e)
+        {
+            changing++;
+            e.Cancel = cancel;
+        }
+
+        void Scroll_PositionChanged (object sender, EventArgs<int> e) { changed++; }
+
+        void Reset ()
+        {
+            changing = 0;
+            cancel = false;
+            changed = 0;
+        }
     }
 
     [Fact]
@@ -842,76 +951,5 @@ public class ScrollTests
                                                         sizeHeight + (orientation == Orientation.Vertical ? 0 : widthHeight - 1));
 
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-    }
-
-    [Fact]
-    public void PositionChanging_PositionChanged_Events_Only_Raises_Once_If_Position_Was_Really_Changed ()
-    {
-        var changing = 0;
-        var cancel = false;
-        var changed = 0;
-        var scroll = new Scroll { Height = 10, Size = 20 };
-        scroll.PositionChanging += Scroll_PositionChanging;
-        scroll.PositionChanged += Scroll_PositionChanged;
-
-        Assert.Equal (Orientation.Vertical, scroll.Orientation);
-        Assert.Equal (new (0, 0, 1, 10), scroll.Viewport);
-        Assert.Equal (0, scroll.Position);
-        Assert.Equal (0, changing);
-        Assert.Equal (0, changed);
-
-        scroll.Position = 0;
-        Assert.Equal (0, scroll.Position);
-        Assert.Equal (0, changing);
-        Assert.Equal (0, changed);
-
-        scroll.Position = 1;
-        Assert.Equal (1, scroll.Position);
-        Assert.Equal (1, changing);
-        Assert.Equal (1, changed);
-
-        Reset ();
-        cancel = true;
-        scroll.Position = 2;
-        Assert.Equal (1, scroll.Position);
-        Assert.Equal (1, changing);
-        Assert.Equal (0, changed);
-
-        Reset ();
-        scroll.Position = 10;
-        Assert.Equal (10, scroll.Position);
-        Assert.Equal (1, changing);
-        Assert.Equal (1, changed);
-
-        Reset ();
-        scroll.Position = 11;
-        Assert.Equal (10, scroll.Position);
-        Assert.Equal (0, changing);
-        Assert.Equal (0, changed);
-
-        Reset ();
-        scroll.Position = 0;
-        Assert.Equal (0, scroll.Position);
-        Assert.Equal (1, changing);
-        Assert.Equal (1, changed);
-
-        scroll.PositionChanging -= Scroll_PositionChanging;
-        scroll.PositionChanged -= Scroll_PositionChanged;
-
-
-        void Scroll_PositionChanging (object sender, CancelEventArgs<int> e)
-        {
-            changing++;
-            e.Cancel = cancel;
-        }
-
-        void Scroll_PositionChanged (object sender, EventArgs<int> e) => changed++;
-
-        void Reset ()
-        {
-            changing = 0;
-            cancel = false;
-            changed = 0;
-        }
     }
 }
