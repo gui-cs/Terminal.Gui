@@ -19,6 +19,25 @@ internal class ScrollSlider : View
     private int _lastLocation = -1;
     private ColorScheme? _savedColorScheme;
 
+    public void AdjustSlider ()
+    {
+        if (!IsInitialized)
+        {
+            return;
+        }
+
+        (int Location, int Dimension) sliderLocationAndDimension = GetSliderLocationDimensionFromPosition ();
+        X = _host.Orientation == Orientation.Vertical ? 0 : sliderLocationAndDimension.Location;
+        Y = _host.Orientation == Orientation.Vertical ? sliderLocationAndDimension.Location : 0;
+
+        SetContentSize (
+                        new (
+                             _host.Orientation == Orientation.Vertical ? _host.GetContentSize ().Width : sliderLocationAndDimension.Dimension,
+                             _host.Orientation == Orientation.Vertical ? sliderLocationAndDimension.Dimension : _host.GetContentSize ().Height
+                            ));
+        SetSliderText ();
+    }
+
     /// <inheritdoc/>
     public override Attribute GetNormalColor ()
     {
@@ -144,5 +163,58 @@ internal class ScrollSlider : View
         }
 
         return Math.Min ((location * _host.Size + location) / scrollSize, _host.Size - scrollSize);
+    }
+
+    // QUESTION: This method is only called from one place. Should it be inlined? Or, should it be made internal and unit tests be provided?
+    private (int Location, int Dimension) GetSliderLocationDimensionFromPosition ()
+    {
+        if (_host.GetContentSize ().Height == 0 || _host.GetContentSize ().Width == 0)
+        {
+            return new (0, 0);
+        }
+
+        int scrollSize = _host.Orientation == Orientation.Vertical ? _host.GetContentSize ().Height : _host.GetContentSize ().Width;
+        int location;
+        int dimension;
+
+        if (_host.Size > 0)
+        {
+            dimension = Math.Min (Math.Max (scrollSize * scrollSize / _host.Size, 1), scrollSize);
+
+            // Ensure the Position is valid
+            if (_host.Position > 0 && _host.Position + scrollSize > _host.Size)
+            {
+                _host.Position = _host.Size - scrollSize;
+            }
+
+            location = Math.Min ((_host.Position * scrollSize + _host.Position) / _host.Size, scrollSize - dimension);
+
+            if (_host.Position == _host.Size - scrollSize && location + dimension < scrollSize)
+            {
+                location = scrollSize - dimension;
+            }
+        }
+        else
+        {
+            location = 0;
+            dimension = scrollSize;
+        }
+
+        return new (location, dimension);
+    }
+
+    // TODO: I think you should create a new `internal` view named "ScrollSlider" with an `Orientation` property. It should inherit from View and override GetNormalColor and the mouse events
+    // that can be moved within it's Superview, constrained to move only horizontally or vertically depending on Orientation.
+    // This will really simplify a lot of this.
+
+    private void SetSliderText ()
+    {
+        TextDirection = _host.Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
+
+        // QUESTION: Should these Glyphs be configurable via CM?
+        Text = string.Concat (
+                              Enumerable.Repeat (
+                                                 Glyphs.ContinuousMeterSegment.ToString (),
+                                                 _host.GetContentSize ().Width * _host.GetContentSize ().Height));
     }
 }

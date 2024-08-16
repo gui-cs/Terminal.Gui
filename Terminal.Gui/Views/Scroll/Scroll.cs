@@ -12,14 +12,14 @@ public class Scroll : View
     /// <inheritdoc/>
     public Scroll ()
     {
+        _slider = new (this);
+        Add (_slider);
+
         WantContinuousButtonPressed = true;
         CanFocus = false;
         Orientation = Orientation.Vertical;
         Width = Dim.Auto (DimAutoStyle.Content, 1);
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-
-        _slider = new (this);
-        Add (_slider);
     }
 
     private readonly ScrollSlider _slider;
@@ -35,30 +35,7 @@ public class Scroll : View
     {
         base.EndInit ();
 
-        AdjustSlider ();
-    }
-
-    /// <inheritdoc/>
-    public override void OnAdded (SuperViewChangedEventArgs e)
-    {
-        View parent = (e.Parent is Adornment adornment ? adornment.Parent : e.Parent)!;
-
-        parent.LayoutComplete += SuperView_LayoutComplete!;
-
-        base.OnAdded (e);
-    }
-
-    /// <inheritdoc/>
-    public override void OnRemoved (SuperViewChangedEventArgs e)
-    {
-        if (e.Parent is { })
-        {
-            View parent = (e.Parent is Adornment adornment ? adornment.Parent : e.Parent)!;
-
-            parent.LayoutComplete -= SuperView_LayoutComplete!;
-        }
-
-        base.OnRemoved (e);
+        AdjustAll ();
     }
 
     /// <summary>
@@ -70,7 +47,7 @@ public class Scroll : View
         set
         {
             _orientation = value;
-            AdjustSlider ();
+            AdjustAll ();
         }
     }
 
@@ -105,7 +82,7 @@ public class Scroll : View
 
             if (!_slider._wasSliderMouse)
             {
-                AdjustSlider ();
+                AdjustAll ();
             }
 
             OnPositionChanged (_position);
@@ -131,7 +108,7 @@ public class Scroll : View
         {
             _size = value;
             OnSizeChanged (_size);
-            AdjustSlider ();
+            AdjustAll ();
         }
     }
 
@@ -199,68 +176,21 @@ public class Scroll : View
     /// <summary>Virtual method called when <see cref="Size"/> has changed. Raises <see cref="SizeChanged"/>.</summary>
     protected void OnSizeChanged (int size) { SizeChanged?.Invoke (this, new (in size)); }
 
-    private void AdjustSlider ()
+    /// <inheritdoc/>
+    internal override void OnLayoutComplete (LayoutEventArgs args)
     {
-        if (!IsInitialized)
-        {
-            return;
-        }
+        base.OnLayoutComplete (args);
 
-        (int Location, int Dimension) slider = GetSliderLocationDimensionFromPosition ();
-        _slider.X = Orientation == Orientation.Vertical ? 0 : slider.Location;
-        _slider.Y = Orientation == Orientation.Vertical ? slider.Location : 0;
-
-        _slider.SetContentSize (
-                                new (
-                                     Orientation == Orientation.Vertical ? GetContentSize ().Width : slider.Dimension,
-                                     Orientation == Orientation.Vertical ? slider.Dimension : GetContentSize ().Height
-                                    ));
-        SetSliderText ();
+        AdjustAll ();
     }
 
-    // QUESTION: This method is only called from one place. Should it be inlined? Or, should it be made internal and unit tests be provided?
-    private (int Location, int Dimension) GetSliderLocationDimensionFromPosition ()
+    private void AdjustAll ()
     {
-        if (GetContentSize ().Height == 0 || GetContentSize ().Width == 0)
-        {
-            return new (0, 0);
-        }
-
-        int scrollSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
-        int location;
-        int dimension;
-
-        if (Size > 0)
-        {
-            dimension = Math.Min (Math.Max (scrollSize * scrollSize / Size, 1), scrollSize);
-
-            // Ensure the Position is valid
-            if (Position > 0 && Position + scrollSize > Size)
-            {
-                Position = Size - scrollSize;
-            }
-
-            location = Math.Min ((Position * scrollSize + Position) / Size, scrollSize - dimension);
-
-            if (Position == Size - scrollSize && location + dimension < scrollSize)
-            {
-                location = scrollSize - dimension;
-            }
-        }
-        else
-        {
-            location = 0;
-            dimension = scrollSize;
-        }
-
-        return new (location, dimension);
+        _slider.AdjustSlider ();
+        SetScrollText ();
     }
 
-    // TODO: I think you should create a new `internal` view named "ScrollSlider" with an `Orientation` property. It should inherit from View and override GetNormalColor and the mouse events
-    // that can be moved within it's Superview, constrained to move only horizontally or vertically depending on Orientation.
-    // This will really simplify a lot of this.
-
-    private void SetSliderText ()
+    private void SetScrollText ()
     {
         TextDirection = Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
 
@@ -269,24 +199,5 @@ public class Scroll : View
                               Enumerable.Repeat (
                                                  Glyphs.Stipple.ToString (),
                                                  GetContentSize ().Width * GetContentSize ().Height));
-        _slider.TextDirection = Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
-
-        _slider.Text = string.Concat (
-                                      Enumerable.Repeat (
-                                                         Glyphs.ContinuousMeterSegment.ToString (),
-                                                         _slider.GetContentSize ().Width * _slider.GetContentSize ().Height));
-    }
-
-    // TODO: This is unnecessary. If Scroll.Width/Height is Dim.Auto, the Superview will get resized automatically.
-    private void SuperView_LayoutComplete (object sender, LayoutEventArgs e)
-    {
-        if (!_slider._wasSliderMouse)
-        {
-            AdjustSlider ();
-        }
-        else
-        {
-            _slider._wasSliderMouse = false;
-        }
     }
 }
