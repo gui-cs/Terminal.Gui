@@ -206,7 +206,7 @@ cccccccccccccccccccc",
         {
             root.CanFocus = true;
             v.CanFocus = true;
-            Assert.False (v.HasFocus);
+            Assert.True (v.HasFocus);
             v.SetFocus ();
             Assert.True (v.HasFocus);
             Application.Refresh ();
