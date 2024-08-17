@@ -806,6 +806,8 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (HasFocus)
         {
+            base.ColorScheme ??= new (Attribute.Default);
+
             // When we have focus, we invert the colors
             base.ColorScheme = new (base.ColorScheme)
             {
