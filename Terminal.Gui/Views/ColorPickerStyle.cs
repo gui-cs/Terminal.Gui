@@ -21,5 +21,5 @@ public class ColorPickerStyle
     /// <summary>
     ///     True to show an editable text field indicating the w3c/console color name of selected color.
     /// </summary>
-    public bool ShowName { get; set; } = false;
+    public bool ShowColorName { get; set; } = false;
 }

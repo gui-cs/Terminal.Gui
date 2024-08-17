@@ -524,22 +524,42 @@ public class ColorPickerTests
         Bar1 = 0,
         Bar2 = 1,
         Bar3 = 2,
-        Hex = 3,
+        ColorName = 3,
+        Hex = 4,
     }
 
     private TextField GetTextField (ColorPicker cp, ColorPickerPart toGet)
     {
-        if (!cp.Style.ShowTextFields)
+        var hasBarValueTextFields = cp.Style.ShowTextFields;
+        var hasColorNameTextField = cp.Style.ShowColorName;
+
+        switch (toGet)
         {
-            if (toGet <= ColorPickerPart.Bar3)
-            {
-                throw new NotSupportedException ("There are no bar text fields for ColorPicker because ShowTextFields is false");
-            }
+            case ColorPickerPart.Bar1:
+            case ColorPickerPart.Bar2:
+            case ColorPickerPart.Bar3:
+                if (!hasBarValueTextFields)
+                {
+                    throw new NotSupportedException ("Corresponding Style option is not enabled");
+                }
 
-            return cp.Subviews.OfType<TextField> ().Single ();
+                return cp.Subviews.OfType<TextField> ().ElementAt ((int)toGet);
+            case ColorPickerPart.ColorName:
+                if (!hasColorNameTextField)
+                {
+                    throw new NotSupportedException ("Corresponding Style option is not enabled");
+                }
+
+                return cp.Subviews.OfType<TextField> ().ElementAt (hasBarValueTextFields  ? (int)toGet : (int)toGet -3);
+            case ColorPickerPart.Hex:
+
+                int offset = hasBarValueTextFields ? 0 : 3;
+                offset += hasColorNameTextField ? 0 : 1;
+
+                return cp.Subviews.OfType<TextField> ().ElementAt ((int)toGet - offset);
+            default:
+                throw new ArgumentOutOfRangeException (nameof (toGet), toGet, null);
         }
-
-        return cp.Subviews.OfType<TextField> ().ElementAt ((int)toGet);
     }
 
     private ColorBar GetColorBar (ColorPicker cp, ColorPickerPart toGet)

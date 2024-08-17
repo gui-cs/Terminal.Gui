@@ -134,14 +134,14 @@ public class ColorPickers : Scenario
             Y = Pos.Bottom (cbShowTextFields) + 1,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            CheckedState = foregroundColorPicker.Style.ShowName ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = foregroundColorPicker.Style.ShowColorName ? CheckState.Checked : CheckState.UnChecked,
         };
 
         cbShowName.CheckedStateChanging += (_, e) =>
                                            {
-                                               foregroundColorPicker.Style.ShowName = e.NewValue == CheckState.Checked;
+                                               foregroundColorPicker.Style.ShowColorName = e.NewValue == CheckState.Checked;
                                                foregroundColorPicker.ApplyStyleChanges ();
-                                               backgroundColorPicker.Style.ShowName = e.NewValue == CheckState.Checked;
+                                               backgroundColorPicker.Style.ShowColorName = e.NewValue == CheckState.Checked;
                                                backgroundColorPicker.ApplyStyleChanges ();
                                            };
         app.Add (cbShowName);
