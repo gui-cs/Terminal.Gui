@@ -648,11 +648,102 @@ public class ColorPickerTests
         Assert.NotSame (tf3, tf3After);
 
     }
-    private ColorPicker GetColorPicker (ColorModel colorModel, bool showTextFields)
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ColorPicker_TabCompleteColorName()
+    {
+        var cp = GetColorPicker (ColorModel.RGB, true,true);
+        cp.Draw ();
+
+        var r = GetColorBar (cp, ColorPickerPart.Bar1);
+        var g = GetColorBar (cp, ColorPickerPart.Bar2);
+        var b = GetColorBar (cp, ColorPickerPart.Bar3);
+        var name = GetTextField (cp, ColorPickerPart.ColorName);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        name.FocusFirst (TabBehavior.TabStop);
+
+        Assert.True (name.HasFocus);
+        Assert.Same (name, cp.Focused);
+
+        name.Text = "";
+        Assert.Empty (name.Text);
+
+        Application.OnKeyDown (Key.A);
+        Application.OnKeyDown (Key.Q);
+
+        Assert.Equal ("aq",name.Text);
+
+
+        // Auto complete the color name
+        Application.OnKeyDown (Key.Tab);
+
+        Assert.Equal ("Aquamarine", name.Text);
+
+        // Tab out of the text field
+        Application.OnKeyDown (Key.Tab);
+
+        Assert.False (name.HasFocus);
+        Assert.NotSame (name, cp.Focused);
+
+        Assert.Equal ("#7FFFD4", hex.Text);
+
+        Application.Current?.Dispose ();
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ColorPicker_EnterHexFor_ColorName ()
+    {
+        var cp = GetColorPicker (ColorModel.RGB, true, true);
+        cp.Draw ();
+
+        var name = GetTextField (cp, ColorPickerPart.ColorName);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        hex.FocusFirst (TabBehavior.TabStop);
+
+        Assert.True (hex.HasFocus);
+        Assert.Same (hex, cp.Focused);
+
+        hex.Text = "";
+        name.Text = "";
+
+        Assert.Empty (hex.Text);
+        Assert.Empty (name.Text);
+
+        Application.OnKeyDown ('#');
+        Assert.Empty (name.Text);
+        //7FFFD4
+
+        Assert.Equal ("#", hex.Text);
+        Application.OnKeyDown ('7');
+        Application.OnKeyDown ('F');
+        Application.OnKeyDown ('F');
+        Application.OnKeyDown ('F');
+        Application.OnKeyDown ('D');
+        Assert.Empty (name.Text);
+
+        Application.OnKeyDown ('4');
+
+        // Tab out of the text field
+        Application.OnKeyDown (Key.Tab);
+        Assert.False (hex.HasFocus);
+        Assert.NotSame (hex, cp.Focused);
+
+        // Color name should be recognised as a known string and populated
+        Assert.Equal ("#7FFFD4", hex.Text);
+        Assert.Equal("Aquamarine", name.Text);
+
+        Application.Current?.Dispose ();
+    }
+    private ColorPicker GetColorPicker (ColorModel colorModel, bool showTextFields, bool showName = false)
     {
         var cp = new ColorPicker { Width = 20, SelectedColor = new (0, 0) };
         cp.Style.ColorModel = colorModel;
         cp.Style.ShowTextFields = showTextFields;
+        cp.Style.ShowColorName = showName;
         cp.ApplyStyleChanges ();
 
         Application.Current = new Toplevel () { Width = 20 ,Height = 5};

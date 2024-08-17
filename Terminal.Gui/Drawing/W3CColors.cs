@@ -20,4 +20,13 @@ public class W3CColors : IColorNameResolver
     {
         return ColorStrings.TryParseW3CColorName (name, out color);
     }
+
+    /// <inheritdoc />
+    public bool TryNameColor (Color color, out string name)
+    {
+        var answer = ColorStrings.GetW3CColorName (color);
+
+        name = answer ?? string.Empty;
+        return answer != null;
+    }
 }

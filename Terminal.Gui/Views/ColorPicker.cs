@@ -71,7 +71,14 @@ public class ColorPicker : View
             kvp.Value.Text = kvp.Key.Value.ToString();
         }
 
-        _tfHex.Text = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}");
+        var colorHex = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}");
+
+        if (_tfName != null)
+        {
+            _tfName.Text = _colorNameResolver.TryNameColor (_selectedColor, out string name) ? name : string.Empty;
+        }
+
+        _tfHex.Text = colorHex;
     }
 
     /// <summary>
