@@ -738,6 +738,14 @@ public class ColorPickerTests
 
         Application.Current?.Dispose ();
     }
+
+    [Fact]
+    public void TestColorNames ()
+    {
+        var colors = new W3CColors ();
+        Assert.Contains ("Aquamarine", colors.GetColorNames ());
+        Assert.DoesNotContain ("Save as",colors.GetColorNames ());
+    }
     private ColorPicker GetColorPicker (ColorModel colorModel, bool showTextFields, bool showName = false)
     {
         var cp = new ColorPicker { Width = 20, SelectedColor = new (0, 0) };
