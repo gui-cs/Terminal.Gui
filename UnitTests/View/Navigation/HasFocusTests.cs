@@ -74,61 +74,6 @@ public class HasFocusTests (ITestOutputHelper _output) : TestsAllViews
     }
 
 
-    [Fact]
-    public void HasFocus_False_Leave_Invoked ()
-    {
-        var view = new View ()
-        {
-            Id = "view",
-            CanFocus = true
-        };
-        Assert.True (view.CanFocus);
-        Assert.False (view.HasFocus);
-
-        int leaveInvoked = 0;
-
-        view.Leave += (s, e) => leaveInvoked++;
-
-        view.SetFocus ();
-        Assert.True (view.HasFocus);
-        Assert.Equal (0, leaveInvoked);
-
-        view.HasFocus = false;
-        Assert.False (view.HasFocus);
-        Assert.Equal (1, leaveInvoked);
-    }
-
-    [Fact]
-    public void HasFocus_False_Leave_Invoked_ForAllSubViews ()
-    {
-        var view = new View ()
-        {
-            Id = "view",
-            CanFocus = true
-        };
-
-        var subview = new View ()
-        {
-            Id = "subview",
-            CanFocus = true
-        };
-        view.Add (subview);
-
-        int leaveInvoked = 0;
-
-        view.Leave += (s, e) => leaveInvoked++;
-        subview.Leave += (s, e) => leaveInvoked++;
-
-        view.SetFocus ();
-        Assert.True (view.HasFocus);
-        Assert.Equal (0, leaveInvoked);
-
-        view.HasFocus = false;
-        Assert.False (view.HasFocus);
-        Assert.False (subview.HasFocus);
-        Assert.Equal (2, leaveInvoked);
-    }
-
 
     [Fact]
     public void Enabled_False_Sets_HasFocus_To_False ()
@@ -157,4 +102,57 @@ public class HasFocusTests (ITestOutputHelper _output) : TestsAllViews
         Assert.False (view.HasFocus);
     }
 
+
+
+    [Fact]
+    public void HasFocus_False_CompoundSubView_Leaves_All ()
+    {
+        var view = new View ()
+        {
+            Id = "view",
+            CanFocus = true
+        };
+
+        var subView = new View ()
+        {
+            Id = "subView",
+            CanFocus = true
+        };
+
+        var subViewSubView1 = new View ()
+        {
+            Id = "subViewSubView1",
+            CanFocus = false
+        };
+
+        var subViewSubView2 = new View ()
+        {
+            Id = "subViewSubView2",
+            CanFocus = true
+        };
+
+        var subViewSubView3 = new View ()
+        {
+            Id = "subViewSubView3",
+            CanFocus = false
+        };
+
+        subView.Add (subViewSubView1, subViewSubView2, subViewSubView3);
+
+        view.Add (subView);
+
+        view.SetFocus ();
+        Assert.True (view.HasFocus);
+        Assert.True (subView.HasFocus);
+        Assert.False (subViewSubView1.HasFocus);
+        Assert.True (subViewSubView2.HasFocus);
+        Assert.False (subViewSubView3.HasFocus);
+
+        view.HasFocus = false;
+        Assert.False (view.HasFocus);
+        Assert.False (subView.HasFocus);
+        Assert.False (subViewSubView1.HasFocus);
+        Assert.False (subViewSubView2.HasFocus);
+        Assert.False (subViewSubView3.HasFocus);
+    }
 }

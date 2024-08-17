@@ -332,9 +332,12 @@ public static partial class Application // Keyboard handling
                     Command.NextView,
                     () =>
                     {
-                        ApplicationNavigation.MoveNextView ();
-
-                        return true;
+                        View? current = Application.Current;
+                        if (current is {})
+                        {
+                            return current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+                        }
+                        return false;
                     }
                    );
 
@@ -342,9 +345,12 @@ public static partial class Application // Keyboard handling
                     Command.PreviousView,
                     () =>
                     {
-                        ApplicationNavigation.MovePreviousView ();
-
-                        return true;
+                        View? current = Application.Current;
+                        if (current is { })
+                        {
+                            return current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+                        }
+                        return false;
                     }
                    );
 
@@ -352,9 +358,22 @@ public static partial class Application // Keyboard handling
                     Command.NextViewOrTop,
                     () =>
                     {
-                        ApplicationNavigation.MoveNextViewOrTop ();
+                        if (ApplicationOverlapped.OverlappedTop is null)
+                        {
+                            View? current = Application.Current;
+                            if (current is { })
+                            {
+                                return current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
+                            }
+                        }
+                        else
+                        {
+                            ApplicationOverlapped.OverlappedMoveNext ();
 
-                        return true;
+                            return true;
+                        }
+
+                        return false;
                     }
                    );
 

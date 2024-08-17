@@ -296,7 +296,7 @@ public partial class View : Responder, ISupportInitializeNotification
     private bool _oldEnabled;
 
     /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> can respond to user interaction.</summary>
-    public virtual bool Enabled
+    public bool Enabled
     {
         get => _enabled;
         set
@@ -311,6 +311,11 @@ public partial class View : Responder, ISupportInitializeNotification
             if (!_enabled && HasFocus)
             {
                 HasFocus = false;
+            }
+
+            if (_enabled && CanFocus && Visible && !HasFocus && SuperView?.GetFocused() == null)
+            {
+                SetFocus ();
             }
 
             OnEnabledChanged ();
@@ -366,11 +371,15 @@ public partial class View : Responder, ISupportInitializeNotification
                 {
                     HasFocus = false;
                 }
-
                 if (IsInitialized && ClearOnVisibleFalse)
                 {
                     Clear ();
                 }
+            }
+
+            if (_visible && CanFocus && Enabled && !HasFocus && SuperView?.GetFocused () == null)
+            {
+                SetFocus ();
             }
 
             OnVisibleChanged ();

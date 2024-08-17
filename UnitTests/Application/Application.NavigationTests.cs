@@ -13,6 +13,8 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     {
         bool raised = false;
 
+        Application.Navigation = new ApplicationNavigation();
+
         Application.Navigation.FocusedChanged += ApplicationNavigationOnFocusedChanged;
 
         Application.Navigation.SetFocused(new View ());
@@ -23,6 +25,8 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         Application.Navigation.SetFocused(null);
 
         Application.Navigation.FocusedChanged -= ApplicationNavigationOnFocusedChanged;
+
+        Application.Navigation = null;
 
         return;
 
@@ -109,68 +113,29 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         Assert.Equal (grandChildView, result);
     }
 
-    [Fact]
-    public void MoveNextView_ShouldMoveFocusToNextView ()
-    {
-        // Arrange
-        var top = new Toplevel ();
-        var view1 = new View () { Id = "view1", CanFocus = true };
-        var view2 = new View () { Id = "view2", CanFocus = true };
-        top.Add (view1, view2);
-        Application.Top = top;
-        Application.Current = top;
-        view1.SetFocus ();
 
-        // Act
-        ApplicationNavigation.MoveNextView ();
+    //[Fact]
+    //public void MoveNextViewOrTop_ShouldMoveFocusToNextViewOrTop ()
+    //{
+    //    // Arrange
+    //    var top = new Toplevel ();
+    //    var view1 = new View () { Id = "view1", CanFocus = true };
+    //    var view2 = new View () { Id = "view2", CanFocus = true };
+    //    top.Add (view1, view2);
+    //    Application.Top = top;
+    //    Application.Current = top;
+    //    view1.SetFocus ();
 
-        // Assert
-        Assert.True (view2.HasFocus);
+    //    // Act
+    //    ApplicationNavigation.MoveNextViewOrTop ();
 
-        top.Dispose ();
-    }
+    //    // Assert
+    //    Assert.True (view2.HasFocus);
 
-    [Fact]
-    public void MoveNextViewOrTop_ShouldMoveFocusToNextViewOrTop ()
-    {
-        // Arrange
-        var top = new Toplevel ();
-        var view1 = new View () { Id = "view1", CanFocus = true };
-        var view2 = new View () { Id = "view2", CanFocus = true };
-        top.Add (view1, view2);
-        Application.Top = top;
-        Application.Current = top;
-        view1.SetFocus ();
+    //    top.Dispose ();
+    //}
 
-        // Act
-        ApplicationNavigation.MoveNextViewOrTop ();
 
-        // Assert
-        Assert.True (view2.HasFocus);
-
-        top.Dispose ();
-    }
-
-    [Fact]
-    public void MovePreviousView_ShouldMoveFocusToPreviousView ()
-    {
-        // Arrange
-        var top = new Toplevel ();
-        var view1 = new View () { Id = "view1", CanFocus = true };
-        var view2 = new View () { Id = "view2", CanFocus = true };
-        top.Add (view1, view2);
-        Application.Top = top;
-        Application.Current = top;
-        view2.SetFocus ();
-
-        // Act
-        ApplicationNavigation.MovePreviousView ();
-
-        // Assert
-        Assert.True (view1.HasFocus);
-
-        top.Dispose ();
-    }
 
     [Fact]
     public void MovePreviousViewOrTop_ShouldMoveFocusToPreviousViewOrTop ()

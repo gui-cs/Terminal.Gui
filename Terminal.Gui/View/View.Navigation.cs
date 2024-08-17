@@ -121,7 +121,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
 
             // Couldn't restore focus, so use Advance to navigate to the next focusable subview
-            if (AdvanceFocus (NavigationDirection.Forward, TabStop))
+            if (AdvanceFocus (NavigationDirection.Forward, null))
             {
                 // A subview was focused. We're done because the subview has focus and it recursed up the superview hierarchy.
                 return true;
@@ -159,7 +159,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         _hasFocus = true;
 
         // Ensure that the peer loses focus
-        focusedPeer?.LeaveFocus (this);
+        focusedPeer?.LeaveFocus (this, true);
 
         // We're the most focused view in the application, we need to set the focused view to this view.
         Application.Navigation?.SetFocused (this);
@@ -226,32 +226,40 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         // If enteringView is null, we need to find the view that should get focus, and SetFocus on it.
-        if (enteringView is null && SuperView is { })
+        if (!traversingDown && enteringView is null)
         {
-            if (SuperView?.PreviouslyMostFocused is { } && SuperView?.PreviouslyMostFocused != this)
+            if (SuperView?._previouslyMostFocused is { } && SuperView?._previouslyMostFocused != this)
             {
-                SuperView?.PreviouslyMostFocused?.SetFocus ();
+                SuperView?._previouslyMostFocused?.SetFocus ();
 
                 // The above will cause LeaveFocus, so we can return
                 return;
             }
 
-            if (Application.Navigation is { })
+            if (SuperView is {} && SuperView.AdvanceFocus (NavigationDirection.Forward, TabStop))
             {
-                // Temporarily ensure this view can't get focus
-                bool prevCanFocus = _canFocus;
-                _canFocus = false;
-                ApplicationNavigation.MoveNextView ();
-                _canFocus = prevCanFocus;
-
                 // The above will cause LeaveFocus, so we can return
                 return;
             }
+
+            //if (Application.Navigation is { })
+            //{
+            //    // Temporarily ensure this view can't get focus
+            //    bool prevCanFocus = _canFocus;
+            //    _canFocus = false;
+            //    ApplicationNavigation.MoveNextView ();
+            //    _canFocus = prevCanFocus;
+
+            //    // The above will cause LeaveFocus, so we can return
+            //    return;
+            //}
+
+            // No other focusable view to be found. Just "leave" us...
         }
 
         // Before we can leave focus, we need to make sure that all views down the subview-hierarchy have left focus.
         View mostFocused = GetMostFocused ();
-        if (mostFocused is { })
+        if (mostFocused is { } && (enteringView is null || mostFocused != enteringView))
         {
             // Start at the bottom and work our way up to us
             View bottom = mostFocused;
@@ -261,13 +269,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 if (bottom.HasFocus)
                 {
                     bottom.LeaveFocus (enteringView, true);
-
-                    break;
                 }
                 bottom = bottom.SuperView;
             }
-
-            PreviouslyMostFocused = mostFocused;
+            _previouslyMostFocused = mostFocused;
         }
 
         bool previousValue = HasFocus;
@@ -282,7 +287,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         View focusedPeer = SuperView?.GetFocused ();
         _hasFocus = false;
 
-        if (!traversingDown)
+        if (!traversingDown && CanFocus && Visible && Enabled)
         {
             // Now ensure all views up the superview-hierarchy are unfocused
             if (SuperView is { HasFocus: true } && focusedPeer == this)
@@ -304,7 +309,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Caches the most focused subview when this view is losing focus. This is used by <see cref="RestoreFocus"/>.
     /// </summary>
     [CanBeNull]
-    internal View PreviouslyMostFocused { get; set; }
+    private View _previouslyMostFocused;
 
     /// <summary>Virtual method invoked when this view is losing focus (leaving).</summary>
     /// <param name="enteringView">The view that is gaining focus.</param>
@@ -350,16 +355,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         View focused = GetFocused ();
-        if (focused is null)
-        {
-            View deepest = FindDeepestFocusableView (behavior, direction);
-            if (deepest is { })
-            {
-                return deepest.SetFocus ();
-            }
-        }
 
-        if (focused!.AdvanceFocus (direction, behavior))
+        if (focused is {} && focused.AdvanceFocus (direction, behavior))
         {
             return true;
         }
@@ -415,10 +412,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         if (GetFocused () is null && _subviews?.Count > 0)
         {
-            // TODO: Find the previous focused view and set focus to it
-            if (PreviouslyMostFocused is { } && PreviouslyMostFocused.TabStop == behavior)
+            if (_previouslyMostFocused is { }/* && (behavior is null || _previouslyMostFocused.TabStop == behavior)*/)
             {
-                return PreviouslyMostFocused.SetFocus ();
+                return _previouslyMostFocused.SetFocus ();
             }
             return false;
         }

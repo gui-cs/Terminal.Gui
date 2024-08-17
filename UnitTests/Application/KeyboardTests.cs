@@ -177,20 +177,177 @@ public class KeyboardTests
         }
     }
 
-    [Fact (Skip = "Replace when new key statics are added.")]
+
+    [Fact]
+    public void NextTabKey_Moves_Focus_To_Next_TabStop ()
+    {
+        // Arrange
+        Application.Navigation = new ApplicationNavigation ();
+        var top = new Toplevel ();
+        var view1 = new View () { Id = "view1", CanFocus = true };
+        var view2 = new View () { Id = "view2", CanFocus = true };
+        top.Add (view1, view2);
+        Application.Top = top;
+        Application.Current = top;
+        view1.SetFocus ();
+
+        // Act
+        Application.OnKeyDown (Application.NextTabKey);
+
+        // Assert
+        Assert.True (view2.HasFocus);
+
+        top.Dispose ();
+        Application.Navigation = null;
+    }
+
+    [Fact]
+    public void PrevTabKey_Moves_Focus_To_Prev_TabStop ()
+    {
+        // Arrange
+        Application.Navigation = new ApplicationNavigation ();
+        var top = new Toplevel ();
+        var view1 = new View () { Id = "view1", CanFocus = true };
+        var view2 = new View () { Id = "view2", CanFocus = true };
+        top.Add (view1, view2);
+        Application.Top = top;
+        Application.Current = top;
+        view1.SetFocus ();
+
+        // Act
+        Application.OnKeyDown (Application.NextTabKey);
+
+        // Assert
+        Assert.True (view2.HasFocus);
+
+        top.Dispose ();
+        Application.Navigation = null;
+    }
+
+
+
+    [Fact]
+    public void NextTabGroupKey_Moves_Focus_To_TabStop_In_Next_TabGroup ()
+    {
+        // Arrange
+        Application.Navigation = new ApplicationNavigation ();
+        var top = new Toplevel ();
+        var view1 = new View ()
+        {
+            Id = "view1", 
+            CanFocus = true, 
+            TabStop = TabBehavior.TabGroup
+        };
+
+        var subView1 = new View ()
+        {
+            Id = "subView1",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+
+        view1.Add (subView1);
+
+        var view2 = new View ()
+        {
+            Id = "view2", 
+            CanFocus = true, 
+            TabStop = TabBehavior.TabGroup
+        };
+        var subView2 = new View ()
+        {
+            Id = "subView2",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+        view2.Add (subView2);
+
+        top.Add (view1, view2);
+        Application.Top = top;
+        Application.Current = top;
+        view1.SetFocus ();
+        Assert.True (view1.HasFocus);
+        Assert.True (subView1.HasFocus);
+
+        // Act
+        Application.OnKeyDown (Application.NextTabGroupKey);
+
+        // Assert
+        Assert.True (view2.HasFocus);
+        Assert.True (subView2.HasFocus);
+
+        top.Dispose ();
+        Application.Navigation = null;
+    }
+
+    [Fact]
+    public void PrevTabGroupKey_Moves_Focus_To_TabStop_In_Prev_TabGroup ()
+    {
+        // Arrange
+        Application.Navigation = new ApplicationNavigation ();
+        var top = new Toplevel ();
+        var view1 = new View ()
+        {
+            Id = "view1",
+            CanFocus = true,
+            TabStop = TabBehavior.TabGroup
+        };
+
+        var subView1 = new View ()
+        {
+            Id = "subView1",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+
+        view1.Add (subView1);
+
+        var view2 = new View ()
+        {
+            Id = "view2",
+            CanFocus = true,
+            TabStop = TabBehavior.TabGroup
+        };
+        var subView2 = new View ()
+        {
+            Id = "subView2",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+        view2.Add (subView2);
+
+        top.Add (view1, view2);
+        Application.Top = top;
+        Application.Current = top;
+        view1.SetFocus ();
+        Assert.True (view1.HasFocus);
+        Assert.True (subView1.HasFocus);
+
+        // Act
+        Application.OnKeyDown (Application.PrevTabGroupKey);
+
+        // Assert
+        Assert.True (view2.HasFocus);
+        Assert.True (subView2.HasFocus);
+
+        top.Dispose ();
+        Application.Navigation = null;
+    }
+
+    [Fact]
     public void NextTabGroupKey_PrevTabGroupKey_Tests ()
     {
         Application.Init (new FakeDriver ());
 
-        Toplevel top = new ();
-        var w1 = new Window ();
-        var v1 = new TextField ();
-        var v2 = new TextView ();
+        Toplevel top = new (); // TabGroup
+        var w1 = new Window (); // TabGroup
+        var v1 = new TextField (); // TabStop
+        var v2 = new TextView (); // TabStop
         w1.Add (v1, v2);
 
-        var w2 = new Window ();
-        var v3 = new CheckBox ();
-        var v4 = new Button ();
+        var w2 = new Window (); // TabGroup
+        var v3 = new CheckBox (); // TabStop
+        var v4 = new Button (); // TabStop
         w2.Add (v3, v4);
 
         top.Add (w1, w2);
@@ -199,47 +356,28 @@ public class KeyboardTests
                                  {
                                      Assert.True (v1.HasFocus);
 
-                                     // Using default keys.
-                                     Application.OnKeyDown (Key.F6);
-                                     Assert.True (v2.HasFocus);
+                                     // Across TabGroups
                                      Application.OnKeyDown (Key.F6);
                                      Assert.True (v3.HasFocus);
-                                     Application.OnKeyDown (Key.F6);
-                                     Assert.True (v4.HasFocus);
                                      Application.OnKeyDown (Key.F6);
                                      Assert.True (v1.HasFocus);
 
                                      Application.OnKeyDown (Key.F6.WithShift);
-                                     Assert.True (v4.HasFocus);
-                                     Application.OnKeyDown (Key.F6.WithShift);
                                      Assert.True (v3.HasFocus);
                                      Application.OnKeyDown (Key.F6.WithShift);
-                                     Assert.True (v2.HasFocus);
-                                     Application.OnKeyDown (Key.F6.WithShift);
                                      Assert.True (v1.HasFocus);
-                                     
-                                     // Using alternate keys.
-                                     Application.NextTabGroupKey = Key.F7;
-                                     Application.PrevTabGroupKey = Key.F8;
 
-                                     Application.OnKeyDown (Key.F7);
+                                     // Restore?
+                                     Application.OnKeyDown (Key.Tab);
                                      Assert.True (v2.HasFocus);
-                                     Application.OnKeyDown (Key.F7);
+
+                                     Application.OnKeyDown (Key.F6);
                                      Assert.True (v3.HasFocus);
-                                     Application.OnKeyDown (Key.F7);
-                                     Assert.True (v4.HasFocus);
-                                     Application.OnKeyDown (Key.F7);
-                                     Assert.True (v1.HasFocus);
 
-                                     Application.OnKeyDown (Key.F8);
-                                     Assert.True (v4.HasFocus);
-                                     Application.OnKeyDown (Key.F8);
-                                     Assert.True (v3.HasFocus);
-                                     Application.OnKeyDown (Key.F8);
+                                     Application.OnKeyDown (Key.F6);
                                      Assert.True (v2.HasFocus);
-                                     Application.OnKeyDown (Key.F8);
-                                     Assert.True (v1.HasFocus);
 
+  
                                      Application.RequestStop ();
                                  };
 

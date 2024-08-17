@@ -4,11 +4,10 @@ namespace Terminal.Gui.ViewTests;
 
 public class SetFocusTests (ITestOutputHelper _output) : TestsAllViews
 {
-   
     [Fact]
     public void SetFocus_With_Null_Superview_Does_Not_Throw_Exception ()
     {
-        var view = new View ()
+        var view = new View
         {
             Id = "view",
             CanFocus = true
@@ -26,7 +25,7 @@ public class SetFocusTests (ITestOutputHelper _output) : TestsAllViews
     [Fact]
     public void SetFocus_SetsFocus ()
     {
-        var view = new View ()
+        var view = new View
         {
             Id = "view",
             CanFocus = true
@@ -41,7 +40,7 @@ public class SetFocusTests (ITestOutputHelper _output) : TestsAllViews
     [Fact]
     public void SetFocus_NoSubView_Focused_Is_Null ()
     {
-        var view = new View ()
+        var view = new View
         {
             Id = "view",
             CanFocus = true
@@ -57,13 +56,13 @@ public class SetFocusTests (ITestOutputHelper _output) : TestsAllViews
     [Fact]
     public void SetFocus_SubView_Focused_Is_Set ()
     {
-        var view = new View ()
+        var view = new Window
         {
             Id = "view",
             CanFocus = true
         };
 
-        var subview = new View ()
+        var subview = new View
         {
             Id = "subview",
             CanFocus = true
@@ -80,13 +79,13 @@ public class SetFocusTests (ITestOutputHelper _output) : TestsAllViews
     [Fact]
     public void SetFocus_SetsFocus_DeepestSubView ()
     {
-        var view = new View ()
+        var view = new View
         {
             Id = "view",
             CanFocus = true
         };
 
-        var subview = new View ()
+        var subview = new View
         {
             Id = "subview",
             CanFocus = true
@@ -101,30 +100,31 @@ public class SetFocusTests (ITestOutputHelper _output) : TestsAllViews
     [Fact]
     public void SetFocus_SetsFocus_DeepestSubView_CompoundSubView ()
     {
-        var view = new View ()
+        var view = new View
         {
             Id = "view",
             CanFocus = true
         };
 
-        var subView = new View ()
+        var subView = new View
         {
             Id = "subView",
             CanFocus = true
         };
 
-        var subViewSubView1 = new View ()
+        var subViewSubView1 = new View
         {
             Id = "subViewSubView1",
             CanFocus = false
         };
 
-        var subViewSubView2 = new View ()
+        var subViewSubView2 = new View
         {
             Id = "subViewSubView2",
             CanFocus = true
         };
-        var subViewSubView3 = new View ()
+
+        var subViewSubView3 = new View
         {
             Id = "subViewSubView3",
             CanFocus = false
@@ -140,21 +140,72 @@ public class SetFocusTests (ITestOutputHelper _output) : TestsAllViews
     }
 
     [Fact]
-    public void SetFocus_Peer_LeavesOther ()
+    public void SetFocus_CompoundSubView_SetFocus_Sets ()
     {
-        var view = new View ()
+        var view = new View
         {
             Id = "view",
             CanFocus = true
         };
 
-        var subview1 = new View ()
+        var subView = new View
+        {
+            Id = "subView",
+            CanFocus = true
+        };
+
+        var subViewSubView1 = new View
+        {
+            Id = "subViewSubView1",
+            CanFocus = true
+        };
+
+        var subViewSubView2 = new View
+        {
+            Id = "subViewSubView2",
+            CanFocus = true
+        };
+
+        var subViewSubView3 = new View
+        {
+            Id = "subViewSubView3",
+            CanFocus = true
+        };
+        subView.Add (subViewSubView1, subViewSubView2, subViewSubView3);
+
+        view.Add (subView);
+
+        view.SetFocus ();
+        Assert.True (view.HasFocus);
+        Assert.True (subView.HasFocus);
+        Assert.Equal (subView, view.GetFocused ());
+        Assert.True (subViewSubView1.HasFocus);
+        Assert.Equal (subViewSubView1, subView.GetFocused ());
+
+        subViewSubView2.SetFocus ();
+        Assert.True (view.HasFocus);
+        Assert.True (subView.HasFocus);
+        Assert.False (subViewSubView1.HasFocus);
+        Assert.True (subViewSubView2.HasFocus);
+        Assert.False (subViewSubView3.HasFocus);
+    }
+
+    [Fact]
+    public void SetFocus_Peer_LeavesOther ()
+    {
+        var view = new View
+        {
+            Id = "view",
+            CanFocus = true
+        };
+
+        var subview1 = new View
         {
             Id = "subview1",
             CanFocus = true
         };
 
-        var subview2 = new View ()
+        var subview2 = new View
         {
             Id = "subview2",
             CanFocus = true
@@ -180,6 +231,7 @@ public class SetFocusTests (ITestOutputHelper _output) : TestsAllViews
             Id = "top",
             CanFocus = true
         };
+
         var view1 = new View
         {
             Id = "view1",

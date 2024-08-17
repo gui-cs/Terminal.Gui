@@ -349,7 +349,7 @@ public class AdvanceFocusTests (ITestOutputHelper _output)
     }
 
     [Fact]
-    public void AdvacneFocus_NoStop_Prevents_Stop ()
+    public void AdvanceFocus_NoStop_Prevents_Stop ()
     {
         var r = new View ();
         var v1 = new View { CanFocus = true, TabStop = TabBehavior.NoStop };
