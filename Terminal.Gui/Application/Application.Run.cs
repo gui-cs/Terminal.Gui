@@ -222,7 +222,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     internal static bool PositionCursor (View view)
     {
         // Find the most focused view and position the cursor there.
-        View? mostFocused = view?.MostFocused;
+        View? mostFocused = view?.GetMostFocused ();
 
         if (mostFocused is null)
         {
@@ -858,7 +858,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 if (Current is { HasFocus: false })
                 {
                     Current.SetFocus ();
-                    Current.RestoreFocus (null);
                 }
             }
 

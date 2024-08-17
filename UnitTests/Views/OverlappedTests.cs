@@ -1058,7 +1058,7 @@ public class OverlappedTests
         win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
 
         win1.Closing += (s, e) => isRunning = false;
-        Assert.Null (top.Focused);
+        Assert.Null (top.GetFocused ());
         Assert.Equal (top, Application.Current);
         Assert.True (top.IsCurrentTop);
         Assert.Equal (top, ApplicationOverlapped.OverlappedTop);
@@ -1071,9 +1071,9 @@ public class OverlappedTests
         Assert.Equal (win1, Application.Current);
         Assert.True (win1.IsCurrentTop);
         Assert.True (ApplicationOverlapped.IsOverlapped(win1));
-        Assert.Null (top.Focused);
-        Assert.Null (top.MostFocused);
-        Assert.Equal (tf1W1, win1.MostFocused);
+        Assert.Null (top.GetFocused ());
+        Assert.Null (top.GetMostFocused ());
+        Assert.Equal (tf1W1, win1.GetMostFocused ());
         Assert.True (ApplicationOverlapped.IsOverlapped(win1));
         Assert.Single (ApplicationOverlapped.OverlappedChildren!);
 
@@ -1085,9 +1085,9 @@ public class OverlappedTests
         Assert.Equal (win2, Application.Current);
         Assert.True (win2.IsCurrentTop);
         Assert.True (ApplicationOverlapped.IsOverlapped(win2));
-        Assert.Null (top.Focused);
-        Assert.Null (top.MostFocused);
-        Assert.Equal (tf1W2, win2.MostFocused);
+        Assert.Null (top.GetFocused ());
+        Assert.Null (top.GetMostFocused ());
+        Assert.Equal (tf1W2, win2.GetMostFocused ());
         Assert.Equal (2, ApplicationOverlapped.OverlappedChildren!.Count);
 
         ApplicationOverlapped.MoveToOverlappedChild (win1);
@@ -1109,7 +1109,7 @@ public class OverlappedTests
         Assert.True (Application.OnKeyDown (Key.F5)); // refresh
 
         Assert.True (win1.IsCurrentTop);
-        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.Equal (tvW1, win1.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.Tab));
         Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
 
@@ -1122,22 +1122,22 @@ public class OverlappedTests
         Assert.True (Application.OnKeyDown (Key.F6.WithShift));    // move back to win1
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
 
-        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.Equal (tvW1, win1.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.Tab));    // text view eats tab
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.Equal (tvW1, win1.GetMostFocused ());
 
         tvW1.AllowsTab = false;
         Assert.True (Application.OnKeyDown (Key.Tab));    // text view eats tab
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tf2W1, win1.MostFocused);
+        Assert.Equal (tf2W1, win1.GetMostFocused ());
 
         Assert.True (Application.OnKeyDown (Key.CursorRight));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tf2W1, win1.MostFocused);
+        Assert.Equal (tf2W1, win1.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.CursorDown));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tf1W1, win1.MostFocused);
+        Assert.Equal (tf1W1, win1.GetMostFocused ());
 #if UNIX_KEY_BINDINGS
         Assert.True (ApplicationOverlapped.OverlappedChildren [0].ProcessKeyDown (new (Key.I.WithCtrl)));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
@@ -1145,50 +1145,50 @@ public class OverlappedTests
 #endif
         Assert.True (Application.OnKeyDown (Key.Tab));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.Equal (tvW1, win1.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.CursorLeft));  // The view to the left of tvW1 is tf2W1, but tvW1 is still focused and eats cursor keys
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.Equal (tvW1, win1.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.CursorUp));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.Equal (tvW1, win1.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.Tab));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tf2W1, win1.MostFocused);
+        Assert.Equal (tf2W1, win1.GetMostFocused ());
 
         Assert.True (Application.OnKeyDown (Key.F6)); // Move to win2
         Assert.Equal (win2, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tf1W2, win2.MostFocused);
+        Assert.Equal (tf1W2, win2.GetMostFocused ());
         tf2W2.SetFocus ();
         Assert.True (tf2W2.HasFocus);
 
         Assert.True (Application.OnKeyDown (Key.F6.WithShift));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tf2W1, win1.MostFocused);
+        Assert.Equal (tf2W1, win1.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Application.NextTabGroupKey));
         Assert.Equal (win2, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tf2W2, win2.MostFocused);
+        Assert.Equal (tf2W2, win2.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Application.PrevTabGroupKey));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tf2W1, win1.MostFocused);
+        Assert.Equal (tf2W1, win1.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.CursorDown));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tf1W1, win1.MostFocused);
+        Assert.Equal (tf1W1, win1.GetMostFocused ());
 #if UNIX_KEY_BINDINGS
         Assert.True (Application.OnKeyDown (new (Key.B.WithCtrl)));
 #else
         Assert.True (Application.OnKeyDown (Key.CursorLeft));
 #endif
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tf1W1, win1.MostFocused);
+        Assert.Equal (tf1W1, win1.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.CursorDown));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.Equal (tvW1, win1.GetMostFocused ());
         Assert.Equal (Point.Empty, tvW1.CursorPosition);
 
         Assert.True (Application.OnKeyDown (Key.End.WithCtrl));
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tvW1, win1.MostFocused);
+        Assert.Equal (tvW1, win1.GetMostFocused ());
         Assert.Equal (new (16, 1), tvW1.CursorPosition); // Last position of the text
 #if UNIX_KEY_BINDINGS
         Assert.True (Application.OnKeyDown (new (Key.F.WithCtrl)));
@@ -1196,7 +1196,7 @@ public class OverlappedTests
         Assert.True (Application.OnKeyDown (Key.CursorRight)); // should move to next view w/ in Group (tf2W1)
 #endif
         Assert.Equal (win1, ApplicationOverlapped.OverlappedChildren [0]);
-        Assert.Equal (tf2W1, win1.MostFocused);
+        Assert.Equal (tf2W1, win1.GetMostFocused ());
 
 #if UNIX_KEY_BINDINGS
         Assert.True (ApplicationOverlapped.OverlappedChildren [0].ProcessKeyDown (new (Key.L.WithCtrl)));
@@ -1227,8 +1227,8 @@ public class OverlappedTests
 
         Application.Current = current;
         Assert.True (current.HasFocus);
-        Assert.Equal (superView.Focused, current);
-        Assert.Equal (superView.MostFocused, current);
+        Assert.Equal (superView.GetFocused (), current);
+        Assert.Equal (superView.GetMostFocused (), current);
 
         // Act
         ApplicationOverlapped.SetFocusToNextViewWithWrap (Application.Current.SuperView.TabIndexes, NavigationDirection.Forward);

@@ -765,7 +765,7 @@ At 0,0
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 0, 0), r.Viewport);
         Assert.Equal (new (0, 0, 0, 0), r.Frame);
-        Assert.Null (r.Focused);
+        Assert.Null (r.GetFocused ());
         Assert.Null (r.ColorScheme);
         Assert.Equal (0, r.Width);
         Assert.Equal (0, r.Height);
@@ -777,7 +777,7 @@ At 0,0
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
-        Assert.Null (r.MostFocused);
+        Assert.Null (r.GetMostFocused ());
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
         r.Dispose ();
 
@@ -789,7 +789,7 @@ At 0,0
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 0, 0), r.Viewport);
         Assert.Equal (new (0, 0, 0, 0), r.Frame);
-        Assert.Null (r.Focused);
+        Assert.Null (r.GetFocused ());
         Assert.Null (r.ColorScheme);
         Assert.Equal (0, r.Width);
         Assert.Equal (0, r.Height);
@@ -801,7 +801,7 @@ At 0,0
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
-        Assert.Null (r.MostFocused);
+        Assert.Null (r.GetMostFocused ());
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
         r.Dispose ();
 
@@ -813,7 +813,7 @@ At 0,0
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 3, 4), r.Viewport);
         Assert.Equal (new (1, 2, 3, 4), r.Frame);
-        Assert.Null (r.Focused);
+        Assert.Null (r.GetFocused ());
         Assert.Null (r.ColorScheme);
         Assert.Equal (3, r.Width);
         Assert.Equal (4, r.Height);
@@ -825,7 +825,7 @@ At 0,0
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
-        Assert.Null (r.MostFocused);
+        Assert.Null (r.GetMostFocused ());
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
         r.Dispose ();
 
@@ -846,7 +846,7 @@ At 0,0
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 1, 13), r.Viewport);
         Assert.Equal (new (0, 0, 1, 13), r.Frame);
-        Assert.Null (r.Focused);
+        Assert.Null (r.GetFocused ());
         Assert.Null (r.ColorScheme);
         Assert.False (r.IsCurrentTop);
 #if DEBUG
@@ -858,7 +858,7 @@ At 0,0
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
-        Assert.Null (r.MostFocused);
+        Assert.Null (r.GetMostFocused ());
         Assert.Equal (TextDirection.TopBottom_LeftRight, r.TextDirection);
         r.Dispose ();
     }

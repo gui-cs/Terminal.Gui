@@ -101,7 +101,7 @@ public class ConfigurationEditor : Scenario
     }
     public void Save ()
     {
-        if (_tileView.MostFocused is ConfigTextView editor)
+        if (_tileView.GetMostFocused () is ConfigTextView editor)
         {
             editor.Save ();
         }
@@ -172,7 +172,7 @@ public class ConfigurationEditor : Scenario
 
     private void Reload ()
     {
-        if (_tileView.MostFocused is ConfigTextView editor)
+        if (_tileView.GetMostFocused () is ConfigTextView editor)
         {
             editor.Read ();
         }

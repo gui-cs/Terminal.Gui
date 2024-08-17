@@ -139,10 +139,10 @@ public sealed class KeyBindings : Scenario
 
     private void AppWindow_DrawContent (object sender, DrawEventArgs e)
     {
-        _focusedBindingsListView.Title = $"_Focused ({Application.Top.MostFocused.GetType ().Name}) Bindings";
+        _focusedBindingsListView.Title = $"_Focused ({Application.Top.GetMostFocused ().GetType ().Name}) Bindings";
 
         _focusedBindings.Clear ();
-        foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
+        foreach (var binding in Application.Top.GetMostFocused ().KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
         {
             _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
         }
@@ -150,7 +150,7 @@ public sealed class KeyBindings : Scenario
 
     private void AppWindow_Leave (object sender, FocusEventArgs e)
     {
-        foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
+        foreach (var binding in Application.Top.GetMostFocused ().KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
         {
             _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
         }

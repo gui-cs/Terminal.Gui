@@ -64,6 +64,16 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         if (view.CanFocus)
         {
+            view._tabIndex = _tabIndexes.IndexOf (view);
+        }
+
+        if (view.Enabled && view.Visible && view.CanFocus)
+        {
+            if (HasFocus)
+            {
+                view.SetFocus ();
+            }
+
 #if AUTO_CANFOCUS
             // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Instead, callers to Add should be explicit about what they want.
             _addingViewSoCanFocusAlsoUpdatesSuperView = true;
@@ -79,7 +89,6 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             CanFocus = true;
             _addingViewSoCanFocusAlsoUpdatesSuperView = false;
 #endif
-            view._tabIndex = _tabIndexes.IndexOf (view);
         }
 
         if (view.Enabled && !Enabled)
@@ -184,6 +193,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return view;
         }
 
+        // If a view being removed is focused, it should lose focus.
+        if (view.HasFocus)
+        {
+            view.LeaveFocus(this, true);
+        }
+
         Rectangle touched = view.Frame;
         _subviews.Remove (view);
         _tabIndexes!.Remove (view);
@@ -200,12 +215,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             }
         }
 
-        OnRemoved (new (this, view));
-
-        if (Focused == view)
+        if (HasFocus)
         {
-            Focused = null;
+            FocusDeepest (TabStop, NavigationDirection.Forward);
         }
+
+        OnRemoved (new (this, view));
 
         return view;
     }

@@ -26,11 +26,11 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Assert.Equal ("f", tf.Text);
 
         // Still has focus though
-        Assert.Same (tf, Application.Top.Focused);
+        Assert.Same (tf, Application.Top.GetFocused ());
 
         // But can tab away
         Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
-        Assert.NotSame (tf, Application.Top.Focused);
+        Assert.NotSame (tf, Application.Top.GetFocused ());
         Application.Top.Dispose ();
     }
 
@@ -201,11 +201,11 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Assert.Equal ("fish", tf.Text);
 
         // Tab should autcomplete but not move focus
-        Assert.Same (tf, Application.Top.Focused);
+        Assert.Same (tf, Application.Top.GetFocused ());
 
         // Second tab should move focus (nothing to autocomplete)
         Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
-        Assert.NotSame (tf, Application.Top.Focused);
+        Assert.NotSame (tf, Application.Top.GetFocused ());
         Application.Top.Dispose ();
     }
 
@@ -238,7 +238,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         Application.Begin (top);
 
-        Assert.Same (tf, top.Focused);
+        Assert.Same (tf, top.GetFocused ());
 
         return tf;
     }

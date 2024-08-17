@@ -286,7 +286,7 @@ public partial class View  // Keyboard APIs
 
         // By default the KeyBindingScope is View
 
-        if (Focused?.NewKeyDownEvent (keyEvent) == true)
+        if (GetFocused ()?.NewKeyDownEvent (keyEvent) == true)
         {
             return true;
         }
@@ -446,7 +446,7 @@ public partial class View  // Keyboard APIs
             return false;
         }
 
-        if (Focused?.NewKeyUpEvent (keyEvent) == true)
+        if (GetFocused ()?.NewKeyUpEvent (keyEvent) == true)
         {
             return true;
         }
@@ -611,7 +611,7 @@ public partial class View  // Keyboard APIs
         // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
         foreach (View subview in Subviews)
         {
-            if (subview == Focused)
+            if (subview == GetFocused ())
             {
                 continue;
             }

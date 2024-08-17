@@ -67,7 +67,7 @@ public class NumericUpDown<T> : View where T : notnull
             Width = Dim.Auto (minimumContentDim: Dim.Func (() => string.Format (Format, Value).Length)),
             Height = 1,
             TextAlignment = Alignment.Center,
-            CanFocus = true
+            CanFocus = true,
         };
 
         _up = new ()

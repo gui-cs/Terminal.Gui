@@ -132,7 +132,7 @@ public class WindowTests
         Assert.False (defaultWindow.HasFocus);
         Assert.Equal (new Rectangle (0, 0, Application.Screen.Width - 2, Application.Screen.Height - 2), defaultWindow.Viewport);
         Assert.Equal (new Rectangle (0, 0, Application.Screen.Width, Application.Screen.Height), defaultWindow.Frame);
-        Assert.Null (defaultWindow.Focused);
+        Assert.Null (defaultWindow.GetFocused ());
         Assert.NotNull (defaultWindow.ColorScheme);
         Assert.Equal (0, defaultWindow.X);
         Assert.Equal (0, defaultWindow.Y);
@@ -143,7 +143,7 @@ public class WindowTests
         Assert.False (defaultWindow.WantContinuousButtonPressed);
         Assert.False (defaultWindow.WantMousePositionReports);
         Assert.Null (defaultWindow.SuperView);
-        Assert.Null (defaultWindow.MostFocused);
+        Assert.Null (defaultWindow.GetMostFocused ());
         Assert.Equal (TextDirection.LeftRight_TopBottom, defaultWindow.TextDirection);
 
         // Empty Rect
@@ -154,7 +154,7 @@ public class WindowTests
         Assert.False (windowWithFrameRectEmpty.HasFocus);
         Assert.Equal (Rectangle.Empty, windowWithFrameRectEmpty.Viewport);
         Assert.Equal (Rectangle.Empty, windowWithFrameRectEmpty.Frame);
-        Assert.Null (windowWithFrameRectEmpty.Focused);
+        Assert.Null (windowWithFrameRectEmpty.GetFocused ());
         Assert.NotNull (windowWithFrameRectEmpty.ColorScheme);
         Assert.Equal (0, windowWithFrameRectEmpty.X);
         Assert.Equal (0, windowWithFrameRectEmpty.Y);
@@ -167,7 +167,7 @@ public class WindowTests
         Assert.False (windowWithFrameRectEmpty.WantContinuousButtonPressed);
         Assert.False (windowWithFrameRectEmpty.WantMousePositionReports);
         Assert.Null (windowWithFrameRectEmpty.SuperView);
-        Assert.Null (windowWithFrameRectEmpty.MostFocused);
+        Assert.Null (windowWithFrameRectEmpty.GetMostFocused ());
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrameRectEmpty.TextDirection);
 
         // Rect with values
@@ -185,7 +185,7 @@ public class WindowTests
         Assert.False (windowWithFrame1234.HasFocus);
         Assert.Equal (new (0, 0, 1, 2), windowWithFrame1234.Viewport);
         Assert.Equal (new (1, 2, 3, 4), windowWithFrame1234.Frame);
-        Assert.Null (windowWithFrame1234.Focused);
+        Assert.Null (windowWithFrame1234.GetFocused ());
         Assert.NotNull (windowWithFrame1234.ColorScheme);
         Assert.Equal (1, windowWithFrame1234.X);
         Assert.Equal (2, windowWithFrame1234.Y);
@@ -198,7 +198,7 @@ public class WindowTests
         Assert.False (windowWithFrame1234.WantContinuousButtonPressed);
         Assert.False (windowWithFrame1234.WantMousePositionReports);
         Assert.Null (windowWithFrame1234.SuperView);
-        Assert.Null (windowWithFrame1234.MostFocused);
+        Assert.Null (windowWithFrame1234.GetMostFocused ());
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrame1234.TextDirection);
     }
 

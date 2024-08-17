@@ -107,7 +107,7 @@ public class MenuBarScenario : Scenario
                                };
 
         // There's no focus change event, so this is a bit of a hack.
-        menuBar.LayoutComplete += (s, e) => { _focusedView.Text = appWindow.MostFocused?.ToString () ?? "None"; };
+        menuBar.LayoutComplete += (s, e) => { _focusedView.Text = appWindow.GetMostFocused ()?.ToString () ?? "None"; };
 
         var openBtn = new Button { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true };
         openBtn.Accept += (s, e) => { menuBar.OpenMenu (); };

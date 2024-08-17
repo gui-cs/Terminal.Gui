@@ -115,17 +115,17 @@ public class ApplicationNavigation
     /// </summary>
     internal static void MoveNextView ()
     {
-        View? old = GetDeepestFocusedSubview (Application.Current!.Focused);
+        View? old = GetDeepestFocusedSubview (Application.Current!.GetFocused ());
 
         if (!Application.Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop))
         {
             Application.Current.AdvanceFocus (NavigationDirection.Forward, null);
         }
 
-        if (old != Application.Current.Focused && old != Application.Current.Focused?.Focused)
+        if (old != Application.Current.GetFocused () && old != Application.Current.GetFocused ()?.GetFocused ())
         {
             old?.SetNeedsDisplay ();
-            Application.Current.Focused?.SetNeedsDisplay ();
+            Application.Current.GetFocused ()?.SetNeedsDisplay ();
         }
         else
         {
@@ -147,16 +147,16 @@ public class ApplicationNavigation
             {
                 Application.Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
 
-                if (Application.Current.Focused is null)
+                if (Application.Current.GetFocused () is null)
                 {
                     Application.Current.RestoreFocus (TabBehavior.TabGroup);
                 }
             }
 
-            if (top != Application.Current.Focused && top != Application.Current.Focused?.Focused)
+            if (top != Application.Current.GetFocused() && top != Application.Current.GetFocused ()?.GetFocused ())
             {
                 top?.SetNeedsDisplay ();
-                Application.Current.Focused?.SetNeedsDisplay ();
+                Application.Current.GetFocused ()?.SetNeedsDisplay ();
             }
             else
             {
@@ -165,7 +165,7 @@ public class ApplicationNavigation
 
             //top!.AdvanceFocus (NavigationDirection.Forward);
 
-            //if (top.Focused is null)
+            //if (top.GetFocused () is null)
             //{
             //    top.AdvanceFocus (NavigationDirection.Forward);
             //}
@@ -188,17 +188,17 @@ public class ApplicationNavigation
     /// </summary>
     internal static void MovePreviousView ()
     {
-        View? old = GetDeepestFocusedSubview (Application.Current!.Focused);
+        View? old = GetDeepestFocusedSubview (Application.Current!.GetFocused());
 
         if (!Application.Current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop))
         {
             Application.Current.AdvanceFocus (NavigationDirection.Backward, null);
         }
 
-        if (old != Application.Current.Focused && old != Application.Current.Focused?.Focused)
+        if (old != Application.Current.GetFocused() && old != Application.Current.GetFocused()?.GetFocused())
         {
             old?.SetNeedsDisplay ();
-            Application.Current.Focused?.SetNeedsDisplay ();
+            Application.Current.GetFocused ()?.SetNeedsDisplay ();
         }
         else
         {
@@ -208,12 +208,12 @@ public class ApplicationNavigation
 
     internal static void MovePreviousViewOrTop ()
     {
-        if (ApplicationOverlapped.OverlappedTop is null)
+        if (ApplicationOverlapped.OverlappedTop is null)    
         {
             Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
             top!.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
 
-            if (top.Focused is null)
+            if (top.GetFocused () is null)
             {
                 top.AdvanceFocus (NavigationDirection.Backward, null);
             }

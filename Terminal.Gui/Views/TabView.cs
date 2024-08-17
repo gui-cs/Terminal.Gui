@@ -77,7 +77,7 @@ public class TabView : View
                         {
                             _contentView.SetFocus ();
 
-                            return _contentView.Focused is { };
+                            return _contentView.GetFocused () is { };
                         }
 
                         return false;
@@ -94,7 +94,7 @@ public class TabView : View
                                               {
                                                   _contentView.SetFocus ();
 
-                                                  return _contentView.Focused is { };
+                                                  return _contentView.GetFocused () is { };
                                               }
 
                                               return false;
@@ -1300,7 +1300,7 @@ public class TabView : View
                 // if tab is the selected one and focus is inside this control
                 if (toRender.IsSelected && _host.HasFocus)
                 {
-                    if (_host.Focused == this)
+                    if (_host.GetFocused () == this)
                     {
                         // if focus is the tab bar itself then show that they can switch tabs
                         prevAttr = ColorScheme.HotFocus;

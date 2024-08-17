@@ -79,7 +79,6 @@ public partial class Toplevel : View
     /// <inheritdoc/>
     public override View Add (View view)
     {
-        CanFocus = true;
         AddMenuStatusBar (view);
 
         return base.Add (view);
@@ -432,7 +431,7 @@ public partial class Toplevel : View
     {
         if (!IsOverlappedContainer)
         {
-            if (Focused is null)
+            if (GetFocused () is null)
             {
                 RestoreFocus (null);
             }
@@ -442,7 +441,7 @@ public partial class Toplevel : View
 
         // This code path only happens when the Toplevel is an Overlapped container
 
-        if (Focused is null)
+        if (GetFocused () is null)
         {
             // TODO: this is an Overlapped hack
             foreach (Toplevel top in ApplicationOverlapped.OverlappedChildren!)
