@@ -60,7 +60,8 @@ public static class ColorStrings
     {
         foreach (DictionaryEntry entry in _resourceManager.GetResourceSet (CultureInfo.CurrentCulture, true, true)!)
         {
-            if (entry.Value is string colorName)
+            var keyName = entry.Key.ToString () ?? string.Empty;
+            if (entry.Value is string colorName && keyName.StartsWith ('#'))
             {
                 yield return colorName;
             }
