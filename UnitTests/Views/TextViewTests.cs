@@ -137,7 +137,6 @@ public class TextViewTests
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
 
-        Assert.Throws<InvalidOperationException> (() => tv.CanFocus = true);
         fv.CanFocus = true;
         tv.CanFocus = true;
         tv.NewMouseEvent (new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked });
@@ -152,7 +151,7 @@ public class TextViewTests
         tv.NewMouseEvent (new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Equal ("some ", tv.SelectedText); // Setting CanFocus to false don't change the SelectedText
-        Assert.False (tv.CanFocus);
+        Assert.True (tv.CanFocus); // v2: CanFocus is not longer automatically changed
         Assert.False (tv.HasFocus);
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);

@@ -78,6 +78,7 @@ public class RadioGroupTests (ITestOutputHelper output)
     [Fact]
     public void KeyBindings_Command ()
     {
+        Application.Navigation = new ();
         var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
         Application.Current = new Toplevel ();
         Application.Current.Add (rg);
@@ -100,7 +101,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (1, rg.SelectedItem);
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
-        Application.Current.Dispose ();
+        Application.ResetState();
     }
 
     [Fact]

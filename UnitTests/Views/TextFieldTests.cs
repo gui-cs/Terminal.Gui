@@ -126,7 +126,6 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
 
-        // Assert.Throws<InvalidOperationException> (() => tf.CanFocus = true);
         fv.CanFocus = true;
         tf.CanFocus = true;
 
@@ -147,7 +146,7 @@ public class TextFieldTests (ITestOutputHelper output)
                          );
 
         Assert.Equal ("some ", tf.SelectedText); // Setting CanFocus to false don't change the SelectedText
-        Assert.False (tf.CanFocus);
+        Assert.True (tf.CanFocus); // v2: CanFocus is not longer automatically changed
         Assert.False (tf.HasFocus);
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);

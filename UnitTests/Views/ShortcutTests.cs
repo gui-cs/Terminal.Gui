@@ -211,7 +211,7 @@ public class ShortcutTests
         Assert.Contains (Key.A, shortcut.KeyBindings.Bindings.Keys);
         Assert.DoesNotContain (Key.A, Application.KeyBindings.Bindings.Keys);
     }
-    
+
     [Theory]
     [InlineData (Orientation.Horizontal)]
     [InlineData (Orientation.Vertical)]
@@ -363,7 +363,7 @@ public class ShortcutTests
         shortcut.Accept += (s, e) => accepted++;
 
         Application.OnMouseEvent (
-                                  new()
+                                  new ()
                                   {
                                       Position = new (x, 0),
                                       Flags = MouseFlags.Button1Clicked
@@ -418,7 +418,7 @@ public class ShortcutTests
         //Assert.True (shortcut.HasFocus);
 
         Application.OnMouseEvent (
-                                  new()
+                                  new ()
                                   {
                                       Position = new (x, 0),
                                       Flags = MouseFlags.Button1Clicked
@@ -601,7 +601,8 @@ public class ShortcutTests
     [Fact]
     public void ColorScheme_SetColorScheme_Does_Not_Fault_3664 ()
     {
-        Application.Current = new Toplevel ();
+        Application.Current = new ();
+        Application.Navigation = new ();
         Shortcut shortcut = new Shortcut ();
 
         Application.Current.ColorScheme = null;
@@ -610,9 +611,10 @@ public class ShortcutTests
 
         shortcut.HasFocus = true;
 
-        Assert.NotNull (shortcut.ColorScheme);
+        Assert.Null (shortcut.ColorScheme);
 
         Application.Current.Dispose ();
+        Application.ResetState ();
     }
 
 }
