@@ -38,9 +38,6 @@ public class ShortcutTests
 
         Assert.IsType<DimAuto> (shortcut.Width);
         Assert.IsType<DimAuto> (shortcut.Height);
-        //shortcut.BeginInit();
-        //shortcut.EndInit ();
-       // shortcut.LayoutSubviews ();
         shortcut.SetRelativeLayout (new (100, 100));
 
         // |0123456789
@@ -254,19 +251,6 @@ public class ShortcutTests
         shortcut.Action.Invoke ();
 
         Assert.True (actionInvoked);
-    }
-
-    [Fact]
-    public void ColorScheme_SetsAndGetsCorrectly ()
-    {
-        var colorScheme = new ColorScheme ();
-
-        var shortcut = new Shortcut
-        {
-            ColorScheme = colorScheme
-        };
-
-        Assert.Same (colorScheme, shortcut.ColorScheme);
     }
 
     [Fact]
@@ -600,5 +584,35 @@ public class ShortcutTests
     }
 
 
+    [Fact]
+    public void ColorScheme_SetsAndGetsCorrectly ()
+    {
+        var colorScheme = new ColorScheme ();
+
+        var shortcut = new Shortcut
+        {
+            ColorScheme = colorScheme
+        };
+
+        Assert.Same (colorScheme, shortcut.ColorScheme);
+    }
+
+    // https://github.com/gui-cs/Terminal.Gui/issues/3664
+    [Fact]
+    public void ColorScheme_SetColorScheme_Does_Not_Fault_3664 ()
+    {
+        Application.Current = new Toplevel ();
+        Shortcut shortcut = new Shortcut ();
+
+        Application.Current.ColorScheme = null;
+
+        Assert.Null (shortcut.ColorScheme);
+
+        shortcut.HasFocus = true;
+
+        Assert.NotNull (shortcut.ColorScheme);
+
+        Application.Current.Dispose ();
+    }
 
 }
