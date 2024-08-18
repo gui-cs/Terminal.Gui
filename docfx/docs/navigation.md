@@ -1,7 +1,5 @@
 # Navigation Deep Dive
 
-**Navigation** refers to the user-experience for moving Focus between views in the application view-hierarchy. It applies to the following questions:
-
 - What are the visual cues that help the user know which element of an application is receiving keyboard and mouse input (which one has focus)? 
 - How does the user change which element of an application has focus?
 - How does the user change which element of an application has focus?
@@ -11,9 +9,12 @@
 
 ## Lexicon & Taxonomy
 
-- **Navigation** - Refers to the user-experience for moving Focus between views in the application view-hierarchy.
-- **Focus** - Indicates which view-hierarchy is receiving keyboard input. Only one view-hierarchy in an application can have focus (`top.HasFocus == true`), and there  one, and only one, View in a focused hierarchy that is the most-focused; the one receiving keyboard input. 
+- **Navigation** refers to the user-experience for moving Focus between views in the application view-hierarchy. 
+- **Focus** - Refers to the state where a particular UI element (`View`), such as a button, input field, or any interactive component, is actively selected and ready to receive user input. When an element has focus, it typically responds to keyboard events and other interactions.
+- **Focus Chain** - The ordered sequence of UI elements that can receive focus, starting from the currently focused element and extending to its parent (SuperView) elements up to the root of the focus tree (`Application.Top`). This chain determines the path that focus traversal follows within the application. Only one focus chain in an application can have focus (`top.HasFocus == true`), and there is one, and only one, View in a focus chain that is the most-focused; the one receiving keyboard input. 
+- **Navigation** - Refers to the user-experience for moving Focus between views in focus chain.
 - **Cursor** - A visual indicator to the user where keyboard input will have an impact. There is one Cursor per terminal session. See [Cursor](cursor.md) for a deep-dive.
+- **Focus Ordering** - The order focusable Views are navigated. Focus Ordering is typically used in UI frameworks to enable screen readers and improve the Accessibility of an application. In v1, `TabIndex`/`TabIndexes` enabled Focus Ordering. 
 - **Tab** - Describes the `Tab` key found on all keyboards, a break in text that is wider than a space, or a UI element that is a stop-point for keyboard navigation. The use of the word "Tab" for this comes from the typewriter, and is re-enforced by the existence of a `Tab` key on all keyboards.
 - **TabStop** - A `View` that is an ultimate stop-point for keyboard navigation. In this usage, ultimate means the `View` has no focusable subviews. The `Application.NextTabStopKey` and `Application.PrevTabStopKey` are `Key.Tab` and `Key.Tab.WithShift` respectively. These keys navigate only between peer-views. 
 - **TabGroup** - A `View` that is a container for other focusable views. The `Application.NextTabGroupKey` and `Application.PrevTabGroupKey` are `Key.PageDown.WithCtrl` and `Key.PageUp.WithCtrl` respectively. These keys enable the user to use the keyboard to navigate up and down the view-hierarchy. 
@@ -108,6 +109,7 @@ This method replaces about a dozen functions in v1 (scattered across `Applicatio
 ## `View`
 
 At the View-level, navigation is encapsulated within `View.Navigation.cs`.
+
 
 ## What makes a View focusable?
 
@@ -244,4 +246,101 @@ A bunch of the above is the proposed design. Eventually `Toplevel` will be delet
 
 - The old `Toplevel` and `OverlappedTop` code. Only utilized when `IsOverlappedContainer == true`
 - The new code path that treats all Views the same but relies on the appropriate combination of `TabBehavior` and `ViewArrangement` settings as well as `IRunnable`.
+
+
+# Rough Design Notes 
+
+## Accesibilty Tenets
+
+See https://devblogs.microsoft.com/dotnet/the-journey-to-accessible-apps-keyboard-accessible/
+
+https://github.com/dotnet/maui/issues/1646 
+
+## Focus Chain & DOM ideas
+
+The navigation/focus code in `View.Navigation.cs` has been rewritten in v2 (in https://github.com/gui-cs/Terminal.Gui/pull/3627) to simplify and make more robust.
+
+The design is fundamentally the same as in v1: The logic for tracking and updating the focus chain is based on recursion up and down the `View.Subviews`/`View.SuperView` hierarchy. In this model, there is the need for tracking state during recursion, leading to APIs like the following:
+
+```cs
+// From v1/early v2: Note the `force` param.
+private void SetHasFocus (bool newHasFocus, View view, bool force = false)
+
+// From #3627: Note the `traversingUp` param
+ private bool EnterFocus ([CanBeNull] View leavingView, bool traversingUp = false)
+```
+
+The need for these "special-case trackers" is clear evidence of poor architecture. Both implementations work, and the #3627 version is far cleaner, but a better design could result in further simplification. 
+
+For example, moving to a model where `Application` is responsible for tracking and updating the focus chain instead `View`. We would introduce a formalization of the *Focus Chain*.
+
+**Focus Chain**: A sequence or hierarchy of UI elements (Views) that determines the order in which keyboard focus is navigated within an application. This chain represents the potential paths that focus can take, ensuring that each element can be reached through keyboard navigation. Instead of using recursion, the Focus Chain can be implemented using lists or trees to maintain and update the focus state efficiently at the `Application` level.
+
+By using lists or trees, you can manage the focus state without the need for recursive traversal, making the navigation model more scalable and easier to maintain. This approach allows you to explicitly define the order and structure of focusable elements, providing greater control over the navigation flow.
+
+Now, the interesting thing about this, is it really starts to look like a DOM!
+
+Designing a DOM (Document Object Model) for UI library involves creating a structured representation of the UI elements and their relationships. 
+
+1. Hierarchy and Structure- Root Node: The top-level node representing the entire application or window.
+    - View Nodes: Each UI element (View) is a node in the DOM. These nodes can have child nodes, representing nested or contained elements.
+2. Node Properties- Attributes: Each node can have attributes such as id, class, style, and custom properties specific to the View.
+    - State: Nodes can maintain state information, such as whether they are focused, visible, enabled, etc.
+3. Traversal Methods- Parent-Child Relationships: Nodes maintain references to their parent and children, allowing traversal up and down the hierarchy.
+    - Sibling Relationships: Nodes can also maintain references to their previous and next siblings for easier navigation.
+4. Event Handling- Event Listeners: Nodes can have event listeners attached to handle user interactions like clicks, key presses, and focus changes.
+    - Event Propagation: Events can propagate through the DOM, allowing for capturing and bubbling phases similar to web DOM events.
+5. Focus Management- Focus Chain: Maintain a list or tree of focusable nodes to manage keyboard navigation efficiently.
+    - Focus Methods: Methods to programmatically set and get focus, ensuring the correct element is focused based on user actions or application logic.
+6. Mouse Events - Mouse handling in Terminal.Gui involves capturing and responding to mouse events such as clicks, drags, and scrolls. In v2, mouse events are managed at the View level, but for a DOM-like structure, this should be centralized.
+7. Layout - The Pos/Dim system in Terminal.Gui is used for defining the layout of views. It allows for dynamic positioning and sizing based on various constraints. For a DOM-model we'd maintain the Pos/Dim system but ensure the layout calculations are managed by the DOM manager.
+8. Drawing  - Drawing in Terminal.Gui involves rendering text, colors, and shapes. This is handled within the View class today. In a DOM model we'd centralize the drawing logic in the DOM manager to ensure consistent rendering.
+
+This is all well and good, however we are NOT going to fully transition to a DOM in v2. But we may start with Focus/Navigation (item 3 above). Would could retain the existing external `View` API for focus (e.g. `View.SetFocus`, `Focused`, `CanFocus`, `TabIndexes`, etc...) but refactor the implementation of those to leverage a `FocusChain` (or `FocusManager`) at the `Application` level.
+
+(Crap code generated by Copilot; but gets the idea across):
+
+```cs
+public class FocusChain {
+    private List<View> focusableViews = new List<View>();
+    private View currentFocusedView;
+
+    public void RegisterView(View view) {
+        if (view.CanFocus) {
+            focusableViews.Add(view);
+            focusableViews = focusableViews.OrderBy(v => v.TabIndex).ToList();
+        }
+    }
+
+    public void UnregisterView(View view) {
+        focusableViews.Remove(view);
+    }
+
+    public void SetFocus(View view) {
+        if (focusableViews.Contains(view)) {
+            currentFocusedView?.LeaveFocus();
+            currentFocusedView = view;
+            currentFocusedView.EnterFocus();
+        }
+    }
+
+    public View GetFocusedView() {
+        return currentFocusedView;
+    }
+
+    public void MoveFocusNext() {
+        if (focusableViews.Count == 0) return;
+        int currentIndex = focusableViews.IndexOf(currentFocusedView);
+        int nextIndex = (currentIndex + 1) % focusableViews.Count;
+        SetFocus(focusableViews[nextIndex]);
+    }
+
+    public void MoveFocusPrevious() {
+        if (focusableViews.Count == 0) return;
+        int currentIndex = focusableViews.IndexOf(currentFocusedView);
+        int previousIndex = (currentIndex - 1 + focusableViews.Count) % focusableViews.Count;
+        SetFocus(focusableViews[previousIndex]);
+    }
+}
+```
 
