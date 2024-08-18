@@ -1948,7 +1948,7 @@ Les Miśerables",
 
         Application.Begin (top);
 
-        Assert.Same (tf, top.GetFocused ());
+        Assert.Same (tf, top.Focused);
 
         return tf;
     }

@@ -133,7 +133,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         // If we previously had a subview with focus (`Focused = subview`), we need to make sure that all subviews down the `subview`-hierarchy LeaveFocus.
         // LeaveFocus will recurse down the subview hierarchy and will also set PreviouslyMostFocused
-        View focused = GetFocused ();
+        View focused = Focused;
         focused?.LeaveFocus (this, true);
 
         // We need to ensure all superviews up the superview hierarchy have focus.
@@ -155,7 +155,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // - By setting _hasFocus to true we definitively change HasFocus for this view.
 
         // Get whatever peer has focus, if any
-        View focusedPeer = SuperView?.GetFocused ();
+        View focusedPeer = SuperView?.Focused;
 
         _hasFocus = true;
 
@@ -285,7 +285,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         Leave?.Invoke (this, args);
 
         // Get whatever peer has focus, if any
-        View focusedPeer = SuperView?.GetFocused ();
+        View focusedPeer = SuperView?.Focused;
         _hasFocus = false;
 
         if (!traversingDown && CanFocus && Visible && Enabled)
@@ -355,7 +355,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return false;
         }
 
-        View focused = GetFocused ();
+        View focused = Focused;
 
         if (focused is {} && focused.AdvanceFocus (direction, behavior))
         {
@@ -369,7 +369,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return false;
         }
 
-        var focusedIndex = index.IndexOf (GetFocused ());
+        var focusedIndex = index.IndexOf (Focused);
         int next = 0;
 
         if (focusedIndex < index.Length - 1)
@@ -382,7 +382,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             {
                 // Go down the subview-hierarchy and leave
                 // BUGBUG: This doesn't seem right
-                GetFocused ().HasFocus = false;
+                Focused.HasFocus = false;
 
                 // TODO: Should we check the return value of SetHasFocus?
 
@@ -399,7 +399,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         // The subview does not have focus, but at least one other that can. Can this one be focused?
-        return view.EnterFocus (GetFocused ());
+        return view.EnterFocus (Focused);
     }
 
 
@@ -411,7 +411,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </returns>
     internal bool RestoreFocus (TabBehavior? behavior)
     {
-        if (GetFocused () is null && _subviews?.Count > 0)
+        if (Focused is null && _subviews?.Count > 0)
         {
             if (_previouslyMostFocused is { }/* && (behavior is null || _previouslyMostFocused.TabStop == behavior)*/)
             {
@@ -429,19 +429,19 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <returns>The most focused Subview, or <see langword="null"/> if no Subview is focused.</returns>
     public View GetMostFocused ()
     {
-        if (GetFocused () is null)
+        if (Focused is null)
         {
             return null;
         }
 
-        View most = GetFocused ()!.GetMostFocused ();
+        View most = Focused!.GetMostFocused ();
 
         if (most is { })
         {
             return most;
         }
 
-        return GetFocused ();
+        return Focused;
     }
 
     ///// <summary>
@@ -595,7 +595,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 HasFocus = false;
             }
 
-            if (_canFocus && !HasFocus && Visible && SuperView is { } && SuperView.GetFocused () is null )
+            if (_canFocus && !HasFocus && Visible && SuperView is { } && SuperView.Focused is null )
             {
                 // If CanFocus is set to true and this view does not have focus, make it enter focus
                 SetFocus ();
@@ -611,12 +611,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </remarks>
     public event EventHandler CanFocusChanged;
 
-    /// <summary>Returns the currently focused Subview of this view, or <see langword="null"/> if nothing is focused.</summary>
-    /// <value>The currently focused Subview.</value>
+    /// <summary>Gets the currently focused Subview of this view, or <see langword="null"/> if nothing is focused.</summary>
     [CanBeNull]
-    public View GetFocused ()
+    public View Focused
     {
-        return Subviews.FirstOrDefault (v => v.HasFocus);
+        get { return Subviews.FirstOrDefault (v => v.HasFocus); }
     }
 
     /// <summary>

@@ -385,12 +385,12 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
     public void Focused_NoSubviews ()
     {
         var view = new View ();
-        Assert.Null (view.GetFocused ());
+        Assert.Null (view.Focused);
 
         view.CanFocus = true;
         view.SetFocus ();
         Assert.True (view.HasFocus);
-        Assert.Null (view.GetFocused ()); // BUGBUG: Should be view
+        Assert.Null (view.Focused); // BUGBUG: Should be view
     }
 
     [Fact]
@@ -497,7 +497,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
     public void GetMostFocused_NoSubviews_Returns_Null ()
     {
         var view = new View ();
-        Assert.Null (view.GetFocused ());
+        Assert.Null (view.Focused);
 
         view.CanFocus = true;
         Assert.False (view.HasFocus);
@@ -675,7 +675,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Application.Init (new FakeDriver ());
 
         var top = new Toplevel ();
-        top.Ready += (s, e) => { Assert.Null (top.GetFocused ()); };
+        top.Ready += (s, e) => { Assert.Null (top.Focused); };
 
         // Keyboard navigation with tab
         FakeConsole.MockKeyPresses.Push (new ('\t', ConsoleKey.Tab, false, false, false));

@@ -466,7 +466,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Assert.Equal (new (0, 0, 40, 25), win1.Frame);
         Assert.Equal (new (41, 0, 40, 25), win2.Frame);
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tf1W1, top.GetMostFocused ());
 
         Assert.True (isRunning);
@@ -477,7 +477,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.True (Application.OnKeyDown (Key.F5)); // refresh
 
         Assert.True (Application.OnKeyDown (Key.Tab));
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.Tab));
         Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
@@ -487,10 +487,10 @@ public partial class ToplevelTests (ITestOutputHelper output)
         var prevMostFocusedSubview = top.GetMostFocused ();
 
         Assert.True (Application.OnKeyDown (Key.F6)); // move to next TabGroup (win2)
-        Assert.Equal (win2, top.GetFocused ());
+        Assert.Equal (win2, top.Focused);
 
         Assert.True (Application.OnKeyDown (Key.F6.WithShift)); // move to prev TabGroup (win1)
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.GetMostFocused ());  // BUGBUG: Should be prevMostFocusedSubview - We need to cache the last focused view in the TabGroup somehow
 
         prevMostFocusedSubview.SetFocus ();
@@ -499,13 +499,13 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         tf2W1.SetFocus ();
         Assert.True (Application.OnKeyDown (Key.Tab)); // tf2W1 is last subview in win1 - tabbing should take us to first subview of win1
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tf1W1, top.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.CursorRight)); // move char to right in tf1W1. We're at last char so nav to next view
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.CursorDown)); // move down to next view (tvW1)
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.GetMostFocused ());
 #if UNIX_KEY_BINDINGS
         Assert.True (Application.OnKeyDown (new (Key.I.WithCtrl)));
@@ -513,34 +513,34 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (tf2W1, top.MostFocused);
 #endif
         Assert.True (Application.OnKeyDown (Key.Tab.WithShift)); // Ignored. TextView eats shift-tab by default
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.GetMostFocused ());
         tvW1.AllowsTab = false;
         Assert.True (Application.OnKeyDown (Key.Tab.WithShift));
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tf1W1, top.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.CursorLeft));
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.CursorUp));
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.GetMostFocused ());
 
         // nav to win2
         Assert.True (Application.OnKeyDown (Key.F6));
-        Assert.Equal (win2, top.GetFocused ());
+        Assert.Equal (win2, top.Focused);
         Assert.Equal (tf1W2, top.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.F6.WithShift));
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Application.NextTabGroupKey));
-        Assert.Equal (win2, top.GetFocused ());
+        Assert.Equal (win2, top.Focused);
         Assert.Equal (tf1W2, top.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Application.PrevTabGroupKey));
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tf2W1, top.GetMostFocused ());
         Assert.True (Application.OnKeyDown (Key.CursorUp));
-        Assert.Equal (win1, top.GetFocused ());
+        Assert.Equal (win1, top.Focused);
         Assert.Equal (tvW1, top.GetMostFocused ());
 
         top.Dispose ();

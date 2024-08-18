@@ -27,7 +27,7 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
         top.Add (subView);
 
         Assert.True (top.HasFocus);
-        Assert.Equal (subView, top.GetFocused ());
+        Assert.Equal (subView, top.Focused);
         Assert.True (subView.HasFocus);
         Assert.Equal (1, nEnter);
     }
@@ -61,7 +61,7 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
         top.Add (subView);
 
         Assert.True (top.HasFocus);
-        Assert.Equal (subView, top.GetFocused ());
+        Assert.Equal (subView, top.Focused);
         Assert.True (subView.HasFocus);
         Assert.True (subSubView.HasFocus);
     }
@@ -88,12 +88,12 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
 
         top.SetFocus ();
         Assert.True (top.HasFocus);
-        Assert.Equal (subView, top.GetFocused ());
+        Assert.Equal (subView, top.Focused);
         Assert.True (subView.HasFocus);
 
         top.Remove (subView);
         Assert.True (top.HasFocus);
-        Assert.Equal (null, top.GetFocused ());
+        Assert.Equal (null, top.Focused);
         Assert.False (subView.HasFocus);
         Assert.Equal (1, nLeave);
     }
@@ -125,14 +125,14 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
 
         top.SetFocus ();
         Assert.True (top.HasFocus);
-        Assert.Equal (subView1, top.GetFocused ());
+        Assert.Equal (subView1, top.Focused);
         Assert.True (subView1.HasFocus);
         Assert.False (subView2.HasFocus);
 
         top.Remove (subView1);
         Assert.True (top.HasFocus);
         Assert.True (subView2.HasFocus);
-        Assert.Equal (subView2, top.GetFocused ());
+        Assert.Equal (subView2, top.Focused);
         Assert.False (subView1.HasFocus);
         Assert.Equal (1, nLeave1);
     }

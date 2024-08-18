@@ -765,7 +765,7 @@ At 0,0
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 0, 0), r.Viewport);
         Assert.Equal (new (0, 0, 0, 0), r.Frame);
-        Assert.Null (r.GetFocused ());
+        Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.Equal (0, r.Width);
         Assert.Equal (0, r.Height);
@@ -789,7 +789,7 @@ At 0,0
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 0, 0), r.Viewport);
         Assert.Equal (new (0, 0, 0, 0), r.Frame);
-        Assert.Null (r.GetFocused ());
+        Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.Equal (0, r.Width);
         Assert.Equal (0, r.Height);
@@ -813,7 +813,7 @@ At 0,0
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 3, 4), r.Viewport);
         Assert.Equal (new (1, 2, 3, 4), r.Frame);
-        Assert.Null (r.GetFocused ());
+        Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.Equal (3, r.Width);
         Assert.Equal (4, r.Height);
@@ -846,7 +846,7 @@ At 0,0
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 1, 13), r.Viewport);
         Assert.Equal (new (0, 0, 1, 13), r.Frame);
-        Assert.Null (r.GetFocused ());
+        Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.False (r.IsCurrentTop);
 #if DEBUG

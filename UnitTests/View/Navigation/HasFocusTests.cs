@@ -65,10 +65,10 @@ public class HasFocusTests (ITestOutputHelper _output) : TestsAllViews
         view.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.True (subview.HasFocus);
-        Assert.Equal (subview, view.GetFocused ());
+        Assert.Equal (subview, view.Focused);
 
         view.HasFocus = false;
-        Assert.Null (view.GetFocused ());
+        Assert.Null (view.Focused);
         Assert.False (view.HasFocus);
         Assert.False (subview.HasFocus);
     }

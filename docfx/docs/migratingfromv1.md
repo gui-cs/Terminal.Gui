@@ -175,6 +175,7 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 * Use [View.Keybindings](~/api/Terminal.Gui.View.Keybindings.yml) to configure key bindings to `Command`s.
 * It should be very uncommon for v2 code to override `OnKeyPressed` etc... 
 * Anywhere `Ctrl+Q` was hard-coded as the "quit key", replace with `Application.QuitKey`.
+* See *Navigation* below for more information on v2's navigation keys.
 
 ## Updated Mouse API
 
@@ -193,16 +194,71 @@ The API for mouse input is now internally consistent and easier to use.
 * Set `View.WantContinousButtonPresses = true` to have the [Command.Accept](~/api/Terminal.Gui.Command.Accept.yml) command be invoked repeatedly as the user holds a mouse button down on the view.
 * Update any code that assumed mouse events provided coordinates relative to the `Screen`.
 
-## Cursor and Focus
+## Navigation - `Cursor`, `Focus`, `TabStop` etc... 
 
 The cursor and focus system has been redesigned in v2 to be more consistent and easier to use. If you are using custom cursor or focus logic in your application, you may need to update it to use the new system.
 
-### How to Fix
+### Cursor
 
-* Use [Application.MostFocusedView](~/api/Terminal.Gui.Application.MostFocusedView.yml) to get the most focused view in the application.
+In v1, whether the cursor (the flashing caret) was visible or not was controlled by `View.CursorVisibility` which was an enum extracted from Ncruses/Terminfo. It only works in some cases on Linux, and only partially with `WindowsDriver`. The position of the cursor was the same as `ConsoleDriver.Row`/`Col` and determined by the last call to `ConsoleDriver.Move`. `View.PositionCursor()` could be overridden by views to cause `Application` to call `ConsoleDriver.Move` on behalf of the app and to manage setting `CursorVisiblity`. This API was confusing and bug-prone.
+
+In v2, the API is (NOT YET IMPLEMENTED) simplified. A view simply reports the style of cursor it wants and the Viewport-relative location:
+
+* `public Point? CursorPosition`
+    - If `null` the cursor is not visible
+    - If `{}` the cursor is visible at the `Point`.
+* `public event EventHandler<LocationChangedEventArgs>? CursorPositionChanged`
+* `public int? CursorStyle`
+	- If `null` the default cursor style is used.
+	- If `{}` specifies the style of cursor. See [cursor.md](cursor.md) for more.
+* `Application` now has APIs for querying available cursor styles.
+* The details in `ConsoleDriver` are no longer available to applications.	
+
+#### How to Fix (Cursor API)
+
 * Use [View.CursorPosition](~/api/Terminal.Gui.View.CursorPosition.yml) to set the cursor position in a view. Set [View.CursorPosition](~/api/Terminal.Gui.View.CursorPosition.yml) to `null` to hide the cursor.
 * Set [View.CursorVisibility](~/api/Terminal.Gui.View.CursorVisibility.yml) to the cursor style you want to use.
+
+### Focus
+
+See [navigation.md](navigation.md) for more details.
+See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
+
+* In v1, calling `super.Add (view)` where `view.CanFocus == true` caused all views up the hierarchy (all SuperViews) to get `CanFocus` set to `true` as well. In v2, developers need to explicitly set `CanFocus` for any view in the view-hierarchy where focus is desired. This simplifies the implementation and removes confusing automatic behavior. 
+* In v1, if `view.CanFocus == true`, `Add` would automatically set `TabStop`. In v2, the automatic setting of `TabStop` in `Add` is retained because it is not overly complex to do so and is a nice convenience for developers to not have to set both `Tabstop` and `CanFocus`. Note v2 does NOT automatically change `CanFocus` if `TabStop` is changed.
+* `view.TabStop` now describes the behavior of a view in the focus-chain. the `TabBehavior` enum includes `NoStop` (the view may be focusable, but not via next/prev keyboard nav), `TabStop` (the view may be focusable, and `NextTabStop`/`PrevTabStop` keyboard nav will stop), `TabGroup` (the view may be focusable, and `NextTabGroup`/`PrevTabGroup` keyboard nav will stop). 
+
+### How to Fix (Focus API)
+
+* Use [Application.Navigation.GetFocused()](~/api/Terminal.Gui.Application.Navigation.GetFocused.yml) to get the most focused view in the application.
 * Remove any overrides of `OnEnter` and `OnLeave` that explicitly change the cursor.
+
+### Keyboard Navigation
+
+In v2, `HotKey`s can be used to navigate across the entire application view-hierarchy. They work independently of `Focus`. This enables a user to navigate across a complex UI of nested subviews if needed (even in overlapped scenarios). An example use-case is the `AllViewsTester` scenario.
+
+In v2, unlike v1, multiple Views in an application (even within the same SuperView) can have the same `HotKey`. Each press of the `HotKey` will invoke the next `HotKey` across the View hierarchy (NOT IMPLEMENTED YET)*
+
+In v1, the keys used for navigation were both hard-coded and configurable, but in an inconsistent way. `Tab` and `Shift+Tab` worked consistently for navigating between Subviews, but were not configurable. `Ctrl+Tab` and `Ctrl+Shift+Tab` navigated across `Overlapped` views and had configurable "alternate" versions (`Ctrl+PageDown` and `Ctrl+PageUp`).
+
+In v2, this is made consistent and configurable:
+
+- `Application.NextTabStopKey` (`Key.Tab`) - Navigates to the next subview that is a `TabStop` (see below). If there is no next, the first subview that is a `TabStop` will gain focus.
+- `Application.PrevTabStopKey` (`Key.Tab.WithShift`) - Opposite of `Application.NextTabStopKey`.
+- `Key.CursorRight` - Operates identically to `Application.NextTabStopKey`.
+- `Key.CursorDown` - Operates identically to `Application.NextTabStopKey`.
+- `Key.CursorLeft` - Operates identically to `Application.PrevTabStopKey`.
+- `Key.CursorUp` - Operates identically to `Application.PrevTabStopKey`.
+- `Application.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a `TabGroup` (see below). If there is no next, the first view that is a `TabGroup` will gain focus.
+- `Application.PrevTabGroupKey` (`Key.F6.WithShift`) - Opposite of `Application.NextTabGroupKey`.
+
+`F6` was chosen to match [Windows](https://learn.microsoft.com/en-us/windows/apps/design/input/keyboard-accelerators#common-keyboard-accelerators)
+
+These keys are all registered as `KeyBindingScope.Application` key bindings by `Application`. Because application-scoped key bindings have the lowest priority, Views can override the behaviors of these keys (e.g. `TextView` overrides `Key.Tab` by default, enabling the user to enter `\t` into text). The `AllViews_AtLeastOneNavKey_Leaves` unit test ensures all built-in Views have at least one of the above keys that can advance. 
+
+### How to Fix (Keyboard Navigation)
+
+...
 
 ## Events now use `object sender, EventArgs args` signature
 

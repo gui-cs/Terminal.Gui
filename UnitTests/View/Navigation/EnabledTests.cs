@@ -40,7 +40,7 @@ public class EnabledTests (ITestOutputHelper _output) : TestsAllViews
         view.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
-        Assert.Equal (subView, view.GetFocused ());
+        Assert.Equal (subView, view.Focused);
 
         view.Enabled = false;
         Assert.False (view.HasFocus);
@@ -67,7 +67,7 @@ public class EnabledTests (ITestOutputHelper _output) : TestsAllViews
         view.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
-        Assert.Equal (subView, view.GetFocused ());
+        Assert.Equal (subView, view.Focused);
 
         view.Enabled = false;
         Assert.False (view.HasFocus);
@@ -94,7 +94,7 @@ public class EnabledTests (ITestOutputHelper _output) : TestsAllViews
         view.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
-        Assert.Equal (subView, view.GetFocused ());
+        Assert.Equal (subView, view.Focused);
 
         subView.Enabled = false;
         Assert.True (view.HasFocus);
@@ -139,13 +139,13 @@ public class EnabledTests (ITestOutputHelper _output) : TestsAllViews
 
         view.SetFocus ();
         Assert.True (subView.HasFocus);
-        Assert.Equal (subView, view.GetFocused ());
-        Assert.Equal (subViewSubView2, subView.GetFocused ());
+        Assert.Equal (subView, view.Focused);
+        Assert.Equal (subViewSubView2, subView.Focused);
 
         subViewSubView2.Enabled = false;
         Assert.True (subView.HasFocus);
-        Assert.Equal (subView, view.GetFocused ());
-        Assert.Equal (subViewSubView3, subView.GetFocused ());
+        Assert.Equal (subView, view.Focused);
+        Assert.Equal (subViewSubView3, subView.Focused);
         Assert.True (subViewSubView3.HasFocus);
     }
 
@@ -246,8 +246,8 @@ public class EnabledTests (ITestOutputHelper _output) : TestsAllViews
 
         subView.Enabled = true;
         Assert.True (subView.HasFocus);
-        Assert.Equal (subView, view.GetFocused ());
-        Assert.Equal (subViewSubView2, subView.GetFocused ());
+        Assert.Equal (subView, view.Focused);
+        Assert.Equal (subViewSubView2, subView.Focused);
         Assert.True (subViewSubView2.HasFocus);
     }
 

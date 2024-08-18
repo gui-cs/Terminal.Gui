@@ -313,7 +313,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 HasFocus = false;
             }
 
-            if (_enabled && CanFocus && Visible && !HasFocus && SuperView is { } && SuperView ?.GetFocused() is null)
+            if (_enabled && CanFocus && Visible && !HasFocus && SuperView is { } && SuperView?.Focused is null)
             {
                 SetFocus ();
             }
@@ -377,7 +377,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 }
             }
 
-            if (_visible && CanFocus && Enabled && !HasFocus && SuperView?.GetFocused () == null)
+            if (_visible && CanFocus && Enabled && !HasFocus && SuperView?.Focused == null)
             {
                 SetFocus ();
             }

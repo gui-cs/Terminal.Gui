@@ -117,7 +117,7 @@ public class ApplicationNavigation
             Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
             top!.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
 
-            if (top.GetFocused () is null)
+            if (top.Focused is null)
             {
                 top.AdvanceFocus (NavigationDirection.Backward, null);
             }

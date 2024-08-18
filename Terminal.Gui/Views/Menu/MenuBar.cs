@@ -391,7 +391,7 @@ public class MenuBar : View, IDesignable
         _selected = 0;
         SetNeedsDisplay ();
 
-        _previousFocused = SuperView is null ? Application.Current?.GetFocused () : SuperView.GetFocused ();
+        _previousFocused = SuperView is null ? Application.Current?.Focused : SuperView.Focused;
         OpenMenu (_selected);
 
         if (!SelectEnabledItem (
@@ -452,7 +452,7 @@ public class MenuBar : View, IDesignable
 
         if (_openMenu is null)
         {
-            _previousFocused = SuperView is null ? Application.Current?.GetFocused () ?? null : SuperView.GetFocused ();
+            _previousFocused = SuperView is null ? Application.Current?.Focused ?? null : SuperView.Focused;
         }
 
         OpenMenu (idx, sIdx, subMenu);

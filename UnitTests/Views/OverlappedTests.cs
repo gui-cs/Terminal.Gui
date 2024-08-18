@@ -1058,7 +1058,7 @@ public class OverlappedTests
         win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
 
         win1.Closing += (s, e) => isRunning = false;
-        Assert.Null (top.GetFocused ());
+        Assert.Null (top.Focused);
         Assert.Equal (top, Application.Current);
         Assert.True (top.IsCurrentTop);
         Assert.Equal (top, ApplicationOverlapped.OverlappedTop);
@@ -1071,7 +1071,7 @@ public class OverlappedTests
         Assert.Equal (win1, Application.Current);
         Assert.True (win1.IsCurrentTop);
         Assert.True (ApplicationOverlapped.IsOverlapped(win1));
-        Assert.Null (top.GetFocused ());
+        Assert.Null (top.Focused);
         Assert.Null (top.GetMostFocused ());
         Assert.Equal (tf1W1, win1.GetMostFocused ());
         Assert.True (ApplicationOverlapped.IsOverlapped(win1));
@@ -1085,7 +1085,7 @@ public class OverlappedTests
         Assert.Equal (win2, Application.Current);
         Assert.True (win2.IsCurrentTop);
         Assert.True (ApplicationOverlapped.IsOverlapped(win2));
-        Assert.Null (top.GetFocused ());
+        Assert.Null (top.Focused);
         Assert.Null (top.GetMostFocused ());
         Assert.Equal (tf1W2, win2.GetMostFocused ());
         Assert.Equal (2, ApplicationOverlapped.OverlappedChildren!.Count);
@@ -1227,7 +1227,7 @@ public class OverlappedTests
 
         Application.Current = current;
         Assert.True (current.HasFocus);
-        Assert.Equal (superView.GetFocused (), current);
+        Assert.Equal (superView.Focused, current);
         Assert.Equal (superView.GetMostFocused (), current);
 
         // Act

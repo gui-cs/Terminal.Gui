@@ -431,7 +431,7 @@ public partial class Toplevel : View
     {
         if (!IsOverlappedContainer)
         {
-            if (GetFocused () is null)
+            if (Focused is null)
             {
                 RestoreFocus (null);
             }
@@ -441,7 +441,7 @@ public partial class Toplevel : View
 
         // This code path only happens when the Toplevel is an Overlapped container
 
-        if (GetFocused () is null)
+        if (Focused is null)
         {
             // TODO: this is an Overlapped hack
             foreach (Toplevel top in ApplicationOverlapped.OverlappedChildren!)

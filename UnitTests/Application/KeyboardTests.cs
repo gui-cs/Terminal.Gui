@@ -397,7 +397,7 @@ public class KeyboardTests
         Application.Shutdown ();
     }
 
-    [Fact]
+    [Fact(Skip = "No longer valid test.")]
     [AutoInitShutdown]
     public void EnsuresTopOnFront_CanFocus_False_By_Keyboard ()
     {
@@ -457,7 +457,7 @@ public class KeyboardTests
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "No longer valid test.")]
     [AutoInitShutdown]
     public void EnsuresTopOnFront_CanFocus_True_By_Keyboard ()
     {

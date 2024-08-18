@@ -147,7 +147,7 @@ public class CanFocusTests (ITestOutputHelper _output) : TestsAllViews
 
         top.SetFocus ();
         Assert.True (top.HasFocus);
-        Assert.Equal (subView, top.GetFocused ());
+        Assert.Equal (subView, top.Focused);
         Assert.True (subView.HasFocus);
         Assert.True (subSubView.HasFocus);
 
