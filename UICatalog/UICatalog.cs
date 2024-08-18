@@ -408,7 +408,7 @@ public class UICatalogApp
             _themeMenuItems = CreateThemeMenuItems ();
             _themeMenuBarItem = new ("_Themes", _themeMenuItems);
 
-            MenuBar = new ()
+            MenuBar menuBar = new ()
             {
                 Menus =
                 [
@@ -462,13 +462,15 @@ public class UICatalogApp
                         )
                 ]
             };
+            Add (menuBar);
 
-            StatusBar = new ()
+            StatusBar statusBar = new ()
             {
                 Visible = ShowStatusBar,
                 AlignmentModes = AlignmentModes.IgnoreFirstOrLast,
                 CanFocus = false
             };
+            Add (statusBar);
 
             if (StatusBar is { })
             {
@@ -484,7 +486,11 @@ public class UICatalogApp
                     Title = "Show/Hide Status Bar",
                     CanFocus = false,
                 };
-                statusBarShortcut.Accept += (sender, args) => { StatusBar.Visible = !StatusBar.Visible; };
+                statusBarShortcut.Accept += (sender, args) =>
+                                            {
+                                                StatusBar.Visible = !StatusBar.Visible;
+                                                args.Handled = true;
+                                            };
 
                 ShForce16Colors = new ()
                 {

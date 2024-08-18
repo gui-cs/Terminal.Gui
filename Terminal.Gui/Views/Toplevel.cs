@@ -69,73 +69,19 @@ public partial class Toplevel : View
     #region Subviews
 
     // TODO: Deprecate - Any view can host a menubar in v2
-    /// <summary>Gets or sets the menu for this Toplevel.</summary>
-    public MenuBar? MenuBar { get; set; }
+    /// <summary>Gets the latest <see cref="MenuBar"/> added into this Toplevel.</summary>
+    public MenuBar? MenuBar => (MenuBar?)Subviews?.LastOrDefault (s => s is MenuBar);
 
     // TODO: Deprecate - Any view can host a statusbar in v2
-    /// <summary>Gets or sets the status bar for this Toplevel.</summary>
-    public StatusBar? StatusBar { get; set; }
+    /// <summary>Gets the latest <see cref="StatusBar"/> added into this Toplevel.</summary>
+    public StatusBar? StatusBar => (StatusBar?)Subviews?.LastOrDefault (s => s is StatusBar);
 
     /// <inheritdoc/>
     public override View Add (View view)
     {
         CanFocus = true;
-        AddMenuStatusBar (view);
 
         return base.Add (view);
-    }
-
-    /// <inheritdoc/>
-    public override View Remove (View view)
-    {
-        if (this is Toplevel { MenuBar: { } })
-        {
-            RemoveMenuStatusBar (view);
-        }
-
-        return base.Remove (view);
-    }
-
-    /// <inheritdoc/>
-    public override void RemoveAll ()
-    {
-        if (this == Application.Top)
-        {
-            MenuBar?.Dispose ();
-            MenuBar = null;
-            StatusBar?.Dispose ();
-            StatusBar = null;
-        }
-
-        base.RemoveAll ();
-    }
-
-    internal void AddMenuStatusBar (View view)
-    {
-        if (view is MenuBar)
-        {
-            MenuBar = view as MenuBar;
-        }
-
-        if (view is StatusBar)
-        {
-            StatusBar = view as StatusBar;
-        }
-    }
-
-    internal void RemoveMenuStatusBar (View view)
-    {
-        if (view is MenuBar)
-        {
-            MenuBar?.Dispose ();
-            MenuBar = null;
-        }
-
-        if (view is StatusBar)
-        {
-            StatusBar?.Dispose ();
-            StatusBar = null;
-        }
     }
 
     // TODO: Overlapped - Rename to AllSubviewsClosed - Move to View?
