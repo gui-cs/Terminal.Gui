@@ -9,13 +9,12 @@
 
 ## Lexicon & Taxonomy
 
-- **Navigation** refers to the user-experience for moving Focus between views in the application view-hierarchy. 
+- **Navigation** refers to the user experience for moving focus between views in the application view-hierarchy. 
 - **Focus** - Refers to the state where a particular UI element (`View`), such as a button, input field, or any interactive component, is actively selected and ready to receive user input. When an element has focus, it typically responds to keyboard events and other interactions.
 - **Focus Chain** - The ordered sequence of UI elements that can receive focus, starting from the currently focused element and extending to its parent (SuperView) elements up to the root of the focus tree (`Application.Top`). This chain determines the path that focus traversal follows within the application. Only one focus chain in an application can have focus (`top.HasFocus == true`), and there is one, and only one, View in a focus chain that is the most-focused; the one receiving keyboard input. 
-- **Navigation** - Refers to the user-experience for moving Focus between views in focus chain.
 - **Cursor** - A visual indicator to the user where keyboard input will have an impact. There is one Cursor per terminal session. See [Cursor](cursor.md) for a deep-dive.
 - **Focus Ordering** - The order focusable Views are navigated. Focus Ordering is typically used in UI frameworks to enable screen readers and improve the Accessibility of an application. In v1, `TabIndex`/`TabIndexes` enabled Focus Ordering. 
-- **Tab** - Describes the `Tab` key found on all keyboards, a break in text that is wider than a space, or a UI element that is a stop-point for keyboard navigation. The use of the word "Tab" for this comes from the typewriter, and is re-enforced by the existence of a `Tab` key on all keyboards.
+- **Tab** - Describes the `Tab` key found on all keyboards, a break in text that is wider than a space, or a UI element that is a stop-point for keyboard navigation. The use of the word "Tab" for this comes from the typewriter, and is reinforced by the existence of a `Tab` key on all keyboards.
 - **TabStop** - A `View` that is an ultimate stop-point for keyboard navigation. In this usage, ultimate means the `View` has no focusable subviews. The `Application.NextTabStopKey` and `Application.PrevTabStopKey` are `Key.Tab` and `Key.Tab.WithShift` respectively. These keys navigate only between peer-views. 
 - **TabGroup** - A `View` that is a container for other focusable views. The `Application.NextTabGroupKey` and `Application.PrevTabGroupKey` are `Key.PageDown.WithCtrl` and `Key.PageUp.WithCtrl` respectively. These keys enable the user to use the keyboard to navigate up and down the view-hierarchy. 
 - **Enter** / **Gain** - Means a View that previously was not focused is now becoming focused. "The View is entering focus" is the same as "The View is gaining focus". These terms are legacy terms from v1.
@@ -29,11 +28,11 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 * **One Focus Per App** - It should not be possible to have two views be the "most focused" view in an application.
 
-* **There's Always a Way With The Keyboard** - The framework strives to ensure users' wanting to use the keyboard can't get into a situation where some element of the application is not accessible via the keyboard. For example, we have unit tests that ensure built-in Views will all have at least one navigation key that advances focus. Another example: As long as a View with a HotKey is visible and enabled, regardless of view hierarchy, if the user presses that hotkey, the action defined by the hotkey will happen (and, by default the View that defines it will be focused). 
+* **There's Always a Way With The Keyboard** - The framework strives to ensure users' wanting to use the keyboard can't get into a situation where some element of the application is not accessible via the keyboard. For example, we have unit tests that ensure built-in Views will all have at least one navigation key that advances focus. Another example: As long as a View with a HotKey is visible and enabled, regardless of view-hierarchy, if the user presses that hotkey, the action defined by the hotkey will happen (and, by default the View that defines it will be focused). 
 
-* **Flexible Overrides** - The framework makes it easy for navigation changes to be made from code and enables changing of behavior to be done in flexible ways. For example a view can be prevented from getting focus by setting `CanFocus` to `false`, overriding `OnEnter` and returning `true` to cancel, or subscribing to `Enter` and setting `Cancel` to `true`. 
+* **Flexible Overrides** - The framework makes it easy for navigation changes to be made from code and enables changing of behavior to be done in flexible ways. For example a view can be prevented from getting focus by setting `CanFocus` to `false`, overriding `OnHasFocusChanging` and returning `true` to cancel, or subscribing to `HasFocusChanging` and setting `Cancel` to `true`. 
 
-* **Decouple Concepts** - In v1 `CanFocus` is tightly coupled with `HasFocus`, `TabIndex`, `TabIndexes`, and `TabStop` and vice-versa. There is a bunch of "magic" logic that automatically attempts to keep these concepts aligned. This results in a bunch of poorly specified, hard to test, and fragile APIs. In v2 we strive to keep the related navigation concepts decoupled. For example, `CanFocus` and `TabStop` completely distinct. A view with `CanFocus == true` can have `TabStop == NoStop` and still be focusable with the mouse.
+* **Decouple Concepts** - In v1 `CanFocus` is tightly coupled with `HasFocus`, `TabIndex`, `TabIndexes`, and `TabStop` and vice-versa. There is a bunch of "magic" logic that automatically attempts to keep these concepts aligned. This results in a bunch of poorly specified, hard-to-test, and fragile APIs. In v2 we strive to keep the related navigation concepts decoupled. For example, `CanFocus` and `TabStop` are decoupled. A view with `CanFocus == true` can have `TabStop == NoStop` and still be focusable with the mouse.
 
 # Design
 
@@ -60,9 +59,9 @@ These keys are all registered as `KeyBindingScope.Application` key bindings by `
 
 See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
 
-In v2, `HotKey`s can be used to navigate across the entire application view-hierarchy. They work independently of `Focus`. This enables a user to navigate across a complex UI of nested subviews if needed (even in overlapped scenarios). An example use-case is the `AllViewsTester` scenario.
+In v2, `HotKey`s can be used to navigate across the entire application view-hierarchy. They work independently of `Focus`. This enables a user to navigate across a complex UI of nested subviews if needed (even in overlapped scenarios). An example use case is the `AllViewsTester` scenario.
 
-Additionally, in v2, multiple Views in an application (even within the same SuperView) can have the same HotKey. Each press of the HotKey will invoke the next HotKey across the View hierarchy (NOT IMPLEMENTED YET - And may be too complex to actually implement for v2.)
+Additionally, in v2, multiple Views in an application (even within the same SuperView) can have the same HotKey. Each press of the HotKey will invoke the next HotKey across the View hierarchy (NOT IMPLEMENTED YET - And may be too complex to implement for v2.)
 
 ## Mouse Navigation
 
@@ -115,7 +114,7 @@ At the View-level, navigation is encapsulated within `View.Navigation.cs`.
 
 First, only Views that are visible and enabled can gain focus. Both `Visible` and `Enabled` must be `true` for a view to be focusable. 
 
-For visible and enabled Views, the `CanFocus` property is then used to determine whether the `View` is focusable. `CanFocus` must be `true` for a View to gain focus. However, even if `CanFocus` is `true`, other factor can prevent the view from gaining focus...
+For visible and enabled Views, the `CanFocus` property is then used to determine whether the `View` is focusable. `CanFocus` must be `true` for a View to gain focus. However, even if `CanFocus` is `true`, other factors can prevent the view from gaining focus...
 
 A visible, enabled, and `CanFocus == true` view can be focused if the user uses the mouse to clicks on it or if code explicitly calls `View.SetFocus()`. Of course, the view itself or some other code can cancel the focus (e.g. by overriding `OnEnter`).
 
@@ -123,7 +122,7 @@ For keyboard navigation, the `TabStop` property is a filter for which views are 
 
 * `null` - This View is still being initialized; acts as a signal to `set_CanFocus` to set `TabStop` to `TabBehavior.TabStop` as convince for the most common use-case. Equivalent to `TabBehavior.NoStop` when determining if a view is focusable by the keyboard or not.
 * `TabBehavior.NoStop` - Prevents the user from using keyboard navigation to cause view (and by definition it's subviews) to gain focus. Note: The view can still be focused using code or the mouse.
-* `TabBehavior.TabStop` - Indicates a View is a focusable view with no focusable subviews. `Application.Next/PrevTabStopKey` will advance ONLY through the peer-Views (`SuperView.Subviews`). 
+* `TabBehavior.TabStop` - Indicates a View is a focusable view with no focusable subviews. `Application.Next/PrevTabStopKey` will advance ONLY through the peer-Views (`SuperView.Subviews`).
 
 * `TabBehavior.GroupStop` - Indicates a View is a focusable container for other focusable views and enables keyboard navigation across these containers. This applies to both tiled and overlapped views. For example, `FrameView` is a simple view designed to be a visible container of other views tiled scenarios. It has `TabStop` set to `TabBehavior.GroupStop` (and `Arrangement` set to `ViewArrangement.Fixed`). Likewise, `Window` is a simple view designed to be a visible container of other views in overlapped scenarios. It has `TabStop` set to `TabBehavior.GroupStop` (and `Arrangement` set to `ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped`). `Application.Next/PrevGroupStopKey` will advance across all `GroupStop` views in the application (unless blocked by a `NoStop` SuperView).
 
@@ -131,7 +130,7 @@ For keyboard navigation, the `TabStop` property is a filter for which views are 
 
 `View.HasFocus` indicates whether the `View` is focused or not. It is the definitive signal. If the view has no focusable Subviews then this property also indicates the view is the most-focused view in the application. 
 
-Setting this property to `true` has the same effect as calling `View.SetFocus ()`, which also means the focus may not actually change as a result.
+Setting this property to `true` has the same effect as calling `View.SetFocus ()`, which also means the focus may not change as a result.
 
 If `v.HasFocus == true` then
 

@@ -6,7 +6,7 @@ For detailed breaking change documentation check out this Discussion: https://gi
 
 ## View Constructors -> Initializers
 
-In v1, [View](~/api/Terminal.Gui.View.yml) and most sub-classes, had multiple constructors that took a variety of parameters. In v2, the constructors have been replaced with initializers. This change was made to simplify the API and make it easier to use. In addition, the v1 constructors drove a false (and needlessly complex) distinction between "Absoulte" and "Computed" layout. In v2, the layout system is much simpler and more intuitive.
+In v1, [View](~/api/Terminal.Gui.View.yml) and most sub-classes had multiple constructors that took a variety of parameters. In v2, the constructors have been replaced with initializers. This change was made to simplify the API and make it easier to use. In addition, the v1 constructors drove a false (and needlessly complex) distinction between "Absolute" and "Computed" layout. In v2, the layout system is much simpler and more intuitive.
 
 ### How to Fix
 
@@ -85,12 +85,12 @@ When measuring the screen space taken up by a `string` you can use the extension
 
 In v1, [View](~/api/Terminal.Gui.View.yml) was derived from `Responder` which supported `IDisposable`. In v2, `Responder` has been removed and [View](~/api/Terminal.Gui.View.yml) is the base-class supporting `IDisposable`. 
 
-In v1, [Application.Init](~/api/Terminal.Gui./Terminal.Gui.Application.Init) automatically created a toplevel view and set [Applicaton.Top](~/api/Terminal.Gui.Applicaton.Top.yml). In v2, [Application.Init](~/api/Terminal.Gui.Application.Init.yml) no longer automatically creates a toplevel or sets [Applicaton.Top](~/api/Terminal.Gui.Applicaton.Top.yml); app developers must explicitly create the toplevel view and pass it to [Appliation.Run](~/api/Terminal.Gui.Appliation.Run.yml) (or use `Application.Run<myTopLevel>`). Developers are responsible for calling `Dispose` on any toplevel they create before exiting. 
+In v1, [Application.Init](~/api/Terminal.Gui./Terminal.Gui.Application.Init) automatically created a toplevel view and set [Application.Top](~/api/Terminal.Gui.Application.Top.yml). In v2, [Application.Init](~/api/Terminal.Gui.Application.Init.yml) no longer automatically creates a toplevel or sets [Application.Top](~/api/Terminal.Gui.Application.Top.yml); app developers must explicitly create the toplevel view and pass it to [Application.Run](~/api/Terminal.Gui.Application.Run.yml) (or use `Application.Run<myTopLevel>`). Developers are responsible for calling `Dispose` on any toplevel they create before exiting. 
 
 ### How to Fix
 
 * Replace `Responder` with [View](~/api/Terminal.Gui.View.yml)
-* Update any code that assumes `Application.Init` automatically created a toplevel view and set `Applicaton.Top`.
+* Update any code that assumes `Application.Init` automatically created a toplevel view and set `Application.Top`.
 * Update any code that assumes `Application.Init` automatically disposed of the toplevel view when the application exited.
 
 ## [Pos](~/api/Terminal.Gui.Pos.yml) and [Dim](~/api/Terminal.Gui.Dim.yml) types now adhere to standard C# idioms
@@ -114,7 +114,7 @@ In v1, [Application.Init](~/api/Terminal.Gui./Terminal.Gui.Application.Init) aut
 
 In v2, the layout system has been improved to make it easier to create complex user interfaces. If you are using custom layouts in your application, you may need to update them to use the new layout system.
 
-* The distinction between `Absoulte Layout` and `Computed Layout` has been removed, as has the `LayoutStyle` enum. v1 drew a false distinction between these styles. 
+* The distinction between `Absolute Layout` and `Computed Layout` has been removed, as has the `LayoutStyle` enum. v1 drew a false distinction between these styles. 
 * [View.Frame](~/api/Terminal.Gui.View.Frame.yml) now represents the position and size of the view in the superview's coordinate system. The `Frame` property is of type `Rectangle`.
 * [View.Bounds](~/api/Terminal.Gui.View.Bounds.yml) has been replaced by [View.Viewport](~/api/Terminal.Gui.View.Viewport.yml). The `Viewport` property represents the visible area of the view in its own coordinate system. The `Viewport` property is of type `Rectangle`.
 * [View.GetContentSize()](~/api/Terminal.Gui.View.GetContentSize.yml) represents the size of the view's content. This replaces `ScrollView` and `ScrollBarView` in v1. See more below.
@@ -150,7 +150,7 @@ In v2, the `Border`, `Margin`, and `Padding` properties have been added to all v
 
 ## Built-in Scrolling
 
-In v1, scrolling was enabled by using `ScrollView` or `ScrollBarView`. In v2, the base [View](~/api/Terminal.Gui.View.yml) class supports scrolling inherently. The area of a view visible to the user at a given moment was previously a rectangle called `Bounds`. `Bounds.Location` was always `Point.Empty`. In v2 the visible area is a rectangle called `Viewport` which is a protal into the Views content, which can be bigger (or smaller) than the area visible to the user. Causing a view to scroll is as simple as changing `View.Viewport.Location`. The View's content described by [View.GetContentSize()](~/api/Terminal.Gui.View.GetContentSize.yml). See [Layout](layout.md) for details.
+In v1, scrolling was enabled by using `ScrollView` or `ScrollBarView`. In v2, the base [View](~/api/Terminal.Gui.View.yml) class supports scrolling inherently. The area of a view visible to the user at a given moment was previously a rectangle called `Bounds`. `Bounds.Location` was always `Point.Empty`. In v2 the visible area is a rectangle called `Viewport` which is a protal into the Views content, which can be bigger (or smaller) than the area visible to the user. Causing a view to scroll is as simple as changing `View.Viewport.Location`. The View's content is described by [View.GetContentSize()](~/api/Terminal.Gui.View.GetContentSize.yml). See [Layout](layout.md) for details.
 
 ### How to Fix
 
@@ -200,7 +200,7 @@ The cursor and focus system has been redesigned in v2 to be more consistent and 
 
 ### Cursor
 
-In v1, whether the cursor (the flashing caret) was visible or not was controlled by `View.CursorVisibility` which was an enum extracted from Ncruses/Terminfo. It only works in some cases on Linux, and only partially with `WindowsDriver`. The position of the cursor was the same as `ConsoleDriver.Row`/`Col` and determined by the last call to `ConsoleDriver.Move`. `View.PositionCursor()` could be overridden by views to cause `Application` to call `ConsoleDriver.Move` on behalf of the app and to manage setting `CursorVisiblity`. This API was confusing and bug-prone.
+In v1, whether the cursor (the flashing caret) was visible or not was controlled by `View.CursorVisibility` which was an enum extracted from Ncruses/Terminfo. It only works in some cases on Linux, and only partially with `WindowsDriver`. The position of the cursor was the same as `ConsoleDriver.Row`/`Col` and determined by the last call to `ConsoleDriver.Move`. `View.PositionCursor()` could be overridden by views to cause `Application` to call `ConsoleDriver.Move` on behalf of the app and to manage setting `CursorVisibility`. This API was confusing and bug-prone.
 
 In v2, the API is (NOT YET IMPLEMENTED) simplified. A view simply reports the style of cursor it wants and the Viewport-relative location:
 
@@ -228,7 +228,7 @@ See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
 * In v1 it was not possible to remove focus from a view. `HasFocus` as a get-only property. In v2, `view.HasFocus` can be set as well. Setting to `true` is equivalent to calling `view.SetFocus`. Setting to `false` is equivalent to calling `view.SuperView.AdvanceFocus` (which might not actually cause `view` to stop having focus). 
 * In v1, calling `super.Add (view)` where `view.CanFocus == true` caused all views up the hierarchy (all SuperViews) to get `CanFocus` set to `true` as well. In v2, developers need to explicitly set `CanFocus` for any view in the view-hierarchy where focus is desired. This simplifies the implementation and removes confusing automatic behavior. 
 * In v1, if `view.CanFocus == true`, `Add` would automatically set `TabStop`. In v2, the automatic setting of `TabStop` in `Add` is retained because it is not overly complex to do so and is a nice convenience for developers to not have to set both `Tabstop` and `CanFocus`. Note v2 does NOT automatically change `CanFocus` if `TabStop` is changed.
-* `view.TabStop` now describes the behavior of a view in the focus-chain. the `TabBehavior` enum includes `NoStop` (the view may be focusable, but not via next/prev keyboard nav), `TabStop` (the view may be focusable, and `NextTabStop`/`PrevTabStop` keyboard nav will stop), `TabGroup` (the view may be focusable, and `NextTabGroup`/`PrevTabGroup` keyboard nav will stop). 
+* `view.TabStop` now describes the behavior of a view in the focus chain. the `TabBehavior` enum includes `NoStop` (the view may be focusable, but not via next/prev keyboard nav), `TabStop` (the view may be focusable, and `NextTabStop`/`PrevTabStop` keyboard nav will stop), `TabGroup` (the view may be focusable, and `NextTabGroup`/`PrevTabGroup` keyboard nav will stop). 
 * In v1, the `View.Focused` property was a cache of which view in `SubViews/TabIndexes` had `HasFocus == true`. There was a lot of logic for keeping this property in sync. In v2, `View.Focused` is a get-only, computed property. 
 * In v1, the `View.MostFocused` property recursed down the subview-hierarchy on each get. In addition, because only one View in an application can be the "most focused", it doesn't make sense for this property to be on every View. In v2, this API is removed. Use `Application.Navigation.GetFocused()` instead.
 * The v1 APIs `View.EnsureFocus`/`FocusNext`/`FocusPrev`/`FocusFirst`/`FocusLast` are replaced in v2 with these APIs that accomplish the same thing, more simply.
@@ -259,7 +259,7 @@ In v2, this is made consistent and configurable:
 - `Key.CursorDown` - Operates identically to `Application.NextTabStopKey`.
 - `Key.CursorLeft` - Operates identically to `Application.PrevTabStopKey`.
 - `Key.CursorUp` - Operates identically to `Application.PrevTabStopKey`.
-- `Application.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a `TabGroup` (see below). If there is no next, the first view that is a `TabGroup` will gain focus.
+- `Application.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a `TabGroup` (see below). If there is no next, the first view which is a `TabGroup`` will gain focus.
 - `Application.PrevTabGroupKey` (`Key.F6.WithShift`) - Opposite of `Application.NextTabGroupKey`.
 
 `F6` was chosen to match [Windows](https://learn.microsoft.com/en-us/windows/apps/design/input/keyboard-accelerators#common-keyboard-accelerators)
@@ -298,7 +298,7 @@ public class TimeoutEventArgs : EventArgs {
 ```
 
 ## How To Fix
-If you previously had a lamda expression, you can simply add the extra arguments:
+If you previously had a lambda expression, you can simply add the extra arguments:
 
 ```diff
 - btnLogin.Clicked += () => { /*do something*/ };
@@ -324,7 +324,7 @@ If you have used a named method instead of a lamda you will need to update the s
 All public classes that were previously [nested classes](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/nested-types) are now in the root namespace as their own classes.
 
 ### How To Fix
-Replace references to to nested types with the new standalone version
+Replace references to nested types with the new standalone version
 
 ```diff
 - var myTab = new TabView.Tab();
@@ -367,7 +367,7 @@ The [Aligner](~/api/Terminal.Gui.Aligner.yml) class makes it easy to align eleme
 
 In v1 `CheckBox` used `bool?` to represent the 3 states. To support consistent behavior for the `Accept` event, `CheckBox` was refactored to use the new `CheckState` enum instead of `bool?`.
 
-Additionally the `Toggle` event was renamed `CheckStateChanging` and made cancelable. The `Toggle` method was renamed to `AdvanceCheckState`.
+Additionally, the `Toggle` event was renamed `CheckStateChanging` and made cancelable. The `Toggle` method was renamed to `AdvanceCheckState`.
 
 ### How to Fix
 
