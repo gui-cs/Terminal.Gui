@@ -89,6 +89,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (CanFocus && SuperView is { CanFocus: false })
         {
+            Debug.WriteLine($@"WARNING: Attempt to EnterFocus where SuperView.CanFocus == false. {this}");
             return false;
         }
 
@@ -594,7 +595,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 HasFocus = false;
             }
 
-            if (_canFocus && SuperView is { } && SuperView.GetFocused () is null && !HasFocus)
+            if (_canFocus && !HasFocus && Visible && SuperView is { } && SuperView.GetFocused () is null )
             {
                 // If CanFocus is set to true and this view does not have focus, make it enter focus
                 SetFocus ();

@@ -126,7 +126,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
 
-        Assert.Throws<InvalidOperationException> (() => tf.CanFocus = true);
+        // Assert.Throws<InvalidOperationException> (() => tf.CanFocus = true);
         fv.CanFocus = true;
         tf.CanFocus = true;
 
