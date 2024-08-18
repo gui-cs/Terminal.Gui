@@ -1155,7 +1155,7 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     ///<inheritdoc/>
-    protected override bool OnEnter (View view)
+    protected override bool OnHasFocusChanging (View view)
     {
         if (SelectedObject is null && Objects.Any ())
         {

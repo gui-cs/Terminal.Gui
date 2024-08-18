@@ -138,8 +138,8 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         var nEnter = 0;
         var nLeave = 0;
 
-        view.Enter += (s, e) => nEnter++;
-        view.Leave += (s, e) => nLeave++;
+        view.HasFocusChanging += (s, e) => nEnter++;
+        view.HasFocusChanged += (s, e) => nLeave++;
 
         top.Add (view, otherView);
         Assert.False (view.HasFocus);
@@ -294,8 +294,8 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         var nEnter = 0;
         var nLeave = 0;
 
-        view.Enter += (s, e) => nEnter++;
-        view.Leave += (s, e) => nLeave++;
+        view.HasFocusChanging += (s, e) => nEnter++;
+        view.HasFocusChanged += (s, e) => nLeave++;
 
         top.Add (view, otherView);
         Application.Begin (top);
@@ -409,25 +409,25 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Application.Current.Add (frm);
         Application.Current.SetFocus ();
 
-        Assert.Equal (winSubview, Application.Current.GetMostFocused ());
+        Assert.Equal (winSubview, Application.Current.MostFocused);
 
         Application.OnKeyDown (Key.Tab); // Move to the next TabStop. There is none. So we should stay.
-        Assert.Equal (winSubview, Application.Current.GetMostFocused ());
+        Assert.Equal (winSubview, Application.Current.MostFocused);
 
         Application.OnKeyDown (Key.F6);
-        Assert.Equal (frmSubview, Application.Current.GetMostFocused ());
+        Assert.Equal (frmSubview, Application.Current.MostFocused);
 
         Application.OnKeyDown (Key.Tab);
-        Assert.Equal (frmSubview, Application.Current.GetMostFocused ());
+        Assert.Equal (frmSubview, Application.Current.MostFocused);
 
         Application.OnKeyDown (Key.F6);
-        Assert.Equal (winSubview, Application.Current.GetMostFocused ());
+        Assert.Equal (winSubview, Application.Current.MostFocused);
 
         Application.OnKeyDown (Key.F6.WithShift);
-        Assert.Equal (frmSubview, Application.Current.GetMostFocused ());
+        Assert.Equal (frmSubview, Application.Current.MostFocused);
 
         Application.OnKeyDown (Key.F6.WithShift);
-        Assert.Equal (winSubview, Application.Current.GetMostFocused ());
+        Assert.Equal (winSubview, Application.Current.MostFocused);
 
         Application.Current.Dispose ();
     }
@@ -451,7 +451,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         View view3 = null;
         var removed = false;
 
-        view2.Enter += (s, e) =>
+        view2.HasFocusChanging += (s, e) =>
                        {
                            if (!removed)
                            {
@@ -463,7 +463,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                            }
                        };
 
-        view2.Leave += (s, e) =>
+        view2.HasFocusChanged += (s, e) =>
                        {
                            Application.Current.Remove (view3);
                            view3.Dispose ();
@@ -503,7 +503,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Assert.False (view.HasFocus);
         view.SetFocus ();
         Assert.True (view.HasFocus);
-        Assert.Null (view.GetMostFocused ());
+        Assert.Null (view.MostFocused);
     }
 
     [Fact]
@@ -526,7 +526,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         view.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.True (subview.HasFocus);
-        Assert.Equal (subview, view.GetMostFocused ());
+        Assert.Equal (subview, view.MostFocused);
 
         var subview2 = new View ()
         {
@@ -535,7 +535,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         };
 
         view.Add (subview2);
-        Assert.Equal (subview2, view.GetMostFocused ());
+        Assert.Equal (subview2, view.MostFocused);
     }
 
     //    [Fact]

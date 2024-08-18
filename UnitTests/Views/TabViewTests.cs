@@ -394,8 +394,8 @@ public class TabViewTests (ITestOutputHelper output)
         // Is the selected tab view hosting focused
         Assert.Equal (tab1, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
-        Assert.Equal (tv.GetMostFocused (), top.Focused.GetMostFocused ());
-        Assert.Equal (tv.SelectedTab.View, top.Focused.GetMostFocused ());
+        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+        Assert.Equal (tv.SelectedTab.View, top.Focused.MostFocused);
 
         // Press the cursor up key to focus the selected tab
         Application.OnKeyDown (Key.CursorUp);
@@ -404,7 +404,7 @@ public class TabViewTests (ITestOutputHelper output)
         // Is the selected tab focused
         Assert.Equal (tab1, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
-        Assert.Equal (tv.GetMostFocused (), top.Focused.GetMostFocused ());
+        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         Tab oldChanged = null;
         Tab newChanged = null;
@@ -422,12 +422,12 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
-        Assert.Equal (tv.GetMostFocused (), top.Focused.GetMostFocused ());
+        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor down key. Since the selected tab has no focusable views, the focus should move to the next view in the toplevel
         Application.OnKeyDown (Key.CursorDown);
         Assert.Equal (tab2, tv.SelectedTab);
-        Assert.Equal (btn, top.GetMostFocused ());
+        Assert.Equal (btn, top.MostFocused);
 
         // Add a focusable subview to Selected Tab
         var btnSubView = new View ()
@@ -441,26 +441,26 @@ public class TabViewTests (ITestOutputHelper output)
         // Press cursor up. Should focus the subview in the selected tab.
         Application.OnKeyDown (Key.CursorUp);
         Assert.Equal (tab2, tv.SelectedTab);
-        Assert.Equal (btnSubView, top.GetMostFocused ());
+        Assert.Equal (btnSubView, top.MostFocused);
 
         Application.OnKeyDown (Key.CursorUp);
-        Assert.Equal (tab2, top.GetMostFocused ());
+        Assert.Equal (tab2, top.MostFocused);
 
         // Press the cursor down key twice.
         Application.OnKeyDown (Key.CursorDown);
         Application.OnKeyDown (Key.CursorDown);
-        Assert.Equal (btn, top.GetMostFocused ());
+        Assert.Equal (btn, top.MostFocused);
 
         // Press the cursor down key again will focus next view in the toplevel, whic is the TabView
         Application.OnKeyDown (Key.CursorDown);
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
-        Assert.Equal (tab1, tv.GetMostFocused ());
+        Assert.Equal (tab1, tv.MostFocused);
 
         // Press the cursor down key to focus the selected tab view hosting again
         Application.OnKeyDown (Key.CursorDown);
         Assert.Equal (tab2, tv.SelectedTab);
-        Assert.Equal (btnSubView, top.GetMostFocused ());
+        Assert.Equal (btnSubView, top.MostFocused);
 
         // Press the cursor up key to focus the selected tab
         Application.OnKeyDown (Key.CursorUp);
@@ -469,7 +469,7 @@ public class TabViewTests (ITestOutputHelper output)
         // Is the selected tab focused
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
-        Assert.Equal (tv.GetMostFocused (), top.Focused.GetMostFocused ());
+        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor left key to select the previous tab
         Application.OnKeyDown (Key.CursorLeft);
@@ -478,7 +478,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
-        Assert.Equal (tv.GetMostFocused (), top.Focused.GetMostFocused ());
+        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the end key to select the last tab
         Application.OnKeyDown (Key.End);
@@ -487,7 +487,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
-        Assert.Equal (tv.GetMostFocused (), top.Focused.GetMostFocused ());
+        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the home key to select the first tab
         Application.OnKeyDown (Key.Home);
@@ -496,7 +496,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
-        Assert.Equal (tv.GetMostFocused (), top.Focused.GetMostFocused ());
+        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the page down key to select the next set of tabs
         Application.OnKeyDown (Key.PageDown);
@@ -505,7 +505,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
-        Assert.Equal (tv.GetMostFocused (), top.Focused.GetMostFocused ());
+        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the page up key to select the previous set of tabs
         Application.OnKeyDown (Key.PageUp);
@@ -514,7 +514,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
-        Assert.Equal (tv.GetMostFocused (), top.Focused.GetMostFocused ());
+        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
         top.Dispose ();
     }
 

@@ -1033,7 +1033,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    protected override void OnLeave (View view)
+    protected override void OnHasFocusChanged (View view)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {

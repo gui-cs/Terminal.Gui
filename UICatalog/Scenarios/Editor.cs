@@ -860,7 +860,7 @@ public class Editor : Scenario
             Width = Dim.Fill (1),
             Text = _textToFind
         };
-        txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
+        txtToFind.HasFocusChanging += (s, e) => txtToFind.Text = _textToFind;
         d.Add (txtToFind);
 
         var btnFindNext = new Button
@@ -1088,7 +1088,7 @@ public class Editor : Scenario
             Width = Dim.Fill (1),
             Text = _textToFind
         };
-        txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
+        txtToFind.HasFocusChanging += (s, e) => txtToFind.Text = _textToFind;
         d.Add (txtToFind);
 
         var btnFindNext = new Button

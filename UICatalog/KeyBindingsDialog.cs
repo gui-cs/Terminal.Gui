@@ -60,7 +60,7 @@ internal class KeyBindingsDialog : Dialog
         AddButton (cancel);
 
         // Register event handler as the last thing in constructor to prevent early calls
-        // before it is even shown (e.g. OnEnter)
+        // before it is even shown (e.g. OnHasFocusChanging)
         _commandsListView.SelectedItemChanged += CommandsListView_SelectedItemChanged;
 
         // Setup to show first ListView entry

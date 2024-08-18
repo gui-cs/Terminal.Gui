@@ -1119,7 +1119,7 @@ public class ScrollViewTests (ITestOutputHelper output)
             CanFocus = true;
         }
 
-        protected override bool OnEnter (View view)
+        protected override bool OnHasFocusChanging (View view)
         {
             Border.LineStyle = LineStyle.None;
             Border.Thickness = new (0);
@@ -1129,7 +1129,7 @@ public class ScrollViewTests (ITestOutputHelper output)
             return false; // don't cancel
         }
 
-        protected override void OnLeave (View view)
+        protected override void OnHasFocusChanged (View view)
         {
             Border.LineStyle = LineStyle.Single;
             Border.Thickness = new (1);

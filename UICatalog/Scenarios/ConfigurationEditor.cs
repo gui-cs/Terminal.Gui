@@ -101,7 +101,7 @@ public class ConfigurationEditor : Scenario
     }
     public void Save ()
     {
-        if (_tileView.GetMostFocused () is ConfigTextView editor)
+        if (_tileView.MostFocused is ConfigTextView editor)
         {
             editor.Save ();
         }
@@ -133,7 +133,7 @@ public class ConfigurationEditor : Scenario
 
             textView.Read ();
 
-            textView.Enter += (s, e) => { _lenShortcut.Title = $"Len:{textView.Text.Length}"; };
+            textView.HasFocusChanging += (s, e) => { _lenShortcut.Title = $"Len:{textView.Text.Length}"; };
         }
 
         Application.Top.LayoutSubviews ();
@@ -172,7 +172,7 @@ public class ConfigurationEditor : Scenario
 
     private void Reload ()
     {
-        if (_tileView.GetMostFocused () is ConfigTextView editor)
+        if (_tileView.MostFocused is ConfigTextView editor)
         {
             editor.Read ();
         }

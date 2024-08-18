@@ -755,7 +755,7 @@ public class MenuBar : View, IDesignable
         {
             case null:
                 // Open a submenu below a MenuBar
-                _lastFocused ??= SuperView is null ? Application.Current?.GetMostFocused () : SuperView.GetMostFocused ();
+                _lastFocused ??= SuperView is null ? Application.Current?.MostFocused : SuperView.MostFocused;
 
                 if (_openSubMenu is { } && !CloseMenu (false, true))
                 {

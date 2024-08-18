@@ -299,7 +299,7 @@ public class ComboBox : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnEnter (View view)
+    protected override bool OnHasFocusChanging (View view)
     {
         if (!_search.HasFocus && !_listview.HasFocus)
         {
@@ -315,7 +315,7 @@ public class ComboBox : View, IDesignable
     public virtual void OnExpanded () { Expanded?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    protected override void OnLeave (View view)
+    protected override void OnHasFocusChanged (View view)
     {
         if (_source?.Count > 0
             && _selectedItem > -1
@@ -940,7 +940,7 @@ public class ComboBox : View, IDesignable
             }
         }
 
-        protected override bool OnEnter (View view)
+        protected override bool OnHasFocusChanging (View view)
         {
             if (_hideDropdownListOnClick)
             {
@@ -952,7 +952,7 @@ public class ComboBox : View, IDesignable
             return false; // Don't cancel the focus switch
         }
 
-        protected override void OnLeave (View view)
+        protected override void OnHasFocusChanged (View view)
         {
             if (_hideDropdownListOnClick)
             {

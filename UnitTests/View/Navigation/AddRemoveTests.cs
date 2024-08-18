@@ -22,7 +22,7 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
             Id = "subView",
             CanFocus = true
         };
-        subView.Enter += (s, e) => nEnter++;
+        subView.HasFocusChanging += (s, e) => nEnter++;
 
         top.Add (subView);
 
@@ -82,7 +82,7 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
             Id = "subView",
             CanFocus = true
         };
-        subView.Leave += (s, e) => nLeave++;
+        subView.HasFocusChanged += (s, e) => nLeave++;
 
         top.Add (subView);
 
@@ -114,7 +114,7 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
             Id = "subView1",
             CanFocus = true
         };
-        subView1.Leave += (s, e) => nLeave1++;
+        subView1.HasFocusChanged += (s, e) => nLeave1++;
 
         View subView2 = new View ()
         {

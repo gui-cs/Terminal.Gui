@@ -125,8 +125,8 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (_focusedBindingsListView);
 
-        appWindow.Leave += AppWindow_Leave;
-        appWindow.Enter += AppWindow_Leave;
+        appWindow.HasFocusChanged += AppWindow_Leave;
+        appWindow.HasFocusChanging += AppWindow_Leave;
         appWindow.DrawContent += AppWindow_DrawContent;
 
         // Run - Start the application.
@@ -139,10 +139,10 @@ public sealed class KeyBindings : Scenario
 
     private void AppWindow_DrawContent (object sender, DrawEventArgs e)
     {
-        _focusedBindingsListView.Title = $"_Focused ({Application.Top.GetMostFocused ().GetType ().Name}) Bindings";
+        _focusedBindingsListView.Title = $"_Focused ({Application.Top.MostFocused.GetType ().Name}) Bindings";
 
         _focusedBindings.Clear ();
-        foreach (var binding in Application.Top.GetMostFocused ().KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
+        foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
         {
             _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
         }
@@ -150,7 +150,7 @@ public sealed class KeyBindings : Scenario
 
     private void AppWindow_Leave (object sender, FocusEventArgs e)
     {
-        foreach (var binding in Application.Top.GetMostFocused ().KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
+        foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
         {
             _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
         }

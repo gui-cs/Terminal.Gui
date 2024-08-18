@@ -777,7 +777,7 @@ At 0,0
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
-        Assert.Null (r.GetMostFocused ());
+        Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
         r.Dispose ();
 
@@ -801,7 +801,7 @@ At 0,0
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
-        Assert.Null (r.GetMostFocused ());
+        Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
         r.Dispose ();
 
@@ -825,7 +825,7 @@ At 0,0
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
-        Assert.Null (r.GetMostFocused ());
+        Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
         r.Dispose ();
 
@@ -858,7 +858,7 @@ At 0,0
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
-        Assert.Null (r.GetMostFocused ());
+        Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.TopBottom_LeftRight, r.TextDirection);
         r.Dispose ();
     }
@@ -1083,7 +1083,7 @@ At 0,0
                                      Assert.True (RunesCount () == 0);
 
                                      win.Visible = true;
-                                     win.FocusDeepest (null, NavigationDirection.Forward);
+                                     win.FocusDeepest (NavigationDirection.Forward, null);
                                      Assert.True (button.HasFocus);
                                      Assert.True (win.HasFocus);
                                      top.Draw ();

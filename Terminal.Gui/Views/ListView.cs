@@ -739,7 +739,7 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnEnter (View view)
+    protected override bool OnHasFocusChanging (View view)
     {
         if (_lastSelectedItem != _selected)
         {

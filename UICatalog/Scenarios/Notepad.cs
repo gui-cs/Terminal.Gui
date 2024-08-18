@@ -84,7 +84,7 @@ public class Notepad : Scenario
 
         _focusedTabView = _tabView;
         _tabView.SelectedTabChanged += TabView_SelectedTabChanged;
-        _tabView.Enter += (s, e) => _focusedTabView = _tabView;
+        _tabView.HasFocusChanging += (s, e) => _focusedTabView = _tabView;
 
         top.Ready += (s, e) =>
                      {
@@ -241,7 +241,7 @@ public class Notepad : Scenario
 
         tv.TabClicked += TabView_TabClicked;
         tv.SelectedTabChanged += TabView_SelectedTabChanged;
-        tv.Enter += (s, e) => _focusedTabView = tv;
+        tv.HasFocusChanging += (s, e) => _focusedTabView = tv;
 
         return tv;
     }
@@ -309,7 +309,7 @@ public class Notepad : Scenario
         tab.CloneTo (newTabView);
         newTile.ContentView.Add (newTabView);
 
-        newTabView.FocusDeepest (null, NavigationDirection.Forward);
+        newTabView.FocusDeepest (NavigationDirection.Forward, null);
         newTabView.AdvanceFocus (NavigationDirection.Forward, null);
     }
 

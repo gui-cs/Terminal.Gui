@@ -938,7 +938,7 @@ public class DynamicMenuBar : Scenario
                                               SetFrameDetails (menuBarItem);
                                           };
 
-            _lstMenus.Enter += (s, e) =>
+            _lstMenus.HasFocusChanging += (s, e) =>
                                {
                                    MenuItem menuBarItem = _lstMenus.SelectedItem > -1 && DataContext.Menus.Count > 0
                                                               ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem
@@ -966,7 +966,7 @@ public class DynamicMenuBar : Scenario
                                        SelectCurrentMenuBarItem ();
                                    };
 
-            lblMenuBar.Enter += (s, e) =>
+            lblMenuBar.HasFocusChanging += (s, e) =>
                                  {
                                      if (_menuBar?.Menus != null)
                                      {

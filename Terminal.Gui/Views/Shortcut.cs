@@ -837,7 +837,7 @@ public class Shortcut : View, IOrientation, IDesignable
     private View _lastFocusedView;
 
     /// <inheritdoc/>
-    protected override bool OnEnter (View view)
+    protected override bool OnHasFocusChanging (View view)
     {
         SetColors ();
         _lastFocusedView = view;
@@ -846,7 +846,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnLeave (View view)
+    protected override void OnHasFocusChanged (View view)
     {
         SetColors ();
         _lastFocusedView = this;

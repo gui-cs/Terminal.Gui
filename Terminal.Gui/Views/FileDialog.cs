@@ -518,7 +518,7 @@ public class FileDialog : Dialog
             };
             AllowedTypeMenuClicked (0);
 
-            _allowedTypeMenuBar.Enter += (s, e) => { _allowedTypeMenuBar.OpenMenu (0); };
+            _allowedTypeMenuBar.HasFocusChanging += (s, e) => { _allowedTypeMenuBar.OpenMenu (0); };
 
             _allowedTypeMenuBar.DrawContentComplete += (s, e) =>
                                                        {
@@ -538,7 +538,7 @@ public class FileDialog : Dialog
         // to streamline user experience and allow direct typing of paths
         // with zero navigation we start with focus in the text box and any
         // default/current path fully selected and ready to be overwritten
-        _tbPath.FocusDeepest (null, NavigationDirection.Forward);
+        _tbPath.FocusDeepest (NavigationDirection.Forward, null);
         _tbPath.SelectAll ();
 
         if (string.IsNullOrEmpty (Title))
@@ -1050,7 +1050,7 @@ public class FileDialog : Dialog
     {
         if (keyEvent.KeyCode == isKey)
         {
-            to.FocusDeepest (null, NavigationDirection.Forward);
+            to.FocusDeepest (NavigationDirection.Forward, null);
 
             if (to == _tbPath)
             {
@@ -1439,7 +1439,7 @@ public class FileDialog : Dialog
     {
         if (_treeView.HasFocus && Separators.Contains ((char)keyEvent))
         {
-            _tbPath.FocusDeepest (null, NavigationDirection.Forward);
+            _tbPath.FocusDeepest (NavigationDirection.Forward, null);
 
             // let that keystroke go through on the tbPath instead
             return true;

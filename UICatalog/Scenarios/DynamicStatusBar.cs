@@ -440,7 +440,7 @@ public class DynamicStatusBar : Scenario
                                       }
                                   };
 
-            _lstItems.Enter += (s, e) =>
+            _lstItems.HasFocusChanging += (s, e) =>
                                {
                                    Shortcut statusItem = DataContext.Items.Count > 0
                                                                ? DataContext.Items [_lstItems.SelectedItem].Shortcut

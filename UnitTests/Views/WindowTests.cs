@@ -143,7 +143,7 @@ public class WindowTests
         Assert.False (defaultWindow.WantContinuousButtonPressed);
         Assert.False (defaultWindow.WantMousePositionReports);
         Assert.Null (defaultWindow.SuperView);
-        Assert.Null (defaultWindow.GetMostFocused ());
+        Assert.Null (defaultWindow.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, defaultWindow.TextDirection);
 
         // Empty Rect
@@ -167,7 +167,7 @@ public class WindowTests
         Assert.False (windowWithFrameRectEmpty.WantContinuousButtonPressed);
         Assert.False (windowWithFrameRectEmpty.WantMousePositionReports);
         Assert.Null (windowWithFrameRectEmpty.SuperView);
-        Assert.Null (windowWithFrameRectEmpty.GetMostFocused ());
+        Assert.Null (windowWithFrameRectEmpty.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrameRectEmpty.TextDirection);
 
         // Rect with values
@@ -198,7 +198,7 @@ public class WindowTests
         Assert.False (windowWithFrame1234.WantContinuousButtonPressed);
         Assert.False (windowWithFrame1234.WantMousePositionReports);
         Assert.Null (windowWithFrame1234.SuperView);
-        Assert.Null (windowWithFrame1234.GetMostFocused ());
+        Assert.Null (windowWithFrame1234.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrame1234.TextDirection);
     }
 

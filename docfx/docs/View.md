@@ -132,7 +132,7 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
 ## Design
 
 * `Responder`("Responder base class implemented by objects that want to participate on keyboard and mouse input.") remains mostly unchanged, with minor changes:
-   * Methods that take `View` parameters (e.g. `OnEnter`) change to take `Responder` (bad OO design).
+   * Methods that take `View` parameters change to take `Responder` (bad OO design).
    * Nuke `IsOverriden` (bad OO design)
    * Move `View.Data` to `Responder` (primitive)
    * Move `Command` and `KeyBinding` stuff from `View`.

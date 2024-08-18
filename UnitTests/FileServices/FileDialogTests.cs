@@ -107,8 +107,8 @@ public class FileDialogTests (ITestOutputHelper output)
         Application.OnKeyDown (Key.Tab);
 #endif
 
-        Assert.IsType<TextField> (dlg.GetMostFocused ());
-        var tf = (TextField)dlg.GetMostFocused ();
+        Assert.IsType<TextField> (dlg.MostFocused);
+        var tf = (TextField)dlg.MostFocused;
         Assert.Equal ("Enter Search", tf.Caption);
 
         // Dialog has not yet been confirmed with a choice
@@ -142,9 +142,9 @@ public class FileDialogTests (ITestOutputHelper output)
 
         AssertIsTheStartingDirectory (dlg.Path);
 
-        Assert.IsType<TextField> (dlg.GetMostFocused ());
+        Assert.IsType<TextField> (dlg.MostFocused);
         Send ('v', ConsoleKey.DownArrow);
-        Assert.IsType<TableView> (dlg.GetMostFocused ());
+        Assert.IsType<TableView> (dlg.MostFocused);
 
         // ".." should be the first thing selected
         // ".." should not mess with the displayed path
@@ -181,9 +181,9 @@ public class FileDialogTests (ITestOutputHelper output)
         IReadOnlyCollection<string> eventMultiSelected = null;
         dlg.FilesSelected += (s, e) => { eventMultiSelected = e.Dialog.MultiSelected; };
 
-        Assert.IsType<TextField> (dlg.GetMostFocused ());
+        Assert.IsType<TextField> (dlg.MostFocused);
         Send ('v', ConsoleKey.DownArrow);
-        Assert.IsType<TableView> (dlg.GetMostFocused ());
+        Assert.IsType<TableView> (dlg.MostFocused);
 
         // Try to toggle '..'
         Send (' ', ConsoleKey.Spacebar);
@@ -236,9 +236,9 @@ public class FileDialogTests (ITestOutputHelper output)
         IReadOnlyCollection<string> eventMultiSelected = null;
         dlg.FilesSelected += (s, e) => { eventMultiSelected = e.Dialog.MultiSelected; };
 
-        Assert.IsType<TextField> (dlg.GetMostFocused ());
+        Assert.IsType<TextField> (dlg.MostFocused);
         Send ('v', ConsoleKey.DownArrow);
-        Assert.IsType<TableView> (dlg.GetMostFocused ());
+        Assert.IsType<TableView> (dlg.MostFocused);
 
         // Move selection to subfolder
         Send ('v', ConsoleKey.DownArrow);
@@ -288,9 +288,9 @@ public class FileDialogTests (ITestOutputHelper output)
         IReadOnlyCollection<string> eventMultiSelected = null;
         dlg.FilesSelected += (s, e) => { eventMultiSelected = e.Dialog.MultiSelected; };
 
-        Assert.IsType<TextField> (dlg.GetMostFocused ());
+        Assert.IsType<TextField> (dlg.MostFocused);
         Send ('v', ConsoleKey.DownArrow);
-        Assert.IsType<TableView> (dlg.GetMostFocused ());
+        Assert.IsType<TableView> (dlg.MostFocused);
 
         // Move selection to subfolder
         Send ('v', ConsoleKey.DownArrow);
@@ -331,9 +331,9 @@ public class FileDialogTests (ITestOutputHelper output)
         dlg.OpenMode = openModeMixed ? OpenMode.Mixed : OpenMode.Directory;
         dlg.AllowsMultipleSelection = multiple;
 
-        Assert.IsType<TextField> (dlg.GetMostFocused ());
+        Assert.IsType<TextField> (dlg.MostFocused);
         Send ('v', ConsoleKey.DownArrow);
-        Assert.IsType<TableView> (dlg.GetMostFocused ());
+        Assert.IsType<TableView> (dlg.MostFocused);
 
         // Should be selecting ..
         Send ('v', ConsoleKey.DownArrow);

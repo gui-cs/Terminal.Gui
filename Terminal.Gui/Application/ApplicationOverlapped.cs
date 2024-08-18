@@ -75,7 +75,7 @@ public static class ApplicationOverlapped
             return;
         }
 
-        View? top = FindTopFromView (Application.Top?.GetMostFocused ());
+        View? top = FindTopFromView (Application.Top?.MostFocused);
 
         if (top is Toplevel && Application.Top?.Subviews.Count > 1 && Application.Top.Subviews [^1] != top)
         {

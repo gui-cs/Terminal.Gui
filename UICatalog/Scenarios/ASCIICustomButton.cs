@@ -110,7 +110,7 @@ public class ASCIICustomButtonTest : Scenario
             Add (_border, _fill, title);
         }
 
-        protected override bool OnEnter (View view)
+        protected override bool OnHasFocusChanging (View view)
         {
             _border.Visible = false;
             _fill.Visible = true;
@@ -119,7 +119,7 @@ public class ASCIICustomButtonTest : Scenario
             return false; // don't cancel
         }
 
-        protected override void OnLeave (View view)
+        protected override void OnHasFocusChanged (View view)
         {
             _border.Visible = true;
             _fill.Visible = false;
