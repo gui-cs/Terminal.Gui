@@ -616,7 +616,7 @@ public class TableViewTests (ITestOutputHelper output)
         top.Add (tableView);
         Application.Begin (top);
 
-        top.FocusDeepest (null, NavigationDirection.Forward);
+        top.FocusDeepest (NavigationDirection.Forward, null);
         Assert.True (tableView.HasFocus);
 
         Assert.Equal (0, tableView.RowOffset);
@@ -1606,7 +1606,7 @@ public class TableViewTests (ITestOutputHelper output)
         top.Add (tv);
         Application.Begin (top);
 
-        top.FocusDeepest (null, NavigationDirection.Forward);
+        top.FocusDeepest (NavigationDirection.Forward, null);
         Assert.True (tv.HasFocus);
 
         // already on fish

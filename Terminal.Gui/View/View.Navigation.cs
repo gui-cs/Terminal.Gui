@@ -362,7 +362,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return true;
         }
 
-        View[] index = GetScopedTabIndexes (behavior, direction);
+        View[] index = GetScopedTabIndexes (direction, behavior);
 
         if (index.Length == 0)
         {
@@ -622,12 +622,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Focuses the deepest focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
     ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
     /// </summary>
-    /// <param name="behavior"></param>
     /// <param name="direction"></param>
+    /// <param name="behavior"></param>
     /// <returns><see langword="true"/> if a subview other than this was focused.</returns>
-    public bool FocusDeepest (TabBehavior? behavior, NavigationDirection direction)
+    public bool FocusDeepest (NavigationDirection direction, TabBehavior? behavior)
     {
-        View deepest = FindDeepestFocusableView (behavior, direction);
+        View deepest = FindDeepestFocusableView (direction, behavior);
 
         if (deepest is { })
         {
@@ -638,9 +638,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
     }
 
     [CanBeNull]
-    private View FindDeepestFocusableView (TabBehavior? behavior, NavigationDirection direction)
+    private View FindDeepestFocusableView (NavigationDirection direction, TabBehavior? behavior)
     {
-        var indicies = GetScopedTabIndexes (behavior, direction);
+        var indicies = GetScopedTabIndexes (direction, behavior);
 
         foreach (View v in indicies)
         {
@@ -649,7 +649,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 return v;
             }
 
-            return v.FindDeepestFocusableView (behavior, direction);
+            return v.FindDeepestFocusableView (direction, behavior);
         }
 
         return null;
@@ -680,10 +680,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <summary>
     /// Gets TabIndexes that are scoped to the specified behavior and direction. If behavior is null, all TabIndexes are returned.
     /// </summary>
-    /// <param name="behavior"></param>
     /// <param name="direction"></param>
+    /// <param name="behavior"></param>
     /// <returns></returns>GetScopedTabIndexes
-    private View [] GetScopedTabIndexes (TabBehavior? behavior, NavigationDirection direction)
+    private View [] GetScopedTabIndexes (NavigationDirection direction, TabBehavior? behavior)
     {
         IEnumerable<View>? indicies;
 

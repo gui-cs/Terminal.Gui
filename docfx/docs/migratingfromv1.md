@@ -218,6 +218,7 @@ In v2, the API is (NOT YET IMPLEMENTED) simplified. A view simply reports the st
 
 * Use [View.CursorPosition](~/api/Terminal.Gui.View.CursorPosition.yml) to set the cursor position in a view. Set [View.CursorPosition](~/api/Terminal.Gui.View.CursorPosition.yml) to `null` to hide the cursor.
 * Set [View.CursorVisibility](~/api/Terminal.Gui.View.CursorVisibility.yml) to the cursor style you want to use.
+* Remove any overrides of `OnEnter` and `OnLeave` that explicitly change the cursor.
 
 ### Focus
 
@@ -227,11 +228,14 @@ See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
 * In v1, calling `super.Add (view)` where `view.CanFocus == true` caused all views up the hierarchy (all SuperViews) to get `CanFocus` set to `true` as well. In v2, developers need to explicitly set `CanFocus` for any view in the view-hierarchy where focus is desired. This simplifies the implementation and removes confusing automatic behavior. 
 * In v1, if `view.CanFocus == true`, `Add` would automatically set `TabStop`. In v2, the automatic setting of `TabStop` in `Add` is retained because it is not overly complex to do so and is a nice convenience for developers to not have to set both `Tabstop` and `CanFocus`. Note v2 does NOT automatically change `CanFocus` if `TabStop` is changed.
 * `view.TabStop` now describes the behavior of a view in the focus-chain. the `TabBehavior` enum includes `NoStop` (the view may be focusable, but not via next/prev keyboard nav), `TabStop` (the view may be focusable, and `NextTabStop`/`PrevTabStop` keyboard nav will stop), `TabGroup` (the view may be focusable, and `NextTabGroup`/`PrevTabGroup` keyboard nav will stop). 
+* In v1, the `View.Focused` property was a cache of which view in `SubViews/TabIndexes` had `HasFocus == true`. There was a lot of logic for keeping this property in sync. In v2, `View.Focused` is a get-only, computed property. 
+* In v1, the `View.OnEnter/Enter` and `View.OnLeave/Leave` virtual methods/events could be used to notify that a view had gained or lost focus, but had confusing semantics around what it mean to override (requiring calling `base`) and bug-ridden behavior on what the return values signified. The "Enter" and "Leave" terminology was confusing. In v2, the terminology is "Focus" and "Blur", matching modern web frameworks and the `View.OnFocus/Focus` and `View.OnBlur/Blur` virtual methods/events follow standard dotnet event patterns. The `OnFocus/Focus` event supports being cancelled.
+* In v1, the concept of `Mdi` views included a large amount of complex code (in `Toplevel` and `Application`) for dealing with navigation across overlapped Views. This has all been radically simplified in v2. Any View can work in an "overlapped" or "tiled" way. See [navigation.md](navigation.md) for more details.
 
 ### How to Fix (Focus API)
 
 * Use [Application.Navigation.GetFocused()](~/api/Terminal.Gui.Application.Navigation.GetFocused.yml) to get the most focused view in the application.
-* Remove any overrides of `OnEnter` and `OnLeave` that explicitly change the cursor.
+* ..
 
 ### Keyboard Navigation
 
