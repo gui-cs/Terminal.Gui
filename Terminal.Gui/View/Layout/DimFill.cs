@@ -11,11 +11,6 @@ namespace Terminal.Gui;
 /// <param name="Margin">The margin to not fill.</param>
 public record DimFill (int Margin) : Dim
 {
-    /// <summary>
-    ///     Gets the margin to not fill.
-    /// </summary>
-    public int Margin { get; } = Margin;
-
     /// <inheritdoc/>
     public override string ToString () { return $"Fill({Margin})"; }
 

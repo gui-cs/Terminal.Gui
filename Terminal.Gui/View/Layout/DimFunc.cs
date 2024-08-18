@@ -8,19 +8,16 @@ namespace Terminal.Gui;
 ///     This is a low-level API that is typically used internally by the layout system. Use the various static
 ///     methods on the <see cref="Gui.Dim"/> class to create <see cref="Gui.Dim"/> objects instead.
 /// </remarks>
-/// <param name="Dim"></param>
-public record DimFunc (Func<int> Dim) : Dim
+/// <param name="Fn">The function that computes the dimension.</param>
+public record DimFunc (Func<int> Fn) : Dim
 {
     /// <summary>
     ///     Gets the function that computes the dimension.
     /// </summary>
-    public new Func<int> Func { get; } = Dim;
+    public Func<int> Fn { get; } = Fn;
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return Func.GetHashCode (); }
+    public override string ToString () { return $"DimFunc({Fn ()})"; }
 
-    /// <inheritdoc/>
-    public override string ToString () { return $"DimFunc({Func ()})"; }
-
-    internal override int GetAnchor (int size) { return Func (); }
+    internal override int GetAnchor (int size) { return Fn (); }
 }

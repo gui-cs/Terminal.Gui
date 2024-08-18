@@ -4,22 +4,11 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Represents a position that is computed by executing a function that returns an integer position.
 /// </summary>
-/// <remarks>
-///     <para>
-///         This is a low-level API that is typically used internally by the layout system. Use the various static
-///         methods on the <see cref="Gui.Pos"/> class to create <see cref="Gui.Pos"/> objects instead.
-///     </para>
-/// </remarks>
-/// <param name="Pos">The position.</param>
-public record PosFunc (Func<int> Pos) : Pos
+/// <param name="Pos">The function that computes the position.</param>
+public record PosFunc (Func<int> Fn) : Pos
 {
-    /// <summary>
-    ///     Gets the function that computes the position.
-    /// </summary>
-    public new Func<int> Func { get; } = Pos;
-
     /// <inheritdoc/>
-    public override string ToString () { return $"PosFunc({Func ()})"; }
+    public override string ToString () { return $"PosFunc({Fn ()})"; }
 
-    internal override int GetAnchor (int size) { return Func (); }
+    internal override int GetAnchor (int size) { return Fn (); }
 }
