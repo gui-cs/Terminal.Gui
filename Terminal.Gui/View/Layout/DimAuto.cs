@@ -15,63 +15,16 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 ///     </para>
 /// </remarks>
-public class DimAuto : Dim
+/// <param name="MaximumContentDim">The maximum dimension the View's ContentSize will be fit to.</param>
+/// <param name="MinimumContentDim">The minimum dimension the View's ContentSize will be constrained to.</param>
+/// <param name="Style">The <see cref="DimAutoStyle"/> of the <see cref="DimAuto"/>.</param>
+public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoStyle Style) : Dim
 {
-    private readonly Dim? _maximumContentDim;
-
-    private readonly Dim? _minimumContentDim;
-
-    private readonly DimAutoStyle _style;
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other)
-    {
-        if (other is not DimAuto auto)
-        {
-            return false;
-        }
-
-        return auto.MinimumContentDim == MinimumContentDim && auto.MaximumContentDim == MaximumContentDim && auto.Style == Style;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (MinimumContentDim, MaximumContentDim, Style); }
-
-    /// <summary>
-    ///     Gets the maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.
-    /// </summary>
-
-    // ReSharper disable once ConvertToAutoProperty
-    public required Dim? MaximumContentDim
-    {
-        get => _maximumContentDim;
-        init => _maximumContentDim = value;
-    }
-
-    /// <summary>
-    ///     Gets the minimum dimension the View's ContentSize will be constrained to.
-    /// </summary>
-
-    // ReSharper disable once ConvertToAutoProperty
-    public required Dim? MinimumContentDim
-    {
-        get => _minimumContentDim;
-        init => _minimumContentDim = value;
-    }
-
-    /// <summary>
-    ///     Gets the style of the DimAuto.
-    /// </summary>
-
-    // ReSharper disable once ConvertToAutoProperty
-    public required DimAutoStyle Style
-    {
-        get => _style;
-        init => _style = value;
-    }
-
     /// <inheritdoc/>
     public override string ToString () { return $"Auto({Style},{MinimumContentDim},{MaximumContentDim})"; }
+
+    /// <inheritdoc />
+    internal override int GetAnchor (int size) => 0;
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
@@ -181,8 +134,8 @@ public class DimAuto : Dim
                                                                         && !v.X.Has (typeof (PosAnchorEnd), out _)
                                                                         && !v.X.Has (typeof (PosAlign), out _)
                                                                         && !v.X.Has (typeof (PosCenter), out _)
-                                                                        && !v.Width.Has (typeof (DimFill), out _)
-                                                                        && !v.Width.Has (typeof (DimPercent), out _)
+                                                                        && !v.Width.Has<DimFill> (out _)
+                                                                        && !v.Width.Has<DimPercent> (out _)
                                                                   )
                                                            .ToList ();
                 }
@@ -194,8 +147,8 @@ public class DimAuto : Dim
                                                                         && !v.Y.Has (typeof (PosAnchorEnd), out _)
                                                                         && !v.Y.Has (typeof (PosAlign), out _)
                                                                         && !v.Y.Has (typeof (PosCenter), out _)
-                                                                        && !v.Height.Has (typeof (DimFill), out _)
-                                                                        && !v.Height.Has (typeof (DimPercent), out _)
+                                                                        && !v.Height.Has<DimFill> (out _)
+                                                                        && !v.Height.Has<DimPercent> (out _)
                                                                   )
                                                            .ToList ();
                 }
@@ -419,11 +372,11 @@ public class DimAuto : Dim
 
                 if (dimension == Dimension.Width)
                 {
-                    dimViewSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has (typeof (DimView), out _)).ToList ();
+                    dimViewSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has<DimView> (out _)).ToList ();
                 }
                 else
                 {
-                    dimViewSubViews = includedSubviews.Where (v => v.Height is { } && v.Height.Has (typeof (DimView), out _)).ToList ();
+                    dimViewSubViews = includedSubviews.Where (v => v.Height is { } && v.Height.Has<DimView> (out _)).ToList ();
                 }
 
                 for (var i = 0; i < dimViewSubViews.Count; i++)

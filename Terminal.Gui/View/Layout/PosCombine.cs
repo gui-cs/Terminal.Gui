@@ -10,27 +10,27 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
 ///     </para>
 /// </remarks>
-/// <param name="add">
+/// <param name="Add">
 ///     Indicates whether the two positions are added or subtracted.
 /// </param>
-/// <param name="left">The left position.</param>
-/// <param name="right">The right position.</param>
-public class PosCombine (AddOrSubtract add, Pos left, Pos right) : Pos
+/// <param name="Left">The left position.</param>
+/// <param name="Right">The right position.</param>
+public record PosCombine (AddOrSubtract Add, Pos Left, Pos Right) : Pos
 {
     /// <summary>
     ///     Gets whether the two positions are added or subtracted.
     /// </summary>
-    public AddOrSubtract Add { get; } = add;
+    public AddOrSubtract Add { get; } = Add;
 
     /// <summary>
     ///     Gets the left position.
     /// </summary>
-    public new Pos Left { get; } = left;
+    public new Pos Left { get; } = Left;
 
     /// <summary>
     ///     Gets the right position.
     /// </summary>
-    public new Pos Right { get; } = right;
+    public new Pos Right { get; } = Right;
 
     /// <inheritdoc/>
     public override string ToString () { return $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})"; }

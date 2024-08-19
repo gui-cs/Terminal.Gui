@@ -1,7 +1,7 @@
 #nullable enable
-using System.Diagnostics;
-
 namespace Terminal.Gui;
+
+using System.Numerics;
 
 /// <summary>
 ///     <para>
@@ -78,7 +78,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para></para>
 /// </remarks>
-public abstract class Dim
+public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
 {
     #region static Dim creation methods
 
@@ -113,12 +113,10 @@ public abstract class Dim
     /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to.</param>
     public static Dim? Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim? minimumContentDim = null, Dim? maximumContentDim = null)
     {
-        return new DimAuto ()
-        {
-            MinimumContentDim = minimumContentDim,
-            MaximumContentDim = maximumContentDim,
-            Style = style
-        };
+        return new DimAuto (
+                            MinimumContentDim: minimumContentDim,
+                            MaximumContentDim: maximumContentDim,
+                            Style: style);
     }
 
     /// <summary>
@@ -172,28 +170,22 @@ public abstract class Dim
 
     #endregion static Dim creation methods
 
+
     /// <summary>
-    ///     Indicates whether the specified type is in the hierarchy of this Dim object.
+    ///     Indicates whether the specified type <typeparamref name="T"/> is in the hierarchy of this Dim object.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="dim"></param>
+    /// <param name="dim">A reference to this <see cref="Dim"/> instance.</param>
     /// <returns></returns>
-    public bool Has (Type type, out Dim dim)
+    public bool Has<T> (out Dim dim) where T : Dim
     {
         dim = this;
-        if (type == GetType ())
-        {
-            return true;
-        }
 
-        // If we are a PosCombine, we have to check the left and right
-        // to see if they are of the type we are looking for.
-        if (this is DimCombine { } combine && (combine.Left.Has (type, out dim) || combine.Right.Has (type, out dim)))
-        {
-            return true;
-        }
-
-        return false;
+        return this switch
+               {
+                   DimCombine combine => combine.Left.Has<T> (out dim) || combine.Right.Has<T> (out dim),
+                   T => true,
+                   _ => false
+               };
     }
 
     #region virtual methods
@@ -208,7 +200,7 @@ public abstract class Dim
     ///     subclass of Dim that is used. For example, DimAbsolute returns a fixed dimension, DimFactor returns a
     ///     dimension that is a certain percentage of the super view's size, and so on.
     /// </returns>
-    internal virtual int GetAnchor (int size) { return 0; }
+    internal abstract int GetAnchor (int size);
 
     /// <summary>
     ///     Calculates and returns the dimension of a <see cref="View"/> object. It takes into account the location of the
@@ -228,7 +220,7 @@ public abstract class Dim
     /// </returns>
     internal virtual int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        return Math.Max (GetAnchor (superviewContentSize - location), 0);
+        return Math.Clamp (GetAnchor (superviewContentSize - location), 0, short.MaxValue);
     }
 
     /// <summary>
