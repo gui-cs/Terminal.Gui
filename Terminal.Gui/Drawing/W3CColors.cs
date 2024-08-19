@@ -11,11 +11,13 @@ namespace Terminal.Gui;
 /// </summary>
 public class W3CColors : IColorNameResolver
 {
+    /// <inheritdoc />
     public IEnumerable<string> GetColorNames ()
     {
         return ColorStrings.GetW3CColorNames ();
     }
 
+    /// <inheritdoc />
     public bool TryParseColor (string name, out Color color)
     {
         return ColorStrings.TryParseW3CColorName (name, out color);

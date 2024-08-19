@@ -56,6 +56,10 @@ public static class ColorStrings
         return false;
     }
 
+    /// <summary>
+    ///     Returns the list of W3C standard color names.
+    /// </summary>
+    /// <returns></returns>
     public static IEnumerable<string> GetW3CColorNames ()
     {
         foreach (DictionaryEntry entry in _resourceManager.GetResourceSet (CultureInfo.CurrentCulture, true, true)!)
