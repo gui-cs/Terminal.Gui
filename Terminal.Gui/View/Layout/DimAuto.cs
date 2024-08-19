@@ -15,7 +15,7 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 ///     </para>
 /// </remarks>
-/// <param name="MaximumContentDim">The maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.</param>
+/// <param name="MaximumContentDim">The maximum dimension the View's ContentSize will be fit to.</param>
 /// <param name="MinimumContentDim">The minimum dimension the View's ContentSize will be constrained to.</param>
 /// <param name="Style">The <see cref="DimAutoStyle"/> of the <see cref="DimAuto"/>.</param>
 public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoStyle Style) : Dim
@@ -134,8 +134,8 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                                                                         && !v.X.Has (typeof (PosAnchorEnd), out _)
                                                                         && !v.X.Has (typeof (PosAlign), out _)
                                                                         && !v.X.Has (typeof (PosCenter), out _)
-                                                                        && !v.Width.Has (typeof (DimFill), out _)
-                                                                        && !v.Width.Has (typeof (DimPercent), out _)
+                                                                        && !v.Width.Has<DimFill> (out _)
+                                                                        && !v.Width.Has<DimPercent> (out _)
                                                                   )
                                                            .ToList ();
                 }
@@ -147,8 +147,8 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                                                                         && !v.Y.Has (typeof (PosAnchorEnd), out _)
                                                                         && !v.Y.Has (typeof (PosAlign), out _)
                                                                         && !v.Y.Has (typeof (PosCenter), out _)
-                                                                        && !v.Height.Has (typeof (DimFill), out _)
-                                                                        && !v.Height.Has (typeof (DimPercent), out _)
+                                                                        && !v.Height.Has<DimFill> (out _)
+                                                                        && !v.Height.Has<DimPercent> (out _)
                                                                   )
                                                            .ToList ();
                 }
@@ -372,11 +372,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    dimViewSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has (typeof (DimView), out _)).ToList ();
+                    dimViewSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has<DimView> (out _)).ToList ();
                 }
                 else
                 {
-                    dimViewSubViews = includedSubviews.Where (v => v.Height is { } && v.Height.Has (typeof (DimView), out _)).ToList ();
+                    dimViewSubViews = includedSubviews.Where (v => v.Height is { } && v.Height.Has<DimView> (out _)).ToList ();
                 }
 
                 for (var i = 0; i < dimViewSubViews.Count; i++)

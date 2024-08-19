@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Represents a position that is computed by executing a function that returns an integer position.
 /// </summary>
-/// <param name="Pos">The function that computes the position.</param>
+/// <param name="Fn">The function that computes the position.</param>
 public record PosFunc (Func<int> Fn) : Pos
 {
     /// <inheritdoc/>

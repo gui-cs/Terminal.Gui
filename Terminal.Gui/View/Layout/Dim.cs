@@ -170,31 +170,6 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
 
     #endregion static Dim creation methods
 
-    /// <summary>
-    ///     Indicates whether the specified type is in the hierarchy of this Dim object.
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="dim"></param>
-    /// <returns></returns>
-    [Obsolete ("Not AoT-safe. Use generic form Has<T> instead.")]
-    public bool Has (Type type, out Dim dim)
-    {
-        dim = this;
-
-        if (type == GetType ())
-        {
-            return true;
-        }
-
-        // If we are a DimCombine, we have to check the left and right
-        // to see if they are of the type we are looking for.
-        if (this is DimCombine { } combine && (combine.Left.Has (type, out dim) || combine.Right.Has (type, out dim)))
-        {
-            return true;
-        }
-
-        return false;
-    }
 
     /// <summary>
     ///     Indicates whether the specified type <typeparamref name="T"/> is in the hierarchy of this Dim object.
@@ -207,15 +182,9 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
 
         return this switch
                {
-                   T => true,
-
-                   // INTENT: Is it intentional that, when T is already DimCombine, this won't get called?
-                   // If not, the fix is to do this one first.
-                   // (That's also the case in the original)
-                   // If we are a DimCombine, we have to check the left and right
-                   // to see if they are of the type we are looking for.
                    DimCombine combine => combine.Left.Has<T> (out dim) || combine.Right.Has<T> (out dim),
-                   _                  => false
+                   T => true,
+                   _ => false
                };
     }
 
