@@ -178,15 +178,17 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <param name="type"></param>
     /// <param name="dim"></param>
     /// <returns></returns>
+    [Obsolete ("Not AoT-safe. Use generic form Has<T> instead.")]
     public bool Has (Type type, out Dim dim)
     {
         dim = this;
+
         if (type == GetType ())
         {
             return true;
         }
 
-        // If we are a PosCombine, we have to check the left and right
+        // If we are a DimCombine, we have to check the left and right
         // to see if they are of the type we are looking for.
         if (this is DimCombine { } combine && (combine.Left.Has (type, out dim) || combine.Right.Has (type, out dim)))
         {
