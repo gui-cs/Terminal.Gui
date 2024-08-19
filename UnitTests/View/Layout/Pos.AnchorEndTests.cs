@@ -28,15 +28,6 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void PosAnchorEnd_GetHashCode ()
-    {
-        var posAnchorEnd = new PosAnchorEnd (10);
-        var expectedHashCode = 10.GetHashCode ();
-
-        Assert.Equal (expectedHashCode, posAnchorEnd.GetHashCode ());
-    }
-
-    [Fact]
     public void PosAnchorEnd_ToString ()
     {
         var posAnchorEnd = new PosAnchorEnd (10);

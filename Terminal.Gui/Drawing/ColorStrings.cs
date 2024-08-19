@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 /// </summary>
 public static class ColorStrings
 {
-    private static readonly ResourceManager _resourceManager = new ResourceManager (typeof (Strings));
+    private static readonly ResourceManager _resourceManager = new (typeof (Strings));
 
     /// <summary>
     ///     Gets the W3C standard string for <paramref name="color"/>.
@@ -22,6 +22,23 @@ public static class ColorStrings
     {
         // Fetch the color name from the resource file
         return _resourceManager.GetString ($"#{color.R:X2}{color.G:X2}{color.B:X2}", CultureInfo.CurrentCulture);
+    }
+
+    /// <summary>
+    ///     Returns the list of W3C standard color names.
+    /// </summary>
+    /// <returns></returns>
+    public static IEnumerable<string> GetW3CColorNames ()
+    {
+        foreach (DictionaryEntry entry in _resourceManager.GetResourceSet (CultureInfo.CurrentCulture, true, true)!)
+        {
+            string keyName = entry.Key.ToString () ?? string.Empty;
+
+            if (entry.Value is string colorName && keyName.StartsWith ('#'))
+            {
+                yield return colorName;
+            }
+        }
     }
 
     /// <summary>
@@ -39,35 +56,23 @@ public static class ColorStrings
             {
                 // Parse the key to extract the color components
                 string key = entry.Key.ToString () ?? string.Empty;
+
                 if (key.StartsWith ("#") && key.Length == 7)
                 {
-                    if (int.TryParse (key.Substring (1, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int r) &&
-                        int.TryParse (key.Substring (3, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int g) &&
-                        int.TryParse (key.Substring (5, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int b))
+                    if (int.TryParse (key.Substring (1, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int r)
+                        && int.TryParse (key.Substring (3, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int g)
+                        && int.TryParse (key.Substring (5, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int b))
                     {
-                        color = new Color (r, g, b);
+                        color = new (r, g, b);
+
                         return true;
                     }
                 }
             }
         }
 
-        color = default;
-        return false;
-    }
+        color = default (Color);
 
-    /// <summary>
-    ///     Returns the list of W3C standard color names.
-    /// </summary>
-    /// <returns></returns>
-    public static IEnumerable<string> GetW3CColorNames ()
-    {
-        foreach (DictionaryEntry entry in _resourceManager.GetResourceSet (CultureInfo.CurrentCulture, true, true)!)
-        {
-            if (entry.Value is string colorName)
-            {
-                yield return colorName;
-            }
-        }
+        return false;
     }
 }

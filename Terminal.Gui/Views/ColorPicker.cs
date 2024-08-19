@@ -7,77 +7,10 @@ namespace Terminal.Gui;
 /// </summary>
 public class ColorPicker : View
 {
-    private TextField _tfHex;
-    private Label _lbHex;
-
-    private TextField? _tfName;
-    private Label? _lbName;
-
-    private Color _selectedColor = Color.Black;
-
-    // TODO: Add interface
-    private IColorNameResolver _colorNameResolver = new W3CColors ();
-
-    private List<IColorBar> _bars = new ();
-    private readonly Dictionary<IColorBar, TextField> _textFields = new ();
-    private readonly ColorModelStrategy _strategy = new ();
-
     /// <summary>
-    ///     Style settings for the color picker.  After making changes ensure you call
-    ///     <see cref="ApplyStyleChanges"/>.
-    /// </summary>
-    public ColorPickerStyle Style { get; set; } = new ();
-
-    /// <summary>
-    ///     Fired when color is changed.
-    /// </summary>
-    public event EventHandler<ColorEventArgs> ColorChanged;
-
-
-    /// <summary>
-    ///     The color selected in the picker
-    /// </summary>
-    public Color SelectedColor
-    {
-        get => _selectedColor;
-        set => SetSelectedColor (value,true);
-    }
-
-    private void SetSelectedColor (Color value, bool syncBars)
-    {
-
-        if (_selectedColor != value)
-        {
-            Color old = _selectedColor;
-            _selectedColor = value;
-
-            ColorChanged?.Invoke (
-                                  this,
-                                  new (value));
-        }
-
-        SyncSubViewValues (syncBars);
-    }
-
-    private void SyncSubViewValues (bool syncBars)
-    {
-        if (syncBars)
-        {
-            _strategy.SetBarsToColor (_bars, _selectedColor, Style.ColorModel);
-        }
-
-        foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
-        {
-            kvp.Value.Text = kvp.Key.Value.ToString();
-        }
-
-        _tfHex.Text = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}");
-    }
-
-    /// <summary>
-    /// Creates a new instance of <see cref="ColorPicker"/>. Use
-    /// <see cref="Style"/> to change color model. Use <see cref="SelectedColor"/>
-    /// to change initial <see cref="Color"/>.
+    ///     Creates a new instance of <see cref="ColorPicker"/>. Use
+    ///     <see cref="Style"/> to change color model. Use <see cref="SelectedColor"/>
+    ///     to change initial <see cref="Color"/>.
     /// </summary>
     public ColorPicker ()
     {
@@ -87,8 +20,23 @@ public class ColorPicker : View
         ApplyStyleChanges ();
     }
 
+    private readonly Dictionary<IColorBar, TextField> _textFields = new ();
+    private readonly ColorModelStrategy _strategy = new ();
+    private TextField _tfHex;
+    private Label _lbHex;
+
+    private TextField? _tfName;
+    private Label? _lbName;
+
+    private Color _selectedColor = Color.Black;
+
+    // TODO: Add interface
+    private readonly IColorNameResolver _colorNameResolver = new W3CColors ();
+
+    private List<IColorBar> _bars = new ();
+
     /// <summary>
-    /// Rebuild the user interface to reflect the new state of <see cref="Style"/>.
+    ///     Rebuild the user interface to reflect the new state of <see cref="Style"/>.
     /// </summary>
     public void ApplyStyleChanges ()
     {
@@ -125,17 +73,47 @@ public class ColorPicker : View
             Add (bar);
         }
 
-        if (Style.ShowName)
+        if (Style.ShowColorName)
         {
             CreateNameField ();
         }
-
 
         CreateTextField ();
         SelectedColor = oldValue;
 
         LayoutSubviews ();
     }
+
+    /// <summary>
+    ///     Fired when color is changed.
+    /// </summary>
+    public event EventHandler<ColorEventArgs> ColorChanged;
+
+    /// <inheritdoc/>
+    public override void OnDrawContent (Rectangle viewport)
+    {
+        base.OnDrawContent (viewport);
+        Attribute normal = GetNormalColor ();
+        Driver.SetAttribute (new (SelectedColor, normal.Background));
+        int y = _bars.Count + (Style.ShowColorName ? 1 : 0);
+        AddRune (13, y, (Rune)'■');
+    }
+
+    /// <summary>
+    ///     The color selected in the picker
+    /// </summary>
+    public Color SelectedColor
+    {
+        get => _selectedColor;
+        set => SetSelectedColor (value, true);
+    }
+
+    /// <summary>
+    ///     Style settings for the color picker.  After making changes ensure you call
+    ///     <see cref="ApplyStyleChanges"/>.
+    /// </summary>
+    public ColorPickerStyle Style { get; set; } = new ();
+
     private void CreateNameField ()
     {
         _lbName = new ()
@@ -156,7 +134,8 @@ public class ColorPicker : View
         Add (_tfName);
 
         var auto = new AppendAutocomplete (_tfName);
-        auto.SuggestionGenerator = new SingleWordSuggestionGenerator ()
+
+        auto.SuggestionGenerator = new SingleWordSuggestionGenerator
         {
             AllSuggestions = _colorNameResolver.GetColorNames ().ToList ()
         };
@@ -169,19 +148,19 @@ public class ColorPicker : View
     {
         int y = _bars.Count;
 
-        if (Style.ShowName)
+        if (Style.ShowColorName)
         {
             y++;
         }
 
-        _lbHex = new()
+        _lbHex = new ()
         {
             Text = "Hex:",
             X = 0,
             Y = y
         };
 
-        _tfHex = new()
+        _tfHex = new ()
         {
             Y = y,
             X = 4,
@@ -192,20 +171,6 @@ public class ColorPicker : View
         Add (_tfHex);
 
         _tfHex.Leave += UpdateValueFromTextField;
-    }
-
-    private void UpdateSingleBarValueFromTextField (object sender, FocusEventArgs e)
-    {
-        foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
-        {
-            if (kvp.Value == sender)
-            {
-                if (int.TryParse (kvp.Value.Text, out int v))
-                {
-                    kvp.Key.Value = v;
-                }
-            }
-        }
     }
 
     private void DisposeOldViews ()
@@ -243,7 +208,7 @@ public class ColorPicker : View
             _tfHex = null;
         }
 
-        if (_lbName!= null)
+        if (_lbName != null)
         {
             Remove (_lbName);
             _lbName.Dispose ();
@@ -259,18 +224,59 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateValueFromTextField (object sender, FocusEventArgs e)
+    private void RebuildColorFromBar (object sender, EventArgs<int> e) { SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false); }
+
+    private void SetSelectedColor (Color value, bool syncBars)
     {
-        if (Color.TryParse (_tfHex.Text, out Color? newColor))
+        if (_selectedColor != value)
         {
-            SelectedColor = newColor.Value;
+            Color old = _selectedColor;
+            _selectedColor = value;
+
+            ColorChanged?.Invoke (
+                                  this,
+                                  new (value));
         }
-        else
+
+        SyncSubViewValues (syncBars);
+    }
+
+    private void SyncSubViewValues (bool syncBars)
+    {
+        if (syncBars)
         {
-            // value is invalid, revert the value in the text field back to current state
-            SyncSubViewValues (false);
+            _strategy.SetBarsToColor (_bars, _selectedColor, Style.ColorModel);
+        }
+
+        foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
+        {
+            kvp.Value.Text = kvp.Key.Value.ToString ();
+        }
+
+        var colorHex = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}");
+
+        if (_tfName != null)
+        {
+            _tfName.Text = _colorNameResolver.TryNameColor (_selectedColor, out string name) ? name : string.Empty;
+        }
+
+        _tfHex.Text = colorHex;
+    }
+
+    private void UpdateSingleBarValueFromTextField (object sender, FocusEventArgs e)
+    {
+        foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
+        {
+            if (kvp.Value == sender)
+            {
+                if (int.TryParse (kvp.Value.Text, out int v))
+                {
+                    kvp.Key.Value = v;
+                }
+            }
         }
     }
+
     private void UpdateValueFromName (object sender, FocusEventArgs e)
     {
         if (_tfName == null)
@@ -289,18 +295,16 @@ public class ColorPicker : View
         }
     }
 
-    /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    private void UpdateValueFromTextField (object sender, FocusEventArgs e)
     {
-        base.OnDrawContent (viewport);
-        Attribute normal = GetNormalColor ();
-        Driver.SetAttribute (new (SelectedColor, normal.Background));
-        int y = _bars.Count + (Style.ShowName ? 1 : 0);
-        AddRune (13, y, (Rune)'■');
-    }
-
-    private void RebuildColorFromBar (object sender, EventArgs<int> e)
-    {
-        SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel),false);
+        if (Color.TryParse (_tfHex.Text, out Color? newColor))
+        {
+            SelectedColor = newColor.Value;
+        }
+        else
+        {
+            // value is invalid, revert the value in the text field back to current state
+            SyncSubViewValues (false);
+        }
     }
 }

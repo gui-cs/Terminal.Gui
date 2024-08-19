@@ -14,9 +14,6 @@ internal class SaturationBar : ColorBar
     public ValueBar? VBar { get; set; }
 
     /// <inheritdoc/>
-    protected override int MaxValue => 100;
-
-    /// <inheritdoc/>
     protected override Color GetColor (double fraction)
     {
         if (LBar != null)
@@ -35,6 +32,9 @@ internal class SaturationBar : ColorBar
             return new (rgb.R, rgb.G, rgb.B);
         }
 
-        throw new ($"{nameof(SaturationBar)} requires either Lightness or Value to render");
+        throw new ($"{nameof (SaturationBar)} requires either Lightness or Value to render");
     }
+
+    /// <inheritdoc/>
+    protected override int MaxValue => 100;
 }

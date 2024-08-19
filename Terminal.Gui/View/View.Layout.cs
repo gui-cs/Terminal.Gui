@@ -474,7 +474,7 @@ public partial class View // Layout APIs
                 return;
             }
 
-            if (_height is { } && _height.Has (typeof (DimAuto), out _))
+            if (_height is { } && _height.Has<DimAuto> (out _))
             {
                 // Reset ContentSize to Viewport
                 _contentSize = null;
@@ -523,7 +523,7 @@ public partial class View // Layout APIs
                 return;
             }
 
-            if (_width is { } && _width.Has (typeof (DimAuto), out _))
+            if (_width is { } && _width.Has<DimAuto> (out _))
             {
                 // Reset ContentSize to Viewport
                 _contentSize = null;
