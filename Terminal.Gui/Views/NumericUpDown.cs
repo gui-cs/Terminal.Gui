@@ -100,7 +100,7 @@ public class NumericUpDown<T> : View where T : notnull
                             return false;
                         }
 
-                        if (Value is { })
+                        if (Value is { } && Increment is { })
                         {
                             Value = (dynamic)Value + (dynamic)Increment;
                         }
@@ -117,10 +117,11 @@ public class NumericUpDown<T> : View where T : notnull
                             return false;
                         }
 
-                        if (Value is { })
+                        if (Value is { } && Increment is { })
                         {
                             Value = (dynamic)Value - (dynamic)Increment;
                         }
+
 
                         return true;
                     });
@@ -227,21 +228,21 @@ public class NumericUpDown<T> : View where T : notnull
         get => _increment;
         set
         {
-            if ((dynamic)_increment == (dynamic)value)
+            if (_increment is { } && value is { } && (dynamic)_increment == (dynamic)value)
             {
                 return;
             }
 
             _increment = value;
 
-            IncrementChanged?.Invoke (this, new (value));
+            IncrementChanged?.Invoke (this, new (value!));
         }
     }
 
     /// <summary>
     ///     Raised when <see cref="Increment"/> has changed.
     /// </summary>
-    public event EventHandler<EventArgs<T?>>? IncrementChanged;
+    public event EventHandler<EventArgs<T>>? IncrementChanged;
 }
 
 /// <summary>
