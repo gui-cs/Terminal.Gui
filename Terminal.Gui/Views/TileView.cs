@@ -13,7 +13,10 @@ public class TileView : View
     private TileView parentTileView;
 
     /// <summary>Creates a new instance of the <see cref="TileView"/> class with 2 tiles (i.e. left and right).</summary>
-    public TileView () : this (2) { }
+    public TileView () : this (2)
+    {
+        CanFocus = true;
+    }
 
     /// <summary>Creates a new instance of the <see cref="TileView"/> class with <paramref name="tiles"/> number of tiles.</summary>
     /// <param name="tiles"></param>

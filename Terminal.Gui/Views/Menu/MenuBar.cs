@@ -68,6 +68,7 @@ public class MenuBar : View, IDesignable
     {
         MenuItem._menuBar = this;
 
+        CanFocus = true;
         TabStop = TabBehavior.NoStop;
         X = 0;
         Y = 0;

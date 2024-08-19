@@ -28,6 +28,7 @@ public class ComboBox : View, IDesignable
     /// <summary>Public constructor</summary>
     public ComboBox ()
     {
+        CanFocus = true;
         _search = new TextField () { CanFocus = true, TabStop = TabBehavior.NoStop };
 
         _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = TabBehavior.NoStop};
@@ -824,6 +825,7 @@ public class ComboBox : View, IDesignable
             set => _hideDropdownListOnClick = WantContinuousButtonPressed = value;
         }
 
+        // BUGBUG: OnMouseEvent is internal!
         protected internal override bool OnMouseEvent (MouseEvent me)
         {
             var res = false;
@@ -960,8 +962,6 @@ public class ComboBox : View, IDesignable
                 _highlighted = _container.SelectedItem;
                 Application.UngrabMouse ();
             }
-
-            return;
         }
 
         public override bool OnSelectedChanged ()

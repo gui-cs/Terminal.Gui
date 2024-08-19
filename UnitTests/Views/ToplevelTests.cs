@@ -1078,7 +1078,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
     public void PositionCursor_SetCursorVisibility_To_Invisible_If_Focused_Is_Null ()
     {
         var tf = new TextField { Width = 5, Text = "test" };
-        var view = new View { Width = 10, Height = 10 };
+        var view = new View { Width = 10, Height = 10, CanFocus = true };
         view.Add (tf);
         var top = new Toplevel ();
         top.Add (view);

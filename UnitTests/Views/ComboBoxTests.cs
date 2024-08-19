@@ -806,7 +806,7 @@ Three ",
         top.Dispose ();
     }
 
-    [Fact (Skip = "BUGBUG: New focus stuff broke. Fix later.")]
+    [Fact]
     [AutoInitShutdown]
     public void KeyBindings_Command ()
     {

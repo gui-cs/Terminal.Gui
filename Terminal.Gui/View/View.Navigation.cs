@@ -45,7 +45,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
             {
                 if (value)
                 {
-                    if (FocusChanging (Application.Navigation!.GetFocused ()))
+                    // NOTE: If Application.Navigation is null, we pass null to FocusChanging. For unit tests.
+                    if (FocusChanging (Application.Navigation?.GetFocused ()))
                     {
                         // The change happened
                         // HasFocus is now true
@@ -388,7 +389,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (view.HasFocus)
         {
             // We could not advance
-            return false;
+            return true;
         }
 
         // The subview does not have focus, but at least one other that can. Can this one be focused?
