@@ -53,7 +53,7 @@ public class Label : View
 
     private bool? FocusNext ()
     {
-        var me = SuperView?.Subviews.IndexOf (this) ?? -1;
+        int me = SuperView?.Subviews.IndexOf (this) ?? -1;
         if (me != -1 && me < SuperView?.Subviews.Count - 1)
         {
             SuperView?.Subviews [me + 1].SetFocus ();
