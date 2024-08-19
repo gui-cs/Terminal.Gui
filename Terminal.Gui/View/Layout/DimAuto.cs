@@ -15,46 +15,28 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 ///     </para>
 /// </remarks>
-public record DimAuto : Dim
+public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoStyle Style) : Dim
 {
-    private readonly Dim? _maximumContentDim;
-
     /// <summary>
     ///     Gets the maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.
     /// </summary>
 
     // ReSharper disable once ConvertToAutoProperty
-    public required Dim? MaximumContentDim
-    {
-        get => _maximumContentDim;
-        init => _maximumContentDim = value;
-    }
-
-    private readonly Dim? _minimumContentDim;
+    public required Dim? MaximumContentDim { get; init; } = MaximumContentDim;
 
     /// <summary>
     ///     Gets the minimum dimension the View's ContentSize will be constrained to.
     /// </summary>
 
     // ReSharper disable once ConvertToAutoProperty
-    public required Dim? MinimumContentDim
-    {
-        get => _minimumContentDim;
-        init => _minimumContentDim = value;
-    }
-
-    private readonly DimAutoStyle _style;
+    public required Dim? MinimumContentDim { get; init; } = MinimumContentDim;
 
     /// <summary>
     ///     Gets the style of the DimAuto.
     /// </summary>
 
     // ReSharper disable once ConvertToAutoProperty
-    public required DimAutoStyle Style
-    {
-        get => _style;
-        init => _style = value;
-    }
+    public required DimAutoStyle Style { get; init; } = Style;
 
     /// <inheritdoc/>
     public override string ToString () { return $"Auto({Style},{MinimumContentDim},{MaximumContentDim})"; }
