@@ -253,7 +253,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// </returns>
     internal virtual int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        return Math.Max (GetAnchor (superviewContentSize - location), 0);
+        return Math.Clamp (GetAnchor (superviewContentSize - location), 0, short.MaxValue);
     }
 
     /// <summary>
