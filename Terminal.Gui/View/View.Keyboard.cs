@@ -27,7 +27,6 @@ public partial class View  // Keyboard APIs
     private void DisposeKeyboard ()
     {
         TitleTextFormatter.HotKeyChanged -= TitleTextFormatter_HotKeyChanged;
-        Application.RemoveKeyBindings (this);
     }
 
     #region HotKey Support
