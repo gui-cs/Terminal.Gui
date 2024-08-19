@@ -302,14 +302,15 @@ public class ComboBox : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnHasFocusChanging (View view)
     {
+        bool cancel = false;
         if (!_search.HasFocus && !_listview.HasFocus)
         {
-            _search.SetFocus ();
+            cancel = _search.SetFocus ();
         }
 
         _search.CursorPosition = _search.Text.GetRuneCount ();
 
-        return false; // Don't cancel the focus switch
+        return cancel; 
     }
 
     /// <summary>Virtual method which invokes the <see cref="Expanded"/> event.</summary>

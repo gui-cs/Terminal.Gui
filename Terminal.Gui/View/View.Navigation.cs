@@ -123,7 +123,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
 
             // Couldn't restore focus, so use Advance to navigate to the next focusable subview
-            if (AdvanceFocus (NavigationDirection.Forward, null))
+            if (AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop))
             {
                 // A subview was focused. We're done because the subview has focus and it recursed up the superview hierarchy.
                 return true;
