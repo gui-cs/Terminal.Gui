@@ -1504,8 +1504,7 @@ public class MenuBar : View, IDesignable
                     return false;
                 }
             }
-            else if (!_isContextMenuLoading
-                     && !(me.View is MenuBar || me.View is Menu)
+            else if (!(me.View is MenuBar || me.View is Menu)
                      && me.Flags != MouseFlags.ReportMousePosition
                      && me.Flags != 0)
             {
