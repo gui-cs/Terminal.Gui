@@ -1,9 +1,10 @@
-using System.Text;
+﻿using System.Text;
 using Xunit.Abstractions;
 using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui.LayoutTests;
 
+[Trait("Category", "Layout")]
 public partial class DimAutoTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
