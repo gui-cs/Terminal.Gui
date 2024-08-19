@@ -35,7 +35,7 @@ public class Scroll : View
     {
         base.EndInit ();
 
-        AdjustAll ();
+        AdjustScroll ();
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ public class Scroll : View
         set
         {
             _orientation = value;
-            AdjustAll ();
+            AdjustScroll ();
         }
     }
 
@@ -82,7 +82,7 @@ public class Scroll : View
 
             if (!_slider._wasSliderMouse)
             {
-                AdjustAll ();
+                AdjustScroll ();
             }
 
             OnPositionChanged (_position);
@@ -108,7 +108,7 @@ public class Scroll : View
         {
             _size = value;
             OnSizeChanged (_size);
-            AdjustAll ();
+            AdjustScroll ();
         }
     }
 
@@ -181,10 +181,10 @@ public class Scroll : View
     {
         base.OnLayoutComplete (args);
 
-        AdjustAll ();
+        AdjustScroll ();
     }
 
-    private void AdjustAll ()
+    private void AdjustScroll ()
     {
         _slider.AdjustSlider ();
         SetScrollText ();
