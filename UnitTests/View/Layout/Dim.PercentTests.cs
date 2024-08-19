@@ -15,7 +15,6 @@ public class DimPercentTests
         Assert.Equal (50, result);
     }
 
-
     [Fact]
     public void DimPercent_Equals ()
     {
@@ -61,6 +60,15 @@ public class DimPercentTests
         dim1 = Dim.Percent (n1);
         dim2 = Dim.Percent (n2);
         Assert.NotEqual (dim1, dim2);
+    }
+
+    [Fact]
+    public void TestEquality ()
+    {
+        var a = Dim.Percent (32);
+        var b = Dim.Percent (32);
+        Assert.True (a.Equals (b));
+        Assert.True (a.GetHashCode () == b.GetHashCode ());
     }
 
     [Fact]
@@ -157,7 +165,7 @@ public class DimPercentTests
     }
 
     [Theory]
-    [InlineData(0)]
+    [InlineData (0)]
     [InlineData (1)]
     [InlineData (50)]
     [InlineData (100)]
