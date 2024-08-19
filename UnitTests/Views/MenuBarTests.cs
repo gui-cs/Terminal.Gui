@@ -3800,7 +3800,7 @@ Edit
 
         menuItem.RemoveMenuItem ();
         Assert.Single (menuBar.Menus);
-        Assert.Equal (null, menuBar.Menus [0].Children);
+        Assert.Null (menuBar.Menus [0].Children);
         Assert.Contains (Key.N.WithAlt, menuBar.KeyBindings.Bindings);
         Assert.DoesNotContain (Key.I, menuBar.KeyBindings.Bindings);
 
