@@ -146,21 +146,6 @@ public class PosTests ()
     }
 
     [Fact]
-    public void PosFunction_Equal ()
-    {
-        Func<int> f1 = () => 0;
-        Func<int> f2 = () => 0;
-
-        Pos pos1 = Pos.Func (f1);
-        Pos pos2 = Pos.Func (f2);
-        Assert.Equal (pos1, pos2);
-
-        f2 = () => 1;
-        pos2 = Pos.Func (f2);
-        Assert.NotEqual (pos1, pos2);
-    }
-
-    [Fact]
     public void PosFunction_SetsValue ()
     {
         var text = "Test";

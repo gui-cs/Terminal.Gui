@@ -10,19 +10,13 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 ///     </para>
 /// </remarks>
-/// <param name="size"></param>
-public class DimAbsolute (int size) : Dim
+/// <param name="Size"></param>
+public record DimAbsolute (int Size) : Dim
 {
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is DimAbsolute abs && abs.Size == Size; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Size.GetHashCode (); }
-
     /// <summary>
     ///     Gets the size of the dimension.
     /// </summary>
-    public int Size { get; } = size;
+    public int Size { get; } = Size;
 
     /// <inheritdoc/>
     public override string ToString () { return $"Absolute({Size})"; }

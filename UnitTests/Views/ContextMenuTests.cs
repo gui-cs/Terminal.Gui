@@ -1359,4 +1359,53 @@ public class ContextMenuTests (ITestOutputHelper output)
                                         )
         };
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Handling_TextField_With_Opened_ContextMenu_By_Mouse_HasFocus ()
+    {
+        var tf1 = new TextField { Width = 10, Text = "TextField 1" };
+        var tf2 = new TextField { Y = 2, Width = 10, Text = "TextField 2" };
+        var win = new Window ();
+        win.Add (tf1, tf2);
+        var rs = Application.Begin (win);
+
+        Assert.True (tf1.HasFocus);
+        Assert.False (tf2.HasFocus);
+        Assert.Equal (2, win.Subviews.Count);
+        Assert.Null (Application.MouseEnteredView);
+
+        // Right click on tf2 to open context menu
+        Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button3Clicked });
+        Assert.False (tf1.HasFocus);
+        Assert.False (tf2.HasFocus);
+        Assert.Equal (3, win.Subviews.Count);
+        Assert.True (tf2.ContextMenu.MenuBar.IsMenuOpen);
+        Assert.True (win.Focused is Menu);
+        Assert.True (Application.MouseGrabView is MenuBar);
+        Assert.Equal (tf2, Application.MouseEnteredView);
+
+        // Click on tf1 to focus it, which cause context menu being closed
+        Application.OnMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked });
+        Assert.True (tf1.HasFocus);
+        Assert.False (tf2.HasFocus);
+        Assert.Equal (2, win.Subviews.Count);
+        Assert.Null (tf2.ContextMenu.MenuBar);
+        Assert.Equal (win.Focused, tf1);
+        Assert.Null (Application.MouseGrabView);
+        Assert.Equal (tf1, Application.MouseEnteredView);
+
+        // Click on tf2 to focus it
+        Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button1Clicked });
+        Assert.False (tf1.HasFocus);
+        Assert.True (tf2.HasFocus);
+        Assert.Equal (2, win.Subviews.Count);
+        Assert.Null (tf2.ContextMenu.MenuBar);
+        Assert.Equal (win.Focused, tf2);
+        Assert.Null (Application.MouseGrabView);
+        Assert.Equal (tf2, Application.MouseEnteredView);
+
+        Application.End (rs);
+        win.Dispose ();
+    }
 }

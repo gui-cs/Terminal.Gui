@@ -131,7 +131,7 @@ namespace Terminal.Gui;
 ///         </list>
 ///     </para>
 /// </remarks>
-public abstract class Pos
+public abstract record Pos
 {
     #region static Pos creation methods
 
