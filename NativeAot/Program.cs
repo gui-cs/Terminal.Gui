@@ -17,7 +17,7 @@ public static class Program
 
         #region The code in this region is not intended for use in a native Aot self-contained. It's just here to make sure there is no functionality break with localization in Terminal.Gui using self-contained
 
-        if (Equals(Thread.CurrentThread.CurrentUICulture, CultureInfo.InvariantCulture) && Application.SupportedCultures.Count == 0)
+        if (Equals(Thread.CurrentThread.CurrentUICulture, CultureInfo.InvariantCulture) && Application.SupportedCultures!.Count == 0)
         {
             // Only happens if the project has <InvariantGlobalization>true</InvariantGlobalization>
             Debug.Assert (Application.SupportedCultures.Count == 0);

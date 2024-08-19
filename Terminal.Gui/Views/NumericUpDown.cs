@@ -218,11 +218,11 @@ public class NumericUpDown<T> : View where T : notnull
         Text = _number.Text;
     }
 
-    private T _increment;
+    private T? _increment;
 
     /// <summary>
     /// </summary>
-    public T Increment
+    public T? Increment
     {
         get => _increment;
         set
@@ -241,7 +241,7 @@ public class NumericUpDown<T> : View where T : notnull
     /// <summary>
     ///     Raised when <see cref="Increment"/> has changed.
     /// </summary>
-    public event EventHandler<EventArgs<T>>? IncrementChanged;
+    public event EventHandler<EventArgs<T?>>? IncrementChanged;
 }
 
 /// <summary>
