@@ -2582,7 +2582,9 @@ A B C
 
         TestHelpers.AssertDriverContentsAre (expected, output);
 
+#pragma warning disable xUnit2029
         Assert.Empty (pets.Where (p => p.IsPicked));
+#pragma warning restore xUnit2029
 
         tv.NewKeyDownEvent (Key.Space);
 
@@ -2795,7 +2797,9 @@ A B C
 
         tv.NewKeyDownEvent (Key.Space);
 
+#pragma warning disable xUnit2029
         Assert.Empty (pets.Where (p => p.IsPicked));
+#pragma warning restore xUnit2029
 
         tv.Draw ();
 
@@ -2924,7 +2928,9 @@ A B C
 
         TestHelpers.AssertDriverContentsAre (expected, output);
 
+#pragma warning disable xUnit2029
         Assert.Empty (pets.Where (p => p.IsPicked));
+#pragma warning restore xUnit2029
 
         tv.NewKeyDownEvent (Key.Space);
 
@@ -3089,7 +3095,9 @@ A B C
         // Can untoggle at 1,0 even though 0,0 was initial toggle because FullRowSelect is on
         tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
 
+#pragma warning disable xUnit2029
         Assert.Empty (tableView.MultiSelectedRegions.Where (r => r.IsToggled));
+#pragma warning restore xUnit2029
     }
 
     [Fact]

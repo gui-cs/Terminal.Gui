@@ -32,7 +32,7 @@ public static partial class Application
     /// <returns>A string representation of the Application </returns>
     public new static string ToString ()
     {
-        ConsoleDriver driver = Driver;
+        ConsoleDriver? driver = Driver;
 
         if (driver is null)
         {
@@ -47,13 +47,17 @@ public static partial class Application
     /// </summary>
     /// <param name="driver">The driver to use to render the contents.</param>
     /// <returns>A string representation of the Application </returns>
-    public static string ToString (ConsoleDriver driver)
+    public static string ToString (ConsoleDriver? driver)
     {
+        if (driver is null)
+        {
+            return string.Empty;
+        }
         var sb = new StringBuilder ();
 
-        Cell [,] contents = driver.Contents;
+        Cell [,] contents = driver?.Contents!;
 
-        for (var r = 0; r < driver.Rows; r++)
+        for (var r = 0; r < driver!.Rows; r++)
         {
             for (var c = 0; c < driver.Cols; c++)
             {

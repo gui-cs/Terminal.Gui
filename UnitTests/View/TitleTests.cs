@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-public class TitleTests (ITestOutputHelper output)
+public class TitleTests
 {
     // Unit tests that verify look & feel of title are in BorderTests.cs
 

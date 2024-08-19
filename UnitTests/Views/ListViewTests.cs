@@ -674,8 +674,10 @@ Item 6",
 
     private class NewListDataSource : IListDataSource
     {
+#pragma warning disable CS0067
         /// <inheritdoc />
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+#pragma warning restore CS0067
 
         public int Count => 0;
         public int Length => 0;

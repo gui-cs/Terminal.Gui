@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class NumericUpDownTests (ITestOutputHelper _output)
+public class NumericUpDownTests
 {
     [Fact]
     public void WhenCreated_ShouldHaveDefaultValues_int ()

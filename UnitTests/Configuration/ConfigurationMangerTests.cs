@@ -389,6 +389,7 @@ public class ConfigurationManagerTests
                                             )
                    );
 
+#pragma warning disable xUnit2029
         Assert.Empty (
                       Settings.Where (
                                       cp => cp.Value.PropertyInfo!.GetCustomAttribute (
@@ -397,6 +398,7 @@ public class ConfigurationManagerTests
                                             == null
                                      )
                      );
+#pragma warning restore xUnit2029
 
         // Application is a static class
         PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");

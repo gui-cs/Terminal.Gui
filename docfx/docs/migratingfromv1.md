@@ -167,6 +167,7 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 * The preferred way to enable Application-wide or View-heirarchy-dependent keystrokes is to use the [Shortcut](~/api/Terminal.Gui.Shortcut.yml) View or the built-in View's that utilize it, such as the [Bar](~/api/Terminal.Gui.Bar.yml)-based views.
 * The preferred way to handle single keystrokes is to use **Key Bindings**. Key Bindings map a key press to a [Command](~/api/Terminal.Gui.Command.yml). A view can declare which commands it supports, and provide a lambda that implements the functionality of the command, using `View.AddCommand()`. Use the [View.Keybindings](~/api/Terminal.Gui.View.Keybindings.yml) to configure the key bindings.
 * For better consistency and user experience, the default key for closing an app or `Toplevel` is now `Esc` (it was previously `Ctrl+Q`).
+* The `Application.RootKeyEvent` method has been replaced with `Application.KeyDown`
 
 ### How to Fix
 
@@ -176,6 +177,12 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 * It should be very uncommon for v2 code to override `OnKeyPressed` etc... 
 * Anywhere `Ctrl+Q` was hard-coded as the "quit key", replace with `Application.QuitKey`.
 * See *Navigation* below for more information on v2's navigation keys.
+* Replace `Application.RootKeyEvent` with `Application.KeyDown`.  If the reason for subscribing to RootKeyEvent was to enable an application-wide action based on a key-press, consider using Application.KeyBindings instead.
+
+```diff
+- Application.RootKeyEvent(KeyEvent arg)
++ Application.KeyDown(object? sender, Key e)
+```
 
 ## Updated Mouse API
 
@@ -186,6 +193,7 @@ The API for mouse input is now internally consistent and easier to use.
 * Views can use the [View.Highlight](~/api/Terminal.Gui.View.Highlight.yml) event to have the view be visibly highlighted on various mouse events.
 * Views can set `View.WantContinousButtonPresses = true` to have their [Command.Accept](~/api/Terminal.Gui.Command.Accept.yml) command be invoked repeatedly as the user holds a mouse button down on the view.
 * Mouse and draw events now provide coordinates relative to the `Viewport` not the `Screen`.
+* The `Application.RootMouseEvent` method has been replaced with `Application.MouseEvent`
 
 ### How to Fix
 
@@ -193,6 +201,12 @@ The API for mouse input is now internally consistent and easier to use.
 * Use the [View.Highlight](~/api/Terminal.Gui.View.Highlight.yml) event to have the view be visibly highlighted on various mouse events.
 * Set `View.WantContinousButtonPresses = true` to have the [Command.Accept](~/api/Terminal.Gui.Command.Accept.yml) command be invoked repeatedly as the user holds a mouse button down on the view.
 * Update any code that assumed mouse events provided coordinates relative to the `Screen`.
+* Replace `Application.RootMouseEvent` with `Application.MouseEvent`.  
+
+```diff
+- Application.RootMouseEvent(KeyEvent arg)
++ Application.MouseEvent(object? sender, MouseEvent mouseEvent)
+```
 
 ## Navigation - `Cursor`, `Focus`, `TabStop` etc... 
 
@@ -270,6 +284,21 @@ These keys are all registered as `KeyBindingScope.Application` key bindings by `
 
 ...
 
+## Button.Clicked Event Renamed
+
+The `Button.Clicked` event has been renamed `Button.Accept`
+
+## How to Fix
+
+Rename all instances of `Button.Clicked` to `Button.Accept`.  Note the signature change to mouse events below.
+
+```diff
+- btnLogin.Clicked 
++ btnLogin.Accept
+```
+
+Alternatively, if you want to have key events as well as mouse events to fire an event, use `Button.Accept`.
+
 ## Events now use `object sender, EventArgs args` signature
 
 Previously events in Terminal.Gui used a mixture of `Action` (no arguments), `Action<string>` (or other raw datatype) and `Action<EventArgs>`. Now all events use the `EventHandler<EventArgs>` [standard .net design pattern](https://learn.microsoft.com/en-us/dotnet/csharp/event-pattern#event-delegate-signatures).
@@ -302,8 +331,9 @@ If you previously had a lambda expression, you can simply add the extra argument
 
 ```diff
 - btnLogin.Clicked += () => { /*do something*/ };
-+ btnLogin.Clicked += (s,e) => { /*do something*/ };
++ btnLogin.Accept += (s,e) => { /*do something*/ };
 ```
+Note that the event name has also changed as noted above.
 
 If you have used a named method instead of a lamda you will need to update the signature e.g.
 
@@ -392,3 +422,15 @@ Additionally, the `Toggle` event was renamed `CheckStateChanging` and made cance
 +preventChange = false;
 +cb.AdvanceCheckState ();
 ```
+
+## `MainLoop` is no longer accessible from `Application`
+
+In v1, you could add timeouts via `Application.MainLoop.AddTimeout` among other things.  In v2, the `MainLoop` object is internal to `Application` and methods previously accessed via `MainLoop` can now be accessed directly via `Application`
+
+### How to Fix
+
+```diff
+- Application.MainLoop.AddTimeout (TimeSpan time, Func<MainLoop, bool> callback)
++ Application.AddTimeout (TimeSpan time, Func<bool> callback)
+```
+
