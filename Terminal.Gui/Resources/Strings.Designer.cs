@@ -367,7 +367,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DimGrey.
+        ///   Looks up a localized string similar to DimGray.
         /// </summary>
         internal static string _696969 {
             get {
@@ -394,7 +394,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SlateGrey.
+        ///   Looks up a localized string similar to SlateGray.
         /// </summary>
         internal static string _708090 {
             get {
@@ -475,7 +475,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Grey.
+        ///   Looks up a localized string similar to Gray.
         /// </summary>
         internal static string _808080 {
             get {
@@ -772,7 +772,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to LightGrey.
+        ///   Looks up a localized string similar to LightGray.
         /// </summary>
         internal static string _D3D3D3 {
             get {

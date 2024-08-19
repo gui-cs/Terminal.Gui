@@ -3,6 +3,9 @@
 /// <summary>The <see cref="ColorPicker16"/> <see cref="View"/> Color picker.</summary>
 public class ColorPicker16 : View
 {
+    /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
+    public ColorPicker16 () { SetInitialProperties (); }
+
     /// <summary>Columns of color boxes</summary>
     private readonly int _cols = 8;
 
@@ -12,36 +15,6 @@ public class ColorPicker16 : View
     private int _boxHeight = 2;
     private int _boxWidth = 4;
     private int _selectColorIndex = (int)Color.Black;
-
-    /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
-    public ColorPicker16 () { SetInitialProperties (); }
-
-    private void SetInitialProperties ()
-    {
-        HighlightStyle = Gui.HighlightStyle.PressedOutside | Gui.HighlightStyle.Pressed;
-
-        CanFocus = true;
-        AddCommands ();
-        AddKeyBindings ();
-
-        Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
-        Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
-        SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
-
-        MouseClick += ColorPicker_MouseClick;
-    }
-
-    // TODO: Decouple Cursor from SelectedColor so that mouse press-and-hold can show the color under the cursor.
-
-    private void ColorPicker_MouseClick (object sender, MouseEventEventArgs me)
-    {
-        // if (CanFocus)
-        {
-            Cursor = new Point (me.MouseEvent.Position.X / _boxWidth, me.MouseEvent.Position.Y / _boxHeight);
-            SetFocus ();
-            me.Handled = true;
-        }
-    }
 
     /// <summary>Height of a color box</summary>
     public int BoxHeight
@@ -77,6 +50,9 @@ public class ColorPicker16 : View
         }
     }
 
+    /// <summary>Fired when a color is picked.</summary>
+    public event EventHandler<ColorEventArgs> ColorChanged;
+
     /// <summary>Cursor for the selected color.</summary>
     public Point Cursor
     {
@@ -88,30 +64,17 @@ public class ColorPicker16 : View
         }
     }
 
-    /// <summary>Selected color.</summary>
-    public ColorName SelectedColor
+    /// <summary>Moves the selected item index to the next row.</summary>
+    /// <returns></returns>
+    public virtual bool MoveDown ()
     {
-        get => (ColorName)_selectColorIndex;
-        set
+        if (Cursor.Y < _rows - 1)
         {
-            if (value == (ColorName)_selectColorIndex)
-            {
-                return;
-            }
-
-            _selectColorIndex = (int)value;
-
-            ColorChanged?.Invoke (
-                                  this,
-                                  new (value)
-                                 );
-            SetNeedsDisplay ();
+            SelectedColor += _cols;
         }
+
+        return true;
     }
-
-    /// <summary>Fired when a color is picked.</summary>
-    public event EventHandler<ColorEventArgs> ColorChanged;
-
 
     /// <summary>Moves the selected item index to the previous column.</summary>
     /// <returns></returns>
@@ -149,18 +112,6 @@ public class ColorPicker16 : View
         return true;
     }
 
-    /// <summary>Moves the selected item index to the next row.</summary>
-    /// <returns></returns>
-    public virtual bool MoveDown ()
-    {
-        if (Cursor.Y < _rows - 1)
-        {
-            SelectedColor += _cols;
-        }
-
-        return true;
-    }
-
     ///<inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
@@ -179,7 +130,8 @@ public class ColorPicker16 : View
                 {
                     continue;
                 }
-                Driver.SetAttribute (new Attribute ((ColorName)foregroundColorIndex, (ColorName)colorIndex));
+
+                Driver.SetAttribute (new ((ColorName)foregroundColorIndex, (ColorName)colorIndex));
                 bool selected = x == Cursor.X && y == Cursor.Y;
                 DrawColorBox (x, y, selected);
                 colorIndex++;
@@ -187,6 +139,26 @@ public class ColorPicker16 : View
         }
     }
 
+    /// <summary>Selected color.</summary>
+    public ColorName SelectedColor
+    {
+        get => (ColorName)_selectColorIndex;
+        set
+        {
+            if (value == (ColorName)_selectColorIndex)
+            {
+                return;
+            }
+
+            _selectColorIndex = (int)value;
+
+            ColorChanged?.Invoke (
+                                  this,
+                                  new (value)
+                                 );
+            SetNeedsDisplay ();
+        }
+    }
 
     /// <summary>Add the commands.</summary>
     private void AddCommands ()
@@ -204,6 +176,18 @@ public class ColorPicker16 : View
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.CursorUp, Command.LineUp);
         KeyBindings.Add (Key.CursorDown, Command.LineDown);
+    }
+
+    // TODO: Decouple Cursor from SelectedColor so that mouse press-and-hold can show the color under the cursor.
+
+    private void ColorPicker_MouseClick (object sender, MouseEventEventArgs me)
+    {
+        // if (CanFocus)
+        {
+            Cursor = new (me.MouseEvent.Position.X / _boxWidth, me.MouseEvent.Position.Y / _boxHeight);
+            SetFocus ();
+            me.Handled = true;
+        }
     }
 
     /// <summary>Draw a box for one color.</summary>
@@ -267,5 +251,20 @@ public class ColorPicker16 : View
         {
             AddRune (p.Key.X, p.Key.Y, p.Value);
         }
+    }
+
+    private void SetInitialProperties ()
+    {
+        HighlightStyle = HighlightStyle.PressedOutside | HighlightStyle.Pressed;
+
+        CanFocus = true;
+        AddCommands ();
+        AddKeyBindings ();
+
+        Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
+        Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
+        SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
+
+        MouseClick += ColorPicker_MouseClick;
     }
 }

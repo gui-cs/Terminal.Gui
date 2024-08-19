@@ -11,14 +11,11 @@ internal class ValueBar : ColorBar
     public SaturationBar? SBar { get; set; }
 
     /// <inheritdoc/>
-    protected override int MaxValue => 100;
-
-    /// <inheritdoc/>
     protected override Color GetColor (double fraction)
     {
         if (HBar == null || SBar == null)
         {
-            throw new Exception ($"{nameof (ValueBar)} has not been set up correctly before drawing");
+            throw new ($"{nameof (ValueBar)} has not been set up correctly before drawing");
         }
 
         var hsv = new HSV (HBar.Value, (byte)SBar.Value, (byte)(MaxValue * fraction));
@@ -26,4 +23,7 @@ internal class ValueBar : ColorBar
 
         return new (rgb.R, rgb.G, rgb.B);
     }
+
+    /// <inheritdoc/>
+    protected override int MaxValue => 100;
 }

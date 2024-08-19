@@ -3,72 +3,13 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// A bar representing a single component of a <see cref="Color"/> e.g.
-/// the Red portion of a <see cref="ColorModel.RGB"/>.
+///     A bar representing a single component of a <see cref="Color"/> e.g.
+///     the Red portion of a <see cref="ColorModel.RGB"/>.
 /// </summary>
 internal abstract class ColorBar : View, IColorBar
 {
     /// <summary>
-    /// X coordinate that the bar starts at excluding any label.
-    /// </summary>
-    private int _barStartsAt;
-
-    /// <summary>
-    ///     0-1 for how much of the color element is present currently (HSL)
-    /// </summary>
-    private int _value;
-
-    /// <summary>
-    ///     The amount of <see cref="Value"/> represented by each cell width on the bar
-    ///     Can be less than 1 e.g. if Saturation (0-100) and width > 100
-    /// </summary>
-    private double _cellValue = 1d;
-
-    /// <summary>
-    /// The maximum value allowed for this component e.g. Saturation allows up to 100 as it
-    /// is a percentage while Hue allows up to 360 as it is measured in degrees.
-    /// </summary>
-    protected abstract int MaxValue { get; }
-
-    /// <summary>
-    /// The currently selected amount of the color component stored by this class e.g.
-    /// the amount of Hue in a <see cref="ColorModel.HSL"/>.
-    /// </summary>
-    public int Value
-    {
-        get => _value;
-        set
-        {
-            int clampedValue = Math.Clamp (value, 0, MaxValue);
-
-            if (_value != clampedValue)
-            {
-                _value = clampedValue;
-                OnValueChanged ();
-            }
-        }
-    }
-
-    /// <inheritdoc />
-    void IColorBar.SetValueWithoutRaisingEvent (int v)
-    {
-        _value = v;
-        SetNeedsDisplay ();
-    }
-
-    /// <summary>
-    /// The last drawn location in View's viewport where the Triangle appeared.
-    /// Used exclusively for tests.
-    /// </summary>
-    internal int TrianglePosition { get; private set; }
-
-    /// <summary>
-    /// Event fired when <see cref="Value"/> is changed to a new value
-    /// </summary>
-    public event EventHandler<EventArgs<int>> ValueChanged;
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="ColorBar"/> class.
+    ///     Creates a new instance of the <see cref="ColorBar"/> class.
     /// </summary>
     protected ColorBar ()
     {
@@ -93,59 +34,51 @@ internal abstract class ColorBar : View, IColorBar
         KeyBindings.Add (Key.End, Command.RightEnd);
     }
 
-    private bool? SetMax ()
-    {
-        Value = MaxValue;
+    /// <summary>
+    ///     X coordinate that the bar starts at excluding any label.
+    /// </summary>
+    private int _barStartsAt;
 
-        return true;
-    }
+    /// <summary>
+    ///     0-1 for how much of the color element is present currently (HSL)
+    /// </summary>
+    private int _value;
 
-    private bool? SetZero ()
-    {
-        Value = 0;
-
-        return true;
-    }
-
-    private bool? Adjust (int delta)
-    {
-        var change = (int)(delta * _cellValue);
-
-        // Ensure that the change is at least 1 or -1 if delta is non-zero
-        if (change == 0 && delta != 0)
-        {
-            change = delta > 0 ? 1 : -1;
-        }
-
-        Value += change;
-
-        return true;
-    }
+    /// <summary>
+    ///     The amount of <see cref="Value"/> represented by each cell width on the bar
+    ///     Can be less than 1 e.g. if Saturation (0-100) and width > 100
+    /// </summary>
+    private double _cellValue = 1d;
 
     /// <summary>
     ///     Last known width of the bar as passed to <see cref="DrawBar"/>.
     /// </summary>
     private int _barWidth;
 
+    /// <summary>
+    ///     The currently selected amount of the color component stored by this class e.g.
+    ///     the amount of Hue in a <see cref="ColorModel.HSL"/>.
+    /// </summary>
+    public int Value
+    {
+        get => _value;
+        set
+        {
+            int clampedValue = Math.Clamp (value, 0, MaxValue);
+
+            if (_value != clampedValue)
+            {
+                _value = clampedValue;
+                OnValueChanged ();
+            }
+        }
+    }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    void IColorBar.SetValueWithoutRaisingEvent (int v)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
-        {
-            if (mouseEvent.Position.X >= _barStartsAt)
-            {
-                double v = MaxValue * ((double)mouseEvent.Position.X - _barStartsAt) / (_barWidth - 1);
-                Value = Math.Clamp ((int)v, 0, MaxValue);
-            }
-
-            mouseEvent.Handled = true;
-            FocusFirst (null);
-
-            return true;
-        }
-
-        return base.OnMouseEvent (mouseEvent);
+        _value = v;
+        SetNeedsDisplay ();
     }
 
     /// <inheritdoc/>
@@ -171,6 +104,67 @@ internal abstract class ColorBar : View, IColorBar
         DrawBar (xOffset, 0, _barWidth);
     }
 
+    /// <summary>
+    ///     Event fired when <see cref="Value"/> is changed to a new value
+    /// </summary>
+    public event EventHandler<EventArgs<int>> ValueChanged;
+
+    /// <inheritdoc/>
+    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    {
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        {
+            if (mouseEvent.Position.X >= _barStartsAt)
+            {
+                double v = MaxValue * ((double)mouseEvent.Position.X - _barStartsAt) / (_barWidth - 1);
+                Value = Math.Clamp ((int)v, 0, MaxValue);
+            }
+
+            mouseEvent.Handled = true;
+            FocusFirst (null);
+
+            return true;
+        }
+
+        return base.OnMouseEvent (mouseEvent);
+    }
+
+    /// <summary>
+    ///     When overriden in a derived class, returns the <see cref="Color"/> to
+    ///     render at <paramref name="fraction"/> proportion of the full bars width.
+    ///     e.g. 0.5 fraction of Saturation is 50% because Saturation goes from 0-100.
+    /// </summary>
+    /// <param name="fraction"></param>
+    /// <returns></returns>
+    protected abstract Color GetColor (double fraction);
+
+    /// <summary>
+    ///     The maximum value allowed for this component e.g. Saturation allows up to 100 as it
+    ///     is a percentage while Hue allows up to 360 as it is measured in degrees.
+    /// </summary>
+    protected abstract int MaxValue { get; }
+
+    /// <summary>
+    ///     The last drawn location in View's viewport where the Triangle appeared.
+    ///     Used exclusively for tests.
+    /// </summary>
+    internal int TrianglePosition { get; private set; }
+
+    private bool? Adjust (int delta)
+    {
+        var change = (int)(delta * _cellValue);
+
+        // Ensure that the change is at least 1 or -1 if delta is non-zero
+        if (change == 0 && delta != 0)
+        {
+            change = delta > 0 ? 1 : -1;
+        }
+
+        Value += change;
+
+        return true;
+    }
+
     private void DrawBar (int xOffset, int yOffset, int width)
     {
         // Each 1 unit of X in the bar corresponds to this much of Value
@@ -182,8 +176,8 @@ internal abstract class ColorBar : View, IColorBar
             Color color = GetColor (fraction);
 
             // Adjusted isSelectedCell calculation
-            var cellBottomThreshold = (x - 1) * _cellValue;
-            var cellTopThreshold = x * _cellValue;
+            double cellBottomThreshold = (x - 1) * _cellValue;
+            double cellTopThreshold = x * _cellValue;
 
             if (x == width - 1)
             {
@@ -219,18 +213,23 @@ internal abstract class ColorBar : View, IColorBar
         }
     }
 
-    /// <summary>
-    /// When overriden in a derived class, returns the <see cref="Color"/> to
-    /// render at <paramref name="fraction"/> proportion of the full bars width.
-    /// e.g. 0.5 fraction of Saturation is 50% because Saturation goes from 0-100.
-    /// </summary>
-    /// <param name="fraction"></param>
-    /// <returns></returns>
-    protected abstract Color GetColor (double fraction);
-
     private void OnValueChanged ()
     {
         ValueChanged?.Invoke (this, new (in _value));
         SetNeedsDisplay ();
+    }
+
+    private bool? SetMax ()
+    {
+        Value = MaxValue;
+
+        return true;
+    }
+
+    private bool? SetZero ()
+    {
+        Value = 0;
+
+        return true;
     }
 }
