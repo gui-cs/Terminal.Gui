@@ -107,7 +107,7 @@ internal abstract class ColorBar : View, IColorBar
     /// <summary>
     ///     Event fired when <see cref="Value"/> is changed to a new value
     /// </summary>
-    public event EventHandler<EventArgs<int>> ValueChanged;
+    public event EventHandler<EventArgs<int>>? ValueChanged;
 
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
@@ -199,7 +199,7 @@ internal abstract class ColorBar : View, IColorBar
             if (isSelectedCell)
             {
                 // Draw the triangle at the closest position
-                Application.Driver.SetAttribute (new (triangleColor, color));
+                Application.Driver?.SetAttribute (new (triangleColor, color));
                 AddRune (x + xOffset, yOffset, new ('▲'));
 
                 // Record for tests
@@ -207,7 +207,7 @@ internal abstract class ColorBar : View, IColorBar
             }
             else
             {
-                Application.Driver.SetAttribute (new (color, color));
+                Application.Driver?.SetAttribute (new (color, color));
                 AddRune (x + xOffset, yOffset, new ('█'));
             }
         }

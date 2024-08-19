@@ -16,7 +16,7 @@ internal class SaturationBar : ColorBar
     /// <inheritdoc/>
     protected override Color GetColor (double fraction)
     {
-        if (LBar != null)
+        if (LBar != null && HBar != null)
         {
             var hsl = new HSL (HBar.Value, (byte)(MaxValue * fraction), (byte)LBar.Value);
             RGB rgb = ColorConverter.HslToRgb (hsl);
@@ -24,7 +24,7 @@ internal class SaturationBar : ColorBar
             return new (rgb.R, rgb.G, rgb.B);
         }
 
-        if (VBar != null)
+        if (VBar != null && HBar != null)
         {
             var hsv = new HSV (HBar.Value, (byte)(MaxValue * fraction), (byte)VBar.Value);
             RGB rgb = ColorConverter.HsvToRgb (hsv);

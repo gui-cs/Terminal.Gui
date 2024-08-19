@@ -22,8 +22,8 @@ public class ColorPicker : View
 
     private readonly Dictionary<IColorBar, TextField> _textFields = new ();
     private readonly ColorModelStrategy _strategy = new ();
-    private TextField _tfHex;
-    private Label _lbHex;
+    private TextField? _tfHex;
+    private Label? _lbHex;
 
     private TextField? _tfName;
     private Label? _lbName;
@@ -87,7 +87,7 @@ public class ColorPicker : View
     /// <summary>
     ///     Fired when color is changed.
     /// </summary>
-    public event EventHandler<ColorEventArgs> ColorChanged;
+    public event EventHandler<ColorEventArgs>? ColorChanged;
 
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
@@ -179,7 +179,7 @@ public class ColorPicker : View
         {
             bar.ValueChanged -= RebuildColorFromBar;
 
-            if (_textFields.TryGetValue (bar, out TextField tf))
+            if (_textFields.TryGetValue (bar, out TextField? tf))
             {
                 tf.Leave -= UpdateSingleBarValueFromTextField;
                 Remove (tf);
@@ -224,7 +224,7 @@ public class ColorPicker : View
         }
     }
 
-    private void RebuildColorFromBar (object sender, EventArgs<int> e) { SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false); }
+    private void RebuildColorFromBar (object? sender, EventArgs<int> e) { SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false); }
 
     private void SetSelectedColor (Color value, bool syncBars)
     {
@@ -260,10 +260,13 @@ public class ColorPicker : View
             _tfName.Text = _colorNameResolver.TryNameColor (_selectedColor, out string name) ? name : string.Empty;
         }
 
-        _tfHex.Text = colorHex;
+        if (_tfHex != null)
+        {
+            _tfHex.Text = colorHex;
+        }
     }
 
-    private void UpdateSingleBarValueFromTextField (object sender, FocusEventArgs e)
+    private void UpdateSingleBarValueFromTextField (object? sender, FocusEventArgs e)
     {
         foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
         {
@@ -277,7 +280,7 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateValueFromName (object sender, FocusEventArgs e)
+    private void UpdateValueFromName (object? sender, FocusEventArgs e)
     {
         if (_tfName == null)
         {
@@ -295,8 +298,13 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateValueFromTextField (object sender, FocusEventArgs e)
+    private void UpdateValueFromTextField (object? sender, FocusEventArgs e)
     {
+        if (_tfHex == null)
+        {
+            return;
+        }
+
         if (Color.TryParse (_tfHex.Text, out Color? newColor))
         {
             SelectedColor = newColor.Value;
