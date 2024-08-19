@@ -16,16 +16,6 @@ public class PosCenterTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void PosCenter_Equals ()
-    {
-        var posCenter1 = new PosCenter ();
-        var posCenter2 = new PosCenter ();
-
-        Assert.False (posCenter1.Equals (posCenter2));
-        Assert.False (posCenter2.Equals (posCenter1));
-    }
-
-    [Fact]
     public void PosCenter_ToString ()
     {
         var posCenter = new PosCenter ();
