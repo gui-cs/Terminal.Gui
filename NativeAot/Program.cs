@@ -24,7 +24,7 @@ public static class Program
         }
         else
         {
-            Debug.Assert (Application.SupportedCultures.Count > 0);
+            Debug.Assert (Application.SupportedCultures!.Count > 0);
             Debug.Assert (Equals (CultureInfo.CurrentCulture, Thread.CurrentThread.CurrentUICulture));
         }
 
