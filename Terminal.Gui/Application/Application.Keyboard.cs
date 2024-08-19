@@ -432,31 +432,4 @@ public static partial class Application // Keyboard handling
                           .Distinct ()
                           .ToList ();
     }
-
-    ///// <summary>
-    /////     Gets the list of Views that have <see cref="KeyBindingScope.Application"/> key bindings for the specified key.
-    ///// </summary>
-    ///// <remarks>
-    /////     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
-    ///// </remarks>
-    ///// <param name="key">The key to check.</param>
-    ///// <param name="views">Outputs the list of views bound to <paramref name="key"/></param>
-    ///// <returns><see langword="True"/> if successful.</returns>
-    //internal static bool TryGetKeyBindings (Key key, out List<View> views) { return _keyBindings.TryGetValue (key, out views); }
-
-    /// <summary>
-    ///     Removes all <see cref="KeyBindingScope.Application"/> scoped key bindings for the specified view.
-    /// </summary>
-    /// <remarks>
-    ///     This is an internal method used by the <see cref="View"/> class to remove Application key bindings.
-    /// </remarks>
-    /// <param name="view">The view that is bound to the key.</param>
-    internal static void RemoveKeyBindings (View view)
-    {
-        List<KeyBinding> list = KeyBindings.Bindings
-                                           .Where (kv => kv.Value.Scope != KeyBindingScope.Application)
-                                           .Select (kv => kv.Value)
-                                           .Distinct ()
-                                           .ToList ();
-    }
 }
