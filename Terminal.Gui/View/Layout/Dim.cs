@@ -113,12 +113,10 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to.</param>
     public static Dim? Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim? minimumContentDim = null, Dim? maximumContentDim = null)
     {
-        return new DimAuto ()
-        {
-            MinimumContentDim = minimumContentDim,
-            MaximumContentDim = maximumContentDim,
-            Style = style
-        };
+        return new DimAuto (
+                            MinimumContentDim: minimumContentDim,
+                            MaximumContentDim: maximumContentDim,
+                            Style: style);
     }
 
     /// <summary>

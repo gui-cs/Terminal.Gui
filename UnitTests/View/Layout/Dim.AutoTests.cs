@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Xunit.Abstractions;
 using static Terminal.Gui.Dim;
 
@@ -203,40 +203,35 @@ public partial class DimAutoTests (ITestOutputHelper output)
     [Fact]
     public void TestEquality ()
     {
-        var a = new DimAuto
-        {
-            MaximumContentDim = null,
-            MinimumContentDim = 1,
-            Style = DimAutoStyle.Auto
-        };
+        var a = new DimAuto (
+                             MaximumContentDim: null,
+                             MinimumContentDim: 1,
+                             Style: DimAutoStyle.Auto
+                            );
 
-        var b = new DimAuto
-        {
-            MaximumContentDim = null,
-            MinimumContentDim = 1,
-            Style = DimAutoStyle.Auto
-        };
+        var b = new DimAuto (
+                             MaximumContentDim: null,
+                             MinimumContentDim: 1,
+                             Style: DimAutoStyle.Auto
+                            );
 
-        var c = new DimAuto
-        {
-            MaximumContentDim = 2,
-            MinimumContentDim = 1,
-            Style = DimAutoStyle.Auto
-        };
+        var c = new DimAuto(
+                             MaximumContentDim: 2,
+                             MinimumContentDim: 1,
+                             Style: DimAutoStyle.Auto
+                            );
 
-        var d = new DimAuto
-        {
-            MaximumContentDim = null,
-            MinimumContentDim = 1,
-            Style = DimAutoStyle.Content
-        };
+        var d = new DimAuto (
+                             MaximumContentDim: null,
+                             MinimumContentDim: 1,
+                             Style: DimAutoStyle.Content
+                            );
 
-        var e = new DimAuto
-        {
-            MaximumContentDim = null,
-            MinimumContentDim = 2,
-            Style = DimAutoStyle.Auto
-        };
+        var e = new DimAuto (
+                             MaximumContentDim: null,
+                             MinimumContentDim: 2,
+                             Style: DimAutoStyle.Auto
+                            );
 
         // Test equality with same values
         Assert.True (a.Equals (b));
