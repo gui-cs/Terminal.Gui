@@ -8,7 +8,7 @@ namespace Terminal.Gui;
 ///     This is a low-level API that is typically used internally by the layout system. Use the various static
 ///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 /// </remarks>
-public class DimView : Dim
+public record DimView : Dim
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="DimView"/> class.
@@ -25,12 +25,6 @@ public class DimView : Dim
     ///     Gets the indicated dimension of the View.
     /// </summary>
     public Dimension Dimension { get; }
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is DimView abs && abs.Target == Target && abs.Dimension == Dimension; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Target!.GetHashCode (); }
 
     /// <summary>
     ///     Gets the View the dimension is anchored to.

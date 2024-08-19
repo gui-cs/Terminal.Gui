@@ -10,7 +10,7 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
 ///     </para>
 /// </remarks>
-public class PosAnchorEnd : Pos
+public record PosAnchorEnd : Pos
 {
     /// <summary>
     ///     Gets the offset of the position from the right/bottom.
@@ -29,12 +29,6 @@ public class PosAnchorEnd : Pos
     /// </summary>
     /// <param name="offset"></param>
     public PosAnchorEnd (int offset) { Offset = offset; }
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is PosAnchorEnd anchorEnd && anchorEnd.Offset == Offset; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Offset.GetHashCode (); }
 
     /// <summary>
     ///     If true, the offset is the width of the view, if false, the offset is the offset value.

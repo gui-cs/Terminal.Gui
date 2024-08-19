@@ -14,8 +14,11 @@ public class DimFuncTests (ITestOutputHelper output)
         Func<int> f2 = () => 0;
 
         Dim dim1 = Func (f1);
-        Dim dim2 = Func (f2);
+        Dim dim2 = Func (f1);
         Assert.Equal (dim1, dim2);
+
+        dim2 = Func (f2);
+        Assert.NotEqual (dim1, dim2);
 
         f2 = () => 1;
         dim2 = Func (f2);
