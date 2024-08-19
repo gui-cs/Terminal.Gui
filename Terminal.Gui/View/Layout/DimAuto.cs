@@ -59,6 +59,9 @@ public record DimAuto : Dim
     /// <inheritdoc/>
     public override string ToString () { return $"Auto({Style},{MinimumContentDim},{MaximumContentDim})"; }
 
+    /// <inheritdoc />
+    internal override int GetAnchor (int size) => 0;
+
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
         var textSize = 0;

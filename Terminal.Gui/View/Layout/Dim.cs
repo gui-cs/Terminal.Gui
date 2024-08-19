@@ -233,7 +233,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     subclass of Dim that is used. For example, DimAbsolute returns a fixed dimension, DimFactor returns a
     ///     dimension that is a certain percentage of the super view's size, and so on.
     /// </returns>
-    internal virtual int GetAnchor (int size) { return 0; }
+    internal abstract int GetAnchor (int size);
 
     /// <summary>
     ///     Calculates and returns the dimension of a <see cref="View"/> object. It takes into account the location of the
