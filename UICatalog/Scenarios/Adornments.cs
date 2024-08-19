@@ -38,7 +38,7 @@ public class Adornments : Scenario
         app.Add (window);
 
         var tf1 = new TextField { Width = 10, Text = "TextField" };
-        var color = new ColorPicker { Title = "BG", X = Pos.AnchorEnd ()};
+        var color = new ColorPicker16 { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd () };
         color.BorderStyle = LineStyle.RoundedDotted;
 
         color.ColorChanged += (s, e) =>
@@ -90,7 +90,7 @@ public class Adornments : Scenario
 
         var longLabel = new Label
         {
-            X = 40, Y = 7, Title = "This is long text (in a label) that should clip."
+            X = 40, Y = 5, Title = "This is long text (in a label) that should clip."
         };
         longLabel.TextFormatter.WordWrap = true;
         window.Add (tf1, color, button, label, btnButtonInWindow, labelAnchorEnd, longLabel);

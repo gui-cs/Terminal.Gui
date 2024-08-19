@@ -318,8 +318,10 @@ public class Shortcuts : Scenario
             CanFocus = false
         };
 
-        var bgColor = new ColorPicker ()
+        var bgColor = new ColorPicker16 ()
         {
+            BoxHeight = 1,
+            BoxWidth = 1,
             CanFocus = false
         };
         bgColor.ColorChanged += (o, args) =>
