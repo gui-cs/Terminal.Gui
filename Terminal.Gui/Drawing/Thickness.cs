@@ -61,7 +61,7 @@ public record struct Thickness
     [JsonInclude]
     public int Bottom
     {
-        get => (int)_sides.W;
+        readonly get => (int)_sides.W;
         set => _sides.W = value;
     }
 
@@ -249,7 +249,7 @@ public record struct Thickness
     [JsonInclude]
     public int Left
     {
-        get => (int)_sides.X;
+        readonly get => (int)_sides.X;
         set => _sides.X = value;
     }
 
@@ -265,7 +265,7 @@ public record struct Thickness
     [JsonInclude]
     public int Right
     {
-        get => (int)_sides.Z;
+        readonly get => (int)_sides.Z;
         set => _sides.Z = value;
     }
 
@@ -273,7 +273,7 @@ public record struct Thickness
     [JsonInclude]
     public int Top
     {
-        get => (int)_sides.Y;
+        readonly get => (int)_sides.Y;
         set => _sides.Y = value;
     }
 

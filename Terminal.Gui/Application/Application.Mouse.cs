@@ -160,13 +160,13 @@ public static partial class Application // Mouse handling
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.Position,
-                View = MouseGrabView
+                View = view ?? MouseGrabView
             };
 
             if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
-                MouseEnteredView?.NewMouseLeaveEvent (mouseEvent);
+                MouseGrabView?.NewMouseLeaveEvent (mouseEvent);
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
