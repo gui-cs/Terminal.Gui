@@ -202,9 +202,11 @@ public class ListViewWithSelection : Scenario
 
             return false;
         }
-
+#pragma warning disable CS0067
         /// <inheritdoc />
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+#pragma warning restore CS0067
+
         public int Count => Scenarios?.Count ?? 0;
         public int Length { get; private set; }
         public bool SuspendCollectionChangedEvent { get => throw new System.NotImplementedException (); set => throw new System.NotImplementedException (); }

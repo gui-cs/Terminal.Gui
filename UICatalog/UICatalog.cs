@@ -643,7 +643,7 @@ public class UICatalogApp
             Add (CategoryList);
             Add (ScenarioList);
 
-            Add (MenuBar);
+            Add (MenuBar!);
 
             if (StatusBar is { })
             {
