@@ -196,6 +196,29 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         return false;
     }
 
+    /// <summary>
+    ///     Indicates whether the specified type <typeparamref name="T"/> is in the hierarchy of this Dim object.
+    /// </summary>
+    /// <param name="dim">A reference to this <see cref="Dim"/> instance.</param>
+    /// <returns></returns>
+    public bool Has<T> (out Dim dim) where T : Dim
+    {
+        dim = this;
+
+        return this switch
+               {
+                   T => true,
+
+                   // INTENT: Is it intentional that, when T is already DimCombine, this won't get called?
+                   // If not, the fix is to do this one first.
+                   // (That's also the case in the original)
+                   // If we are a DimCombine, we have to check the left and right
+                   // to see if they are of the type we are looking for.
+                   DimCombine combine => combine.Left.Has<T> (out dim) || combine.Right.Has<T> (out dim),
+                   _                  => false
+               };
+    }
+
     #region virtual methods
 
     /// <summary>
