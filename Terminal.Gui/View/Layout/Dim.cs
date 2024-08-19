@@ -1,7 +1,7 @@
 #nullable enable
-using System.Diagnostics;
-
 namespace Terminal.Gui;
+
+using System.Numerics;
 
 /// <summary>
 ///     <para>
@@ -78,7 +78,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para></para>
 /// </remarks>
-public abstract record Dim
+public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
 {
     #region static Dim creation methods
 
