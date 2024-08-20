@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using JetBrains.Annotations;
+using Xunit.Abstractions;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Terminal.Gui.ViewTests;
@@ -87,7 +88,8 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Enter_Leave_Events (Type viewType)
+    [SetupFakeDriver]
+    public void AllViews_HasFocus_Changed_Event (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
 
@@ -112,13 +114,13 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
             return;
         }
 
-        Application.Init (new FakeDriver ());
-
         Toplevel top = new ()
         {
             Height = 10,
             Width = 10
         };
+        Application.Current = top;
+        Application.Navigation = new ApplicationNavigation();
 
         View otherView = new ()
         {
@@ -135,25 +137,34 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         view.Width = 10;
         view.Height = 1;
 
-        var nEnter = 0;
-        var nLeave = 0;
+        var hasFocusTrue = 0;
+        var hasFocusFalse = 0;
 
-        view.HasFocusChanging += (s, e) => nEnter++;
-        view.HasFocusChanged += (s, e) => nLeave++;
+        view.HasFocusChanged += (s, e) =>
+                                {
+                                    if (e.NewValue)
+                                    {
+                                        hasFocusTrue++;
+                                    }
+                                    else
+                                    {
+                                        hasFocusFalse++;
+                                    }
+                                };
 
         top.Add (view, otherView);
         Assert.False (view.HasFocus);
         Assert.False (otherView.HasFocus);
 
-        Application.Begin (top);
+        Application.Current.SetFocus ();
         Assert.True (Application.Current!.HasFocus);
         Assert.True (top.HasFocus);
 
         // Start with the focus on our test view
         Assert.True (view.HasFocus);
 
-        Assert.Equal (1, nEnter);
-        Assert.Equal (0, nLeave);
+        Assert.Equal (1, hasFocusTrue);
+        Assert.Equal (0, hasFocusFalse);
 
         // Use keyboard to navigate to next view (otherView).
         var tries = 0;
@@ -189,8 +200,8 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
             }
         }
 
-        Assert.Equal (1, nEnter);
-        Assert.Equal (1, nLeave);
+        Assert.Equal (1, hasFocusTrue);
+        Assert.Equal (1, hasFocusFalse);
 
         Assert.False (view.HasFocus);
         Assert.True (otherView.HasFocus);
@@ -218,8 +229,8 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                 throw new ArgumentOutOfRangeException ();
         }
 
-        Assert.Equal (2, nEnter);
-        Assert.Equal (1, nLeave);
+        Assert.Equal (2, hasFocusTrue);
+        Assert.Equal (1, hasFocusFalse);
 
         Assert.True (view.HasFocus);
         Assert.False (otherView.HasFocus);
@@ -229,17 +240,18 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         bool otherViewHasFocus = otherView.HasFocus;
         bool viewHasFocus = view.HasFocus;
 
-        int enterCount = nEnter;
-        int leaveCount = nLeave;
+        int enterCount = hasFocusTrue;
+        int leaveCount = hasFocusFalse;
 
         top.Dispose ();
-        Application.Shutdown ();
 
         Assert.False (otherViewHasFocus);
         Assert.True (viewHasFocus);
 
         Assert.Equal (2, enterCount);
         Assert.Equal (1, leaveCount);
+
+        Application.ResetState ();
     }
 
     [Theory]

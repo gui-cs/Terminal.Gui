@@ -300,7 +300,7 @@ public class ComboBox : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnHasFocusChanging (View view)
+    protected override bool OnHasFocusChanging (bool currentHasFocus, bool newHasFocus, [CanBeNull] View currentFocused, [CanBeNull] View newFocused)
     {
         bool cancel = false;
         if (!_search.HasFocus && !_listview.HasFocus)
@@ -310,14 +310,14 @@ public class ComboBox : View, IDesignable
 
         _search.CursorPosition = _search.Text.GetRuneCount ();
 
-        return cancel; 
+        return cancel;
     }
 
     /// <summary>Virtual method which invokes the <see cref="Expanded"/> event.</summary>
     public virtual void OnExpanded () { Expanded?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    protected override void OnHasFocusChanged (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
         if (_source?.Count > 0
             && _selectedItem > -1
@@ -943,25 +943,25 @@ public class ComboBox : View, IDesignable
             }
         }
 
-        protected override bool OnHasFocusChanging (View view)
+        protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View previousFocusedView, [CanBeNull] View focusedVew)
         {
-            if (_hideDropdownListOnClick)
+            if (newHasFocus)
             {
-                _isFocusing = true;
-                _highlighted = _container.SelectedItem;
-                Application.GrabMouse (this);
+                if (_hideDropdownListOnClick)
+                {
+                    _isFocusing = true;
+                    _highlighted = _container.SelectedItem;
+                    Application.GrabMouse (this);
+                }
             }
-
-            return false; // Don't cancel the focus switch
-        }
-
-        protected override void OnHasFocusChanged (View view)
-        {
-            if (_hideDropdownListOnClick)
+            else
             {
-                _isFocusing = false;
-                _highlighted = _container.SelectedItem;
-                Application.UngrabMouse ();
+                if (_hideDropdownListOnClick)
+                {
+                    _isFocusing = false;
+                    _highlighted = _container.SelectedItem;
+                    Application.UngrabMouse ();
+                }
             }
         }
 

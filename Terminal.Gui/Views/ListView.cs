@@ -739,7 +739,7 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnHasFocusChanging (View view)
+    protected override bool OnHasFocusChanging (bool currentHasFocus, bool newHasFocus, [CanBeNull] View currentFocused, [CanBeNull] View newFocused)
     {
         if (_lastSelectedItem != _selected)
         {

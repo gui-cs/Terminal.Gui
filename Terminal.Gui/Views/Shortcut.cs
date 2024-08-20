@@ -834,22 +834,10 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
-    private View _lastFocusedView;
-
     /// <inheritdoc/>
-    protected override bool OnHasFocusChanging (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
         SetColors ();
-        _lastFocusedView = view;
-
-        return false; // Don't cancel the focus switch
-    }
-
-    /// <inheritdoc/>
-    protected override void OnHasFocusChanged (View view)
-    {
-        SetColors ();
-        _lastFocusedView = this;
     }
 
     #endregion Focus

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using JetBrains.Annotations;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -1119,25 +1120,19 @@ public class ScrollViewTests (ITestOutputHelper output)
             CanFocus = true;
         }
 
-        protected override bool OnHasFocusChanging (View view)
+        protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View previousFocusedView, [CanBeNull] View focusedVew)
         {
-            Border.LineStyle = LineStyle.None;
-            Border.Thickness = new (0);
-            labelFill.Visible = true;
-            view = this;
-
-            return false; // don't cancel
-        }
-
-        protected override void OnHasFocusChanged (View view)
-        {
-            Border.LineStyle = LineStyle.Single;
-            Border.Thickness = new (1);
-            labelFill.Visible = false;
-
-            if (view == null)
+            if (newHasFocus)
             {
-                view = this;
+                Border.LineStyle = LineStyle.None;
+                Border.Thickness = new (0);
+                labelFill.Visible = true;
+            }
+            else
+            {
+                Border.LineStyle = LineStyle.Single;
+                Border.Thickness = new (1);
+                labelFill.Visible = false;
             }
         }
     }

@@ -193,17 +193,18 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return view;
         }
 
-        // If a view being removed is focused, it should lose focus.
-        if (view.HasFocus)
-        {
-            view.FocusChanged(this, true);
-        }
-
         Rectangle touched = view.Frame;
         _subviews.Remove (view);
         _tabIndexes!.Remove (view);
         view._superView = null;
         //view._tabIndex = -1;
+
+        // If a view being removed is focused, it should lose focus.
+        if (view.HasFocus)
+        {
+            view.HasFocus = false;
+        }
+
         SetNeedsLayout ();
         SetNeedsDisplay ();
 

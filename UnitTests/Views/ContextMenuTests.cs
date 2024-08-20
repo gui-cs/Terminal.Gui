@@ -1188,7 +1188,13 @@ public class ContextMenuTests (ITestOutputHelper output)
         };
         Toplevel top = new ();
         RunState rs = Application.Begin (top);
+        top.SetFocus ();
+        Assert.NotNull (Application.Current);
+
         cm.Show ();
+        Assert.True(ContextMenu.IsShow);
+        Assert.True (Application.Top.Subviews [0].HasFocus);
+        Assert.Equal(Application.Top.Subviews [0], Application.Navigation.GetFocused());
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
         Application.Refresh ();
 

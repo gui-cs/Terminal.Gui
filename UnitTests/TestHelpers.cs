@@ -240,6 +240,7 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+        Application.ResetState ();
         Assert.Null (Application.Driver);
         Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
         base.Before (methodUnderTest);

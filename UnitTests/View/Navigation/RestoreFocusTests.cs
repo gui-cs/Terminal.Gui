@@ -106,13 +106,15 @@ public class RestoreFocusTests (ITestOutputHelper _output) : TestsAllViews
         var tabGroup1SubView1 = new View
         {
             Id = "tabGroup1SubView1",
-            CanFocus = true
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
         };
 
         var tabGroup1SubView2 = new View
         {
             Id = "tabGroup1SubView2",
-            CanFocus = true
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
         };
         tabGroup1.Add (tabGroup1SubView1, tabGroup1SubView2);
 
@@ -126,13 +128,15 @@ public class RestoreFocusTests (ITestOutputHelper _output) : TestsAllViews
         var tabGroup2SubView1 = new View
         {
             Id = "tabGroup2SubView1",
-            CanFocus = true
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
         };
 
         var tabGroup2SubView2 = new View
         {
             Id = "tabGroup2SubView2",
-            CanFocus = true
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
         };
         tabGroup2.Add (tabGroup2SubView1, tabGroup2SubView2);
 

@@ -392,7 +392,7 @@ public class MenuBar : View, IDesignable
         _selected = 0;
         SetNeedsDisplay ();
 
-        _previousFocused = SuperView is null ? Application.Current?.Focused : SuperView.Focused;
+        _previousFocused = null;//SuperView is null ? Application.Current?.Focused : SuperView.Focused;
         OpenMenu (_selected);
 
         if (!SelectEnabledItem (
@@ -453,7 +453,7 @@ public class MenuBar : View, IDesignable
 
         if (_openMenu is null)
         {
-            _previousFocused = SuperView is null ? Application.Current?.Focused ?? null : SuperView.Focused;
+            _previousFocused = null;//SuperView is null ? Application.Current?.Focused ?? null : SuperView.Focused;
         }
 
         OpenMenu (idx, sIdx, subMenu);
@@ -599,14 +599,13 @@ public class MenuBar : View, IDesignable
                 }
 
                 IsMenuOpen = false;
-
                 break;
 
             case true:
                 _selectedSub = -1;
                 SetNeedsDisplay ();
                 RemoveAllOpensSubMenus ();
-                OpenCurrentMenu._previousSubFocused.SetFocus ();
+                OpenCurrentMenu?._previousSubFocused.SetFocus ();
                 _openSubMenu = null;
                 IsMenuOpen = true;
 
@@ -756,7 +755,7 @@ public class MenuBar : View, IDesignable
         {
             case null:
                 // Open a submenu below a MenuBar
-                _lastFocused ??= SuperView is null ? Application.Current?.MostFocused : SuperView.MostFocused;
+                _lastFocused = null;//Application.Navigation.GetFocused();// ??= SuperView is null ? Application.Current?.MostFocused : SuperView.MostFocused;
 
                 if (_openSubMenu is { } && !CloseMenu (false, true))
                 {

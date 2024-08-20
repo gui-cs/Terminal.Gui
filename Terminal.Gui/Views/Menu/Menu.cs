@@ -587,11 +587,9 @@ internal sealed class Menu : View
         _host.Run (action);
     }
 
-    protected override void OnHasFocusChanged (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
         _host.LostFocus (view);
-
-        return;
     }
 
     private void RunSelected ()

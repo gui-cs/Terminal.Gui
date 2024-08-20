@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Threading;
+using JetBrains.Annotations;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -1277,14 +1278,10 @@ public class OverlappedTests
     {
         public bool IsFocused { get; private set; }
 
-        protected override bool OnHasFocusChanging (View view)
+        protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew)
         {
-            IsFocused = true;
-
-            return false;
+            IsFocused = newHasFocus;
         }
-
-        protected override void OnHasFocusChanged (View view) { IsFocused = false; }
     }
 
     private class TestView : View
@@ -1295,16 +1292,9 @@ public class OverlappedTests
         }
         public bool IsFocused { get; private set; }
 
-        protected override bool OnHasFocusChanging (View view)
+        protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew)
         {
-            IsFocused = true;
-
-            return false; // don't cancel
-        }
-
-        protected override void OnHasFocusChanged (View view)
-        {
-            IsFocused = false;
+            IsFocused = newHasFocus;
         }
     }
 }

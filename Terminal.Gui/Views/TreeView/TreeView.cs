@@ -1158,14 +1158,16 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     ///<inheritdoc/>
-    protected override bool OnHasFocusChanging (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View currentFocused, [CanBeNull] View newFocused)
     {
-        if (SelectedObject is null && Objects.Any ())
+        if (newHasFocus)
         {
-            SelectedObject = Objects.First ();
+            // If there is no selected object and there are objects in the tree, select the first one
+            if (SelectedObject is null && Objects.Any ())
+            {
+                SelectedObject = Objects.First ();
+            }
         }
-
-        return false; // Don't cancel the focus switch
     }
 
     /// <inheritdoc/>
