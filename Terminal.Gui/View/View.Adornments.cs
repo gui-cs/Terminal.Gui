@@ -43,6 +43,8 @@ public partial class View // Adornments
         Padding = null;
     }
 
+    private Margin _margin;
+
     /// <summary>
     ///     The <see cref="Adornment"/> that enables separation of a View from other SubViews of the same
     ///     SuperView. The margin offsets the <see cref="Viewport"/> from the <see cref="Frame"/>.
@@ -58,7 +60,30 @@ public partial class View // Adornments
     ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
     ///     </para>
     /// </remarks>
-    public Margin Margin { get; private set; }
+    [NotNull]
+    public Margin Margin
+    {
+        get
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            return _margin;
+        }
+        private set
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            _margin = value;
+        }
+    }
 
     private ShadowStyle _shadowStyle;
     /// <summary>
@@ -86,6 +111,8 @@ public partial class View // Adornments
         }
     }
 
+    private Border _border;
+
     /// <summary>
     ///     The <see cref="Adornment"/> that offsets the <see cref="Viewport"/> from the <see cref="Margin"/>.
     ///     The Border provides the space for a visual border (drawn using
@@ -104,7 +131,29 @@ public partial class View // Adornments
     ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
     ///     </para>
     /// </remarks>
-    public Border Border { get; private set; }
+    public Border Border
+    {
+        get
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            return _border;
+        }
+        private set
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            _border = value;
+        }
+    }
 
     /// <summary>Gets or sets whether the view has a one row/col thick border.</summary>
     /// <remarks>
@@ -196,6 +245,8 @@ public partial class View // Adornments
     /// </summary>
     public event EventHandler<CancelEventArgs<LineStyle>> BorderStyleChanging;
 
+    private Padding _padding;
+
     /// <summary>
     ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="Viewport"/>
     ///     from the <see cref="Border"/>.
@@ -211,7 +262,29 @@ public partial class View // Adornments
     ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
     ///     </para>
     /// </remarks>
-    public Padding Padding { get; private set; }
+    public Padding Padding
+    {
+        get
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            return _padding;
+        }
+        private set
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            _padding = value;
+        }
+    }
 
     /// <summary>
     ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
