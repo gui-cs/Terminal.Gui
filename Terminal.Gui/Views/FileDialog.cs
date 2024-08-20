@@ -518,7 +518,10 @@ public class FileDialog : Dialog
             };
             AllowedTypeMenuClicked (0);
 
-            _allowedTypeMenuBar.HasFocusChanging += (s, e) => { _allowedTypeMenuBar.OpenMenu (0); };
+            _allowedTypeMenuBar.HasFocusChanging += (s, e) =>
+                                                    {
+                                                        _allowedTypeMenuBar.OpenMenu (0);
+                                                    };
 
             _allowedTypeMenuBar.DrawContentComplete += (s, e) =>
                                                        {

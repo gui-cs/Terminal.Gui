@@ -224,7 +224,7 @@ public class SetFocusTests (ITestOutputHelper _output) : TestsAllViews
     }
 
     [Fact]
-    public void SetFocus_Peer_LeavesOthers_Subviews ()
+    public void SetFocus_On_Peer_Moves_Focus_To_Peer ()
     {
         var top = new View
         {

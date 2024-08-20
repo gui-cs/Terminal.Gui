@@ -6,7 +6,7 @@ public class HasFocusTests (ITestOutputHelper _output) : TestsAllViews
 {
 
     [Fact]
-    public void HasFocus_False_Leaves ()
+    public void HasFocus_False ()
     {
         var view = new View ()
         {
@@ -22,7 +22,7 @@ public class HasFocusTests (ITestOutputHelper _output) : TestsAllViews
     }
 
     [Fact]
-    public void HasFocus_False_WithSuperView_Leaves_All ()
+    public void HasFocus_False_WithSuperView_Does_Not_Change_SuperView ()
     {
         var view = new View ()
         {
@@ -42,8 +42,8 @@ public class HasFocusTests (ITestOutputHelper _output) : TestsAllViews
         Assert.True (subview.HasFocus);
 
         subview.HasFocus = false;
-        Assert.False (view.HasFocus);
         Assert.False (subview.HasFocus);
+        Assert.True (view.HasFocus);
     }
 
     [Fact]

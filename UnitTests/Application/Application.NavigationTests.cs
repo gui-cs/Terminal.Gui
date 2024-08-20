@@ -137,24 +137,24 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
 
 
 
-    [Fact]
-    public void MovePreviousViewOrTop_ShouldMoveFocusToPreviousViewOrTop ()
-    {
-        // Arrange
-        var top = new Toplevel ();
-        var view1 = new View () { Id = "view1", CanFocus = true, TabStop = TabBehavior.TabGroup };
-        var view2 = new View () { Id = "view2", CanFocus = true, TabStop = TabBehavior.TabGroup };
-        top.Add (view1, view2);
-        Application.Top = top;
-        Application.Current = top;
-        view2.SetFocus ();
+    //[Fact]
+    //public void MovePreviousViewOrTop_ShouldMoveFocusToPreviousViewOrTop ()
+    //{
+    //    // Arrange
+    //    var top = new Toplevel ();
+    //    var view1 = new View () { Id = "view1", CanFocus = true, TabStop = TabBehavior.TabGroup };
+    //    var view2 = new View () { Id = "view2", CanFocus = true, TabStop = TabBehavior.TabGroup };
+    //    top.Add (view1, view2);
+    //    Application.Top = top;
+    //    Application.Current = top;
+    //    view2.SetFocus ();
 
-        // Act
-        ApplicationNavigation.MovePreviousViewOrTop ();
+    //    // Act
+    //    ApplicationNavigation.MovePreviousViewOrTop ();
 
-        // Assert
-        Assert.True (view1.HasFocus);
+    //    // Assert
+    //    Assert.True (view1.HasFocus);
 
-        top.Dispose ();
-    }
+    //    top.Dispose ();
+    //}
 }

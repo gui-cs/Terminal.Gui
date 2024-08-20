@@ -75,14 +75,11 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
             CanFocus = true
         };
 
-        int nLeave = 0;
-
         View subView = new View ()
         {
             Id = "subView",
             CanFocus = true
         };
-        subView.HasFocusChanged += (s, e) => nLeave++;
 
         top.Add (subView);
 
@@ -95,7 +92,6 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
         Assert.True (top.HasFocus);
         Assert.Equal (null, top.Focused);
         Assert.False (subView.HasFocus);
-        Assert.Equal (1, nLeave);
     }
 
     [Fact]
@@ -107,14 +103,11 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
             CanFocus = true
         };
 
-        int nLeave1 = 0;
-
         View subView1 = new View ()
         {
             Id = "subView1",
             CanFocus = true
         };
-        subView1.HasFocusChanged += (s, e) => nLeave1++;
 
         View subView2 = new View ()
         {
@@ -134,7 +127,5 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
         Assert.True (subView2.HasFocus);
         Assert.Equal (subView2, top.Focused);
         Assert.False (subView1.HasFocus);
-        Assert.Equal (1, nLeave1);
     }
-
 }

@@ -186,7 +186,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
-        toplevel.AdvanceFocus (NavigationDirection.Forward, null);//.FocusDeepest (null, NavigationDirection.Forward);
+        // Try to set initial focus to any TabGroup
+        if (!toplevel.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup))
+        {
+            // That didn't work. Try TabStop.
+            toplevel.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        }
         ApplicationOverlapped.BringOverlappedTopToFront ();
 
         if (refreshDriver)

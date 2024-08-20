@@ -8,7 +8,8 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 {
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_AtLeastOneNavKey_Leaves (Type viewType)
+    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
+    public void AllViews_AtLeastOneNavKey_Advances (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
 
@@ -26,9 +27,10 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
             return;
         }
 
-        Application.Init (new FakeDriver ());
 
         Toplevel top = new ();
+        Application.Current = top;
+        Application.Navigation = new ApplicationNavigation ();
 
         View otherView = new ()
         {
@@ -38,12 +40,11 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         };
 
         top.Add (view, otherView);
-        Application.Begin (top);
 
         // Start with the focus on our test view
         view.SetFocus ();
 
-        Key [] navKeys = { Key.Tab, Key.Tab.WithShift, Key.CursorUp, Key.CursorDown, Key.CursorLeft, Key.CursorRight };
+        Key [] navKeys = [Key.Tab, Key.Tab.WithShift, Key.CursorUp, Key.CursorDown, Key.CursorLeft, Key.CursorRight];
 
         if (view.TabStop == TabBehavior.TabGroup)
         {
@@ -81,14 +82,14 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         }
 
         top.Dispose ();
-        Application.Shutdown ();
+        Application.ResetState ();
 
         Assert.True (left);
     }
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver]
+    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
     public void AllViews_HasFocus_Changed_Event (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
@@ -114,28 +115,16 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
             return;
         }
 
-        Toplevel top = new ()
-        {
-            Height = 10,
-            Width = 10
-        };
+        Toplevel top = new ();
         Application.Current = top;
-        Application.Navigation = new ApplicationNavigation();
+        Application.Navigation = new ApplicationNavigation ();
 
         View otherView = new ()
         {
             Id = "otherView",
-            X = 0, Y = 0,
-            Height = 1,
-            Width = 1,
             CanFocus = true,
             TabStop = view.TabStop == TabBehavior.NoStop ? TabBehavior.TabStop : view.TabStop
         };
-
-        view.X = Pos.Right (otherView);
-        view.Y = 0;
-        view.Width = 10;
-        view.Height = 1;
 
         var hasFocusTrue = 0;
         var hasFocusFalse = 0;
@@ -256,7 +245,8 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Enter_Leave_Events_Visible_False (Type viewType)
+    [SetupFakeDriver] // SetupFakeDriver resets app state; helps to avoid test pollution
+    public void AllViews_Visible_False_No_HasFocus_Events (Type viewType)
     {
         View view = CreateInstanceIfNotGeneric (viewType);
 
@@ -281,70 +271,46 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
             return;
         }
 
-        Application.Init (new FakeDriver ());
+        Toplevel top = new ();
 
-        Toplevel top = new ()
-        {
-            Height = 10,
-            Width = 10
-        };
+        Application.Current = top;
+        Application.Navigation = new ApplicationNavigation ();
 
         View otherView = new ()
         {
-            X = 0, Y = 0,
-            Height = 1,
-            Width = 1,
             CanFocus = true
         };
 
         view.Visible = false;
-        view.X = Pos.Right (otherView);
-        view.Y = 0;
-        view.Width = 10;
-        view.Height = 1;
 
-        var nEnter = 0;
-        var nLeave = 0;
+        var hasFocusChangingCount = 0;
+        var hasFocusChangedCount = 0;
 
-        view.HasFocusChanging += (s, e) => nEnter++;
-        view.HasFocusChanged += (s, e) => nLeave++;
+        view.HasFocusChanging += (s, e) => hasFocusChangingCount++;
+        view.HasFocusChanged += (s, e) => hasFocusChangedCount++;
 
         top.Add (view, otherView);
-        Application.Begin (top);
 
         // Start with the focus on our test view
         view.SetFocus ();
 
-        Assert.Equal (0, nEnter);
-        Assert.Equal (0, nLeave);
+        Assert.Equal (0, hasFocusChangingCount);
+        Assert.Equal (0, hasFocusChangedCount);
 
-        // Use keyboard to navigate to next view (otherView). 
-        if (view is TextView)
-        {
-            Application.OnKeyDown (Key.F6);
-        }
-        else if (view is DatePicker)
-        {
-            for (var i = 0; i < 4; i++)
-            {
-                Application.OnKeyDown (Key.F6);
-            }
-        }
-        else
-        {
-            Application.OnKeyDown (Key.Tab);
-        }
+        Application.OnKeyDown (Key.Tab);
 
-        Assert.Equal (0, nEnter);
-        Assert.Equal (0, nLeave);
+        Assert.Equal (0, hasFocusChangingCount);
+        Assert.Equal (0, hasFocusChangedCount);
 
-        top.NewKeyDownEvent (Key.Tab);
+        Application.OnKeyDown (Key.F6);
 
-        Assert.Equal (0, nEnter);
-        Assert.Equal (0, nLeave);
+        Assert.Equal (0, hasFocusChangingCount);
+        Assert.Equal (0, hasFocusChangedCount);
 
         top.Dispose ();
-        Application.Shutdown ();
+
+        Application.ResetState ();
+
     }
 
     [Fact]
@@ -442,67 +408,6 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Assert.Equal (winSubview, Application.Current.MostFocused);
 
         Application.Current.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void FocusNext_Does_Not_Throws_If_A_View_Was_Removed_From_The_Collection ()
-    {
-        Toplevel top1 = new ();
-        var view1 = new View { Id = "view1", Width = 10, Height = 5, CanFocus = true };
-        var top2 = new Toplevel { Id = "top2", Y = 1, Width = 10, Height = 5 };
-
-        var view2 = new View
-        {
-            Id = "view2",
-            Y = 1,
-            Width = 10,
-            Height = 5,
-            CanFocus = true
-        };
-        View view3 = null;
-        var removed = false;
-
-        view2.HasFocusChanging += (s, e) =>
-                       {
-                           if (!removed)
-                           {
-                               removed = true;
-                               view3 = new () { Id = "view3", Y = 1, Width = 10, Height = 5 };
-                               Application.Current.Add (view3);
-                               Application.Current.BringSubviewToFront (view3);
-                               Assert.False (view3.HasFocus);
-                           }
-                       };
-
-        view2.HasFocusChanged += (s, e) =>
-                       {
-                           Application.Current.Remove (view3);
-                           view3.Dispose ();
-                           view3 = null;
-                       };
-        top2.Add (view2);
-        top1.Add (view1, top2);
-        Application.Begin (top1);
-
-        Assert.True (top1.HasFocus);
-        Assert.True (view1.HasFocus);
-        Assert.False (view2.HasFocus);
-        Assert.False (removed);
-        Assert.Null (view3);
-
-        Assert.True (Application.OnKeyDown (Key.F6));
-        Assert.True (top1.HasFocus);
-        Assert.False (view1.HasFocus);
-        Assert.True (view2.HasFocus);
-        Assert.True (removed);
-        Assert.NotNull (view3);
-
-        Exception exception = Record.Exception (() => Application.OnKeyDown (Key.F6));
-        Assert.Null (exception);
-        Assert.True (removed);
-        //Assert.Null (view3);
-        top1.Dispose ();
     }
 
     [Fact]

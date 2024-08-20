@@ -333,7 +333,7 @@ public static partial class Application // Keyboard handling
                     () =>
                     {
                         View? current = Application.Current;
-                        if (current is {})
+                        if (current is { })
                         {
                             return current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
                         }
@@ -363,7 +363,7 @@ public static partial class Application // Keyboard handling
                             View? current = Application.Current;
                             if (current is { })
                             {
-                                return current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
+                                return current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
                             }
                         }
                         else
@@ -381,9 +381,22 @@ public static partial class Application // Keyboard handling
                     Command.PreviousViewOrTop,
                     () =>
                     {
-                        ApplicationNavigation.MovePreviousViewOrTop ();
+                        if (ApplicationOverlapped.OverlappedTop is null)
+                        {
+                            View? current = Application.Current;
+                            if (current is { })
+                            {
+                                return current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
+                            }
+                        }
+                        else
+                        {
+                            ApplicationOverlapped.OverlappedMovePrevious();
 
-                        return true;
+                            return true;
+                        }
+
+                        return false;
                     }
                    );
 

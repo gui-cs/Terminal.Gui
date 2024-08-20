@@ -107,27 +107,4 @@ public class ApplicationNavigation
 
         return view;
     }
-    
-
-    
-    internal static void MovePreviousViewOrTop ()
-    {
-        if (ApplicationOverlapped.OverlappedTop is null)
-        {
-            Toplevel? top = Application.Current!.Modal ? Application.Current : Application.Top;
-            top!.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
-
-            if (top.Focused is null)
-            {
-                top.AdvanceFocus (NavigationDirection.Backward, null);
-            }
-
-            top.SetNeedsDisplay ();
-            ApplicationOverlapped.BringOverlappedTopToFront ();
-        }
-        else
-        {
-            ApplicationOverlapped.OverlappedMovePrevious ();
-        }
-    }
 }

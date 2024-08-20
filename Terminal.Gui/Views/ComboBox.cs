@@ -8,6 +8,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading.Channels;
 
 namespace Terminal.Gui;
 
@@ -31,7 +32,7 @@ public class ComboBox : View, IDesignable
         CanFocus = true;
         _search = new TextField () { CanFocus = true, TabStop = TabBehavior.NoStop };
 
-        _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = TabBehavior.NoStop};
+        _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = TabBehavior.NoStop };
 
         _search.TextChanged += Search_Changed;
         _search.Accept += Search_Accept;
@@ -299,19 +300,6 @@ public class ComboBox : View, IDesignable
         Driver.AddRune (Glyphs.DownArrow);
     }
 
-    /// <inheritdoc/>
-    protected override bool OnHasFocusChanging (bool currentHasFocus, bool newHasFocus, [CanBeNull] View currentFocused, [CanBeNull] View newFocused)
-    {
-        bool cancel = false;
-        if (!_search.HasFocus && !_listview.HasFocus)
-        {
-            cancel = _search.SetFocus ();
-        }
-
-        _search.CursorPosition = _search.Text.GetRuneCount ();
-
-        return cancel;
-    }
 
     /// <summary>Virtual method which invokes the <see cref="Expanded"/> event.</summary>
     public virtual void OnExpanded () { Expanded?.Invoke (this, EventArgs.Empty); }
@@ -319,25 +307,34 @@ public class ComboBox : View, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
-        if (_source?.Count > 0
-            && _selectedItem > -1
-            && _selectedItem < _source.Count - 1
-            && _text != _source.ToList () [_selectedItem].ToString ())
+        if (newHasFocus)
         {
-            SetValue (_source.ToList () [_selectedItem].ToString ());
+            if (!_search.HasFocus && !_listview.HasFocus)
+            {
+                _search.SetFocus ();
+            }
+            _search.CursorPosition = _search.Text.GetRuneCount ();
         }
+        else
+        { 
+            if (_source?.Count > 0
+              && _selectedItem > -1
+              && _selectedItem < _source.Count - 1
+              && _text != _source.ToList () [_selectedItem].ToString ())
+            {
+                SetValue (_source.ToList () [_selectedItem].ToString ());
+            }
 
-        if (_autoHide && IsShow && view != this && view != _search && view != _listview)
-        {
-            IsShow = false;
-            HideList ();
+            if (_autoHide && IsShow && view != this && view != _search && view != _listview)
+            {
+                IsShow = false;
+                HideList ();
+            }
+            else if (_listview.TabStop?.HasFlag (TabBehavior.TabStop) ?? false)
+            {
+                _listview.TabStop = TabBehavior.NoStop;
+            }
         }
-        else if (_listview.TabStop?.HasFlag (TabBehavior.TabStop) ?? false)
-        {
-            _listview.TabStop = TabBehavior.NoStop;
-        }
-
-        return;
     }
 
     /// <summary>Invokes the OnOpenSelectedItem event if it is defined.</summary>
@@ -565,7 +562,7 @@ public class ComboBox : View, IDesignable
     {
         if (HasItems ())
         {
-           return  _listview.MoveUp ();
+            return _listview.MoveUp ();
         }
 
         return false;
