@@ -1035,7 +1035,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorsTest_ColorGetter (bool focused)
@@ -1062,6 +1062,10 @@ public class TableViewTests (ITestOutputHelper output)
         };
 
         bStyle.ColorGetter = a => Convert.ToInt32 (a.CellValue) == 2 ? cellHighlight : null;
+
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         tv.HasFocus = focused;
         Assert.Equal(focused, tv.HasFocus);
@@ -1123,10 +1127,12 @@ public class TableViewTests (ITestOutputHelper output)
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
                                               );
+
+        top.Dispose ();
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorsTest_RowColorGetter (bool focused)
@@ -1149,10 +1155,13 @@ public class TableViewTests (ITestOutputHelper output)
 
         // when B is 2 use the custom highlight color for the row
         tv.Style.RowColorGetter += e => Convert.ToInt32 (e.Table [e.RowIndex, 1]) == 2 ? rowHighlight : null;
+        
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         tv.HasFocus = focused;
         Assert.Equal (focused, tv.HasFocus);
-
         tv.Draw ();
 
         var expected = @"
@@ -1210,10 +1219,11 @@ public class TableViewTests (ITestOutputHelper output)
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
                                               );
+        top.Dispose ();
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorTests_FocusedOrNot (bool focused)
@@ -1223,6 +1233,10 @@ public class TableViewTests (ITestOutputHelper output)
 
         // width exactly matches the max col widths
         tv.Viewport = new (0, 0, 5, 4);
+
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
         tv.HasFocus = focused;
         Assert.Equal (focused, tv.HasFocus);
@@ -1250,7 +1264,7 @@ public class TableViewTests (ITestOutputHelper output)
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
                                               );
-
+        top.Dispose ();
     }
 
     [Theory]
