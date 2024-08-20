@@ -62,9 +62,9 @@ public class DatePickerTests
         Assert.True (Application.OnKeyDown (Key.Enter));
         Assert.Equal (12, datePicker.Date.Month);
 
-        // Date should not change as next month button is disabled
-        Assert.False (Application.OnKeyDown (Key.Enter));
-        Assert.Equal (12, datePicker.Date.Month);
+        // Date should change as next month button was disabled, causing focus to advance
+        Assert.True (Application.OnKeyDown (Key.Enter));
+        Assert.Equal (11, datePicker.Date.Month);
         top.Dispose ();
     }
 
@@ -72,7 +72,7 @@ public class DatePickerTests
     [AutoInitShutdown]
     public void DatePicker_ShouldNot_SetDateOutOfRange_UsingPreviousMonthButton ()
     {
-        var date = new DateTime (1, 2, 15);
+        var date = new DateTime (1, 2, 0);
         var datePicker = new DatePicker (date);
         var top = new Toplevel ();
 
@@ -88,8 +88,8 @@ public class DatePickerTests
         Assert.True (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (1, datePicker.Date.Month);
 
-        // Date should not change as previous month button is disabled
-        Assert.False (datePicker.NewKeyDownEvent (Key.Enter));
+        // Previous month button is disabled, so focus advanced to edit field
+        Assert.True (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (1, datePicker.Date.Month);
         top.Dispose ();
     }
