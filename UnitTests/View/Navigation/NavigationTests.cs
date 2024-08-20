@@ -604,6 +604,28 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Application.Shutdown ();
     }
 
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Application_Begin_FocusesDeepest ()
+    {
+        var win1 = new Window { Id = "win1", Width = 10, Height = 1 };
+        var view1 = new View { Id = "view1", Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
+        var win2 = new Window { Id = "win2", Y = 6, Width = 10, Height = 1 };
+        var view2 = new View { Id = "view2", Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
+        win2.Add (view2);
+        win1.Add (view1, win2);
+
+        Application.Begin (win1);
+
+        Assert.True (win1.HasFocus);
+        Assert.True (view1.HasFocus);
+        Assert.False (win2.HasFocus);
+        Assert.False (view2.HasFocus);
+        win1.Dispose ();
+    }
+
+
 #if V2_NEW_FOCUS_IMPL // bogus test - Depends on auto setting of CanFocus
     [Fact]
     [AutoInitShutdown]
