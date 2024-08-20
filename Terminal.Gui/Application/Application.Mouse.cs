@@ -139,6 +139,12 @@ public static partial class Application // Mouse handling
 
         if (view is { })
         {
+#if DEBUG_IDISPOSABLE
+            if (view.WasDisposed)
+            {
+                throw new ObjectDisposedException (view.GetType ().FullName);
+            }
+#endif
             mouseEvent.View = view;
         }
 
@@ -151,6 +157,13 @@ public static partial class Application // Mouse handling
 
         if (MouseGrabView is { })
         {
+
+#if DEBUG_IDISPOSABLE
+            if (MouseGrabView.WasDisposed)
+            {
+                throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
+            }
+#endif
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
             Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.Position);
@@ -170,6 +183,13 @@ public static partial class Application // Mouse handling
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
+
+#if DEBUG_IDISPOSABLE
+            if (MouseGrabView.WasDisposed)
+            {
+                throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
+            }
+#endif
             if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) == true)
             {
                 return;

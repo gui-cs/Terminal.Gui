@@ -41,6 +41,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         set
         {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
             if (HasFocus != value)
             {
                 if (value)
@@ -59,7 +65,16 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 }
             }
         }
-        get => _hasFocus;
+        get
+        {
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            return _hasFocus;
+        }
     }
 
     /// <summary>
@@ -163,6 +178,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
         }
 
+        if (previousFocusedView is { HasFocus: true } && Subviews.Contains (previousFocusedView))
+        {
+            previousFocusedView.SetHasFocusFalse (this, false);
+        }
         NotifyFocusChanged (HasFocus, previousFocusedView, this);
         SetNeedsDisplay ();
 
@@ -258,7 +277,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 return;
             }
 
-            if (Application.Navigation is { })
+            if (Application.Navigation is { } && Application.Current is {})
             {
                 // Temporarily ensure this view can't get focus
                 bool prevCanFocus = _canFocus;
@@ -313,7 +332,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // Post-conditions - prove correctness
         if (HasFocus == previousValue)
         {
-            throw new InvalidOperationException ($"LeaveFocus and the HasFocus value did not change.");
+            throw new InvalidOperationException ($"SetHasFocusFalse and the HasFocus value did not change.");
         }
 
         SetNeedsDisplay ();

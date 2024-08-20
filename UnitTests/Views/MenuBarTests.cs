@@ -3064,7 +3064,7 @@ Edit
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 10, 6), pos);
 
-        Assert.False (
+        Assert.True (
                       menu.NewMouseEvent (
                                           new () { Position = new (70, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top }
                                          )
@@ -3329,7 +3329,7 @@ Edit
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 10, 6), pos);
 
-        Assert.False (menu.NewMouseEvent (new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [1] }));
+        Assert.True (menu.NewMouseEvent (new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [1] }));
         top.Draw ();
 
         expected = @"
@@ -3345,7 +3345,7 @@ Edit
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 15, 7), pos);
 
-        Assert.False (menu.NewMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [2] }));
+        Assert.True (menu.NewMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [2] }));
         top.Draw ();
 
         expected = @"
@@ -3514,11 +3514,11 @@ Edit
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 8, 4), pos);
 
-        Assert.False (
-                      menu.NewMouseEvent (
-                                          new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [1] }
-                                         )
-                     );
+        Assert.True (
+                     menu.NewMouseEvent (
+                                         new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [1] }
+                                        )
+                    );
         top.Draw ();
 
         expected = @"
@@ -3532,11 +3532,11 @@ Edit
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 13, 5), pos);
 
-        Assert.False (
-                      menu.NewMouseEvent (
-                                          new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [2] }
-                                         )
-                     );
+        Assert.True (
+                     menu.NewMouseEvent (
+                                         new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [2] }
+                                        )
+                    );
         top.Draw ();
 
         expected = @"
@@ -3550,10 +3550,10 @@ Edit
         Assert.Equal (new (1, 0, 8, 4), pos);
 
         Assert.False (
-                      menu.NewMouseEvent (
-                                          new () { Position = new (70, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top }
-                                         )
-                     );
+                     menu.NewMouseEvent (
+                                         new () { Position = new (70, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top }
+                                        )
+                    );
         top.Draw ();
 
         expected = @"

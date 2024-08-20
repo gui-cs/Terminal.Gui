@@ -121,10 +121,19 @@ public sealed class ContextMenu : IDisposable
     }
 
     /// <summary>Hides (closes) the ContextMenu.</summary>
-    public void Hide ()
+    public void Hide (bool dispose = false)
     {
-        _menuBar?.CleanUp ();
-        Dispose ();
+        if (_menuBar is { })
+        {
+            //_menuBar?.CleanUp ();
+            _menuBar.Enabled = false;
+
+            if (dispose)
+            {
+                _menuBar.Dispose ();
+                _menuBar = null;
+            }
+        }
     }
 
     /// <summary>Event invoked when the <see cref="ContextMenu.Key"/> is changed.</summary>
@@ -221,5 +230,9 @@ public sealed class ContextMenu : IDisposable
 
     private void Container_Deactivate (object sender, ToplevelEventArgs e) { Hide (); }
     private void Container_Closing (object sender, ToplevelClosingEventArgs obj) { Hide (); }
-    private void MenuBar_MenuAllClosed (object sender, EventArgs e) { Dispose (); }
+
+    private void MenuBar_MenuAllClosed (object sender, EventArgs e)
+    {
+        Hide (true);
+    }
 }

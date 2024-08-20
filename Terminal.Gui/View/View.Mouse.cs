@@ -244,7 +244,7 @@ public partial class View // Mouse APIs
         if (!Enabled)
         {
             // QUESTION: Is this right? Should a disabled view eat mouse clicks?
-            return args.Handled = true;
+            return args.Handled = false;
         }
 
         MouseClick?.Invoke (this, args);

@@ -115,9 +115,6 @@ public class MenuBar : View, IDesignable
     /// <summary><see langword="true"/> if the menu is open; otherwise <see langword="true"/>.</summary>
     public bool IsMenuOpen { get; protected set; }
 
-    /// <summary>Gets the view that was last focused before opening the menu.</summary>
-    public View LastFocused { get; private set; }
-
     /// <summary>
     ///     Gets or sets the array of <see cref="MenuBarItem"/>s for the menu. Only set this after the
     ///     <see cref="MenuBar"/> is visible.
@@ -355,7 +352,7 @@ public class MenuBar : View, IDesignable
 
         _selected = 0;
 
-        _previousFocused = null;//SuperView is null ? Application.Current?.Focused : SuperView.Focused;
+        _previousFocused = Application.Navigation?.GetFocused ();
         OpenMenu (_selected);
 
         if (!SelectEnabledItem (
@@ -418,7 +415,7 @@ public class MenuBar : View, IDesignable
 
         if (_openMenu is null)
         {
-            _previousFocused = null;//SuperView is null ? Application.Current?.Focused ?? null : SuperView.Focused;
+            _previousFocused = Application.Navigation?.GetFocused ();
         }
 
         return OpenMenu (idx, sIdx, subMenu);
@@ -461,16 +458,23 @@ public class MenuBar : View, IDesignable
                 return;
             }
 
-            if (LastFocused is { } && LastFocused != this)
+#if DEBUG_IDISPOSABLE
+            if (WasDisposed)
             {
-                _selected = -1;
+                throw new ObjectDisposedException (GetType ().FullName);
             }
+#endif
+
+            _selected = -1;
+            Enabled = false;
 
             Application.UngrabMouse ();
         }
 
-        if (OpenCurrentMenu is { })
+        if (OpenCurrentMenu is { } && OpenCurrentMenu is Menu)
         {
+            OpenCurrentMenu.HasFocus = false;
+            OpenCurrentMenu.Dispose ();
             OpenCurrentMenu = null;
         }
 
@@ -513,52 +517,35 @@ public class MenuBar : View, IDesignable
                     Application.Current?.Remove (_openMenu);
                 }
 
-                if (_previousFocused is Menu && _openMenu is { } && _previousFocused.ToString () != OpenCurrentMenu.ToString ())
+                if (_previousFocused is Menu && _openMenu is { } && (OpenCurrentMenu is {} && _previousFocused.ToString () != OpenCurrentMenu.ToString ()))
                 {
                     _previousFocused.SetFocus ();
                 }
 
                 _openMenu?.Dispose ();
+                if (_openMenu == OpenCurrentMenu)
+                {
+                    OpenCurrentMenu = null;
+                }
                 _openMenu = null;
 
-                if (_lastFocused is Menu or MenuBar)
-                {
-                    _lastFocused = null;
-                }
-
-                LastFocused = _lastFocused;
-                _lastFocused = null;
-
-                if (LastFocused is { CanFocus: true })
-                {
-                    if (!reopen)
-                    {
-                        _selected = -1;
-                    }
-
-                    if (_openSubMenu is { })
-                    {
-                        _openSubMenu = null;
-                    }
-
-                    if (OpenCurrentMenu is { })
-                    {
-                        Application.Current?.Remove (OpenCurrentMenu);
-                        OpenCurrentMenu.Dispose ();
-                        OpenCurrentMenu = null;
-                    }
-
-                    LastFocused.SetFocus ();
-                }
-                else if (_openSubMenu is null || _openSubMenu.Count == 0)
+                if (_openSubMenu is null || _openSubMenu.Count == 0)
                 {
                     CloseAllMenus ();
+
+                    return false;
                 }
                 else
                 {
                     SetFocus ();
                 }
 
+#if DEBUG_IDISPOSABLE
+                if (WasDisposed)
+                {
+                    throw new ObjectDisposedException (GetType ().FullName);
+                }
+#endif
                 IsMenuOpen = false;
                 break;
 
@@ -575,6 +562,12 @@ public class MenuBar : View, IDesignable
         _reopen = false;
         _isMenuClosing = false;
 
+#if DEBUG_IDISPOSABLE
+        if (WasDisposed)
+        {
+            throw new ObjectDisposedException (GetType ().FullName);
+        }
+#endif
         return true;
     }
 
@@ -726,6 +719,11 @@ public class MenuBar : View, IDesignable
                 {
                     Application.Current?.Remove (_openMenu);
                     _openMenu.Dispose ();
+
+                    if (_openMenu == OpenCurrentMenu)
+                    {
+                        OpenCurrentMenu = null;
+                    }
                     _openMenu = null;
                 }
 
@@ -916,6 +914,11 @@ public class MenuBar : View, IDesignable
             foreach (Menu item in _openSubMenu)
             {
                 Application.Current.Remove (item);
+
+                if (item == OpenCurrentMenu)
+                {
+                    OpenCurrentMenu = null;
+                }
                 item.Dispose ();
             }
         }
@@ -1037,7 +1040,6 @@ public class MenuBar : View, IDesignable
         if (_openedByAltKey)
         {
             _openedByAltKey = false;
-            LastFocused?.SetFocus ();
         }
 
         return true;
@@ -1099,6 +1101,11 @@ public class MenuBar : View, IDesignable
             Point screen = ViewportToScreen (new Point (0, i));
             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = mi };
             menu.Run (mi.Action);
+
+            if (menu == OpenCurrentMenu)
+            {
+                OpenCurrentMenu = null;
+            }
             menu.Dispose ();
         }
         else
@@ -1171,6 +1178,10 @@ public class MenuBar : View, IDesignable
                 }
 
                 menu.Dispose ();
+                if (menu == OpenCurrentMenu)
+                {
+                    OpenCurrentMenu = null;
+                }
             }
 
             RemoveSubMenu (i, ignoreUseSubMenusSingleFrame);
@@ -1303,7 +1314,7 @@ public class MenuBar : View, IDesignable
     /// <inheritdoc/>
     internal void LostFocus (View view)
     {
-        if (((!(view is MenuBar) && !(view is Menu)) || (!(view is MenuBar) && !(view is Menu) && _openMenu is { })) && !_isCleaning && !_reopen)
+        if (((!(view is MenuBar) && !(view is Menu))) && !_isCleaning && !_reopen)
         {
             CleanUp ();
         }
@@ -1314,10 +1325,21 @@ public class MenuBar : View, IDesignable
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent me)
     {
-        if (!_handled && !HandleGrabView (me, this))
+        if (!HandleGrabView (me, this))
         {
             return false;
         }
+
+        if (!IsMenuOpen)
+        {
+            return false;
+        }
+
+        if (!_handled)
+        {
+            return false;
+        }
+
 
         _handled = false;
 
@@ -1351,6 +1373,10 @@ public class MenuBar : View, IDesignable
                             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = Menus [i] };
                             menu.Run (Menus [i].Action);
                             menu.Dispose ();
+                            if (menu == OpenCurrentMenu)
+                            {
+                                OpenCurrentMenu = null;
+                            }
                         }
                         else if (!IsMenuOpen)
                         {
@@ -1487,9 +1513,18 @@ public class MenuBar : View, IDesignable
                     CloseAllMenus ();
                 }
 
+//#if DEBUG_IDISPOSABLE
+//                if (WasDisposed)
+//                {
+//                    throw new ObjectDisposedException (GetType ().FullName);
+//                }
+//#endif
                 _handled = false;
 
+                Enabled = false;
                 return false;
+
+
             }
             else
             {

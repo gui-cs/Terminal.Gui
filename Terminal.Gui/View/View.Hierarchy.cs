@@ -73,22 +73,6 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             {
                 view.SetFocus ();
             }
-
-#if AUTO_CANFOCUS
-            // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Instead, callers to Add should be explicit about what they want.
-            _addingViewSoCanFocusAlsoUpdatesSuperView = true;
-
-            if (SuperView?.CanFocus == false)
-            {
-                SuperView._addingViewSoCanFocusAlsoUpdatesSuperView = true;
-                SuperView.CanFocus = true;
-                SuperView._addingViewSoCanFocusAlsoUpdatesSuperView = false;
-            }
-
-            // QUESTION: This automatic behavior of setting CanFocus to true on the SuperView is not documented, and is annoying.
-            CanFocus = true;
-            _addingViewSoCanFocusAlsoUpdatesSuperView = false;
-#endif
         }
 
         if (view.Enabled && !Enabled)

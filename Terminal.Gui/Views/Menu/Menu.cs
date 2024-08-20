@@ -589,7 +589,10 @@ internal sealed class Menu : View
 
     protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
-        _host.LostFocus (view);
+        if (!newHasFocus)
+        {
+            _host.LostFocus (previousFocusedView);
+        }
     }
 
     private void RunSelected ()
