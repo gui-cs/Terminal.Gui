@@ -72,7 +72,7 @@ public class DatePickerTests
     [AutoInitShutdown]
     public void DatePicker_ShouldNot_SetDateOutOfRange_UsingPreviousMonthButton ()
     {
-        var date = new DateTime (1, 2, 0);
+        var date = new DateTime (1, 2, 15);
         var datePicker = new DatePicker (date);
         var top = new Toplevel ();
 
