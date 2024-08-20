@@ -414,7 +414,10 @@ public class ComboBox : View, IDesignable
 
     private bool CancelSelected ()
     {
-        _search.SetFocus ();
+        if (HasFocus)
+        {
+            _search.SetFocus ();
+        }
 
         if (ReadOnly || HideDropdownListOnClick)
         {

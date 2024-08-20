@@ -131,6 +131,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
         }
 
+        if (_hasFocus)
+        {
+            // Something else beat us to the change (likely a FocusChanged handler).
+            return (true, false);
+        }
+
         // By setting _hasFocus to true we definitively change HasFocus for this view.
 
         // Get whatever peer has focus, if any
