@@ -73,7 +73,11 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         if (AutoInit)
         {
             // TODO: This Dispose call is here until all unit tests that don't correctly dispose Toplevel's they create are fixed.
-            Application.Top?.Dispose ();
+            if (!Application.Top?.WasDisposed ?? false)
+            {
+                Application.Top?.Dispose ();
+            }
+
             Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
             if (Responder.Instances.Count == 0)
