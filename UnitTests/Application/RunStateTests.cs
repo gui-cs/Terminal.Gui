@@ -9,7 +9,6 @@ public class RunStateTests
     {
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
-        RunState.Instances.Clear ();
 #endif
     }
 
@@ -36,50 +35,19 @@ public class RunStateTests
         top.Dispose ();
         Shutdown ();
 
-#if DEBUG_IDISPOSABLE
-        Assert.True (rs.WasDisposed);
-#endif
-
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
     }
 
     [Fact]
-    public void Dispose_Cleans_Up_RunState ()
-    {
-        var rs = new RunState (null);
-        Assert.NotNull (rs);
-
-        // Should not throw because Toplevel was null
-        rs.Dispose ();
-#if DEBUG_IDISPOSABLE
-        Assert.True (rs.WasDisposed);
-#endif
-        var top = new Toplevel ();
-        rs = new RunState (top);
-        Assert.NotNull (rs);
-
-        // Should throw because Toplevel was not cleaned up
-        Assert.Throws<InvalidOperationException> (() => rs.Dispose ());
-
-        rs.Toplevel.Dispose ();
-        rs.Toplevel = null;
-        rs.Dispose ();
-#if DEBUG_IDISPOSABLE
-        Assert.True (rs.WasDisposed);
-        Assert.True (top.WasDisposed);
-#endif
-    }
-
-    [Fact]
     public void New_Creates_RunState ()
     {
-        var rs = new RunState (null);
+        RunState rs = new (null!);
         Assert.Null (rs.Toplevel);
 
         var top = new Toplevel ();
-        rs = new RunState (top);
+        rs = new (top);
         Assert.Equal (top, rs.Toplevel);
     }
 
@@ -94,13 +62,5 @@ public class RunStateTests
     private void Shutdown ()
     {
         Application.Shutdown ();
-#if DEBUG_IDISPOSABLE
-
-        // Validate there are no outstanding RunState-based instances left
-        foreach (RunState inst in RunState.Instances)
-        {
-            Assert.True (inst.WasDisposed);
-        }
-#endif
     }
 }

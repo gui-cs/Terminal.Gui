@@ -13,7 +13,6 @@ public class OverlappedTests
         _output = output;
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
-        RunState.Instances.Clear ();
 #endif
     }
 
@@ -956,12 +955,11 @@ public class OverlappedTests
 
         // This will end the win2 and not the overlapped
         Application.End (rsOverlapped);
+
         // rsOverlapped has been disposed and Toplevel property is null
         // So we must use another valid RunState to iterate
         Application.RunIteration (ref rsWin1, ref firstIteration);
-#if DEBUG_IDISPOSABLE
-        Assert.True (rsOverlapped.WasDisposed);
-#endif
+
         Assert.Null (rsOverlapped.Toplevel);
         Assert.Equal (Application.Top, overlapped);
         Assert.Equal (ApplicationOverlapped.OverlappedTop, overlapped);
@@ -970,29 +968,25 @@ public class OverlappedTests
         Assert.Equal (win1, rsWin1.Toplevel);
 
         Application.End (rsWin1);
+
         // rsWin1 has been disposed and Toplevel property is null
         // So we must use another valid RunState to iterate
         Application.RunIteration (ref rsWin2, ref firstIteration);
-#if DEBUG_IDISPOSABLE
-        Assert.True (rsOverlapped.WasDisposed);
-        Assert.True (rsWin1.WasDisposed);
-#endif
+
         Assert.Null (rsOverlapped.Toplevel);
         Assert.Equal (Application.Top, overlapped);
         Assert.Equal (ApplicationOverlapped.OverlappedTop, overlapped);
         Assert.Equal (Application.Current, overlapped);
         Assert.Null (rsWin1.Toplevel);
+
         // See here that the only Toplevel that needs to End is the overlapped
         // which the rsWin2 now has the Toplevel set to the overlapped
         Assert.Equal (overlapped, rsWin2.Toplevel);
 
         Application.End (rsWin2);
+
         // There is no more RunState to iteration
-#if DEBUG_IDISPOSABLE
-        Assert.True (rsOverlapped.WasDisposed);
-        Assert.True (rsWin1.WasDisposed);
-        Assert.True (rsWin2.WasDisposed);
-#endif
+
         Assert.Null (rsOverlapped.Toplevel);
         Assert.Equal (Application.Top, overlapped);
         Assert.Equal (ApplicationOverlapped.OverlappedTop, overlapped);
@@ -1005,6 +999,7 @@ public class OverlappedTests
         Assert.False (win1.WasDisposed);
         Assert.False (overlapped.WasDisposed);
 #endif
+
         // Now dispose all them
         win2.Dispose ();
         win1.Dispose ();
