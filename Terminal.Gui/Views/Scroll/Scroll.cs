@@ -22,12 +22,12 @@ public class Scroll : View
         Height = Dim.Auto (DimAutoStyle.Content, 1);
     }
 
+
+    internal bool _wasSliderLayoutComplete = true;
+
     private readonly ScrollSlider _slider;
-
     private Orientation _orientation;
-
     private int _position;
-
     private int _size;
 
     /// <inheritdoc/>
@@ -118,6 +118,12 @@ public class Scroll : View
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
+        if (!_wasSliderLayoutComplete)
+        {
+            // Do not process if slider layout wasn't yet completed
+            return base.OnMouseEvent (mouseEvent);
+        }
+
         int location = Orientation == Orientation.Vertical ? mouseEvent.Position.Y : mouseEvent.Position.X;
         int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
 
@@ -125,11 +131,11 @@ public class Scroll : View
                                                        ? new (_slider.Frame.Y, _slider.Frame.Bottom - 1)
                                                        : new (_slider.Frame.X, _slider.Frame.Right - 1);
 
-        if (mouseEvent.Flags == MouseFlags.Button1Pressed && location < sliderPos.topLeft)
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && location < sliderPos.topLeft)
         {
             Position = Math.Max (Position - barSize, 0);
         }
-        else if (mouseEvent.Flags == MouseFlags.Button1Pressed && location > sliderPos.bottomRight)
+        else if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && location > sliderPos.bottomRight)
         {
             Position = Math.Min (Position + barSize, Size - barSize);
         }
@@ -150,8 +156,19 @@ public class Scroll : View
                 return _slider.OnMouseEvent (mouseEvent);
             }
         }
+        // Flag as false until slider layout is completed
+        _wasSliderLayoutComplete = false;
 
         return base.OnMouseEvent (mouseEvent);
+    }
+
+    /// <inheritdoc/>
+    protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
+    {
+        // If scroll isn't handling mouse then reset the flag
+        _wasSliderLayoutComplete = true;
+
+        return base.OnMouseLeave (mouseEvent);
     }
 
     // TODO: Move this into "ScrollSlider" and override it there. Scroll can then subscribe to _slider.LayoutComplete and call AdjustSlider.

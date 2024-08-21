@@ -73,11 +73,17 @@ internal class ScrollSlider : View
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
+        if (!_host._wasSliderLayoutComplete)
+        {
+            // Ensure not blocking scroll mouse event
+            _host._wasSliderLayoutComplete = true;
+        }
+
         int location = _host.Orientation == Orientation.Vertical ? mouseEvent.Position.Y : mouseEvent.Position.X;
         int offset = _lastLocation > -1 ? location - _lastLocation : 0;
         int barSize = _host.Orientation == Orientation.Vertical ? _host.GetContentSize ().Height : _host.GetContentSize ().Width;
 
-        if (mouseEvent.Flags == MouseFlags.Button1Pressed)
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && _lastLocation == -1)
         {
             if (Application.MouseGrabView != this)
             {
@@ -141,6 +147,14 @@ internal class ScrollSlider : View
         }
 
         return base.OnMouseLeave (mouseEvent);
+    }
+
+    /// <inheritdoc />
+    internal override void OnLayoutComplete (LayoutEventArgs args)
+    {
+        base.OnLayoutComplete (args);
+
+        _host._wasSliderLayoutComplete = true;
     }
 
     private int GetPositionFromSliderLocation (int location)
