@@ -3,7 +3,7 @@
 namespace Terminal.Gui;
 
 /// <summary>The execution state for a <see cref="Toplevel"/> view.</summary>
-public class RunState : IDisposable
+public sealed record RunState
 {
     /// <summary>Initializes a new <see cref="RunState"/> class.</summary>
     /// <param name="view"></param>
