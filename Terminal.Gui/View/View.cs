@@ -224,6 +224,10 @@ public partial class View : Responder, ISupportInitializeNotification
     /// </remarks>
     public virtual void BeginInit ()
     {
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (WasDisposed, typeof (View));
+#endif
+
         if (IsInitialized)
         {
             throw new InvalidOperationException ("The view is already initialized.");
@@ -474,6 +478,10 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
     protected void OnTitleChanged ()
     {
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (WasDisposed, typeof (View));
+#endif
+
         TitleChanged?.Invoke (this, new (in _title));
     }
 
