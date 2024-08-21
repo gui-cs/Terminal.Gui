@@ -232,7 +232,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released)]
     [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released)]
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
-    public void WantContinuousButtonPressed_True_Button_Press_Release_Clicks (MouseFlags pressed, MouseFlags released)
+    public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Button_Press_Release_Clicks (MouseFlags pressed, MouseFlags released)
     {
         var me = new MouseEvent ();
 
@@ -240,7 +240,8 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         {
             Width = 1,
             Height = 1,
-            WantContinuousButtonPressed = true
+            WantContinuousButtonPressed = true,
+            WantMousePositionReports = true
         };
 
         var clickedCount = 0;
@@ -263,7 +264,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
     [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_Button_Press_Release_Clicks_Repeatedly (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Button_Press_Release_Clicks_Repeatedly (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
         var me = new MouseEvent ();
 
@@ -271,7 +272,8 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         {
             Width = 1,
             Height = 1,
-            WantContinuousButtonPressed = true
+            WantContinuousButtonPressed = true,
+            WantMousePositionReports = true
         };
 
         var clickedCount = 0;
@@ -301,7 +303,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Fact]
-    public void WantContinuousButtonPressed_True_Move_InViewport_OutOfViewport_Keeps_Counting ()
+    public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Move_InViewport_OutOfViewport_Keeps_Counting ()
     {
         var me = new MouseEvent ();
 
@@ -309,7 +311,8 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         {
             Width = 1,
             Height = 1,
-            WantContinuousButtonPressed = true
+            WantContinuousButtonPressed = true,
+            WantMousePositionReports = true
         };
 
         var clickedCount = 0;
