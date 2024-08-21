@@ -177,7 +177,7 @@ internal class ScrollSlider : View
 
         if (_host.Size > 0)
         {
-            dimension = Math.Min (Math.Max (scrollSize * scrollSize / _host.Size, 1), scrollSize);
+            dimension = (int)Math.Min (Math.Max (Math.Ceiling ((double)scrollSize * scrollSize / _host.Size), 1), scrollSize);
 
             // Ensure the Position is valid
             if (_host.Position > 0 && _host.Position + scrollSize > _host.Size)

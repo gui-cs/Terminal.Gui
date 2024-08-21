@@ -49,7 +49,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░
@@ -62,15 +62,37 @@ public class ScrollTests
                     @"
 ░░░░░█████",
                     @"
-░░██░░░░░░")]
+░░███░░░░░")]
     [InlineData (
                     40,
                     @"
 █
 █
+█
 ░
 ░
 ░
+░
+░
+░
+░",
+                    @"
+░
+█
+█
+█
+░
+░
+░
+░
+░
+░",
+                    @"
+░
+░
+█
+█
+█
 ░
 ░
 ░
@@ -88,35 +110,13 @@ public class ScrollTests
 ░
 ░",
                     @"
-░
-░
-█
-█
-░
-░
-░
-░
-░
-░",
+███░░░░░░░",
                     @"
-░
-█
-░
-░
-░
-░
-░
-░
-░
-░",
+░███░░░░░░",
                     @"
-██░░░░░░░░",
+░░███░░░░░",
                     @"
-░██░░░░░░░",
-                    @"
-░░██░░░░░░",
-                    @"
-░█░░░░░░░░")]
+░██░░░░░░░")]
     public void Changing_Position_Size_Orientation_Draws_Correctly (
         int size,
         string firstVertExpected,
@@ -232,7 +232,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░
@@ -247,7 +247,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░")]
     [InlineData (
@@ -266,10 +266,10 @@ public class ScrollTests
                     10,
                     5,
                     @"
-░░██░░░░░░",
+░░███░░░░░",
                     20,
                     @"
-░░░░░██░░░")]
+░░░░░███░░")]
     public void Mouse_On_The_Container (Orientation orientation, int size, int position, int location, string output, int expectedPos, string expectedOut)
     {
         var scroll = new Scroll
@@ -340,7 +340,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░
@@ -353,7 +353,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░
@@ -378,11 +378,11 @@ public class ScrollTests
                     3,
                     3,
                     @"
-░░██░░░░░░",
+░░███░░░░░",
                     MouseFlags.Button1Pressed,
                     10,
                     @"
-░░██░░░░░░")]
+░░███░░░░░")]
     [InlineData (
                     Orientation.Vertical,
                     20,
@@ -478,7 +478,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░
@@ -490,7 +490,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░
@@ -504,11 +504,11 @@ public class ScrollTests
                     2,
                     1,
                     @"
-░░██░░░░░░",
+░░███░░░░░",
                     MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition,
                     4,
                     @"
-░██░░░░░░░")]
+░███░░░░░░")]
     [InlineData (
                     Orientation.Vertical,
                     40,
@@ -520,7 +520,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░
@@ -534,7 +534,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░
@@ -546,11 +546,11 @@ public class ScrollTests
                     3,
                     4,
                     @"
-░░██░░░░░░",
+░░███░░░░░",
                     MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition,
                     12,
                     @"
-░░░██░░░░░")]
+░░░███░░░░")]
     [InlineData (
                     Orientation.Vertical,
                     40,
@@ -562,7 +562,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░
@@ -576,7 +576,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░
@@ -588,11 +588,11 @@ public class ScrollTests
                     2,
                     3,
                     @"
-░░██░░░░░░",
+░░███░░░░░",
                     MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition,
                     12,
                     @"
-░░░██░░░░░")]
+░░░███░░░░")]
     [InlineData (
                     Orientation.Vertical,
                     40,
@@ -604,7 +604,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░
@@ -619,7 +619,7 @@ public class ScrollTests
 ░
 █
 █
-░
+█
 ░
 ░
 ░")]
@@ -630,11 +630,11 @@ public class ScrollTests
                     2,
                     4,
                     @"
-░░██░░░░░░",
+░░███░░░░░",
                     MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition,
                     16,
                     @"
-░░░░██░░░░")]
+░░░░███░░░")]
     public void Mouse_On_The_Slider (
         Orientation orientation,
         int size,
@@ -887,7 +887,7 @@ public class ScrollTests
 │█│
 │█│
 │█│
-│░│
+│█│
 │░│
 │░│
 │░│
@@ -900,7 +900,7 @@ public class ScrollTests
                     Orientation.Horizontal,
                     @"
 ┌────────┐
-│███░░░░░│
+│████░░░░│
 └────────┘")]
     [InlineData (
                     3,
@@ -912,7 +912,7 @@ public class ScrollTests
 │███│
 │███│
 │███│
-│░░░│
+│███│
 │░░░│
 │░░░│
 │░░░│
@@ -925,9 +925,9 @@ public class ScrollTests
                     Orientation.Horizontal,
                     @"
 ┌────────┐
-│███░░░░░│
-│███░░░░░│
-│███░░░░░│
+│████░░░░│
+│████░░░░│
+│████░░░░│
 └────────┘")]
     public void Vertical_Horizontal_Draws_Correctly (int sizeWidth, int sizeHeight, int widthHeight, Orientation orientation, string expected)
     {
