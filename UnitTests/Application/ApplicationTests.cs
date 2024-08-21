@@ -746,14 +746,12 @@ public class ApplicationTests
         Assert.True (Application.Top is Window);
 
         Application.Top.Dispose ();
-        Application.Top = null;
 
         // Run<Toplevel> when already initialized or not with a Driver will not throw (because Dialog is derived from Toplevel)
         Application.Run<Dialog> (null, new FakeDriver ());
         Assert.True (Application.Top is Dialog);
 
         Application.Top.Dispose ();
-        Application.Top = null;
         Shutdown ();
 
         Assert.Null (Application.Top);

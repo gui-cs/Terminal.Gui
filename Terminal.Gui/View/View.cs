@@ -432,22 +432,10 @@ public partial class View : Responder, ISupportInitializeNotification
     {
         get
         {
-#if DEBUG_IDISPOSABLE
-            if (WasDisposed)
-            {
-                throw new ObjectDisposedException (GetType ().FullName);
-            }
-#endif
             return _title;
         }
         set
         {
-#if DEBUG_IDISPOSABLE
-            if (WasDisposed)
-            {
-                throw new ObjectDisposedException (GetType ().FullName);
-            }
-#endif
             if (value == _title)
             {
                 return;
