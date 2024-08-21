@@ -147,6 +147,9 @@ public static partial class Application // Keyboard handling
         {
             foreach (Toplevel topLevel in TopLevels.ToList ())
             {
+#if DEBUG_IDISPOSABLE
+                ObjectDisposedException.ThrowIf (topLevel is { WasDisposed: true }, typeof (View));
+#endif
                 if (topLevel.NewKeyDownEvent (keyEvent))
                 {
                     return true;
@@ -160,6 +163,9 @@ public static partial class Application // Keyboard handling
         }
         else
         {
+#if DEBUG_IDISPOSABLE
+            ObjectDisposedException.ThrowIf (Current is { WasDisposed: true }, typeof (View));
+#endif
             if (Current.NewKeyDownEvent (keyEvent))
             {
                 return true;
