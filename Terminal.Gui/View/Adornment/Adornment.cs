@@ -75,6 +75,10 @@ public class Adornment : View
     /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
     public void OnThicknessChanged ()
     {
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (WasDisposed, typeof (Adornment));
+#endif
+
         ThicknessChanged?.Invoke (this, EventArgs.Empty);
     }
 
@@ -147,6 +151,10 @@ public class Adornment : View
     /// <summary>Redraws the Adornments that comprise the <see cref="Adornment"/>.</summary>
     public override void OnDrawContent (Rectangle viewport)
     {
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (WasDisposed, typeof (Adornment));
+#endif
+
         if (Thickness == Thickness.Empty)
         {
             return;

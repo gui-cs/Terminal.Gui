@@ -7,6 +7,27 @@ public class AdornmentTests (ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
+    public void Throws_ObjectDisposedException ()
+    {
+        View view = new ();
+        Assert.NotNull (view.Margin);
+        Assert.NotNull (view.Border);
+        Assert.NotNull (view.Padding);
+
+        view.Margin.Dispose ();
+
+        Assert.Throws<ObjectDisposedException> (() => view.Margin.Thickness = new Thickness (1));
+
+        view.Border.Dispose ();
+        Assert.Throws<ObjectDisposedException> (() => view.Border.Thickness = new Thickness (1));
+
+        view.Padding.Dispose ();
+        Assert.Throws<ObjectDisposedException> (() => view.Padding.Thickness = new Thickness (1));
+
+        view.Dispose ();
+    }
+
+    [Fact]
     public void Viewport_Location_Always_Empty_Size_Correct ()
     {
         var view = new View
