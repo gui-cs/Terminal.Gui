@@ -108,6 +108,7 @@ public sealed class ContextMenu : IDisposable
         if (IsShow)
         {
             _menuBar.MenuAllClosed -= MenuBar_MenuAllClosed;
+            Application.UngrabMouse ();
             _menuBar.Dispose ();
             _menuBar = null;
             IsShow = false;
