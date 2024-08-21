@@ -60,6 +60,10 @@ public partial class View // Layout APIs
 
             View? subview = null;
 
+#if DEBUG_IDISPOSABLE
+            ObjectDisposedException.ThrowIf (start.WasDisposed, typeof (View));
+#endif
+
             for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
                 if (start.InternalSubviews [i].Visible

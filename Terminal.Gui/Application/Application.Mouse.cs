@@ -79,6 +79,9 @@ public static partial class Application // Mouse handling
             return false;
         }
 
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (view.WasDisposed, typeof (View));
+#endif
         var evArgs = new GrabMouseEventArgs (view);
         GrabbingMouse?.Invoke (view, evArgs);
 
@@ -91,6 +94,10 @@ public static partial class Application // Mouse handling
         {
             return false;
         }
+
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (view.WasDisposed, typeof (View));
+#endif
 
         var evArgs = new GrabMouseEventArgs (view);
         UnGrabbingMouse?.Invoke (view, evArgs);
@@ -105,6 +112,10 @@ public static partial class Application // Mouse handling
             return;
         }
 
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (view.WasDisposed, typeof (View));
+#endif
+
         GrabbedMouse?.Invoke (view, new (view));
     }
 
@@ -114,6 +125,10 @@ public static partial class Application // Mouse handling
         {
             return;
         }
+
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (view.WasDisposed, typeof (View));
+#endif
 
         UnGrabbedMouse?.Invoke (view, new (view));
     }
@@ -143,10 +158,21 @@ public static partial class Application // Mouse handling
             return;
         }
 
+#if DEBUG_IDISPOSABLE
+        if (Current is { })
+        {
+            ObjectDisposedException.ThrowIf (Current.WasDisposed, typeof (View));
+        }
+#endif
+
         var view = View.FindDeepestView (Current, mouseEvent.Position);
 
         if (view is { })
         {
+#if DEBUG_IDISPOSABLE
+            ObjectDisposedException.ThrowIf (view.WasDisposed, typeof (View));
+#endif
+
             mouseEvent.View = view;
         }
 
@@ -204,6 +230,10 @@ public static partial class Application // Mouse handling
                 // This occurs when there are multiple overlapped "tops"
                 // E.g. "Mdi" - in the Background Worker Scenario
                 View? top = ApplicationOverlapped.FindDeepestTop (Top!, mouseEvent.Position);
+
+#if DEBUG_IDISPOSABLE
+                ObjectDisposedException.ThrowIf (top is { WasDisposed: true }, typeof (View));
+#endif
                 view = View.FindDeepestView (top, mouseEvent.Position);
 
                 if (view is { } && view != ApplicationOverlapped.OverlappedTop && top != Current && top is { })
@@ -257,6 +287,10 @@ public static partial class Application // Mouse handling
         }
         else if (MouseEnteredView != view)
         {
+#if DEBUG_IDISPOSABLE
+            ObjectDisposedException.ThrowIf (MouseEnteredView is { WasDisposed: true }, typeof (View));
+#endif
+
             MouseEnteredView.NewMouseLeaveEvent (me);
             view.NewMouseEnterEvent (me);
             MouseEnteredView = view;
@@ -268,6 +302,10 @@ public static partial class Application // Mouse handling
         }
 
         WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
+
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (WantContinuousButtonPressedView is { WasDisposed: true }, typeof (View));
+#endif
 
         //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
