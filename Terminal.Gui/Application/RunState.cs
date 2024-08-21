@@ -1,14 +1,16 @@
-﻿namespace Terminal.Gui;
+#nullable enable 
+
+namespace Terminal.Gui;
 
 /// <summary>The execution state for a <see cref="Toplevel"/> view.</summary>
 public class RunState : IDisposable
 {
     /// <summary>Initializes a new <see cref="RunState"/> class.</summary>
     /// <param name="view"></param>
-    public RunState (Toplevel view) { Toplevel = view; }
+    public RunState (Toplevel? view) { Toplevel = view; }
 
     /// <summary>The <see cref="Toplevel"/> belonging to this <see cref="RunState"/>.</summary>
-    public Toplevel Toplevel { get; internal set; }
+    public Toplevel? Toplevel { get; internal set; }
 
     /// <summary>Releases all resource used by the <see cref="RunState"/> object.</summary>
     /// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="RunState"/>.</remarks>
