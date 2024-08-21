@@ -15,7 +15,6 @@ public class AdornmentTests (ITestOutputHelper output)
         Assert.NotNull (view.Padding);
 
         view.Margin.Dispose ();
-
         Assert.Throws<ObjectDisposedException> (() => view.Margin.Thickness = new Thickness (1));
 
         view.Border.Dispose ();
