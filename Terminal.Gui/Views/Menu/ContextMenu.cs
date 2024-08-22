@@ -105,6 +105,7 @@ public sealed class ContextMenu : IDisposable
     /// <summary>Disposes the context menu object.</summary>
     public void Dispose ()
     {
+        _menuBar.MenuAllClosed -= MenuBar_MenuAllClosed;
         Application.UngrabMouse ();
         _menuBar?.Dispose ();
         _menuBar = null;
@@ -122,6 +123,7 @@ public sealed class ContextMenu : IDisposable
     public void Hide ()
     {
         _menuBar?.CleanUp ();
+        IsShow = false;
     }
 
     /// <summary>Event invoked when the <see cref="ContextMenu.Key"/> is changed.</summary>
@@ -211,6 +213,7 @@ public sealed class ContextMenu : IDisposable
         };
 
         _menuBar._isContextMenuLoading = true;
+        _menuBar.MenuAllClosed += MenuBar_MenuAllClosed;
         _menuBar.BeginInit ();
         _menuBar.EndInit ();
         IsShow = true;
@@ -220,4 +223,6 @@ public sealed class ContextMenu : IDisposable
     private void Container_Closing (object sender, ToplevelClosingEventArgs obj) { Hide (); }
     private void Container_Deactivate (object sender, ToplevelEventArgs e) { Hide (); }
     private void Container_Disposing (object sender, EventArgs e) { Dispose (); }
+
+    private void MenuBar_MenuAllClosed (object sender, EventArgs e) { Hide (); }
 }
