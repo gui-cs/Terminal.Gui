@@ -105,19 +105,16 @@ public sealed class ContextMenu : IDisposable
     /// <summary>Disposes the context menu object.</summary>
     public void Dispose ()
     {
-        if (IsShow)
-        {
-            _menuBar.MenuAllClosed -= MenuBar_MenuAllClosed;
-            Application.UngrabMouse ();
-            _menuBar.Dispose ();
-            _menuBar = null;
-            IsShow = false;
-        }
+        Application.UngrabMouse ();
+        _menuBar?.Dispose ();
+        _menuBar = null;
+        IsShow = false;
 
         if (_container is { })
         {
             _container.Closing -= Container_Closing;
             _container.Deactivate -= Container_Deactivate;
+            _container.Disposing -= Container_Disposing;
         }
     }
 
@@ -125,7 +122,6 @@ public sealed class ContextMenu : IDisposable
     public void Hide ()
     {
         _menuBar?.CleanUp ();
-        Dispose ();
     }
 
     /// <summary>Event invoked when the <see cref="ContextMenu.Key"/> is changed.</summary>
@@ -140,11 +136,13 @@ public sealed class ContextMenu : IDisposable
         if (_menuBar is { })
         {
             Hide ();
+            Dispose ();
         }
 
         _container = Application.Current;
-        _container.Closing += Container_Closing;
+        _container!.Closing += Container_Closing;
         _container.Deactivate += Container_Deactivate;
+        _container.Disposing += Container_Disposing;
         Rectangle frame = Application.Screen;
         Point position = Position;
 
@@ -213,14 +211,13 @@ public sealed class ContextMenu : IDisposable
         };
 
         _menuBar._isContextMenuLoading = true;
-        _menuBar.MenuAllClosed += MenuBar_MenuAllClosed;
         _menuBar.BeginInit ();
         _menuBar.EndInit ();
         IsShow = true;
         _menuBar.OpenMenu ();
     }
 
-    private void Container_Deactivate (object sender, ToplevelEventArgs e) { Hide (); }
     private void Container_Closing (object sender, ToplevelClosingEventArgs obj) { Hide (); }
-    private void MenuBar_MenuAllClosed (object sender, EventArgs e) { Dispose (); }
+    private void Container_Deactivate (object sender, ToplevelEventArgs e) { Hide (); }
+    private void Container_Disposing (object sender, EventArgs e) { Dispose (); }
 }
