@@ -57,7 +57,7 @@ public static partial class Application // Mouse handling
         }
 
 #if DEBUG_IDISPOSABLE
-        ObjectDisposedException.ThrowIf (MouseGrabView.WasDisposed, typeof (View));
+        ObjectDisposedException.ThrowIf (MouseGrabView.WasDisposed, MouseGrabView);
 #endif
 
         if (!OnUnGrabbingMouse (MouseGrabView))
