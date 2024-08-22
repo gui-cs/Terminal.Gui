@@ -28,6 +28,11 @@ public class Label : View
 
     private void Label_MouseClick (object sender, MouseEventEventArgs e)
     {
+        if (CanFocus)
+        {
+            return;
+        }
+
         e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
