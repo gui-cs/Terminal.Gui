@@ -13,7 +13,6 @@ public class ApplicationTests
 
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
-        RunState.Instances.Clear ();
 #endif
     }
 
@@ -177,7 +176,6 @@ public class ApplicationTests
         Application.End (rs);
 
 #if DEBUG_IDISPOSABLE
-        Assert.True (rs.WasDisposed);
         Assert.False (Application.Top.WasDisposed); // Is true because the rs.Toplevel is the same as Application.Top
 #endif
 

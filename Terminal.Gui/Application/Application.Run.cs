@@ -436,8 +436,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 #if DEBUG_IDISPOSABLE
                 Debug.Assert (TopLevels.Count == 0);
 #endif
-                runState.Dispose ();
-
                 return;
             }
 
@@ -892,6 +890,5 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         }
 
         runState.Toplevel = null;
-        runState.Dispose ();
     }
 }

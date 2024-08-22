@@ -13,7 +13,6 @@ public class MouseTests
         _output = output;
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
-        RunState.Instances.Clear ();
 #endif
     }
 
