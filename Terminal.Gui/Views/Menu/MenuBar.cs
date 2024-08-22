@@ -479,6 +479,16 @@ public class MenuBar : View, IDesignable
         }
 
         SetNeedsDisplay ();
+
+        if (Application.MouseGrabView is { } && Application.MouseGrabView is MenuBar && Application.MouseGrabView != this)
+        {
+            var menuBar = Application.MouseGrabView as MenuBar;
+
+            if (menuBar!.IsMenuOpen)
+            {
+                menuBar.CleanUp ();
+            }
+        }
         Application.UngrabMouse ();
         _isCleaning = false;
     }
