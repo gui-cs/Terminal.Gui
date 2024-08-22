@@ -38,7 +38,7 @@ public class Adornments : Scenario
         app.Add (window);
 
         var tf1 = new TextField { Width = 10, Text = "TextField" };
-        var color = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd () };
+        var color = new ColorPicker16 { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd () };
         color.BorderStyle = LineStyle.RoundedDotted;
 
         color.ColorChanged += (s, e) =>
@@ -47,7 +47,7 @@ public class Adornments : Scenario
                                   {
                                       Normal = new (
                                                     color.SuperView.ColorScheme.Normal.Foreground,
-                                                    e.Color
+                                                    e.CurrentValue
                                                    )
                                   };
                               };
