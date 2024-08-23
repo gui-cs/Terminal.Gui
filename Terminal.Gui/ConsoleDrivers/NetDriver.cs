@@ -133,6 +133,7 @@ internal sealed class NetWinVTConsole
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 }
 
+[MustDisposeResource]
 internal sealed class NetEvents : IDisposable
 {
     private readonly ManualResetEventSlim _inputReady = new (false);
