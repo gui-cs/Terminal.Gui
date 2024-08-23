@@ -945,5 +945,66 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
         Assert.Equal (0, subviewSubView3EnterCount);
         Assert.Equal (0, subviewSubView3LeaveCount);
     }
+
+
+    [Fact]
+    public void HasFocusChanged_NewValue_False_Hide_Subview ()
+    {
+        var subView1 = new View
+        {
+            Id = $"subView1",
+            CanFocus = true
+        };
+
+        var subView2 = new View
+        {
+            Id = $"subView2",
+            CanFocus = true
+        };
+
+        var view = new View
+        {
+            Id = "view",
+            CanFocus = true
+        };
+        view.HasFocusChanged += (s, e) =>
+        {
+            if (e.NewValue)
+            {
+                Assert.True (view.HasFocus);
+                Assert.True (subView1.HasFocus);
+                Assert.False (subView2.HasFocus);
+
+                subView1.Visible = true;
+                subView2.Visible = false;
+
+                Assert.True (view.HasFocus);
+                Assert.True (subView1.HasFocus);
+                Assert.False (subView2.HasFocus);
+
+            }
+            else
+            {
+                Assert.False (view.HasFocus);
+                Assert.False (subView1.HasFocus);
+                Assert.False (subView2.HasFocus);
+
+                subView1.Visible = false;
+                subView2.Visible = true;
+            }
+        };
+
+        view.Add (subView1, subView2);
+
+        view.SetFocus ();
+        Assert.True (view.HasFocus);
+        Assert.True (subView1.HasFocus);
+        Assert.False (subView2.HasFocus);
+
+        view.HasFocus = false;
+        Assert.False (view.HasFocus);
+        Assert.False (subView1.HasFocus);
+        Assert.False (subView2.HasFocus);
+    }
     #endregion HasFocusChanged
 }

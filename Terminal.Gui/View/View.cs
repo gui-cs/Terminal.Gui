@@ -377,7 +377,8 @@ public partial class View : Responder, ISupportInitializeNotification
                 }
             }
 
-            if (_visible && CanFocus && Enabled && !HasFocus && SuperView?.Focused == null)
+            if (_visible && CanFocus && Enabled && !HasFocus 
+                && (SuperView is null || SuperView is { HasFocus: true, Visible: true, Enabled: true, Focused: null }))
             {
                 SetFocus ();
             }

@@ -287,7 +287,79 @@ public class CanFocusTests (ITestOutputHelper _output) : TestsAllViews
         r.Dispose ();
     }
 
+    [Fact]
+    public void CanFocus_True_Focuses ()
+    {
+        View view = new ()
+        {
+            Id = "view"
+        };
 
+        View superView = new ()
+        {
+            Id = "superView",
+            CanFocus = true
+        };
+
+        superView.Add (view);
+
+        superView.SetFocus ();
+        Assert.True (superView.HasFocus);
+        Assert.NotEqual (view, superView.Focused);
+
+        view.CanFocus = true;
+        Assert.True (superView.HasFocus);
+        Assert.Equal (view, superView.Focused);
+        Assert.True (view.HasFocus);
+
+        view.CanFocus = false;
+        Assert.True (superView.HasFocus);
+        Assert.NotEqual (view, superView.Focused);
+        Assert.False (view.HasFocus);
+    }
+
+
+    [Fact]
+    public void CanFocus_Set_True_Get_AdvanceFocus_Works ()
+    {
+        Label label = new () { Text = "label" };
+        View view = new () { Text = "view", CanFocus = true };
+        Application.Current = new ();
+        Application.Current.Add (label, view);
+
+        Application.Current.SetFocus ();
+        Assert.Equal (view, Application.Current.MostFocused);
+        Assert.False (label.CanFocus);
+        Assert.False (label.HasFocus);
+        Assert.True (view.CanFocus);
+        Assert.True (view.HasFocus);
+
+        Assert.False (Application.Current.AdvanceFocus (NavigationDirection.Forward, null));
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        // Set label CanFocus to true
+        label.CanFocus = true;
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        // label can now be focused, so AdvanceFocus should move to it.
+        Assert.True (Application.Current.AdvanceFocus (NavigationDirection.Forward, null));
+        Assert.True (label.HasFocus);
+        Assert.False (view.HasFocus);
+
+        // Move back to view
+        view.SetFocus ();
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.True (label.HasFocus);
+        Assert.False (view.HasFocus);
+
+        Application.Current.Dispose ();
+        Application.ResetState ();
+    }
 
 #if V2_NEW_FOCUS_IMPL // Bogus test - depends on auto CanFocus behavior
 

@@ -265,7 +265,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 return;
             }
 
-            if (Application.Navigation is { } && Application.Current is {})
+            if (Application.Navigation is { } && Application.Current is { })
             {
                 // Temporarily ensure this view can't get focus
                 bool prevCanFocus = _canFocus;
@@ -311,6 +311,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
         _hasFocus = false;
 
         NotifyFocusChanged (HasFocus, this, newFocusedVew);
+
+        if (_hasFocus)
+        {
+            // Notify caused HasFocus to change to true.
+            return;
+        }
 
         if (SuperView is { })
         {
@@ -452,7 +458,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         // The subview does not have focus, but at least one other that can. Can this one be focused?
         (bool focusSet, bool _) = view.SetHasFocusTrue (Focused);
-
         return focusSet;
     }
 
