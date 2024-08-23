@@ -188,26 +188,29 @@ public static partial class Application // Mouse handling
                                               _                                     => null
                                           };
 
-        if (view is not Adornment)
+        // NOTE: These two nested ifs were already an AND condition, so I at least merged them in this pass.
+        // But also, we have type-checked view already, right above.
+        // We can combine this into the switch expression to reduce cognitive complexity even more and likely
+        // avoid one or two of these checks in the process, as well.
+        if (view is not Adornment
+         && (view is null || view == ApplicationOverlapped.OverlappedTop)
+         && Current is { Modal: false }
+         && ApplicationOverlapped.OverlappedTop != null
+         && mouseEvent.Flags != MouseFlags.ReportMousePosition
+         && mouseEvent.Flags != 0)
         {
-            if ((view is null || view == ApplicationOverlapped.OverlappedTop)
-                && Current is { Modal: false }
-                && ApplicationOverlapped.OverlappedTop != null
-                && mouseEvent.Flags != MouseFlags.ReportMousePosition
-                && mouseEvent.Flags != 0)
-            {
-                // This occurs when there are multiple overlapped "tops"
-                // E.g. "Mdi" - in the Background Worker Scenario
-                View? top = ApplicationOverlapped.FindDeepestTop (Top!, mouseEvent.Position);
-                view = View.FindDeepestView (top, mouseEvent.Position);
+            // This occurs when there are multiple overlapped "tops"
+            // E.g. "Mdi" - in the Background Worker Scenario
+            View? top = ApplicationOverlapped.FindDeepestTop (Top!, mouseEvent.Position);
+            view = View.FindDeepestView (top, mouseEvent.Position);
 
-                if (view is { } && view != ApplicationOverlapped.OverlappedTop && top != Current && top is { })
-                {
-                    ApplicationOverlapped.MoveCurrent ((Toplevel)top);
-                }
+            if (view is { } && view != ApplicationOverlapped.OverlappedTop && top != Current && top is { })
+            {
+                ApplicationOverlapped.MoveCurrent ((Toplevel)top);
             }
         }
 
+        // NOTE: This statement is also likely mergeable with the above stuff, too.
         if (view is null)
         {
             return;
