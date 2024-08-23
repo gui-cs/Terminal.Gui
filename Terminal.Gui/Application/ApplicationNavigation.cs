@@ -36,10 +36,6 @@ public class ApplicationNavigation
             return;
         }
 
-#if DEBUG_IDISPOSABLE
-        ObjectDisposedException.ThrowIf (value is { WasDisposed: true }, typeof (View));
-#endif
-
         _focused = value;
 
         FocusedChanged?.Invoke (null, EventArgs.Empty);
