@@ -215,7 +215,7 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        MouseEvent? me = null;
+        MouseEvent? me;
 
         if (view is Adornment adornment)
         {
@@ -241,8 +241,7 @@ public static partial class Application // Mouse handling
                 View = view
             };
         }
-
-        if (me is null)
+        else
         {
             return;
         }
