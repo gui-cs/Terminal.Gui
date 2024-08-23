@@ -1,5 +1,6 @@
-﻿#nullable enable
+#nullable enable
 namespace Terminal.Gui;
+
 public static partial class Application // Mouse handling
 {
     #region Mouse handling
@@ -68,6 +69,7 @@ public static partial class Application // Mouse handling
         }
     }
 
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     private static bool OnGrabbingMouse (View? view)
     {
         if (view is null)
@@ -81,6 +83,7 @@ public static partial class Application // Mouse handling
         return evArgs.Cancel;
     }
 
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     private static bool OnUnGrabbingMouse (View? view)
     {
         if (view is null)
@@ -94,6 +97,7 @@ public static partial class Application // Mouse handling
         return evArgs.Cancel;
     }
 
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     private static void OnGrabbedMouse (View? view)
     {
         if (view is null)
@@ -104,6 +108,7 @@ public static partial class Application // Mouse handling
         GrabbedMouse?.Invoke (view, new (view));
     }
 
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     private static void OnUnGrabbedMouse (View? view)
     {
         if (view is null)
@@ -113,8 +118,6 @@ public static partial class Application // Mouse handling
 
         UnGrabbedMouse?.Invoke (view, new (view));
     }
-
-#nullable enable
 
     // Used by OnMouseEvent to track the last view that was clicked on.
     internal static View? MouseEnteredView { get; set; }
@@ -170,11 +173,11 @@ public static partial class Application // Mouse handling
             if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
-                MouseGrabView?.NewMouseLeaveEvent (mouseEvent);
+                MouseGrabView.NewMouseLeaveEvent (mouseEvent);
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) == true)
+            if (MouseGrabView.NewMouseEvent (viewRelativeMouseEvent) is true)
             {
                 return;
             }
