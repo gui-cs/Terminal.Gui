@@ -335,16 +335,9 @@ public class ColorPickerTests
 
         View otherView = new View () { CanFocus = true };
 
-        Application.Current?.Add (otherView);
+        Application.Current?.Add (otherView); // thi sets focus to otherView
 
-        cp.Draw ();
-
-        // Change value using text field
-        TextField rBarTextField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "0");
-
-        rBarTextField.Text = "128";
-        //rBarTextField.OnLeave (cp); // OnLeave should be protected virtual. Don't call it.
-        otherView.SetFocus (); // Remove focus from the color picker
+        cp.SetFocus ();
 
         cp.Draw ();
 
@@ -355,6 +348,25 @@ public class ColorPickerTests
         var rTextField = GetTextField (cp, ColorPickerPart.Bar1);
         var gTextField = GetTextField (cp, ColorPickerPart.Bar2);
         var bTextField = GetTextField (cp, ColorPickerPart.Bar3);
+
+        Assert.Equal ("R:", r.Text);
+        Assert.Equal (2, r.TrianglePosition);
+        Assert.Equal ("0", rTextField.Text);
+        Assert.Equal ("G:", g.Text);
+        Assert.Equal (2, g.TrianglePosition);
+        Assert.Equal ("0", gTextField.Text);
+        Assert.Equal ("B:", b.Text);
+        Assert.Equal (2, b.TrianglePosition);
+        Assert.Equal ("0", bTextField.Text);
+        Assert.Equal ("#000000", hex.Text);
+        // Change value using text field
+        TextField rBarTextField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "0");
+
+        rBarTextField.Text = "128";
+
+        otherView.SetFocus ();
+
+        cp.Draw ();
 
         Assert.Equal ("R:", r.Text);
         Assert.Equal (9, r.TrianglePosition);
@@ -380,15 +392,22 @@ public class ColorPickerTests
 
         // Enter invalid hex value
         TextField hexField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "#000000");
+        hexField.SetFocus ();
         hexField.Text = "#ZZZZZZ";
-        hexField.HasFocus = false;
-
-        cp.Draw ();
+        Assert.True (hexField.HasFocus);
+        Assert.Equal ("#ZZZZZZ", hexField.Text);
 
         var r = GetColorBar (cp, ColorPickerPart.Bar1);
         var g = GetColorBar (cp, ColorPickerPart.Bar2);
         var b = GetColorBar (cp, ColorPickerPart.Bar3);
         var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        Assert.Equal ("#ZZZZZZ", hex.Text);
+
+        // Advance away from hexField to cause validation
+        cp.AdvanceFocus (NavigationDirection.Forward, null);
+
+        cp.Draw ();
 
         Assert.Equal ("R:", r.Text);
         Assert.Equal (2, r.TrianglePosition);
@@ -410,28 +429,38 @@ public class ColorPickerTests
         cp.Draw ();
 
         // Click on Green bar
-        cp.Subviews.OfType<GBar> ()
-          .Single ()
-          .OnMouseEvent (
-                         new ()
-                         {
-                             Flags = MouseFlags.Button1Pressed,
-                             Position = new (0, 1)
-                         });
+        Application.OnMouseEvent(new ()
+        {
+            Flags = MouseFlags.Button1Pressed,
+            Position = new (0, 1)
+        });
+        //cp.Subviews.OfType<GBar> ()
+        //  .Single ()
+        //  .OnMouseEvent (
+        //                 new ()
+        //                 {
+        //                     Flags = MouseFlags.Button1Pressed,
+        //                     Position = new (0, 1)
+        //                 });
 
         cp.Draw ();
 
         Assert.IsAssignableFrom<GBar> (cp.Focused);
 
         // Click on Blue bar
-        cp.Subviews.OfType<BBar> ()
-          .Single ()
-          .OnMouseEvent (
-                         new ()
-                         {
-                             Flags = MouseFlags.Button1Pressed,
-                             Position = new (0, 2)
-                         });
+        Application.OnMouseEvent (new ()
+        {
+            Flags = MouseFlags.Button1Pressed,
+            Position = new (0, 2)
+        });
+        //cp.Subviews.OfType<BBar> ()
+        //  .Single ()
+        //  .OnMouseEvent (
+        //                 new ()
+        //                 {
+        //                     Flags = MouseFlags.Button1Pressed,
+        //                     Position = new (0, 2)
+        //                 });
 
         cp.Draw ();
 
@@ -733,7 +762,7 @@ public class ColorPickerTests
         Assert.True (hex.HasFocus);
 
         // Tab out of the hex field - should wrap to first focusable subview 
-       Application.OnKeyDown (Key.Tab);
+        Application.OnKeyDown (Key.Tab);
         Assert.False (hex.HasFocus);
         Assert.NotSame (hex, cp.Focused);
 
