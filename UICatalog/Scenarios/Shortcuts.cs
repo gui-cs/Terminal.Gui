@@ -318,17 +318,17 @@ public class Shortcuts : Scenario
             CanFocus = false
         };
 
-        var bgColor = new ColorPicker ()
+        var bgColor = new ColorPicker16 ()
         {
-            CanFocus = false,
             BoxHeight = 1,
             BoxWidth = 1,
+            CanFocus = false
         };
         bgColor.ColorChanged += (o, args) =>
                                 {
                                     Application.Top.ColorScheme = new ColorScheme (Application.Top.ColorScheme)
                                     {
-                                        Normal = new Attribute (Application.Top.ColorScheme.Normal.Foreground, args.Color),
+                                        Normal = new Attribute (Application.Top.ColorScheme.Normal.Foreground, args.CurrentValue),
                                     };
                                 };
         hShortcutBG.CommandView = bgColor;

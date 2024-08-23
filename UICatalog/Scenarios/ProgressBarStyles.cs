@@ -63,55 +63,25 @@ public class ProgressBarStyles : Scenario
 
         #region ColorPicker
 
-        ColorName ChooseColor (string text, ColorName colorName)
-        {
-            var colorPicker = new ColorPicker { Title = text, SelectedColor = colorName };
-
-            var dialog = new Dialog { Title = text };
-
-            dialog.Initialized += (sender, args) =>
-                                     {
-                                         // TODO: Replace with Dim.Auto
-                                         dialog.X = _pbList.Frame.X;
-                                         dialog.Y = _pbList.Frame.Height;
-                                     };
-
-            dialog.LayoutComplete += (sender, args) =>
-                                    {
-                                        dialog.Viewport = Rectangle.Empty with
-                                        {
-                                            Width = colorPicker.Frame.Width,
-                                            Height = colorPicker.Frame.Height
-                                        };
-                                        Application.Top.LayoutSubviews ();
-                                    };
-
-            dialog.Add (colorPicker);
-            colorPicker.ColorChanged += (s, e) => { dialog.RequestStop (); };
-            Application.Run (dialog);
-            dialog.Dispose ();
-
-            ColorName retColor = colorPicker.SelectedColor;
-            colorPicker.Dispose ();
-
-            return retColor;
-        }
 
         var fgColorPickerBtn = new Button
         {
             Text = "Foreground HotNormal Color",
             X = Pos.Center (),
-            Y = Pos.Align (Alignment.Start),
+            Y = Pos.Align (Alignment.Start)
         };
         container.Add (fgColorPickerBtn);
 
         fgColorPickerBtn.Accept += (s, e) =>
                                     {
-                                        ColorName newColor = ChooseColor (
-                                                                          fgColorPickerBtn.Text,
-                                                                          editor.ViewToEdit.ColorScheme.HotNormal.Foreground
-                                                                                .GetClosestNamedColor ()
-                                                                         );
+                                        if (!LineDrawing.PromptForColor (
+                                                                         fgColorPickerBtn.Text,
+                                                                         editor.ViewToEdit.ColorScheme.HotNormal.Foreground,
+                                                                         out var newColor
+                                                                        ))
+                                        {
+                                            return;
+                                        }
 
                                         var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
                                         {
@@ -134,11 +104,14 @@ public class ProgressBarStyles : Scenario
 
         bgColorPickerBtn.Accept += (s, e) =>
                                     {
-                                        ColorName newColor = ChooseColor (
-                                                                          fgColorPickerBtn.Text,
-                                                                          editor.ViewToEdit.ColorScheme.HotNormal.Background
-                                                                                .GetClosestNamedColor ()
-                                                                         );
+                                        if (!LineDrawing.PromptForColor (
+                                                                         fgColorPickerBtn.Text,
+                                                                         editor.ViewToEdit.ColorScheme.HotNormal.Background
+                                                                        , out var newColor))
+
+                                        {
+                                            return;
+                                        }
 
                                         var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
                                         {
