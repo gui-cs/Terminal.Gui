@@ -53,6 +53,7 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <PackageReference Include="ColorHelper" Version="[1.8.1,2)" />
+    <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.2.2" PrivateAssets="all" />
     <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="[4.10,5)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="[4.10,5)" PrivateAssets="all" />

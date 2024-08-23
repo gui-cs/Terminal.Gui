@@ -10,6 +10,8 @@ using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui;
+
+using CommunityToolkit.Diagnostics;
 using Microsoft.Win32.SafeHandles;
 
 internal sealed class NetWinVTConsole : IDisposable
@@ -49,7 +51,7 @@ internal sealed class NetWinVTConsole : IDisposable
 
         if (!GetConsoleMode (_inputHandle, out uint mode))
         {
-            throw new ApplicationException ($"Failed to get input console mode, error code: {GetLastError ()}.");
+            ThrowHelper.ThrowInvalidOperationException ($"Failed to get input console mode, error code: {GetLastError ()}.");
         }
 
         _originalInputConsoleMode = mode;
