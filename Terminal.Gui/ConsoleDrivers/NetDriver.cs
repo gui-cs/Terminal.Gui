@@ -184,7 +184,7 @@ internal sealed class NetEvents : IDisposable
     public NetEvents (ConsoleDriver consoleDriver)
     {
         _consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
-        _inputReadyCancellationTokenSource = new CancellationTokenSource ();
+        _inputReadyCancellationTokenSource = new ();
 
         Task.Run (ProcessInputQueue, _inputReadyCancellationTokenSource.Token);
 
@@ -294,13 +294,13 @@ internal sealed class NetEvents : IDisposable
                         if (_cki is null && consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)
                         {
                             _cki = EscSeqUtils.ResizeArray (
-                                                            new ConsoleKeyInfo (
-                                                                                (char)KeyCode.Esc,
-                                                                                0,
-                                                                                false,
-                                                                                false,
-                                                                                false
-                                                                               ),
+                                                            new (
+                                                                 (char)KeyCode.Esc,
+                                                                 0,
+                                                                 false,
+                                                                 false,
+                                                                 false
+                                                                ),
                                                             _cki
                                                            );
                         }
@@ -432,7 +432,7 @@ internal sealed class NetEvents : IDisposable
         _inputQueue.Enqueue (
                              new InputResult
                              {
-                                 EventType = EventType.WindowSize, WindowSizeEvent = new WindowSizeEvent { Size = new (w, h) }
+                                 EventType = EventType.WindowSize, WindowSizeEvent = new() { Size = new (w, h) }
                              }
                             );
 
@@ -627,13 +627,13 @@ internal sealed class NetEvents : IDisposable
         {
             // BUGBUG: I can't find where we send a request for cursor position (ESC[?6n), so I'm not sure if this is needed.
             case EscSeqUtils.CSI_RequestCursorPositionReport_Terminator:
-                var point = new Point { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
+                Point point = new() { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
 
                 if (_lastCursorPosition.Y != point.Y)
                 {
                     _lastCursorPosition = point;
-                    var eventType = EventType.WindowPosition;
-                    var winPositionEv = new WindowPositionEvent { CursorPosition = point };
+                    EventType eventType = EventType.WindowPosition;
+                    WindowPositionEvent winPositionEv = new() { CursorPosition = point };
 
                     _inputQueue.Enqueue (
                                          new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
@@ -676,8 +676,8 @@ internal sealed class NetEvents : IDisposable
 
     private void EnqueueRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
     {
-        var eventType = EventType.RequestResponse;
-        var requestRespEv = new RequestResponseEvent { ResultTuple = (c1Control, code, values, terminating) };
+        EventType eventType = EventType.RequestResponse;
+        RequestResponseEvent requestRespEv = new() { ResultTuple = (c1Control, code, values, terminating) };
 
         _inputQueue.Enqueue (
                              new InputResult { EventType = eventType, RequestResponseEvent = requestRespEv }
@@ -686,7 +686,7 @@ internal sealed class NetEvents : IDisposable
 
     private void HandleMouseEvent (MouseButtonState buttonState, Point pos)
     {
-        var mouseEvent = new MouseEvent { Position = pos, ButtonState = buttonState };
+        MouseEvent mouseEvent = new() { Position = pos, ButtonState = buttonState };
 
         _inputQueue.Enqueue (
                              new InputResult { EventType = EventType.Mouse, MouseEvent = mouseEvent }
@@ -788,8 +788,8 @@ internal sealed class NetEvents : IDisposable
         /// <returns></returns>
         public readonly string ToString (ConsoleKeyInfo cki)
         {
-            var ke = new Key ((KeyCode)cki.KeyChar);
-            var sb = new StringBuilder ();
+            Key ke = new ((KeyCode)cki.KeyChar);
+            StringBuilder sb = new ();
             sb.Append ($"Key: {(KeyCode)cki.Key} ({cki.Key})");
             sb.Append ((cki.Modifiers & ConsoleModifiers.Shift) != 0 ? " | Shift" : string.Empty);
             sb.Append ((cki.Modifiers & ConsoleModifiers.Control) != 0 ? " | Control" : string.Empty);
@@ -803,7 +803,7 @@ internal sealed class NetEvents : IDisposable
 
     private void HandleKeyboardEvent (ConsoleKeyInfo cki)
     {
-        var inputResult = new InputResult { EventType = EventType.Key, ConsoleKeyInfo = cki };
+        InputResult inputResult = new() { EventType = EventType.Key, ConsoleKeyInfo = cki };
 
         _inputQueue.Enqueue (inputResult);
     }
@@ -863,7 +863,7 @@ internal sealed class NetDriver : ConsoleDriver
 
     public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
     {
-        var input = new InputResult
+        InputResult input = new InputResult
         {
             EventType = EventType.Key, ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control)
         };
@@ -923,7 +923,7 @@ internal sealed class NetDriver : ConsoleDriver
         var left = 0;
         int rows = Rows;
         int cols = Cols;
-        var output = new StringBuilder ();
+        StringBuilder output = new ();
         Attribute? redrawAttr = null;
         int lastCol = -1;
 
