@@ -426,12 +426,15 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
         else
         {
-            if (SuperView is { })
+            // We're moving beyond the last subview
+
+            // Determine if focus should remain in this focus chain, or move to the superview's focus chain
+            if (SuperView is { } && SuperView.GetScopedTabIndexes (direction, behavior).Length > 1)
             {
+                // Our superview has an focusable subview in addition to us
                 return false;
             }
 
-            // We're moving beyond the last subview
             // If our superview 
             //if (behavior == TabBehavior.TabGroup && behavior == TabStop && SuperView?.TabStop == TabBehavior.TabGroup)
             {

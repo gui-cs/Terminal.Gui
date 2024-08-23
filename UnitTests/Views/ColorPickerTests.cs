@@ -665,7 +665,7 @@ public class ColorPickerTests
         var name = GetTextField (cp, ColorPickerPart.ColorName);
         var hex = GetTextField (cp, ColorPickerPart.Hex);
 
-        name.RestoreFocus (TabBehavior.TabStop);
+        name.SetFocus ();
 
         Assert.True (name.HasFocus);
         Assert.Same (name, cp.Focused);
@@ -705,7 +705,7 @@ public class ColorPickerTests
         var name = GetTextField (cp, ColorPickerPart.ColorName);
         var hex = GetTextField (cp, ColorPickerPart.Hex);
 
-        hex.RestoreFocus (TabBehavior.TabStop);
+        hex.SetFocus ();
 
         Assert.True (hex.HasFocus);
         Assert.Same (hex, cp.Focused);
@@ -730,7 +730,9 @@ public class ColorPickerTests
 
         Application.OnKeyDown ('4');
 
-        // Tab out of the text field
+        Assert.True (hex.HasFocus);
+
+        // Tab out of the hex field - should wrap to first focusable subview 
         Application.OnKeyDown (Key.Tab);
         Assert.False (hex.HasFocus);
         Assert.NotSame (hex, cp.Focused);
@@ -759,11 +761,10 @@ public class ColorPickerTests
 
         Application.Current = new Toplevel () { Width = 20, Height = 5 };
         Application.Current.Add (cp);
-        Application.Current.RestoreFocus (null);
 
         Application.Current.LayoutSubviews ();
+        Application.Current.SetFocus ();
 
-        Application.Current.RestoreFocus (null);
         return cp;
     }
 }
