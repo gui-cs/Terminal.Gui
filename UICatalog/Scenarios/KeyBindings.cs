@@ -151,9 +151,12 @@ public sealed class KeyBindings : Scenario
     {
         if (e.NewValue)
         {
-            foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
+            if (Application.Top is { MostFocused: {} })
             {
-                _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
+                foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
+                {
+                    _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
+                }
             }
         }
     }
