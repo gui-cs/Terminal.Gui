@@ -11,7 +11,7 @@ on:
       - '**.md'
       
 jobs:
-  build_and_test:
+  build_and_test_debug:
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 10
     steps:
 
-# Build
+# Build (Debug)
 
     - name: Checkout code
       uses: actions/checkout@v4
@@ -76,6 +76,24 @@ jobs:
           logs/    
           UnitTests/TestResults/
   
+
+  build_release:
+    # Ensure that RELEASE builds are not broken
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+        dotnet-quality: 'ga'
+
+    - name: Build Release
+      run: dotnet build --configuration Release
+
+
     # Note: this step is currently not writing to the gist for some reason
     # - name: Create Test Coverage Badge
     #   uses: simon-k/dotnet-code-coverage-badge@v1.0.0
