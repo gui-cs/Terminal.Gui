@@ -196,8 +196,7 @@ public static partial class Application // Mouse handling
          && (view is null || view == ApplicationOverlapped.OverlappedTop)
          && Current is { Modal: false }
          && ApplicationOverlapped.OverlappedTop != null
-         && mouseEvent.Flags != MouseFlags.ReportMousePosition
-         && mouseEvent.Flags != 0)
+         && mouseEvent.Flags is not MouseFlags.ReportMousePosition and not 0)
         {
             // This occurs when there are multiple overlapped "tops"
             // E.g. "Mdi" - in the Background Worker Scenario
