@@ -267,7 +267,7 @@ public static partial class Application // Mouse handling
 
         //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
-        while (view.NewMouseEvent (me) is not true || MouseGrabView is not { })
+        while (view.NewMouseEvent (me) is not true && MouseGrabView is not { })
         {
             if (view is Adornment adornmentView)
             {
