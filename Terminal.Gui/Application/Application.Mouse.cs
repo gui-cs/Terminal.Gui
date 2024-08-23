@@ -170,6 +170,8 @@ public static partial class Application // Mouse handling
                 View = view ?? MouseGrabView
             };
 
+            // INTENT: Just checking: This is operating on a copy of ViewPort and throwing it away.
+            // Was assignment also intended?
             if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
