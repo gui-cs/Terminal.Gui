@@ -115,7 +115,7 @@ internal class ScrollButton : View
     /// <inheritdoc/>
     protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
     {
-        if (_savedColorScheme is { } && !mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (_savedColorScheme is { })
         {
             ColorScheme = _savedColorScheme;
             _savedColorScheme = null;
