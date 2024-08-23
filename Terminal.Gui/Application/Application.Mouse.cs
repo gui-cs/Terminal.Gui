@@ -167,8 +167,6 @@ public static partial class Application // Mouse handling
                 View = view ?? MouseGrabView
             };
 
-            // INTENT: Just checking: This is operating on a copy of ViewPort and throwing it away.
-            // Was assignment also intended?
             if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
@@ -182,16 +180,14 @@ public static partial class Application // Mouse handling
             }
         }
 
+        // We can combine this into the switch expression to reduce cognitive complexity even more and likely
+        // avoid one or two of these checks in the process, as well.
         WantContinuousButtonPressedView = view switch
                                           {
                                               { WantContinuousButtonPressed: true } => view,
                                               _                                     => null
                                           };
 
-        // NOTE: These two nested ifs were already an AND condition, so I at least merged them in this pass.
-        // But also, we have type-checked view already, right above.
-        // We can combine this into the switch expression to reduce cognitive complexity even more and likely
-        // avoid one or two of these checks in the process, as well.
         if (view is not Adornment
          && (view is null || view == ApplicationOverlapped.OverlappedTop)
          && Current is { Modal: false }
@@ -209,7 +205,8 @@ public static partial class Application // Mouse handling
             }
         }
 
-        // NOTE: This statement is also likely mergeable with the above stuff, too.
+        // May be null before the prior condition or the condition may set it as null.
+        // So, the checking must be outside the prior condition.
         if (view is null)
         {
             return;
