@@ -11,7 +11,7 @@ using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui;
 
-internal class NetWinVTConsole
+internal sealed class NetWinVTConsole
 {
     private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
     private const uint ENABLE_ECHO_INPUT = 4;
@@ -133,7 +133,7 @@ internal class NetWinVTConsole
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 }
 
-internal class NetEvents : IDisposable
+internal sealed class NetEvents : IDisposable
 {
     private readonly ManualResetEventSlim _inputReady = new (false);
     private CancellationTokenSource _inputReadyCancellationTokenSource;
@@ -799,7 +799,7 @@ internal class NetEvents : IDisposable
     }
 }
 
-internal class NetDriver : ConsoleDriver
+internal sealed class NetDriver : ConsoleDriver
 {
     private const int COLOR_BLACK = 30;
     private const int COLOR_BLUE = 34;
@@ -1200,7 +1200,7 @@ internal class NetDriver : ConsoleDriver
         }
     }
 
-    public virtual void ResizeScreen ()
+    public void ResizeScreen ()
     {
         // Not supported on Unix.
         if (IsWinPlatform)
@@ -1673,7 +1673,7 @@ internal class NetDriver : ConsoleDriver
 ///     cross-platform but lacks things like file descriptor monitoring.
 /// </summary>
 /// <remarks>This implementation is used for NetDriver.</remarks>
-internal class NetMainLoop : IMainLoopDriver
+internal sealed class NetMainLoop : IMainLoopDriver
 {
     internal NetEvents _netEvents;
 

@@ -11,7 +11,7 @@ using Terminal.Gui.ConsoleDrivers;
 namespace Terminal.Gui;
 
 /// <summary>Implements a mock ConsoleDriver for unit testing</summary>
-public class FakeDriver : ConsoleDriver
+public sealed class FakeDriver : ConsoleDriver
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -433,7 +433,7 @@ public class FakeDriver : ConsoleDriver
         OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
     }
 
-    public virtual void ResizeScreen ()
+    public void ResizeScreen ()
     {
         if (FakeConsole.WindowHeight > 0)
         {
