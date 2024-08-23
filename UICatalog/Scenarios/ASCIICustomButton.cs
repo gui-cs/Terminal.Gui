@@ -123,11 +123,6 @@ public class ASCIICustomButtonTest : Scenario
             {
                 _border.Visible = true;
                 _fill.Visible = false;
-
-                //if (view == null)
-                //{
-                //    view = this;
-                //}
             }
         }
 
