@@ -12,7 +12,7 @@ using static Terminal.Gui.NetEvents;
 namespace Terminal.Gui;
 using Microsoft.Win32.SafeHandles;
 
-internal sealed class NetWinVTConsole
+internal sealed class NetWinVTConsole : IDisposable
 {
     private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
     private const uint ENABLE_ECHO_INPUT = 4;
@@ -133,6 +133,32 @@ internal sealed class NetWinVTConsole
 
     [LibraryImport ("kernel32")]
     private static extern bool SetConsoleMode (SafeHandle hConsoleHandle, uint dwMode);
+
+    private volatile bool _disposed;
+
+    private void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            _errorHandle.Dispose ();
+            _inputHandle.Dispose ();
+            _outputHandle.Dispose ();
+        }
+    }
+
+    /// <inheritdoc />
+    public void Dispose ()
+    {
+        if (!_disposed)
+        {
+            Dispose (true);
+            _disposed = true;
+            GC.SuppressFinalize (this);
+        }
+    }
+
+    /// <inheritdoc />
+    ~NetWinVTConsole () { Dispose (false); }
 }
 
 [MustDisposeResource]
