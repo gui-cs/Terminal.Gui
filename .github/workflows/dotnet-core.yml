@@ -11,7 +11,7 @@ on:
       - '**.md'
       
 jobs:
-  build_and_test:
+  build_and_test_debug:
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 10
     steps:
 
-# Build
+# Build (Debug)
 
     - name: Checkout code
       uses: actions/checkout@v4
@@ -78,7 +78,7 @@ jobs:
   
 
   build_release:
-    # Final check to ensure that the release build is working
+    # Ensure that RELEASE builds are not broken
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
