@@ -87,7 +87,7 @@ public partial class View // Mouse APIs
             return mouseEvent.Handled = true;
         }
 
-        if (HighlightStyle != HighlightStyle.None || WantContinuousButtonPressed)
+        if (HighlightStyle != HighlightStyle.None || (WantContinuousButtonPressed && WantMousePositionReports))
         {
             if (HandlePressed (mouseEvent))
             {
