@@ -200,6 +200,75 @@ public class AdvanceFocusTests (ITestOutputHelper _output)
         Assert.Equal (tabStop, view.TabStop);
     }
 
+
+    [Fact]
+    public void AdvanceFocus_Compound_Subview ()
+    {
+        var top = new View () { Id = "top", CanFocus = true };
+
+        var compoundSubview = new View ()
+        {
+            CanFocus = true,
+            Id = "compoundSubview",
+        };
+        var v1 = new View { Id = "v1", CanFocus = true };
+        var v2 = new View { Id = "v2", CanFocus = true };
+        var v3 = new View { Id = "v3", CanFocus = false };
+
+        compoundSubview.Add (v1, v2, v3);
+
+        top.Add (compoundSubview);
+
+        // Cycle through v1 & v2
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.True (v1.HasFocus);
+        Assert.False (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.False (v1.HasFocus);
+        Assert.True (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.True (v1.HasFocus);
+        Assert.False (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+
+        // Add another subview
+        View otherSubview = new ()
+        {
+            CanFocus = true,
+            Id = "otherSubview",
+        };
+
+        top.Add (otherSubview);
+        // Adding a focusable subview causes advancefocus
+        Assert.True (otherSubview.HasFocus);
+        Assert.False (v1.HasFocus);
+
+        // Cycle through v1 & v2
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.True (v1.HasFocus);
+        Assert.False (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.False (v1.HasFocus);
+        Assert.True (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.False (v1.HasFocus);
+        Assert.False (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+
+        Assert.True (otherSubview.HasFocus);
+        // v2 was previously focused down the compoundSubView focus chain
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.False (v1.HasFocus);
+        Assert.True (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+
+        top.Dispose ();
+    }
+
     [Fact]
     public void AdvanceFocus_With_CanFocus_Are_All_True ()
     {

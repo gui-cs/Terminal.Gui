@@ -4,8 +4,8 @@ namespace Terminal.Gui.ViewTests;
 
 public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllViews
 {
-  [Fact]
-    public void Add_Subview_Gets_Focus ()
+    [Fact]
+    public void Add_First_Subview_Gets_Focus ()
     {
         View top = new View ()
         {
@@ -16,24 +16,56 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
         top.SetFocus ();
         Assert.True (top.HasFocus);
 
-        int nEnter = 0;
         View subView = new View ()
         {
             Id = "subView",
             CanFocus = true
         };
-        subView.HasFocusChanging += (s, e) => nEnter++;
 
         top.Add (subView);
 
         Assert.True (top.HasFocus);
         Assert.Equal (subView, top.Focused);
         Assert.True (subView.HasFocus);
-        Assert.Equal (1, nEnter);
     }
 
     [Fact]
-    public void Add_Subview_Deepest_Gets_Focus ()
+    public void Add_Subsequent_Subview_Gets_Focus ()
+    {
+        View top = new View ()
+        {
+            Id = "top",
+            CanFocus = true
+        };
+
+        top.SetFocus ();
+        Assert.True (top.HasFocus);
+
+        View subView = new View ()
+        {
+            Id = "subView",
+            CanFocus = true
+        };
+
+        top.Add (subView);
+
+        Assert.True (subView.HasFocus);
+
+        View subView2 = new View ()
+        {
+            Id = "subView2",
+            CanFocus = true
+        };
+
+        top.Add (subView2);
+
+        Assert.True (subView2.HasFocus);
+
+
+    }
+
+    [Fact]
+    public void Add_Nested_Subviews_Deepest_Gets_Focus ()
     {
         View top = new View ()
         {

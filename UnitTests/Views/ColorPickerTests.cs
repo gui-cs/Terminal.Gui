@@ -733,7 +733,7 @@ public class ColorPickerTests
         Assert.True (hex.HasFocus);
 
         // Tab out of the hex field - should wrap to first focusable subview 
-        Application.OnKeyDown (Key.Tab);
+       Application.OnKeyDown (Key.Tab);
         Assert.False (hex.HasFocus);
         Assert.NotSame (hex, cp.Focused);
 

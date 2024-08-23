@@ -69,6 +69,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         if (view.Enabled && view.Visible && view.CanFocus)
         {
+            // Add will cause the newly added subview to gain focus if it's focusable
             if (HasFocus)
             {
                 view.SetFocus ();
