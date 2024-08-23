@@ -10,6 +10,7 @@ using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui;
+using Microsoft.Win32.SafeHandles;
 
 internal sealed class NetWinVTConsole
 {
@@ -35,12 +36,12 @@ internal sealed class NetWinVTConsole
     private const int STD_INPUT_HANDLE = -10;
     private const int STD_OUTPUT_HANDLE = -11;
 
-    private readonly nint _errorHandle;
-    private readonly nint _inputHandle;
+    private readonly SafeHandleMinusOneIsInvalid _errorHandle;
+    private readonly SafeHandleMinusOneIsInvalid _inputHandle;
+    private readonly SafeHandleMinusOneIsInvalid _outputHandle;
     private readonly uint _originalErrorConsoleMode;
     private readonly uint _originalInputConsoleMode;
     private readonly uint _originalOutputConsoleMode;
-    private readonly nint _outputHandle;
 
     public NetWinVTConsole ()
     {
@@ -121,16 +122,17 @@ internal sealed class NetWinVTConsole
     }
 
     [LibraryImport ("kernel32")]
-    private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
+    private static extern bool GetConsoleMode (SafeHandle hConsoleHandle, out uint lpMode);
 
     [LibraryImport ("kernel32")]
     private static extern uint GetLastError ();
 
+    [MustDisposeResource (false)]
     [LibraryImport ("kernel32", SetLastError = true)]
-    private static extern nint GetStdHandle (int nStdHandle);
+    private static extern SafeHandleMinusOneIsInvalid GetStdHandle (int nStdHandle);
 
     [LibraryImport ("kernel32")]
-    private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+    private static extern bool SetConsoleMode (SafeHandle hConsoleHandle, uint dwMode);
 }
 
 [MustDisposeResource]
