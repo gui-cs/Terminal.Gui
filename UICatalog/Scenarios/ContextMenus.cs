@@ -93,9 +93,22 @@ public class ContextMenus : Scenario
                                 Application.MouseEvent -= ApplicationMouseEvent;
                             };
 
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new (
+                     "File",
+                     new MenuItem [] { new ("Quit", "", () => Application.RequestStop (), null, null, Application.QuitKey) })
+            ]
+        };
+
+        var top = new Toplevel ();
+        top.Add (appWindow, menu);
+
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
+        Application.Run (top);
+        top.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
