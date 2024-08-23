@@ -37,16 +37,13 @@ public static partial class Application // Mouse handling
     /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
     public static void GrabMouse (View? view)
     {
-        if (view is null)
+        if (view is null || OnGrabbingMouse (view))
         {
             return;
         }
 
-        if (!OnGrabbingMouse (view))
-        {
-            OnGrabbedMouse (view);
-            MouseGrabView = view;
-        }
+        OnGrabbedMouse (view);
+        MouseGrabView = view;
     }
 
     /// <summary>Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.</summary>
@@ -185,14 +182,11 @@ public static partial class Application // Mouse handling
             }
         }
 
-        if (view is { WantContinuousButtonPressed: true })
-        {
-            WantContinuousButtonPressedView = view;
-        }
-        else
-        {
-            WantContinuousButtonPressedView = null;
-        }
+        WantContinuousButtonPressedView = view switch
+                                          {
+                                              { WantContinuousButtonPressed: true } => view,
+                                              _                                     => null
+                                          };
 
         if (view is not Adornment)
         {
