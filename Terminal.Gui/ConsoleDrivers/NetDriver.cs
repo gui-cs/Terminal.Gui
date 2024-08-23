@@ -1,8 +1,9 @@
-﻿//
+#nullable enable
+
+//
 // NetDriver.cs: The System.Console-based .NET driver, works on Windows and Unix, but is not particularly efficient.
 //
 
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
