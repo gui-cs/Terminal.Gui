@@ -97,7 +97,7 @@ public class ColorPickerTests
     [SetupFakeDriver]
     public void ColorPicker_RGB_MouseNavigation ()
     {
-        var cp = GetColorPicker (ColorModel.RGB,false);
+        var cp = GetColorPicker (ColorModel.RGB, false);
 
         cp.Draw ();
 
@@ -381,7 +381,7 @@ public class ColorPickerTests
         // Enter invalid hex value
         TextField hexField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "#000000");
         hexField.Text = "#ZZZZZZ";
-        hexField.OnLeave (cp);
+        hexField.HasFocus = false;
 
         cp.Draw ();
 
@@ -550,7 +550,7 @@ public class ColorPickerTests
                     throw new NotSupportedException ("Corresponding Style option is not enabled");
                 }
 
-                return cp.Subviews.OfType<TextField> ().ElementAt (hasBarValueTextFields  ? (int)toGet : (int)toGet -3);
+                return cp.Subviews.OfType<TextField> ().ElementAt (hasBarValueTextFields ? (int)toGet : (int)toGet - 3);
             case ColorPickerPart.Hex:
 
                 int offset = hasBarValueTextFields ? 0 : 3;
@@ -608,7 +608,7 @@ public class ColorPickerTests
     [SetupFakeDriver]
     public void ColorPicker_DisposesOldViews_OnModelChange ()
     {
-        var cp = GetColorPicker (ColorModel.HSL,true);
+        var cp = GetColorPicker (ColorModel.HSL, true);
 
         var b1 = GetColorBar (cp, ColorPickerPart.Bar1);
         var b2 = GetColorBar (cp, ColorPickerPart.Bar2);
@@ -621,7 +621,7 @@ public class ColorPickerTests
         var hex = GetTextField (cp, ColorPickerPart.Hex);
 
 #if DEBUG_IDISPOSABLE
-        Assert.All (new View [] { b1, b2, b3, tf1, tf2, tf3,hex }, b => Assert.False (b.WasDisposed));
+        Assert.All (new View [] { b1, b2, b3, tf1, tf2, tf3, hex }, b => Assert.False (b.WasDisposed));
 #endif
         cp.Style.ColorModel = ColorModel.RGB;
         cp.ApplyStyleChanges ();
@@ -638,11 +638,11 @@ public class ColorPickerTests
 
         // Old bars should be disposed
 #if DEBUG_IDISPOSABLE
-        Assert.All (new View [] { b1, b2, b3, tf1, tf2, tf3,hex }, b => Assert.True (b.WasDisposed));
+        Assert.All (new View [] { b1, b2, b3, tf1, tf2, tf3, hex }, b => Assert.True (b.WasDisposed));
 #endif
-        Assert.NotSame (hex,hexAfter);
+        Assert.NotSame (hex, hexAfter);
 
-        Assert.NotSame (b1,b1After);
+        Assert.NotSame (b1, b1After);
         Assert.NotSame (b2, b2After);
         Assert.NotSame (b3, b3After);
 
@@ -654,9 +654,9 @@ public class ColorPickerTests
 
     [Fact]
     [SetupFakeDriver]
-    public void ColorPicker_TabCompleteColorName()
+    public void ColorPicker_TabCompleteColorName ()
     {
-        var cp = GetColorPicker (ColorModel.RGB, true,true);
+        var cp = GetColorPicker (ColorModel.RGB, true, true);
         cp.Draw ();
 
         var r = GetColorBar (cp, ColorPickerPart.Bar1);
@@ -665,7 +665,7 @@ public class ColorPickerTests
         var name = GetTextField (cp, ColorPickerPart.ColorName);
         var hex = GetTextField (cp, ColorPickerPart.Hex);
 
-        name.FocusFirst (TabBehavior.TabStop);
+        name.RestoreFocus (TabBehavior.TabStop);
 
         Assert.True (name.HasFocus);
         Assert.Same (name, cp.Focused);
@@ -676,7 +676,7 @@ public class ColorPickerTests
         Application.OnKeyDown (Key.A);
         Application.OnKeyDown (Key.Q);
 
-        Assert.Equal ("aq",name.Text);
+        Assert.Equal ("aq", name.Text);
 
 
         // Auto complete the color name
@@ -705,7 +705,7 @@ public class ColorPickerTests
         var name = GetTextField (cp, ColorPickerPart.ColorName);
         var hex = GetTextField (cp, ColorPickerPart.Hex);
 
-        hex.FocusFirst (TabBehavior.TabStop);
+        hex.RestoreFocus (TabBehavior.TabStop);
 
         Assert.True (hex.HasFocus);
         Assert.Same (hex, cp.Focused);
@@ -737,7 +737,7 @@ public class ColorPickerTests
 
         // Color name should be recognised as a known string and populated
         Assert.Equal ("#7FFFD4", hex.Text);
-        Assert.Equal("Aquamarine", name.Text);
+        Assert.Equal ("Aquamarine", name.Text);
 
         Application.Current?.Dispose ();
     }
@@ -747,7 +747,7 @@ public class ColorPickerTests
     {
         var colors = new W3CColors ();
         Assert.Contains ("Aquamarine", colors.GetColorNames ());
-        Assert.DoesNotContain ("Save as",colors.GetColorNames ());
+        Assert.DoesNotContain ("Save as", colors.GetColorNames ());
     }
     private ColorPicker GetColorPicker (ColorModel colorModel, bool showTextFields, bool showName = false)
     {
@@ -757,13 +757,13 @@ public class ColorPickerTests
         cp.Style.ShowColorName = showName;
         cp.ApplyStyleChanges ();
 
-        Application.Current = new Toplevel () { Width = 20 ,Height = 5};
+        Application.Current = new Toplevel () { Width = 20, Height = 5 };
         Application.Current.Add (cp);
-        Application.Current.FocusFirst (null);
+        Application.Current.RestoreFocus (null);
 
         Application.Current.LayoutSubviews ();
 
-        Application.Current.FocusFirst (null);
+        Application.Current.RestoreFocus (null);
         return cp;
     }
 }

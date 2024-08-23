@@ -860,7 +860,7 @@ public class ScrollViewTests (ITestOutputHelper output)
 ";
 
         TestHelpers.AssertDriverContentsAre (expected, output);
-        
+
         top.Dispose ();
     }
 

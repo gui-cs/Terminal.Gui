@@ -43,6 +43,10 @@ internal class ColorModelStrategy
 
     public void SetBarsToColor (IList<IColorBar> bars, Color newValue, ColorModel model)
     {
+        if (bars.Count == 0)
+        {
+            return;
+        }
         switch (model)
         {
             case ColorModel.RGB:

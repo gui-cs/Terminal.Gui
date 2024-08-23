@@ -41,12 +41,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         set
         {
-#if DEBUG_IDISPOSABLE
-            if (WasDisposed)
-            {
-                throw new ObjectDisposedException (GetType ().FullName);
-            }
-#endif
             if (HasFocus != value)
             {
                 if (value)
@@ -67,12 +61,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
         get
         {
-#if DEBUG_IDISPOSABLE
-            if (WasDisposed)
-            {
-                throw new ObjectDisposedException (GetType ().FullName);
-            }
-#endif
             return _hasFocus;
         }
     }
@@ -427,19 +415,30 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (focusedIndex < index.Length - 1)
         {
+            // We're moving w/in the subviews
             next = focusedIndex + 1;
         }
         else
         {
-            if (behavior == TabBehavior.TabGroup && behavior == TabStop && SuperView?.TabStop == TabBehavior.TabGroup)
+            if (SuperView is { })
             {
-                // Go down the subview-hierarchy and leave
-                // BUGBUG: This doesn't seem right
-                Focused.HasFocus = false;
-
-                // TODO: Should we check the return value of SetHasFocus?
-
                 return false;
+            }
+
+            // We're moving beyond the last subview
+            // If our superview 
+            //if (behavior == TabBehavior.TabGroup && behavior == TabStop && SuperView?.TabStop == TabBehavior.TabGroup)
+            {
+                next = 0;
+                //return 
+
+                //// Go down the subview-hierarchy and leave
+                //// BUGBUG: This doesn't seem right
+                //Focused.HasFocus = false;
+
+                //// TODO: Should we check the return value of SetHasFocus?
+
+                //return false;
             }
         }
 

@@ -390,7 +390,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
         Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
         Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
-        Assert.Null (tf.ContextMenu.MenuBar);
+        // The last context menu bar opened is always preserved
+        Assert.NotNull (tf.ContextMenu.MenuBar);
         top.Dispose ();
     }
 
@@ -1396,7 +1397,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
         Assert.Equal (2, win.Subviews.Count);
-        Assert.Null (tf2.ContextMenu.MenuBar);
+        // The last context menu bar opened is always preserved
+        Assert.NotNull (tf2.ContextMenu.MenuBar);
         Assert.Equal (win.Focused, tf1);
         Assert.Null (Application.MouseGrabView);
         Assert.Equal (tf1, Application.MouseEnteredView);
@@ -1406,7 +1408,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.False (tf1.HasFocus);
         Assert.True (tf2.HasFocus);
         Assert.Equal (2, win.Subviews.Count);
-        Assert.Null (tf2.ContextMenu.MenuBar);
+        // The last context menu bar opened is always preserved
+        Assert.NotNull (tf2.ContextMenu.MenuBar);
         Assert.Equal (win.Focused, tf2);
         Assert.Null (Application.MouseGrabView);
         Assert.Equal (tf2, Application.MouseEnteredView);

@@ -15,6 +15,7 @@ public class ColorPicker : View
     public ColorPicker ()
     {
         CanFocus = true;
+        TabStop = TabBehavior.TabStop;
         Height = Dim.Auto ();
         Width = Dim.Auto ();
         ApplyStyleChanges ();
@@ -59,7 +60,7 @@ public class ColorPicker : View
                     Y = y,
                     Width = textFieldWidth
                 };
-                tfValue.Leave += UpdateSingleBarValueFromTextField;
+                tfValue.HasFocusChanged += UpdateSingleBarValueFromTextField;
                 _textFields.Add (bar, tfValue);
                 Add (tfValue);
             }
@@ -141,7 +142,7 @@ public class ColorPicker : View
         };
         _tfName.Autocomplete = auto;
 
-        _tfName.Leave += UpdateValueFromName;
+        _tfName.HasFocusChanged += UpdateValueFromName;
     }
 
     private void CreateTextField ()
@@ -164,13 +165,13 @@ public class ColorPicker : View
         {
             Y = y,
             X = 4,
-            Width = 8
+            Width = 8,
         };
 
         Add (_lbHex);
         Add (_tfHex);
 
-        _tfHex.Leave += UpdateValueFromTextField;
+        _tfHex.HasFocusChanged += UpdateValueFromTextField;
     }
 
     private void DisposeOldViews ()
@@ -181,7 +182,7 @@ public class ColorPicker : View
 
             if (_textFields.TryGetValue (bar, out TextField? tf))
             {
-                tf.Leave -= UpdateSingleBarValueFromTextField;
+                tf.HasFocusChanged -= UpdateSingleBarValueFromTextField;
                 Remove (tf);
                 tf.Dispose ();
             }
@@ -203,7 +204,7 @@ public class ColorPicker : View
         if (_tfHex != null)
         {
             Remove (_tfHex);
-            _tfHex.Leave -= UpdateValueFromTextField;
+            _tfHex.HasFocusChanged -= UpdateValueFromTextField;
             _tfHex.Dispose ();
             _tfHex = null;
         }
@@ -218,7 +219,7 @@ public class ColorPicker : View
         if (_tfName != null)
         {
             Remove (_tfName);
-            _tfName.Leave -= UpdateValueFromName;
+            _tfName.HasFocusChanged -= UpdateValueFromName;
             _tfName.Dispose ();
             _tfName = null;
         }
@@ -266,8 +267,13 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateSingleBarValueFromTextField (object? sender, FocusEventArgs e)
+    private void UpdateSingleBarValueFromTextField (object? sender, HasFocusEventArgs e)
     {
+        if (e.NewValue)
+        {
+            return;
+        }
+
         foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
         {
             if (kvp.Value == sender)
@@ -280,8 +286,13 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateValueFromName (object? sender, FocusEventArgs e)
+    private void UpdateValueFromName (object? sender, HasFocusEventArgs e)
     {
+        if (e.NewValue)
+        {
+            return;
+        }
+
         if (_tfName == null)
         {
             return;
@@ -298,8 +309,13 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateValueFromTextField (object? sender, FocusEventArgs e)
+    private void UpdateValueFromTextField (object? sender, HasFocusEventArgs e)
     {
+        if (e.NewValue)
+        {
+            return;
+        }
+
         if (_tfHex == null)
         {
             return;

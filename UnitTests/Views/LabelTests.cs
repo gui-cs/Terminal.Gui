@@ -1315,4 +1315,49 @@ e
         Assert.Equal (expectedLabelBounds, label.Viewport);
         super.Dispose ();
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Label_CanFocus_True_Get_Focus_By_Keyboard_And_Mouse ()
+    {
+        Label label = new () { Text = "label" };
+        View view = new () { Y = 2, Width = 10, Height = 1, Text = "view", CanFocus = true };
+        Toplevel top = new ();
+        top.Add (label, view);
+        Application.Begin (top);
+
+        Assert.Equal (new (0, 0, 5, 1), label.Frame);
+        Assert.Equal (new (0, 2, 10, 1), view.Frame);
+        Assert.Equal (view, top.MostFocused);
+        Assert.False (label.CanFocus);
+        Assert.False (label.HasFocus);
+        Assert.True (view.CanFocus);
+        Assert.True (view.HasFocus);
+
+        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        // Set label CanFocus to true
+        label.CanFocus = true;
+        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.True (label.HasFocus);
+        Assert.False (view.HasFocus);
+
+        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Assert.True (label.HasFocus);
+        Assert.False (view.HasFocus);
+
+        Application.OnMouseEvent (new () { Position = new (0, 2), Flags = MouseFlags.Button1Clicked });
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+    }
 }

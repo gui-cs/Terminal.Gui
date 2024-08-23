@@ -105,35 +105,25 @@ public sealed class ContextMenu : IDisposable
     /// <summary>Disposes the context menu object.</summary>
     public void Dispose ()
     {
-        if (IsShow)
-        {
-            _menuBar.MenuAllClosed -= MenuBar_MenuAllClosed;
-            _menuBar.Dispose ();
-            _menuBar = null;
-            IsShow = false;
-        }
+        _menuBar.MenuAllClosed -= MenuBar_MenuAllClosed;
+        Application.UngrabMouse ();
+        _menuBar?.Dispose ();
+        _menuBar = null;
+        IsShow = false;
 
         if (_container is { })
         {
             _container.Closing -= Container_Closing;
             _container.Deactivate -= Container_Deactivate;
+            _container.Disposing -= Container_Disposing;
         }
     }
 
     /// <summary>Hides (closes) the ContextMenu.</summary>
-    public void Hide (bool dispose = false)
+    public void Hide ()
     {
-        if (_menuBar is { })
-        {
-            //_menuBar?.CleanUp ();
-            _menuBar.Enabled = false;
-
-            if (dispose)
-            {
-                _menuBar.Dispose ();
-                _menuBar = null;
-            }
-        }
+        _menuBar?.CleanUp ();
+        IsShow = false;
     }
 
     /// <summary>Event invoked when the <see cref="ContextMenu.Key"/> is changed.</summary>
@@ -148,11 +138,13 @@ public sealed class ContextMenu : IDisposable
         if (_menuBar is { })
         {
             Hide ();
+            Dispose ();
         }
 
         _container = Application.Current;
-        _container.Closing += Container_Closing;
+        _container!.Closing += Container_Closing;
         _container.Deactivate += Container_Deactivate;
+        _container.Disposing += Container_Disposing;
         Rectangle frame = Application.Screen;
         Point position = Position;
 
@@ -228,11 +220,9 @@ public sealed class ContextMenu : IDisposable
         _menuBar.OpenMenu ();
     }
 
-    private void Container_Deactivate (object sender, ToplevelEventArgs e) { Hide (); }
     private void Container_Closing (object sender, ToplevelClosingEventArgs obj) { Hide (); }
+    private void Container_Deactivate (object sender, ToplevelEventArgs e) { Hide (); }
+    private void Container_Disposing (object sender, EventArgs e) { Dispose (); }
 
-    private void MenuBar_MenuAllClosed (object sender, EventArgs e)
-    {
-        Hide (true);
-    }
+    private void MenuBar_MenuAllClosed (object sender, EventArgs e) { Hide (); }
 }
