@@ -620,8 +620,9 @@ public class ColorPickerTests
 
         var hex = GetTextField (cp, ColorPickerPart.Hex);
 
+#if DEBUG_IDISPOSABLE
         Assert.All (new View [] { b1, b2, b3, tf1, tf2, tf3,hex }, b => Assert.False (b.WasDisposed));
-
+#endif
         cp.Style.ColorModel = ColorModel.RGB;
         cp.ApplyStyleChanges ();
 
@@ -636,7 +637,9 @@ public class ColorPickerTests
         var hexAfter = GetTextField (cp, ColorPickerPart.Hex);
 
         // Old bars should be disposed
+#if DEBUG_IDISPOSABLE
         Assert.All (new View [] { b1, b2, b3, tf1, tf2, tf3,hex }, b => Assert.True (b.WasDisposed));
+#endif
         Assert.NotSame (hex,hexAfter);
 
         Assert.NotSame (b1,b1After);
