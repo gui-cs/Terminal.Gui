@@ -1,5 +1,6 @@
-﻿#nullable enable
+#nullable enable
 namespace Terminal.Gui;
+
 public static partial class Application // Mouse handling
 {
     #region Mouse handling
@@ -36,16 +37,13 @@ public static partial class Application // Mouse handling
     /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
     public static void GrabMouse (View? view)
     {
-        if (view is null)
+        if (view is null || OnGrabbingMouse (view))
         {
             return;
         }
 
-        if (!OnGrabbingMouse (view))
-        {
-            OnGrabbedMouse (view);
-            MouseGrabView = view;
-        }
+        OnGrabbedMouse (view);
+        MouseGrabView = view;
     }
 
     /// <summary>Releases the mouse grab, so mouse events will be routed to the view on which the mouse is.</summary>
@@ -68,6 +66,7 @@ public static partial class Application // Mouse handling
         }
     }
 
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     private static bool OnGrabbingMouse (View? view)
     {
         if (view is null)
@@ -81,6 +80,7 @@ public static partial class Application // Mouse handling
         return evArgs.Cancel;
     }
 
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     private static bool OnUnGrabbingMouse (View? view)
     {
         if (view is null)
@@ -94,6 +94,7 @@ public static partial class Application // Mouse handling
         return evArgs.Cancel;
     }
 
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     private static void OnGrabbedMouse (View? view)
     {
         if (view is null)
@@ -104,6 +105,7 @@ public static partial class Application // Mouse handling
         GrabbedMouse?.Invoke (view, new (view));
     }
 
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     private static void OnUnGrabbedMouse (View? view)
     {
         if (view is null)
@@ -113,8 +115,6 @@ public static partial class Application // Mouse handling
 
         UnGrabbedMouse?.Invoke (view, new (view));
     }
-
-#nullable enable
 
     // Used by OnMouseEvent to track the last view that was clicked on.
     internal static View? MouseEnteredView { get; set; }
@@ -167,54 +167,55 @@ public static partial class Application // Mouse handling
                 View = view ?? MouseGrabView
             };
 
+            // INTENT: Just checking: This is operating on a copy of ViewPort and throwing it away.
+            // Was assignment also intended?
             if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
             {
                 // The mouse has moved outside the bounds of the view that grabbed the mouse
-                MouseGrabView?.NewMouseLeaveEvent (mouseEvent);
+                MouseGrabView.NewMouseLeaveEvent (mouseEvent);
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) == true)
+            if (MouseGrabView.NewMouseEvent (viewRelativeMouseEvent) is true)
             {
                 return;
             }
         }
 
-        if (view is { WantContinuousButtonPressed: true })
-        {
-            WantContinuousButtonPressedView = view;
-        }
-        else
-        {
-            WantContinuousButtonPressedView = null;
-        }
+        WantContinuousButtonPressedView = view switch
+                                          {
+                                              { WantContinuousButtonPressed: true } => view,
+                                              _                                     => null
+                                          };
 
-        if (view is not Adornment)
+        // NOTE: These two nested ifs were already an AND condition, so I at least merged them in this pass.
+        // But also, we have type-checked view already, right above.
+        // We can combine this into the switch expression to reduce cognitive complexity even more and likely
+        // avoid one or two of these checks in the process, as well.
+        if (view is not Adornment
+         && (view is null || view == ApplicationOverlapped.OverlappedTop)
+         && Current is { Modal: false }
+         && ApplicationOverlapped.OverlappedTop != null
+         && mouseEvent.Flags is not MouseFlags.ReportMousePosition and not 0)
         {
-            if ((view is null || view == ApplicationOverlapped.OverlappedTop)
-                && Current is { Modal: false }
-                && ApplicationOverlapped.OverlappedTop != null
-                && mouseEvent.Flags != MouseFlags.ReportMousePosition
-                && mouseEvent.Flags != 0)
+            // This occurs when there are multiple overlapped "tops"
+            // E.g. "Mdi" - in the Background Worker Scenario
+            View? top = ApplicationOverlapped.FindDeepestTop (Top!, mouseEvent.Position);
+            view = View.FindDeepestView (top, mouseEvent.Position);
+
+            if (view is { } && view != ApplicationOverlapped.OverlappedTop && top != Current && top is { })
             {
-                // This occurs when there are multiple overlapped "tops"
-                // E.g. "Mdi" - in the Background Worker Scenario
-                View? top = ApplicationOverlapped.FindDeepestTop (Top!, mouseEvent.Position);
-                view = View.FindDeepestView (top, mouseEvent.Position);
-
-                if (view is { } && view != ApplicationOverlapped.OverlappedTop && top != Current && top is { })
-                {
-                    ApplicationOverlapped.MoveCurrent ((Toplevel)top);
-                }
+                ApplicationOverlapped.MoveCurrent ((Toplevel)top);
             }
         }
 
+        // NOTE: This statement is also likely mergeable with the above stuff, too.
         if (view is null)
         {
             return;
         }
 
-        MouseEvent? me = null;
+        MouseEvent? me;
 
         if (view is Adornment adornment)
         {
@@ -240,8 +241,7 @@ public static partial class Application // Mouse handling
                 View = view
             };
         }
-
-        if (me is null)
+        else
         {
             return;
         }
@@ -267,13 +267,8 @@ public static partial class Application // Mouse handling
 
         //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
 
-        while (view.NewMouseEvent (me) != true)
+        while (view.NewMouseEvent (me) is not true || MouseGrabView is not { })
         {
-            if (MouseGrabView is { })
-            {
-                break;
-            }
-
             if (view is Adornment adornmentView)
             {
                 view = adornmentView.Parent!.SuperView;
