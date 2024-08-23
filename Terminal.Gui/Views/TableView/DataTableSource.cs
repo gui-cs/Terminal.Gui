@@ -25,5 +25,5 @@ public class DataTableSource : ITableSource
     public int Columns => DataTable.Columns.Count;
 
     /// <inheritdoc/>
-    public string [] ColumnNames => DataTable.Columns.Cast<DataColumn> ().Select (c => c.ColumnName).ToArray ();
+    public string [] ColumnNames => DataTable.Columns.Cast<DataColumn> ().Select (c => c.Caption ?? c.ColumnName).ToArray ();
 }
