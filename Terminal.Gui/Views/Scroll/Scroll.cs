@@ -10,8 +10,11 @@ namespace Terminal.Gui;
 public class Scroll : View
 {
     /// <inheritdoc/>
-    public Scroll ()
+    public Scroll () : this (null) { }
+
+    public Scroll (ScrollBar? host)
     {
+        _host = host;
         _slider = new (this);
         Add (_slider);
 
@@ -23,6 +26,7 @@ public class Scroll : View
     }
 
 
+    internal readonly ScrollBar? _host;
     internal bool _wasSliderLayoutComplete = true;
 
     private readonly ScrollSlider _slider;
@@ -193,18 +197,26 @@ public class Scroll : View
     /// <summary>Virtual method called when <see cref="Size"/> has changed. Raises <see cref="SizeChanged"/>.</summary>
     protected void OnSizeChanged (int size) { SizeChanged?.Invoke (this, new (in size)); }
 
+    internal void AdjustScroll ()
+    {
+        if (_host is { })
+        {
+            X = Orientation == Orientation.Vertical ? 0 : 1;
+            Y = Orientation == Orientation.Vertical ? 1 : 0;
+            Width = Orientation == Orientation.Vertical ? Dim.Fill () : Dim.Fill (1);
+            Height = Orientation == Orientation.Vertical ? Dim.Fill (1) : Dim.Fill ();
+        }
+
+        _slider.AdjustSlider ();
+        SetScrollText ();
+    }
+
     /// <inheritdoc/>
     internal override void OnLayoutComplete (LayoutEventArgs args)
     {
         base.OnLayoutComplete (args);
 
         AdjustScroll ();
-    }
-
-    private void AdjustScroll ()
-    {
-        _slider.AdjustSlider ();
-        SetScrollText ();
     }
 
     private void SetScrollText ()
