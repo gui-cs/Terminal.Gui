@@ -120,16 +120,16 @@ internal sealed class NetWinVTConsole
         }
     }
 
-    [DllImport ("kernel32.dll")]
+    [LibraryImport ("kernel32")]
     private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
 
-    [DllImport ("kernel32.dll")]
+    [LibraryImport ("kernel32")]
     private static extern uint GetLastError ();
 
-    [DllImport ("kernel32.dll", SetLastError = true)]
+    [LibraryImport ("kernel32", SetLastError = true)]
     private static extern nint GetStdHandle (int nStdHandle);
 
-    [DllImport ("kernel32.dll")]
+    [LibraryImport ("kernel32")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 }
 
