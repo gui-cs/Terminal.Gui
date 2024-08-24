@@ -1081,7 +1081,11 @@ internal class WindowsDriver : ConsoleDriver
         };
     }
 
-    public override bool IsRuneSupported (Rune rune) { return base.IsRuneSupported (rune) && rune.IsBmp; }
+    // INTENT: Is the same issue as in CursesDriver also true here?
+    // As far as I can tell from messing around with toy apps, the windows console appears able to show you any
+    // codepoint that your font supports.
+    /// <inheritdoc />
+    public override bool IsRuneSupported (in Rune rune) => rune.IsBmp && base.IsRuneSupported (in rune);
 
     public override void Refresh ()
     {

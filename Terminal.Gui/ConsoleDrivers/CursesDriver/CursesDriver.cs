@@ -78,11 +78,9 @@ internal class CursesDriver : ConsoleDriver
         return false;
     }
 
-    public override bool IsRuneSupported (Rune rune)
-    {
-        // See Issue #2615 - CursesDriver is broken with non-BMP characters
-        return base.IsRuneSupported (rune) && rune.IsBmp;
-    }
+    /// <inheritdoc />
+    /// <remarks>See Issue #2615 - CursesDriver is broken with non-BMP characters</remarks>
+    public override bool IsRuneSupported (in Rune rune) => rune.IsBmp && base.IsRuneSupported (in rune);
 
     public override void Move (int col, int row)
     {
