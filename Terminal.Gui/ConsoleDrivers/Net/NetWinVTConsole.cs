@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using CommunityToolkit.Diagnostics;
 using Microsoft.Win32.SafeHandles;
 
+[MustDisposeResource]
 internal sealed partial class NetWinVTConsole : IDisposable
 {
     private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
