@@ -586,10 +586,11 @@ public class ScenarioTests : TestsAllViews
     [Fact]
     public void Run_Generic ()
     {
-        ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
-        Assert.NotEmpty (scenarios);
+        ObservableCollection<Scenario>? scenarios = Scenario.GetScenarios ();
+        Assume.NotNull (scenarios);
+        Assume.NotEmpty (scenarios);
 
-        int item = scenarios.IndexOf (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
+        int item = scenarios.IndexOf (static s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
         Scenario generic = scenarios [item];
 
         Application.Init (new FakeDriver ());
