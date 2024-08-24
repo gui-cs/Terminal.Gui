@@ -50,7 +50,10 @@ internal sealed class NetDriver : ConsoleDriver
             ProcessInput (input);
         }
         catch (OverflowException)
-        { }
+        {
+            // BUG: This is almost certainly a bug.
+            // When and why does this exception happen?
+        }
     }
 
     public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix
