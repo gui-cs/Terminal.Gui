@@ -89,14 +89,12 @@ public static partial class Application // Initialization (Init/Shutdown)
         bool calledViaRunT = false
     )
     {
-        if (IsInitialized && driver is null)
+        switch (IsInitialized)
         {
-            return;
-        }
-
-        if (IsInitialized)
-        {
-            throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
+            case true when driver is null:
+                return;
+            case true:
+                throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
         }
 
         if (!calledViaRunT)
@@ -148,7 +146,7 @@ public static partial class Application // Initialization (Init/Shutdown)
             else
             {
                 List<Type?> drivers = GetDriverTypes ();
-                Type? driverType = drivers.FirstOrDefault (t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
+                Type? driverType = drivers.FirstOrDefault (static t => t!.Name.Equals (ForceDriver, StringComparison.InvariantCultureIgnoreCase));
 
                 if (driverType is { })
                 {
@@ -165,7 +163,7 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         try
         {
-            MainLoop = Driver!.Init ();
+            MainLoop = Driver.Init ();
         }
         catch (InvalidOperationException ex)
         {
