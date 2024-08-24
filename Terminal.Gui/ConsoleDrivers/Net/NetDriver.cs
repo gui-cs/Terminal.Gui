@@ -291,9 +291,7 @@ internal sealed class NetDriver : ConsoleDriver
 
     internal override MainLoop Init ()
     {
-        PlatformID p = Environment.OSVersion.Platform;
-
-        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        if (Environment.OSVersion.Platform is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
         {
             IsWinPlatform = true;
 
