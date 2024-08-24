@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -6,15 +8,15 @@ namespace Terminal.Gui;
 /// </summary>
 public abstract partial class PopupAutocomplete : AutocompleteBase
 {
-    /// <summary>Creates a new instance of the <see cref="PopupAutocomplete"/> class.</summary>
-    public PopupAutocomplete () { PopupInsideContainer = true; }
-
     private bool _closed;
     private ColorScheme _colorScheme;
     private View _hostControl;
-    private View _top; // _hostControl's SuperView
+    private View _top;  // The _hostControl's SuperView
     private View _popup;
-    private int toRenderLength;
+    private int _toRenderLength;
+
+    /// <summary>Creates a new instance of the <see cref="PopupAutocomplete"/> class.</summary>
+    public PopupAutocomplete () { PopupInsideContainer = true; }
 
     /// <summary>
     ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized
@@ -34,6 +36,29 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         set => _colorScheme = value;
     }
 
+    /// <summary>The host control to handle.</summary>
+    public override View HostControl
+    {
+        get => _hostControl;
+        set
+        {
+            Debug.Assert (_hostControl is null);
+            _hostControl = value;
+            _top = _hostControl.SuperView;
+
+            if (_top is { })
+            {
+                _top.Initialized += _top_Initialized;
+                _top.Removed += _top_Removed;
+            }
+        }
+    }
+
+    private void _top_Initialized (object sender, EventArgs e)
+    {
+        AddPopupToTop ();
+    }
+
     /// <inheritdoc/>
     public override void EnsureSelectedIdxIsValid ()
     {
@@ -46,27 +71,9 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         }
 
         // if user moved selection down past bottom of current scroll window
-        while (toRenderLength > 0 && SelectedIdx >= ScrollOffset + toRenderLength)
+        while (_toRenderLength > 0 && SelectedIdx >= ScrollOffset + _toRenderLength)
         {
             ScrollOffset++;
-        }
-    }
-
-    /// <summary>The host control to handle.</summary>
-    public override View HostControl
-    {
-        get => _hostControl;
-        set
-        {
-            _hostControl = value;
-            _top = _hostControl.SuperView;
-
-            if (_top is { })
-            {
-                _top.DrawContent += Top_DrawContent;
-                _top.DrawContentComplete += Top_DrawContentComplete;
-                _top.Removed += Top_Removed;
-            }
         }
     }
 
@@ -120,7 +127,8 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
         if (_popup is null || Suggestions.Count == 0)
         {
-            ManipulatePopup ();
+            //AddPopupToTop ();
+            //Debug.Fail ("popup is null");
 
             return false;
         }
@@ -167,7 +175,6 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         if (SuggestionGenerator.IsWordChar ((Rune)key))
         {
             Visible = true;
-            ManipulatePopup ();
             _closed = false;
 
             return false;
@@ -302,7 +309,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         }
 
         Suggestion [] toRender = Suggestions.Skip (ScrollOffset).Take (height).ToArray ();
-        toRenderLength = toRender.Length;
+        _toRenderLength = toRender.Length;
 
         if (toRender.Length == 0)
         {
@@ -397,7 +404,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         Visible = false;
         _closed = true;
         HostControl?.SetNeedsDisplay ();
-        ManipulatePopup ();
+        //RemovePopupFromTop ();
     }
 
     /// <summary>Deletes the text backwards before insert the selected text in the <see cref="HostControl"/>.</summary>
@@ -517,42 +524,29 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     private Point? LastPopupPos { get; set; }
 #nullable restore
 
-    private void ManipulatePopup ()
+    private void AddPopupToTop ()
     {
-        if (Visible && _popup is null)
+        if (_popup is null)
         {
             _popup = new Popup (this) { Frame = Rectangle.Empty };
             _top?.Add (_popup);
         }
+    }
 
-        if (!Visible && _popup is { })
+    private void RemovePopupFromTop ()
+    {
+        if (_popup is { } && _top.Subviews.Contains (_popup))
         {
             _top?.Remove (_popup);
             _popup.Dispose ();
             _popup = null;
+
         }
     }
 
-    private void Top_DrawContent (object sender, DrawEventArgs e)
-    {
-        if (!_closed)
-        {
-            ReopenSuggestions ();
-        }
-
-        ManipulatePopup ();
-
-        if (Visible)
-        {
-            _top.BringSubviewToFront (_popup);
-        }
-    }
-
-    private void Top_DrawContentComplete (object sender, DrawEventArgs e) { ManipulatePopup (); }
-
-    private void Top_Removed (object sender, SuperViewChangedEventArgs e)
+    private void _top_Removed (object sender, SuperViewChangedEventArgs e)
     {
         Visible = false;
-        ManipulatePopup ();
+        RemovePopupFromTop ();
     }
 }
