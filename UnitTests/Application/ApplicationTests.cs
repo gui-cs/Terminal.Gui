@@ -1,5 +1,6 @@
-#nullable enable
+﻿#nullable enable
 using Xunit.Abstractions;
+// ReSharper disable SuggestVarOrType_SimpleTypes
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -29,11 +30,11 @@ public class ApplicationTests
         _timeoutLock = new ();
 
         uint timeoutTime = 250;
-        var initialized = false;
-        var iteration = 0;
-        var shutdown = false;
+        bool initialized = false;
+        int iteration = 0;
+        bool shutdown = false;
         object? timeout = null;
-        var timeoutCount = 0;
+        int timeoutCount = 0;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
@@ -387,7 +388,7 @@ public class ApplicationTests
         //Pre_Init_State ();
 #if DEBUG_IDISPOSABLE
 
-        // Validate there are no outstanding Responder-based instances 
+        // Validate there are no outstanding Responder-based instances
         // after a scenario was selected to run. This proves the main UI Catalog
         // 'app' closed cleanly.
         Assert.Empty (Responder.Instances);
@@ -768,7 +769,7 @@ public class ApplicationTests
 
         // Init doesn't create a Toplevel and assigned it to Application.Top
         // but Begin does
-        var initTop = new Toplevel ();
+        Toplevel initTop = new Toplevel ();
 
         Application.Iteration += (s, a) =>
                                  {
@@ -897,7 +898,7 @@ public class ApplicationTests
         // Setup Mock driver
         Init ();
 
-        var top = new Toplevel ();
+        Toplevel top = new Toplevel ();
         RunState rs = Application.Begin (top);
         Assert.NotNull (rs);
         Assert.Equal (top, Application.Current);
@@ -921,7 +922,7 @@ public class ApplicationTests
         // Setup Mock driver
         Init ();
 
-        var top = new Toplevel ();
+        Toplevel top = new Toplevel ();
         RunState rs = Application.Begin (top);
         Assert.NotNull (rs);
         Assert.Equal (top, Application.Current);
@@ -944,7 +945,7 @@ public class ApplicationTests
     {
         Init ();
         Toplevel top = new ();
-        var count = 0;
+        int count = 0;
         top.Loaded += (s, e) => count++;
         top.Ready += (s, e) => count++;
         top.Unloaded += (s, e) => count++;
@@ -960,7 +961,7 @@ public class ApplicationTests
     public void Run_Toplevel_With_Modal_View_Does_Not_Refresh_If_Not_Dirty ()
     {
         Init ();
-        var count = 0;
+        int count = 0;
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
         Dialog? d = null;
@@ -1038,7 +1039,7 @@ public class ApplicationTests
     {
         Init ();
 
-        var top = new Toplevel ();
+        Toplevel top = new Toplevel ();
 
         Window w = new ();
         w.Ready += (s, e) => Application.RequestStop (); // Causes `End` to be called
@@ -1118,7 +1119,7 @@ public class ApplicationTests
     [Fact]
     public void Run_T_Creates_Top_Without_Init ()
     {
-        var driver = new FakeDriver ();
+        FakeDriver driver = new FakeDriver ();
 
         Assert.Null (Application.Top);
 
@@ -1193,7 +1194,7 @@ public class ApplicationTests
     [Fact]
     public async Task Shutdown_Allows_Async ()
     {
-        var isCompletedSuccessfully = false;
+        bool isCompletedSuccessfully = false;
 
         async Task TaskWithAsyncContinuation ()
         {
