@@ -7,6 +7,8 @@ using System.Diagnostics;
 
 namespace Terminal.Gui;
 
+using System.Runtime.CompilerServices;
+
 /// <summary>Base class for Terminal.Gui ConsoleDriver implementations.</summary>
 /// <remarks>
 ///     There are currently four implementations: - <see cref="CursesDriver"/> (for Unix and Mac) -
@@ -334,6 +336,7 @@ public abstract class ConsoleDriver
                         IsDirty = true
                     };
                 }
+
                 _dirtyLines [row] = true;
             }
         }
@@ -353,6 +356,7 @@ public abstract class ConsoleDriver
                 {
                     Contents [row, c].IsDirty = true;
                 }
+
                 _dirtyLines! [row] = true;
             }
         }
@@ -413,7 +417,8 @@ public abstract class ConsoleDriver
     ///     <see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver does not
     ///     support displaying this rune.
     /// </returns>
-    public virtual bool IsRuneSupported (Rune rune) { return Rune.IsValid (rune.Value); }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public virtual bool IsRuneSupported (in Rune rune) => Rune.IsValid (rune.Value);
 
     /// <summary>Tests whether the specified coordinate are valid for drawing.</summary>
     /// <param name="col">The column.</param>
