@@ -1196,7 +1196,7 @@ public class ApplicationTests
     #region ShutdownTests
 
     [Fact]
-    public async void Shutdown_Allows_Async ()
+    public async Task Shutdown_Allows_Async ()
     {
         var isCompletedSuccessfully = false;
 
