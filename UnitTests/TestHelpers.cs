@@ -761,6 +761,33 @@ internal partial class TestHelpers
 
     [GeneratedRegex ("\\s+$", RegexOptions.Multiline)]
     private static partial Regex TrailingWhiteSpaceRegEx ();
+
+#nullable enable
+    public static IEnumerable<object []> GetDriverNames (string exclusions = "")
+    {
+        string [] exclusionsSplit = exclusions.Split (',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        return DriversWithNames.Where (d => !exclusionsSplit.Contains (d [0])).Select<object [], object []> (static d => [d [0]]);
+    }
+
+    public static IEnumerable<object []> GetDriversOnly (string exclusions = "")
+    {
+        string [] exclusionsSplit = exclusions.Split (',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        return DriversWithNames.Where (d => !exclusionsSplit.Contains (d [0])).Select<object [], object []> (static d => [d [1]]);
+    }
+
+    public static IEnumerable<object []> DriversWithNames
+    {
+        get
+        {
+            yield return [nameof (FakeDriver), new FakeDriver ()];
+            yield return [nameof (NetDriver), new NetDriver ()];
+            yield return [nameof (WindowsDriver), new WindowsDriver ()];
+            yield return [nameof (CursesDriver), new CursesDriver ()];
+        }
+    }
+#nullable restore
 }
 
 public class TestsAllViews
