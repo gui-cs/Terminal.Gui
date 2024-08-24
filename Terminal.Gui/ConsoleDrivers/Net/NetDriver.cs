@@ -1,15 +1,14 @@
-#nullable enable
-
 //
 // NetDriver.cs: The System.Console-based .NET driver, works on Windows and Unix, but is not particularly efficient.
 //
 
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.ConsoleDrivers.Net.NetEvents;
 
 namespace Terminal.Gui.ConsoleDrivers.Net;
+
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 internal sealed class NetDriver : ConsoleDriver
 {
@@ -29,12 +28,9 @@ internal sealed class NetDriver : ConsoleDriver
     private const int COLOR_RED = 31;
     private const int COLOR_WHITE = 37;
     private const int COLOR_YELLOW = 33;
-    private NetMainLoop _mainLoopDriver;
+    private NetMainLoop _mainLoopDriver = null!;
     public bool IsWinPlatform { get; private set; }
-    public NetWinVTConsole NetWinConsole { get; private set; }
-
-    public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix
-                                              || IsWinPlatform && Environment.OSVersion.Version.Build >= 14931;
+    public NetWinVTConsole NetWinConsole { get; private set; } = null!;
 
     public override void Refresh ()
     {
@@ -44,9 +40,9 @@ internal sealed class NetDriver : ConsoleDriver
 
     public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
     {
-        InputResult input = new InputResult
+        InputResult input = new ()
         {
-            EventType = EventType.Key, ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control)
+            EventType = EventType.Key, ConsoleKeyInfo = new (keyChar, key, shift, alt, control)
         };
 
         try
@@ -56,6 +52,9 @@ internal sealed class NetDriver : ConsoleDriver
         catch (OverflowException)
         { }
     }
+
+    public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix
+                                           || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
     public override void Suspend ()
     {
@@ -94,7 +93,7 @@ internal sealed class NetDriver : ConsoleDriver
         if (RunningUnitTests
          || _winSizeChanging
          || Console.WindowHeight < 1
-         || Contents is { } c && c.Length != Rows * Cols
+         || (Contents is { } c && c.Length != Rows * Cols)
          || Rows != Console.WindowHeight)
         {
             return;
@@ -281,7 +280,7 @@ internal sealed class NetDriver : ConsoleDriver
 
             try
             {
-                NetWinConsole = new NetWinVTConsole ();
+                NetWinConsole = new ();
             }
             catch (ApplicationException)
             {
@@ -332,14 +331,14 @@ internal sealed class NetDriver : ConsoleDriver
 
         ResizeScreen ();
         ClearContents ();
-        CurrentAttribute = new Attribute (Color.White, Color.Black);
+        CurrentAttribute = new (Color.White, Color.Black);
 
         StartReportingMouseMoves ();
 
-        _mainLoopDriver = new NetMainLoop (this);
+        _mainLoopDriver = new (this);
         _mainLoopDriver.ProcessInput = ProcessInput;
 
-        return new MainLoop (_mainLoopDriver);
+        return new (_mainLoopDriver);
     }
 
     private void ProcessInput (InputResult inputEvent)
@@ -362,12 +361,13 @@ internal sealed class NetDriver : ConsoleDriver
                     break;
                 }
 
-                OnKeyDown (new Key (map));
-                OnKeyUp (new Key (map));
+                OnKeyDown (new (map));
+                OnKeyUp (new (map));
 
                 break;
             case EventType.Mouse:
                 MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
+
                 //Debug.WriteLine ($"NetDriver: ({me.X},{me.Y}) - {me.Flags}");
                 OnMouseEvent (me);
 
@@ -382,7 +382,7 @@ internal sealed class NetDriver : ConsoleDriver
                 ResizeScreen ();
                 ClearContents ();
                 _winSizeChanging = false;
-                OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
+                OnSizeChanged (new (new (Cols, Rows)));
 
                 break;
             case EventType.RequestResponse:
@@ -437,6 +437,7 @@ internal sealed class NetDriver : ConsoleDriver
                 }
 #pragma warning restore CA1416
             }
+
             // INTENT: Why are these eating the exceptions?
             // Comments would be good here.
             catch (IOException)
@@ -464,7 +465,10 @@ internal sealed class NetDriver : ConsoleDriver
     #region Color Handling
 
     // Cache the list of ConsoleColor values.
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
+    [UnconditionalSuppressMessage (
+                                      "AOT",
+                                      "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+                                      Justification = "<Pending>")]
     private static readonly HashSet<int> ConsoleColorValues = new (
                                                                    Enum.GetValues (typeof (ConsoleColor))
                                                                        .OfType<ConsoleColor> ()
@@ -493,10 +497,8 @@ internal sealed class NetDriver : ConsoleDriver
     };
 
     // Map a ConsoleColor to a platform dependent value.
-    private int MapColors (ConsoleColor color, bool isForeground = true)
-    {
-        return colorMap.TryGetValue (color, out int colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
-    }
+    private int MapColors (ConsoleColor color, bool isForeground = true) =>
+        colorMap.TryGetValue (color, out int colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
 
     ///// <remarks>
     ///// In the NetDriver, colors are encoded as an int. 
@@ -752,7 +754,7 @@ internal sealed class NetDriver : ConsoleDriver
             mouseFlag |= MouseFlags.ButtonAlt;
         }
 
-        return new MouseEvent { Position = me.Position, Flags = mouseFlag };
+        return new () { Position = me.Position, Flags = mouseFlag };
     }
 
     #endregion Mouse Handling
@@ -773,7 +775,7 @@ internal sealed class NetDriver : ConsoleDriver
 
         ConsoleKeyInfo cKeyInfo = DecodeVKPacketToKConsoleKeyInfo (consoleKeyInfo);
 
-        return new ConsoleKeyInfo (cKeyInfo.KeyChar, cKeyInfo.Key, shift, alt, control);
+        return new (cKeyInfo.KeyChar, cKeyInfo.Key, shift, alt, control);
     }
 
     private KeyCode MapKey (ConsoleKeyInfo keyInfo)
@@ -825,7 +827,7 @@ internal sealed class NetDriver : ConsoleDriver
 
         // Handle control keys (e.g. CursorUp)
         if (keyInfo.Key != ConsoleKey.None
-            && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))
+         && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))
         {
             return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
         }
@@ -833,29 +835,29 @@ internal sealed class NetDriver : ConsoleDriver
         if ((ConsoleKey)keyInfo.KeyChar is >= ConsoleKey.A and <= ConsoleKey.Z)
         {
             // Shifted
-            keyInfo = new ConsoleKeyInfo (
-                                          keyInfo.KeyChar,
-                                          (ConsoleKey)keyInfo.KeyChar,
-                                          true,
-                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
-                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+            keyInfo = new (
+                           keyInfo.KeyChar,
+                           (ConsoleKey)keyInfo.KeyChar,
+                           true,
+                           keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                           keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
         }
 
         if ((ConsoleKey)keyInfo.KeyChar - 32 is >= ConsoleKey.A and <= ConsoleKey.Z)
         {
             // Unshifted
-            keyInfo = new ConsoleKeyInfo (
-                                          keyInfo.KeyChar,
-                                          (ConsoleKey)(keyInfo.KeyChar - 32),
-                                          false,
-                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
-                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+            keyInfo = new (
+                           keyInfo.KeyChar,
+                           (ConsoleKey)(keyInfo.KeyChar - 32),
+                           false,
+                           keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                           keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
         }
 
         if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
         {
             if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
-                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+             || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
             {
                 // NetDriver doesn't support Shift-Ctrl/Shift-Alt combos
                 return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.Key);
@@ -873,8 +875,7 @@ internal sealed class NetDriver : ConsoleDriver
             return (KeyCode)keyInfo.Key;
         }
 
-
-        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.KeyChar);
+        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
     }
 
     #endregion Keyboard Handling
