@@ -1,3 +1,4 @@
+#nullable enable
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -6,7 +7,7 @@ namespace Terminal.Gui.ApplicationTests;
 
 public class ApplicationTests
 {
-    public ApplicationTests (ITestOutputHelper output)
+    public ApplicationTests (ITestOutputHelper? output)
     {
         _output = output;
         ConsoleDriver.RunningUnitTests = true;
@@ -31,7 +32,7 @@ public class ApplicationTests
         var initialized = false;
         var iteration = 0;
         var shutdown = false;
-        object timeout = null;
+        object? timeout = null;
         var timeoutCount = 0;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
@@ -74,7 +75,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
         {
             if (a.CurrentValue)
             {
@@ -111,7 +112,7 @@ public class ApplicationTests
             return false;
         }
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, IterationEventArgs? a)
         {
             lock (_timeoutLock)
             {
@@ -205,26 +206,26 @@ public class ApplicationTests
         // if we don't stop
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
-        RunState runstate = null;
+        RunState? runState = null;
 
         EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
                                                         {
                                                             Assert.NotNull (e.State);
-                                                            runstate = e.State;
+                                                            runState = e.State;
                                                         };
         Application.NotifyNewRunState += newRunStateFn;
 
-        var topLevel = new Toplevel ();
+        Toplevel topLevel = new Toplevel ();
         RunState rs = Application.Begin (topLevel);
         Assert.NotNull (rs);
-        Assert.NotNull (runstate);
-        Assert.Equal (rs, runstate);
+        Assert.NotNull (runState);
+        Assert.Equal (rs, runState);
 
         Assert.Equal (topLevel, Application.Top);
         Assert.Equal (topLevel, Application.Current);
 
         Application.NotifyNewRunState -= newRunStateFn;
-        Application.End (runstate);
+        Application.End (runState);
 
         Assert.Null (Application.Current);
         Assert.NotNull (Application.Top);
@@ -417,7 +418,7 @@ public class ApplicationTests
 
         return;
 
-        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
         {
             if (a.CurrentValue)
             {
@@ -470,7 +471,7 @@ public class ApplicationTests
         Toplevel topLevel = new ();
         Application.InternalInit (new FakeDriver ());
 
-        RunState runstate = null;
+        RunState? runstate = null;
 
         EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
                                                         {
@@ -532,11 +533,11 @@ public class ApplicationTests
     public void Invoke_Adds_Idle ()
     {
         Application.Init (new FakeDriver ());
-        var top = new Toplevel ();
+        Toplevel top = new Toplevel ();
         RunState rs = Application.Begin (top);
-        var firstIteration = false;
+        bool firstIteration = false;
 
-        var actionCalled = 0;
+        int actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
         Application.MainLoop.Running = true;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -548,7 +549,7 @@ public class ApplicationTests
     [Fact]
     public void Run_Iteration_Fires ()
     {
-        var iteration = 0;
+        int iteration = 0;
 
         Application.Init (new FakeDriver ());
 
@@ -560,7 +561,7 @@ public class ApplicationTests
 
         return;
 
-        void Application_Iteration (object sender, IterationEventArgs e)
+        void Application_Iteration (object? sender, IterationEventArgs? e)
         {
             if (iteration > 0)
             {
@@ -576,18 +577,18 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void SetCurrentAsTop_Run_A_Not_Modal_Toplevel_Make_It_The_Current_Application_Top ()
     {
-        var top = new Toplevel ();
+        Toplevel top = new Toplevel ();
 
-        var t1 = new Toplevel ();
-        var t2 = new Toplevel ();
-        var t3 = new Toplevel ();
+        Toplevel t1 = new Toplevel ();
+        Toplevel t2 = new Toplevel ();
+        Toplevel t3 = new Toplevel ();
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
-        var d = new Dialog ();
-        var t4 = new Toplevel ();
+        Dialog d = new Dialog ();
+        Toplevel t4 = new Toplevel ();
 
         // t1, t2, t3, d, t4
-        var iterations = 5;
+        int iterations = 5;
 
         t1.Ready += (s, e) =>
                     {
@@ -967,7 +968,7 @@ public class ApplicationTests
         var count = 0;
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
-        Dialog d = null;
+        Dialog? d = null;
         Toplevel top = new ();
         top.DrawContent += (s, a) => count++;
         int iteration = -1;
@@ -1013,7 +1014,7 @@ public class ApplicationTests
         Init ();
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
-        var w = new Window
+        Window w = new Window
         {
             Width = 5, Height = 5,
             Arrangement = ViewArrangement.Movable
@@ -1063,7 +1064,7 @@ public class ApplicationTests
 
 #if DEBUG_IDISPOSABLE
         Assert.False (w.WasDisposed);
-        Exception exception = Record.Exception (Application.Shutdown); // Invalid - w has not been disposed.
+        Exception? exception = Record.Exception (Application.Shutdown); // Invalid - w has not been disposed.
         Assert.NotNull (exception);
 
         w.Dispose ();
@@ -1089,7 +1090,7 @@ public class ApplicationTests
     [Fact]
     public void Run_Creates_Top_Without_Init ()
     {
-        var driver = new FakeDriver ();
+        FakeDriver driver = new FakeDriver ();
 
         Assert.Null (Application.Top);
 
@@ -1102,7 +1103,7 @@ public class ApplicationTests
 #if DEBUG_IDISPOSABLE
         Assert.Equal (top, Application.Top);
         Assert.False (top.WasDisposed);
-        Exception exception = Record.Exception (Application.Shutdown);
+        Exception? exception = Record.Exception (Application.Shutdown);
         Assert.NotNull (exception);
         Assert.False (top.WasDisposed);
 #endif
@@ -1134,7 +1135,7 @@ public class ApplicationTests
         Application.Run<Toplevel> (null, driver);
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Top.WasDisposed);
-        Exception exception = Record.Exception (Application.Shutdown);
+        Exception? exception = Record.Exception (Application.Shutdown);
         Assert.NotNull (exception);
         Assert.False (Application.Top.WasDisposed);
 
@@ -1158,7 +1159,7 @@ public class ApplicationTests
         // The Application.Run(new(Toplevel)) must always call Application.Init() first because
         // the new(Toplevel) may be a derived class that is possible using Application static
         // properties that is only available after the Application.Init was called
-        var driver = new FakeDriver ();
+        FakeDriver driver = new FakeDriver ();
 
         Assert.Null (Application.Top);
 
@@ -1174,7 +1175,7 @@ public class ApplicationTests
         Application.Run (new Toplevel ());
 #if DEBUG_IDISPOSABLE
         Assert.False (Application.Top.WasDisposed);
-        Exception exception = Record.Exception (Application.Shutdown);
+        Exception? exception = Record.Exception (Application.Shutdown);
         Assert.NotNull (exception);
         Assert.False (Application.Top.WasDisposed);
 
