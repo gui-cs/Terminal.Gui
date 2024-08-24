@@ -21,8 +21,18 @@ public class Scroll : View
         WantContinuousButtonPressed = true;
         CanFocus = false;
         Orientation = Orientation.Vertical;
-        Width = Dim.Auto (DimAutoStyle.Content, 1);
-        Height = Dim.Auto (DimAutoStyle.Content, 1);
+
+        if (_host is { })
+        {
+            Y = 1;
+            Width = Dim.Fill ();
+            Height = Dim.Fill (1);
+        }
+        else
+        {
+            Width = Dim.Auto (DimAutoStyle.Content, 1);
+            Height = Dim.Auto (DimAutoStyle.Content, 1);
+        }
     }
 
 
@@ -66,6 +76,12 @@ public class Scroll : View
             if (value == _position || value < 0)
             {
                 return;
+            }
+
+            if (_host is { IsInitialized: false })
+            {
+                // Ensures a more exactly calculation
+                SetRelativeLayout (_host.Frame.Size);
             }
 
             int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
