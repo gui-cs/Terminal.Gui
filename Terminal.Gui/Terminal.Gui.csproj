@@ -73,6 +73,7 @@
     <Using Include="System.Drawing" />
     <Using Include="System.Text" />
     <Using Include="Terminal.Gui.EnumExtensions" />
+    <Using Include="Terminal.Gui.ConsoleDrivers.Net" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Assembliy names for which internal items are visible -->

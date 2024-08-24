@@ -7,14 +7,14 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
-using static Terminal.Gui.NetEvents;
+using static Terminal.Gui.ConsoleDrivers.Net.NetEvents;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.ConsoleDrivers.Net;
 
 using CommunityToolkit.Diagnostics;
 using Microsoft.Win32.SafeHandles;
 
-internal sealed class NetWinVTConsole : IDisposable
+internal sealed partial class NetWinVTConsole : IDisposable
 {
     private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
     private const uint ENABLE_ECHO_INPUT = 4;
@@ -124,17 +124,17 @@ internal sealed class NetWinVTConsole : IDisposable
     }
 
     [LibraryImport ("kernel32")]
-    private static extern bool GetConsoleMode (SafeHandle hConsoleHandle, out uint lpMode);
+    private static partial bool GetConsoleMode (SafeHandle hConsoleHandle, out uint lpMode);
 
     [LibraryImport ("kernel32")]
-    private static extern uint GetLastError ();
+    private static partial uint GetLastError ();
 
     [MustDisposeResource (false)]
     [LibraryImport ("kernel32", SetLastError = true)]
-    private static extern SafeHandleMinusOneIsInvalid GetStdHandle (int nStdHandle);
+    private static partial SafeHandleMinusOneIsInvalid GetStdHandle (int nStdHandle);
 
     [LibraryImport ("kernel32")]
-    private static extern bool SetConsoleMode (SafeHandle hConsoleHandle, uint dwMode);
+    private static partial bool SetConsoleMode (SafeHandle hConsoleHandle, uint dwMode);
 
     private volatile bool _disposed;
 
@@ -251,7 +251,7 @@ internal sealed class NetEvents : IDisposable
 
         cancellationToken.ThrowIfCancellationRequested ();
 
-        return default (ConsoleKeyInfo);
+        return default;
     }
 
     private void ProcessInputQueue ()
@@ -288,8 +288,8 @@ internal sealed class NetEvents : IDisposable
                         return;
                     }
 
-                    if ((consoleKeyInfo.KeyChar == (char)KeyCode.Esc && !_isEscSeq)
-                        || (consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq))
+                    if (consoleKeyInfo.KeyChar == (char)KeyCode.Esc && !_isEscSeq
+                        || consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)
                     {
                         if (_cki is null && consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)
                         {
@@ -432,7 +432,7 @@ internal sealed class NetEvents : IDisposable
         _inputQueue.Enqueue (
                              new InputResult
                              {
-                                 EventType = EventType.WindowSize, WindowSizeEvent = new() { Size = new (w, h) }
+                                 EventType = EventType.WindowSize, WindowSizeEvent = new () { Size = new (w, h) }
                              }
                             );
 
@@ -773,14 +773,14 @@ internal sealed class NetEvents : IDisposable
         public readonly override string ToString ()
         {
             return EventType switch
-                   {
-                       EventType.Key => ToString (ConsoleKeyInfo),
-                       EventType.Mouse => MouseEvent.ToString (),
+            {
+                EventType.Key => ToString (ConsoleKeyInfo),
+                EventType.Mouse => MouseEvent.ToString (),
 
-                       //EventType.WindowSize => WindowSize.ToString (),
-                       //EventType.RequestResponse => RequestResponse.ToString (),
-                       _ => "Unknown event type: " + EventType
-                   };
+                //EventType.WindowSize => WindowSize.ToString (),
+                //EventType.RequestResponse => RequestResponse.ToString (),
+                _ => "Unknown event type: " + EventType
+            };
         }
 
         /// <summary>Prints a ConsoleKeyInfoEx structure</summary>
@@ -853,7 +853,7 @@ internal sealed class NetDriver : ConsoleDriver
     public NetWinVTConsole NetWinConsole { get; private set; }
 
     public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix
-                                              || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
+                                              || IsWinPlatform && Environment.OSVersion.Version.Build >= 14931;
 
     public override void Refresh ()
     {
@@ -911,10 +911,10 @@ internal sealed class NetDriver : ConsoleDriver
     public override void UpdateScreen ()
     {
         if (RunningUnitTests
-            || _winSizeChanging
-            || Console.WindowHeight < 1
-            || Contents.Length != Rows * Cols
-            || Rows != Console.WindowHeight)
+         || _winSizeChanging
+         || Console.WindowHeight < 1
+         || Contents is { } c && c.Length != Rows * Cols
+         || Rows != Console.WindowHeight)
         {
             return;
         }
@@ -1427,7 +1427,7 @@ internal sealed class NetDriver : ConsoleDriver
 
     private MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
     {
-       //System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
+        //System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
 
         MouseFlags mouseFlag = 0;
 
@@ -1634,12 +1634,12 @@ internal sealed class NetDriver : ConsoleDriver
         // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
         if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key))
         {
-            if (keyInfo.Modifiers.HasFlag(ConsoleModifiers.Control) && keyInfo.Key == ConsoleKey.I)
+            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control) && keyInfo.Key == ConsoleKey.I)
             {
                 return KeyCode.Tab;
             }
 
-            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key));
+            return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
         }
 
         // Handle control keys (e.g. CursorUp)
@@ -1649,7 +1649,7 @@ internal sealed class NetDriver : ConsoleDriver
             return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
         }
 
-        if (((ConsoleKey)keyInfo.KeyChar) is >= ConsoleKey.A and <= ConsoleKey.Z)
+        if ((ConsoleKey)keyInfo.KeyChar is >= ConsoleKey.A and <= ConsoleKey.Z)
         {
             // Shifted
             keyInfo = new ConsoleKeyInfo (
@@ -1671,7 +1671,7 @@ internal sealed class NetDriver : ConsoleDriver
                                           keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
         }
 
-        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z )
+        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
         {
             if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
                 || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
@@ -1693,7 +1693,7 @@ internal sealed class NetDriver : ConsoleDriver
         }
 
 
-        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
+        return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.KeyChar);
     }
 
     #endregion Keyboard Handling

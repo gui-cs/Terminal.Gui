@@ -57,6 +57,7 @@
   <ItemGroup>
     <Using Include="System.Drawing" />
     <Using Include="Terminal.Gui" />
+    <Using Include="Terminal.Gui.ConsoleDrivers.Net" />
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
