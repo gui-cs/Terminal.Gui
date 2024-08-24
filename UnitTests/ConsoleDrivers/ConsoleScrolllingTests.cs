@@ -1,4 +1,4 @@
-﻿using Xunit.Abstractions;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -16,15 +16,12 @@ public class ConsoleScrollingTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
-
-    //[InlineData (typeof (NetDriver))]
-    //[InlineData (typeof (ANSIDriver))]
-    //[InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (CursesDriver))]
-    public void Left_And_Top_Is_Always_Zero (Type driverType)
+    [MemberData (
+                    nameof (TestHelpers.GetDriversOnly),
+                    [$"{nameof (NetDriver)},{nameof (WindowsDriver)},{nameof (CursesDriver)}"],
+                    MemberType = typeof (TestHelpers))]
+    public void Left_And_Top_Is_Always_Zero<T> (T driver) where T : ConsoleDriver
     {
-        var driver = (FakeDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
 
         Assert.Equal (0, Console.WindowLeft);

@@ -1,4 +1,4 @@
-﻿using Xunit.Abstractions;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -240,23 +240,21 @@ public class ApplicationTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
-
-    //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
-    public void Init_DriverName_Should_Pick_Correct_Driver (Type driverType)
+    [MemberData (nameof (TestHelpers.DriversWithNames), MemberType = typeof (TestHelpers))]
+    [Trait ("Category", "Console Drivers")]
+    [Trait ("Category", "Lifecycle")]
+    public void Init_DriverName_Should_Pick_Correct_Driver<T> (string driverName, T? driver) where T : ConsoleDriver
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-        Application.Init (driverName: driverType.Name);
+        Application.Init (driverName: driverName);
         Assert.NotNull (Application.Driver);
         Assert.NotEqual (driver, Application.Driver);
-        Assert.Equal (driverType, Application.Driver?.GetType ());
+        Assert.Equal (typeof (T), Application.Driver?.GetType ());
         Shutdown ();
     }
 
     [Fact]
+    [Trait ("Category", "Console Drivers")]
+    [Trait ("Category", "Lifecycle")]
     public void Init_Null_Driver_Should_Pick_A_Driver ()
     {
         Application.Init ();
@@ -267,11 +265,8 @@ public class ApplicationTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
-    public void Init_ResetState_Resets_Properties (Type driverType)
+    [MemberData (nameof (TestHelpers.GetDriverNames), [""], MemberType = typeof (TestHelpers))]
+    public void Init_ResetState_Resets_Properties (string driverName)
     {
         ConfigurationManager.ThrowOnJsonErrors = true;
 
@@ -279,7 +274,7 @@ public class ApplicationTests
 
         // Set some values
 
-        Application.Init (driverName: driverType.Name);
+        Application.Init (driverName: driverName);
         Application.IsInitialized = true;
 
         // Reset
@@ -398,18 +393,18 @@ public class ApplicationTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
-    public void Init_Shutdown_Fire_InitializedChanged (Type driverType)
+    [MemberData (nameof (TestHelpers.GetDriverNames), [""], MemberType = typeof (TestHelpers))]
+    [Trait ("Category", "Console Drivers")]
+    [Trait ("Category", "Lifecycle")]
+    [Trait ("Category", "Events")]
+    public void Init_Shutdown_Raise_InitializedChanged (string driverName)
     {
-        var initialized = false;
-        var shutdown = false;
+        bool initialized = false;
+        bool shutdown = false;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
-        Application.Init (driverName: driverType.Name);
+        Application.Init (driverName: driverName);
         Assert.True (initialized);
         Assert.False (shutdown);
 
