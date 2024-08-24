@@ -1,4 +1,5 @@
 #nullable enable
+
 using System.Numerics;
 using System.Text.Json.Serialization;
 
@@ -13,9 +14,10 @@ namespace Terminal.Gui;
 [JsonConverter (typeof (AttributeJsonConverter))]
 public readonly record struct Attribute : IEqualityOperators<Attribute, Attribute, bool>
 {
-    /// <summary>Default empty attribute.</summary>
+    /// <summary>Default value (white on black).</summary>
+    /// <value>Black background, white foreground.</value>
     [JsonIgnore]
-    public static Attribute Default => new (Color.White, ColorName.Black);
+    public static Attribute Default { get; } = new (Color.White, ColorName.Black);
 
     /// <summary>The <see cref="ConsoleDriver"/>-specific color value.</summary>
     [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
