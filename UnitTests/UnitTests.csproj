@@ -20,6 +20,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <NoLogo>true</NoLogo>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <IsGraphBuild>true</IsGraphBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DefineDebug>true</DefineDebug>
