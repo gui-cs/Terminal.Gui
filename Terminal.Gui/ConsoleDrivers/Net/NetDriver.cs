@@ -30,7 +30,7 @@ internal sealed class NetDriver : ConsoleDriver
     private const int COLOR_YELLOW = 33;
     private NetMainLoop _mainLoopDriver = null!;
     public bool IsWinPlatform { get; private set; }
-    public NetWinVTConsole NetWinConsole { get; private set; } = null!;
+    public NetWinVTConsole? NetWinConsole { get; private set; }
 
     public override void Refresh ()
     {
@@ -104,7 +104,7 @@ internal sealed class NetDriver : ConsoleDriver
         int rows = Rows;
         int cols = Cols;
         StringBuilder output = new ();
-        Attribute? redrawAttr = null;
+        Attribute redrawAttr = default;
         int lastCol = -1;
 
         CursorVisibility? savedVisibility = _cachedCursorVisibility;
@@ -117,7 +117,7 @@ internal sealed class NetDriver : ConsoleDriver
                 return;
             }
 
-            if (!_dirtyLines [row])
+            if (_dirtyLines? [row] is false)
             {
                 continue;
             }
@@ -127,7 +127,7 @@ internal sealed class NetDriver : ConsoleDriver
                 return;
             }
 
-            _dirtyLines [row] = false;
+            _dirtyLines! [row] = false;
             output.Clear ();
 
             for (int col = left; col < cols; col++)
@@ -137,7 +137,7 @@ internal sealed class NetDriver : ConsoleDriver
 
                 for (; col < cols; col++)
                 {
-                    if (!Contents [row, col].IsDirty)
+                    if (Contents? [row, col].IsDirty is false)
                     {
                         if (output.Length > 0)
                         {
