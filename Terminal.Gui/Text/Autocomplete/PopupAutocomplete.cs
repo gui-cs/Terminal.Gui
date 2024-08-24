@@ -6,14 +6,15 @@ namespace Terminal.Gui;
 /// </summary>
 public abstract partial class PopupAutocomplete : AutocompleteBase
 {
-    private bool closed;
-    private ColorScheme colorScheme;
-    private View hostControl;
-    private View top, popup;
-    private int toRenderLength;
-
     /// <summary>Creates a new instance of the <see cref="PopupAutocomplete"/> class.</summary>
     public PopupAutocomplete () { PopupInsideContainer = true; }
+
+    private bool _closed;
+    private ColorScheme _colorScheme;
+    private View _hostControl;
+    private View _top; // _hostControl's SuperView
+    private View _popup;
+    private int toRenderLength;
 
     /// <summary>
     ///     The colors to use to render the overlay. Accessing this property before the Application has been initialized
@@ -23,43 +24,15 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     {
         get
         {
-            if (colorScheme is null)
+            if (_colorScheme is null)
             {
-                colorScheme = Colors.ColorSchemes ["Menu"];
+                _colorScheme = Colors.ColorSchemes ["Menu"];
             }
 
-            return colorScheme;
+            return _colorScheme;
         }
-        set => colorScheme = value;
+        set => _colorScheme = value;
     }
-
-    /// <summary>The host control to handle.</summary>
-    public override View HostControl
-    {
-        get => hostControl;
-        set
-        {
-            hostControl = value;
-            top = hostControl.SuperView;
-
-            if (top is { })
-            {
-                top.DrawContent += Top_DrawContent;
-                top.DrawContentComplete += Top_DrawContentComplete;
-                top.Removed += Top_Removed;
-            }
-        }
-    }
-
-    /// <summary>
-    ///     When more suggestions are available than can be rendered the user can scroll down the dropdown list. This
-    ///     indicates how far down they have gone
-    /// </summary>
-    public virtual int ScrollOffset { get; set; }
-
-    #nullable enable
-    private Point? LastPopupPos { get; set; }
-    #nullable restore
 
     /// <inheritdoc/>
     public override void EnsureSelectedIdxIsValid ()
@@ -76,6 +49,24 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         while (toRenderLength > 0 && SelectedIdx >= ScrollOffset + toRenderLength)
         {
             ScrollOffset++;
+        }
+    }
+
+    /// <summary>The host control to handle.</summary>
+    public override View HostControl
+    {
+        get => _hostControl;
+        set
+        {
+            _hostControl = value;
+            _top = _hostControl.SuperView;
+
+            if (_top is { })
+            {
+                _top.DrawContent += Top_DrawContent;
+                _top.DrawContentComplete += Top_DrawContentComplete;
+                _top.Removed += Top_Removed;
+            }
         }
     }
 
@@ -119,7 +110,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             if (Visible && HostControl is { })
             {
                 Visible = false;
-                closed = false;
+                _closed = false;
             }
 
             HostControl?.SetNeedsDisplay ();
@@ -127,7 +118,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (popup is null || Suggestions.Count == 0)
+        if (_popup is null || Suggestions.Count == 0)
         {
             ManipulatePopup ();
 
@@ -177,7 +168,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             Visible = true;
             ManipulatePopup ();
-            closed = false;
+            _closed = false;
 
             return false;
         }
@@ -189,11 +180,11 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             return ReopenSuggestions ();
         }
 
-        if (closed || Suggestions.Count == 0)
+        if (_closed || Suggestions.Count == 0)
         {
             Visible = false;
 
-            if (!closed)
+            if (!_closed)
             {
                 Close ();
             }
@@ -249,7 +240,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     {
         if (!Context.Canceled && Suggestions.Count > 0 && !Visible && HostControl?.HasFocus == true)
         {
-            ProcessKey (new Key (Suggestions [0].Title [0]));
+            ProcessKey (new (Suggestions [0].Title [0]));
         }
         else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0)
         {
@@ -287,13 +278,13 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         else
         {
             // don't overspill vertically
-            height = Math.Min (Math.Min (top.Viewport.Height - HostControl.Frame.Bottom, MaxHeight), Suggestions.Count);
+            height = Math.Min (Math.Min (_top.Viewport.Height - HostControl.Frame.Bottom, MaxHeight), Suggestions.Count);
 
             // There is no space below, lets see if can popup on top
-            if (height < Suggestions.Count && HostControl.Frame.Y - top.Frame.Y >= height)
+            if (height < Suggestions.Count && HostControl.Frame.Y - _top.Frame.Y >= height)
             {
                 // Verifies that the upper limit available is greater than the lower limit
-                if (HostControl.Frame.Y > top.Viewport.Height - HostControl.Frame.Y)
+                if (HostControl.Frame.Y > _top.Viewport.Height - HostControl.Frame.Y)
                 {
                     renderAt.Y = Math.Max (HostControl.Frame.Y - Math.Min (Suggestions.Count, MaxHeight), 0);
                     height = Math.Min (Math.Min (Suggestions.Count, MaxHeight), HostControl.Frame.Y);
@@ -340,37 +331,37 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         else
         {
             // don't overspill horizontally, let's see if it can be displayed on the left
-            if (width > top.Viewport.Width - (renderAt.X + HostControl.Frame.X))
+            if (width > _top.Viewport.Width - (renderAt.X + HostControl.Frame.X))
             {
                 // Verifies that the left limit available is greater than the right limit
-                if (renderAt.X + HostControl.Frame.X > top.Viewport.Width - (renderAt.X + HostControl.Frame.X))
+                if (renderAt.X + HostControl.Frame.X > _top.Viewport.Width - (renderAt.X + HostControl.Frame.X))
                 {
                     renderAt.X -= Math.Min (width, LastPopupPos.Value.X);
                     width = Math.Min (width, LastPopupPos.Value.X);
                 }
                 else
                 {
-                    width = Math.Min (width, top.Viewport.Width - renderAt.X);
+                    width = Math.Min (width, _top.Viewport.Width - renderAt.X);
                 }
             }
         }
 
         if (PopupInsideContainer)
         {
-            popup.Frame = new (
+            _popup.Frame = new (
                                new (HostControl.Frame.X + renderAt.X, HostControl.Frame.Y + renderAt.Y),
                                new (width, height)
                               );
         }
         else
         {
-            popup.Frame = new (
+            _popup.Frame = new (
                                renderAt with { X = HostControl.Frame.X + renderAt.X },
                                new (width, height)
                               );
         }
 
-        popup.Move (0, 0);
+        _popup.Move (0, 0);
 
         for (var i = 0; i < toRender.Length; i++)
         {
@@ -383,7 +374,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
                 Application.Driver?.SetAttribute (ColorScheme.Normal);
             }
 
-            popup.Move (0, i);
+            _popup.Move (0, i);
 
             string text = TextFormatter.ClipOrPad (toRender [i].Title, width);
 
@@ -392,13 +383,19 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     }
 
     /// <summary>
+    ///     When more suggestions are available than can be rendered the user can scroll down the dropdown list. This
+    ///     indicates how far down they have gone
+    /// </summary>
+    public virtual int ScrollOffset { get; set; }
+
+    /// <summary>
     ///     Closes the Autocomplete context menu if it is showing and <see cref="IAutocomplete.ClearSuggestions"/>
     /// </summary>
     protected void Close ()
     {
         ClearSuggestions ();
         Visible = false;
-        closed = true;
+        _closed = true;
         HostControl?.SetNeedsDisplay ();
         ManipulatePopup ();
     }
@@ -486,7 +483,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         if (Suggestions.Count > 0)
         {
             Visible = true;
-            closed = false;
+            _closed = false;
             HostControl?.SetNeedsDisplay ();
 
             return true;
@@ -516,25 +513,29 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     /// <param name="column"></param>
     protected abstract void SetCursorPosition (int column);
 
+#nullable enable
+    private Point? LastPopupPos { get; set; }
+#nullable restore
+
     private void ManipulatePopup ()
     {
-        if (Visible && popup is null)
+        if (Visible && _popup is null)
         {
-            popup = new Popup (this) { Frame = Rectangle.Empty };
-            top?.Add (popup);
+            _popup = new Popup (this) { Frame = Rectangle.Empty };
+            _top?.Add (_popup);
         }
 
-        if (!Visible && popup is { })
+        if (!Visible && _popup is { })
         {
-            top?.Remove (popup);
-            popup.Dispose ();
-            popup = null;
+            _top?.Remove (_popup);
+            _popup.Dispose ();
+            _popup = null;
         }
     }
 
     private void Top_DrawContent (object sender, DrawEventArgs e)
     {
-        if (!closed)
+        if (!_closed)
         {
             ReopenSuggestions ();
         }
@@ -543,7 +544,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
         if (Visible)
         {
-            top.BringSubviewToFront (popup);
+            _top.BringSubviewToFront (_popup);
         }
     }
 

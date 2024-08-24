@@ -5,16 +5,14 @@ public abstract partial class PopupAutocomplete
 {
     private sealed class Popup : View
     {
-        private readonly PopupAutocomplete _autoComplete;
-
         public Popup (PopupAutocomplete autoComplete)
         {
-            this._autoComplete = autoComplete;
+            _autoComplete = autoComplete;
             CanFocus = true;
             WantMousePositionReports = true;
         }
 
-        protected internal override bool OnMouseEvent  (MouseEvent mouseEvent) { return _autoComplete.OnMouseEvent (mouseEvent); }
+        private readonly PopupAutocomplete _autoComplete;
 
         public override void OnDrawContent (Rectangle viewport)
         {
@@ -25,5 +23,7 @@ public abstract partial class PopupAutocomplete
 
             _autoComplete.RenderOverlay (_autoComplete.LastPopupPos.Value);
         }
+
+        protected internal override bool OnMouseEvent (MouseEvent mouseEvent) { return _autoComplete.OnMouseEvent (mouseEvent); }
     }
 }
