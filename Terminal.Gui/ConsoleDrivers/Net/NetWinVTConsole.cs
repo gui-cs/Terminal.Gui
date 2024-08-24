@@ -42,7 +42,7 @@ internal sealed partial class NetWinVTConsole : IDisposable
 
         if (!GetConsoleMode (_inputHandle, out uint mode))
         {
-            ThrowHelper.ThrowInvalidOperationException ($"Failed to get input console mode, error code: {GetLastError ()}.");
+            throw new IOException ($"Failed to get input console mode, error code: {GetLastError ()}.");
         }
 
         _originalInputConsoleMode = mode;
@@ -53,7 +53,7 @@ internal sealed partial class NetWinVTConsole : IDisposable
 
             if (!SetConsoleMode (_inputHandle, mode))
             {
-                throw new ApplicationException ($"Failed to set input console mode, error code: {GetLastError ()}.");
+                throw new IOException ($"Failed to set input console mode, error code: {GetLastError ()}.");
             }
         }
 
@@ -61,7 +61,7 @@ internal sealed partial class NetWinVTConsole : IDisposable
 
         if (!GetConsoleMode (_outputHandle, out mode))
         {
-            throw new ApplicationException ($"Failed to get output console mode, error code: {GetLastError ()}.");
+            throw new IOException ($"Failed to get output console mode, error code: {GetLastError ()}.");
         }
 
         _originalOutputConsoleMode = mode;
@@ -72,7 +72,7 @@ internal sealed partial class NetWinVTConsole : IDisposable
 
             if (!SetConsoleMode (_outputHandle, mode))
             {
-                throw new ApplicationException ($"Failed to set output console mode, error code: {GetLastError ()}.");
+                throw new IOException ($"Failed to set output console mode, error code: {GetLastError ()}.");
             }
         }
 
@@ -80,7 +80,7 @@ internal sealed partial class NetWinVTConsole : IDisposable
 
         if (!GetConsoleMode (_errorHandle, out mode))
         {
-            throw new ApplicationException ($"Failed to get error console mode, error code: {GetLastError ()}.");
+            throw new IOException ($"Failed to get error console mode, error code: {GetLastError ()}.");
         }
 
         _originalErrorConsoleMode = mode;
@@ -91,7 +91,7 @@ internal sealed partial class NetWinVTConsole : IDisposable
 
             if (!SetConsoleMode (_errorHandle, mode))
             {
-                throw new ApplicationException ($"Failed to set error console mode, error code: {GetLastError ()}.");
+                throw new IOException ($"Failed to set error console mode, error code: {GetLastError ()}.");
             }
         }
     }
@@ -100,17 +100,17 @@ internal sealed partial class NetWinVTConsole : IDisposable
     {
         if (!SetConsoleMode (_inputHandle, _originalInputConsoleMode))
         {
-            throw new ApplicationException ($"Failed to restore input console mode, error code: {GetLastError ()}.");
+            throw new IOException ($"Failed to restore input console mode, error code: {GetLastError ()}.");
         }
 
         if (!SetConsoleMode (_outputHandle, _originalOutputConsoleMode))
         {
-            throw new ApplicationException ($"Failed to restore output console mode, error code: {GetLastError ()}.");
+            throw new IOException ($"Failed to restore output console mode, error code: {GetLastError ()}.");
         }
 
         if (!SetConsoleMode (_errorHandle, _originalErrorConsoleMode))
         {
-            throw new ApplicationException ($"Failed to restore error console mode, error code: {GetLastError ()}.");
+            throw new IOException ($"Failed to restore error console mode, error code: {GetLastError ()}.");
         }
     }
 
