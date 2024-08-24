@@ -123,8 +123,7 @@ public partial class ColorTests
         [CombinatorialRange (0, 255, 51)] byte b
     )
     {
-        Vector3 vector = new (r, g, b);
-        Color color = vector;
+        Color color = new Vector3 (r, g, b);
 
         Assert.Equal (r, color.R);
         Assert.Equal (g, color.G);
@@ -142,8 +141,7 @@ public partial class ColorTests
         [CombinatorialValues (0, 255)] byte a
     )
     {
-        Vector4 vector = new (r, g, b, a);
-        Color color = vector;
+        Color color = new Vector4 (r, g, b, a);
 
         Assert.Equal (r, color.R);
         Assert.Equal (g, color.G);
