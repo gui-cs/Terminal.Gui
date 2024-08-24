@@ -9,6 +9,7 @@ namespace Terminal.Gui.ConsoleDrivers.Net;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using static EscSeqUtils;
 
 internal sealed class NetDriver : ConsoleDriver
 {
@@ -74,15 +75,15 @@ internal sealed class NetDriver : ConsoleDriver
             Console.Clear ();
 
             //Disable alternative screen buffer.
-            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+            Console.Out.Write (CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
 
             //Set cursor key to cursor.
-            Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+            Console.Out.Write (CSI_ShowCursor);
 
             Platform.Suspend ();
 
             //Enable alternative screen buffer.
-            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+            Console.Out.Write (CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 
             SetContentsAsDirty ();
             Refresh ();
@@ -108,6 +109,8 @@ internal sealed class NetDriver : ConsoleDriver
         int cols = Cols;
         StringBuilder output = new ();
         Attribute redrawAttr = default;
+        Attribute attr = default;
+        ref Attribute redrawAttrRef = ref redrawAttr;
         int lastCol = -1;
 
         CursorVisibility? savedVisibility = _cachedCursorVisibility;
@@ -164,41 +167,54 @@ internal sealed class NetDriver : ConsoleDriver
                         lastCol = col;
                     }
 
-                    Attribute attr = Contents [row, col].Attribute.Value;
+                    // These two checks likely can be made conditional for debug builds, once this
+                    // is mad thread-safe.
+                    // They shouldn't be possible at that point but would be good to have debug capability.
+                    if (Contents is null)
+                    {
+                        throw new InvalidOperationException ("Contents null on attempt to update screen.");
+                    }
+
+                    if (!Contents [row, col].Attribute.HasValue)
+                    {
+                        throw new InvalidOperationException ($"Null contents at ({row},{col}).");
+                    }
+
+                    attr = Contents [row, col].Attribute!.Value;
 
                     // Performance: Only send the escape sequence if the attribute has changed.
-                    if (attr != redrawAttr)
+                    if (attr != redrawAttrRef)
                     {
-                        redrawAttr = attr;
+                        redrawAttrRef = ref attr;
 
                         if (Force16Colors)
                         {
                             output.Append (
-                                           EscSeqUtils.CSI_SetGraphicsRendition (
-                                                                                 MapColors (
-                                                                                            (ConsoleColor)attr.Background.GetClosestNamedColor (),
-                                                                                            false
-                                                                                           ),
-                                                                                 MapColors ((ConsoleColor)attr.Foreground.GetClosestNamedColor ())
-                                                                                )
+                                           CSI_SetGraphicsRendition (
+                                                                     MapColors (
+                                                                                (ConsoleColor)attr.Background.GetClosestNamedColor (),
+                                                                                false
+                                                                               ),
+                                                                     MapColors ((ConsoleColor)attr.Foreground.GetClosestNamedColor ())
+                                                                    )
                                           );
                         }
                         else
                         {
                             output.Append (
-                                           EscSeqUtils.CSI_SetForegroundColorRGB (
-                                                                                  attr.Foreground.R,
-                                                                                  attr.Foreground.G,
-                                                                                  attr.Foreground.B
-                                                                                 )
+                                           CSI_SetForegroundColorRGB (
+                                                                      attr.Foreground.R,
+                                                                      attr.Foreground.G,
+                                                                      attr.Foreground.B
+                                                                     )
                                           );
 
                             output.Append (
-                                           EscSeqUtils.CSI_SetBackgroundColorRGB (
-                                                                                  attr.Background.R,
-                                                                                  attr.Background.G,
-                                                                                  attr.Background.B
-                                                                                 )
+                                           CSI_SetBackgroundColorRGB (
+                                                                      attr.Background.R,
+                                                                      attr.Background.G,
+                                                                      attr.Background.B
+                                                                     )
                                           );
                         }
                     }
@@ -265,10 +281,10 @@ internal sealed class NetDriver : ConsoleDriver
             Console.ResetColor ();
 
             //Disable alternative screen buffer.
-            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+            Console.Out.Write (CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
 
             //Set cursor key to cursor.
-            Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+            Console.Out.Write (CSI_ShowCursor);
             Console.Out.Close ();
         }
     }
@@ -319,10 +335,10 @@ internal sealed class NetDriver : ConsoleDriver
             Rows = Console.WindowHeight;
 
             //Enable alternative screen buffer.
-            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+            Console.Out.Write (CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 
             //Set cursor key to application.
-            Console.Out.Write (EscSeqUtils.CSI_HideCursor);
+            Console.Out.Write (CSI_HideCursor);
         }
         else
         {
@@ -456,7 +472,7 @@ internal sealed class NetDriver : ConsoleDriver
         }
         else
         {
-            Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
+            Console.Out.Write (CSI_SetTerminalWindowSize (Rows, Cols));
         }
 
         // CONCURRENCY: Unsynchronized access to Clip is not safe.
@@ -541,7 +557,7 @@ internal sealed class NetDriver : ConsoleDriver
 
         // + 1 is needed because non-Windows is based on 1 instead of 0 and
         // Console.CursorTop/CursorLeft isn't reliable.
-        Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
+        Console.Out.Write (CSI_SetCursorPosition (row + 1, col + 1));
 
         return true;
     }
@@ -570,7 +586,7 @@ internal sealed class NetDriver : ConsoleDriver
     {
         _cachedCursorVisibility = visibility;
 
-        Console.Out.Write (visibility == CursorVisibility.Default ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+        Console.Out.Write (visibility == CursorVisibility.Default ? CSI_ShowCursor : CSI_HideCursor);
 
         return visibility == CursorVisibility.Default;
     }
@@ -599,7 +615,7 @@ internal sealed class NetDriver : ConsoleDriver
     {
         if (!RunningUnitTests)
         {
-            Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+            Console.Out.Write (CSI_EnableMouseEvents);
         }
     }
 
@@ -607,7 +623,7 @@ internal sealed class NetDriver : ConsoleDriver
     {
         if (!RunningUnitTests)
         {
-            Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+            Console.Out.Write (CSI_DisableMouseEvents);
         }
     }
 
