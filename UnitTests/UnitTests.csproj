@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- In the source tree the version will always be 2.0 for all projects. -->
@@ -35,6 +35,7 @@
     <PackageReference Include="ReportGenerator" Version="[5.3.8,6)" />
     <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="[21.0.29,22)" />
     <PackageReference Include="xunit" Version="[2.9.0,3)" />
+    <PackageReference Include="Xunit.Assume" Version="2.0.0" />
     <PackageReference Include="Xunit.Combinatorial" Version="[1.6.24,2)" />
     <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2,3)">
       <PrivateAssets>all</PrivateAssets>
