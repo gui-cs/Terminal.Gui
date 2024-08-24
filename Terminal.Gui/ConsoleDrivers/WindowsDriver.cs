@@ -1252,6 +1252,9 @@ internal class WindowsDriver : ConsoleDriver
         }
     }
 
+    /// <inheritdoc />
+    public override void SetWindowPosition (int left, int top) { throw new NotImplementedException (); }
+
     /// <inheritdoc/>
     public override bool EnsureCursorVisibility ()
     {

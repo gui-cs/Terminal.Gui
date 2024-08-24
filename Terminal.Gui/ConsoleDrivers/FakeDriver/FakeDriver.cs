@@ -1,4 +1,4 @@
-﻿//
+//
 // FakeDriver.cs: A fake ConsoleDriver for unit tests. 
 //
 
@@ -415,7 +415,7 @@ public sealed class FakeDriver : ConsoleDriver
         ProcessResize ();
     }
 
-    public void SetWindowPosition (int left, int top)
+    public override void SetWindowPosition (int left, int top)
     {
         if (Left > 0 || Top > 0)
         {

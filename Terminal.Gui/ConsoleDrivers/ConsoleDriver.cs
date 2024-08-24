@@ -455,6 +455,8 @@ public abstract class ConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     public abstract bool SetCursorVisibility (CursorVisibility visibility);
 
+    public abstract void SetWindowPosition (int left, int top);
+
     /// <summary>The event fired when the terminal is resized.</summary>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 

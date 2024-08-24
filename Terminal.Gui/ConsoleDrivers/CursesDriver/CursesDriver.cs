@@ -177,6 +177,9 @@ internal class CursesDriver : ConsoleDriver
         return true;
     }
 
+    /// <inheritdoc />
+    public override void SetWindowPosition (int left, int top) { throw new NotImplementedException (); }
+
     public void StartReportingMouseMoves ()
     {
         if (!RunningUnitTests)

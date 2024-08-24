@@ -398,7 +398,7 @@ internal sealed class NetDriver : ConsoleDriver
 
     private volatile bool _winSizeChanging;
 
-    private void SetWindowPosition (int col, int row)
+    public override void SetWindowPosition (int col, int row)
     {
         if (!RunningUnitTests)
         {
