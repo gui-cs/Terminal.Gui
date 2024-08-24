@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Reflection;
 
 namespace Terminal.Gui.DrawingTests;
@@ -48,10 +48,33 @@ public partial class ColorTests
         }
     }
 
+    public static IEnumerable<object[]> ColorValueSetInt32
+    {
+        get
+        {
+            for (int colorValue = int.MinValue; colorValue < int.MaxValue; colorValue += 0x0F0F0F0F)
+            {
+                yield return [colorValue];
+            }
+        }
+    }
+
+    public static IEnumerable<object[]> ColorValueSetUInt32
+    {
+        get
+        {
+            for (uint colorValue = uint.MinValue; colorValue < uint.MaxValue; colorValue += 0x0F0F0F0F)
+            {
+                yield return [colorValue];
+            }
+        }
+    }
+
     [Theory]
-    [CombinatorialData]
+
+    [MemberData (nameof (ColorValueSetInt32))]
     [Trait ("Category", "Operators")]
-    public void GetHashCode_DelegatesTo_Rgba ([CombinatorialRandomData (Count = 16)] int rgba)
+    public void GetHashCode_DelegatesTo_Rgba (int rgba)
     {
         Color color = new (rgba);
 
@@ -72,11 +95,9 @@ public partial class ColorTests
     }
 
     [Theory]
-    [CombinatorialData]
+    [MemberData (nameof (ColorValueSetInt32))]
     [Trait ("Category", "Operators")]
-    public void ImplicitOperator_FromInt32_ReturnsCorrectColorValue (
-        [CombinatorialRandomData (Count = 16)] int expectedValue
-    )
+    public void ImplicitOperator_FromInt32_ReturnsCorrectColorValue (int expectedValue)
     {
         Color color = expectedValue;
 
@@ -84,11 +105,9 @@ public partial class ColorTests
     }
 
     [Theory]
-    [CombinatorialData]
+    [MemberData (nameof (ColorValueSetUInt32))]
     [Trait ("Category", "Operators")]
-    public void ImplicitOperator_FromUInt32_ReturnsCorrectColorValue (
-        [CombinatorialRandomData (Count = 16)] uint expectedValue
-    )
+    public void ImplicitOperator_FromUInt32_ReturnsCorrectColorValue (uint expectedValue)
     {
         Color color = expectedValue;
 
@@ -133,29 +152,21 @@ public partial class ColorTests
     }
 
     [Theory]
-    [CombinatorialData]
+    [MemberData (nameof (ColorValueSetInt32))]
     [Trait ("Category", "Operators")]
-    public void ImplicitOperator_ToInt32_ReturnsCorrectInt32Value (
-        [CombinatorialRandomData (Count = 16)] int expectedValue
-    )
+    public void ImplicitOperator_ToInt32_ReturnsCorrectInt32Value (int expectedValue)
     {
-        Color color = new (expectedValue);
-
-        int colorAsInt32 = color;
+        int colorAsInt32 = new Color (expectedValue);
 
         Assert.Equal (expectedValue, colorAsInt32);
     }
 
     [Theory]
-    [CombinatorialData]
+    [MemberData (nameof (ColorValueSetUInt32))]
     [Trait ("Category", "Operators")]
-    public void ImplicitOperator_ToUInt32_ReturnsCorrectUInt32Value (
-        [CombinatorialRandomData (Count = 16)] uint expectedValue
-    )
+    public void ImplicitOperator_ToUInt32_ReturnsCorrectUInt32Value (uint expectedValue)
     {
-        Color color = new (expectedValue);
-
-        uint colorAsInt32 = color;
+        uint colorAsInt32 = new Color (expectedValue);
 
         Assert.Equal (expectedValue, colorAsInt32);
     }
