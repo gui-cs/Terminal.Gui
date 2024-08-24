@@ -43,6 +43,8 @@ public class TextField : View
 
         Initialized += TextField_Initialized;
 
+        Added += TextField_Added;
+
         // Things this view knows how to do
         AddCommand (
                     Command.DeleteCharRight,
@@ -134,7 +136,7 @@ public class TextField : View
                     }
                    );
 
-        AddCommand (Command.Left,  () => MoveLeft ());
+        AddCommand (Command.Left, () => MoveLeft ());
 
         AddCommand (
                     Command.RightEnd,
@@ -404,6 +406,7 @@ public class TextField : View
         KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
         KeyBindings.Add (Key.Enter, Command.Accept);
     }
+
 
     /// <summary>
     ///     Provides autocomplete context menu based on suggestions at the current cursor position. Configure
@@ -1855,6 +1858,15 @@ public class TextField : View
         ContextMenu.Show ();
     }
 
+    private void TextField_Added (object sender, SuperViewChangedEventArgs e)
+    {
+        if (Autocomplete.HostControl is null)
+        {
+            Autocomplete.HostControl = this;
+            Autocomplete.PopupInsideContainer = false;
+        }
+    }
+
     private void TextField_Initialized (object sender, EventArgs e)
     {
         _cursorPosition = Text.GetRuneCount ();
@@ -1864,8 +1876,11 @@ public class TextField : View
             ScrollOffset = _cursorPosition > Viewport.Width + 1 ? _cursorPosition - Viewport.Width + 1 : 0;
         }
 
-        Autocomplete.HostControl = this;
-        Autocomplete.PopupInsideContainer = false;
+        if (Autocomplete.HostControl is null)
+        {
+            Autocomplete.HostControl = this;
+            Autocomplete.PopupInsideContainer = false;
+        }
     }
 }
 

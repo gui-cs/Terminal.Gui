@@ -48,15 +48,22 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
             if (_top is { })
             {
-                _top.Initialized += _top_Initialized;
+                if (_top.IsInitialized)
+                {
+                    AddPopupToTop ();
+                }
+                else
+                {
+                    _top.Initialized += _top_Initialized;
+                }
                 _top.Removed += _top_Removed;
             }
         }
     }
 
-    private void _top_Initialized (object sender, EventArgs e)
+    private void _top_Added (object sender, SuperViewChangedEventArgs e)
     {
-        AddPopupToTop ();
+        throw new NotImplementedException ();
     }
 
     /// <inheritdoc/>
@@ -542,6 +549,11 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             _popup = null;
 
         }
+    }
+
+    private void _top_Initialized (object sender, EventArgs e)
+    {
+        AddPopupToTop ();
     }
 
     private void _top_Removed (object sender, SuperViewChangedEventArgs e)

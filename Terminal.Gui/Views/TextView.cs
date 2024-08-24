@@ -2002,6 +2002,8 @@ public class TextView : View
 
         Initialized += TextView_Initialized!;
 
+        Added += TextView_Added!;
+
         LayoutComplete += TextView_LayoutComplete;
 
         // Things this view knows how to do
@@ -2497,6 +2499,11 @@ public class TextView : View
         ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
         KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
+    }
+
+    private void TextView_Added1 (object? sender, SuperViewChangedEventArgs e)
+    {
+        throw new NotImplementedException ();
     }
 
     // BUGBUG: AllowsReturn is mis-named. It should be EnterKeyAccepts.
@@ -6334,9 +6341,21 @@ public class TextView : View
         return StringExtensions.ToString (encoded);
     }
 
+    private void TextView_Added (object sender, SuperViewChangedEventArgs e)
+    {
+        if (Autocomplete.HostControl is null)
+        {
+            Autocomplete.HostControl = this;
+        }
+    }
+
+
     private void TextView_Initialized (object sender, EventArgs e)
     {
-        Autocomplete.HostControl = this;
+        if (Autocomplete.HostControl is null)
+        {
+            Autocomplete.HostControl = this;
+        }
         OnContentsChanged ();
     }
 
