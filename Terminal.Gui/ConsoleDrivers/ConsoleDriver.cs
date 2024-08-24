@@ -135,6 +135,7 @@ public abstract class ConsoleDriver
             rune = rune.MakePrintable ();
             runeWidth = rune.GetColumns ();
 
+            // BUG: CONCURRENCY: This is broken.
             lock (Contents)
             {
                 if (runeWidth == 0 && rune.IsCombiningMark ())
@@ -266,6 +267,7 @@ public abstract class ConsoleDriver
 
             if (validLocation && Col < Clip.Right)
             {
+                // BUG: CONCURRENCY: This is broken.
                 lock (Contents!)
                 {
                     // This is a double-width character, and we are not at the end of the line.
@@ -314,7 +316,7 @@ public abstract class ConsoleDriver
     public void ClearContents ()
     {
         Contents = new Cell [Rows, Cols];
-        //CONCURRENCY: Unsynchronized access to Clip isn't safe.
+        // CONCURRENCY: Unsynchronized access to Clip isn't safe.
         // TODO: ClearContents should not clear the clip; it should only clear the contents. Move clearing it elsewhere.
         Clip = Screen;
         _dirtyLines = new bool [Rows];
@@ -369,6 +371,8 @@ public abstract class ConsoleDriver
     public void FillRect (Rectangle rect, Rune rune = default)
     {
         rect = Rectangle.Intersect (rect, Clip);
+
+        // BUG: CONCURRENCY: This is broken.
         lock (Contents!)
         {
             for (int r = rect.Y; r < rect.Y + rect.Height; r++)
