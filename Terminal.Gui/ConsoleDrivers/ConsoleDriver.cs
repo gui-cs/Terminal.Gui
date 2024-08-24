@@ -429,6 +429,13 @@ public abstract class ConsoleDriver
     /// </returns>
     public bool IsValidLocation (int col, int row)
     {
+        // INTENT: Half of this is impossible and thus redundant.
+        // Screen is hard-coded to have origin at 0,0.
+        // Screen is also hard-coded to be Cols x Rows in size.
+        // Clip intersects it.
+        // Therefore, the call to Clip.Contains(col, row) already covers col >= 0 and row >= 0.
+        // The checks for col < Cols and row < Rows can also be eliminated by making the entire line be:
+        // return Clip.Contains (col + 1, row + 1);
         return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip.Contains (col, row);
     }
 
