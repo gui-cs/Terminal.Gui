@@ -299,7 +299,7 @@ internal sealed class NetDriver : ConsoleDriver
             {
                 NetWinConsole = new ();
             }
-            catch (ApplicationException)
+            catch (IOException ioe) when (Console.IsOutputRedirected || Console.IsInputRedirected)
             {
                 // Likely running as a unit test, or in a non-interactive session.
             }
