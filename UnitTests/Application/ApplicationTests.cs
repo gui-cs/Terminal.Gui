@@ -369,6 +369,7 @@ public class ApplicationTests
     }
 
     [Fact]
+    [Trait ("Category", "Lifecycle")]
     public void Init_Shutdown_Cleans_Up ()
     {
         // Verify initial state is per spec

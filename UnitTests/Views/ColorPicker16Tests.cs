@@ -1,5 +1,7 @@
 ﻿namespace Terminal.Gui.ViewsTests;
 
+[Trait ("Category","Color")]
+[Trait ("Category","View Types")]
 public class ColorPicker16Tests
 {
     [Fact]
@@ -43,6 +45,9 @@ public class ColorPicker16Tests
 
     [Fact]
     [AutoInitShutdown]
+    [Trait ("Category", "Events")]
+    [Trait ("Category", "Mouse")]
+    [Trait ("Category", "Input")]
     public void MouseEvents ()
     {
         var colorPicker = new ColorPicker16 { X = 0, Y = 0, Height = 4, Width = 32 };

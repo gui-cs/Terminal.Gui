@@ -2,6 +2,7 @@
 
 namespace Terminal.Gui.DrawingTests;
 
+[Trait ("Category", "Color")]
 public partial class ColorTests
 {
     [Theory]

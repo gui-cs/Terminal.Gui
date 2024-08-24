@@ -2,6 +2,9 @@
 
 namespace Terminal.Gui.LayoutTests;
 
+[Trait ("Category", "Layout")]
+[Trait ("Category", "Output")]
+[Trait ("Category", "Drawing")]
 public class AbsoluteLayoutTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

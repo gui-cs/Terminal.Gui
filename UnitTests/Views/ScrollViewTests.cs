@@ -4,6 +4,11 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
+using System.ComponentModel;
+
+[Trait ("Category", "Layout")]
+[Trait ("Category", "Scrolling")]
+[Trait ("Category", "View Types")]
 public class ScrollViewTests (ITestOutputHelper output)
 {
     [Fact]

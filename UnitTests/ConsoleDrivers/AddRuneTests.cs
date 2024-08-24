@@ -6,6 +6,8 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.DriverTests;
 
+[Trait ("Category", "Console Drivers")]
+[Trait ("Category", "Output")]
 public class AddRuneTests
 {
     private readonly ITestOutputHelper _output;
