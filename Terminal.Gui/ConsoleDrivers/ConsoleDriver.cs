@@ -73,7 +73,7 @@ public abstract class ConsoleDriver
     public Cell [,]? Contents { get; internal set; }
 
     /// <summary>The leftmost column in the terminal.</summary>
-    public virtual int Left { get; internal set; } = 0;
+    public virtual int Left { get; internal set; }
 
     /// <summary>
     ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
