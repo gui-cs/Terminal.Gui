@@ -38,8 +38,39 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     public static void Init (ConsoleDriver? driver = null, string? driverName = null) { InternalInit (driver, driverName); }
 
+    /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
+    /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
+    /// <para>
+    ///     This function loads the right <see cref="ConsoleDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
+    ///     assigns it to <see cref="Top"/>
+    /// </para>
+    /// <para>
+    ///     <see cref="Shutdown"/> must be called when the application is closing (typically after
+    ///     <see cref="Run{T}"/> has returned) to ensure resources are cleaned up and
+    ///     terminal settings
+    ///     restored.
+    /// </para>
+    /// <para>
+    ///     The <see cref="Run{T}"/> function combines
+    ///     <see cref="Init(Terminal.Gui.ConsoleDriver,string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
+    ///     into a single
+    ///     call. An application cam use <see cref="Run{T}"/> without explicitly calling
+    ///     <see cref="Init(Terminal.Gui.ConsoleDriver,string)"/>.
+    /// </para>
+    /// <typeparam name="TDriver">
+    ///     The <see cref="ConsoleDriver"/>-derived type to use. A default instance will be created.
+    /// </typeparam>
+    public static void Init<TDriver> () where TDriver : ConsoleDriver, new () { InternalInit (new TDriver ()); }
+
     internal static bool IsInitialized { get; set; }
     internal static int MainThreadId { get; set; } = -1;
+
+    /// <summary>
+    ///     Internal method to call <see cref="InternalInit"/> with a default instance of the driver type specified in <typeparamref name="TDriver"/>.
+    /// </summary>
+    /// <typeparam name="TDriver">The <see cref="ConsoleDriver"/>-derived type to create and pass to <see cref="InternalInit"/>.</typeparam>
+    /// <param name="calledViaRunT">If false (default) all state will be reset. If true the state will not be reset.</param>
+    internal static void InternalInit<TDriver> (bool calledViaRunT = false) where TDriver : ConsoleDriver, new () { InternalInit (new TDriver ()); }
 
     // INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
     //
