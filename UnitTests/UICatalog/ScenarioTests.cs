@@ -162,7 +162,7 @@ public class ScenarioTests : TestsAllViews
         List<string> posNames = new () { "Percent", "AnchorEnd", "Center", "Absolute" };
         List<string> dimNames = new () { "Auto", "Percent", "Fill", "Absolute" };
 
-        Application.Init (new FakeDriver ());
+        Application.Init<FakeDriver> ();
 
         var top = new Toplevel ();
 
@@ -593,7 +593,7 @@ public class ScenarioTests : TestsAllViews
         int item = scenarios.IndexOf (static s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
         Scenario generic = scenarios [item];
 
-        Application.Init (new FakeDriver ());
+        Application.Init<FakeDriver> ();
 
         // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
         // by adding this Space it seems to work.

@@ -376,7 +376,7 @@ public class ApplicationTests
         // Verify initial state is per spec
         //Pre_Init_State ();
 
-        Application.Init (new FakeDriver ());
+        Application.Init<FakeDriver> ();
 
         // Verify post-Init state is correct
         //Post_Init_State ();
@@ -436,12 +436,7 @@ public class ApplicationTests
     {
         Application.Init (new FakeDriver ());
 
-        Assert.Throws<InvalidOperationException> (
-                                                  () =>
-                                                      Application.InternalInit (
-                                                                                new FakeDriver ()
-                                                                               )
-                                                 );
+        Assert.Throws<InvalidOperationException> (static () => Application.InternalInit<FakeDriver> ());
         Shutdown ();
 
         Assert.Null (Application.Top);
