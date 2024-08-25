@@ -71,12 +71,6 @@ internal class ScrollSlider : View
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
-        if (!_host._wasSliderLayoutComplete)
-        {
-            // Ensure not blocking scroll mouse event
-            _host._wasSliderLayoutComplete = true;
-        }
-
         int location = _host.Orientation == Orientation.Vertical ? mouseEvent.Position.Y : mouseEvent.Position.X;
         int offset = _lastLocation > -1 ? location - _lastLocation : 0;
         int barSize = _host.Orientation == Orientation.Vertical ? _host.GetContentSize ().Height : _host.GetContentSize ().Width;
@@ -200,14 +194,6 @@ internal class ScrollSlider : View
         }
 
         return new (location, dimension);
-    }
-
-    /// <inheritdoc/>
-    internal override void OnLayoutComplete (LayoutEventArgs args)
-    {
-        base.OnLayoutComplete (args);
-
-        _host._wasSliderLayoutComplete = true;
     }
 
     // TODO: I think you should create a new `internal` view named "ScrollSlider" with an `Orientation` property. It should inherit from View and override GetNormalColor and the mouse events

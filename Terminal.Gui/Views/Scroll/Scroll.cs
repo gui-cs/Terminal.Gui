@@ -38,7 +38,6 @@ public class Scroll : View
     internal readonly ScrollBar? _host;
 
     internal readonly ScrollSlider _slider;
-    internal bool _wasSliderLayoutComplete = true;
     private Orientation _orientation;
     private int _position;
     private int _size;
@@ -134,12 +133,6 @@ public class Scroll : View
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
-        if (!_wasSliderLayoutComplete)
-        {
-            // Do not process if slider layout wasn't yet completed
-            return base.OnMouseEvent (mouseEvent);
-        }
-
         int location = Orientation == Orientation.Vertical ? mouseEvent.Position.Y : mouseEvent.Position.X;
         int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
 
@@ -173,19 +166,7 @@ public class Scroll : View
             }
         }
 
-        // Flag as false until slider layout is completed
-        _wasSliderLayoutComplete = false;
-
         return base.OnMouseEvent (mouseEvent);
-    }
-
-    /// <inheritdoc/>
-    protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
-    {
-        // If scroll isn't handling mouse then reset the flag
-        _wasSliderLayoutComplete = true;
-
-        return base.OnMouseLeave (mouseEvent);
     }
 
     // TODO: Move this into "ScrollSlider" and override it there. Scroll can then subscribe to _slider.LayoutComplete and call AdjustSlider.
