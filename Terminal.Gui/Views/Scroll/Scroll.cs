@@ -39,7 +39,7 @@ public class Scroll : View
     internal readonly ScrollBar? _host;
     internal bool _wasSliderLayoutComplete = true;
 
-    private readonly ScrollSlider _slider;
+    internal readonly ScrollSlider _slider;
     private Orientation _orientation;
     private int _position;
     private int _size;
@@ -100,10 +100,7 @@ public class Scroll : View
 
             _position = value;
 
-            if (!_slider._wasSliderMouse)
-            {
-                AdjustScroll ();
-            }
+            AdjustScroll ();
 
             OnPositionChanged (_position);
         }

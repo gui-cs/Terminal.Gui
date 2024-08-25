@@ -13,8 +13,6 @@ internal class ScrollSlider : View
         WantMousePositionReports = true;
     }
 
-    internal bool _wasSliderMouse;
-
     private readonly Scroll _host;
     private int _lastLocation = -1;
     private ColorScheme? _savedColorScheme;
@@ -93,8 +91,6 @@ internal class ScrollSlider : View
         }
         else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
         {
-            _wasSliderMouse = true;
-
             if (_host.Orientation == Orientation.Vertical)
             {
                 Y = Frame.Y + offset < 0 ? 0 :
@@ -157,7 +153,7 @@ internal class ScrollSlider : View
         _host._wasSliderLayoutComplete = true;
     }
 
-    private int GetPositionFromSliderLocation (int location)
+    internal int GetPositionFromSliderLocation (int location)
     {
         if (_host.GetContentSize ().Height == 0 || _host.GetContentSize ().Width == 0)
         {
@@ -168,17 +164,16 @@ internal class ScrollSlider : View
 
         // Ensure the Position is valid if the slider is at end
         // We use Frame here instead of ContentSize because even if the slider has a margin or border, Frame indicates the actual size
-        if ((_host.Orientation == Orientation.Vertical && location + Frame.Height == scrollSize)
-            || (_host.Orientation == Orientation.Horizontal && location + Frame.Width == scrollSize))
+        if ((_host.Orientation == Orientation.Vertical && location + Frame.Height >= scrollSize)
+            || (_host.Orientation == Orientation.Horizontal && location + Frame.Width >= scrollSize))
         {
-            return _host.Size - scrollSize;
+                return _host.Size - scrollSize;
         }
 
-        return Math.Min ((location * _host.Size + location) / scrollSize, _host.Size - scrollSize);
+        return (int)Math.Min (Math.Round ((double)(location * _host.Size + location) / scrollSize), _host.Size - scrollSize);
     }
 
-    // QUESTION: This method is only called from one place. Should it be inlined? Or, should it be made internal and unit tests be provided?
-    private (int Location, int Dimension) GetSliderLocationDimensionFromPosition ()
+    internal (int Location, int Dimension) GetSliderLocationDimensionFromPosition ()
     {
         if (_host.GetContentSize ().Height == 0 || _host.GetContentSize ().Width == 0)
         {
@@ -199,7 +194,7 @@ internal class ScrollSlider : View
                 _host.Position = _host.Size - scrollSize;
             }
 
-            location = Math.Min ((_host.Position * scrollSize + _host.Position) / _host.Size, scrollSize - dimension);
+            location = (int)Math.Min (Math.Round ((double)_host.Position * scrollSize / (_host.Size + 1)), scrollSize - dimension);
 
             if (_host.Position == _host.Size - scrollSize && location + dimension < scrollSize)
             {
