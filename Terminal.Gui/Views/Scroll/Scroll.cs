@@ -35,11 +35,10 @@ public class Scroll : View
         }
     }
 
-
     internal readonly ScrollBar? _host;
-    internal bool _wasSliderLayoutComplete = true;
 
     internal readonly ScrollSlider _slider;
+    internal bool _wasSliderLayoutComplete = true;
     private Orientation _orientation;
     private int _position;
     private int _size;
@@ -173,6 +172,7 @@ public class Scroll : View
                 return _slider.OnMouseEvent (mouseEvent);
             }
         }
+
         // Flag as false until slider layout is completed
         _wasSliderLayoutComplete = false;
 

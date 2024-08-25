@@ -145,14 +145,6 @@ internal class ScrollSlider : View
         return base.OnMouseLeave (mouseEvent);
     }
 
-    /// <inheritdoc />
-    internal override void OnLayoutComplete (LayoutEventArgs args)
-    {
-        base.OnLayoutComplete (args);
-
-        _host._wasSliderLayoutComplete = true;
-    }
-
     internal int GetPositionFromSliderLocation (int location)
     {
         if (_host.GetContentSize ().Height == 0 || _host.GetContentSize ().Width == 0)
@@ -167,7 +159,7 @@ internal class ScrollSlider : View
         if ((_host.Orientation == Orientation.Vertical && location + Frame.Height >= scrollSize)
             || (_host.Orientation == Orientation.Horizontal && location + Frame.Width >= scrollSize))
         {
-                return _host.Size - scrollSize;
+            return _host.Size - scrollSize;
         }
 
         return (int)Math.Min (Math.Round ((double)(location * _host.Size + location) / scrollSize), _host.Size - scrollSize);
@@ -208,6 +200,14 @@ internal class ScrollSlider : View
         }
 
         return new (location, dimension);
+    }
+
+    /// <inheritdoc/>
+    internal override void OnLayoutComplete (LayoutEventArgs args)
+    {
+        base.OnLayoutComplete (args);
+
+        _host._wasSliderLayoutComplete = true;
     }
 
     // TODO: I think you should create a new `internal` view named "ScrollSlider" with an `Orientation` property. It should inherit from View and override GetNormalColor and the mouse events

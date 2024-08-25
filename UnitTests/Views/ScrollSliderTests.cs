@@ -67,6 +67,7 @@ public class ScrollSliderTests
 
             host.Width = host.Orientation == Orientation.Vertical ? 1 : randomScrollLength;
             host.Height = host.Orientation == Orientation.Vertical ? randomScrollLength : 1;
+
             // Slider may have changed content size
             host.LayoutSubviews ();
 
