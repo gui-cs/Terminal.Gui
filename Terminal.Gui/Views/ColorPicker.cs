@@ -52,9 +52,10 @@ public class ColorPicker : View
             bar.Y = y;
             bar.Width = Dim.Fill (Style.ShowTextFields ? textFieldWidth : 0);
 
+            TextField? tfValue = null;
             if (Style.ShowTextFields)
             {
-                var tfValue = new TextField
+                tfValue = new TextField
                 {
                     X = Pos.AnchorEnd (textFieldWidth),
                     Y = y,
@@ -62,7 +63,6 @@ public class ColorPicker : View
                 };
                 tfValue.HasFocusChanged += UpdateSingleBarValueFromTextField;
                 _textFields.Add (bar, tfValue);
-                Add (tfValue);
             }
 
             y++;
@@ -72,6 +72,11 @@ public class ColorPicker : View
             _bars.Add (bar);
 
             Add (bar);
+
+            if (tfValue is { })
+            {
+                Add (tfValue);
+            }
         }
 
         if (Style.ShowColorName)

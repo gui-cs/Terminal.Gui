@@ -100,7 +100,7 @@ public class ViewExperiments : Scenario
             Id = $"Tiled{id}",
             BorderStyle = LineStyle.Single,
             CanFocus = true, // Can't drag without this? BUGBUG
-            TabStop = TabBehavior.TabGroup,
+            TabStop = TabBehavior.TabStop,
             Arrangement = ViewArrangement.Fixed
         };
 

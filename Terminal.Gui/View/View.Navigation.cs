@@ -33,7 +33,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         focusable to also gain focus (as long as <see cref="TabStop"/>
     ///     </para>
     ///     <para>
-    ///         Setting this property to <see langword="false"/> will cause <see cref="ApplicationNavigation.MoveNextView"/> to set
+    ///         Setting this property to <see langword="false"/> will cause <see cref="AdvanceFocus"/> to set
     ///         the focus on the next view to be focused.
     ///     </para>
     /// </remarks>
@@ -429,10 +429,13 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // We're moving beyond the last subview
 
             // Determine if focus should remain in this focus chain, or move to the superview's focus chain
-            if (SuperView is { } && SuperView.GetScopedTabIndexes (direction, behavior).Length > 1)
+            if (SuperView is { } && SuperView.TabStop != TabBehavior.NoStop && SuperView.GetScopedTabIndexes (direction, behavior).Length > 1)
             {
-                // Our superview has an focusable subview in addition to us
-                return false;
+                //if (behavior == TabBehavior.TabGroup && behavior == TabStop && SuperView?.TabStop == TabBehavior.TabGroup)
+                {
+                    // Our superview has an focusable subview in addition to us
+                    return false;
+                }
             }
 
             // If our superview 
