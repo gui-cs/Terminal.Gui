@@ -79,7 +79,7 @@ public static class ApplicationOverlapped
 
         if (top is Toplevel && Application.Top?.Subviews.Count > 1 && Application.Top.Subviews [^1] != top)
         {
-            Application.Top.BringSubviewToFront (top);
+            Application.Top.MoveSubviewToStart (top);
         }
     }
 

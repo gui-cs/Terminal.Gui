@@ -226,9 +226,11 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     public event EventHandler<SuperViewChangedEventArgs> Removed;
 
 
-    /// <summary>Moves <paramref name="subview"/> one position towards the start of the <see cref="Subviews"/> list</summary>
-    /// <param name="subview">The subview to move forward.</param>
-    public void BringSubviewForward (View subview)
+    /// <summary>
+    ///     Moves <paramref name="subview"/> one position towards the end of the <see cref="Subviews"/> list.
+    /// </summary>
+    /// <param name="subview">The subview to move.</param>
+    public void MoveSubviewTowardsEnd (View subview)
     {
         PerformActionForSubview (
                                  subview,
@@ -245,9 +247,11 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
                                 );
     }
 
-    /// <summary>Moves <paramref name="subview"/> to the start of the <see cref="Subviews"/> list.</summary>
-    /// <param name="subview">The subview to send to the start.</param>
-    public void BringSubviewToFront (View subview)
+    /// <summary>
+    ///     Moves <paramref name="subview"/> to the end of the <see cref="Subviews"/> list.
+    /// </summary>
+    /// <param name="subview">The subview to move.</param>
+    public void MoveSubviewToEnd (View subview)
     {
         PerformActionForSubview (
                                  subview,
@@ -260,9 +264,11 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     }
 
 
-    /// <summary>Moves <paramref name="subview"/> one position towards the end of the <see cref="Subviews"/> list</summary>
-    /// <param name="subview">The subview to move backwards.</param>
-    public void SendSubviewBackwards (View subview)
+    /// <summary>
+    ///     Moves <paramref name="subview"/> one position towards the start of the <see cref="Subviews"/> list.
+    /// </summary>
+    /// <param name="subview">The subview to move.</param>
+    public void MoveSubviewTowardsStart (View subview)
     {
         PerformActionForSubview (
                                  subview,
@@ -279,9 +285,11 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
                                 );
     }
 
-    /// <summary>Moves <paramref name="subview"/> to the end of the <see cref="Subviews"/> list.</summary>
-    /// <param name="subview">The subview to send to the end.</param>
-    public void SendSubviewToBack (View subview)
+    /// <summary>
+    ///     Moves <paramref name="subview"/> to the start of the <see cref="Subviews"/> list.
+    /// </summary>
+    /// <param name="subview">The subview to move.</param>
+    public void MoveSubviewToStart (View subview)
     {
         PerformActionForSubview (
                                  subview,

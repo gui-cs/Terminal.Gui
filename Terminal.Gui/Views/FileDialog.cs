@@ -89,10 +89,11 @@ public class FileDialog : Dialog
                                   NavigateIf (k, KeyCode.CursorUp, _tableView);
                                   NavigateIf (k, KeyCode.CursorRight, _btnOk);
                               };
-        _btnCancel.Accept += (s, e) => {
-                                 Canceled = true;
-                                 Application.RequestStop ();
-                             };
+        _btnCancel.Accept += (s, e) =>
+        {
+            Canceled = true;
+            Application.RequestStop ();
+        };
 
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
@@ -290,6 +291,8 @@ public class FileDialog : Dialog
 
         UpdateNavigationVisibility ();
 
+        // BUGBUG: This TabOrder is counter-intuitive. The tab order for a dialog should match the
+        // order the Views' are presented, left to right, top to bottom.
         // Determines tab order
         Add (_btnToggleSplitterCollapse);
         Add (_tbFind);
@@ -458,19 +461,6 @@ public class FileDialog : Dialog
         _btnForward.Text = GetForwardButtonText ();
         _btnToggleSplitterCollapse.Text = GetToggleSplitterText (false);
 
-        if (Style.FlipOkCancelButtonLayoutOrder)
-        {
-            _btnCancel.X = Pos.Func (CalculateOkButtonPosX);
-            _btnOk.X = Pos.Right (_btnCancel) + 1;
-
-            //// Flip tab order too for consistency
-            //int? p1 = _btnOk.TabIndex;
-            //int? p2 = _btnCancel.TabIndex;
-
-            //_btnOk.TabIndex = p2;
-            //_btnCancel.TabIndex = p1;
-        }
-
         _tbPath.Caption = Style.PathCaption;
         _tbFind.Caption = Style.SearchCaption;
 
@@ -549,6 +539,12 @@ public class FileDialog : Dialog
             Title = GetDefaultTitle ();
         }
 
+        if (Style.FlipOkCancelButtonLayoutOrder)
+        {
+            _btnCancel.X = Pos.Func (CalculateOkButtonPosX);
+            _btnOk.X = Pos.Right (_btnCancel) + 1;
+            MoveSubviewTowardsFront (_btnCancel);
+        }
         LayoutSubviews ();
     }
 
@@ -591,7 +587,7 @@ public class FileDialog : Dialog
 
     internal void ApplySort ()
     {
-        FileSystemInfoStats [] stats = State?.Children ?? new FileSystemInfoStats[0];
+        FileSystemInfoStats [] stats = State?.Children ?? new FileSystemInfoStats [0];
 
         // This portion is never reordered (always .. at top then folders)
         IOrderedEnumerable<FileSystemInfoStats> forcedOrder = stats
@@ -1549,7 +1545,7 @@ public class FileDialog : Dialog
         public SearchState (IDirectoryInfo dir, FileDialog parent, string searchTerms) : base (dir, parent)
         {
             parent.SearchMatcher.Initialize (searchTerms);
-            Children = new FileSystemInfoStats[0];
+            Children = new FileSystemInfoStats [0];
             BeginSearch ();
         }
 

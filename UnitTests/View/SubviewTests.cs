@@ -373,4 +373,130 @@ public class SubviewTests
         view.Remove (subview);
         Assert.Equal (new Size (5, 5), view.GetContentSize ());
     }
+
+    [Fact]
+    public void MoveSubviewToStart ()
+    {
+        View superView = new ();
+
+        View subview1 = new View ()
+        {
+            Id = "subview1"
+        };
+
+        View subview2 = new View ()
+        {
+            Id = "subview2"
+        };
+
+        View subview3 = new View ()
+        {
+            Id = "subview3"
+        };
+
+        superView.Add (subview1, subview2, subview3);
+
+        superView.MoveSubviewToStart (subview2);
+        Assert.Equal(subview2, superView.Subviews [0]);
+
+        superView.MoveSubviewToStart (subview3);
+        Assert.Equal (subview3, superView.Subviews [0]);
+    }
+
+
+    [Fact]
+    public void MoveSubviewTowardsFront ()
+    {
+        View superView = new ();
+
+        View subview1 = new View ()
+        {
+            Id = "subview1"
+        };
+
+        View subview2 = new View ()
+        {
+            Id = "subview2"
+        };
+
+        View subview3 = new View ()
+        {
+            Id = "subview3"
+        };
+
+        superView.Add (subview1, subview2, subview3);
+
+        superView.MoveSubviewTowardsFront (subview2);
+        Assert.Equal (subview2, superView.Subviews [0]);
+
+        superView.MoveSubviewTowardsFront (subview3);
+        Assert.Equal (subview3, superView.Subviews [1]);
+
+        // Already at front, what happens?
+        superView.MoveSubviewTowardsFront (subview2);
+        Assert.Equal (subview2, superView.Subviews [0]);
+    }
+
+    [Fact]
+    public void MoveSubviewToEnd ()
+    {
+        View superView = new ();
+
+        View subview1 = new View ()
+        {
+            Id = "subview1"
+        };
+
+        View subview2 = new View ()
+        {
+            Id = "subview2"
+        };
+
+        View subview3 = new View ()
+        {
+            Id = "subview3"
+        };
+
+        superView.Add (subview1, subview2, subview3);
+
+        superView.MoveSubviewToEnd (subview1);
+        Assert.Equal (subview1, superView.Subviews [^1]);
+
+        superView.MoveSubviewToEnd (subview2);
+        Assert.Equal (subview2, superView.Subviews [^1]);
+    }
+
+
+    [Fact]
+    public void MoveSubviewTowardsEnd ()
+    {
+        View superView = new ();
+
+        View subview1 = new View ()
+        {
+            Id = "subview1"
+        };
+
+        View subview2 = new View ()
+        {
+            Id = "subview2"
+        };
+
+        View subview3 = new View ()
+        {
+            Id = "subview3"
+        };
+
+        superView.Add (subview1, subview2, subview3);
+
+        superView.MoveSubviewTowardsEnd (subview2);
+        Assert.Equal (subview2, superView.Subviews [^1]);
+
+        superView.MoveSubviewTowardsEnd (subview1);
+        Assert.Equal (subview1, superView.Subviews [1]);
+
+        // Already at end, what happens?
+        superView.MoveSubviewTowardsEnd (subview2);
+        Assert.Equal (subview2, superView.Subviews [^1]);
+    }
 }

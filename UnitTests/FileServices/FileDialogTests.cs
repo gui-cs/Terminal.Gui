@@ -99,13 +99,9 @@ public class FileDialogTests (ITestOutputHelper output)
         string openIn = Path.Combine (Environment.CurrentDirectory, "zz");
         Directory.CreateDirectory (openIn);
         dlg.Path = openIn + Path.DirectorySeparatorChar;
-#if BROKE_IN_2927
-        Send ('f', ConsoleKey.F, false, true, false);
-#else
         Application.OnKeyDown (Key.Tab);
         Application.OnKeyDown (Key.Tab);
         Application.OnKeyDown (Key.Tab);
-#endif
 
         Assert.IsType<TextField> (dlg.MostFocused);
         var tf = (TextField)dlg.MostFocused;

@@ -434,3 +434,13 @@ In v1, you could add timeouts via `Application.MainLoop.AddTimeout` among other 
 + Application.AddTimeout (TimeSpan time, Func<bool> callback)
 ```
 
+## `SendSubviewXXX` renamed and corrected
+
+In v1, the `View` methods to move Subviews within the Subviews list were poorly named and actually operated in reverse of what their names suggested.
+
+In v2, these methods have been named correctly.
+
+- `SendSubViewToBack` -> `MoveSubviewToStart` - Moves the specified subview to the start of the list.
+- `SendSubViewBackward` -> `MoveSubviewTowardsStart` - Moves the specified subview one position towards the start of the list.
+- `SendSubViewToFront` -> `MoveSubviewToEnd` - Moves the specified subview to the end of the list.
+- `SendSubViewForward` -> `MoveSubviewTowardsEnd` - Moves the specified subview one position towards the end of the list.
