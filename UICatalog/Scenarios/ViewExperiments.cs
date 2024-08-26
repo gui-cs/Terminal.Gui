@@ -42,7 +42,7 @@ public class ViewExperiments : Scenario
         {
             X = 0,
             Y = 0,
-            Title = $"TopButton _{GetNextHotKey()}",
+            Title = $"TopButton _{GetNextHotKey ()}",
         };
 
         testFrame.Add (button);
@@ -53,16 +53,26 @@ public class ViewExperiments : Scenario
         testFrame.Add (tiledView1);
         testFrame.Add (tiledView2);
 
-        var overlappedView1 = CreateOverlappedView (2, Pos.Center()-5, Pos.Center());
+        var tiledView3 = CreateTiledView (1, Pos.Right (tiledView2), Pos.Top (tiledView2));
+        tiledView3.TabStop = TabBehavior.TabGroup;
+        tiledView3.BorderStyle = LineStyle.Double;
+        testFrame.Add (tiledView3);
+
+        var overlappedView1 = CreateOverlappedView (2, Pos.Center () - 5, Pos.Center ());
         var tiledSubView = CreateTiledView (4, 0, 2);
         overlappedView1.Add (tiledSubView);
-        
-        var overlappedView2 = CreateOverlappedView (3, Pos.Center() + 10, Pos.Center() + 5);
-        tiledSubView = CreateTiledView (4, 0, 2);
-        overlappedView2.Add (tiledSubView);
 
-        tiledSubView = CreateTiledView (5, 0, Pos.Bottom(tiledSubView));
-        overlappedView2.Add (tiledSubView);
+        var overlappedView2 = CreateOverlappedView (3, Pos.Center () + 10, Pos.Center () + 5);
+
+        // BUGBUG: F6 through nested tab groups doesn't work yet.
+#if NESTED_TABGROUPS
+        var overlappedInOverlapped1 = CreateOverlappedView (4, 1, 4);
+        overlappedView2.Add (overlappedInOverlapped1);
+
+        var overlappedInOverlapped2 = CreateOverlappedView (5, 10, 7);
+        overlappedView2.Add (overlappedInOverlapped2);
+
+#endif
 
         testFrame.Add (overlappedView1);
         testFrame.Add (overlappedView2);
