@@ -336,8 +336,10 @@ public class ColorPickerTests
         View otherView = new View () { CanFocus = true };
 
         Application.Current?.Add (otherView); // thi sets focus to otherView
+        Assert.True (otherView.HasFocus);
 
         cp.SetFocus ();
+        Assert.False (otherView.HasFocus);
 
         cp.Draw ();
 
@@ -362,9 +364,11 @@ public class ColorPickerTests
         // Change value using text field
         TextField rBarTextField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "0");
 
+        rBarTextField.SetFocus ();
         rBarTextField.Text = "128";
 
         otherView.SetFocus ();
+        Assert.True (otherView.HasFocus);
 
         cp.Draw ();
 
@@ -429,7 +433,7 @@ public class ColorPickerTests
         cp.Draw ();
 
         // Click on Green bar
-        Application.OnMouseEvent(new ()
+        Application.OnMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Pressed,
             Position = new (0, 1)
