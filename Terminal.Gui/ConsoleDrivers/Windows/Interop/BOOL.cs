@@ -5,14 +5,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
 /// <summary>
-///     Native boolean type for Windows interop, based on a 32-bit integer which is considered false if 0 and true for all other values.
+///     Native boolean type for Windows interop, based on a 32-bit integer which is considered false if 0 and true for all other
+///     values.
 /// </summary>
 /// <remarks>
 ///     This type should not be used outside of interop with the Win32 APIs.
 /// </remarks>
 [DebuggerDisplay ($"{{{nameof (Value)}}}")]
-[SuppressMessage ("ReSharper", "InconsistentNaming", Justification = "Following recommendation to keep types named the same as the native types.")]
-internal readonly record struct BOOL : IEqualityOperators<BOOL, BOOL, bool>
+[SuppressMessage (
+                     "ReSharper",
+                     "InconsistentNaming",
+                     Justification = "Following recommendation to keep types named the same as the native types.")]
+internal readonly record struct BOOL : IEqualityOperators<BOOL, BOOL, bool>, ITrueFalseOperators<BOOL>
 {
     internal BOOL (int value) { Value = value; }
 
