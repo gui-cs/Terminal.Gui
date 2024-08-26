@@ -10,10 +10,8 @@ internal enum VariationMode
 
 internal class ScrollButton : View
 {
-    public ScrollButton (ScrollBar host, VariationMode variation = VariationMode.Decrease)
+    public ScrollButton ()
     {
-        _host = host;
-        VariationMode = variation;
         TextAlignment = Alignment.Center;
         VerticalTextAlignment = Alignment.Center;
         Id = "scrollButton";
@@ -23,7 +21,6 @@ internal class ScrollButton : View
         WantContinuousButtonPressed = true;
     }
 
-    private readonly ScrollBar _host;
     private ColorScheme? _savedColorScheme;
 
     public void AdjustButton ()
@@ -33,8 +30,8 @@ internal class ScrollButton : View
             return;
         }
 
-        Width = _host.Orientation == Orientation.Vertical ? Dim.Fill () : 1;
-        Height = _host.Orientation == Orientation.Vertical ? 1 : Dim.Fill ();
+        Width = SupView.Orientation == Orientation.Vertical ? Dim.Fill () : 1;
+        Height = SupView.Orientation == Orientation.Vertical ? 1 : Dim.Fill ();
 
         switch (VariationMode)
         {
@@ -44,8 +41,8 @@ internal class ScrollButton : View
 
                 break;
             case VariationMode.Increase:
-                X = _host.Orientation == Orientation.Vertical ? 0 : Pos.AnchorEnd (1);
-                Y = _host.Orientation == Orientation.Vertical ? Pos.AnchorEnd (1) : 0;
+                X = SupView.Orientation == Orientation.Vertical ? 0 : Pos.AnchorEnd (1);
+                Y = SupView.Orientation == Orientation.Vertical ? Pos.AnchorEnd (1) : 0;
 
                 break;
             default:
@@ -60,22 +57,22 @@ internal class ScrollButton : View
     {
         if (_savedColorScheme is null)
         {
-            ColorScheme = new () { Normal = new (_host.ColorScheme.HotNormal.Foreground, _host.ColorScheme.HotNormal.Background) };
+            ColorScheme = new () { Normal = new (SupView.ColorScheme.HotNormal.Foreground, SupView.ColorScheme.HotNormal.Background) };
         }
         else
         {
-            ColorScheme = new () { Normal = new (_host.ColorScheme.Normal.Background, _host.ColorScheme.Normal.Foreground) };
+            ColorScheme = new () { Normal = new (SupView.ColorScheme.Normal.Background, SupView.ColorScheme.Normal.Foreground) };
         }
 
         return base.GetNormalColor ();
     }
 
-    public VariationMode VariationMode { get; }
+    public VariationMode VariationMode { get; init; }
 
     /// <inheritdoc/>
     protected internal override bool? OnMouseEnter (MouseEvent mouseEvent)
     {
-        _savedColorScheme ??= _host.ColorScheme;
+        _savedColorScheme ??= SupView.ColorScheme;
 
         ColorScheme = new ()
         {
@@ -97,11 +94,11 @@ internal class ScrollButton : View
             switch (VariationMode)
             {
                 case VariationMode.Decrease:
-                    _host.Position--;
+                    SupView.Position--;
 
                     return true;
                 case VariationMode.Increase:
-                    _host.Position++;
+                    SupView.Position++;
 
                     return true;
                 default:
@@ -129,15 +126,17 @@ internal class ScrollButton : View
         switch (VariationMode)
         {
             case VariationMode.Decrease:
-                Text = _host.Orientation == Orientation.Vertical ? Glyphs.UpArrow.ToString () : Glyphs.LeftArrow.ToString ();
+                Text = SupView.Orientation == Orientation.Vertical ? Glyphs.UpArrow.ToString () : Glyphs.LeftArrow.ToString ();
 
                 break;
             case VariationMode.Increase:
-                Text = _host.Orientation == Orientation.Vertical ? Glyphs.DownArrow.ToString () : Glyphs.RightArrow.ToString ();
+                Text = SupView.Orientation == Orientation.Vertical ? Glyphs.DownArrow.ToString () : Glyphs.RightArrow.ToString ();
 
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
     }
+
+    private ScrollBar SupView => (SuperView as ScrollBar)!;
 }

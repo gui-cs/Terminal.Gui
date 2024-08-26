@@ -17,7 +17,7 @@ public class ScrollSliderTests
     public void Test_Position_Location_Consistency (Orientation orientation, int scrollLength, int size, int location, int expectedPosition)
     {
         // Arrange
-        Scroll host = new ()
+        Scroll scroll = new ()
         {
             Orientation = orientation,
             Width = orientation == Orientation.Vertical ? 1 : scrollLength,
@@ -25,18 +25,18 @@ public class ScrollSliderTests
             Size = size
         };
 
-        host.BeginInit ();
-        host.EndInit ();
+        scroll.BeginInit ();
+        scroll.EndInit ();
 
         // Act
-        host.Position = host._slider.GetPositionFromSliderLocation (location);
-        (int calculatedLocation, int calculatedDimension) = host._slider.GetSliderLocationDimensionFromPosition ();
-        int calculatedPosition = host._slider.GetPositionFromSliderLocation (calculatedLocation);
+        scroll.Position = scroll._slider.GetPositionFromSliderLocation (location);
+        (int calculatedLocation, int calculatedDimension) = scroll._slider.GetSliderLocationDimensionFromPosition ();
+        int calculatedPosition = scroll._slider.GetPositionFromSliderLocation (calculatedLocation);
 
         // Assert
         AssertLocation (scrollLength, location, calculatedLocation, calculatedDimension);
 
-        Assert.Equal (host.Position, expectedPosition);
+        Assert.Equal (scroll.Position, expectedPosition);
         Assert.Equal (calculatedPosition, expectedPosition);
     }
 
@@ -47,7 +47,7 @@ public class ScrollSliderTests
     {
         var random = new Random ();
 
-        Scroll host = new ()
+        Scroll scroll = new ()
         {
             Orientation = orientation,
             Width = orientation == Orientation.Vertical ? 1 : scrollLength,
@@ -55,8 +55,8 @@ public class ScrollSliderTests
             Size = size
         };
 
-        host.BeginInit ();
-        host.EndInit ();
+        scroll.BeginInit ();
+        scroll.EndInit ();
 
         // Number of random tests to run
         for (var i = 0; i < testCount; i++)
@@ -65,21 +65,21 @@ public class ScrollSliderTests
             int randomScrollLength = random.Next (0, 60); // Random content size length
             int randomLocation = random.Next (0, randomScrollLength); // Random location
 
-            host.Width = host.Orientation == Orientation.Vertical ? 1 : randomScrollLength;
-            host.Height = host.Orientation == Orientation.Vertical ? randomScrollLength : 1;
+            scroll.Width = scroll.Orientation == Orientation.Vertical ? 1 : randomScrollLength;
+            scroll.Height = scroll.Orientation == Orientation.Vertical ? randomScrollLength : 1;
 
             // Slider may have changed content size
-            host.LayoutSubviews ();
+            scroll.LayoutSubviews ();
 
             // Act
-            host.Position = host._slider.GetPositionFromSliderLocation (randomLocation);
-            (int calculatedLocation, int calculatedDimension) = host._slider.GetSliderLocationDimensionFromPosition ();
-            int calculatedPosition = host._slider.GetPositionFromSliderLocation (calculatedLocation);
+            scroll.Position = scroll._slider.GetPositionFromSliderLocation (randomLocation);
+            (int calculatedLocation, int calculatedDimension) = scroll._slider.GetSliderLocationDimensionFromPosition ();
+            int calculatedPosition = scroll._slider.GetPositionFromSliderLocation (calculatedLocation);
 
             // Assert
             AssertLocation (randomScrollLength, randomLocation, calculatedLocation, calculatedDimension);
 
-            Assert.Equal (host.Position, calculatedPosition);
+            Assert.Equal (scroll.Position, calculatedPosition);
         }
     }
 

@@ -4,16 +4,14 @@ namespace Terminal.Gui;
 
 internal class ScrollSlider : View
 {
-    public ScrollSlider (Scroll host)
+    public ScrollSlider ()
     {
-        _host = host;
         Id = "scrollSlider";
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
         WantMousePositionReports = true;
     }
 
-    private readonly Scroll _host;
     private int _lastLocation = -1;
     private ColorScheme? _savedColorScheme;
 
@@ -25,13 +23,13 @@ internal class ScrollSlider : View
         }
 
         (int Location, int Dimension) sliderLocationAndDimension = GetSliderLocationDimensionFromPosition ();
-        X = _host.Orientation == Orientation.Vertical ? 0 : sliderLocationAndDimension.Location;
-        Y = _host.Orientation == Orientation.Vertical ? sliderLocationAndDimension.Location : 0;
+        X = SupView.Orientation == Orientation.Vertical ? 0 : sliderLocationAndDimension.Location;
+        Y = SupView.Orientation == Orientation.Vertical ? sliderLocationAndDimension.Location : 0;
 
         SetContentSize (
                         new (
-                             _host.Orientation == Orientation.Vertical ? _host.GetContentSize ().Width : sliderLocationAndDimension.Dimension,
-                             _host.Orientation == Orientation.Vertical ? sliderLocationAndDimension.Dimension : _host.GetContentSize ().Height
+                             SupView.Orientation == Orientation.Vertical ? SupView.GetContentSize ().Width : sliderLocationAndDimension.Dimension,
+                             SupView.Orientation == Orientation.Vertical ? sliderLocationAndDimension.Dimension : SupView.GetContentSize ().Height
                             ));
         SetSliderText ();
     }
@@ -41,11 +39,11 @@ internal class ScrollSlider : View
     {
         if (_savedColorScheme is null)
         {
-            ColorScheme = new () { Normal = new (_host.ColorScheme.HotNormal.Foreground, _host.ColorScheme.HotNormal.Foreground) };
+            ColorScheme = new () { Normal = new (SupView.ColorScheme.HotNormal.Foreground, SupView.ColorScheme.HotNormal.Foreground) };
         }
         else
         {
-            ColorScheme = new () { Normal = new (_host.ColorScheme.Normal.Foreground, _host.ColorScheme.Normal.Foreground) };
+            ColorScheme = new () { Normal = new (SupView.ColorScheme.Normal.Foreground, SupView.ColorScheme.Normal.Foreground) };
         }
 
         return base.GetNormalColor ();
@@ -54,7 +52,7 @@ internal class ScrollSlider : View
     /// <inheritdoc/>
     protected internal override bool? OnMouseEnter (MouseEvent mouseEvent)
     {
-        _savedColorScheme ??= _host.ColorScheme;
+        _savedColorScheme ??= SupView.ColorScheme;
 
         ColorScheme = new ()
         {
@@ -71,9 +69,9 @@ internal class ScrollSlider : View
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
-        int location = _host.Orientation == Orientation.Vertical ? mouseEvent.Position.Y : mouseEvent.Position.X;
+        int location = SupView.Orientation == Orientation.Vertical ? mouseEvent.Position.Y : mouseEvent.Position.X;
         int offset = _lastLocation > -1 ? location - _lastLocation : 0;
-        int barSize = _host.Orientation == Orientation.Vertical ? _host.GetContentSize ().Height : _host.GetContentSize ().Width;
+        int barSize = SupView.Orientation == Orientation.Vertical ? SupView.GetContentSize ().Height : SupView.GetContentSize ().Width;
 
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && _lastLocation == -1)
         {
@@ -85,19 +83,19 @@ internal class ScrollSlider : View
         }
         else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
         {
-            if (_host.Orientation == Orientation.Vertical)
+            if (SupView.Orientation == Orientation.Vertical)
             {
                 Y = Frame.Y + offset < 0 ? 0 :
                     Frame.Y + offset + Frame.Height > barSize ? Math.Max (barSize - Frame.Height, 0) : Frame.Y + offset;
 
-                _host.Position = GetPositionFromSliderLocation (Frame.Y);
+                SupView.Position = GetPositionFromSliderLocation (Frame.Y);
             }
             else
             {
                 X = Frame.X + offset < 0 ? 0 :
                     Frame.X + offset + Frame.Width > barSize ? Math.Max (barSize - Frame.Width, 0) : Frame.X + offset;
 
-                _host.Position = GetPositionFromSliderLocation (Frame.X);
+                SupView.Position = GetPositionFromSliderLocation (Frame.X);
             }
         }
         else if (mouseEvent.Flags == MouseFlags.Button1Released)
@@ -109,15 +107,15 @@ internal class ScrollSlider : View
                 Application.UngrabMouse ();
             }
         }
-        else if ((mouseEvent.Flags == MouseFlags.WheeledDown && _host.Orientation == Orientation.Vertical)
-                 || (mouseEvent.Flags == MouseFlags.WheeledRight && _host.Orientation == Orientation.Horizontal))
+        else if ((mouseEvent.Flags == MouseFlags.WheeledDown && SupView.Orientation == Orientation.Vertical)
+                 || (mouseEvent.Flags == MouseFlags.WheeledRight && SupView.Orientation == Orientation.Horizontal))
         {
-            _host.Position = Math.Min (_host.Position + 1, _host.Size - barSize);
+            SupView.Position = Math.Min (SupView.Position + 1, SupView.Size - barSize);
         }
-        else if ((mouseEvent.Flags == MouseFlags.WheeledUp && _host.Orientation == Orientation.Vertical)
-                 || (mouseEvent.Flags == MouseFlags.WheeledLeft && _host.Orientation == Orientation.Horizontal))
+        else if ((mouseEvent.Flags == MouseFlags.WheeledUp && SupView.Orientation == Orientation.Vertical)
+                 || (mouseEvent.Flags == MouseFlags.WheeledLeft && SupView.Orientation == Orientation.Horizontal))
         {
-            _host.Position = Math.Max (_host.Position - 1, 0);
+            SupView.Position = Math.Max (SupView.Position - 1, 0);
         }
         else if (mouseEvent.Flags != MouseFlags.ReportMousePosition)
         {
@@ -141,48 +139,48 @@ internal class ScrollSlider : View
 
     internal int GetPositionFromSliderLocation (int location)
     {
-        if (_host.GetContentSize ().Height == 0 || _host.GetContentSize ().Width == 0)
+        if (SupView.GetContentSize ().Height == 0 || SupView.GetContentSize ().Width == 0)
         {
             return 0;
         }
 
-        int scrollSize = _host.Orientation == Orientation.Vertical ? _host.GetContentSize ().Height : _host.GetContentSize ().Width;
+        int scrollSize = SupView.Orientation == Orientation.Vertical ? SupView.GetContentSize ().Height : SupView.GetContentSize ().Width;
 
         // Ensure the Position is valid if the slider is at end
         // We use Frame here instead of ContentSize because even if the slider has a margin or border, Frame indicates the actual size
-        if ((_host.Orientation == Orientation.Vertical && location + Frame.Height >= scrollSize)
-            || (_host.Orientation == Orientation.Horizontal && location + Frame.Width >= scrollSize))
+        if ((SupView.Orientation == Orientation.Vertical && location + Frame.Height >= scrollSize)
+            || (SupView.Orientation == Orientation.Horizontal && location + Frame.Width >= scrollSize))
         {
-            return _host.Size - scrollSize;
+            return SupView.Size - scrollSize;
         }
 
-        return (int)Math.Min (Math.Round ((double)(location * _host.Size + location) / scrollSize), _host.Size - scrollSize);
+        return (int)Math.Min (Math.Round ((double)(location * SupView.Size + location) / scrollSize), SupView.Size - scrollSize);
     }
 
     internal (int Location, int Dimension) GetSliderLocationDimensionFromPosition ()
     {
-        if (_host.GetContentSize ().Height == 0 || _host.GetContentSize ().Width == 0)
+        if (SupView.GetContentSize ().Height == 0 || SupView.GetContentSize ().Width == 0)
         {
             return new (0, 0);
         }
 
-        int scrollSize = _host.Orientation == Orientation.Vertical ? _host.GetContentSize ().Height : _host.GetContentSize ().Width;
+        int scrollSize = SupView.Orientation == Orientation.Vertical ? SupView.GetContentSize ().Height : SupView.GetContentSize ().Width;
         int location;
         int dimension;
 
-        if (_host.Size > 0)
+        if (SupView.Size > 0)
         {
-            dimension = (int)Math.Min (Math.Max (Math.Ceiling ((double)scrollSize * scrollSize / _host.Size), 1), scrollSize);
+            dimension = (int)Math.Min (Math.Max (Math.Ceiling ((double)scrollSize * scrollSize / SupView.Size), 1), scrollSize);
 
             // Ensure the Position is valid
-            if (_host.Position > 0 && _host.Position + scrollSize > _host.Size)
+            if (SupView.Position > 0 && SupView.Position + scrollSize > SupView.Size)
             {
-                _host.Position = _host.Size - scrollSize;
+                SupView.Position = SupView.Size - scrollSize;
             }
 
-            location = (int)Math.Min (Math.Round ((double)_host.Position * scrollSize / (_host.Size + 1)), scrollSize - dimension);
+            location = (int)Math.Min (Math.Round ((double)SupView.Position * scrollSize / (SupView.Size + 1)), scrollSize - dimension);
 
-            if (_host.Position == _host.Size - scrollSize && location + dimension < scrollSize)
+            if (SupView.Position == SupView.Size - scrollSize && location + dimension < scrollSize)
             {
                 location = scrollSize - dimension;
             }
@@ -202,12 +200,14 @@ internal class ScrollSlider : View
 
     private void SetSliderText ()
     {
-        TextDirection = _host.Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
+        TextDirection = SupView.Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
 
         // QUESTION: Should these Glyphs be configurable via CM?
         Text = string.Concat (
                               Enumerable.Repeat (
                                                  Glyphs.ContinuousMeterSegment.ToString (),
-                                                 _host.GetContentSize ().Width * _host.GetContentSize ().Height));
+                                                 SupView.GetContentSize ().Width * SupView.GetContentSize ().Height));
     }
+
+    private Scroll SupView => (SuperView as Scroll)!;
 }

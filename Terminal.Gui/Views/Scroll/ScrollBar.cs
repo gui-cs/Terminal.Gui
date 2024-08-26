@@ -17,9 +17,9 @@ public class ScrollBar : View
     /// <inheritdoc/>
     public ScrollBar ()
     {
-        _scroll = new (this);
-        _decrease = new (this);
-        _increase = new (this, VariationMode.Increase);
+        _scroll = new ();
+        _decrease = new ();
+        _increase = new () { VariationMode = VariationMode.Increase };
         Add (_scroll, _decrease, _increase);
 
         CanFocus = false;
@@ -68,6 +68,9 @@ public class ScrollBar : View
     /// </summary>
     public event EventHandler<CancelEventArgs<int>>? PositionChanging;
 
+    /// <summary>
+    ///     Gets or sets the size of the Scroll. This is the total size of the content that can be scrolled through.
+    /// </summary>
     public int Size
     {
         get => _scroll.Size;

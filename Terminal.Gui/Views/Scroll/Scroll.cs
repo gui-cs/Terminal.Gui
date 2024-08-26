@@ -10,32 +10,18 @@ namespace Terminal.Gui;
 public class Scroll : View
 {
     /// <inheritdoc/>
-    public Scroll () : this (null) { }
-
-    public Scroll (ScrollBar? host)
+    public Scroll ()
     {
-        _host = host;
-        _slider = new (this);
+        _slider = new ();
         Add (_slider);
 
         WantContinuousButtonPressed = true;
         CanFocus = false;
         Orientation = Orientation.Vertical;
 
-        if (_host is { })
-        {
-            Y = 1;
-            Width = Dim.Fill ();
-            Height = Dim.Fill (1);
-        }
-        else
-        {
-            Width = Dim.Auto (DimAutoStyle.Content, 1);
-            Height = Dim.Auto (DimAutoStyle.Content, 1);
-        }
+        Width = Dim.Auto (DimAutoStyle.Content, 1);
+        Height = Dim.Auto (DimAutoStyle.Content, 1);
     }
-
-    internal readonly ScrollBar? _host;
 
     internal readonly ScrollSlider _slider;
     private Orientation _orientation;
@@ -76,10 +62,10 @@ public class Scroll : View
                 return;
             }
 
-            if (_host is { IsInitialized: false })
+            if (SupView is { IsInitialized: false })
             {
                 // Ensures a more exactly calculation
-                SetRelativeLayout (_host.Frame.Size);
+                SetRelativeLayout (SupView.Frame.Size);
             }
 
             int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
@@ -193,7 +179,7 @@ public class Scroll : View
 
     internal void AdjustScroll ()
     {
-        if (_host is { })
+        if (SupView is { })
         {
             X = Orientation == Orientation.Vertical ? 0 : 1;
             Y = Orientation == Orientation.Vertical ? 1 : 0;
@@ -212,6 +198,8 @@ public class Scroll : View
 
         AdjustScroll ();
     }
+
+    internal ScrollBar? SupView => SuperView as ScrollBar;
 
     private void SetScrollText ()
     {
