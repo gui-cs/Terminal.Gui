@@ -3657,7 +3657,7 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
