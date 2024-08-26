@@ -1,10 +1,9 @@
 ﻿using JetBrains.Annotations;
 using Xunit.Abstractions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Terminal.Gui.ViewTests;
 
-public class NavigationTests () : TestsAllViews
+public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 {
     [Theory]
     [MemberData (nameof (AllViewTypes))]
