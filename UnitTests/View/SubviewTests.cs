@@ -426,14 +426,14 @@ public class SubviewTests
 
         superView.Add (subview1, subview2, subview3);
 
-        superView.MoveSubviewTowardsFront (subview2);
+        superView.MoveSubviewTowardsStart (subview2);
         Assert.Equal (subview2, superView.Subviews [0]);
 
-        superView.MoveSubviewTowardsFront (subview3);
+        superView.MoveSubviewTowardsStart (subview3);
         Assert.Equal (subview3, superView.Subviews [1]);
 
         // Already at front, what happens?
-        superView.MoveSubviewTowardsFront (subview2);
+        superView.MoveSubviewTowardsStart (subview2);
         Assert.Equal (subview2, superView.Subviews [0]);
     }
 

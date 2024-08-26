@@ -250,7 +250,7 @@ See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
   - `public bool FocusDeepest (NavigationDirection direction, TabBehavior? behavior)` 
 * In v1, the `View.OnEnter/Enter` and `View.OnLeave/Leave` virtual methods/events could be used to notify that a view had gained or lost focus, but had confusing semantics around what it mean to override (requiring calling `base`) and bug-ridden behavior on what the return values signified. The "Enter" and "Leave" terminology was confusing. In v2, `View.OnHasFocusChanging/HasFocusChanging` and `View.OnHasFocusChanged/HasFocusChanged` replace `View.OnEnter/Enter` and `View.OnLeave/Leave`. These virtual methods/events follow standard Terminal.Gui event patterns. The `View.OnHasFocusChanging/HasFocusChanging` event supports being cancelled.
 * In v1, the concept of `Mdi` views included a large amount of complex code (in `Toplevel` and `Application`) for dealing with navigation across overlapped Views. This has all been radically simplified in v2. Any View can work in an "overlapped" or "tiled" way. See [navigation.md](navigation.md) for more details.
-* The `View.TabIndex` and `View.TabIndexes` have been removed. Change the order of the views in `View.Subviews` to change the navigation order. 
+* The `View.TabIndex` and `View.TabIndexes` have been removed. Change the order of the views in `View.Subviews` to change the navigation order (using, for example `View.MoveSubviewTowardsStart()`).
 
 ### How to Fix (Focus API)
 

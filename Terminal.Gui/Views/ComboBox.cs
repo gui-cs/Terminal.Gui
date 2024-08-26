@@ -495,7 +495,7 @@ public class ComboBox : View, IDesignable
         Reset (true);
         _listview.Clear ();
         _listview.TabStop = TabBehavior.NoStop;
-        SuperView?.MoveSubviewToEnd (this);
+        SuperView?.MoveSubviewToStart (this);
         Rectangle rect = _listview.ViewportToScreen (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
         SuperView?.SetNeedsDisplay (rect);
         OnCollapsed ();

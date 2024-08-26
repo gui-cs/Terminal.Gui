@@ -543,7 +543,7 @@ public class FileDialog : Dialog
         {
             _btnCancel.X = Pos.Func (CalculateOkButtonPosX);
             _btnOk.X = Pos.Right (_btnCancel) + 1;
-            MoveSubviewTowardsFront (_btnCancel);
+            MoveSubviewTowardsStart (_btnCancel);
         }
         LayoutSubviews ();
     }

@@ -1348,7 +1348,7 @@ public class TabView : View
                 _leftScrollIndicator.Visible = true;
 
                 // Ensures this is clicked instead of the first tab
-                MoveSubviewToStart (_leftScrollIndicator);
+                MoveSubviewToEnd (_leftScrollIndicator);
                 _leftScrollIndicator.Draw ();
             }
             else
