@@ -692,6 +692,7 @@ public class ScrollBarTests
         }
 
         Assert.Equal ("scrollSlider", Application.MouseGrabView?.Id);
+        Assert.IsType<ScrollSlider> (Application.MouseGrabView);
         Assert.Equal (expectedPos, scrollBar.Position);
 
         Application.Refresh ();
@@ -722,7 +723,7 @@ public class ScrollBarTests
         Application.Begin (top);
 
         var scroll = (Scroll)scrollBar.Subviews.FirstOrDefault (x => x is Scroll);
-        Rectangle scrollSliderFrame = scroll!.Subviews.FirstOrDefault (x => x.Id == "scrollSlider")!.Frame;
+        Rectangle scrollSliderFrame = scroll!.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame;
         Assert.Equal (scrollSliderFrame, orientation == Orientation.Vertical ? new (0, 2, 1, 4) : new (2, 0, 4, 1));
 
         Application.OnMouseEvent (new () { Position = orientation == Orientation.Vertical ? new (10, 14) : new (14, 10), Flags = MouseFlags.Button1Pressed });
@@ -733,7 +734,7 @@ public class ScrollBarTests
                                       Position = orientation == Orientation.Vertical ? new (10, 0) : new (0, 10),
                                       Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                   });
-        Assert.Equal (new (0, 0), scroll.Subviews.FirstOrDefault (x => x.Id == "scrollSlider")!.Frame.Location);
+        Assert.Equal (new (0, 0), scroll.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame.Location);
 
         Application.OnMouseEvent (
                                   new ()
@@ -744,7 +745,7 @@ public class ScrollBarTests
 
         Assert.Equal (
                       orientation == Orientation.Vertical ? new (0, 4) : new (4, 0),
-                      scroll.Subviews.FirstOrDefault (x => x.Id == "scrollSlider")!.Frame.Location);
+                      scroll.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame.Location);
     }
 
     [Theory]
@@ -964,5 +965,60 @@ public class ScrollBarTests
                                                          sizeHeight + (orientation == Orientation.Vertical ? 0 : widthHeight - 1));
 
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+    }
+
+    [Theory]
+    [AutoInitShutdown]
+    [InlineData (Orientation.Vertical)]
+    [InlineData (Orientation.Horizontal)]
+    public void Mouse_Pressed_On_ScrollButton_Changes_Position (Orientation orientation)
+    {
+        var scrollBar = new ScrollBar
+        {
+            X = 10, Y = 10, Width = orientation == Orientation.Vertical ? 1 : 10, Height = orientation == Orientation.Vertical ? 10 : 1, Size = 20,
+            Orientation = orientation
+        };
+        var top = new Toplevel ();
+        top.Add (scrollBar);
+        Application.Begin (top);
+
+        var scroll = (Scroll)scrollBar.Subviews.FirstOrDefault (x => x is Scroll);
+        Rectangle scrollSliderFrame = scroll!.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame;
+        Assert.Equal (scrollSliderFrame, orientation == Orientation.Vertical ? new (0, 0, 1, 4) : new (0, 0, 4, 1));
+        Assert.Equal (0, scrollBar.Position);
+
+        // ScrollButton increase
+        for (int i = 0; i < 13; i++)
+        {
+            Application.OnMouseEvent (new () { Position = orientation == Orientation.Vertical ? new (10, 19) : new (19, 10), Flags = MouseFlags.Button1Pressed });
+
+            if (i < 12)
+            {
+                Assert.Equal (i + 1, scrollBar.Position);
+            }
+            else
+            {
+                Assert.Equal (i, scrollBar.Position);
+                Assert.Equal (
+                              orientation == Orientation.Vertical ? new (0, 4) : new (4, 0),
+                              scroll.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame.Location);
+            }
+
+        }
+
+        for (int i = 12; i > -1; i--)
+        {
+            Application.OnMouseEvent (new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed });
+
+            if (i > 0)
+            {
+                Assert.Equal (i - 1, scrollBar.Position);
+            }
+            else
+            {
+                Assert.Equal (0, scrollBar.Position);
+                Assert.Equal (new (0, 0), scroll.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame.Location);
+            }
+        }
     }
 }
