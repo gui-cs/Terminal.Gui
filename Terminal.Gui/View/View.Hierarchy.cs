@@ -1,3 +1,4 @@
+#nullable enable
 using System.Diagnostics;
 
 namespace Terminal.Gui;
@@ -5,8 +6,8 @@ namespace Terminal.Gui;
 public partial class View // SuperView/SubView hierarchy management (SuperView, SubViews, Add, Remove, etc.)
 {
     private static readonly IList<View> _empty = new List<View> (0).AsReadOnly ();
-    private List<View> _subviews; // This is null, and allocated on demand.
-    private View _superView;
+    private List<View>? _subviews; // This is null, and allocated on demand.
+    private View? _superView;
 
     /// <summary>Indicates whether the view was added to <see cref="SuperView"/>.</summary>
     public bool IsAdded { get; private set; }
@@ -19,7 +20,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <value>The super view.</value>
     public virtual View SuperView
     {
-        get => _superView;
+        get => _superView!;
         set => throw new NotImplementedException ();
     }
 
@@ -42,14 +43,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <returns>The view that was added.</returns>
     public virtual View Add (View view)
     {
-        if (view is null)
-        {
-            return view;
-        }
-
         if (_subviews is null)
         {
-            _subviews = new ();
+            _subviews = [];
         }
 
         Debug.WriteLineIf (_subviews.Contains (view), $"BUGBUG: {view} has already been added to {this}.");
@@ -116,11 +112,11 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
     /// <summary>Get the top superview of a given <see cref="View"/>.</summary>
     /// <returns>The superview view.</returns>
-    public View GetTopSuperView (View view = null, View superview = null)
+    public View? GetTopSuperView (View? view = null, View? superview = null)
     {
-        View top = superview ?? Application.Top;
+        View? top = superview ?? Application.Top;
 
-        for (View v = view?.SuperView ?? this?.SuperView; v != null; v = v.SuperView)
+        for (View? v = view?.SuperView ?? this?.SuperView; v != null; v = v.SuperView)
         {
             top = v;
 
@@ -160,9 +156,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///         lifecycle to be transferred to the caller; the caller muse call <see cref="Dispose"/>.
     ///     </para>
     /// </remarks>
-    public virtual View Remove (View view)
+    /// <returns>
+    ///     The removed View. <see langword="null"/> if the View could not be removed.
+    /// </returns>
+    public virtual View? Remove (View view)
     {
-        if (view is null || _subviews is null)
+        if (_subviews is null)
         {
             return view;
         }
@@ -236,7 +235,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
                                  subview,
                                  x =>
                                  {
-                                     int idx = _subviews.IndexOf (x);
+                                     int idx = _subviews!.IndexOf (x);
 
                                      if (idx + 1 < _subviews.Count)
                                      {
@@ -257,7 +256,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
                                  subview,
                                  x =>
                                  {
-                                     _subviews.Remove (x);
+                                     _subviews!.Remove (x);
                                      _subviews.Add (x);
                                  }
                                 );
@@ -274,7 +273,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
                                  subview,
                                  x =>
                                  {
-                                     int idx = _subviews.IndexOf (x);
+                                     int idx = _subviews!.IndexOf (x);
 
                                      if (idx > 0)
                                      {
@@ -295,7 +294,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
                                  subview,
                                  x =>
                                  {
-                                     _subviews.Remove (x);
+                                     _subviews!.Remove (x);
                                      _subviews.Insert (0, subview);
                                  }
                                 );
@@ -308,7 +307,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <param name="action"></param>
     private void PerformActionForSubview (View subview, Action<View> action)
     {
-        if (_subviews.Contains (subview))
+        if (_subviews!.Contains (subview))
         {
             action (subview);
         }

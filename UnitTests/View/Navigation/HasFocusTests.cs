@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class HasFocusTests (ITestOutputHelper _output) : TestsAllViews
+public class HasFocusTests () : TestsAllViews
 {
 
     [Fact]

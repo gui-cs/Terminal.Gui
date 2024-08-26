@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllViews
+public class HasFocusChangeEventTests () : TestsAllViews
 {
     #region HasFocusChanging_NewValue_True
 

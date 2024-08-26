@@ -4,7 +4,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Terminal.Gui.ViewTests;
 
-public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
+public class NavigationTests () : TestsAllViews
 {
     [Theory]
     [MemberData (nameof (AllViewTypes))]

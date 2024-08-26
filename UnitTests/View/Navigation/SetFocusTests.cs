@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class SetFocusTests (ITestOutputHelper _output) : TestsAllViews
+public class SetFocusTests () : TestsAllViews
 {
     [Fact]
     public void SetFocus_With_Null_Superview_Does_Not_Throw_Exception ()

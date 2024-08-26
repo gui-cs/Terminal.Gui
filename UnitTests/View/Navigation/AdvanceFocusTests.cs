@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class AdvanceFocusTests (ITestOutputHelper _output)
+public class AdvanceFocusTests ()
 {
     [Fact]
     public void AdvanceFocus_CanFocus_Mixed ()

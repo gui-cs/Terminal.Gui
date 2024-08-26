@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class CanFocusTests (ITestOutputHelper _output) : TestsAllViews
+public class CanFocusTests () : TestsAllViews
 {
     [Fact]
     public void CanFocus_False_Prevents_SubSubView_HasFocus ()

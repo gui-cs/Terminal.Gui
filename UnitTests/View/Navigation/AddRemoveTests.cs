@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllViews
+public class AddRemoveNavigationTests () : TestsAllViews
 {
     [Fact]
     public void Add_First_Subview_Gets_Focus ()
@@ -199,7 +199,7 @@ public class AddRemoveNavigationTests (ITestOutputHelper _output) : TestsAllView
 
         top.Remove (subView);
         Assert.True (top.HasFocus);
-        Assert.Equal (null, top.Focused);
+        Assert.Null (top.Focused);
         Assert.False (subView.HasFocus);
     }
 
