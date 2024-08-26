@@ -244,48 +244,48 @@ public class CanFocusTests (ITestOutputHelper _output) : TestsAllViews
         Application.Shutdown ();
     }
 
-    [Fact]
-    public void CanFocus_Set_Changes_TabIndex_And_TabStop ()
-    {
-        var r = new View ();
-        var v1 = new View { Text = "1" };
-        var v2 = new View { Text = "2" };
-        var v3 = new View { Text = "3" };
+    //[Fact]
+    //public void CanFocus_Set_Changes_TabIndex_And_TabStop ()
+    //{
+    //    var r = new View ();
+    //    var v1 = new View { Text = "1" };
+    //    var v2 = new View { Text = "2" };
+    //    var v3 = new View { Text = "3" };
 
-        r.Add (v1, v2, v3);
+    //    r.Add (v1, v2, v3);
 
-        v2.CanFocus = true;
-        Assert.Equal (r.TabIndexes.IndexOf (v2), v2.TabIndex);
-        Assert.Equal (0, v2.TabIndex);
-        Assert.Equal (TabBehavior.TabStop, v2.TabStop);
+    //    v2.CanFocus = true;
+    //    Assert.Equal (r.TabIndexes.IndexOf (v2), v2.TabIndex);
+    //    Assert.Equal (0, v2.TabIndex);
+    //    Assert.Equal (TabBehavior.TabStop, v2.TabStop);
 
-        v1.CanFocus = true;
-        Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
-        Assert.Equal (1, v1.TabIndex);
-        Assert.Equal (TabBehavior.TabStop, v1.TabStop);
+    //    v1.CanFocus = true;
+    //    Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
+    //    Assert.Equal (1, v1.TabIndex);
+    //    Assert.Equal (TabBehavior.TabStop, v1.TabStop);
 
-        v1.TabIndex = 2;
-        Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
-        Assert.Equal (1, v1.TabIndex);
-        v3.CanFocus = true;
-        Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
-        Assert.Equal (1, v1.TabIndex);
-        Assert.Equal (r.TabIndexes.IndexOf (v3), v3.TabIndex);
-        Assert.Equal (2, v3.TabIndex);
-        Assert.Equal (TabBehavior.TabStop, v3.TabStop);
+    //    v1.TabIndex = 2;
+    //    Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
+    //    Assert.Equal (1, v1.TabIndex);
+    //    v3.CanFocus = true;
+    //    Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
+    //    Assert.Equal (1, v1.TabIndex);
+    //    Assert.Equal (r.TabIndexes.IndexOf (v3), v3.TabIndex);
+    //    Assert.Equal (2, v3.TabIndex);
+    //    Assert.Equal (TabBehavior.TabStop, v3.TabStop);
 
-        v2.CanFocus = false;
-        Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
-        Assert.Equal (1, v1.TabIndex);
-        Assert.Equal (TabBehavior.TabStop, v1.TabStop);
-        Assert.Equal (r.TabIndexes.IndexOf (v2), v2.TabIndex); // TabIndex is not changed
-        Assert.NotEqual (-1, v2.TabIndex);
-        Assert.Equal (TabBehavior.TabStop, v2.TabStop); // TabStop is not changed
-        Assert.Equal (r.TabIndexes.IndexOf (v3), v3.TabIndex);
-        Assert.Equal (2, v3.TabIndex);
-        Assert.Equal (TabBehavior.TabStop, v3.TabStop);
-        r.Dispose ();
-    }
+    //    v2.CanFocus = false;
+    //    Assert.Equal (r.TabIndexes.IndexOf (v1), v1.TabIndex);
+    //    Assert.Equal (1, v1.TabIndex);
+    //    Assert.Equal (TabBehavior.TabStop, v1.TabStop);
+    //    Assert.Equal (r.TabIndexes.IndexOf (v2), v2.TabIndex); // TabIndex is not changed
+    //    Assert.NotEqual (-1, v2.TabIndex);
+    //    Assert.Equal (TabBehavior.TabStop, v2.TabStop); // TabStop is not changed
+    //    Assert.Equal (r.TabIndexes.IndexOf (v3), v3.TabIndex);
+    //    Assert.Equal (2, v3.TabIndex);
+    //    Assert.Equal (TabBehavior.TabStop, v3.TabStop);
+    //    r.Dispose ();
+    //}
 
     [Fact]
     public void CanFocus_True_Focuses ()

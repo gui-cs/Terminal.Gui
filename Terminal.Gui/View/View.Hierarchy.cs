@@ -52,20 +52,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             _subviews = new ();
         }
 
-        if (_tabIndexes is null)
-        {
-            _tabIndexes = new ();
-        }
-
         Debug.WriteLineIf (_subviews.Contains (view), $"BUGBUG: {view} has already been added to {this}.");
         _subviews.Add (view);
-        _tabIndexes.Add (view);
         view._superView = this;
-
-        if (view.CanFocus)
-        {
-            view._tabIndex = _tabIndexes.IndexOf (view);
-        }
 
         if (view.Enabled && view.Visible && view.CanFocus)
         {
@@ -179,16 +168,14 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
 
         Rectangle touched = view.Frame;
-        _subviews.Remove (view);
-        _tabIndexes!.Remove (view);
-        view._superView = null;
-        //view._tabIndex = -1;
 
         // If a view being removed is focused, it should lose focus.
         if (view.HasFocus)
         {
             view.HasFocus = false;
         }
+        _subviews.Remove (view);
+        view._superView = null; // Null this AFTER removing focus
 
         SetNeedsLayout ();
         SetNeedsDisplay ();

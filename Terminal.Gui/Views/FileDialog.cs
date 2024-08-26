@@ -463,12 +463,12 @@ public class FileDialog : Dialog
             _btnCancel.X = Pos.Func (CalculateOkButtonPosX);
             _btnOk.X = Pos.Right (_btnCancel) + 1;
 
-            // Flip tab order too for consistency
-            int? p1 = _btnOk.TabIndex;
-            int? p2 = _btnCancel.TabIndex;
+            //// Flip tab order too for consistency
+            //int? p1 = _btnOk.TabIndex;
+            //int? p2 = _btnCancel.TabIndex;
 
-            _btnOk.TabIndex = p2;
-            _btnCancel.TabIndex = p1;
+            //_btnOk.TabIndex = p2;
+            //_btnCancel.TabIndex = p1;
         }
 
         _tbPath.Caption = Style.PathCaption;

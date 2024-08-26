@@ -8,7 +8,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     private bool _canFocus;
 
     /// <summary>
-    ///     Advances the focus to the next or previous view in <see cref="View.TabIndexes"/>, based on
+    ///     Advances the focus to the next or previous view in the focus chain, based on
     ///     <paramref name="direction"/>.
     ///     itself.
     /// </summary>
@@ -30,11 +30,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return false;
         }
 
-        if (TabIndexes is null || TabIndexes.Count == 0)
-        {
-            return false;
-        }
-
         View? focused = Focused;
 
         if (focused is { } && focused.AdvanceFocus (direction, behavior))
@@ -42,14 +37,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return true;
         }
 
-        View [] index = GetScopedTabIndexes (direction, behavior);
+        View [] index = GetSubviewFocusChain (direction, behavior);
 
         if (index.Length == 0)
         {
             return false;
         }
 
-        int focusedIndex = index.IndexOf (Focused);
+        int focusedIndex = index.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
         var next = 0;
 
         if (focusedIndex < index.Length - 1)
@@ -69,7 +64,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             //}
 
             // - If we are TabStop and our SuperView has at least one other TabStop subview, move to the SuperView's chain
-            if (TabStop == TabBehavior.TabStop && SuperView is { } && SuperView.GetScopedTabIndexes (direction, behavior).Length > 1)
+            if (TabStop == TabBehavior.TabStop && SuperView is { } && SuperView.GetSubviewFocusChain (direction, behavior).Length > 1)
             {
                 return false;
             }
@@ -81,7 +76,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 {
                     // Wrap to first focusable views
                     // BUGBUG: This should do a Restore Focus instead
-                    index = GetScopedTabIndexes (direction, null);
+                    index = GetSubviewFocusChain (direction, null);
                 }
             }
         }
@@ -110,10 +105,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         the next focusable view.
     ///     </para>
     ///     <para>
-    ///         When set to <see langword="false"/>, the <see cref="TabIndex"/> will be set to -1.
-    ///     </para>
-    ///     <para>
-    ///         When set to <see langword="false"/>, the values of <see cref="CanFocus"/> and <see cref="TabIndex"/> for all
+    ///         When set to <see langword="false"/>, the value of <see cref="CanFocus"/> for all
     ///         subviews will be cached so that when <see cref="CanFocus"/> is set back to <see langword="true"/>, the subviews
     ///         will be restored to their previous values.
     ///     </para>
@@ -163,8 +155,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     public event EventHandler CanFocusChanged;
 
     /// <summary>
-    ///     Focuses the deepest focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
-    ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
+    ///     Focuses the deepest focusable Subview if one exists. If there are no focusable Subviews then the focus is set to the view itself.
     /// </summary>
     /// <param name="direction"></param>
     /// <param name="behavior"></param>
@@ -244,15 +235,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
     private View? FindDeepestFocusableView (NavigationDirection direction, TabBehavior? behavior)
     {
-        View [] indicies = GetScopedTabIndexes (direction, behavior);
+        View [] indicies = GetSubviewFocusChain (direction, behavior);
 
         foreach (View v in indicies)
         {
-            if (v.TabIndexes.Count == 0)
-            {
-                return v;
-            }
-
             return v.FindDeepestFocusableView (direction, behavior);
         }
 
@@ -580,6 +566,16 @@ public partial class View // Focus and cross-view navigation management (TabStop
         View? focusedPeer = SuperView?.Focused;
         _hasFocus = false;
 
+        if (Application.Navigation is { })
+        {
+            View? appFocused = Application.Navigation.GetFocused ();
+
+            if (appFocused is { } || appFocused == this)
+            {
+                Application.Navigation.SetFocused (SuperView);
+            }
+        }
+
         NotifyFocusChanged (HasFocus, this, newFocusedVew);
 
         if (_hasFocus)
@@ -643,14 +639,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
     #region Tab/Focus Handling
 
-    private List<View>? _tabIndexes;
-
-    // TODO: This should be a get-only property?
-    // BUGBUG: This returns an AsReadOnly list, but isn't declared as such.
-    /// <summary>Gets a list of the subviews that are a <see cref="TabStop"/>.</summary>
-    /// <value>The tabIndexes.</value>
-    public IList<View> TabIndexes => _tabIndexes?.AsReadOnly () ?? _empty;
-
     /// <summary>
     ///     Gets TabIndexes that are scoped to the specified behavior and direction. If behavior is null, all TabIndexes are
     ///     returned.
@@ -659,138 +647,25 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <param name="behavior"></param>
     /// <returns></returns>
     /// GetScopedTabIndexes
-    private View [] GetScopedTabIndexes (NavigationDirection direction, TabBehavior? behavior)
+    private View [] GetSubviewFocusChain (NavigationDirection direction, TabBehavior? behavior)
     {
-        IEnumerable<View>? indicies;
+        IEnumerable<View>? fitleredSubviews;
 
         if (behavior.HasValue)
         {
-            indicies = _tabIndexes?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+            fitleredSubviews = _subviews?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
         }
         else
         {
-            indicies = _tabIndexes?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
+            fitleredSubviews = _subviews?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
         if (direction == NavigationDirection.Backward)
         {
-            indicies = indicies?.Reverse ();
+            fitleredSubviews = fitleredSubviews?.Reverse ();
         }
 
-        return indicies?.ToArray () ?? Array.Empty<View> ();
-    }
-
-    private int? _tabIndex; // null indicates the view has not yet been added to TabIndexes
- 
-    /// <summary>
-    ///     Indicates the order of the current <see cref="View"/> in <see cref="TabIndexes"/> list.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         If <see langword="null"/>, the view is not part of the tab order.
-    ///     </para>
-    ///     <para>
-    ///         On set, if <see cref="SuperView"/> is <see langword="null"/> or has not TabStops, <see cref="TabIndex"/> will
-    ///         be set to 0.
-    ///     </para>
-    ///     <para>
-    ///         On set, if <see cref="SuperView"/> has only one TabStop, <see cref="TabIndex"/> will be set to 0.
-    ///     </para>
-    ///     <para>
-    ///         See also <seealso cref="TabStop"/>.
-    ///     </para>
-    /// </remarks>
-    public int? TabIndex
-    {
-        get => _tabIndex;
-
-        // TOOD: This should be a get-only property. Introduce SetTabIndex (int value) (or similar).
-        set
-        {
-            // Once a view is in the tab order, it should not be removed from the tab order; set TabStop to NoStop instead.
-            Debug.Assert (value >= 0);
-            Debug.Assert (value is { });
-
-            if (SuperView?._tabIndexes is null || SuperView?._tabIndexes.Count == 1)
-            {
-                // BUGBUG: Property setters should set the property to the value passed in and not have side effects.
-                _tabIndex = 0;
-
-                return;
-            }
-
-            if (_tabIndex == value && TabIndexes.IndexOf (this) == value)
-            {
-                return;
-            }
-
-            _tabIndex = value > SuperView!.TabIndexes.Count - 1 ? SuperView._tabIndexes.Count - 1 :
-                        value < 0 ? 0 : value;
-            _tabIndex = GetGreatestTabIndexInSuperView ((int)_tabIndex);
-
-            if (SuperView._tabIndexes.IndexOf (this) != _tabIndex)
-            {
-                // BUGBUG: we have to use _tabIndexes and not TabIndexes because TabIndexes returns is a read-only version of _tabIndexes
-                SuperView._tabIndexes.Remove (this);
-                SuperView._tabIndexes.Insert ((int)_tabIndex, this);
-                UpdatePeerTabIndexes ();
-            }
-
-            return;
-
-            // Updates the <see cref="TabIndex"/>s of the views in the <see cref="SuperView"/>'s to match their order in <see cref="TabIndexes"/>.
-            void UpdatePeerTabIndexes ()
-            {
-                if (SuperView is null)
-                {
-                    return;
-                }
-
-                var i = 0;
-
-                foreach (View superViewTabStop in SuperView._tabIndexes)
-                {
-                    if (superViewTabStop._tabIndex is null)
-                    {
-                        continue;
-                    }
-
-                    superViewTabStop._tabIndex = i;
-                    i++;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Gets the greatest <see cref="TabIndex"/> of the <see cref="SuperView"/>'s <see cref="TabIndexes"/> that is less
-    ///     than or equal to <paramref name="idx"/>.
-    /// </summary>
-    /// <param name="idx"></param>
-    /// <returns>The minimum of <paramref name="idx"/> and the <see cref="SuperView"/>'s <see cref="TabIndexes"/>.</returns>
-    private int GetGreatestTabIndexInSuperView (int idx)
-    {
-        if (SuperView is null)
-        {
-            return 0;
-        }
-
-        var i = 0;
-
-        if (SuperView._tabIndexes is { })
-        {
-            foreach (View superViewTabStop in SuperView._tabIndexes)
-            {
-                if (superViewTabStop._tabIndex is null || superViewTabStop == this)
-                {
-                    continue;
-                }
-
-                i++;
-            }
-        }
-
-        return Math.Min (i, idx);
+        return fitleredSubviews?.ToArray () ?? Array.Empty<View> ();
     }
 
     private TabBehavior? _tabStop;
@@ -826,17 +701,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
             if (_tabStop == value)
             {
                 return;
-            }
-
-            Debug.Assert (value is { });
-
-            if (_tabStop is null && TabIndex is null)
-            {
-                // This view has not yet been added to TabIndexes (TabStop has not been set previously).
-                if (SuperView?._tabIndexes is { })
-                {
-                    TabIndex = GetGreatestTabIndexInSuperView (SuperView is { } ? SuperView._tabIndexes.Count : 0);
-                }
             }
 
             _tabStop = value;

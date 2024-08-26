@@ -506,7 +506,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         top.Add (otherView, cb);
         Application.Begin (top);
 
-        Assert.False (cb.HasFocus);
+        Assert.True (cb.HasFocus);
 
         Assert.True (cb.HideDropdownListOnClick);
         Assert.False (cb.IsShow);
@@ -857,7 +857,7 @@ Three ",
         Assert.True (Application.OnKeyDown (Key.CursorDown)); // losing focus
         Assert.False (cb.IsShow);
         Assert.False (cb.HasFocus);
-        top.FocusDeepest (NavigationDirection.Forward, null); // Gets focus again
+        cb.SetFocus ();
         Assert.False (cb.IsShow);
         Assert.True (cb.HasFocus);
         cb.Expand ();
@@ -969,7 +969,8 @@ Three
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        top.FocusDeepest (NavigationDirection.Forward, null); // Gets focus again
+
+        cb.SetFocus ();
         Assert.True (cb.HasFocus);
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);

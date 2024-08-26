@@ -5,296 +5,6 @@ namespace Terminal.Gui.ViewTests;
 public class AdvanceFocusTests (ITestOutputHelper _output)
 {
     [Fact]
-    public void Subviews_TabIndexes_AreEqual ()
-    {
-        var r = new View ();
-        var v1 = new View { CanFocus = true };
-        var v2 = new View { CanFocus = true };
-        var v3 = new View { CanFocus = true };
-
-        r.Add (v1, v2, v3);
-
-        Assert.True (r.Subviews.IndexOf (v1) == 0);
-        Assert.True (r.Subviews.IndexOf (v2) == 1);
-        Assert.True (r.Subviews.IndexOf (v3) == 2);
-
-        Assert.True (r.TabIndexes.IndexOf (v1) == 0);
-        Assert.True (r.TabIndexes.IndexOf (v2) == 1);
-        Assert.True (r.TabIndexes.IndexOf (v3) == 2);
-
-        Assert.Equal (r.Subviews.IndexOf (v1), r.TabIndexes.IndexOf (v1));
-        Assert.Equal (r.Subviews.IndexOf (v2), r.TabIndexes.IndexOf (v2));
-        Assert.Equal (r.Subviews.IndexOf (v3), r.TabIndexes.IndexOf (v3));
-        r.Dispose ();
-    }
-
-    [Fact]
-    public void TabIndex_Invert_Order ()
-    {
-        var r = new View ();
-        var v1 = new View { Id = "1", CanFocus = true };
-        var v2 = new View { Id = "2", CanFocus = true };
-        var v3 = new View { Id = "3", CanFocus = true };
-
-        r.Add (v1, v2, v3);
-
-        v1.TabIndex = 2;
-        v2.TabIndex = 1;
-        v3.TabIndex = 0;
-        Assert.True (r.TabIndexes.IndexOf (v1) == 2);
-        Assert.True (r.TabIndexes.IndexOf (v2) == 1);
-        Assert.True (r.TabIndexes.IndexOf (v3) == 0);
-
-        Assert.True (r.Subviews.IndexOf (v1) == 0);
-        Assert.True (r.Subviews.IndexOf (v2) == 1);
-        Assert.True (r.Subviews.IndexOf (v3) == 2);
-    }
-
-    [Fact]
-    public void TabIndex_Invert_Order_Added_One_By_One_Does_Not_Do_What_Is_Expected ()
-    {
-        var r = new View ();
-        var v1 = new View { Id = "1", CanFocus = true };
-        r.Add (v1);
-        v1.TabIndex = 2;
-        var v2 = new View { Id = "2", CanFocus = true };
-        r.Add (v2);
-        v2.TabIndex = 1;
-        var v3 = new View { Id = "3", CanFocus = true };
-        r.Add (v3);
-        v3.TabIndex = 0;
-
-        Assert.False (r.TabIndexes.IndexOf (v1) == 2);
-        Assert.True (r.TabIndexes.IndexOf (v1) == 1);
-        Assert.False (r.TabIndexes.IndexOf (v2) == 1);
-        Assert.True (r.TabIndexes.IndexOf (v2) == 2);
-
-        // Only the last is in the expected index
-        Assert.True (r.TabIndexes.IndexOf (v3) == 0);
-
-        Assert.True (r.Subviews.IndexOf (v1) == 0);
-        Assert.True (r.Subviews.IndexOf (v2) == 1);
-        Assert.True (r.Subviews.IndexOf (v3) == 2);
-    }
-
-    [Fact]
-    public void TabIndex_Invert_Order_Mixed ()
-    {
-        var r = new View ();
-        var vl1 = new View { Id = "vl1" };
-        var v1 = new View { Id = "v1", CanFocus = true };
-        var vl2 = new View { Id = "vl2" };
-        var v2 = new View { Id = "v2", CanFocus = true };
-        var vl3 = new View { Id = "vl3" };
-        var v3 = new View { Id = "v3", CanFocus = true };
-
-        r.Add (vl1, v1, vl2, v2, vl3, v3);
-
-        v1.TabIndex = 2;
-        v2.TabIndex = 1;
-        v3.TabIndex = 0;
-        Assert.True (r.TabIndexes.IndexOf (v1) == 4);
-        Assert.True (r.TabIndexes.IndexOf (v2) == 2);
-        Assert.True (r.TabIndexes.IndexOf (v3) == 0);
-
-        Assert.True (r.Subviews.IndexOf (v1) == 1);
-        Assert.True (r.Subviews.IndexOf (v2) == 3);
-        Assert.True (r.Subviews.IndexOf (v3) == 5);
-    }
-
-    [Fact]
-    public void TabIndex_Set_CanFocus_False ()
-    {
-        var r = new View ();
-        var v1 = new View { CanFocus = true };
-        var v2 = new View { CanFocus = true };
-        var v3 = new View { CanFocus = true };
-
-        r.Add (v1, v2, v3);
-
-        v1.CanFocus = false;
-        v1.TabIndex = 0;
-        Assert.True (r.Subviews.IndexOf (v1) == 0);
-        Assert.True (r.TabIndexes.IndexOf (v1) == 0);
-        Assert.NotEqual (-1, v1.TabIndex);
-        r.Dispose ();
-    }
-
-    [Fact]
-    public void TabIndex_Set_CanFocus_False_To_True ()
-    {
-        var r = new View ();
-        var v1 = new View ();
-        var v2 = new View { CanFocus = true };
-        var v3 = new View { CanFocus = true };
-
-        r.Add (v1, v2, v3);
-
-        v1.CanFocus = true;
-        v1.TabIndex = 1;
-        Assert.True (r.Subviews.IndexOf (v1) == 0);
-        Assert.True (r.TabIndexes.IndexOf (v1) == 1);
-        r.Dispose ();
-    }
-
-    [Fact]
-    public void TabIndex_Set_CanFocus_HigherValues ()
-    {
-        var r = new View ();
-        var v1 = new View { CanFocus = true };
-        var v2 = new View { CanFocus = true };
-        var v3 = new View { CanFocus = true };
-
-        r.Add (v1, v2, v3);
-
-        v1.TabIndex = 3;
-        Assert.True (r.Subviews.IndexOf (v1) == 0);
-        Assert.True (r.TabIndexes.IndexOf (v1) == 2);
-        r.Dispose ();
-    }
-
-    [Fact]
-    public void TabIndex_Set_CanFocus_LowerValues ()
-    {
-        var r = new View ();
-        var v1 = new View { CanFocus = true };
-        var v2 = new View { CanFocus = true };
-        var v3 = new View { CanFocus = true };
-
-        r.Add (v1, v2, v3);
-
-        //v1.TabIndex = -1;
-        Assert.True (r.Subviews.IndexOf (v1) == 0);
-        Assert.True (r.TabIndexes.IndexOf (v1) == 0);
-        r.Dispose ();
-    }
-
-    [Fact]
-    public void TabIndex_Set_CanFocus_ValidValues ()
-    {
-        var r = new View ();
-        var v1 = new View { CanFocus = true };
-        var v2 = new View { CanFocus = true };
-        var v3 = new View { CanFocus = true };
-
-        r.Add (v1, v2, v3);
-
-        v1.TabIndex = 1;
-        Assert.True (r.Subviews.IndexOf (v1) == 0);
-        Assert.True (r.TabIndexes.IndexOf (v1) == 1);
-
-        v1.TabIndex = 2;
-        Assert.True (r.Subviews.IndexOf (v1) == 0);
-        Assert.True (r.TabIndexes.IndexOf (v1) == 2);
-        r.Dispose ();
-    }
-
-
-    [Theory]
-    [CombinatorialData]
-    public void TabStop_And_CanFocus_Are_Decoupled (bool canFocus, TabBehavior tabStop)
-    {
-        var view = new View { CanFocus = canFocus, TabStop = tabStop };
-
-        Assert.Equal (canFocus, view.CanFocus);
-        Assert.Equal (tabStop, view.TabStop);
-    }
-
-
-    [Fact]
-    public void AdvanceFocus_Compound_Subview ()
-    {
-        var top = new View () { Id = "top", CanFocus = true };
-
-        var compoundSubview = new View ()
-        {
-            CanFocus = true,
-            Id = "compoundSubview",
-        };
-        var v1 = new View { Id = "v1", CanFocus = true };
-        var v2 = new View { Id = "v2", CanFocus = true };
-        var v3 = new View { Id = "v3", CanFocus = false };
-
-        compoundSubview.Add (v1, v2, v3);
-
-        top.Add (compoundSubview);
-
-        // Cycle through v1 & v2
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.True (v1.HasFocus);
-        Assert.False (v2.HasFocus);
-        Assert.False (v3.HasFocus);
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.False (v1.HasFocus);
-        Assert.True (v2.HasFocus);
-        Assert.False (v3.HasFocus);
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.True (v1.HasFocus);
-        Assert.False (v2.HasFocus);
-        Assert.False (v3.HasFocus);
-
-        // Add another subview
-        View otherSubview = new ()
-        {
-            CanFocus = true,
-            Id = "otherSubview",
-        };
-
-        top.Add (otherSubview);
-        // Adding a focusable subview causes advancefocus
-        Assert.True (otherSubview.HasFocus);
-        Assert.False (v1.HasFocus);
-
-        // Cycle through v1 & v2
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.True (v1.HasFocus);
-        Assert.False (v2.HasFocus);
-        Assert.False (v3.HasFocus);
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.False (v1.HasFocus);
-        Assert.True (v2.HasFocus);
-        Assert.False (v3.HasFocus);
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.False (v1.HasFocus);
-        Assert.False (v2.HasFocus);
-        Assert.False (v3.HasFocus);
-
-        Assert.True (otherSubview.HasFocus);
-        // v2 was previously focused down the compoundSubView focus chain
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.False (v1.HasFocus);
-        Assert.True (v2.HasFocus);
-        Assert.False (v3.HasFocus);
-
-        top.Dispose ();
-    }
-
-    [Fact]
-    public void AdvanceFocus_With_CanFocus_Are_All_True ()
-    {
-        var top = new View () { Id = "top", CanFocus = true };
-        var v1 = new View { Id = "v1", CanFocus = true };
-        var v2 = new View { Id = "v2", CanFocus = true };
-        var v3 = new View { Id = "v3", CanFocus = true };
-
-        top.Add (v1, v2, v3);
-
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.True (v1.HasFocus);
-        Assert.False (v2.HasFocus);
-        Assert.False (v3.HasFocus);
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.False (v1.HasFocus);
-        Assert.True (v2.HasFocus);
-        Assert.False (v3.HasFocus);
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.False (v1.HasFocus);
-        Assert.False (v2.HasFocus);
-        Assert.True (v3.HasFocus);
-        top.Dispose ();
-    }
-
-    [Fact]
     public void AdvanceFocus_CanFocus_Mixed ()
     {
         var r = new View ();
@@ -323,7 +33,7 @@ public class AdvanceFocusTests (ITestOutputHelper _output)
     [CombinatorialData]
     public void AdvanceFocus_Change_CanFocus_Works ([CombinatorialValues (TabBehavior.NoStop, TabBehavior.TabStop, TabBehavior.TabGroup)] TabBehavior behavior)
     {
-        var r = new View () { CanFocus = true };
+        var r = new View { CanFocus = true };
         var v1 = new View ();
         var v2 = new View ();
         var v3 = new View ();
@@ -360,6 +70,76 @@ public class AdvanceFocusTests (ITestOutputHelper _output)
         Assert.False (v2.HasFocus);
         Assert.True (v3.HasFocus);
         r.Dispose ();
+    }
+
+    [Fact]
+    public void AdvanceFocus_Compound_Subview ()
+    {
+        var top = new View { Id = "top", CanFocus = true };
+
+        var compoundSubview = new View
+        {
+            CanFocus = true,
+            Id = "compoundSubview"
+        };
+        var v1 = new View { Id = "v1", CanFocus = true };
+        var v2 = new View { Id = "v2", CanFocus = true };
+        var v3 = new View { Id = "v3", CanFocus = false };
+
+        compoundSubview.Add (v1, v2, v3);
+
+        top.Add (compoundSubview);
+
+        // Cycle through v1 & v2
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.True (v1.HasFocus);
+        Assert.False (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.False (v1.HasFocus);
+        Assert.True (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.True (v1.HasFocus);
+        Assert.False (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+
+        // Add another subview
+        View otherSubview = new ()
+        {
+            CanFocus = true,
+            Id = "otherSubview"
+        };
+
+        top.Add (otherSubview);
+
+        // Adding a focusable subview causes advancefocus
+        Assert.True (otherSubview.HasFocus);
+        Assert.False (v1.HasFocus);
+
+        // Cycle through v1 & v2
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.True (v1.HasFocus);
+        Assert.False (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.False (v1.HasFocus);
+        Assert.True (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.False (v1.HasFocus);
+        Assert.False (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+
+        Assert.True (otherSubview.HasFocus);
+
+        // v2 was previously focused down the compoundSubView focus chain
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.False (v1.HasFocus);
+        Assert.True (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+
+        top.Dispose ();
     }
 
     [Fact]
@@ -458,5 +238,208 @@ public class AdvanceFocusTests (ITestOutputHelper _output)
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
         r.Dispose ();
+    }
+
+    [Fact]
+    public void AdvanceFocus_Subviews_Raises_HasFocusChanged ()
+    {
+        var top = new View
+        {
+            Id = "top",
+            CanFocus = true
+        };
+
+        var subView1 = new View
+        {
+            Id = "subView1",
+            CanFocus = true
+        };
+
+        var subView2 = new View
+        {
+            Id = "subView2",
+            CanFocus = true
+        };
+        top.Add (subView1, subView2);
+
+        var subView1HasFocusChangedTrueCount = 0;
+        var subView1HasFocusChangedFalseCount = 0;
+
+        subView1.HasFocusChanged += (s, e) =>
+                                    {
+                                        if (e.NewValue)
+                                        {
+                                            subView1HasFocusChangedTrueCount++;
+                                        }
+                                        else
+                                        {
+                                            subView1HasFocusChangedFalseCount++;
+                                        }
+                                    };
+
+        var subView2HasFocusChangedTrueCount = 0;
+        var subView2HasFocusChangedFalseCount = 0;
+
+        subView2.HasFocusChanged += (s, e) =>
+                                    {
+                                        if (e.NewValue)
+                                        {
+                                            subView2HasFocusChangedTrueCount++;
+                                        }
+                                        else
+                                        {
+                                            subView2HasFocusChangedFalseCount++;
+                                        }
+                                    };
+
+        top.SetFocus ();
+        Assert.True (top.HasFocus);
+        Assert.True (subView1.HasFocus);
+        Assert.False (subView2.HasFocus);
+
+        Assert.Equal (1, subView1HasFocusChangedTrueCount);
+        Assert.Equal (0, subView1HasFocusChangedFalseCount);
+
+        Assert.Equal (0, subView2HasFocusChangedTrueCount);
+        Assert.Equal (0, subView2HasFocusChangedFalseCount);
+
+        top.AdvanceFocus (NavigationDirection.Forward, null);
+        Assert.False (subView1.HasFocus);
+        Assert.True (subView2.HasFocus);
+
+        Assert.Equal (1, subView1HasFocusChangedTrueCount);
+        Assert.Equal (1, subView1HasFocusChangedFalseCount);
+
+        Assert.Equal (1, subView2HasFocusChangedTrueCount);
+        Assert.Equal (0, subView2HasFocusChangedFalseCount);
+
+        top.AdvanceFocus (NavigationDirection.Forward, null);
+        Assert.True (subView1.HasFocus);
+        Assert.False (subView2.HasFocus);
+
+        Assert.Equal (2, subView1HasFocusChangedTrueCount);
+        Assert.Equal (1, subView1HasFocusChangedFalseCount);
+
+        Assert.Equal (1, subView2HasFocusChangedTrueCount);
+        Assert.Equal (1, subView2HasFocusChangedFalseCount);
+    }
+
+    [Fact]
+    public void AdvanceFocus_Subviews_Raises_HasFocusChanging ()
+    {
+        var top = new View
+        {
+            Id = "top",
+            CanFocus = true
+        };
+
+        var subView1 = new View
+        {
+            Id = "subView1",
+            CanFocus = true
+        };
+
+        var subView2 = new View
+        {
+            Id = "subView2",
+            CanFocus = true
+        };
+        top.Add (subView1, subView2);
+
+        var subView1HasFocusChangingTrueCount = 0;
+        var subView1HasFocusChangingFalseCount = 0;
+
+        subView1.HasFocusChanging += (s, e) =>
+                                     {
+                                         if (e.NewValue)
+                                         {
+                                             subView1HasFocusChangingTrueCount++;
+                                         }
+                                         else
+                                         {
+                                             subView1HasFocusChangingFalseCount++;
+                                         }
+                                     };
+
+        var subView2HasFocusChangingTrueCount = 0;
+        var subView2HasFocusChangingFalseCount = 0;
+
+        subView2.HasFocusChanging += (s, e) =>
+                                     {
+                                         if (e.NewValue)
+                                         {
+                                             subView2HasFocusChangingTrueCount++;
+                                         }
+                                         else
+                                         {
+                                             subView2HasFocusChangingFalseCount++;
+                                         }
+                                     };
+
+        top.SetFocus ();
+        Assert.True (top.HasFocus);
+        Assert.True (subView1.HasFocus);
+        Assert.False (subView2.HasFocus);
+
+        Assert.Equal (1, subView1HasFocusChangingTrueCount);
+        Assert.Equal (0, subView1HasFocusChangingFalseCount);
+
+        Assert.Equal (0, subView2HasFocusChangingTrueCount);
+        Assert.Equal (0, subView2HasFocusChangingFalseCount);
+
+        top.AdvanceFocus (NavigationDirection.Forward, null);
+        Assert.False (subView1.HasFocus);
+        Assert.True (subView2.HasFocus);
+
+        Assert.Equal (1, subView1HasFocusChangingTrueCount);
+        Assert.Equal (1, subView1HasFocusChangingFalseCount);
+
+        Assert.Equal (1, subView2HasFocusChangingTrueCount);
+        Assert.Equal (0, subView2HasFocusChangingFalseCount);
+
+        top.AdvanceFocus (NavigationDirection.Forward, null);
+        Assert.True (subView1.HasFocus);
+        Assert.False (subView2.HasFocus);
+
+        Assert.Equal (2, subView1HasFocusChangingTrueCount);
+        Assert.Equal (1, subView1HasFocusChangingFalseCount);
+
+        Assert.Equal (1, subView2HasFocusChangingTrueCount);
+        Assert.Equal (1, subView2HasFocusChangingFalseCount);
+    }
+
+    [Fact]
+    public void AdvanceFocus_With_CanFocus_Are_All_True ()
+    {
+        var top = new View { Id = "top", CanFocus = true };
+        var v1 = new View { Id = "v1", CanFocus = true };
+        var v2 = new View { Id = "v2", CanFocus = true };
+        var v3 = new View { Id = "v3", CanFocus = true };
+
+        top.Add (v1, v2, v3);
+
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.True (v1.HasFocus);
+        Assert.False (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.False (v1.HasFocus);
+        Assert.True (v2.HasFocus);
+        Assert.False (v3.HasFocus);
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Assert.False (v1.HasFocus);
+        Assert.False (v2.HasFocus);
+        Assert.True (v3.HasFocus);
+        top.Dispose ();
+    }
+
+    [Theory]
+    [CombinatorialData]
+    public void TabStop_And_CanFocus_Are_Decoupled (bool canFocus, TabBehavior tabStop)
+    {
+        var view = new View { CanFocus = canFocus, TabStop = tabStop };
+
+        Assert.Equal (canFocus, view.CanFocus);
+        Assert.Equal (tabStop, view.TabStop);
     }
 }

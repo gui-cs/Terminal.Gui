@@ -5,6 +5,7 @@ namespace Terminal.Gui.ViewTests;
 public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllViews
 {
     #region HasFocusChanging_NewValue_True
+
     [Fact]
     public void HasFocusChanging_SetFocus_Raises ()
     {
@@ -16,6 +17,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanging += (s, e) =>
                                  {
                                      if (e.NewValue)
@@ -49,6 +51,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanging += (s, e) =>
                                  {
                                      if (e.NewValue)
@@ -69,17 +72,18 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subview",
             CanFocus = true
         };
+
         subview.HasFocusChanging += (s, e) =>
-                                 {
-                                     if (e.NewValue)
-                                     {
-                                         subviewHasFocusTrueCount++;
-                                     }
-                                     else
-                                     {
-                                         subviewHasFocusFalseCount++;
-                                     }
-                                 };
+                                    {
+                                        if (e.NewValue)
+                                        {
+                                            subviewHasFocusTrueCount++;
+                                        }
+                                        else
+                                        {
+                                            subviewHasFocusFalseCount++;
+                                        }
+                                    };
 
         view.Add (subview);
 
@@ -104,6 +108,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanging += (s, e) =>
                                  {
                                      if (e.NewValue)
@@ -124,6 +129,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subview",
             CanFocus = true
         };
+
         subview.HasFocusChanging += (s, e) =>
                                     {
                                         if (e.NewValue)
@@ -158,6 +164,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanging += (s, e) =>
                                  {
                                      if (e.NewValue)
@@ -178,6 +185,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subView",
             CanFocus = true
         };
+
         subView.HasFocusChanging += (s, e) =>
                                     {
                                         if (e.NewValue)
@@ -198,6 +206,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subViewSubView1",
             CanFocus = false
         };
+
         subViewSubView1.HasFocusChanging += (s, e) =>
                                             {
                                                 if (e.NewValue)
@@ -218,6 +227,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subViewSubView2",
             CanFocus = true
         };
+
         subViewSubView2.HasFocusChanging += (s, e) =>
                                             {
                                                 if (e.NewValue)
@@ -238,6 +248,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subViewSubView3",
             CanFocus = false
         };
+
         subViewSubView3.HasFocusChanging += (s, e) =>
                                             {
                                                 if (e.NewValue)
@@ -288,6 +299,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanging += (s, e) =>
                                  {
                                      if (e.NewValue)
@@ -309,6 +321,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subview",
             CanFocus = true
         };
+
         subview.HasFocusChanging += (s, e) =>
                                     {
                                         if (e.NewValue)
@@ -346,6 +359,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanging += (s, e) =>
                                  {
                                      if (e.NewValue)
@@ -367,6 +381,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subview",
             CanFocus = true
         };
+
         subview.HasFocusChanging += (s, e) =>
                                     {
                                         if (e.NewValue)
@@ -404,6 +419,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanging += (s, e) =>
                                  {
                                      if (e.NewValue)
@@ -424,6 +440,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subview",
             CanFocus = true
         };
+
         subview.HasFocusChanging += (s, e) =>
                                     {
                                         if (e.NewValue)
@@ -463,6 +480,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanging += (s, e) =>
                                  {
                                      if (e.NewValue)
@@ -483,6 +501,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subview",
             CanFocus = true
         };
+
         subview.HasFocusChanging += (s, e) =>
                                     {
                                         if (e.NewValue)
@@ -537,6 +556,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanging += (s, e) =>
                                  {
                                      if (e.NewValue)
@@ -575,6 +595,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanging += (s, e) =>
                                  {
                                      if (e.NewValue)
@@ -595,6 +616,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subview",
             CanFocus = true
         };
+
         subview.HasFocusChanging += (s, e) =>
                                     {
                                         if (e.NewValue)
@@ -618,7 +640,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
         Assert.Equal (0, subviewHasFocusFalseCount);
 
         view.HasFocus = false;
-        Assert.False(view.HasFocus);
+        Assert.False (view.HasFocus);
         Assert.False (subview.HasFocus);
         Assert.Equal (1, hasFocusTrueCount);
         Assert.Equal (1, hasFocusFalseCount);
@@ -640,6 +662,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanging += (s, e) =>
                                  {
                                      if (e.NewValue)
@@ -660,6 +683,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subview",
             CanFocus = true
         };
+
         subview.HasFocusChanging += (s, e) =>
                                     {
                                         if (e.NewValue)
@@ -691,6 +715,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
         Assert.Equal (1, subviewHasFocusFalseCount);
 
     }
+
     #endregion HasFocusChanging_NewValue_False
 
     #region HasFocusChanged
@@ -706,6 +731,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanged += (s, e) =>
                                 {
                                     if (e.NewValue)
@@ -743,6 +769,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanged += (s, e) =>
                                 {
                                     if (e.NewValue)
@@ -763,6 +790,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subview",
             CanFocus = true
         };
+
         subview.HasFocusChanged += (s, e) =>
                                    {
                                        if (e.NewValue)
@@ -821,6 +849,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanged += (s, e) =>
                                 {
                                     if (e.NewValue)
@@ -841,6 +870,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subView",
             CanFocus = true
         };
+
         subView.HasFocusChanged += (s, e) =>
                                    {
                                        if (e.NewValue)
@@ -861,6 +891,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subViewSubView1",
             CanFocus = false
         };
+
         subViewSubView1.HasFocusChanged += (s, e) =>
                                            {
                                                if (e.NewValue)
@@ -881,6 +912,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subViewSubView2",
             CanFocus = true
         };
+
         subViewSubView2.HasFocusChanged += (s, e) =>
                                            {
                                                if (e.NewValue)
@@ -900,6 +932,7 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "subViewSubView3",
             CanFocus = false
         };
+
         subViewSubView3.HasFocusChanged += (s, e) =>
                                            {
                                                if (e.NewValue)
@@ -967,32 +1000,33 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
             Id = "view",
             CanFocus = true
         };
+
         view.HasFocusChanged += (s, e) =>
-        {
-            if (e.NewValue)
-            {
-                Assert.True (view.HasFocus);
-                Assert.True (subView1.HasFocus);
-                Assert.False (subView2.HasFocus);
+                                {
+                                    if (e.NewValue)
+                                    {
+                                        Assert.True (view.HasFocus);
+                                        Assert.True (subView1.HasFocus);
+                                        Assert.False (subView2.HasFocus);
 
-                subView1.Visible = true;
-                subView2.Visible = false;
+                                        subView1.Visible = true;
+                                        subView2.Visible = false;
 
-                Assert.True (view.HasFocus);
-                Assert.True (subView1.HasFocus);
-                Assert.False (subView2.HasFocus);
+                                        Assert.True (view.HasFocus);
+                                        Assert.True (subView1.HasFocus);
+                                        Assert.False (subView2.HasFocus);
 
-            }
-            else
-            {
-                Assert.False (view.HasFocus);
-                Assert.False (subView1.HasFocus);
-                Assert.False (subView2.HasFocus);
+                                    }
+                                    else
+                                    {
+                                        Assert.False (view.HasFocus);
+                                        Assert.False (subView1.HasFocus);
+                                        Assert.False (subView2.HasFocus);
 
-                subView1.Visible = false;
-                subView2.Visible = true;
-            }
-        };
+                                        subView1.Visible = false;
+                                        subView2.Visible = true;
+                                    }
+                                };
 
         view.Add (subView1, subView2);
 
@@ -1006,5 +1040,6 @@ public class HasFocusChangeEventTests (ITestOutputHelper _output) : TestsAllView
         Assert.False (subView1.HasFocus);
         Assert.False (subView2.HasFocus);
     }
+
     #endregion HasFocusChanged
 }

@@ -313,48 +313,6 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
     }
 
-    [Fact]
-    public void BringSubviewForward_Subviews_vs_TabIndexes ()
-    {
-        var r = new View ();
-        var v1 = new View { CanFocus = true };
-        var v2 = new View { CanFocus = true };
-        var v3 = new View { CanFocus = true };
-
-        r.Add (v1, v2, v3);
-
-        r.BringSubviewForward (v1);
-        Assert.True (r.Subviews.IndexOf (v1) == 1);
-        Assert.True (r.Subviews.IndexOf (v2) == 0);
-        Assert.True (r.Subviews.IndexOf (v3) == 2);
-
-        Assert.True (r.TabIndexes.IndexOf (v1) == 0);
-        Assert.True (r.TabIndexes.IndexOf (v2) == 1);
-        Assert.True (r.TabIndexes.IndexOf (v3) == 2);
-        r.Dispose ();
-    }
-
-    [Fact]
-    public void BringSubviewToFront_Subviews_vs_TabIndexes ()
-    {
-        var r = new View ();
-        var v1 = new View { CanFocus = true };
-        var v2 = new View { CanFocus = true };
-        var v3 = new View { CanFocus = true };
-
-        r.Add (v1, v2, v3);
-
-        r.BringSubviewToFront (v1);
-        Assert.True (r.Subviews.IndexOf (v1) == 2);
-        Assert.True (r.Subviews.IndexOf (v2) == 0);
-        Assert.True (r.Subviews.IndexOf (v3) == 1);
-
-        Assert.True (r.TabIndexes.IndexOf (v1) == 0);
-        Assert.True (r.TabIndexes.IndexOf (v2) == 1);
-        Assert.True (r.TabIndexes.IndexOf (v3) == 2);
-        r.Dispose ();
-    }
-
     // View.Focused & View.MostFocused tests
 
     // View.Focused - No subviews

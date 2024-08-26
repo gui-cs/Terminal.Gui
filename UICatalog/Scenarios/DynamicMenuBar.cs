@@ -640,10 +640,10 @@ public class DynamicMenuBar : Scenario
             };
             frmMenu.Add (_lstMenus);
 
-            lblMenuBar.TabIndex = btnPrevious.TabIndex + 1;
-            _lstMenus.TabIndex = lblMenuBar.TabIndex + 1;
-            btnNext.TabIndex = _lstMenus.TabIndex + 1;
-            btnAdd.TabIndex = btnNext.TabIndex + 1;
+            //lblMenuBar.TabIndex = btnPrevious.TabIndex + 1;
+            //_lstMenus.TabIndex = lblMenuBar.TabIndex + 1;
+            //btnNext.TabIndex = _lstMenus.TabIndex + 1;
+            //btnAdd.TabIndex = btnNext.TabIndex + 1;
 
             var btnRemove = new Button { X = Pos.Left (btnAdd), Y = Pos.Top (btnAdd) + 1, Text = "Remove" };
             frmMenu.Add (btnRemove);
