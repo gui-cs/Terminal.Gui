@@ -429,28 +429,27 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // We're moving beyond the last subview
 
             // Determine if focus should remain in this focus chain, or move to the superview's focus chain
-            if (SuperView is { } && SuperView.TabStop != TabBehavior.NoStop && SuperView.GetScopedTabIndexes (direction, behavior).Length > 1)
+            // - If we are TabStop and our SuperView is TabStop move to superview's focus chain
+            if (TabStop == TabBehavior.TabStop && SuperView is { TabStop: TabBehavior.TabStop })
             {
-                //if (behavior == TabBehavior.TabGroup && behavior == TabStop && SuperView?.TabStop == TabBehavior.TabGroup)
-                {
-                    // Our superview has an focusable subview in addition to us
-                    return false;
-                }
+                return false;
             }
 
-            // If our superview 
-            //if (behavior == TabBehavior.TabGroup && behavior == TabStop && SuperView?.TabStop == TabBehavior.TabGroup)
+            // - If we are TabStop and our SuperView has at least one other TabStop subview, move to the SuperView's chain
+            if (TabStop == TabBehavior.TabStop && SuperView is { } && SuperView.GetScopedTabIndexes (direction, behavior).Length > 1)
             {
-                next = 0;
-                //return 
+                return false;
+            }
 
-                //// Go down the subview-hierarchy and leave
-                //// BUGBUG: This doesn't seem right
-                //Focused.HasFocus = false;
-
-                //// TODO: Should we check the return value of SetHasFocus?
-
-                //return false;
+            // - If we are TabGrup and our SuperView has at least one other TabGroup subview, move to the SuperView's chain
+            if (TabStop == TabBehavior.TabGroup && SuperView is { TabStop: TabBehavior.TabGroup })
+            {
+                if (behavior == TabBehavior.TabGroup)
+                {
+                    // Wrap to first focusable views
+                    // BUGBUG: This should do a Restore Focus instead
+                    index = GetScopedTabIndexes (direction, null);
+                }
             }
         }
 

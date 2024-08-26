@@ -53,11 +53,11 @@ public class ViewExperiments : Scenario
         testFrame.Add (tiledView1);
         testFrame.Add (tiledView2);
 
-        var overlappedView1 = CreateOverlappedView (2, Pos.Center(), Pos.Center());
+        var overlappedView1 = CreateOverlappedView (2, Pos.Center()-5, Pos.Center());
         var tiledSubView = CreateTiledView (4, 0, 2);
         overlappedView1.Add (tiledSubView);
         
-        var overlappedView2 = CreateOverlappedView (3, Pos.Center() + 5, Pos.Center() + 5);
+        var overlappedView2 = CreateOverlappedView (3, Pos.Center() + 10, Pos.Center() + 5);
         tiledSubView = CreateTiledView (4, 0, 2);
         overlappedView2.Add (tiledSubView);
 
