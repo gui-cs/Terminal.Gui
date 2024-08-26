@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class EnabledTests (ITestOutputHelper _output) : TestsAllViews
+public class EnabledTests () : TestsAllViews
 {
     [Fact]
     public void Enabled_False_Leaves ()

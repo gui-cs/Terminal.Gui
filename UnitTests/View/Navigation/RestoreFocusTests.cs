@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class RestoreFocusTests (ITestOutputHelper _output) : TestsAllViews
+public class RestoreFocusTests () : TestsAllViews
 {
     [Fact]
     public void RestoreFocus_Restores ()
