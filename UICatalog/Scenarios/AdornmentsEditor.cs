@@ -21,8 +21,6 @@ public class AdornmentsEditor : View
 
         TabStop = TabBehavior.TabGroup;
 
-        //Application.MouseEvent += Application_MouseEvent;
-        Application.Navigation!.FocusedChanged += ApplicationNavigationOnFocusedChanged;
         Initialized += AdornmentsEditor_Initialized;
     }
 
@@ -154,36 +152,5 @@ public class AdornmentsEditor : View
 
         Add (_diagRulerCheckBox);
         _diagRulerCheckBox.Y = Pos.Bottom (_diagPaddingCheckBox);
-    }
-
-    private void Application_MouseEvent (object sender, MouseEvent e)
-    {
-        if (!AutoSelectViewToEdit || FrameToScreen ().Contains (e.Position))
-        {
-            return;
-        }
-
-        // TODO: Add a setting (property) so only subviews of a specified view are considered.
-        View view = e.View;
-
-        if (view is { } && e.Flags == MouseFlags.Button1Clicked)
-        {
-            if (view is Adornment adornment)
-            {
-                ViewToEdit = adornment.Parent;
-            }
-            else
-            {
-                ViewToEdit = view;
-            }
-        }
-    }
-
-    private void ApplicationNavigationOnFocusedChanged (object sender, EventArgs e)
-    {
-        if (ApplicationNavigation.IsInHierarchy (this, Application.Navigation!.GetFocused ()))
-        {
-            return;
-        }
     }
 }

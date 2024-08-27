@@ -1,14 +1,11 @@
-﻿using System;
-using Terminal.Gui;
+﻿using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("View Experiments", "v2 View Experiments")]
-[ScenarioCategory ("Controls")]
-[ScenarioCategory ("Borders")]
+[ScenarioMetadata ("Navigation", "Navigation Tester")]
+[ScenarioCategory ("Mouse and Keyboard")]
 [ScenarioCategory ("Layout")]
-[ScenarioCategory ("Proof of Concept")]
-public class ViewExperiments : Scenario
+public class Navigation : Scenario
 {
     public override void Main ()
     {
@@ -48,6 +45,36 @@ public class ViewExperiments : Scenario
 
         testFrame.Add (button);
 
+        var tiledView1 = CreateTiledView (0, 2, 2);
+        var tiledView2 = CreateTiledView (1, Pos.Right (tiledView1), Pos.Top (tiledView1));
+
+        testFrame.Add (tiledView1);
+        testFrame.Add (tiledView2);
+
+        var tiledView3 = CreateTiledView (1, Pos.Right (tiledView2), Pos.Top (tiledView2));
+        tiledView3.TabStop = TabBehavior.TabGroup;
+        tiledView3.BorderStyle = LineStyle.Double;
+        testFrame.Add (tiledView3);
+
+        var overlappedView1 = CreateOverlappedView (2, Pos.Center () - 5, Pos.Center ());
+        var tiledSubView = CreateTiledView (4, 0, 2);
+        overlappedView1.Add (tiledSubView);
+
+        var overlappedView2 = CreateOverlappedView (3, Pos.Center () + 10, Pos.Center () + 5);
+
+        // BUGBUG: F6 through nested tab groups doesn't work yet.
+#if NESTED_TABGROUPS
+        var overlappedInOverlapped1 = CreateOverlappedView (4, 1, 4);
+        overlappedView2.Add (overlappedInOverlapped1);
+
+        var overlappedInOverlapped2 = CreateOverlappedView (5, 10, 7);
+        overlappedView2.Add (overlappedInOverlapped2);
+
+#endif
+
+        testFrame.Add (overlappedView1);
+        testFrame.Add (overlappedView2);
+
         button = new ()
         {
             X = Pos.AnchorEnd (),
@@ -56,54 +83,10 @@ public class ViewExperiments : Scenario
         };
 
         testFrame.Add (button);
-        Application.MouseEvent += ApplicationOnMouseEvent;
-        Application.Navigation.FocusedChanged += NavigationOnFocusedChanged;
-
 
         Application.Run (app);
         app.Dispose ();
-
         Application.Shutdown ();
-
-        return;
-
-
-        void NavigationOnFocusedChanged (object sender, EventArgs e)
-        {
-            if (!ApplicationNavigation.IsInHierarchy (testFrame, Application.Navigation!.GetFocused ()))
-            {
-                return;
-            }
-
-            editor.ViewToEdit = Application.Navigation!.GetFocused ();
-        }
-        void ApplicationOnMouseEvent (object sender, MouseEvent e)
-        {
-            if (e.Flags != MouseFlags.Button1Clicked)
-            {
-                return;
-            }
-
-            if (!editor.AutoSelectViewToEdit || !testFrame.FrameToScreen ().Contains (e.Position))
-            {
-                return;
-            }
-
-            // TODO: Add a setting (property) so only subviews of a specified view are considered.
-            View view = e.View;
-
-            if (view is { } && e.Flags == MouseFlags.Button1Clicked)
-            {
-                if (view is Adornment adornment)
-                {
-                    editor.ViewToEdit = adornment.Parent;
-                }
-                else
-                {
-                    editor.ViewToEdit = view;
-                }
-            }
-        }
     }
 
     private int _hotkeyCount;
@@ -125,7 +108,7 @@ public class ViewExperiments : Scenario
             Id = $"Tiled{id}",
             BorderStyle = LineStyle.Single,
             CanFocus = true, // Can't drag without this? BUGBUG
-            TabStop = TabBehavior.TabGroup,
+            TabStop = TabBehavior.TabStop,
             Arrangement = ViewArrangement.Fixed
         };
 

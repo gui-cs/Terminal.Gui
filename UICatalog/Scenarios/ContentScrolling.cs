@@ -407,8 +407,35 @@ public class ContentScrolling : Scenario
 
         app.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
 
+        Application.MouseEvent += ApplicationOnMouseEvent;
+
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();
+
+        return;
+
+        void ApplicationOnMouseEvent (object sender, MouseEvent e)
+        {
+            if (!editor.AutoSelectViewToEdit || editor.FrameToScreen ().Contains (e.Position))
+            {
+                return;
+            }
+
+            // TODO: Add a setting (property) so only subviews of a specified view are considered.
+            View view = e.View;
+
+            if (view is { } && e.Flags == MouseFlags.Button1Clicked)
+            {
+                if (view is Adornment adornment)
+                {
+                    editor.ViewToEdit = adornment.Parent;
+                }
+                else
+                {
+                    editor.ViewToEdit = view;
+                }
+            }
+        }
     }
 }

@@ -19,11 +19,13 @@ public class Adornments : Scenario
         var editor = new AdornmentsEditor
         {
             AutoSelectViewToEdit = true,
+
             // This is for giggles, to show that the editor can be moved around.
             Arrangement = ViewArrangement.Movable,
-            X = Pos.AnchorEnd(),
+            X = Pos.AnchorEnd ()
         };
-        editor.Border.Thickness = new Thickness (1, 2, 1, 1);
+
+        editor.Border.Thickness = new (1, 2, 1, 1);
 
         app.Add (editor);
 
@@ -31,7 +33,8 @@ public class Adornments : Scenario
         {
             Title = "The _Window",
             Arrangement = ViewArrangement.Movable,
-           // X = Pos.Center (),
+
+            // X = Pos.Center (),
             Width = Dim.Percent (60),
             Height = Dim.Percent (80)
         };
@@ -127,9 +130,36 @@ public class Adornments : Scenario
 #endif
                               };
 
+        Application.MouseEvent += ApplicationOnMouseEvent;
+
         Application.Run (app);
         app.Dispose ();
 
         Application.Shutdown ();
+
+        return;
+
+        void ApplicationOnMouseEvent (object sender, MouseEvent e)
+        {
+            if (!editor.AutoSelectViewToEdit || editor.FrameToScreen ().Contains (e.Position))
+            {
+                return;
+            }
+
+            // TODO: Add a setting (property) so only subviews of a specified view are considered.
+            View view = e.View;
+
+            if (view is { } && e.Flags == MouseFlags.Button1Clicked)
+            {
+                if (view is Adornment adornment)
+                {
+                    editor.ViewToEdit = adornment.Parent;
+                }
+                else
+                {
+                    editor.ViewToEdit = view;
+                }
+            }
+        }
     }
 }

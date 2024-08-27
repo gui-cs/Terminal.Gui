@@ -35,7 +35,7 @@ dotnet run
 * [API Documentation](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.html)
 * [Documentation Home](https://gui-cs.github.io/Terminal.GuiV2Docs)
 
-The above documentation matches the most recent Nuget release from the `v2_develop` branch. Get the [v1 documentation here]( (This is the v2 API documentation. For v1 go here: https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.html)
+The above documentation matches the most recent Nuget release from the `v2_develop` branch. Get the [v1 documentation here](This is the v2 API documentation. For v1 go here: https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.html)
 
 See the [`Terminal.Gui/` README](https://github.com/gui-cs/Terminal.Gui/tree/master/Terminal.Gui) for an overview of how the library is structured. 
 
